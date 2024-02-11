@@ -30,13 +30,14 @@ export default function Hero6() {
             <div className="col-lg-6">
               <div className="pr50 pr0-xl mb30-md position-relative">
                 <h1 className="animate-up-1 mb15 text-thm2">
-                  With talented <span className="text-thm">freelancers</span>{" "}
+                  Οι καλύτεροι <span className="text-thm">επαγγελματίες</span>{" "}
                   <br className="d-none d-xl-block" />
-                  do more work.
+                  στην οθόνη σου.
                 </h1>
                 <p className="animate-up-2 ff-heading mb30 text">
-                  Millions of people use freeio.com to turn their ideas into
-                  reality.
+                  Βρες αξιόλογους επαγγελματίες για να εκτελέσουν οποιαδήποτε εργασία. 
+
+.
                 </p>
                 <div className="advance-search-tab at-home6 bgc-white bdrs4 p10 position-relative zi2 animate-up-3">
                   <div className="row">
@@ -52,7 +53,7 @@ export default function Hero6() {
                           className="ud-btn btn-thm2 bdrs4 w-100"
                           type="button"
                         >
-                          Search
+                          Αναζήτηση
                         </button>
                       </div>
                     </div>
@@ -60,7 +61,7 @@ export default function Hero6() {
                 </div>
                 <div className="d-block d-md-flex mt30 banner-text animate-up-4">
                   <p className="hero-text fz15 me-2 mb-0 text">
-                    Popular Searches
+                    Δημοφιλή
                   </p>
                   {popular.map((elm,i)=><a key={i} style={{marginRight:'5px'}} >
                           {`${elm}${(i != (popular.length -1)) ? ',':' '}`}
@@ -74,14 +75,14 @@ export default function Hero6() {
                   <span className="icon flaticon-review" />
                   <div className="details">
                     <h6>4.9/5</h6>
-                    <p className="text fz13 mb-0">Clients rate professionals</p>
+                    <p className="text fz13 mb-0">Έμπειροι επαγγελματίες</p>
                   </div>
                 </div>
                 <div className="iconbox-small2 d-none d-md-block wow fadeInLeft default-box-shadow4 bounce-y animate-up-2 animated">
                   <span className="icon flaticon-review" />
                   <div className="details">
-                    <h6>+12M</h6>
-                    <p className="text fz13 mb-0">Project Completed</p>
+                    <h6>500+</h6>
+                    <p className="text fz13 mb-0">Υπηρεσίες</p>
                   </div>
                 </div>
                 <Image
