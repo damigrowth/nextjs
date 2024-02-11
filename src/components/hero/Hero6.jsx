@@ -36,8 +36,6 @@ export default function Hero6() {
                 </h1>
                 <p className="animate-up-2 ff-heading mb30 text">
                   Βρες αξιόλογους επαγγελματίες για να εκτελέσουν οποιαδήποτε εργασία. 
-
-.
                 </p>
                 <div className="advance-search-tab at-home6 bgc-white bdrs4 p10 position-relative zi2 animate-up-3">
                   <div className="row">
