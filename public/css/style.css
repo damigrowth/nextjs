@@ -12563,6 +12563,27 @@ column-gap: 20px;
   /* margin:15px!important; */
   }
  }
+
+.header.nav-homepage-style.btn-mega, .header.nav-homepage-style.login-info, .header.nav-homepage-style.sidemenu-btn {
+    color: #000 !important;
+}
+
+#mega-menu > a  {
+    color: #000 !important;
+}
+
+.header.nav-homepage-style.ace-responsive-menu.megamenu_style a.list-item, .header.nav-homepage-style.ace-responsive-menu.visible_list a.list-item {
+    color: #000;
+}
+
+.header.nav-homepage-style .ace-responsive-menu a {
+    color: #000;
+}
+
+header.nav-homepage-style .ace-responsive-menu a {
+    color: #000;
+}
+
 .mobile-dasboard-menu-active{
   background-color: #222 !important;
   color: #fff !important;
