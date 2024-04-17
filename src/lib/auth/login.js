@@ -50,6 +50,8 @@ export async function login(prevState, formData) {
       return { ...prevState, message: data.error.message, errors: null };
     if (response.ok && data.jwt) {
       cookies().set("jwt", data.jwt);
+      redirect("/dashboard");
+
     }
   } catch (error) {
     console.error("Login error:", error);
