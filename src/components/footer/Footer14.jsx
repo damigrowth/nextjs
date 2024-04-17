@@ -1,4 +1,5 @@
 "use client";
+
 import { about, category, support } from "@/data/footer";
 import Link from "next/link";
 import Image from "next/image";
@@ -15,7 +16,9 @@ export default function Footer14() {
               <div className="footer-widget mb-4 mb-lg-5">
                 <div className="mailchimp-widget mb90">
                   <h6 className="title text-white mb20">Subscribe</h6>
-                  <div className="mailchimp-style1 at-home9 bdrs60 overflow-hidden">
+                  {/* HYDRATION ERROR */}
+                  {/* <div className="mailchimp-style1 at-home9 bdrs60 overflow-hidden">
+                  
                     <input
                       type="email"
                       className="form-control"
@@ -24,15 +27,15 @@ export default function Footer14() {
                     <button className="text-white" type="submit">
                       Send
                     </button>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="row justify-content-between">
                   <div className="col-auto">
                     <div className="link-style1 mb-3">
                       <h6 className="text-white mb25">About</h6>
                       <div className="link-list">
-                        {about.map((item,i) => (
-                          <Link key={ i } href={item.path}>
+                        {about.map((item, i) => (
+                          <Link key={i} href={item.path}>
                             {item.name}
                           </Link>
                         ))}
@@ -43,8 +46,8 @@ export default function Footer14() {
                     <div className="link-style1 mb-3">
                       <h6 className="text-white mb25">Categories</h6>
                       <ul className="ps-0">
-                        {category.map((item,i) => (
-                          <li key={ i }>
+                        {category.map((item, i) => (
+                          <li key={i}>
                             <Link href={item.path}>{item.name}</Link>
                           </li>
                         ))}
@@ -55,8 +58,8 @@ export default function Footer14() {
                     <div className="link-style1 mb-3">
                       <h6 className="text-white mb25">Support</h6>
                       <ul className="ps-0">
-                        {support.map((item,i) => (
-                          <li key={ i }>
+                        {support.map((item, i) => (
+                          <li key={i}>
                             <Link href={item.path}>{item.name}</Link>
                           </li>
                         ))}
