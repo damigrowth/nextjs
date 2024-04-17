@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import { useState } from "react";
 
@@ -21,7 +22,7 @@ export default function ServiceGallery() {
     };
 
     const uniqueNewFiles = newFiles.filter(
-      (file) => !isFileDuplicate(file, uploadedFiles),
+      (file) => !isFileDuplicate(file, uploadedFiles)
     );
 
     setUploadedFiles((prevFiles) => [...prevFiles, ...uniqueNewFiles]);
@@ -30,14 +31,14 @@ export default function ServiceGallery() {
   // delete handler
   const handleFileDelete = (fileName) => {
     setUploadedFiles((prevFiles) =>
-      prevFiles.filter((file) => file.name !== fileName),
+      prevFiles.filter((file) => file.name !== fileName)
     );
   };
   return (
     <>
       <div className="ps-widget bgc-white bdrs12 p30 mb30 overflow-hidden position-relative">
         <div className="bdrb1 pb15 mb30">
-          <h5 className="list-title">Gallery</h5>
+          <h5 className="list-title">Φωτογραφίες - Βίντεο</h5>
         </div>
         <div className="col-xl-9">
           <div className="d-flex mb30 flex-wrap gap-3">
@@ -95,10 +96,6 @@ export default function ServiceGallery() {
             Max file size is 1MB, Minimum dimension: 330x300 And Suitable files
             are .jpg &amp; .png
           </p>
-          <a className="ud-btn btn-thm mt-2">
-            Save
-            <i className="fal fa-arrow-right-long" />
-          </a>
         </div>
       </div>
     </>
