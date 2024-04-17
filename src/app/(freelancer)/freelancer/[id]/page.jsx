@@ -12,7 +12,6 @@ export const metadata = {
 export default function page() {
   return (
     <>
-    
       <TabSection1 />
       <Breadcumb10 path={["Home", "Services", "Design & Creative"]} />
 
