@@ -56,7 +56,7 @@ export const header3 = [
 ];
 export const header4 = ["/home-3"];
 export const header5 = ["/home-4"];
-export const header6 = ["/home-5"];
+export const header = ["/home-5"];
 export const header7 = ["/home-6"];
 export const header8 = ["/home-7"];
 export const header9 = ["/home-8"];
