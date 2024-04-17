@@ -1,42 +1,21 @@
 "use client";
+
 import { useState } from "react";
 
-const extraService = [
-  {
-    id: 1,
-    title: "100 Words (+2 days)",
-    brief: "I will professionally translate english to german",
-    price: 25,
-    value: "silver",
-  },
-  {
-    id: 2,
-    title: "100 Words (+2 days)",
-    brief: "I will professionally translate english to german",
-    price: 45,
-    value: "gold",
-  },
-  {
-    id: 3,
-    title: "100 Words (+2 days)",
-    brief: "I will professionally translate english to german",
-    price: 75,
-    value: "platinum",
-  },
-];
+export default function ServiceDetailExtra1({ addons }) {
+  // console.log("addons====>", addons);
 
-export default function ServiceDetailExtra1() {
   const [getSelect, setSelect] = useState([]);
 
   // handler
-  const serviceSelectHandler = (value) => {
-    const isExist = getSelect.includes(value);
+  const serviceSelectHandler = (price) => {
+    const isExist = getSelect.includes(price);
 
     if (!isExist) {
-      return setSelect((old) => [...old, value]);
+      return setSelect((old) => [...old, price]);
     }
 
-    const deleted = getSelect.filter((item) => item !== value);
+    const deleted = getSelect.filter((item) => item !== price);
     setSelect(deleted);
   };
 
@@ -45,24 +24,24 @@ export default function ServiceDetailExtra1() {
       <div className="extra-service-tab mb40 mt30">
         <nav>
           <div className="nav flex-column nav-tabs">
-            {extraService.map((item,i) => (
+            {addons.map((addon, i) => (
               <button
-                key={ i }
+                key={i}
                 className={`nav-link ${
-                  getSelect?.includes(item.value) ? "active" : ""
+                  getSelect?.includes(addon.price) ? "active" : ""
                 }`}
               >
                 <label className="custom_checkbox fw500 text-start">
-                  {item.title}
-                  <span className="text text-bottom">{item.brief}</span>
+                  {addon.title}
+                  <span className="text text-bottom">{addon.description}</span>
                   <input
                     type="checkbox"
-                    checked={getSelect?.includes(item.value)}
-                    onChange={() => serviceSelectHandler(item.value)}
+                    checked={getSelect?.includes(addon.price)}
+                    onChange={() => serviceSelectHandler(addon.price)}
                   />
                   <span className="checkmark" />
                 </label>
-                <span className="price">${item.price}</span>
+                <span className="price">${addon.price}</span>
               </button>
             ))}
           </div>
