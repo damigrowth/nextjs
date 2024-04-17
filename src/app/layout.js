@@ -1,49 +1,19 @@
-"use client";
-import Header1 from "@/components/header/Header1";
-import { DM_Sans } from "next/font/google";
+// "use client";
+
 import "./globals.css";
-import Footer from "@/components/footer/Footer";
-import { useEffect } from "react";
-import BottomToTop from "@/components/button/BottomToTop";
-import SearchModal1 from "@/components/modal/SearchModal1";
-import { usePathname } from "next/navigation";
-import Header2 from "@/components/header/Header2";
-import Header3 from "@/components/header/Header3";
-import {
-  header1,
-  header10,
-  header11,
-  header2,
-  header3,
-  header4,
-  header5,
-  header6,
-  header7,
-  header8,
-  header9,
-  sidebarEnable,
-} from "@/data/header";
-import Header4 from "@/components/header/Header4";
-import Header5 from "@/components/header/Header5";
-import Footer2 from "@/components/footer/Footer2";
-import Header6 from "@/components/header/Header6";
-import Footer3 from "@/components/footer/Footer3";
-import Header7 from "@/components/header/Header7";
-import Header8 from "@/components/header/Header8";
-import Header9 from "@/components/header/Header9";
-import Footer4 from "@/components/footer/Footer4";
-import Header10 from "@/components/header/Header10";
-import Footer5 from "@/components/footer/Footer5";
-import Header11 from "@/components/header/Header11";
-import toggleStore from "@/store/toggleStore";
-import { footer } from "@/data/footer";
 import "react-tooltip/dist/react-tooltip.css";
-import NavSidebar from "@/components/sidebar/NavSidebar";
-import Footer12 from "@/components/footer/Footer12";
+
+import BottomToTop from "@/components/button/BottomToTop";
+import { DM_Sans } from "next/font/google";
 import Footer14 from "@/components/footer/Footer14";
-import Footer15 from "@/components/footer/Footer15";
-import Footer18 from "@/components/footer/Footer18";
-import Footer20 from "@/components/footer/Footer20";
+import Header from "@/components/header/Header";
+import NavSidebar from "@/components/sidebar/NavSidebar";
+import SearchModal1 from "@/components/modal/SearchModal1";
+import { footer } from "@/data/footer";
+import { headers } from "next/headers";
+import { sidebarEnable } from "@/data/header";
+import toggleStore from "@/store/toggleStore";
+import { usePathname } from "next/navigation";
 
 if (typeof window !== "undefined") {
   import("bootstrap");
@@ -56,17 +26,20 @@ const dmSans = DM_Sans({
 });
 
 export default function RootLayout({ children }) {
-  const isListingActive = toggleStore((state) => state.isListingActive);
-  const path = usePathname();
+  // const isListingActive = toggleStore((state) => state.isListingActive);
+  // const path = usePathname();
+
+  const headersList = headers();
+  const path = headersList.get("x-invoke-path") || "";
 
   // wow js
-  useEffect(() => {
-    const { WOW } = require("wowjs");
-    const wow = new WOW({
-      live: false,
-    });
-    wow.init();
-  }, [path]);
+  // useEffect(() => {
+  //   const { WOW } = require("wowjs");
+  //   const wow = new WOW({
+  //     live: false,
+  //   });
+  //   wow.init();
+  // }, [path]);
 
   return (
     <html lang="en">
@@ -83,7 +56,7 @@ export default function RootLayout({ children }) {
       >
         {!footer.includes(path) ? (
           <div className="wrapper ovh mm-page mm-slideout">
-            {header1.find(
+            {/* {header1.find(
               (elm) => elm?.split("/")[1] == path?.split("/")[1]
             ) && <Header1 />}
             {header2.find(
@@ -115,14 +88,16 @@ export default function RootLayout({ children }) {
             ) && <Header10 />}
             {header11.find(
               (elm) => elm?.split("/")[1] == path?.split("/")[1]
-            ) && <Header11 />}
+            ) && <Header11 />} */}
+
+            <Header />
 
             <SearchModal1 />
 
             <div className="body_content">
               {children}
               {/* footer */}
-              {path === "/home-4" ||
+              {/* {path === "/home-4" ||
               path === "/home-7" ||
               path === "/home-13" ? (
                 <Footer2 />
@@ -144,7 +119,8 @@ export default function RootLayout({ children }) {
                 <Footer20 />
               ) : (
                 path !== "/service-7" && path !== "/invoices" && <Footer />
-              )}
+              )} */}
+              <Footer14 />
 
               {/* bottom to top */}
               <BottomToTop />
