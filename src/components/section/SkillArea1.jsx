@@ -1,7 +1,9 @@
 "use client";
+
+import { useMemo, useState } from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
 
 const tabs = [
   "Top skills",
@@ -182,12 +184,7 @@ export default function SkillArea1() {
 
   return (
     <>
-      <section
-        className={`pb90 pb30-md 
-                ${path === "/home-9" ? "pb30-md" : "pt-0"}
-                ${path === "/home-14" ? "pt110" : "pt-0"}
-                `}
-      >
+      <section className="pb90 pb30-md pt110">
         <div className="container">
           <div className="row align-items-md-center">
             <div className="col-lg-12">
