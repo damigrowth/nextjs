@@ -1,4 +1,7 @@
+import AuthRoleOptions from "@/components/forms/AuthRoleOptions";
 import Link from "next/link";
+import RegisterForm from "@/components/forms/RegisterForm";
+import RegisterHeading from "@/components/forms/RegisterHeading";
 
 export default function page() {
   return (
@@ -11,10 +14,9 @@ export default function page() {
               data-wow-delay="300ms"
             >
               <div className="main-title text-center">
-                <h2 className="title">Register</h2>
+                <h2 className="title">Εγγραφή</h2>
                 <p className="paragraph">
-                  Give your visitor a smooth online experience with a solid UX
-                  design
+                  Δημιουργήστε τον λογαριασμό σας μόνο με λίγα βήματα
                 </p>
               </div>
             </div>
@@ -23,81 +25,16 @@ export default function page() {
             <div className="col-xl-6 mx-auto">
               <div className="log-reg-form search-modal form-style1 bgc-white p50 p30-sm default-box-shadow1 bdrs12">
                 <div className="mb30">
-                  <h4>Let's create your account!</h4>
+                  <RegisterHeading />
                   <p className="text mt20">
-                    Already have an account?{" "}
+                    Έχετε ήδη λογαριασμό?{" "}
                     <Link href="/login" className="text-thm">
-                      Log In!
+                      Συνδεθείτε!
                     </Link>
                   </p>
                 </div>
-                <div className="mb25">
-                  <label className="form-label fw500 dark-color">
-                    Display Name
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="ali"
-                  />
-                </div>
-                <div className="mb25">
-                  <label className="form-label fw500 dark-color">
-                    Username
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="alitf"
-                  />
-                </div>
-                <div className="mb25">
-                  <label className="form-label fw500 dark-color">Email</label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    placeholder="alitfn58@gmail.com"
-                  />
-                </div>
-                <div className="mb15">
-                  <label className="form-label fw500 dark-color">
-                    Password
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="*******"
-                  />
-                </div>
-                <div className="d-grid mb20">
-                  <button
-                    className="ud-btn btn-thm default-box-shadow2"
-                    type="button"
-                  >
-                    Creat Account <i className="fal fa-arrow-right-long" />
-                  </button>
-                </div>
-                <div className="hr_content mb20">
-                  <hr />
-                  <span className="hr_top_text">OR</span>
-                </div>
-                <div className="d-md-flex justify-content-between">
-                  <button
-                    className="ud-btn btn-fb fz14 fw400 mb-2 mb-md-0"
-                    type="button"
-                  >
-                    <i className="fab fa-facebook-f pr10" /> Continue Facebook
-                  </button>
-                  <button
-                    className="ud-btn btn-google fz14 fw400 mb-2 mb-md-0"
-                    type="button"
-                  >
-                    <i className="fab fa-google" /> Continue Google
-                  </button>
-                  <button className="ud-btn btn-apple fz14 fw400" type="button">
-                    <i className="fab fa-apple" /> Continue Apple
-                  </button>
-                </div>
+                <AuthRoleOptions />
+                <RegisterForm />
               </div>
             </div>
           </div>
