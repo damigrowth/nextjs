@@ -1,10 +1,12 @@
+import AddServiceForm from "@/components/forms/AddServiceForm";
 import DashboardNavigation from "../header/DashboardNavigation";
-import BasicInformation from "./BasicInformation";
-import ExtraService from "./ExtraService";
-import ServiceGallery from "./ServiceGallery";
-import ServicePackage from "./ServicePackage";
+import { fetchServiceForm } from "@/lib/service/data";
+import TestingForm from "@/components/forms/TestingForm";
 
-export default function AddServiceInfo() {
+export default async function AddServiceInfo() {
+  const { categories, skills, cities } = await fetchServiceForm();
+
+  // console.log(categories, skills, cities);
   return (
     <>
       <div className="dashboard__content hover-bgc-color">
@@ -12,27 +14,12 @@ export default function AddServiceInfo() {
           <div className="col-lg-12">
             <DashboardNavigation />
           </div>
-          <div className="col-lg-9">
-            <div className="dashboard_title_area">
-              <h2>Add Services</h2>
-              <p className="text">Lorem ipsum dolor sit amet, consectetur.</p>
-            </div>
-          </div>
-          <div className="col-lg-3">
-            <div className="text-lg-end">
-              <a className="ud-btn btn-dark">
-                Save &amp; Publish
-                <i className="fal fa-arrow-right-long" />
-              </a>
-            </div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-xl-12">
-            <BasicInformation />
-            <ServicePackage />
-            <ExtraService />
-            <ServiceGallery />
+          <div className="col-lg-12">
+            <AddServiceForm
+              categories={categories}
+              skills={skills}
+              cities={cities}
+            />
           </div>
         </div>
       </div>
