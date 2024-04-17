@@ -1,10 +1,14 @@
-import Link from "next/link";
-import Navigation from "./Navigation";
+import Avatar from "../avatars/Avatar";
 import Image from "next/image";
+import Link from "next/link";
 import Mega from "./Mega";
 import MobileNavigation5 from "./MobileNavigation5";
+import Navigation from "./Navigation";
+import Protected from "../auth/Protected";
+import Public from "../auth/Public";
+import { isAuthenticated } from "@/lib/auth/authenticated";
 
-export default function Header6() {
+export default async function Header() {
   return (
     <>
       <header className="header-nav nav-innerpage-style bg-transparent zi9 position-relative main-menu border-0  ">
@@ -45,15 +49,20 @@ export default function Header6() {
                     <span className="d-none d-xl-inline-block">Become a</span>{" "}
                     Seller
                   </Link>
-                  <Link className="login-info mr10-lg mr30" href="/login">
-                    Sign in
-                  </Link>
-                  <Link
-                    className="ud-btn btn-thm2 add-joining"
-                    href="/register"
-                  >
-                    Join
-                  </Link>
+                  <Public>
+                    <Link className="login-info mr10-lg mr30" href="/login">
+                      Sign in
+                    </Link>
+                    <Link
+                      className="ud-btn btn-thm2 add-joining"
+                      href="/register"
+                    >
+                      Join
+                    </Link>
+                  </Public>
+                  <Protected>
+                    <Avatar firstName="John" lastName="Doe" avatar="" />
+                  </Protected>
                 </div>
               </div>
             </div>
