@@ -15,6 +15,8 @@ export default function FreelancerDetail1() {
   const { id } = useParams();
 
   const data = freelancer1.find((item) => item.id == id);
+
+  //TODO http://localhost:3000/freelancer/akielgraf CREATE THE FIELDSI IN BACKEND
   return (
     <>
       <StickyContainer>
@@ -228,8 +230,8 @@ export default function FreelancerDetail1() {
                   <hr className="opacity-100 mb60" />
                   <h4 className="mb30">Featured Services</h4>
                   <div className="row mb35">
-                    {product1.slice(0, 3).map((item,i) => (
-                      <div className="col-sm-6 col-xl-4" key={ i }>
+                    {product1.slice(0, 3).map((item, i) => (
+                      <div className="col-sm-6 col-xl-4" key={i}>
                         <FreelancerFutureCard1 data={item} />
                       </div>
                     ))}
