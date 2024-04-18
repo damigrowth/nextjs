@@ -22,7 +22,15 @@ import { useParams } from "next/navigation";
 export default async function ServiceDetail3({ service }) {
   // const isMatchedScreen = useScreen(1216);
 
-  console.log("Service====>", service.description);
+  // console.log("Service====>", service.description);
+
+  if (!service) {
+    return (
+      <div>
+        <p>Παρακαλώ περιμένετε...</p>
+      </div>
+    );
+  }
 
   return (
     <>
