@@ -16,7 +16,7 @@ const LoginForm = () => {
   const initialState = {};
   const [formState, formAction] = useFormState(login, initialState);
 
-  console.log(formState);
+  // console.log(formState);
 
   return (
     <form action={formAction}>

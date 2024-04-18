@@ -9,6 +9,29 @@ const formSchema = z.object({
   password: z.string().min(6).max(100),
 });
 
+const postLoginDetails = async (url, identifier, password) => {
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        identifier,
+        password,
+      }),
+      cache: "no-cache",
+    });
+
+    const data = await response.json();
+
+    return { response, data };
+  } catch (error) {
+    console.error("Login error:", error);
+    return { error: "Server error. Please try again later." };
+  }
+};
+
 export async function login(prevState, formData) {
   const STRAPI_URL = process.env.STRAPI_API_URL;
   const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
@@ -31,31 +54,13 @@ export async function login(prevState, formData) {
 
   const { identifier, password } = validatedFields.data;
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        identifier,
-        password,
-      }),
-      cache: "no-cache",
-    });
+  const { response, data } = await postLoginDetails(url, identifier, password);
 
-    const data = await response.json();
+  if (!response.ok && data.error)
+    return { ...prevState, message: data.error.message, errors: null };
+  if (response.ok && data.jwt) {
+    cookies().set("jwt", data.jwt);
 
-    if (!response.ok && data.error)
-      return { ...prevState, message: data.error.message, errors: null };
-    if (response.ok && data.jwt) {
-      cookies().set("jwt", data.jwt);
-      redirect("/dashboard");
-
-    }
-  } catch (error) {
-    console.error("Login error:", error);
-    return { error: "Server error. Please try again later." };
+    redirect("/dashboard");
   }
-  redirect("/");
 }
