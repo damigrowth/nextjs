@@ -1,13 +1,34 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { login } from "@/lib/auth/login";
-import { useFormState } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 
-function LoginButton() {
+function LoginButton({ setLoading }) {
+  const { pending } = useFormStatus();
+
+  useEffect(() => {
+    if (pending) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [pending]);
+
   return (
-    <button type="submit" className="ud-btn btn-thm default-box-shadow2">
-      Σύνδεση <i className="fal fa-arrow-right-long" />
+    <button
+      disabled={pending}
+      type="submit"
+      className="ud-btn btn-thm default-box-shadow2"
+    >
+      Σύνδεση
+      {pending ? (
+        <div class="spinner-border spinner-border-sm ml10" role="status">
+          <span class="sr-only"></span>
+        </div>
+      ) : (
+        <i className="fal fa-arrow-right-long" />
+      )}
     </button>
   );
 }
@@ -15,6 +36,8 @@ function LoginButton() {
 const LoginForm = () => {
   const initialState = {};
   const [formState, formAction] = useFormState(login, initialState);
+
+  const [loading, setLoading] = useState(false);
 
   // console.log(formState);
 
@@ -30,6 +53,7 @@ const LoginForm = () => {
           name="identifier"
           id="identifier"
           placeholder="Το email σου"
+          disabled={loading}
         />
       </div>
       <div className="mb15">
@@ -43,21 +67,22 @@ const LoginForm = () => {
           type="password"
           placeholder="Ο κωδικός σου"
           minLength={6}
+          disabled={loading}
         />
       </div>
       <div className="checkbox-style1 d-block d-sm-flex align-items-center justify-content-between mb20">
-        <label className="custom_checkbox fz14 ff-heading">
+        {/* <label className="custom_checkbox fz14 ff-heading">
           Θύμησε μου
           <input type="checkbox" defaultChecked="checked" />
           <span className="checkmark" />
-        </label>
+        </label> */}
         <a className="fz14 ff-heading">Ξέχασες τον κωδικό σου?</a>
       </div>
       {formState?.message && (
         <div className="mb20 text-danger">{formState?.message}</div>
       )}
       <div className="d-grid mb20">
-        <LoginButton />
+        <LoginButton setLoading={setLoading} />
       </div>
       <div className="hr_content mb20">
         <hr />
