@@ -1,7 +1,6 @@
 import AddServiceForm from "@/components/forms/AddServiceForm";
 import DashboardNavigation from "../header/DashboardNavigation";
 import { fetchServiceForm } from "@/lib/service/data";
-import TestingForm from "@/components/forms/TestingForm";
 
 export default async function AddServiceInfo() {
   const { categories, skills, cities } = await fetchServiceForm();

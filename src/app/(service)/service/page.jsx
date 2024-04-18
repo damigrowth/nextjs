@@ -1,6 +1,5 @@
 import Breadcumb3 from "@/components/breadcumb/Breadcumb3";
 import PopulerService from "@/components/section/PopulerService";
-import ServiceDetail2 from "@/components/section/ServiceDetails2";
 import ServiceDetail3 from "@/components/section/ServiceDetails3";
 
 import TabSection1 from "@/components/section/TabSection1";

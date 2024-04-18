@@ -1,29 +1,12 @@
 // import { Sticky, StickyContainer } from "react-sticky";
 
-import Avatar from "../avatars/Avatar";
-import { BlocksRenderer } from "@strapi/blocks-react-renderer";
-import Image from "next/image";
-import JsonViewer from "../json/JsonViewer";
-import ServiceContactWidget1 from "../element/ServiceContactWidget1";
 import ServiceDetailComment1 from "../element/ServiceDetailComment1";
 import ServiceDetailExtra1 from "../element/ServiceDetailExtra1";
 import ServiceDetailFaq1 from "../element/ServiceDetailFaq1";
-import ServiceDetailPrice1 from "../element/ServiceDetailPrice1";
 import ServiceDetailReviewInfo1 from "../element/ServiceDetailReviewInfo1";
-import ServiceDetailSlider1 from "../element/ServiceDetailSlider1";
 import ServiceDetailSlider2 from "../element/ServiceDetailSlider2";
-import { getService } from "@/lib/service";
-import { useParams } from "next/navigation";
-
-// import { product1 } from "@/data/product";
-// import { useParams } from "next/navigation";
-// import useScreen from "@/hook/useScreen";
 
 export default async function ServiceDetail3({ service }) {
-  // const isMatchedScreen = useScreen(1216);
-
-  // console.log("Service====>", service.description);
-
   if (!service) {
     return (
       <div>

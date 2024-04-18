@@ -1,9 +1,7 @@
 "use server";
 
-import { serviceFormSchema } from "@/schemas/service";
 import { postData } from "../api";
-import { getUser, getUserId } from "../user/user";
-import { getFreelancer, getFreelancerId } from "../freelancer/freelancer";
+import { getFreelancerId } from "../freelancer/freelancer";
 
 // Create service
 export async function createService(prevState, formData) {

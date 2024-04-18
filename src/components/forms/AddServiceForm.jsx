@@ -1,22 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useFormState, useFormStatus } from "react-dom";
 
-import BasicInformation from "../dashboard/section/BasicInformation";
-import ExtraService from "../dashboard/section/ExtraService";
-import Input from "../inputs/Input";
-import SelectInput from "../dashboard/option/SelectInput";
-import SelectInputMultiple from "../dashboard/option/SelectInputMultiple";
 import ServiceGallery from "../dashboard/section/ServiceGallery";
-import TextArea from "../inputs/TextArea";
 import { createService } from "@/lib/service/create";
-import { useForm } from "react-hook-form";
 import ServicePackages from "../dashboard/section/ServicePackages";
 import ServiceAddons from "../dashboard/section/ServiceAddons";
 import ServiceFaq from "../dashboard/section/ServiceFaq/ServiceFaq";
 import ServiceInformation from "../dashboard/section/ServiceInformation/ServiceInformation";
-import useInfoStore from "@/store/service/infoStore";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 
 function AddServiceButton() {
