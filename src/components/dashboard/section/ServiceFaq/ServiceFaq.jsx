@@ -3,7 +3,7 @@ import NewFaqInputs from "./NewFaqInputs";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 
 export default function ServiceFaq() {
-  const { saveFaq, showNewFaqInputs, handleShowNewFaqInputs } =
+  const { faq, saveFaq, showNewFaqInputs, handleShowNewFaqInputs } =
     useCreateServiceStore();
 
   return (
@@ -23,9 +23,11 @@ export default function ServiceFaq() {
         {showNewFaqInputs && <NewFaqInputs />}
         <FaqList />
       </div>
+
       <button
         type="button"
         className="ud-btn btn-thm mt20 no-rotate"
+        disabled={faq.length === 0}
         onClick={saveFaq}
       >
         Αποθήκευση

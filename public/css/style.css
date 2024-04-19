@@ -7197,8 +7197,6 @@ textarea {
   font-size: 20px;
 }
 
-
-
 .ud-btn i {
   margin-left: 10px;
   font-size: 16px;
@@ -12965,7 +12963,7 @@ header.nav-homepage-style .sidemenu-btn {
 }
 
 .table-editing-bg {
-  background-color: #f6f8fa!important;
+  background-color: #f6f8fa !important;
 }
 
 .fit {
@@ -12974,7 +12972,6 @@ header.nav-homepage-style .sidemenu-btn {
 
 .bold {
   font-weight: 500;
-  
 }
 
 .service-package-badge {
@@ -12987,6 +12984,31 @@ header.nav-homepage-style .sidemenu-btn {
   border-bottom-right-radius: 8px;
 }
 
-.no-rotate i{
+.no-rotate i {
   transform: rotate(0deg);
+}
+
+.btn-dark-disabled {
+  opacity: 0.5;
+}
+
+.btn-dark-disabled::before {
+  all: unset;
+}
+
+.btn-dark-disabled:hover {
+  background-color: var(--headings-color);
+  border: 1px solid var(--headings-color);
+  color: #ffffff;
+}
+
+.dropzone {
+  text-align: center;
+  padding: 40px 20px;
+  border: 3px dashed #1f4b3f;
+  background-color: #e0f1e0;
+  color: #bebdbd;
+  border-radius: 8px;
+  margin-top: 20px;
+  margin-bottom: 40px;
 }

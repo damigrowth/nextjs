@@ -10,6 +10,13 @@ const tiers = ["basic", "standard", "premium"];
 const useSaveServiceStore = (set) => ({
   errors: initialErrorsState,
   service: {},
+  saved: {
+    info: false,
+    packages: false,
+    addons: false,
+    faq: false,
+    gallery: false,
+  },
   saveInfo: () =>
     set((state) => {
       const { title, description, category, skills, price, time } = state.info;
@@ -119,6 +126,10 @@ const useSaveServiceStore = (set) => ({
         service: {
           ...state.service,
           ...state.info,
+        },
+        saved: {
+          ...state.saved,
+          info: true,
         },
       };
     }),
@@ -289,6 +300,10 @@ const useSaveServiceStore = (set) => ({
             features: packages[tier].features,
           })),
         },
+        saved: {
+          ...state.saved,
+          packages: true,
+        },
       };
     }),
   saveAddons: () =>
@@ -298,6 +313,10 @@ const useSaveServiceStore = (set) => ({
         ...state.service,
         addons: state.addons,
       },
+      saved: {
+        ...state.saved,
+        addons: true,
+      },
     })),
   saveFaq: () =>
     set((state) => ({
@@ -305,6 +324,22 @@ const useSaveServiceStore = (set) => ({
       service: {
         ...state.service,
         faq: state.faq,
+      },
+      saved: {
+        ...state.saved,
+        faq: true,
+      },
+    })),
+  saveGallery: () =>
+    set((state) => ({
+      ...state,
+      service: {
+        ...state.service,
+        gallery: state.uploadedFiles,
+      },
+      saved: {
+        ...state.saved,
+        gallery: true,
       },
     })),
 });

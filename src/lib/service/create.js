@@ -2,6 +2,7 @@
 
 import { postData } from "../api";
 import { getFreelancerId } from "../freelancer/freelancer";
+import { uploadMedia } from "../uploads/upload";
 
 // Create service
 export async function createService(prevState, formData) {
@@ -33,9 +34,15 @@ export async function createService(prevState, formData) {
       return parsedField;
     };
 
-    // const serviceData = formData.get('service')
-
+    const images = formData.get("uploaded-media");
     const service = parseField("service", "JSON");
+
+    const media = service.gallery;
+
+    // const uploadedMediaUrls = await uploadMedia(media);
+
+    console.log("media", images);
+    // console.log("uploadedMediaUrls", uploadedMediaUrls);
 
     const freelancerId = await getFreelancerId();
 
@@ -72,13 +79,14 @@ export async function createService(prevState, formData) {
 
     // Destructure validated fields
     // const { title } = validatedFields.data;
-    const res = await postData("services", {
-      ...service,
-      freelancer: freelancerId,
-      status: 2,
-    });
 
-    console.log("FORMDATA=>", res);
+    // const res = await postData("services", {
+    //   ...service,
+    //   freelancer: freelancerId,
+    //   status: 2,
+    // });
+
+    // console.log("FORMDATA=>", res);
   } catch (error) {
     console.error(error);
     return { error: "Server error. Please try again later." };

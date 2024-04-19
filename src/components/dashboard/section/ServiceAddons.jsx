@@ -4,7 +4,7 @@ import AddonsList from "./ServiceAddons/AddonsList";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 
 export default function ServiceAddons() {
-  const { saveAddons, showNewAddonInputs, handleShowNewAddonInputs } =
+  const { addons, saveAddons, showNewAddonInputs, handleShowNewAddonInputs } =
     useCreateServiceStore();
 
   return (
@@ -27,6 +27,7 @@ export default function ServiceAddons() {
       <button
         type="button"
         className="ud-btn btn-thm mt20 no-rotate"
+        disabled={addons.length === 0}
         onClick={saveAddons}
       >
         Αποθήκευση

@@ -1,7 +1,10 @@
 "use client";
 
+import { uploadMedia } from "@/lib/uploads/upload";
+import useCreateServiceStore from "@/store/service/createServiceStore";
 import Image from "next/image";
 import { useState } from "react";
+import Dropzone from "react-dropzone";
 
 const imgs = [
   "/images/gallery/g-1.jpg",
@@ -11,29 +14,31 @@ const imgs = [
 ];
 
 export default function ServiceGallery() {
-  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const {
+    service,
+    media,
+    setMedia,
+    setMediaUrls,
+    deleteMedia,
+    gallery,
+    setGallery,
+    saveGallery,
+  } = useCreateServiceStore();
 
-  // upload handler
-  const handleFileUpload = (event) => {
-    const newFiles = Array.from(event.target.files);
-
-    const isFileDuplicate = (file, fileList) => {
-      return fileList.some((existingFile) => existingFile.name === file.name);
-    };
-
-    const uniqueNewFiles = newFiles.filter(
-      (file) => !isFileDuplicate(file, uploadedFiles)
-    );
-
-    setUploadedFiles((prevFiles) => [...prevFiles, ...uniqueNewFiles]);
+  const handleDropMedia = (files) => {
+    setMedia(files);
   };
 
-  // delete handler
-  const handleFileDelete = (fileName) => {
-    setUploadedFiles((prevFiles) =>
-      prevFiles.filter((file) => file.name !== fileName)
-    );
+  const handleMediaUpload = async () => {
+    const mediaUrls = await uploadMedia(media);
+
+    setGallery(mediaUrls);
   };
+
+  console.log(gallery);
+
+  // TODO Watch this for loading state: https://www.youtube.com/watch?v=hVTacwwtxP8
+
   return (
     <>
       <div className="ps-widget bgc-white bdrs12 p30 mb30 overflow-hidden position-relative">
@@ -41,8 +46,31 @@ export default function ServiceGallery() {
           <h5 className="list-title">Φωτογραφίες - Βίντεο</h5>
         </div>
         <div className="col-xl-9">
+          <Dropzone
+            className="dropzone"
+            value={media}
+            onDrop={handleDropMedia}
+            onChange={(e) => setMedia(e.target.value)}
+          >
+            {({ getRootProps, getInputProps }) => (
+              <div>
+                <div {...getRootProps({ className: "dropzone" })}>
+                  <span className="fz30">🎞️</span>
+                  <p className="text mt20">
+                    Drag 'n' drop your media here, or click to select the media
+                  </p>
+                  <p>
+                    Max file size is 1MB, Minimum dimension: 330x300 And
+                    Suitable files are .jpg &amp; .png
+                  </p>
+                </div>
+              </div>
+            )}
+          </Dropzone>
+        </div>
+        <div className="col-xl-9">
           <div className="d-flex mb30 flex-wrap gap-3">
-            {uploadedFiles.map((item, i) => (
+            {media.map((item, i) => (
               <div
                 key={i}
                 className="gallery-item bdrs4 overflow-hidden position-relative"
@@ -57,46 +85,26 @@ export default function ServiceGallery() {
                 />
                 <div className="del-edit">
                   <div className="d-flex justify-content-center">
-                    <a className="icon me-2">
+                    {/* <a className="icon me-2">
                       <span className="flaticon-pencil" />
-                    </a>
-                    <a
-                      className="icon"
-                      onClick={() => handleFileDelete(item.name)}
-                    >
+                    </a> */}
+                    <a className="icon" onClick={() => mediaDelete(item.name)}>
                       <span className="flaticon-delete" />
                     </a>
                   </div>
                 </div>
               </div>
             ))}
-
-            <div className="gallery-item bdrs4 overflow-hidden">
-              <label>
-                <a>
-                  <Image
-                    height={119}
-                    width={136}
-                    className="w-100 h-auto"
-                    src="/images/gallery/g-1.png"
-                    alt="gallery"
-                  />
-                  <input
-                    type="file"
-                    accept=".png, .jpg, .jpeg"
-                    className="d-none"
-                    onChange={handleFileUpload}
-                    multiple
-                  />
-                </a>
-              </label>
-            </div>
           </div>
-          <p className="text">
-            Max file size is 1MB, Minimum dimension: 330x300 And Suitable files
-            are .jpg &amp; .png
-          </p>
         </div>
+        <button
+          type="button"
+          className="ud-btn btn-thm mt20 no-rotate"
+          onClick={handleMediaUpload}
+        >
+          Αποθήκευση
+          <i className="fa-solid fa-floppy-disk"></i>
+        </button>
       </div>
     </>
   );
