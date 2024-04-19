@@ -37,7 +37,7 @@ const RegisterForm = () => {
       formState.role = role;
     }
     formRef.current?.reset();
-  }, [role]);
+  }, [role, formState]);
 
   if (role === 0) return null;
 

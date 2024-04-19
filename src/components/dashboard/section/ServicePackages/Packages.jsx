@@ -39,11 +39,12 @@ export default function Packages() {
     if (errors.tier === "premium") {
       setTier("premium");
     }
-  }, [errors]);
+  }, [errors, setTier]);
 
   // console.log(tier);
   // console.log(packages);
-  console.log("ERRORS", errors);
+
+  // console.log("ERRORS", errors);
 
   return (
     <div>
@@ -121,7 +122,7 @@ export default function Packages() {
             <button
               type="button"
               onClick={() => setTier(packages[tier].nav.next.tier)}
-              className="ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3"
+              className="ud-btn btn-thm2 bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3"
             >
               <span>{packages[tier].nav.next.text}</span>
               <span className="d-flex align-items-center flaticon-right fz20" />
