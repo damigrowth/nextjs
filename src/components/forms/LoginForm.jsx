@@ -23,8 +23,8 @@ function LoginButton({ setLoading }) {
     >
       Σύνδεση
       {pending ? (
-        <div class="spinner-border spinner-border-sm ml10" role="status">
-          <span class="sr-only"></span>
+        <div className="spinner-border spinner-border-sm ml10" role="status">
+          <span className="sr-only"></span>
         </div>
       ) : (
         <i className="fal fa-arrow-right-long" />
