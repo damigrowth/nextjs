@@ -188,17 +188,6 @@ const usePackagesStore = (set, get) => ({
             },
           };
         }
-
-        // Check if the value is over 5 characters
-        if (value.length < 3) {
-          return {
-            errors: {
-              field: "package-feature-value",
-              active: true,
-              message: "To κείμενο παροχής είναι μικρό",
-            },
-          };
-        }
       }
 
       // Update features for all tiers using Object.keys
@@ -270,6 +259,9 @@ const usePackagesStore = (set, get) => ({
 
         // Extract the new title from the editingFeature
         const newTitle = editingFeature.title;
+        const newChecked = editingFeature.checked;
+
+        console.log("newTitle", newChecked);
 
         // Check if the newTitle is over 1 characters
         if (newTitle.length < 1) {
@@ -304,17 +296,7 @@ const usePackagesStore = (set, get) => ({
           };
         }
 
-        // Check if the value is over 5 characters
-        if (editingFeature.value.length < 3) {
-          return {
-            errors: {
-              field: "editing-feature-value",
-              active: true,
-              message: "To κείμενο παροχής είναι μικρό",
-            },
-          };
-        }
-
+        //TODO Update bugged checked value
         // Update features for all tiers and set the new title at the specified index
         const updatedPackages = Object.keys(state.packages).reduce(
           (updatedPackages, tier) => ({

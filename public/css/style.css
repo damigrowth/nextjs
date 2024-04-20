@@ -13002,6 +13002,17 @@ header.nav-homepage-style .sidemenu-btn {
   color: #ffffff;
 }
 
+.btn-green-disabled {
+  opacity: 0.8;
+  background-color: #5bbb7b;
+  border: 2px solid #5bbb7b;
+  color: #ffffff;
+}
+
+.btn-green-disabled::before {
+  all: unset;
+}
+
 .dropzone {
   text-align: center;
   padding: 40px 20px;

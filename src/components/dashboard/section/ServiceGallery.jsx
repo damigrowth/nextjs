@@ -3,25 +3,21 @@
 import { uploadMedia } from "@/lib/uploads/upload";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 import Image from "next/image";
-import { useState } from "react";
 import Dropzone from "react-dropzone";
-
-const imgs = [
-  "/images/gallery/g-1.jpg",
-  "/images/gallery/g-2.jpg",
-  "/images/gallery/g-3.jpg",
-  "/images/gallery/g-4.jpg",
-];
 
 export default function ServiceGallery() {
   const {
     service,
     media,
     setMedia,
+    mediaDelete,
+    loading,
+    setLoading,
     setMediaUrls,
     deleteMedia,
     gallery,
     setGallery,
+    saved,
     saveGallery,
   } = useCreateServiceStore();
 
@@ -30,19 +26,26 @@ export default function ServiceGallery() {
   };
 
   const handleMediaUpload = async () => {
-    const mediaUrls = await uploadMedia(media);
+    setLoading(true);
+    try {
+      const mediaUrls = await uploadMedia(media);
 
-    setGallery(mediaUrls);
+      saveGallery(mediaUrls);
+      setLoading(false);
+    } catch (error) {
+      console.log("Media upload failed! Something went wrong.");
+      setLoading(false);
+    }
   };
 
-  console.log(gallery);
+  console.log(saved);
 
   // TODO Watch this for loading state: https://www.youtube.com/watch?v=hVTacwwtxP8
 
   return (
     <>
       <div className="ps-widget bgc-white bdrs12 p30 mb30 overflow-hidden position-relative">
-        <div className="bdrb1 pb15 mb30">
+        <div className="bdrb1 pb15 ">
           <h5 className="list-title">Φωτογραφίες - Βίντεο</h5>
         </div>
         <div className="col-xl-9">
@@ -55,7 +58,7 @@ export default function ServiceGallery() {
             {({ getRootProps, getInputProps }) => (
               <div>
                 <div {...getRootProps({ className: "dropzone" })}>
-                  <span className="fz30">🎞️</span>
+                  <span className="fz30">📁</span>
                   <p className="text mt20">
                     Drag 'n' drop your media here, or click to select the media
                   </p>
@@ -99,11 +102,23 @@ export default function ServiceGallery() {
         </div>
         <button
           type="button"
-          className="ud-btn btn-thm mt20 no-rotate"
+          className={`ud-btn no-rotate ${
+            media.length < 1 === true ? "btn-green-disabled" : "btn-thm"
+          }`}
+          disabled={media.length < 1 === true}
           onClick={handleMediaUpload}
         >
-          Αποθήκευση
-          <i className="fa-solid fa-floppy-disk"></i>
+          {loading ? "Αποθήκευση..." : "Αποθήκευση"}
+          {loading ? (
+            <div
+              className="spinner-border spinner-border-sm ml10"
+              role="status"
+            >
+              <span className="sr-only"></span>
+            </div>
+          ) : (
+            <i className="fa-solid fa-floppy-disk"></i>
+          )}
         </button>
       </div>
     </>

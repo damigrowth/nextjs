@@ -39,46 +39,9 @@ export async function createService(prevState, formData) {
 
     const media = service.gallery;
 
-    // const uploadedMediaUrls = await uploadMedia(media);
+    console.log("media", media);
 
-    console.log("media", images);
-    // console.log("uploadedMediaUrls", uploadedMediaUrls);
-
-    const freelancerId = await getFreelancerId();
-
-    // service.data.freelancer = uid
-
-    // const data = JSON.stringify(object);
-
-    // console.log(freelancerId);
-
-    // const title = formData.get('title')
-    // const description =  formData.get('description')
-    // const category = parseField('category', 'JSON');
-    // const skills = parseField('skills', 'JSON');
-    // const price = parseField('price', 'Number');
-    // const time = parseField('time', 'Number');
-
-    // // Validate form data against schema
-    // const validatedFields = serviceFormSchema.safeParse({
-    //   title,
-    //   description,
-    //   price,
-    //   time,
-    //   category,
-    //   skills,
-    // });
-
-    //    // Check if form data validation failed
-    //    if (!validatedFields.success) {
-    //     return {
-    //       errors: validatedFields.error.flatten().fieldErrors,
-    //       message: "Missing Fields. Failed to Create Service.",
-    //     };
-    //   }
-
-    // Destructure validated fields
-    // const { title } = validatedFields.data;
+    // const freelancerId = await getFreelancerId();
 
     // const res = await postData("services", {
     //   ...service,

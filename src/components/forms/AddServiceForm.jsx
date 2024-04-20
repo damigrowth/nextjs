@@ -10,14 +10,19 @@ import ServiceAddons from "../dashboard/section/ServiceAddons";
 import ServiceFaq from "../dashboard/section/ServiceFaq/ServiceFaq";
 import ServiceInformation from "../dashboard/section/ServiceInformation/ServiceInformation";
 import useCreateServiceStore from "@/store/service/createServiceStore";
-import Buttons1 from "../ui-elements/Buttons1";
 
 function AddServiceButton() {
   const { pending } = useFormStatus();
   return (
     <button disabled={pending} className="ud-btn btn-dark default-box-shadow2">
-      {pending ? "Δημοσίευση Υπηρεσίας..." : "Δημοσίευση"}{" "}
-      <i className="fal fa-arrow-right-long" />
+      {pending ? "Δημοσίευση Υπηρεσίας..." : "Δημοσίευση Υπηρεσίας"}
+      {pending ? (
+        <div className="spinner-border spinner-border-sm ml10" role="status">
+          <span className="sr-only"></span>
+        </div>
+      ) : (
+        <span className="pl10">🚀</span>
+      )}
     </button>
   );
 }
@@ -46,11 +51,6 @@ export default function AddServiceForm({ categories, skills, cities }) {
             </p>
           </div>
         </div>
-        <div className="col-lg-3">
-          <div className="text-lg-end">
-            <AddServiceButton />
-          </div>
-        </div>
       </div>
 
       <div className="col-xl-12">
@@ -67,9 +67,9 @@ export default function AddServiceForm({ categories, skills, cities }) {
         )}
         {step === "packages" && <ServicePackages />}
         {step === "addons" && <ServiceAddons />}
-        {step === "faq" && <ServiceFaq />} */}
-        {/* {step === "gallery" && <ServiceGallery />} */}
-        <ServiceGallery />
+        {step === "faq" && <ServiceFaq />}
+        {step === "gallery" && <ServiceGallery />} */}
+        <ServicePackages />
       </div>
       <div className="row pt10 ">
         <div className="col-sm-6 text-start">
@@ -84,21 +84,27 @@ export default function AddServiceForm({ categories, skills, cities }) {
             </button>
           ) : null}
         </div>
-        <div className="col-sm-6 text-end d-flex justify-content-end align-items-center">
-          {steps[step].next ? (
-            <button
-              type="button"
-              disabled={saved[step] === false}
-              onClick={() => setStep(steps[step].next)}
-              className={`ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3 ${
-                saved[step] === false ? "btn-dark-disabled" : ""
-              }`}
-            >
-              <span>Επόμενο</span>
-              <span className="d-flex align-items-center flaticon-right fz20" />
-            </button>
-          ) : null}
-        </div>
+        {saved.gallery === true ? (
+          <div className="d-flex justify-content-center">
+            <AddServiceButton />
+          </div>
+        ) : (
+          <div className="col-sm-6 text-end d-flex justify-content-end align-items-center">
+            {steps[step].next ? (
+              <button
+                type="button"
+                disabled={saved[step] === false}
+                onClick={() => setStep(steps[step].next)}
+                className={`ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3 ${
+                  saved[step] === false ? "btn-dark-disabled" : ""
+                }`}
+              >
+                <span>Επόμενο</span>
+                <span className="d-flex align-items-center flaticon-right fz20" />
+              </button>
+            ) : null}
+          </div>
+        )}
       </div>
     </form>
   );

@@ -330,12 +330,12 @@ const useSaveServiceStore = (set) => ({
         faq: true,
       },
     })),
-  saveGallery: () =>
+  saveGallery: (urls) =>
     set((state) => ({
       ...state,
       service: {
         ...state.service,
-        gallery: state.uploadedFiles,
+        gallery: urls,
       },
       saved: {
         ...state.saved,
