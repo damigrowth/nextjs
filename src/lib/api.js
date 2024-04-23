@@ -1,7 +1,7 @@
-export const getData = async (query) => {
-  const STRAPI_URL = process.env.STRAPI_API_URL;
+import { STRAPI_TOKEN, STRAPI_URL, validateEnvVars } from "./strapi";
 
-  if (!STRAPI_URL) throw new Error("Missing STRAPI_URL environment variable.");
+export const getData = async (query) => {
+  validateEnvVars();
 
   const url = `${STRAPI_URL}/${query}`;
 
@@ -10,6 +10,7 @@ export const getData = async (query) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${STRAPI_TOKEN}`,
       },
 
       cache: "no-cache",
