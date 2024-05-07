@@ -51,7 +51,7 @@ export async function createService(prevState, formData) {
       return {
         ...prevState,
         message: "Η δημιουργία υπηρεσίας απέτυχε!",
-        errors: response.errors,
+        errors: response,
         data: null,
       };
     } else {
