@@ -17,7 +17,6 @@ export default function SelectInputMultiple({
   const [selectedOptions, setSelectedOptions] = useState([]);
 
   const handleMultiSelect = (options) => {
-    // console.log("OPTIONS=>", options);
     const formattedOptions = options.map((option) => ({
       id: option.value,
       title: option.label,
@@ -30,24 +29,17 @@ export default function SelectInputMultiple({
   return isMounted ? (
     <fieldset className="form-style1">
       <label className="heading-color ff-heading fw500 mb10">{label}</label>
-      {/* <input
-        type="text"
-        name={name}
-        id={id}
-        value={JSON.stringify(selectedOptions)}
-        hidden
-        readOnly
-      /> */}
       <Select
         options={options}
         defaultValue={value}
         isMulti
         id={id}
         name={name}
-        className="basic-multi-select"
+        className="basic-multi-select select-input"
         classNamePrefix="select"
         placeholder="Επιλογή..."
         onChange={handleMultiSelect}
+        // menuIsOpen={true}
       />
       {errors?.field === name ? (
         <div>
