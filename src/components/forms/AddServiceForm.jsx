@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 
 import ServiceGallery from "../dashboard/section/ServiceGallery";
@@ -10,6 +10,7 @@ import ServiceAddons from "../dashboard/section/ServiceAddons";
 import ServiceFaq from "../dashboard/section/ServiceFaq/ServiceFaq";
 import ServiceInformation from "../dashboard/section/ServiceInformation/ServiceInformation";
 import useCreateServiceStore from "@/store/service/createServiceStore";
+import ServiceSuccess from "../dashboard/section/ServiceSuccess/ServiceSuccess";
 
 function AddServiceButton() {
   const { pending } = useFormStatus();
@@ -27,18 +28,23 @@ function AddServiceButton() {
   );
 }
 
-export default function AddServiceForm({ categories, skills, cities }) {
+export default function AddServiceForm({ categories, skills, locations }) {
+  const { service, saved, step, steps, setStep, info, media } =
+    useCreateServiceStore();
+
   const initialState = {
+    data: null,
     errors: {},
     message: null,
   };
 
   const [formState, formAction] = useFormState(createService, initialState);
 
-  const { service, saved, step, steps, setStep } = useCreateServiceStore();
+  const serviceID = formState?.data?.id;
+  const serviceTitle = formState?.data?.attributes?.title;
 
-  console.log("SERVICE", service);
-  // console.log("FORMSTATE", errors);
+  console.log("SERVICE response frontend", formState.data);
+  // console.log("STEPS", steps);
 
   return (
     <form action={formAction}>
@@ -62,14 +68,23 @@ export default function AddServiceForm({ categories, skills, cities }) {
           hidden
           readOnly
         />
-        {/* {step === "info" && (
-          <ServiceInformation categories={categories} skills={skills} />
+        {step === "info" && (
+          <ServiceInformation
+            categories={categories}
+            skills={skills}
+            locations={locations}
+          />
         )}
-        {step === "packages" && <ServicePackages />}
-        {step === "addons" && <ServiceAddons />}
-        {step === "faq" && <ServiceFaq />}
-        {step === "gallery" && <ServiceGallery />} */}
-        <ServicePackages />
+        {serviceID ? (
+          <ServiceSuccess id={serviceID} title={serviceTitle} />
+        ) : (
+          <>
+            {step === "packages" && <ServicePackages />}
+            {step === "addons" && <ServiceAddons />}
+            {step === "faq" && <ServiceFaq />}
+            {step === "gallery" && <ServiceGallery />}
+          </>
+        )}
       </div>
       <div className="row pt10 ">
         <div className="col-sm-6 text-start">
@@ -93,7 +108,7 @@ export default function AddServiceForm({ categories, skills, cities }) {
             {steps[step].next ? (
               <button
                 type="button"
-                disabled={saved[step] === false}
+                // disabled={saved[step] === false}
                 onClick={() => setStep(steps[step].next)}
                 className={`ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3 ${
                   saved[step] === false ? "btn-dark-disabled" : ""
