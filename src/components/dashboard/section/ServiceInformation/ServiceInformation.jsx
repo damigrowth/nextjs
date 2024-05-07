@@ -1,16 +1,24 @@
 import InputB from "@/components/inputs/InputB";
 import TextArea from "@/components/inputs/TextArea";
-import React from "react";
+import React, { useEffect } from "react";
 import SelectInput from "../../option/SelectInput";
 import SelectInputMultiple from "../../option/SelectInputMultiple";
 import useCreateServiceStore from "@/store/service/createServiceStore";
+import SelectInputSingle from "../../option/SelectInputSearch";
+import SelectInputSearch from "../../option/SelectInputSearch";
 
-export default function ServiceInformation({ categories, skills }) {
-  const { service, saveInfo, info, setInfo, errors } = useCreateServiceStore();
+export default function ServiceInformation({ categories, skills, locations }) {
+  const { service, saveInfo, info, setInfo, errors, handleStepsTypeChange } =
+    useCreateServiceStore();
 
   const categoryOptions = categories.map((category) => ({
-    id: category.id,
-    title: category.attributes.title,
+    value: category.id,
+    label: category.attributes.title,
+  }));
+
+  const locationOptions = locations.map((location) => ({
+    value: location.id,
+    label: `${location.attributes.area} ${location.attributes.zipcode}, ${location.attributes.county} `,
   }));
 
   const skillOptions = skills.map((skill) => ({
@@ -18,12 +26,18 @@ export default function ServiceInformation({ categories, skills }) {
     label: skill.attributes.title,
   }));
 
-  // console.log("INFO", info.description);
-  console.log("Service", service);
+  const handlePriceTypeChange = (e) => {
+    const isFixed = e.target.checked;
+    setInfo("fixed", isFixed);
+    handleStepsTypeChange(isFixed);
+  };
+
+  // console.log("INFO", info);
+  // console.log("Service", service);
 
   return (
     <div>
-      <div className="ps-widget bgc-white bdrs4 p30 mb30 overflow-hidden position-relative">
+      <div className="ps-widget bgc-white bdrs4 p30 mb30 position-relative">
         <div className="bdrb1 pb15 mb25">
           <h3 className="list-title">Βασικές Πληροφορίες</h3>
         </div>
@@ -77,7 +91,7 @@ export default function ServiceInformation({ categories, skills }) {
           <div className="row">
             <div className="col-sm-6">
               <div className="mb20">
-                <SelectInput
+                {/* <SelectInput
                   type="object"
                   id="service-category"
                   name="service-category"
@@ -88,6 +102,22 @@ export default function ServiceInformation({ categories, skills }) {
                   onSelect={({ id, title }) =>
                     setInfo("category", { id, title })
                   }
+                /> */}
+                <SelectInputSearch
+                  type="object"
+                  id="service-category"
+                  name="service-category"
+                  label="Κατηγορία"
+                  labelPlural="κατηγορίες"
+                  query="category"
+                  errors={errors}
+                  isSearchable={true}
+                  options={categoryOptions}
+                  // value={locationOptions}
+                  onSelect={({ id, title }) =>
+                    setInfo("category", { id, title })
+                  }
+                  capitalize
                 />
               </div>
             </div>
@@ -108,7 +138,25 @@ export default function ServiceInformation({ categories, skills }) {
             </div>
           </div>
           <div className="row">
-            <div className="col-sm-6">
+            <div className="col-sm-4">
+              <div className="mb20 ">
+                <label htmlFor="pricing-type" className="fw500 dark-color ">
+                  Απλή Αμοιβή ή Πακέτα
+                </label>
+                <div className="form-check form-switch switch-style1">
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    id="pricing-type"
+                    name="pricing-type"
+                    checked={info.fixed}
+                    onChange={handlePriceTypeChange}
+                    className="form-check-input"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="col-sm-4">
               <div className="mb20">
                 <InputB
                   id="service-price"
@@ -123,12 +171,13 @@ export default function ServiceInformation({ categories, skills }) {
                   }
                   className="form-control input-group"
                   errors={errors}
+                  disabled={info.fixed === true}
                   append="€"
                   formatSymbols
                 />
               </div>
             </div>
-            <div className="col-sm-6">
+            <div className="col-sm-4">
               <div className="mb20">
                 <InputB
                   id="service-time"
@@ -144,6 +193,24 @@ export default function ServiceInformation({ categories, skills }) {
                   formatSymbols
                 />
               </div>
+            </div>
+          </div>
+          <div className="col-sm-6">
+            <div className="mb20">
+              <SelectInputSearch
+                type="object"
+                id="service-location"
+                name="service-location"
+                label="Περιοχή"
+                labelPlural="περιοχές"
+                query="location"
+                errors={errors}
+                isSearchable={true}
+                options={locationOptions}
+                // value={locationOptions}
+                onSelect={({ id, title }) => setInfo("location", { id, title })}
+                capitalize
+              />
             </div>
           </div>
         </div>
