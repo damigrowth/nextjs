@@ -8,13 +8,13 @@ const useGalleryStore = (set) => ({
       media: [
         ...state.media,
         ...newFiles.filter(
-          (file) => !state.media.some((f) => f.name === file.name)
+          (item) => !state.media.some((f) => f.file.name === item.file.name)
         ),
       ],
     })),
   mediaDelete: (fileName) => {
     set((state) => ({
-      media: state.media.filter((file) => file.name !== fileName),
+      media: state.media.filter((item) => item.file.name !== fileName),
     }));
   },
   setGallery: (urls) => set(() => ({ gallery: urls })),
