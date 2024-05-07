@@ -41,11 +41,6 @@ export default function Packages() {
     }
   }, [errors, setTier]);
 
-  // console.log(tier);
-  // console.log(packages);
-
-  // console.log("ERRORS", errors);
-
   return (
     <div>
       <h4 className="text-thm bgc-thm7 service-package-badge fit px30 py10 bold">
@@ -67,7 +62,6 @@ export default function Packages() {
           }
           capitalize
           formatSymbols
-          formatNumbers
           counter
         />
       </div>
