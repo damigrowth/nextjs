@@ -1,3 +1,5 @@
+"use server";
+
 import { STRAPI_TOKEN, STRAPI_URL, validateEnvVars } from "./strapi";
 
 export const getData = async (query) => {
@@ -28,18 +30,13 @@ export const getData = async (query) => {
   }
 };
 
-export const postData = async (url, arg) => {
-  const STRAPI_URL = process.env.STRAPI_API_URL;
-  const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
+export const postData = async (url, payload) => {
+  validateEnvVars();
 
-  if (!STRAPI_URL) throw new Error("Missing STRAPI_URL environment variable.");
-
-  const api = `${STRAPI_URL}/${url}`;
-
-  console.log("postData", arg);
+  const endpoint = `${STRAPI_URL}/${url}`;
 
   try {
-    const response = await fetch(api, {
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,17 +44,33 @@ export const postData = async (url, arg) => {
       },
       body: JSON.stringify({
         data: {
-          ...arg,
+          ...payload,
         },
       }),
       cache: "no-cache",
     });
 
-    // // Handle response
-    // if (!response.ok) {
-    //   const data = await response.json();
-    //   return { message: data.error.message, errors: null };
-    // }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Server error. Please try again later.", error);
+    return { error: "Server error. Please try again later." };
+  }
+};
+
+export const postMedia = async (url, payload) => {
+  validateEnvVars();
+
+  const endpoint = `${STRAPI_URL}/${url}`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${STRAPI_TOKEN}`,
+      },
+      body: payload,
+    });
 
     const data = await response.json();
     return data;
