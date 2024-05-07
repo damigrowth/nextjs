@@ -7,8 +7,6 @@ import useFaqStore from "./faqStore";
 import useSaveServiceStore from "./saveServiceStore";
 import useGalleryStore from "./galleryStore";
 
-//TODO Create freelancer id and status and city
-
 const useCreateServiceStore = create((set) => ({
   ...useStepsStore(set),
   ...useInfoStore(set),
