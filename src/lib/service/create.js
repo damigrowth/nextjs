@@ -7,51 +7,67 @@ import { uploadMedia } from "../uploads/upload";
 // Create service
 export async function createService(prevState, formData) {
   try {
-    // Strapi Url and Token
-    const STRAPI_URL = process.env.STRAPI_API_URL;
-    const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
-
-    // Check for required environment variables
-    if (!STRAPI_URL || !STRAPI_TOKEN) {
-      throw new Error(
-        "Missing STRAPI_API_URL or STRAPI_API_TOKEN environment variable."
-      );
-    }
-
     const parseField = (fieldName, type) => {
       let parsedField;
       const fieldValue = formData.get(fieldName);
 
-      if (type === "JSON") {
-        const parsedJSON = JSON.parse(fieldValue);
-        parsedField = parsedJSON;
-      }
-      if (type === "Number") {
-        const parsedNumber = parseFloat(fieldValue);
-        parsedField = parsedNumber;
+      if (fieldValue !== null) {
+        if (type === "JSON") {
+          parsedField = JSON.parse(fieldValue);
+        } else if (type === "Number") {
+          parsedField = parseFloat(fieldValue);
+        }
       }
 
       return parsedField;
     };
 
-    const images = formData.get("uploaded-media");
+    // PARSE SERVICE FIELDS
     const service = parseField("service", "JSON");
 
-    const media = service.gallery;
+    // UPLOAD MEDIA
+    // GET MEDIA IDS
+    const files = formData.getAll("media-files");
+    const uploadedMedia = await uploadMedia(files);
 
-    console.log("media", media);
+    // console.log("UPLOADED MEDIA", uploadedMedia);
 
-    // const freelancerId = await getFreelancerId();
+    // GET FREELANCER ID
+    const freelancerId = await getFreelancerId();
 
-    // const res = await postData("services", {
-    //   ...service,
-    //   freelancer: freelancerId,
-    //   status: 2,
-    // });
+    // CREATE SERVICE
+    const payload = {
+      ...service,
+      freelancer: freelancerId,
+      status: 2,
+      media: uploadedMedia,
+    };
 
-    // console.log("FORMDATA=>", res);
+    const response = await postData("services", payload);
+
+    // console.log("RESPONSE backend", response);
+
+    if (!response.data) {
+      return {
+        ...prevState,
+        message: "Η δημιουργία υπηρεσίας απέτυχε!",
+        errors: response.errors,
+        data: null,
+      };
+    } else {
+      return {
+        ...prevState,
+        message: "Η δημιουργία υπηρεσίας ολοκληρώθηκε επιτυχώς!",
+        errors: null,
+        data: response.data,
+      };
+    }
   } catch (error) {
     console.error(error);
-    return { error: "Server error. Please try again later." };
+    return {
+      errors: error?.message,
+      message: "Server error. Please try again later.",
+      data: null,
+    };
   }
 }
