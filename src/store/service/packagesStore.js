@@ -250,6 +250,7 @@ const usePackagesStore = (set, get) => ({
   saveEditingFeature: () =>
     set((state) => {
       const { editingInput, editingFeature } = state;
+      const { title, value, isCheckField } = editingFeature;
       if (
         editingInput >= 0 &&
         editingInput < state.packages[state.tier].features.length
@@ -257,14 +258,8 @@ const usePackagesStore = (set, get) => ({
         const newPackageFeatures = [...state.packages[state.tier].features];
         newPackageFeatures[editingInput] = { ...editingFeature };
 
-        // Extract the new title from the editingFeature
-        const newTitle = editingFeature.title;
-        const newChecked = editingFeature.checked;
-
-        console.log("newTitle", newChecked);
-
-        // Check if the newTitle is over 1 characters
-        if (newTitle.length < 1) {
+        // Check if the title is over 1 characters
+        if (title.length < 1) {
           return {
             errors: {
               field: "editing-feature-title",
@@ -274,8 +269,8 @@ const usePackagesStore = (set, get) => ({
           };
         }
 
-        // Check if the newTitle is over 5 characters
-        if (newTitle.length < 5) {
+        // Check if the title is over 5 characters
+        if (title.length < 5) {
           return {
             errors: {
               field: "editing-feature-title",
@@ -285,19 +280,21 @@ const usePackagesStore = (set, get) => ({
           };
         }
 
-        // Check if the value is over 1 character
-        if (editingFeature.value.length < 1) {
-          return {
-            errors: {
-              field: "editing-feature-value",
-              active: true,
-              message: "To κείμενο παροχής είναι υποχρεωτικό",
-            },
-          };
+        if (!isCheckField) {
+          // Check if the value is over 1 character
+          if (editingFeature.value.length < 1) {
+            return {
+              errors: {
+                field: "editing-feature-value",
+                active: true,
+                message: "To κείμενο παροχής είναι υποχρεωτικό",
+              },
+            };
+          }
         }
 
         //TODO Update bugged checked value
-        // Update features for all tiers and set the new title at the specified index
+
         const updatedPackages = Object.keys(state.packages).reduce(
           (updatedPackages, tier) => ({
             ...updatedPackages,
@@ -307,7 +304,7 @@ const usePackagesStore = (set, get) => ({
                 if (index === editingInput) {
                   return {
                     ...feature,
-                    title: newTitle,
+                    title: title,
                   };
                 }
                 return feature;

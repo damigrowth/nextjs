@@ -1,15 +1,19 @@
 import { create } from "zustand";
 
+const initialObjectState = {
+  id: 0,
+  title: "",
+};
+
 const initialInfoState = {
+  fixed: false,
   title: "",
   description: "", // Array for the RichText editor
   price: 0,
   time: 0,
-  category: {
-    id: 0,
-    title: "",
-  },
+  category: initialObjectState,
   skills: [],
+  location: initialObjectState,
 };
 
 const initialErrorsState = {
@@ -18,7 +22,7 @@ const initialErrorsState = {
   active: false,
 };
 
-const useInfoStore = ((set, get) => ({
+const useInfoStore = (set, get) => ({
   info: initialInfoState,
   errors: initialErrorsState,
   setInfo: (key, value) =>
@@ -28,6 +32,6 @@ const useInfoStore = ((set, get) => ({
         [key]: value,
       },
     })),
-}));
+});
 
 export default useInfoStore;

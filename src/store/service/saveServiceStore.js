@@ -19,7 +19,16 @@ const useSaveServiceStore = (set) => ({
   },
   saveInfo: () =>
     set((state) => {
-      const { title, description, category, skills, price, time } = state.info;
+      const {
+        title,
+        description,
+        category,
+        skills,
+        price,
+        time,
+        location,
+        fixed,
+      } = state.info;
 
       // Check if the title is over 1 characters
       if (title.length < 1) {
@@ -65,26 +74,28 @@ const useSaveServiceStore = (set) => ({
         };
       }
 
-      // Check if the price is bellow 10€
-      if (price < 10) {
-        return {
-          errors: {
-            field: "service-price",
-            active: true,
-            message: "Η αμοιβή είναι μικρότερη από 10€",
-          },
-        };
-      }
+      if (fixed === true) {
+        // Check if the price is bellow 10€
+        if (price < 10) {
+          return {
+            errors: {
+              field: "service-price",
+              active: true,
+              message: "Η αμοιβή είναι μικρότερη από 10€",
+            },
+          };
+        }
 
-      // Check if the price is above 50000€
-      if (price > 50000) {
-        return {
-          errors: {
-            field: "service-price",
-            active: true,
-            message: "Η αμοιβή είναι μεγαλύτερη από 50000€",
-          },
-        };
+        // Check if the price is above 50000€
+        if (price > 50000) {
+          return {
+            errors: {
+              field: "service-price",
+              active: true,
+              message: "Η αμοιβή είναι μεγαλύτερη από 50000€",
+            },
+          };
+        }
       }
 
       // Check if the time is bellow 10€
@@ -120,6 +131,17 @@ const useSaveServiceStore = (set) => ({
         };
       }
 
+      // Check if the location is empty
+      if (location.id === 0) {
+        return {
+          errors: {
+            field: "service-location",
+            active: true,
+            message: "Η περιοχή είναι υποχρεωτική",
+          },
+        };
+      }
+
       return {
         ...state,
         errors: initialErrorsState,
@@ -136,154 +158,157 @@ const useSaveServiceStore = (set) => ({
   savePackages: () =>
     set((state) => {
       const { packages } = state;
+      const { fixed } = state.info;
 
-      if (packages["basic"].features.length < 4) {
-        return {
-          errors: {
-            tier: "basic",
-            field: "service-packages",
-            active: true,
-            message: "Ο ελάχιστος αριθμός παροχών είναι 4",
-          },
-        };
-      }
+      if (fixed === false) {
+        if (packages["basic"].features.length < 4) {
+          return {
+            errors: {
+              tier: "basic",
+              field: "service-packages",
+              active: true,
+              message: "Ο ελάχιστος αριθμός παροχών είναι 4",
+            },
+          };
+        }
 
-      if (packages["basic"].description.length < 1) {
-        return {
-          errors: {
-            tier: "basic",
-            field: "package-description-basic",
-            active: true,
-            message: "Η περιγραφή του Βασικού πακέτου είναι υποχρεωτική",
-          },
-        };
-      }
+        if (packages["basic"].description.length < 1) {
+          return {
+            errors: {
+              tier: "basic",
+              field: "package-description-basic",
+              active: true,
+              message: "Η περιγραφή του Βασικού πακέτου είναι υποχρεωτική",
+            },
+          };
+        }
 
-      if (packages["standard"].description.length < 1) {
-        return {
-          errors: {
-            tier: "standard",
-            field: "package-description-standard",
-            active: true,
-            message: "Η περιγραφή του Κανονικού πακέτου είναι υποχρεωτική",
-          },
-        };
-      }
+        if (packages["standard"].description.length < 1) {
+          return {
+            errors: {
+              tier: "standard",
+              field: "package-description-standard",
+              active: true,
+              message: "Η περιγραφή του Κανονικού πακέτου είναι υποχρεωτική",
+            },
+          };
+        }
 
-      if (packages["premium"].description.length < 1) {
-        return {
-          errors: {
-            tier: "premium",
-            field: "package-description-premium",
-            active: true,
-            message: "Η περιγραφή του Προχωρημένου πακέτου είναι υποχρεωτική",
-          },
-        };
-      }
+        if (packages["premium"].description.length < 1) {
+          return {
+            errors: {
+              tier: "premium",
+              field: "package-description-premium",
+              active: true,
+              message: "Η περιγραφή του Προχωρημένου πακέτου είναι υποχρεωτική",
+            },
+          };
+        }
 
-      if (packages["basic"].description.length < 10) {
-        return {
-          errors: {
-            tier: "basic",
-            field: "package-description-basic",
-            active: true,
-            message: "Η περιγραφή του Βασικού πακέτου είναι μικρή",
-          },
-        };
-      }
+        if (packages["basic"].description.length < 10) {
+          return {
+            errors: {
+              tier: "basic",
+              field: "package-description-basic",
+              active: true,
+              message: "Η περιγραφή του Βασικού πακέτου είναι μικρή",
+            },
+          };
+        }
 
-      if (packages["standard"].description.length < 10) {
-        return {
-          errors: {
-            tier: "standard",
-            field: "package-description-standard",
-            active: true,
-            message: "Η περιγραφή του Κανονικού πακέτου είναι μικρή",
-          },
-        };
-      }
+        if (packages["standard"].description.length < 10) {
+          return {
+            errors: {
+              tier: "standard",
+              field: "package-description-standard",
+              active: true,
+              message: "Η περιγραφή του Κανονικού πακέτου είναι μικρή",
+            },
+          };
+        }
 
-      if (packages["premium"].description.length < 10) {
-        return {
-          errors: {
-            tier: "premium",
-            field: "package-description-premium",
-            active: true,
-            message: "Η περιγραφή του Προχωρημένου πακέτου είναι μικρή",
-          },
-        };
-      }
+        if (packages["premium"].description.length < 10) {
+          return {
+            errors: {
+              tier: "premium",
+              field: "package-description-premium",
+              active: true,
+              message: "Η περιγραφή του Προχωρημένου πακέτου είναι μικρή",
+            },
+          };
+        }
 
-      if (packages["basic"].description.length >= 85) {
-        return {
-          errors: {
-            tier: "basic",
-            field: "package-description-basic",
-            active: true,
-            message:
-              "Η μέγιστη περιγραφή του Απλού πακέτου είναι 85 χαρακτήρες",
-          },
-        };
-      }
+        if (packages["basic"].description.length >= 85) {
+          return {
+            errors: {
+              tier: "basic",
+              field: "package-description-basic",
+              active: true,
+              message:
+                "Η μέγιστη περιγραφή του Απλού πακέτου είναι 85 χαρακτήρες",
+            },
+          };
+        }
 
-      if (packages["standard"].description.length >= 85) {
-        return {
-          errors: {
-            tier: "standard",
-            field: "package-description-standard",
-            active: true,
-            message:
-              "Η μέγιστη περιγραφή του Κανονικού πακέτου είναι 85 χαρακτήρες",
-          },
-        };
-      }
+        if (packages["standard"].description.length >= 85) {
+          return {
+            errors: {
+              tier: "standard",
+              field: "package-description-standard",
+              active: true,
+              message:
+                "Η μέγιστη περιγραφή του Κανονικού πακέτου είναι 85 χαρακτήρες",
+            },
+          };
+        }
 
-      if (packages["premium"].description.length >= 85) {
-        return {
-          errors: {
-            tier: "premium",
-            field: "package-description-premium",
-            active: true,
-            message:
-              "Η μέγιστη περιγραφή του Προχωρημένου πακέτου είναι 85 χαρακτήρες",
-          },
-        };
-      }
+        if (packages["premium"].description.length >= 85) {
+          return {
+            errors: {
+              tier: "premium",
+              field: "package-description-premium",
+              active: true,
+              message:
+                "Η μέγιστη περιγραφή του Προχωρημένου πακέτου είναι 85 χαρακτήρες",
+            },
+          };
+        }
 
-      if (packages["standard"].price <= packages["basic"].price) {
-        return {
-          errors: {
-            tier: "standard",
-            field: "package-price",
-            active: true,
-            message:
-              "Η τιμή του κανονικού πακέτου δεν μπορεί να έιναι μικρότερη ή ίση με του βασικού",
-          },
-        };
-      }
+        if (packages["standard"].price <= packages["basic"].price) {
+          return {
+            errors: {
+              tier: "standard",
+              field: "package-price",
+              active: true,
+              message:
+                "Η τιμή του κανονικού πακέτου δεν μπορεί να έιναι μικρότερη ή ίση με του βασικού",
+            },
+          };
+        }
 
-      if (packages["premium"].price <= packages["standard"].price) {
-        return {
-          errors: {
-            tier: "premium",
-            field: "package-price",
-            active: true,
-            message:
-              "Η τιμή του προχωρημένου πακέτου δεν μπορεί να έιναι μικρότερη ή ίση με του κανονικού",
-          },
-        };
-      }
+        if (packages["premium"].price <= packages["standard"].price) {
+          return {
+            errors: {
+              tier: "premium",
+              field: "package-price",
+              active: true,
+              message:
+                "Η τιμή του προχωρημένου πακέτου δεν μπορεί να έιναι μικρότερη ή ίση με του κανονικού",
+            },
+          };
+        }
 
-      if (packages["premium"].price < packages["basic"].price) {
-        return {
-          errors: {
-            tier: "premium",
-            field: "package-price",
-            active: true,
-            message:
-              "Η τιμή του προχωρημένου πακέτου δεν μπορεί να έιναι μικρότερη ή ίση με του βασικού",
-          },
-        };
+        if (packages["premium"].price < packages["basic"].price) {
+          return {
+            errors: {
+              tier: "premium",
+              field: "package-price",
+              active: true,
+              message:
+                "Η τιμή του προχωρημένου πακέτου δεν μπορεί να έιναι μικρότερη ή ίση με του βασικού",
+            },
+          };
+        }
       }
 
       return {
@@ -330,13 +355,16 @@ const useSaveServiceStore = (set) => ({
         faq: true,
       },
     })),
-  saveGallery: (urls) =>
+  saveGallery: () =>
     set((state) => ({
       ...state,
-      service: {
-        ...state.service,
-        gallery: urls,
-      },
+      // gallery: state.media.map((item) => ({
+      //   url: item.url,
+      //   name: item.file.name,
+      //   type: item.file.type,
+      //   size: item.file.size,
+      // })),
+      // TODO Do the validation of the media here!
       saved: {
         ...state.saved,
         gallery: true,
