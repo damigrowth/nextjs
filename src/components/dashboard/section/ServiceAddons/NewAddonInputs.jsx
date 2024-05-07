@@ -24,7 +24,7 @@ export default function NewAddonInputs() {
                   type="text"
                   id="addon-title"
                   name="addon-title"
-                  maxLength={20}
+                  maxLength={40}
                   value={newAddon.title}
                   onChange={(formattedValue) =>
                     setNewAddon("title", formattedValue)
@@ -73,7 +73,6 @@ export default function NewAddonInputs() {
                 errors={errors}
                 capitalize
                 formatSymbols
-                formatNumbers
                 counter
               />
             </div>
