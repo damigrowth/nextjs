@@ -1,3 +1,5 @@
+"use server";
+
 import { getData } from "../api";
 
 export async function fetchModel(model, query) {
