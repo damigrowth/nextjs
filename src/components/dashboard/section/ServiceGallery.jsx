@@ -1,9 +1,12 @@
 "use client";
 
+import { createService } from "@/lib/service/create";
 import { uploadMedia } from "@/lib/uploads/upload";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 import Image from "next/image";
-import Dropzone from "react-dropzone";
+import { useState } from "react";
+import Dropzone, { useDropzone } from "react-dropzone";
+import { useFormStatus } from "react-dom";
 
 export default function ServiceGallery() {
   const {
@@ -13,32 +16,29 @@ export default function ServiceGallery() {
     mediaDelete,
     loading,
     setLoading,
-    setMediaUrls,
-    deleteMedia,
     gallery,
-    setGallery,
-    saved,
     saveGallery,
   } = useCreateServiceStore();
 
+  const { pending } = useFormStatus();
+
   const handleDropMedia = (files) => {
-    setMedia(files);
-  };
+    const data = [];
 
-  const handleMediaUpload = async () => {
-    setLoading(true);
-    try {
-      const mediaUrls = await uploadMedia(media);
-
-      saveGallery(mediaUrls);
-      setLoading(false);
-    } catch (error) {
-      console.log("Media upload failed! Something went wrong.");
-      setLoading(false);
+    for (const file of files) {
+      const blob = URL.createObjectURL(file);
+      data.push({ file, url: blob });
     }
+    setMedia(data);
   };
 
-  console.log(saved);
+  const handleMediaSave = async () => {
+    setLoading(true);
+    saveGallery();
+    setLoading(false);
+  };
+
+  // console.log("MEDIA", media);
 
   // TODO Watch this for loading state: https://www.youtube.com/watch?v=hVTacwwtxP8
 
@@ -48,31 +48,43 @@ export default function ServiceGallery() {
         <div className="bdrb1 pb15 ">
           <h5 className="list-title">Φωτογραφίες - Βίντεο</h5>
         </div>
-        <div className="col-xl-9">
-          <Dropzone
+        <div className="dropzone-container">
+          <span className="fz30">📁</span>
+          <input
+            type="file"
+            name="media-files"
+            id="media-files"
+            accept="image/*"
+            placeholder="Επιλογή αρχείων"
+            multiple
+            maxsize={1048576}
+            onChange={(e) => handleDropMedia(e.target.files)}
             className="dropzone"
-            value={media}
-            onDrop={handleDropMedia}
-            onChange={(e) => setMedia(e.target.value)}
-          >
-            {({ getRootProps, getInputProps }) => (
-              <div>
-                <div {...getRootProps({ className: "dropzone" })}>
-                  <span className="fz30">📁</span>
-                  <p className="text mt20">
-                    Drag 'n' drop your media here, or click to select the media
-                  </p>
-                  <p>
-                    Max file size is 1MB, Minimum dimension: 330x300 And
-                    Suitable files are .jpg &amp; .png
-                  </p>
-                </div>
-              </div>
+          />
+          <div className="mt10">
+            {media.length === 0 ? (
+              <p className="fz14">Επιλογή αρχείων</p>
+            ) : (
+              <p className="fz14">
+                Έχετε επιλέξει{" "}
+                {media.length === 1
+                  ? media.length + " " + "αρχείο"
+                  : media.length + " " + "αρχεία"}
+              </p>
             )}
-          </Dropzone>
-        </div>
-        <div className="col-xl-9">
-          <div className="d-flex mb30 flex-wrap gap-3">
+            <div className="mt10">
+              <p className="fz14 mt5">
+                Το μέγιστο επιτρεπτό μέγεθος αρχείων είναι{" "}
+                <span className="fw600">1MB</span>
+              </p>
+              {media.length < 1 && (
+                <p className="fz12">
+                  Σύρετε τα αρχεία σας εδώ, ή κάντε κλικ για να τα επιλέξετε
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="gallery">
             {media.map((item, i) => (
               <div
                 key={i}
@@ -82,7 +94,7 @@ export default function ServiceGallery() {
                   height={119}
                   width={136}
                   className="object-fit-cover"
-                  src={URL.createObjectURL(item)}
+                  src={item.url}
                   style={{ height: "166px", width: " 190px" }}
                   alt="gallery"
                 />
@@ -91,9 +103,15 @@ export default function ServiceGallery() {
                     {/* <a className="icon me-2">
                       <span className="flaticon-pencil" />
                     </a> */}
-                    <a className="icon" onClick={() => mediaDelete(item.name)}>
-                      <span className="flaticon-delete" />
-                    </a>
+                    {!pending && (
+                      <a
+                        disabled={true}
+                        className="icon"
+                        onClick={() => mediaDelete(item.file.name)}
+                      >
+                        <span className="flaticon-delete" />
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
@@ -105,8 +123,8 @@ export default function ServiceGallery() {
           className={`ud-btn no-rotate ${
             media.length < 1 === true ? "btn-green-disabled" : "btn-thm"
           }`}
-          disabled={media.length < 1 === true}
-          onClick={handleMediaUpload}
+          disabled={media.length < 1 === true || pending}
+          onClick={handleMediaSave}
         >
           {loading ? "Αποθήκευση..." : "Αποθήκευση"}
           {loading ? (
