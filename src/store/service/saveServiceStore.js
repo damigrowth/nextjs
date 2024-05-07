@@ -64,7 +64,7 @@ const useSaveServiceStore = (set) => ({
       }
 
       // Check if the description is over 20 characters
-      if (description.length < 20) {
+      if (description.length < 80) {
         return {
           errors: {
             field: "service-description",
