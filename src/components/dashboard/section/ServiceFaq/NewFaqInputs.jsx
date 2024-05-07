@@ -51,7 +51,6 @@ export default function NewFaqInputs() {
                 }
                 className="form-control input-group"
                 errors={errors}
-                formatNumbers
                 formatSymbols
                 capitalize
               />
