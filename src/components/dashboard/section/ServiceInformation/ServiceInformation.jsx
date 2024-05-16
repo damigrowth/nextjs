@@ -45,17 +45,17 @@ export default function ServiceInformation({ categories, skills }) {
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
   const { data: counties } = useSWR(
-    `http://167.99.244.34:1337/api/${COUNTY_SEARCH(
+    `https://167.99.244.34:1337/api/${COUNTY_SEARCH(
       locationParams.county_search
     )}`,
     fetcher
   );
   const { data: areas } = useSWR(
-    `http://167.99.244.34:1337/api/${AREAS_BY_COUNTY(locationParams.county)}`,
+    `https://167.99.244.34:1337/api/${AREAS_BY_COUNTY(locationParams.county)}`,
     fetcher
   );
   const { data: zipcodes } = useSWR(
-    `http://167.99.244.34:1337/api/${ZIPCODES_BY_AREA(locationParams.area)}`,
+    `https://167.99.244.34:1337/api/${ZIPCODES_BY_AREA(locationParams.area)}`,
     fetcher
   );
 
