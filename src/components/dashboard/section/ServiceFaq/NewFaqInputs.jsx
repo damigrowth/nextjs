@@ -23,7 +23,7 @@ export default function NewFaqInputs() {
                 id="faq-question"
                 name="faq-question"
                 minLength={10}
-                maxLength={50}
+                maxLength={80}
                 value={newFaq.question}
                 onChange={(formattedValue) =>
                   setNewFaq("question", formattedValue)
@@ -44,7 +44,7 @@ export default function NewFaqInputs() {
                 id="faq-answer"
                 name="faq-answer"
                 minLength={2}
-                maxLength={100}
+                maxLength={300}
                 value={newFaq.answer}
                 onChange={(formattedValue) =>
                   setNewFaq("answer", formattedValue)
