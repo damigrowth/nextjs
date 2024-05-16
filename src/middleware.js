@@ -17,5 +17,13 @@ export function middleware(request) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  if (currentPath === "/add-services" && cookie === undefined) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (currentPath === "/manage-services" && cookie === undefined) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   return NextResponse.next();
 }
