@@ -413,5 +413,8 @@ a {
   font-size: 12px;
   font-weight: 500;
   color: #bebdbd;
+}
 
+.switch-style1 input.form-check-input {
+  background-color: rgba(91, 187, 123, 0.35);
 }
