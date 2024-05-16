@@ -28,8 +28,8 @@ function AddServiceButton() {
   );
 }
 
-export default function AddServiceForm({ categories, skills, locations }) {
-  const { service, saved, step, steps, setStep, info, media } =
+export default function AddServiceForm({ categories, skills }) {
+  const { service, saved, optional, step, steps, setStep, info, media } =
     useCreateServiceStore();
 
   const initialState = {
@@ -43,8 +43,12 @@ export default function AddServiceForm({ categories, skills, locations }) {
   const serviceID = formState?.data?.id;
   const serviceTitle = formState?.data?.attributes?.title;
 
-  console.log("SERVICE response frontend", formState.data);
-  // console.log("STEPS", steps);
+  const handleDisable = () => {
+    if (optional[step]) {
+      return false; // Not disabled if optional
+    }
+    return !saved[step]; // Disabled if not saved
+  };
 
   return (
     <form action={formAction}>
@@ -69,11 +73,7 @@ export default function AddServiceForm({ categories, skills, locations }) {
           readOnly
         />
         {step === "info" && (
-          <ServiceInformation
-            categories={categories}
-            skills={skills}
-            locations={locations}
-          />
+          <ServiceInformation categories={categories} skills={skills} />
         )}
         {serviceID ? (
           <ServiceSuccess id={serviceID} title={serviceTitle} />
@@ -83,42 +83,42 @@ export default function AddServiceForm({ categories, skills, locations }) {
             {step === "addons" && <ServiceAddons />}
             {step === "faq" && <ServiceFaq />}
             {step === "gallery" && <ServiceGallery />}
+            <div className="row pt10 ">
+              <div className="col-sm-6 text-start">
+                {steps[step].previous ? (
+                  <button
+                    type="button"
+                    onClick={() => setStep(steps[step].previous)}
+                    className="ud-btn btn-white bdrs4 d-flex align-items-center gap-2 default-box-shadow p3"
+                  >
+                    <span className="d-flex align-items-center flaticon-left fz20" />
+                    <span>Πίσω</span>
+                  </button>
+                ) : null}
+              </div>
+              {saved.gallery === true ? (
+                <div className="d-flex justify-content-center">
+                  <AddServiceButton />
+                </div>
+              ) : (
+                <div className="col-sm-6 text-end d-flex justify-content-end align-items-center">
+                  {steps[step].next ? (
+                    <button
+                      type="button"
+                      disabled={handleDisable()}
+                      onClick={() => setStep(steps[step].next)}
+                      className={`ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3 ${
+                        handleDisable() ? "btn-dark-disabled" : ""
+                      }`}
+                    >
+                      <span>Επόμενο</span>
+                      <span className="d-flex align-items-center flaticon-right fz20" />
+                    </button>
+                  ) : null}
+                </div>
+              )}
+            </div>
           </>
-        )}
-      </div>
-      <div className="row pt10 ">
-        <div className="col-sm-6 text-start">
-          {steps[step].previous ? (
-            <button
-              type="button"
-              onClick={() => setStep(steps[step].previous)}
-              className="ud-btn btn-white bdrs4 d-flex align-items-center gap-2 default-box-shadow p3"
-            >
-              <span className="d-flex align-items-center flaticon-left fz20" />
-              <span>Πίσω</span>
-            </button>
-          ) : null}
-        </div>
-        {saved.gallery === true ? (
-          <div className="d-flex justify-content-center">
-            <AddServiceButton />
-          </div>
-        ) : (
-          <div className="col-sm-6 text-end d-flex justify-content-end align-items-center">
-            {steps[step].next ? (
-              <button
-                type="button"
-                // disabled={saved[step] === false}
-                onClick={() => setStep(steps[step].next)}
-                className={`ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3 ${
-                  saved[step] === false ? "btn-dark-disabled" : ""
-                }`}
-              >
-                <span>Επόμενο</span>
-                <span className="d-flex align-items-center flaticon-right fz20" />
-              </button>
-            ) : null}
-          </div>
         )}
       </div>
     </form>
