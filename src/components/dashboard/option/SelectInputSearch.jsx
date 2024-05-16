@@ -11,10 +11,11 @@ export default function SelectInputSearch({
   options,
   name,
   query,
+  isMulti,
   label,
   errors,
   labelPlural,
-  value,
+  defaultValue,
   onSelect,
   isDisabled,
   isLoading,
@@ -28,36 +29,46 @@ export default function SelectInputSearch({
 }) {
   const id = Date.now().toString();
   const [isMounted, setIsMounted] = useState(false);
-  const [term, setTerm] = useState("");
+  const [term, setTerm] = useState(defaultValue);
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
 
   const handleSearch = useDebouncedCallback((value) => {
-    const formattedValue = formatInput({ value, capitalize });
-    setTerm(formattedValue);
+    if (!isMulti) {
+      const formattedValue = formatInput({ value, capitalize });
+      setTerm(formattedValue);
 
-    const params = new URLSearchParams(searchParams);
-    if (term) {
-      params.set(query, formattedValue);
+      const params = new URLSearchParams(searchParams);
+      if (term) {
+        params.set(query, formattedValue);
+      } else {
+        params.delete(query);
+      }
+
+      replace(`${pathname}?${params.toString()}`, { scroll: false });
     } else {
-      params.delete(query);
+      setTerm(value);
     }
-
-    replace(`${pathname}?${params.toString()}`, { scroll: false });
   }, 150);
 
   const handleSelect = (option) => {
-    // console.log("OPTION:", option);
-    const formattedOption = {
-      id: option.value,
-      title: option.label,
-    };
-    onSelect(formattedOption);
-  };
+    if (isMulti) {
+      const formattedOptions = options.map((option) => ({
+        id: option.value,
+        title: option.label,
+      }));
+      onSelect(formattedOptions);
+    } else {
+      const formattedOption = {
+        id: option.value,
+        title: option.label,
+      };
 
-  console.log("OPTIONS", term);
+      onSelect(formattedOption);
+    }
+  };
 
   useEffect(() => setIsMounted(true), []);
 
@@ -65,30 +76,30 @@ export default function SelectInputSearch({
     <fieldset className="form-style1">
       <label className="heading-color ff-heading fw500 mb10">{label}</label>
       <Select
-        className="basic-single select-input"
-        classNamePrefix="select"
-        // defaultValue={options[0]}
+        id={id}
+        name={name}
+        options={options}
+        defaultValue={term}
+        isMulti={isMulti}
         isDisabled={isDisabled}
         isLoading={isLoading}
         isClearable={isClearable}
         isSearchable={isSearchable}
-        name={name}
-        options={options}
-        id={id}
-        placeholder="Επιλογή..."
-        noOptionsMessage={() => `Δεν βρέθηκαν ${labelPlural}`}
-        inputValue={term}
-        // menuIsOpen={true}
-        // onKeyDown={(newValue) => {
-        //   handleSearch(newValue);
-        // }}
-        // value={term}
+        inputValue={!isMulti ? term : undefined}
         onInputChange={(newValue) => {
           handleSearch(newValue);
         }}
         onChange={(newValue) => {
           handleSelect(newValue);
         }}
+        placeholder="Επιλογή..."
+        noOptionsMessage={() => `Δεν βρέθηκαν ${labelPlural}`}
+        classNamePrefix="select"
+        className={
+          isMulti
+            ? "basic-multi-select select-input"
+            : "basic-single select-input"
+        }
       />
       {errors?.field === name ? (
         <div>
