@@ -1,15 +1,11 @@
 import AddServiceForm from "@/components/forms/AddServiceForm";
 import DashboardNavigation from "../header/DashboardNavigation";
 import { fetchModel } from "@/lib/models/model";
-import { CATEGORIES, LOCATIONS, LOCATIONS_SEARCH, SKILLS } from "@/lib/queries";
+import { CATEGORIES, SKILLS } from "@/lib/queries";
 
-export default async function AddServiceInfo({ locationsSearchQuery }) {
+export default async function AddServiceInfo() {
   const { categories } = await fetchModel("categories", CATEGORIES);
   const { skills } = await fetchModel("skills", SKILLS);
-  const { locations } = await fetchModel(
-    "locations",
-    LOCATIONS_SEARCH(locationsSearchQuery)
-  );
 
   return (
     <>
@@ -19,11 +15,7 @@ export default async function AddServiceInfo({ locationsSearchQuery }) {
             <DashboardNavigation />
           </div>
           <div className="col-lg-12">
-            <AddServiceForm
-              categories={categories}
-              skills={skills}
-              locations={locations}
-            />
+            <AddServiceForm categories={categories} skills={skills} />
           </div>
         </div>
       </div>
