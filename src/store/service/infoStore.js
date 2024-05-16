@@ -5,6 +5,11 @@ const initialObjectState = {
   title: "",
 };
 
+const initialLocationObjectState = {
+  id: 0,
+  name: "",
+};
+
 const initialInfoState = {
   fixed: false,
   title: "",
@@ -13,7 +18,9 @@ const initialInfoState = {
   time: 0,
   category: initialObjectState,
   skills: [],
-  location: initialObjectState,
+  county: initialLocationObjectState,
+  area: initialLocationObjectState,
+  zipcode: initialLocationObjectState,
 };
 
 const initialErrorsState = {
@@ -25,11 +32,11 @@ const initialErrorsState = {
 const useInfoStore = (set, get) => ({
   info: initialInfoState,
   errors: initialErrorsState,
-  setInfo: (key, value) =>
+  setInfo: (key, payload) =>
     set((state) => ({
       info: {
         ...state.info,
-        [key]: value,
+        [key]: payload,
       },
     })),
 });
