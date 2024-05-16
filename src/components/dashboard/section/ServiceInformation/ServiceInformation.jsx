@@ -11,7 +11,7 @@ import {
   COUNTY_SEARCH,
   ZIPCODES_BY_AREA,
 } from "@/lib/queries";
-import { fetchSWR } from "@/lib/swr";
+import useSWR from "swr";
 
 export default function ServiceInformation({ categories, skills }) {
   const { info, setInfo, saveInfo, errors, handleStepsTypeChange } =
@@ -42,16 +42,21 @@ export default function ServiceInformation({ categories, skills }) {
     handleStepsTypeChange(isFixed);
   };
 
-  const { counties } = fetchSWR(
-    "counties",
-    COUNTY_SEARCH(locationParams.county_search)
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+  const { data: counties } = useSWR(
+    `http://167.99.244.34:1337/api/${COUNTY_SEARCH(
+      locationParams.county_search
+    )}`,
+    fetcher
   );
-
-  const { areas } = fetchSWR("areas", AREAS_BY_COUNTY(locationParams.county));
-
-  const { zipcodes } = fetchSWR(
-    "zipcodes",
-    ZIPCODES_BY_AREA(locationParams.area)
+  const { data: areas } = useSWR(
+    `http://167.99.244.34:1337/api/${AREAS_BY_COUNTY(locationParams.county)}`,
+    fetcher
+  );
+  const { data: zipcodes } = useSWR(
+    `http://167.99.244.34:1337/api/${ZIPCODES_BY_AREA(locationParams.area)}`,
+    fetcher
   );
 
   const locationData = {
