@@ -58,6 +58,34 @@ export const postData = async (url, payload) => {
   }
 };
 
+export const putData = async (url, payload) => {
+  validateEnvVars();
+
+  const endpoint = `${STRAPI_URL}/${url}`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${STRAPI_TOKEN}`,
+      },
+      body: JSON.stringify({
+        data: {
+          ...payload,
+        },
+      }),
+      cache: "no-cache",
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Server error. Please try again later.", error);
+    return { error: "Server error. Please try again later." };
+  }
+};
+
 export const postMedia = async (url, payload) => {
   validateEnvVars();
 
