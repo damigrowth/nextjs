@@ -1,24 +1,34 @@
+"use client";
+
 import InputB from "@/components/inputs/InputB";
 import TextArea from "@/components/inputs/TextArea";
-import React, { useEffect } from "react";
-import SelectInput from "../../option/SelectInput";
-import SelectInputMultiple from "../../option/SelectInputMultiple";
+import React from "react";
 import useCreateServiceStore from "@/store/service/createServiceStore";
-import SelectInputSingle from "../../option/SelectInputSearch";
 import SelectInputSearch from "../../option/SelectInputSearch";
+import { useSearchParams } from "next/navigation";
+import {
+  AREAS_BY_COUNTY,
+  COUNTY_SEARCH,
+  ZIPCODES_BY_AREA,
+} from "@/lib/queries";
+import { fetchSWR } from "@/lib/swr";
 
-export default function ServiceInformation({ categories, skills, locations }) {
-  const { service, saveInfo, info, setInfo, errors, handleStepsTypeChange } =
+export default function ServiceInformation({ categories, skills }) {
+  const { info, setInfo, saveInfo, errors, handleStepsTypeChange } =
     useCreateServiceStore();
+
+  const searchParams = useSearchParams();
+
+  const locationParams = {
+    county_search: searchParams.get("counties") || "",
+    county: info.county.id,
+    area: info.area.id,
+    zipcode: info.zipcode.id,
+  };
 
   const categoryOptions = categories.map((category) => ({
     value: category.id,
     label: category.attributes.title,
-  }));
-
-  const locationOptions = locations.map((location) => ({
-    value: location.id,
-    label: `${location.attributes.area} ${location.attributes.zipcode}, ${location.attributes.county} `,
   }));
 
   const skillOptions = skills.map((skill) => ({
@@ -32,8 +42,38 @@ export default function ServiceInformation({ categories, skills, locations }) {
     handleStepsTypeChange(isFixed);
   };
 
-  // console.log("INFO", info);
-  // console.log("Service", service);
+  const { counties } = fetchSWR(
+    "counties",
+    COUNTY_SEARCH(locationParams.county_search)
+  );
+
+  const { areas } = fetchSWR("areas", AREAS_BY_COUNTY(locationParams.county));
+
+  const { zipcodes } = fetchSWR(
+    "zipcodes",
+    ZIPCODES_BY_AREA(locationParams.area)
+  );
+
+  const locationData = {
+    counties: counties?.data || [],
+    areas: areas?.data?.attributes?.areas?.data || [],
+    zipcodes: zipcodes?.data?.attributes?.zipcodes?.data || [],
+  };
+
+  const locationOptions = {
+    counties: locationData.counties.map((county) => ({
+      value: county.id,
+      label: county.attributes.name,
+    })),
+    areas: locationData.areas.map((area) => ({
+      value: area.id,
+      label: area.attributes.name,
+    })),
+    zipcodes: locationData.zipcodes.map((zipcode) => ({
+      value: zipcode.id,
+      label: zipcode.attributes.name,
+    })),
+  };
 
   return (
     <div>
@@ -82,6 +122,7 @@ export default function ServiceInformation({ categories, skills, locations }) {
                 counter
                 errors={errors}
                 value={info.description}
+                defaultValue={info.description}
                 onChange={(formattedValue) =>
                   setInfo("description", formattedValue)
                 }
@@ -91,18 +132,6 @@ export default function ServiceInformation({ categories, skills, locations }) {
           <div className="row">
             <div className="col-sm-6">
               <div className="mb20">
-                {/* <SelectInput
-                  type="object"
-                  id="service-category"
-                  name="service-category"
-                  label="Κατηγορία"
-                  errors={errors}
-                  data={categoryOptions}
-                  value={info.category.title}
-                  onSelect={({ id, title }) =>
-                    setInfo("category", { id, title })
-                  }
-                /> */}
                 <SelectInputSearch
                   type="object"
                   id="service-category"
@@ -113,7 +142,7 @@ export default function ServiceInformation({ categories, skills, locations }) {
                   errors={errors}
                   isSearchable={true}
                   options={categoryOptions}
-                  // value={locationOptions}
+                  defaultValue={info.category.title}
                   onSelect={({ id, title }) =>
                     setInfo("category", { id, title })
                   }
@@ -123,16 +152,21 @@ export default function ServiceInformation({ categories, skills, locations }) {
             </div>
             <div className="col-sm-6">
               <div className="mb20">
-                <SelectInputMultiple
+                <SelectInputSearch
                   options={skillOptions}
                   id="service-skills"
                   name="service-skills"
                   label="Δεξιότητες"
+                  labelPlural="δεξιότητες"
                   errors={errors}
-                  value={info.skills}
+                  defaultValue={info.skills.map((skill) => ({
+                    value: skill.id,
+                    label: skill.title,
+                  }))}
                   onSelect={(formattedArray) =>
                     setInfo("skills", formattedArray)
                   }
+                  isMulti
                 />
               </div>
             </div>
@@ -165,6 +199,7 @@ export default function ServiceInformation({ categories, skills, locations }) {
                   type="number"
                   min={10}
                   max={50000}
+                  defaultValue={info.price}
                   value={info.price}
                   onChange={(formattedValue) =>
                     setInfo("price", formattedValue)
@@ -182,10 +217,11 @@ export default function ServiceInformation({ categories, skills, locations }) {
                 <InputB
                   id="service-time"
                   name="service-time"
-                  label="Χρόνος Παράδωσης"
+                  label="Χρόνος Παράδοσης"
                   type="number"
                   min={1}
                   append="Μέρες"
+                  defaultValue={info.time}
                   value={info.time}
                   onChange={(formattedValue) => setInfo("time", formattedValue)}
                   className="form-control input-group"
@@ -195,22 +231,70 @@ export default function ServiceInformation({ categories, skills, locations }) {
               </div>
             </div>
           </div>
-          <div className="col-sm-6">
-            <div className="mb20">
-              <SelectInputSearch
-                type="object"
-                id="service-location"
-                name="service-location"
-                label="Περιοχή"
-                labelPlural="περιοχές"
-                query="location"
-                errors={errors}
-                isSearchable={true}
-                options={locationOptions}
-                // value={locationOptions}
-                onSelect={({ id, title }) => setInfo("location", { id, title })}
-                capitalize
-              />
+          <div className="row">
+            <h4>Τοποθεσία</h4>
+            <div className="col-sm-4">
+              <div className="mb20">
+                <SelectInputSearch
+                  type="object"
+                  id="service-location-county"
+                  name="service-location-county"
+                  label="Νομός"
+                  labelPlural="νομοί"
+                  query="counties"
+                  querySelection="county"
+                  errors={errors}
+                  isSearchable={true}
+                  options={locationOptions.counties}
+                  defaultValue={info.county.name}
+                  onSelect={({ id, title }) =>
+                    setInfo("county", { id, name: title })
+                  }
+                  capitalize
+                />
+              </div>
+            </div>
+            <div className="col-sm-4">
+              <div className="mb20">
+                <SelectInputSearch
+                  type="object"
+                  id="service-location-area"
+                  name="service-location-area"
+                  label="Περιοχή"
+                  labelPlural="περιοχές"
+                  query="areas"
+                  querySelection="area"
+                  errors={errors}
+                  isSearchable={true}
+                  options={locationOptions.areas}
+                  defaultValue={info.area.name}
+                  onSelect={({ id, title }) =>
+                    setInfo("area", { id, name: title })
+                  }
+                  capitalize
+                />
+              </div>
+            </div>
+            <div className="col-sm-4">
+              <div className="mb20">
+                <SelectInputSearch
+                  type="object"
+                  id="service-location-zipcode"
+                  name="service-location-zipcode"
+                  label="Τ.Κ"
+                  labelPlural="τ.κ"
+                  query="zipcodes"
+                  querySelection="zipcode"
+                  errors={errors}
+                  isSearchable={true}
+                  options={locationOptions.zipcodes}
+                  defaultValue={info.zipcode.name}
+                  onSelect={({ id, title }) =>
+                    setInfo("zipcode", { id, name: title })
+                  }
+                  capitalize
+                />
+              </div>
             </div>
           </div>
         </div>
