@@ -9,15 +9,12 @@ export const metadata = {
   title: "Doulitsa",
 };
 
-export default async function page({ searchParams }) {
-  const locationsSearchQuery = searchParams?.location || "";
-
-  console.log("searchParams:", searchParams);
+export default async function page() {
   return (
     <>
       <MobileNavigation2 />
       <DashboardLayout>
-        <AddServiceInfo locationsSearchQuery={locationsSearchQuery} />
+        <AddServiceInfo />
       </DashboardLayout>
     </>
   );
