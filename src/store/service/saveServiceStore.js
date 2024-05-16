@@ -10,6 +10,13 @@ const tiers = ["basic", "standard", "premium"];
 const useSaveServiceStore = (set) => ({
   errors: initialErrorsState,
   service: {},
+  optional: {
+    info: false,
+    packages: false,
+    addons: true,
+    faq: true,
+    gallery: false,
+  },
   saved: {
     info: false,
     packages: false,
@@ -26,7 +33,9 @@ const useSaveServiceStore = (set) => ({
         skills,
         price,
         time,
-        location,
+        county,
+        area,
+        zipcode,
         fixed,
       } = state.info;
 
@@ -131,13 +140,35 @@ const useSaveServiceStore = (set) => ({
         };
       }
 
-      // Check if the location is empty
-      if (location.id === 0) {
+      // Check if the location county is empty
+      if (county.id === 0) {
         return {
           errors: {
-            field: "service-location",
+            field: "service-location-county",
+            active: true,
+            message: "Ο νομός είναι υποχρεωτικός",
+          },
+        };
+      }
+
+      // Check if the location area is empty
+      if (area.id === 0) {
+        return {
+          errors: {
+            field: "service-location-area",
             active: true,
             message: "Η περιοχή είναι υποχρεωτική",
+          },
+        };
+      }
+
+      // Check if the location zipcode is empty
+      if (zipcode.id === 0) {
+        return {
+          errors: {
+            field: "service-location-zipcode",
+            active: true,
+            message: "Ο τ.κ είναι υποχρεωτικός",
           },
         };
       }
