@@ -2,6 +2,30 @@
 
 import { STRAPI_TOKEN, STRAPI_URL, validateEnvVars } from "./strapi";
 
+export const getPublicData = async (query) => {
+  const url = `${STRAPI_URL}/${query}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-cache",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok && data.error) console.log(data.error.message);
+    if (response.ok) {
+      return data;
+    }
+  } catch (error) {
+    console.error("Server error. Please try again later.", error);
+    return { error: "Server error. Please try again later." };
+  }
+};
+
 export const getData = async (query) => {
   validateEnvVars();
 
