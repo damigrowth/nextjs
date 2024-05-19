@@ -1,7 +1,17 @@
 import Link from "next/link";
 import LoginForm from "@/components/forms/LoginForm";
+import { getMaintenanceStatus } from "@/lib/maintenance/maintenance";
+import { isAuthenticated } from "@/lib/auth/authenticated";
+import { redirect } from "next/navigation";
 
-export default function page() {
+export default async function page() {
+  const { isUnderMaintenance } = await getMaintenanceStatus();
+  const { authenticated } = await isAuthenticated();
+
+  if (authenticated) {
+    redirect("/");
+  }
+
   return (
     <>
       <section className="our-login">
@@ -24,12 +34,14 @@ export default function page() {
               <div className="log-reg-form search-modal form-style1 bgc-white p50 p30-sm default-box-shadow1 bdrs12">
                 <div className="mb30">
                   <h4>Συνέχεια με τον λογαριασμό σου</h4>
-                  <p className="text">
-                    Δεν έχεις λογαριασμό?{" "}
-                    <Link href="/register" className="text-thm">
-                      Εγγραφή!
-                    </Link>
-                  </p>
+                  {!isUnderMaintenance && (
+                    <p className="text">
+                      Δεν έχεις λογαριασμό?{" "}
+                      <Link href="/register" className="text-thm">
+                        Εγγραφή!
+                      </Link>
+                    </p>
+                  )}
                 </div>
                 <LoginForm />
               </div>
