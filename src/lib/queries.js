@@ -1,3 +1,4 @@
+export const MAINTENANCE = "maintenance?fields[0]=isActive";
 export const CATEGORIES = "categories?fields[0]=title";
 export const SKILLS = "skills?fields[0]=title";
 export const LOCATIONS =
