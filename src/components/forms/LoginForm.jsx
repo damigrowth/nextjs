@@ -23,9 +23,9 @@ function LoginButton({ setLoading }) {
     >
       Σύνδεση
       {pending ? (
-        <div className="spinner-border spinner-border-sm ml10" role="status">
+        <span className="spinner-border spinner-border-sm ml10" role="status">
           <span className="sr-only"></span>
-        </div>
+        </span>
       ) : (
         <i className="fal fa-arrow-right-long" />
       )}
@@ -44,7 +44,7 @@ const LoginForm = () => {
   return (
     <form action={formAction}>
       <div className="mb25">
-        <label htmlFor="email" className="form-label fw500 dark-color">
+        <label htmlFor="identifier" className="form-label fw500 dark-color">
           Email
         </label>
         <input
@@ -84,7 +84,7 @@ const LoginForm = () => {
       <div className="d-grid mb20">
         <LoginButton setLoading={setLoading} />
       </div>
-      <div className="hr_content mb20">
+      {/* <div className="hr_content mb20">
         <hr />
         <span className="hr_top_text">ή</span>
       </div>
@@ -101,7 +101,7 @@ const LoginForm = () => {
         <button className="ud-btn btn-apple fz14 fw400" type="button">
           <i className="fab fa-apple" /> Σύνδεση με Apple
         </button>
-      </div>
+      </div> */}
     </form>
   );
 };
