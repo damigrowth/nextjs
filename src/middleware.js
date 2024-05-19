@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { getMaintenanceStatus } from "./lib/maintenance/maintenance";
+import { isAuthenticated } from "./lib/auth/authenticated";
 
 export async function middleware(request) {
-  const cookie = request.cookies.get("jwt");
   const currentPath = request.nextUrl.pathname;
   const { isUnderMaintenance } = await getMaintenanceStatus();
+  const { authenticated } = await isAuthenticated();
 
   // List of paths that should be publicly accessible
   const maintenancePublicPaths = [
@@ -33,12 +34,12 @@ export async function middleware(request) {
     );
 
     // If the path is not public and the cookie is missing, redirect to the login page
-    if (!isPublicPath && !cookie) {
+    if (!isPublicPath && !authenticated) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   } else {
     // Redirect to the login page if trying to access protected paths without a cookie
-    if (protectedPaths.includes(currentPath) && cookie === undefined) {
+    if (protectedPaths.includes(currentPath) && authenticated === undefined) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
