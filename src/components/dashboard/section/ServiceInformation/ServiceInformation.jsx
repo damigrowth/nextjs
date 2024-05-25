@@ -38,24 +38,24 @@ export default function ServiceInformation({ categories, skills }) {
 
   const handlePriceTypeChange = (e) => {
     const isFixed = e.target.checked;
-    setInfo("fixed", isFixed);
-    handleStepsTypeChange(isFixed);
+    setInfo("fixed", !isFixed);
+    handleStepsTypeChange(!isFixed);
   };
 
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
   const { data: counties } = useSWR(
-    `https://167.99.244.34:1337/api/${COUNTY_SEARCH(
+    `https://api.doulitsa.gr/api/${COUNTY_SEARCH(
       locationParams.county_search
     )}`,
     fetcher
   );
   const { data: areas } = useSWR(
-    `https://167.99.244.34:1337/api/${AREAS_BY_COUNTY(locationParams.county)}`,
+    `https://api.doulitsa.gr/api/${AREAS_BY_COUNTY(locationParams.county)}`,
     fetcher
   );
   const { data: zipcodes } = useSWR(
-    `https://167.99.244.34:1337/api/${ZIPCODES_BY_AREA(locationParams.area)}`,
+    `https://api.doulitsa.gr/api/${ZIPCODES_BY_AREA(locationParams.area)}`,
     fetcher
   );
 
@@ -188,7 +188,7 @@ export default function ServiceInformation({ categories, skills }) {
                     role="switch"
                     id="pricing-type"
                     name="pricing-type"
-                    checked={info.fixed}
+                    checked={!info.fixed}
                     onChange={handlePriceTypeChange}
                     className="form-check-input"
                   />
@@ -211,7 +211,7 @@ export default function ServiceInformation({ categories, skills }) {
                   }
                   className="form-control input-group"
                   errors={errors}
-                  disabled={info.fixed === true}
+                  disabled={!info.fixed}
                   append="€"
                   formatSymbols
                 />
