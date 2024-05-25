@@ -11,7 +11,7 @@ const initialLocationObjectState = {
 };
 
 const initialInfoState = {
-  fixed: false,
+  fixed: true,
   title: "",
   description: "", // Array for the RichText editor
   price: 0,

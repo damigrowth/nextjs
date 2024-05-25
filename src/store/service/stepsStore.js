@@ -46,14 +46,14 @@ const useStepsStore = (set) => ({
   setStep: (currentStep) => set(() => ({ step: currentStep })),
   handleStepsTypeChange: (fixed) =>
     set((state) => {
-      if (fixed === false || fixed === null) {
+      if (fixed || fixed === null) {
         return {
           ...state,
           steps: initialFixedStepsTypeState,
         };
       }
 
-      if (fixed === true) {
+      if (!fixed) {
         return {
           ...state,
           steps: initialPackagesStepsTypeState,
