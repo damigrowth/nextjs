@@ -11,7 +11,7 @@ export default function page() {
       <TabSection1 />
       <div className=" bgc-thm3">
         <Breadcumb3 path={["Home", "Services", "Design & Creative"]} />
-        <ServiceDetail3 />
+        {/* <ServiceDetail3 /> */}
         <PopulerService />
       </div>
     </>
