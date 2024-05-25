@@ -52,7 +52,7 @@ export default async function SingleService({
                     title={service.title}
                     displayName={service.freelancer.data.attributes.displayName}
                     rating={service.rating}
-                    ratingServicesCount={ratingServicesCount}
+                    reviewsCount={reviews.length}
                   />
                   <Info
                     area={service.area.data.attributes.name}
