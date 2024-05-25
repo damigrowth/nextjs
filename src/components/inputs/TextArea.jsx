@@ -28,6 +28,7 @@ export default function TextArea({
   maxLength,
   counter,
   errors,
+  zod,
   onChange,
   className,
 }) {
@@ -60,6 +61,9 @@ export default function TextArea({
     }
   };
 
+  const fieldError = errors?.field === name ? errors?.message : null;
+  const nameError = errors?.[name] ? errors[name] : null;
+
   return (
     <>
       {hideLabel === undefined && (
@@ -90,11 +94,11 @@ export default function TextArea({
             </p>
           )}
         </div>
-        {errors?.field === name ? (
+        {(fieldError || nameError) && (
           <div>
-            <p className="text-danger">{errors.message}</p>
+            <p className="text-danger">{fieldError || nameError}</p>
           </div>
-        ) : null}
+        )}
       </div>
 
       {/* {state?.errors?.[id] ? (
