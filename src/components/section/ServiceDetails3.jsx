@@ -1,12 +1,26 @@
 // import { Sticky, StickyContainer } from "react-sticky";
 
+import { RATING_SERVICES_COUNT } from "@/lib/queries";
 import ServiceDetailComment1 from "../element/ServiceDetailComment1";
 import ServiceDetailExtra1 from "../element/ServiceDetailExtra1";
 import ServiceDetailFaq1 from "../element/ServiceDetailFaq1";
 import ServiceDetailReviewInfo1 from "../element/ServiceDetailReviewInfo1";
 import ServiceDetailSlider2 from "../element/ServiceDetailSlider2";
+import { getData } from "@/lib/api";
+import AddServiceReviewForm from "../forms/AddServiceReviewForm";
+import Packages from "../dashboard/section/SingleService/Packages";
+import Addons from "../dashboard/section/SingleService/Addons";
+import Gallery from "../dashboard/section/SingleService/Gallery";
+import Description from "../dashboard/section/SingleService/Description";
+import Faq from "../dashboard/section/SingleService/Faq";
+import Reviews from "../dashboard/section/SingleService/Reviews";
 
-export default async function ServiceDetail3({ service }) {
+export default async function ServiceDetail3({
+  serviceId,
+  service,
+  reviews,
+  ratings,
+}) {
   if (!service) {
     return (
       <div>
@@ -14,6 +28,20 @@ export default async function ServiceDetail3({ service }) {
       </div>
     );
   }
+
+  // GET SERVICES COUNT OF SPECIFIC RATING
+  let ratingServicesCount = undefined;
+
+  if (service.rating_global.data && service.rating_global.data.id) {
+    const ratingServicesCountData = await getData(
+      RATING_SERVICES_COUNT(service.rating_global.data.id)
+    );
+
+    ratingServicesCount =
+      ratingServicesCountData?.data?.attributes?.services?.data?.length;
+  }
+
+  // console.log("SERVICE-DETAIL=>>", reviews);
 
   return (
     <>
@@ -79,12 +107,12 @@ export default async function ServiceDetail3({ service }) {
                           <span className="flaticon-calendar" />
                         </div>
                         <div className="details">
-                          <h5 className="title">Χρόνος Παράδωσης</h5>
+                          <h5 className="title">Χρόνος Παράδοσης</h5>
                           <p className="mb-0 text">{service.time} Μέρες</p>
                         </div>
                       </div>
                     </div>
-                    <div className="col-sm-6 col-md-4">
+                    {/* <div className="col-sm-6 col-md-4">
                       <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
                         <div className="icon flex-shrink-0">
                           <span className="flaticon-goal" />
@@ -94,7 +122,7 @@ export default async function ServiceDetail3({ service }) {
                           <p className="mb-0 text">Professional</p>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                     <div className="col-sm-6 col-md-4">
                       <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
                         <div className="icon flex-shrink-0">
@@ -103,115 +131,33 @@ export default async function ServiceDetail3({ service }) {
                         <div className="details">
                           <h5 className="title">Περιοχή</h5>
                           <p className="mb-0 text">
-                            {/* {service.city.data.attributes.title} */}
+                            {service.area.data.attributes.name}
                           </p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                <ServiceDetailSlider2 />
+                <Gallery />
                 <div className="service-about">
-                  <div className="px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
-                    <h4>Περιγραφή</h4>
-                    <div className="text mb30 rich-text-editor">
-                      <p>{service.description}</p>
-                      {/* <BlocksRenderer content={service.description} /> */}
-                    </div>
-                  </div>
-
-                  <div className="px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
-                    <h4>Compare Packages</h4>
-                    <div className="table-style2 table-responsive bdr1 mt30 mb60">
-                      <table className="table table-borderless mb-0">
-                        <thead className="t-head">
-                          <tr>
-                            <th className="col " scope="col" />
-                            {service.packages.map((pack) => (
-                              <th key={pack.id} className="col w25" scope="col">
-                                <span className="h2">{pack.price}€</span>
-                                <br />
-                                <span className="h4">{pack.title}</span>
-                                <br />
-                                <span className="text">{pack.description}</span>
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody className="t-body">
-                          {service.packages[0].features.map(
-                            (feature, featureIndex) => (
-                              <tr className="bgc-thm3" key={featureIndex}>
-                                <th scope="row">{feature.title}</th>
-                                {service.packages.map((pack, index) => (
-                                  <td key={index}>
-                                    {pack.features[featureIndex]
-                                      .isCheckField ? (
-                                      <div
-                                        className={
-                                          pack.features[featureIndex].checked
-                                            ? "check_circle bgc-thm"
-                                            : "check_circle bgc-red"
-                                        }
-                                      >
-                                        <span
-                                          className={
-                                            pack.features[featureIndex].checked
-                                              ? "fas fa-check"
-                                              : "fas fa-times"
-                                          }
-                                        />
-                                      </div>
-                                    ) : (
-                                      pack.features[featureIndex].value
-                                    )}
-                                  </td>
-                                ))}
-                              </tr>
-                            )
-                          )}
-
-                          <tr>
-                            <th scope="row" />
-                            <td>
-                              <a className="ud-btn btn-thm">
-                                Select
-                                <i className="fal fa-arrow-right-long" />
-                              </a>
-                            </td>
-                            <td>
-                              <a className="ud-btn btn-thm">
-                                Select
-                                <i className="fal fa-arrow-right-long" />
-                              </a>
-                            </td>
-                            <td>
-                              <a className="ud-btn btn-thm">
-                                Select
-                                <i className="fal fa-arrow-right-long" />
-                              </a>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>{" "}
-                  </div>
-                  {/* <hr className="opacity-100 mb60" /> */}
-                  <div className="px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
-                    <h4>Συχνές Ερωτήσεις</h4>
-                    <ServiceDetailFaq1 faq={service.faq} />{" "}
-                  </div>
-                  {/* <hr className="opacity-100 mb60" /> */}
-                  <div className="px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
-                    <h4>Extra Υπηρεσίες</h4>
-                    <ServiceDetailExtra1 addons={service.addons} />{" "}
-                  </div>
+                  <Description description={service.description} />
+                  {service.fixed ? null : <Packages service={service} />}
+                  {service.faq.length > 0 && <Faq faq={service.faq} />}
+                  {service.addons.length > 0 && (
+                    <Addons addons={service.addons} />
+                  )}
                   {/* <hr className="opacity-100 mb15" /> */}
-                  <div className="px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
-                    <ServiceDetailReviewInfo1 />
-                    <ServiceDetailComment1 />
-                  </div>
+
+                  {reviews?.length > 0 && (
+                    <Reviews
+                      reviews={reviews}
+                      ratings={ratings}
+                      serviceRating={service.rating}
+                      serviceRatingGlobal={service.rating_global.data}
+                      ratingServicesCount={ratingServicesCount}
+                    />
+                  )}
+                  <AddServiceReviewForm serviceId={serviceId} />
                 </div>
               </div>
             </div>
