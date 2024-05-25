@@ -3911,21 +3911,40 @@ li {
   }
 }
 
-.review_cansel_btns a {
+.review_reactions button {
   color: #697488;
   font-family: var(--title-font-family);
   line-height: 26px;
   letter-spacing: 0em;
   margin-right: 30px;
+  border: none;
+  outline: none;
 }
-.review_cansel_btns a:last-child {
+.review_reactions button:last-child {
   margin-right: 0;
 }
-.review_cansel_btns a:hover {
+.review_reactions button:hover {
   color: var(--headings-color);
 }
-.review_cansel_btns i {
+.review_reactions i {
   padding-right: 10px;
+}
+
+.review_reactions .review_reactions_counter {
+  padding-right: 5px;
+  font-weight: 600;
+}
+
+.reacted_on_like {
+  color: #5bbb7b;
+}
+
+.reacted_on_dislike {
+  color: #e8543e;
+}
+
+.reacted_off {
+  color: #697488;
 }
 
 .total-review-box {
