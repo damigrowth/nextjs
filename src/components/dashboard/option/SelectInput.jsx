@@ -89,7 +89,7 @@ export default function SelectInput({
       </div>
       {errors?.field === name ? (
         <div>
-          <p className="text-danger">{errors.message}</p>
+          <p className="text-danger">{errors?.message}</p>
         </div>
       ) : null}
     </fieldset>
