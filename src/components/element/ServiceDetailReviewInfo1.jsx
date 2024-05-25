@@ -1,167 +1,158 @@
+import { patchData } from "@/lib/api";
+import { REVIEW_REACT } from "@/lib/queries";
+import { getUserId } from "@/lib/user/user";
+import { formatDate } from "@/utils/formatDate";
 import Image from "next/image";
 import Link from "next/link";
+import ReviewReactionsForm from "../forms/ReviewReactionsForm";
+import ReviewStatsForm from "../forms/ReviewStatsForm";
 
-export default function ServiceDetailReviewInfo1() {
+const Review = async ({
+  reviewId,
+  image,
+  name,
+  date,
+  comment,
+  likes,
+  dislikes,
+}) => {
+  const { formattedDate } = formatDate(date, "dd MMMM yyyy");
+
+  const uid = await getUserId();
+
+  const reactionsFormData = {
+    likes: likes.map(({ id }) => id),
+    dislikes: dislikes.map(({ id }) => id),
+    uid,
+    reviewId,
+  };
+
   return (
-    <>
+    <div className="col-md-12 mb40">
+      <div className="mt30 position-relative d-flex align-items-center justify-content-start mb30-sm">
+        <Image
+          height={60}
+          width={60}
+          src={!image ? "/images/blog/comments-2.png" : image}
+          className="mr-3"
+          alt="comments-2.png"
+        />
+        <div className="ml20">
+          <h6 className="mt-0 mb-0">{name}</h6>
+          <div>
+            <span className="fz14">{formattedDate}</span>
+          </div>
+        </div>
+      </div>
+      <p className="text mt20 mb20">{comment}</p>
+      <ReviewReactionsForm data={reactionsFormData} />
+    </div>
+  );
+};
+
+const ReviewStatsLine = ({ data }) => {
+  return (
+    <div className="review-list d-flex align-items-center mb10">
+      <div className="list-number">
+        {data.stars}{" "}
+        {data.stars === 1 ? (
+          <span style={{ paddingRight: "12.5px" }}>Αστέρι</span>
+        ) : (
+          "Αστέρια"
+        )}
+      </div>
+      <div className="progress">
+        <div
+          className="progress-bar"
+          style={{
+            width: `${data.value}%`,
+          }}
+          aria-valuenow={data.value}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        />
+      </div>
+      <div className="value text-end">{data.count}</div>
+    </div>
+  );
+};
+
+export default function ServiceDetailReviewInfo1({
+  reviews,
+  ratings,
+  serviceRating,
+  serviceRatingGlobal,
+  ratingServicesCount,
+}) {
+  // This outputs: [ 4, 3 ]
+  const reviewRatings = reviews.map((review) => review.attributes.rating);
+
+  const ratingIds = ratings.map(({ id }) => id);
+
+  // Calculate the count for each star rating
+  const starCounts = ratingIds.map((star) => ({
+    stars: star,
+    count: reviewRatings.filter((rating) => rating === star).length,
+  }));
+
+  // Determine the maximum count for normalization
+  const maxCount = Math.max(...starCounts.map((star) => star.count));
+
+  // Calculate the value for each star rating based on the maximum count
+  const reviewStats = starCounts.map((star) => ({
+    stars: star.stars,
+    count: star.count,
+    value: maxCount === 0 ? 0 : ((star.count / maxCount) * 100).toFixed(2),
+  }));
+
+  return (
+    <div className="px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
       <div className="product_single_content mb50">
         <div className="mbp_pagination_comments">
           <div className="row">
             <div className="col-lg-12">
               <div className="total_review mb30 mt45">
-                <h4>80 Reviews</h4>
+                <h4>{reviews.length} Κριτικές</h4>
               </div>
               <div className="d-md-flex align-items-center mb30">
                 <div className="total-review-box d-flex align-items-center text-center mb30-sm">
-                  <div className="wrapper mx-auto">
-                    <div className="t-review mb15">4.96</div>
-                    <h5>Exceptional</h5>
-                    <p className="text mb-0">3,014 reviews</p>
-                  </div>
+                  <ReviewStatsForm
+                    reviews={reviews}
+                    ratings={ratings}
+                    reviewRatings={reviewRatings}
+                    serviceRating={serviceRating}
+                    serviceRatingGlobal={serviceRatingGlobal}
+                    ratingServicesCount={ratingServicesCount}
+                  />
                 </div>
                 <div className="wrapper ml60 ml0-sm">
-                  <div className="review-list d-flex align-items-center mb10">
-                    <div className="list-number">5 Star</div>
-                    <div className="progress">
-                      <div
-                        className="progress-bar"
-                        style={{
-                          width: "90%",
-                        }}
-                        aria-valuenow={90}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                      />
+                  {reviewStats.map((stat, i) => (
+                    <div key={i}>
+                      <ReviewStatsLine data={stat} />
                     </div>
-                    <div className="value text-end">58</div>
-                  </div>
-                  <div className="review-list d-flex align-items-center mb10">
-                    <div className="list-number">4 Star</div>
-                    <div className="progress">
-                      <div
-                        className="progress-bar w-75"
-                        aria-valuenow={75}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                      />
-                    </div>
-                    <div className="value text-end">20</div>
-                  </div>
-                  <div className="review-list d-flex align-items-center mb10">
-                    <div className="list-number">3 Star</div>
-                    <div className="progress">
-                      <div
-                        className="progress-bar w-50"
-                        aria-valuenow={50}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                      />
-                    </div>
-                    <div className="value text-end">15</div>
-                  </div>
-                  <div className="review-list d-flex align-items-center mb10">
-                    <div className="list-number">2 Star</div>
-                    <div className="progress">
-                      <div
-                        className="progress-bar"
-                        style={{
-                          width: "30%",
-                        }}
-                        aria-valuenow={30}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                      />
-                    </div>
-                    <div className="value text-end">2</div>
-                  </div>
-                  <div className="review-list d-flex align-items-center mb10">
-                    <div className="list-number">1 Star</div>
-                    <div className="progress">
-                      <div
-                        className="progress-bar"
-                        style={{
-                          width: "20%",
-                        }}
-                        aria-valuenow={10}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                      />
-                    </div>
-                    <div className="value text-end">1</div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
-            <div className="col-md-12">
-              <div className="mbp_first position-relative d-flex align-items-center justify-content-start mb30-sm">
-                <Image
-                  height={60}
-                  width={60}
-                  src="/images/blog/comments-2.png"
-                  className="mr-3"
-                  alt="comments-2.png"
-                />
-                <div className="ml20">
-                  <h6 className="mt-0 mb-0">Bessie Cooper</h6>
-                  <div>
-                    <span className="fz14">12 March 2022</span>
-                  </div>
-                </div>
-              </div>
-              <p className="text mt20 mb20">
-                There are many variations of passages of Lorem Ipsum available,
-                but the majority have suffered alteration in some form, by
-                injected humour, or randomised words which don't look even
-                slightly believable. If you are going to use a passage of Lorem
-                Ipsum, you need to be sure there isn't anything embarrassing
-                hidden in the middle of text.
-              </p>
-              <div className="review_cansel_btns d-flex">
-                <a>
-                  <i className="fas fa-thumbs-up" />
-                  Helpful
-                </a>
-                <a>
-                  <i className="fas fa-thumbs-down" />
-                  Not helpful
-                </a>
-              </div>
-            </div>
-            <div className="col-md-12">
-              <div className="mbp_first position-relative d-flex align-items-center justify-content-start mt30 mb30-sm">
-                <Image
-                  height={60}
-                  width={60}
-                  src="/images/blog/comments-2.png"
-                  className="mr-3"
-                  alt="comments-2.png"
-                />
-                <div className="ml20">
-                  <h6 className="mt-0 mb-0">Darrell Steward</h6>
-                  <div>
-                    <span className="fz14">12 March 2022</span>
-                  </div>
-                </div>
-              </div>
-              <p className="text mt20 mb20">
-                There are many variations of passages of Lorem Ipsum available,
-                but the majority have suffered alteration in some form, by
-                injected humour, or randomised words which don't look even
-                slightly believable. If you are going to use a passage of Lorem
-                Ipsum, you need to be sure there isn't anything embarrassing
-                hidden in the middle of text.
-              </p>
-              <div className="review_cansel_btns d-flex pb30">
-                <a>
-                  <i className="fas fa-thumbs-up" />
-                  Helpful
-                </a>
-                <a>
-                  <i className="fas fa-thumbs-down" />
-                  Not helpful
-                </a>
-              </div>
-            </div>
+            <ul>
+              {!reviews ? (
+                <div>Δεν υπάρχουν κριτικές.</div>
+              ) : (
+                reviews.map(({ attributes: review, id }, i) => (
+                  <li key={i}>
+                    <Review
+                      reviewId={id}
+                      image={null}
+                      name={review.user.data.attributes.displayName}
+                      date={review.publishedAt}
+                      comment={review.comment}
+                      likes={review.likes.data}
+                      dislikes={review.dislikes.data}
+                    />
+                  </li>
+                ))
+              )}
+            </ul>
             <div className="col-md-12">
               <div className="position-relative bdrb1 pb50">
                 <Link href="/service-single" className="ud-btn btn-light-thm">
@@ -173,6 +164,6 @@ export default function ServiceDetailReviewInfo1() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
