@@ -227,7 +227,7 @@ export default function ServiceDetail2() {
                     </div>
                     <hr className="opacity-100 mb60" />
                     <h4>Frequently Asked Questions</h4>
-                    <ServiceDetailFaq1 />
+                    {/* <ServiceDetailFaq1 /> */}
                     <hr className="opacity-100 mb60" />
                     <h4>Add Extra Services</h4>
                     <ServiceDetailExtra1 />
