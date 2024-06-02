@@ -1,14 +1,17 @@
-import ReviewReactionsForm from "@/components/forms/ReviewReactionsForm";
 import ReviewStatsForm from "@/components/forms/ReviewStatsForm";
+import UserImage from "@/components/user/UserImage";
 import { getUserId } from "@/lib/user/user";
 import { formatDate } from "@/utils/formatDate";
 import Image from "next/image";
 import Link from "next/link";
+import ReviewReactions from "./ReviewReactions";
 
 const Review = async ({
   reviewId,
+  firstName,
+  lastName,
+  displayName,
   image,
-  name,
   date,
   comment,
   likes,
@@ -18,7 +21,7 @@ const Review = async ({
 
   const uid = await getUserId();
 
-  const reactionsFormData = {
+  const reactions = {
     likes: likes.map(({ id }) => id),
     dislikes: dislikes.map(({ id }) => id),
     uid,
@@ -28,22 +31,22 @@ const Review = async ({
   return (
     <div className="col-md-12 mb40">
       <div className="mt30 position-relative d-flex align-items-center justify-content-start mb30-sm">
-        <Image
-          height={60}
-          width={60}
-          src={!image ? "/images/blog/comments-2.png" : image}
-          className="mr-3"
-          alt="comments-2.png"
+        <UserImage
+          firstName={firstName}
+          lastName={lastName}
+          image={image}
+          width={50}
+          height={50}
         />
         <div className="ml20">
-          <h6 className="mt-0 mb-0">{name}</h6>
+          <h6 className="mt-0 mb-0">{displayName}</h6>
           <div>
             <span className="fz14">{formattedDate}</span>
           </div>
         </div>
       </div>
       <p className="text mt20 mb20">{comment}</p>
-      <ReviewReactionsForm data={reactionsFormData} />
+      <ReviewReactions data={reactions} />
     </div>
   );
 };
@@ -103,6 +106,11 @@ export default function Reviews({
     value: maxCount === 0 ? 0 : ((star.count / maxCount) * 100).toFixed(2),
   }));
 
+  // console.log(
+  //   "reviews",
+  //   reviews.map((review) => review.attributes.user.data.attributes)
+  // );
+
   return (
     <div className="px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
       <div className="product_single_content mb50">
@@ -132,25 +140,30 @@ export default function Reviews({
                 </div>
               </div>
             </div>
-            <ul>
+            <div>
               {!reviews ? (
                 <div>Δεν υπάρχουν κριτικές.</div>
               ) : (
                 reviews.map(({ attributes: review, id }, i) => (
-                  <li key={i}>
+                  <div key={i}>
                     <Review
                       reviewId={id}
-                      image={null}
-                      name={review.user.data.attributes.displayName}
+                      firstName={review.user.data.attributes.firstName}
+                      lastName={review.user.data.attributes.lastName}
+                      displayName={review.user.data.attributes.displayName}
+                      image={
+                        review.user.data.attributes.image?.data?.attributes
+                          ?.formats?.thumbnail?.url
+                      }
                       date={review.publishedAt}
                       comment={review.comment}
                       likes={review.likes.data}
                       dislikes={review.dislikes.data}
                     />
-                  </li>
+                  </div>
                 ))
               )}
-            </ul>
+            </div>
             <div className="col-md-12">
               <div className="position-relative bdrb1 pb50">
                 <Link href="/service-single" className="ud-btn btn-light-thm">
