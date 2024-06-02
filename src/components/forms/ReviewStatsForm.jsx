@@ -56,9 +56,9 @@ export default function ReviewStatsForm({
         averageRating,
         serviceRating,
         serviceRatingGlobal: {
-          id: serviceRatingGlobal.id,
-          grade: serviceRatingGlobal.attributes.grade,
-          name: serviceRatingGlobal.attributes.name,
+          id: serviceRatingGlobal?.id,
+          grade: serviceRatingGlobal?.attributes?.grade,
+          name: serviceRatingGlobal?.attributes?.name,
         },
         sortedRating: {
           id: sortedRating.id,
@@ -87,7 +87,7 @@ export default function ReviewStatsForm({
   return (
     <form action={formAction} ref={formRef} className="wrapper mx-auto">
       <div className="t-review mb15">{averageRating}</div>
-      <h5>{serviceRatingGlobal.attributes.name}</h5>
+      <h5>{serviceRatingGlobal && serviceRatingGlobal.attributes.name}</h5>
       <p className="text mb-0">
         {ratingServicesCount}{" "}
         {ratingServicesCount > 1 ? "Υπηρεσίες" : "Υπηρεσία"}
