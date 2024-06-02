@@ -2,42 +2,32 @@
 
 import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
+import { getData } from "../api";
 
 export async function getUserId() {
   const token = cookies().get("jwt").value;
 
   const uid = jwtDecode(token).id;
 
-  return uid
+  return uid;
 }
 
 export async function getUser() {
-  const STRAPI_URL = process.env.STRAPI_API_URL;
+  const uid = await getUserId();
 
-  if (!STRAPI_URL) throw new Error("Missing STRAPI_URL environment variable.");
+  const url = `users/${uid}?populate=*`;
 
-  const uid = await getUserId() 
+  const data = getData(url);
 
-  const url = `${STRAPI_URL}/users/${uid}?populate=*`;
+  return data;
+}
 
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+export async function getUserInfo() {
+  const uid = await getUserId();
 
-      cache: "no-cache",
-    });
+  const url = `users/${uid}?populate[image][fields][0]=formats&fields[0]=displayName&fields[1]=firstName&fields[2]=lastName`;
 
-    const data = await response.json();
+  const data = getData(url);
 
-    if (!response.ok && data.error) console.log(data.error.message);
-    if (response.ok) {
-      return data;
-    }
-  } catch (error) {
-    console.error("Get User error:", error);
-    return { error: "Server error. Please try again later." };
-  }
+  return data;
 }
