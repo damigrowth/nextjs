@@ -1,38 +1,24 @@
+import { getData } from "../api";
 import { getUser } from "../user/user";
 
 export async function getFreelancerId() {
   const user = await getUser();
-  const id = user.freelancer.id
-  return id
+  const id = user.freelancer.id;
+  return id;
 }
 
-export async function getFreelancer() {
-  const STRAPI_URL = process.env.STRAPI_API_URL;
+export async function getFreelancer(query) {
+  const freelancerId = await getFreelancerId();
 
-  if (!STRAPI_URL) throw new Error("Missing STRAPI_URL environment variable.");
+  let url = ``;
 
-  const freelancerId = await getFreelancerId()
-
-  const url = `${STRAPI_URL}/freelancers/${freelancerId}?populate=*`;
-
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      cache: "no-cache",
-    });
-
-    const data = await response.json();
-
-    if (!response.ok && data.error) console.log(data.error.message);
-    if (response.ok) {
-      return data;
-    }
-  } catch (error) {
-    console.error("Server error. Please try again later:", error);
-    return { error: "Server error. Please try again later." };
+  if (query === "basic") {
+    url = `freelancers/${freelancerId}?fields[0]=firstName&fields[1]=lastName`;
+  } else {
+    url = `freelancers/${freelancerId}?populate=*`;
   }
+
+  const data = await getData(url);
+
+  return data;
 }
