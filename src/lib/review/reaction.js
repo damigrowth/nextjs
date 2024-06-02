@@ -1,14 +1,12 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { putData } from "../api";
 import { REVIEW_REACT } from "../queries";
 
 // React to a Review - Like or Dislike
-export async function reviewReaction(prevState, formData) {
+export async function reviewReaction(reaction) {
   try {
-    const reactions = formData.get("reactions");
-    const reaction = JSON.parse(reactions);
-
     const likesPayload = {
       likes: reaction.likes,
     };
@@ -17,15 +15,9 @@ export async function reviewReaction(prevState, formData) {
       dislikes: reaction.dislikes,
     };
 
-    const likesResponse = await putData(
-      REVIEW_REACT("like", reaction.reviewId),
-      likesPayload
-    );
+    await putData(REVIEW_REACT("like", reaction.reviewId), likesPayload);
 
-    const dislikesResponse = await putData(
-      REVIEW_REACT("dislike", reaction.reviewId),
-      dislikesPayload
-    );
+    await putData(REVIEW_REACT("dislike", reaction.reviewId), dislikesPayload);
   } catch (error) {
     console.error(error);
     return {
