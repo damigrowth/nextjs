@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -14,12 +15,25 @@ const gigImages = [
   "/images/listings/service-details-1.jpg",
 ];
 
-export default function Gallery() {
+export default function Gallery({ images }) {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [showSwiper, setShowSwiper] = useState(false);
+
   useEffect(() => {
     setShowSwiper(true);
   }, []);
+
+  const galleryImages = images.map((image) => image.attributes.formats);
+
+  const getBestDimensions = (formats) => {
+    if (formats.medium) {
+      return formats.medium;
+    }
+    if (formats.small) {
+      return formats.small;
+    }
+    return formats.thumbnail;
+  };
 
   return (
     <>
@@ -43,17 +57,20 @@ export default function Gallery() {
                 modules={[FreeMode, Navigation, Thumbs]}
                 className="mySwiper2"
               >
-                {gigImages.map((item, i) => (
-                  <SwiperSlide key={i}>
-                    <Image
-                      height={554}
-                      width={929}
-                      src={item}
-                      alt="gallery"
-                      className="w-100 h-auto"
-                    />
-                  </SwiperSlide>
-                ))}
+                {galleryImages.map((formats, i) => {
+                  const image = getBestDimensions(formats);
+                  return (
+                    <SwiperSlide key={i}>
+                      <Image
+                        height={image.height}
+                        width={image.width}
+                        src={image.url}
+                        alt={`gallery-image-${i}`}
+                        className="w-100 h-auto"
+                      />
+                    </SwiperSlide>
+                  );
+                })}
               </Swiper>
             )}
           </div>
@@ -74,14 +91,15 @@ export default function Gallery() {
               modules={[FreeMode, Navigation, Thumbs]}
               className="mySwiper ui-service-gig-slder-bottom"
             >
-              {gigImages.map((item, i) => (
+              {galleryImages.map((image, i) => (
                 <SwiperSlide key={i}>
                   <Image
-                    height={112}
-                    width={150}
-                    src={item}
-                    alt="image"
+                    height={image.thumbnail.height}
+                    width={image.thumbnail.width}
+                    src={image.thumbnail.url}
+                    alt={`gallery-thumb-image-${image.thumbnail.name}`}
                     className="w-100"
+                    style={{ height: "inherit" }}
                   />
                 </SwiperSlide>
               ))}
