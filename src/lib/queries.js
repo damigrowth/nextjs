@@ -44,12 +44,12 @@ export const REVIEW = (reviewId) => {
 };
 
 export const SERVICE = (serviceId) => {
-  const url = `services/${serviceId}?populate[freelancer][fields]=*&populate[category][fields][0]=title&populate[area][fields]=name&populate[skills][fields][0]=title&populate[packages][populate][0]=features&populate[addons][fields]=*&populate[faq][fields]=*&populate[media][fields]=formats&populate[status][fields]=type&populate[rating_global][fields]=name&populate[rating_global][fields]=grade`;
+  const url = `services/${serviceId}?populate[freelancer][fields][0]=firstName&populate[freelancer][fields][1]=lastName&populate[freelancer][fields][2]=displayName&populate[freelancer][populate][0]=image&populate[category][fields][0]=title&populate[area][fields]=name&populate[skills][fields][0]=title&populate[packages][populate][0]=features&populate[addons][fields]=*&populate[faq][fields]=*&populate[media][fields]=formats&populate[status][fields]=type&populate[rating_global][fields]=name&populate[rating_global][fields]=grade&populate[views][populate][user][fields]=id`;
   return url;
 };
 
 export const REVIEWS_BY_SERVICE = (serviceId) => {
-  const url = `reviews?filters[service][id][$eq]=${serviceId}&publicationState=live&populate[user][fields]=displayName&populate[type][fields]=name&populate[status][fields]=type&populate[likes][fields]=id&populate[dislikes][fields]=id`;
+  const url = `reviews?filters[service][id][$eq]=${serviceId}&publicationState=live&populate[user][fields]=displayName&populate[user][fields]=firstName&populate[user][fields]=lastName&populate[user][populate][0]=image&populate[type][fields]=name&populate[status][fields]=type&populate[likes][fields]=id&populate[dislikes][fields]=id`;
 
   return url;
 };
@@ -71,3 +71,13 @@ export const SERVICE_RATING_UPDATE = (serviceId) => {
 };
 
 export const POST_REVIEW = `reviews?populate[status][fields]=type`;
+
+export const SERVICE_VIEW = (serviceId) => {
+  const url = `services/${serviceId}?fields[0]=views`;
+  return url;
+};
+
+export const VIEWS_BY_SERVICE_USER = (serviceId, userId) => {
+  const url = `views?filters[service][id][$eq]=${serviceId}&filters[user][id][$eq]=${userId}`;
+  return url;
+};
