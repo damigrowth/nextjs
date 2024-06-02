@@ -10,6 +10,7 @@ import { Sticky, StickyContainer } from "react-sticky";
 import useScreen from "@/hook/useScreen";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+
 export default function FreelancerDetail1() {
   const isMatchedScreen = useScreen(1216);
   const { id } = useParams();
@@ -229,7 +230,7 @@ export default function FreelancerDetail1() {
                   </div>
                   <hr className="opacity-100 mb60" />
                   <h4 className="mb30">Featured Services</h4>
-                  <div className="row mb35">
+                  {/* <div className="row mb35">
                     {product1.slice(0, 3).map((item, i) => (
                       <div className="col-sm-6 col-xl-4" key={i}>
                         <FreelancerFutureCard1 data={item} />
@@ -238,7 +239,7 @@ export default function FreelancerDetail1() {
                   </div>
                   <hr className="opacity-100" />
                   <ServiceDetailReviewInfo1 />
-                  <ServiceDetailComment1 />
+                  <ServiceDetailComment1 /> */}
                 </div>
               </div>
               <div className="col-lg-4">
