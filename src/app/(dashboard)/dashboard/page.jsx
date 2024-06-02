@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 export default async function page() {
-  const user = await getUser();
+  // const user = await getUser();
 
   // console.log("USER - Dashboard ==>", user);
   return (
