@@ -1,15 +1,16 @@
 import React from "react";
+import PackagesBtns from "./PackagesBtns";
 
-export default function Packages({ service }) {
+export default function Packages({ packages }) {
   return (
     <div className="px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
-      <h4>Compare Packages</h4>
+      <h4>Πακέτα</h4>
       <div className="table-style2 table-responsive bdr1 mt30 mb60">
         <table className="table table-borderless mb-0">
           <thead className="t-head">
             <tr>
               <th className="col " scope="col" />
-              {service.packages.map((pack) => (
+              {packages.map((pack) => (
                 <th key={pack.id} className="col w25" scope="col">
                   <span className="h2">{pack.price}€</span>
                   <br />
@@ -21,10 +22,10 @@ export default function Packages({ service }) {
             </tr>
           </thead>
           <tbody className="t-body">
-            {service.packages[0].features.map((feature, featureIndex) => (
+            {packages[0].features.map((feature, featureIndex) => (
               <tr className="bgc-thm3" key={featureIndex}>
                 <th scope="row">{feature.title}</th>
-                {service.packages.map((pack, index) => (
+                {packages.map((pack, index) => (
                   <td key={index}>
                     {pack.features[featureIndex].isCheckField ? (
                       <div
@@ -50,27 +51,7 @@ export default function Packages({ service }) {
               </tr>
             ))}
 
-            <tr>
-              <th scope="row" />
-              <td>
-                <a className="ud-btn btn-thm">
-                  Select
-                  <i className="fal fa-arrow-right-long" />
-                </a>
-              </td>
-              <td>
-                <a className="ud-btn btn-thm">
-                  Select
-                  <i className="fal fa-arrow-right-long" />
-                </a>
-              </td>
-              <td>
-                <a className="ud-btn btn-thm">
-                  Select
-                  <i className="fal fa-arrow-right-long" />
-                </a>
-              </td>
-            </tr>
+            <PackagesBtns packages={packages} />
           </tbody>
         </table>
       </div>{" "}
