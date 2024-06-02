@@ -3919,6 +3919,7 @@ li {
   margin-right: 30px;
   border: none;
   outline: none;
+  background: transparent;
 }
 .review_reactions button:last-child {
   margin-right: 0;
@@ -11755,6 +11756,7 @@ input:focus-visible {
   font-family: var(--title-font-family);
   font-weight: 400;
 }
+
 .list-news-style .list-meta a {
   color: var(--headings-color);
   font-family: var(--title-font-family);
@@ -11880,7 +11882,7 @@ input:focus-visible {
   -moz-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
   -o-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
   box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   padding: 15px 30px 30px;
   position: relative;
 }
@@ -12254,6 +12256,10 @@ input:focus-visible {
   background-color: rgba(91, 187, 123, 0.15);
 }
 
+.bgc-red-light {
+  background-color: rgba(232, 84, 62, 0.15);
+}
+
 .review-color {
   color: #e1c03f;
 }
@@ -12585,6 +12591,10 @@ input:focus-visible {
 
 .curp {
   cursor: pointer;
+}
+
+.bdr0 {
+  border: none;
 }
 
 .bdr1 {
@@ -13183,4 +13193,112 @@ header.nav-homepage-style .sidemenu-btn {
   display: flex;
   gap: 1.5rem;
   margin-top: 0.5rem;
+}
+
+.user-image-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+}
+
+.small-addon {
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  border-bottom: 1px solid #e9e9e9;
+  outline: none;
+  background-color: transparent;
+}
+
+.small-addon-container {
+  display: block;
+  cursor: pointer;
+  color: var(--headings-color);
+  font-family: var(--title-font-family);
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.85;
+  letter-spacing: 0em;
+  position: relative;
+  padding-left: 28px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  text-align: left;
+}
+
+.small-addon-content {
+  font-size: 14px;
+}
+
+.small-addon-title {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 5px;
+  color: #222222;
+}
+
+.small-addon-description {
+  color: #222222;
+}
+
+.small-addon-price {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+.small-addon-input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.small-addon-container input:checked ~ .small-addon-checkmark {
+  background-color: #1f4b3f;
+}
+
+.small-addon-container .small-addon-checkmark:after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.small-addon-checkmark {
+  border: 1px solid #041e42;
+  border-radius: 4px;
+  position: absolute;
+  top: 3px;
+  left: 0;
+  height: 16px;
+  width: 16px;
+}
+
+.small-packages-nav-tabs {
+  display: flex !important;
+  flex-wrap: initial !important;
+  margin-bottom: 20px !important;
+}
+
+.contact-meta-info {
+  color: var(--headings-color);
+  text-decoration: none;
+  font-weight: 500;
+  text-align: left;
 }

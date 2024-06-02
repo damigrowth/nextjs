@@ -363,8 +363,6 @@ a {
 }
 
 .profile-image {
-  width: 42px;
-  height: 42px;
   position: relative;
   display: flex;
   align-items: center;
