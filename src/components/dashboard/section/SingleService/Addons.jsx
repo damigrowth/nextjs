@@ -1,45 +1,79 @@
 "use client";
 
-import React, { useState } from "react";
+import useServiceOrderStore from "@/store/order/service";
+import React, { useEffect } from "react";
 
-export default function Addons({ addons }) {
-  const [getSelect, setSelect] = useState([]);
+export default function Addons({ addons, small }) {
+  const { order, setOrder, calculateTotal } = useServiceOrderStore();
 
-  // handler
-  const serviceSelectHandler = (price) => {
-    const isExist = getSelect.includes(price);
+  const handleSelectAddons = (addon) => {
+    const isExist = order.addons.some((a) => a.id === addon.id);
 
     if (!isExist) {
-      return setSelect((old) => [...old, price]);
+      setOrder({ addons: [...order.addons, addon] });
+    } else {
+      const newAddons = order.addons.filter((item) => item.id !== addon.id);
+      setOrder({ addons: newAddons });
     }
 
-    const deleted = getSelect.filter((item) => item !== price);
-    setSelect(deleted);
+    calculateTotal();
   };
+
   return (
-    <div className="px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
-      <h4>Extra Υπηρεσίες</h4>
-      <div className="extra-service-tab mb40 mt30">
+    <div
+      className={`pb-0 bg-white bdrs12 wow fadeInUp default-box-shadow1 ${
+        !small ? "px30 pt30" : ""
+      }`}
+    >
+      {!small && <h4>Extra Υπηρεσίες</h4>}
+      <div className="extra-service-tab mb20 mt20">
         <nav>
           <div className="nav flex-column nav-tabs">
             {addons.map((addon, i) => (
               <button
                 key={i}
-                className={`nav-link ${
-                  getSelect?.includes(addon.price) ? "active" : ""
+                className={`${
+                  !small
+                    ? `nav-link ${
+                        order.addons?.some((a) => a.id === addon.id)
+                          ? "active"
+                          : ""
+                      }`
+                    : "small-addon"
                 }`}
               >
-                <label className="custom_checkbox fw500 text-start">
-                  {addon.title}
-                  <span className="text text-bottom">{addon.description}</span>
-                  <input
-                    type="checkbox"
-                    checked={getSelect?.includes(addon.price)}
-                    onChange={() => serviceSelectHandler(addon.price)}
-                  />
-                  <span className="checkmark" />
-                </label>
-                <span className="price">${addon.price}</span>
+                {!small ? (
+                  <label className="custom_checkbox fw500 text-start">
+                    {addon.title}
+                    <span className="text text-bottom">
+                      {addon.description}
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={order.addons?.some((a) => a.id === addon.id)}
+                      onChange={() => handleSelectAddons(addon)}
+                    />
+                    <span className="checkmark" />
+                  </label>
+                ) : (
+                  <label className="small-addon-container">
+                    <div className="small-addon-content">
+                      <h5 className="small-addon-title">{addon.title}</h5>
+                      <div className="small-addon-description">
+                        {addon.description}
+                      </div>
+                      <div className="small-addon-price">{addon.price}€</div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={order.addons?.some((a) => a.id === addon.id)}
+                      onChange={() => handleSelectAddons(addon)}
+                      className="small-addon-input"
+                    />
+                    <span className="small-addon-checkmark" />
+                  </label>
+                )}
+                {!small && <span className="price">{addon.price}€</span>}
               </button>
             ))}
           </div>
