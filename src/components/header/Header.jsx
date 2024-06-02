@@ -1,4 +1,4 @@
-import Avatar from "../avatars/Avatar";
+import InitialsImage from "../user/InitialsImage";
 import Image from "next/image";
 import Link from "next/link";
 import Mega from "./Mega";
@@ -7,8 +7,13 @@ import Navigation from "./Navigation";
 import Protected from "../auth/Protected";
 import Public from "../auth/Public";
 import { isAuthenticated } from "@/lib/auth/authenticated";
+import { getUserInfo } from "@/lib/user/user";
+import { getFreelancer } from "@/lib/freelancer/freelancer";
+import UserImage from "../user/UserImage";
 
 export default async function Header() {
+  const user = await getUserInfo();
+  // console.log(user.image.formats.thumbnail);
   return (
     <>
       <header className="header-nav nav-innerpage-style bg-transparent zi9 position-relative main-menu border-0  ">
@@ -61,7 +66,17 @@ export default async function Header() {
                     </Link>
                   </Public>
                   <Protected>
-                    <Avatar firstName="John" lastName="Doe" avatar="" />
+                    <UserImage
+                      firstName={user.firstName}
+                      lastName={user.lastName}
+                      // displayName={user.displayName}
+                      image={user.image.formats.thumbnail.url}
+                      alt={
+                        user.image.formats.thumbnail.provider_metadata.public_id
+                      }
+                      width={40}
+                      height={40}
+                    />
                   </Protected>
                 </div>
               </div>
