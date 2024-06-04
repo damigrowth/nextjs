@@ -23,16 +23,20 @@ export default function Gallery({ images }) {
     setShowSwiper(true);
   }, []);
 
-  const galleryImages = images.map((image) => image.attributes.formats);
+  const galleryImages = images.map((image) => image?.attributes?.formats);
+
+  console.log("galleryImage", galleryImages);
 
   const getBestDimensions = (formats) => {
-    if (formats.medium) {
-      return formats.medium;
+    if (formats) {
+      if (formats.medium) {
+        return formats.medium;
+      }
+      if (formats.small) {
+        return formats.small;
+      }
+      return formats.thumbnail;
     }
-    if (formats.small) {
-      return formats.small;
-    }
-    return formats.thumbnail;
   };
 
   return (

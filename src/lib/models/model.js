@@ -7,7 +7,6 @@ export async function fetchModel(model, query) {
     const res = await getData(query);
 
     const data = res.data;
-    console.log(model, data);
     const meta = res.meta;
 
     return { [model]: data, ...meta };
