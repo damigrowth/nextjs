@@ -68,8 +68,9 @@ export default async function SingleService({
                   reviewsCount={reviews.length}
                   views={service.views.data.length}
                 />
+
                 <Info
-                  area={service.area.data.attributes.name}
+                  area={service.area.data?.attributes?.name}
                   time={service.time}
                 />
               </div>
@@ -125,7 +126,7 @@ export default async function SingleService({
             <ContactDetails
               freelancer={service.freelancer.data.attributes}
               freelancerId={service.freelancer.data.id}
-              area={service.area.data.attributes.name}
+              area={service.area.data?.attributes?.name}
             />
           </StickySidebar>
         </div>

@@ -4,7 +4,7 @@ import { RATING_SERVICES_COUNT } from "@/lib/queries";
 import ServiceDetailComment1 from "../element/ServiceDetailComment1";
 import ServiceDetailExtra1 from "../element/ServiceDetailExtra1";
 import ServiceDetailFaq1 from "../element/ServiceDetailFaq1";
-import ServiceDetailReviewInfo1 from "../element/ServiceDetailReviewInfo1";
+// import ServiceDetailReviewInfo1 from "../element/ServiceDetailReviewInfo1";
 import ServiceDetailSlider2 from "../element/ServiceDetailSlider2";
 import { getData } from "@/lib/api";
 import AddServiceReviewForm from "../forms/AddServiceReviewForm";

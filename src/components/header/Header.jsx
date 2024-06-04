@@ -12,6 +12,7 @@ import { getFreelancer } from "@/lib/freelancer/freelancer";
 import UserImage from "../user/UserImage";
 
 export default async function Header() {
+  const { authenticated } = await isAuthenticated();
   const user = await getUserInfo();
   // console.log(user.image.formats.thumbnail);
   return (
@@ -54,18 +55,7 @@ export default async function Header() {
                     <span className="d-none d-xl-inline-block">Become a</span>{" "}
                     Seller
                   </Link>
-                  <Public>
-                    <Link className="login-info mr10-lg mr30" href="/login">
-                      Sign in
-                    </Link>
-                    <Link
-                      className="ud-btn btn-thm2 add-joining"
-                      href="/register"
-                    >
-                      Join
-                    </Link>
-                  </Public>
-                  <Protected>
+                  {authenticated ? (
                     <UserImage
                       firstName={user.firstName}
                       lastName={user.lastName}
@@ -77,7 +67,19 @@ export default async function Header() {
                       width={40}
                       height={40}
                     />
-                  </Protected>
+                  ) : (
+                    <>
+                      <Link className="login-info mr10-lg mr30" href="/login">
+                        Sign in
+                      </Link>
+                      <Link
+                        className="ud-btn btn-thm2 add-joining"
+                        href="/register"
+                      >
+                        Join
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

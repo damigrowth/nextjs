@@ -4,6 +4,8 @@ import { getMaintenanceStatus } from "@/lib/maintenance/maintenance";
 import { isAuthenticated } from "@/lib/auth/authenticated";
 import { redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function page() {
   const { isUnderMaintenance } = await getMaintenanceStatus();
   const { authenticated } = await isAuthenticated();

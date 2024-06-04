@@ -3,11 +3,17 @@
 import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
 import { getData } from "../api";
+import { getCookieData } from "@/utils/cookies";
 
 export async function getUserId() {
-  const token = cookies().get("jwt").value;
+  let uid = null;
+  const token = cookies().get("jwt")?.value;
 
-  const uid = jwtDecode(token).id;
+  if (token) {
+    uid = jwtDecode(token).id;
+  } else {
+    uid = null;
+  }
 
   return uid;
 }
@@ -15,9 +21,14 @@ export async function getUserId() {
 export async function getUser() {
   const uid = await getUserId();
 
-  const url = `users/${uid}?populate=*`;
+  let data = null;
 
-  const data = getData(url);
+  if (uid) {
+    const url = `users/${uid}?populate=*`;
+    data = getData(url);
+  } else {
+    data = null;
+  }
 
   return data;
 }
@@ -25,9 +36,14 @@ export async function getUser() {
 export async function getUserInfo() {
   const uid = await getUserId();
 
-  const url = `users/${uid}?populate[image][fields][0]=formats&fields[0]=displayName&fields[1]=firstName&fields[2]=lastName`;
+  let data = null;
 
-  const data = getData(url);
+  if (uid) {
+    const url = `users/${uid}?populate[image][fields][0]=formats&fields[0]=displayName&fields[1]=firstName&fields[2]=lastName`;
+    data = getData(url);
+  } else {
+    data = null;
+  }
 
   return data;
 }

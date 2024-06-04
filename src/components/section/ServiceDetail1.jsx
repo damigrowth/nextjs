@@ -3,7 +3,7 @@ import ServiceDetailComment1 from "../element/ServiceDetailComment1";
 import ServiceDetailExtra1 from "../element/ServiceDetailExtra1";
 import ServiceDetailFaq1 from "../element/ServiceDetailFaq1";
 import ServiceDetailPrice1 from "../element/ServiceDetailPrice1";
-import ServiceDetailReviewInfo1 from "../element/ServiceDetailReviewInfo1";
+// import ServiceDetailReviewInfo1 from "../element/ServiceDetailReviewInfo1";
 import ServiceDetailSlider1 from "../element/ServiceDetailSlider1";
 import { Sticky, StickyContainer } from "react-sticky";
 import useScreen from "@/hook/useScreen";
@@ -184,7 +184,7 @@ export default function ServiceDetail1() {
                     <h4>Add Extra Services</h4>
                     <ServiceDetailExtra1 />
                     <hr className="opacity-100 mb15" />
-                    <ServiceDetailReviewInfo1 />
+                    {/* <ServiceDetailReviewInfo1 /> */}
                     <ServiceDetailComment1 />
                   </div>
                 </div>

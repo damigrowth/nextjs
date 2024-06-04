@@ -33,8 +33,8 @@ export async function updateRating(prevState, formData) {
 
       // POST THE RESPONSE DATA
       resData = {
-        newRating: res.data.attributes.rating,
-        newGlobalRating: res.data.attributes.rating_global.data,
+        newRating: res?.data?.attributes?.rating,
+        newGlobalRating: res?.data?.attributes?.rating_global?.data,
         newRatingServicesCount: ratingServicesCount,
       };
 

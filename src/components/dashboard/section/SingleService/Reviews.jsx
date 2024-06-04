@@ -86,7 +86,7 @@ export default function Reviews({
   ratingServicesCount,
 }) {
   // This outputs: [ 4, 3 ]
-  const reviewRatings = reviews.map((review) => review.attributes.rating);
+  const reviewRatings = reviews.map((review) => review?.attributes?.rating);
 
   const ratingIds = ratings.map(({ id }) => id);
 

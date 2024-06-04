@@ -4,7 +4,7 @@ import { freelancer1, product1 } from "@/data/product";
 import FreelancerAbout1 from "../element/FreelancerAbout1";
 import FreelancerSkill1 from "../element/FreelancerSkill1";
 import ServiceDetailComment1 from "../element/ServiceDetailComment1";
-import ServiceDetailReviewInfo1 from "../element/ServiceDetailReviewInfo1";
+// import ServiceDetailReviewInfo1 from "../element/ServiceDetailReviewInfo1";
 import FreelancerFutureCard1 from "../card/FreelancerFutureCard1";
 import { Sticky, StickyContainer } from "react-sticky";
 import useScreen from "@/hook/useScreen";

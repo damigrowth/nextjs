@@ -4,7 +4,7 @@ import { freelancer1, product1 } from "@/data/product";
 import FreelancerAbout1 from "../element/FreelancerAbout1";
 import FreelancerSkill1 from "../element/FreelancerSkill1";
 import ServiceDetailComment1 from "../element/ServiceDetailComment1";
-import ServiceDetailReviewInfo1 from "../element/ServiceDetailReviewInfo1";
+// import ServiceDetailReviewInfo1 from "../element/ServiceDetailReviewInfo1";
 import FreelancerFutureCard1 from "../card/FreelancerFutureCard1";
 import { Sticky, StickyContainer } from "react-sticky";
 import useScreen from "@/hook/useScreen";
@@ -223,8 +223,8 @@ export default function FreelancerDetail3() {
                   <div className="px30 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1 bdr1">
                     <h4 className="mb30">Featured Services</h4>
                     <div className="row mb35">
-                      {product1.slice(0, 3).map((item,i) => (
-                        <div className="col-sm-6 col-xl-4" key={ i }>
+                      {product1.slice(0, 3).map((item, i) => (
+                        <div className="col-sm-6 col-xl-4" key={i}>
                           <FreelancerFutureCard1 data={item} />
                         </div>
                       ))}
@@ -232,7 +232,7 @@ export default function FreelancerDetail3() {
                   </div>
                   {/* <hr className="opacity-100" /> */}
                   <div className="px30 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1 bdr1">
-                    <ServiceDetailReviewInfo1 />
+                    {/* <ServiceDetailReviewInfo1 /> */}
                     <ServiceDetailComment1 />
                   </div>
                 </div>
