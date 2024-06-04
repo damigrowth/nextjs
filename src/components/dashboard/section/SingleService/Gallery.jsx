@@ -9,12 +9,6 @@ import "swiper/css/thumbs";
 import { FreeMode, Navigation, Thumbs } from "swiper";
 import Image from "next/image";
 
-const gigImages = [
-  "/images/listings/service-details-1.jpg",
-  "/images/listings/service-details-1.jpg",
-  "/images/listings/service-details-1.jpg",
-];
-
 export default function Gallery({ images }) {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [showSwiper, setShowSwiper] = useState(false);
@@ -24,8 +18,6 @@ export default function Gallery({ images }) {
   }, []);
 
   const galleryImages = images.map((image) => image?.attributes?.formats);
-
-  console.log("galleryImage", galleryImages);
 
   const getBestDimensions = (formats) => {
     if (formats) {
