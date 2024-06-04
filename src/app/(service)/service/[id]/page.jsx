@@ -24,28 +24,32 @@ export default async function page({ params }) {
   if (service === undefined) {
     redirect("/not-found");
   } else {
-    // Get current views of service based on service id and user id
-    const { views } = await fetchModel(
-      "views",
-      VIEWS_BY_SERVICE_USER(serviceId, userId)
-    );
-
-    // Check if the length of the filtered array is not empty
-    if (views.length === 0) {
-      const newView = {
-        user: userId,
-        service: serviceId,
-      };
-
-      await postData("views", newView);
-    }
-
     // Get the ratings and reviews
     const { ratings } = await fetchModel("ratings", RATINGS);
     const { reviews } = await fetchModel(
       "reviews",
       REVIEWS_BY_SERVICE(serviceId)
     );
+
+    if (serviceId && userId) {
+      // Get current views of service based on service id and user id
+      const { views } = await fetchModel(
+        "views",
+        VIEWS_BY_SERVICE_USER(serviceId, userId)
+      );
+
+      if (views) {
+        // Check if the length of the filtered array is not empty
+        if (views.length === 0) {
+          const newView = {
+            user: userId,
+            service: serviceId,
+          };
+
+          await postData("views", newView);
+        }
+      }
+    }
 
     return (
       <>
