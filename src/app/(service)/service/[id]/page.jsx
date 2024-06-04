@@ -21,48 +21,46 @@ export default async function page({ params }) {
 
   const { service } = await fetchModel("service", SERVICE(serviceId));
 
-  // console.log("SERVICE", service);
-
   if (service === undefined) {
     redirect("/not-found");
+  } else {
+    // Get current views of service based on service id and user id
+    const { views } = await fetchModel(
+      "views",
+      VIEWS_BY_SERVICE_USER(serviceId, userId)
+    );
+
+    // Check if the length of the filtered array is not empty
+    if (views.length === 0) {
+      const newView = {
+        user: userId,
+        service: serviceId,
+      };
+
+      await postData("views", newView);
+    }
+
+    // Get the ratings and reviews
+    const { ratings } = await fetchModel("ratings", RATINGS);
+    const { reviews } = await fetchModel(
+      "reviews",
+      REVIEWS_BY_SERVICE(serviceId)
+    );
+
+    return (
+      <>
+        <TabSection1 />
+        <div className=" bgc-thm3">
+          <Breadcumb3 path={["Home", "Services", "Design & Creative"]} />
+          <SingleService
+            serviceId={service.id}
+            service={service.attributes}
+            reviews={reviews}
+            ratings={ratings}
+          />
+          <PopulerService />
+        </div>
+      </>
+    );
   }
-
-  // Get current views of service based on service id and user id
-  const { views } = await fetchModel(
-    "views",
-    VIEWS_BY_SERVICE_USER(serviceId, userId)
-  );
-
-  // Check if the length of the filtered array is not empty
-  if (views.length === 0) {
-    const newView = {
-      user: userId,
-      service: serviceId,
-    };
-
-    await postData("views", newView);
-  }
-
-  // Get the ratings and reviews
-  const { ratings } = await fetchModel("ratings", RATINGS);
-  const { reviews } = await fetchModel(
-    "reviews",
-    REVIEWS_BY_SERVICE(serviceId)
-  );
-
-  return (
-    <>
-      <TabSection1 />
-      <div className=" bgc-thm3">
-        <Breadcumb3 path={["Home", "Services", "Design & Creative"]} />
-        <SingleService
-          serviceId={service.id}
-          service={service.attributes}
-          reviews={reviews}
-          ratings={ratings}
-        />
-        <PopulerService />
-      </div>
-    </>
-  );
 }
