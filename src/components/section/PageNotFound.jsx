@@ -29,14 +29,15 @@ export default function PageNotFound() {
                   40<span className="text-thm">4</span>
                 </div>
                 <div className="h2 error_title">
-                  Oops! It looks like you're lost.
+                  Ουυπς! Η σελίδα που ψάχνετε δεν υπάρχει.
                 </div>
                 <p className="text fz15 mb20">
-                  The page you're looking for isn't available. Try to search
-                  again or use the go <br className="d-none d-lg-block" /> to.
+                  Η σελίδα που αναζητάτε δεν είναι διαθέσιμη. Προσπαθήστε να
+                  ψάξετε ξανά ή χρησιμοποιήστε το κουμπί πίσω στην αρχική{" "}
+                  <br className="d-none d-lg-block" />
                 </p>
                 <Link href="/" className="ud-btn btn-thm">
-                  Go back to home
+                  Πίσω στην αρχική
                   <i className="fal fa-arrow-right-long" />
                 </Link>
               </div>

@@ -2,6 +2,9 @@ import React from "react";
 import PackagesBtns from "./PackagesBtns";
 
 export default function Packages({ packages }) {
+  if (packages.length === 0) {
+    return null;
+  }
   return (
     <div className="px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
       <h4>Πακέτα</h4>

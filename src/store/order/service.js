@@ -23,7 +23,12 @@ const useServiceOrderStore = create((set) => ({
       if (fixed) {
         total = fixedPrice + addonsPrice;
       } else {
-        const packagePrice = packages.length > 0 ? packages[0].price : 0;
+        let packagePrice = 0;
+        if (packages.length > 0) {
+          packagePrice = packages[0]?.price;
+        } else {
+          packagePrice = 0;
+        }
         total = packagePrice + addonsPrice;
       }
 

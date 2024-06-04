@@ -21,7 +21,9 @@ export default async function page({ params }) {
 
   const { service } = await fetchModel("service", SERVICE(serviceId));
 
-  if (!service) {
+  // console.log("SERVICE", service);
+
+  if (service === undefined) {
     redirect("/not-found");
   }
 
