@@ -25,21 +25,18 @@ export default function Meta({
             width={40}
             height={40}
           />
-          <p className="mb-0 dark-color fz14 list-inline-item ml25 ml15-sm mb5-sm ml0-xs">
-            <i className="fas fa-star vam fz10 review-color mb5"></i>{" "}
-            {reviewsCount > 0 ? (
-              <>
-                <span>{rating}</span>
-                <span className="ml5">
-                  {reviewsCount === 1
-                    ? `(${reviewsCount}) κριτική`
-                    : `(${reviewsCount}) κριτικές`}
-                </span>
-              </>
-            ) : (
-              <span>Χωρίς κριτικές</span>
-            )}
-          </p>
+          {reviewsCount > 0 ? (
+            <p className="mb-0 dark-color fz14 list-inline-item ml25 ml15-sm mb5-sm ml0-xs">
+              <i className="fas fa-star vam fz10 review-color mb5"></i>{" "}
+              <span>{rating}</span>
+              <span className="ml5">
+                {reviewsCount === 1
+                  ? `(${reviewsCount}) κριτική`
+                  : `(${reviewsCount}) κριτικές`}
+              </span>
+            </p>
+          ) : null}
+
           <p className="mb-0 dark-color fz14 list-inline-item ml25 ml15-sm mb5-sm ml0-xs">
             <i className="flaticon-file-1 vam fz20 me-2"></i> 2 Order in Queue
           </p>
