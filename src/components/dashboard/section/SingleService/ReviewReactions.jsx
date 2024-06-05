@@ -60,7 +60,6 @@ function ReactionButton({ type, reactions, setReactions }) {
       <span className="review_reactions_counter">
         {type === "like" ? reactions.likes.length : reactions.dislikes.length}
       </span>
-      <span>{type === "like" ? "Θετικά" : "Αρνητικά"}</span>
     </button>
   );
 }
