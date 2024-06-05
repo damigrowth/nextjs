@@ -46,7 +46,7 @@ export default async function SingleService({
 
   const uid = await getUserId();
 
-  // console.log(uid);
+  // console.log(service.category.data?.attributes?.title);
 
   return (
     <section className="pt10 pb90 pb30-md">
@@ -71,6 +71,7 @@ export default async function SingleService({
 
                 <Info
                   area={service.area.data?.attributes?.name}
+                  category={service.category.data?.attributes?.title}
                   time={service.time}
                 />
               </div>
