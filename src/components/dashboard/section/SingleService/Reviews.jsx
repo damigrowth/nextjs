@@ -118,7 +118,7 @@ export default function Reviews({
           <div className="row">
             <div className="col-lg-12">
               <div className="total_review mb30 mt45">
-                <h4>{reviews.length} Κριτικές</h4>
+                <h4>{reviews.length} Αξιολογήσεις</h4>
               </div>
               <div className="d-md-flex align-items-center mb30">
                 <div className="total-review-box d-flex align-items-center text-center mb30-sm">
@@ -142,7 +142,7 @@ export default function Reviews({
             </div>
             <div>
               {!reviews ? (
-                <div>Δεν υπάρχουν κριτικές.</div>
+                <div>Δεν υπάρχουν αξιολογήσεις.</div>
               ) : (
                 reviews.map(({ attributes: review, id }, i) => (
                   <div key={i}>

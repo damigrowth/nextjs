@@ -31,8 +31,8 @@ export default function Meta({
               <span>{rating}</span>
               <span className="ml5">
                 {reviewsCount === 1
-                  ? `(${reviewsCount}) κριτική`
-                  : `(${reviewsCount}) κριτικές`}
+                  ? `(${reviewsCount}) αξιολόγηση`
+                  : `(${reviewsCount}) αξιολογήσεις`}
               </span>
             </p>
           ) : null}
