@@ -6,6 +6,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import ReactStars from "react-stars";
 import TextArea from "../inputs/TextArea";
 import ReviewSuccess from "../dashboard/section/ReviewSuccess/ReviewSuccess";
+import Rating from "../rating/Rating";
 
 function AddServiceReviewButton() {
   const { pending } = useFormStatus();
@@ -87,13 +88,14 @@ export default function AddServiceReviewForm({ serviceId }) {
             Το email σας δεν θα δημοσιευτεί, μόνο το όνομα και το επίθετο.
           </p>
           <h6>Βαθμολογία</h6>
-          <ReactStars
+          <Rating
             count={5}
             value={formData.rating}
             half={false}
             onChange={handleRatingChange}
             size={24}
-            color2={"#5bbb7b"}
+            color1={"#6b7177"}
+            color2={"#e1c03f"}
           />
 
           <form action={formAction} className="comments_form mt30 mb30-md">
