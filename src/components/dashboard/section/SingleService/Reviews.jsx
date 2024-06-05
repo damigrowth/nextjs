@@ -5,6 +5,7 @@ import { formatDate } from "@/utils/formatDate";
 import Image from "next/image";
 import Link from "next/link";
 import ReviewReactions from "./ReviewReactions";
+import Rating from "@/components/rating/Rating";
 
 const Review = async ({
   reviewId,
@@ -16,8 +17,9 @@ const Review = async ({
   comment,
   likes,
   dislikes,
+  rating,
 }) => {
-  const { formattedDate } = formatDate(date, "dd MMMM yyyy");
+  const { formattedDate } = formatDate(date, "dd/MM/yyyy");
 
   const uid = await getUserId();
 
@@ -40,7 +42,21 @@ const Review = async ({
         />
         <div className="ml20">
           <h6 className="mt-0 mb-0">{displayName}</h6>
-          <div>
+          <div className="d-flex align-items-center">
+            <div className="d-flex align-items-center">
+              <Rating
+                count={5}
+                value={rating}
+                half={false}
+                size={20}
+                color1={"#6b7177"}
+                color2={"#e1c03f"}
+                onChange={null}
+                edit={false}
+              />
+              <span className="ml5 fz14 fw600">{rating}</span>
+            </div>
+            <span className="inline-divider"></span>
             <span className="fz14">{formattedDate}</span>
           </div>
         </div>
@@ -159,6 +175,7 @@ export default function Reviews({
                       comment={review.comment}
                       likes={review.likes.data}
                       dislikes={review.dislikes.data}
+                      rating={review.rating}
                     />
                   </div>
                 ))
