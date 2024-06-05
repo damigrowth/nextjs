@@ -38,9 +38,6 @@ export default function Meta({
           ) : null}
 
           <p className="mb-0 dark-color fz14 list-inline-item ml25 ml15-sm mb5-sm ml0-xs">
-            <i className="flaticon-file-1 vam fz20 me-2"></i> 2 Order in Queue
-          </p>
-          <p className="mb-0 dark-color fz14 list-inline-item ml25 ml15-sm mb5-sm ml0-xs">
             <i className="flaticon-website vam fz20 me-2"></i> {views} Views
           </p>
         </div>
