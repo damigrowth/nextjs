@@ -25,6 +25,8 @@ export async function middleware(request) {
     "/dashboard/customers",
     "/add-services",
     "/manage-services",
+    "/message",
+    "my-profile",
   ];
 
   if (isUnderMaintenance) {
@@ -39,7 +41,7 @@ export async function middleware(request) {
     }
   } else {
     // Redirect to the login page if trying to access protected paths without a cookie
-    if (protectedPaths.includes(currentPath) && authenticated === undefined) {
+    if (protectedPaths.includes(currentPath) && authenticated === false) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
