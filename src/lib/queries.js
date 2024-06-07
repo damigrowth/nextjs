@@ -1,12 +1,23 @@
 export const MAINTENANCE = "maintenance?fields[0]=isActive";
+
 export const CATEGORIES = "categories?fields[0]=title";
+
 export const SKILLS = "skills?fields[0]=title";
+
+export const TAGS = "tags?fields[0]=title";
+
+export const TAGS_SEARCH = (query) => {
+  const url = `tags?fields[0]=title&fields[1]=slug&filters[title][$contains]=${query}`;
+  return url;
+};
 export const LOCATIONS =
   "locations/?fields[0]=zipcode&fields[1]=area&fields[2]=county";
+
 export const LOCATIONS_SEARCH = (query) => {
   const url = `locations?fields[0]=zipcode&fields[1]=area&fields[2]=county&filters[area][$contains]=${query}`;
   return url;
 };
+
 export const ZIPCODE = (zipcode) => {
   const url = `zipcodes?fields[0]=name&filters[name][$eq]=${zipcode}`;
   return url;
@@ -43,8 +54,8 @@ export const REVIEW = (reviewId) => {
   const url = `reviews/${reviewId}/?populate[user][fields]=id&populate[type][fields]=name&populate[status][fields]=type&populate[service][fields]=id&populate[likes][fields]=id&fields[0]=comment&fields[1]=rating`;
 };
 
-export const SERVICE = (serviceId) => {
-  const url = `services/${serviceId}?populate[freelancer][fields][0]=firstName&populate[freelancer][fields][1]=lastName&populate[freelancer][fields][2]=displayName&populate[freelancer][populate][0]=image&populate[category][fields][0]=title&populate[area][fields]=name&populate[skills][fields][0]=title&populate[packages][populate][0]=features&populate[addons][fields]=*&populate[faq][fields]=*&populate[media][fields]=formats&populate[status][fields]=type&populate[rating_global][fields]=name&populate[rating_global][fields]=grade&populate[views][populate][user][fields]=id`;
+export const SERVICE = (serviceSlug) => {
+  const url = `services?filters[slug][$eq]=${serviceSlug}&populate[freelancer][fields][0]=firstName&populate[freelancer][fields][1]=lastName&populate[freelancer][fields][2]=displayName&populate[freelancer][populate][image][fields]=*&populate[freelancer][populate][user][fields]=verified&populate[category][fields][0]=title&populate[area][fields]=name&populate[skills][fields][0]=title&populate[packages][populate][0]=features&populate[addons][fields]=*&populate[faq][fields]=*&populate[media][fields]=formats&populate[status][fields]=type&populate[rating_global][fields]=name&populate[rating_global][fields]=grade&populate[views][populate][user][fields]=id&populate[tags][fields]=title&populate[tags][fields]=slug`;
   return url;
 };
 
