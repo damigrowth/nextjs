@@ -30,7 +30,7 @@ const useSaveServiceStore = (set) => ({
         title,
         description,
         category,
-        skills,
+        tags,
         price,
         time,
         county,
@@ -129,13 +129,13 @@ const useSaveServiceStore = (set) => ({
         };
       }
 
-      // Check if skills are empty
-      if (skills.length < 1) {
+      // Check if tags are empty
+      if (tags.length < 1) {
         return {
           errors: {
-            field: "service-skills",
+            field: "service-tags",
             active: true,
-            message: "Οι δεξιότητες είναι υποχρεωτικές",
+            message: "Τα χαρακτηριστικά είναι υποχρεωτικά",
           },
         };
       }

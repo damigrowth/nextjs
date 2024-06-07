@@ -13,7 +13,7 @@ import {
 } from "@/lib/queries";
 import useSWR from "swr";
 
-export default function ServiceInformation({ categories, skills }) {
+export default function ServiceInformation({ categories, tags }) {
   const { info, setInfo, saveInfo, errors, handleStepsTypeChange } =
     useCreateServiceStore();
 
@@ -31,9 +31,9 @@ export default function ServiceInformation({ categories, skills }) {
     label: category.attributes.title,
   }));
 
-  const skillOptions = skills.map((skill) => ({
-    value: skill.id,
-    label: skill.attributes.title,
+  const tagOptions = tags.map((tag) => ({
+    value: tag.id,
+    label: tag.attributes.title,
   }));
 
   const handlePriceTypeChange = (e) => {
@@ -158,19 +158,17 @@ export default function ServiceInformation({ categories, skills }) {
             <div className="col-sm-6">
               <div className="mb20">
                 <SelectInputSearch
-                  options={skillOptions}
-                  id="service-skills"
-                  name="service-skills"
-                  label="Δεξιότητες"
-                  labelPlural="δεξιότητες"
+                  options={tagOptions}
+                  id="service-tags"
+                  name="service-tags"
+                  label="Χαρακτηριστικά"
+                  labelPlural="χαρακτηριστικά"
                   errors={errors}
-                  defaultValue={info.skills.map((skill) => ({
-                    value: skill.id,
-                    label: skill.title,
+                  defaultValue={info.tags.map((tag) => ({
+                    value: tag.id,
+                    label: tag.title,
                   }))}
-                  onSelect={(formattedArray) =>
-                    setInfo("skills", formattedArray)
-                  }
+                  onSelect={(formattedArray) => setInfo("tags", formattedArray)}
                   isMulti
                 />
               </div>

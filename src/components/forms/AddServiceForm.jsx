@@ -28,7 +28,7 @@ function AddServiceButton() {
   );
 }
 
-export default function AddServiceForm({ categories, skills }) {
+export default function AddServiceForm({ categories, tags }) {
   const { service, saved, optional, step, steps, setStep, info, media } =
     useCreateServiceStore();
 
@@ -73,7 +73,7 @@ export default function AddServiceForm({ categories, skills }) {
           readOnly
         />
         {step === "info" && (
-          <ServiceInformation categories={categories} skills={skills} />
+          <ServiceInformation categories={categories} tags={tags} />
         )}
         {serviceID ? (
           <ServiceSuccess id={serviceID} title={serviceTitle} />

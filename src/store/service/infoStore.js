@@ -17,7 +17,7 @@ const initialInfoState = {
   price: 0,
   time: 0,
   category: initialObjectState,
-  skills: [],
+  tags: [],
   county: initialLocationObjectState,
   area: initialLocationObjectState,
   zipcode: initialLocationObjectState,
