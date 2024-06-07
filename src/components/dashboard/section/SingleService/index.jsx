@@ -46,12 +46,10 @@ export default async function SingleService({
 
   const uid = await getUserId();
 
-  // console.log(service.category.data?.attributes?.title);
-
   return (
     <section className="pt10 pb90 pb30-md">
       <div className="container">
-        <div className="row wrap">
+        <div className="row wrap service-wrapper">
           <div className="col-lg-8">
             <div className="column">
               <div className="row  px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
@@ -67,6 +65,10 @@ export default async function SingleService({
                   rating={service.rating}
                   reviewsCount={reviews.length}
                   views={service.views.data.length}
+                  verified={
+                    service.freelancer.data.attributes.user.data.attributes
+                      .verified
+                  }
                 />
 
                 <Info
@@ -77,7 +79,10 @@ export default async function SingleService({
               </div>
               <Gallery images={service.media.data} />
               <div className="service-about">
-                <Description description={service.description} />
+                <Description
+                  description={service.description}
+                  tags={service.tags.data}
+                />
                 {service.fixed ? null : (
                   <Packages packages={service.packages} />
                 )}
