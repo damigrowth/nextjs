@@ -737,3 +737,31 @@ a {
   margin: 2px 15px;
   height: 15px;
 }
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-items: flex-start;
+  gap: 0.3rem;
+  padding-top: 0.5rem;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  padding-inline-start: 0px;
+}
+
+.tags li {
+  list-style: none;
+}
+
+.tags p {
+  margin: 0px;
+  width: fit-content;
+  border-radius: 50px;
+  padding: 0.2rem 1rem;
+  background-color: #d1e7dd;
+  color: #198754;
+}
+
+.service-sidebar {
+  position: relative;
+}
