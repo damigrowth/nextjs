@@ -14,14 +14,31 @@ import {
 import SingleService from "@/components/dashboard/section/SingleService";
 import { postData, putData } from "@/lib/api";
 import { getUserId } from "@/lib/user/user";
+import { truncateText } from "@/utils/truncateText";
+
+// Dynamic SEO
+export async function generateMetadata({ params }) {
+  const serviceSlug = params.slug;
+  const { service } = await fetchModel("service", SERVICE(serviceSlug));
+
+  const title = service[0].attributes.title;
+  const description = truncateText(service[0].attributes.description, 155);
+
+  return {
+    title: title + " - " + "Doulitsa",
+    description,
+  };
+}
 
 export default async function page({ params }) {
-  const serviceId = params.id;
+  const serviceSlug = params.slug;
   const userId = await getUserId();
 
-  const { service } = await fetchModel("service", SERVICE(serviceId));
+  const { service } = await fetchModel("service", SERVICE(serviceSlug));
 
-  if (service === undefined) {
+  const serviceId = service[0]?.id;
+
+  if (service === undefined || serviceId === undefined) {
     redirect("/not-found");
   } else {
     // Get the ratings and reviews
@@ -57,8 +74,8 @@ export default async function page({ params }) {
         <div className=" bgc-thm3">
           <Breadcumb3 path={["Home", "Services", "Design & Creative"]} />
           <SingleService
-            serviceId={service.id}
-            service={service.attributes}
+            serviceId={serviceId}
+            service={service[0].attributes}
             reviews={reviews}
             ratings={ratings}
           />
