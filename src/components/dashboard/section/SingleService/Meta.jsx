@@ -10,6 +10,7 @@ export default function Meta({
   rating,
   reviewsCount,
   views,
+  verified,
 }) {
   // console.log("meta", firstName, lastName, displayName, image);
   return (
@@ -37,9 +38,11 @@ export default function Meta({
             </p>
           ) : null}
 
-          <p className="mb-0 dark-color fz14 list-inline-item ml25 ml15-sm mb5-sm ml0-xs">
-            <i className="flaticon-badge vam fz20 me-2"></i>Πιστοποιημένος
-          </p>
+          {verified === null || verified === false ? null : (
+            <p className="mb-0 dark-color fz14 list-inline-item ml25 ml15-sm mb5-sm ml0-xs">
+              <i className="flaticon-badge vam fz20 me-2"></i>Πιστοποιημένος
+            </p>
+          )}
         </div>
       </div>
     </div>
