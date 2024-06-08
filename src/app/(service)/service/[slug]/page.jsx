@@ -21,13 +21,30 @@ export async function generateMetadata({ params }) {
   const serviceSlug = params.slug;
   const { service } = await fetchModel("service", SERVICE(serviceSlug));
 
-  const title = service[0].attributes.title;
-  const description = truncateText(service[0].attributes.description, 155);
+  // console.log("META", service[0].attributes.seo);
 
-  return {
-    title: title + " - " + "Doulitsa",
-    description,
-  };
+  if (service === undefined) {
+    redirect("/not-found");
+  } else {
+    const title = service[0].attributes.title;
+    const description = truncateText(service[0].attributes.description, 155);
+
+    let metaTitle = "";
+    let metaDescription = "";
+
+    if (service[0].attributes.seo !== null) {
+      metaTitle = service[0].attributes.seo.metaTitle + " - " + "Doulitsa";
+      metaDescription = service[0].attributes.seo.metaDescription;
+    } else {
+      metaTitle = title + " - " + "Doulitsa";
+      metaDescription = description;
+    }
+
+    return {
+      title: metaTitle,
+      description: metaDescription,
+    };
+  }
 }
 
 export default async function page({ params }) {

@@ -55,7 +55,7 @@ export const REVIEW = (reviewId) => {
 };
 
 export const SERVICE = (serviceSlug) => {
-  const url = `services?filters[slug][$eq]=${serviceSlug}&populate[freelancer][fields][0]=firstName&populate[freelancer][fields][1]=lastName&populate[freelancer][fields][2]=displayName&populate[freelancer][populate][image][fields]=*&populate[freelancer][populate][user][fields]=verified&populate[category][fields][0]=title&populate[area][fields]=name&populate[skills][fields][0]=title&populate[packages][populate][0]=features&populate[addons][fields]=*&populate[faq][fields]=*&populate[media][fields]=formats&populate[status][fields]=type&populate[rating_global][fields]=name&populate[rating_global][fields]=grade&populate[views][populate][user][fields]=id&populate[tags][fields]=title&populate[tags][fields]=slug`;
+  const url = `services?filters[slug][$eq]=${serviceSlug}&populate[freelancer][fields][0]=firstName&populate[freelancer][fields][1]=lastName&populate[freelancer][fields][2]=displayName&populate[freelancer][populate][image][fields]=*&populate[freelancer][populate][user][fields]=verified&populate[category][fields][0]=title&populate[area][fields]=name&populate[skills][fields][0]=title&populate[packages][populate][0]=features&populate[addons][fields]=*&populate[faq][fields]=*&populate[media][fields]=formats&populate[status][fields]=type&populate[rating_global][fields]=name&populate[rating_global][fields]=grade&populate[views][populate][user][fields]=id&populate[tags][fields]=title&populate[tags][fields]=slug&populate[seo]=*`;
   return url;
 };
 
