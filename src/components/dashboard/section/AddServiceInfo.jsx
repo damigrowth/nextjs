@@ -1,11 +1,13 @@
 import AddServiceForm from "@/components/forms/AddServiceForm";
 import DashboardNavigation from "../header/DashboardNavigation";
 import { fetchModel } from "@/lib/models/model";
-import { CATEGORIES, SKILLS, TAGS } from "@/lib/queries";
+import { getData } from "@/lib/client/operations";
+import { CATEGORIES, TAGS } from "@/lib/graphql/queries";
 
 export default async function AddServiceInfo() {
-  const { categories } = await fetchModel("categories", CATEGORIES);
-  const { tags } = await fetchModel("tags", TAGS);
+  const { categories } = await getData(CATEGORIES);
+  const { tags } = await getData(TAGS);
+  // console.log(tags.data);
 
   return (
     <>
@@ -15,7 +17,7 @@ export default async function AddServiceInfo() {
             <DashboardNavigation />
           </div>
           <div className="col-lg-12">
-            <AddServiceForm categories={categories} tags={tags} />
+            <AddServiceForm categories={categories.data} tags={tags.data} />
           </div>
         </div>
       </div>

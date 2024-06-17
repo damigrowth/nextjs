@@ -1,5 +1,3 @@
-// import { Sticky, StickyWrapper } from "react-sticky";
-
 import AddServiceReviewForm from "@/components/forms/AddServiceReviewForm";
 import Description from "./Description";
 import Packages from "./Packages";
@@ -7,7 +5,6 @@ import Faq from "./Faq";
 import Addons from "./Addons";
 import Reviews from "./Reviews";
 import { RATING_SERVICES_COUNT } from "@/lib/queries";
-import { getData } from "@/lib/api";
 import Info from "./Info";
 import Meta from "./Meta";
 import SkeletonRect from "@/components/loading/PartialSkeletons";
@@ -17,6 +14,8 @@ import ContactDetails from "./ContactDetails";
 import StickySidebar from "@/components/sticky/StickySidebar";
 import Gallery from "./Gallery";
 import { getUserId } from "@/lib/user/user";
+import { getData } from "@/lib/client/operations";
+import { COUNT_SERVICES_BY_RATING } from "@/lib/graphql/queries";
 
 export default async function SingleService({
   serviceId,
@@ -36,12 +35,16 @@ export default async function SingleService({
   let ratingServicesCount = undefined;
 
   if (service.rating_global.data && service.rating_global.data.id) {
-    const ratingServicesCountData = await getData(
-      RATING_SERVICES_COUNT(service.rating_global.data.id)
-    );
+    const ratingId = Number(service.rating_global.data.id);
+    const ratingServicesCountData = await getData(COUNT_SERVICES_BY_RATING, {
+      ratingId: ratingId,
+    });
 
     ratingServicesCount =
-      ratingServicesCountData?.data?.attributes?.services?.data?.length;
+      ratingServicesCountData.ratings?.data[0]?.attributes?.services?.data
+        ?.length;
+
+    // console.log("ratingServicesCount", ratingServicesCount);
   }
 
   const uid = await getUserId();
@@ -59,12 +62,12 @@ export default async function SingleService({
                   lastName={service.freelancer.data.attributes.lastName}
                   displayName={service.freelancer.data.attributes.displayName}
                   image={
-                    service.freelancer.data.attributes?.image?.data?.attributes
+                    service.freelancer.data.attributes.image.data?.attributes
                       ?.formats?.thumbnail?.url
                   }
                   rating={service.rating}
                   reviewsCount={reviews.length}
-                  views={service.views.data.length}
+                  views={service?.views?.data?.length}
                   verified={
                     service.freelancer.data.attributes.user.data.attributes
                       .verified
@@ -73,7 +76,7 @@ export default async function SingleService({
 
                 <Info
                   area={service.area.data?.attributes?.name}
-                  category={service.category.data?.attributes?.title}
+                  category={service.category.data?.attributes?.label}
                   time={service.time}
                 />
               </div>

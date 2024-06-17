@@ -31,6 +31,8 @@ export default function Gallery({ images }) {
     }
   };
 
+  // console.log("formats", galleryImages);
+
   return (
     <>
       <div className="scrollbalance-inner">

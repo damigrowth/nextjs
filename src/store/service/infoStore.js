@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 const initialObjectState = {
   id: 0,
-  title: "",
+  label: "",
 };
 
 const initialLocationObjectState = {

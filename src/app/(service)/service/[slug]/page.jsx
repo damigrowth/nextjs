@@ -4,37 +4,34 @@ import React from "react";
 import TabSection1 from "@/components/section/TabSection1";
 import { redirect } from "next/navigation";
 import { fetchModel } from "@/lib/models/model";
-import {
-  RATINGS,
-  REVIEWS_BY_SERVICE,
-  SERVICE,
-  SERVICE_VIEW,
-  VIEWS_BY_SERVICE_USER,
-} from "@/lib/queries";
+import { VIEWS_BY_SERVICE_USER } from "@/lib/queries";
 import SingleService from "@/components/dashboard/section/SingleService";
 import { postData, putData } from "@/lib/api";
 import { getUserId } from "@/lib/user/user";
 import { truncateText } from "@/utils/truncateText";
+import { getData } from "@/lib/client/operations";
+import { RATINGS, SERVICE_BY_SLUG } from "@/lib/graphql/queries";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
   const serviceSlug = params.slug;
-  const { service } = await fetchModel("service", SERVICE(serviceSlug));
+  const { services } = await getData(SERVICE_BY_SLUG, { slug: serviceSlug });
+  const service = services.data[0].attributes;
 
   // console.log("META", service[0].attributes.seo);
 
   if (service === undefined) {
     redirect("/not-found");
   } else {
-    const title = service[0].attributes.title;
-    const description = truncateText(service[0].attributes.description, 155);
+    const title = service.title;
+    const description = truncateText(service.description, 155);
 
     let metaTitle = "";
     let metaDescription = "";
 
-    if (service[0].attributes.seo !== null) {
-      metaTitle = service[0].attributes.seo.metaTitle + " - " + "Doulitsa";
-      metaDescription = service[0].attributes.seo.metaDescription;
+    if (service.seo !== null) {
+      metaTitle = service.seo.metaTitle + " - " + "Doulitsa";
+      metaDescription = service.seo.metaDescription;
     } else {
       metaTitle = title + " - " + "Doulitsa";
       metaDescription = description;
@@ -51,19 +48,27 @@ export default async function page({ params }) {
   const serviceSlug = params.slug;
   const userId = await getUserId();
 
-  const { service } = await fetchModel("service", SERVICE(serviceSlug));
+  const { services } = await getData(SERVICE_BY_SLUG, { slug: serviceSlug });
 
-  const serviceId = service[0]?.id;
+  const serviceId = Number(services.data[0]?.id);
+  const service = services.data[0].attributes;
 
   if (service === undefined || serviceId === undefined) {
     redirect("/not-found");
   } else {
     // Get the ratings and reviews
-    const { ratings } = await fetchModel("ratings", RATINGS);
-    const { reviews } = await fetchModel(
-      "reviews",
-      REVIEWS_BY_SERVICE(serviceId)
-    );
+    // const { ratings } = await fetchModel("ratings", RATINGS);
+    // const { reviews } = await fetchModel(
+    //   "reviews",
+    //   REVIEWS_BY_SERVICE(serviceId)
+    // );
+    // console.log("REVIEWS ORIGINAL", reviews);
+
+    const reviews = service.reviews?.data;
+    const ratingsData = await getData(RATINGS);
+    const ratings = ratingsData.ratings?.data;
+    // console.log("RATINGS", ratings);
+    // console.log("REVIEWS", reviews);
 
     if (serviceId && userId) {
       // Get current views of service based on service id and user id
@@ -92,7 +97,7 @@ export default async function page({ params }) {
           <Breadcumb3 path={["Home", "Services", "Design & Creative"]} />
           <SingleService
             serviceId={serviceId}
-            service={service[0].attributes}
+            service={service}
             reviews={reviews}
             ratings={ratings}
           />

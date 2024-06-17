@@ -29,6 +29,8 @@ function ReviewCommentInput({ formState, formData, handleCommentChange }) {
   return (
     <TextArea
       label=""
+      id="comment"
+      name="comment"
       minLength={25}
       maxLength={350}
       counter
@@ -44,6 +46,7 @@ function ReviewCommentInput({ formState, formData, handleCommentChange }) {
 }
 
 export default function AddServiceReviewForm({ serviceId }) {
+  console.log("serviceId", serviceId);
   const initialState = {
     data: null,
     errors: {},
@@ -76,6 +79,8 @@ export default function AddServiceReviewForm({ serviceId }) {
   };
 
   const reviewId = formState?.data?.id;
+
+  // console.log("ERRRORS", formState?.errors, reviewId);
 
   return (
     <>

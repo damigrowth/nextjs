@@ -27,13 +27,13 @@ export default function ServiceInformation({ categories, tags }) {
   };
 
   const categoryOptions = categories.map((category) => ({
-    value: category.id,
-    label: category.attributes.title,
+    value: Number(category.id),
+    label: category.attributes.label,
   }));
 
   const tagOptions = tags.map((tag) => ({
-    value: tag.id,
-    label: tag.attributes.title,
+    value: Number(tag.id),
+    label: tag.attributes.label,
   }));
 
   const handlePriceTypeChange = (e) => {
@@ -79,6 +79,9 @@ export default function ServiceInformation({ categories, tags }) {
       label: zipcode.attributes.name,
     })),
   };
+
+  // console.log("category", info.zipcode);
+  // console.log("TAGS", info.tags);
 
   return (
     <div>
@@ -147,9 +150,9 @@ export default function ServiceInformation({ categories, tags }) {
                   errors={errors}
                   isSearchable={true}
                   options={categoryOptions}
-                  defaultValue={info.category.title}
-                  onSelect={({ id, title }) =>
-                    setInfo("category", { id, title })
+                  defaultValue={info.category.label}
+                  onSelect={({ id, label }) =>
+                    setInfo("category", { id, label })
                   }
                   capitalize
                 />
@@ -166,7 +169,7 @@ export default function ServiceInformation({ categories, tags }) {
                   errors={errors}
                   defaultValue={info.tags.map((tag) => ({
                     value: tag.id,
-                    label: tag.title,
+                    label: tag.label,
                   }))}
                   onSelect={(formattedArray) => setInfo("tags", formattedArray)}
                   isMulti

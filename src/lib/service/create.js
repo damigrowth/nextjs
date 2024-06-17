@@ -1,7 +1,8 @@
 "use server";
 
-import { postData } from "../api";
+import { postData } from "../client/operations";
 import { getFreelancerId } from "../freelancer/freelancer";
+import { POST_SERVICE } from "../graphql/mutations";
 import { uploadMedia } from "../uploads/upload";
 
 // Create service
@@ -37,17 +38,29 @@ export async function createService(prevState, formData) {
 
     // CREATE SERVICE
     const payload = {
-      ...service,
-      freelancer: freelancerId,
-      status: 2,
-      media: uploadedMedia,
+      data: {
+        fixed: service.fixed,
+        title: service.title,
+        description: service.description,
+        price: service.price,
+        time: service.time,
+        category: service.category.id,
+        tags: service.tags.map((el) => el.id),
+        county: service.county.id,
+        area: service.area.id,
+        zipcode: service.zipcode.id,
+        freelancer: Number(freelancerId),
+        status: 2,
+        media: uploadedMedia,
+      },
     };
 
-    const response = await postData("services", payload);
+    // console.log("PAYLOAD", payload);
 
-    // console.log("RESPONSE backend", response);
+    // const response = await postData("services", payload);
+    const response = await postData(POST_SERVICE, payload);
 
-    if (!response.data) {
+    if (!response?.createService?.data) {
       return {
         ...prevState,
         message: "Η δημιουργία υπηρεσίας απέτυχε!",
@@ -59,7 +72,7 @@ export async function createService(prevState, formData) {
         ...prevState,
         message: "Η δημιουργία υπηρεσίας ολοκληρώθηκε επιτυχώς!",
         errors: null,
-        data: response.data,
+        data: response.createService.data,
       };
     }
   } catch (error) {

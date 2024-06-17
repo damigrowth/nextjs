@@ -1,9 +1,9 @@
 "use server";
 
 import { z } from "zod";
-import { postData, putData } from "../api";
-import { POST_REVIEW } from "../queries";
 import { getUserId } from "../user/user";
+import { postData } from "../client/operations";
+import { POST_REVIEW } from "../graphql/mutations";
 
 const reviewSchema = z.object({
   rating: z.number(),
@@ -39,16 +39,16 @@ export async function createServiceReview(prevState, formData) {
     const payload = {
       rating: review.rating,
       comment: review.comment,
-      service: review.serviceId,
+      service: Number(review.serviceId),
       user: uid,
       type: 1,
       status: 2,
       publishedAt: null,
     };
 
-    const response = await postData(POST_REVIEW, payload);
+    const response = await postData(POST_REVIEW, { data: payload });
 
-    const reviewId = response?.data?.id;
+    const reviewId = response?.createReview?.data?.id;
 
     if (reviewId) {
       return {

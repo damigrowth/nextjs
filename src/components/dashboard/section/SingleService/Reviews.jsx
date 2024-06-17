@@ -30,6 +30,8 @@ const Review = async ({
     reviewId,
   };
 
+  // console.log("rating", rating);
+
   return (
     <div className="col-md-12 mb40">
       <div className="mt30 position-relative d-flex align-items-center justify-content-start mb30-sm">
@@ -104,7 +106,7 @@ export default function Reviews({
   // This outputs: [ 4, 3 ]
   const reviewRatings = reviews.map((review) => review?.attributes?.rating);
 
-  const ratingIds = ratings.map(({ id }) => id);
+  const ratingIds = ratings.map(({ id }) => Number(id));
 
   // Calculate the count for each star rating
   const starCounts = ratingIds.map((star) => ({

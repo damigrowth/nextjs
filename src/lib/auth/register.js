@@ -63,7 +63,7 @@ export async function register(prevState, formData) {
     if (!validatedFields.success) {
       return {
         errors: validatedFields.error.flatten().fieldErrors,
-        message: "Missing Fields. Failed to Login.",
+        message: "Λάθος στοιχεία εγγραφής.",
       };
     }
 

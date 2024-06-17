@@ -15,7 +15,7 @@ export default function Description({ description, tags }) {
             <ul className="tags">
               {tags.map((tag, i) => (
                 <li key={i}>
-                  <p>{tag.attributes.title}</p>
+                  <p>{tag.attributes.label}</p>
                 </li>
               ))}
             </ul>

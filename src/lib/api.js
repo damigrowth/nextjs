@@ -2,8 +2,7 @@
 
 import { STRAPI_TOKEN, STRAPI_URL, validateEnvVars } from "./strapi";
 
-//TODO Create caching funtions based on parameters
-
+//* REST API *//
 export const getPublicData = async (query) => {
   const url = `${STRAPI_URL}/${query}`;
 

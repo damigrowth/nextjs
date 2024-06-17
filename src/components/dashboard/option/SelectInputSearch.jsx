@@ -55,15 +55,18 @@ export default function SelectInputSearch({
 
   const handleSelect = (option) => {
     if (isMulti) {
-      const formattedOptions = options.map((option) => ({
+      let newArrayOptions = [];
+      newArrayOptions.push(...option);
+      const formattedOptions = newArrayOptions.map((option) => ({
         id: option.value,
-        title: option.label,
+        label: option.label,
       }));
+      // console.log("option", formattedOptions);
       onSelect(formattedOptions);
     } else {
       const formattedOption = {
         id: option.value,
-        title: option.label,
+        label: option.label,
       };
 
       onSelect(formattedOption);
