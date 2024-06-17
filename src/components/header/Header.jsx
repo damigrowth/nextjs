@@ -60,9 +60,10 @@ export default async function Header() {
                       firstName={user.firstName}
                       lastName={user.lastName}
                       // displayName={user.displayName}
-                      image={user.image.formats.thumbnail.url}
+                      image={user?.image?.formats?.thumbnail?.url}
                       alt={
-                        user.image.formats.thumbnail.provider_metadata.public_id
+                        user?.image?.formats?.thumbnail?.provider_metadata
+                          ?.public_id
                       }
                       width={40}
                       height={40}
