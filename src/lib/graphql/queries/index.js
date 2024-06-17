@@ -79,7 +79,7 @@ const TAGS = gql`
   ${TAG}
 `;
 
-export const COUNT_SERVICES_BY_RATING = gql`
+const COUNT_SERVICES_BY_RATING = gql`
   query GetServicesCountByRating($ratingId: ID!) {
     ratings(filters: { id: { eq: $ratingId } }) {
       data {

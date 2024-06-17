@@ -14,7 +14,7 @@ export default async function page({ params }) {
 
   const { freelancers } = await getData(FREELANCER_BY_USERNAME(username));
 
-  console.log("FREELANCER", freelancers);
+  // console.log("FREELANCER", freelancers);
   return (
     <>
       <TabSection1 />
