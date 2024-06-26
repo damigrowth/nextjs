@@ -23,7 +23,7 @@ export default function Socials({ socials = {} }) {
     { icon: "fa-dribbble", data: dribbble },
   ];
   return (
-    <div className="social-style1">
+    <div className="social-style1 light-style2">
       {socialsData.map((social) =>
         social.data ? (
           <a
