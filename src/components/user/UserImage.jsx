@@ -11,9 +11,14 @@ export default function UserImage({
   firstName,
   lastName,
   displayName,
+  bigText,
+  path,
 }) {
   return (
-    <Link className="user-image-container mb5-sm" href="/">
+    <Link
+      className="user-image-container mb5-sm"
+      href={!path ? "/not-linked" : path}
+    >
       <span className="position-relative">
         {image ? (
           <Image
@@ -29,6 +34,7 @@ export default function UserImage({
             lastName={lastName}
             width={width}
             height={height}
+            bigText={bigText}
           />
         )}
 
