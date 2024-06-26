@@ -4,8 +4,8 @@ import { getUserId } from "@/lib/user/user";
 import { formatDate } from "@/utils/formatDate";
 import Image from "next/image";
 import Link from "next/link";
-import ReviewReactionsForm from "../dashboard/section/SingleService/ReviewReactions";
-import ReviewStatsForm from "../forms/ReviewStatsForm";
+import ReviewReactionsForm from "../ui/Reviews/ReviewReactions";
+import ReviewStatsForm from "../ui/forms/ReviewStatsForm";
 
 const Review = async ({
   reviewId,
