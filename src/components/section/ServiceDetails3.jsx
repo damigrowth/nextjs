@@ -7,13 +7,13 @@ import ServiceDetailFaq1 from "../element/ServiceDetailFaq1";
 // import ServiceDetailReviewInfo1 from "../element/ServiceDetailReviewInfo1";
 import ServiceDetailSlider2 from "../element/ServiceDetailSlider2";
 import { getData } from "@/lib/api";
-import AddServiceReviewForm from "../forms/AddServiceReviewForm";
-import Packages from "../dashboard/section/SingleService/Packages";
-import Addons from "../dashboard/section/SingleService/Addons";
-import Gallery from "../dashboard/section/SingleService/Gallery";
-import Description from "../dashboard/section/SingleService/Description";
-import Faq from "../dashboard/section/SingleService/Faq";
-import Reviews from "../dashboard/section/SingleService/Reviews";
+import AddServiceReviewForm from "../ui/forms/AddModelReviewForm";
+import Packages from "../ui/SingleService/Packages";
+import Addons from "../ui/SingleService/Addons";
+import Gallery from "../ui/Gallery/Gallery";
+import Description from "../ui/SingleService/Description";
+import Faq from "../ui/SingleService/Faq";
+import Reviews from "../ui/SingleService/Reviews";
 
 export default async function ServiceDetail3({
   serviceId,
