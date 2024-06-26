@@ -1464,6 +1464,7 @@ li {
 .listing-style1 .list-thumb {
   overflow: hidden;
   position: relative;
+  height: 200px;
 }
 .listing-style1 img {
   -webkit-transition: all 0.4s ease;
@@ -10276,6 +10277,41 @@ input:focus-visible {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+/*	Social Styles svg  */
+.social-style1 svg {
+  color: #ffffff;
+  border-radius: 50%;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  width: 40px;
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  -ms-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+}
+.social-style1 svg:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.social-style1.light-style svg {
+  color: var(--headings-color);
+}
+.social-style1.light-style svg:hover {
+  background-color: var(--headings-color);
+  color: #ffffff;
+}
+.social-style1.light-style2 svg {
+  color: var(--headings-color);
+}
+.social-style1.light-style2 svg:hover {
+  background-color: #f7f7f7;
+  color: var(--headings-color);
+}
+.social-style1.at-home15 svg:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 .app-list .app-title,
 .app-list i {
   color: rgba(255, 255, 255, 0.7);
@@ -11796,6 +11832,21 @@ input:focus-visible {
   margin-bottom: 20px;
 }
 .category-list a:last-child {
+  margin-bottom: 0;
+}
+
+.category-list .list-item {
+  color: var(--headings-color);
+  font-family: var(--title-font-family);
+  font-weight: 500;
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  -ms-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+  margin-bottom: 20px;
+}
+.category-list .list-item:last-child {
   margin-bottom: 0;
 }
 
