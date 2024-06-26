@@ -8,17 +8,17 @@ import { Sticky, StickyContainer } from "react-sticky";
 import useScreen from "@/hook/useScreen";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import Meta from "../profiles/freelancer/Meta";
-import Metrics from "../profiles/freelancer/Metrics";
-import Description from "../profiles/freelancer/Description";
-import Education from "../profiles/freelancer/Education";
-import Experience from "../profiles/freelancer/Experience";
-import Certificates from "../profiles/freelancer/Certificates";
-import Featured from "../profiles/freelancer/Featured";
-import Reviews from "../profiles/freelancer/Reviews";
-import Skills from "../profiles/freelancer/Skills";
-import Info from "../profiles/freelancer/Info";
-import StickySidebar from "../sticky/StickySidebar";
+import Meta from "../ui/profiles/freelancer/Meta";
+import Metrics from "../ui/profiles/freelancer/Metrics";
+import Description from "../ui/profiles/freelancer/Description";
+import Education from "../ui/profiles/freelancer/Education";
+import Experience from "../ui/profiles/freelancer/Experience";
+import Certificates from "../ui/profiles/freelancer/Certificates";
+import Featured from "../ui/profiles/freelancer/Featured";
+import Reviews from "../ui/profiles/freelancer/Reviews";
+import Skills from "../ui/profiles/freelancer/Skills";
+import Info from "../ui/profiles/freelancer/Info";
+import StickySidebar from "../ui/sticky/StickySidebar";
 
 export default function FreelancerDetail1() {
   const { id } = useParams();
