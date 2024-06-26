@@ -4,7 +4,7 @@ import "react-tooltip/dist/react-tooltip.css";
 import BottomToTop from "@/components/button/BottomToTop";
 import { DM_Sans } from "next/font/google";
 import Footer14 from "@/components/footer/Footer14";
-import Header from "@/components/header/Header";
+import Header from "@/components/ui/Header";
 import NavSidebar from "@/components/sidebar/NavSidebar";
 import SearchModal1 from "@/components/modal/SearchModal1";
 import { footer } from "@/data/footer";
