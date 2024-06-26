@@ -36,3 +36,4 @@ next-env.d.ts
 todos.js
 yarn.lock
 yarn.lock
+src/lib/models/entries.js

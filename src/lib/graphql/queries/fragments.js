@@ -247,33 +247,50 @@ const RATING = gql`
   }
 `;
 
-const FREELANCER = gql`
-  fragment Freelancer on FreelancerEntityResponse {
+const SINGLE_IMAGE = gql`
+  fragment SingleImage on UploadFileEntityResponse {
+    data {
+      id
+      attributes {
+        formats
+      }
+    }
+  }
+`;
+
+const MULTIPLE_IMAGES = gql`
+  fragment MultipleImages on UploadFileRelationResponseCollection {
+    data {
+      id
+      attributes {
+        formats
+      }
+    }
+  }
+`;
+
+const USER_PARTIAL = gql`
+  fragment UserPartial on UsersPermissionsUserEntityResponse {
     data {
       id
       attributes {
         firstName
         lastName
         displayName
-        image {
-          data {
-            id
-            attributes {
-              formats
-            }
-          }
+        email
+        phone
+        confirmed
+        verification {
+          ...Verification
         }
-        user {
-          data {
-            id
-            attributes {
-              verified
-            }
-          }
+        image {
+          ...SingleImage
         }
       }
     }
   }
+  ${VERIFICATION}
+  ${SINGLE_IMAGE}
 `;
 
 const AREA = gql`
@@ -285,6 +302,28 @@ const AREA = gql`
       }
     }
   }
+`;
+
+const FREELANCER = gql`
+  fragment Freelancer on FreelancerEntityResponse {
+    data {
+      id
+      attributes {
+        tagline
+        rating
+        rate
+        username
+        base {
+          ...Base
+        }
+        user {
+          ...UserPartial
+        }
+      }
+    }
+  }
+  ${USER_PARTIAL}
+  ${BASE}
 `;
 
 const ADDONS = gql`
@@ -301,17 +340,6 @@ const FAQ = gql`
     id
     question
     answer
-  }
-`;
-
-const MEDIA_FORMATS = gql`
-  fragment MediaFormats on UploadFileRelationResponseCollection {
-    data {
-      id
-      attributes {
-        formats
-      }
-    }
   }
 `;
 
@@ -392,27 +420,6 @@ const PACKAGES = gql`
   ${PREMIUM_PACKAGE}
 `;
 
-const USER_PARTIAL = gql`
-  fragment UserPartial on UsersPermissionsUserEntityResponse {
-    data {
-      id
-      attributes {
-        displayName
-        firstName
-        lastName
-        image {
-          data {
-            id
-            attributes {
-              formats
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
 const TYPE = gql`
   fragment Type on TypeEntityResponse {
     data {
@@ -440,12 +447,76 @@ const DISLIKES = gql`
   }
 `;
 
+const REVIEW_LIKES = gql`
+  fragment ReviewLikes on ReviewRelationResponseCollection {
+    data {
+      id
+    }
+  }
+`;
+
+const REVIEW_DISLIKES = gql`
+  fragment ReviewDislikes on ReviewRelationResponseCollection {
+    data {
+      id
+    }
+  }
+`;
+
+const ROLE = gql`
+  fragment Role on UsersPermissionsRoleEntityResponse {
+    data {
+      id
+      attributes {
+        type
+        name
+      }
+    }
+  }
+`;
+
+const PAYMENT_METHOD = gql`
+  fragment PaymentMethod on PaymentMethodRelationResponseCollection {
+    data {
+      id
+      attributes {
+        label
+        slug
+      }
+    }
+  }
+`;
+
+const SETTLEMENT_METHOD = gql`
+  fragment SettlementMethod on SettlementMethodRelationResponseCollection {
+    data {
+      id
+      attributes {
+        label
+        slug
+      }
+    }
+  }
+`;
+
+const PAGINATION = gql`
+  fragment Pagination on ResponseCollectionMeta {
+    pagination {
+      page
+      pageSize
+      pageCount
+      total
+    }
+  }
+`;
+
 export {
   SERVICES,
   ORDERS,
   SKILLS,
   BASE,
   COVERAGE,
+  FREELANCER,
   FREELANCER_TYPE,
   SIZE,
   VERIFICATION,
@@ -456,16 +527,22 @@ export {
   SOCIALS,
   TAG,
   RATING,
-  FREELANCER,
   CATEGORY,
   AREA,
   ADDONS,
   FAQ,
-  MEDIA_FORMATS,
+  SINGLE_IMAGE,
+  MULTIPLE_IMAGES,
   STATUS,
   PACKAGES,
   USER_PARTIAL,
   TYPE,
   LIKES,
   DISLIKES,
+  REVIEW_LIKES,
+  REVIEW_DISLIKES,
+  ROLE,
+  PAYMENT_METHOD,
+  SETTLEMENT_METHOD,
+  PAGINATION,
 };

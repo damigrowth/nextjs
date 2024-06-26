@@ -27,82 +27,14 @@ import {
   TYPE,
   LIKES,
   DISLIKES,
+  REVIEW_LIKES,
+  REVIEW_DISLIKES,
+  MULTIPLE_IMAGES,
+  ROLE,
+  SINGLE_IMAGE,
+  PAYMENT_METHOD,
+  SETTLEMENT_METHOD,
 } from "./fragments";
-
-const FREELANCER_MAIN = gql`
-  fragment FreelancerMain on Freelancer {
-    firstName
-    lastName
-    displayName
-    username
-    website
-    tagline
-    rate
-    commencement
-    yearsOfExperience
-    description
-    rating
-    topLevel
-    terms
-  }
-`;
-
-const FREELANCER_RELATIONS = gql`
-  fragment FreelancerRelations on Freelancer {
-    services {
-      ...Services
-    }
-    orders {
-      ...Orders
-    }
-    skills {
-      ...Skills
-    }
-    base {
-      ...Base
-    }
-    coverage {
-      ...Coverage
-    }
-    socials {
-      ...Socials
-    }
-    type {
-      ...FreelancerType
-    }
-    size {
-      ...Size
-    }
-    verification {
-      ...Verification
-    }
-    specialisations {
-      ...Specialisations
-    }
-    minBudgets {
-      ...MinBudgets
-    }
-    industries {
-      ...Industries
-    }
-    contactTypes {
-      ...ContactTypes
-    }
-  }
-  ${SERVICES}
-  ${ORDERS}
-  ${SKILLS}
-  ${BASE}
-  ${COVERAGE}
-  ${SOCIALS}
-  ${FREELANCER_TYPE}
-  ${SIZE}
-  ${VERIFICATION}
-  ${SPECIALISATIONS}
-  ${MIN_BUDGETS}
-  ${INDUSTRIES}
-  ${CONTACT_TYPES}
-`;
 
 const REVIEW_MAIN = gql`
   fragment ReviewMain on Review {
@@ -153,6 +85,95 @@ const REVIEW = gql`
   ${REVIEW_RELATIONS}
 `;
 
+const FREELANCER_MAIN = gql`
+  fragment FreelancerMain on Freelancer {
+    username
+    website
+    tagline
+    rate
+    commencement
+    yearsOfExperience
+    description
+    rating
+    topLevel
+    terms
+    rating
+  }
+`;
+
+const FREELANCER_RELATIONS = gql`
+  fragment FreelancerRelations on Freelancer {
+    user {
+      ...UserPartial
+    }
+    services {
+      ...Services
+    }
+    orders {
+      ...Orders
+    }
+    skills {
+      ...Skills
+    }
+    base {
+      ...Base
+    }
+    coverage {
+      ...Coverage
+    }
+    socials {
+      ...Socials
+    }
+    type {
+      ...FreelancerType
+    }
+    size {
+      ...Size
+    }
+    specialisations {
+      ...Specialisations
+    }
+    minBudgets {
+      ...MinBudgets
+    }
+    industries {
+      ...Industries
+    }
+    contactTypes {
+      ...ContactTypes
+    }
+    payment_methods {
+      ...PaymentMethod
+    }
+    settlement_methods {
+      ...SettlementMethod
+    }
+    portfolio {
+      ...MultipleImages
+    }
+    rating_global {
+      ...Rating
+    }
+  }
+  ${USER_PARTIAL}
+  ${SERVICES}
+  ${ORDERS}
+  ${SKILLS}
+  ${BASE}
+  ${COVERAGE}
+  ${SOCIALS}
+  ${FREELANCER_TYPE}
+  ${SIZE}
+  ${SPECIALISATIONS}
+  ${MIN_BUDGETS}
+  ${INDUSTRIES}
+  ${CONTACT_TYPES}
+  ${PAYMENT_METHOD}
+  ${SETTLEMENT_METHOD}
+  ${MULTIPLE_IMAGES}
+  ${RATING}
+`;
+
 const SERVICE_MAIN = gql`
   fragment ServiceMain on Service {
     title
@@ -191,7 +212,7 @@ const SERVICE_RELATIONS = gql`
       ...Faq
     }
     media {
-      ...MediaFormats
+      ...MultipleImages
     }
     status {
       ...Status
@@ -204,9 +225,7 @@ const SERVICE_RELATIONS = gql`
         ...Tag
       }
     }
-    reviews {
-      ...Review
-    }
+
     seo {
       metaTitle
       metaDescription
@@ -219,14 +238,100 @@ const SERVICE_RELATIONS = gql`
   ${PACKAGES}
   ${ADDONS}
   ${FAQ}
-  ${MEDIA_FORMATS}
+  ${MULTIPLE_IMAGES}
   ${STATUS}
   ${RATING}
   ${TAG}
+`;
+
+const USER_MAIN = gql`
+  fragment UserMain on UsersPermissionsUser {
+    username
+    email
+    phone
+    confirmed
+    firstName
+    lastName
+    displayName
+    image {
+      ...SingleImage
+    }
+    freelancer {
+      data {
+        id
+      }
+    }
+    verification {
+      ...Verification
+    }
+  }
+  ${SINGLE_IMAGE}
+  ${VERIFICATION}
+`;
+
+const USER_RELATIONS = gql`
+  fragment UserRelations on UsersPermissionsUser {
+    role {
+      ...Role
+    }
+    review_likes {
+      ...ReviewLikes
+    }
+    review_dislikes {
+      ...ReviewDislikes
+    }
+    reviews_given {
+      ...Review
+    }
+    orders {
+      ...Orders
+    }
+    viewed {
+      data {
+        id
+      }
+    }
+  }
+  ${ROLE}
+  ${REVIEW_LIKES}
+  ${REVIEW_DISLIKES}
   ${REVIEW}
+  ${ORDERS}
+`;
+
+const FEATURED_SERVICE_MAIN = gql`
+  fragment FeaturedServiceMain on Service {
+    title
+    price
+    rating
+    slug
+  }
+`;
+
+const FEATURED_SERVICE_RELATIONS = gql`
+  fragment FeaturedServiceRelations on Service {
+    packages {
+      __typename
+      ... on ComponentPricingBasicPackage {
+        price
+      }
+    }
+    category {
+      data {
+        ...Category
+      }
+    }
+    media {
+      ...MultipleImages
+    }
+  }
+  ${CATEGORY}
+  ${MULTIPLE_IMAGES}
 `;
 
 export {
+  USER_MAIN,
+  USER_RELATIONS,
   FREELANCER_MAIN,
   FREELANCER_RELATIONS,
   REVIEW_MAIN,
@@ -234,4 +339,6 @@ export {
   REVIEW,
   SERVICE_MAIN,
   SERVICE_RELATIONS,
+  FEATURED_SERVICE_MAIN,
+  FEATURED_SERVICE_RELATIONS,
 };
