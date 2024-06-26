@@ -1,9 +1,9 @@
-import Pagination1 from "@/components/section/Pagination1";
-import ProposalCard1 from "../card/ProposalCard1";
-import DashboardNavigation from "../header/DashboardNavigation";
 import { project1 } from "@/data/product";
-import DeleteModal from "../modal/DeleteModal";
-import ProposalModal1 from "../modal/ProposalModal1";
+import ProposalCard1 from "@/components/dashboard/card/ProposalCard1";
+import DashboardNavigation from "@/components/dashboard/header/DashboardNavigation";
+import ProposalModal1 from "@/components/dashboard/modal/ProposalModal1";
+import DeleteModal from "@/components/dashboard/modal/DeleteModal";
+import Pagination1 from "@/components/section/Pagination1";
 
 export default function ProposalInfo() {
   return (
@@ -33,7 +33,7 @@ export default function ProposalInfo() {
                     </tr>
                   </thead>
                   <tbody className="t-body">
-                    {project1.slice(0, 7).map((item,i) => (
+                    {project1.slice(0, 7).map((item, i) => (
                       <ProposalCard1 key={i} data={item} />
                     ))}
                   </tbody>

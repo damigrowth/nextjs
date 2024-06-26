@@ -1,6 +1,6 @@
 "use client";
 
-import Packages from "../ui/ServicePackages/Packages";
+import Packages from "../ServicePackages/Packages";
 
 export default function ServicePackages() {
   return (

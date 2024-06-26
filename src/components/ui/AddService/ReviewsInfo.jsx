@@ -1,7 +1,8 @@
 "use client";
+
 import { useState } from "react";
-import DashboardNavigation from "../header/DashboardNavigation";
-import ReviewComment from "../element/ReviewComment";
+import DashboardNavigation from "@/components/dashboard/header/DashboardNavigation";
+import ReviewComment from "@/components/dashboard/element/ReviewComment";
 
 const tab = ["Services", "Project", "Jobs"];
 

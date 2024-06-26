@@ -1,12 +1,12 @@
 "use client";
 import Pagination1 from "@/components/section/Pagination1";
-import DashboardNavigation from "../header/DashboardNavigation";
 import { useState } from "react";
-import ServiceCard1 from "../card/ServiceCard1";
-import ProjectCard1 from "../card/ProjectCard1";
-import JobCard1 from "../card/JobCard1";
 import { product1, project1 } from "@/data/product";
 import { job1 } from "@/data/job";
+import DashboardNavigation from "@/components/dashboard/header/DashboardNavigation";
+import ProjectCard1 from "@/components/dashboard/card/ProjectCard1";
+import ServiceCard1 from "@/components/dashboard/card/ServiceCard1";
+import JobCard1 from "@/components/dashboard/card/JobCard1";
 
 const tab = ["Services", "Project", "Jobs"];
 
@@ -49,7 +49,7 @@ export default function SavedInfo() {
                 {/* services tab */}
                 {getCurrentTab === 0 && (
                   <div className="row">
-                    {product1.slice(0, 8).map((item,i) => (
+                    {product1.slice(0, 8).map((item, i) => (
                       <div key={i} className="col-sm-6 col-xl-3">
                         <ServiceCard1 data={item} />
                       </div>
@@ -60,11 +60,8 @@ export default function SavedInfo() {
                 {/* projects tab */}
                 {getCurrentTab === 1 && (
                   <div className="row">
-                    {project1.slice(0, 6).map((item,i) => (
-                      <div
-                        key={i}
-                        className="col-md-6 col-lg-12 col-xl-6"
-                      >
+                    {project1.slice(0, 6).map((item, i) => (
+                      <div key={i} className="col-md-6 col-lg-12 col-xl-6">
                         <ProjectCard1 data={item} />
                       </div>
                     ))}

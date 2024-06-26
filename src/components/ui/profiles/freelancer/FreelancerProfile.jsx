@@ -101,7 +101,9 @@ export default function FreelancerProfile({
                 meta={servicesMeta}
                 servicesPage={servicesPage}
               />
-              <Gallery images={portfolio?.data} title="Portfolio" border />
+              {portfolio?.data?.length > 0 && (
+                <Gallery images={portfolio?.data} title="Portfolio" border />
+              )}
               <Description heading="Όροι Συνεργασίας" text={terms} border />
               {reviews.length > 0 ? (
                 <Reviews

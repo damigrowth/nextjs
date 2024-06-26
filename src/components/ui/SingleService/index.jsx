@@ -80,10 +80,9 @@ export default async function SingleService({
               <div className="service-about">
                 <Description description={description} tags={tags.data} />
                 {fixed ? null : <Packages packages={packages} />}
-                <Faq faq={faq} />
-                <Addons addons={addons} />
+                {faq?.length > 0 && <Faq faq={faq} />}
+                {addons?.length > 0 && <Addons addons={addons} />}
                 {/* <hr className="opacity-100 mb15" /> */}
-
                 <Reviews
                   type="service"
                   modelId={serviceId}
@@ -95,7 +94,6 @@ export default async function SingleService({
                   reviewsPage={reviewsPage}
                   allReviewsRatings={allReviewsRatings}
                 />
-
                 <AddModelReviewForm type="service" modelId={serviceId} />
               </div>
             </div>

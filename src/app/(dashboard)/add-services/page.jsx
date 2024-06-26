@@ -1,9 +1,6 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import AddServiceInfo from "@/components/dashboard/section/AddServiceInfo";
-
 import MobileNavigation2 from "@/components/header/MobileNavigation2";
-import { fetchModel } from "@/lib/models/model";
-import { CATEGORIES, LOCATIONS_SEARCH, SKILLS } from "@/lib/queries";
+import AddServiceInfo from "@/components/ui/AddServiceInfo";
 
 export const metadata = {
   title: "Doulitsa",

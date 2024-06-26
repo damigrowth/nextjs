@@ -11,10 +11,6 @@ import Image from "next/image";
 import { getBestDimensions } from "@/utils/imageDimensions";
 
 export default function Gallery({ images, title, border }) {
-  if (images.length === 0) {
-    return;
-  }
-
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [showSwiper, setShowSwiper] = useState(false);
 

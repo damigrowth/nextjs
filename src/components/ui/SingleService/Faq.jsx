@@ -3,9 +3,6 @@
 import React, { useState } from "react";
 
 export default function Faq({ faq }) {
-  if (faq.length === 0) {
-    return;
-  }
   const [activeItem, setActiveItem] = useState(0);
 
   const toggleAccordion = (index) => {

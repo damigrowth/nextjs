@@ -1,7 +1,6 @@
-import ServiceDetailExtra1 from "@/components/element/ServiceDetailExtra1";
-import NewAddonInputs from "../ui/ServiceAddons/NewAddonInputs";
-import AddonsList from "../ui/ServiceAddons/AddonsList";
 import useCreateServiceStore from "@/store/service/createServiceStore";
+import NewAddonInputs from "../ServiceAddons/NewAddonInputs";
+import AddonsList from "../ServiceAddons/AddonsList";
 
 export default function ServiceAddons() {
   const { addons, saveAddons, showNewAddonInputs, handleShowNewAddonInputs } =

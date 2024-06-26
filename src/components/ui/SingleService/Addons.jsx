@@ -4,9 +4,6 @@ import useServiceOrderStore from "@/store/order/service";
 import React, { useEffect } from "react";
 
 export default function Addons({ addons, small }) {
-  if (addons.length === 0) {
-    return;
-  }
   const { order, setOrder, calculateTotal } = useServiceOrderStore();
 
   const handleSelectAddons = (addon) => {

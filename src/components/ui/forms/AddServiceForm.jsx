@@ -5,12 +5,12 @@ import { useFormState, useFormStatus } from "react-dom";
 
 import ServiceGallery from "../AddService/ServiceGallery";
 import { createService } from "@/lib/service/create";
-import ServicePackages from "../dashboard/section/ServicePackages";
-import ServiceAddons from "../dashboard/section/ServiceAddons";
 import ServiceFaq from "../ServiceFaq/ServiceFaq";
 import ServiceInformation from "../ServiceInformation/ServiceInformation";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 import ServiceSuccess from "../ServiceSuccess/ServiceSuccess";
+import ServicePackages from "../AddService/ServicePackages";
+import ServiceAddons from "../AddService/ServiceAddons";
 
 function AddServiceButton() {
   const { pending } = useFormStatus();
