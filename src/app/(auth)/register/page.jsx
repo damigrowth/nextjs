@@ -1,7 +1,7 @@
-import AuthRoleOptions from "@/components/forms/AuthRoleOptions";
+import AuthRoleOptions from "@/components/ui/forms/AuthRoleOptions";
 import Link from "next/link";
-import RegisterForm from "@/components/forms/RegisterForm";
-import RegisterHeading from "@/components/forms/RegisterHeading";
+import RegisterForm from "@/components/ui/forms/RegisterForm";
+import RegisterHeading from "@/components/ui/forms/RegisterHeading";
 
 export default function page() {
   return (
