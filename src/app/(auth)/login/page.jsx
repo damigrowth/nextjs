@@ -1,5 +1,5 @@
 import Link from "next/link";
-import LoginForm from "@/components/forms/LoginForm";
+import LoginForm from "@/components/ui/forms/LoginForm";
 import { getMaintenanceStatus } from "@/lib/maintenance/maintenance";
 import { isAuthenticated } from "@/lib/auth/authenticated";
 import { redirect } from "next/navigation";
