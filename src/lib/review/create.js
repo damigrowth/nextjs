@@ -12,10 +12,10 @@ const reviewSchema = z.object({
     .min(1, "Η κριτική είναι υποχρεωτική")
     .min(25, "Η κριτική είναι μικρή")
     .max(350, "Η μέγιστη κριτική είναι 350 χαρακτήρες"),
-  serviceId: z.number(),
+  modelId: z.number(),
 });
 
-export async function createServiceReview(prevState, formData) {
+export async function createModelReview(prevState, formData) {
   try {
     const reviewData = formData.get("newReviewData");
     const review = JSON.parse(reviewData);
@@ -37,9 +37,9 @@ export async function createServiceReview(prevState, formData) {
     }
 
     const payload = {
+      [review.type]: Number(review.modelId),
       rating: review.rating,
       comment: review.comment,
-      service: Number(review.serviceId),
       user: uid,
       type: 1,
       status: 2,
