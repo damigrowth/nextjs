@@ -1,24 +1,107 @@
-import { getData } from "../api";
+import { getData } from "../client/operations";
+import {
+  ALL_REVIEWS_RATINGS_BY_FREELANCER,
+  FEATURED_SERVICES_BY_FREELANCER,
+  FREELANCER_BY_USERNAME,
+  REVIEWS_BY_FREELANCER,
+} from "../graphql/queries";
 import { getUser } from "../user/user";
 
 export async function getFreelancerId() {
   const user = await getUser();
-  const id = user.freelancer.id;
-  return id;
+  const id = user.freelancer.data.id;
+  const freelancerId = Number(id);
+  return { freelancerId };
 }
 
-export async function getFreelancer(query) {
-  const freelancerId = await getFreelancerId();
+export async function getFreelancerByUsername(username) {
+  try {
+    let freelancer = null;
+    let uid = null;
 
-  let url = ``;
+    const { freelancers } = await getData(FREELANCER_BY_USERNAME, { username });
 
-  if (query === "basic") {
-    url = `freelancers/${freelancerId}?fields[0]=firstName&fields[1]=lastName`;
-  } else {
-    url = `freelancers/${freelancerId}?populate=*`;
+    if (freelancers?.data?.length > 0) {
+      freelancer = freelancers.data[0].attributes;
+
+      uid = Number(freelancers.data[0].id);
+    }
+
+    return { freelancer, uid };
+  } catch (error) {
+    console.error("Error fetching freelancer by username:", error);
+    return null;
   }
+}
 
-  const data = await getData(url);
+export async function getReviewsByFreelancer(uid, page, pageSize) {
+  try {
+    let reviews = [];
+    let reviewsMeta = null;
 
-  return data;
+    const res = await getData(REVIEWS_BY_FREELANCER, {
+      id: uid,
+      page: page,
+      pageSize: pageSize,
+    });
+
+    if (res?.reviews?.data?.length > 0) {
+      reviews = res.reviews.data;
+      reviewsMeta = res.reviews.meta.pagination;
+    } else {
+      return { reviews, reviewsMeta };
+    }
+
+    return { reviews, reviewsMeta };
+  } catch (error) {
+    console.error("Error fetching freelancer reviews:", error);
+    return [];
+  }
+}
+
+export async function getAllReviewsRatingsByFreelancer(uid, pageSize) {
+  try {
+    let allReviewsRatings = [];
+
+    const { reviews } = await getData(ALL_REVIEWS_RATINGS_BY_FREELANCER, {
+      id: uid,
+      pageSize: pageSize,
+    });
+
+    if (reviews?.data?.length > 0) {
+      allReviewsRatings = reviews.data;
+    } else {
+      return { allReviewsRatings };
+    }
+
+    return { allReviewsRatings };
+  } catch (error) {
+    console.error("Error fetching freelancer reviews:", error);
+    return [];
+  }
+}
+
+export async function getFeaturedServicesByFreelancer(uid, pageSize) {
+  try {
+    let services = [];
+    let servicesMeta = null;
+
+    const res = await getData(FEATURED_SERVICES_BY_FREELANCER, {
+      id: { eq: uid },
+      page: 1,
+      pageSize: pageSize,
+    });
+
+    if (res?.services?.data?.length > 0) {
+      services = res.services.data;
+      servicesMeta = res.services.meta.pagination;
+    } else {
+      return { services, servicesMeta };
+    }
+
+    return { services, servicesMeta };
+  } catch (error) {
+    console.error("Error fetching freelancer reviews:", error);
+    return [];
+  }
 }
