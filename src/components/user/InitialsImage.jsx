@@ -2,7 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-export default function InitialsImage({ firstName, lastName, width, height }) {
+export default function InitialsImage({
+  firstName,
+  lastName,
+  width,
+  height,
+  bigText,
+}) {
   const initials =
     firstName.slice(0, 1).toUpperCase() + lastName.slice(0, 1).toUpperCase();
 
@@ -14,7 +20,7 @@ export default function InitialsImage({ firstName, lastName, width, height }) {
         height: !height ? "40px" : height,
       }}
     >
-      <span className="w-42">{initials}</span>
+      <span className={bigText ? "w-42 fz40" : "w-42"}>{initials}</span>
     </div>
   );
 }
