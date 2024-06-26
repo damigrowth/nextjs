@@ -32,7 +32,7 @@ export default function Breadcumb10({ path }) {
                     }`}
                   >
                     <span className="icon flaticon-share dark-color fz12 mr10" />
-                    <div className="h6 mb-0">Share</div>
+                    <div className="h6 mb-0">Κοινοποίηση</div>
                   </div>
                   {shareToggle && (
                     <div className="ui-social-media">
@@ -58,7 +58,7 @@ export default function Breadcumb10({ path }) {
                     }`}
                   >
                     <span className="icon flaticon-like dark-color fz12 mr10" />
-                    <div className="h6 mb-0">Save</div>
+                    <div className="h6 mb-0">Αποθήκευση</div>
                   </div>
                 </a>
               </div>
