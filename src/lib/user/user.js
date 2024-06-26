@@ -2,15 +2,16 @@
 
 import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
-import { getData } from "../api";
-import { getCookieData } from "@/utils/cookies";
+import { getData } from "../client/operations";
+import { USER_BY_ID, USER_BY_ID_BASIC } from "../graphql/queries";
 
 export async function getUserId() {
   let uid = null;
   const token = cookies().get("jwt")?.value;
 
   if (token) {
-    uid = jwtDecode(token).id;
+    const decodedUid = jwtDecode(token).id;
+    uid = Number(decodedUid);
   } else {
     uid = null;
   }
@@ -18,31 +19,25 @@ export async function getUserId() {
   return uid;
 }
 
-export async function getUser() {
+export async function getUser(type) {
   const uid = await getUserId();
 
   let data = null;
 
   if (uid) {
-    const url = `users/${uid}?populate=*`;
-    data = getData(url);
-  } else {
-    data = null;
-  }
+    switch (type) {
+      case "all":
+        const user = await getData(USER_BY_ID, { id: uid });
 
-  return data;
-}
+        data = user.usersPermissionsUser.data.attributes;
 
-export async function getUserInfo() {
-  const uid = await getUserId();
+        break;
+      default:
+        const userBasic = await getData(USER_BY_ID_BASIC, { id: uid });
 
-  let data = null;
-
-  if (uid) {
-    const url = `users/${uid}?populate[image][fields][0]=formats&fields[0]=displayName&fields[1]=firstName&fields[2]=lastName`;
-    data = getData(url);
-  } else {
-    data = null;
+        data = userBasic.usersPermissionsUser.data.attributes;
+        break;
+    }
   }
 
   return data;
