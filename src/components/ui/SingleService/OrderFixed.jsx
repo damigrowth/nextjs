@@ -18,7 +18,7 @@ export default function OrderFixed({ price, addons }) {
       {addons.length > 0 && <Addons addons={addons} small />}
       <div className="d-grid">
         <a className="ud-btn btn-thm">
-          Αγοράss {order.total}€ <i className="fal fa-arrow-right-long"></i>
+          Αγορά {order?.total}€ <i className="fal fa-arrow-right-long"></i>
         </a>
       </div>
     </div>
