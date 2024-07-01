@@ -9,9 +9,9 @@ const reviewSchema = z.object({
   rating: z.number(),
   comment: z
     .string()
-    .min(1, "Η κριτική είναι υποχρεωτική")
-    .min(25, "Η κριτική είναι μικρή")
-    .max(350, "Η μέγιστη κριτική είναι 350 χαρακτήρες"),
+    .min(1, "Η αξιολόγηση είναι υποχρεωτική")
+    .min(25, "Η αξιολόγηση είναι μικρή")
+    .max(350, "Η μέγιστη αξιολόγηση είναι 350 χαρακτήρες"),
   modelId: z.number(),
 });
 
@@ -37,7 +37,8 @@ export async function createModelReview(prevState, formData) {
     }
 
     const payload = {
-      [review.type]: Number(review.modelId),
+      [review.modelType]: Number(review.modelId),
+      [review.tenantType]: Number(review.tenantId),
       rating: review.rating,
       comment: review.comment,
       user: uid,
