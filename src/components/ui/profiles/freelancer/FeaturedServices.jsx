@@ -45,6 +45,7 @@ export default async function FeaturedServices({
       </div>
 
       <LoadMoreBtn
+        name="Υπηρεσίες"
         paramsName="services"
         total={meta.total}
         count={services.length}
