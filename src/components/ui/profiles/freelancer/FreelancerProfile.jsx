@@ -2,7 +2,7 @@ import { freelancer1 } from "@/data/product";
 import React from "react";
 import Meta from "./Meta";
 import Metrics from "./Metrics";
-import Description from "./Description";
+import Description from "./Terms";
 import Education from "./Education";
 import Experience from "./Experience";
 import Certificates from "./Certificates";
@@ -16,6 +16,7 @@ import FeaturedServices from "./FeaturedServices";
 import Gallery from "@/components/ui/Gallery/Gallery";
 import Reviews from "../../Reviews/Reviews";
 import AddModelReviewForm from "../../forms/AddModelReviewForm";
+import Terms from "./Terms";
 
 export default function FreelancerProfile({
   freelancer,
@@ -47,6 +48,7 @@ export default function FreelancerProfile({
     payment_methods,
     settlement_methods,
     skills,
+    specialisations,
     industries,
     topLevel,
     portfolio,
@@ -104,7 +106,7 @@ export default function FreelancerProfile({
               {portfolio?.data?.length > 0 && (
                 <Gallery images={portfolio?.data} title="Portfolio" border />
               )}
-              <Description heading="Όροι Συνεργασίας" text={terms} border />
+              <Terms heading="Όροι Συνεργασίας" text={terms} border />
               {reviews.length > 0 ? (
                 <Reviews
                   type="freelancer"
@@ -116,11 +118,17 @@ export default function FreelancerProfile({
                   reviewsMeta={reviewsMeta}
                   reviewsPage={reviewsPage}
                   allReviewsRatings={allReviewsRatings}
+                  showReviewsModel
                 />
               ) : (
                 <h4>Χωρίς Αξιολογήσεις</h4>
               )}
-              <AddModelReviewForm type="freelancer" modelId={uid} />
+              <AddModelReviewForm
+                modelType="service"
+                tenantType="freelancer"
+                // modelId={serviceId} // TODO: Fetch all orders and get the services ids in an input
+                tenantId={uid}
+              />
             </div>
           </div>
           <StickySidebar>
@@ -133,7 +141,10 @@ export default function FreelancerProfile({
               phone={freelancerUser.phone}
               email={freelancerUser.email}
             />
-            <Skills skills={skills?.data} />
+            <Skills
+              skills={skills?.data}
+              specialisations={specialisations?.data}
+            />
           </StickySidebar>
         </div>
       </div>
