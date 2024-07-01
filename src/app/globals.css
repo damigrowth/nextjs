@@ -727,7 +727,14 @@ a {
   color: var(--headings-color);
   text-decoration: none;
   font-weight: 500;
+}
+
+.contact-meta-info.left {
   text-align: left;
+}
+
+.contact-meta-info.right {
+  text-align: right;
 }
 
 .inline-divider {
@@ -758,9 +765,14 @@ a {
   width: fit-content;
   border-radius: 50px;
   padding: 0.2rem 1rem;
-  background-color: #d1e7dd;
+  color: #6b7177;
+  font-weight: 600;
+}
+
+.tags .specialisation {
   color: #198754;
-  font-weight: 400;
+  background-color: #d1e7dd;
+  font-weight: 500;
 }
 
 .tags .orange {
@@ -802,7 +814,70 @@ a {
 
 .top-badge {
   position: absolute;
-  z-index: 100;
-  top: 0;
-  right: -5px;
+  z-index: 8;
+  top: -5px;
+  right: -10px;
+}
+
+.top-badge-inline {
+  display: flex;
+}
+
+.list-item-title {
+  font-weight: 600;
+}
+
+.review-service-title {
+  font-style: italic;
+  color: #a1988c;
+  font-size: 13px;
+}
+
+.tooltip-container {
+  position: relative;
+  display: flex;
+}
+
+.tooltip {
+  position: absolute;
+  width: fit-content;
+  background-color: #fff;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-right: 10px solid transparent;
+  border-left: 10px solid transparent;
+  border-top: 10px solid #ddd;
+  border-bottom: 10px solid transparent;
+}
+
+.tooltip-container:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.socials-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.socials-list i::before {
+  color: var(--body-text-color);
 }
