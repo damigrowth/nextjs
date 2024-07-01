@@ -64,8 +64,8 @@ export default function Meta({
                     <span>{rating}</span>
                     <span className="ml5">
                       {totalReviews === 1
-                        ? `(${totalReviews}) αξιολόγηση`
-                        : `(${totalReviews}) αξιολογήσεις`}
+                        ? `(από ${totalReviews} αξιολόγηση)`
+                        : `(από ${totalReviews} αξιολογήσεις)`}
                     </span>
                   </p>
                 ) : null}
