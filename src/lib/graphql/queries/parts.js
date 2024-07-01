@@ -12,7 +12,6 @@ import {
   INDUSTRIES,
   CONTACT_TYPES,
   SOCIALS,
-  FREELANCER,
   CATEGORY,
   AREA,
   PACKAGES,
@@ -34,6 +33,8 @@ import {
   SINGLE_IMAGE,
   PAYMENT_METHOD,
   SETTLEMENT_METHOD,
+  FREELANCER_CATEGORY,
+  SERVICE,
 } from "./fragments";
 
 const REVIEW_MAIN = gql`
@@ -51,6 +52,9 @@ const REVIEW_RELATIONS = gql`
     user {
       ...UserPartial
     }
+    service {
+      ...Service
+    }
     type {
       ...Type
     }
@@ -65,6 +69,7 @@ const REVIEW_RELATIONS = gql`
     }
   }
   ${USER_PARTIAL}
+  ${SERVICE}
   ${TYPE}
   ${STATUS}
   ${LIKES}
@@ -83,6 +88,70 @@ const REVIEW = gql`
   }
   ${REVIEW_MAIN}
   ${REVIEW_RELATIONS}
+`;
+
+const FREELANCER_PARTIAL_MAIN = gql`
+  fragment FreelancerPartialMain on Freelancer {
+    tagline
+    rating
+    rate
+    username
+    terms
+    topLevel
+    commencement
+    website
+  }
+`;
+
+const FREELANCER_PARTIAL_RELATIONS = gql`
+  fragment FreelancerPartialRelations on Freelancer {
+    user {
+      ...UserPartial
+    }
+    base {
+      ...Base
+    }
+    type {
+      ...FreelancerType
+    }
+    category {
+      ...FreelancerCategory
+    }
+    socials {
+      ...Socials
+    }
+    contactTypes {
+      ...ContactTypes
+    }
+    payment_methods {
+      ...PaymentMethod
+    }
+    settlement_methods {
+      ...SettlementMethod
+    }
+  }
+  ${USER_PARTIAL}
+  ${BASE}
+  ${SOCIALS}
+  ${FREELANCER_TYPE}
+  ${FREELANCER_CATEGORY}
+  ${CONTACT_TYPES}
+  ${PAYMENT_METHOD}
+  ${SETTLEMENT_METHOD}
+`;
+
+const FREELANCER_PARTIAL = gql`
+  fragment FreelancerPartial on FreelancerEntityResponse {
+    data {
+      id
+      attributes {
+        ...FreelancerPartialMain
+        ...FreelancerPartialRelations
+      }
+    }
+  }
+  ${FREELANCER_PARTIAL_MAIN}
+  ${FREELANCER_PARTIAL_RELATIONS}
 `;
 
 const FREELANCER_MAIN = gql`
@@ -127,6 +196,9 @@ const FREELANCER_RELATIONS = gql`
     type {
       ...FreelancerType
     }
+    category {
+      ...FreelancerCategory
+    }
     size {
       ...Size
     }
@@ -163,6 +235,7 @@ const FREELANCER_RELATIONS = gql`
   ${COVERAGE}
   ${SOCIALS}
   ${FREELANCER_TYPE}
+  ${FREELANCER_CATEGORY}
   ${SIZE}
   ${SPECIALISATIONS}
   ${MIN_BUDGETS}
@@ -189,7 +262,7 @@ const SERVICE_MAIN = gql`
 const SERVICE_RELATIONS = gql`
   fragment ServiceRelations on Service {
     freelancer {
-      ...Freelancer
+      ...FreelancerPartial
     }
     category {
       data {
@@ -231,7 +304,7 @@ const SERVICE_RELATIONS = gql`
       metaDescription
     }
   }
-  ${FREELANCER}
+  ${FREELANCER_PARTIAL}
   ${CATEGORY}
   ${AREA}
   ${SKILLS}
@@ -332,6 +405,7 @@ const FEATURED_SERVICE_RELATIONS = gql`
 export {
   USER_MAIN,
   USER_RELATIONS,
+  FREELANCER_PARTIAL,
   FREELANCER_MAIN,
   FREELANCER_RELATIONS,
   REVIEW_MAIN,
