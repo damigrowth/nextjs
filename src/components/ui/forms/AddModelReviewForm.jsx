@@ -12,7 +12,7 @@ function AddModelReviewButton() {
   const { pending } = useFormStatus();
   return (
     <button disabled={pending} className="ud-btn btn-dark default-box-shadow2">
-      {pending ? "Αποστολή Κριτικής..." : "Αποστολή Κριτικής"}
+      {pending ? "Αποστολή Αξιολόγησης..." : "Αποστολή Αξιολόγησης"}
       {pending ? (
         <div className="spinner-border spinner-border-sm ml10" role="status">
           <span className="sr-only"></span>
@@ -45,7 +45,12 @@ function ReviewCommentInput({ formState, formData, handleCommentChange }) {
   );
 }
 
-export default function AddModelReviewForm({ modelId, type }) {
+export default function AddModelReviewForm({
+  modelType,
+  tenantType,
+  modelId,
+  tenantId,
+}) {
   const initialState = {
     data: null,
     errors: {},
@@ -57,8 +62,10 @@ export default function AddModelReviewForm({ modelId, type }) {
   const [formData, setFormData] = useState({
     rating: 1,
     comment: "",
+    modelType,
+    tenantType,
     modelId,
-    type,
+    tenantId,
   });
 
   const handleRatingChange = (value) => {
@@ -85,9 +92,9 @@ export default function AddModelReviewForm({ modelId, type }) {
         <ReviewSuccess id={reviewId} />
       ) : (
         <div className="bsp_reveiw_wrt mb20">
-          <h6 className="fz17">Πρόσθεσε Κριτική</h6>
+          <h6 className="fz17">Πρόσθεσε Αξιολόγηση</h6>
           <p className="text">
-            Το email σας δεν θα δημοσιευτεί, μόνο το όνομα και το επίθετο.
+            Θα πρέπει να έχετε λάβει κάποια υπηρεσία για να βάλετε βαθμολογία.
           </p>
           <h6>Βαθμολογία</h6>
           <Rating
@@ -113,7 +120,7 @@ export default function AddModelReviewForm({ modelId, type }) {
               <div className="col-md-12">
                 <div className="mb-4">
                   <label className="fw500 fz16 ff-heading dark-color mb-2">
-                    Κριτική
+                    Αξιολόγηση
                   </label>
                   <ReviewCommentInput
                     formState={formState}
