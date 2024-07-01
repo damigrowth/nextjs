@@ -28,7 +28,7 @@ export default function Info({
             <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
               <span className="text">
                 <i className="flaticon-place text-thm2 pe-2 vam" />
-                Περιοχή
+                <span className="list-item-title">Έδρα</span>
               </span>
               <span>{base}</span>
             </div>
@@ -37,7 +37,7 @@ export default function Info({
             <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
               <span className="text">
                 <i className="flaticon-customer-service text-thm2 pe-2 vam" />
-                Εξυπηρετεί
+                <span className="list-item-title">Εξυπηρετεί</span>
               </span>
               <span>{covers}</span>
             </div>
@@ -46,7 +46,7 @@ export default function Info({
             <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
               <span className="text">
                 <i className="flaticon-calendar text-thm2 pe-2 vam" />
-                Έτος Έναρξης
+                <span className="list-item-title">Έτος Έναρξης</span>
               </span>
               <span>{commencement}</span>
             </div>
@@ -55,7 +55,7 @@ export default function Info({
             <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
               <span className="text">
                 <i className="flaticon-website text-thm2 pe-2 vam" />
-                Ιστοσελίδα
+                <span className="list-item-title">Ιστοσελίδα</span>
               </span>
               <a href={website} target="_blank" rel="noopener noreferrer">
                 {formattedWebsite}
@@ -66,7 +66,7 @@ export default function Info({
             <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
               <span className="text">
                 <i className="flaticon-call text-thm2 pe-2 vam" />
-                Τηλέφωνο
+                <span className="list-item-title">Τηλέφωνο</span>
               </span>
               <a href={`tel:${phone}`}>{phone}</a>
             </div>
@@ -75,7 +75,7 @@ export default function Info({
             <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
               <span className="text">
                 <i className="flaticon-mail text-thm2 pe-2 vam" />
-                Email
+                <span className="list-item-title">Email</span>
               </span>
               <a href={`mailto:${email}`}>{email}</a>
             </div>
