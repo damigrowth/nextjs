@@ -71,8 +71,8 @@ export default async function SingleService({
                   views={views?.data?.length}
                   verified={user.verification.data}
                   topLevel={freelancer?.topLevel}
-                  rating={freelancer.rating}
-                  totalReviews={totalFreelancerReviews}
+                  rating={rating}
+                  totalReviews={reviewsMeta?.total}
                 />
 
                 <Info
@@ -139,12 +139,12 @@ export default async function SingleService({
               displayName={user.displayName}
               username={freelancer.username}
               tagline={freelancer.tagline}
-              rating={freelancer.rating}
               topLevel={freelancer.topLevel}
               base={freelancer.base}
               rate={freelancer.rate}
               image={user.image?.data?.attributes?.formats?.thumbnail?.url}
-              totalReviews={totalFreelancerReviews}
+              rating={rating}
+              totalReviews={reviewsMeta?.total}
               socials={freelancer.socials}
               email={user.email}
               phone={user.phone}

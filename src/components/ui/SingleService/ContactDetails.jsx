@@ -59,19 +59,18 @@ export default function ContactDetails({
               <h5 className="title mb-1">{displayName}</h5>
             </Link>
             <p className="mb-0">{tagline}</p>
-            {rating && (
-              <div className="review">
-                <p>
-                  <i className="fas fa-star fz10 review-color pr10" />
-                  <span className="dark-color">{rating}</span>
-                  <span className="ml5">
-                    {totalReviews === 1
-                      ? `(από ${totalReviews} αξιολόγηση)`
-                      : `(από ${totalReviews} αξιολογήσεις)`}
-                  </span>
-                </p>
-              </div>
-            )}
+
+            {totalReviews > 0 ? (
+              <p className="mb-0 fz14 list-inline-item ">
+                <i className="fas fa-star vam fz12 review-color mb5"></i>{" "}
+                <span className="dark-color ">{rating}</span>
+                <span className="ml5 review-count-text">
+                  {totalReviews === 1
+                    ? `(από ${totalReviews} αξιολόγηση)`
+                    : `(από ${totalReviews} αξιολογήσεις)`}
+                </span>
+              </p>
+            ) : null}
           </div>
         </div>
         <div className="d-flex align-items-center justify-content-end mb-0  fz15 fw500 list-inline-item ml15 mb5-sm ml0-xs">
