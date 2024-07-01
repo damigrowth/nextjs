@@ -3,7 +3,13 @@
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import React, { useCallback, useEffect, useState, useTransition } from "react";
 
-export default function LoadMoreBtn({ paramsName, paramsPage, total, count }) {
+export default function LoadMoreBtn({
+  name,
+  paramsName,
+  paramsPage,
+  total,
+  count,
+}) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname(); // Use the current pathname
@@ -40,7 +46,7 @@ export default function LoadMoreBtn({ paramsName, paramsPage, total, count }) {
         onClick={handleNewParamsPage}
         className="ud-btn btn-dark default-box-shadow2"
       >
-        Περισσότερες
+        Περισσότερες {name}
         {isPending ? (
           <div className="spinner-border spinner-border-sm ml10" role="status">
             <span className="sr-only"></span>
