@@ -16,6 +16,8 @@ import { getUserId } from "@/lib/user/user";
 import { getData } from "@/lib/client/operations";
 import { COUNT_SERVICES_BY_RATING } from "@/lib/graphql/queries";
 import Reviews from "../Reviews/Reviews";
+import Terms from "./Terms";
+import Buy from "./Buy";
 
 export default async function SingleService({
   serviceId,
@@ -48,6 +50,7 @@ export default async function SingleService({
 
   const userId = freelancerUser.data.attributes.user.data.id;
   const user = freelancerUser.data.attributes.user.data.attributes;
+
   const freelancerId = freelancerUser.data.id;
   const freelancer = freelancerUser.data.attributes;
 
@@ -63,11 +66,13 @@ export default async function SingleService({
                   firstName={user.firstName}
                   lastName={user.lastName}
                   displayName={user.displayName}
+                  username={freelancer.username}
                   image={user.image.data?.attributes?.formats?.thumbnail?.url}
                   views={views?.data?.length}
                   verified={user.verification.data}
-                  rating={rating}
-                  totalReviews={reviewsMeta?.total}
+                  topLevel={freelancer?.topLevel}
+                  rating={freelancer.rating}
+                  totalReviews={totalFreelancerReviews}
                 />
 
                 <Info
@@ -76,12 +81,19 @@ export default async function SingleService({
                   time={time}
                 />
               </div>
-              <Gallery images={media.data} />
               <div className="service-about">
-                <Description description={description} tags={tags.data} />
+                <Description
+                  description={description}
+                  tags={tags.data}
+                  contactTypes={freelancer.contactTypes}
+                  payment_methods={freelancer.payment_methods}
+                  settlement_methods={freelancer.settlement_methods}
+                />
+                <Gallery images={media.data} />
                 {fixed ? null : <Packages packages={packages} />}
+                {addons?.length > 0 && <Addons addons={addons} price={price} />}
                 {faq?.length > 0 && <Faq faq={faq} />}
-                {addons?.length > 0 && <Addons addons={addons} />}
+                <Terms heading="Όροι Συνεργασίας" text={freelancer?.terms} />
                 {/* <hr className="opacity-100 mb15" /> */}
                 <Reviews
                   type="service"
@@ -94,7 +106,12 @@ export default async function SingleService({
                   reviewsPage={reviewsPage}
                   allReviewsRatings={allReviewsRatings}
                 />
-                <AddModelReviewForm type="service" modelId={serviceId} />
+                <AddModelReviewForm
+                  modelType="service"
+                  tenantType="freelancer"
+                  modelId={serviceId}
+                  tenantId={freelancerId}
+                />
               </div>
             </div>
           </div>
@@ -123,10 +140,18 @@ export default async function SingleService({
               username={freelancer.username}
               tagline={freelancer.tagline}
               rating={freelancer.rating}
+              topLevel={freelancer.topLevel}
               base={freelancer.base}
               rate={freelancer.rate}
               image={user.image?.data?.attributes?.formats?.thumbnail?.url}
-              totalFreelancerReviews={totalFreelancerReviews}
+              totalReviews={totalFreelancerReviews}
+              socials={freelancer.socials}
+              email={user.email}
+              phone={user.phone}
+              website={freelancer.website}
+              type={freelancer.type}
+              category={freelancer.category}
+              commencement={freelancer.commencement}
             />
           </StickySidebar>
         </div>
