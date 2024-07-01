@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Socials({ socials = {} }) {
+export default function Socials({ socials = {}, email, phone, website }) {
   const {
     facebook = null,
     linkedin = null,
@@ -21,19 +21,33 @@ export default function Socials({ socials = {} }) {
     { icon: "fa-instagram", data: instagram },
     { icon: "fa-behance", data: behance },
     { icon: "fa-dribbble", data: dribbble },
-  ];
+    email && { icon: "flaticon-mail", data: { url: `mailto:${email}` } },
+    phone && { icon: "flaticon-call", data: { url: `tel:${phone}` } },
+    website && { icon: "flaticon-website", data: { url: website } },
+  ].filter(Boolean); // Filter out any null entries
+
   return (
-    <div className="social-style1 light-style2">
-      {socialsData.map((social) =>
+    <div className="social-style1 light-style2 socials-list">
+      {socialsData.map((social, index) =>
         social.data ? (
           <a
-            key={social.data.label}
+            key={index}
             id={social.data.label}
             href={social.data.url}
-            target="_blank"
-            rel="noopener noreferrer"
+            target={
+              social.data.url && social.data.url.startsWith("http")
+                ? "_blank"
+                : undefined
+            }
+            rel={
+              social.data.url && social.data.url.startsWith("http")
+                ? "noopener noreferrer"
+                : undefined
+            }
           >
-            <i className={`fab ${social.icon} list-inline-item`} />
+            <i
+              className={`fab ${social.icon} list-inline-item d-flex align-items-center justify-content-center`}
+            />
           </a>
         ) : null
       )}
