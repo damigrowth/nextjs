@@ -7,6 +7,8 @@ export default function Features({
   payment_methods,
   settlement_methods,
 }) {
+  const sizeNumber = Number(size?.slug);
+
   // Function to find the smallest budget
   const getSmallestBudget = (budgets) => {
     if (!budgets || budgets.length === 0) return null;
@@ -40,7 +42,7 @@ export default function Features({
             </div>
           </div>
         )}
-        {size && (
+        {sizeNumber > 1 && (
           <div className="col-sm-6 col-xl-4">
             <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
               <div className="icon flex-shrink-0">
