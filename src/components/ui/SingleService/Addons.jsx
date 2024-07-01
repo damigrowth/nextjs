@@ -2,8 +2,9 @@
 
 import useServiceOrderStore from "@/store/order/service";
 import React, { useEffect } from "react";
+import Buy from "./Buy";
 
-export default function Addons({ addons, small }) {
+export default function Addons({ addons, small, price }) {
   const { order, setOrder, calculateTotal } = useServiceOrderStore();
 
   const handleSelectAddons = (addon) => {
@@ -62,7 +63,7 @@ export default function Addons({ addons, small }) {
                       <div className="small-addon-description">
                         {addon.description}
                       </div>
-                      <div className="small-addon-price">{addon.price}€</div>
+                      <div className="small-addon-price">+{addon.price}€</div>
                     </div>
                     <input
                       type="checkbox"
@@ -73,10 +74,15 @@ export default function Addons({ addons, small }) {
                     <span className="small-addon-checkmark" />
                   </label>
                 )}
-                {!small && <span className="price">{addon.price}€</span>}
+                {!small && <span className="price">+{addon.price}€</span>}
               </button>
             ))}
           </div>
+          {price && (
+            <div className="pt10 pb20">
+              <Buy price={price} />
+            </div>
+          )}
         </nav>
       </div>
     </div>
