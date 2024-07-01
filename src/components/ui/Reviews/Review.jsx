@@ -5,9 +5,11 @@ import React from "react";
 import ReviewReactions from "./ReviewReactions";
 import UserImage from "@/components/user/UserImage";
 import Rating from "../rating/Rating";
+import Link from "next/link";
 
 export default async function Review({
   reviewId,
+  service,
   firstName,
   lastName,
   displayName,
@@ -17,14 +19,15 @@ export default async function Review({
   likes,
   dislikes,
   rating,
+  showReviewsModel,
 }) {
-  const { formattedDate } = formatDate(date, "dd MMMM yyyy");
+  const { formattedDate } = formatDate(date, "dd/MM/yy");
 
   const uid = await getUserId();
 
   const reactions = {
     likes: likes.map(({ id }) => Number(id)),
-    dislikes: dislikes.map(({ id }) => Number(id)),
+    // dislikes: dislikes.map(({ id }) => Number(id)),
     uid,
     reviewId,
   };
@@ -41,6 +44,14 @@ export default async function Review({
         />
         <div className="ml20">
           <h6 className="mt-0 mb-0">{displayName}</h6>
+          {showReviewsModel && (
+            <Link
+              href={`/service/${service.slug}`}
+              className="review-service-title"
+            >
+              <span>{service.title}</span>
+            </Link>
+          )}
           <div className="d-flex align-items-center">
             <div className="d-flex align-items-center">
               <Rating
