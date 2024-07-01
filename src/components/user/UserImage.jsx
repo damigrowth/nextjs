@@ -14,11 +14,8 @@ export default function UserImage({
   bigText,
   path,
 }) {
-  return (
-    <Link
-      className="user-image-container mb5-sm"
-      href={!path ? "/not-linked" : path}
-    >
+  const content = (
+    <>
       <span className="position-relative">
         {image ? (
           <Image
@@ -37,10 +34,14 @@ export default function UserImage({
             bigText={bigText}
           />
         )}
-
-        {/* <span className="online-badge"></span>  Make this functionality! */}
       </span>
       {displayName && <span className="fz14 ml10">{displayName}</span>}
-    </Link>
+    </>
+  );
+
+  return (
+    <div className="user-image-container mb5-sm">
+      {path ? <Link href={path}>{content}</Link> : content}
+    </div>
   );
 }
