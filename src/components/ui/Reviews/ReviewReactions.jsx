@@ -3,33 +3,33 @@
 import { reviewReaction } from "@/lib/review/reaction";
 import React, { useState } from "react";
 
-//TODO: NEED TO REVALIDATE PATH, THE LIKES AND DISLIKES DON'T UPDATE WITH REFRESH
+// REMOVED DISLIKES
 function ReactionButton({ type, reactions, setReactions }) {
   const handleReaction = async () => {
     try {
       let newLikes = [...reactions.likes];
-      let newDislikes = [...reactions.dislikes];
+      // let newDislikes = [...reactions.dislikes];
 
       if (type === "like") {
         if (reactions.likes.includes(reactions.uid)) {
           newLikes = newLikes.filter((id) => id !== reactions.uid);
         } else {
           newLikes.push(reactions.uid);
-          newDislikes = newDislikes.filter((id) => id !== reactions.uid);
+          // newDislikes = newDislikes.filter((id) => id !== reactions.uid);
         }
-      } else if (type === "dislike") {
-        if (reactions.dislikes.includes(reactions.uid)) {
-          newDislikes = newDislikes.filter((id) => id !== reactions.uid);
-        } else {
-          newDislikes.push(reactions.uid);
-          newLikes = newLikes.filter((id) => id !== reactions.uid);
-        }
+        // } else if (type === "dislike") {
+        //   if (reactions.dislikes.includes(reactions.uid)) {
+        //     newDislikes = newDislikes.filter((id) => id !== reactions.uid);
+        //   } else {
+        //     newDislikes.push(reactions.uid);
+        //     newLikes = newLikes.filter((id) => id !== reactions.uid);
+        //   }
       }
 
       const updatedReactions = {
         ...reactions,
         likes: newLikes,
-        dislikes: newDislikes,
+        // dislikes: newDislikes,
         type: type === reactions.type ? "" : type,
       };
 
@@ -51,15 +51,19 @@ function ReactionButton({ type, reactions, setReactions }) {
             ? `fas fa-thumbs-up ${
                 reactions.likes.includes(reactions.uid) ? "reacted_on_like" : ""
               }`
-            : `fas fa-thumbs-down ${
+            : "" /* `fas fa-thumbs-down ${
                 reactions.dislikes.includes(reactions.uid)
                   ? "reacted_on_dislike"
                   : ""
-              }`
+              }` */
         }
       />
       <span className="review_reactions_counter">
-        {type === "like" ? reactions.likes.length : reactions.dislikes.length}
+        {
+          type === "like"
+            ? reactions.likes.length
+            : 0 /* reactions.dislikes.length */
+        }
       </span>
     </button>
   );
@@ -78,11 +82,11 @@ export default function ReviewReactions({ data }) {
         reactions={reactions}
         setReactions={setReactions}
       />
-      <ReactionButton
+      {/* <ReactionButton
         type="dislike"
         reactions={reactions}
         setReactions={setReactions}
-      />
+      /> */}
     </div>
   );
 }
