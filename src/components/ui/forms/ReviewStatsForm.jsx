@@ -13,7 +13,7 @@ export default function ReviewStatsForm({
   reviewRatings,
   rating,
   rating_global,
-  ratingModelCount,
+  // ratingModelCount,  // -- Removed --
 }) {
   const initialState = {
     data: null,
@@ -96,32 +96,34 @@ export default function ReviewStatsForm({
   };
 
   const newRating = formState?.data?.newRating;
-  const newRatingModelCount = formState?.data?.newRatingModelCount;
+  // -- Removed --
+  // const newRatingModelCount = formState?.data?.newRatingModelCount;
   const newGlobalRating = formState?.data?.newGlobalRating?.attributes?.label;
 
-  const handleLabelModelCount = (count) => {
-    if (type === "freelancer") {
-      if (count > 1) {
-        return count + " " + "Ελεύθεροι Επαγγελματίες";
-      } else {
-        return count + " " + "Ελεύθερος Επαγγελματίας";
-      }
-    } else if (type === "service") {
-      if (count > 1) {
-        return count + " " + "Υπηρεσίες";
-      } else {
-        return count + " " + "Υπηρεσία";
-      }
-    } else if (type === "employer") {
-      if (count > 1) {
-        return count + " " + "Εργοδότες";
-      } else {
-        return count + " " + "Εργοδότης";
-      }
-    } else {
-      return "";
-    }
-  };
+  // -- Removed --
+  // const handleLabelModelCount = (count) => {
+  //   if (type === "freelancer") {
+  //     if (count > 1) {
+  //       return count + " " + "Ελεύθεροι Επαγγελματίες";
+  //     } else {
+  //       return count + " " + "Ελεύθερος Επαγγελματίας";
+  //     }
+  //   } else if (type === "service") {
+  //     if (count > 1) {
+  //       return count + " " + "Υπηρεσίες";
+  //     } else {
+  //       return count + " " + "Υπηρεσία";
+  //     }
+  //   } else if (type === "employer") {
+  //     if (count > 1) {
+  //       return count + " " + "Εργοδότες";
+  //     } else {
+  //       return count + " " + "Εργοδότης";
+  //     }
+  //   } else {
+  //     return "";
+  //   }
+  // };
 
   return (
     <form action={formAction} ref={formRef} className="wrapper mx-auto">
@@ -132,9 +134,9 @@ export default function ReviewStatsForm({
           ? rating_global.attributes.label
           : newGlobalRating}
       </h5>
-      <p className="fz14 mb-0">
+      {/* <p className="fz14 mb-0">
         {handleLabelModelCount(ratingModelCount || newRatingModelCount)}
-      </p>
+      </p> */}
       <input
         type="text"
         id="rating"
