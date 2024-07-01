@@ -6,7 +6,7 @@ import {
   COUNT_FREELANCERS_BY_RATING,
   COUNT_SERVICES_BY_RATING,
 } from "@/lib/graphql/queries";
-import { getRatingsModelCount } from "@/lib/rating/get";
+// import { getRatingsModelCount } from "@/lib/rating/get";  // -- Removed --
 import LoadMoreBtn from "../profiles/freelancer/LoadMoreBtn";
 
 export default async function Reviews({
@@ -19,6 +19,7 @@ export default async function Reviews({
   reviewsMeta,
   reviewsPage,
   allReviewsRatings,
+  showReviewsModel,
 }) {
   if (reviews.length === 0) {
     return <h4 className="mt40 mb20">Χωρίς Αξιολογήσεις</h4>;
@@ -48,7 +49,8 @@ export default async function Reviews({
     ),
   }));
 
-  const ratingModelCount = await getRatingsModelCount(type, rating_global.id);
+  // -- Removed --
+  // const ratingModelCount = await getRatingsModelCount(type, rating_global.id);
 
   return (
     <div className="px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
@@ -68,8 +70,8 @@ export default async function Reviews({
                     reviewRatings={reviewRatings}
                     rating={rating}
                     rating_global={rating_global}
-                    ratingModelCount={ratingModelCount}
                     allReviewsRatings={allReviewsRatings}
+                    // ratingModelCount={ratingModelCount}  // -- Removed --
                   />
                 </div>
                 <div className="wrapper ml60 ml0-sm">
@@ -86,6 +88,8 @@ export default async function Reviews({
                 <li key={i}>
                   <Review
                     reviewId={Number(id)}
+                    showReviewsModel={showReviewsModel}
+                    service={review?.service?.data?.attributes}
                     firstName={review.user.data.attributes.firstName}
                     lastName={review.user.data.attributes.lastName}
                     displayName={review.user.data.attributes.displayName}
@@ -104,6 +108,7 @@ export default async function Reviews({
             </ul>
             <div className="col-md-12">
               <LoadMoreBtn
+                name="Αξιολογήσεις"
                 total={reviewsMeta.total}
                 count={reviews.length}
                 paramsName="reviews"
