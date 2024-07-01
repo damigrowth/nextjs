@@ -10,7 +10,7 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import Meta from "../ui/profiles/freelancer/Meta";
 import Metrics from "../ui/profiles/freelancer/Metrics";
-import Description from "../ui/profiles/freelancer/Description";
+import Description from "../ui/profiles/freelancer/Terms";
 import Education from "../ui/profiles/freelancer/Education";
 import Experience from "../ui/profiles/freelancer/Experience";
 import Certificates from "../ui/profiles/freelancer/Certificates";
