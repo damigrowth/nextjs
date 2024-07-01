@@ -10,6 +10,7 @@ import {
 import { getRatings } from "@/lib/rating/get";
 import { inspect } from "@/utils/inspect";
 import { redirect } from "next/navigation";
+import ProfileBreadcrumb from "@/components/ui/breadcrumbs/freelancer/ProfileBreadcrumb";
 
 export const metadata = {
   title:
@@ -53,7 +54,7 @@ export default async function page({ params, searchParams }) {
     return (
       <>
         <TabSection1 />
-        <Breadcumb10 path={["Home", "Services", "Design & Creative"]} />
+        <ProfileBreadcrumb category={freelancer?.category} />
         <FreelancerProfile
           uid={uid}
           freelancer={freelancer}
