@@ -13,7 +13,7 @@ export default function ServiceDetailComment1() {
   return (
     <>
       <div className="bsp_reveiw_wrt mb20">
-        <h6 className="fz17">Πρόσθεσε Κριτική</h6>
+        <h6 className="fz17">Πρόσθεσε Αξιολόγησης</h6>
         <p className="text">
           Το email σας δεν θα δημοσιευτεί, μόνο το όνομα και το επίθετο.
         </p>
@@ -31,7 +31,7 @@ export default function ServiceDetailComment1() {
             <div className="col-md-12">
               <div className="mb-4">
                 <label className="fw500 fz16 ff-heading dark-color mb-2">
-                  Κριτική
+                  Αξιολόγηση
                 </label>
                 <textarea
                   className="pt15"
