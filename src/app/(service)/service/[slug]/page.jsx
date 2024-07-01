@@ -18,6 +18,7 @@ import {
 } from "@/lib/service/service";
 import { getRatings } from "@/lib/rating/get";
 import { getReviewsByFreelancer } from "@/lib/freelancer/freelancer";
+import ServiceBreadcrumb from "@/components/ui/breadcrumbs/service/ServiceBreadcrumb";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
@@ -112,7 +113,8 @@ export default async function page({ params, searchParams }) {
       <>
         <TabSection1 />
         <div className=" bgc-thm3">
-          <Breadcumb3 path={["Home", "Services", "Design & Creative"]} />
+          {/* <Breadcumb3 path={["Home", "Services", "Design & Creative"]} /> */}
+          <ServiceBreadcrumb category={service?.category} />
           <SingleService
             serviceId={uid}
             service={service}
