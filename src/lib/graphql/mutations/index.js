@@ -10,6 +10,23 @@ const POST_REVIEW = gql`
   }
 `;
 
+const UPDATE_REVIEW = gql`
+  mutation UpdateReview($id: ID!, $data: ReviewInput!) {
+    updateReview(id: $id, data: $data) {
+      data {
+        id
+        attributes {
+          freelancer {
+            data {
+              id
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 const POST_SERVICE = gql`
   mutation CreateService($data: ServiceInput!) {
     createService(data: $data) {
@@ -69,4 +86,5 @@ export {
   POST_SERVICE,
   UPDATE_FREELANCER_RATING,
   UPDATE_SERVICE_RATING,
+  UPDATE_REVIEW,
 };
