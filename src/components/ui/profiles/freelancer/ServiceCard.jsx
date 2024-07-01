@@ -14,17 +14,25 @@ export default function ServiceCard({
   slug,
 }) {
   //   const [isFavActive, setFavActive] = useState(false);
+  const maxTitleLength = 80;
+  const truncatedTitle =
+    title.length > maxTitleLength
+      ? title.slice(0, maxTitleLength) + "..."
+      : title;
+
   return (
     <>
       <div className="listing-style1">
         <div className="list-thumb">
-          <Image
-            height={190}
-            width={255}
-            className="w-100 h-100 object-fit-cover"
-            src={image}
-            alt={title}
-          />
+          <Link href={`/service/${slug}`}>
+            <Image
+              height={190}
+              width={255}
+              className="w-100 h-100 object-fit-cover"
+              src={image}
+              alt={title}
+            />
+          </Link>
           {/* <a
             onClick={() => setFavActive(!isFavActive)}
             className={`listing-fav fz12 ${isFavActive ? "ui-fav-active" : ""}`}
@@ -35,7 +43,7 @@ export default function ServiceCard({
         <div className="list-content">
           <p className="list-text body-color fz14 mb-1">{category}</p>
           <h6 className="list-title">
-            <Link href={`/service/${slug}`}>{title.slice(0, 40) + "..."}</Link>
+            <Link href={`/service/${slug}`}>{truncatedTitle}</Link>
           </h6>
           <div
             className="review-meta d-flex align-items-center "
@@ -56,7 +64,7 @@ export default function ServiceCard({
           <div className="list-meta mt15">
             <div className="budget">
               <p className="mb-0 body-color">
-                Starting at
+                από
                 <span className="fz17 fw500 dark-color ms-1">{price}€</span>
               </p>
             </div>
