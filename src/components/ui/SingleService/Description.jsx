@@ -1,20 +1,19 @@
+import { formatDescription } from "@/utils/formatDescription";
 import React from "react";
+import Features from "./Features";
 
-export default function Description({ description, tags }) {
-  // console.log(tags);
+export default function Description({
+  description,
+  tags,
+  contactTypes,
+  payment_methods,
+  settlement_methods,
+}) {
   if (!description) {
     return;
   }
 
-  const formattedDescription = description
-    .split("\n")
-    .map((description, index) =>
-      description.trim() !== "" ? (
-        <p key={index}>{description}</p>
-      ) : (
-        <div key={index} className="line-break"></div>
-      )
-    );
+  const formattedDescription = formatDescription(description);
 
   return (
     <div className="px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
@@ -36,6 +35,11 @@ export default function Description({ description, tags }) {
             </ul>
           </div>
         )}
+        <Features
+          contactTypes={contactTypes?.data}
+          payment_methods={payment_methods?.data}
+          settlement_methods={settlement_methods?.data}
+        />
       </div>
     </div>
   );
