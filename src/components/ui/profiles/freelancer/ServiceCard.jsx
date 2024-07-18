@@ -24,7 +24,7 @@ export default function ServiceCard({
     <>
       <div className="listing-style1">
         <div className="list-thumb">
-          <Link href={`/service/${slug}`}>
+          <Link href={`/s/${slug}`}>
             <Image
               height={190}
               width={255}
@@ -43,7 +43,7 @@ export default function ServiceCard({
         <div className="list-content">
           <p className="list-text body-color fz14 mb-1">{category}</p>
           <h6 className="list-title">
-            <Link href={`/service/${slug}`}>{truncatedTitle}</Link>
+            <Link href={`/s/${slug}`}>{truncatedTitle}</Link>
           </h6>
           <div
             className="review-meta d-flex align-items-center "
