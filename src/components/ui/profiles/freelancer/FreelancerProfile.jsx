@@ -24,11 +24,9 @@ export default function FreelancerProfile({
   services,
   servicesPage,
   servicesMeta,
-  ratings,
   reviews,
   reviewsMeta,
   reviewsPage,
-  allReviewsRatings,
 }) {
   const {
     user,
@@ -40,6 +38,7 @@ export default function FreelancerProfile({
     description,
     rate,
     commencement,
+    yearsOfExperience,
     type,
     website,
     minBudgets,
@@ -55,9 +54,23 @@ export default function FreelancerProfile({
     terms,
     rating,
     rating_global,
+    reviews_total,
+    rating_stars_1,
+    rating_stars_2,
+    rating_stars_3,
+    rating_stars_4,
+    rating_stars_5,
   } = freelancer;
 
   const freelancerUser = user?.data?.attributes;
+
+  const ratingStars = [
+    rating_stars_1,
+    rating_stars_2,
+    rating_stars_3,
+    rating_stars_4,
+    rating_stars_5,
+  ];
 
   return (
     <section className="pt10 pb90 pb30-md">
@@ -76,12 +89,13 @@ export default function FreelancerProfile({
                 freelancerUser.image.data?.attributes?.formats?.thumbnail?.url
               }
               rating={rating}
-              totalReviews={reviewsMeta?.total}
+              totalReviews={reviews_total}
             />
             <Metrics
               type={type?.data?.attributes}
               servicesTotal={servicesMeta?.total}
               commencement={commencement}
+              yearsOfExperience={yearsOfExperience}
               verification={
                 freelancerUser?.verification?.data?.attributes?.status?.data
                   ?.attributes?.type
@@ -107,22 +121,17 @@ export default function FreelancerProfile({
                 <Gallery images={portfolio?.data} title="Portfolio" border />
               )}
               <Terms heading="Όροι Συνεργασίας" text={terms} border />
-              {reviews.length > 0 ? (
-                <Reviews
-                  type="freelancer"
-                  modelId={uid}
-                  reviews={reviews}
-                  ratings={ratings}
-                  rating={rating}
-                  rating_global={rating_global.data}
-                  reviewsMeta={reviewsMeta}
-                  reviewsPage={reviewsPage}
-                  allReviewsRatings={allReviewsRatings}
-                  showReviewsModel
-                />
-              ) : (
-                <h4>Χωρίς Αξιολογήσεις</h4>
-              )}
+              <Reviews
+                reviews={reviews}
+                rating={rating}
+                reviews_total={reviews_total}
+                rating_global={rating_global.data}
+                reviewsMeta={reviewsMeta}
+                reviewsPage={reviewsPage}
+                ratingStars={ratingStars}
+                showReviewsModel
+              />
+
               <AddModelReviewForm
                 modelType="service"
                 tenantType="freelancer"
