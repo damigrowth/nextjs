@@ -60,7 +60,7 @@ export const getData = async (query, variables) => {
 
     const { data } = await response.json();
 
-    if (!response.ok && data.error) console.log(data.error.message);
+    if (!response.ok && data?.error) console.log(data?.error?.message);
     if (response.ok) {
       return data;
     }
