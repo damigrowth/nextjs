@@ -81,10 +81,24 @@ const UPDATE_SERVICE_RATING = gql`
   }
 `;
 
+const UPDATE_SERVICE_SLUG = gql`
+  mutation updateServiceSlug($id: ID!, $slug: String!) {
+    updateService(id: $id, data: { slug: $slug }) {
+      data {
+        id
+        attributes {
+          slug
+        }
+      }
+    }
+  }
+`;
+
 export {
   POST_REVIEW,
   POST_SERVICE,
   UPDATE_FREELANCER_RATING,
   UPDATE_SERVICE_RATING,
   UPDATE_REVIEW,
+  UPDATE_SERVICE_SLUG,
 };
