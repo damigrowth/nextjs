@@ -53,28 +53,59 @@ const VERIFICATION = gql`
   }
 `;
 
-const USER_PARTIAL = gql`
-  fragment UserPartial on UsersPermissionsUserEntityResponse {
+const SPECIALISATIONS = gql`
+  fragment Specialisations on SkillRelationResponseCollection {
+    data {
+      id
+      attributes {
+        label
+        slug
+      }
+    }
+  }
+`;
+
+const USER_REFERENCE = gql`
+  fragment UserReference on UsersPermissionsUserEntityResponse {
     data {
       id
       attributes {
         firstName
         lastName
         displayName
-        email
-        phone
-        confirmed
-        verification {
-          ...Verification
-        }
+        username
         image {
           ...SingleImage
         }
       }
     }
   }
-  ${VERIFICATION}
   ${SINGLE_IMAGE}
+`;
+
+const PAGINATION = gql`
+  fragment Pagination on ResponseCollectionMeta {
+    pagination {
+      page
+      pageSize
+      pageCount
+      total
+    }
+  }
+`;
+
+const COVERAGE = gql`
+  fragment Coverage on ComponentLocationCoverage {
+    online
+    counties {
+      data {
+        id
+        attributes {
+          name
+        }
+      }
+    }
+  }
 `;
 
 const BASE = gql`
@@ -105,6 +136,53 @@ const BASE = gql`
       }
     }
   }
+`;
+
+const FREELANCER_REFERENCE = gql`
+  fragment FreelancerReference on Freelancer {
+    username
+    tagline
+    rating
+    reviews_total
+    rate
+    user {
+      ...UserReference
+    }
+    specialisations {
+      ...Specialisations
+    }
+    base {
+      ...Base
+    }
+  }
+
+  ${USER_REFERENCE}
+  ${SPECIALISATIONS}
+  ${BASE}
+`;
+
+const USER_PARTIAL = gql`
+  fragment UserPartial on UsersPermissionsUserEntityResponse {
+    data {
+      id
+      attributes {
+        firstName
+        lastName
+        displayName
+        email
+        phone
+        confirmed
+        verification {
+          ...Verification
+        }
+        image {
+          ...SingleImage
+        }
+      }
+    }
+  }
+  ${VERIFICATION}
+  ${SINGLE_IMAGE}
 `;
 
 const SOCIALS = gql`
@@ -235,34 +313,8 @@ const SKILLS = gql`
   }
 `;
 
-const COVERAGE = gql`
-  fragment Coverage on ComponentLocationCoverage {
-    online
-    counties {
-      data {
-        id
-        attributes {
-          name
-        }
-      }
-    }
-  }
-`;
-
 const SIZE = gql`
   fragment Size on SizeEntityResponse {
-    data {
-      id
-      attributes {
-        label
-        slug
-      }
-    }
-  }
-`;
-
-const SPECIALISATIONS = gql`
-  fragment Specialisations on SkillRelationResponseCollection {
     data {
       id
       attributes {
@@ -503,17 +555,6 @@ const ROLE = gql`
   }
 `;
 
-const PAGINATION = gql`
-  fragment Pagination on ResponseCollectionMeta {
-    pagination {
-      page
-      pageSize
-      pageCount
-      total
-    }
-  }
-`;
-
 export {
   SERVICE,
   SERVICES,
@@ -550,4 +591,6 @@ export {
   PAYMENT_METHOD,
   SETTLEMENT_METHOD,
   PAGINATION,
+  USER_REFERENCE,
+  FREELANCER_REFERENCE,
 };
