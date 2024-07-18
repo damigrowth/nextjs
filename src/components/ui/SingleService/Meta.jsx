@@ -28,7 +28,7 @@ export default function Meta({
             image={image}
             width={40}
             height={40}
-            path={`/freelancer/${username}`}
+            path={`/profile/${username}`}
           />
           <div className="tooltip-container">
             {verified === null || verified === false ? null : (
