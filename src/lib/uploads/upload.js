@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { postData, postMedia } from "../api";
 
 const convertToBlob = async (url) => {
@@ -20,7 +21,8 @@ export async function uploadMedia(files) {
   const uploadedMedia = [];
 
   for (const file of files) {
-    formData.append("files", file, file.name);
+    const fileName = file.name || `${faker.date.recent()}`;
+    formData.append("files", file, fileName);
   }
 
   const response = await postMedia("upload", formData);
