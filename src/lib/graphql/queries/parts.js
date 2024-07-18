@@ -35,6 +35,8 @@ import {
   SETTLEMENT_METHOD,
   FREELANCER_CATEGORY,
   SERVICE,
+  USER_REFERENCE,
+  FREELANCER_REFERENCE,
 } from "./fragments";
 
 const REVIEW_MAIN = gql`
@@ -93,13 +95,14 @@ const REVIEW = gql`
 const FREELANCER_PARTIAL_MAIN = gql`
   fragment FreelancerPartialMain on Freelancer {
     tagline
-    rating
     rate
     username
     terms
     topLevel
     commencement
     website
+    rating
+    reviews_total
   }
 `;
 
@@ -167,6 +170,12 @@ const FREELANCER_MAIN = gql`
     topLevel
     terms
     rating
+    reviews_total
+    rating_stars_1
+    rating_stars_2
+    rating_stars_3
+    rating_stars_4
+    rating_stars_5
   }
 `;
 
@@ -247,15 +256,38 @@ const FREELANCER_RELATIONS = gql`
   ${RATING}
 `;
 
+const FREELANCER_SEO = gql`
+  fragment FreelancerSEO on Freelancer {
+    user {
+      data {
+        attributes {
+          displayName
+        }
+      }
+    }
+    description
+    seo {
+      metaTitle
+      metaDescription
+    }
+  }
+`;
+
 const SERVICE_MAIN = gql`
   fragment ServiceMain on Service {
     title
+    slug
     price
     time
     description
     fixed
     rating
-    slug
+    reviews_total
+    rating_stars_1
+    rating_stars_2
+    rating_stars_3
+    rating_stars_4
+    rating_stars_5
   }
 `;
 
@@ -298,7 +330,6 @@ const SERVICE_RELATIONS = gql`
         ...Tag
       }
     }
-
     seo {
       metaTitle
       metaDescription
@@ -315,6 +346,18 @@ const SERVICE_RELATIONS = gql`
   ${STATUS}
   ${RATING}
   ${TAG}
+`;
+
+const SERVICE_SEO = gql`
+  fragment ServiceSEO on Service {
+    title
+    slug
+    description
+    seo {
+      metaTitle
+      metaDescription
+    }
+  }
 `;
 
 const USER_MAIN = gql`
@@ -402,12 +445,67 @@ const FEATURED_SERVICE_RELATIONS = gql`
   ${MULTIPLE_IMAGES}
 `;
 
+const SERVICE_PARTIAL_MAIN = gql`
+  fragment ServicePartialMain on Service {
+    title
+    price
+    rating
+    reviews_total
+    slug
+  }
+`;
+
+const SERVICE_PARTIAL_RELATIONS = gql`
+  fragment ServicePartialRelations on Service {
+    packages {
+      __typename
+      ... on ComponentPricingBasicPackage {
+        price
+      }
+    }
+    category {
+      data {
+        ...Category
+      }
+    }
+    media {
+      ...MultipleImages
+    }
+    freelancer {
+      data {
+        id
+        attributes {
+          ...FreelancerReference
+        }
+      }
+    }
+  }
+  ${CATEGORY}
+  ${MULTIPLE_IMAGES}
+  ${FREELANCER_REFERENCE}
+`;
+
+const SERVICE_PARTIAL = gql`
+  fragment ServicePartial on ServiceEntityResponseCollection {
+    data {
+      id
+      attributes {
+        ...ServicePartialMain
+        ...ServicePartialRelations
+      }
+    }
+  }
+  ${SERVICE_PARTIAL_MAIN}
+  ${SERVICE_PARTIAL_RELATIONS}
+`;
+
 export {
   USER_MAIN,
   USER_RELATIONS,
   FREELANCER_PARTIAL,
   FREELANCER_MAIN,
   FREELANCER_RELATIONS,
+  FREELANCER_SEO,
   REVIEW_MAIN,
   REVIEW_RELATIONS,
   REVIEW,
@@ -415,4 +513,8 @@ export {
   SERVICE_RELATIONS,
   FEATURED_SERVICE_MAIN,
   FEATURED_SERVICE_RELATIONS,
+  SERVICE_PARTIAL_MAIN,
+  SERVICE_PARTIAL_RELATIONS,
+  SERVICE_PARTIAL,
+  SERVICE_SEO,
 };
