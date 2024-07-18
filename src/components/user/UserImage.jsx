@@ -13,10 +13,19 @@ export default function UserImage({
   displayName,
   bigText,
   path,
+  topLevel,
 }) {
   const content = (
     <>
-      <span className="position-relative">
+      <div className="position-relative">
+        {topLevel && (
+          <div className="top-badge">
+            {/* <div className="icon ">
+                      <span className="flaticon-badge" />
+                    </div> */}
+            <Image width={30} height={30} src="/images/top-badge.png" />
+          </div>
+        )}
         {image ? (
           <Image
             width={!width ? 40 : width}
@@ -34,14 +43,23 @@ export default function UserImage({
             bigText={bigText}
           />
         )}
-      </span>
+      </div>
       {displayName && <span className="fz14 ml10">{displayName}</span>}
     </>
   );
 
   return (
     <div className="user-image-container mb5-sm">
-      {path ? <Link href={path}>{content}</Link> : content}
+      {path ? (
+        <Link
+          href={path}
+          className="d-flex justify-content-center align-items-center"
+        >
+          {content}
+        </Link>
+      ) : (
+        content
+      )}
     </div>
   );
 }
