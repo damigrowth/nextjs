@@ -6,8 +6,10 @@ export default function Metrics({
   servicesTotal,
   commencement,
   verification,
+  yearsOfExperience,
 }) {
-  const yearsOfExperience = getYearsOfExperience(commencement);
+  // DONE IN THE BACKEND
+  // const yearsOfExperience = getYearsOfExperience(commencement);
 
   const verified = verification === "Completed" ? true : false;
 
