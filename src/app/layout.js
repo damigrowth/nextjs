@@ -1,5 +1,6 @@
 import "./globals.css";
 import "react-tooltip/dist/react-tooltip.css";
+import "react-loading-skeleton/dist/skeleton.css";
 
 import BottomToTop from "@/components/button/BottomToTop";
 import { DM_Sans } from "next/font/google";
@@ -14,6 +15,8 @@ import toggleStore from "@/store/toggleStore";
 import { usePathname } from "next/navigation";
 import { getMaintenanceStatus } from "@/lib/maintenance/maintenance";
 import { isAuthenticated } from "@/lib/auth/authenticated";
+import Script from "next/script";
+import InstallBootstrap from "@/components/ui/InstallBootstrap";
 
 if (typeof window !== "undefined") {
   import("bootstrap");
@@ -45,6 +48,7 @@ export default async function RootLayout({ children }) {
             : ""
         }`}
       >
+        <InstallBootstrap />
         {!footer.includes(path) ? (
           <div className="wrapper ovh mm-page mm-slideout">
             {(!isUnderMaintenance || authenticated) && <Header />}
