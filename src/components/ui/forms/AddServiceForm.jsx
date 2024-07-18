@@ -40,7 +40,7 @@ export default function AddServiceForm({ categories, tags }) {
 
   const [formState, formAction] = useFormState(createService, initialState);
 
-  const serviceID = formState?.data?.id;
+  const serviceUid = formState?.data?.attributes?.uid;
   const serviceTitle = formState?.data?.attributes?.title;
 
   const handleDisable = () => {
@@ -75,8 +75,8 @@ export default function AddServiceForm({ categories, tags }) {
         {step === "info" && (
           <ServiceInformation categories={categories} tags={tags} />
         )}
-        {serviceID ? (
-          <ServiceSuccess id={serviceID} title={serviceTitle} />
+        {serviceUid ? (
+          <ServiceSuccess id={serviceUid} title={serviceTitle} />
         ) : (
           <>
             {step === "packages" && <ServicePackages />}
