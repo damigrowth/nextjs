@@ -38,24 +38,12 @@ export default function ContactDetails({
               lastName={lastName}
               image={image}
               bigText
-              path={`/freelancer/${username}`}
+              path={`/profile/${username}`}
+              topLevel={topLevel}
             />
-            {topLevel && (
-              <div className="top-badge">
-                {/* <div className="icon ">
-                      <span className="flaticon-badge" />
-                    </div> */}
-                <Image
-                  width={30}
-                  height={30}
-                  src="/images/top-badge.png"
-                  alt="top badge"
-                />
-              </div>
-            )}
           </div>
           <div className="ml20">
-            <Link href={`/freelancer/${username}`}>
+            <Link href={`/profile/${username}`}>
               <h5 className="title mb-1">{displayName}</h5>
             </Link>
             <p className="mb-0">{tagline}</p>
@@ -107,10 +95,7 @@ export default function ContactDetails({
           </div>
         </div>
         <div className="d-grid mt30">
-          <Link
-            href={`/freelancer/${username}`}
-            className="ud-btn btn-thm-border"
-          >
+          <Link href={`/profile/${username}`} className="ud-btn btn-thm-border">
             Επικοινωνία
             <i className="fal fa-arrow-right-long" />
           </Link>
