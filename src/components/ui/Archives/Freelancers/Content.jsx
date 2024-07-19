@@ -10,7 +10,7 @@ export default async function Content({ paramsFilters }) {
   const { freelancers } = await getData(FREELANCERS_ARCHIVE, paramsFilters);
 
   return (
-    <div className="col-lg-9">
+    <>
       <Topbar
         meta={freelancers?.meta?.pagination}
         single="επαγγελματίας"
@@ -26,6 +26,6 @@ export default async function Content({ paramsFilters }) {
           plural="επαγγελματίες"
         />
       </div>
-    </div>
+    </>
   );
 }
