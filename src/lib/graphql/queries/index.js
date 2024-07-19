@@ -329,7 +329,7 @@ const SERVICES_ARCHIVE = gql`
         freelancer: { user: { verified: { eq: $verified } } }
       }
       sort: $sort
-      pagination: { page: $page, pageSize: 5 }
+      pagination: { page: $page, pageSize: 20 }
     ) {
       data {
         id
@@ -391,7 +391,7 @@ const FREELANCERS_ARCHIVE = gql`
         topLevel: { eq: $top }
       }
       sort: $sort
-      pagination: { page: $page, pageSize: 9 }
+      pagination: { page: $page, pageSize: 20 }
     ) {
       data {
         id
