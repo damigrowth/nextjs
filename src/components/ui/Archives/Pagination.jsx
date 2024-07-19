@@ -5,6 +5,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function Pagination({ meta, plural }) {
   const { pageSize, pageCount, total } = meta;
+
+  if (total < 20) return null;
+
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
