@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 export default function Switch({ paramName, label }) {
   const router = useRouter();
@@ -11,6 +11,7 @@ export default function Switch({ paramName, label }) {
   // Initialize state from search parameters or default to false
   const getInitialVerified = () => searchParams.has(paramName);
   const [isToggled, setIsToggled] = useState(getInitialVerified);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setIsToggled(getInitialVerified());
@@ -29,13 +30,19 @@ export default function Switch({ paramName, label }) {
       params.delete(paramName);
     }
     const paramString = params.toString().replace(/=(&|$)/g, "$1");
-    router.push(pathname + "?" + paramString, {
-      scroll: false,
+
+    startTransition(() => {
+      router.push(pathname + "?" + paramString, {
+        scroll: false,
+      });
     });
   };
 
   return (
-    <div className="card-body card-body px-0 pt-0">
+    <div
+      data-pending={isPending ? "" : undefined}
+      className="card-body card-body px-0 pt-0"
+    >
       <div className="switch-style1">
         <div className="form-check form-switch mb20">
           <input
