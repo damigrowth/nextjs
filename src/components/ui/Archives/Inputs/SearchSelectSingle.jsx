@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useOptimistic, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import BorderSpinner from "../../Spinners/BorderSpinner";
 
 export default function SearchSelectSingle({
   defaultLabel,
@@ -18,7 +19,7 @@ export default function SearchSelectSingle({
 
   // Initialize search state from search parameters or default value
   const getInitialSearch = () => searchParams.get(paramSearchName) || "";
-  const [search, setSearch] = useState(getInitialSearch);
+  const [search, setSearch] = useOptimistic(getInitialSearch());
 
   // Initialize selected option state from search parameters or default value
   const getInitialSelectedOption = () => {
@@ -28,37 +29,46 @@ export default function SearchSelectSingle({
       allOptions[0]
     );
   };
-  const [selectedOption, setSelectedOption] = useState(
-    getInitialSelectedOption
+  const [selectedOption, setSelectedOption] = useOptimistic(
+    getInitialSelectedOption()
   );
 
+  const [isPending, startTransition] = useTransition();
+  const [isSearchPending, startSearchTransition] = useTransition();
+
   useEffect(() => {
-    setSearch(getInitialSearch());
-    setSelectedOption(getInitialSelectedOption());
+    startTransition(() => {
+      setSearch(getInitialSearch());
+      setSelectedOption(getInitialSelectedOption());
+    });
   }, [searchParams, paramSearchName, paramOptionName]);
 
   const selectHandler = (data) => {
-    setSelectedOption(data);
-    const params = new URLSearchParams(searchParams.toString());
-    if (data.value === "") {
-      params.delete(paramOptionName);
-      params.delete(paramSearchName);
-    } else {
-      params.set(paramOptionName, data.value);
-      params.delete(paramSearchName);
-    }
-    params.set("page", 1);
+    startTransition(() => {
+      setSelectedOption(data);
+      const params = new URLSearchParams(searchParams.toString());
+      if (data.value === "") {
+        params.delete(paramOptionName);
+        params.delete(paramSearchName);
+      } else {
+        params.set(paramOptionName, data.value);
+        params.delete(paramSearchName);
+      }
+      params.set("page", 1);
 
-    router.push(pathname + "?" + params, { scroll: false });
+      router.push(pathname + "?" + params.toString(), { scroll: false });
+    });
   };
 
   const searchHandler = (text) => {
-    setSearch(text);
-    const params = new URLSearchParams(searchParams.toString());
-    params.set(paramSearchName, text);
-    params.set("page", 1);
+    startSearchTransition(() => {
+      setSearch(text);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(paramSearchName, text);
+      params.set("page", 1);
 
-    router.replace(pathname + "?" + params, { scroll: false });
+      router.replace(pathname + "?" + params.toString(), { scroll: false });
+    });
   };
 
   const searchFilter = (item) =>
@@ -83,8 +93,12 @@ export default function SearchSelectSingle({
   ));
 
   return (
-    <div className="card-body card-body px-0 pt-0">
-      <div className="form-style1">
+    <div
+      data-pending={isPending ? "" : undefined}
+      search-pending={isSearchPending ? "" : undefined}
+      className="card-body card-body px-0 pt-0"
+    >
+      <div className="form-style1 ">
         <div className="bootselect-multiselect">
           <div className="dropdown bootstrap-select">
             <button
@@ -109,9 +123,15 @@ export default function SearchSelectSingle({
                   value={search}
                 />
               </div>
-              <div className="inner show">
+              <div className="inner show position-relative">
+                <BorderSpinner
+                  width="1rem"
+                  height="1rem"
+                  borderWidth="0.3rem"
+                  className="search-content-spinner"
+                />
                 <ul
-                  className="dropdown-menu inner show"
+                  className="dropdown-menu inner show search-loading-element"
                   style={{
                     overflowY: "auto",
                     maxHeight: "250px",
@@ -122,7 +142,7 @@ export default function SearchSelectSingle({
                     content
                   ) : (
                     <li className="no-results">
-                      Κανένα αποτέλεσμα για "{search}"
+                      {isSearchPending ? "" : `Κανένα αποτέλεσμα για ${search}`}
                     </li>
                   )}
                 </ul>
