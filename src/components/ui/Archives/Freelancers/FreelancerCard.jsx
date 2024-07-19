@@ -17,7 +17,7 @@ export default function FreelancerCard({ freelancer }) {
 
   return (
     <>
-      <div className="freelancer-style1 text-center bdr1 hover-box-shadow">
+      <div className="data-loading-element freelancer-style1 text-center bdr1 hover-box-shadow">
         <div className="thumb w90 mb25 mx-auto position-relative rounded-circle">
           {/* <Image
             height={90}
