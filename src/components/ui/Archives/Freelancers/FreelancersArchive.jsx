@@ -11,6 +11,7 @@ import Experience from "./Filters/Experience";
 import Top from "./Filters/Top";
 import Content from "./Content";
 import ContentSkeleton from "./ContentSkeleton";
+import BorderSpinner from "../../Spinners/BorderSpinner";
 
 export default function FreelancersArchive({
   categories,
@@ -18,38 +19,63 @@ export default function FreelancersArchive({
   searchParams,
   paramsFilters,
 }) {
+  const { min, max, pay_m, con_t, cov_o, cov_c, type, cat, spec, exp, top } =
+    searchParams;
+
+  // Remove 'cov_c_s' from searchParams
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(([key]) => key !== "cov_c_s")
+  );
+
   const filters = [
-    { heading: "Εργατοώρα", component: <Rate /> },
-    { heading: "Τρόποι Πληρωμής", component: <PaymentMethods /> },
+    { heading: "Εργατοώρα", params: [min, max], component: <Rate /> },
+    {
+      heading: "Τρόποι Πληρωμής",
+      params: pay_m,
+      component: <PaymentMethods />,
+    },
     {
       heading: "Τρόποι Επικοινωνίας",
+      params: con_t,
       component: <ContactTypes />,
     },
     {
       heading: "Περιοχές Εξυπηρέτησης",
+      params: [cov_o, cov_c],
       component: <Coverage counties={counties} />,
     },
-    { heading: "Τύπος", component: <Type /> },
-    { heading: "Κατηγορία", component: <Category categories={categories} /> },
-    { heading: "Κλάδος εξειδίκευσης", component: <Specialization /> },
-    { heading: "Εμπειρία σε έτη", component: <Experience /> },
-    { heading: "Top", component: <Top /> },
+    { heading: "Τύπος", params: type, component: <Type /> },
+    {
+      heading: "Κατηγορία",
+      params: cat,
+      component: <Category categories={categories} />,
+    },
+    {
+      heading: "Κλάδος εξειδίκευσης",
+      params: spec,
+      component: <Specialization />,
+    },
+    { heading: "Εμπειρία σε έτη", params: exp, component: <Experience /> },
+    { heading: "Top", params: top, component: <Top /> },
   ];
 
   return (
     <>
       <section id="archive" className="pt30 pb90">
         <div className="container">
-          <div className="row">
+          <div className="row data-loading-section">
             <div className="col-lg-3">
               <Sidebar filters={filters} />
             </div>
-            <Suspense
-              key={JSON.stringify(searchParams)}
-              fallback={<ContentSkeleton />}
-            >
-              <Content paramsFilters={paramsFilters} />
-            </Suspense>
+            <div className="col-lg-9 archive-content">
+              <BorderSpinner className="archive-content-spinner" />
+              <Suspense
+                key={JSON.stringify(filteredSearchParams)}
+                fallback={<ContentSkeleton />}
+              >
+                <Content paramsFilters={paramsFilters} />
+              </Suspense>
+            </div>
           </div>
         </div>
       </section>
