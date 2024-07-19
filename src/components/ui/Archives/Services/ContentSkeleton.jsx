@@ -6,7 +6,7 @@ import ServiceGridSkeleton from "./ServiceGridSkeleton";
 
 export default function ContentSkeleton() {
   return (
-    <div className="col-lg-9">
+    <>
       <div className="row align-items-center mb20">
         <div className="col-md-6">
           <div className="text-center text-md-start">
@@ -31,6 +31,6 @@ export default function ContentSkeleton() {
           <p className="mt10 mb-0 pagination_page_count text-center"></p>
         </div>
       </div>
-    </div>
+    </>
   );
 }
