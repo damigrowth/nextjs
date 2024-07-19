@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useOptimistic, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 
@@ -14,32 +14,44 @@ export default function CheckBox({ options, paramName }) {
     return paramValue ? paramValue.split(",") : [];
   };
 
-  const [checkedValues, setCheckedValues] = useState(getInitialParamsValue);
+  const [isPending, startTransition] = useTransition();
+
+  const [checkedValues, setCheckedValues] = useOptimistic(
+    getInitialParamsValue()
+  );
 
   useEffect(() => {
     const paramValue = searchParams.get(paramName);
-    setCheckedValues(paramValue ? paramValue.split(",") : []);
+    startTransition(() => {
+      setCheckedValues(paramValue ? paramValue.split(",") : []);
+    });
   }, [searchParams, paramName]);
 
   const handleChange = (value) => {
-    const newCheckedValues = checkedValues.includes(String(value))
-      ? checkedValues.filter((v) => v !== String(value))
-      : [...checkedValues, String(value)];
+    startTransition(() => {
+      const newCheckedValues = checkedValues.includes(String(value))
+        ? checkedValues.filter((v) => v !== String(value))
+        : [...checkedValues, String(value)];
 
-    setCheckedValues(newCheckedValues);
+      setCheckedValues(newCheckedValues);
 
-    const params = new URLSearchParams(searchParams.toString());
-    if (newCheckedValues.length > 0) {
-      params.set(paramName, newCheckedValues.join(","));
-    } else {
-      params.delete(paramName);
-    }
-    params.set("page", 1);
-    router.push(pathname + "?" + params.toString(), { scroll: false });
+      const params = new URLSearchParams(searchParams.toString());
+      if (newCheckedValues.length > 0) {
+        params.set(paramName, newCheckedValues.join(","));
+      } else {
+        params.delete(paramName);
+      }
+      params.set("page", 1);
+
+      router.push(pathname + "?" + params.toString(), { scroll: false });
+    });
   };
 
   return (
-    <div className="card-body card-body px-0 pt-0">
+    <div
+      data-pending={isPending ? "" : undefined}
+      className="card-body card-body px-0 pt-0"
+    >
       <div className="checkbox-style1 mb15">
         {options.map((option, i) => (
           <label key={i} className="custom_checkbox">
