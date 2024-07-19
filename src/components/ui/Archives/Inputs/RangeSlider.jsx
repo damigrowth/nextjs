@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import ReactSlider from "react-slider";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { debounce } from "lodash";
@@ -17,6 +17,8 @@ export default function RangeSlider({ iniMin, iniMax }) {
   const [min, setMin] = useState(getInitialMin);
   const [max, setMax] = useState(getInitialMax);
 
+  const [isPending, startTransition] = useTransition();
+
   useEffect(() => {
     setMin(getInitialMin());
     setMax(getInitialMax());
@@ -28,7 +30,10 @@ export default function RangeSlider({ iniMin, iniMax }) {
     params.set("min", newMin);
     params.set("max", newMax);
     params.set("page", 1);
-    router.push(pathname + "?" + params.toString(), { scroll: false });
+
+    startTransition(() => {
+      router.push(pathname + "?" + params.toString(), { scroll: false });
+    });
   };
 
   // Debounced function to update search parameters
@@ -58,7 +63,10 @@ export default function RangeSlider({ iniMin, iniMax }) {
     debouncedUpdateSearchParams(min, max);
   };
   return (
-    <div className="card-body card-body px-0 pt-0">
+    <div
+      data-pending={isPending ? "" : undefined}
+      className="card-body card-body px-0 pt-0"
+    >
       <div className="widget-wrapper mb0 pr20">
         <div className="range-slider-style1">
           <div className="range-wrapper">
