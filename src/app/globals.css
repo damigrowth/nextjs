@@ -891,3 +891,49 @@ a {
 .socials-list i::before {
   color: var(--body-text-color);
 }
+
+.data-loading-section:has([data-pending]) .data-loading-element {
+  opacity: 0.5;
+}
+
+.data-loading-section:has([search-pending]) .search-loading-element {
+  opacity: 0.5;
+}
+
+.search-loading-element {
+  position: relative;
+}
+
+.archive-content {
+  position: relative;
+}
+
+.archive-content-spinner {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+}
+
+.search-content-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+}
+
+.data-loading-section:has([data-pending]) .archive-content-spinner {
+  display: flex;
+}
+
+.data-loading-section:has([search-pending]) .search-content-spinner {
+  display: flex;
+}
