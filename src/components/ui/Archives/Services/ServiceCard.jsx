@@ -23,7 +23,7 @@ export default function ServiceCard({ service }) {
   const user = freelancer?.data?.attributes?.user?.data?.attributes;
 
   return (
-    <div className="listing-style1 list-style d-block d-xl-flex align-items-center">
+    <div className="data-loading-element listing-style1 list-style d-block d-xl-flex align-items-center">
       <ServiceCardMedia media={media?.data} />
       <div className="list-content flex-grow-1 ms-1">
         <a className="listing-fav fz12">
