@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useOptimistic, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function RadioBox({ options, paramName }) {
@@ -8,28 +8,39 @@ export default function RadioBox({ options, paramName }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Initialize state from search parameters or default value
   const getInitialParamsValue = () => searchParams.get(paramName) || "";
-  const [selectedValue, setSelectedValue] = useState(getInitialParamsValue);
+
+  const [selectedValue, setSelectedValue] = useOptimistic(
+    getInitialParamsValue()
+  );
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     const paramValue = searchParams.get(paramName);
-    setSelectedValue(paramValue || "");
+    startTransition(() => {
+      setSelectedValue(paramValue || "");
+    });
   }, [searchParams, paramName]);
 
   const handleChange = (value) => {
-    setSelectedValue(value);
+    startTransition(() => {
+      setSelectedValue(value);
 
-    const params = new URLSearchParams(searchParams.toString());
-    params.set(paramName, value);
-    params.set("page", 1);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(paramName, value);
+      params.set("page", 1);
 
-    router.push(pathname + "?" + params.toString(), {
-      scroll: false,
+      router.push(pathname + "?" + params.toString(), {
+        scroll: false,
+      });
     });
   };
+
   return (
-    <div className="card-body card-body px-0 pt-0">
+    <div
+      data-pending={isPending ? "" : undefined}
+      className="card-body card-body px-0 pt-0"
+    >
       <div className="radiobox-style1">
         <div className="radio-element">
           {options.map((option, i) => (
