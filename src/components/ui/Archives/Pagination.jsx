@@ -6,8 +6,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 export default function Pagination({ meta, plural }) {
   const { pageSize, pageCount, total } = meta;
 
-  if (total < 20) return null;
-
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -23,6 +21,8 @@ export default function Pagination({ meta, plural }) {
   };
 
   const pages = Array.from({ length: pageCount }, (_, i) => i + 1);
+
+  if (total < 20) return null;
 
   return (
     <div className="mbp_pagination text-center">
