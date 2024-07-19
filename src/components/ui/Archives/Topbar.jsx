@@ -18,7 +18,7 @@ export default function Topbar({ meta, single, plural, sortOptions }) {
       <div className="col-md-6">
         <div className="text-center text-md-start">
           <p className="text mb-0 mb10-sm">
-            <span className="fw500">{total}</span>
+            <span className="fw500 data-loading-element">{total}</span>
           </p>
         </div>
       </div>
