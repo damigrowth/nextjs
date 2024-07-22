@@ -18,45 +18,44 @@ export default function FreelancersArchive({
   counties,
   searchParams,
   paramsFilters,
+  childPath,
 }) {
-  const { min, max, pay_m, con_t, cov_o, cov_c, type, cat, spec, exp, top } =
-    searchParams;
-
   // Remove 'cov_c_s' from searchParams
   const filteredSearchParams = Object.fromEntries(
     Object.entries(searchParams).filter(([key]) => key !== "cov_c_s")
   );
 
   const filters = [
-    { heading: "Εργατοώρα", params: [min, max], component: <Rate /> },
+    { heading: "Εργατοώρα", params: ["min", "max"], component: <Rate /> },
     {
       heading: "Τρόποι Πληρωμής",
-      params: pay_m,
+      params: ["pay_m"],
       component: <PaymentMethods />,
     },
     {
       heading: "Τρόποι Επικοινωνίας",
-      params: con_t,
+      params: ["con_t"],
       component: <ContactTypes />,
     },
     {
       heading: "Περιοχές Εξυπηρέτησης",
-      params: [cov_o, cov_c],
+      params: ["cov_o", "cov_c"],
       component: <Coverage counties={counties} />,
     },
-    { heading: "Τύπος", params: type, component: <Type /> },
+    { heading: "Τύπος", params: ["type"], component: <Type /> },
     {
       heading: "Κατηγορία",
-      params: cat,
+      params: ["cat"],
+      childPath,
       component: <Category categories={categories} />,
     },
     {
       heading: "Κλάδος εξειδίκευσης",
-      params: spec,
+      params: ["spec"],
       component: <Specialization />,
     },
-    { heading: "Εμπειρία σε έτη", params: exp, component: <Experience /> },
-    { heading: "Top", params: top, component: <Top /> },
+    { heading: "Εμπειρία σε έτη", params: ["exp"], component: <Experience /> },
+    { heading: "Top", params: ["top"], component: <Top /> },
   ];
 
   return (
@@ -65,7 +64,7 @@ export default function FreelancersArchive({
         <div className="container">
           <div className="row data-loading-section">
             <div className="col-lg-3">
-              <Sidebar filters={filters} />
+              <Sidebar filters={filters} searchParams={searchParams} />
             </div>
             <div className="col-lg-9 archive-content">
               <BorderSpinner className="archive-content-spinner" />
