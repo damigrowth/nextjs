@@ -238,7 +238,10 @@ a {
 .listing-style1 .height {
   width: 329px;
   max-width: 329px;
-  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* height: 100%; */
 }
 
 .listing-style1 .review-meta {
@@ -936,4 +939,39 @@ a {
 
 .data-loading-section:has([search-pending]) .search-content-spinner {
   display: flex;
+}
+
+.archive-filters-title {
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.archive-service-card-meta {
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.archive-service-card-user-meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.archive-search-select-list-link {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  padding: 10px;
+}
+
+.archive-breadcrump-active {
+  color: var(--darkreader-text--headings-color, #e8e6e3);
+  display: inline-block;
+  font-size: 14px;
+  position: relative;
+  margin-right: 25px;
 }
