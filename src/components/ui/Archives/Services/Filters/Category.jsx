@@ -3,7 +3,7 @@ import SearchSelectSingle from "../../Inputs/SearchSelectSingle";
 
 export default function Category({ categories }) {
   const options = categories.map((cat) => ({
-    value: cat.id,
+    value: cat.attributes.slug,
     label: cat.attributes.label,
   }));
 
@@ -13,6 +13,8 @@ export default function Category({ categories }) {
       paramOptionName="cat"
       paramSearchName="cat_s"
       options={options}
+      parentPathLink="ipiresies"
+      navigates
     />
   );
 }
