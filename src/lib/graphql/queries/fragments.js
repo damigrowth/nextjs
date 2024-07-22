@@ -83,6 +83,30 @@ const USER_REFERENCE = gql`
   ${SINGLE_IMAGE}
 `;
 
+const USER_PARTIAL = gql`
+  fragment UserPartial on UsersPermissionsUserEntityResponse {
+    data {
+      id
+      attributes {
+        firstName
+        lastName
+        displayName
+        email
+        phone
+        confirmed
+        verification {
+          ...Verification
+        }
+        image {
+          ...SingleImage
+        }
+      }
+    }
+  }
+  ${VERIFICATION}
+  ${SINGLE_IMAGE}
+`;
+
 const PAGINATION = gql`
   fragment Pagination on ResponseCollectionMeta {
     pagination {
@@ -138,6 +162,31 @@ const BASE = gql`
   }
 `;
 
+const FREELANCER_CATEGORY = gql`
+  fragment FreelancerCategory on FreelancerCategoryEntityResponse {
+    data {
+      id
+      attributes {
+        label
+        plural
+        slug
+      }
+    }
+  }
+`;
+
+const FREELANCER_TYPE = gql`
+  fragment FreelancerType on FreelancerTypeEntityResponse {
+    data {
+      id
+      attributes {
+        label
+        slug
+      }
+    }
+  }
+`;
+
 const FREELANCER_REFERENCE = gql`
   fragment FreelancerReference on Freelancer {
     username
@@ -145,44 +194,25 @@ const FREELANCER_REFERENCE = gql`
     rating
     reviews_total
     rate
+    topLevel
     user {
-      ...UserReference
+      ...UserPartial
     }
     specialisations {
       ...Specialisations
     }
-    base {
-      ...Base
+    type {
+      ...FreelancerType
+    }
+    category {
+      ...FreelancerCategory
     }
   }
 
-  ${USER_REFERENCE}
+  ${USER_PARTIAL}
   ${SPECIALISATIONS}
-  ${BASE}
-`;
-
-const USER_PARTIAL = gql`
-  fragment UserPartial on UsersPermissionsUserEntityResponse {
-    data {
-      id
-      attributes {
-        firstName
-        lastName
-        displayName
-        email
-        phone
-        confirmed
-        verification {
-          ...Verification
-        }
-        image {
-          ...SingleImage
-        }
-      }
-    }
-  }
-  ${VERIFICATION}
-  ${SINGLE_IMAGE}
+  ${FREELANCER_CATEGORY}
+  ${FREELANCER_TYPE}
 `;
 
 const SOCIALS = gql`
@@ -252,31 +282,6 @@ const CONTACT_TYPES = gql`
       id
       attributes {
         label
-        slug
-      }
-    }
-  }
-`;
-
-const FREELANCER_TYPE = gql`
-  fragment FreelancerType on FreelancerTypeEntityResponse {
-    data {
-      id
-      attributes {
-        label
-        slug
-      }
-    }
-  }
-`;
-
-const FREELANCER_CATEGORY = gql`
-  fragment FreelancerCategory on FreelancerCategoryEntityResponse {
-    data {
-      id
-      attributes {
-        label
-        plural
         slug
       }
     }
