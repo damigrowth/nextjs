@@ -75,6 +75,7 @@ export default async function page({ params, searchParams }) {
         category={category}
         categories={freelancerCategories?.data}
         plural
+        searchParams={searchParams}
       />
       <Breadcrumb
         parentPathLabel="Επαγγελματίες"

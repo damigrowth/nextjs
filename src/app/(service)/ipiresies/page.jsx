@@ -41,6 +41,7 @@ export default async function page({ searchParams }) {
         parentPathLabel="Όλες οι κατηγορίες"
         parentPathLink="ipiresies"
         categories={categories?.data}
+        searchParams={searchParams}
       />
       <Breadcrumb
         parentPathLabel="Υπηρεσίες"

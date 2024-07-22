@@ -79,6 +79,7 @@ export default async function page({ searchParams }) {
         parentPathLink="pros"
         categories={freelancerCategories?.data}
         plural
+        searchParams={searchParams}
       />
       <Breadcrumb
         parentPathLabel="Επαγγελματίες"

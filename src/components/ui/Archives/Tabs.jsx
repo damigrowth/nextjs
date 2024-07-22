@@ -7,7 +7,16 @@ export default function Tabs({
   category,
   categories,
   plural,
+  searchParams,
 }) {
+  // Serialize search parameters to a query string
+  const queryString = new URLSearchParams(searchParams).toString();
+
+  // Generate the URL with query string
+  const generateLink = (path) => {
+    return queryString ? `${path}?${queryString}` : path;
+  };
+
   return (
     <section className="categories_list_section overflow-hidden">
       <div className="container">
@@ -17,7 +26,7 @@ export default function Tabs({
               <ul className="mb0 d-flex ps-0">
                 <li>
                   <Link
-                    href={`/${parentPathLink}`}
+                    href={generateLink(`/${parentPathLink}`)}
                     className={!category ? "active" : ""}
                   >
                     {parentPathLabel}
@@ -26,7 +35,9 @@ export default function Tabs({
                 {categories.map((cat, index) => (
                   <li key={index}>
                     <Link
-                      href={`/${parentPathLink}/${cat.attributes.slug}`}
+                      href={generateLink(
+                        `/${parentPathLink}/${cat.attributes.slug}`
+                      )}
                       className={
                         category == cat.attributes.slug ? "active" : ""
                       }
