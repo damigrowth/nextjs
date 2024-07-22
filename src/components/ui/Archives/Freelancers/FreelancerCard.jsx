@@ -9,8 +9,10 @@ export default function FreelancerCard({ freelancer }) {
     rating,
     reviews_total,
     rate,
+    topLevel,
     specialisations,
-    base,
+    category,
+    type,
   } = freelancer;
 
   const user = freelancer.user.data.attributes;
@@ -34,11 +36,13 @@ export default function FreelancerCard({ freelancer }) {
             firstName={user.firstName}
             lastName={user.lastName}
             bigText
+            path={`/profile/${username}`}
+            topLevel={topLevel}
           />
         </div>
         <div className="review">
           <h5 className="title mb-1">{user.displayName}</h5>
-          <p className="mb-0">{user.displayName}</p>
+          <p className="mb-0">{category?.data?.attributes?.label}</p>
           {reviews_total > 0 ? (
             <p className="mb-0 fz14 list-inline-item ">
               <i className="fas fa-star vam fz10 review-color mb5"></i>{" "}
@@ -72,9 +76,7 @@ export default function FreelancerCard({ freelancer }) {
           <div className="fl-meta d-flex align-items-center justify-content-between">
             <div className="meta fw500 text-start">
               <span className="fz14 fw400">
-                {base && base.online
-                  ? "Online"
-                  : base?.county?.data?.attributes?.name}
+                {type && type.data && type.data.attributes.label}
               </span>
             </div>
             <div className="meta fw500 text-start">
