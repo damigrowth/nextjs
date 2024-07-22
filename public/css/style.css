@@ -1509,8 +1509,8 @@ li {
   }
 }
 .listing-style1 .list-title {
-  margin-bottom: 15px;
-  height: 60px;
+  margin-bottom: 10px;
+  /* height: 60px; */
 }
 .listing-style1 .list-title a {
   -webkit-transition: all 0.4s ease;
@@ -6729,7 +6729,7 @@ textarea {
   display: inline-block;
   padding: 5px 10px;
   font-style: normal;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 15px;
 }
 
