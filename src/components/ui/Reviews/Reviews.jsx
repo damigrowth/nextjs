@@ -11,6 +11,8 @@ export default async function Reviews({
   showReviewsModel,
   ratingStars,
 }) {
+  if (!reviews) return null;
+
   if (reviews.length === 0) {
     return <h4 className="mt40 mb20">Χωρίς Αξιολογήσεις</h4>;
   }
@@ -27,27 +29,31 @@ export default async function Reviews({
               ratingStars={ratingStars}
             />
             <ul>
-              {reviews.map(({ attributes: review, id }, i) => (
-                <li key={i}>
-                  <Review
-                    reviewId={Number(id)}
-                    showReviewsModel={showReviewsModel}
-                    service={review?.service?.data?.attributes}
-                    firstName={review.user.data.attributes.firstName}
-                    lastName={review.user.data.attributes.lastName}
-                    displayName={review.user.data.attributes.displayName}
-                    image={
-                      review.user.data.attributes.image?.data?.attributes
-                        ?.formats?.thumbnail?.url
-                    }
-                    date={review.publishedAt}
-                    comment={review.comment}
-                    likes={review.likes.data}
-                    dislikes={review.dislikes.data}
-                    rating={review.rating}
-                  />
-                </li>
-              ))}
+              {reviews.map(({ attributes: review, id }, i) => {
+                return (
+                  review.user.data && (
+                    <li key={i}>
+                      <Review
+                        reviewId={Number(id)}
+                        showReviewsModel={showReviewsModel}
+                        service={review.service.data.attributes}
+                        firstName={review.user.data.attributes.firstName}
+                        lastName={review.user.data.attributes.lastName}
+                        displayName={review.user.data.attributes.displayName}
+                        image={
+                          review?.user?.data?.attributes?.image?.data
+                            ?.attributes?.formats?.thumbnail?.url
+                        }
+                        date={review.publishedAt}
+                        comment={review.comment}
+                        likes={review.likes.data}
+                        dislikes={review.dislikes.data}
+                        rating={review.rating}
+                      />
+                    </li>
+                  )
+                );
+              })}
             </ul>
             <div className="col-md-12">
               <LoadMoreBtn
