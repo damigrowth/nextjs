@@ -1,20 +1,22 @@
-"use client";
-
 import React from "react";
 import ClearBtn from "./ClearBtn";
 
-export default function Sidebar({ filters }) {
+export default function Sidebar({ filters, searchParams }) {
   return (
     <div className="list-sidebar-style1 d-none d-lg-block">
       <div className="accordion" id="accordionExample">
         {filters.map((filter, index) => {
-          const paramsArray = Array.isArray(filter.params)
-            ? filter.params
-            : [filter.params];
-          const hasParams = paramsArray.some(
-            (param) => param !== undefined && param !== null && param !== ""
+          const paramsArray = filter.params.map(
+            (paramName) => searchParams[paramName]
           );
-          const isCollapsed = index !== 0 && !hasParams;
+
+          const hasParams = paramsArray.some(
+            (param) => param !== undefined && param !== null
+          );
+
+          const hasChildPath = filter.childPath !== undefined;
+
+          const isCollapsed = index !== 0 && !hasParams && !hasChildPath;
 
           return (
             <div className="card mb20 pb10 mt-0" key={index}>
@@ -29,7 +31,7 @@ export default function Sidebar({ filters }) {
                 aria-controls={`collapse${index}`}
               >
                 <div className="card-header" id={`heading${index}`}>
-                  <h4 style={{ textAlign: "left" }}>{filter.heading}</h4>
+                  <h4 className="archive-filters-title">{filter.heading}</h4>
                 </div>
               </button>
               <div
