@@ -1,32 +1,17 @@
-"use client";
-
 import Link from "next/link";
 import React from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 export default function Breadcrumb({
-  heading,
+  parentPathLabel,
+  parentPathLink,
   category,
   categories,
-  paramName,
   plural,
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   // Find the current category from the array of categories
-  const currentCategory =
-    categories.find((cat) => Number(cat.id) === category) || "";
-
-  const handleChange = () => {
-    console.log("firing");
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete(paramName);
-
-    router.push(pathname + "?" + params, {
-      scroll: false,
-    });
-  };
+  const currentCategory = categories.find(
+    (cat) => cat.attributes.slug === category
+  );
 
   return (
     <section className="breadcumb-section">
@@ -36,12 +21,14 @@ export default function Breadcrumb({
             <div className="breadcumb-style1">
               <div className="breadcumb-list">
                 <Link href="/">Αρχική</Link>
-                <a onClick={handleChange}>{heading}</a>
-                <a>
-                  {plural
-                    ? currentCategory?.attributes?.plural
-                    : currentCategory?.attributes?.label}
-                </a>
+                <Link href={`/${parentPathLink}`}>{parentPathLabel}</Link>
+                {category && (
+                  <div className="archive-breadcrump-active">
+                    {plural
+                      ? currentCategory.attributes.plural
+                      : currentCategory.attributes.label}
+                  </div>
+                )}
               </div>
             </div>
           </div>
