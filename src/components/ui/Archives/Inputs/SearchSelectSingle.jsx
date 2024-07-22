@@ -1,17 +1,27 @@
 "use client";
 
 import { useEffect, useOptimistic, useState, useTransition } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import BorderSpinner from "../../Spinners/BorderSpinner";
+import Link from "next/link";
 
 export default function SearchSelectSingle({
   defaultLabel,
   paramOptionName,
   paramSearchName,
+  paramDisabledName,
   options,
+  parentPathLink,
+  navigates,
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const params = useParams();
   const searchParams = useSearchParams();
 
   // Add default option
@@ -31,6 +41,15 @@ export default function SearchSelectSingle({
   };
   const [selectedOption, setSelectedOption] = useOptimistic(
     getInitialSelectedOption()
+  );
+
+  const getInitialSelectedLink = () => {
+    return (
+      allOptions.find((opt) => opt.value === params.category) || allOptions[0]
+    );
+  };
+  const [selectedLink, setSelectedLink] = useOptimistic(
+    getInitialSelectedLink()
   );
 
   const [isPending, startTransition] = useTransition();
@@ -71,10 +90,12 @@ export default function SearchSelectSingle({
     });
   };
 
+  const isDisabled = () => searchParams.has(paramDisabledName);
+
   const searchFilter = (item) =>
     item.label.toLowerCase().includes(search.toLowerCase());
 
-  const content = allOptions.filter(searchFilter).map((item, i) => (
+  const listFilters = allOptions.filter(searchFilter).map((item, i) => (
     <li
       key={i}
       name={`select-${paramOptionName}-${i}`}
@@ -92,6 +113,28 @@ export default function SearchSelectSingle({
     </li>
   ));
 
+  const selectLinkHandler = (item) => {
+    setSelectedLink(item);
+  };
+
+  const listLinks = allOptions.filter(searchFilter).map((item, i) => (
+    <li
+      key={i}
+      name={`select-${item.value}-${i}`}
+      className={`dropdown-item p0 ${
+        params.category === item.value ? "selected active" : ""
+      }`}
+      onClick={() => selectLinkHandler(item)}
+    >
+      <Link
+        href={item.value === "" ? `/${parentPathLink}` : `${item.value}`}
+        className="archive-search-select-list-link"
+      >
+        <span className="text">{item.label}</span>
+      </Link>
+    </li>
+  ));
+
   return (
     <div
       data-pending={isPending ? "" : undefined}
@@ -105,11 +148,12 @@ export default function SearchSelectSingle({
               type="button"
               className="btn dropdown-toggle btn-light"
               data-bs-toggle="dropdown"
+              disabled={isDisabled()}
             >
               <div className="filter-option">
                 <div className="filter-option-inner">
                   <div className="filter-option-inner-inner">
-                    {selectedOption.label}
+                    {navigates ? selectedLink.label : selectedOption.label}
                   </div>
                 </div>
               </div>
@@ -138,8 +182,18 @@ export default function SearchSelectSingle({
                     minHeight: "auto",
                   }}
                 >
-                  {content.length !== 0 ? (
-                    content
+                  {navigates ? (
+                    listLinks.length !== 0 ? (
+                      listLinks
+                    ) : (
+                      <li className="no-results">
+                        {isSearchPending
+                          ? ""
+                          : `Κανένα αποτέλεσμα για ${search}`}
+                      </li>
+                    )
+                  ) : listFilters.length !== 0 ? (
+                    listFilters
                   ) : (
                     <li className="no-results">
                       {isSearchPending ? "" : `Κανένα αποτέλεσμα για ${search}`}
