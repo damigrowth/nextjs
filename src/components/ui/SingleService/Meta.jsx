@@ -1,4 +1,6 @@
+import TopLevelBadge from "@/components/user/TopLevelBadge";
 import UserImage from "@/components/user/UserImage";
+import VerifiedBadge from "@/components/user/VerifiedBadge";
 import Image from "next/image";
 import React from "react";
 
@@ -30,34 +32,11 @@ export default function Meta({
             height={40}
             path={`/profile/${username}`}
           />
-          <div className="tooltip-container">
-            {verified === null || verified === false ? null : (
-              <p className="mb-0 fz14 list-inline-item ml15 ml15-sm mb5-sm ml0-xs">
-                <i className="flaticon-success fa-xl text-thm vam fz24 me-2"></i>
-              </p>
-            )}
-
-            <div className="tooltip" style={{ top: "-50px" }}>
-              Πιστοποιημένος
-            </div>
-          </div>
-
-          <div className="tooltip-container">
-            {topLevel && (
-              <div className="top-badge-inline mb-0 list-inline-item ml5 ml15-sm mb5-sm ml0-xs">
-                <Image
-                  width={22}
-                  height={22}
-                  src="/images/top-badge.png"
-                  alt="top badge"
-                />
-              </div>
-            )}
-
-            <div className="tooltip" style={{ top: "-95px" }}>
-              Έχει λάβει εξαιρετικές αξιολογήσεις
-            </div>
-          </div>
+          <VerifiedBadge verified={verified} tooltipText="Πιστοποιημένος" />
+          <TopLevelBadge
+            topLevel={topLevel}
+            tooltipText="Έχει λάβει εξαιρετικές αξιολογήσεις"
+          />
 
           {totalReviews > 0 ? (
             <p className="mb-0 fz14 list-inline-item ml15 ml15-sm mb5-sm ml0-xs">
