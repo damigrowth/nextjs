@@ -113,6 +113,13 @@ export default function SearchSelectSingle({
     </li>
   ));
 
+  const generateLink = (value) => {
+    const basePath =
+      value === "" ? `/${parentPathLink}` : `/${parentPathLink}/${value}`;
+    const queryString = searchParams.toString();
+    return `${basePath}${queryString ? `?${queryString}` : ""}`;
+  };
+
   const selectLinkHandler = (item) => {
     setSelectedLink(item);
   };
@@ -127,11 +134,7 @@ export default function SearchSelectSingle({
       onClick={() => selectLinkHandler(item)}
     >
       <Link
-        href={
-          item.value === ""
-            ? `/${parentPathLink}`
-            : `/${parentPathLink}/${item.value}`
-        }
+        href={generateLink(item.value)}
         className="archive-search-select-list-link"
       >
         <span className="text">{item.label}</span>
