@@ -373,6 +373,38 @@ const CATEGORY = gql`
       slug
     }
   }
+  ${SINGLE_IMAGE}
+`;
+
+const CATEGORY_FULL = gql`
+  fragment CategoryFull on CategoryEntity {
+    id
+    attributes {
+      label
+      slug
+      description
+      image {
+        ...SingleImage
+      }
+    }
+  }
+  ${SINGLE_IMAGE}
+`;
+
+const FREELANCER_CATEGORY_FULL = gql`
+  fragment FreelancerCategoryFull on FreelancerCategoryEntity {
+    id
+    attributes {
+      label
+      plural
+      slug
+      description
+      image {
+        ...SingleImage
+      }
+    }
+  }
+  ${SINGLE_IMAGE}
 `;
 
 // TODO: Add id
@@ -569,6 +601,7 @@ export {
   COVERAGE,
   FREELANCER_TYPE,
   FREELANCER_CATEGORY,
+  FREELANCER_CATEGORY_FULL,
   SIZE,
   VERIFICATION,
   SPECIALISATIONS,
@@ -579,6 +612,7 @@ export {
   TAG,
   RATING,
   CATEGORY,
+  CATEGORY_FULL,
   AREA,
   ADDONS,
   FAQ,

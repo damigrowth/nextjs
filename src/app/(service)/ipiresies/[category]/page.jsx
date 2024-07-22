@@ -1,4 +1,5 @@
 import Breadcumb6 from "@/components/breadcumb/Breadcumb6";
+import Banner from "@/components/ui/Archives/Banner";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import Tabs from "@/components/ui/Archives/Tabs";
@@ -43,7 +44,7 @@ export default async function page({ params, searchParams }) {
         category={category}
         categories={categories?.data}
       />
-      <Breadcumb6 />
+      <Banner category={category} categories={categories?.data} />
       <ServicesArchive
         categories={categories?.data}
         searchParams={searchParams}

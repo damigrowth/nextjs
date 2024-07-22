@@ -1,4 +1,5 @@
 import Breadcumb16 from "@/components/breadcumb/Breadcumb16";
+import Banner from "@/components/ui/Archives/Banner";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import FreelancersArchive from "@/components/ui/Archives/Freelancers/FreelancersArchive";
 import Tabs from "@/components/ui/Archives/Tabs";
@@ -82,7 +83,7 @@ export default async function page({ params, searchParams }) {
         categories={freelancerCategories?.data}
         plural
       />
-      <Breadcumb16 />
+      <Banner category={category} categories={freelancerCategories?.data} />
       <FreelancersArchive
         categories={freelancerCategories?.data}
         counties={counties?.data}

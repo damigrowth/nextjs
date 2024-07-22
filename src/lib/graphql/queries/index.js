@@ -19,6 +19,8 @@ import {
 } from "./parts";
 import {
   CATEGORY,
+  CATEGORY_FULL,
+  FREELANCER_CATEGORY_FULL,
   FREELANCER_REFERENCE,
   PAGINATION,
   SINGLE_IMAGE,
@@ -352,11 +354,11 @@ const CATEGORIES_SEARCH = gql`
   query CategoriesSearch($label: String) {
     categories(filters: { label: { contains: $label } }, sort: "label:desc") {
       data {
-        ...Category
+        ...CategoryFull
       }
     }
   }
-  ${CATEGORY}
+  ${CATEGORY_FULL}
 `;
 
 const FREELANCERS_ARCHIVE = gql`
@@ -457,15 +459,11 @@ const FREELANCER_CATEGORIES_SEARCH = gql`
       sort: "label:desc"
     ) {
       data {
-        id
-        attributes {
-          label
-          plural
-          slug
-        }
+        ...FreelancerCategoryFull
       }
     }
   }
+  ${FREELANCER_CATEGORY_FULL}
 `;
 
 const SPECIALIZATIONS = gql`
