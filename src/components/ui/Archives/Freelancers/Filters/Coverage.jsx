@@ -15,6 +15,7 @@ export default function Coverage({ counties }) {
         defaultLabel="Όλες οι περιοχές"
         paramOptionName="cov_c"
         paramSearchName="cov_c_s"
+        paramDisabledName="cov_o"
         options={options}
       />
     </>
