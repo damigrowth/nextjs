@@ -316,7 +316,7 @@ const SERVICES_ARCHIVE = gql`
     $min: Int
     $max: Int
     $time: Int
-    $cat: ID
+    $cat: String
     $verified: Boolean
     $page: Int
     $sort: [String]
@@ -325,7 +325,7 @@ const SERVICES_ARCHIVE = gql`
       filters: {
         price: { gte: $min, lte: $max }
         time: { lte: $time }
-        category: { id: { eq: $cat } }
+        category: { slug: { eq: $cat } }
         freelancer: { user: { verified: { eq: $verified } } }
       }
       sort: $sort
@@ -387,7 +387,7 @@ const FREELANCERS_ARCHIVE = gql`
         type: { id: { eq: $type } }
         category: { id: { eq: $cat } }
         specialisations: { id: { in: $specializations } }
-        yearsOfExperience: { lte: $experience }
+        yearsOfExperience: { gte: $experience }
         topLevel: { eq: $top }
       }
       sort: $sort
