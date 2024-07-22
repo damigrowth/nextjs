@@ -127,7 +127,11 @@ export default function SearchSelectSingle({
       onClick={() => selectLinkHandler(item)}
     >
       <Link
-        href={item.value === "" ? `/${parentPathLink}` : `${item.value}`}
+        href={
+          item.value === ""
+            ? `/${parentPathLink}`
+            : `/${parentPathLink}/${item.value}`
+        }
         className="archive-search-select-list-link"
       >
         <span className="text">{item.label}</span>
