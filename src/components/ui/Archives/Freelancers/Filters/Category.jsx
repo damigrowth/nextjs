@@ -2,9 +2,9 @@ import React from "react";
 import SearchSelectSingle from "../../Inputs/SearchSelectSingle";
 
 export default function Category({ categories }) {
-  const options = categories.map((el) => ({
-    value: el.id,
-    label: el.attributes.label,
+  const options = categories.map((cat) => ({
+    value: cat.attributes.slug,
+    label: cat.attributes.label,
   }));
 
   return (
@@ -13,6 +13,8 @@ export default function Category({ categories }) {
       paramOptionName="cat"
       paramSearchName="cat_s"
       options={options}
+      parentPathLink="pros"
+      navigates
     />
   );
 }
