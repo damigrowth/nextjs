@@ -3,6 +3,7 @@ import Breadcumb6 from "@/components/breadcumb/Breadcumb6";
 
 import Listing4 from "@/components/section/Listing4";
 import TabSection1 from "@/components/section/TabSection1";
+import BannerVid from "@/components/ui/Archives/BannerVid";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import Tabs from "@/components/ui/Archives/Tabs";
@@ -46,7 +47,10 @@ export default async function page({ searchParams }) {
         parentPathLink="ipiresies"
         categories={categories?.data}
       />
-      <Breadcumb6 />
+      <BannerVid
+        heading="Όλες οι Υπηρεσίες"
+        description="Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας."
+      />
       <ServicesArchive
         categories={categories?.data}
         searchParams={searchParams}

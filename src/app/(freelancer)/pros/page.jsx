@@ -3,6 +3,7 @@ import Breadcumb3 from "@/components/breadcumb/Breadcumb3";
 
 import Listing14 from "@/components/section/Listing14";
 import TabSection1 from "@/components/section/TabSection1";
+import BannerVid from "@/components/ui/Archives/BannerVid";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import FreelancerGridSkeleton from "@/components/ui/Archives/Freelancers/FreelancerGridSkeleton";
 import FreelancersArchive from "@/components/ui/Archives/Freelancers/FreelancersArchive";
@@ -85,7 +86,10 @@ export default async function page({ searchParams }) {
         categories={freelancerCategories?.data}
         plural
       />
-      <Breadcumb16 />
+      <BannerVid
+        heading="Βρείτε Επαγγελματίες και Επιχειρήσεις"
+        description="Ανακαλύψτε και προσλάβετε τις καλύτερες επιχειρήσεις και εξειδικευμένοους επαγγελματίες για οποιαδήποτε ανάγκη."
+      />
       <FreelancersArchive
         categories={freelancerCategories?.data}
         counties={counties?.data}
