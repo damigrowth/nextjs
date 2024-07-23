@@ -7,6 +7,8 @@ import Verified from "./Filters/Verified";
 import Content from "./Content";
 import ContentSkeleton from "./ContentSkeleton";
 import BorderSpinner from "../../Spinners/BorderSpinner";
+import ListingSidebarModal1 from "@/components/modal/ListingSidebarModal1";
+import SidebarModal from "../SidebarModal";
 
 export default function ServicesArchive({
   categories,
@@ -55,7 +57,7 @@ export default function ServicesArchive({
           </div>
         </div>
       </section>
-      {/* <ListingSidebarModal1 /> */}
+      <SidebarModal filters={filters} searchParams={searchParams} />
     </>
   );
 }

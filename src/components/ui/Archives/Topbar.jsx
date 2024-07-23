@@ -1,6 +1,6 @@
-import Image from "next/image";
 import React from "react";
 import SortOptions from "./SortOptions";
+import FiltersModalBtn from "./SidebarModalBtn";
 
 export default function Topbar({ meta, single, plural, sortOptions }) {
   let total = 0;
@@ -27,20 +27,7 @@ export default function Topbar({ meta, single, plural, sortOptions }) {
           <div className="dropdown-lists d-block d-lg-none me-2 mb10-sm">
             <ul className="p-0 mb-0 text-center text-md-start">
               <li>
-                <button
-                  // onClick={listingToggle}
-                  type="button"
-                  className="open-btn filter-btn-left"
-                >
-                  <Image
-                    height={18}
-                    width={18}
-                    className="me-2"
-                    src="/images/icon/all-filter-icon.svg"
-                    alt="icon"
-                  />
-                  Όλα τα φίλτρα
-                </button>
+                <FiltersModalBtn type="open" />
               </li>
             </ul>
           </div>

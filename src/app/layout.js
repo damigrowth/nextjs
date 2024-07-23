@@ -17,6 +17,7 @@ import { getMaintenanceStatus } from "@/lib/maintenance/maintenance";
 import { isAuthenticated } from "@/lib/auth/authenticated";
 import Script from "next/script";
 import InstallBootstrap from "@/components/ui/InstallBootstrap";
+import Body from "@/components/ui/Body";
 
 if (typeof window !== "undefined") {
   import("bootstrap");
@@ -37,17 +38,7 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body
-        className={`${dmSans.className} ${
-          path === "/register" || path === "/login"
-            ? "bgc-thm4 mm-wrapper mm-wrapper--position-left-front"
-            : sidebarEnable.includes(path)
-            ? isListingActive
-              ? "menu-hidden-sidebar-content"
-              : ""
-            : ""
-        }`}
-      >
+      <Body path={path} dmSans={dmSans}>
         <InstallBootstrap />
         {!footer.includes(path) ? (
           <div className="wrapper ovh mm-page mm-slideout">
@@ -66,7 +57,7 @@ export default async function RootLayout({ children }) {
           </div>
         )}
         <NavSidebar />
-      </body>
+      </Body>
     </html>
   );
 }

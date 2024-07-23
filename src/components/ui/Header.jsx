@@ -1,11 +1,8 @@
-import InitialsImage from "../user/InitialsImage";
 import Image from "next/image";
 import Link from "next/link";
 import Mega from "../header/Mega";
 import MobileNavigation5 from "../header/MobileNavigation5";
 import Navigation from "../header/Navigation";
-import Protected from "../auth/Protected";
-import Public from "../auth/Public";
 import { isAuthenticated } from "@/lib/auth/authenticated";
 import UserImage from "../user/UserImage";
 import { getUser } from "@/lib/user/user";

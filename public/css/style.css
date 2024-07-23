@@ -8811,7 +8811,7 @@ li.mm-listitem:focus {
   width: 3px;
 }
 .lefttside-hidden-bar .hsidebar-content {
-  padding: 0 30px 30px;
+  padding: 10px 30px 30px;
   position: relative;
   max-height: 750px;
   overflow-y: scroll;
