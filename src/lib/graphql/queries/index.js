@@ -370,7 +370,7 @@ const FREELANCERS_ARCHIVE = gql`
     $coverageOnline: Boolean
     $coverageCounties: [ID]
     $type: ID
-    $cat: ID
+    $cat: String
     $specializations: [ID]
     $experience: Int
     $top: Boolean
@@ -387,7 +387,7 @@ const FREELANCERS_ARCHIVE = gql`
           counties: { id: { in: $coverageCounties } }
         }
         type: { id: { eq: $type } }
-        category: { id: { eq: $cat } }
+        category: { slug: { eq: $cat } }
         specialisations: { id: { in: $specializations } }
         yearsOfExperience: { gte: $experience }
         topLevel: { eq: $top }

@@ -46,7 +46,7 @@ export default async function page({ params, searchParams }) {
     paymentMethods: addFilter(pay_m && pay_m.length > 0, toIntArray(pay_m)),
     contactTypes: addFilter(con_t && con_t.length > 0, toIntArray(con_t)),
     type: addFilter(type, parseInt(type, 10)),
-    cat: addFilter(cat, parseInt(cat, 10)),
+    cat: category,
     specializations: addFilter(spec && spec.length > 0, toIntArray(spec)),
     experience: addFilter(exp, parseInt(exp, 10)),
     top: addFilter(top, top === "true"),
