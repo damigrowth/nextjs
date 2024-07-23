@@ -5,7 +5,7 @@ export default function TopLevelBadge({ topLevel, tooltipText }) {
   if (!topLevel) return null;
   return (
     <div className="tooltip-container">
-      <div className="top-badge-inline mb-0 list-inline-item ml5 ml15-sm mb5-sm ml0-xs">
+      <div className="top-badge-inline mb-0">
         <Image
           width={22}
           height={22}
@@ -13,7 +13,9 @@ export default function TopLevelBadge({ topLevel, tooltipText }) {
           alt="top badge"
         />
       </div>
-      <div className="tooltip">{tooltipText}</div>
+      <div className="tooltip" style={{ top: "-95px" }}>
+        {tooltipText}
+      </div>
     </div>
   );
 }

@@ -975,3 +975,11 @@ a {
   position: relative;
   margin-right: 25px;
 }
+
+.badges {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding-left: 0.5rem;
+}

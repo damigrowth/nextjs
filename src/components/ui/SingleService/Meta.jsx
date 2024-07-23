@@ -1,7 +1,5 @@
-import TopLevelBadge from "@/components/user/TopLevelBadge";
+import Badges from "@/components/user/Badges";
 import UserImage from "@/components/user/UserImage";
-import VerifiedBadge from "@/components/user/VerifiedBadge";
-import Image from "next/image";
 import React from "react";
 
 export default function Meta({
@@ -32,11 +30,7 @@ export default function Meta({
             height={40}
             path={`/profile/${username}`}
           />
-          <VerifiedBadge verified={verified} tooltipText="Πιστοποιημένος" />
-          <TopLevelBadge
-            topLevel={topLevel}
-            tooltipText="Έχει λάβει εξαιρετικές αξιολογήσεις"
-          />
+          <Badges verified={verified} topLevel={topLevel} />
 
           {totalReviews > 0 ? (
             <p className="mb-0 fz14 list-inline-item ml15 ml15-sm mb5-sm ml0-xs">

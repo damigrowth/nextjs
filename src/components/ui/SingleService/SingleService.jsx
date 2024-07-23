@@ -3,21 +3,15 @@ import Description from "./Description";
 import Packages from "./Packages";
 import Faq from "./Faq";
 import Addons from "./Addons";
-import { RATING_SERVICES_COUNT } from "@/lib/queries";
 import Info from "./Info";
 import Meta from "./Meta";
-import SkeletonRect from "@/components/ui/loading/PartialSkeletons";
 import OrderPackages from "./OrderPackages";
 import OrderFixed from "./OrderFixed";
 import ContactDetails from "./ContactDetails";
 import StickySidebar from "@/components/ui/sticky/StickySidebar";
 import Gallery from "../Gallery/Gallery";
-import { getUserId } from "@/lib/user/user";
-import { getData } from "@/lib/client/operations";
-import { COUNT_SERVICES_BY_RATING } from "@/lib/graphql/queries";
 import Reviews from "../Reviews/Reviews";
 import Terms from "./Terms";
-import Buy from "./Buy";
 
 export default async function SingleService({
   serviceId,
@@ -54,6 +48,10 @@ export default async function SingleService({
   const userId = freelancerUser.data.attributes.user.data.id;
   const user = freelancerUser.data.attributes.user.data.attributes;
 
+  const isVerified =
+    user?.verification?.data?.attributes?.status?.data?.attributes?.type ===
+    "Completed";
+
   const freelancerId = freelancerUser.data.id;
   const freelancer = freelancerUser.data.attributes;
 
@@ -80,7 +78,7 @@ export default async function SingleService({
                   username={freelancer.username}
                   image={user.image.data?.attributes?.formats?.thumbnail?.url}
                   views={views?.data?.length}
-                  verified={user.verification.data}
+                  verified={isVerified}
                   topLevel={freelancer?.topLevel}
                   rating={rating}
                   totalReviews={reviews_total}

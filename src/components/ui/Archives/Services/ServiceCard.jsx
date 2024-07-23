@@ -1,10 +1,8 @@
 import UserImage from "@/components/user/UserImage";
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import ServiceCardMedia from "./ServiceCardMedia";
-import VerifiedBadge from "@/components/user/VerifiedBadge";
-import TopLevelBadge from "@/components/user/TopLevelBadge";
+import Badges from "@/components/user/Badges";
 
 export default function ServiceCard({ service }) {
   const {
@@ -22,7 +20,15 @@ export default function ServiceCard({ service }) {
     return null;
   }
 
+  if (!slug) {
+    return null;
+  }
+
   const user = freelancer?.data?.attributes?.user?.data?.attributes;
+
+  const isVerified =
+    user?.verification?.data?.attributes?.status?.data?.attributes?.type ===
+    "Completed";
 
   return (
     <div className="data-loading-element listing-style1 list-style d-block d-xl-flex align-items-center">
@@ -76,16 +82,12 @@ export default function ServiceCard({ service }) {
               }
               width={30}
               height={30}
-              path={`/profile/${user?.username}`}
+              path={`/profile/${freelancer?.data?.attributes?.username}`}
             />
 
-            <VerifiedBadge
-              verified={user.verified}
-              tooltipText="Πιστοποιημένος"
-            />
-            <TopLevelBadge
+            <Badges
+              verified={isVerified}
               topLevel={freelancer?.data?.attributes?.topLevel}
-              tooltipText="Έχει λάβει εξαιρετικές αξιολογήσεις"
             />
           </div>
 
