@@ -19,7 +19,11 @@ export default async function layout({ children }) {
         parentPathLink="ipiresies"
         categories={categories?.data}
       />
-      <Banner categories={categories?.data} />
+      <Banner
+        categories={categories?.data}
+        heading="Όλες οι Υπηρεσίες"
+        description="Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας."
+      />
       {children}
     </>
   );
