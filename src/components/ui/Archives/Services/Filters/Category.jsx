@@ -13,7 +13,6 @@ export default function Category({ categories }) {
       paramOptionName="cat"
       paramSearchName="cat_s"
       options={options}
-      parentPathLink="ipiresies"
       navigates
     />
   );
