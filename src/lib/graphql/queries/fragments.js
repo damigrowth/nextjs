@@ -187,6 +187,21 @@ const FREELANCER_TYPE = gql`
   }
 `;
 
+const FREELANCER_BASIC = gql`
+  fragment FreelancerBasic on Freelancer {
+    username
+    tagline
+    rating
+    reviews_total
+    rate
+    topLevel
+    user {
+      ...UserPartial
+    }
+  }
+  ${USER_PARTIAL}
+`;
+
 const FREELANCER_REFERENCE = gql`
   fragment FreelancerReference on Freelancer {
     username
@@ -318,6 +333,48 @@ const SKILLS = gql`
   }
 `;
 
+const SKILL_ENTITY = gql`
+  fragment SkillEntity on SkillEntityResponseCollection {
+    data {
+      attributes {
+        label
+        slug
+      }
+    }
+  }
+`;
+const CATEGORY_ENTITY = gql`
+  fragment CategoryEntity on CategoryEntityResponseCollection {
+    data {
+      attributes {
+        label
+        slug
+      }
+    }
+  }
+`;
+const TAG_ENTITY = gql`
+  fragment TagEntity on TagEntityResponseCollection {
+    data {
+      attributes {
+        label
+        slug
+      }
+    }
+  }
+`;
+const FREELANCER_CATEGORY_ENTITY = gql`
+  fragment FreelancerCategoryEntity on FreelancerCategoryEntityResponseCollection {
+    data {
+      attributes {
+        label
+        slug
+        plural
+      }
+    }
+  }
+`;
+
 const SIZE = gql`
   fragment Size on SizeEntityResponse {
     data {
@@ -373,7 +430,22 @@ const CATEGORY = gql`
       slug
     }
   }
-  ${SINGLE_IMAGE}
+`;
+
+const SUBCATEGORY = gql`
+  fragment Subcategory on SubcategoryEntity {
+    id
+    attributes {
+      label
+      slug
+      category {
+        data {
+          ...Category
+        }
+      }
+    }
+  }
+  ${CATEGORY}
 `;
 
 const CATEGORY_FULL = gql`
@@ -383,12 +455,19 @@ const CATEGORY_FULL = gql`
       label
       slug
       description
+      icon
       image {
         ...SingleImage
+      }
+      subcategories {
+        data {
+          ...Subcategory
+        }
       }
     }
   }
   ${SINGLE_IMAGE}
+  ${SUBCATEGORY}
 `;
 
 const FREELANCER_CATEGORY_FULL = gql`
@@ -612,6 +691,7 @@ export {
   TAG,
   RATING,
   CATEGORY,
+  SUBCATEGORY,
   CATEGORY_FULL,
   AREA,
   ADDONS,
@@ -632,4 +712,9 @@ export {
   PAGINATION,
   USER_REFERENCE,
   FREELANCER_REFERENCE,
+  FREELANCER_BASIC,
+  SKILL_ENTITY,
+  CATEGORY_ENTITY,
+  TAG_ENTITY,
+  FREELANCER_CATEGORY_ENTITY,
 };
