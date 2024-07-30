@@ -7,7 +7,7 @@ import React from "react";
 import BannerVidBtn from "./BannerVidBtn";
 import BannerVidBox from "./BannerVidBox";
 
-export default function Banner({ categories }) {
+export default function Banner({ categories, heading, description }) {
   const pathName = usePathname();
   const category = getPathname(pathName, 1);
   const subcategory = getPathname(pathName, 2);
@@ -33,15 +33,13 @@ export default function Banner({ categories }) {
 
   const bannerTitle =
     !category && !subcategory
-      ? "Όλες οι Υπηρεσίες"
+      ? heading
       : displayData?.plural
       ? displayData.plural
       : displayData?.label;
 
   const bannerDescription =
-    !category && !subcategory
-      ? "Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας."
-      : displayData?.description;
+    !category && !subcategory ? description : displayData?.description;
 
   return (
     <>
