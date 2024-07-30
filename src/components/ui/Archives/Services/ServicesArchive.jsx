@@ -22,14 +22,14 @@ export default function ServicesArchive({
   );
 
   const filters = [
-    { heading: "Τιμή", params: ["min", "max"], component: <Price /> },
-    { heading: "Χρόνος παράδοσης", params: ["time"], component: <Time /> },
     {
       heading: "Κατηγορία",
       params: ["cat"],
       childPath,
       component: <Category categories={categories} />,
     },
+    { heading: "Τιμή", params: ["min", "max"], component: <Price /> },
+    { heading: "Χρόνος παράδοσης", params: ["time"], component: <Time /> },
     {
       heading: "Πιστοποιημένο προφίλ",
       params: ["ver"],
