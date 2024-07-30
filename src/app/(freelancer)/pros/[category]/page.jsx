@@ -69,22 +69,6 @@ export default async function page({ params, searchParams }) {
 
   return (
     <>
-      <Tabs
-        parentPathLabel="Όλες οι κατηγορίες"
-        parentPathLink="pros"
-        category={category}
-        categories={freelancerCategories?.data}
-        plural
-        searchParams={searchParams}
-      />
-      <Breadcrumb
-        parentPathLabel="Επαγγελματίες"
-        parentPathLink="pros"
-        category={category}
-        categories={freelancerCategories?.data}
-        plural
-      />
-      <Banner category={category} categories={freelancerCategories?.data} />
       <FreelancersArchive
         categories={freelancerCategories?.data}
         counties={counties?.data}
