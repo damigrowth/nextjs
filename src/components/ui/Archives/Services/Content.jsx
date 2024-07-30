@@ -8,6 +8,7 @@ import ServiceGrid from "./ServiceGrid";
 
 export default async function Content({ paramsFilters }) {
   const { services } = await getData(SERVICES_ARCHIVE, paramsFilters);
+
   return (
     <>
       <Topbar
