@@ -1,5 +1,6 @@
 "use server";
 
+import { inspect } from "@/utils/inspect";
 import { getClient } from ".";
 import { isAuthenticated } from "../auth/authenticated";
 import { GET_ME } from "../graphql/queries";
@@ -41,7 +42,6 @@ export const getData = async (query, variables) => {
   validateEnvVars();
 
   const url = `${STRAPI_GRAPHQL}`;
-
   const queryString = print(query);
 
   try {
@@ -58,12 +58,15 @@ export const getData = async (query, variables) => {
       cache: "no-cache",
     });
 
-    const { data } = await response.json();
+    const jsonResponse = await response.json();
 
-    if (!response.ok && data?.error) console.log(data?.error?.message);
-    if (response.ok) {
-      return data;
+    if (!response.ok) {
+      console.error("GraphQL error:");
+      inspect(jsonResponse.errors);
+      return { error: jsonResponse.errors };
     }
+
+    return jsonResponse.data;
   } catch (error) {
     console.error("Server error. Please try again later.", error);
     return { error: "Server error. Please try again later." };
