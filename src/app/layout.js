@@ -4,20 +4,19 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 import BottomToTop from "@/components/button/BottomToTop";
 import { DM_Sans } from "next/font/google";
-import Footer14 from "@/components/footer/Footer14";
 import Header from "@/components/ui/Header";
-import NavSidebar from "@/components/sidebar/NavSidebar";
 import SearchModal1 from "@/components/modal/SearchModal1";
 import { footer } from "@/data/footer";
 import { headers } from "next/headers";
-import { sidebarEnable } from "@/data/header";
-import toggleStore from "@/store/toggleStore";
-import { usePathname } from "next/navigation";
 import { getMaintenanceStatus } from "@/lib/maintenance/maintenance";
 import { isAuthenticated } from "@/lib/auth/authenticated";
-import Script from "next/script";
 import InstallBootstrap from "@/components/ui/InstallBootstrap";
 import Body from "@/components/ui/Body";
+import Footer from "@/components/ui/Footer";
+import { getUser } from "@/lib/user/user";
+import NavMenuMobile from "@/components/ui/NavMenuMobile";
+import { FOOTER, HEADER } from "@/lib/graphql/queries";
+import { getData } from "@/lib/client/operations";
 
 if (typeof window !== "undefined") {
   import("bootstrap");
@@ -30,11 +29,15 @@ const dmSans = DM_Sans({
 });
 
 export default async function RootLayout({ children }) {
-  const headersList = headers();
-  const path = headersList.get("x-invoke-path") || "";
+  const headerList = headers();
+  const path = headerList.get("x-current-path");
 
   const { isUnderMaintenance } = await getMaintenanceStatus();
   const { authenticated } = await isAuthenticated();
+  const user = await getUser();
+
+  const { header: headerData } = await getData(HEADER);
+  const { footer: footerData } = await getData(FOOTER);
 
   return (
     <html lang="en">
@@ -42,11 +45,19 @@ export default async function RootLayout({ children }) {
         <InstallBootstrap />
         {!footer.includes(path) ? (
           <div className="wrapper ovh mm-page mm-slideout">
-            {(!isUnderMaintenance || authenticated) && <Header />}
-            <SearchModal1 />
+            {(!isUnderMaintenance || authenticated) && (
+              <Header
+                authenticated={authenticated}
+                user={user}
+                header={headerData}
+              />
+            )}
+            {/* <SearchModal1 /> */}
             <div className="body_content">
               {children}
-              {(!isUnderMaintenance || authenticated) && <Footer14 />}
+              {(!isUnderMaintenance || authenticated) && (
+                <Footer footer={footerData} />
+              )}
               <BottomToTop />
             </div>
           </div>
@@ -56,7 +67,7 @@ export default async function RootLayout({ children }) {
             <BottomToTop />
           </div>
         )}
-        <NavSidebar />
+        <NavMenuMobile header={headerData} />
       </Body>
     </html>
   );
