@@ -3017,15 +3017,20 @@ li {
   }
 }
 
+.home9-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
 .home9-tags a {
   background-color: rgba(255, 255, 255, 0.1);
   color: #ffffff;
   display: inline-block;
   font-family: var(--title-font-family);
   font-weight: 400;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 28px;
-  margin-right: 10px;
   padding: 5px 24px;
 }
 .home9-tags a:last-child {
@@ -4206,7 +4211,7 @@ section {
 .advance-search-field .search-suggestions {
   background-color: #ffffff;
   border: 1px solid #e9e9e9;
-  border-radius: 4px;
+  border-radius: 20px;
   left: 0;
   overflow: hidden;
   opacity: 0;
@@ -4214,7 +4219,7 @@ section {
   top: 70px;
   visibility: hidden;
   width: 100%;
-  z-index: 99;
+  z-index: 9999;
   -webkit-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
   -moz-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
   -o-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
@@ -4224,6 +4229,8 @@ section {
   -ms-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   transition: all 0.5s ease;
+
+  padding: 1rem;
 }
 .advance-search-field .search-suggestions.show {
   opacity: 1;
@@ -4240,6 +4247,7 @@ section {
   padding: 8px 30px;
   font-family: var(--title-font-family);
   font-weight: 400;
+  border-radius: 8px;
 }
 .advance-search-field .box-suggestions li:hover {
   background-color: #f0efec;
