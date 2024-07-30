@@ -969,7 +969,7 @@ a {
 }
 
 .archive-breadcrump-active {
-  color: var(--darkreader-text--headings-color, #e8e6e3);
+  color: var(--headings-color);
   display: inline-block;
   font-size: 14px;
   position: relative;
