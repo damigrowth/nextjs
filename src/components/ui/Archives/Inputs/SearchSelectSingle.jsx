@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useOptimistic, useState, useTransition } from "react";
+import { useEffect, useOptimistic, useTransition } from "react";
 import {
   useParams,
   usePathname,
@@ -16,7 +16,6 @@ export default function SearchSelectSingle({
   paramSearchName,
   paramDisabledName,
   options,
-  parentPathLink,
   navigates,
 }) {
   const router = useRouter();
@@ -114,10 +113,9 @@ export default function SearchSelectSingle({
   ));
 
   const generateLink = (value) => {
-    const basePath =
-      value === "" ? `/${parentPathLink}` : `/${parentPathLink}/${value}`;
+    let newPath = value ? `${pathname}/${value}` : pathname;
     const queryString = searchParams.toString();
-    return `${basePath}${queryString ? `?${queryString}` : ""}`;
+    return `${newPath}${queryString ? `?${queryString}` : ""}`;
   };
 
   const selectLinkHandler = (item) => {
