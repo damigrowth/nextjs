@@ -74,23 +74,6 @@ export default async function page({ searchParams }) {
 
   return (
     <>
-      <Tabs
-        parentPathLabel="Όλες οι κατηγορίες"
-        parentPathLink="pros"
-        categories={freelancerCategories?.data}
-        plural
-        searchParams={searchParams}
-      />
-      <Breadcrumb
-        parentPathLabel="Επαγγελματίες"
-        parentPathLink="pros"
-        categories={freelancerCategories?.data}
-        plural
-      />
-      <BannerVid
-        heading="Βρείτε Επαγγελματίες και Επιχειρήσεις"
-        description="Ανακαλύψτε και προσλάβετε τις καλύτερες επιχειρήσεις και εξειδικευμένοους επαγγελματίες για οποιαδήποτε ανάγκη."
-      />
       <FreelancersArchive
         categories={freelancerCategories?.data}
         counties={counties?.data}
