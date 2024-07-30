@@ -26,6 +26,12 @@ export default function FreelancersArchive({
   );
 
   const filters = [
+    {
+      heading: "Κατηγορία",
+      params: ["cat"],
+      childPath,
+      component: <Category categories={categories} />,
+    },
     { heading: "Εργατοώρα", params: ["min", "max"], component: <Rate /> },
     {
       heading: "Τρόποι Πληρωμής",
@@ -43,12 +49,6 @@ export default function FreelancersArchive({
       component: <Coverage counties={counties} />,
     },
     { heading: "Τύπος", params: ["type"], component: <Type /> },
-    {
-      heading: "Κατηγορία",
-      params: ["cat"],
-      childPath,
-      component: <Category categories={categories} />,
-    },
     {
       heading: "Κλάδος εξειδίκευσης",
       params: ["spec"],
