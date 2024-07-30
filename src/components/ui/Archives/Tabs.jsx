@@ -1,16 +1,24 @@
+"use client";
+
+import { getPathname } from "@/utils/paths";
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
 import React from "react";
 
 export default function Tabs({
   parentPathLabel,
   parentPathLink,
-  category,
   categories,
   plural,
-  searchParams,
 }) {
+  const pathName = usePathname();
+  const searchParams = useSearchParams();
+
+  const category = getPathname(pathName, 1);
+
   // Serialize search parameters to a query string
-  const queryString = new URLSearchParams(searchParams).toString();
+  const queryString = searchParams.toString();
 
   // Generate the URL with query string
   const generateLink = (path) => {
