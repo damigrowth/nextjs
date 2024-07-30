@@ -1,11 +1,47 @@
-import Image from "next/image";
-import React from "react";
+"use client";
 
-export default function Banner({ category, categories }) {
+import { getPathname } from "@/utils/paths";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import React from "react";
+import BannerVidBtn from "./BannerVidBtn";
+import BannerVidBox from "./BannerVidBox";
+
+export default function Banner({ categories }) {
+  const pathName = usePathname();
+  const category = getPathname(pathName, 1);
+  const subcategory = getPathname(pathName, 2);
+
   // Find the current category from the array of categories
   const currentCategory = categories.find(
     (cat) => cat.attributes.slug === category
   );
+
+  const currentSubcategory =
+    currentCategory?.attributes?.subcategories?.data?.find(
+      (sub) => sub.attributes.slug === subcategory
+    );
+
+  // Use subcategory if it exists, otherwise use the category
+  const displayData = currentSubcategory
+    ? currentSubcategory.attributes
+    : currentCategory?.attributes;
+
+  const bannerImage = !currentCategory?.attributes?.image?.data
+    ? "/images/vector-img/vector-service-v1.png"
+    : currentCategory?.attributes?.image?.data?.attributes?.formats?.small?.url;
+
+  const bannerTitle =
+    !category && !subcategory
+      ? "Όλες οι Υπηρεσίες"
+      : displayData?.plural
+      ? displayData.plural
+      : displayData?.label;
+
+  const bannerDescription =
+    !category && !subcategory
+      ? "Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας."
+      : displayData?.description;
 
   return (
     <>
@@ -29,33 +65,23 @@ export default function Banner({ category, categories }) {
             height={300}
             width={532}
             className="service-v1-vector bounce-y d-none d-lg-block"
-            src={
-              !currentCategory.attributes.image.data
-                ? "/images/vector-img/vector-service-v1.png"
-                : currentCategory.attributes.image.data.attributes.formats.small
-                    .url
-            }
+            src={bannerImage}
             alt="vector"
           />
           <div className="container">
             <div className="row wow fadeInUp">
               <div className="col-xl-5">
                 <div className="position-relative">
-                  <h2>
-                    {" "}
-                    {!currentCategory?.attributes?.plural
-                      ? currentCategory?.attributes?.label
-                      : currentCategory?.attributes?.plural}
-                  </h2>
-                  <p className="text mb-0">
-                    {currentCategory?.attributes?.description}
-                  </p>
+                  <h2>{bannerTitle}</h2>
+                  <p className="text mb-0 mb20">{bannerDescription}</p>
+                  {!category && !subcategory && <BannerVidBtn />}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
+      {!category && !subcategory && <BannerVidBox />}
     </>
   );
 }
