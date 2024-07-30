@@ -3,10 +3,11 @@ import { getMaintenanceStatus } from "./lib/maintenance/maintenance";
 import { isAuthenticated } from "./lib/auth/authenticated";
 
 export async function middleware(request) {
-  // Add a new header x-current-path which passes the path to downstream components
-  const headers = new Headers(request.headers);
   const currentPath = request.nextUrl.pathname;
-  headers.set("x-current-path", currentPath);
+  // Add a new header x-current-path which passes the path to downstream components
+  const requestHeaders = new Headers(request.headers);
+
+  requestHeaders.set("x-current-path", currentPath);
 
   const { isUnderMaintenance } = await getMaintenanceStatus();
   const { authenticated } = await isAuthenticated();
@@ -49,12 +50,27 @@ export async function middleware(request) {
     }
   }
 
-  return NextResponse.next({ headers });
+  // return NextResponse.next();
+  // - This messes with the server actions
+  // return NextResponse.next({ headers });
+  // - This works
+  return NextResponse.next({
+    headers: requestHeaders,
+    request: {
+      headers: requestHeaders,
+    },
+  });
 }
 
 export const config = {
   matcher: [
-    // match all routes except static files and APIs
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    {
+      source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "next-action" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
   ],
 };
