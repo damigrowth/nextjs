@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import {
+  FEATURED_SERVICE,
   FEATURED_SERVICE_MAIN,
   FEATURED_SERVICE_RELATIONS,
   FREELANCER_MAIN,
@@ -9,7 +10,6 @@ import {
   REVIEW_MAIN,
   REVIEW_RELATIONS,
   SERVICE_MAIN,
-  SERVICE_PARTIAL,
   SERVICE_PARTIAL_MAIN,
   SERVICE_PARTIAL_RELATIONS,
   SERVICE_RELATIONS,
@@ -19,12 +19,17 @@ import {
 } from "./parts";
 import {
   CATEGORY,
+  CATEGORY_ENTITY,
   CATEGORY_FULL,
+  FREELANCER_CATEGORY_ENTITY,
   FREELANCER_CATEGORY_FULL,
   FREELANCER_REFERENCE,
   PAGINATION,
-  SINGLE_IMAGE,
+  SKILL_ENTITY,
+  SKILLS,
+  SUBCATEGORY,
   TAG,
+  TAG_ENTITY,
 } from "./fragments";
 
 const SERVICE_BY_SLUG = gql`
@@ -98,17 +103,6 @@ const RATINGS = gql`
       }
     }
   }
-`;
-
-const CATEGORIES = gql`
-  query GetCategories {
-    categories(sort: "label:desc") {
-      data {
-        ...Category
-      }
-    }
-  }
-  ${CATEGORY}
 `;
 
 const TAGS = gql`
@@ -315,6 +309,7 @@ const SERVICE_UID = gql`
 
 const SERVICES_ARCHIVE = gql`
   query ServicesArchive(
+    $search: String
     $min: Int
     $max: Int
     $time: Int
@@ -325,10 +320,18 @@ const SERVICES_ARCHIVE = gql`
   ) {
     services(
       filters: {
-        price: { gte: $min, lte: $max }
-        time: { lte: $time }
-        category: { slug: { eq: $cat } }
-        freelancer: { user: { verified: { eq: $verified } } }
+        or: [
+          { title: { containsi: $search } }
+          { description: { containsi: $search } }
+          { category: { label: { containsi: $search } } }
+          { category: { subcategories: { label: { containsi: $search } } } }
+        ]
+        and: [
+          { price: { gte: $min, lte: $max } }
+          { time: { lte: $time } }
+          { category: { slug: { eq: $cat } } }
+          { freelancer: { user: { verified: { eq: $verified } } } }
+        ]
       }
       sort: $sort
       pagination: { page: $page, pageSize: 20 }
@@ -348,17 +351,6 @@ const SERVICES_ARCHIVE = gql`
   ${SERVICE_PARTIAL_MAIN}
   ${SERVICE_PARTIAL_RELATIONS}
   ${PAGINATION}
-`;
-
-const CATEGORIES_SEARCH = gql`
-  query CategoriesSearch($label: String) {
-    categories(filters: { label: { contains: $label } }, sort: "label:desc") {
-      data {
-        ...CategoryFull
-      }
-    }
-  }
-  ${CATEGORY_FULL}
 `;
 
 const FREELANCERS_ARCHIVE = gql`
@@ -455,7 +447,7 @@ const FREELANCER_TYPES = gql`
 const FREELANCER_CATEGORIES_SEARCH = gql`
   query FreelancerCategoriesSearch($label: String) {
     freelancerCategories(
-      filters: { label: { contains: $label } }
+      filters: { label: { containsi: $label } }
       sort: "label:desc"
     ) {
       data {
@@ -482,7 +474,7 @@ const SPECIALIZATIONS = gql`
 
 const COUNTIES_SEARCH = gql`
   query CountiesSearch($name: String) {
-    counties(filters: { name: { contains: $name } }, sort: "name:asc") {
+    counties(filters: { name: { containsi: $name } }, sort: "name:asc") {
       data {
         id
         attributes {
@@ -491,6 +483,186 @@ const COUNTIES_SEARCH = gql`
       }
     }
   }
+`;
+
+const HEADER = gql`
+  query Header {
+    header {
+      data {
+        attributes {
+          categories {
+            data {
+              attributes {
+                label
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const FOOTER = gql`
+  query Footer {
+    footer {
+      data {
+        attributes {
+          company {
+            data {
+              attributes {
+                title
+                slug
+              }
+            }
+          }
+          categories {
+            data {
+              attributes {
+                label
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const FEATURED_CATEGORIES = gql`
+  query FeaturedCategories {
+    featuredEntity {
+      data {
+        attributes {
+          categories {
+            data {
+              ...CategoryFull
+            }
+          }
+        }
+      }
+    }
+  }
+  ${CATEGORY_FULL}
+`;
+
+const FEATURED_SERVICES = gql`
+  query FeaturedServices {
+    featuredEntity {
+      data {
+        attributes {
+          services {
+            ...FeaturedService
+          }
+        }
+      }
+    }
+  }
+  ${FEATURED_SERVICE}
+`;
+
+const FEATURED_FREELANCERS = gql`
+  query FeaturedFreelancers {
+    featuredEntity {
+      data {
+        attributes {
+          freelancers {
+            data {
+              attributes {
+                ...FreelancerReference
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  ${FREELANCER_REFERENCE}
+`;
+
+const ALL_TAXONOMIES = gql`
+  query AllTaxonomies {
+    freelancerCategories {
+      ...FreelancerCategoryEntity
+    }
+    skills {
+      ...SkillEntity
+    }
+    tags {
+      ...TagEntity
+    }
+    categories {
+      ...CategoryEntity
+    }
+  }
+  ${FREELANCER_CATEGORY_ENTITY}
+  ${TAG_ENTITY}
+  ${SKILL_ENTITY}
+  ${CATEGORY_ENTITY}
+`;
+
+const CATEGORIES = gql`
+  query GetCategories {
+    categories(sort: "label:desc") {
+      data {
+        ...CategoryFull
+      }
+    }
+  }
+  ${CATEGORY_FULL}
+`;
+
+const CATEGORIES_SEARCH = gql`
+  query CategoriesSearch($label: String) {
+    categories(filters: { label: { containsi: $label } }, sort: "label:desc") {
+      data {
+        ...CategoryFull
+      }
+    }
+  }
+  ${CATEGORY_FULL}
+`;
+
+const SUBCATEGORIES_SEARCH = gql`
+  query SubcategoriesSearch($term: String) {
+    subcategories(filters: { label: { containsi: $term } }) {
+      data {
+        attributes {
+          label
+          slug
+          category {
+            data {
+              ...Category
+            }
+          }
+        }
+      }
+    }
+  }
+  ${CATEGORY}
+`;
+
+const CATEGORY_SUBCATEGORIES_SEARCH = gql`
+  query CategorySubcategoriesSearch(
+    $searchTerm: String
+    $categorySlug: String
+  ) {
+    subcategories(
+      filters: {
+        and: [
+          { label: { containsi: $searchTerm } }
+          { category: { slug: { eq: $categorySlug } } }
+        ]
+      }
+    ) {
+      data {
+        ...Subcategory
+      }
+    }
+  }
+  ${SUBCATEGORY}
 `;
 
 export {
@@ -521,4 +693,12 @@ export {
   FREELANCER_CATEGORIES_SEARCH,
   SPECIALIZATIONS,
   COUNTIES_SEARCH,
+  HEADER,
+  FOOTER,
+  FEATURED_CATEGORIES,
+  FEATURED_SERVICES,
+  FEATURED_FREELANCERS,
+  ALL_TAXONOMIES,
+  SUBCATEGORIES_SEARCH,
+  CATEGORY_SUBCATEGORIES_SEARCH,
 };
