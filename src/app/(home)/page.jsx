@@ -1,40 +1,65 @@
-import BrowserCategory5 from "@/components/section/BrowserCategory5";
-import CounterInfo1 from "@/components/section/CounterInfo1";
-import CtaBanner5 from "@/components/section/CtaBanner5";
-import Hero6 from "@/components/hero/Hero6";
-import LearnFreeio1 from "@/components/section/LearnFreeio1";
-import NeedSomething4 from "@/components/section/NeedSomething4";
-import NewsLetterSubscribe1 from "@/components/section/NewsLetterSubscribe1";
-import OurBlog1 from "@/components/section/OurBlog1";
-import OurPartner1 from "@/components/section/OurPartner1";
-import PopularService3 from "@/components/section/PopularService3";
-import SkillArea1 from "@/components/section/SkillArea1";
-import Testimonial1 from "@/components/section/Testimonial1";
-import TrendingService14 from "@/components/section/TrendingService14";
-import TrendingService4 from "@/components/section/TrendingService4";
-import { getService } from "@/lib/service";
+import Stats from "@/components/ui/Sections/Stats";
+import Features from "@/components/ui/Sections/Features";
+import FeaturedCategories from "@/components/ui/Sections/Featured/Categories/FeaturedCategories";
+import FeaturedServices from "@/components/ui/Sections/Featured/Services/FeaturedServices";
+import {
+  ALL_TAXONOMIES,
+  FEATURED_CATEGORIES,
+  FEATURED_FREELANCERS,
+  FEATURED_SERVICES,
+} from "@/lib/graphql/queries";
+import { getData } from "@/lib/client/operations";
+import FeaturedFreelancers from "@/components/ui/Sections/Featured/Freelancers/FeaturedFreelancers";
+import AllTaxonomies from "@/components/ui/Sections/Taxonomies/AllTaxonomies";
+import Hero from "@/components/ui/Sections/Hero/Hero";
 
 export const metadata = {
   title: "Doulitsa - Οι καλύτεροι επαγγελματίες στην οθόνη σου",
 };
 
 export default async function page() {
-  // const data = await getService("6");
-  // console.log("API DATA====>", data);
+  const { featuredEntity: featuredCategoriesData } = await getData(
+    FEATURED_CATEGORIES
+  );
+
+  const { featuredEntity: featuredServicesData } = await getData(
+    FEATURED_SERVICES
+  );
+
+  const { featuredEntity: featuredFreelancersData } = await getData(
+    FEATURED_FREELANCERS
+  );
+
+  const { freelancerCategories, skills, tags, categories } = await getData(
+    ALL_TAXONOMIES
+  );
+
+  const featuredCategories =
+    featuredCategoriesData?.data?.attributes?.categories?.data;
+  const featuredServices =
+    featuredServicesData?.data?.attributes?.services?.data;
+  const featuredFreelancers =
+    featuredFreelancersData?.data?.attributes?.freelancers?.data;
+
   return (
     <>
-      <Hero6 />
-      <NeedSomething4 />
-      <BrowserCategory5 />
-      <PopularService3 />
-      <CtaBanner5 />
-      <CounterInfo1 />
-      <LearnFreeio1 />
-      <SkillArea1 />
-      <TrendingService14 />
-      <OurBlog1 />
-      <OurPartner1 />
-      <NewsLetterSubscribe1 />
+      <Hero
+        categories={featuredCategoriesData?.data?.attributes?.categories?.data}
+      />
+      <FeaturedCategories categories={featuredCategories} />
+      <Features />
+      <FeaturedServices
+        categories={featuredCategories}
+        services={featuredServices}
+      />
+      <FeaturedFreelancers freelancers={featuredFreelancers} />
+      <Stats />
+      <AllTaxonomies
+        freelancerCategories={freelancerCategories.data}
+        skills={skills.data}
+        tags={tags.data}
+        categories={categories.data}
+      />
     </>
   );
 }
