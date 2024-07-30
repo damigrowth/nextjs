@@ -37,6 +37,7 @@ import {
   SERVICE,
   USER_REFERENCE,
   FREELANCER_REFERENCE,
+  FREELANCER_BASIC,
 } from "./fragments";
 
 const REVIEW_MAIN = gql`
@@ -475,18 +476,32 @@ const SERVICE_PARTIAL_RELATIONS = gql`
       data {
         id
         attributes {
-          ...FreelancerReference
+          ...FreelancerBasic
         }
       }
     }
   }
   ${CATEGORY}
   ${MULTIPLE_IMAGES}
-  ${FREELANCER_REFERENCE}
+  ${FREELANCER_BASIC}
 `;
 
 const SERVICE_PARTIAL = gql`
   fragment ServicePartial on ServiceEntityResponseCollection {
+    data {
+      id
+      attributes {
+        ...ServicePartialMain
+        ...ServicePartialRelations
+      }
+    }
+  }
+  ${SERVICE_PARTIAL_MAIN}
+  ${SERVICE_PARTIAL_RELATIONS}
+`;
+
+const FEATURED_SERVICE = gql`
+  fragment FeaturedService on ServiceRelationResponseCollection {
     data {
       id
       attributes {
@@ -517,4 +532,5 @@ export {
   SERVICE_PARTIAL_RELATIONS,
   SERVICE_PARTIAL,
   SERVICE_SEO,
+  FEATURED_SERVICE,
 };
