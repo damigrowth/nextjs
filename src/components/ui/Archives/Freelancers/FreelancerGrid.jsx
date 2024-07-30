@@ -1,5 +1,5 @@
 import React from "react";
-import FreelancerCard from "./FreelancerCard";
+import FreelancerCard from "../../Cards/FreelancerCard";
 
 export default async function FreelancerGrid({ freelancers }) {
   return (
