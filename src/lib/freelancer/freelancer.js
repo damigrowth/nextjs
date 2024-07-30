@@ -101,7 +101,7 @@ export async function getFeaturedServicesByFreelancer(uid, pageSize) {
 
     return { services, servicesMeta };
   } catch (error) {
-    console.error("Error fetching freelancer reviews:", error);
+    console.error("Error fetching freelancer services:", error);
     return [];
   }
 }
