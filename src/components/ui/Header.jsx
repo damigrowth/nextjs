@@ -1,57 +1,47 @@
 import Image from "next/image";
 import Link from "next/link";
-import Mega from "../header/Mega";
-import MobileNavigation5 from "../header/MobileNavigation5";
-import Navigation from "../header/Navigation";
-import { isAuthenticated } from "@/lib/auth/authenticated";
 import UserImage from "../user/UserImage";
-import { getUser } from "@/lib/user/user";
+import MegaMenu from "./MegaMenu";
+import NavMenu from "./NavMenu";
+import HeaderStickyWrapper from "./HeaderStickyWrapper";
+import HeaderMobile from "./HeaderMobile";
+import HeaderLogo from "./HeaderLogo";
 
-export default async function Header() {
-  const { authenticated } = await isAuthenticated();
-  const user = await getUser();
-
-  // console.log("HEADER", user);
+export default function Header({ authenticated, user, header }) {
+  const categories = header.data.attributes.categories.data.map((item, i) => ({
+    id: i + 1,
+    label: item.attributes.label,
+    slug: item.attributes.slug,
+  }));
   return (
     <>
-      <header className="header-nav nav-innerpage-style bg-transparent zi9 position-relative main-menu border-0  ">
+      <HeaderStickyWrapper>
         <nav className="posr">
-          <div className="container posr menu_bdrt1">
+          <div className="container posr">
             <div className="row align-items-center justify-content-between">
-              <div className="col-auto px-0">
+              <div className="col-auto px-0 px-xl-3">
                 <div className="d-flex align-items-center justify-content-between">
-                  <div className="logos">
-                    <Link className="header-logo logo2" href="/">
-                      <Image
-                        height={40}
-                        width={133}
-                        src="/images/header-logo3.svg"
-                        alt="Header Logo"
-                      />
-                    </Link>
-                  </div>
+                  <HeaderLogo />
                   <div className="home1_style">
-                    <Mega />
+                    <MegaMenu categories={categories} />
                   </div>
-                  <Navigation />
+                  {/* <Navigation /> */}
+                  <NavMenu />
+                  {/* <Navigation id="respMenu" /> */}
                 </div>
               </div>
-              <div className="col-auto px-0">
+
+              <div className="col-auto pe-0 pe-xl-3">
                 <div className="d-flex align-items-center">
-                  <a
-                    className="login-info"
-                    data-bs-toggle="modal"
-                    href="#exampleModalToggle"
-                  >
-                    <span className="flaticon-loupe" />
-                  </a>
                   <Link
-                    className="login-info mx10-lg mx30"
+                    className="login-info mx15-xl mx30"
                     href="/become-seller"
                   >
-                    <span className="d-none d-xl-inline-block">Become a</span>{" "}
-                    Seller
+                    <span className="d-none d-xl-inline-block">
+                      Καταχώριση Επαγγελματία
+                    </span>
                   </Link>
+
                   {authenticated ? (
                     <UserImage
                       firstName={user.firstName}
@@ -64,17 +54,21 @@ export default async function Header() {
                       }
                       width={40}
                       height={40}
+                      path={`/dashboard`}
                     />
                   ) : (
                     <>
-                      <Link className="login-info mr10-lg mr30" href="/login">
-                        Sign in
+                      <Link
+                        className="login-info mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent"
+                        href="/login"
+                      >
+                        Σύνδεση
                       </Link>
                       <Link
-                        className="ud-btn btn-thm2 add-joining"
+                        className="ud-btn btn-dark add-joining bdrs50 text-white"
                         href="/register"
                       >
-                        Join
+                        Εγγραφή
                       </Link>
                     </>
                   )}
@@ -83,8 +77,8 @@ export default async function Header() {
             </div>
           </div>
         </nav>
-      </header>
-      <MobileNavigation5 />
+      </HeaderStickyWrapper>
+      <HeaderMobile user={user} authenticated={authenticated} />
     </>
   );
 }
