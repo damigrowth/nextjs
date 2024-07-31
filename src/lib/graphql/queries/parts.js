@@ -305,9 +305,7 @@ const SERVICE_RELATIONS = gql`
     area {
       ...Area
     }
-    skills {
-      ...Skills
-    }
+
     packages {
       ...Packages
     }
@@ -339,7 +337,6 @@ const SERVICE_RELATIONS = gql`
   ${FREELANCER_PARTIAL}
   ${CATEGORY}
   ${AREA}
-  ${SKILLS}
   ${PACKAGES}
   ${ADDONS}
   ${FAQ}
