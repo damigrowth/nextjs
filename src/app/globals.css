@@ -662,7 +662,7 @@ a {
   display: block;
   cursor: pointer;
   color: var(--headings-color);
-  font-family: var(--title-font-family);
+  font-family: sans-serif;
   font-weight: 400;
   font-size: 15px;
   line-height: 1.85;
@@ -681,7 +681,7 @@ a {
 
 .small-addon-title {
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: bold;
   margin: 0 0 5px;
   color: #222222;
 }
@@ -692,7 +692,8 @@ a {
 
 .small-addon-price {
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: bold;
+  color: #484848;
   margin-top: 5px;
 }
 
