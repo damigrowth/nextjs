@@ -984,3 +984,7 @@ a {
   gap: 0.5rem;
   padding-left: 0.5rem;
 }
+
+.service-card-title {
+  height: 40px;
+}

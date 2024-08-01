@@ -418,6 +418,7 @@ const FEATURED_SERVICE_MAIN = gql`
     title
     price
     rating
+    reviews_total
     slug
   }
 `;

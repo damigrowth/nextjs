@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import CardReviews from "../../Reviews/CardReviews";
 // import { useState } from "react";
 
 export default function ServiceCard({
@@ -10,11 +11,11 @@ export default function ServiceCard({
   category,
   title,
   rating,
-  reviews,
+  reviews_total,
   slug,
 }) {
   //   const [isFavActive, setFavActive] = useState(false);
-  const maxTitleLength = 80;
+  const maxTitleLength = 50;
   const truncatedTitle =
     title.length > maxTitleLength
       ? title.slice(0, maxTitleLength) + "..."
@@ -42,24 +43,10 @@ export default function ServiceCard({
         </div>
         <div className="list-content">
           <p className="list-text body-color fz14 mb-1">{category}</p>
-          <h6 className="list-title">
+          <h6 className="list-title service-card-title">
             <Link href={`/s/${slug}`}>{truncatedTitle}</Link>
           </h6>
-          <div
-            className="review-meta d-flex align-items-center "
-            style={{ height: "25px" }}
-          >
-            {rating && (
-              <>
-                <i className="fas fa-star fz10 review-color me-2" />
-                <p className="mb-0 body-color fz14">
-                  <span className="dark-color me-2">{rating}</span>
-                  {/* {review} reviews */}
-                </p>
-              </>
-            )}
-          </div>
-
+          <CardReviews rating={rating} reviews_total={reviews_total} />
           <hr className="my-2" />
           <div className="list-meta mt15">
             <div className="budget">

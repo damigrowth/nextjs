@@ -1,6 +1,3 @@
-import FreelancerFutureCard1 from "@/components/card/FreelancerFutureCard1";
-import { getData } from "@/lib/client/operations";
-import { FEATURED_SERVICES_BY_FREELANCER } from "@/lib/graphql/queries";
 import React from "react";
 import ServiceCard from "./ServiceCard";
 import { getBestDimensions } from "@/utils/imageDimensions";
@@ -36,7 +33,7 @@ export default async function FeaturedServices({
                 category={service.attributes.category.data.attributes.label}
                 title={service.attributes.title}
                 rating={service.attributes.rating}
-                reviews={null}
+                reviews_total={service.attributes.reviews_total}
                 slug={service.attributes.slug}
               />
             </div>
