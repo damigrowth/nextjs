@@ -80,8 +80,8 @@ export default async function SingleService({
                   views={views?.data?.length}
                   verified={isVerified}
                   topLevel={freelancer?.topLevel}
-                  rating={rating}
-                  totalReviews={reviews_total}
+                  rating={freelancer.rating}
+                  totalReviews={freelancer.reviews_total}
                 />
 
                 <Info
