@@ -10,7 +10,9 @@ export default function FeaturedFreelancers({ freelancers }) {
           <div className="row align-items-center wow fadeInUp">
             <div className="col-lg-9">
               <div className="main-title">
-                <h2 className="title text-white">Top Επαγγελματίες</h2>
+                <h2 className="title text-white">
+                  Πιο Δημοφιλείς Επαγγελματίες
+                </h2>
                 <p className="paragraph text-white">
                   Δείτε τους καλύτερους επαγγελματίες που βρίσκονται στην
                   πλατφόρμα μας.
