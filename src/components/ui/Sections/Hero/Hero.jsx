@@ -4,7 +4,7 @@ import HeroImages from "./HeroImages";
 
 export default async function Hero({ categories }) {
   return (
-    <section className="hero-home12 p-0 overflow-hidden">
+    <section className="hero-home12 overflow-hidden">
       <div className="container">
         <div className="row">
           <div className="col-xl-7">
