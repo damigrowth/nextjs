@@ -1,4 +1,5 @@
 import UserImage from "@/components/user/UserImage";
+import { formatRating } from "@/utils/formatRating";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -51,7 +52,9 @@ export default function FeaturedServiceCard({ service }) {
             <>
               <i className="fas fa-star fz10 review-color me-2" />
               <p className="mb-0 body-color fz14">
-                <span className="dark-color me-2">{freelancerRating}</span>
+                <span className="dark-color me-2">
+                  {formatRating(freelancerRating)}
+                </span>
                 {freelancerReviewsTotal > 1
                   ? `(${freelancerReviewsTotal} αξιολογήσεις)`
                   : `(${freelancerReviewsTotal} αξιολόγηση)`}

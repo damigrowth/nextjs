@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Socials from "../socials/Socials";
 import { getYearsOfExperience } from "@/utils/getYearsOfExperience";
+import { formatRating } from "@/utils/formatRating";
 
 export default function ContactDetails({
   firstName,
@@ -51,11 +52,11 @@ export default function ContactDetails({
             {totalReviews > 0 ? (
               <p className="mb-0 fz14 list-inline-item ">
                 <i className="fas fa-star vam fz12 review-color mb5"></i>{" "}
-                <span className="dark-color ">{rating}</span>
+                <span className="dark-color ">{formatRating(rating)}</span>
                 <span className="ml5 review-count-text">
                   {totalReviews === 1
-                    ? `(από ${totalReviews} αξιολόγηση)`
-                    : `(από ${totalReviews} αξιολογήσεις)`}
+                    ? `(${totalReviews} αξιολόγηση)`
+                    : `(${totalReviews} αξιολογήσεις)`}
                 </span>
               </p>
             ) : null}
