@@ -3,6 +3,7 @@ import Link from "next/link";
 import React from "react";
 import ServiceCardMedia from "./ServiceCardMedia";
 import Badges from "@/components/user/Badges";
+import CardReviews from "../Reviews/CardReviews";
 
 export default function ServiceCard({ service }) {
   const {
