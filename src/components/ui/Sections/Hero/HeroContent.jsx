@@ -25,7 +25,7 @@ export default function HeroContent({ categories }) {
       </span>
       <h1 className="animate-up-1 mb25">
         Οι καλύτεροι επαγγελματίες
-        <br className="d-none d-xl-block" />
+        <br />
         στην οθόνη σου.
       </h1>
       <p className="text animate-up-2">
