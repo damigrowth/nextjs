@@ -1,10 +1,11 @@
 import Image from "next/image";
 import React from "react";
+import TooltipTop from "../ui/TooltipTop";
 
-export default function TopLevelBadge({ topLevel, tooltipText }) {
+export default function TopLevelBadge({ topLevel }) {
   if (!topLevel) return null;
   return (
-    <div className="tooltip-container">
+    <div id="top-level" className="tooltip-container">
       <div className="top-badge-inline mb-0">
         <Image
           width={22}
@@ -13,9 +14,9 @@ export default function TopLevelBadge({ topLevel, tooltipText }) {
           alt="top badge"
         />
       </div>
-      <div className="tooltip" style={{ top: "-95px" }}>
-        {tooltipText}
-      </div>
+      <TooltipTop anchor="top-level">
+        Έχει λάβει εξαιρετικές αξιολογήσεις
+      </TooltipTop>
     </div>
   );
 }
