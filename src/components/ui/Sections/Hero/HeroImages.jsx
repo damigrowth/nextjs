@@ -40,15 +40,15 @@ export default function HeroImages() {
       <div className="iconbox-small1 text-start d-flex wow fadeInRight default-box-shadow4 bounce-x animate-up-1">
         <span className="icon flaticon-review"></span>
         <div className="details pl20">
-          <h6 className="mb-1">4.9/5</h6>
-          <p className="text fz13 mb-0">Clients rate professionals</p>
+          <h6 className="mb-1">Κριτικές 5*</h6>
+          <p className="text fz13 mb-0">TOP επαγγελματίες</p>
         </div>
       </div>
       <div className="iconbox-small2 text-start d-flex wow fadeInLeft default-box-shadow4 bounce-y animate-up-2">
         <span className="icon flaticon-rocket"></span>
         <div className="details pl20">
-          <h6 className="mb-1">12M+</h6>
-          <p className="text fz13 mb-0">Project Completed</p>
+          <h6 className="mb-1">100+ νέες</h6>
+          <p className="text fz13 mb-0">Διαθέσιμες Υπηρεσίες</p>
         </div>
       </div>
     </div>

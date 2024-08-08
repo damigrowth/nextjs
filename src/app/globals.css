@@ -988,3 +988,7 @@ a {
 .service-card-title {
   height: 40px;
 }
+
+.text-bold {
+  font-weight: bold;
+}

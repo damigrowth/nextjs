@@ -4,6 +4,7 @@ import useHomeStore from "@/store/home/homeStore";
 
 export default function Dropdown({ categories }) {
   const { categorySelect, setCategorySelect } = useHomeStore();
+
   return (
     <div className="dropdown bootstrap-select">
       <button
@@ -24,6 +25,19 @@ export default function Dropdown({ categories }) {
       <div className="dropdown-menu">
         <div className="inner show">
           <ul className="dropdown-menu inner show">
+            <li
+              onClick={() => setCategorySelect(null)}
+              key="0"
+              className="selected active"
+            >
+              <a
+                className={`dropdown-item selected ${
+                  categorySelect?.attributes?.slug === "" ? "active" : ""
+                }`}
+              >
+                <span className="text">Όλες οι Κατηγορίες</span>
+              </a>
+            </li>
             {categories.map((category, index) => (
               <li
                 onClick={() => setCategorySelect(category)}

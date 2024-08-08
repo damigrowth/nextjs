@@ -48,7 +48,7 @@ export default function FreelancersList({ freelancers }) {
         >
           {freelancers.slice(0, 4).map((freelancer, index) => (
             <SwiperSlide key={index}>
-              <FreelancerCard freelancer={freelancer.attributes} />
+              <FreelancerCard freelancer={freelancer.attributes} linkedName />
               {/* <HeighestRetedCard3
                 itemClass={
                   "freelancer-style1 text-center bdr1 bdrs16 hover-box-shadow"
