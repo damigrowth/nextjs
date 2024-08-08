@@ -2,7 +2,7 @@ import UserImage from "@/components/user/UserImage";
 import Link from "next/link";
 import React from "react";
 
-export default function FreelancerCard({ freelancer }) {
+export default function FreelancerCard({ freelancer, linkedName }) {
   const {
     username,
     tagline,
@@ -41,8 +41,15 @@ export default function FreelancerCard({ freelancer }) {
           />
         </div>
         <div className="review">
-          <h5 className="title mb-1">{user.displayName}</h5>
-          <p className="mb-0">{category?.data?.attributes?.label}</p>
+          {linkedName ? (
+            <Link href={`/profile/${username}`}>
+              <h5 className="title mb-1 text-bold">{user.displayName}</h5>
+            </Link>
+          ) : (
+            <h5 className="title mb-1 text-bold">{user.displayName}</h5>
+          )}
+
+          <p className="mb-0 text-bold">{category?.data?.attributes?.label}</p>
           {reviews_total > 0 ? (
             <p className="mb-0 fz14 list-inline-item ">
               <i className="fas fa-star vam fz10 review-color mb5"></i>{" "}
