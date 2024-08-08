@@ -9166,7 +9166,19 @@ li.mm-listitem:focus {
 #mega-menu .drop-menu li a:hover {
   color: var(--headings-color);
 }
-#mega-menu:hover .menu {
+
+/* #mega-menu:hover .menu {
+  opacity: 1;
+  top: 10px;
+  visibility: visible;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+} */
+
+#mega-menu .menu.active {
   opacity: 1;
   top: 10px;
   visibility: visible;
