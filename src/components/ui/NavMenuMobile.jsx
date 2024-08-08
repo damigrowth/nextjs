@@ -33,7 +33,7 @@ export default function NavMenuMobile({ header }) {
     {
       id: 3,
       name: "Επαγγελματίες",
-      path: "/pros",
+      path: "/profiles",
     },
   ];
 
