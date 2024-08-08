@@ -15,6 +15,9 @@ export default function FeaturedServiceCard({ service }) {
     price,
   } = service;
 
+  const freelancerRating = freelancer.data.attributes.rating;
+  const freelancerReviewsTotal = freelancer.data.attributes.reviews_total;
+
   return (
     <div className="listing-style1 bdrs16">
       <div className="list-thumb">
@@ -44,14 +47,14 @@ export default function FeaturedServiceCard({ service }) {
           <Link href={`/s/${slug}`}>{title.slice(0, 40) + "..."}</Link>
         </h5>
         <div className="review-meta d-flex align-items-center">
-          {reviews_total && (
+          {freelancerReviewsTotal && (
             <>
               <i className="fas fa-star fz10 review-color me-2" />
               <p className="mb-0 body-color fz14">
-                <span className="dark-color me-2">{rating}</span>
-                {reviews_total > 1
-                  ? `(${reviews_total} αξιολογήσεις)`
-                  : `(${reviews_total} αξιολόγηση)`}
+                <span className="dark-color me-2">{freelancerRating}</span>
+                {freelancerReviewsTotal > 1
+                  ? `(${freelancerReviewsTotal} αξιολογήσεις)`
+                  : `(${freelancerReviewsTotal} αξιολόγηση)`}
               </p>
             </>
           )}
