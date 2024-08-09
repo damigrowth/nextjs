@@ -21,7 +21,7 @@ export default function FeaturedFreelancers({ freelancers }) {
             </div>
             <div className="col-lg-3">
               <div className="text-start text-lg-end mb-4 mb-lg-2">
-                <Link className="ud-btn2 text-white" href="/pros">
+                <Link className="ud-btn2 text-white" href="/profiles">
                   Όλοι οι Επαγγελματίες
                   <i className="fal fa-arrow-right-long" />
                 </Link>

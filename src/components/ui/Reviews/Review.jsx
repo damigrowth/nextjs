@@ -6,6 +6,7 @@ import ReviewReactions from "./ReviewReactions";
 import UserImage from "@/components/user/UserImage";
 import Rating from "../rating/Rating";
 import Link from "next/link";
+import { formatRating } from "@/utils/formatRating";
 
 export default async function Review({
   reviewId,
@@ -64,7 +65,7 @@ export default async function Review({
                 onChange={null}
                 edit={false}
               />
-              <span className="ml5 fz14 fw600">{rating}</span>
+              <span className="ml5 fz14 fw600">{formatRating(rating)}</span>
             </div>
             <span className="inline-divider"></span>
             <span className="fz14">{formattedDate}</span>

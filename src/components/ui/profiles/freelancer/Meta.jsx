@@ -1,5 +1,6 @@
 import Socials from "@/components/ui/socials/Socials";
 import UserImage from "@/components/user/UserImage";
+import { formatRating } from "@/utils/formatRating";
 import Image from "next/image";
 import React from "react";
 
@@ -39,7 +40,6 @@ export default function Meta({
             <div className="list-meta d-sm-flex align-items-center">
               <div className="position-relative freelancer-single-style">
                 {/* <span className="online"></span> */}
-
                 <UserImage
                   firstName={firstName}
                   lastName={lastName}
@@ -53,13 +53,13 @@ export default function Meta({
                 <h5 className="title mb-1">{displayName}</h5>
                 <p className="mb-0">{tagline}</p>
                 {totalReviews > 0 ? (
-                  <p className="mb-0 dark-color fz14 list-inline-item ml15-sm mb5-sm ml0-xs">
+                  <p className="mb-0  fz14 list-inline-item ml15-sm mb5-sm ml0-xs">
                     <i className="fas fa-star vam fz10 review-color mb5"></i>{" "}
-                    <span>{rating}</span>
-                    <span className="ml5">
+                    <span className="dark-color">{formatRating(rating)}</span>
+                    <span className="ml5 body-color">
                       {totalReviews === 1
-                        ? `(από ${totalReviews} αξιολόγηση)`
-                        : `(από ${totalReviews} αξιολογήσεις)`}
+                        ? `(${totalReviews} αξιολόγηση)`
+                        : `(${totalReviews} αξιολογήσεις)`}
                     </span>
                   </p>
                 ) : null}

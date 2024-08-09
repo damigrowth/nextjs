@@ -8,6 +8,21 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      // Basic redirect
+      {
+        source: "/s",
+        destination: "/ipiresies",
+        permanent: true,
+      },
+      {
+        source: "/profile",
+        destination: "/profiles",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

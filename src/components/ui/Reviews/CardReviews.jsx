@@ -1,3 +1,4 @@
+import { formatRating } from "@/utils/formatRating";
 import React from "react";
 
 export default function CardReviews({ rating, reviews_total }) {
@@ -7,10 +8,10 @@ export default function CardReviews({ rating, reviews_total }) {
         <>
           <i className="fas fa-star fz10 review-color me-2" />
           <p className="mb-0 body-color fz14">
-            <span className="dark-color me-2">{rating}</span>
-            {reviews_total > 1
-              ? reviews_total + " " + "αξιολογήσεις"
-              : reviews_total + " " + "αξιολόγηση"}
+            <span className="dark-color me-2">{formatRating(rating)}</span>
+            {reviews_total === 1
+              ? `(${reviews_total} αξιολόγηση)`
+              : `(${reviews_total} αξιολογήσεις)`}
           </p>
         </>
       )}

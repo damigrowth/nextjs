@@ -2,6 +2,7 @@ import Image from "next/image";
 import React from "react";
 import InitialsImage from "./InitialsImage";
 import Link from "next/link";
+import TooltipTop from "../ui/TooltipTop";
 
 export default function UserImage({
   image,
@@ -19,11 +20,14 @@ export default function UserImage({
     <>
       <div className="position-relative">
         {topLevel && (
-          <div className="top-badge">
+          <div id="top-level" className="top-badge">
             {/* <div className="icon ">
                       <span className="flaticon-badge" />
                     </div> */}
             <Image width={30} height={30} src="/images/top-badge.png" />
+            <TooltipTop anchor="top-level">
+              Έχει λάβει εξαιρετικές αξιολογήσεις
+            </TooltipTop>
           </div>
         )}
         {image ? (

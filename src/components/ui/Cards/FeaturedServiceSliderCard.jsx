@@ -10,6 +10,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import UserImage from "@/components/user/UserImage";
+import { formatRating } from "@/utils/formatRating";
 
 export default function FeaturedServiceSliderCard({ service }) {
   const {
@@ -112,7 +113,9 @@ export default function FeaturedServiceSliderCard({ service }) {
               <>
                 <i className="fas fa-star fz10 review-color me-2" />
                 <p className="mb-0 body-color fz14">
-                  <span className="dark-color me-2">{freelancerRating}</span>
+                  <span className="dark-color me-2">
+                    {formatRating(freelancerRating)}
+                  </span>
                   {freelancerReviewsTotal > 1
                     ? `(${freelancerReviewsTotal} αξιολογήσεις)`
                     : `(${freelancerReviewsTotal} αξιολόγηση)`}
