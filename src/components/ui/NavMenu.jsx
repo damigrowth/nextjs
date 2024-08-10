@@ -10,8 +10,13 @@ export default function NavMenu() {
         </Link>
       </li>
       <li className="visible_list menu-active home-menu-parent">
-        <Link href="/profiles" className="list-item">
+        <Link href="/pros" className="list-item">
           <span className="title">Επαγγελματίες</span>
+        </Link>
+      </li>
+      <li className="visible_list menu-active home-menu-parent">
+        <Link href="/companies" className="list-item">
+          <span className="title">Επιχειρήσεις</span>
         </Link>
       </li>
     </ul>

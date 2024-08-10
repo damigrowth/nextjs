@@ -18,7 +18,7 @@ const nextConfig = {
       },
       {
         source: "/profile",
-        destination: "/profiles",
+        destination: "/pros",
         permanent: true,
       },
     ];

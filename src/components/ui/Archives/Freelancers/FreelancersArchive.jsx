@@ -49,7 +49,6 @@ export default function FreelancersArchive({
       params: ["cov_o", "cov_c"],
       component: <Coverage counties={counties} />,
     },
-    { heading: "Τύπος", params: ["type"], component: <Type /> },
     {
       heading: "Κλάδος εξειδίκευσης",
       params: ["spec"],
