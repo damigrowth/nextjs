@@ -54,14 +54,16 @@ export default function RangeSlider({ iniMin, iniMax }) {
 
   const handleSlider = (e, type) => {
     const value = parseInt(e.target.value, 10);
+
     if (type === "min") {
       setMin(value);
+      debouncedUpdateSearchParams(value, max);
     } else {
       setMax(value);
+      debouncedUpdateSearchParams(min, value);
     }
-    // Debounce update to avoid frequent URL updates
-    debouncedUpdateSearchParams(min, max);
   };
+
   return (
     <div
       data-pending={isPending ? "" : undefined}
@@ -88,7 +90,8 @@ export default function RangeSlider({ iniMin, iniMax }) {
                 type="number"
                 className="amount w-100"
                 placeholder={`${iniMin}€`}
-                min={iniMax}
+                min={iniMin}
+                max={max}
                 value={min}
                 onChange={(e) => handleSlider(e, "min")}
               />
@@ -97,7 +100,7 @@ export default function RangeSlider({ iniMin, iniMax }) {
                 type="number"
                 className="amount2 w-100"
                 placeholder={`${iniMax}€`}
-                min={iniMin}
+                min={min}
                 max={iniMax}
                 value={max}
                 onChange={(e) => handleSlider(e, "max")}
