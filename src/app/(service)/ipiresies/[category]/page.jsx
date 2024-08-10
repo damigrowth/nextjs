@@ -4,8 +4,7 @@ import { getData } from "@/lib/client/operations";
 import { CATEGORY_SUBCATEGORIES_SEARCH } from "@/lib/graphql/queries";
 
 export default async function page({ params, searchParams }) {
-  const category = params.category[0];
-  const subcategory = params.category[1];
+  const { category } = params;
 
   const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
 

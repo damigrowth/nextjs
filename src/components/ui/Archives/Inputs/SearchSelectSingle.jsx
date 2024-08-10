@@ -9,6 +9,7 @@ import {
 } from "next/navigation";
 import BorderSpinner from "../../Spinners/BorderSpinner";
 import Link from "next/link";
+import { getPathname } from "@/utils/paths";
 
 export default function SearchSelectSingle({
   defaultLabel,
@@ -21,32 +22,57 @@ export default function SearchSelectSingle({
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
+
+  // Route segments
+  const root = getPathname(pathname, 0);
+  const parent = getPathname(pathname, 1);
+  const child = getPathname(pathname, 2);
+
   const searchParams = useSearchParams();
 
-  // Add default option
-  const allOptions = [{ value: "", label: defaultLabel }, ...options];
+  const defaultOption = { value: "", label: defaultLabel };
 
-  // Initialize search state from search parameters or default value
+  // Add default option
+  const allOptions = [defaultOption, ...options];
+
   const getInitialSearch = () => searchParams.get(paramSearchName) || "";
   const [search, setSearch] = useOptimistic(getInitialSearch());
 
-  // Initialize selected option state from search parameters or default value
+  // Initial Option
   const getInitialSelectedOption = () => {
-    const initialSelectedOptionValue = searchParams.get(paramOptionName);
-    return (
-      allOptions.find((opt) => opt.value === initialSelectedOptionValue) ||
-      allOptions[0]
-    );
+    const searchParamValue = searchParams.get(paramOptionName);
+
+    if (searchParamValue) {
+      return allOptions.find((opt) => opt.value === child) || allOptions[0];
+    }
+
+    if (child) {
+      return allOptions.find((opt) => opt.value === child) || allOptions[0];
+    }
+
+    if (parent) {
+      return defaultOption;
+    }
+
+    return defaultOption;
   };
+
   const [selectedOption, setSelectedOption] = useOptimistic(
     getInitialSelectedOption()
   );
 
   const getInitialSelectedLink = () => {
-    return (
-      allOptions.find((opt) => opt.value === params.category) || allOptions[0]
-    );
+    if (child) {
+      return allOptions.find((opt) => opt.value === child) || allOptions[0];
+    }
+
+    if (parent) {
+      return defaultOption;
+    }
+
+    return defaultOption;
   };
+
   const [selectedLink, setSelectedLink] = useOptimistic(
     getInitialSelectedLink()
   );
@@ -113,9 +139,29 @@ export default function SearchSelectSingle({
   ));
 
   const generateLink = (value) => {
-    let newPath = value ? `${pathname}/${value}` : pathname;
-    const queryString = searchParams.toString();
-    return `${newPath}${queryString ? `?${queryString}` : ""}`;
+    if (value === "" && pathname === `/${root}`) {
+      return pathname;
+    }
+    if (value === "") {
+      let newPath;
+      if (child) {
+        newPath = pathname.substring(0, pathname.lastIndexOf("/"));
+      } else if (parent) {
+        newPath = pathname.substring(0, pathname.lastIndexOf("/"));
+      } else {
+        newPath = "/";
+      }
+      const queryString = searchParams.toString();
+      return `${newPath}${queryString ? `?${queryString}` : ""}`;
+    }
+
+    if (!child) {
+      let newPath = value ? `${pathname}/${value}` : pathname;
+      const queryString = searchParams.toString();
+      return `${newPath}${queryString ? `?${queryString}` : ""}`;
+    } else {
+      return `${value}`;
+    }
   };
 
   const selectLinkHandler = (item) => {
