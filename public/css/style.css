@@ -10165,6 +10165,19 @@ input:focus-visible {
   top: 0;
   z-index: -1;
 }
+
+.service-single-image:after {
+  background-color: #404040;
+  border-radius: 4px;
+  bottom: 0px;
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: -1;
+}
+
 @media (max-width: 767.98px) {
   .service-single-sldier:after {
     bottom: 0;

@@ -12,6 +12,7 @@ import Top from "./Filters/Top";
 import Content from "./Content";
 import ContentSkeleton from "./ContentSkeleton";
 import BorderSpinner from "../../Spinners/BorderSpinner";
+import SidebarModal from "../SidebarModal";
 
 export default function FreelancersArchive({
   categories,
@@ -78,7 +79,7 @@ export default function FreelancersArchive({
           </div>
         </div>
       </section>
-      {/* <ListingSidebarModal5 /> */}
+      <SidebarModal filters={filters} searchParams={searchParams} />
     </>
   );
 }

@@ -12,6 +12,7 @@ import StickySidebar from "@/components/ui/sticky/StickySidebar";
 import Gallery from "../Gallery/Gallery";
 import Reviews from "../Reviews/Reviews";
 import Terms from "./Terms";
+import FeaturedImage from "./FeaturedImage";
 
 export default async function SingleService({
   serviceId,
@@ -63,6 +64,8 @@ export default async function SingleService({
     rating_stars_5,
   ];
 
+  console.log(media.data.length);
+
   return (
     <section className="pt10 pb90 pb30-md">
       <div className="container">
@@ -98,7 +101,11 @@ export default async function SingleService({
                   payment_methods={freelancer.payment_methods}
                   settlement_methods={freelancer.settlement_methods}
                 />
-                <Gallery images={media.data} />
+                {media.data.length > 1 ? (
+                  <Gallery images={media.data} />
+                ) : (
+                  <FeaturedImage formats={media.data[0].attributes.formats} />
+                )}
                 {fixed ? null : <Packages packages={packages} />}
                 {addons?.length > 0 && <Addons addons={addons} price={price} />}
                 {faq?.length > 0 && <Faq faq={faq} />}

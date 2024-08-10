@@ -9,21 +9,9 @@ import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper";
 import Image from "next/image";
 
-export default function ServiceCardMedia({ media }) {
-  if (media.length > 1) {
-    return (
-      <div className="list-thumb flex-shrink-0 height">
-        <Image
-          height={245}
-          width={329}
-          className="w-100 h-100 object-fit-cover"
-          src={media[0].attributes.formats.thumbnail.url}
-          alt="image"
-        />
-      </div>
-    );
-  } else {
-    return (
+export default function ServiceCardMedia({ media, path }) {
+  return (
+    <Link href={path}>
       <div className="list-thumb flex-shrink-0 height">
         <div className="listing-thumbIn-slider position-relative navi_pagi_bottom_center slider-1-grid">
           <Swiper
@@ -70,6 +58,6 @@ export default function ServiceCardMedia({ media }) {
           </Swiper>
         </div>
       </div>
-    );
-  }
+    </Link>
+  );
 }

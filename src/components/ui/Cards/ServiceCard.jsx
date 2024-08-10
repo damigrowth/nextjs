@@ -4,6 +4,7 @@ import React from "react";
 import ServiceCardMedia from "./ServiceCardMedia";
 import Badges from "@/components/user/Badges";
 import CardReviews from "../Reviews/CardReviews";
+import ServiceCardImage from "./ServiceCardImage";
 
 export default function ServiceCard({ service }) {
   const {
@@ -33,12 +34,13 @@ export default function ServiceCard({ service }) {
 
   return (
     <div className="data-loading-element listing-style1 list-style d-block d-xl-flex align-items-center">
-      {slug ? (
-        <Link href={`/s/${slug}`}>
-          <ServiceCardMedia media={media?.data} />
-        </Link>
+      {media.data.length > 1 ? (
+        <ServiceCardMedia media={media?.data} path={`/s/${slug}`} />
       ) : (
-        <ServiceCardMedia media={media?.data} />
+        <ServiceCardImage
+          image={media.data[0].attributes.formats.thumbnail.url}
+          path={`/s/${slug}`}
+        />
       )}
 
       <div className="list-content flex-grow-1 ms-1">
