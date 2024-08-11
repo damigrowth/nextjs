@@ -20,7 +20,7 @@ export default function Meta({
   return (
     <div className="col-xl-12 mb30 pb30 bdrb1">
       <div className="position-relative">
-        <h2>{title}</h2>
+        <h1 className="heading-2">{title}</h1>
         <div className="list-meta meta mt30">
           <UserImage
             firstName={firstName}

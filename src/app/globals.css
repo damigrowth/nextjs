@@ -994,3 +994,21 @@ a {
 .text-bold {
   font-weight: bold;
 }
+
+.heading-2 {
+  color: var(--headings-color);
+  line-height: 1.3125;
+  font-weight: 700;
+  font-size: 32px;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.heading-p {
+  font-size: 15px;
+  color: var(--headings-color);
+  font-family: sans-serif;
+  font-weight: 400;
+  margin-bottom: 0;
+  line-height: 1.85;
+}

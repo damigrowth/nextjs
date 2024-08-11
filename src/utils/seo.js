@@ -22,46 +22,57 @@ export async function fetchEntityData(entityType, params) {
 
   const entity = data?.[`${entityType}s`]?.data?.[0]?.attributes;
 
-  const userDisplayName = entity?.user?.data?.attributes?.displayName;
-
-  return { entity, userDisplayName };
+  return { entity };
 }
 
-function getMeta(entity, fallbackTitle, fallbackDescription) {
-  const title = entity?.seo?.metaTitle
-    ? `${entity.seo.metaTitle} - Doulitsa`
-    : `${fallbackTitle} - Doulitsa`;
-  const description = entity?.seo?.metaDescription
-    ? entity.seo.metaDescription
-    : truncateText(fallbackDescription, 155);
+function getPropertyValue(entity, property) {
+  const title = entity.title;
+  const displayName =
+    entity?.freelancer?.data?.attributes?.user?.data?.attributes?.displayName;
+  const category = entity.category?.data?.attributes?.label;
+  const description = entity.description;
 
-  return { title, description };
+  switch (property.toLowerCase()) {
+    case "title":
+      return title || "";
+    case "displayname":
+      return displayName || "";
+    case "category":
+      return category || "";
+    case "description":
+      return description || "";
+    default:
+      console.log(`Property not found: ${property}`);
+      return "";
+  }
 }
 
-export async function generateMeta(entityType, params) {
+function formatMetaString(template, entity) {
+  return template.replace(/%([^%]+)%/g, (match, property) => {
+    const value = getPropertyValue(entity, property);
+    return value || match;
+  });
+}
+
+export async function generateMeta(
+  entityType,
+  params,
+  titleTemplate,
+  descriptionTemplate
+) {
   try {
-    const { entity, userDisplayName } = await fetchEntityData(
-      entityType,
-      params
-    );
+    const { entity } = await fetchEntityData(entityType, params);
 
     if (!entity) {
       redirect("/not-found");
     }
 
-    const fallbackTitle = !userDisplayName ? entity.title : userDisplayName;
-
-    const fallbackDescription = entity.description;
-
-    const { title, description } = getMeta(
-      entity,
-      fallbackTitle,
-      fallbackDescription
-    );
+    const title = formatMetaString(titleTemplate, entity);
+    const description = formatMetaString(descriptionTemplate, entity);
 
     return {
       title,
-      description,
+      description: truncateText(description, 100),
     };
   } catch (error) {
     console.error("Error fetching entity data:", error);

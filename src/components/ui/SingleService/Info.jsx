@@ -11,7 +11,7 @@ export default function Info({ time, category, area }) {
             </div>
             <div className="details">
               <h5 className="title">Κατηγορία</h5>
-              <p className="mb-0 text">{category}</p>
+              <h2 className="heading-p">{category}</h2>
             </div>
           </div>
         </div>
