@@ -28,7 +28,7 @@ export default function HeroContent({ categories }) {
         <br />
         στην οθόνη σου.
       </h1>
-      <h2 className="text animate-up-2">
+      <h2 className="heading-p animate-up-2">
         Ανακάλυψε Υπηρεσίες από τους Καλύτερους Επαγγελματίες.
       </h2>
       <SearchBar categories={categories} subcategories={subcategories} />
