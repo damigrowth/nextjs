@@ -361,7 +361,7 @@ const FREELANCERS_ARCHIVE = gql`
     $contactTypes: [ID]
     $coverageOnline: Boolean
     $coverageCounties: [ID]
-    $type: ID
+    $type: String
     $cat: String
     $specializations: [ID]
     $experience: Int
@@ -371,6 +371,7 @@ const FREELANCERS_ARCHIVE = gql`
   ) {
     freelancers(
       filters: {
+        type: { slug: { eq: $type } }
         rate: { gte: $min, lte: $max }
         payment_methods: { id: { in: $paymentMethods } }
         contactTypes: { id: { in: $contactTypes } }
@@ -378,7 +379,6 @@ const FREELANCERS_ARCHIVE = gql`
           online: { eq: $coverageOnline }
           counties: { id: { in: $coverageCounties } }
         }
-        type: { id: { eq: $type } }
         category: { slug: { eq: $cat } }
         specialisations: { id: { in: $specializations } }
         yearsOfExperience: { gte: $experience }
@@ -445,9 +445,9 @@ const FREELANCER_TYPES = gql`
 `;
 
 const FREELANCER_CATEGORIES_SEARCH = gql`
-  query FreelancerCategoriesSearch($label: String) {
+  query FreelancerCategoriesSearch($label: String, $type: String) {
     freelancerCategories(
-      filters: { label: { containsi: $label } }
+      filters: { label: { containsi: $label }, type: { slug: { eq: $type } } }
       sort: "label:desc"
     ) {
       data {
@@ -665,6 +665,19 @@ const CATEGORY_SUBCATEGORIES_SEARCH = gql`
   ${SUBCATEGORY}
 `;
 
+const GET_COMPANY_PAGE = gql`
+  query GetCompanyPage($slug: String) {
+    pages(filters: { slug: { eq: $slug } }) {
+      data {
+        attributes {
+          title
+          content
+        }
+      }
+    }
+  }
+`;
+
 export {
   GET_ME,
   USER_BY_ID,
@@ -701,4 +714,5 @@ export {
   ALL_TAXONOMIES,
   SUBCATEGORIES_SEARCH,
   CATEGORY_SUBCATEGORIES_SEARCH,
+  GET_COMPANY_PAGE,
 };

@@ -11,6 +11,8 @@ export default function Tabs({
   parentPathLink,
   categories,
   plural,
+  freelancerCategory,
+  serviceCategory,
 }) {
   const pathName = usePathname();
   const searchParams = useSearchParams();
@@ -47,7 +49,11 @@ export default function Tabs({
                         `/${parentPathLink}/${cat.attributes.slug}`
                       )}
                       className={
-                        category == cat.attributes.slug ? "active" : ""
+                        category === cat.attributes.slug ||
+                        freelancerCategory === cat.attributes.slug ||
+                        serviceCategory === cat.attributes.slug
+                          ? "active"
+                          : ""
                       }
                     >
                       {plural ? cat.attributes.plural : cat.attributes.label}
