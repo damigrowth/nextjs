@@ -14,7 +14,9 @@ import AllTaxonomies from "@/components/ui/Sections/Taxonomies/AllTaxonomies";
 import Hero from "@/components/ui/Sections/Hero/Hero";
 
 export const metadata = {
-  title: "Doulitsa - Οι καλύτεροι επαγγελματίες στην οθόνη σου",
+  title: "Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη",
+  description:
+    "Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.",
 };
 
 export default async function page() {
