@@ -625,6 +625,19 @@ const CATEGORIES_SEARCH = gql`
   ${CATEGORY_FULL}
 `;
 
+const SUBCATEGORIES = gql`
+  query Subcategories {
+    subcategories {
+      data {
+        attributes {
+          label
+          slug
+        }
+      }
+    }
+  }
+`;
+
 const SUBCATEGORIES_SEARCH = gql`
   query SubcategoriesSearch($term: String) {
     subcategories(filters: { label: { containsi: $term } }) {
@@ -715,4 +728,5 @@ export {
   SUBCATEGORIES_SEARCH,
   CATEGORY_SUBCATEGORIES_SEARCH,
   GET_COMPANY_PAGE,
+  SUBCATEGORIES,
 };

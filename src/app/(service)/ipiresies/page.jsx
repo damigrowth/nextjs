@@ -1,10 +1,21 @@
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
 import { CATEGORIES_SEARCH, SERVICES_ARCHIVE } from "@/lib/graphql/queries";
+import { generateMeta } from "@/utils/seo";
 
-export const metadata = {
-  title: "Freeio - Freelance Marketplace React/Next Js Template | Service 4",
-};
+// Static SEO
+export async function generateMetadata() {
+  const titleTemplate = "Υπηρεσίες | Doulitsa";
+  const descriptionTemplate =
+    "Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας.";
+
+  const metadata = {
+    title: titleTemplate,
+    description: descriptionTemplate,
+  };
+
+  return metadata;
+}
 
 export default async function page({ searchParams }) {
   const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;

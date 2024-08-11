@@ -2,6 +2,29 @@ import React from "react";
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
 import { CATEGORY_SUBCATEGORIES_SEARCH } from "@/lib/graphql/queries";
+import { generateMeta } from "@/utils/seo";
+
+// Dynamic SEO
+export async function generateMetadata({ params }) {
+  const { subcategory } = params;
+
+  const titleTemplate =
+    "%arcCategory% - Βρες τις καλύτερες Υπηρεσίες στη Doulitsa";
+  const descriptionTemplate = "%arcCategoryDesc%";
+  const descriptionSize = 100;
+
+  const metadata = await generateMeta(
+    "subcategories",
+    undefined,
+    titleTemplate,
+    descriptionTemplate,
+    descriptionSize,
+    true,
+    subcategory
+  );
+
+  return metadata;
+}
 
 export default async function page({ params, searchParams }) {
   const { category } = params;
