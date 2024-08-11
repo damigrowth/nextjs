@@ -11,9 +11,13 @@ export default function ProfileBreadcrumb({ category }) {
             <div className="breadcumb-style1 mb10-xs">
               <div className="breadcumb-list">
                 <Link href="/">Αρχική</Link>
-                <Link href="/freelancers">Επαγγελματίες</Link>
-                <Link href={`/freelancers/${category.data.attributes.slug}`}>
-                  {category.data.attributes.plural}
+                <Link href="/pros">
+                  <h2 className="heading-p-gray">Επαγγελματίες</h2>
+                </Link>
+                <Link href={`/pros/${category.data.attributes.slug}`}>
+                  <h2 className="heading-p">
+                    {category.data.attributes.plural}
+                  </h2>
                 </Link>
               </div>
             </div>

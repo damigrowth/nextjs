@@ -28,9 +28,12 @@ export async function fetchEntityData(entityType, params) {
 function getPropertyValue(entity, property) {
   const title = entity.title;
   const displayName =
-    entity?.freelancer?.data?.attributes?.user?.data?.attributes?.displayName;
+    entity?.freelancer?.data?.attributes?.user?.data?.attributes?.displayName ||
+    entity?.user?.data?.attributes?.displayName;
   const category = entity.category?.data?.attributes?.label;
   const description = entity.description;
+  const type = entity?.type?.data?.attributes?.label;
+  const tagline = entity.tagline;
 
   switch (property.toLowerCase()) {
     case "title":
@@ -41,8 +44,11 @@ function getPropertyValue(entity, property) {
       return category || "";
     case "description":
       return description || "";
+    case "type":
+      return type || "";
+    case "tagline":
+      return tagline || "";
     default:
-      console.log(`Property not found: ${property}`);
       return "";
   }
 }
@@ -58,7 +64,8 @@ export async function generateMeta(
   entityType,
   params,
   titleTemplate,
-  descriptionTemplate
+  descriptionTemplate,
+  size
 ) {
   try {
     const { entity } = await fetchEntityData(entityType, params);
@@ -72,7 +79,7 @@ export async function generateMeta(
 
     return {
       title,
-      description: truncateText(description, 100),
+      description: truncateText(description, size),
     };
   } catch (error) {
     console.error("Error fetching entity data:", error);

@@ -267,6 +267,22 @@ const FREELANCER_SEO = gql`
       }
     }
     description
+    tagline
+    type {
+      data {
+        attributes {
+          label
+        }
+      }
+    }
+    category {
+      data {
+        attributes {
+          label
+          plural
+        }
+      }
+    }
     seo {
       metaTitle
       metaDescription

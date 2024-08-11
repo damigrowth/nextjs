@@ -995,7 +995,7 @@ a {
   font-weight: bold;
 }
 
-.heading-2 {
+.heading-h2 {
   color: var(--headings-color);
   line-height: 1.3125;
   font-weight: 700;
@@ -1011,4 +1011,19 @@ a {
   font-weight: 400;
   margin-bottom: 0;
   line-height: 1.85;
+}
+
+.heading-h5 {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--headings-color);
+  line-height: 1.3125;
+}
+
+.heading-p-gray {
+  color: var(--body-text-color);
+  display: inline-block;
+  font-size: 14px;
+  position: relative;
+  font-weight: 400;
 }
