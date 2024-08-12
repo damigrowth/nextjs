@@ -39,7 +39,7 @@ export default function ServicesArchive({
 
   return (
     <>
-      <section id="archive" className="pt30 pb90">
+      <section id="archive" className="pt30 pb90 bg-orange">
         <div className="container">
           <div className="row data-loading-section">
             <div className="col-lg-3">
