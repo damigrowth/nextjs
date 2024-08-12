@@ -111,9 +111,11 @@ export async function generateMeta(
       pageParams
     );
 
+    const truncatedDescription = truncateText(description, size);
+
     return {
       title,
-      description: truncateText(description, size),
+      description: truncatedDescription,
     };
   } catch (error) {
     console.error("Error fetching entity data:", error);
