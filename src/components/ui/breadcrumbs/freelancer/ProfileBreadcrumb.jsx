@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function ProfileBreadcrumb({ category }) {
   return (
-    <section className="breadcumb-section">
+    <section className="breadcumb-section bg-white">
       <div className="container">
         <div className="row">
           <div className="col-sm-8 col-lg-10">

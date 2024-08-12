@@ -124,7 +124,7 @@ a {
 
 .swiper__parent {
   position: absolute;
-  bottom: 14px;
+  bottom: 20px;
   z-index: 9;
   left: 50%;
   transform: translateX(-50%);
@@ -790,8 +790,8 @@ a {
 }
 
 .tags .orange {
-  background-color: rgba(232, 84, 62, 0.15);
-  color: saddlebrown;
+  background-color: #fbf7ed;
+  color: #ac780d;
 }
 
 .service-sidebar {
@@ -992,3 +992,51 @@ a {
 .text-bold {
   font-weight: bold;
 }
+<<<<<<< Updated upstream
+=======
+
+.heading-h2 {
+  color: var(--headings-color);
+  line-height: 1.3125;
+  font-weight: 700;
+  font-size: 32px;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.heading-p {
+  font-size: 15px;
+  color: var(--headings-color);
+  font-family: sans-serif;
+  font-weight: 400;
+  margin-bottom: 0;
+  line-height: 1.85;
+}
+
+.heading-h5 {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--headings-color);
+  line-height: 1.3125;
+}
+
+.heading-p-gray {
+  color: var(--body-text-color);
+  display: inline-block;
+  font-size: 14px;
+  position: relative;
+  font-weight: 400;
+}
+
+.bg-orange {
+  background-color: #fbf7ed;
+}
+
+.bg-white {
+  background-color: #fff;
+}
+
+.fit {
+  width: fit-content;
+}
+>>>>>>> Stashed changes
