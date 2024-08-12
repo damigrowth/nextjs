@@ -13,8 +13,12 @@ export default async function Content({ paramsFilters }) {
     <>
       <Topbar
         meta={freelancers?.meta?.pagination}
-        single="επαγγελματίας"
-        plural="επαγγελματίες"
+        single={
+          paramsFilters.type === "company" ? "επιχειρήση" : "επαγγελματίας"
+        }
+        plural={
+          paramsFilters.type === "company" ? "επιχειρήσεις" : "επαγγελματίες"
+        }
         sortOptions={freelancerSortOptions}
       />
 
@@ -23,7 +27,9 @@ export default async function Content({ paramsFilters }) {
       <div className="row mt30">
         <Pagination
           meta={freelancers?.meta?.pagination}
-          plural="επαγγελματίες"
+          plural={
+            paramsFilters.type === "company" ? "επιχειρήσεις" : "επαγγελματίες"
+          }
         />
       </div>
     </>

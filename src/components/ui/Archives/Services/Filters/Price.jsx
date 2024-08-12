@@ -3,5 +3,5 @@ import React from "react";
 import Slider from "../../Inputs/RangeSlider";
 
 export default function Price() {
-  return <Slider iniMin={5} iniMax={5000} />;
+  return <Slider iniMin={5} iniMax={1000} />;
 }

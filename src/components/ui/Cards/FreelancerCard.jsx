@@ -1,4 +1,5 @@
 import UserImage from "@/components/user/UserImage";
+import { formatRating } from "@/utils/formatRating";
 import Link from "next/link";
 import React from "react";
 
@@ -53,11 +54,11 @@ export default function FreelancerCard({ freelancer, linkedName }) {
           {reviews_total > 0 ? (
             <p className="mb-0 fz14 list-inline-item ">
               <i className="fas fa-star vam fz10 review-color mb5"></i>{" "}
-              <span className="dark-color fw500">{rating}</span>
+              <span className="dark-color fw500">{formatRating(rating)}</span>
               <span className="ml5 review-count-text">
                 {reviews_total === 1
-                  ? `(από ${reviews_total} αξιολόγηση)`
-                  : `(από ${reviews_total} αξιολογήσεις)`}
+                  ? `(${reviews_total} αξιολόγηση)`
+                  : `(${reviews_total} αξιολογήσεις)`}
               </span>
             </p>
           ) : (

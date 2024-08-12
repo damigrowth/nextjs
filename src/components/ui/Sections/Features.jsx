@@ -9,10 +9,10 @@ export default function Features() {
           <div className="col-lg-12">
             <div className="main-title text-center">
               <h2>Ψάχνετε κάποια υπηρεσία;</h2>
-              <p className="text">
-                Βρείτε επαγγελματίες που μπορούν να εκτελέσουν την εργασία που
-                θέλετε.
-              </p>
+              <h3 className="heading-p">
+                Βρες Επαγγελματίες και Υπηρεσίες που Ταιριάζουν στις Ανάγκες
+                σου.
+              </h3>
             </div>
           </div>
         </div>

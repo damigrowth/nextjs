@@ -12,13 +12,13 @@ export default async function layout({ children }) {
     <>
       <Tabs
         parentPathLabel="Όλες οι κατηγορίες"
-        parentPathLink="pros"
+        parentPathLink="profiles"
         categories={freelancerCategories?.data}
         plural
       />
       <Breadcrumb
         parentPathLabel="Επαγγελματίες"
-        parentPathLink="pros"
+        parentPathLink="profiles"
         categories={freelancerCategories?.data}
         plural
       />

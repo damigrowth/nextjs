@@ -35,6 +35,11 @@ export default function NavMenuMobile({ header }) {
       name: "Επαγγελματίες",
       path: "/pros",
     },
+    {
+      id: 4,
+      name: "Επιχειρήσεις",
+      path: "/companies",
+    },
   ];
 
   return (

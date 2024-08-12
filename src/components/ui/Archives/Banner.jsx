@@ -70,8 +70,8 @@ export default function Banner({ categories, heading, description }) {
             <div className="row wow fadeInUp">
               <div className="col-xl-5">
                 <div className="position-relative">
-                  <h2>{bannerTitle}</h2>
-                  <p className="text mb-0 mb20">{bannerDescription}</p>
+                  <h1 className="heading-h2">{bannerTitle}</h1>
+                  <h2 className="heading-p mb-0 mb20">{bannerDescription}</h2>
                   {!category && !subcategory && <BannerVidBtn />}
                 </div>
               </div>

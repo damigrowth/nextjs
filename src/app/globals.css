@@ -640,6 +640,8 @@ a {
   display: flex;
   align-items: center;
   width: fit-content;
+  /* Apply padding for the badge tooltip */
+  /* padding-top: 50px; */
 }
 
 .meta {
@@ -1037,3 +1039,4 @@ a {
 .fit {
   width: fit-content;
 }
+

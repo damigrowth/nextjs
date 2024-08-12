@@ -1,5 +1,6 @@
 import Badges from "@/components/user/Badges";
 import UserImage from "@/components/user/UserImage";
+import { formatRating } from "@/utils/formatRating";
 import React from "react";
 
 export default function Meta({
@@ -19,7 +20,7 @@ export default function Meta({
   return (
     <div className="col-xl-12 mb30 pb30 bdrb1">
       <div className="position-relative">
-        <h2>{title}</h2>
+        <h1 className="heading-h2">{title}</h1>
         <div className="list-meta meta mt30">
           <UserImage
             firstName={firstName}
@@ -35,11 +36,11 @@ export default function Meta({
           {totalReviews > 0 ? (
             <p className="mb-0 fz14 list-inline-item ml15 ml15-sm mb5-sm ml0-xs">
               <i className="fas fa-star vam fz10 review-color mb5"></i>{" "}
-              <span className="dark-color ">{rating}</span>
+              <span className="dark-color ">{formatRating(rating)}</span>
               <span className="ml5 review-count-text">
                 {totalReviews === 1
-                  ? `(από ${totalReviews} αξιολόγηση)`
-                  : `(από ${totalReviews} αξιολογήσεις)`}
+                  ? `(${totalReviews} αξιολόγηση)`
+                  : `(${totalReviews} αξιολογήσεις)`}
               </span>
             </p>
           ) : null}

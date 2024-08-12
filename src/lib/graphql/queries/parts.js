@@ -267,6 +267,22 @@ const FREELANCER_SEO = gql`
       }
     }
     description
+    tagline
+    type {
+      data {
+        attributes {
+          label
+        }
+      }
+    }
+    category {
+      data {
+        attributes {
+          label
+          plural
+        }
+      }
+    }
     seo {
       metaTitle
       metaDescription
@@ -351,6 +367,27 @@ const SERVICE_SEO = gql`
     title
     slug
     description
+    freelancer {
+      data {
+        attributes {
+          user {
+            data {
+              attributes {
+                firstName
+                displayName
+              }
+            }
+          }
+        }
+      }
+    }
+    category {
+      data {
+        attributes {
+          label
+        }
+      }
+    }
     seo {
       metaTitle
       metaDescription

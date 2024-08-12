@@ -14,6 +14,11 @@ export default function NavMenu() {
           <span className="title">Επαγγελματίες</span>
         </Link>
       </li>
+      <li className="visible_list menu-active home-menu-parent">
+        <Link href="/companies" className="list-item">
+          <span className="title">Επιχειρήσεις</span>
+        </Link>
+      </li>
     </ul>
   );
 }
