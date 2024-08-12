@@ -50,8 +50,8 @@ export default function Meta({
                 />
               </div>
               <div className="ml20 ml0-xs">
-                <h5 className="title mb-1">{displayName}</h5>
-                <p className="mb-0">{tagline}</p>
+                <h1 className="heading-h5 title mb-1">{displayName}</h1>
+                <h2 className="heading-p mb-0">{tagline}</h2>
                 {totalReviews > 0 ? (
                   <p className="mb-0  fz14 list-inline-item ml15-sm mb5-sm ml0-xs">
                     <i className="fas fa-star vam fz10 review-color mb5"></i>{" "}

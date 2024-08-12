@@ -64,8 +64,6 @@ export default async function SingleService({
     rating_stars_5,
   ];
 
-  console.log(media.data.length);
-
   return (
     <section className="pt10 pb90 pb30-md">
       <div className="container">

@@ -5,9 +5,19 @@ import {
   FREELANCER_CATEGORIES_SEARCH,
 } from "@/lib/graphql/queries";
 
-export const metadata = {
-  title: "Freeio - Freelance Marketplace React/Next Js Template | Freelancer 2",
-};
+// Static SEO
+export async function generateMetadata() {
+  const titleTemplate = "Επιχειρήσεις | Doulitsa";
+  const descriptionTemplate =
+    "Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές.";
+
+  const metadata = {
+    title: titleTemplate,
+    description: descriptionTemplate,
+  };
+
+  return metadata;
+}
 
 export default async function page({ params, searchParams }) {
   const { category } = params;

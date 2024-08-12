@@ -8,11 +8,26 @@ import {
 import { redirect } from "next/navigation";
 import ProfileBreadcrumb from "@/components/ui/breadcrumbs/freelancer/ProfileBreadcrumb";
 import { generateMeta } from "@/utils/seo";
+import { getData } from "@/lib/client/operations";
+import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries";
+import Tabs from "@/components/ui/Archives/Tabs";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
   const username = params.username;
-  return await generateMeta("freelancer", { username });
+  const titleTemplate = "%displayName% - %type% %category%. %tagline%";
+  const descriptionTemplate = "%description%";
+  const descriptionSize = 160;
+
+  const metadata = await generateMeta(
+    "freelancer",
+    { username },
+    titleTemplate,
+    descriptionTemplate,
+    descriptionSize
+  );
+
+  return metadata;
 }
 
 export default async function page({ params, searchParams }) {
@@ -42,9 +57,19 @@ export default async function page({ params, searchParams }) {
       servicesPageSize
     );
 
+    const { freelancerCategories } = await getData(
+      FREELANCER_CATEGORIES_SEARCH
+    );
+
     return (
       <>
-        <TabSection1 />
+        <Tabs
+          parentPathLabel="Όλες οι κατηγορίες"
+          parentPathLink="pros"
+          categories={freelancerCategories?.data}
+          plural
+          freelancerCategory={freelancer?.category?.data?.attributes?.slug}
+        />
         <ProfileBreadcrumb category={freelancer?.category} />
         <FreelancerProfile
           uid={uid}

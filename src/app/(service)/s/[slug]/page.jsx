@@ -6,11 +6,26 @@ import SingleService from "@/components/ui/SingleService/SingleService";
 import { getReviewsByService, getServiceBySlug } from "@/lib/service/service";
 import ServiceBreadcrumb from "@/components/ui/breadcrumbs/service/ServiceBreadcrumb";
 import { generateMeta } from "@/utils/seo";
+import { getData } from "@/lib/client/operations";
+import { CATEGORIES } from "@/lib/graphql/queries";
+import Tabs from "@/components/ui/Archives/Tabs";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
   const serviceSlug = params.slug;
-  return await generateMeta("service", { slug: serviceSlug });
+  const titleTemplate = "%title% από %displayName% | Doulitsa";
+  const descriptionTemplate = "%category% - %description%";
+  const descriptionSize = 100;
+
+  const metadata = await generateMeta(
+    "service",
+    { slug: serviceSlug },
+    titleTemplate,
+    descriptionTemplate,
+    descriptionSize
+  );
+
+  return metadata;
 }
 
 export default async function page({ params, searchParams }) {
@@ -31,10 +46,17 @@ export default async function page({ params, searchParams }) {
       reviewsPageSize
     );
 
+    const { categories } = await getData(CATEGORIES);
+
     return (
       <>
-        <TabSection1 />
-        <div className=" bgc-thm3">
+        <Tabs
+          parentPathLabel="Όλες οι κατηγορίες"
+          parentPathLink="ipiresies"
+          categories={categories?.data}
+          serviceCategory={service?.category?.data?.attributes?.slug}
+        />
+        <div className="bgc-thm3">
           <ServiceBreadcrumb category={service?.category} />
           <SingleService
             serviceId={uid}
