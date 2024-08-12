@@ -992,8 +992,6 @@ a {
 .text-bold {
   font-weight: bold;
 }
-<<<<<<< Updated upstream
-=======
 
 .heading-h2 {
   color: var(--headings-color);
@@ -1039,4 +1037,3 @@ a {
 .fit {
   width: fit-content;
 }
->>>>>>> Stashed changes
