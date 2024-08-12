@@ -3,6 +3,7 @@
 import { getData } from "@/lib/client/operations";
 import {
   CATEGORIES,
+  FREELANCER_CATEGORIES_SEARCH,
   FREELANCER_SEO_BY_USERNAME,
   SERVICE_SEO_BY_SLUG,
   SUBCATEGORIES,
@@ -16,6 +17,7 @@ const ENTITY_QUERIES = {
   freelancer: FREELANCER_SEO_BY_USERNAME,
   categories: CATEGORIES,
   subcategories: SUBCATEGORIES,
+  freelancerCategories: FREELANCER_CATEGORIES_SEARCH,
 };
 
 export async function fetchEntityData(entityType, params, plural) {
@@ -49,6 +51,7 @@ function getPropertyValue(entity, property, pageParams) {
   const currentEntity = entity.find((el) => el.attributes.slug === pageParams);
 
   const arcCategory = currentEntity?.attributes?.label;
+  const arcCategoryPlural = currentEntity?.attributes?.plural;
   const arcCategoryDesc = currentEntity?.attributes?.description;
 
   switch (property) {
@@ -66,6 +69,8 @@ function getPropertyValue(entity, property, pageParams) {
       return tagline || "";
     case "arcCategory":
       return arcCategory || "";
+    case "arcCategoryPlural":
+      return arcCategoryPlural || "";
     case "arcCategoryDesc":
       return arcCategoryDesc || "";
     default:

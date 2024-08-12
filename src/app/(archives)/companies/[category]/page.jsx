@@ -1,17 +1,34 @@
-import Breadcumb16 from "@/components/breadcumb/Breadcumb16";
-import Banner from "@/components/ui/Archives/Banner";
-import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import FreelancersArchive from "@/components/ui/Archives/Freelancers/FreelancersArchive";
-import Tabs from "@/components/ui/Archives/Tabs";
 import { getData } from "@/lib/client/operations";
 import {
   COUNTIES_SEARCH,
   FREELANCER_CATEGORIES_SEARCH,
 } from "@/lib/graphql/queries";
+import { generateMeta } from "@/utils/seo";
 
-export const metadata = {
-  title: "Freeio - Freelance Marketplace React/Next Js Template | Freelancer 2",
-};
+// Dynamic SEO
+export async function generateMetadata({ params }) {
+  const { category } = params;
+
+  const titleTemplate = "%arcCategoryPlural% - Αναζήτηση για Επιχειρήσεις";
+  const descriptionTemplate =
+    "Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές. %arcCategoryDesc%";
+  const descriptionSize = 200;
+
+  const metadata = await generateMeta(
+    "freelancerCategories",
+    {
+      type: "company",
+    },
+    titleTemplate,
+    descriptionTemplate,
+    descriptionSize,
+    true,
+    category
+  );
+
+  return metadata;
+}
 
 export default async function page({ params, searchParams }) {
   const { category } = params;
