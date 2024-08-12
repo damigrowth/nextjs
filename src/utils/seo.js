@@ -48,7 +48,9 @@ function getPropertyValue(entity, property, pageParams) {
   const tagline = entity.tagline;
 
   // Find the current entity from the array
-  const currentEntity = entity.find((el) => el.attributes.slug === pageParams);
+  const currentEntity =
+    (pageParams && entity.find((el) => el.attributes.slug === pageParams)) ||
+    null;
 
   const arcCategory = currentEntity?.attributes?.label;
   const arcCategoryPlural = currentEntity?.attributes?.plural;
