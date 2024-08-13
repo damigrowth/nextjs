@@ -388,11 +388,15 @@ const SERVICE_SEO = gql`
         }
       }
     }
+    media {
+      ...MultipleImages
+    }
     seo {
       metaTitle
       metaDescription
     }
   }
+  ${MULTIPLE_IMAGES}
 `;
 
 const USER_MAIN = gql`

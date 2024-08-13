@@ -24,7 +24,12 @@ export default function UserImage({
             {/* <div className="icon ">
                       <span className="flaticon-badge" />
                     </div> */}
-            <Image width={30} height={30} src="/images/top-badge.png" />
+            <Image
+              width={30}
+              height={30}
+              src="/images/top-badge.png"
+              alt="top badge"
+            />
             <TooltipTop anchor="top-level">
               Έχει λάβει εξαιρετικές αξιολογήσεις
             </TooltipTop>

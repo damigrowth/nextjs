@@ -8,6 +8,7 @@ import {
   SERVICE_SEO_BY_SLUG,
   SUBCATEGORIES,
 } from "@/lib/graphql/queries";
+import { headers } from "next/headers";
 
 const { redirect } = require("next/navigation");
 const { truncateText } = require("./truncateText");
@@ -46,6 +47,7 @@ function getPropertyValue(entity, property, pageParams) {
   const description = entity.description;
   const type = entity?.type?.data?.attributes?.label;
   const tagline = entity.tagline;
+  const singleImage = entity?.media?.data?.[0]?.attributes?.formats?.small?.url;
 
   // Find the current entity from the array
   const currentEntity =
@@ -55,11 +57,13 @@ function getPropertyValue(entity, property, pageParams) {
   const arcCategory = currentEntity?.attributes?.label;
   const arcCategoryPlural = currentEntity?.attributes?.plural;
   const arcCategoryDesc = currentEntity?.attributes?.description;
+  const arcCategoryImage =
+    currentEntity?.attributes?.image?.data?.attributes?.formats?.small?.url;
 
   switch (property) {
     case "title":
       return title || "";
-    case "displayname":
+    case "displayName":
       return displayName || "";
     case "category":
       return category || "";
@@ -75,6 +79,8 @@ function getPropertyValue(entity, property, pageParams) {
       return arcCategoryPlural || "";
     case "arcCategoryDesc":
       return arcCategoryDesc || "";
+    case "image":
+      return singleImage || arcCategoryImage || "";
     default:
       return "";
   }
@@ -86,6 +92,61 @@ function formatMetaString(template, entity, pageParams) {
 
     return value;
   });
+}
+
+export async function assignMetadata({ title, description, size, image }) {
+  const headersList = headers();
+  const url = headersList.get("x-current-path") || "/";
+
+  const truncatedDescription = truncateText(description, size);
+  const fallbackDescription =
+    "Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.";
+
+  const fallbackImage =
+    "https://res.cloudinary.com/ddejhvzbf/image/upload/v1723560374/doulitsa_92f5bf4005.png";
+
+  const metadata = {
+    metadataBase: new URL("https://doulitsa.gr"),
+    title,
+    description: truncatedDescription || fallbackDescription,
+    openGraph: {
+      title,
+      description: truncatedDescription || fallbackDescription,
+      url: `https://doulitsa.gr${url}`,
+      siteName: "Doulitsa",
+      images: [
+        {
+          url: !image || image === "" ? fallbackImage : image,
+          width: 1600,
+          height: 900,
+          alt: title,
+        },
+      ],
+      locale: "el_GR",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: truncatedDescription || fallbackDescription,
+      creator: "@doulitsa",
+      images: [
+        {
+          url: !image || image === "" ? fallbackImage : image,
+          width: 1600,
+          height: 900,
+          alt: title,
+        },
+      ],
+    },
+    alternates: {
+      canonical: `https://doulitsa.gr${url}`,
+      languages: {
+        "el-GR": `https://doulitsa.gr${url}`,
+      },
+    },
+  };
+  return { metadata };
 }
 
 export async function generateMeta(
@@ -105,18 +166,23 @@ export async function generateMeta(
     }
 
     const title = formatMetaString(titleTemplate, entity, pageParams);
+
     const description = formatMetaString(
       descriptionTemplate,
       entity,
       pageParams
     );
 
-    const truncatedDescription = truncateText(description, size);
+    const image = formatMetaString("%image%", entity, pageParams);
 
-    return {
+    const { metadata } = await assignMetadata({
       title,
-      description: truncatedDescription,
-    };
+      description,
+      size,
+      image,
+    });
+
+    return metadata;
   } catch (error) {
     console.error("Error fetching entity data:", error);
     redirect("/not-found");
