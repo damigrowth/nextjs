@@ -40,7 +40,7 @@ export default async function RootLayout({ children }) {
   const { footer: footerData } = await getData(FOOTER);
 
   return (
-    <html lang="en">
+    <html lang="el">
       <Body path={path} dmSans={dmSans}>
         <InstallBootstrap />
         {!footer.includes(path) ? (

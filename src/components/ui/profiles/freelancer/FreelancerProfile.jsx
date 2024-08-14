@@ -17,6 +17,7 @@ import Gallery from "@/components/ui/Gallery/Gallery";
 import Reviews from "../../Reviews/Reviews";
 import AddModelReviewForm from "../../forms/AddModelReviewForm";
 import Terms from "./Terms";
+import FreelancerSchema from "@/utils/Seo/Schema/FreelancerSchema";
 
 export default function FreelancerProfile({
   freelancer,
@@ -74,6 +75,16 @@ export default function FreelancerProfile({
 
   return (
     <section className="pt10 pb90 pb30-md">
+      <FreelancerSchema
+        displayName={freelancerUser?.displayName}
+        location={base?.county?.data?.attributes?.name}
+        rating={rating}
+        reviews_total={reviews_total}
+        reviews={reviews}
+        profileImage={
+          freelancerUser.image.data?.attributes?.formats?.thumbnail?.url
+        }
+      />
       <div className="container">
         <div className="row wow fadeInUp">
           <div className="col-lg-8">

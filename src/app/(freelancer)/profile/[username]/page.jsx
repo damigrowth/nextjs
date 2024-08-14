@@ -7,10 +7,10 @@ import {
 } from "@/lib/freelancer/freelancer";
 import { redirect } from "next/navigation";
 import ProfileBreadcrumb from "@/components/ui/breadcrumbs/freelancer/ProfileBreadcrumb";
-import { generateMeta } from "@/utils/seo";
 import { getData } from "@/lib/client/operations";
 import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries";
 import Tabs from "@/components/ui/Archives/Tabs";
+import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }) {
   const descriptionTemplate = "%description%";
   const descriptionSize = 160;
 
-  const metadata = await generateMeta(
+  const { meta } = await dynamicMeta(
     "freelancer",
     { username },
     titleTemplate,
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }) {
     descriptionSize
   );
 
-  return metadata;
+  return meta;
 }
 
 export default async function page({ params, searchParams }) {

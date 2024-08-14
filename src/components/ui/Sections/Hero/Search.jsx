@@ -2,6 +2,7 @@
 
 import { searchSubcategories } from "@/lib/search/subcategories";
 import useHomeStore from "@/store/home/homeStore";
+import HomeSchema from "@/utils/Seo/Schema/HomeSchema";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, {
@@ -71,6 +72,14 @@ export default function Search() {
 
   return (
     <>
+      <HomeSchema
+        searchTarget={
+          !categorySlug
+            ? `/ipiresies?search=${searchTerm}`
+            : `/ipiresies/${categorySlug}?search=${searchTerm}`
+        }
+        searchInput={`searchTerm`}
+      />
       <form
         ref={formRef}
         action={action}

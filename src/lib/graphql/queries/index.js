@@ -691,6 +691,19 @@ const GET_COMPANY_PAGE = gql`
   }
 `;
 
+const GET_PAGE_BY_SLUG = gql`
+  query GetPage($slug: String) {
+    pages(filters: { slug: { eq: $slug } }) {
+      data {
+        attributes {
+          title
+          content
+        }
+      }
+    }
+  }
+`;
+
 export {
   GET_ME,
   USER_BY_ID,
@@ -729,4 +742,5 @@ export {
   CATEGORY_SUBCATEGORIES_SEARCH,
   GET_COMPANY_PAGE,
   SUBCATEGORIES,
+  GET_PAGE_BY_SLUG,
 };

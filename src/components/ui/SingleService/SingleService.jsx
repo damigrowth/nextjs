@@ -13,6 +13,7 @@ import Gallery from "../Gallery/Gallery";
 import Reviews from "../Reviews/Reviews";
 import Terms from "./Terms";
 import FeaturedImage from "./FeaturedImage";
+import ServiceSchema from "@/utils/Seo/Schema/ServiceSchema";
 
 export default async function SingleService({
   serviceId,
@@ -65,6 +66,16 @@ export default async function SingleService({
   ];
 
   return (
+    <section className="pt10 pb90 pb30-md">
+      <ServiceSchema
+        title={title}
+        displayName={user.displayName}
+        price={price}
+        rating={rating}
+        reviews_total={reviews_total}
+        reviews={reviews}
+        faq={faq}
+      />
     <section className="pt10 pb90 pb30-md bg-orange">
       <div className="container">
         <div className="row wrap service-wrapper">

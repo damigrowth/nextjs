@@ -12,12 +12,24 @@ import { getData } from "@/lib/client/operations";
 import FeaturedFreelancers from "@/components/ui/Sections/Featured/Freelancers/FeaturedFreelancers";
 import AllTaxonomies from "@/components/ui/Sections/Taxonomies/AllTaxonomies";
 import Hero from "@/components/ui/Sections/Hero/Hero";
+import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
 
-export const metadata = {
-  title: "Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη",
-  description:
-    "Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.",
-};
+// Static SEO
+export async function generateMetadata() {
+  const titleTemplate =
+    "Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη";
+  const descriptionTemplate =
+    "Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.";
+  const descriptionSize = 160;
+
+  const { meta } = await staticMeta({
+    title: titleTemplate,
+    description: descriptionTemplate,
+    size: descriptionSize,
+  });
+
+  return meta;
+}
 
 export default async function page() {
   const { featuredEntity: featuredCategoriesData } = await getData(

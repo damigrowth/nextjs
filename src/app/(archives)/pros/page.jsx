@@ -4,6 +4,7 @@ import {
   COUNTIES_SEARCH,
   FREELANCER_CATEGORIES_SEARCH,
 } from "@/lib/graphql/queries";
+import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
 
 // Static SEO
 export async function generateMetadata() {
@@ -11,12 +12,13 @@ export async function generateMetadata() {
   const descriptionTemplate =
     "Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές.";
 
-  const metadata = {
+  const { meta } = await staticMeta({
     title: titleTemplate,
     description: descriptionTemplate,
-  };
+    size: 150,
+  });
 
-  return metadata;
+  return meta;
 }
 
 export default async function page({ params, searchParams }) {
