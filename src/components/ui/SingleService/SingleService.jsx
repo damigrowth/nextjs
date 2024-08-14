@@ -76,6 +76,7 @@ export default async function SingleService({
         reviews={reviews}
         faq={faq}
       />
+
       <div className="container">
         <div className="row wrap service-wrapper">
           <div className="col-lg-8">
