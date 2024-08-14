@@ -4,7 +4,7 @@ import {
   COUNTIES_SEARCH,
   FREELANCER_CATEGORIES_SEARCH,
 } from "@/lib/graphql/queries";
-import { generateMeta } from "@/utils/seo";
+import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }) {
     "Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές. %arcCategoryDesc%";
   const descriptionSize = 200;
 
-  const metadata = await generateMeta(
+  const { meta } = await dynamicMeta(
     "freelancerCategories",
     {
       type: "company",
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }) {
     category
   );
 
-  return metadata;
+  return meta;
 }
 
 export default async function page({ params, searchParams }) {

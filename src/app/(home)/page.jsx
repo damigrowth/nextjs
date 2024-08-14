@@ -12,7 +12,7 @@ import { getData } from "@/lib/client/operations";
 import FeaturedFreelancers from "@/components/ui/Sections/Featured/Freelancers/FeaturedFreelancers";
 import AllTaxonomies from "@/components/ui/Sections/Taxonomies/AllTaxonomies";
 import Hero from "@/components/ui/Sections/Hero/Hero";
-import { assignMetadata } from "@/utils/seo";
+import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
 
 // Static SEO
 export async function generateMetadata() {
@@ -22,13 +22,13 @@ export async function generateMetadata() {
     "Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.";
   const descriptionSize = 160;
 
-  const { metadata } = await assignMetadata({
+  const { meta } = await staticMeta({
     title: titleTemplate,
     description: descriptionTemplate,
     size: descriptionSize,
   });
 
-  return metadata;
+  return meta;
 }
 
 export default async function page() {

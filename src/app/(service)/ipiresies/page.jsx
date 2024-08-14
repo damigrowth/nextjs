@@ -1,7 +1,7 @@
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
 import { CATEGORIES_SEARCH, SERVICES_ARCHIVE } from "@/lib/graphql/queries";
-import { assignMetadata } from "@/utils/seo";
+import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
 
 // Static SEO
 export async function generateMetadata() {
@@ -9,13 +9,13 @@ export async function generateMetadata() {
   const descriptionTemplate =
     "Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας.";
 
-  const { metadata } = await assignMetadata({
+  const { meta } = await staticMeta({
     title: titleTemplate,
     description: descriptionTemplate,
     size: 150,
   });
 
-  return metadata;
+  return meta;
 }
 
 export default async function page({ searchParams }) {

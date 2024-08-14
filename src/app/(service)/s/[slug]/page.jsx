@@ -5,19 +5,19 @@ import { redirect } from "next/navigation";
 import SingleService from "@/components/ui/SingleService/SingleService";
 import { getReviewsByService, getServiceBySlug } from "@/lib/service/service";
 import ServiceBreadcrumb from "@/components/ui/breadcrumbs/service/ServiceBreadcrumb";
-import { generateMeta } from "@/utils/seo";
 import { getData } from "@/lib/client/operations";
 import { CATEGORIES } from "@/lib/graphql/queries";
 import Tabs from "@/components/ui/Archives/Tabs";
+import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
   const serviceSlug = params.slug;
-  const titleTemplate = "%title% από %displayName% | Doulitsa";
+  const titleTemplate = "%title% από %displayName%";
   const descriptionTemplate = "%category% - %description%";
   const descriptionSize = 100;
 
-  const metadata = await generateMeta(
+  const { meta } = await dynamicMeta(
     "service",
     { slug: serviceSlug },
     titleTemplate,
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }) {
     descriptionSize
   );
 
-  return metadata;
+  return meta;
 }
 
 export default async function page({ params, searchParams }) {

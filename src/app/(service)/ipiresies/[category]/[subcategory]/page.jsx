@@ -2,7 +2,7 @@ import React from "react";
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
 import { CATEGORY_SUBCATEGORIES_SEARCH } from "@/lib/graphql/queries";
-import { generateMeta } from "@/utils/seo";
+import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
@@ -13,7 +13,7 @@ export async function generateMetadata({ params }) {
   const descriptionTemplate = "%arcCategoryDesc%";
   const descriptionSize = 100;
 
-  const metadata = await generateMeta(
+  const { meta } = await dynamicMeta(
     "subcategories",
     undefined,
     titleTemplate,
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }) {
     subcategory
   );
 
-  return metadata;
+  return meta;
 }
 
 export default async function page({ params, searchParams }) {
