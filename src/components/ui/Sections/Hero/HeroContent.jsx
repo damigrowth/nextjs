@@ -20,7 +20,7 @@ export default function HeroContent({ categories }) {
 
   return (
     <div className="home12-hero-content">
-      <span className="d-inline-block tag animate-up-1 mb15 fit">
+      <span className="d-inline-block tag animate-up-1 mb15">
         Κατάλογος Υπηρεσιών
       </span>
       <h1 className="animate-up-1 mb25">

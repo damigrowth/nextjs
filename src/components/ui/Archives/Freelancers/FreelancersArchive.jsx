@@ -60,7 +60,7 @@ export default function FreelancersArchive({
 
   return (
     <>
-      <section id="archive" className="pt30 pb90 bg-orange">
+      <section id="archive" className="pt30 pb90">
         <div className="container">
           <div className="row data-loading-section">
             <div className="col-lg-3">

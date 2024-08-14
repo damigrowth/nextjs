@@ -7,7 +7,6 @@ import Verified from "./Filters/Verified";
 import Content from "./Content";
 import ContentSkeleton from "./ContentSkeleton";
 import BorderSpinner from "../../Spinners/BorderSpinner";
-import ListingSidebarModal1 from "@/components/modal/ListingSidebarModal1";
 import SidebarModal from "../SidebarModal";
 
 export default function ServicesArchive({
@@ -39,7 +38,7 @@ export default function ServicesArchive({
 
   return (
     <>
-      <section id="archive" className="pt30 pb90 bg-orange">
+      <section id="archive" className="pt30 pb90">
         <div className="container">
           <div className="row data-loading-section">
             <div className="col-lg-3">

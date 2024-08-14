@@ -124,7 +124,7 @@ a {
 
 .swiper__parent {
   position: absolute;
-  bottom: 20px;
+  bottom: 14px;
   z-index: 9;
   left: 50%;
   transform: translateX(-50%);
@@ -792,8 +792,8 @@ a {
 }
 
 .tags .orange {
-  background-color: #fbf7ed;
-  color: #ac780d;
+  background-color: rgba(232, 84, 62, 0.15);
+  color: saddlebrown;
 }
 
 .service-sidebar {
@@ -1027,16 +1027,3 @@ a {
   position: relative;
   font-weight: 400;
 }
-
-.bg-orange {
-  background-color: #fbf7ed;
-}
-
-.bg-white {
-  background-color: #fff;
-}
-
-.fit {
-  width: fit-content;
-}
-
