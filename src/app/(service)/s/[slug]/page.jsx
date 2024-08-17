@@ -6,9 +6,9 @@ import SingleService from "@/components/ui/SingleService/SingleService";
 import { getReviewsByService, getServiceBySlug } from "@/lib/service/service";
 import ServiceBreadcrumb from "@/components/ui/breadcrumbs/service/ServiceBreadcrumb";
 import { getData } from "@/lib/client/operations";
-import { CATEGORIES } from "@/lib/graphql/queries";
 import Tabs from "@/components/ui/Archives/Tabs";
 import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
+import { CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/service";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {

@@ -1,7 +1,7 @@
 import React from "react";
 import CheckBox from "../../Inputs/CheckBox";
-import { CONTACT_TYPES } from "@/lib/graphql/queries";
 import { getData } from "@/lib/client/operations";
+import { CONTACT_TYPES } from "@/lib/graphql/queries/main/contact";
 
 export default async function ContactTypes() {
   const { contactTypes } = await getData(CONTACT_TYPES);

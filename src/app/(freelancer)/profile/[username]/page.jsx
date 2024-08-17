@@ -8,9 +8,9 @@ import {
 import { redirect } from "next/navigation";
 import ProfileBreadcrumb from "@/components/ui/breadcrumbs/freelancer/ProfileBreadcrumb";
 import { getData } from "@/lib/client/operations";
-import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries";
 import Tabs from "@/components/ui/Archives/Tabs";
 import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
+import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {

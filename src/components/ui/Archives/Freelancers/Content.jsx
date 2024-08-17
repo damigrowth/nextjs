@@ -3,11 +3,9 @@ import Topbar from "../Topbar";
 import FreelancerGrid from "./FreelancerGrid";
 import Pagination from "../Pagination";
 import { freelancerSortOptions } from "../options";
-import {
-  FREELANCER_CATEGORIES_SEARCH,
-  FREELANCERS_ARCHIVE,
-} from "@/lib/graphql/queries";
 import { getData } from "@/lib/client/operations";
+import { FREELANCERS_ARCHIVE } from "@/lib/graphql/queries/main/freelancer";
+import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 
 export default async function Content({ paramsFilters }) {
   const { freelancers } = await getData(FREELANCERS_ARCHIVE, paramsFilters);

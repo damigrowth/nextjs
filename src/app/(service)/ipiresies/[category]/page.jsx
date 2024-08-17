@@ -1,8 +1,8 @@
 import React from "react";
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
-import { CATEGORY_SUBCATEGORIES_SEARCH } from "@/lib/graphql/queries";
 import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
+import { CATEGORY_SUBCATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/service";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {

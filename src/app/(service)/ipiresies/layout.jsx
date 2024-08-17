@@ -2,7 +2,7 @@ import Banner from "@/components/ui/Archives/Banner";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Tabs from "@/components/ui/Archives/Tabs";
 import { getData } from "@/lib/client/operations";
-import { CATEGORIES } from "@/lib/graphql/queries";
+import { CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/service";
 import React from "react";
 
 export default async function layout({ children }) {

@@ -15,8 +15,8 @@ import Body from "@/components/ui/Body";
 import Footer from "@/components/ui/Footer";
 import { getUser } from "@/lib/user/user";
 import NavMenuMobile from "@/components/ui/NavMenuMobile";
-import { FOOTER, HEADER } from "@/lib/graphql/queries";
 import { getData } from "@/lib/client/operations";
+import { FOOTER, HEADER } from "@/lib/graphql/queries/main/global";
 
 if (typeof window !== "undefined") {
   import("bootstrap");

@@ -1,11 +1,9 @@
 // "use server";
 
 import { getData } from "../client/operations";
-import {
-  RATINGS,
-  COUNT_FREELANCERS_BY_RATING,
-  COUNT_SERVICES_BY_RATING,
-} from "../graphql/queries";
+import { COUNT_FREELANCERS_BY_RATING } from "../graphql/queries/main/freelancer";
+import { RATINGS } from "../graphql/queries/main/reviews";
+import { COUNT_SERVICES_BY_RATING } from "../graphql/queries/main/service";
 
 export async function getRatings() {
   try {

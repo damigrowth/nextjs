@@ -2,9 +2,10 @@ import React from "react";
 import Topbar from "../Topbar";
 import { serviceSortOptions } from "../options";
 import Pagination from "../Pagination";
-import { CATEGORIES, SERVICES_ARCHIVE } from "@/lib/graphql/queries";
 import { getData } from "@/lib/client/operations";
 import ServiceGrid from "./ServiceGrid";
+import { SERVICES_ARCHIVE } from "@/lib/graphql/queries/main/service";
+import { CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/service";
 
 export default async function Content({ paramsFilters }) {
   const { services } = await getData(SERVICES_ARCHIVE, paramsFilters);

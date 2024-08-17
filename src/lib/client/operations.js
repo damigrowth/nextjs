@@ -3,9 +3,9 @@
 import { inspect } from "@/utils/inspect";
 import { getClient } from ".";
 import { isAuthenticated } from "../auth/authenticated";
-import { GET_ME } from "../graphql/queries";
 import { STRAPI_GRAPHQL, STRAPI_TOKEN, validateEnvVars } from "../strapi";
 import { print } from "graphql/language/printer";
+import { GET_ME } from "../graphql/queries/main/user";
 
 // export const getData = async (query, variables) => {
 //   validateEnvVars();

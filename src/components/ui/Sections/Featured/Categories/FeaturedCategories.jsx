@@ -1,8 +1,6 @@
 import React from "react";
 // import BrowserCategoryCard1 from "../card/BrowserCategoryCard1";
 import Link from "next/link";
-import { getData } from "@/lib/client/operations";
-import { FEATURED_CATEGORIES } from "@/lib/graphql/queries";
 import { categoriesClassNames } from "../../../data";
 import FeaturedCategoriesSwiper from "./FeaturedCategoriesSwiper";
 
