@@ -1,7 +1,7 @@
 import React from "react";
 import CheckBox from "../../Inputs/CheckBox";
 import { getData } from "@/lib/client/operations";
-import { SPECIALIZATIONS } from "@/lib/graphql/queries";
+import { SPECIALIZATIONS } from "@/lib/graphql/queries/main/specialisation";
 
 export default async function Specialization() {
   const { skills: specializations } = await getData(SPECIALIZATIONS);

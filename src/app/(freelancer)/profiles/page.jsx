@@ -1,20 +1,7 @@
-import Breadcumb16 from "@/components/breadcumb/Breadcumb16";
-import Breadcumb3 from "@/components/breadcumb/Breadcumb3";
-
-import Listing14 from "@/components/section/Listing14";
-import TabSection1 from "@/components/section/TabSection1";
-import BannerVid from "@/components/ui/Archives/BannerVid";
-import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
-import FreelancerGridSkeleton from "@/components/ui/Archives/Freelancers/FreelancerGridSkeleton";
 import FreelancersArchive from "@/components/ui/Archives/Freelancers/FreelancersArchive";
-import Tabs from "@/components/ui/Archives/Tabs";
 import { getData } from "@/lib/client/operations";
-import {
-  COUNTIES_SEARCH,
-  FREELANCER_CATEGORIES_SEARCH,
-  FREELANCERS_ARCHIVE,
-} from "@/lib/graphql/queries";
-import { inspect } from "@/utils/inspect";
+import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
+import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 
 export const metadata = {
   title: "Freeio - Freelance Marketplace React/Next Js Template | Freelancer 2",

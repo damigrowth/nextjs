@@ -1,13 +1,13 @@
 "use server";
 
 import { getData } from "@/lib/client/operations";
+import { FREELANCER_SEO_BY_USERNAME } from "@/lib/graphql/queries/main/freelancer";
+import { SERVICE_SEO_BY_SLUG } from "@/lib/graphql/queries/main/service";
+import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import {
   CATEGORIES,
-  FREELANCER_CATEGORIES_SEARCH,
-  FREELANCER_SEO_BY_USERNAME,
-  SERVICE_SEO_BY_SLUG,
   SUBCATEGORIES,
-} from "@/lib/graphql/queries";
+} from "@/lib/graphql/queries/main/taxonomies/service";
 
 const ENTITY_QUERIES = {
   service: SERVICE_SEO_BY_SLUG,

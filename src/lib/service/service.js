@@ -2,8 +2,8 @@ import { getData } from "../client/operations";
 import {
   ALL_REVIEWS_RATINGS_BY_SERVICE,
   REVIEWS_BY_SERVICE,
-  SERVICE_BY_SLUG,
-} from "../graphql/queries";
+} from "../graphql/queries/main/reviews";
+import { SERVICE_BY_SLUG } from "../graphql/queries/main/service";
 
 export async function getServiceBySlug(slug) {
   try {

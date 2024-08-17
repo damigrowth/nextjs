@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
 import { getData } from "../client/operations";
-import { USER_BY_ID, USER_BY_ID_BASIC } from "../graphql/queries";
+import { USER_BY_ID, USER_BY_ID_BASIC } from "../graphql/queries/main/user";
 
 export async function getUserId() {
   let uid = null;

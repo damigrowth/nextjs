@@ -1,6 +1,6 @@
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
-import { CATEGORIES_SEARCH, SERVICES_ARCHIVE } from "@/lib/graphql/queries";
+import { CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/service";
 import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
 
 // Static SEO

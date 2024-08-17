@@ -2,17 +2,17 @@ import Stats from "@/components/ui/Sections/Stats";
 import Features from "@/components/ui/Sections/Features";
 import FeaturedCategories from "@/components/ui/Sections/Featured/Categories/FeaturedCategories";
 import FeaturedServices from "@/components/ui/Sections/Featured/Services/FeaturedServices";
-import {
-  ALL_TAXONOMIES,
-  FEATURED_CATEGORIES,
-  FEATURED_FREELANCERS,
-  FEATURED_SERVICES,
-} from "@/lib/graphql/queries";
 import { getData } from "@/lib/client/operations";
 import FeaturedFreelancers from "@/components/ui/Sections/Featured/Freelancers/FeaturedFreelancers";
 import AllTaxonomies from "@/components/ui/Sections/Taxonomies/AllTaxonomies";
 import Hero from "@/components/ui/Sections/Hero/Hero";
 import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
+import {
+  ALL_TAXONOMIES,
+  FEATURED_CATEGORIES,
+} from "@/lib/graphql/queries/main/taxonomies";
+import { FEATURED_SERVICES } from "@/lib/graphql/queries/main/service";
+import { FEATURED_FREELANCERS } from "@/lib/graphql/queries/main/freelancer";
 
 // Static SEO
 export async function generateMetadata() {

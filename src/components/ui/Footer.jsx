@@ -1,11 +1,7 @@
 import Link from "next/link";
 import React from "react";
-import FooterSocial5 from "../footer/FooterSocial5";
 import Image from "next/image";
-import { about, category, support } from "@/data/footer";
 import Socials from "./Socials";
-import { getData } from "@/lib/client/operations";
-import { FOOTER } from "@/lib/graphql/queries";
 
 export default async function Footer({ footer }) {
   const companyLinks = footer.data.attributes.company.data;

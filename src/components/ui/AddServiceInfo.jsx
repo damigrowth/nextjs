@@ -1,8 +1,8 @@
 import AddServiceForm from "@/components/ui/forms/AddServiceForm";
 import DashboardNavigation from "../dashboard/header/DashboardNavigation";
-import { fetchModel } from "@/lib/models/model";
 import { getData } from "@/lib/client/operations";
-import { CATEGORIES, TAGS } from "@/lib/graphql/queries";
+import { CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/service";
+import { TAGS } from "@/lib/graphql/queries/main/tag";
 
 export default async function AddServiceInfo() {
   const { categories } = await getData(CATEGORIES);

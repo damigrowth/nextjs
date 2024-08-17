@@ -1,10 +1,11 @@
 import { getData } from "../client/operations";
+import { FREELANCER_BY_USERNAME } from "../graphql/queries/main/freelancer";
 import {
   ALL_REVIEWS_RATINGS_BY_FREELANCER,
-  FEATURED_SERVICES_BY_FREELANCER,
-  FREELANCER_BY_USERNAME,
   REVIEWS_BY_FREELANCER,
-} from "../graphql/queries";
+} from "../graphql/queries/main/reviews";
+import { FEATURED_SERVICES_BY_FREELANCER } from "../graphql/queries/main/service";
+
 import { getUser } from "../user/user";
 
 export async function getFreelancerId() {
