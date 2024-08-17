@@ -1,3 +1,4 @@
+import FreelancersArchive from "@/components/ui/Archives/Freelancers/FreelancersArchive";
 import { getData } from "@/lib/client/operations";
 import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
 import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
