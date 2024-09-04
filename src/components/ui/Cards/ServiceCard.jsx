@@ -43,7 +43,7 @@ export default function ServiceCard({ service }) {
         />
       )}
 
-      <div className="list-content flex-grow-1 ms-1">
+      <div className="list-content flex-grow-1 ms-1 bgc-white">
         <a className="listing-fav fz12">
           <span className="far fa-heart" />
         </a>

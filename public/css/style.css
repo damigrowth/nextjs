@@ -1500,10 +1500,10 @@ li {
   position: relative;
 }
 
-.listing-style1.list-style .list-content,
+/* .listing-style1.list-style .list-content,
 .listing-style1.listi-style2 .list-content {
   background-color: #fbf7ed;
-}
+} */
 
 @media (max-width: 1199.98px) {
   .listing-style1 .list-content {
