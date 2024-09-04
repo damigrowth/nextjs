@@ -3,7 +3,10 @@
 import { getData } from "@/lib/client/operations";
 import { FREELANCER_SEO_BY_USERNAME } from "@/lib/graphql/queries/main/freelancer";
 import { SERVICE_SEO_BY_SLUG } from "@/lib/graphql/queries/main/service";
-import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import {
+  FREELANCER_CATEGORIES_SEARCH,
+  FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH,
+} from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import {
   CATEGORIES,
   SUBCATEGORIES,
@@ -15,6 +18,7 @@ const ENTITY_QUERIES = {
   categories: CATEGORIES,
   subcategories: SUBCATEGORIES,
   freelancerCategories: FREELANCER_CATEGORIES_SEARCH,
+  freelancerSubcategories: FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH,
 };
 
 export async function fetchEntity(entityType, params, plural) {

@@ -5,8 +5,9 @@ import { FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH } from "@/lib/graphql/queries/
 import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 
 // Dynamic SEO
+
 export async function generateMetadata({ params }) {
-  const { category } = params;
+  const { subcategory } = params;
 
   const titleTemplate = "%arcCategoryPlural% - Αναζήτηση για Επαγγελματίες";
   const descriptionTemplate =
@@ -14,7 +15,7 @@ export async function generateMetadata({ params }) {
   const descriptionSize = 200;
 
   const { meta } = await dynamicMeta(
-    "freelancerCategories",
+    "freelancerSubcategories",
     {
       type: "freelancer",
     },
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }) {
     descriptionTemplate,
     descriptionSize,
     true,
-    category
+    subcategory
   );
 
   return meta;
