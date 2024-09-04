@@ -14,6 +14,7 @@ export default function ServiceCard({ service }) {
     reviews_total,
     slug,
     category,
+    subcategory,
     media,
     freelancer,
   } = service.attributes;
@@ -53,7 +54,9 @@ export default function ServiceCard({ service }) {
               <Link href={`/s/${slug}`}>{title}</Link>
             </h5>
             <p className="list-text body-color fz14 mb-1">
-              {category?.data?.attributes?.label}
+              {category?.data?.attributes?.label}{" "}
+              {subcategory?.data &&
+                " - " + subcategory?.data?.attributes?.label}
             </p>
           </div>
           <CardReviews
