@@ -1,28 +1,31 @@
 import FreelancersArchive from "@/components/ui/Archives/Freelancers/FreelancersArchive";
 import { getData } from "@/lib/client/operations";
 import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
-import { FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import {
+  FREELANCER_CATEGORIES_SEARCH,
+  FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH,
+} from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
-  const { category } = params;
+  const { subcategory } = params;
 
-  const titleTemplate = "%arcCategoryPlural% - Αναζήτηση για Επαγγελματίες";
+  const titleTemplate = "%arcCategoryPlural% - Αναζήτηση για Επιχειρήσεις";
   const descriptionTemplate =
-    "Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές. %arcCategoryDesc%";
+    "Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές. %arcCategoryDesc%";
   const descriptionSize = 200;
 
   const { meta } = await dynamicMeta(
-    "freelancerCategories",
+    "freelancerSubcategories",
     {
-      type: "freelancer",
+      type: "company",
     },
     titleTemplate,
     descriptionTemplate,
     descriptionSize,
     true,
-    category
+    subcategory
   );
 
   return meta;
@@ -56,7 +59,7 @@ export default async function page({ params, searchParams }) {
   const addFilter = (condition, value) => (condition ? value : undefined);
 
   const paramsFilters = {
-    type: "freelancer",
+    type: "company",
     min: addFilter(min, parseInt(min, 10)),
     max: addFilter(max, parseInt(max, 10)),
     paymentMethods: addFilter(pay_m && pay_m.length > 0, toIntArray(pay_m)),
@@ -77,9 +80,9 @@ export default async function page({ params, searchParams }) {
   const { freelancerSubcategories } = await getData(
     FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH,
     {
-      type: "freelancer",
+      type: "company",
       categorySlug: category,
-      searchTerm: categorySearch,
+      label: categorySearch,
     }
   );
 

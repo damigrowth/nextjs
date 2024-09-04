@@ -67,6 +67,7 @@ export default async function page({ params, searchParams }) {
 
   const { freelancerCategories } = await getData(FREELANCER_CATEGORIES_SEARCH, {
     label: categorySearch,
+    type: "freelancer",
   });
 
   const { counties } = await getData(COUNTIES_SEARCH, {
