@@ -14,6 +14,7 @@ export default function ServiceCard({ service }) {
     reviews_total,
     slug,
     category,
+    subcategory,
     media,
     freelancer,
   } = service.attributes;
@@ -43,7 +44,7 @@ export default function ServiceCard({ service }) {
         />
       )}
 
-      <div className="list-content flex-grow-1 ms-1">
+      <div className="list-content flex-grow-1 ms-1 bgc-white">
         <a className="listing-fav fz12">
           <span className="far fa-heart" />
         </a>
@@ -53,10 +54,15 @@ export default function ServiceCard({ service }) {
               <Link href={`/s/${slug}`}>{title}</Link>
             </h5>
             <p className="list-text body-color fz14 mb-1">
-              {category?.data?.attributes?.label}
+              {category?.data?.attributes?.label}{" "}
+              {subcategory?.data &&
+                " - " + subcategory?.data?.attributes?.label}
             </p>
           </div>
-          <CardReviews rating={rating} reviews_total={reviews_total} />
+          <CardReviews
+            rating={freelancer.data.attributes.rating}
+            reviews_total={freelancer.data.attributes.reviews_total}
+          />
         </div>
 
         <hr className="my-2" />
