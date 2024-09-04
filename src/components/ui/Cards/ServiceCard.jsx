@@ -56,7 +56,10 @@ export default function ServiceCard({ service }) {
               {category?.data?.attributes?.label}
             </p>
           </div>
-          <CardReviews rating={rating} reviews_total={reviews_total} />
+          <CardReviews
+            rating={freelancer.data.attributes.rating}
+            reviews_total={freelancer.data.attributes.reviews_total}
+          />
         </div>
 
         <hr className="my-2" />
