@@ -16,7 +16,9 @@ export default function FreelancerCard({ freelancer, linkedName }) {
     type,
   } = freelancer;
 
-  const user = freelancer.user.data.attributes;
+  const user = freelancer.user?.data?.attributes;
+
+  if (!user) return null;
 
   return (
     <>
