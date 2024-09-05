@@ -15,6 +15,14 @@ export const serviceSortOptions = [
     value: "price:desc",
     label: "Φθίνουσα τιμή",
   },
+  {
+    value: "freelancer.rating:desc",
+    label: "Υψηλότερη βαθμολογία",
+  },
+  {
+    value: "freelancer.rating:asc",
+    label: "Χαμηλότερη βαθμολογία",
+  },
 ];
 
 export const freelancerSortOptions = [
