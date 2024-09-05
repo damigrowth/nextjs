@@ -19,7 +19,7 @@ export default async function Content({ paramsFilters }) {
       <Topbar
         meta={freelancers?.meta?.pagination}
         single={
-          paramsFilters.type === "company" ? "επιχειρήση" : "επαγγελματίας"
+          paramsFilters.type === "company" ? "επιχείρηση" : "επαγγελματίας"
         }
         plural={
           paramsFilters.type === "company" ? "επιχειρήσεις" : "επαγγελματίες"
