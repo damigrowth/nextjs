@@ -42,6 +42,14 @@ export const freelancerSortOptions = [
     value: "rate:desc",
     label: "Φθίνουσα εργατοώρα",
   },
+  {
+    value: "rating:desc",
+    label: "Υψηλότερη βαθμολογία",
+  },
+  {
+    value: "rating:asc",
+    label: "Χαμηλότερη βαθμολογία",
+  },
 ];
 
 export const serviceTimeOptions = [
