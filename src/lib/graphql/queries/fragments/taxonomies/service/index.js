@@ -22,6 +22,15 @@ const CATEGORY_ENTITY = gql`
   }
 `;
 
+const SUBCATEGORY_ENTITY = gql`
+  fragment SubcategoryEntity on SubcategoryEntity {
+    attributes {
+      label
+      slug
+    }
+  }
+`;
+
 const SUBCATEGORY = gql`
   fragment Subcategory on SubcategoryEntity {
     id
@@ -60,4 +69,10 @@ const CATEGORY_FULL = gql`
   ${SUBCATEGORY}
 `;
 
-export { CATEGORY, CATEGORY_ENTITY, SUBCATEGORY, CATEGORY_FULL };
+export {
+  CATEGORY,
+  CATEGORY_ENTITY,
+  SUBCATEGORY_ENTITY,
+  SUBCATEGORY,
+  CATEGORY_FULL,
+};

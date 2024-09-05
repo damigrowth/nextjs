@@ -1,6 +1,9 @@
 import { gql } from "@apollo/client";
 import { FREELANCER_PARTIAL } from "../freelancer";
-import { CATEGORY } from "../../fragments/taxonomies/service";
+import {
+  CATEGORY,
+  SUBCATEGORY_ENTITY,
+} from "../../fragments/taxonomies/service";
 import { AREA } from "../../fragments/entities/location";
 import { ADDONS, FAQ, PACKAGES } from "../../fragments/components/pricing";
 import { MULTIPLE_IMAGES, STATUS } from "../../fragments/global";
@@ -140,6 +143,11 @@ const SERVICE_PARTIAL_RELATIONS = gql`
         ...Category
       }
     }
+    subcategory {
+      data {
+        ...SubcategoryEntity
+      }
+    }
     media {
       ...MultipleImages
     }
@@ -153,6 +161,7 @@ const SERVICE_PARTIAL_RELATIONS = gql`
     }
   }
   ${CATEGORY}
+  ${SUBCATEGORY_ENTITY}
   ${MULTIPLE_IMAGES}
   ${FREELANCER_BASIC}
 `;

@@ -26,6 +26,22 @@ const FREELANCER_CATEGORY_ENTITY = gql`
   }
 `;
 
+const FREELANCER_SUBCATEGORY = gql`
+  fragment FreelancerSubcategory on FreelancerSubcategoryEntity {
+    id
+    attributes {
+      label
+      slug
+      plural
+      description
+      category {
+        ...FreelancerCategory
+      }
+    }
+  }
+  ${FREELANCER_CATEGORY}
+`;
+
 const FREELANCER_CATEGORY_FULL = gql`
   fragment FreelancerCategoryFull on FreelancerCategoryEntity {
     id
@@ -37,13 +53,20 @@ const FREELANCER_CATEGORY_FULL = gql`
       image {
         ...SingleImage
       }
+      subcategories {
+        data {
+          ...FreelancerSubcategory
+        }
+      }
     }
   }
   ${SINGLE_IMAGE}
+  ${FREELANCER_SUBCATEGORY}
 `;
 
 export {
   FREELANCER_CATEGORY,
   FREELANCER_CATEGORY_ENTITY,
   FREELANCER_CATEGORY_FULL,
+  FREELANCER_SUBCATEGORY,
 };

@@ -78,6 +78,7 @@ const FREELANCERS_ARCHIVE = gql`
     $specializations: [ID]
     $experience: Int
     $top: Boolean
+    $verified: Boolean
     $sort: [String]
     $page: Int
   ) {
@@ -95,6 +96,7 @@ const FREELANCERS_ARCHIVE = gql`
         specialisations: { id: { in: $specializations } }
         yearsOfExperience: { gte: $experience }
         topLevel: { eq: $top }
+        user: { verified: { eq: $verified } }
       }
       sort: $sort
       pagination: { page: $page, pageSize: 20 }

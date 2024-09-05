@@ -4,15 +4,15 @@ import Rate from "./Filters/Rate";
 import PaymentMethods from "./Filters/PaymentMethods";
 import ContactTypes from "./Filters/ContactTypes";
 import Coverage from "./Filters/Coverage";
-import Type from "./Filters/Type";
 import Category from "./Filters/Category";
 import Specialization from "./Filters/Specialization";
 import Experience from "./Filters/Experience";
-import Top from "./Filters/Top";
 import Content from "./Content";
 import ContentSkeleton from "./ContentSkeleton";
 import BorderSpinner from "../../Spinners/BorderSpinner";
 import SidebarModal from "../SidebarModal";
+import Top from "./Filters/Top";
+import Verified from "./Filters/Verified";
 
 export default function FreelancersArchive({
   categories,
@@ -55,6 +55,11 @@ export default function FreelancersArchive({
       component: <Specialization />,
     },
     { heading: "Εμπειρία σε έτη", params: ["exp"], component: <Experience /> },
+    {
+      heading: "Πιστοποιημένο προφίλ",
+      params: ["ver"],
+      component: <Verified />,
+    },
     { heading: "Top", params: ["top"], component: <Top /> },
   ];
 
