@@ -38,7 +38,7 @@ export default function SortOptions({ sortOptions }) {
             </div>
           </div>
         </button>
-        <div className="dropdown-menu" style={{ width: "220px" }}>
+        <div className="dropdown-menu" style={{ width: "233px" }}>
           <div className="inner show">
             <ul className="dropdown-menu inner show">
               {sortOptions.map((option, i) => (
