@@ -1,4 +1,5 @@
 import Socials from "@/components/ui/socials/Socials";
+import Rating from "@/components/user/Rating";
 import UserImage from "@/components/user/UserImage";
 import { formatRating } from "@/utils/formatRating";
 import Image from "next/image";
@@ -52,23 +53,12 @@ export default function Meta({
               <div className="ml20 ml0-xs">
                 <h1 className="heading-h5 title mb-1">{displayName}</h1>
                 <h2 className="heading-p mb-0">{tagline}</h2>
-                {totalReviews > 0 ? (
-                  <p className="mb-0  fz14 list-inline-item ml15-sm mb5-sm ml0-xs">
-                    <i className="fas fa-star vam fz10 review-color mb5"></i>{" "}
-                    <span className="dark-color">{formatRating(rating)}</span>
-                    <span className="ml5 body-color">
-                      {totalReviews === 1
-                        ? `(${totalReviews} αξιολόγηση)`
-                        : `(${totalReviews} αξιολογήσεις)`}
-                    </span>
-                  </p>
-                ) : null}
+                <Rating totalReviews={totalReviews} rating={rating} />
                 {base && (
                   <p className="mb-0 dark-color fz15 fw500 list-inline-item ml15 mb5-sm ml0-xs">
                     <i className="flaticon-place vam fz20 me-2"></i> {base}
                   </p>
                 )}
-
                 <div className="mb-0 dark-color fz15 fw500 list-inline-item ml15 mb5-sm ml0-xs">
                   <Socials socials={socials} />
                 </div>
