@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Addons from "./Addons";
 import useServiceOrderStore from "@/store/order/service";
+import Link from "next/link";
 
 const tabs = ["Απλό", "Κανονικό", "Προχωρημένο"];
 
@@ -12,6 +13,7 @@ export default function OrderPackages({
   serviceId,
   freelancerId,
   userId,
+  username,
 }) {
   const { order, setOrder, calculateTotal } = useServiceOrderStore();
 
@@ -114,10 +116,10 @@ export default function OrderPackages({
         </div>
         {addons.length > 0 && <Addons addons={addons} small />}
         <div className="d-grid">
-          <a className="ud-btn btn-thm">
+          <Link href={`/profile/${username}`} className="ud-btn btn-thm">
             Αγορά {order.total}€
             <i className="fal fa-arrow-right-long" />
-          </a>
+          </Link>
         </div>
       </div>
     </>

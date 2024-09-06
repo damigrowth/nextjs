@@ -1,9 +1,10 @@
 "use client";
 
 import useServiceOrderStore from "@/store/order/service";
+import Link from "next/link";
 import React, { useEffect } from "react";
 
-export default function Buy({ price }) {
+export default function Buy({ price, username }) {
   const { order, setOrder, calculateTotal } = useServiceOrderStore();
 
   useEffect(() => {
@@ -12,8 +13,8 @@ export default function Buy({ price }) {
   }, []);
 
   return (
-    <a className="ud-btn btn-thm">
-      Αγορά {order?.total}€ <i className="fal fa-arrow-right-long"></i>
-    </a>
+    <Link href={`/profile/${username}`} className="ud-btn btn-thm">
+      Σύνολο {order?.total}€ <i className="fal fa-arrow-right-long"></i>
+    </Link>
   );
 }

@@ -145,6 +145,7 @@ export default async function SingleService({
                 serviceId={serviceId}
                 freelancerId={freelancerId}
                 userId={userId}
+                username={freelancer.username}
               />
             ) : (
               <OrderPackages
@@ -153,6 +154,7 @@ export default async function SingleService({
                 serviceId={serviceId}
                 freelancerId={freelancerId}
                 userId={userId}
+                username={freelancer.username}
               />
             )}
             <ContactDetails
