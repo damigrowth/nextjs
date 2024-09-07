@@ -1,17 +1,21 @@
 import React from "react";
 
-export default function Info({ time, category, area }) {
+export default function Info({ time, category, subcategory, area }) {
   return (
     <div className="row">
       {category && (
         <div className="col-sm-6 col-md-4">
           <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
             <div className="icon flex-shrink-0">
-              <span className="flaticon-category" />
+              <span
+                className={
+                  !category?.icon ? "flaticon-category" : category?.icon
+                }
+              />
             </div>
             <div className="details">
-              <h5 className="title">Κατηγορία</h5>
-              <h2 className="heading-p">{category}</h2>
+              <h5 className="title">{category?.label}</h5>
+              <h2 className="heading-p">{subcategory?.label}</h2>
             </div>
           </div>
         </div>
