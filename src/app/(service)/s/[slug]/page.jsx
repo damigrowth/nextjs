@@ -59,6 +59,7 @@ export default async function page({ params, searchParams }) {
           <ServiceBreadcrumb
             serviceTitle={service?.title}
             category={service?.category}
+            subcategory={service?.subcategory}
           />
           <SingleService
             serviceId={uid}
