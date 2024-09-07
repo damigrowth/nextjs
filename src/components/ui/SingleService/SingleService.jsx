@@ -14,6 +14,7 @@ import Reviews from "../Reviews/Reviews";
 import Terms from "./Terms";
 import FeaturedImage from "./FeaturedImage";
 import ServiceSchema from "@/utils/Seo/Schema/ServiceSchema";
+import Protected from "@/components/auth/Protected";
 
 export default async function SingleService({
   serviceId,
@@ -130,12 +131,14 @@ export default async function SingleService({
                   reviewsPage={reviewsPage}
                   ratingStars={ratingStars}
                 />
-                <AddModelReviewForm
-                  modelType="service"
-                  tenantType="freelancer"
-                  modelId={serviceId}
-                  tenantId={freelancerId}
-                />
+                <Protected message="Κάνε σύνδεση για να αξιολογήσεις την υπηρεσία.">
+                  <AddModelReviewForm
+                    modelType="service"
+                    tenantType="freelancer"
+                    modelId={serviceId}
+                    tenantId={freelancerId}
+                  />
+                </Protected>
               </div>
             </div>
           </div>
