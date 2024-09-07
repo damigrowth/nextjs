@@ -16,9 +16,9 @@ export default async function FeaturedServices({ category, subcategory }) {
         <div className="row align-items-center wow fadeInUp">
           <div className="col-lg-12">
             <div className="main-title mb30-lg">
-              <h2 className="title">Σχετικές Υπηρεσίες</h2>
+              <h2 className="title">Δείτε ακόμα</h2>
               <p className="paragraph">
-                Δείτε τις υπηρεσίες με τη μεγαλύτερη ζήτηση
+                Περισσότερες υπηρεσίες που μπορεί να σας ενδιαφέρουν.
               </p>
             </div>
           </div>
