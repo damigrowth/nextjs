@@ -14,7 +14,10 @@ export default function Buy({ price, username }) {
 
   return (
     <Link href={`/profile/${username}`} className="ud-btn btn-thm">
-      Σύνολο {order?.total}€ <i className="fal fa-arrow-right-long"></i>
+      {price === 0 || price === null
+        ? "Επικοινωνήστε"
+        : `Σύνολο ${order?.total}€`}
+      <i className="fal fa-arrow-right-long"></i>
     </Link>
   );
 }
