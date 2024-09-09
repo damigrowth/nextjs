@@ -157,6 +157,28 @@ const SERVICES_ARCHIVE = gql`
   ${PAGINATION}
 `;
 
+const SERVICES_BY_CATEGORY = gql`
+  query ServicesByCategory($category: String!, $subcategory: String) {
+    services(
+      filters: {
+        category: { slug: { eq: $category } }
+        subcategory: { slug: { eq: $subcategory } }
+      }
+      pagination: { page: 1, pageSize: 4 }
+    ) {
+      data {
+        id
+        attributes {
+          ...ServicePartialMain
+          ...ServicePartialRelations
+        }
+      }
+    }
+  }
+  ${SERVICE_PARTIAL_MAIN}
+  ${SERVICE_PARTIAL_RELATIONS}
+`;
+
 export {
   SERVICE_BY_SLUG,
   SERVICE_SEO_BY_SLUG,
@@ -165,4 +187,5 @@ export {
   SERVICE_UID,
   FEATURED_SERVICES,
   SERVICES_ARCHIVE,
+  SERVICES_BY_CATEGORY,
 };

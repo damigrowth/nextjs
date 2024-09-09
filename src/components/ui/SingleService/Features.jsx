@@ -53,11 +53,13 @@ export default function Features({
             </div>
             <div className="details">
               <h5 className="title">Μέθοδος Εξόφλησης</h5>
-              {settlement_methods.map((method, i) => (
-                <p key={i} className="mb-0 text list-inline-item">
-                  {method?.attributes?.label}
-                </p>
-              ))}
+              <div className="freelancer-features-list">
+                {settlement_methods.map((method, i) => (
+                  <p key={i} className="freelancer-features-list-item">
+                    {method?.attributes?.label}
+                  </p>
+                ))}
+              </div>
             </div>
           </div>
         </div>

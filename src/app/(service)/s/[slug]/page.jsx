@@ -1,6 +1,4 @@
-import PopulerService from "@/components/section/PopulerService";
 import React from "react";
-import TabSection1 from "@/components/section/TabSection1";
 import { redirect } from "next/navigation";
 import SingleService from "@/components/ui/SingleService/SingleService";
 import { getReviewsByService, getServiceBySlug } from "@/lib/service/service";
@@ -9,6 +7,7 @@ import { getData } from "@/lib/client/operations";
 import Tabs from "@/components/ui/Archives/Tabs";
 import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 import { CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/service";
+import FeaturedServices from "@/components/ui/SingleService/Featured";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
@@ -57,7 +56,11 @@ export default async function page({ params, searchParams }) {
           serviceCategory={service?.category?.data?.attributes?.slug}
         />
         <div className="bgc-thm3">
-          <ServiceBreadcrumb category={service?.category} />
+          <ServiceBreadcrumb
+            serviceTitle={service?.title}
+            category={service?.category}
+            subcategory={service?.subcategory}
+          />
           <SingleService
             serviceId={uid}
             service={service}
@@ -65,7 +68,10 @@ export default async function page({ params, searchParams }) {
             reviewsPage={reviewsPage}
             reviewsMeta={reviewsMeta}
           />
-          <PopulerService />
+          <FeaturedServices
+            category={service?.category?.data?.attributes?.slug}
+            subcategory={service?.subcategory?.data?.attributes?.slug}
+          />
         </div>
       </>
     );

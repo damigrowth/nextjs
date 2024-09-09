@@ -5,6 +5,7 @@ import Link from "next/link";
 import Socials from "../socials/Socials";
 import { getYearsOfExperience } from "@/utils/getYearsOfExperience";
 import { formatRating } from "@/utils/formatRating";
+import Rating from "@/components/user/Rating";
 
 export default function ContactDetails({
   firstName,
@@ -48,18 +49,7 @@ export default function ContactDetails({
               <h5 className="title mb-1">{displayName}</h5>
             </Link>
             <p className="mb-0">{tagline}</p>
-
-            {totalReviews > 0 ? (
-              <p className="mb-0 fz14 list-inline-item ">
-                <i className="fas fa-star vam fz12 review-color mb5"></i>{" "}
-                <span className="dark-color ">{formatRating(rating)}</span>
-                <span className="ml5 review-count-text">
-                  {totalReviews === 1
-                    ? `(${totalReviews} αξιολόγηση)`
-                    : `(${totalReviews} αξιολογήσεις)`}
-                </span>
-              </p>
-            ) : null}
+            <Rating totalReviews={totalReviews} rating={rating} />
           </div>
         </div>
         <div className="d-flex align-items-center justify-content-end mb-0  fz15 fw500 list-inline-item ml15 mb5-sm ml0-xs">
