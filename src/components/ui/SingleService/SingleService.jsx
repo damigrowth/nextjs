@@ -14,6 +14,7 @@ import Reviews from "../Reviews/Reviews";
 import Terms from "./Terms";
 import FeaturedImage from "./FeaturedImage";
 import ServiceSchema from "@/utils/Seo/Schema/ServiceSchema";
+import Protected from "@/components/auth/Protected";
 
 export default async function SingleService({
   serviceId,
@@ -27,6 +28,7 @@ export default async function SingleService({
     views,
     area,
     category,
+    subcategory,
     time,
     media,
     description,
@@ -97,7 +99,8 @@ export default async function SingleService({
 
                 <Info
                   area={area.data?.attributes?.name}
-                  category={category.data?.attributes?.label}
+                  category={category.data?.attributes}
+                  subcategory={subcategory.data?.attributes}
                   time={time}
                 />
               </div>
@@ -128,12 +131,14 @@ export default async function SingleService({
                   reviewsPage={reviewsPage}
                   ratingStars={ratingStars}
                 />
-                <AddModelReviewForm
-                  modelType="service"
-                  tenantType="freelancer"
-                  modelId={serviceId}
-                  tenantId={freelancerId}
-                />
+                <Protected message="Κάνε σύνδεση για να αξιολογήσεις την υπηρεσία.">
+                  <AddModelReviewForm
+                    modelType="service"
+                    tenantType="freelancer"
+                    modelId={serviceId}
+                    tenantId={freelancerId}
+                  />
+                </Protected>
               </div>
             </div>
           </div>
@@ -145,6 +150,7 @@ export default async function SingleService({
                 serviceId={serviceId}
                 freelancerId={freelancerId}
                 userId={userId}
+                username={freelancer.username}
               />
             ) : (
               <OrderPackages
@@ -153,6 +159,7 @@ export default async function SingleService({
                 serviceId={serviceId}
                 freelancerId={freelancerId}
                 userId={userId}
+                username={freelancer.username}
               />
             )}
             <ContactDetails

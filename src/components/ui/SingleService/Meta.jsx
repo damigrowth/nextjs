@@ -1,4 +1,5 @@
 import Badges from "@/components/user/Badges";
+import Rating from "@/components/user/Rating";
 import UserImage from "@/components/user/UserImage";
 import { formatRating } from "@/utils/formatRating";
 import React from "react";
@@ -32,18 +33,7 @@ export default function Meta({
             path={`/profile/${username}`}
           />
           <Badges verified={verified} topLevel={topLevel} />
-
-          {totalReviews > 0 ? (
-            <p className="mb-0 fz14 list-inline-item ml15 ml15-sm mb5-sm ml0-xs">
-              <i className="fas fa-star vam fz10 review-color mb5"></i>{" "}
-              <span className="dark-color ">{formatRating(rating)}</span>
-              <span className="ml5 review-count-text">
-                {totalReviews === 1
-                  ? `(${totalReviews} αξιολόγηση)`
-                  : `(${totalReviews} αξιολογήσεις)`}
-              </span>
-            </p>
-          ) : null}
+          <Rating totalReviews={totalReviews} rating={rating} />
         </div>
       </div>
     </div>

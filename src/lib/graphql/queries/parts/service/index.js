@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { FREELANCER_PARTIAL } from "../freelancer";
 import {
   CATEGORY,
+  SUBCATEGORY,
   SUBCATEGORY_ENTITY,
 } from "../../fragments/taxonomies/service";
 import { AREA } from "../../fragments/entities/location";
@@ -39,10 +40,14 @@ const SERVICE_RELATIONS = gql`
         ...Category
       }
     }
+    subcategory {
+      data {
+        ...SubcategoryEntity
+      }
+    }
     area {
       ...Area
     }
-
     packages {
       ...Packages
     }
@@ -81,6 +86,7 @@ const SERVICE_RELATIONS = gql`
   ${STATUS}
   ${RATING}
   ${TAG}
+  ${SUBCATEGORY_ENTITY}
 `;
 
 const SERVICE_SEO = gql`

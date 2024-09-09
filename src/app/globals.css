@@ -646,7 +646,9 @@ a {
 
 .meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  gap: 0.5rem;
 }
 
 .small-addon {
@@ -826,6 +828,7 @@ a {
   margin-bottom: 5px;
   margin-right: 5px;
   padding: 3px 10px;
+  text-align: center;
 }
 
 .top-badge {
@@ -984,7 +987,6 @@ a {
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  padding-left: 0.5rem;
 }
 
 .service-card-title {
@@ -1038,4 +1040,8 @@ a {
 
 .fit {
   width: fit-content;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
