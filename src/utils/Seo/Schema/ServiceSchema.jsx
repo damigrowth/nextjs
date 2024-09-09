@@ -22,7 +22,7 @@ export default function ServiceSchema({
     },
     author: {
       "@type": "Person",
-      name: review.attributes.user.data.attributes.displayName,
+      name: review?.attributes?.user?.data?.attributes?.displayName,
     },
   }));
 
