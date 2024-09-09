@@ -16,6 +16,8 @@ export default function FeaturedServiceCard({ service }) {
     price,
   } = service;
 
+  if (!freelancer?.data?.user?.data?.attributes) return null;
+
   const freelancerRating = freelancer.data.attributes.rating;
   const freelancerReviewsTotal = freelancer.data.attributes.reviews_total;
 
