@@ -19,15 +19,23 @@ export default function ServicesList({ services }) {
                 featuredCategory && item
         )
         .slice(0, 4)
-        .map((service, i) => (
-          <div key={i} className="col-sm-6 col-xl-3">
-            {service.attributes.media?.data?.length > 1 ? (
-              <FeaturedServiceSliderCard service={service.attributes} />
-            ) : (
-              <FeaturedServiceCard service={service.attributes} />
-            )}
-          </div>
-        ))}
+        .map((service, i) => {
+          if (
+            !service?.attributes?.freelancer?.data?.attributes?.user?.data
+              ?.attributes
+          ) {
+            return null;
+          }
+          return (
+            <div key={i} className="col-sm-6 col-xl-3">
+              {service.attributes.media?.data?.length > 1 ? (
+                <FeaturedServiceSliderCard service={service.attributes} />
+              ) : (
+                <FeaturedServiceCard service={service.attributes} />
+              )}
+            </div>
+          );
+        })}
     </div>
   );
 }
