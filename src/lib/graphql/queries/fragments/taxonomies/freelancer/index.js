@@ -14,6 +14,19 @@ const FREELANCER_CATEGORY = gql`
   }
 `;
 
+const FREELANCER_SUBCATEGORY_PARTIAL = gql`
+  fragment FreelancerSubcategoryPartial on FreelancerSubcategoryEntityResponse {
+    data {
+      id
+      attributes {
+        label
+        plural
+        slug
+      }
+    }
+  }
+`;
+
 const FREELANCER_CATEGORY_ENTITY = gql`
   fragment FreelancerCategoryEntity on FreelancerCategoryEntityResponseCollection {
     data {
@@ -69,4 +82,5 @@ export {
   FREELANCER_CATEGORY_ENTITY,
   FREELANCER_CATEGORY_FULL,
   FREELANCER_SUBCATEGORY,
+  FREELANCER_SUBCATEGORY_PARTIAL,
 };

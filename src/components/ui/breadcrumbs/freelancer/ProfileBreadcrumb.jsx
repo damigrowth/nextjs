@@ -2,7 +2,9 @@ import React from "react";
 import BreadcrumbButtons from "./BreadcrumbButtons";
 import Link from "next/link";
 
-export default function ProfileBreadcrumb({ category }) {
+export default function ProfileBreadcrumb({ category, subcategory, type }) {
+  const parentSlug = type === "company" ? "companies" : "pros";
+
   return (
     <section className="breadcumb-section bg-white">
       <div className="container">
@@ -11,14 +13,29 @@ export default function ProfileBreadcrumb({ category }) {
             <div className="breadcumb-style1 mb10-xs">
               <div className="breadcumb-list">
                 <Link href="/">Αρχική</Link>
-                <Link href="/pros">
-                  <h2 className="heading-p-gray">Επαγγελματίες</h2>
-                </Link>
-                <Link href={`/pros/${category.data.attributes.slug}`}>
-                  <h2 className="heading-p">
+                {type === "company" ? (
+                  <Link href="/companies">
+                    <span className="heading-p-gray">Επιχειρήσεις</span>
+                  </Link>
+                ) : (
+                  <Link href={`/${parentSlug}`}>
+                    <span className="heading-p-gray">Επαγγελματίες</span>
+                  </Link>
+                )}
+                <Link href={`/${parentSlug}/${category.data.attributes.slug}`}>
+                  <span className="heading-p-gray">
                     {category.data.attributes.plural}
-                  </h2>
+                  </span>
                 </Link>
+                {subcategory?.data?.attributes && (
+                  <Link
+                    href={`/${parentSlug}/${category.data.attributes.slug}/${subcategory.data.attributes.slug}`}
+                  >
+                    <span className="heading-p">
+                      {subcategory.data.attributes.plural}
+                    </span>
+                  </Link>
+                )}
               </div>
             </div>
           </div>
