@@ -1,8 +1,9 @@
-import { getPublicData } from "../api";
-import { MAINTENANCE } from "../queries";
+import { getData } from "../client/operations";
+import { MAINTENANCE_STATUS } from "../graphql/queries/main/global";
 
 export async function getMaintenanceStatus() {
-  const { data } = await getPublicData(MAINTENANCE);
-  const isUnderMaintenance = data?.attributes?.isActive;
+  const { maintenance } = await getData(MAINTENANCE_STATUS);
+
+  const isUnderMaintenance = maintenance?.data?.attributes?.isActive;
   return { isUnderMaintenance };
 }
