@@ -2,7 +2,12 @@ import React from "react";
 import BreadcrumbButtons from "./BreadcrumbButtons";
 import Link from "next/link";
 
-export default function ProfileBreadcrumb({ category, subcategory, type }) {
+export default function ProfileBreadcrumb({
+  category,
+  subcategory,
+  type,
+  subjectTitle,
+}) {
   const parentSlug = type === "company" ? "companies" : "pros";
 
   return (
@@ -41,7 +46,7 @@ export default function ProfileBreadcrumb({ category, subcategory, type }) {
           </div>
           <div className="col-sm-4 col-lg-2">
             <div className="d-flex align-items-center justify-content-sm-end">
-              <BreadcrumbButtons />
+              <BreadcrumbButtons subjectTitle={subjectTitle} />
             </div>
           </div>
         </div>

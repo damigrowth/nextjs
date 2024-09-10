@@ -77,6 +77,7 @@ export default async function page({ params, searchParams }) {
           category={freelancer?.category}
           type={type}
           subcategory={freelancer?.subcategory}
+          subjectTitle={freelancer?.displayName}
         />
         <FreelancerProfile
           uid={uid}
