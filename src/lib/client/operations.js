@@ -3,7 +3,12 @@
 import { inspect } from "@/utils/inspect";
 import { getClient } from ".";
 import { isAuthenticated } from "../auth/authenticated";
-import { STRAPI_GRAPHQL, STRAPI_TOKEN, validateEnvVars } from "../strapi";
+import {
+  STRAPI_GRAPHQL,
+  STRAPI_TOKEN,
+  STRAPI_URL,
+  validateEnvVars,
+} from "../strapi";
 import { print } from "graphql/language/printer";
 import { GET_ME } from "../graphql/queries/main/user";
 
@@ -37,6 +42,37 @@ import { GET_ME } from "../graphql/queries/main/user";
 //     console.log("Failed to get GraphQL data!", error);
 //   }
 // };
+
+/**
+ * Checks server health by making an HTTP request to the server.
+ *
+ * @returns {Object} An object with a single property, `serverStatus`, which
+ * is a boolean indicating whether the server is up or not.
+ */
+export const checkServerHealth = async () => {
+  try {
+    let serverStatus = null;
+    // console.log("⚙️ Checking server health...");
+
+    const response = await fetch(STRAPI_URL);
+
+    // console.log("📡 Response status:", response.status);
+
+    // Server is considered up if we get any response, even 404
+    if (response.status >= 200 && response.status < 500) {
+      // console.log("✅ Server is up.");
+      serverStatus = true;
+    } else {
+      // console.log("❌ Server is down.");
+      serverStatus = false;
+    }
+
+    return { serverStatus };
+  } catch (error) {
+    console.error("⚠️ Error checking server health:", error);
+    return { serverStatus: false }; // Server is down if there's an error
+  }
+};
 
 export const getData = async (query, variables) => {
   validateEnvVars();

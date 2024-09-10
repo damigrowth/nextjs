@@ -15,8 +15,9 @@ import Body from "@/components/ui/Body";
 import Footer from "@/components/ui/Footer";
 import { getUser } from "@/lib/user/user";
 import NavMenuMobile from "@/components/ui/NavMenuMobile";
-import { getData } from "@/lib/client/operations";
+import { checkServerHealth, getData } from "@/lib/client/operations";
 import { FOOTER, HEADER } from "@/lib/graphql/queries/main/global";
+import ServerDown from "@/components/ui/Errors/ServerDown";
 
 if (typeof window !== "undefined") {
   import("bootstrap");
@@ -29,6 +30,17 @@ const dmSans = DM_Sans({
 });
 
 export default async function RootLayout({ children }) {
+  const { serverStatus } = await checkServerHealth();
+
+  if (!serverStatus)
+    return (
+      <html>
+        <body>
+          <ServerDown />
+        </body>
+      </html>
+    );
+
   const headerList = headers();
   const path = headerList.get("x-current-path");
 
