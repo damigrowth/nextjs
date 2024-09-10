@@ -3,7 +3,10 @@ import { USER_PARTIAL } from "../../fragments/entities/user";
 import { BASE, COVERAGE } from "../../fragments/components/location";
 import { SOCIALS } from "../../fragments/components/socials";
 import { FREELANCER_TYPE } from "../../fragments/entities/freelancer";
-import { FREELANCER_CATEGORY } from "../../fragments/taxonomies/freelancer";
+import {
+  FREELANCER_CATEGORY,
+  FREELANCER_SUBCATEGORY_PARTIAL,
+} from "../../fragments/taxonomies/freelancer";
 import { CONTACT_TYPES } from "../../fragments/entities/contact";
 import { PAYMENT_METHOD } from "../../fragments/entities/payment";
 import { SETTLEMENT_METHOD } from "../../fragments/entities/settlement";
@@ -133,6 +136,9 @@ const FREELANCER_RELATIONS = gql`
     category {
       ...FreelancerCategory
     }
+    subcategory {
+      ...FreelancerSubcategoryPartial
+    }
     size {
       ...Size
     }
@@ -170,6 +176,7 @@ const FREELANCER_RELATIONS = gql`
   ${SOCIALS}
   ${FREELANCER_TYPE}
   ${FREELANCER_CATEGORY}
+  ${FREELANCER_SUBCATEGORY_PARTIAL}
   ${SIZE}
   ${SPECIALISATIONS}
   ${MIN_BUDGETS}

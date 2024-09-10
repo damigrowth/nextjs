@@ -1023,7 +1023,6 @@ a {
 }
 
 .heading-p-gray {
-  color: var(--body-text-color);
   display: inline-block;
   font-size: 14px;
   position: relative;

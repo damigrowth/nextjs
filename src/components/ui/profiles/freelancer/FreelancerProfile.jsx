@@ -18,6 +18,7 @@ import Reviews from "../../Reviews/Reviews";
 import AddModelReviewForm from "../../forms/AddModelReviewForm";
 import Terms from "./Terms";
 import FreelancerSchema from "@/utils/Seo/Schema/FreelancerSchema";
+import Protected from "@/components/auth/Protected";
 
 export default function FreelancerProfile({
   freelancer,
@@ -142,13 +143,20 @@ export default function FreelancerProfile({
                 ratingStars={ratingStars}
                 showReviewsModel
               />
-
-              <AddModelReviewForm
-                modelType="service"
-                tenantType="freelancer"
-                // modelId={serviceId} // TODO: Fetch all orders and get the services ids in an input
-                tenantId={uid}
-              />
+              <Protected
+                message={
+                  type === "company"
+                    ? "Κάνε σύνδεση για να αξιολογήσεις την επιχείρηση."
+                    : "Κάνε σύνδεση για να αξιολογήσεις τον επαγγελματία."
+                }
+              >
+                <AddModelReviewForm
+                  modelType="service"
+                  tenantType="freelancer"
+                  // modelId={serviceId} // TODO: Fetch all orders and get the services ids in an input
+                  tenantId={uid}
+                />
+              </Protected>
             </div>
           </div>
           <StickySidebar>

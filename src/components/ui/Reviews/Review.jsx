@@ -46,10 +46,7 @@ export default async function Review({
         <div className="ml20">
           <h6 className="mt-0 mb-0">{displayName}</h6>
           {showReviewsModel && (
-            <Link
-              href={`/service/${service.slug}`}
-              className="review-service-title"
-            >
+            <Link href={`/s/${service.slug}`} className="review-service-title">
               <span>{service.title}</span>
             </Link>
           )}

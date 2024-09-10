@@ -57,8 +57,11 @@ export default async function page({ params, searchParams }) {
       servicesPageSize
     );
 
+    const type = freelancer?.type?.data?.attributes?.slug;
+
     const { freelancerCategories } = await getData(
-      FREELANCER_CATEGORIES_SEARCH
+      FREELANCER_CATEGORIES_SEARCH,
+      { type }
     );
 
     return (
@@ -70,7 +73,12 @@ export default async function page({ params, searchParams }) {
           plural
           freelancerCategory={freelancer?.category?.data?.attributes?.slug}
         />
-        <ProfileBreadcrumb category={freelancer?.category} />
+        <ProfileBreadcrumb
+          category={freelancer?.category}
+          type={type}
+          subcategory={freelancer?.subcategory}
+          subjectTitle={freelancer?.displayName}
+        />
         <FreelancerProfile
           uid={uid}
           freelancer={freelancer}

@@ -3,7 +3,7 @@ import React from "react";
 import BreadcrumbButtons from "../freelancer/BreadcrumbButtons";
 
 export default function ServiceBreadcrumb({
-  serviceTitle,
+  subjectTitle,
   category,
   subcategory,
 }) {
@@ -31,7 +31,7 @@ export default function ServiceBreadcrumb({
           </div>
           <div className="col-sm-4 col-lg-2">
             <div className="d-flex align-items-center justify-content-sm-end">
-              <BreadcrumbButtons serviceTitle={serviceTitle} />
+              <BreadcrumbButtons subjectTitle={serviceTitle} />
             </div>
           </div>
         </div>
