@@ -57,7 +57,7 @@ export default async function page({ params, searchParams }) {
         />
         <div className="bgc-thm3">
           <ServiceBreadcrumb
-            serviceTitle={service?.title}
+            subjectTitle={service?.title}
             category={service?.category}
             subcategory={service?.subcategory}
           />

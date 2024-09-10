@@ -59,11 +59,7 @@ function ReactionButton({ type, reactions, setReactions }) {
         }
       />
       <span className="review_reactions_counter">
-        {
-          type === "like"
-            ? reactions.likes.length
-            : 0 /* reactions.dislikes.length */
-        }
+        {reactions.likes.length > 0 ? reactions.likes.length : ""}
       </span>
     </button>
   );

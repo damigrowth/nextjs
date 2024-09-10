@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-export default function BreadcrumbButtons({ serviceTitle }) {
+export default function BreadcrumbButtons({ subjectTitle }) {
   const [shareToggle, setShareToggle] = useState(false);
   const [saveToggle, setSaveToggle] = useState(false);
 
@@ -24,7 +24,7 @@ export default function BreadcrumbButtons({ serviceTitle }) {
         window.open(shareUrl, "_blank");
         break;
       case "email":
-        shareUrl = `mailto:?subject=${serviceTitle}?body=${encodeURIComponent(
+        shareUrl = `mailto:?subject=${subjectTitle}?body=${encodeURIComponent(
           currentUrl
         )}`;
         window.location.href = shareUrl;
