@@ -18,8 +18,6 @@ export default function FreelancerCard({ freelancer, linkedName }) {
 
   const user = freelancer.user?.data?.attributes;
 
-  if (!user) return null;
-
   return (
     <>
       <div className="data-loading-element freelancer-style1 text-center bdr1 hover-box-shadow">
