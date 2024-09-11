@@ -31,7 +31,7 @@ export default function ServiceBreadcrumb({
           </div>
           <div className="col-sm-4 col-lg-2">
             <div className="d-flex align-items-center justify-content-sm-end">
-              <BreadcrumbButtons subjectTitle={serviceTitle} />
+              <BreadcrumbButtons subjectTitle={subjectTitle} />
             </div>
           </div>
         </div>

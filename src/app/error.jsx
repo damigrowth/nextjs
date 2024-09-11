@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function ErrorBoundary() {
+export default function ErrorBoundary({ error }) {
   return (
     <>
       <section className="our-error">
@@ -35,6 +35,7 @@ export default function ErrorBoundary() {
                   Η σελίδα που αναζητάτε δεν είναι διαθέσιμη. Προσπαθήστε να
                   ψάξετε ξανά ή χρησιμοποιήστε το κουμπί πίσω στην αρχική{" "}
                   <br className="d-none d-lg-block" />
+                  Error: {error.message}
                 </p>
                 <Link href="/" className="ud-btn btn-thm">
                   Πίσω στην αρχική
