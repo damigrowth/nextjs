@@ -3,6 +3,7 @@
 import React, { useRef, useState } from "react";
 import MegaMenuPillar from "./MegaMenuPillar";
 import { useClickOutside } from "@/hook/useClickOutside";
+import Link from "next/link";
 
 export default function MegaMenu({ categories, staticMenuClass }) {
   const [isActive, setIsActive] = useState(false);
@@ -36,10 +37,10 @@ export default function MegaMenu({ categories, staticMenuClass }) {
         <ul ref={inputRef} className={`menu pl0 ${isActive ? "active" : ""}`}>
           {categories.map((cat) => (
             <li key={cat.id}>
-              <a className="dropdown">
+              <Link href={`/ipiresies/${cat.slug}`} className="dropdown">
                 <span className="menu-icn flaticon-developer" />
                 <span className="menu-title">{cat.label}</span>
-              </a>
+              </Link>
               <div className="drop-menu d-flex justify-content-between">
                 <MegaMenuPillar />
                 <MegaMenuPillar />

@@ -36,9 +36,11 @@ export default async function FeaturedCategories({ categories }) {
           {featuredCategories.map((item, i) => (
             <div key={i} className={item.classNames}>
               <div className="iconbox-style1 at-home12-v2">
-                <div className="icon">
-                  <span className={item.attributes.icon}></span>
-                </div>
+                <Link href={`/ipiresies/${item.attributes.slug}`}>
+                  <div className="icon">
+                    <span className={item.attributes.icon}></span>
+                  </div>
+                </Link>
                 <div className="details mt20">
                   {/* <p className="text mb5">{item.skills} skills</p> */}
                   <h4 className="title">
@@ -49,8 +51,19 @@ export default async function FeaturedCategories({ categories }) {
                   <p className="mb-0">
                     {item.attributes.subcategories.data
                       .slice(0, 3)
-                      .map((sub) => sub.attributes.label)
-                      .join(", ")}
+                      .map((sub, i) => (
+                        <span key={i}>
+                          <Link
+                            href={`/ipiresies/${item.attributes.slug}/${sub.attributes.slug}`}
+                          >
+                            {sub.attributes.label}
+                          </Link>
+                          {i < 2 &&
+                          i < item.attributes.subcategories.data.length - 1
+                            ? ", "
+                            : ""}
+                        </span>
+                      ))}
                   </p>
                 </div>
               </div>
