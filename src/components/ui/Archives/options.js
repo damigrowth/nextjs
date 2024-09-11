@@ -19,10 +19,6 @@ export const serviceSortOptions = [
     value: "freelancer.rating:desc",
     label: "Υψηλότερη βαθμολογία",
   },
-  {
-    value: "freelancer.rating:asc",
-    label: "Χαμηλότερη βαθμολογία",
-  },
 ];
 
 export const freelancerSortOptions = [
@@ -45,10 +41,6 @@ export const freelancerSortOptions = [
   {
     value: "rating:desc",
     label: "Υψηλότερη βαθμολογία",
-  },
-  {
-    value: "rating:asc",
-    label: "Χαμηλότερη βαθμολογία",
   },
 ];
 
