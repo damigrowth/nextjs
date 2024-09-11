@@ -53,7 +53,9 @@ export default function Meta({
               <div className="ml20 ml0-xs">
                 <h1 className="heading-h5 title mb-1">{displayName}</h1>
                 <h2 className="heading-p mb-0">{tagline}</h2>
-                <Rating totalReviews={totalReviews} rating={rating} />
+                {totalReviews > 0 && (
+                  <Rating totalReviews={totalReviews} rating={rating} />
+                )}
                 {base && (
                   <p className="mb-0 dark-color fz15 fw500 list-inline-item ml15 mb5-sm ml0-xs">
                     <i className="flaticon-place vam fz20 me-2"></i> {base}

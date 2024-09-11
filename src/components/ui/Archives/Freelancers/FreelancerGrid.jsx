@@ -15,11 +15,17 @@ export default async function FreelancerGrid({
         categories={categories}
       />
       {freelancers.length > 0 ? (
-        freelancers.map((freelancer, i) => (
-          <div key={i} className="col-sm-6 col-xl-4">
-            <FreelancerCard freelancer={freelancer?.attributes} linkedName />
-          </div>
-        ))
+        freelancers.map(
+          (freelancer, i) =>
+            freelancer?.attributes?.user?.data?.attributes && (
+              <div key={i} className="col-sm-6 col-xl-4">
+                <FreelancerCard
+                  freelancer={freelancer?.attributes}
+                  linkedName
+                />
+              </div>
+            )
+        )
       ) : (
         <div>Δεν βρέθηκαν επαγγελματίες</div>
       )}
