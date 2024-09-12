@@ -27,11 +27,15 @@ export default function ProfileBreadcrumb({
                     <span className="heading-p-gray">Επαγγελματίες</span>
                   </Link>
                 )}
-                <Link href={`/${parentSlug}/${category.data.attributes.slug}`}>
-                  <span className="heading-p-gray">
-                    {category.data.attributes.plural}
-                  </span>
-                </Link>
+                {category?.data?.attributes && (
+                  <Link
+                    href={`/${parentSlug}/${category.data.attributes.slug}`}
+                  >
+                    <span className="heading-p-gray">
+                      {category.data.attributes.plural}
+                    </span>
+                  </Link>
+                )}
                 {subcategory?.data?.attributes && (
                   <Link
                     href={`/${parentSlug}/${category.data.attributes.slug}/${subcategory.data.attributes.slug}`}
