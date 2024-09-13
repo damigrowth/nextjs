@@ -30,6 +30,11 @@ export const AREA = (area) => {
   return url;
 };
 
+export const SUBCATEGORY = (subcategory) => {
+  const url = `subcategories?fields[0]=label&filters[label][$eq]=${subcategory}`;
+  return url;
+};
+
 export const COUNTY_SEARCH = (county) => {
   const url = `counties?fields[0]=name&filters[name][$contains]=${county}&sort[0]=name:asc`;
   return url;

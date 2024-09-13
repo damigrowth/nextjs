@@ -12,7 +12,8 @@ export default async function populateTaxonomies(
   execute,
   endpoint,
   filePath,
-  limit
+  limit,
+  properties // Add this parameter
 ) {
   if (execute === 1) {
     console.log("Executing...");
@@ -27,6 +28,8 @@ export default async function populateTaxonomies(
       const usedLabels = new Set(); // Track used labels to avoid duplicates
 
       for (const item of itemsToPost) {
+        console.log("Processing item:", item);
+
         // Check if label has already been posted
         if (usedLabels.has(item.label)) {
           console.log(
@@ -35,7 +38,7 @@ export default async function populateTaxonomies(
           continue; // Skip if the label already exists
         }
 
-        let slug = createSlug(item.plural);
+        let slug = createSlug(item.plural || item.label);
 
         // Ensure slug uniqueness by appending incremental suffix
         let originalSlug = slug;
@@ -47,17 +50,15 @@ export default async function populateTaxonomies(
         usedSlugs.add(slug); // Add the final slug to the set
         usedLabels.add(item.label); // Add the label to the set
 
-        const data = {
-          label: item.label,
-          plural: item.plural,
-          category: item.category,
-          type: item.type,
-          slug,
-        };
+        const data = {};
+        for (const prop of properties) {
+          if (item[prop]) {
+            data[prop] = item[prop];
+          }
+        }
+        data.slug = slug; // Always include the slug
 
         try {
-          // console.log("slug", data.slug);
-
           const response = await postData(endpoint, data);
           console.log(
             "Response => ",
@@ -67,28 +68,17 @@ export default async function populateTaxonomies(
                 response?.error?.details?.errors?.[0]?.path
           );
         } catch (error) {
-          if (
-            error?.response?.data?.error?.message ===
-            "This attribute must be unique"
-          ) {
-            console.log(
-              `Item "${data.label}" with slug "${slug}" already exists, skipping...`
-            );
-            continue; // Skip to the next item if it's already in the database
-          } else {
-            console.log(
-              `Error posting item with slug "${slug}":`,
-              error?.response?.data?.error?.message || error
-            );
-            // Handle other errors if needed
-          }
+          console.error(
+            `Error posting item with slug "${slug}":`,
+            error?.response?.data?.error?.message || error
+          );
         }
       }
 
       // Log when finished
       console.log(`Finished uploading to ${endpoint}.`);
     } catch (error) {
-      console.log("Error parsing CSV or executing script:", error);
+      console.error("Error in populateTaxonomies:", error);
     }
   } else {
     console.log("Not executing...");
