@@ -1,4 +1,4 @@
-import { findColumnIds } from "@/lib/populate/findColumnIdsumnIds";
+import { findColumnIds } from "@/lib/populate/findColumnIds";
 import populateTaxonomies from "@/lib/populate/taxonomies";
 import React from "react";
 
