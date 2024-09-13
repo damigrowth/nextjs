@@ -1,7 +1,7 @@
 // SCRIPT FOR POPULATING COUNTIES, AREAS AND ZIPCODES
-import { putData } from "../api";
-import { fetchModel } from "../models/model";
-import { AREA, ZIPCODE } from "../queries";
+import { putData } from "../../api";
+import { fetchModel } from "../../models/model";
+import { AREA, ZIPCODE } from "../../queries";
 
 //* NOTE: Populate collection data function for client comps
 //   const names = `

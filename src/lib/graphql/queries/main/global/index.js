@@ -17,7 +17,7 @@ const HEADER = gql`
     header {
       data {
         attributes {
-          categories {
+          categories(sort: "label:asc") {
             data {
               attributes {
                 label
@@ -44,7 +44,7 @@ const FOOTER = gql`
               }
             }
           }
-          categories {
+          categories(sort: "label:asc") {
             data {
               attributes {
                 label

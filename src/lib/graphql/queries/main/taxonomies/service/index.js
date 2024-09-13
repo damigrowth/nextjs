@@ -7,7 +7,7 @@ import {
 
 const CATEGORIES = gql`
   query GetCategories {
-    categories(sort: "label:desc") {
+    categories(sort: "label:asc") {
       data {
         ...CategoryFull
       }
@@ -18,7 +18,7 @@ const CATEGORIES = gql`
 
 const CATEGORIES_SEARCH = gql`
   query CategoriesSearch($label: String) {
-    categories(filters: { label: { containsi: $label } }, sort: "label:desc") {
+    categories(filters: { label: { containsi: $label } }, sort: "label:asc") {
       data {
         ...CategoryFull
       }

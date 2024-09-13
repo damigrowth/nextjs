@@ -12,13 +12,13 @@ const ALL_TAXONOMIES = gql`
     freelancerCategories {
       ...FreelancerCategoryEntity
     }
-    skills {
+    skills(sort: "label:asc") {
       ...SkillEntity
     }
-    tags {
+    tags(sort: "label:asc") {
       ...TagEntity
     }
-    categories {
+    categories(sort: "label:asc") {
       ...CategoryEntity
     }
   }
