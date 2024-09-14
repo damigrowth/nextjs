@@ -35,16 +35,19 @@ export default function MegaMenu({ categories, staticMenuClass }) {
           Κατηγορίες
         </a>
         <ul ref={inputRef} className={`menu pl0 ${isActive ? "active" : ""}`}>
-          {categories.map((cat) => (
-            <li key={cat.id}>
-              <Link href={`/ipiresies/${cat.slug}`} className="dropdown">
+          {categories.map((category) => (
+            <li key={category.id}>
+              <Link href={`/ipiresies/${category.slug}`} className="dropdown">
                 <span className="menu-icn flaticon-developer" />
-                <span className="menu-title">{cat.label}</span>
+                <span className="menu-title">{category.label}</span>
               </Link>
-              <div className="drop-menu d-flex justify-content-between">
-                <MegaMenuPillar />
-                <MegaMenuPillar />
-                <MegaMenuPillar />
+              <div className="drop-menu ">
+                {category.subcategories.map((subcategory) => (
+                  <MegaMenuPillar
+                    key={subcategory.id}
+                    subcategory={subcategory}
+                  />
+                ))}
               </div>
             </li>
           ))}
