@@ -12,6 +12,16 @@ export default function Header({ authenticated, user, header }) {
     id: i + 1,
     label: item.attributes.label,
     slug: item.attributes.slug,
+    subcategories: item.attributes.subcategories.data.map((subcategory) => ({
+      label: subcategory.attributes.label,
+      slug: subcategory.attributes.slug,
+      subdivisions: subcategory.attributes.subdivisions.data.map(
+        (subdivision) => ({
+          label: subdivision.attributes.label,
+          slug: subdivision.attributes.slug,
+        })
+      ),
+    })),
   }));
   return (
     <>

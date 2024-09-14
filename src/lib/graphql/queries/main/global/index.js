@@ -22,6 +22,25 @@ const HEADER = gql`
               attributes {
                 label
                 slug
+                subcategories(sort: "label:asc", pagination: { limit: 6 }) {
+                  data {
+                    attributes {
+                      label
+                      slug
+                      subdivisions(
+                        sort: "label:asc"
+                        pagination: { limit: 4 }
+                      ) {
+                        data {
+                          attributes {
+                            label
+                            slug
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }
           }
