@@ -3,7 +3,7 @@ import React from "react";
 
 export default function MegaMenuPillar({ subcategory }) {
   return (
-    <div>
+    <>
       <Link
         className="h6 p0 mb10 fz15 fw600"
         href={`/ipiresies/${subcategory.slug}`}
@@ -19,6 +19,6 @@ export default function MegaMenuPillar({ subcategory }) {
           </li>
         ))}
       </ul>
-    </div>
+    </>
   );
 }
