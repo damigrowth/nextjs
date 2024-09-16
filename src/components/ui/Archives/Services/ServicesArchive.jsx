@@ -10,6 +10,7 @@ import BorderSpinner from "../../Spinners/BorderSpinner";
 import SidebarModal from "../SidebarModal";
 
 export default function ServicesArchive({
+  currCategory,
   categories,
   searchParams,
   paramsFilters,
@@ -25,7 +26,9 @@ export default function ServicesArchive({
       heading: "Κατηγορία",
       params: ["cat"],
       childPath,
-      component: <Category categories={categories} />,
+      component: (
+        <Category currCategory={currCategory} categories={categories} />
+      ),
     },
     { heading: "Τιμή", params: ["min", "max"], component: <Price /> },
     { heading: "Χρόνος παράδοσης", params: ["time"], component: <Time /> },
