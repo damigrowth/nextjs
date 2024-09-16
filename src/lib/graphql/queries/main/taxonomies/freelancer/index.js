@@ -4,23 +4,37 @@ import {
   FREELANCER_CATEGORY_FULL,
   FREELANCER_SUBCATEGORY,
 } from "../../../fragments/taxonomies/freelancer";
+import { SINGLE_IMAGE } from "../../../fragments/global";
+
+// const FREELANCER_CATEGORIES = gql`
+//   query GetFreelancerCategories {
+//     freelancerCategories(sort: "label:asc") {
+//       data {
+//         ...FreelancerCategoryFull
+//       }
+//     }
+//   }
+//   ${FREELANCER_CATEGORY_FULL}
+// `;
 
 const FREELANCER_CATEGORIES = gql`
-  query GetFreelancerCategories {
-    freelancerCategories(sort: "label:desc") {
+  query FreelancerCategories {
+    freelancerCategories(sort: "label:asc") {
       data {
-        ...FreelancerCategoryFull
+        attributes {
+          label
+          slug
+        }
       }
     }
   }
-  ${FREELANCER_CATEGORY_FULL}
 `;
 
 const FREELANCER_CATEGORIES_SEARCH = gql`
   query FreelancerCategoriesSearch($label: String, $type: String) {
     freelancerCategories(
       filters: { label: { containsi: $label }, type: { slug: { eq: $type } } }
-      sort: "label:desc"
+      sort: "label:asc"
     ) {
       data {
         ...FreelancerCategoryFull
@@ -32,7 +46,7 @@ const FREELANCER_CATEGORIES_SEARCH = gql`
 
 const FREELANCER_SUBCATEGORIES = gql`
   query FreelancerSubcategories {
-    freelancerSubcategories {
+    freelancerSubcategories(sort: "label:asc") {
       data {
         attributes {
           label
@@ -46,7 +60,11 @@ const FREELANCER_SUBCATEGORIES = gql`
 const FREELANCER_SUBCATEGORIES_SEARCH = gql`
   query FreelancerSubcategoriesSearch($term: String, $type: String) {
     freelancerSubcategories(
-      filters: { label: { containsi: $term }, type: { slug: { eq: $type } } }
+      filters: {
+        label: { containsi: $term }
+        type: { slug: { eq: $type } }
+        sort: "label:asc"
+      }
     ) {
       data {
         attributes {
@@ -85,10 +103,53 @@ const FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH = gql`
   ${FREELANCER_SUBCATEGORY}
 `;
 
+const FREELANCER_TAXONOMIES_BY_SLUG = gql`
+  query FreelancerTaxonomiesBySlug(
+    $category: String
+    $subcategory: String
+    $type: String
+  ) {
+    freelancerCategories(
+      filters: { slug: { eq: $category } }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          plural
+          slug
+          description
+          image {
+            ...SingleImage
+          }
+        }
+      }
+    }
+    freelancerSubcategories(
+      filters: { slug: { eq: $subcategory }, type: { slug: { eq: $type } } }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          plural
+          slug
+          description
+          image {
+            ...SingleImage
+          }
+        }
+      }
+    }
+  }
+  ${SINGLE_IMAGE}
+`;
+
 export {
   FREELANCER_CATEGORIES,
   FREELANCER_CATEGORIES_SEARCH,
   FREELANCER_SUBCATEGORIES,
   FREELANCER_SUBCATEGORIES_SEARCH,
   FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH,
+  FREELANCER_TAXONOMIES_BY_SLUG,
 };

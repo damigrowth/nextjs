@@ -1,4 +1,7 @@
+import Banner from "@/components/ui/Archives/Banner";
+import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import FreelancersArchive from "@/components/ui/Archives/Freelancers/FreelancersArchive";
+import Tabs from "@/components/ui/Archives/Tabs";
 import { getData } from "@/lib/client/operations";
 import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
 import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
@@ -69,7 +72,6 @@ export default async function page({ params, searchParams }) {
 
   const { freelancerCategories } = await getData(FREELANCER_CATEGORIES_SEARCH, {
     label: categorySearch,
-    type: "freelancer",
   });
 
   const { counties } = await getData(COUNTIES_SEARCH, {
@@ -78,6 +80,21 @@ export default async function page({ params, searchParams }) {
 
   return (
     <>
+      <Tabs
+        parentPathLabel="Όλες οι κατηγορίες"
+        parentPathLink="pros"
+        categories={freelancerCategories?.data}
+        plural
+      />
+      <Breadcrumb
+        parentPathLabel="Επαγγελματίες"
+        parentPathLink="pros"
+        plural
+      />
+      <Banner
+        heading="Βρείτε Επαγγελματίες"
+        description="Ανακαλύψτε και προσλάβετε τους καλύτερους επαγγελματίες για οποιαδήποτε ανάγκη."
+      />
       <FreelancersArchive
         categories={freelancerCategories?.data}
         counties={counties?.data}

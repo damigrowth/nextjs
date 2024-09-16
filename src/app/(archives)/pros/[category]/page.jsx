@@ -1,7 +1,15 @@
+import Banner from "@/components/ui/Archives/Banner";
+import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import FreelancersArchive from "@/components/ui/Archives/Freelancers/FreelancersArchive";
+import Tabs from "@/components/ui/Archives/Tabs";
 import { getData } from "@/lib/client/operations";
 import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
-import { FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import {
+  FREELANCER_CATEGORIES,
+  FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH,
+  FREELANCER_TAXONOMIES_BY_SLUG,
+} from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import { inspect } from "@/utils/inspect";
 import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 
 // Dynamic SEO
@@ -30,6 +38,18 @@ export async function generateMetadata({ params }) {
 
 export default async function page({ params, searchParams }) {
   const { category } = params;
+
+  const { freelancerCategories } = await getData(FREELANCER_CATEGORIES);
+
+  const { freelancerCategories: freelancerCategoriesData } = await getData(
+    FREELANCER_TAXONOMIES_BY_SLUG,
+    {
+      category,
+      type: "freelancer",
+    }
+  );
+
+  const currCategory = freelancerCategoriesData?.data[0]?.attributes;
 
   const {
     min,
@@ -89,9 +109,26 @@ export default async function page({ params, searchParams }) {
     name: coverageCountySearch,
   });
 
+  // inspect(freelancerCategories);
   return (
     <>
+      <Tabs
+        parentPathLabel="Όλες οι κατηγορίες"
+        parentPathLink="pros"
+        categories={freelancerCategories?.data}
+      />
+      <Breadcrumb
+        parentPathLabel="Επαγγελματίες"
+        parentPathLink="pros"
+        category={currCategory}
+      />
+      <Banner
+        heading={currCategory?.label}
+        description={currCategory?.description}
+        image={currCategory?.image?.data?.attributes?.formats?.small?.url}
+      />
       <FreelancersArchive
+        currCategory={currCategory?.label}
         categories={freelancerSubcategories?.data}
         counties={counties?.data}
         searchParams={searchParams}

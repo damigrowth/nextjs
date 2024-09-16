@@ -124,14 +124,14 @@ export default function SearchSelectSingle({
   const isDisabled = () => searchParams.has(paramDisabledName);
 
   const searchFilter = (item) =>
-    item.label.toLowerCase().includes(search.toLowerCase());
+    item?.label?.toLowerCase().includes(search.toLowerCase());
 
   const listFilters = filterableOptions.filter(searchFilter).map((item, i) => (
     <li
       key={i}
       name={`select-${paramOptionName}-${i}`}
       className={`dropdown-item ${
-        selectedOption.label === item.label ? "selected active" : ""
+        selectedOption?.label === item?.label ? "selected active" : ""
       }`}
       onClick={() => {
         selectHandler(item);
@@ -139,11 +139,10 @@ export default function SearchSelectSingle({
       }}
     >
       <a>
-        <span className="text">{item.label}</span>
+        <span className="text">{item?.label}</span>
       </a>
     </li>
   ));
-
   const generateLink = (value) => {
     if (value === "" || value === "default") {
       // If value is empty or default, return to the root
@@ -151,15 +150,43 @@ export default function SearchSelectSingle({
     }
 
     let newPath;
-    if (!parent) {
-      // If no parent, set as parent
-      newPath = `/${root}/${value}`;
-    } else if (!child) {
-      // If no child, set as child
-      newPath = `/${root}/${parent}/${value}`;
-    } else {
-      // If child exists, set as last
-      newPath = `/${root}/${parent}/${child}/${value}`;
+
+    switch (root) {
+      case "pros":
+        // "pros" has fewer segments (parent, child)
+        if (!parent) {
+          // If no parent, use root and value as parent
+          newPath = `/${root}/${value}`;
+        } else if (!child) {
+          // If no child, use root, parent, and value as child
+          newPath = `/${root}/${parent}/${value}`;
+        } else {
+          // If child exists, replace child with value (no deeper nesting)
+          newPath = `/${root}/${parent}/${value}`;
+        }
+        break;
+
+      case "ipiresies":
+        // "ipiresies" allows deeper nesting with more segments (parent, child, last)
+        if (!parent) {
+          // If no parent, use root and value as parent
+          newPath = `/${root}/${value}`;
+        } else if (!child) {
+          // If no child, use root, parent, and value as child
+          newPath = `/${root}/${parent}/${value}`;
+        } else if (!last) {
+          // If no last, use root, parent, child, and value as last
+          newPath = `/${root}/${parent}/${child}/${value}`;
+        } else {
+          // If all segments are present, replace the last with value
+          newPath = `/${root}/${parent}/${child}/${value}`;
+        }
+        break;
+
+      default:
+        // Handle cases where root doesn't match "pros" or "ipiresies"
+        newPath = `/${root}`;
+        break;
     }
 
     const queryString = searchParams.toString();

@@ -15,6 +15,7 @@ import Top from "./Filters/Top";
 import Verified from "./Filters/Verified";
 
 export default function FreelancersArchive({
+  currCategory,
   categories,
   counties,
   searchParams,
@@ -31,7 +32,9 @@ export default function FreelancersArchive({
       heading: "Κατηγορία",
       params: ["cat"],
       childPath,
-      component: <Category categories={categories} />,
+      component: (
+        <Category currCategory={currCategory} categories={categories} />
+      ),
     },
     { heading: "Εργατοώρα", params: ["min", "max"], component: <Rate /> },
     {
