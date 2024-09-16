@@ -128,12 +128,19 @@ const SERVICES_ARCHIVE = gql`
           { title: { containsi: $search } }
           { description: { containsi: $search } }
           { category: { label: { containsi: $search } } }
-          { category: { subcategories: { label: { containsi: $search } } } }
+          { subcategory: { label: { containsi: $search } } }
+          { subdivision: { label: { containsi: $search } } }
         ]
         and: [
           { price: { gte: $min, lte: $max } }
           { time: { lte: $time } }
-          { category: { slug: { eq: $cat } } }
+          {
+            or: [
+              { category: { slug: { eq: $cat } } }
+              { subcategory: { slug: { eq: $cat } } }
+              { subdivision: { slug: { eq: $cat } } }
+            ]
+          }
           { freelancer: { user: { verified: { eq: $verified } } } }
         ]
       }

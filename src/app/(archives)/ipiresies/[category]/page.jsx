@@ -2,7 +2,15 @@ import React from "react";
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
 import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
-import { CATEGORY_SUBCATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/service";
+import {
+  CATEGORY_BY_SLUG,
+  CATEGORY_SUBCATEGORIES_SEARCH,
+  CATEGORIES,
+  TAXONOMIES_BY_SLUG,
+} from "@/lib/graphql/queries/main/taxonomies/service";
+import Tabs from "@/components/ui/Archives/Tabs";
+import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
+import Banner from "@/components/ui/Archives/Banner";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
@@ -27,7 +35,23 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function page({ params, searchParams }) {
-  const { category } = params;
+  const { category, subcategory, subdivision } = params;
+
+  const { categories } = await getData(CATEGORIES);
+
+  const {
+    categories: categoriesData,
+    subcategories: subcategoriesData,
+    subdivisions: subdivisionsData,
+  } = await getData(TAXONOMIES_BY_SLUG, {
+    category,
+    subcategory: "",
+    subdivision: "",
+  });
+
+  const currCategory = categoriesData?.data[0]?.attributes;
+  const currSubcategory = subcategoriesData?.data[0]?.attributes;
+  const currSubdivision = subdivisionsData?.data[0]?.attributes;
 
   const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
 
@@ -55,7 +79,25 @@ export default async function page({ params, searchParams }) {
 
   return (
     <>
+      <Tabs
+        parentPathLabel="Όλες οι κατηγορίες"
+        parentPathLink="ipiresies"
+        categories={categories?.data}
+      />
+      <Breadcrumb
+        parentPathLabel="Υπηρεσίες"
+        parentPathLink="ipiresies"
+        category={currCategory}
+        subcategory={currSubcategory}
+        subdivision={currSubdivision}
+      />
+      <Banner
+        heading={currCategory?.label}
+        description={currCategory?.description}
+        image={currCategory?.image?.data?.attributes?.formats?.small?.url}
+      />
       <ServicesArchive
+        currCategory={currCategory?.label}
         categories={subcategories?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}

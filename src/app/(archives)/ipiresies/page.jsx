@@ -1,5 +1,9 @@
+import React from "react";
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
+import Tabs from "@/components/ui/Archives/Tabs";
+import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
+import Banner from "@/components/ui/Archives/Banner";
 import { CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/service";
 import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
 
@@ -42,6 +46,16 @@ export default async function page({ searchParams }) {
 
   return (
     <>
+      <Tabs
+        parentPathLabel="Όλες οι κατηγορίες"
+        parentPathLink="ipiresies"
+        categories={categories?.data}
+      />
+      <Breadcrumb parentPathLabel="Υπηρεσίες" parentPathLink="ipiresies" />
+      <Banner
+        heading="Όλες οι Υπηρεσίες"
+        description="Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας."
+      />
       <ServicesArchive
         categories={categories?.data}
         searchParams={searchParams}
