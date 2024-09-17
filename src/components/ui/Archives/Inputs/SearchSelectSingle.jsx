@@ -153,7 +153,8 @@ export default function SearchSelectSingle({
 
     switch (root) {
       case "pros":
-        // "pros" has fewer segments (parent, child)
+      case "companies":
+        // Both "pros" and "companies" have fewer segments (parent, child)
         if (!parent) {
           // If no parent, use root and value as parent
           newPath = `/${root}/${value}`;
@@ -184,7 +185,7 @@ export default function SearchSelectSingle({
         break;
 
       default:
-        // Handle cases where root doesn't match "pros" or "ipiresies"
+        // Handle cases where root doesn't match "pros", "companies", or "ipiresies"
         newPath = `/${root}`;
         break;
     }

@@ -60,11 +60,8 @@ const FREELANCER_SUBCATEGORIES = gql`
 const FREELANCER_SUBCATEGORIES_SEARCH = gql`
   query FreelancerSubcategoriesSearch($term: String, $type: String) {
     freelancerSubcategories(
-      filters: {
-        label: { containsi: $term }
-        type: { slug: { eq: $type } }
-        sort: "label:asc"
-      }
+      filters: { label: { containsi: $term }, type: { slug: { eq: $type } } }
+      sort: "label:asc"
     ) {
       data {
         attributes {

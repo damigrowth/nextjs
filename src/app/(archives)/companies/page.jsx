@@ -1,7 +1,11 @@
+import Banner from "@/components/ui/Archives/Banner";
+import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import FreelancersArchive from "@/components/ui/Archives/Freelancers/FreelancersArchive";
+import Tabs from "@/components/ui/Archives/Tabs";
 import { getData } from "@/lib/client/operations";
 import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
 import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import { inspect } from "@/utils/inspect";
 import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
 
 // Static SEO
@@ -77,6 +81,21 @@ export default async function page({ params, searchParams }) {
 
   return (
     <>
+      <Tabs
+        parentPathLabel="Όλες οι κατηγορίες"
+        parentPathLink="companies"
+        categories={freelancerCategories?.data}
+        plural
+      />
+      <Breadcrumb
+        parentPathLabel="Επιχειρήσεις"
+        parentPathLink="companies"
+        plural
+      />
+      <Banner
+        heading="Βρείτε Επιχειρήσεις"
+        description="Ανακαλύψτε και προσλάβετε τις καλύτερες επιχειρήσεις"
+      />
       <FreelancersArchive
         categories={freelancerCategories?.data}
         counties={counties?.data}

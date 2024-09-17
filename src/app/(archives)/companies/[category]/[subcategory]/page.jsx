@@ -1,9 +1,14 @@
+import Banner from "@/components/ui/Archives/Banner";
+import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import FreelancersArchive from "@/components/ui/Archives/Freelancers/FreelancersArchive";
+import Tabs from "@/components/ui/Archives/Tabs";
 import { getData } from "@/lib/client/operations";
 import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
 import {
+  FREELANCER_CATEGORIES,
   FREELANCER_CATEGORIES_SEARCH,
   FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH,
+  FREELANCER_TAXONOMIES_BY_SLUG,
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 
@@ -32,7 +37,21 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function page({ params, searchParams }) {
-  const { category } = params;
+  const { category, subcategory } = params;
+
+  const { freelancerCategories } = await getData(FREELANCER_CATEGORIES);
+
+  const {
+    freelancerCategories: freelancerCategoriesData,
+    freelancerSubcategories: freelancerSubcategoriesData,
+  } = await getData(FREELANCER_TAXONOMIES_BY_SLUG, {
+    category,
+    subcategory,
+    type: "company",
+  });
+
+  const currCategory = freelancerCategoriesData?.data[0]?.attributes;
+  const currSubcategory = freelancerSubcategoriesData?.data[0]?.attributes;
 
   const {
     min,
@@ -94,7 +113,25 @@ export default async function page({ params, searchParams }) {
 
   return (
     <>
+      <Tabs
+        parentPathLabel="Όλες οι κατηγορίες"
+        parentPathLink="companies"
+        categories={freelancerCategories?.data}
+      />
+      <Breadcrumb
+        parentPathLabel="Επιχειρήσεις"
+        parentPathLink="companies"
+        category={currCategory}
+        subcategory={currSubcategory}
+        plural
+      />
+      <Banner
+        heading={currSubcategory?.plural}
+        description={currSubcategory?.description}
+        image={currSubcategory?.image?.data?.attributes?.formats?.small?.url}
+      />
       <FreelancersArchive
+        currCategory={currSubcategory?.label}
         categories={freelancerSubcategories?.data}
         counties={counties?.data}
         searchParams={searchParams}
