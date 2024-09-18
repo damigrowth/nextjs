@@ -39,21 +39,19 @@ import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 export default async function page({ params, searchParams }) {
   const { category, subcategory } = params;
 
-  const { freelancerCategories: mainCategories } = await getData(
-    FREELANCER_CATEGORIES
+  const { categories } = await getData(FREELANCER_CATEGORIES);
+
+  const { categoryBySlug, subcategoryBySlug } = await getData(
+    FREELANCER_TAXONOMIES_BY_SLUG,
+    {
+      category,
+      subcategory,
+      type: "freelancer",
+    }
   );
 
-  const {
-    freelancerCategories: categoriesData,
-    freelancerSubcategories: subcategoriesData,
-  } = await getData(FREELANCER_TAXONOMIES_BY_SLUG, {
-    category,
-    subcategory,
-    type: "freelancer",
-  });
-
-  const currCategory = categoriesData?.data[0]?.attributes;
-  const currSubcategory = subcategoriesData?.data[0]?.attributes;
+  const currCategory = categoryBySlug?.data[0]?.attributes;
+  const currSubcategory = subcategoryBySlug?.data[0]?.attributes;
 
   const {
     min,
@@ -101,7 +99,7 @@ export default async function page({ params, searchParams }) {
   let categorySearch = cat_s ? cat_s : undefined;
   let coverageCountySearch = cov_c_s ? cov_c_s : undefined;
 
-  const { freelancerSubcategories } = await getData(
+  const { subcategoriesSearch } = await getData(
     FREELANCER_SUBCATEGORIES_SEARCH,
     {
       type: "freelancer",
@@ -119,7 +117,7 @@ export default async function page({ params, searchParams }) {
       <Tabs
         parentPathLabel="Όλες οι κατηγορίες"
         parentPathLink="pros"
-        categories={mainCategories?.data}
+        categories={categories?.data}
       />
       <Breadcrumb
         parentPathLabel="Επαγγελματίες"
@@ -135,7 +133,7 @@ export default async function page({ params, searchParams }) {
       />
       <FreelancersArchive
         currCategory={currSubcategory?.label}
-        categories={freelancerSubcategories?.data}
+        categories={subcategoriesSearch?.data}
         counties={counties?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}

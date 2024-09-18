@@ -39,19 +39,14 @@ import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 export default async function page({ params, searchParams }) {
   const { category, subcategory } = params;
 
-  const { freelancerCategories: mainCategories } = await getData(
-    FREELANCER_CATEGORIES
-  );
+  const { categories } = await getData(FREELANCER_CATEGORIES);
 
-  const { freelancerCategories: categoriesData } = await getData(
-    FREELANCER_TAXONOMIES_BY_SLUG,
-    {
-      category,
-      type: "freelancer",
-    }
-  );
+  const { categoryBySlug } = await getData(FREELANCER_TAXONOMIES_BY_SLUG, {
+    category,
+    type: "freelancer",
+  });
 
-  const currCategory = categoriesData?.data[0]?.attributes;
+  const currCategory = categoryBySlug?.data[0]?.attributes;
 
   const {
     min,
@@ -99,7 +94,7 @@ export default async function page({ params, searchParams }) {
   let categorySearch = cat_s ? cat_s : undefined;
   let coverageCountySearch = cov_c_s ? cov_c_s : undefined;
 
-  const { freelancerSubcategories } = await getData(
+  const { subcategoriesSearch } = await getData(
     FREELANCER_SUBCATEGORIES_SEARCH,
     {
       type: "freelancer",
@@ -118,7 +113,7 @@ export default async function page({ params, searchParams }) {
       <Tabs
         parentPathLabel="Όλες οι κατηγορίες"
         parentPathLink="pros"
-        categories={mainCategories?.data}
+        categories={categories?.data}
       />
       <Breadcrumb
         parentPathLabel="Επαγγελματίες"
@@ -132,7 +127,7 @@ export default async function page({ params, searchParams }) {
       />
       <FreelancersArchive
         currCategory={currCategory?.label}
-        categories={freelancerSubcategories?.data}
+        categories={subcategoriesSearch?.data}
         counties={counties?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}

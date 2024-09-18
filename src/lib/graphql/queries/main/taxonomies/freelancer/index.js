@@ -19,7 +19,7 @@ import { SINGLE_IMAGE } from "../../../fragments/global";
 
 const FREELANCER_CATEGORIES = gql`
   query FreelancerCategories {
-    freelancerCategories(sort: "label:asc") {
+    categories: freelancerCategories(sort: "label:asc") {
       data {
         attributes {
           label
@@ -32,7 +32,7 @@ const FREELANCER_CATEGORIES = gql`
 
 const FREELANCER_CATEGORIES_SEARCH = gql`
   query FreelancerCategoriesSearch($label: String, $type: String) {
-    freelancerCategories(
+    categoriesSearch: freelancerCategories(
       filters: { label: { containsi: $label }, type: { slug: { eq: $type } } }
       sort: "label:asc"
     ) {
@@ -49,7 +49,7 @@ const FREELANCER_CATEGORIES_SEARCH = gql`
 
 const FREELANCER_SUBCATEGORIES = gql`
   query FreelancerSubcategories {
-    freelancerSubcategories(sort: "label:asc") {
+    subcategories: freelancerSubcategories(sort: "label:asc") {
       data {
         attributes {
           label
@@ -61,12 +61,12 @@ const FREELANCER_SUBCATEGORIES = gql`
 `;
 
 const FREELANCER_SUBCATEGORIES_SEARCH = gql`
-  query FreelancerCategorySubcategoriesSearch(
+  query FreelancerSubcategoriesSearch(
     $searchTerm: String
     $categorySlug: String
     $type: String
   ) {
-    freelancerSubcategories(
+    subcategoriesSearch: freelancerSubcategories(
       filters: {
         and: [
           { label: { containsi: $searchTerm } }
@@ -93,7 +93,7 @@ const FREELANCER_TAXONOMIES_BY_SLUG = gql`
     $subcategory: String
     $type: String
   ) {
-    freelancerCategories(
+    categoryBySlug: freelancerCategories(
       filters: { slug: { eq: $category } }
       sort: "label:asc"
     ) {
@@ -109,7 +109,7 @@ const FREELANCER_TAXONOMIES_BY_SLUG = gql`
         }
       }
     }
-    freelancerSubcategories(
+    subcategoryBySlug: freelancerSubcategories(
       filters: { slug: { eq: $subcategory }, type: { slug: { eq: $type } } }
       sort: "label:asc"
     ) {

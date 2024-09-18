@@ -29,9 +29,7 @@ export async function generateMetadata() {
 export default async function page({ params, searchParams }) {
   const { category } = params;
 
-  const { freelancerCategories: mainCategories } = await getData(
-    FREELANCER_CATEGORIES
-  );
+  const { categories } = await getData(FREELANCER_CATEGORIES);
 
   const {
     min,
@@ -78,7 +76,7 @@ export default async function page({ params, searchParams }) {
   let categorySearch = cat_s ? cat_s : undefined;
   let coverageCountySearch = cov_c_s ? cov_c_s : undefined;
 
-  const { freelancerCategories } = await getData(FREELANCER_CATEGORIES_SEARCH, {
+  const { categoriesSearch } = await getData(FREELANCER_CATEGORIES_SEARCH, {
     label: categorySearch,
   });
 
@@ -91,7 +89,7 @@ export default async function page({ params, searchParams }) {
       <Tabs
         parentPathLabel="Όλες οι κατηγορίες"
         parentPathLink="companies"
-        categories={mainCategories?.data}
+        categories={categories?.data}
       />
       <Breadcrumb
         parentPathLabel="Επιχειρήσεις"
@@ -103,7 +101,7 @@ export default async function page({ params, searchParams }) {
         description="Ανακαλύψτε και προσλάβετε τις καλύτερες επιχειρήσεις"
       />
       <FreelancersArchive
-        categories={freelancerCategories?.data}
+        categories={categoriesSearch?.data}
         counties={counties?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}
