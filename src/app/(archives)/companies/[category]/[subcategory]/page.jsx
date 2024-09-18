@@ -9,31 +9,25 @@ import {
   FREELANCER_SUBCATEGORIES_SEARCH,
   FREELANCER_TAXONOMIES_BY_SLUG,
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import { dynamicMeta } from "@/utils/Seo/Meta/Meta";
+import { Meta } from "@/utils/Seo/Meta/Meta";
 
 // Dynamic SEO
-// export async function generateMetadata({ params }) {
-//   const { subcategory } = params;
+export async function generateMetadata({ params }) {
+  const { subcategory } = params;
 
-//   const titleTemplate = "%arcCategoryPlural% - Αναζήτηση για Επιχειρήσεις";
-//   const descriptionTemplate =
-//     "Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές. %arcCategoryDesc%";
-//   const descriptionSize = 200;
+  const data = {
+    type: "freelancerSubcategory",
+    params: { category: "", subcategory, type: "company" },
+    titleTemplate: "%arcCategoryPlural% - Αναζήτηση για Επιχειρήσεις",
+    descriptionTemplate:
+      "Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές. %arcCategoryDesc%",
+    size: 200,
+  };
 
-//   const { meta } = await dynamicMeta(
-//     "freelancerSubcategories",
-//     {
-//       type: "company",
-//     },
-//     titleTemplate,
-//     descriptionTemplate,
-//     descriptionSize,
-//     true,
-//     subcategory
-//   );
+  const { meta } = await Meta(data);
 
-//   return meta;
-// }
+  return meta;
+}
 
 export default async function page({ params, searchParams }) {
   const { category, subcategory } = params;

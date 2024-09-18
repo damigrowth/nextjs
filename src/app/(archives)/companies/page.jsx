@@ -8,18 +8,14 @@ import {
   FREELANCER_CATEGORIES,
   FREELANCER_CATEGORIES_SEARCH,
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import { inspect } from "@/utils/inspect";
-import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
+import { Meta } from "@/utils/Seo/Meta/Meta";
 
 // Static SEO
 export async function generateMetadata() {
-  const titleTemplate = "Επιχειρήσεις | Doulitsa";
-  const descriptionTemplate =
-    "Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές.";
-
-  const { meta } = await staticMeta({
-    title: titleTemplate,
-    description: descriptionTemplate,
+  const { meta } = await Meta({
+    titleTemplate: "Επιχειρήσεις | Doulitsa",
+    descriptionTemplate:
+      "Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές.",
     size: 150,
   });
 
