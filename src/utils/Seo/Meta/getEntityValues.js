@@ -1,4 +1,4 @@
-export function getEntityValues(entity, property, pageParams) {
+export function getEntityValues(entity, property) {
   const title = entity.title;
   const displayName =
     entity?.freelancer?.data?.attributes?.user?.data?.attributes?.displayName ||
@@ -9,16 +9,10 @@ export function getEntityValues(entity, property, pageParams) {
   const tagline = entity.tagline;
   const singleImage = entity?.media?.data?.[0]?.attributes?.formats?.small?.url;
 
-  // Find the current entity from the array
-  const currentEntity =
-    (pageParams && entity.find((el) => el.attributes.slug === pageParams)) ||
-    null;
-
-  const arcCategory = currentEntity?.attributes?.label;
-  const arcCategoryPlural = currentEntity?.attributes?.plural;
-  const arcCategoryDesc = currentEntity?.attributes?.description;
-  const arcCategoryImage =
-    currentEntity?.attributes?.image?.data?.attributes?.formats?.small?.url;
+  const arcCategory = entity?.label;
+  const arcCategoryPlural = entity?.plural;
+  const arcCategoryDesc = entity?.description;
+  const arcCategoryImage = entity?.image?.data?.attributes?.formats?.small?.url;
 
   switch (property) {
     case "title":

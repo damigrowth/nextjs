@@ -1,7 +1,7 @@
 import React from "react";
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
-import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
+import { dynamicMeta, Meta } from "@/utils/Seo/Meta/Meta";
 import {
   CATEGORIES,
   SUBDIVISIONS_SEARCH,
@@ -13,26 +13,21 @@ import Banner from "@/components/ui/Archives/Banner";
 import { inspect } from "@/utils/inspect";
 
 // Dynamic SEO
-// export async function generateMetadata({ params }) {
-//   const { subdivision } = params;
+export async function generateMetadata({ params }) {
+  const { subdivision } = params;
 
-//   const titleTemplate =
-//     "%arcCategory% - Βρες τις καλύτερες Υπηρεσίες στη Doulitsa";
-//   const descriptionTemplate = "%arcCategoryDesc%";
-//   const descriptionSize = 100;
+  const data = {
+    type: "subdivision",
+    params: { category: "", subcategory: "", subdivision },
+    titleTemplate: "%arcCategory% - Βρες τις καλύτερες Υπηρεσίες στη Doulitsa",
+    descriptionTemplate: "%arcCategoryDesc%",
+    size: 100,
+  };
 
-//   const { meta } = await dynamicMeta(
-//     "subcategories",
-//     undefined,
-//     titleTemplate,
-//     descriptionTemplate,
-//     descriptionSize,
-//     true,
-//     subdivision
-//   );
+  const { meta } = await Meta(data);
 
-//   return meta;
-// }
+  return meta;
+}
 
 export default async function page({ params, searchParams }) {
   const { category, subcategory, subdivision } = params;

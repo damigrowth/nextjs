@@ -27,9 +27,9 @@ const SERVICE_BY_SLUG = gql`
   ${SERVICE_RELATIONS}
 `;
 
-const SERVICE_SEO_BY_SLUG = gql`
+const SERVICE_PAGE_SEO = gql`
   query GetServiceSEO($slug: String!) {
-    services(filters: { slug: { eq: $slug } }) {
+    service: services(filters: { slug: { eq: $slug } }) {
       data {
         attributes {
           ...ServiceSEO
@@ -188,7 +188,7 @@ const SERVICES_BY_CATEGORY = gql`
 
 export {
   SERVICE_BY_SLUG,
-  SERVICE_SEO_BY_SLUG,
+  SERVICE_PAGE_SEO,
   COUNT_SERVICES_BY_RATING,
   FEATURED_SERVICES_BY_FREELANCER,
   SERVICE_UID,

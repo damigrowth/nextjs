@@ -6,26 +6,23 @@ import { getData } from "@/lib/client/operations";
 import FeaturedFreelancers from "@/components/ui/Sections/Featured/Freelancers/FeaturedFreelancers";
 import AllTaxonomies from "@/components/ui/Sections/Taxonomies/AllTaxonomies";
 import Hero from "@/components/ui/Sections/Hero/Hero";
-import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
 import {
   ALL_TAXONOMIES,
   FEATURED_CATEGORIES,
 } from "@/lib/graphql/queries/main/taxonomies";
 import { FEATURED_SERVICES } from "@/lib/graphql/queries/main/service";
 import { FEATURED_FREELANCERS } from "@/lib/graphql/queries/main/freelancer";
+import { Meta } from "@/utils/Seo/Meta/Meta";
 
 // Static SEO
-export async function generateMetadata() {
-  const titleTemplate =
-    "Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη";
-  const descriptionTemplate =
-    "Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.";
-  const descriptionSize = 160;
 
-  const { meta } = await staticMeta({
-    title: titleTemplate,
-    description: descriptionTemplate,
-    size: descriptionSize,
+export async function generateMetadata() {
+  const { meta } = await Meta({
+    titleTemplate:
+      "Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη",
+    descriptionTemplate:
+      "Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.",
+    size: 160,
   });
 
   return meta;

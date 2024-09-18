@@ -1,39 +1,31 @@
 "use server";
 
 import { getData } from "@/lib/client/operations";
-import { FREELANCER_SEO_BY_USERNAME } from "@/lib/graphql/queries/main/freelancer";
-import { SERVICE_SEO_BY_SLUG } from "@/lib/graphql/queries/main/service";
+import { FREELANCER_PAGE_SEO } from "@/lib/graphql/queries/main/freelancer";
+import { SERVICE_PAGE_SEO } from "@/lib/graphql/queries/main/service";
+import { FREELANCERS_ARCHIVE_SEO } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import {
-  FREELANCER_CATEGORIES_SEARCH,
-  FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH,
-} from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import {
-  CATEGORIES,
-  SUBCATEGORIES,
+  SERVICES_ARCHIVE_SEO,
+  TAXONOMIES_BY_SLUG,
 } from "@/lib/graphql/queries/main/taxonomies/service";
 
 const ENTITY_QUERIES = {
-  service: SERVICE_SEO_BY_SLUG,
-  freelancer: FREELANCER_SEO_BY_USERNAME,
-  categories: CATEGORIES,
-  subcategories: SUBCATEGORIES,
-  freelancerCategories: FREELANCER_CATEGORIES_SEARCH,
-  freelancerSubcategories: FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH,
+  service: SERVICE_PAGE_SEO,
+  freelancer: FREELANCER_PAGE_SEO,
+  category: SERVICES_ARCHIVE_SEO,
+  subcategory: SERVICES_ARCHIVE_SEO,
+  subdivision: SERVICES_ARCHIVE_SEO,
+  freelancerCategory: FREELANCERS_ARCHIVE_SEO,
+  freelancerSubcategory: FREELANCERS_ARCHIVE_SEO,
 };
 
-export async function fetchEntity(entityType, params, plural) {
-  const query = ENTITY_QUERIES[entityType];
-  if (!query) throw new Error(`Unsupported entity type: ${entityType}`);
+export async function fetchEntity(type, params) {
+  const query = ENTITY_QUERIES[type];
+  if (!query) throw new Error(`Unsupported entity type: ${type}`);
 
   const data = await getData(query, params);
 
-  let entity = null;
-
-  if (plural) {
-    entity = data?.[entityType]?.data;
-  } else {
-    entity = data?.[`${entityType}s`]?.data?.[0]?.attributes;
-  }
+  const entity = data?.[type]?.data?.[0]?.attributes;
 
   return { entity };
 }

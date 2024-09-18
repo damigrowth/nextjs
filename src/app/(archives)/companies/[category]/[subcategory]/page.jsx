@@ -9,7 +9,7 @@ import {
   FREELANCER_SUBCATEGORIES_SEARCH,
   FREELANCER_TAXONOMIES_BY_SLUG,
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
+import { dynamicMeta } from "@/utils/Seo/Meta/Meta";
 
 // Dynamic SEO
 // export async function generateMetadata({ params }) {

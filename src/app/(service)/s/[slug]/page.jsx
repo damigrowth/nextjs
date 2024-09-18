@@ -5,32 +5,31 @@ import { getReviewsByService, getServiceBySlug } from "@/lib/service/service";
 import ServiceBreadcrumb from "@/components/ui/breadcrumbs/service/ServiceBreadcrumb";
 import { getData } from "@/lib/client/operations";
 import Tabs from "@/components/ui/Archives/Tabs";
-import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
+import { Meta } from "@/utils/Seo/Meta/Meta";
 import { CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/service";
 import FeaturedServices from "@/components/ui/SingleService/Featured";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
-  const serviceSlug = params.slug;
-  const titleTemplate = "%title% από %displayName%";
-  const descriptionTemplate = "%category% - %description%";
-  const descriptionSize = 100;
+  const { slug } = params;
 
-  const { meta } = await dynamicMeta(
-    "service",
-    { slug: serviceSlug },
-    titleTemplate,
-    descriptionTemplate,
-    descriptionSize
-  );
+  const data = {
+    type: "service",
+    params: { slug },
+    titleTemplate: "%title% από %displayName%",
+    descriptionTemplate: "%category% - %description%",
+    size: 100,
+  };
+
+  const { meta } = await Meta(data);
 
   return meta;
 }
 
 export default async function page({ params, searchParams }) {
-  const serviceSlug = params.slug;
+  const { slug } = params;
 
-  const { service, uid } = await getServiceBySlug(serviceSlug);
+  const { service, uid } = await getServiceBySlug(slug);
 
   if (!service) {
     redirect("/not-found");

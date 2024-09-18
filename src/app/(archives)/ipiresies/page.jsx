@@ -8,17 +8,14 @@ import {
   CATEGORIES,
   CATEGORIES_SEARCH,
 } from "@/lib/graphql/queries/main/taxonomies/service";
-import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
+import { Meta } from "@/utils/Seo/Meta/Meta";
 
 // Static SEO
 export async function generateMetadata() {
-  const titleTemplate = "Υπηρεσίες | Doulitsa";
-  const descriptionTemplate =
-    "Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας.";
-
-  const { meta } = await staticMeta({
-    title: titleTemplate,
-    description: descriptionTemplate,
+  const { meta } = await Meta({
+    titleTemplate: "Υπηρεσίες | Doulitsa",
+    descriptionTemplate:
+      "Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας.",
     size: 150,
   });
 

@@ -129,10 +129,53 @@ const FREELANCER_TAXONOMIES_BY_SLUG = gql`
   ${SINGLE_IMAGE}
 `;
 
+const FREELANCERS_ARCHIVE_SEO = gql`
+  query FreelancerTaxonomiesBySlug(
+    $category: String
+    $subcategory: String
+    $type: String
+  ) {
+    freelancerCategory: freelancerCategories(
+      filters: { slug: { eq: $category } }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          plural
+          slug
+          description
+          image {
+            ...SingleImage
+          }
+        }
+      }
+    }
+    freelancerSubcategory: freelancerSubcategories(
+      filters: { slug: { eq: $subcategory }, type: { slug: { eq: $type } } }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          plural
+          slug
+          description
+          image {
+            ...SingleImage
+          }
+        }
+      }
+    }
+  }
+  ${SINGLE_IMAGE}
+`;
+
 export {
   FREELANCER_CATEGORIES,
   FREELANCER_CATEGORIES_SEARCH,
   FREELANCER_SUBCATEGORIES,
   FREELANCER_SUBCATEGORIES_SEARCH,
   FREELANCER_TAXONOMIES_BY_SLUG,
+  FREELANCERS_ARCHIVE_SEO,
 };

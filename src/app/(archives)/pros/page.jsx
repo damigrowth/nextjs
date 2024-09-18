@@ -8,22 +8,19 @@ import {
   FREELANCER_CATEGORIES,
   FREELANCER_CATEGORIES_SEARCH,
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
+import { Meta } from "@/utils/Seo/Meta/Meta";
 
 // Static SEO
-// export async function generateMetadata() {
-//   const titleTemplate = "Επαγγελματίες | Doulitsa";
-//   const descriptionTemplate =
-//     "Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές.";
+export async function generateMetadata() {
+  const { meta } = await Meta({
+    titleTemplate: "Επαγγελματίες | Doulitsa",
+    descriptionTemplate:
+      "Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές.",
+    size: 150,
+  });
 
-//   const { meta } = await staticMeta({
-//     title: titleTemplate,
-//     description: descriptionTemplate,
-//     size: 150,
-//   });
-
-//   return meta;
-// }
+  return meta;
+}
 
 export default async function page({ params, searchParams }) {
   const { category, subcategory } = params;

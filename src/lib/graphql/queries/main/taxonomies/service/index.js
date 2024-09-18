@@ -160,6 +160,61 @@ const TAXONOMIES_BY_SLUG = gql`
   ${SINGLE_IMAGE}
 `;
 
+const SERVICES_ARCHIVE_SEO = gql`
+  query ServicesArchiveSeo(
+    $category: String
+    $subcategory: String
+    $subdivision: String
+  ) {
+    category: categories(
+      filters: { slug: { eq: $category } }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+          description
+          image {
+            ...SingleImage
+          }
+        }
+      }
+    }
+    subcategory: subcategories(
+      filters: { slug: { eq: $subcategory } }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+          description
+          image {
+            ...SingleImage
+          }
+        }
+      }
+    }
+    subdivision: subdivisions(
+      filters: { slug: { eq: $subdivision } }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+          description
+          image {
+            ...SingleImage
+          }
+        }
+      }
+    }
+  }
+  ${SINGLE_IMAGE}
+`;
+
 export {
   CATEGORIES,
   CATEGORIES_SEARCH,
@@ -167,4 +222,5 @@ export {
   SUBCATEGORIES_SEARCH,
   SUBDIVISIONS_SEARCH,
   TAXONOMIES_BY_SLUG,
+  SERVICES_ARCHIVE_SEO,
 };

@@ -37,9 +37,9 @@ const FREELANCER_BY_USERNAME = gql`
   ${FREELANCER_RELATIONS}
 `;
 
-const FREELANCER_SEO_BY_USERNAME = gql`
+const FREELANCER_PAGE_SEO = gql`
   query GetFreelancerSEO($username: String!) {
-    freelancers(filters: { username: { eq: $username } }) {
+    freelancer: freelancers(filters: { username: { eq: $username } }) {
       data {
         attributes {
           ...FreelancerSEO
@@ -140,7 +140,7 @@ const FEATURED_FREELANCERS = gql`
 export {
   FREELANCER_TYPES,
   FREELANCER_BY_USERNAME,
-  FREELANCER_SEO_BY_USERNAME,
+  FREELANCER_PAGE_SEO,
   COUNT_FREELANCERS_BY_RATING,
   FREELANCERS_ARCHIVE,
   FEATURED_FREELANCERS,
