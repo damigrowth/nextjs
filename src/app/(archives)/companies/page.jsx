@@ -1,18 +1,21 @@
+import Banner from "@/components/ui/Archives/Banner";
+import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import FreelancersArchive from "@/components/ui/Archives/Freelancers/FreelancersArchive";
+import Tabs from "@/components/ui/Archives/Tabs";
 import { getData } from "@/lib/client/operations";
 import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
-import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
+import {
+  FREELANCER_CATEGORIES,
+  FREELANCER_CATEGORIES_SEARCH,
+} from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import { Meta } from "@/utils/Seo/Meta/Meta";
 
 // Static SEO
 export async function generateMetadata() {
-  const titleTemplate = "Επιχειρήσεις | Doulitsa";
-  const descriptionTemplate =
-    "Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές.";
-
-  const { meta } = await staticMeta({
-    title: titleTemplate,
-    description: descriptionTemplate,
+  const { meta } = await Meta({
+    titleTemplate: "Επιχειρήσεις | Doulitsa",
+    descriptionTemplate:
+      "Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές.",
     size: 150,
   });
 
@@ -21,6 +24,8 @@ export async function generateMetadata() {
 
 export default async function page({ params, searchParams }) {
   const { category } = params;
+
+  const { categories } = await getData(FREELANCER_CATEGORIES);
 
   const {
     min,
@@ -67,7 +72,7 @@ export default async function page({ params, searchParams }) {
   let categorySearch = cat_s ? cat_s : undefined;
   let coverageCountySearch = cov_c_s ? cov_c_s : undefined;
 
-  const { freelancerCategories } = await getData(FREELANCER_CATEGORIES_SEARCH, {
+  const { categoriesSearch } = await getData(FREELANCER_CATEGORIES_SEARCH, {
     label: categorySearch,
   });
 
@@ -77,8 +82,22 @@ export default async function page({ params, searchParams }) {
 
   return (
     <>
+      <Tabs
+        parentPathLabel="Όλες οι κατηγορίες"
+        parentPathLink="companies"
+        categories={categories?.data}
+      />
+      <Breadcrumb
+        parentPathLabel="Επιχειρήσεις"
+        parentPathLink="companies"
+        plural
+      />
+      <Banner
+        heading="Βρείτε Επιχειρήσεις"
+        description="Ανακαλύψτε και προσλάβετε τις καλύτερες επιχειρήσεις"
+      />
       <FreelancersArchive
-        categories={freelancerCategories?.data}
+        categories={categoriesSearch?.data}
         counties={counties?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}

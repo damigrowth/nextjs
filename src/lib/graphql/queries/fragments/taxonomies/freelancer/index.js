@@ -66,11 +66,6 @@ const FREELANCER_CATEGORY_FULL = gql`
       image {
         ...SingleImage
       }
-      subcategories {
-        data {
-          ...FreelancerSubcategory
-        }
-      }
     }
   }
   ${SINGLE_IMAGE}

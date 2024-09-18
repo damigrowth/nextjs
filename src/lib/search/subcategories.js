@@ -1,7 +1,7 @@
 "use server";
 
 import { getData } from "../client/operations";
-import { CATEGORY_SUBCATEGORIES_SEARCH } from "../graphql/queries/main/taxonomies/service";
+import { SUBCATEGORIES_SEARCH } from "../graphql/queries/main/taxonomies/service";
 
 export async function searchSubcategories(prevState, formData) {
   try {
@@ -10,7 +10,7 @@ export async function searchSubcategories(prevState, formData) {
 
     const searchTerm = formData.get("searchTerm");
 
-    const { subcategories } = await getData(CATEGORY_SUBCATEGORIES_SEARCH, {
+    const { subcategories } = await getData(SUBCATEGORIES_SEARCH, {
       searchTerm: searchTerm,
       categorySlug: category || undefined,
     });

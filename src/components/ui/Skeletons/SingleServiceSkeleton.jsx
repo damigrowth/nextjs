@@ -170,14 +170,14 @@ export default function SingleServiceSkeleton() {
                       // style={{ marginRight: "6px" }}
                     />
                   </div>
-                  <div class="pb-0 bg-white bdrs12 wow fadeInUp default-box-shadow1 ">
-                    <div class="extra-service-tab mb20 mt20">
+                  <div className="pb-0 bg-white bdrs12 wow fadeInUp default-box-shadow1 ">
+                    <div className="extra-service-tab mb20 mt20">
                       <nav>
-                        <div class="nav flex-column nav-tabs">
-                          <button class="small-addon">
-                            <label class="small-addon-container">
-                              <div class="small-addon-content">
-                                <h5 class="small-addon-title">
+                        <div className="nav flex-column nav-tabs">
+                          <button className="small-addon">
+                            <label className="small-addon-container">
+                              <div className="small-addon-content">
+                                <h5 className="small-addon-title">
                                   <Skeleton
                                     width={130}
                                     height={19}
@@ -185,7 +185,7 @@ export default function SingleServiceSkeleton() {
                                     style={{ marginBottom: "6px" }}
                                   />
                                 </h5>
-                                <div class="small-addon-description">
+                                <div className="small-addon-description">
                                   <Skeleton
                                     width={270}
                                     height={15}
@@ -199,7 +199,7 @@ export default function SingleServiceSkeleton() {
                                     // style={{ marginRight: "6px" }}
                                   />
                                 </div>
-                                <div class="small-addon-price"></div>
+                                <div className="small-addon-price"></div>
                               </div>
 
                               <Skeleton

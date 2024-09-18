@@ -3,7 +3,7 @@
 import { truncateText } from "@/utils/truncateText";
 import { headers } from "next/headers";
 
-export async function staticMeta({ title, description, size, image }) {
+export async function MetaData({ title, description, size, image }) {
   const headersList = headers();
   const url = headersList.get("x-current-path") || "/";
 

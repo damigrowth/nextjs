@@ -1,17 +1,21 @@
+import React from "react";
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
-import { CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/service";
-import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
+import Tabs from "@/components/ui/Archives/Tabs";
+import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
+import Banner from "@/components/ui/Archives/Banner";
+import {
+  CATEGORIES,
+  CATEGORIES_SEARCH,
+} from "@/lib/graphql/queries/main/taxonomies/service";
+import { Meta } from "@/utils/Seo/Meta/Meta";
 
 // Static SEO
 export async function generateMetadata() {
-  const titleTemplate = "Υπηρεσίες | Doulitsa";
-  const descriptionTemplate =
-    "Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας.";
-
-  const { meta } = await staticMeta({
-    title: titleTemplate,
-    description: descriptionTemplate,
+  const { meta } = await Meta({
+    titleTemplate: "Υπηρεσίες | Doulitsa",
+    descriptionTemplate:
+      "Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας.",
     size: 150,
   });
 
@@ -19,6 +23,8 @@ export async function generateMetadata() {
 }
 
 export default async function page({ searchParams }) {
+  const { categories } = await getData(CATEGORIES);
+
   const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
 
   const addFilter = (condition, value) => (condition ? value : undefined);
@@ -36,14 +42,24 @@ export default async function page({ searchParams }) {
 
   let categorySearch = cat_s ? cat_s : undefined;
 
-  const { categories } = await getData(CATEGORIES_SEARCH, {
+  const { categoriesSearch } = await getData(CATEGORIES_SEARCH, {
     label: categorySearch,
   });
 
   return (
     <>
-      <ServicesArchive
+      <Tabs
+        parentPathLabel="Όλες οι κατηγορίες"
+        parentPathLink="ipiresies"
         categories={categories?.data}
+      />
+      <Breadcrumb parentPathLabel="Υπηρεσίες" parentPathLink="ipiresies" />
+      <Banner
+        heading="Όλες οι Υπηρεσίες"
+        description="Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας."
+      />
+      <ServicesArchive
+        categories={categoriesSearch?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}
       />

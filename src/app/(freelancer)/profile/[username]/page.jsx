@@ -1,5 +1,4 @@
 import FreelancerProfile from "@/components/ui/profiles/freelancer/FreelancerProfile";
-import TabSection1 from "@/components/section/TabSection1";
 import {
   getFeaturedServicesByFreelancer,
   getFreelancerByUsername,
@@ -9,29 +8,28 @@ import { redirect } from "next/navigation";
 import ProfileBreadcrumb from "@/components/ui/breadcrumbs/freelancer/ProfileBreadcrumb";
 import { getData } from "@/lib/client/operations";
 import Tabs from "@/components/ui/Archives/Tabs";
-import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
-import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import { Meta } from "@/utils/Seo/Meta/Meta";
+import { FREELANCER_CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
-  const username = params.username;
-  const titleTemplate = "%displayName% - %type% %category%. %tagline%";
-  const descriptionTemplate = "%description%";
-  const descriptionSize = 160;
+  const { username } = params;
 
-  const { meta } = await dynamicMeta(
-    "freelancer",
-    { username },
-    titleTemplate,
-    descriptionTemplate,
-    descriptionSize
-  );
+  const data = {
+    type: "freelancer",
+    params: { username },
+    titleTemplate: "%displayName% - %type% - %category%. %tagline%",
+    descriptionTemplate: "%description%",
+    size: 160,
+  };
+
+  const { meta } = await Meta(data);
 
   return meta;
 }
 
 export default async function page({ params, searchParams }) {
-  const username = params.username;
+  const { username } = params;
 
   const { freelancer, uid } = await getFreelancerByUsername(username);
 
@@ -59,18 +57,14 @@ export default async function page({ params, searchParams }) {
 
     const type = freelancer?.type?.data?.attributes?.slug;
 
-    const { freelancerCategories } = await getData(
-      FREELANCER_CATEGORIES_SEARCH,
-      { type }
-    );
+    const { categories } = await getData(FREELANCER_CATEGORIES);
 
     return (
       <>
         <Tabs
           parentPathLabel="Όλες οι κατηγορίες"
           parentPathLink="pros"
-          categories={freelancerCategories?.data}
-          plural
+          categories={categories?.data}
           freelancerCategory={freelancer?.category?.data?.attributes?.slug}
         />
         <ProfileBreadcrumb

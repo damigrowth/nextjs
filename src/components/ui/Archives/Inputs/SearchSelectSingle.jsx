@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useOptimistic, useTransition } from "react";
+import React, { useEffect, useOptimistic, useTransition } from "react";
 import {
   useParams,
   usePathname,
@@ -12,6 +12,7 @@ import Link from "next/link";
 import { getPathname } from "@/utils/paths";
 
 export default function SearchSelectSingle({
+  rootLabel,
   defaultLabel,
   paramOptionName,
   paramSearchName,
@@ -22,18 +23,20 @@ export default function SearchSelectSingle({
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
+  const searchParams = useSearchParams();
 
   // Route segments
   const root = getPathname(pathname, 0);
   const parent = getPathname(pathname, 1);
   const child = getPathname(pathname, 2);
+  const last = getPathname(pathname, 3);
 
-  const searchParams = useSearchParams();
+  const rootOption = { value: "", label: rootLabel };
+  const defaultOption = { value: "default", label: defaultLabel };
 
-  const defaultOption = { value: "", label: defaultLabel };
-
-  // Add default option
-  const allOptions = [defaultOption, ...options];
+  // Include rootOption and defaultOption in allOptions, but only rootOption in filterableOptions
+  const allOptions = [rootOption, defaultOption, ...options];
+  const filterableOptions = [rootOption, ...options];
 
   const getInitialSearch = () => searchParams.get(paramSearchName) || "";
   const [search, setSearch] = useOptimistic(getInitialSearch());
@@ -43,15 +46,18 @@ export default function SearchSelectSingle({
     const searchParamValue = searchParams.get(paramOptionName);
 
     if (searchParamValue) {
-      return allOptions.find((opt) => opt.value === child) || allOptions[0];
+      return (
+        allOptions.find((opt) => opt.value === child || opt.value === last) ||
+        defaultOption
+      );
+    }
+
+    if (last) {
+      return allOptions.find((opt) => opt.value === last) || defaultOption;
     }
 
     if (child) {
-      return allOptions.find((opt) => opt.value === child) || allOptions[0];
-    }
-
-    if (parent) {
-      return defaultOption;
+      return allOptions.find((opt) => opt.value === child) || defaultOption;
     }
 
     return defaultOption;
@@ -62,12 +68,12 @@ export default function SearchSelectSingle({
   );
 
   const getInitialSelectedLink = () => {
-    if (child) {
-      return allOptions.find((opt) => opt.value === child) || allOptions[0];
+    if (last) {
+      return allOptions.find((opt) => opt.value === last) || defaultOption;
     }
 
-    if (parent) {
-      return defaultOption;
+    if (child) {
+      return allOptions.find((opt) => opt.value === child) || defaultOption;
     }
 
     return defaultOption;
@@ -91,7 +97,7 @@ export default function SearchSelectSingle({
     startTransition(() => {
       setSelectedOption(data);
       const params = new URLSearchParams(searchParams.toString());
-      if (data.value === "") {
+      if (data.value === "" || data.value === "default") {
         params.delete(paramOptionName);
         params.delete(paramSearchName);
       } else {
@@ -118,14 +124,14 @@ export default function SearchSelectSingle({
   const isDisabled = () => searchParams.has(paramDisabledName);
 
   const searchFilter = (item) =>
-    item.label.toLowerCase().includes(search.toLowerCase());
+    item?.label?.toLowerCase().includes(search.toLowerCase());
 
-  const listFilters = allOptions.filter(searchFilter).map((item, i) => (
+  const listFilters = filterableOptions.filter(searchFilter).map((item, i) => (
     <li
       key={i}
       name={`select-${paramOptionName}-${i}`}
       className={`dropdown-item ${
-        selectedOption.label === item.label ? "selected active" : ""
+        selectedOption?.label === item?.label ? "selected active" : ""
       }`}
       onClick={() => {
         selectHandler(item);
@@ -133,42 +139,66 @@ export default function SearchSelectSingle({
       }}
     >
       <a>
-        <span className="text">{item.label}</span>
+        <span className="text">{item?.label}</span>
       </a>
     </li>
   ));
-
   const generateLink = (value) => {
-    if (value === "" && pathname === `/${root}`) {
-      return pathname;
-    }
-    if (value === "") {
-      let newPath;
-      if (child) {
-        newPath = pathname.substring(0, pathname.lastIndexOf("/"));
-      } else if (parent) {
-        newPath = pathname.substring(0, pathname.lastIndexOf("/"));
-      } else {
-        newPath = "/";
-      }
-      const queryString = searchParams.toString();
-      return `${newPath}${queryString ? `?${queryString}` : ""}`;
+    if (value === "" || value === "default") {
+      // If value is empty or default, return to the root
+      return `/${root}`;
     }
 
-    if (!child) {
-      let newPath = value ? `${pathname}/${value}` : pathname;
-      const queryString = searchParams.toString();
-      return `${newPath}${queryString ? `?${queryString}` : ""}`;
-    } else {
-      return `${value}`;
+    let newPath;
+
+    switch (root) {
+      case "pros":
+      case "companies":
+        // Both "pros" and "companies" have fewer segments (parent, child)
+        if (!parent) {
+          // If no parent, use root and value as parent
+          newPath = `/${root}/${value}`;
+        } else if (!child) {
+          // If no child, use root, parent, and value as child
+          newPath = `/${root}/${parent}/${value}`;
+        } else {
+          // If child exists, replace child with value (no deeper nesting)
+          newPath = `/${root}/${parent}/${value}`;
+        }
+        break;
+
+      case "ipiresies":
+        // "ipiresies" allows deeper nesting with more segments (parent, child, last)
+        if (!parent) {
+          // If no parent, use root and value as parent
+          newPath = `/${root}/${value}`;
+        } else if (!child) {
+          // If no child, use root, parent, and value as child
+          newPath = `/${root}/${parent}/${value}`;
+        } else if (!last) {
+          // If no last, use root, parent, child, and value as last
+          newPath = `/${root}/${parent}/${child}/${value}`;
+        } else {
+          // If all segments are present, replace the last with value
+          newPath = `/${root}/${parent}/${child}/${value}`;
+        }
+        break;
+
+      default:
+        // Handle cases where root doesn't match "pros", "companies", or "ipiresies"
+        newPath = `/${root}`;
+        break;
     }
+
+    const queryString = searchParams.toString();
+    return `${newPath}${queryString ? `?${queryString}` : ""}`;
   };
 
   const selectLinkHandler = (item) => {
     setSelectedLink(item);
   };
 
-  const listLinks = allOptions.filter(searchFilter).map((item, i) => (
+  const listLinks = filterableOptions.filter(searchFilter).map((item, i) => (
     <li
       key={i}
       name={`select-${item.value}-${i}`}

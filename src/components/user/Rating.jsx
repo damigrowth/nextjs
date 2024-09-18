@@ -2,7 +2,7 @@ import { formatRating } from "@/utils/formatRating";
 import React from "react";
 
 export default function Rating({ totalReviews, rating }) {
-  return totalReviews === 0 ? null : (
+  return totalReviews === 0 || totalReviews === null ? null : (
     <p className="mb-0 fz14 ">
       <i
         className="fas fa-star vam review-color"

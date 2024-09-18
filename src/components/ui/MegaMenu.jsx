@@ -41,12 +41,11 @@ export default function MegaMenu({ categories, staticMenuClass }) {
                 <span className="menu-icn flaticon-developer" />
                 <span className="menu-title">{category.label}</span>
               </Link>
-              <div className="drop-menu ">
-                {category.subcategories.map((subcategory) => (
-                  <MegaMenuPillar
-                    key={subcategory.id}
-                    subcategory={subcategory}
-                  />
+              <div className="drop-menu">
+                {category.subcategories.map((subcategory, i) => (
+                  <div key={i}>
+                    <MegaMenuPillar subcategory={subcategory} />
+                  </div>
                 ))}
               </div>
             </li>
