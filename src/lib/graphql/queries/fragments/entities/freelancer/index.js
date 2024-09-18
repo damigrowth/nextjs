@@ -1,7 +1,11 @@
 import { gql } from "@apollo/client";
 import { USER_PARTIAL } from "../user";
 import { SPECIALISATIONS } from "../specialisation";
-import { FREELANCER_CATEGORY } from "../../taxonomies/freelancer";
+import {
+  FREELANCER_CATEGORY,
+  FREELANCER_SUBCATEGORY,
+  FREELANCER_SUBCATEGORY_PARTIAL,
+} from "../../taxonomies/freelancer";
 
 const FREELANCER_TYPE = gql`
   fragment FreelancerType on FreelancerTypeEntityResponse {
@@ -50,11 +54,15 @@ const FREELANCER_REFERENCE = gql`
     category {
       ...FreelancerCategory
     }
+    subcategory {
+      ...FreelancerSubcategoryPartial
+    }
   }
 
   ${USER_PARTIAL}
   ${SPECIALISATIONS}
   ${FREELANCER_CATEGORY}
+  ${FREELANCER_SUBCATEGORY_PARTIAL}
   ${FREELANCER_TYPE}
 `;
 

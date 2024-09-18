@@ -4,7 +4,10 @@ import FreelancersArchive from "@/components/ui/Archives/Freelancers/Freelancers
 import Tabs from "@/components/ui/Archives/Tabs";
 import { getData } from "@/lib/client/operations";
 import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
-import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import {
+  FREELANCER_CATEGORIES,
+  FREELANCER_CATEGORIES_SEARCH,
+} from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import { inspect } from "@/utils/inspect";
 import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
 
@@ -25,6 +28,10 @@ export async function generateMetadata() {
 
 export default async function page({ params, searchParams }) {
   const { category } = params;
+
+  const { freelancerCategories: mainCategories } = await getData(
+    FREELANCER_CATEGORIES
+  );
 
   const {
     min,
@@ -84,8 +91,7 @@ export default async function page({ params, searchParams }) {
       <Tabs
         parentPathLabel="Όλες οι κατηγορίες"
         parentPathLink="companies"
-        categories={freelancerCategories?.data}
-        plural
+        categories={mainCategories?.data}
       />
       <Breadcrumb
         parentPathLabel="Επιχειρήσεις"

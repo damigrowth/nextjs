@@ -4,26 +4,33 @@ import FreelancersArchive from "@/components/ui/Archives/Freelancers/Freelancers
 import Tabs from "@/components/ui/Archives/Tabs";
 import { getData } from "@/lib/client/operations";
 import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
-import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import {
+  FREELANCER_CATEGORIES,
+  FREELANCER_CATEGORIES_SEARCH,
+} from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
 
 // Static SEO
-export async function generateMetadata() {
-  const titleTemplate = "Επαγγελματίες | Doulitsa";
-  const descriptionTemplate =
-    "Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές.";
+// export async function generateMetadata() {
+//   const titleTemplate = "Επαγγελματίες | Doulitsa";
+//   const descriptionTemplate =
+//     "Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές.";
 
-  const { meta } = await staticMeta({
-    title: titleTemplate,
-    description: descriptionTemplate,
-    size: 150,
-  });
+//   const { meta } = await staticMeta({
+//     title: titleTemplate,
+//     description: descriptionTemplate,
+//     size: 150,
+//   });
 
-  return meta;
-}
+//   return meta;
+// }
 
 export default async function page({ params, searchParams }) {
-  const { category } = params;
+  const { category, subcategory } = params;
+
+  const { freelancerCategories: mainCategories } = await getData(
+    FREELANCER_CATEGORIES
+  );
 
   const {
     min,
@@ -57,6 +64,7 @@ export default async function page({ params, searchParams }) {
     paymentMethods: addFilter(pay_m && pay_m.length > 0, toIntArray(pay_m)),
     contactTypes: addFilter(con_t && con_t.length > 0, toIntArray(con_t)),
     cat: category,
+    sub: subcategory,
     specializations: addFilter(spec && spec.length > 0, toIntArray(spec)),
     experience: addFilter(exp, parseInt(exp, 10)),
     top: addFilter(top === "", true),
@@ -83,8 +91,7 @@ export default async function page({ params, searchParams }) {
       <Tabs
         parentPathLabel="Όλες οι κατηγορίες"
         parentPathLink="pros"
-        categories={freelancerCategories?.data}
-        plural
+        categories={mainCategories?.data}
       />
       <Breadcrumb
         parentPathLabel="Επαγγελματίες"

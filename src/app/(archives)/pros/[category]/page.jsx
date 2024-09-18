@@ -6,42 +6,44 @@ import { getData } from "@/lib/client/operations";
 import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
 import {
   FREELANCER_CATEGORIES,
-  FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH,
+  FREELANCER_SUBCATEGORIES_SEARCH,
   FREELANCER_TAXONOMIES_BY_SLUG,
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import { inspect } from "@/utils/inspect";
 import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 
 // Dynamic SEO
-export async function generateMetadata({ params }) {
-  const { category } = params;
+// export async function generateMetadata({ params }) {
+//   const { category } = params;
 
-  const titleTemplate = "%arcCategoryPlural% - Αναζήτηση για Επαγγελματίες";
-  const descriptionTemplate =
-    "Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές. %arcCategoryDesc%";
-  const descriptionSize = 200;
+//   const titleTemplate = "%arcCategoryPlural% - Αναζήτηση για Επαγγελματίες";
+//   const descriptionTemplate =
+//     "Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές. %arcCategoryDesc%";
+//   const descriptionSize = 200;
 
-  const { meta } = await dynamicMeta(
-    "freelancerCategories",
-    {
-      type: "freelancer",
-    },
-    titleTemplate,
-    descriptionTemplate,
-    descriptionSize,
-    true,
-    category
-  );
+//   const { meta } = await dynamicMeta(
+//     "freelancerCategories",
+//     {
+//       type: "freelancer",
+//     },
+//     titleTemplate,
+//     descriptionTemplate,
+//     descriptionSize,
+//     true,
+//     category
+//   );
 
-  return meta;
-}
+//   return meta;
+// }
 
 export default async function page({ params, searchParams }) {
-  const { category } = params;
+  const { category, subcategory } = params;
 
-  const { freelancerCategories } = await getData(FREELANCER_CATEGORIES);
+  const { freelancerCategories: mainCategories } = await getData(
+    FREELANCER_CATEGORIES
+  );
 
-  const { freelancerCategories: freelancerCategoriesData } = await getData(
+  const { freelancerCategories: categoriesData } = await getData(
     FREELANCER_TAXONOMIES_BY_SLUG,
     {
       category,
@@ -49,7 +51,7 @@ export default async function page({ params, searchParams }) {
     }
   );
 
-  const currCategory = freelancerCategoriesData?.data[0]?.attributes;
+  const currCategory = categoriesData?.data[0]?.attributes;
 
   const {
     min,
@@ -83,6 +85,7 @@ export default async function page({ params, searchParams }) {
     paymentMethods: addFilter(pay_m && pay_m.length > 0, toIntArray(pay_m)),
     contactTypes: addFilter(con_t && con_t.length > 0, toIntArray(con_t)),
     cat: category,
+    sub: subcategory,
     specializations: addFilter(spec && spec.length > 0, toIntArray(spec)),
     experience: addFilter(exp, parseInt(exp, 10)),
     top: addFilter(top === "", true),
@@ -97,7 +100,7 @@ export default async function page({ params, searchParams }) {
   let coverageCountySearch = cov_c_s ? cov_c_s : undefined;
 
   const { freelancerSubcategories } = await getData(
-    FREELANCER_CATEGORY_SUBCATEGORIES_SEARCH,
+    FREELANCER_SUBCATEGORIES_SEARCH,
     {
       type: "freelancer",
       categorySlug: category,
@@ -115,7 +118,7 @@ export default async function page({ params, searchParams }) {
       <Tabs
         parentPathLabel="Όλες οι κατηγορίες"
         parentPathLink="pros"
-        categories={freelancerCategories?.data}
+        categories={mainCategories?.data}
       />
       <Breadcrumb
         parentPathLabel="Επαγγελματίες"
