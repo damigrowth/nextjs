@@ -5,51 +5,50 @@ import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 import {
   CATEGORIES,
   TAXONOMIES_BY_SLUG,
-  SUBCATEGORY_SUBDIVISIONS_SEARCH,
+  SUBDIVISIONS_SEARCH,
 } from "@/lib/graphql/queries/main/taxonomies/service";
 import Tabs from "@/components/ui/Archives/Tabs";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
 
 // Dynamic SEO
-export async function generateMetadata({ params }) {
-  const { subcategory } = params;
+// export async function generateMetadata({ params }) {
+//   const { subcategory } = params;
 
-  const titleTemplate =
-    "%arcCategory% - Βρες τις καλύτερες Υπηρεσίες στη Doulitsa";
-  const descriptionTemplate = "%arcCategoryDesc%";
-  const descriptionSize = 100;
+//   const titleTemplate =
+//     "%arcCategory% - Βρες τις καλύτερες Υπηρεσίες στη Doulitsa";
+//   const descriptionTemplate = "%arcCategoryDesc%";
+//   const descriptionSize = 100;
 
-  const { meta } = await dynamicMeta(
-    "subcategories",
-    undefined,
-    titleTemplate,
-    descriptionTemplate,
-    descriptionSize,
-    true,
-    subcategory
-  );
+//   const { meta } = await dynamicMeta(
+//     "subcategories",
+//     undefined,
+//     titleTemplate,
+//     descriptionTemplate,
+//     descriptionSize,
+//     true,
+//     subcategory
+//   );
 
-  return meta;
-}
+//   return meta;
+// }
 
 export default async function page({ params, searchParams }) {
-  const { category, subcategory, subdivision } = params;
+  const { category, subcategory } = params;
 
   const { categories } = await getData(CATEGORIES);
 
-  const {
-    categories: categoriesData,
-    subcategories: subcategoriesData,
-    subdivisions: subdivisionsData,
-  } = await getData(TAXONOMIES_BY_SLUG, {
-    category,
-    subcategory,
-    subdivision: "",
-  });
-  const currCategory = categoriesData?.data[0]?.attributes;
-  const currSubcategory = subcategoriesData?.data[0]?.attributes;
-  const currSubdivision = subdivisionsData?.data[0]?.attributes;
+  const { categoryBySlug, subcategoryBySlug } = await getData(
+    TAXONOMIES_BY_SLUG,
+    {
+      category,
+      subcategory,
+      subdivision: "",
+    }
+  );
+
+  const currCategory = categoryBySlug?.data[0]?.attributes;
+  const currSubcategory = subcategoryBySlug?.data[0]?.attributes;
 
   const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
 
@@ -68,7 +67,7 @@ export default async function page({ params, searchParams }) {
 
   let categorySearch = cat_s ? cat_s : undefined;
 
-  const { subdivisions } = await getData(SUBCATEGORY_SUBDIVISIONS_SEARCH, {
+  const { subdivisionsSearch } = await getData(SUBDIVISIONS_SEARCH, {
     subcategorySlug: subcategory,
     searchTerm: categorySearch,
   });
@@ -96,7 +95,7 @@ export default async function page({ params, searchParams }) {
       />
       <ServicesArchive
         currCategory={currSubcategory?.label}
-        categories={subdivisions?.data}
+        categories={subdivisionsSearch?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}
         childPath

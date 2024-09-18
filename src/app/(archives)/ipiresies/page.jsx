@@ -4,7 +4,10 @@ import { getData } from "@/lib/client/operations";
 import Tabs from "@/components/ui/Archives/Tabs";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
-import { CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/service";
+import {
+  CATEGORIES,
+  CATEGORIES_SEARCH,
+} from "@/lib/graphql/queries/main/taxonomies/service";
 import { staticMeta } from "@/utils/Seo/Meta/staticMeta";
 
 // Static SEO
@@ -23,6 +26,8 @@ export async function generateMetadata() {
 }
 
 export default async function page({ searchParams }) {
+  const { categories } = await getData(CATEGORIES);
+
   const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
 
   const addFilter = (condition, value) => (condition ? value : undefined);
@@ -40,7 +45,7 @@ export default async function page({ searchParams }) {
 
   let categorySearch = cat_s ? cat_s : undefined;
 
-  const { categories } = await getData(CATEGORIES_SEARCH, {
+  const { categoriesSearch } = await getData(CATEGORIES_SEARCH, {
     label: categorySearch,
   });
 
@@ -57,7 +62,7 @@ export default async function page({ searchParams }) {
         description="Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας."
       />
       <ServicesArchive
-        categories={categories?.data}
+        categories={categoriesSearch?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}
       />

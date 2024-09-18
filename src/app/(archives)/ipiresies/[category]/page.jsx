@@ -3,9 +3,8 @@ import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
 import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 import {
-  CATEGORY_BY_SLUG,
-  CATEGORY_SUBCATEGORIES_SEARCH,
   CATEGORIES,
+  SUBCATEGORIES_SEARCH,
   TAXONOMIES_BY_SLUG,
 } from "@/lib/graphql/queries/main/taxonomies/service";
 import Tabs from "@/components/ui/Archives/Tabs";
@@ -13,45 +12,39 @@ import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
 
 // Dynamic SEO
-export async function generateMetadata({ params }) {
-  const { category } = params;
+// export async function generateMetadata({ params }) {
+//   const { category } = params;
 
-  const titleTemplate =
-    "%arcCategory% - Βρες τις καλύτερες Υπηρεσίες στη Doulitsa";
-  const descriptionTemplate = "%arcCategoryDesc%";
-  const descriptionSize = 100;
+//   const titleTemplate =
+//     "%arcCategory% - Βρες τις καλύτερες Υπηρεσίες στη Doulitsa";
+//   const descriptionTemplate = "%arcCategoryDesc%";
+//   const descriptionSize = 100;
 
-  const { meta } = await dynamicMeta(
-    "categories",
-    undefined,
-    titleTemplate,
-    descriptionTemplate,
-    descriptionSize,
-    true,
-    category
-  );
+//   const { meta } = await dynamicMeta(
+//     "categories",
+//     undefined,
+//     titleTemplate,
+//     descriptionTemplate,
+//     descriptionSize,
+//     true,
+//     category
+//   );
 
-  return meta;
-}
+//   return meta;
+// }
 
 export default async function page({ params, searchParams }) {
-  const { category, subcategory, subdivision } = params;
+  const { category } = params;
 
   const { categories } = await getData(CATEGORIES);
 
-  const {
-    categories: categoriesData,
-    subcategories: subcategoriesData,
-    subdivisions: subdivisionsData,
-  } = await getData(TAXONOMIES_BY_SLUG, {
+  const { categoryBySlug } = await getData(TAXONOMIES_BY_SLUG, {
     category,
     subcategory: "",
     subdivision: "",
   });
 
-  const currCategory = categoriesData?.data[0]?.attributes;
-  const currSubcategory = subcategoriesData?.data[0]?.attributes;
-  const currSubdivision = subdivisionsData?.data[0]?.attributes;
+  const currCategory = categoryBySlug?.data[0]?.attributes;
 
   const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
 
@@ -70,12 +63,10 @@ export default async function page({ params, searchParams }) {
 
   let categorySearch = cat_s ? cat_s : undefined;
 
-  const { subcategories } = await getData(CATEGORY_SUBCATEGORIES_SEARCH, {
+  const { subcategoriesSearch } = await getData(SUBCATEGORIES_SEARCH, {
     categorySlug: category,
     searchTerm: categorySearch,
   });
-
-  // inspect(subcategories);
 
   return (
     <>
@@ -88,8 +79,6 @@ export default async function page({ params, searchParams }) {
         parentPathLabel="Υπηρεσίες"
         parentPathLink="ipiresies"
         category={currCategory}
-        subcategory={currSubcategory}
-        subdivision={currSubdivision}
       />
       <Banner
         heading={currCategory?.label}
@@ -98,7 +87,7 @@ export default async function page({ params, searchParams }) {
       />
       <ServicesArchive
         currCategory={currCategory?.label}
-        categories={subcategories?.data}
+        categories={subcategoriesSearch?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}
         childPath

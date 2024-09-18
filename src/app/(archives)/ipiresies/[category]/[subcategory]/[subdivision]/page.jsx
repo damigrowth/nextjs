@@ -3,11 +3,9 @@ import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
 import { dynamicMeta } from "@/utils/Seo/Meta/dynamicMeta";
 import {
-  SUBDIVISION_BY_SLUG,
-  SUBCATEGORY_SUBDIVISIONS_SEARCH,
   CATEGORIES,
+  SUBDIVISIONS_SEARCH,
   TAXONOMIES_BY_SLUG,
-  CATEGORIES_SIMPLE,
 } from "@/lib/graphql/queries/main/taxonomies/service";
 import Tabs from "@/components/ui/Archives/Tabs";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
@@ -41,18 +39,16 @@ export default async function page({ params, searchParams }) {
 
   const { categories } = await getData(CATEGORIES);
 
-  const {
-    categories: categoriesData,
-    subcategories: subcategoriesData,
-    subdivisions: subdivisionsData,
-  } = await getData(TAXONOMIES_BY_SLUG, {
-    category,
-    subcategory,
-    subdivision,
-  });
-  const currCategory = categoriesData?.data[0]?.attributes;
-  const currSubcategory = subcategoriesData?.data[0]?.attributes;
-  const currSubdivision = subdivisionsData?.data[0]?.attributes;
+  const { categoryBySlug, subcategoryBySlug, subdivisionBySlug } =
+    await getData(TAXONOMIES_BY_SLUG, {
+      category,
+      subcategory,
+      subdivision,
+    });
+
+  const currCategory = categoryBySlug?.data[0]?.attributes;
+  const currSubcategory = subcategoryBySlug?.data[0]?.attributes;
+  const currSubdivision = subdivisionBySlug?.data[0]?.attributes;
 
   const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
 
@@ -71,7 +67,7 @@ export default async function page({ params, searchParams }) {
 
   let categorySearch = cat_s ? cat_s : undefined;
 
-  const { subdivisions } = await getData(SUBCATEGORY_SUBDIVISIONS_SEARCH, {
+  const { subdivisionsSearch } = await getData(SUBDIVISIONS_SEARCH, {
     subcategorySlug: subcategory,
     searchTerm: categorySearch,
   });
@@ -98,7 +94,7 @@ export default async function page({ params, searchParams }) {
       />
       <ServicesArchive
         currCategory={currSubcategory?.label}
-        categories={subdivisions?.data}
+        categories={subdivisionsSearch?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}
         childPath

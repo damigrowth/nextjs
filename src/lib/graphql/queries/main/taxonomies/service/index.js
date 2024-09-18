@@ -33,13 +33,18 @@ const CATEGORIES = gql`
 
 const CATEGORIES_SEARCH = gql`
   query CategoriesSearch($label: String) {
-    categories(filters: { label: { containsi: $label } }, sort: "label:asc") {
+    categoriesSearch: categories(
+      filters: { label: { containsi: $label } }
+      sort: "label:asc"
+    ) {
       data {
-        ...CategoryFull
+        attributes {
+          label
+          slug
+        }
       }
     }
   }
-  ${CATEGORY_FULL}
 `;
 
 const SUBCATEGORIES = gql`
@@ -56,30 +61,8 @@ const SUBCATEGORIES = gql`
 `;
 
 const SUBCATEGORIES_SEARCH = gql`
-  query SubcategoriesSearch($term: String) {
-    subcategories(filters: { label: { containsi: $term } }, sort: "label:asc") {
-      data {
-        attributes {
-          label
-          slug
-          category {
-            data {
-              ...Category
-            }
-          }
-        }
-      }
-    }
-  }
-  ${CATEGORY}
-`;
-
-const CATEGORY_SUBCATEGORIES_SEARCH = gql`
-  query CategorySubcategoriesSearch(
-    $searchTerm: String
-    $categorySlug: String
-  ) {
-    subcategories(
+  query SubcategoriesSearch($searchTerm: String, $categorySlug: String) {
+    subcategoriesSearch: subcategories(
       filters: {
         and: [
           { label: { containsi: $searchTerm } }
@@ -89,19 +72,21 @@ const CATEGORY_SUBCATEGORIES_SEARCH = gql`
       sort: "label:asc"
     ) {
       data {
-        ...Subcategory
+        attributes {
+          label
+          slug
+        }
       }
     }
   }
-  ${SUBCATEGORY}
 `;
 
-const SUBCATEGORY_SUBDIVISIONS_SEARCH = gql`
+const SUBDIVISIONS_SEARCH = gql`
   query SubcategorySubdivisionsSearch(
     $searchTerm: String
     $subcategorySlug: String
   ) {
-    subdivisions(
+    subdivisionsSearch: subdivisions(
       filters: {
         and: [
           { label: { containsi: $searchTerm } }
@@ -111,68 +96,13 @@ const SUBCATEGORY_SUBDIVISIONS_SEARCH = gql`
       sort: "label:asc"
     ) {
       data {
-        ...Subdivision
-      }
-    }
-  }
-  ${SUBDIVISION}
-`;
-
-const CATEGORY_BY_SLUG = gql`
-  query CategoryBySlug($slug: String!) {
-    categories(filters: { slug: { eq: $slug } }, sort: "label:asc") {
-      data {
-        ...CategoryFull
-      }
-    }
-  }
-  ${CATEGORY_FULL}
-`;
-
-const SUBCATEGORY_BY_SLUG = gql`
-  query SubcategoryBySlug($slug: String!) {
-    subcategories(filters: { slug: { eq: $slug } }, sort: "label:asc") {
-      data {
-        ...Subcategory
         attributes {
-          category {
-            data {
-              ...Category
-            }
-          }
+          label
+          slug
         }
       }
     }
   }
-  ${SUBCATEGORY}
-  ${CATEGORY}
-`;
-
-const SUBDIVISION_BY_SLUG = gql`
-  query SubdivisionBySlug($slug: String!) {
-    subdivisions(filters: { slug: { eq: $slug } }, sort: "label:asc") {
-      data {
-        ...Subdivision
-        attributes {
-          subcategory {
-            data {
-              ...Subcategory
-              attributes {
-                category {
-                  data {
-                    ...Category
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  ${SUBDIVISION}
-  ${SUBCATEGORY}
-  ${CATEGORY}
 `;
 
 const TAXONOMIES_BY_SLUG = gql`
@@ -181,7 +111,10 @@ const TAXONOMIES_BY_SLUG = gql`
     $subcategory: String
     $subdivision: String
   ) {
-    categories(filters: { slug: { eq: $category } }, sort: "label:asc") {
+    categoryBySlug: categories(
+      filters: { slug: { eq: $category } }
+      sort: "label:asc"
+    ) {
       data {
         attributes {
           label
@@ -193,7 +126,10 @@ const TAXONOMIES_BY_SLUG = gql`
         }
       }
     }
-    subcategories(filters: { slug: { eq: $subcategory } }, sort: "label:asc") {
+    subcategoryBySlug: subcategories(
+      filters: { slug: { eq: $subcategory } }
+      sort: "label:asc"
+    ) {
       data {
         attributes {
           label
@@ -205,7 +141,10 @@ const TAXONOMIES_BY_SLUG = gql`
         }
       }
     }
-    subdivisions(filters: { slug: { eq: $subdivision } }, sort: "label:asc") {
+    subdivisionBySlug: subdivisions(
+      filters: { slug: { eq: $subdivision } }
+      sort: "label:asc"
+    ) {
       data {
         attributes {
           label
@@ -224,12 +163,8 @@ const TAXONOMIES_BY_SLUG = gql`
 export {
   CATEGORIES,
   CATEGORIES_SEARCH,
-  TAXONOMIES_BY_SLUG,
   SUBCATEGORIES,
   SUBCATEGORIES_SEARCH,
-  CATEGORY_SUBCATEGORIES_SEARCH,
-  SUBCATEGORY_SUBDIVISIONS_SEARCH,
-  CATEGORY_BY_SLUG,
-  SUBCATEGORY_BY_SLUG,
-  SUBDIVISION_BY_SLUG,
+  SUBDIVISIONS_SEARCH,
+  TAXONOMIES_BY_SLUG,
 };
