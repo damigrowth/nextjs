@@ -86,13 +86,14 @@ export default function ServiceCard({ service }) {
               topLevel={freelancer?.data?.attributes?.topLevel}
             />
           </div>
-
-          <div className="budget">
-            <p className="mb-0 body-color">
-              από
-              <span className="fz17 fw500 dark-color ms-1">{price}€</span>
-            </p>
-          </div>
+          {price > 0 && (
+            <div className="budget">
+              <p className="mb-0 body-color">
+                από
+                <span className="fz17 fw500 dark-color ms-1">{price}€</span>
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
