@@ -13,6 +13,7 @@ export default function FreelancerCard({ freelancer, linkedName }) {
     topLevel,
     specialisations,
     category,
+    subcategory,
     type,
   } = freelancer;
 
@@ -50,7 +51,11 @@ export default function FreelancerCard({ freelancer, linkedName }) {
             <h5 className="title mb-1 text-bold">{user.displayName}</h5>
           )}
 
-          <p className="mb-0 text-bold">{category?.data?.attributes?.label}</p>
+          <p className="mb-0 text-bold">
+            {subcategory?.data
+              ? subcategory?.data?.attributes?.label
+              : category?.data?.attributes?.label}
+          </p>
           {reviews_total > 0 ? (
             <p className="mb-0 fz14 list-inline-item ">
               <i className="fas fa-star vam fz10 review-color mb5"></i>{" "}
