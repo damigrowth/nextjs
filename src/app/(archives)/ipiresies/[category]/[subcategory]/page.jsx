@@ -1,7 +1,7 @@
 import React from "react";
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
-import { dynamicMeta, Meta } from "@/utils/Seo/Meta/Meta";
+import { Meta } from "@/utils/Seo/Meta/Meta";
 import {
   CATEGORIES,
   TAXONOMIES_BY_SLUG,
@@ -45,6 +45,13 @@ export default async function page({ params, searchParams }) {
   const currCategory = categoryBySlug?.data[0]?.attributes;
   const currSubcategory = subcategoryBySlug?.data[0]?.attributes;
 
+  const taxonomies = {
+    current: currSubcategory?.label,
+    category: currCategory,
+    subcategory: currSubcategory,
+    subdivision: null,
+  };
+
   const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
 
   const addFilter = (condition, value) => (condition ? value : undefined);
@@ -67,8 +74,6 @@ export default async function page({ params, searchParams }) {
     searchTerm: categorySearch,
   });
 
-  // inspect(subdivisions);
-
   return (
     <>
       <Tabs
@@ -89,7 +94,7 @@ export default async function page({ params, searchParams }) {
         image={currSubcategory?.image?.data?.attributes?.formats?.small?.url}
       />
       <ServicesArchive
-        currCategory={currSubcategory?.label}
+        taxonomies={taxonomies}
         categories={subdivisionsSearch?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}

@@ -4,7 +4,7 @@ import FreelancerArchiveSchema from "@/utils/Seo/Schema/FreelancerArchiveSchema"
 
 export default async function FreelancerGrid({
   freelancers,
-  categories,
+  taxonomies,
   type,
 }) {
   return (
@@ -12,7 +12,7 @@ export default async function FreelancerGrid({
       <FreelancerArchiveSchema
         type={type}
         entities={freelancers}
-        categories={categories}
+        taxonomies={taxonomies}
       />
       {freelancers.length > 0 ? (
         freelancers.map(

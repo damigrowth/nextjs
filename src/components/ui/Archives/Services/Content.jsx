@@ -5,11 +5,9 @@ import Pagination from "../Pagination";
 import { getData } from "@/lib/client/operations";
 import ServiceGrid from "./ServiceGrid";
 import { SERVICES_ARCHIVE } from "@/lib/graphql/queries/main/service";
-import { CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/service";
 
-export default async function Content({ paramsFilters }) {
+export default async function Content({ paramsFilters, taxonomies }) {
   const { services } = await getData(SERVICES_ARCHIVE, paramsFilters);
-  const { categories } = await getData(CATEGORIES);
 
   return (
     <>
@@ -19,7 +17,7 @@ export default async function Content({ paramsFilters }) {
         plural="υπηρεσίες"
         sortOptions={serviceSortOptions}
       />
-      <ServiceGrid services={services?.data} categories={categories} />
+      <ServiceGrid services={services?.data} taxonomies={taxonomies} />
       <div className="row mt30">
         <Pagination meta={services?.meta?.pagination} plural="υπηρεσίες" />
       </div>

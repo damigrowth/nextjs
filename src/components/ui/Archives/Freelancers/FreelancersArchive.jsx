@@ -15,7 +15,7 @@ import Top from "./Filters/Top";
 import Verified from "./Filters/Verified";
 
 export default function FreelancersArchive({
-  currCategory,
+  taxonomies,
   categories,
   counties,
   searchParams,
@@ -33,7 +33,7 @@ export default function FreelancersArchive({
       params: ["cat"],
       childPath,
       component: (
-        <Category currCategory={currCategory} categories={categories} />
+        <Category currCategory={taxonomies.current} categories={categories} />
       ),
     },
     { heading: "Εργατοώρα", params: ["min", "max"], component: <Rate /> },
@@ -80,7 +80,10 @@ export default function FreelancersArchive({
                 key={JSON.stringify(filteredSearchParams)}
                 fallback={<ContentSkeleton />}
               >
-                <Content paramsFilters={paramsFilters} />
+                <Content
+                  paramsFilters={paramsFilters}
+                  taxonomies={taxonomies}
+                />
               </Suspense>
             </div>
           </div>

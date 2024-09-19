@@ -42,6 +42,12 @@ export default async function page({ params, searchParams }) {
 
   const currCategory = categoryBySlug?.data[0]?.attributes;
 
+  const taxonomies = {
+    current: currCategory?.label,
+    category: currCategory,
+    subcategory: null,
+  };
+
   const {
     min,
     max,
@@ -112,15 +118,17 @@ export default async function page({ params, searchParams }) {
       <Breadcrumb
         parentPathLabel="Επαγγελματίες"
         parentPathLink="pros"
-        category={currCategory}
+        category={taxonomies.category}
       />
       <Banner
-        heading={currCategory?.label}
-        description={currCategory?.description}
-        image={currCategory?.image?.data?.attributes?.formats?.small?.url}
+        heading={taxonomies?.category?.label}
+        description={taxonomies?.category?.description}
+        image={
+          taxonomies?.category?.image?.data?.attributes?.formats?.small?.url
+        }
       />
       <FreelancersArchive
-        currCategory={currCategory?.label}
+        taxonomies={taxonomies}
         categories={subcategoriesSearch?.data}
         counties={counties?.data}
         searchParams={searchParams}

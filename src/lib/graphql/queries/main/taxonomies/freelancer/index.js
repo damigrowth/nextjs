@@ -23,6 +23,7 @@ const FREELANCER_CATEGORIES = gql`
       data {
         attributes {
           label
+          plural
           slug
         }
       }
