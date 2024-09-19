@@ -41,6 +41,13 @@ export default async function page({ params, searchParams }) {
 
   const currCategory = categoryBySlug?.data[0]?.attributes;
 
+  const taxonomies = {
+    current: currCategory?.label,
+    category: currCategory,
+    subcategory: null,
+    subdivision: null,
+  };
+
   const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
 
   const addFilter = (condition, value) => (condition ? value : undefined);
@@ -81,7 +88,7 @@ export default async function page({ params, searchParams }) {
         image={currCategory?.image?.data?.attributes?.formats?.small?.url}
       />
       <ServicesArchive
-        currCategory={currCategory?.label}
+        taxonomies={taxonomies}
         categories={subcategoriesSearch?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}

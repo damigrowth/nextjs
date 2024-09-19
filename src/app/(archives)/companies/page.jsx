@@ -27,6 +27,12 @@ export default async function page({ params, searchParams }) {
 
   const { categories } = await getData(FREELANCER_CATEGORIES);
 
+  const taxonomies = {
+    current: null,
+    category: null,
+    subcategory: null,
+  };
+
   const {
     min,
     max,
@@ -97,6 +103,7 @@ export default async function page({ params, searchParams }) {
         description="Ανακαλύψτε και προσλάβετε τις καλύτερες επιχειρήσεις"
       />
       <FreelancersArchive
+        taxonomies={taxonomies}
         categories={categoriesSearch?.data}
         counties={counties?.data}
         searchParams={searchParams}

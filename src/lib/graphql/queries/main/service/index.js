@@ -186,6 +186,18 @@ const SERVICES_BY_CATEGORY = gql`
   ${SERVICE_PARTIAL_RELATIONS}
 `;
 
+const SERVICES_ALL = gql`
+  query ServicesAll {
+    allServices: services(pagination: { page: 1, pageSize: 1000 }) {
+      data {
+        attributes {
+          slug
+        }
+      }
+    }
+  }
+`;
+
 export {
   SERVICE_BY_SLUG,
   SERVICE_PAGE_SEO,
@@ -195,4 +207,5 @@ export {
   FEATURED_SERVICES,
   SERVICES_ARCHIVE,
   SERVICES_BY_CATEGORY,
+  SERVICES_ALL,
 };

@@ -137,6 +137,18 @@ const FEATURED_FREELANCERS = gql`
   ${FREELANCER_REFERENCE}
 `;
 
+const FREELANCERS_ALL = gql`
+  query FreelancersAll {
+    allFreelancers: freelancers(pagination: { page: 1, pageSize: 1000 }) {
+      data {
+        attributes {
+          username
+        }
+      }
+    }
+  }
+`;
+
 export {
   FREELANCER_TYPES,
   FREELANCER_BY_USERNAME,
@@ -144,4 +156,5 @@ export {
   COUNT_FREELANCERS_BY_RATING,
   FREELANCERS_ARCHIVE,
   FEATURED_FREELANCERS,
+  FREELANCERS_ALL,
 };

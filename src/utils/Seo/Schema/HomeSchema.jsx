@@ -6,10 +6,10 @@ export default function HomeSchema({ searchTarget, searchInput }) {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Doulitsa",
-    url: "https://doulitsa.gr",
+    url: `${process.env.LIVE_URL}`,
     potentialAction: {
       "@type": "SearchAction",
-      target: `https://doulitsa.gr${searchTarget}`,
+      target: `${process.env.LIVE_URL}${searchTarget}`,
       "query-input": `name=${searchInput}`,
     },
   };

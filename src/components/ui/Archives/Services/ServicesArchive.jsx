@@ -10,7 +10,7 @@ import BorderSpinner from "../../Spinners/BorderSpinner";
 import SidebarModal from "../SidebarModal";
 
 export default function ServicesArchive({
-  currCategory,
+  taxonomies,
   categories,
   searchParams,
   paramsFilters,
@@ -27,7 +27,7 @@ export default function ServicesArchive({
       params: ["cat"],
       childPath,
       component: (
-        <Category currCategory={currCategory} categories={categories} />
+        <Category currCategory={taxonomies.current} categories={categories} />
       ),
     },
     { heading: "Τιμή", params: ["min", "max"], component: <Price /> },
@@ -53,7 +53,10 @@ export default function ServicesArchive({
                 key={JSON.stringify(filteredSearchParams)}
                 fallback={<ContentSkeleton />}
               >
-                <Content paramsFilters={paramsFilters} />
+                <Content
+                  paramsFilters={paramsFilters}
+                  taxonomies={taxonomies}
+                />
               </Suspense>
             </div>
           </div>

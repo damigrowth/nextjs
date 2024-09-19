@@ -45,6 +45,13 @@ export default async function page({ params, searchParams }) {
   const currSubcategory = subcategoryBySlug?.data[0]?.attributes;
   const currSubdivision = subdivisionBySlug?.data[0]?.attributes;
 
+  const taxonomies = {
+    current: currSubcategory?.label,
+    category: currCategory,
+    subcategory: currSubcategory,
+    subdivision: currSubdivision,
+  };
+
   const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
 
   const addFilter = (condition, value) => (condition ? value : undefined);
@@ -88,7 +95,7 @@ export default async function page({ params, searchParams }) {
         image={currSubdivision.image?.data?.attributes?.formats?.small?.url}
       />
       <ServicesArchive
-        currCategory={currSubcategory?.label}
+        taxonomies={taxonomies}
         categories={subdivisionsSearch?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}

@@ -53,7 +53,7 @@ export default function ServiceSchema({
       "@type": "Offer",
       priceCurrency: "EUR",
       price: price,
-      url: `https://doulitsa.gr${url}`,
+      url: `${process.env.LIVE_URL}/${url}`,
       availability: "http://schema.org/InStock",
     },
     aggregateRating: {

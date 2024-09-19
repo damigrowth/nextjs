@@ -25,6 +25,13 @@ export async function generateMetadata() {
 export default async function page({ searchParams }) {
   const { categories } = await getData(CATEGORIES);
 
+  const taxonomies = {
+    current: null,
+    category: null,
+    subcategory: null,
+    subdivision: null,
+  };
+
   const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
 
   const addFilter = (condition, value) => (condition ? value : undefined);
@@ -59,6 +66,7 @@ export default async function page({ searchParams }) {
         description="Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας."
       />
       <ServicesArchive
+        taxonomies={taxonomies}
         categories={categoriesSearch?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}

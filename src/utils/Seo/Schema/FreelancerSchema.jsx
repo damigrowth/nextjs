@@ -40,9 +40,9 @@ export default function FreelancerSchema({
       reviewCount: reviews_total,
     },
     review: reviewsData,
-    url: `https://doulitsa.gr${url}`,
+    url: `${process.env.LIVE_URL}${url}`,
     image: profileImage,
-    sameAs: "https://doulitsa.gr",
+    sameAs: `${process.env.LIVE_URL}`,
   };
 
   return <JsonLd data={data} />;

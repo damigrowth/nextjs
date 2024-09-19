@@ -41,6 +41,12 @@ export default async function page({ params, searchParams }) {
 
   const currCategory = categoryBySlug?.data[0]?.attributes;
 
+  const taxonomies = {
+    current: currCategory?.label,
+    category: currCategory,
+    subcategory: null,
+  };
+
   const {
     min,
     max,
@@ -117,7 +123,7 @@ export default async function page({ params, searchParams }) {
         image={currCategory?.image?.data?.attributes?.formats?.small?.url}
       />
       <FreelancersArchive
-        currCategory={currCategory?.label}
+        taxonomies={taxonomies}
         categories={subcategoriesSearch?.data}
         counties={counties?.data}
         searchParams={searchParams}
