@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /dashboard/
+Disallow: /login/
+Disallow: /register/
+Disallow: /add-services/
+Disallow: /co/terms/
+Disallow: /co/privacy/
+Disallow: /not-found/
