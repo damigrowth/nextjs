@@ -11,6 +11,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import UserImage from "@/components/user/UserImage";
 import { formatRating } from "@/utils/formatRating";
+import { getBestDimensions } from "@/utils/imageDimensions";
 
 export default function FeaturedServiceSliderCard({ service }) {
   const {
@@ -30,7 +31,7 @@ export default function FeaturedServiceSliderCard({ service }) {
   const [showSwiper, setShowSwiper] = useState(false);
 
   const mediaUrls = media.data.map(
-    (img) => img.attributes.formats.thumbnail.url
+    (img) => getBestDimensions(img.attributes.formats).url
   );
 
   useEffect(() => {

@@ -8,6 +8,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper";
 import Image from "next/image";
+import { getBestDimensions } from "@/utils/imageDimensions";
 
 export default function ServiceCardMedia({ media, path }) {
   return (
@@ -33,7 +34,7 @@ export default function ServiceCardMedia({ media, path }) {
                   height={245}
                   width={329}
                   className="w-100 h-100 object-fit-cover"
-                  src={item.attributes.formats.thumbnail.url}
+                  src={getBestDimensions(item.attributes.formats).url}
                   alt="thumbnail"
                 />
               </SwiperSlide>

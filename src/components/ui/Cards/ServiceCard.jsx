@@ -5,6 +5,7 @@ import ServiceCardMedia from "./ServiceCardMedia";
 import Badges from "@/components/user/Badges";
 import CardReviews from "../Reviews/CardReviews";
 import ServiceCardImage from "./ServiceCardImage";
+import { getBestDimensions } from "@/utils/imageDimensions";
 
 export default function ServiceCard({ service }) {
   const {
@@ -39,7 +40,7 @@ export default function ServiceCard({ service }) {
         <ServiceCardMedia media={media?.data} path={`/s/${slug}`} />
       ) : (
         <ServiceCardImage
-          image={media.data[0].attributes.formats.thumbnail.url}
+          image={getBestDimensions(media.data[0].attributes.formats).url}
           path={`/s/${slug}`}
         />
       )}
