@@ -15,13 +15,13 @@ export async function MetaData({ title, description, size, image }) {
     "https://res.cloudinary.com/ddejhvzbf/image/upload/v1723560374/doulitsa_92f5bf4005.png";
 
   const meta = {
-    metadataBase: new URL("https://doulitsa.gr"),
+    metadataBase: new URL(`${process.env.LIVE_URL}`),
     title,
     description: truncatedDescription || fallbackDescription,
     openGraph: {
       title,
       description: truncatedDescription || fallbackDescription,
-      url: `https://doulitsa.gr${url}`,
+      url: `${process.env.LIVE_URL}${url}`,
       siteName: "Doulitsa",
       images: [
         {
@@ -49,9 +49,9 @@ export async function MetaData({ title, description, size, image }) {
       ],
     },
     alternates: {
-      canonical: `https://doulitsa.gr${url}`,
+      canonical: `${process.env.LIVE_URL}${url}`,
       languages: {
-        "el-GR": `https://doulitsa.gr${url}`,
+        "el-GR": `${process.env.LIVE_URL}${url}`,
       },
     },
   };
