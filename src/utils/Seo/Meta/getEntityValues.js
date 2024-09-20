@@ -1,3 +1,5 @@
+import { getBestDimensions } from "@/utils/imageDimensions";
+
 export function getEntityValues(entity, property) {
   const title = entity.title;
   const displayName =
@@ -7,12 +9,16 @@ export function getEntityValues(entity, property) {
   const description = entity.description;
   const type = entity?.type?.data?.attributes?.label;
   const tagline = entity.tagline;
-  const singleImage = entity?.media?.data?.[0]?.attributes?.formats?.small?.url;
+  const singleImage = getBestDimensions(
+    entity?.media?.data?.[0]?.attributes?.formats
+  )?.url;
 
   const arcCategory = entity?.label;
   const arcCategoryPlural = entity?.plural;
   const arcCategoryDesc = entity?.description;
-  const arcCategoryImage = entity?.image?.data?.attributes?.formats?.small?.url;
+  const arcCategoryImage = getBestDimensions(
+    entity?.image?.data?.attributes?.formats
+  )?.url;
 
   switch (property) {
     case "title":

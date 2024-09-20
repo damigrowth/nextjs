@@ -1,5 +1,8 @@
 export const getBestDimensions = (formats) => {
   if (formats) {
+    if (formats.large) {
+      return formats.large;
+    }
     if (formats.medium) {
       return formats.medium;
     }
