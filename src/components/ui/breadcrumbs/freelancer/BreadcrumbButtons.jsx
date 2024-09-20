@@ -24,9 +24,9 @@ export default function BreadcrumbButtons({ subjectTitle }) {
         window.open(shareUrl, "_blank");
         break;
       case "email":
-        shareUrl = `mailto:?subject=${subjectTitle}?body=${encodeURIComponent(
-          currentUrl
-        )}`;
+        shareUrl = `mailto:?subject=${encodeURIComponent(
+          subjectTitle
+        )}&body=${encodeURIComponent(currentUrl)}`;
         window.location.href = shareUrl;
         break;
       case "copy":
