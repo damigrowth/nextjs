@@ -46,30 +46,30 @@ export const freelancerSortOptions = [
 
 export const serviceTimeOptions = [
   {
-    value: 3,
+    value: "3",
     label: "Μέχρι 3 ημέρες",
   },
   {
-    value: 7,
+    value: "7",
     label: "Μέχρι 7 ημέρες",
   },
   {
-    value: 30,
+    value: "30",
     label: "Μέχρι 30 ημέρες",
   },
 ];
 
 export const freelancerExperienceOptions = [
   {
-    value: 1,
+    value: "1",
     label: "1+",
   },
   {
-    value: 3,
+    value: "3",
     label: "3+",
   },
   {
-    value: 5,
+    value: "5",
     label: "5+",
   },
 ];
