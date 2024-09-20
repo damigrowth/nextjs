@@ -1625,11 +1625,12 @@ li {
 .listing-style1.style5 .list-content {
   padding-top: 10px;
 }
-@media (max-width: 1366px) {
+/* @media (max-width: 1366px) {
   .listing-style1.list-style .list-thumb {
     width: 45%;
   }
-}
+} */
+
 @media (max-width: 1199.98px) {
   .listing-style1.list-style .list-thumb {
     width: auto;
