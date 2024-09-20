@@ -1625,11 +1625,12 @@ li {
 .listing-style1.style5 .list-content {
   padding-top: 10px;
 }
-@media (max-width: 1366px) {
+/* @media (max-width: 1366px) {
   .listing-style1.list-style .list-thumb {
     width: 45%;
   }
-}
+} */
+
 @media (max-width: 1199.98px) {
   .listing-style1.list-style .list-thumb {
     width: auto;
@@ -13128,7 +13129,7 @@ header.nav-homepage-style .sidemenu-btn {
 
 .checkbox-style1,
 .custom_checkbox {
-  padding-left: 7px;
+  margin-left: 7px;
 }
 
 section.pb40-md.pb90 > div > div.row.d-block.d-lg-none > div > div.row {

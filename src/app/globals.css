@@ -238,9 +238,9 @@ a {
 .listing-style1 .height {
   width: 329px;
   /* max-width: 329px; */
-  display: flex;
+  /* display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
   /* height: 100%; */
 }
 

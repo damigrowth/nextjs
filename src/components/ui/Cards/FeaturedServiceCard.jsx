@@ -1,5 +1,6 @@
 import UserImage from "@/components/user/UserImage";
 import { formatRating } from "@/utils/formatRating";
+import { getBestDimensions } from "@/utils/imageDimensions";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -27,7 +28,7 @@ export default function FeaturedServiceCard({ service }) {
             height={247}
             width={331}
             className="w-100"
-            src={media.data[0]?.attributes?.formats?.thumbnail?.url}
+            src={getBestDimensions(media.data[0]?.attributes?.formats).url}
             alt={`featured-service-${title}-freelancer-${freelancer?.data?.attributes?.username}`}
           />
         </Link>
