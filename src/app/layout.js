@@ -19,6 +19,8 @@ import { checkServerHealth, getData } from "@/lib/client/operations";
 import { FOOTER, HEADER } from "@/lib/graphql/queries/main/global";
 import ServerDown from "@/components/ui/Errors/ServerDown";
 
+export const dynamic = "force-dynamic";
+
 if (typeof window !== "undefined") {
   import("bootstrap");
 }

@@ -5,14 +5,9 @@ import Pagination from "../Pagination";
 import { freelancerSortOptions } from "../options";
 import { getData } from "@/lib/client/operations";
 import { FREELANCERS_ARCHIVE } from "@/lib/graphql/queries/main/freelancer";
-import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 
-export default async function Content({ paramsFilters }) {
+export default async function Content({ paramsFilters, taxonomies }) {
   const { freelancers } = await getData(FREELANCERS_ARCHIVE, paramsFilters);
-
-  const { freelancerCategories } = await getData(FREELANCER_CATEGORIES_SEARCH, {
-    type: paramsFilters.type,
-  });
 
   return (
     <>
@@ -29,7 +24,7 @@ export default async function Content({ paramsFilters }) {
 
       <FreelancerGrid
         freelancers={freelancers?.data}
-        categories={freelancerCategories}
+        taxonomies={taxonomies}
         type={paramsFilters.type}
       />
 
