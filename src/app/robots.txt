@@ -6,3 +6,5 @@ Disallow: /add-services/
 Disallow: /co/terms/
 Disallow: /co/privacy/
 Disallow: /not-found/
+
+Sitemap: https://doulitsa.gr/sitemap
