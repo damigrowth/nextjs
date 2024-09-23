@@ -18,6 +18,7 @@ import NavMenuMobile from "@/components/ui/NavMenuMobile";
 import { checkServerHealth, getData } from "@/lib/client/operations";
 import { FOOTER, HEADER } from "@/lib/graphql/queries/main/global";
 import ServerDown from "@/components/ui/Errors/ServerDown";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +54,8 @@ export default async function RootLayout({ children }) {
   const { header: headerData } = await getData(HEADER);
   const { footer: footerData } = await getData(FOOTER);
 
+  const gaId = process.env.GA_ID;
+
   return (
     <html lang="el">
       <Body path={path} dmSans={dmSans}>
@@ -82,6 +85,7 @@ export default async function RootLayout({ children }) {
           </div>
         )}
         <NavMenuMobile header={headerData} />
+        <GoogleAnalytics gaId={gaId} />
       </Body>
     </html>
   );
