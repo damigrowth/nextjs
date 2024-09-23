@@ -30,12 +30,14 @@ export default function SingleServiceSkeleton() {
               <div className="col-sm-8 col-lg-10">
                 <div className="breadcumb-style1 mb10-xs">
                   <div className="breadcumb-list">
+                    {/* Breadcrumb */}
                     <Skeleton width={400} height={25} borderRadius={12} />
                   </div>
                 </div>
               </div>
               <div className="col-sm-4 col-lg-2">
                 <div className="d-flex align-items-center justify-content-sm-end">
+                  {/* Buttons */}
                   <Skeleton
                     width={29}
                     height={29}
@@ -69,7 +71,12 @@ export default function SingleServiceSkeleton() {
                     <div className="col-xl-12 mb30 pb30 bdrb1">
                       <div className="position-relative">
                         <h1 className="heading-h2">
-                          <Skeleton width={860} height={38} borderRadius={12} />
+                          {/* Title */}
+                          <Skeleton
+                            width={"90%"}
+                            height={38}
+                            borderRadius={12}
+                          />
                         </h1>
                         <div className="list-meta meta mt30">
                           <Skeleton
@@ -120,20 +127,21 @@ export default function SingleServiceSkeleton() {
                       />
                       <div className="text mb30 rich-text-editor">
                         <div className="freelancer-description text mb30">
+                          {/* Paragraphs */}
                           {Array.from({ length: 3 }).map((item, index) => (
                             <div className="mb10" key={index}>
                               <Skeleton
-                                width={620}
+                                width={"75%"}
                                 height={15}
                                 borderRadius={12}
                               />
                               <Skeleton
-                                width={820}
+                                width={"95%"}
                                 height={15}
                                 borderRadius={12}
                               />
                               <Skeleton
-                                width={420}
+                                width={"55%"}
                                 height={15}
                                 borderRadius={12}
                               />
