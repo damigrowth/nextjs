@@ -18,6 +18,7 @@ import { checkServerHealth, getData } from "@/lib/client/operations";
 import { FOOTER, HEADER } from "@/lib/graphql/queries/main/global";
 import ServerDown from "@/components/ui/Errors/ServerDown";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +79,7 @@ export default async function RootLayout({ children }) {
           </div>
         )}
         <NavMenuMobile header={headerData} />
+        <SpeedInsights />
         <GoogleAnalytics gaId={gaId} />
       </Body>
     </html>
