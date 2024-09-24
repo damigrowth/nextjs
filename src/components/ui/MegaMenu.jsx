@@ -38,7 +38,7 @@ export default function MegaMenu({ categories, staticMenuClass }) {
           {categories.map((category) => (
             <li key={category.id}>
               <Link href={`/ipiresies/${category.slug}`} className="dropdown">
-                <span className="menu-icn flaticon-developer" />
+                <span className={`menu-icn ${category.icon}`} />
                 <span className="menu-title">{category.label}</span>
               </Link>
               <div className="drop-menu">

@@ -22,6 +22,7 @@ const HEADER = gql`
               attributes {
                 label
                 slug
+                icon
                 subcategories(sort: "label:asc", pagination: { limit: 6 }) {
                   data {
                     attributes {
