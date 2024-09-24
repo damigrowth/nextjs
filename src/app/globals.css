@@ -1066,3 +1066,12 @@ a {
   margin-left: 8px;
   cursor: pointer;
 }
+
+.addons-total-price {
+  color: var(--headings-color);
+  font-family: sans-serif;
+  font-weight: 700;
+  font-size: 23px;
+  line-height: 36px;
+  margin-bottom: 10px;
+}
