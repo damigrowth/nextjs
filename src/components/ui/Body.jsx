@@ -3,12 +3,12 @@
 import useArchiveStore from "@/store/archive/archiveStore";
 import React from "react";
 
-export default function Body({ children, path, dmSans }) {
+export default function Body({ children, path }) {
   const { filtersModalToggled } = useArchiveStore();
 
   return (
     <body
-      className={`${dmSans.className} ${
+      className={`${
         path === "/register" || path === "/login"
           ? "bgc-thm4 mm-wrapper mm-wrapper--position-left-front"
           : ""

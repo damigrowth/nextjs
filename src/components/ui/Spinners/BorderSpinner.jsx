@@ -3,12 +3,7 @@
 import React from "react";
 import { RotatingLines } from "react-loader-spinner";
 
-export default function BorderSpinner({
-  className,
-  width,
-  height,
-  borderWidth,
-}) {
+export default function BorderSpinner({ className }) {
   return (
     <div className={className}>
       <RotatingLines
@@ -22,17 +17,6 @@ export default function BorderSpinner({
         wrapperStyle={{}}
         wrapperClass=""
       />
-      {/* <div
-        className="spinner-border text-thm"
-        style={{
-          width: !width ? "3rem" : width,
-          height: !height ? "3rem" : height,
-          borderWidth: !borderWidth ? "0.3rem" : borderWidth,
-        }}
-        role="status"
-      >
-        <span className="sr-only"></span>
-      </div> */}
     </div>
   );
 }

@@ -3,7 +3,6 @@ import "react-tooltip/dist/react-tooltip.css";
 import "react-loading-skeleton/dist/skeleton.css";
 
 import BottomToTop from "@/components/button/BottomToTop";
-import { DM_Sans } from "next/font/google";
 import Header from "@/components/ui/Header";
 import SearchModal1 from "@/components/modal/SearchModal1";
 import { footer } from "@/data/footer";
@@ -18,18 +17,14 @@ import NavMenuMobile from "@/components/ui/NavMenuMobile";
 import { checkServerHealth, getData } from "@/lib/client/operations";
 import { FOOTER, HEADER } from "@/lib/graphql/queries/main/global";
 import ServerDown from "@/components/ui/Errors/ServerDown";
+import { GoogleAnalytics } from "@next/third-parties/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const dynamic = "force-dynamic";
 
 if (typeof window !== "undefined") {
   import("bootstrap");
 }
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-dm-sans",
-});
 
 export default async function RootLayout({ children }) {
   const { serverStatus } = await checkServerHealth();
@@ -53,9 +48,11 @@ export default async function RootLayout({ children }) {
   const { header: headerData } = await getData(HEADER);
   const { footer: footerData } = await getData(FOOTER);
 
+  const gaId = process.env.GA_ID;
+
   return (
     <html lang="el">
-      <Body path={path} dmSans={dmSans}>
+      <Body path={path}>
         <InstallBootstrap />
         {!footer.includes(path) ? (
           <div className="wrapper ovh mm-page mm-slideout">
@@ -82,6 +79,8 @@ export default async function RootLayout({ children }) {
           </div>
         )}
         <NavMenuMobile header={headerData} />
+        <SpeedInsights />
+        <GoogleAnalytics gaId={gaId} />
       </Body>
     </html>
   );

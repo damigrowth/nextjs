@@ -1,6 +1,7 @@
 import React from "react";
 import SortOptions from "./SortOptions";
 import FiltersModalBtn from "./SidebarModalBtn";
+import SearchChip from "./Chips/SearchChip";
 
 export default function Topbar({ meta, single, plural, sortOptions }) {
   let total = 0;
@@ -16,10 +17,11 @@ export default function Topbar({ meta, single, plural, sortOptions }) {
   return (
     <div className="row align-items-center mb20">
       <div className="col-md-6">
-        <div className="text-center text-md-start">
+        <div className="d-flex text-center text-md-start">
           <p className="text mb-0 mb10-sm">
             <span className="fw500 data-loading-element">{total}</span>
           </p>
+          <SearchChip />
         </div>
       </div>
       <div className="col-md-6">
