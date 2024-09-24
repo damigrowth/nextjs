@@ -36,7 +36,7 @@ export default function Addons({ addons, small, price }) {
                 key={i}
                 className={`${
                   !small
-                    ? `nav-link ${
+                    ? `nav-link p0 ${
                         order.addons?.some((a) => a.id === addon.id)
                           ? "active"
                           : ""
@@ -45,10 +45,7 @@ export default function Addons({ addons, small, price }) {
                 }`}
               >
                 {!small ? (
-                  <label
-                    className="custom_checkbox fw500 text-start"
-                    style={{ paddingLeft: "30px" }}
-                  >
+                  <label className="custom_checkbox fw500 text-start m0">
                     <h5 className="small-addon-title">{addon.title}</h5>
                     <span className="text text-bottom">
                       {addon.description}

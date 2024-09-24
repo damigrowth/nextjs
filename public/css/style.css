@@ -7691,7 +7691,7 @@ textarea {
   line-height: 40px;
   letter-spacing: 0em;
   position: relative;
-  padding-left: 28px;
+  padding: 26px 30px 35px 60px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -7711,8 +7711,9 @@ textarea {
   border: 1px solid #041e42;
   border-radius: 4px;
   position: absolute;
-  top: 10px;
-  left: 0;
+  top: 50%;
+  left: 30px;
+  transform: translateY(-50%);
   height: 16px;
   width: 16px;
 }
@@ -9639,7 +9640,6 @@ li.mm-listitem:focus {
   outline: 1px solid #e9e9e9;
   border-radius: 4px;
   margin-bottom: 20px;
-  padding: 26px 30px 35px;
   position: relative;
 }
 .extra-service-tab .nav-link.active {
