@@ -3,7 +3,6 @@ import "react-tooltip/dist/react-tooltip.css";
 import "react-loading-skeleton/dist/skeleton.css";
 
 import BottomToTop from "@/components/button/BottomToTop";
-import { DM_Sans } from "next/font/google";
 import Header from "@/components/ui/Header";
 import SearchModal1 from "@/components/modal/SearchModal1";
 import { footer } from "@/data/footer";
@@ -25,12 +24,6 @@ export const dynamic = "force-dynamic";
 if (typeof window !== "undefined") {
   import("bootstrap");
 }
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-dm-sans",
-});
 
 export default async function RootLayout({ children }) {
   const { serverStatus } = await checkServerHealth();
@@ -58,7 +51,7 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="el">
-      <Body path={path} dmSans={dmSans}>
+      <Body path={path}>
         <InstallBootstrap />
         {!footer.includes(path) ? (
           <div className="wrapper ovh mm-page mm-slideout">
