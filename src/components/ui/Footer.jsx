@@ -29,21 +29,6 @@ export default async function Footer({ footer }) {
           <div className="row">
             <div className="col-lg-6">
               <div className="footer-widget mb-4 mb-lg-5">
-                <div className="mailchimp-widget mb90">
-                  <h6 className="title text-white mb20">Subscribe</h6>
-                  {/* HYDRATION ERROR */}
-                  {/* <div className="mailchimp-style1 at-home9 bdrs60 overflow-hidden">
-                
-                  <input
-                    type="email"
-                    className="form-control"
-                    placeholder="Your email address"
-                  />
-                  <button className="text-white" type="submit">
-                    Send
-                  </button>
-                </div> */}
-                </div>
                 <div className="row justify-content-between">
                   <div className="col-auto">
                     <div className="link-style1 mb-3">
