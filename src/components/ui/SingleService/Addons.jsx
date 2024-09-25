@@ -26,7 +26,7 @@ export default function Addons({ addons, small, price }) {
         !small ? "px30 pt30" : ""
       }`}
     >
-      {!small && <div className="addons-total-price">{order.total}€</div>}
+      {!small && <div className="addons-total-price">{price}€</div>}
       {!small && <h4>Extra Υπηρεσίες</h4>}
       <div className="extra-service-tab mb20 mt20">
         <nav>
