@@ -13099,7 +13099,11 @@ hr {
 }
 
 #mega-menu > a {
-  color: #000 !important;
+  color: #000;
+}
+
+#mega-menu > a > span {
+  color: #1f4b3f;
 }
 
 .header.nav-homepage-style.ace-responsive-menu.megamenu_style a.list-item,

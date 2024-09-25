@@ -10,7 +10,7 @@ export default function HeaderStickyWrapper({ children }) {
 
   return (
     <header
-      className={`header-nav ${
+      className={`header-nav bg-white ${
         pathname === "/" ? "nav-homepage-style" : ""
       } at-home3 stricky main-menu border-0 ${
         sticky ? "slideInDown stricky-fixed" : "slideIn"
