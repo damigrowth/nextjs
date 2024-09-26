@@ -54,7 +54,7 @@ export default function CheckBox({ options, paramName }) {
     >
       <div className="checkbox-style1 mb15">
         {options.map((option, i) => (
-          <label key={i} className="custom_checkbox">
+          <label key={i} className="custom_filter_checkbox">
             {option.label}
             <input
               type="checkbox"
