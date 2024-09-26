@@ -93,22 +93,6 @@ export default function FreelancerCard({ freelancer, linkedName }) {
               ))}
             </div>
           )}
-          <hr className="opacity-100 mt20 mb15" />
-          <div className="fl-meta d-flex align-items-center justify-content-between">
-            <div className="meta fw500 text-start">
-              <span className="fz14 fw400">
-                {type && type.data && type.data.attributes.label}
-              </span>
-            </div>
-            <div className="meta fw500 text-start">
-              {rate && <span className="fz14 fw400">{rate}€ / ώρα</span>}
-            </div>
-            {/* <a className="meta fw500 text-start">
-              Job Success
-              <br />
-              <span className="fz14 fw400">%98</span>
-            </a> */}
-          </div>
           <div className="d-grid mt15">
             <Link
               href={`/profile/${username}`}
