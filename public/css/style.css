@@ -9160,6 +9160,7 @@ li.mm-listitem:focus {
   opacity: 1;
   visibility: visible;
   transform: translateX(1.8%);
+  pointer-events: auto;
 }
 #mega-menu .menu li a {
   border-left: 2px solid transparent;
@@ -9222,6 +9223,7 @@ li.mm-listitem:focus {
   width: 650px;
   z-index: -1;
   transform: translateX(-1%);
+  pointer-events: none;
   -webkit-transition: all 0.3s ease;
   -moz-transition: all 0.3s ease;
   -ms-transition: all 0.3s ease;
