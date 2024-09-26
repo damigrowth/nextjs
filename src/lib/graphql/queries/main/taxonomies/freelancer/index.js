@@ -131,7 +131,7 @@ const FREELANCER_TAXONOMIES_BY_SLUG = gql`
 `;
 
 const FREELANCERS_ARCHIVE_SEO = gql`
-  query FreelancerTaxonomiesBySlug(
+  query FreelancerArchiveSeo(
     $category: String
     $subcategory: String
     $type: String

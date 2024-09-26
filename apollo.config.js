@@ -1,9 +1,9 @@
 module.exports = {
   client: {
     service: {
-      name: "doulitsa",
+      name: "Doulitsa",
       url: "https://api.doulitsa.gr/graphql",
     },
-    includes: ["src/**/*.{ts,tsx,js,jsx}"],
+    includes: ["src/**/*.gql", "src/**/*.js", "src/**/*.jsx"],
   },
 };
