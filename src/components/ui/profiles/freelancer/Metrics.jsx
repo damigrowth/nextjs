@@ -5,13 +5,10 @@ export default function Metrics({
   type,
   servicesTotal,
   commencement,
-  verification,
   yearsOfExperience,
 }) {
   // DONE IN THE BACKEND
   // const yearsOfExperience = getYearsOfExperience(commencement);
-
-  const verified = verification === "Completed" ? true : false;
 
   return (
     <div className="row">
@@ -49,20 +46,6 @@ export default function Metrics({
             <div className="details">
               <h5 className="title fw600">Έτη Εμπειρίας</h5>
               <p className="mb-0 text">{yearsOfExperience}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {verified && (
-        <div className="col-sm-6 col-xl-3">
-          <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
-            <div className="icon flex-shrink-0">
-              <span className="flaticon-success" />
-            </div>
-            <div className="details">
-              <h5 className="title fw600">Πιστοποιημένο Προφίλ</h5>
-              {/* <p className="mb-0 text">{verified ? "Ναι" : "Όχι"}</p> */}
             </div>
           </div>
         </div>

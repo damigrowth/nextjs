@@ -54,7 +54,7 @@ export default function UserImage({
         )}
       </div>
       {displayName && (
-        <span className="fz14 lh-base ml10 mr10 ml5-xs">{displayName}</span>
+        <span className="fz14 lh-base ml10 ml5-xs">{displayName}</span>
       )}
     </>
   );

@@ -1,4 +1,5 @@
 import UserImage from "@/components/user/UserImage";
+import VerifiedBadge from "@/components/user/VerifiedBadge";
 import { formatRating } from "@/utils/formatRating";
 import Link from "next/link";
 import React from "react";
@@ -44,11 +45,18 @@ export default function FreelancerCard({ freelancer, linkedName }) {
         </div>
         <div className="review">
           {linkedName ? (
-            <Link href={`/profile/${username}`}>
-              <h5 className="title mb-1 text-bold">{user.displayName}</h5>
+            <Link
+              href={`/profile/${username}`}
+              className="d-flex align-items-center justify-content-center mb-1"
+            >
+              <h5 className="title m0 mr5 text-bold">{user.displayName}</h5>
+              <VerifiedBadge verified={user?.verified} />
             </Link>
           ) : (
-            <h5 className="title mb-1 text-bold">{user.displayName}</h5>
+            <div className="d-flex align-items-center justify-content-center mb-1">
+              <h5 className="title m0 mr5 text-bold">{user.displayName}</h5>
+              <VerifiedBadge verified={user?.verified} />
+            </div>
           )}
 
           <p className="mb-0 text-bold">

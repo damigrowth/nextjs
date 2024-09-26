@@ -1,7 +1,7 @@
 import Socials from "@/components/ui/socials/Socials";
 import Rating from "@/components/user/Rating";
 import UserImage from "@/components/user/UserImage";
-import { formatRating } from "@/utils/formatRating";
+import VerifiedBadge from "@/components/user/VerifiedBadge";
 import Image from "next/image";
 import React from "react";
 
@@ -16,6 +16,7 @@ export default function Meta({
   image,
   rating,
   totalReviews,
+  verified,
 }) {
   return (
     <div className="cta-service-v1 freelancer-single-v1 pt60 pb60 bdrs16 position-relative overflow-hidden mb30 d-flex align-items-center">
@@ -51,7 +52,10 @@ export default function Meta({
                 />
               </div>
               <div className="ml20 ml0-xs">
-                <h1 className="heading-h5 title mb-1">{displayName}</h1>
+                <div className="d-flex align-items-center">
+                  <h1 className="heading-h5 title m0 p0 pr5">{displayName}</h1>
+                  <VerifiedBadge verified={verified} />
+                </div>
                 <h2 className="heading-p mb-0">{tagline}</h2>
                 {totalReviews > 0 && (
                   <Rating totalReviews={totalReviews} rating={rating} />

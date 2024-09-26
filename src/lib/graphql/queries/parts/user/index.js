@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { SINGLE_IMAGE } from "../../fragments/global";
-import { ROLE, VERIFICATION } from "../../fragments/entities/user";
+import { ROLE } from "../../fragments/entities/user";
 import { REVIEW_DISLIKES, REVIEW_LIKES } from "../../fragments/entities/review";
 import { REVIEW } from "../review";
 import { ORDERS } from "../../fragments/entities/order";
@@ -14,6 +14,7 @@ const USER_MAIN = gql`
     firstName
     lastName
     displayName
+    verified
     image {
       ...SingleImage
     }
@@ -22,12 +23,8 @@ const USER_MAIN = gql`
         id
       }
     }
-    verification {
-      ...Verification
-    }
   }
   ${SINGLE_IMAGE}
-  ${VERIFICATION}
 `;
 
 const USER_RELATIONS = gql`
