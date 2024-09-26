@@ -84,10 +84,10 @@ export default function FreelancerCard({ freelancer, linkedName }) {
               {`(${reviews_total} αξιολογήσεις)`}
             </p>
           </div> */}
-          {specialisations?.data?.length > 0 && (
-            <div className="skill-tags d-flex align-items-center justify-content-center mb5 mt10">
+          {specialisations?.data?.length > 0 ? (
+            <div className="card-tags">
               {specialisations.data.map((el, i) => (
-                <span key={i} className="tag">
+                <span key={i} className="card-tag">
                   {el.attributes.label}
                 </span>
               ))}
