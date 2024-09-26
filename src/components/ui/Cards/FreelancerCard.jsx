@@ -75,7 +75,7 @@ export default function FreelancerCard({ freelancer, linkedName }) {
               </span>
             </p>
           ) : (
-            <div style={{ height: "27px" }}></div>
+            <div className="empty-card-reviews"></div>
           )}
           {/* <div className="review">
             <p>
@@ -92,6 +92,8 @@ export default function FreelancerCard({ freelancer, linkedName }) {
                 </span>
               ))}
             </div>
+          ) : (
+            <div className="empty-card-tags"></div>
           )}
           <div className="d-grid mt15">
             <Link

@@ -1098,3 +1098,11 @@ a {
   line-height: 15px;
   white-space: nowrap;
 }
+
+.empty-card-reviews {
+  height: 27px;
+}
+
+.empty-card-tags {
+  height: 35px;
+}
