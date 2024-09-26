@@ -60,16 +60,13 @@ const USER_PARTIAL = gql`
         email
         phone
         confirmed
-        verification {
-          ...Verification
-        }
+        verified
         image {
           ...SingleImage
         }
       }
     }
   }
-  ${VERIFICATION}
   ${SINGLE_IMAGE}
 `;
 

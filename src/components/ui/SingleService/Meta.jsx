@@ -1,7 +1,6 @@
 import Badges from "@/components/user/Badges";
 import Rating from "@/components/user/Rating";
 import UserImage from "@/components/user/UserImage";
-import { formatRating } from "@/utils/formatRating";
 import React from "react";
 
 export default function Meta({
@@ -12,7 +11,6 @@ export default function Meta({
   username,
   displayName,
   rating,
-  views,
   verified,
   totalReviews,
   topLevel,

@@ -76,7 +76,6 @@ const FREELANCERS_ARCHIVE = gql`
     $type: String
     $cat: String
     $sub: String
-    $specializations: [ID]
     $experience: Int
     $top: Boolean
     $verified: Boolean
@@ -95,7 +94,6 @@ const FREELANCERS_ARCHIVE = gql`
         }
         category: { slug: { eq: $cat } }
         subcategory: { slug: { eq: $sub } }
-        specialisations: { id: { in: $specializations } }
         yearsOfExperience: { gte: $experience }
         topLevel: { eq: $top }
         user: { verified: { eq: $verified } }

@@ -1,9 +1,4 @@
 import { gql } from "@apollo/client";
-import {
-  FREELANCER_CATEGORY,
-  FREELANCER_CATEGORY_FULL,
-  FREELANCER_SUBCATEGORY,
-} from "../../../fragments/taxonomies/freelancer";
 import { SINGLE_IMAGE } from "../../../fragments/global";
 
 // const FREELANCER_CATEGORIES = gql`
@@ -73,6 +68,7 @@ const FREELANCER_SUBCATEGORIES_SEARCH = gql`
           { label: { containsi: $searchTerm } }
           { category: { slug: { eq: $categorySlug } } }
           { type: { slug: { eq: $type } } }
+          { freelancers: { id: { not: { null: true } } } }
         ]
       }
       sort: "label:asc"
@@ -111,7 +107,11 @@ const FREELANCER_TAXONOMIES_BY_SLUG = gql`
       }
     }
     subcategoryBySlug: freelancerSubcategories(
-      filters: { slug: { eq: $subcategory }, type: { slug: { eq: $type } } }
+      filters: {
+        slug: { eq: $subcategory }
+        type: { slug: { eq: $type } }
+        freelancers: { id: { not: { null: true } } }
+      }
       sort: "label:asc"
     ) {
       data {
@@ -131,7 +131,7 @@ const FREELANCER_TAXONOMIES_BY_SLUG = gql`
 `;
 
 const FREELANCERS_ARCHIVE_SEO = gql`
-  query FreelancerTaxonomiesBySlug(
+  query FreelancerArchiveSeo(
     $category: String
     $subcategory: String
     $type: String

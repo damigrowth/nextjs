@@ -29,7 +29,7 @@ export default function Banner({ heading, description, image, withVideo }) {
           <Image
             height={300}
             width={532}
-            className="service-v1-vector bounce-y d-none d-lg-block"
+            className="service-v1-vector d-none d-lg-block"
             src={bannerImage}
             alt="vector"
           />

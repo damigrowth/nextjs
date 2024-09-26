@@ -102,16 +102,13 @@ export default function FreelancerProfile({
               }
               rating={rating}
               totalReviews={reviews_total}
+              verified={freelancerUser?.verified}
             />
             <Metrics
               type={type?.data?.attributes}
               servicesTotal={servicesMeta?.total}
               commencement={commencement}
               yearsOfExperience={yearsOfExperience}
-              verification={
-                freelancerUser?.verification?.data?.attributes?.status?.data
-                  ?.attributes?.type
-              }
             />
             <div className="service-about">
               <Description heading="Περιγραφή" text={description} />

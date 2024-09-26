@@ -5,7 +5,6 @@ import PaymentMethods from "./Filters/PaymentMethods";
 import ContactTypes from "./Filters/ContactTypes";
 import Coverage from "./Filters/Coverage";
 import Category from "./Filters/Category";
-import Specialization from "./Filters/Specialization";
 import Experience from "./Filters/Experience";
 import Content from "./Content";
 import ContentSkeleton from "./ContentSkeleton";
@@ -51,11 +50,6 @@ export default function FreelancersArchive({
       heading: "Περιοχές Εξυπηρέτησης",
       params: ["cov_o", "cov_c"],
       component: <Coverage counties={counties} />,
-    },
-    {
-      heading: "Κλάδος εξειδίκευσης",
-      params: ["spec"],
-      component: <Specialization />,
     },
     { heading: "Εμπειρία σε έτη", params: ["exp"], component: <Experience /> },
     {

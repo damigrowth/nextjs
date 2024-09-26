@@ -67,6 +67,7 @@ const SUBCATEGORIES_SEARCH = gql`
         and: [
           { label: { containsi: $searchTerm } }
           { category: { slug: { eq: $categorySlug } } }
+          { services: { id: { not: { null: true } } } }
         ]
       }
       sort: "label:asc"
@@ -91,6 +92,7 @@ const SUBDIVISIONS_SEARCH = gql`
         and: [
           { label: { containsi: $searchTerm } }
           { subcategory: { slug: { eq: $subcategorySlug } } }
+          { services: { id: { not: { null: true } } } }
         ]
       }
       sort: "label:asc"

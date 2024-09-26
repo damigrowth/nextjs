@@ -6,6 +6,7 @@ import Socials from "../socials/Socials";
 import { getYearsOfExperience } from "@/utils/getYearsOfExperience";
 import { formatRating } from "@/utils/formatRating";
 import Rating from "@/components/user/Rating";
+import VerifiedBadge from "@/components/user/VerifiedBadge";
 
 export default function ContactDetails({
   firstName,
@@ -19,6 +20,7 @@ export default function ContactDetails({
   image,
   totalReviews,
   topLevel,
+  verified,
   socials,
   email,
   phone,
@@ -45,8 +47,12 @@ export default function ContactDetails({
             />
           </div>
           <div className="ml20">
-            <Link href={`/profile/${username}`}>
-              <h5 className="title mb-1">{displayName}</h5>
+            <Link
+              href={`/profile/${username}`}
+              className="d-flex align-items-center"
+            >
+              <h5 className="title mb-1 mr5">{displayName}</h5>
+              <VerifiedBadge verified={verified} />
             </Link>
             <p className="mb-0">{tagline}</p>
             <Rating totalReviews={totalReviews} rating={rating} />

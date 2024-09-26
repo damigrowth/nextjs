@@ -30,10 +30,6 @@ export default function ServiceCard({ service }) {
 
   const user = freelancer?.data?.attributes?.user?.data?.attributes;
 
-  const isVerified =
-    user?.verification?.data?.attributes?.status?.data?.attributes?.type ===
-    "Completed";
-
   return (
     <div className="data-loading-element listing-style1 list-style d-block d-xl-flex align-items-center">
       {media.data.length > 1 ? (
@@ -83,7 +79,7 @@ export default function ServiceCard({ service }) {
             />
 
             <Badges
-              verified={isVerified}
+              verified={user?.verified}
               topLevel={freelancer?.data?.attributes?.topLevel}
             />
           </div>

@@ -52,10 +52,6 @@ export default async function SingleService({
   const userId = freelancerUser.data.attributes.user.data.id;
   const user = freelancerUser.data.attributes.user.data.attributes;
 
-  const isVerified =
-    user?.verification?.data?.attributes?.status?.data?.attributes?.type ===
-    "Completed";
-
   const freelancerId = freelancerUser.data.id;
   const freelancer = freelancerUser.data.attributes;
 
@@ -91,7 +87,7 @@ export default async function SingleService({
                   username={freelancer.username}
                   image={user.image.data?.attributes?.formats?.thumbnail?.url}
                   views={views?.data?.length}
-                  verified={isVerified}
+                  verified={user?.verified}
                   topLevel={freelancer?.topLevel}
                   rating={freelancer.rating}
                   totalReviews={freelancer.reviews_total}
@@ -169,6 +165,7 @@ export default async function SingleService({
               username={freelancer.username}
               tagline={freelancer.tagline}
               topLevel={freelancer.topLevel}
+              verified={user?.verified}
               base={freelancer.base}
               rate={freelancer.rate}
               image={user.image?.data?.attributes?.formats?.thumbnail?.url}

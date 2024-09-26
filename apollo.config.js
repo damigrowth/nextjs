@@ -4,6 +4,6 @@ module.exports = {
       name: "doulitsa",
       url: "https://api.doulitsa.gr/graphql",
     },
-    includes: ["src/**/*.{ts,tsx,js,jsx}"],
+    includes: ["src/**/*.js", "src/**/*.jsx"],
   },
 };

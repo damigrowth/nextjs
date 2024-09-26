@@ -2433,7 +2433,6 @@ li {
 }
 
 .service-v1-vector {
-  bottom: -10px;
   position: absolute;
   right: 5%;
   border: 2px #898989 solid;
@@ -7731,6 +7730,53 @@ textarea {
   transform: rotate(45deg);
 }
 
+.custom_filter_checkbox {
+  display: block;
+  cursor: pointer;
+  color: var(--headings-color);
+  font-family: sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 40px;
+  letter-spacing: 0;
+  padding-left: 28px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+.custom_filter_checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.custom_filter_checkbox input:checked ~ .checkmark {
+  background-color: #1f4b3f;
+}
+
+.custom_filter_checkbox .checkmark {
+  border: 1px solid #041e42;
+  border-radius: 4px;
+  position: absolute;
+  top: 10px;
+  left: 0;
+  height: 16px;
+  width: 16px;
+}
+.custom_filter_checkbox .checkmark:after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
 .switch-style1 input.form-check-input {
   background-color: rgba(91, 187, 123, 0.1);
   border: none;
@@ -9113,6 +9159,7 @@ li.mm-listitem:focus {
   opacity: 1;
   visibility: visible;
   transform: translateX(1.8%);
+  pointer-events: auto;
 }
 #mega-menu .menu li a {
   border-left: 2px solid transparent;
@@ -9175,6 +9222,7 @@ li.mm-listitem:focus {
   width: 650px;
   z-index: -1;
   transform: translateX(-1%);
+  pointer-events: none;
   -webkit-transition: all 0.3s ease;
   -moz-transition: all 0.3s ease;
   -ms-transition: all 0.3s ease;
@@ -11666,6 +11714,14 @@ input:focus-visible {
   line-height: 35px;
 }
 
+.widget-wrapper .form-check-label,
+.widget-wrapper .custom_filter_checkbox {
+  font-size: 15px;
+}
+.widget-wrapper .custom_filter_checkbox {
+  line-height: 35px;
+}
+
 .search_area {
   position: relative;
 }
@@ -13141,6 +13197,12 @@ header.nav-homepage-style .sidemenu-btn {
 
 .checkbox-style1,
 .custom_checkbox {
+  margin-left: 7px;
+}
+
+.checkbox-style1,
+.custom_filter_checkbox {
+  position: relative;
   margin-left: 7px;
 }
 

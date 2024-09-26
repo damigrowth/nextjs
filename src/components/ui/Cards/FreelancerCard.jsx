@@ -1,4 +1,5 @@
 import UserImage from "@/components/user/UserImage";
+import VerifiedBadge from "@/components/user/VerifiedBadge";
 import { formatRating } from "@/utils/formatRating";
 import Link from "next/link";
 import React from "react";
@@ -44,11 +45,18 @@ export default function FreelancerCard({ freelancer, linkedName }) {
         </div>
         <div className="review">
           {linkedName ? (
-            <Link href={`/profile/${username}`}>
-              <h5 className="title mb-1 text-bold">{user.displayName}</h5>
+            <Link
+              href={`/profile/${username}`}
+              className="d-flex align-items-center justify-content-center mb-1"
+            >
+              <h5 className="title m0 mr5 text-bold">{user.displayName}</h5>
+              <VerifiedBadge verified={user?.verified} />
             </Link>
           ) : (
-            <h5 className="title mb-1 text-bold">{user.displayName}</h5>
+            <div className="d-flex align-items-center justify-content-center mb-1">
+              <h5 className="title m0 mr5 text-bold">{user.displayName}</h5>
+              <VerifiedBadge verified={user?.verified} />
+            </div>
           )}
 
           <p className="mb-0 text-bold">
@@ -67,7 +75,7 @@ export default function FreelancerCard({ freelancer, linkedName }) {
               </span>
             </p>
           ) : (
-            <div style={{ height: "27px" }}></div>
+            <div className="empty-card-reviews"></div>
           )}
           {/* <div className="review">
             <p>
@@ -76,31 +84,17 @@ export default function FreelancerCard({ freelancer, linkedName }) {
               {`(${reviews_total} αξιολογήσεις)`}
             </p>
           </div> */}
-          {specialisations?.data?.length > 0 && (
-            <div className="skill-tags d-flex align-items-center justify-content-center mb5 mt10">
+          {specialisations?.data?.length > 0 ? (
+            <div className="card-tags">
               {specialisations.data.map((el, i) => (
-                <span key={i} className="tag">
+                <span key={i} className="card-tag">
                   {el.attributes.label}
                 </span>
               ))}
             </div>
+          ) : (
+            <div className="empty-card-tags"></div>
           )}
-          <hr className="opacity-100 mt20 mb15" />
-          <div className="fl-meta d-flex align-items-center justify-content-between">
-            <div className="meta fw500 text-start">
-              <span className="fz14 fw400">
-                {type && type.data && type.data.attributes.label}
-              </span>
-            </div>
-            <div className="meta fw500 text-start">
-              {rate && <span className="fz14 fw400">{rate}€ / ώρα</span>}
-            </div>
-            {/* <a className="meta fw500 text-start">
-              Job Success
-              <br />
-              <span className="fz14 fw400">%98</span>
-            </a> */}
-          </div>
           <div className="d-grid mt15">
             <Link
               href={`/profile/${username}`}
