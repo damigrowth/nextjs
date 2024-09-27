@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { SINGLE_IMAGE } from "../../global";
+import { VISIBILITY } from "../../components/global";
 
 const ROLE = gql`
   fragment Role on UsersPermissionsRoleEntityResponse {
@@ -61,13 +62,18 @@ const USER_PARTIAL = gql`
         phone
         confirmed
         verified
+        address
         image {
           ...SingleImage
+        }
+        visibility {
+          ...Visibility
         }
       }
     }
   }
   ${SINGLE_IMAGE}
+  ${VISIBILITY}
 `;
 
 const LIKES = gql`
