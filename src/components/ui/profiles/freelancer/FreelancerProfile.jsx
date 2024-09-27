@@ -39,6 +39,7 @@ export default function FreelancerProfile({
     image,
     description,
     rate,
+    subcategory,
     commencement,
     yearsOfExperience,
     type,
@@ -102,7 +103,7 @@ export default function FreelancerProfile({
               visibility={user?.visibility}
             />
             <Metrics
-              type={type?.data?.attributes}
+              subcategory={subcategory?.data?.attributes?.label}
               servicesTotal={servicesMeta?.total}
               commencement={commencement}
               yearsOfExperience={yearsOfExperience}
