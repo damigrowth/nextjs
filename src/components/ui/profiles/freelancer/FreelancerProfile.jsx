@@ -31,7 +31,7 @@ export default function FreelancerProfile({
   reviewsPage,
 }) {
   const {
-    user,
+    user: userData,
     tagline,
     base,
     coverage,
@@ -39,6 +39,7 @@ export default function FreelancerProfile({
     image,
     description,
     rate,
+    subcategory,
     commencement,
     yearsOfExperience,
     type,
@@ -64,7 +65,7 @@ export default function FreelancerProfile({
     rating_stars_5,
   } = freelancer;
 
-  const freelancerUser = user?.data?.attributes;
+  const user = userData?.data?.attributes;
 
   const ratingStars = [
     rating_stars_1,
@@ -77,42 +78,39 @@ export default function FreelancerProfile({
   return (
     <section className="pt10 pb90 pb30-md">
       <FreelancerSchema
-        displayName={freelancerUser?.displayName}
+        displayName={user?.displayName}
         location={base?.county?.data?.attributes?.name}
         rating={rating}
         reviews_total={reviews_total}
         reviews={reviews}
-        profileImage={
-          freelancerUser.image.data?.attributes?.formats?.thumbnail?.url
-        }
+        profileImage={user.image.data?.attributes?.formats?.thumbnail?.url}
       />
       <div className="container">
         <div className="row wow fadeInUp">
           <div className="col-lg-8">
             <Meta
               topLevel={topLevel}
-              firstName={freelancerUser?.firstName}
-              lastName={freelancerUser?.lastName}
-              displayName={freelancerUser?.displayName}
+              firstName={user?.firstName}
+              lastName={user?.lastName}
+              displayName={user?.displayName}
               tagline={tagline}
-              base={base?.county?.data?.attributes?.name}
+              address={user?.address}
               socials={socials}
-              image={
-                freelancerUser.image.data?.attributes?.formats?.thumbnail?.url
-              }
+              image={user.image.data?.attributes?.formats?.thumbnail?.url}
               rating={rating}
               totalReviews={reviews_total}
-              verified={freelancerUser?.verified}
+              verified={user?.verified}
+              coverage={coverage}
+              visibility={user?.visibility}
             />
             <Metrics
-              type={type?.data?.attributes}
+              subcategory={subcategory?.data?.attributes?.label}
               servicesTotal={servicesMeta?.total}
               commencement={commencement}
               yearsOfExperience={yearsOfExperience}
             />
             <div className="service-about">
               <Description heading="Περιγραφή" text={description} />
-              <Industries industries={industries?.data} />
               <Features
                 minBudgets={minBudgets?.data}
                 size={size?.data?.attributes}
@@ -120,6 +118,7 @@ export default function FreelancerProfile({
                 payment_methods={payment_methods?.data}
                 settlement_methods={settlement_methods?.data}
               />
+              <Industries industries={industries?.data} />
               <FeaturedServices
                 uid={uid}
                 services={services}
@@ -163,8 +162,9 @@ export default function FreelancerProfile({
               coverage={coverage}
               commencement={commencement}
               website={website}
-              phone={freelancerUser.phone}
-              email={freelancerUser.email}
+              phone={user.phone}
+              email={user.email}
+              visibility={user?.visibility}
             />
             <Skills
               skills={skills?.data}

@@ -2,7 +2,7 @@ import { getYearsOfExperience } from "@/utils/getYearsOfExperience";
 import React from "react";
 
 export default function Metrics({
-  type,
+  subcategory,
   servicesTotal,
   commencement,
   yearsOfExperience,
@@ -12,15 +12,14 @@ export default function Metrics({
 
   return (
     <div className="row">
-      {type && (
+      {subcategory && (
         <div className="col-sm-6 col-xl-3">
           <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
             <div className="icon flex-shrink-0">
-              <span className="flaticon-briefcase" />
+              <span className="flaticon-category" />
             </div>
             <div className="details">
-              <h5 className="title fw600">{type?.label}</h5>
-              {/* <p className="mb-0 text">98%</p> */}
+              <h5 className="title fw600">{subcategory}</h5>
             </div>
           </div>
         </div>

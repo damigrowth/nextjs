@@ -9,15 +9,21 @@ export default function Info({
   website,
   phone,
   email,
+  visibility,
 }) {
   // console.log(coverage);
   const formattedWebsite = website ? website.replace(/^https?:\/\//, "") : null;
-  const covers = coverage ? (coverage.online ? "Online" : "") : null;
+
+  const covers = [];
+  if (coverage?.online) covers.push("Online");
+  if (coverage?.onbase) covers.push("Στην έδρα");
+  if (coverage?.onsite) covers.push("Στον χώρο σας");
+
   return (
     <>
       <div className="price-widget pt25 bdrs8">
         {rate && (
-          <h3 className="widget-title">
+          <h3 className="widget-title mb30">
             {}
             {rate}€<small className="fz15 fw500"> / εργατοώρα</small>
           </h3>
@@ -25,34 +31,40 @@ export default function Info({
 
         <div className="category-list mt20">
           {base && (
-            <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
+            <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-3">
               <span className="text">
                 <i className="flaticon-place text-thm2 pe-2 vam" />
-                <span className="list-item-title">Έδρα</span>
+                <span className="list-item-title">Περιοχή</span>
               </span>
               <span>{base}</span>
             </div>
           )}
           {covers && (
-            <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
+            <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-3">
               <span className="text">
                 <i className="flaticon-customer-service text-thm2 pe-2 vam" />
                 <span className="list-item-title">Εξυπηρετεί</span>
               </span>
-              <span>{covers}</span>
+              <div className="freelancer-info-chips">
+                {covers.map((el, i) => (
+                  <span key={i} className="freelancer-info-chip">
+                    {el}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
           {commencement && (
-            <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
+            <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-3">
               <span className="text">
                 <i className="flaticon-calendar text-thm2 pe-2 vam" />
                 <span className="list-item-title">Έτος Έναρξης</span>
               </span>
               <span>{commencement}</span>
             </div>
-          )}
+          )}{" "}
           {formattedWebsite && (
-            <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
+            <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-3">
               <span className="text">
                 <i className="flaticon-website text-thm2 pe-2 vam" />
                 <span className="list-item-title">Ιστοσελίδα</span>
@@ -62,8 +74,8 @@ export default function Info({
               </a>
             </div>
           )}
-          {phone && (
-            <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
+          {phone && !visibility?.phone && (
+            <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-3">
               <span className="text">
                 <i className="flaticon-call text-thm2 pe-2 vam" />
                 <span className="list-item-title">Τηλέφωνο</span>
@@ -71,8 +83,8 @@ export default function Info({
               <a href={`tel:${phone}`}>{phone}</a>
             </div>
           )}
-          {email && (
-            <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
+          {email && !visibility?.email && (
+            <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-3">
               <span className="text">
                 <i className="flaticon-mail text-thm2 pe-2 vam" />
                 <span className="list-item-title">Email</span>

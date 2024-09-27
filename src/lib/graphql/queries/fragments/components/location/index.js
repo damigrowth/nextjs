@@ -3,6 +3,8 @@ import { gql } from "@apollo/client";
 const COVERAGE = gql`
   fragment Coverage on ComponentLocationCoverage {
     online
+    onbase
+    onsite
     counties {
       data {
         id
