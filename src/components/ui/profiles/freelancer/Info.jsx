@@ -9,6 +9,7 @@ export default function Info({
   website,
   phone,
   email,
+  visibility,
 }) {
   // console.log(coverage);
   const formattedWebsite = website ? website.replace(/^https?:\/\//, "") : null;
@@ -62,7 +63,7 @@ export default function Info({
               </a>
             </div>
           )}
-          {phone && (
+          {phone && !visibility?.phone && (
             <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
               <span className="text">
                 <i className="flaticon-call text-thm2 pe-2 vam" />
@@ -71,7 +72,7 @@ export default function Info({
               <a href={`tel:${phone}`}>{phone}</a>
             </div>
           )}
-          {email && (
+          {email && !visibility?.email && (
             <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
               <span className="text">
                 <i className="flaticon-mail text-thm2 pe-2 vam" />

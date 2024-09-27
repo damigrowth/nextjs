@@ -164,6 +164,7 @@ export default function FreelancerProfile({
               website={website}
               phone={user.phone}
               email={user.email}
+              visibility={user?.visibility}
             />
             <Skills
               skills={skills?.data}
