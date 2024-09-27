@@ -11,12 +11,13 @@ export default function Meta({
   lastName,
   displayName,
   tagline,
-  base,
+  address,
   socials,
   image,
   rating,
   totalReviews,
   verified,
+  visibility,
 }) {
   return (
     <div className="cta-service-v1 freelancer-single-v1 pt60 pb60 bdrs16 position-relative overflow-hidden mb30 d-flex align-items-center">
@@ -60,9 +61,10 @@ export default function Meta({
                 {totalReviews > 0 && (
                   <Rating totalReviews={totalReviews} rating={rating} />
                 )}
-                {base && (
+                {address && visibility?.address && (
                   <p className="mb-0 dark-color fz15 fw500 list-inline-item ml15 mb5-sm ml0-xs">
-                    <i className="flaticon-place vam fz20 me-2"></i> {base}
+                    <i className="flaticon-home-1 gray-icon vam fz18"></i>{" "}
+                    {address}
                   </p>
                 )}
                 <div className="mb-0 dark-color fz15 fw500 list-inline-item ml15 mb5-sm ml0-xs">

@@ -1106,3 +1106,7 @@ a {
 .empty-card-tags {
   height: 35px;
 }
+
+.gray-icon {
+  color: var(--body-text-color);
+}

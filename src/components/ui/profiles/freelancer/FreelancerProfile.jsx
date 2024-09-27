@@ -32,6 +32,7 @@ export default function FreelancerProfile({
 }) {
   const {
     user,
+    user: userData,
     tagline,
     base,
     coverage,
@@ -65,6 +66,7 @@ export default function FreelancerProfile({
   } = freelancer;
 
   const freelancerUser = user?.data?.attributes;
+  const user = userData?.data?.attributes;
 
   const ratingStars = [
     rating_stars_1,
@@ -78,6 +80,7 @@ export default function FreelancerProfile({
     <section className="pt10 pb90 pb30-md">
       <FreelancerSchema
         displayName={freelancerUser?.displayName}
+        displayName={user?.displayName}
         location={base?.county?.data?.attributes?.name}
         rating={rating}
         reviews_total={reviews_total}
@@ -85,24 +88,28 @@ export default function FreelancerProfile({
         profileImage={
           freelancerUser.image.data?.attributes?.formats?.thumbnail?.url
         }
+        profileImage={user.image.data?.attributes?.formats?.thumbnail?.url}
       />
       <div className="container">
         <div className="row wow fadeInUp">
           <div className="col-lg-8">
             <Meta
               topLevel={topLevel}
-              firstName={freelancerUser?.firstName}
-              lastName={freelancerUser?.lastName}
-              displayName={freelancerUser?.displayName}
+              firstName={user?.firstName}
+              lastName={user?.lastName}
+              displayName={user?.displayName}
               tagline={tagline}
-              base={base?.county?.data?.attributes?.name}
+              address={user?.address}
               socials={socials}
               image={
                 freelancerUser.image.data?.attributes?.formats?.thumbnail?.url
               }
+              image={user.image.data?.attributes?.formats?.thumbnail?.url}
               rating={rating}
               totalReviews={reviews_total}
               verified={freelancerUser?.verified}
+              verified={user?.verified}
+              visibility={user?.visibility}
             />
             <Metrics
               type={type?.data?.attributes}
