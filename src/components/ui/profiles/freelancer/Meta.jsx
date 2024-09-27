@@ -17,6 +17,7 @@ export default function Meta({
   rating,
   totalReviews,
   verified,
+  coverage,
   visibility,
 }) {
   return (
@@ -62,14 +63,25 @@ export default function Meta({
                   <Rating totalReviews={totalReviews} rating={rating} />
                 )}
                 {address && visibility?.address && (
-                  <p className="mb-0 dark-color fz15 fw500 list-inline-item ml15 mb5-sm ml0-xs">
+                  <p className="mb-0 dark-color fz15 fw500 list-inline-item mb5-sm ml0-xs">
                     <i className="flaticon-home-1 gray-icon vam fz18"></i>{" "}
                     {address}
                   </p>
                 )}
-                <div className="mb-0 dark-color fz15 fw500 list-inline-item ml15 mb5-sm ml0-xs">
-                  <Socials socials={socials} />
-                </div>
+                {coverage && (
+                  <p className="mb-0 dark-color fz15 fw500 list-inline-item ml15 mb5-sm ml0-xs">
+                    <i className="flaticon-tracking gray-icon vam fz18"></i>{" "}
+                    {coverage.counties.data
+                      .filter((el) => el.id === "54")
+                      .map(
+                        (el, i, arr) =>
+                          `${el.attributes.name}${
+                            i < arr.length - 1 ? ", " : ""
+                          }`
+                      )}
+                  </p>
+                )}
+                <Socials socials={socials} />
               </div>
             </div>
           </div>

@@ -100,6 +100,7 @@ export default function FreelancerProfile({
               rating={rating}
               totalReviews={reviews_total}
               verified={user?.verified}
+              coverage={coverage}
               visibility={user?.visibility}
             />
             <Metrics
