@@ -28,7 +28,7 @@ export default function Info({
             <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2">
               <span className="text">
                 <i className="flaticon-place text-thm2 pe-2 vam" />
-                <span className="list-item-title">Έδρα</span>
+                <span className="list-item-title">Περιοχή</span>
               </span>
               <span>{base}</span>
             </div>
