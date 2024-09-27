@@ -110,7 +110,6 @@ export default function FreelancerProfile({
             />
             <div className="service-about">
               <Description heading="Περιγραφή" text={description} />
-              <Industries industries={industries?.data} />
               <Features
                 minBudgets={minBudgets?.data}
                 size={size?.data?.attributes}
@@ -118,6 +117,7 @@ export default function FreelancerProfile({
                 payment_methods={payment_methods?.data}
                 settlement_methods={settlement_methods?.data}
               />
+              <Industries industries={industries?.data} />
               <FeaturedServices
                 uid={uid}
                 services={services}
