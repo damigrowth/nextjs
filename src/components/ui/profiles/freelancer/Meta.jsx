@@ -20,7 +20,7 @@ export default function Meta({
   visibility,
 }) {
   return (
-    <div className="cta-service-v1 freelancer-single-v1 pt60 pb60 bdrs16 position-relative overflow-hidden mb30 d-flex align-items-center">
+    <div className="cta-service-v1 freelancer-single-v1 pt30 pb30 bdrs16 position-relative overflow-hidden mb30 d-flex align-items-center">
       <Image
         width={198}
         height={226}
