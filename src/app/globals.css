@@ -1110,3 +1110,33 @@ a {
 .gray-icon {
   color: var(--body-text-color);
 }
+
+.freelancer-info-chips {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+}
+
+.freelancer-info-chip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f5;
+  color: #757575;
+  border-radius: 10px;
+  font-family: sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  font-style: normal;
+  line-height: 15px;
+  white-space: nowrap;
+}
