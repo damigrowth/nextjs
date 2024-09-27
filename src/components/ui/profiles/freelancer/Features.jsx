@@ -21,57 +21,7 @@ export default function Features({
 
   return (
     <>
-      <div className="row">
-        {(minBudgets.length > 0 ||
-          size ||
-          settlement_methods.length > 0 ||
-          contactTypes.length > 0 ||
-          payment_methods.length > 0) && (
-          <hr className="opacity-100 mb60 mt60" />
-        )}
-        {minBudgets.length > 0 && (
-          <div className="col-sm-6 col-xl-4">
-            <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
-              <div className="icon flex-shrink-0">
-                <span className="flaticon-wallet" />
-              </div>
-              <div className="details">
-                <h5 className="title">Ελάχιστο Budget</h5>
-                <p className="mb-0 text">{smallestBudget?.attributes?.label}</p>
-              </div>
-            </div>
-          </div>
-        )}
-        {sizeNumber > 1 && (
-          <div className="col-sm-6 col-xl-4">
-            <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
-              <div className="icon flex-shrink-0">
-                <span className="flaticon-photo" />
-              </div>
-              <div className="details">
-                <h5 className="title">Εργαζόμενοι</h5>
-                <p className="mb-0 text">{size?.label}</p>
-              </div>
-            </div>
-          </div>
-        )}
-        {settlement_methods.length > 0 && (
-          <div className="col-sm-6 col-xl-4">
-            <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
-              <div className="icon flex-shrink-0">
-                <span className="flaticon-antivirus" />
-              </div>
-              <div className="details">
-                <h5 className="title">Μέθοδος Εξόφλησης</h5>
-                {settlement_methods.map((method, i) => (
-                  <p key={i} className="mb-0 text list-inline-item">
-                    {method?.attributes?.label}
-                  </p>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+      <div className="row mt60">
         {contactTypes.length > 0 && (
           <div className="col-sm-6 col-xl-4">
             <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
@@ -106,6 +56,51 @@ export default function Features({
                     </p>
                   ))}
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {settlement_methods.length > 0 && (
+          <div className="col-sm-6 col-xl-4">
+            <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
+              <div className="icon flex-shrink-0">
+                <span className="flaticon-antivirus" />
+              </div>
+              <div className="details">
+                <h5 className="title">Μέθοδος Εξόφλησης</h5>
+                {settlement_methods.map((method, i) => (
+                  <p key={i} className="freelancer-features-list-item">
+                    {method?.attributes?.label}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {sizeNumber > 1 && (
+          <div className="col-sm-6 col-xl-4">
+            <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
+              <div className="icon flex-shrink-0">
+                <span className="flaticon-photo" />
+              </div>
+              <div className="details">
+                <h5 className="title">Αριθμός Εργαζομένων</h5>
+                <p className="mb-0 text">{size?.label}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {minBudgets.length > 0 && (
+          <div className="col-sm-6 col-xl-4">
+            <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
+              <div className="icon flex-shrink-0">
+                <span className="flaticon-wallet" />
+              </div>
+              <div className="details">
+                <h5 className="title">Ελάχιστο Budget</h5>
+                <p className="mb-0 text">{smallestBudget?.attributes?.label}</p>
               </div>
             </div>
           </div>
