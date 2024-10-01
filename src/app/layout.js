@@ -13,32 +13,32 @@ import { getData } from "@/lib/client/operations";
 export const revalidate = 3600;
 
 export default async function RootLayout({ children }) {
-  const data = await getData(ROOT_LAYOUT);
+  // const data = await getData(ROOT_LAYOUT);
 
-  const categories = data.header.data.attributes.categories.data.map(
-    (item, i) => ({
-      id: i + 1,
-      label: item.attributes.label,
-      slug: item.attributes.slug,
-      icon: item.attributes.icon,
-      subcategories: item.attributes.subcategories.data.map((subcategory) => ({
-        label: subcategory.attributes.label,
-        slug: subcategory.attributes.slug,
-        subdivisions: subcategory.attributes.subdivisions.data.map(
-          (subdivision) => ({
-            label: subdivision.attributes.label,
-            slug: subdivision.attributes.slug,
-          })
-        ),
-      })),
-    })
-  );
+  // const categories = data.header.data.attributes.categories.data.map(
+  //   (item, i) => ({
+  //     id: i + 1,
+  //     label: item.attributes.label,
+  //     slug: item.attributes.slug,
+  //     icon: item.attributes.icon,
+  //     subcategories: item.attributes.subcategories.data.map((subcategory) => ({
+  //       label: subcategory.attributes.label,
+  //       slug: subcategory.attributes.slug,
+  //       subdivisions: subcategory.attributes.subdivisions.data.map(
+  //         (subdivision) => ({
+  //           label: subdivision.attributes.label,
+  //           slug: subdivision.attributes.slug,
+  //         })
+  //       ),
+  //     })),
+  //   })
+  // );
 
   return (
     <html lang="el">
       <Body>
         <InstallBootstrap />
-        <Header categories={categories} />
+        {/* <Header categories={categories} /> */}
         <div className="wrapper mm-page mm-slideout">
           {children}
           <BottomToTop />
