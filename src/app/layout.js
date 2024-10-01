@@ -7,29 +7,26 @@ import Header from "@/components/ui/Header";
 import InstallBootstrap from "@/components/ui/InstallBootstrap";
 import Body from "@/components/ui/Body";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import Query from "@/components/query/Query";
 import { ROOT_LAYOUT } from "@/lib/graphql/queries/main/global";
+import { getData } from "@/lib/client/operations";
 
 if (typeof window !== "undefined") {
   import("bootstrap");
 }
 
+export const revalidate = 3600;
+
 export default async function RootLayout({ children }) {
+  const data = await getData(ROOT_LAYOUT);
   return (
     <html lang="el">
       <Body>
         <InstallBootstrap />
-        <Query query={ROOT_LAYOUT}>
-          {(data) => (
-            <>
-              <Header header={data.header} />
-              <div className="wrapper mm-page mm-slideout">
-                {children}
-                <BottomToTop />
-              </div>
-            </>
-          )}
-        </Query>
+        <Header header={data.header} />
+        <div className="wrapper mm-page mm-slideout">
+          {children}
+          <BottomToTop />
+        </div>
         <SpeedInsights />
       </Body>
     </html>
