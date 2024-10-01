@@ -15,10 +15,11 @@ import Footer from "@/components/ui/Footer";
 import { getUser } from "@/lib/user/user";
 import NavMenuMobile from "@/components/ui/NavMenuMobile";
 import { checkServerHealth, getData } from "@/lib/client/operations";
-// import { FOOTER, HEADER, ROOT_LAYOUT } from "@/lib/graphql/queries/main/global";
+import { ROOT_LAYOUT } from "@/lib/graphql/queries/main/global";
 import ServerDown from "@/components/ui/Errors/ServerDown";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import Query from "@/components/query/Query";
 
 export const revalidate = 3600;
 
@@ -45,39 +46,44 @@ export default async function RootLayout({ children }) {
   const { authenticated } = await isAuthenticated();
   const user = await getUser();
 
-  // const { header: headerData, footer: footerData } = await getData(ROOT_LAYOUT);
-
   const gaId = process.env.GA_ID;
 
   return (
     <html lang="el">
       <Body path={path}>
         <InstallBootstrap />
-        {!footer.includes(path) ? (
-          <div className="wrapper ovh mm-page mm-slideout">
-            {/* {(!isUnderMaintenance || authenticated) && (
-              <Header
-                authenticated={authenticated}
-                user={user}
-                header={headerData}
-              />
-            )} */}
-            {/* <SearchModal1 /> */}
-            <div className="body_content">
-              {children}
-              {/* {(!isUnderMaintenance || authenticated) && (
-                <Footer footer={footerData} />
-              )} */}
-              <BottomToTop />
-            </div>
-          </div>
-        ) : (
-          <div className="wrapper mm-page mm-slideout">
-            {children}
-            <BottomToTop />
-          </div>
-        )}
-        {/* <NavMenuMobile header={headerData} /> */}
+        <Query query={ROOT_LAYOUT}>
+          {(data) => (
+            <>
+              {!footer.includes(path) ? (
+                <div className="wrapper ovh mm-page mm-slideout">
+                  {(!isUnderMaintenance || authenticated) && (
+                    <Header
+                      authenticated={authenticated}
+                      user={user}
+                      header={data.header}
+                    />
+                  )}
+                  {/* <SearchModal1 /> */}
+                  <div className="body_content">
+                    {children}
+                    {(!isUnderMaintenance || authenticated) && (
+                      <Footer footer={data.footer} />
+                    )}
+                    <BottomToTop />
+                  </div>
+                </div>
+              ) : (
+                <div className="wrapper mm-page mm-slideout">
+                  {children}
+                  <BottomToTop />
+                </div>
+              )}
+              {/* <NavMenuMobile header={headerData} /> */}
+            </>
+          )}
+        </Query>
+
         <SpeedInsights />
         <GoogleAnalytics gaId={gaId} />
       </Body>

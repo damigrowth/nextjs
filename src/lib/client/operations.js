@@ -88,7 +88,8 @@ export const getData = async (query, variables) => {
 
   // Check if the data is in the cache
   if (cache.has(cacheKey)) {
-    return cache.get(cacheKey);
+    const cachedData = cache.get(cacheKey);
+    return cachedData;
   }
 
   try {

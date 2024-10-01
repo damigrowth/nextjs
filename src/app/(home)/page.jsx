@@ -29,32 +29,32 @@ export async function generateMetadata() {
 }
 
 export default async function page() {
-  const { featuredEntity: featuredCategoriesData } = await getData(
-    FEATURED_CATEGORIES
-  );
+  // const { featuredEntity: featuredCategoriesData } = await getData(
+  //   FEATURED_CATEGORIES
+  // );
 
-  const { featuredEntity: featuredServicesData } = await getData(
-    FEATURED_SERVICES
-  );
+  // const { featuredEntity: featuredServicesData } = await getData(
+  //   FEATURED_SERVICES
+  // );
 
-  const { featuredEntity: featuredFreelancersData } = await getData(
-    FEATURED_FREELANCERS
-  );
+  // const { featuredEntity: featuredFreelancersData } = await getData(
+  //   FEATURED_FREELANCERS
+  // );
 
-  const { freelancerCategories, skills, tags, categories } = await getData(
-    ALL_TAXONOMIES
-  );
+  // const { freelancerCategories, skills, tags, categories } = await getData(
+  //   ALL_TAXONOMIES
+  // );
 
-  const featuredCategories =
-    featuredCategoriesData?.data?.attributes?.categories?.data;
-  const featuredServices =
-    featuredServicesData?.data?.attributes?.services?.data;
-  const featuredFreelancers =
-    featuredFreelancersData?.data?.attributes?.freelancers?.data;
+  // const featuredCategories =
+  //   featuredCategoriesData?.data?.attributes?.categories?.data;
+  // const featuredServices =
+  //   featuredServicesData?.data?.attributes?.services?.data;
+  // const featuredFreelancers =
+  //   featuredFreelancersData?.data?.attributes?.freelancers?.data;
 
   return (
     <>
-      <Hero
+      {/* <Hero
         categories={featuredCategoriesData?.data?.attributes?.categories?.data}
       />
       <FeaturedCategories categories={featuredCategories} />
@@ -70,7 +70,7 @@ export default async function page() {
         skills={skills.data}
         tags={tags.data}
         categories={categories.data}
-      />
+      /> */}
     </>
   );
 }
