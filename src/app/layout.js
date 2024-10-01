@@ -20,7 +20,7 @@ import ServerDown from "@/components/ui/Errors/ServerDown";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 if (typeof window !== "undefined") {
   import("bootstrap");
