@@ -12,6 +12,9 @@ import {
 import { print } from "graphql/language/printer";
 import { GET_ME } from "../graphql/queries/main/user";
 
+// Simple in-memory cache
+const cache = new Map();
+
 // export const getData = async (query, variables) => {
 //   validateEnvVars();
 //   const client = getClient();
@@ -80,6 +83,14 @@ export const getData = async (query, variables) => {
   const url = `${STRAPI_GRAPHQL}`;
   const queryString = print(query);
 
+  // Create a cache key based on the query and variables
+  const cacheKey = JSON.stringify({ query: queryString, variables });
+
+  // Check if the data is in the cache
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey);
+  }
+
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -91,16 +102,19 @@ export const getData = async (query, variables) => {
         query: queryString,
         variables,
       }),
-      cache: "no-cache",
+      next: { revalidate: 60 },
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("GraphQL error:", errorData.errors);
+      return { error: errorData.errors };
+    }
 
     const jsonResponse = await response.json();
 
-    if (!response.ok) {
-      console.error("GraphQL error:");
-      inspect(jsonResponse.errors);
-      return { error: jsonResponse.errors };
-    }
+    // Store the result in the cache
+    cache.set(cacheKey, jsonResponse.data);
 
     return jsonResponse.data;
   } catch (error) {
