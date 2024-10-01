@@ -21,8 +21,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import Query from "@/components/query/Query";
 import { ROOT_LAYOUT } from "@/lib/graphql/queries/main/global";
 
-export const revalidate = 3600;
-
 if (typeof window !== "undefined") {
   import("bootstrap");
 }
@@ -39,8 +37,8 @@ export default async function RootLayout({ children }) {
       </html>
     );
 
-  const headerList = headers();
-  const path = headerList.get("x-current-path");
+  // const headerList = headers();
+  // const path = headerList.get("x-current-path");
 
   // const { isUnderMaintenance } = await getMaintenanceStatus();
   const isUnderMaintenance = false;
@@ -51,7 +49,7 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="el">
-      <Body path={path}>
+      <Body>
         <InstallBootstrap />
         <Query query={ROOT_LAYOUT}>
           {(data) => (
