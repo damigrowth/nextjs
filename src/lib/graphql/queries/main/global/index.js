@@ -12,7 +12,7 @@ const MAINTENANCE_STATUS = gql`
   }
 `;
 
-export const ROOT_LAYOUT = gql`
+const ROOT_LAYOUT = gql`
   query RootLayout {
     header {
       data {
