@@ -7,23 +7,7 @@ import HeaderStickyWrapper from "./HeaderStickyWrapper";
 import HeaderMobile from "./HeaderMobile";
 import HeaderLogo from "./HeaderLogo";
 
-export default function Header({ authenticated, user, header }) {
-  const categories = header.data.attributes.categories.data.map((item, i) => ({
-    id: i + 1,
-    label: item.attributes.label,
-    slug: item.attributes.slug,
-    icon: item.attributes.icon,
-    subcategories: item.attributes.subcategories.data.map((subcategory) => ({
-      label: subcategory.attributes.label,
-      slug: subcategory.attributes.slug,
-      subdivisions: subcategory.attributes.subdivisions.data.map(
-        (subdivision) => ({
-          label: subdivision.attributes.label,
-          slug: subdivision.attributes.slug,
-        })
-      ),
-    })),
-  }));
+export default function Header({ authenticated, user, categories }) {
   return (
     <>
       <HeaderStickyWrapper>
