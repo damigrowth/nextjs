@@ -10,7 +10,12 @@ export default function HeaderMobile({ user, authenticated }) {
         <div className="header bdrb1">
           <div className="menu_and_widgets">
             <div className="mobile_menu_bar d-flex justify-content-between align-items-center">
-              <Link className="mobile_logo" href="/">
+              <Link
+                className="mobile_logo"
+                href="/"
+                prefetch={false}
+                scroll={false}
+              >
                 <Image
                   height={40}
                   width={133}
@@ -34,7 +39,9 @@ export default function HeaderMobile({ user, authenticated }) {
                     path={`/dashboard`}
                   />
                 ) : (
-                  <Link href="/login">Σύνδεση</Link>
+                  <Link href="/login" prefetch={false} scroll={false}>
+                    Σύνδεση
+                  </Link>
                 )}
 
                 <a

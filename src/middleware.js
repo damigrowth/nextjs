@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getMaintenanceStatus } from "./lib/maintenance/maintenance";
+// import { getMaintenanceStatus } from "./lib/maintenance/maintenance";
 import { isAuthenticated } from "./lib/auth/authenticated";
 
 export async function middleware(request) {
@@ -9,7 +9,8 @@ export async function middleware(request) {
 
   requestHeaders.set("x-current-path", currentPath);
 
-  const { isUnderMaintenance } = await getMaintenanceStatus();
+  const isUnderMaintenance = false;
+  // const { isUnderMaintenance } = await getMaintenanceStatus();
   const { authenticated } = await isAuthenticated();
   // List of paths that should be publicly accessible
   const maintenancePublicPaths = [

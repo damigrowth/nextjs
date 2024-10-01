@@ -37,7 +37,12 @@ export default function MegaMenu({ categories, staticMenuClass }) {
         <ul ref={inputRef} className={`menu pl0 ${isActive ? "active" : ""}`}>
           {categories.map((category) => (
             <li key={category.id}>
-              <Link href={`/ipiresies/${category.slug}`} className="dropdown">
+              <Link
+                href={`/ipiresies/${category.slug}`}
+                className="dropdown"
+                prefetch={false}
+                scroll={false}
+              >
                 <span className={`menu-icn ${category.icon}`} />
                 <span className="menu-title">{category.label}</span>
               </Link>
