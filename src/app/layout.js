@@ -14,7 +14,7 @@ import Body from "@/components/ui/Body";
 import Footer from "@/components/ui/Footer";
 import { getUser } from "@/lib/user/user";
 import NavMenuMobile from "@/components/ui/NavMenuMobile";
-import { checkServerHealth, getData } from "@/lib/client/operations";
+// import { checkServerHealth, getData } from "@/lib/client/operations";
 import ServerDown from "@/components/ui/Errors/ServerDown";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -26,19 +26,21 @@ if (typeof window !== "undefined") {
 }
 
 export default async function RootLayout({ children }) {
-  const { serverStatus } = await checkServerHealth();
+  // const { serverStatus } = await checkServerHealth();
 
-  if (!serverStatus)
-    return (
-      <html>
-        <body>
-          <ServerDown />
-        </body>
-      </html>
-    );
+  // if (!serverStatus)
+  //   return (
+  //     <html>
+  //       <body>
+  //         <ServerDown />
+  //       </body>
+  //     </html>
+  //   );
 
   // const headerList = headers();
   // const path = headerList.get("x-current-path");
+
+  const path = true;
 
   // const { isUnderMaintenance } = await getMaintenanceStatus();
   const isUnderMaintenance = false;
@@ -54,7 +56,7 @@ export default async function RootLayout({ children }) {
         <Query query={ROOT_LAYOUT}>
           {(data) => (
             <>
-              {!footer.includes(path) ? (
+              {path ? (
                 <div className="wrapper ovh mm-page mm-slideout">
                   {(!isUnderMaintenance || authenticated) && (
                     <Header
