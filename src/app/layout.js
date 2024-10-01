@@ -15,7 +15,7 @@ import Footer from "@/components/ui/Footer";
 import { getUser } from "@/lib/user/user";
 import NavMenuMobile from "@/components/ui/NavMenuMobile";
 import { checkServerHealth, getData } from "@/lib/client/operations";
-import { FOOTER, HEADER } from "@/lib/graphql/queries/main/global";
+// import { FOOTER, HEADER, ROOT_LAYOUT } from "@/lib/graphql/queries/main/global";
 import ServerDown from "@/components/ui/Errors/ServerDown";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -45,8 +45,7 @@ export default async function RootLayout({ children }) {
   const { authenticated } = await isAuthenticated();
   const user = await getUser();
 
-  const { header: headerData } = await getData(HEADER);
-  const { footer: footerData } = await getData(FOOTER);
+  // const { header: headerData, footer: footerData } = await getData(ROOT_LAYOUT);
 
   const gaId = process.env.GA_ID;
 
@@ -56,19 +55,19 @@ export default async function RootLayout({ children }) {
         <InstallBootstrap />
         {!footer.includes(path) ? (
           <div className="wrapper ovh mm-page mm-slideout">
-            {(!isUnderMaintenance || authenticated) && (
+            {/* {(!isUnderMaintenance || authenticated) && (
               <Header
                 authenticated={authenticated}
                 user={user}
                 header={headerData}
               />
-            )}
+            )} */}
             {/* <SearchModal1 /> */}
             <div className="body_content">
               {children}
-              {(!isUnderMaintenance || authenticated) && (
+              {/* {(!isUnderMaintenance || authenticated) && (
                 <Footer footer={footerData} />
-              )}
+              )} */}
               <BottomToTop />
             </div>
           </div>
@@ -78,7 +77,7 @@ export default async function RootLayout({ children }) {
             <BottomToTop />
           </div>
         )}
-        <NavMenuMobile header={headerData} />
+        {/* <NavMenuMobile header={headerData} /> */}
         <SpeedInsights />
         <GoogleAnalytics gaId={gaId} />
       </Body>
