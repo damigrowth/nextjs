@@ -10,10 +10,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ROOT_LAYOUT } from "@/lib/graphql/queries/main/global";
 import { getData } from "@/lib/client/operations";
 
-if (typeof window !== "undefined") {
-  import("bootstrap");
-}
-
 export const revalidate = 3600;
 
 export default async function RootLayout({ children }) {
@@ -31,4 +27,8 @@ export default async function RootLayout({ children }) {
       </Body>
     </html>
   );
+}
+
+if (typeof window !== "undefined") {
+  import("bootstrap");
 }
