@@ -1140,3 +1140,86 @@ a {
   line-height: 15px;
   white-space: nowrap;
 }
+
+.taxonomies-swiper-card {
+  background-color: #fff;
+  border: 1px solid #e9e9e9;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--headings-color);
+  font-family: var(--title-font-family);
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: 0;
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  vertical-align: middle;
+  line-height: 29.5px;
+  white-space: nowrap;
+}
+
+.taxonomies-swiper .fas.fa-angle-right {
+  color: #a0a0a0;
+  margin-left: 15px;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 0%;
+}
+
+.taxonomies-swiper .swiper-slide {
+  width: auto !important;
+}
+
+.taxonomies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.taxonomies-grid-card {
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  background-color: #fff;
+  border: 1px solid #e9e9e9;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  position: relative;
+  width: 100%;
+  -webkit-transition: all 0.3s;
+  -moz-transition: all 0.3s;
+  -ms-transition: all 0.3s;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s;
+}
+
+.taxonomies-grid-image {
+  overflow: hidden;
+  position: relative;
+  height: 200px;
+}
+
+.taxonomies-grid-info {
+  padding: 30px;
+}
+
+.taxonomies-grid-title {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.taxonomies-grid-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 16px;
+}
+
+.taxonomies-grid-list-item {
+  margin-bottom: 8px;
+}
