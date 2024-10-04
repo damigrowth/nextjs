@@ -4,29 +4,26 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 import BottomToTop from "@/components/button/BottomToTop";
 import Header from "@/components/ui/Header";
-import SearchModal1 from "@/components/modal/SearchModal1";
 import { footer } from "@/data/footer";
-import { headers } from "next/headers";
-import { getMaintenanceStatus } from "@/lib/maintenance/maintenance";
-import { isAuthenticated } from "@/lib/auth/authenticated";
 import InstallBootstrap from "@/components/ui/InstallBootstrap";
 import Body from "@/components/ui/Body";
 import Footer from "@/components/ui/Footer";
-import { getUser } from "@/lib/user/user";
 import NavMenuMobile from "@/components/ui/NavMenuMobile";
 import { checkServerHealth, getData } from "@/lib/client/operations";
-import { FOOTER, HEADER } from "@/lib/graphql/queries/main/global";
+import { ROOT_LAYOUT } from "@/lib/graphql/queries/main/global";
 import ServerDown from "@/components/ui/Errors/ServerDown";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { isAuthenticated } from "@/lib/auth/authenticated";
+import { getUser } from "@/lib/user/user";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 if (typeof window !== "undefined") {
   import("bootstrap");
 }
 
-export default async function RootLayout({ children }) {
+export default async function RootLayout({ children, params }) {
   const { serverStatus } = await checkServerHealth();
 
   if (!serverStatus)
@@ -38,23 +35,22 @@ export default async function RootLayout({ children }) {
       </html>
     );
 
-  const headerList = headers();
-  const path = headerList.get("x-current-path");
+  const isUnderMaintenance = false;
 
-  const { isUnderMaintenance } = await getMaintenanceStatus();
   const { authenticated } = await isAuthenticated();
   const user = await getUser();
 
-  const { header: headerData } = await getData(HEADER);
-  const { footer: footerData } = await getData(FOOTER);
+  const { header: headerData, footer: footerData } = await getData(ROOT_LAYOUT);
 
   const gaId = process.env.GA_ID;
 
+  const isFooterPath = footer.includes(params.path);
+
   return (
     <html lang="el">
-      <Body path={path}>
+      <Body path={params.path}>
         <InstallBootstrap />
-        {!footer.includes(path) ? (
+        {!isFooterPath ? (
           <div className="wrapper ovh mm-page mm-slideout">
             {(!isUnderMaintenance || authenticated) && (
               <Header
@@ -63,7 +59,6 @@ export default async function RootLayout({ children }) {
                 header={headerData}
               />
             )}
-            {/* <SearchModal1 /> */}
             <div className="body_content">
               {children}
               {(!isUnderMaintenance || authenticated) && (
@@ -84,4 +79,16 @@ export default async function RootLayout({ children }) {
       </Body>
     </html>
   );
+}
+
+export async function generateStaticParams() {
+  // Generate static params for all possible paths
+  const paths = [
+    { path: "" },
+    { path: "register" },
+    { path: "login" },
+    ...footer.map((path) => ({ path: path.slice(1) })),
+  ];
+
+  return paths;
 }

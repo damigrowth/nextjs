@@ -11,9 +11,7 @@ import {
 } from "../strapi";
 import { print } from "graphql/language/printer";
 import { GET_ME } from "../graphql/queries/main/user";
-
-// Simple in-memory cache
-const cache = new Map();
+import { cache } from "react";
 
 // export const getData = async (query, variables) => {
 //   validateEnvVars();
@@ -77,19 +75,11 @@ export const checkServerHealth = async () => {
   }
 };
 
-export const getData = async (query, variables) => {
+export const getData = cache(async (query, variables) => {
   validateEnvVars();
 
-  const url = `${STRAPI_GRAPHQL}`;
+  const url = STRAPI_GRAPHQL;
   const queryString = print(query);
-
-  // Create a cache key based on the query and variables
-  const cacheKey = JSON.stringify({ query: queryString, variables });
-
-  // Check if the data is in the cache
-  if (cache.has(cacheKey)) {
-    return cache.get(cacheKey);
-  }
 
   try {
     const response = await fetch(url, {
@@ -102,26 +92,22 @@ export const getData = async (query, variables) => {
         query: queryString,
         variables,
       }),
-      next: { revalidate: 60 },
+      next: { revalidate: 900 }, // 15 minutes
     });
 
     if (!response.ok) {
       const errorData = await response.json();
       console.error("GraphQL error:", errorData.errors);
-      return { error: errorData.errors };
+      throw new Error(JSON.stringify(errorData.errors));
     }
 
     const jsonResponse = await response.json();
-
-    // Store the result in the cache
-    cache.set(cacheKey, jsonResponse.data);
-
     return jsonResponse.data;
   } catch (error) {
-    console.error("Server error. Please try again later.", error);
-    return { error: "Server error. Please try again later." };
+    console.error("Server error:", error);
+    throw error;
   }
-};
+});
 
 // Generic GraphQL mutation function
 export const postData = async (mutation, variables) => {

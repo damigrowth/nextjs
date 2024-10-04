@@ -12,8 +12,8 @@ const MAINTENANCE_STATUS = gql`
   }
 `;
 
-const HEADER = gql`
-  query Header {
+const ROOT_LAYOUT = gql`
+  query RootLayout {
     header {
       data {
         attributes {
@@ -48,11 +48,6 @@ const HEADER = gql`
         }
       }
     }
-  }
-`;
-
-const FOOTER = gql`
-  query Footer {
     footer {
       data {
         attributes {
@@ -78,4 +73,4 @@ const FOOTER = gql`
   }
 `;
 
-export { MAINTENANCE_STATUS, HEADER, FOOTER };
+export { MAINTENANCE_STATUS, ROOT_LAYOUT };
