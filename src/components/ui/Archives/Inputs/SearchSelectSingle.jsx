@@ -10,6 +10,7 @@ import {
 import BorderSpinner from "../../Spinners/BorderSpinner";
 import Link from "next/link";
 import { getPathname } from "@/utils/paths";
+import { RotatingLines } from "react-loader-spinner";
 
 export default function SearchSelectSingle({
   rootLabel,
@@ -218,7 +219,7 @@ export default function SearchSelectSingle({
 
   return (
     <div
-      data-pending={isPending ? "" : undefined}
+      // data-pending={isPending ? "" : undefined}
       search-pending={isSearchPending ? "" : undefined}
       className="card-body card-body px-0 pt-0"
     >
@@ -249,12 +250,20 @@ export default function SearchSelectSingle({
                 />
               </div>
               <div className="inner show position-relative">
-                <BorderSpinner
-                  width="1rem"
-                  height="1rem"
-                  borderWidth="0.3rem"
-                  className="search-content-spinner"
-                />
+                <div className="search-content-spinner">
+                  <RotatingLines
+                    visible={true}
+                    height="30"
+                    width="30"
+                    color="grey"
+                    strokeWidth="4"
+                    animationDuration="0.65"
+                    ariaLabel="rotating-lines-loading"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                    className="search-content-spinner"
+                  />
+                </div>
                 <ul
                   className="dropdown-menu inner show search-loading-element"
                   style={{
