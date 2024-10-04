@@ -1,15 +1,16 @@
 import React from "react";
-import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 import {
   CATEGORIES,
-  SUBCATEGORIES_SEARCH,
-  TAXONOMIES_BY_SLUG,
+  TAXONOMIES_ARCHIVE,
 } from "@/lib/graphql/queries/main/taxonomies/service";
 import Tabs from "@/components/ui/Archives/Tabs";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
+import TaxonomiesArchive from "@/components/ui/Archives/Taxonomies/TaxonomiesArchive";
+
+export const revalidate = 3600;
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
@@ -28,47 +29,16 @@ export async function generateMetadata({ params }) {
   return meta;
 }
 
-export default async function page({ params, searchParams }) {
+export default async function page({ params }) {
   const { category } = params;
 
   const { categories } = await getData(CATEGORIES);
 
-  const { categoryBySlug } = await getData(TAXONOMIES_BY_SLUG, {
+  const { archive } = await getData(TAXONOMIES_ARCHIVE, {
     category,
-    subcategory: "",
-    subdivision: "",
   });
 
-  const currCategory = categoryBySlug?.data[0]?.attributes;
-
-  const taxonomies = {
-    current: currCategory?.label,
-    category: currCategory,
-    subcategory: null,
-    subdivision: null,
-  };
-
-  const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
-
-  const addFilter = (condition, value) => (condition ? value : undefined);
-
-  const paramsFilters = {
-    search: search || undefined,
-    min: addFilter(min, parseInt(min, 10)),
-    max: addFilter(max, parseInt(max, 10)),
-    time: addFilter(time, parseInt(time, 10)),
-    cat: category,
-    verified: addFilter(ver === "", true),
-    page: !page || parseInt(page, 10) < 1 ? 1 : parseInt(page, 10),
-    sort: sort ? sort : "publishedAt:desc",
-  };
-
-  let categorySearch = cat_s ? cat_s : undefined;
-
-  const { subcategoriesSearch } = await getData(SUBCATEGORIES_SEARCH, {
-    categorySlug: category,
-    searchTerm: categorySearch,
-  });
+  const archiveCategory = archive?.category;
 
   return (
     <>
@@ -80,20 +50,14 @@ export default async function page({ params, searchParams }) {
       <Breadcrumb
         parentPathLabel="Υπηρεσίες"
         parentPathLink="ipiresies"
-        category={currCategory}
+        category={archiveCategory}
       />
       <Banner
-        heading={currCategory?.label}
-        description={currCategory?.description}
-        image={currCategory?.image?.data?.attributes?.formats?.small?.url}
+        heading={archiveCategory?.label}
+        description={archiveCategory?.description}
+        image={archiveCategory?.image?.data?.attributes?.formats?.small?.url}
       />
-      <ServicesArchive
-        taxonomies={taxonomies}
-        categories={subcategoriesSearch?.data}
-        searchParams={searchParams}
-        paramsFilters={paramsFilters}
-        childPath
-      />
+      <TaxonomiesArchive archive={archive} />
     </>
   );
 }

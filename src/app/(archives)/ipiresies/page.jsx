@@ -1,14 +1,16 @@
 import React from "react";
-import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { getData } from "@/lib/client/operations";
 import Tabs from "@/components/ui/Archives/Tabs";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
 import {
   CATEGORIES,
-  CATEGORIES_SEARCH,
+  TAXONOMIES_ARCHIVE,
 } from "@/lib/graphql/queries/main/taxonomies/service";
 import { Meta } from "@/utils/Seo/Meta/Meta";
+import TaxonomiesArchive from "@/components/ui/Archives/Taxonomies/TaxonomiesArchive";
+
+export const revalidate = 3600;
 
 // Static SEO
 export async function generateMetadata() {
@@ -22,35 +24,11 @@ export async function generateMetadata() {
   return meta;
 }
 
-export default async function page({ searchParams }) {
+export default async function page() {
   const { categories } = await getData(CATEGORIES);
 
-  const taxonomies = {
-    current: null,
-    category: null,
-    subcategory: null,
-    subdivision: null,
-  };
-
-  const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
-
-  const addFilter = (condition, value) => (condition ? value : undefined);
-
-  const paramsFilters = {
-    search: search || undefined,
-    min: addFilter(min, parseInt(min, 10)),
-    max: addFilter(max, parseInt(max, 10)),
-    time: addFilter(time, parseInt(time, 10)),
-    cat: addFilter(cat, parseInt(cat, 10)),
-    verified: addFilter(ver === "", true),
-    page: !page || parseInt(page, 10) < 1 ? 1 : parseInt(page, 10),
-    sort: sort ? sort : "publishedAt:desc",
-  };
-
-  let categorySearch = cat_s ? cat_s : undefined;
-
-  const { categoriesSearch } = await getData(CATEGORIES_SEARCH, {
-    label: categorySearch,
+  const { archive } = await getData(TAXONOMIES_ARCHIVE, {
+    category: "pliroforiki",
   });
 
   return (
@@ -65,12 +43,7 @@ export default async function page({ searchParams }) {
         heading="Όλες οι Υπηρεσίες"
         description="Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας."
       />
-      <ServicesArchive
-        taxonomies={taxonomies}
-        categories={categoriesSearch?.data}
-        searchParams={searchParams}
-        paramsFilters={paramsFilters}
-      />
+      <TaxonomiesArchive archive={archive} />
     </>
   );
 }
