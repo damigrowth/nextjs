@@ -217,6 +217,62 @@ const SERVICES_ARCHIVE_SEO = gql`
   ${SINGLE_IMAGE}
 `;
 
+const TAXONOMIES_ARCHIVE = gql`
+  query TaxonomiesArchive($category: String!) {
+    archive: topServiceTaxonomiesByCategory(category: $category, limit: 10) {
+      category {
+        label
+        slug
+        description
+        image {
+          ...SingleImage
+        }
+      }
+      subcategories {
+        label
+        slug
+        image {
+          ...SingleImage
+        }
+        category {
+          data {
+            attributes {
+              slug
+            }
+          }
+        }
+        subdivisions {
+          data {
+            attributes {
+              label
+              slug
+            }
+          }
+        }
+      }
+      subdivisions {
+        label
+        slug
+        category {
+          data {
+            attributes {
+              slug
+            }
+          }
+        }
+        subcategory {
+          data {
+            attributes {
+              slug
+            }
+          }
+        }
+      }
+    }
+  }
+  ${SINGLE_IMAGE}
+`;
+
 export {
   CATEGORIES,
   CATEGORIES_SEARCH,
@@ -225,4 +281,5 @@ export {
   SUBDIVISIONS_SEARCH,
   TAXONOMIES_BY_SLUG,
   SERVICES_ARCHIVE_SEO,
+  TAXONOMIES_ARCHIVE,
 };
