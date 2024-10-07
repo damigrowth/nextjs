@@ -20,6 +20,16 @@ const GET_PAGE_BY_SLUG = gql`
         attributes {
           title
           content
+          faq {
+            __typename
+            ... on ComponentGlobalFaq {
+              title
+              faq {
+                question
+                answer
+              }
+            }
+          }
         }
       }
     }
