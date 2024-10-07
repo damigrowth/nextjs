@@ -1,7 +1,10 @@
 "use server";
 
 import { getData } from "../client/operations";
-import { SUBCATEGORIES_SEARCH } from "../graphql/queries/main/taxonomies/service";
+import {
+  HOME_SEARCH,
+  SUBCATEGORIES_SEARCH,
+} from "../graphql/queries/main/taxonomies/service";
 
 export async function searchSubcategories(prevState, formData) {
   try {
@@ -10,13 +13,13 @@ export async function searchSubcategories(prevState, formData) {
 
     const searchTerm = formData.get("searchTerm");
 
-    const { subcategories } = await getData(SUBCATEGORIES_SEARCH, {
+    const { homeSearch } = await getData(HOME_SEARCH, {
       searchTerm: searchTerm,
       categorySlug: category || undefined,
     });
 
-    if (subcategories?.data) {
-      const data = subcategories.data.map((el) => ({
+    if (homeSearch?.data) {
+      const data = homeSearch.data.map((el) => ({
         label: el.attributes.label,
         slug: el.attributes.slug,
         parentSlug: el.attributes.category.data.attributes.slug,

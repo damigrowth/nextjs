@@ -273,6 +273,36 @@ const TAXONOMIES_ARCHIVE = gql`
   ${SINGLE_IMAGE}
 `;
 
+const HOME_SEARCH = gql`
+  query HomeSearch($searchTerm: String, $categorySlug: String) {
+    homeSearch: subcategories(
+      filters: {
+        and: [
+          { label: { containsi: $searchTerm } }
+          { category: { slug: { eq: $categorySlug } } }
+          { services: { id: { not: { null: true } } } }
+        ]
+      }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+          category {
+            data {
+              attributes {
+                label
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export {
   CATEGORIES,
   CATEGORIES_SEARCH,
@@ -282,4 +312,5 @@ export {
   TAXONOMIES_BY_SLUG,
   SERVICES_ARCHIVE_SEO,
   TAXONOMIES_ARCHIVE,
+  HOME_SEARCH,
 };
