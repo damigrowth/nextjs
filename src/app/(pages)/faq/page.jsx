@@ -1,4 +1,3 @@
-import FaqPayment from "@/components/section/FaqPayment";
 import FaqSuggestion from "@/components/section/FaqSuggestion";
 import { getData } from "@/lib/client/operations";
 import { GET_PAGE_BY_SLUG } from "@/lib/graphql/queries/main/page";
