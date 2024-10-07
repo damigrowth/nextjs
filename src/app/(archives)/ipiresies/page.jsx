@@ -28,7 +28,7 @@ export default async function page() {
   const { categories } = await getData(CATEGORIES);
 
   const { archive } = await getData(TAXONOMIES_ARCHIVE, {
-    category: "pliroforiki",
+    category: "",
   });
 
   return (

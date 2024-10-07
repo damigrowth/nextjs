@@ -15,7 +15,7 @@ export default function TaxonomiesSwiper({ taxonomies }) {
   return (
     <section>
       <div className="container taxonomies-swiper">
-        <h2 className="mb40">Ποιο δημοφιλής κατηγορίες</h2>
+        <h2 className="mb40">Πιο δημοφιλείς εργασίες</h2>
         {swiperLoaded && (
           <Swiper
             spaceBetween={15}

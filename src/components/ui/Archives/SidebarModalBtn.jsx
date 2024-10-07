@@ -18,7 +18,7 @@ export default function SidebarModalBtn({ type }) {
       <button
         onClick={filtersModalHandler}
         type="button"
-        className="open-btn filter-btn-left"
+        className="open-btn filter-btn-left mt20"
       >
         <Image
           height={18}
