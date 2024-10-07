@@ -45,17 +45,21 @@ export default function Addons({ addons, small, price }) {
                 }`}
               >
                 {!small ? (
-                  <label className="custom_checkbox fw500 text-start m0">
-                    <h5 className="small-addon-title">{addon.title}</h5>
-                    <span className="text text-bottom">
-                      {addon.description}
-                    </span>
+                  <label className="custom_checkbox d-flex justify-content-between fw500 text-start m0">
+                    <div>
+                      <h5 className="small-addon-title">{addon.title}</h5>
+                      <span className="text text-bottom">
+                        {addon.description}
+                      </span>
+                    </div>
+
                     <input
                       type="checkbox"
                       checked={order.addons?.some((a) => a.id === addon.id)}
                       onChange={() => handleSelectAddons(addon)}
                     />
                     <span className="checkmark" />
+                    {!small && <span className="price">+{addon.price}€</span>}
                   </label>
                 ) : (
                   <label className="small-addon-container">
@@ -75,7 +79,6 @@ export default function Addons({ addons, small, price }) {
                     <span className="small-addon-checkmark" />
                   </label>
                 )}
-                {!small && <span className="price">+{addon.price}€</span>}
               </button>
             ))}
           </div>

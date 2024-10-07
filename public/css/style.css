@@ -9703,16 +9703,17 @@ li.mm-listitem:focus {
   font-family: sans-serif;
   font-size: 23px;
   font-weight: 700;
-  position: absolute;
-  right: 30px;
-  top: 37px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-@media (max-width: 575.98px) {
+
+/* @media (max-width: 575.98px) {
   .extra-service-tab .price {
-    right: 20px;
-    top: 35px;
+    right: 10px;
+    bottom: 10px;
   }
-}
+} */
 
 .home9-navtab-style .nav-link {
   border-bottom: none;
