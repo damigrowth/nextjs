@@ -29,6 +29,7 @@ export default async function SingleService({
     area,
     category,
     subcategory,
+    subdivision,
     time,
     media,
     description,
@@ -95,7 +96,7 @@ export default async function SingleService({
 
                 <Info
                   area={area.data?.attributes?.name}
-                  category={category.data?.attributes}
+                  category={subdivision.data?.attributes}
                   subcategory={subcategory.data?.attributes}
                   time={time}
                 />
