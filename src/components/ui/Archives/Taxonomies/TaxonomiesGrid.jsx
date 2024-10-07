@@ -8,7 +8,6 @@ export default function TaxonomiesGrid({ taxonomies }) {
   return (
     <section className="pt0">
       <div className="container">
-        <h2 className="mb40">Ποιο δημοφιλής κατηγορίες</h2>
         <div className="taxonomies-grid">
           {taxonomies.map((taxonomy, index) => (
             <div key={index} className="taxonomies-grid-card">

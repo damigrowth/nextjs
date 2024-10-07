@@ -13,7 +13,7 @@ export default function TaxonomiesSwiper({ taxonomies }) {
   }, []);
 
   return (
-    <section>
+    <section className="pb60">
       <div className="container taxonomies-swiper">
         <h2 className="mb40">Ποιο δημοφιλής κατηγορίες</h2>
         {swiperLoaded && (
