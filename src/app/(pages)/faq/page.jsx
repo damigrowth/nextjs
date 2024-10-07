@@ -24,10 +24,7 @@ export default async function FAQPage() {
             >
               <div className="main-title text-center">
                 <h2 className="title">{page.title}</h2>
-                <div
-                  className="paragraph mt10"
-                  dangerouslySetInnerHTML={{ __html: page.content }}
-                ></div>
+                <p className="paragraph mt10">{page.description}</p>
               </div>
             </div>
           </div>
