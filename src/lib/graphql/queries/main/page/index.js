@@ -30,6 +30,16 @@ const GET_PAGE_BY_SLUG = gql`
               }
             }
           }
+          tabs {
+            __typename
+            ... on ComponentGlobalTabs {
+              title
+              content {
+                heading
+                paragraph
+              }
+            }
+          }
         }
       }
     }

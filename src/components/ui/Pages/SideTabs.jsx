@@ -11,15 +11,13 @@ export default function SideTabs({ tabs }) {
         <div className="widget_list">
           <nav>
             <div className="nav nav-tabs text-start">
-              {tabs.map((currentTab, i) => (
+              {tabs.map((item, i) => (
                 <button
-                  onClick={() => setTab(currentTab)}
+                  onClick={() => setTab(i)}
                   key={i}
-                  className={`nav-link text-start ${
-                    tab == currentTab ? "active" : ""
-                  }`}
+                  className={`nav-link text-start ${tab == i ? "active" : ""}`}
                 >
-                  {currentTab}
+                  {item.title}
                 </button>
               ))}
             </div>
