@@ -48,6 +48,9 @@ const FREELANCER_PARTIAL_RELATIONS = gql`
     category {
       ...FreelancerCategory
     }
+    subcategory {
+      ...FreelancerSubcategoryPartial
+    }
     socials {
       ...Socials
     }
@@ -66,6 +69,7 @@ const FREELANCER_PARTIAL_RELATIONS = gql`
   ${SOCIALS}
   ${FREELANCER_TYPE}
   ${FREELANCER_CATEGORY}
+  ${FREELANCER_SUBCATEGORY_PARTIAL}
   ${CONTACT_TYPES}
   ${PAYMENT_METHOD}
   ${SETTLEMENT_METHOD}

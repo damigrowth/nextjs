@@ -177,7 +177,7 @@ export default async function SingleService({
               phone={user.phone}
               website={freelancer.website}
               type={freelancer.type}
-              category={freelancer.category}
+              category={freelancer.subcategory}
               commencement={freelancer.commencement}
             />
           </StickySidebar>
