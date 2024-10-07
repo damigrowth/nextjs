@@ -20,7 +20,7 @@ export default function SortOptions({ sortOptions }) {
   };
 
   return (
-    <div className="pcs_dropdown dark-color pr10 pr0-xs text-center">
+    <div className="pcs_dropdown dark-color pr10 pr0-xs text-center d-flex justify-content-center align-items-center">
       <span>Ταξινόμηση κατά</span>
       <div className="dropdown bootstrap-select show-tick">
         <button
@@ -30,7 +30,7 @@ export default function SortOptions({ sortOptions }) {
         >
           <div className="filter-option">
             <div className="filter-option-inner">
-              <div className="filter-option-inner-inner">
+              <div className="filter-option-inner-inner fz14">
                 {sortOptions.find(
                   (option) => option.value === selectedOptionValue
                 )?.label || sortOptions[0].label}
