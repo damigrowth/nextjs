@@ -1,17 +1,7 @@
-"use client";
-
-import { usePathname } from "next/navigation";
-
 export default function OurFaq1() {
-  const path = usePathname();
-
   return (
     <>
-      <section
-        className={`our-faqs pb50 ${
-          path === "/become-seller" ? "pt-0" : path === "/contact" ? "pb70" : ""
-        }`}
-      >
+      <section className="our-faqs pb50 ">
         <div className="container">
           <div className="row wow fadeInUp">
             <div className="col-lg-6 m-auto">
