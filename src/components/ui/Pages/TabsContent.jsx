@@ -11,7 +11,10 @@ export default function TabsContent({ tabs }) {
       <div className="terms_condition_grid text-start">
         <div className="tab-content">
           {tabs.map((item, i) => (
-            <div className={`tab-pane fade ${tab === i ? "show active" : ""}`}>
+            <div
+              key={i}
+              className={`tab-pane fade ${tab === i ? "show active" : ""}`}
+            >
               <div className="grids mb90 mb40-md">
                 <div key={i}>
                   {item.content.map((item, i) => (
