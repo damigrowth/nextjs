@@ -94,6 +94,16 @@ const UPDATE_SERVICE_SLUG = gql`
   }
 `;
 
+const CONTACT = gql`
+  mutation Contact($data: EmailInput!) {
+    createEmail(data: $data) {
+      data {
+        id
+      }
+    }
+  }
+`;
+
 export {
   POST_REVIEW,
   POST_SERVICE,
@@ -101,4 +111,5 @@ export {
   UPDATE_SERVICE_RATING,
   UPDATE_REVIEW,
   UPDATE_SERVICE_SLUG,
+  CONTACT,
 };

@@ -19,7 +19,27 @@ const GET_PAGE_BY_SLUG = gql`
       data {
         attributes {
           title
-          content
+          description
+          faq {
+            __typename
+            ... on ComponentGlobalFaq {
+              title
+              faq {
+                question
+                answer
+              }
+            }
+          }
+          tabs {
+            __typename
+            ... on ComponentGlobalTabs {
+              title
+              content {
+                heading
+                paragraph
+              }
+            }
+          }
         }
       }
     }

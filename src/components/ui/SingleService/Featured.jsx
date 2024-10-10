@@ -11,7 +11,7 @@ export default async function FeaturedServices({ category, subcategory }) {
   });
 
   return (
-    <section className="pb40-md pb70 mt70 mt0-lg">
+    <section className="pt0 pb40-md pb70 mt70 mt0-lg">
       <div className="container">
         <div className="row align-items-center wow fadeInUp">
           <div className="col-lg-12">
