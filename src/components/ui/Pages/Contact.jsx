@@ -16,15 +16,6 @@ export default function Contact({ data }) {
               </div>
               <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
                 <div className="icon flex-shrink-0">
-                  <span className="flaticon-tracking" />
-                </div>
-                <div className="details">
-                  <h5 className="title">{address.title}</h5>
-                  <p className="mb-0 text">{address.text}</p>
-                </div>
-              </div>
-              <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
-                <div className="icon flex-shrink-0">
                   <span className="flaticon-call" />
                 </div>
                 <div className="details">
