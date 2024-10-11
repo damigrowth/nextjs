@@ -5,7 +5,6 @@ import Counter from "@/components/ui/Pages/Counter";
 import Cta1 from "@/components/ui/Pages/Cta1";
 import Cta2 from "@/components/ui/Pages/Cta2";
 import FunFact from "@/components/ui/Pages/FunFact";
-import Partners from "@/components/ui/Pages/Partners";
 import Pricing from "@/components/ui/Pages/Pricing";
 import Testimonials from "@/components/ui/Pages/Testimonials";
 import Faq from "./Faq";
@@ -21,7 +20,6 @@ export default function AboutContent({ data }) {
       <Testimonials data={data.testimonials} />
       <Cta2 data={data.cta2} />
       <Faq data={data.faq} />
-      <Partners data={data.partners} />
       <Pricing data={data.pricing} />
     </>
   );
