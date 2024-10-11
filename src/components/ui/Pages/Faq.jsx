@@ -1,6 +1,6 @@
-export default function Faq({ data }) {
+export default function Faq({ data, className }) {
   return (
-    <section className="our-faqs pb50 ">
+    <section className={`our-faqs pb50 ${className}`}>
       <div className="container">
         <div className="row wow fadeInUp">
           <div className="col-lg-6 m-auto">
