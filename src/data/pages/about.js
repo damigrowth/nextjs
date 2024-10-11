@@ -1,18 +1,18 @@
 export const data = {
   breadcrumb: {
-    title: "About",
+    title: "Keep calm & δώσε Doulitsa",
     description:
-      "Give your visitor a smooth online experience with a solid UX design.",
+      "Χαλάρωσε, εδώ θα βρεις τους κατάλληλους επαγγελματίες για να κάνουν τη Doulitsa που θέλεις.",
   },
   about: {
-    heading: "Join World's Best Marketplace for Workers",
+    heading: "Έλα και εσύ στην καλύτερη πλατφόρμα Επαγγελματιών",
     description:
-      "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.",
+      "Έλα και εσύ στη Doulitsa, την πλατφόρμα που επαναπροσδιορίζει τη σύνδεση επαγγελματιών με πελάτες. Από την πρώτη στιγμή απολαμβάνεις ευκολία, ασφάλεια και άμεση πρόσβαση σε κορυφαίους επαγγελματίες. Ανακάλυψε την επόμενη συνεργασία σου, με διαφάνεια, αξιοπιστία και σιγουριά. Η Doulitsa φέρνει νέες ευκαιρίες στην πόρτα σου!",
     image: "/images/about/about-1.png",
     list: [
-      "Connect to freelancers with proven business experience",
-      "Get matched with the perfect talent by a customer success manager",
-      "Unmatched quality of remote, hybrid, and flexible jobs",
+      "Βρες ικανούς επαγγελματίες, άμεσα και αξιόπιστα.",
+      "Ανακάλυψε υπηρεσίες με κορυφαίες αξιολογήσεις και ειδικές προσφορές!",
+      "Μπες στην πιο εξελιγμένη κοινότητα επαγγελματιών και χρηστών.",
     ],
     button: {
       text: "Find Talent",
@@ -22,55 +22,56 @@ export const data = {
   counter: {
     data: [
       {
-        end: 834,
-        label: "Total Freelancer",
-        text: "M",
+        end: 400,
+        label: "Υπηρεσίες",
+        text: "+",
       },
       {
-        end: 732,
-        label: "Positive Review",
-        text: "M",
+        end: 180,
+        label: "Κατηγορίες Υπηρεσιών",
+        text: "+",
       },
       {
-        end: 90,
-        label: "Order recieved",
-        text: "M",
+        end: 150,
+        label: "Εππαγελματικά Προφίλ",
+        text: "+",
       },
       {
-        end: 236,
-        label: "Projects Completed",
-        text: "M",
+        end: 100,
+        label: "Θετικές Αξιολογήσεις",
+        text: "+",
       },
     ],
   },
   cta1: {
-    title: "A whole world of freelance talent at your fingertips",
-    subtitle: "Find the perfect freelancer for your project",
+    title: "Είσαι έτοιμος για την επόμενη μεγάλη συνεργασία σου;",
+    subtitle: "",
     image: "/images/about/about-7.jpg",
     alt: "alt-image",
     lists: [
       {
-        title: "Proof of quality",
-        desc: "Check any pro's work samples, client reviews, and identity verification.",
+        title: "Ξεχώρισε τους κορυφαίους",
+        desc: "Σύγκρινε και εντόπισε τα επαγγελματικά προφίλ που συγκεντρώνουν τις καλύτερες αξιολογήσεις.",
         icon: "flaticon-badge",
       },
       {
-        title: "No cost until you hire",
-        desc: "Interview potential fits for your job, negotiate rates, and only pay for work you approve.",
+        title: "Χωρίς κρυφά κόστη",
+        desc: "Δεν υπάρχουν κρυφές χρεώσεις ή προμήθειες. Πληρώνεις στους επαγγελματίες το ποσό της προσφοράς τους.",
         icon: "flaticon-money",
       },
       {
-        title: "Security and protection",
-        desc: "We've got your back with secure payments and a trusted platform.",
+        title: "Ασφάλεια και Πιστοποίηση",
+        desc: "Θεωρούμε την ασφάλεια ως τον πιο σημαντικό παράγοντα, για αυτό πιστοποιούμε τα επαγγελματικά προφίλ για να έχεις το κεφάλι σου ήσυχο.",
         icon: "flaticon-security",
       },
     ],
   },
+
   funFact: {
     leftSection: {
-      title: "Find the talent needed to get your business growing.",
+      title: "Μπες στην πιο εξελιγμένη κοινότητα επαγγελματιών και χρηστών.",
       description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
+        "Εντόπισε τα ταλέντα και διάλεξε μια υπηρεσία που είναι Value for Money.",
       buttonText: "Get Started",
       buttonLink: "/contact",
     },
@@ -78,18 +79,18 @@ export const data = {
       facts: [
         {
           value: "4.9",
-          label: "Clients rate professionals on Freeio",
+          label: "Εντόπισε τα καλύτερα προφίλ",
           suffix: "/5",
         },
         {
-          value: "96",
+          value: "98",
           label:
-            "95% of customers are satisfied through to see their freelancers",
+            "Από τους χρήστες δήλωσαν ότι θα ξαναχρησιμοποιήσουν τη Doulitsa",
           suffix: "%",
         },
         {
-          value: "Award",
-          label: "G2's 2021 Best Software Awards",
+          value: "8/10",
+          label: "Επέλεξαν κάποιο Πιστοποιημένο Προφίλ",
           suffix: "",
         },
       ],
@@ -100,34 +101,39 @@ export const data = {
     },
   },
   testimonials: {
-    title: "What our students have to say",
-    subtitle: "Discover your perfect program in our courses.",
+    title: "Είπαν για εμάς",
+    subtitle:
+      "Αν θέλετε να μπείτε εδώ, στείλτε μας τα σχόλια σας για την πλατφόρμα με email.",
+
     testimonials: [
       {
         id: "pills-home",
-        text: "Our family was traveling via bullet train between cities in Japan with our luggage - the location for this hotel made that so easy. Agoda price was fantastic.",
+        title: "Σας συστήνω ανεπιφύλακτα",
+        text: "“Η επιχείρηση μου είναι μια μικρή ξενοδοχειακή μονάδα. Η Doulitsa με βοηθάει να βρω επαγγελματίες που δεν μπορούσα να προσλάβω σε μόνιμη θέση.”",
         author: {
-          name: "Albert Cole",
-          position: "Designer",
+          name: "Δημήτρης Κ.",
+          category: "Ξενοδόχος",
           image: "/images/testimonials/1.jpg",
         },
       },
       {
         id: "pills-profile",
-        text: "Our family was traveling via bullet train between cities in Japan with our luggage - the location for this hotel made that so easy. Agoda price was fantastic.",
+        title: "Πολύ καλή δουλειά",
+        text: "“Βρήκα γρήγορα έναν επαγγελματία designer για να μου σχεδιάσει ένα καινούργιο logo.”",
         author: {
-          name: "Alison Dawn",
-          position: "WP Developer",
+          name: "Manolis S.",
+          category: "Επιχειρηματίας",
           image: "/images/testimonials/2.jpg",
         },
         active: true,
       },
       {
         id: "pills-contact",
-        text: "Our family was traveling via bullet train between cities in Japan with our luggage - the location for this hotel made that so easy. Agoda price was fantastic.",
+        title: "Είμαι πολύ ικανοποιημένος",
+        text: "“Μέσα από την πλατφόρμα μπόρεσα να παρουσιάσω όλη τη δουλειά μου και να βρω νέους πελάτες, αλλά και συνεργάτες.”",
         author: {
-          name: "Daniel Parker",
-          position: "Front-end Developer",
+          name: "Courtney Henry",
+          category: "Web Developer",
           image: "/images/testimonials/3.jpg",
         },
       },
@@ -135,100 +141,59 @@ export const data = {
   },
   cta2: {
     image: "/images/about/about-7.jpg",
-    title: "Need something done?",
-    subtitle: "Most viewed and all-time top-selling services",
+    title: "Ψάχνεις για κάποια Υπηρεσία;",
+    subtitle: "Ξεκίνα την αναζήτηση και κάνε Doulitsa 😉",
     boxes: [
       {
         icon: "flaticon-cv",
-        title: "Post a job",
+        title: "Βρες τον καλύτερο",
         description:
-          "It's free and easy to post a job. Simply fill in a title, description.",
+          "Δες τις αξιολογήσεις και εντόπισε το καλύτερο επαγγελματικό προφίλ για αυτό που ψάχνεις.",
       },
       {
         icon: "flaticon-web-design",
-        title: "Choose freelancers",
+        title: "Επιλέξτε τη συνεργασία σας",
         description:
-          "It's free and easy to post a job. Simply fill in a title, description.",
+          "Επικοινώνησε με τον επαγγελματία για να σε ενημερώσει πως θα προχωρήσετε.",
       },
       {
         icon: "flaticon-secure",
-        title: "Pay safely",
+        title: "Μείνε Ασφαλής",
         description:
-          "It's free and easy to post a job. Simply fill in a title, description.",
+          "Προτίμησε τα Πιστοποιημένα Προφίλ που έχουν διασταυρωθεί ότι υπάρχουν πραγματικά.",
       },
     ],
   },
+
   faq: {
-    title: "Frequently Asked Questions",
-    subtitle: "Lorem ipsum dolor sit amet, consectetur.",
+    title: "Συχνές Ερωτήσεις",
+    subtitle:
+      "Αν έχεις περισσότερες ερωτήσεις πήγαινε στη σελίδα <a href='/faq'>FAQ</a>.",
     questions: [
       {
         id: "One",
-        question: "What methods of payments are supported?",
-        answer:
-          "Cras vitae ac nunc orci. Purus amet tortor non at phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa. Metus, scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.",
+        question: "Που έχει έδρα η Doulitsa;",
+        answer: "Είμαστε Ελληνική εταιρεία και έχουμε την έδρα μας στην Αθήνα.",
         isOpen: true,
       },
       {
         id: "Two",
-        question: "Can I cancel at anytime?",
+        question:
+          "Πώς μπορώ να συνεργαστώ με την Doulitsa αν είμαι επαγγελματίας;",
         answer:
-          "Cras vitae ac nunc orci. Purus amet tortor non at phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa. Metus, scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.",
+          "Για να εγγραφείς ως επαγγελματίας και να προσφέρεις τις υπηρεσίες σου, ακολούθησε τις οδηγίες στη σελίδα 'Εγγραφή'. Θα είμαστε σε επικοινωνία για να σε βοηθήσουμε σε ό,τι χρειαστείς.",
         isOpen: false,
       },
       {
         id: "Three",
-        question: "How do I get a receipt for my purchase?",
+        question: "Υπάρχουν κρυφές χρεώσεις;",
         answer:
-          "Cras vitae ac nunc orci. Purus amet tortor non at phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa. Metus, scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.",
-        isOpen: false,
-      },
-      {
-        id: "Four",
-        question: "Which license do I need?",
-        answer:
-          "Cras vitae ac nunc orci. Purus amet tortor non at phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa. Metus, scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.",
-        isOpen: false,
-      },
-      {
-        id: "Five",
-        question: "How do I get access to a theme I purchased?",
-        answer:
-          "Cras vitae ac nunc orci. Purus amet tortor non at phasellus ultricies hendrerit. Eget a, sit morbi nunc sit id massa. Metus, scelerisque volutpat nec sit vel donec. Sagittis, id volutpat erat vel.",
+          "Η εγγραφή στον κατάλογό μας είναι εντελώς Δωρεάν. Εάν έχετε επαγγελματικό προφίλ μπορείτε να αποκτήσετε μια συνδρομή για να αυξήσετε την προβολή σας. Από την πλευρά των χρηστών, δεν υπάρχει καμία επιβάρυνση για να αποκτήσετε οποιαδήποτε υπηρεσία.",
         isOpen: false,
       },
     ],
   },
 
-  partners: {
-    title: "Trusted by the world's best",
-    logos: [
-      {
-        src: "/images/partners/1.png",
-        alt: "Partner 1",
-      },
-      {
-        src: "/images/partners/2.png",
-        alt: "Partner 2",
-      },
-      {
-        src: "/images/partners/3.png",
-        alt: "Partner 3",
-      },
-      {
-        src: "/images/partners/4.png",
-        alt: "Partner 4",
-      },
-      {
-        src: "/images/partners/5.png",
-        alt: "Partner 5",
-      },
-      {
-        src: "/images/partners/6.png",
-        alt: "Partner 6",
-      },
-    ],
-  },
   pricing: {
     title: "Membership Plans",
     subtitle:
