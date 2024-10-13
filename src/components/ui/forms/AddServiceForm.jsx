@@ -11,6 +11,7 @@ import useCreateServiceStore from "@/store/service/createServiceStore";
 import ServiceSuccess from "../ServiceSuccess/ServiceSuccess";
 import ServicePackages from "../AddService/ServicePackages";
 import ServiceAddons from "../AddService/ServiceAddons";
+import ServiceType from "../AddService/ServiceType";
 
 function AddServiceButton() {
   const { pending } = useFormStatus();
@@ -50,6 +51,8 @@ export default function AddServiceForm({ categories, tags }) {
     return !saved[step]; // Disabled if not saved
   };
 
+  console.log("STEP", step);
+
   return (
     <form action={formAction}>
       <div className="row">
@@ -79,6 +82,7 @@ export default function AddServiceForm({ categories, tags }) {
           <ServiceSuccess id={serviceUid} title={serviceTitle} />
         ) : (
           <>
+            {step === "type" && <ServiceType />}
             {step === "packages" && <ServicePackages />}
             {step === "addons" && <ServiceAddons />}
             {step === "faq" && <ServiceFaq />}

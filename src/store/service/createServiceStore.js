@@ -6,9 +6,11 @@ import useAddonsStore from "./addonsStore";
 import useFaqStore from "./faqStore";
 import useSaveServiceStore from "./saveServiceStore";
 import useGalleryStore from "./galleryStore";
+import useTypeStore from "./typeStore";
 
 const useCreateServiceStore = create((set) => ({
   ...useStepsStore(set),
+  ...useTypeStore(set),
   ...useInfoStore(set),
   ...usePackagesStore(set),
   ...useAddonsStore(set),

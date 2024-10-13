@@ -7349,6 +7349,14 @@ textarea {
   color: #ffffff;
 }
 
+.btn-thm:disabled {
+  background-color: #1f4b3f;
+  border: #1f4b3f;
+  opacity: 0.5;
+  color: #ffffff;
+  pointer-events: none;
+}
+
 .btn-dark {
   background-color: var(--headings-color);
   border: 1px solid var(--headings-color);
@@ -7500,6 +7508,11 @@ textarea {
   color: #ffffff;
 }
 .btn-thm2:hover {
+  background-color: #5bbb7b;
+  border-color: #1f4b3f;
+}
+
+.btn-thm2.active {
   background-color: #5bbb7b;
   border-color: #1f4b3f;
 }

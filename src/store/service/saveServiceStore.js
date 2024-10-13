@@ -11,6 +11,7 @@ const useSaveServiceStore = (set) => ({
   errors: initialErrorsState,
   service: {},
   optional: {
+    type: false,
     info: false,
     packages: false,
     addons: true,
@@ -18,6 +19,7 @@ const useSaveServiceStore = (set) => ({
     gallery: false,
   },
   saved: {
+    type: false,
     info: false,
     packages: false,
     addons: false,
