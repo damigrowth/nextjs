@@ -1,21 +1,19 @@
 "use client";
 
 import { formatInput } from "@/utils/InputFormats/formats";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-
 import Select from "react-select";
 import { useDebouncedCallback } from "use-debounce";
 
 export default function SelectInputSearch({
   options,
   name,
-  query,
   isMulti,
   label,
   errors,
   labelPlural,
   defaultValue,
+  onSearch,
   onSelect,
   isDisabled,
   isLoading,
@@ -31,23 +29,13 @@ export default function SelectInputSearch({
   const [isMounted, setIsMounted] = useState(false);
   const [term, setTerm] = useState(defaultValue);
 
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const { replace } = useRouter();
-
   const handleSearch = useDebouncedCallback((value) => {
     if (!isMulti) {
       const formattedValue = formatInput({ value, capitalize });
       setTerm(formattedValue);
-
-      const params = new URLSearchParams(searchParams);
-      if (term) {
-        params.set(query, formattedValue);
-      } else {
-        params.delete(query);
+      if (onSearch) {
+        onSearch(formattedValue);
       }
-
-      replace(`${pathname}?${params.toString()}`, { scroll: false });
     } else {
       setTerm(value);
     }
@@ -55,20 +43,18 @@ export default function SelectInputSearch({
 
   const handleSelect = (option) => {
     if (isMulti) {
-      let newArrayOptions = [];
-      newArrayOptions.push(...option);
-      const formattedOptions = newArrayOptions.map((option) => ({
-        id: option.value,
-        label: option.label,
+      const formattedOptions = option.map((opt) => ({
+        id: opt.value,
+        label: opt.label,
       }));
-      // console.log("option", formattedOptions);
       onSelect(formattedOptions);
     } else {
-      const formattedOption = {
-        id: option.value,
-        label: option.label,
-      };
-
+      const formattedOption = option
+        ? {
+            id: option.value,
+            label: option.label,
+          }
+        : null;
       onSelect(formattedOption);
     }
   };
@@ -104,11 +90,11 @@ export default function SelectInputSearch({
             : "basic-single select-input"
         }
       />
-      {errors?.field === name ? (
+      {errors?.field === name && (
         <div>
           <p className="text-danger">{errors.message}</p>
         </div>
-      ) : null}
+      )}
     </fieldset>
   ) : null;
 }
