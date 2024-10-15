@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { getUser } from "@/lib/user/user";
 
 export const metadata = {
-  title: "Freeio - Freelance Marketplace React/Next Js Template | Dashboard",
+  title: "Doulitsa - Freelance Marketplace React/Next Js Template | Dashboard",
 };
 
 export default async function page() {

@@ -32,8 +32,8 @@ export default function Footer18() {
             <div className="link-style1 mb-4 mb-sm-5">
               <h5 className="text-white mb15">About</h5>
               <div className="link-list">
-                {about.map((item,i) => (
-                  <Link key={ i } href={item.path}>
+                {about.map((item, i) => (
+                  <Link key={i} href={item.path}>
                     {item.name}
                   </Link>
                 ))}
@@ -44,8 +44,8 @@ export default function Footer18() {
             <div className="link-style1 mb-4 mb-sm-5">
               <h5 className="text-white mb15">Categories</h5>
               <ul className="ps-0">
-                {category.map((item,i) => (
-                  <li key={ i }>
+                {category.map((item, i) => (
+                  <li key={i}>
                     <Link href={item.path}>{item.name}</Link>
                   </li>
                 ))}
@@ -56,8 +56,8 @@ export default function Footer18() {
             <div className="link-style1 mb-4 mb-sm-5">
               <h5 className="text-white mb15">Support</h5>
               <ul className="ps-0">
-                {support.map((item,i) => (
-                  <li key={ i }>
+                {support.map((item, i) => (
+                  <li key={i}>
                     <Link href={item.path}>{item.name}</Link>
                   </li>
                 ))}
@@ -106,7 +106,7 @@ export default function Footer18() {
           <div className="col-md-6">
             <div className="text-center text-lg-start">
               <p className="copyright-text mb-2 mb-md-0 text-white-light ff-heading">
-                © Freeio. 2023 CreativeLayers. All rights reserved.
+                © Doulitsa. 2023 CreativeLayers. All rights reserved.
               </p>
             </div>
           </div>

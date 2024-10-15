@@ -5,7 +5,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper";
 
-import { learnFreeio1 } from "@/data/project";
+import { learnDoulitsa1 } from "@/data/project";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -23,7 +23,7 @@ export default function Testimonials19() {
             <div className="col-lg-9 mx-auto">
               <div className="main-title text-center">
                 <h2 className="title text-white">
-                  People Love To Learn With Freeio
+                  People Love To Learn With Doulitsa
                 </h2>
                 <p className="paragraph text-white">
                   Lorem ipsum dolor sit amet, consectetur.
@@ -63,7 +63,7 @@ export default function Testimonials19() {
                       },
                     }}
                   >
-                    {learnFreeio1.map((elm, index) => (
+                    {learnDoulitsa1.map((elm, index) => (
                       <SwiperSlide key={index}>
                         <div className="item">
                           <div className="testimonial-style1 at-home19 default-box-shadow1 position-relative mb60 bdrs12">

@@ -31,8 +31,8 @@ export default function Footer20() {
                     <div className="link-style1 at-home8 mb-3">
                       <h6 className="mb25">About</h6>
                       <div className="link-list">
-                        {about.map((item,i) => (
-                          <Link key={ i } href={item.path}>
+                        {about.map((item, i) => (
+                          <Link key={i} href={item.path}>
                             {item.name}
                           </Link>
                         ))}
@@ -43,8 +43,8 @@ export default function Footer20() {
                     <div className="link-style1 at-home8 mb-3">
                       <h6 className="mb25">Categories</h6>
                       <ul className="ps-0">
-                        {category.map((item,i) => (
-                          <li key={ i }>
+                        {category.map((item, i) => (
+                          <li key={i}>
                             <Link href={item.path}>{item.name}</Link>
                           </li>
                         ))}
@@ -55,8 +55,8 @@ export default function Footer20() {
                     <div className="link-style1 at-home8 mb-3">
                       <h6 className=" mb25">Support</h6>
                       <ul className="ps-0">
-                        {support.map((item,i) => (
-                          <li key={ i }>
+                        {support.map((item, i) => (
+                          <li key={i}>
                             <Link href={item.path}>{item.name}</Link>
                           </li>
                         ))}
@@ -90,7 +90,7 @@ export default function Footer20() {
                     <div className="contact-info">
                       <p className="info-title mb-2">Need live support?</p>
                       <h5 className="info-mail">
-                        <a href="mailto:hi@freeio.com">hi@freeio.com</a>
+                        <a href="mailto:hi@Doulitsa.com">hi@Doulitsa.com</a>
                       </h5>
                     </div>
                   </div>
@@ -136,7 +136,7 @@ export default function Footer20() {
             <div className="col-sm-6">
               <div className="text-center text-lg-start">
                 <p className="copyright-text mb-0 at-home8 ff-heading">
-                  © Freeio. 2023{" "}
+                  © Doulitsa. 2023{" "}
                   <Link
                     style={{
                       color: "#6b7177",

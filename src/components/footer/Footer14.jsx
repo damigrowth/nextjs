@@ -95,8 +95,8 @@ export default function Footer14() {
                     <div className="contact-info">
                       <p className="info-title mb-2">Need live support?</p>
                       <h5 className="info-mail">
-                        <a className="text-white" href="mailto:hi@freeio.com">
-                          hi@freeio.com
+                        <a className="text-white" href="mailto:hi@Doulitsa.com">
+                          hi@Doulitsa.com
                         </a>
                       </h5>
                     </div>
@@ -151,7 +151,7 @@ export default function Footer14() {
             <div className="col-sm-6">
               <div className="text-center text-lg-start">
                 <p className="copyright-text mb-2 mb-md-0 text-white-light ff-heading">
-                  © Freeio. 2023{" "}
+                  © Doulitsa. 2023{" "}
                   <Link
                     href="https://themeforest.net/user/ib-themes/portfolio"
                     target="_blank"
