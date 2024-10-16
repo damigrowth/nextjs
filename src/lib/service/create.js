@@ -29,7 +29,12 @@ export async function createService(prevState, formData) {
     // UPLOAD MEDIA
     // GET MEDIA IDS
     const files = formData.getAll("media-files");
-    const uploadedMedia = await uploadMedia(files);
+    const firstFileSize = files[0].size;
+    let uploadedMedia = [];
+
+    if (firstFileSize > 0) {
+      uploadedMedia = await uploadMedia(files);
+    }
 
     // console.log("UPLOADED MEDIA", uploadedMedia);
 

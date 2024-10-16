@@ -120,10 +120,8 @@ export default function ServiceGallery() {
         </div>
         <button
           type="button"
-          className={`ud-btn no-rotate ${
-            media.length < 1 === true ? "btn-green-disabled" : "btn-thm"
-          }`}
-          disabled={media.length < 1 === true || pending}
+          className={`ud-btn no-rotate btn-thm`}
+          disabled={pending}
           onClick={handleMediaSave}
         >
           {loading ? "Αποθήκευση..." : "Αποθήκευση"}
