@@ -41,7 +41,7 @@ export default function AddServiceForm({ categories, tags }) {
 
   const [formState, formAction] = useFormState(createService, initialState);
 
-  const serviceUid = formState?.data?.attributes?.uid;
+  const serviceId = formState?.data?.id;
   const serviceTitle = formState?.data?.attributes?.title;
 
   const handleDisable = () => {
@@ -50,8 +50,6 @@ export default function AddServiceForm({ categories, tags }) {
     }
     return !saved[step]; // Disabled if not saved
   };
-
-  console.log("STEP", step);
 
   return (
     <form action={formAction}>
@@ -75,11 +73,9 @@ export default function AddServiceForm({ categories, tags }) {
           hidden
           readOnly
         />
-        {step === "info" && (
-          <ServiceInformation categories={categories} tags={tags} />
-        )}
-        {serviceUid ? (
-          <ServiceSuccess id={serviceUid} title={serviceTitle} />
+        {step === "info" && <ServiceInformation />}
+        {serviceId ? (
+          <ServiceSuccess id={serviceId} title={serviceTitle} />
         ) : (
           <>
             {step === "type" && <ServiceType />}
