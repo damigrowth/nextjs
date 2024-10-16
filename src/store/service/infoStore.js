@@ -9,9 +9,9 @@ const initialInfoState = {
   fixed: true,
   title: "",
   description: "", // Array for the RichText editor
-  price: 0,
-  time: 0,
+  price: 10,
   subscription_type: "monthly",
+  time: 1,
   category: initialObjectState,
   subcategory: initialObjectState,
   subdivision: initialObjectState,
