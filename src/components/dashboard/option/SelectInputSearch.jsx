@@ -8,6 +8,7 @@ import { useDebouncedCallback } from "use-debounce";
 export default function SelectInputSearch({
   options,
   name,
+  value,
   isMulti,
   label,
   errors,
@@ -68,6 +69,7 @@ export default function SelectInputSearch({
         id={id}
         name={name}
         options={options}
+        value={value.id === 0 ? { id: 0, label: "Επιλογή..." } : value}
         defaultValue={term}
         isMulti={isMulti}
         isDisabled={isDisabled}
