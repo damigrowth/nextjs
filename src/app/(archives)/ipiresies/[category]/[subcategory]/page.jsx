@@ -6,6 +6,7 @@ import {
   CATEGORIES,
   TAXONOMIES_BY_SLUG,
   SUBDIVISIONS_SEARCH,
+  SUBDIVISIONS_SEARCH_FILTERED,
 } from "@/lib/graphql/queries/main/taxonomies/service";
 import Tabs from "@/components/ui/Archives/Tabs";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
@@ -70,6 +71,7 @@ export default async function page({ params, searchParams }) {
   let categorySearch = cat_s ? cat_s : undefined;
 
   const { subdivisionsSearch } = await getData(SUBDIVISIONS_SEARCH, {
+  const { subdivisionsSearch } = await getData(SUBDIVISIONS_SEARCH_FILTERED, {
     subcategorySlug: subcategory,
     searchTerm: categorySearch,
   });
