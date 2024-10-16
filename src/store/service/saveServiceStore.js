@@ -26,6 +26,34 @@ const useSaveServiceStore = (set) => ({
     faq: false,
     gallery: false,
   },
+  saveType: () =>
+    set((state) => {
+      const typeStep = state.typeStep;
+
+      // Check if the type steps are done
+      if (typeStep !== 2) {
+        return {
+          errors: {
+            field: "service-type",
+            active: true,
+            message: "Ο τύπος της υπηρεσίας είναι υποχρεωτικός",
+          },
+        };
+      }
+
+      return {
+        ...state,
+        errors: initialErrorsState,
+        service: {
+          ...state.service,
+          type: state.type,
+        },
+        saved: {
+          ...state.saved,
+          type: true,
+        },
+      };
+    }),
   saveInfo: () =>
     set((state) => {
       const {
@@ -40,6 +68,8 @@ const useSaveServiceStore = (set) => ({
         zipcode,
         fixed,
       } = state.info;
+
+      const { oneoff } = state.type;
 
       // Check if the title is over 1 characters
       if (title.length < 1) {
@@ -109,15 +139,17 @@ const useSaveServiceStore = (set) => ({
         }
       }
 
-      // Check if the time is bellow 10€
-      if (time < 1) {
-        return {
-          errors: {
-            field: "service-time",
-            active: true,
-            message: "Ο χρόνος παράδωσης είναι μικρότερος από 1 μέρα",
-          },
-        };
+      if (oneoff === true) {
+        // Check if the time is bellow 1
+        if (time < 1) {
+          return {
+            errors: {
+              field: "service-time",
+              active: true,
+              message: "Ο χρόνος παράδωσης είναι μικρότερος από 1 μέρα",
+            },
+          };
+        }
       }
 
       // Check if category is empty

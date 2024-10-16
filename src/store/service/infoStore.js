@@ -16,6 +16,7 @@ const initialInfoState = {
   description: "", // Array for the RichText editor
   price: 0,
   time: 0,
+  subscription_type: "monthly",
   category: initialObjectState,
   tags: [],
   county: initialLocationObjectState,

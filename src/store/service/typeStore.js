@@ -139,9 +139,6 @@ const useTypeStore = (set) => ({
     }),
 
   resetTypes: () => set(initialState),
-  saveNewFeature: () =>
-    set((state) => {
-    }),
 });
 
 export default useTypeStore;

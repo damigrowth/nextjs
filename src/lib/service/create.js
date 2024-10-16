@@ -44,10 +44,12 @@ export async function createService(prevState, formData) {
     // CREATE SERVICE
     const payload = {
       data: {
+        type: service.type,
         fixed: service.fixed,
         title: service.title,
         description: service.description,
         price: service.price,
+        subscription_type: service.subscription_type,
         time: service.time,
         category: service.category.id,
         tags: service.tags.map((el) => el.id),

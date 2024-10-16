@@ -6,15 +6,7 @@ import ServiceSecondaryType from "./ServiceSecondaryType";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 
 export default function ServiceType() {
-  const { type, typeStep, goBack } = useCreateServiceStore();
-
-  console.log(
-    `🚀 ----------------------------------------------------------------------🚀`
-  );
-  console.log(`🚀 ~ file: ServiceType.jsx:9 ~ ServiceType ~ type:`, type);
-  console.log(
-    `🚀 ----------------------------------------------------------------------🚀`
-  );
+  const { type, typeStep, goBack, saveType, errors } = useCreateServiceStore();
 
   return (
     <div className="ps-widget bgc-white bdrs12 p30 mb30 overflow-hidden position-relative">
@@ -23,6 +15,11 @@ export default function ServiceType() {
       </div>
       {typeStep === 0 && <ServicePrimaryType />}
       {(typeStep === 1 || typeStep === 2) && <ServiceSecondaryType />}
+      {errors?.field === "service-type" ? (
+        <div>
+          <p className="text-danger">{errors.message}</p>
+        </div>
+      ) : null}
       <div className="service-type-buttons">
         <button
           type="button"
@@ -34,12 +31,13 @@ export default function ServiceType() {
           <span className="d-flex align-items-center flaticon-left fz20" />
           <span>Πίσω</span>
         </button>
-        {/* {primaryType && secondaryType && ( */}
+        <input id="service-type" name="service-type" type="hidden" />
+
         <button
           type="button"
           className="ud-btn btn-thm no-rotate visible"
           disabled={typeStep === 0 || typeStep === 1}
-          // onClick={saveAddons}
+          onClick={saveType}
         >
           Αποθήκευση
           <i className="fa-solid fa-floppy-disk"></i>
