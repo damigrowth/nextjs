@@ -316,7 +316,7 @@ const TAXONOMIES_SEARCH = gql`
   }
 `;
 
-export const CATEGORIES_SEARCH = gql`
+const CATEGORIES_SEARCH = gql`
   query CategoriesSearch($categoryTerm: String) {
     categories(
       filters: { label: { containsi: $categoryTerm } }
@@ -332,7 +332,7 @@ export const CATEGORIES_SEARCH = gql`
   }
 `;
 
-export const SUBCATEGORIES_SEARCH = gql`
+const SUBCATEGORIES_SEARCH = gql`
   query SubcategoriesSearch($categoryId: ID, $subcategoryTerm: String) {
     subcategories(
       filters: {
@@ -351,7 +351,7 @@ export const SUBCATEGORIES_SEARCH = gql`
   }
 `;
 
-export const SUBDIVISIONS_SEARCH = gql`
+const SUBDIVISIONS_SEARCH = gql`
   query SubdivisionsSearch($subcategoryId: ID, $subdivisionTerm: String) {
     subdivisions(
       filters: {
