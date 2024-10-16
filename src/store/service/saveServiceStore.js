@@ -60,7 +60,7 @@ const useSaveServiceStore = (set) => ({
         title,
         description,
         category,
-        tags,
+        // tags,
         price,
         time,
         county,
@@ -163,13 +163,9 @@ const useSaveServiceStore = (set) => ({
         };
       }
 
-      // Check if tags are empty
-      if (tags.length < 1) {
         return {
           errors: {
-            field: "service-tags",
             active: true,
-            message: "Τα χαρακτηριστικά είναι υποχρεωτικά",
           },
         };
       }
@@ -206,6 +202,16 @@ const useSaveServiceStore = (set) => ({
           },
         };
       }
+      // // Check if tags are empty
+      // if (tags.length < 1) {
+      //   return {
+      //     errors: {
+      //       field: "service-tags",
+      //       active: true,
+      //       message: "Τα χαρακτηριστικά είναι υποχρεωτικά",
+      //     },
+      //   };
+      // }
 
       return {
         ...state,

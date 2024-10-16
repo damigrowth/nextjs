@@ -18,10 +18,10 @@ const initialInfoState = {
   time: 0,
   subscription_type: "monthly",
   category: initialObjectState,
-  tags: [],
   county: initialLocationObjectState,
   area: initialLocationObjectState,
   zipcode: initialLocationObjectState,
+  // tags: [],
 };
 
 const initialErrorsState = {
