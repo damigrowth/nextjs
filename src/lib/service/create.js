@@ -52,6 +52,8 @@ export async function createService(prevState, formData) {
         subscription_type: service.subscription_type,
         time: service.time,
         category: service.category.id,
+        subcategory: service.subcategory.id,
+        subdivision: service.subdivision.id,
         // tags: service.tags.map((el) => el.id),
         freelancer: freelancerId,
         status: 2,

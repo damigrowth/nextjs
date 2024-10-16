@@ -60,6 +60,8 @@ const useSaveServiceStore = (set) => ({
         title,
         description,
         category,
+        subcategory,
+        subdivision,
         // tags,
         price,
         time,
@@ -163,20 +165,24 @@ const useSaveServiceStore = (set) => ({
         };
       }
 
+      // Check if subcategory is empty
+      if (subcategory.id === 0) {
         return {
           errors: {
+            field: "service-subcategory",
             active: true,
+            message: "Η υποκατηγορία είναι υποχρεωτική",
           },
         };
       }
 
-      // Check if the location county is empty
-      if (county.id === 0) {
+      // Check if subdivision is empty
+      if (subdivision.id === 0) {
         return {
           errors: {
-            field: "service-location-county",
+            field: "service-subdivision",
             active: true,
-            message: "Ο νομός είναι υποχρεωτικός",
+            message: "Το αντικείμενο είναι υποχρεωτικό",
           },
         };
       }

@@ -13,6 +13,8 @@ const initialInfoState = {
   time: 0,
   subscription_type: "monthly",
   category: initialObjectState,
+  subcategory: initialObjectState,
+  subdivision: initialObjectState,
   // tags: [],
 };
 
