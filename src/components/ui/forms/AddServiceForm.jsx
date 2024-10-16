@@ -29,7 +29,7 @@ function AddServiceButton() {
   );
 }
 
-export default function AddServiceForm({ categories, tags }) {
+export default function AddServiceForm() {
   const { service, saved, optional, step, steps, setStep, info, media } =
     useCreateServiceStore();
 

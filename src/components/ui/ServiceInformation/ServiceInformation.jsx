@@ -8,7 +8,7 @@ import SelectInputSearch from "../../dashboard/option/SelectInputSearch";
 import { LOCATION_SEARCH } from "@/lib/graphql/queries/main/location";
 import { useQuery } from "@apollo/client";
 
-export default function ServiceInformation({ categories, tags }) {
+export default function ServiceInformation() {
   const { info, setInfo, saveInfo, errors, handleStepsTypeChange, type } =
     useCreateServiceStore();
 
@@ -17,16 +17,6 @@ export default function ServiceInformation({ categories, tags }) {
     areaTerm: "",
     zipcodeTerm: "",
   });
-
-  const categoryOptions = categories.map((category) => ({
-    value: Number(category.id),
-    label: category.attributes.label,
-  }));
-
-  const tagOptions = tags.map((tag) => ({
-    value: Number(tag.id),
-    label: tag.attributes.label,
-  }));
 
   // Fixed or Packages
   // const handlePriceTypeChange = (e) => {
