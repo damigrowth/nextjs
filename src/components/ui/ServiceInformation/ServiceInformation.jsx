@@ -246,28 +246,7 @@ export default function ServiceInformation() {
                 />
               </div>
             </div>
-            {type.subscription ? (
-              <div className="col-sm-2">
-                <div className="mb20 ">
-                  <label htmlFor="subscription-type" className="dark-color">
-                    Μηνιαία ή Ετήσια
-                  </label>
-                  <div className="form-check form-switch switch-style1">
-                    <input
-                      type="checkbox"
-                      role="switch"
-                      id="subscription-type"
-                      name="subscription-type"
-                      checked={
-                        info.subscription_type === "monthly" ? false : true
-                      }
-                      onChange={handleSubscriptionTypeChange}
-                      className="form-check-input"
-                    />
-                  </div>
-                </div>
-              </div>
-            ) : (
+            {type.online && type.oneoff && (
               <div className="col-sm-2">
                 <div className="mb20 fw400">
                   <InputB
@@ -286,6 +265,28 @@ export default function ServiceInformation() {
                     errors={errors}
                     formatSymbols
                   />
+                </div>
+              </div>
+            )}
+            {type.online && type.subscription && (
+              <div className="col-sm-2">
+                <div className="mb20 ">
+                  <label htmlFor="subscription-type" className="dark-color">
+                    Μηνιαία ή Ετήσια
+                  </label>
+                  <div className="form-check form-switch switch-style1">
+                    <input
+                      type="checkbox"
+                      role="switch"
+                      id="subscription-type"
+                      name="subscription-type"
+                      checked={
+                        info.subscription_type === "monthly" ? false : true
+                      }
+                      onChange={handleSubscriptionTypeChange}
+                      className="form-check-input"
+                    />
+                  </div>
                 </div>
               </div>
             )}
