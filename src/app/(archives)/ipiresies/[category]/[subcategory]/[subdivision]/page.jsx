@@ -4,7 +4,6 @@ import { getData } from "@/lib/client/operations";
 import { dynamicMeta, Meta } from "@/utils/Seo/Meta/Meta";
 import {
   CATEGORIES,
-  SUBDIVISIONS_SEARCH,
   SUBDIVISIONS_SEARCH_FILTERED,
   TAXONOMIES_BY_SLUG,
 } from "@/lib/graphql/queries/main/taxonomies/service";
@@ -70,12 +69,10 @@ export default async function page({ params, searchParams }) {
 
   let categorySearch = cat_s ? cat_s : undefined;
 
-  const { subdivisionsSearch } = await getData(SUBDIVISIONS_SEARCH, {
   const { subdivisionsSearch } = await getData(SUBDIVISIONS_SEARCH_FILTERED, {
     subcategorySlug: subcategory,
     searchTerm: categorySearch,
   });
-  // inspect(subdivisions);
 
   return (
     <>
