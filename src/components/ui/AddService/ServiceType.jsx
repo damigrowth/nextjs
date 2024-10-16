@@ -6,7 +6,7 @@ import ServiceSecondaryType from "./ServiceSecondaryType";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 
 export default function ServiceType() {
-  const { type, typeStep, goBack, saveType, errors } = useCreateServiceStore();
+  const { typeStep, goBack, errors } = useCreateServiceStore();
 
   return (
     <div className="ps-widget bgc-white bdrs12 p30 mb30 overflow-hidden position-relative">
@@ -32,16 +32,6 @@ export default function ServiceType() {
           <span>Πίσω</span>
         </button>
         <input id="service-type" name="service-type" type="hidden" />
-
-        <button
-          type="button"
-          className="ud-btn btn-thm no-rotate visible"
-          disabled={typeStep === 0 || typeStep === 1}
-          onClick={saveType}
-        >
-          Αποθήκευση
-          <i className="fa-solid fa-floppy-disk"></i>
-        </button>
       </div>
     </div>
   );

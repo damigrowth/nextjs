@@ -4,7 +4,12 @@ import React from "react";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 
 export default function ServiceSecondaryType() {
-  const { type, setType } = useCreateServiceStore();
+  const { type, setType, saveType } = useCreateServiceStore();
+
+  const handleTypeChange = (currType) => {
+    setType(currType);
+    saveType();
+  };
 
   return (
     <>
@@ -20,7 +25,7 @@ export default function ServiceSecondaryType() {
                 type.oneoff ? "active" : ""
               }`}
               type="button"
-              onClick={() => setType("oneoff")}
+              onClick={() => handleTypeChange("oneoff")}
             >
               One-off
             </button>
@@ -29,7 +34,7 @@ export default function ServiceSecondaryType() {
                 type.subscription ? "active" : ""
               }`}
               type="button"
-              onClick={() => setType("subscription")}
+              onClick={() => handleTypeChange("subscription")}
             >
               Συνδρομή
             </button>
@@ -48,7 +53,7 @@ export default function ServiceSecondaryType() {
                 type.onsite ? "active" : ""
               }`}
               type="button"
-              onClick={() => setType("onsite")}
+              onClick={() => handleTypeChange("onsite")}
             >
               Στην έδρα μου
             </button>
@@ -57,7 +62,7 @@ export default function ServiceSecondaryType() {
                 type.onbase ? "active" : ""
               }`}
               type="button"
-              onClick={() => setType("onbase")}
+              onClick={() => handleTypeChange("onbase")}
             >
               Στον χώρο του πελάτη
             </button>
