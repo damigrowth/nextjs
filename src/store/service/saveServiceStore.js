@@ -181,27 +181,6 @@ const useSaveServiceStore = (set) => ({
         };
       }
 
-      // Check if the location area is empty
-      if (area.id === 0) {
-        return {
-          errors: {
-            field: "service-location-area",
-            active: true,
-            message: "Η περιοχή είναι υποχρεωτική",
-          },
-        };
-      }
-
-      // Check if the location zipcode is empty
-      if (zipcode.id === 0) {
-        return {
-          errors: {
-            field: "service-location-zipcode",
-            active: true,
-            message: "Ο τ.κ είναι υποχρεωτικός",
-          },
-        };
-      }
       // // Check if tags are empty
       // if (tags.length < 1) {
       //   return {

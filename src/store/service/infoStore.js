@@ -5,11 +5,6 @@ const initialObjectState = {
   label: "",
 };
 
-const initialLocationObjectState = {
-  id: 0,
-  name: "",
-};
-
 const initialInfoState = {
   fixed: true,
   title: "",
@@ -18,9 +13,6 @@ const initialInfoState = {
   time: 0,
   subscription_type: "monthly",
   category: initialObjectState,
-  county: initialLocationObjectState,
-  area: initialLocationObjectState,
-  zipcode: initialLocationObjectState,
   // tags: [],
 };
 

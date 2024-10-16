@@ -5,17 +5,12 @@ import TextArea from "@/components/inputs/TextArea";
 import React, { useCallback, useEffect, useState } from "react";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 import SelectInputSearch from "../../dashboard/option/SelectInputSearch";
-import { LOCATION_SEARCH } from "@/lib/graphql/queries/main/location";
 import { useQuery } from "@apollo/client";
 
 export default function ServiceInformation() {
   const { info, setInfo, saveInfo, errors, handleStepsTypeChange, type } =
     useCreateServiceStore();
 
-  const [locationParams, setLocationParams] = useState({
-    countyTerm: "",
-    areaTerm: "",
-    zipcodeTerm: "",
   });
 
   // Fixed or Packages
@@ -30,43 +25,15 @@ export default function ServiceInformation() {
     setInfo("subscription_type", isYearly ? "yearly" : "monthly");
   };
 
-  const handleLocationSearch = useCallback((field, term) => {
-    setLocationParams((prev) => ({ ...prev, [`${field}Term`]: term }));
+  const handleSearch = useCallback((field, term) => {
+    setTaxonomyParams((prev) => ({ ...prev, [`${field}Term`]: term }));
   }, []);
 
-  const {
-    data: location,
-    error,
-    loading,
-    refetch,
-  } = useQuery(LOCATION_SEARCH, {
-    variables: {
-      countyId: info.county.id,
-      areaId: info.area.id,
-      countyTerm: locationParams.countyTerm,
-      areaTerm: locationParams.areaTerm,
-      zipcodeTerm: locationParams.zipcodeTerm,
-    },
-  });
 
-  const locationData = {
-    counties: location?.counties?.data || [],
-    areas: location?.areas?.data || [],
-    zipcodes: location?.zipcodes?.data || [],
   };
 
-  const locationOptions = {
-    counties: locationData.counties.map((county) => ({
-      value: county.id,
-      label: county.attributes.name,
     })),
-    areas: locationData.areas.map((area) => ({
-      value: area.id,
-      label: area.attributes.name,
     })),
-    zipcodes: locationData.zipcodes.map((zipcode) => ({
-      value: zipcode.id,
-      label: zipcode.attributes.name,
     })),
   };
 
@@ -219,72 +186,6 @@ export default function ServiceInformation() {
                 </div>
               </div>
             )}
-          </div> */}
-          <div className="row">
-            <h4>Τοποθεσία</h4>
-            <div className="col-sm-4">
-              <div className="mb20">
-                <SelectInputSearch
-                  options={locationOptions.counties}
-                  name="service-location-county"
-                  label="Νομός"
-                  labelPlural="νομοί"
-                  errors={errors}
-                  isSearchable={true}
-                  defaultValue={info.county.name}
-                  onSelect={(selected) =>
-                    setInfo("county", {
-                      id: Number(selected.id),
-                      name: selected.label,
-                    })
-                  }
-                  onSearch={(term) => handleLocationSearch("county", term)}
-                  capitalize
-                />
-              </div>
-            </div>
-            <div className="col-sm-4">
-              <div className="mb20">
-                <SelectInputSearch
-                  options={locationOptions.areas}
-                  name="service-location-area"
-                  label="Περιοχή"
-                  labelPlural="περιοχές"
-                  errors={errors}
-                  isSearchable={true}
-                  defaultValue={info.area.name}
-                  onSelect={(selected) =>
-                    setInfo("area", {
-                      id: Number(selected.id),
-                      name: selected.label,
-                    })
-                  }
-                  onSearch={(term) => handleLocationSearch("area", term)}
-                  capitalize
-                />
-              </div>
-            </div>
-            <div className="col-sm-4">
-              <div className="mb20">
-                <SelectInputSearch
-                  options={locationOptions.zipcodes}
-                  name="service-location-zipcode"
-                  label="Τ.Κ"
-                  labelPlural="τ.κ"
-                  errors={errors}
-                  isSearchable={true}
-                  defaultValue={info.zipcode.name}
-                  onSelect={(selected) =>
-                    setInfo("zipcode", {
-                      id: Number(selected.id),
-                      name: selected.label,
-                    })
-                  }
-                  onSearch={(term) => handleLocationSearch("zipcode", term)}
-                  capitalize
-                />
-              </div>
-            </div>
           </div>
         </div>
         <button
