@@ -29,7 +29,7 @@ function AddServiceButton() {
   );
 }
 
-export default function AddServiceForm() {
+export default function AddServiceForm({ base, coverage }) {
   const { service, saved, optional, step, steps, setStep, info, media } =
     useCreateServiceStore();
 
@@ -78,7 +78,7 @@ export default function AddServiceForm() {
           <ServiceSuccess id={serviceId} title={serviceTitle} />
         ) : (
           <>
-            {step === "type" && <ServiceType />}
+            {step === "type" && <ServiceType base={base} coverage={coverage} />}
             {step === "packages" && <ServicePackages />}
             {step === "addons" && <ServiceAddons />}
             {step === "faq" && <ServiceFaq />}

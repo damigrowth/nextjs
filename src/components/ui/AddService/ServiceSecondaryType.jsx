@@ -3,7 +3,7 @@
 import React from "react";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 
-export default function ServiceSecondaryType() {
+export default function ServiceSecondaryType({ base, coverage }) {
   const { type, setType, saveType } = useCreateServiceStore();
 
   const handleTypeChange = (currType) => {
@@ -47,6 +47,20 @@ export default function ServiceSecondaryType() {
             Προσφέρετε τη συγκεκριμένη υπηρεσία, <br /> σε δικό σας χώρο ή στον
             χώρο του πελάτη;
           </h4>
+          {!base && (
+            <p className="pb10 text-danger">
+              Δεν μπορείτε να επιλέξετε "Στην έδρα μου"
+              <br /> γιατί δεν έχετε συμπληρώσει την Περιοχή και την Διεύθυνση
+              στο προφίλ σας.
+            </p>
+          )}
+          {!coverage && (
+            <p className="pb10 text-danger">
+              Δεν μπορείτε να επιλέξετε "Στον χώρο του πελάτη"
+              <br /> γιατί δεν έχετε συμπληρώσει τις Περιοχές Εξυπηρέτησης στο
+              προφίλ σας.
+            </p>
+          )}
           <div className="mb20-lg mb30">
             <button
               className={`ud-btn btn-thm2 add-joining mr10-lg mr20 ${
@@ -54,6 +68,7 @@ export default function ServiceSecondaryType() {
               }`}
               type="button"
               onClick={() => handleTypeChange("onsite")}
+              disabled={!base}
             >
               Στην έδρα μου
             </button>
@@ -63,6 +78,7 @@ export default function ServiceSecondaryType() {
               }`}
               type="button"
               onClick={() => handleTypeChange("onbase")}
+              disabled={!coverage}
             >
               Στον χώρο του πελάτη
             </button>

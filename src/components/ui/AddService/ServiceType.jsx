@@ -5,7 +5,7 @@ import ServicePrimaryType from "./ServicePrimaryType";
 import ServiceSecondaryType from "./ServiceSecondaryType";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 
-export default function ServiceType() {
+export default function ServiceType({ base, coverage }) {
   const { typeStep, goBack, errors } = useCreateServiceStore();
 
   return (
@@ -13,8 +13,10 @@ export default function ServiceType() {
       <div className="bdrb1">
         <h3 className="list-title pb5">Τύπος υπηρεσίας</h3>
       </div>
-      {typeStep === 0 && <ServicePrimaryType />}
-      {(typeStep === 1 || typeStep === 2) && <ServiceSecondaryType />}
+      {typeStep === 0 && <ServicePrimaryType base={base} coverage={coverage} />}
+      {(typeStep === 1 || typeStep === 2) && (
+        <ServiceSecondaryType base={base} coverage={coverage} />
+      )}
       {errors?.field === "service-type" ? (
         <div>
           <p className="text-danger">{errors.message}</p>
