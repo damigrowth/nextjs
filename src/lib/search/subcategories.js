@@ -1,10 +1,7 @@
 "use server";
 
 import { getData } from "../client/operations";
-import {
-  HOME_SEARCH,
-  SUBCATEGORIES_SEARCH,
-} from "../graphql/queries/main/taxonomies/service";
+import { HOME_SEARCH } from "../graphql/queries/main/taxonomies/service";
 
 export async function searchSubcategories(prevState, formData) {
   try {

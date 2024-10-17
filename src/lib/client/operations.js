@@ -13,37 +13,6 @@ import { print } from "graphql/language/printer";
 import { GET_ME } from "../graphql/queries/main/user";
 import { cache } from "react";
 
-// export const getData = async (query, variables) => {
-//   validateEnvVars();
-//   const client = getClient();
-
-//   try {
-//     const { data } = await client.query({
-//       query,
-//       variables,
-//       context: {
-//         headers: {
-//           Authorization: `Bearer ${STRAPI_TOKEN}`,
-//         },
-//       },
-//       context: {
-//         fetchOptions: {
-//           next: { revalidate: 1 },
-//         },
-//       },
-//     });
-//     return data;
-//   } catch (error) {
-//     if (error.graphQLErrors) {
-//       console.log("GraphQL Errors:", error.graphQLErrors[0].extensions);
-//     }
-//     if (error.networkError) {
-//       console.log("Network Error:", error.networkError);
-//     }
-//     console.log("Failed to get GraphQL data!", error);
-//   }
-// };
-
 /**
  * Checks server health by making an HTTP request to the server.
  *
@@ -79,7 +48,20 @@ export const getData = cache(async (query, variables) => {
   validateEnvVars();
 
   const url = STRAPI_GRAPHQL;
-  const queryString = print(query);
+  let queryString;
+
+  if (typeof query === "string") {
+    // If query is already a string, use it directly
+    queryString = query;
+  } else {
+    // If query is an AST object, print it
+    try {
+      queryString = print(query);
+    } catch (error) {
+      console.error("Error printing query:", error);
+      throw new Error("Invalid GraphQL query");
+    }
+  }
 
   try {
     const response = await fetch(url, {
@@ -92,7 +74,7 @@ export const getData = cache(async (query, variables) => {
         query: queryString,
         variables,
       }),
-      next: { revalidate: 900 }, // 15 minutes
+      next: { revalidate: 60 }, // 1 minute
     });
 
     if (!response.ok) {

@@ -16,6 +16,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { isAuthenticated } from "@/lib/auth/authenticated";
 import { getUser } from "@/lib/user/user";
+import { ApolloWrapper } from "@/lib/client/apollo-wrapper";
 
 export const revalidate = 3600;
 
@@ -60,7 +61,9 @@ export default async function RootLayout({ children, params }) {
               />
             )}
             <div className="body_content">
-              {children}
+              <ApolloWrapper>
+                {children}
+                </ApolloWrapper>
               {(!isUnderMaintenance || authenticated) && (
                 <Footer footer={footerData} />
               )}

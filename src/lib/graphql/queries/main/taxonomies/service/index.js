@@ -1,22 +1,48 @@
 import { gql } from "@apollo/client";
-import {
-  CATEGORY,
-  CATEGORY_FULL,
-  SUBCATEGORY,
-  SUBDIVISION,
-} from "../../../fragments/taxonomies/service";
-import { SINGLE_IMAGE } from "../../../fragments/global";
+import { PAGINATION, SINGLE_IMAGE } from "../../../fragments/global";
 
-// const CATEGORIES = gql`
-//   query GetCategories {
-//     categories(sort: "label:asc") {
-//       data {
-//         ...CategoryFull
-//       }
-//     }
-//   }
-//   ${CATEGORY_FULL}
-// `;
+const SERVICE_TAXONOMIES = gql`
+  query ServiceTaxonomies {
+    categories(sort: "label:asc") {
+      data {
+        attributes {
+          label
+          slug
+        }
+      }
+    }
+    subcategories(sort: "label:asc") {
+      data {
+        attributes {
+          label
+          slug
+          category {
+            data {
+              attributes {
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+    subdivisions(sort: "label:asc") {
+      data {
+        attributes {
+          label
+          slug
+          subcategory {
+            data {
+              attributes {
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 const CATEGORIES = gql`
   query Categories {
@@ -31,72 +57,9 @@ const CATEGORIES = gql`
   }
 `;
 
-const CATEGORIES_SEARCH = gql`
-  query CategoriesSearch($label: String) {
-    categoriesSearch: categories(
-      filters: { label: { containsi: $label } }
-      sort: "label:asc"
-    ) {
-      data {
-        attributes {
-          label
-          slug
-        }
-      }
-    }
-  }
-`;
-
 const SUBCATEGORIES = gql`
   query Subcategories {
     subcategories(sort: "label:asc") {
-      data {
-        attributes {
-          label
-          slug
-        }
-      }
-    }
-  }
-`;
-
-const SUBCATEGORIES_SEARCH = gql`
-  query SubcategoriesSearch($searchTerm: String, $categorySlug: String) {
-    subcategoriesSearch: subcategories(
-      filters: {
-        and: [
-          { label: { containsi: $searchTerm } }
-          { category: { slug: { eq: $categorySlug } } }
-          { services: { id: { not: { null: true } } } }
-        ]
-      }
-      sort: "label:asc"
-    ) {
-      data {
-        attributes {
-          label
-          slug
-        }
-      }
-    }
-  }
-`;
-
-const SUBDIVISIONS_SEARCH = gql`
-  query SubcategorySubdivisionsSearch(
-    $searchTerm: String
-    $subcategorySlug: String
-  ) {
-    subdivisionsSearch: subdivisions(
-      filters: {
-        and: [
-          { label: { containsi: $searchTerm } }
-          { subcategory: { slug: { eq: $subcategorySlug } } }
-          { services: { id: { not: { null: true } } } }
-        ]
-      }
-      sort: "label:asc"
-    ) {
       data {
         attributes {
           label
@@ -303,14 +266,171 @@ const HOME_SEARCH = gql`
   }
 `;
 
+const TAXONOMIES_SEARCH = gql`
+  query TaxonomiesSearch(
+    $categoryId: ID
+    $subcategoryId: ID
+    $categoryTerm: String
+    $subcategoryTerm: String
+    $subdivisionTerm: String
+  ) {
+    categories(
+      filters: { label: { containsi: $categoryTerm } }
+      sort: "label:asc"
+    ) {
+      data {
+        id
+        attributes {
+          label
+        }
+      }
+    }
+    subcategories(
+      filters: {
+        category: { id: { eq: $categoryId } }
+        label: { containsi: $subcategoryTerm }
+      }
+      sort: "label:asc"
+    ) {
+      data {
+        id
+        attributes {
+          label
+        }
+      }
+    }
+    subdivisions(
+      filters: {
+        subcategory: { id: { eq: $subcategoryId } }
+        label: { containsi: $subdivisionTerm }
+      }
+      sort: "label:asc"
+    ) {
+      data {
+        id
+        attributes {
+          label
+        }
+      }
+    }
+  }
+`;
+
+const CATEGORIES_SEARCH = gql`
+  query CategoriesSearch($categoryTerm: String) {
+    categories(
+      filters: { label: { containsi: $categoryTerm } }
+      sort: "label:asc"
+    ) {
+      data {
+        id
+        attributes {
+          label
+        }
+      }
+    }
+  }
+`;
+
+const SUBCATEGORIES_SEARCH = gql`
+  query SubcategoriesSearch($categoryId: ID, $subcategoryTerm: String) {
+    subcategories(
+      filters: {
+        category: { id: { eq: $categoryId } }
+        label: { containsi: $subcategoryTerm }
+      }
+      sort: "label:asc"
+    ) {
+      data {
+        id
+        attributes {
+          label
+        }
+      }
+    }
+  }
+`;
+
+const SUBDIVISIONS_SEARCH = gql`
+  query SubdivisionsSearch($subcategoryId: ID, $subdivisionTerm: String) {
+    subdivisions(
+      filters: {
+        subcategory: { id: { eq: $subcategoryId } }
+        label: { containsi: $subdivisionTerm }
+      }
+      sort: "label:asc"
+    ) {
+      data {
+        id
+        attributes {
+          label
+        }
+      }
+    }
+  }
+`;
+
+const SUBCATEGORIES_SEARCH_FILTERED = gql`
+  query SubcategoriesSearchFiltered(
+    $searchTerm: String
+    $categorySlug: String
+  ) {
+    subcategoriesSearch: subcategories(
+      filters: {
+        and: [
+          { label: { containsi: $searchTerm } }
+          { category: { slug: { eq: $categorySlug } } }
+          { services: { id: { not: { null: true } } } }
+        ]
+      }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+        }
+      }
+    }
+  }
+`;
+const SUBDIVISIONS_SEARCH_FILTERED = gql`
+  query SubdivisionsSearchFiltered(
+    $searchTerm: String
+    $subcategorySlug: String
+  ) {
+    subdivisionsSearch: subdivisions(
+      filters: {
+        and: [
+          { label: { containsi: $searchTerm } }
+          { subcategory: { slug: { eq: $subcategorySlug } } }
+          { services: { id: { not: { null: true } } } }
+        ]
+      }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+        }
+      }
+    }
+  }
+`;
+
 export {
   CATEGORIES,
-  CATEGORIES_SEARCH,
   SUBCATEGORIES,
-  SUBCATEGORIES_SEARCH,
-  SUBDIVISIONS_SEARCH,
   TAXONOMIES_BY_SLUG,
   SERVICES_ARCHIVE_SEO,
+  SERVICE_TAXONOMIES,
   TAXONOMIES_ARCHIVE,
   HOME_SEARCH,
+  TAXONOMIES_SEARCH,
+  CATEGORIES_SEARCH,
+  SUBCATEGORIES_SEARCH,
+  SUBDIVISIONS_SEARCH,
+  SUBCATEGORIES_SEARCH_FILTERED,
+  SUBDIVISIONS_SEARCH_FILTERED,
 };

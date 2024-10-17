@@ -21,6 +21,22 @@ const FREELANCER_TYPES = gql`
   }
 `;
 
+const FREELANCER_BY_ID = gql`
+  query GetFreelancer($id: ID!) {
+    freelancers(filters: { user: { id: { eq: $id } } }) {
+      data {
+        id
+        attributes {
+          ...FreelancerMain
+          ...FreelancerRelations
+        }
+      }
+    }
+  }
+  ${FREELANCER_MAIN}
+  ${FREELANCER_RELATIONS}
+`;
+
 const FREELANCER_BY_USERNAME = gql`
   query GetFreelancer($username: String!) {
     freelancers(filters: { username: { eq: $username } }) {
@@ -149,6 +165,7 @@ const FREELANCERS_ALL = gql`
 
 export {
   FREELANCER_TYPES,
+  FREELANCER_BY_ID,
   FREELANCER_BY_USERNAME,
   FREELANCER_PAGE_SEO,
   COUNT_FREELANCERS_BY_RATING,

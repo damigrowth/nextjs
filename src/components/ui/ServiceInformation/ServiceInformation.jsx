@@ -2,86 +2,110 @@
 
 import InputB from "@/components/inputs/InputB";
 import TextArea from "@/components/inputs/TextArea";
-import React from "react";
+import React, { useCallback, useState } from "react";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 import SelectInputSearch from "../../dashboard/option/SelectInputSearch";
-import { useSearchParams } from "next/navigation";
+import { useQuery } from "@apollo/client";
 import {
-  AREAS_BY_COUNTY,
-  COUNTY_SEARCH,
-  ZIPCODES_BY_AREA,
-} from "@/lib/queries";
-import useSWR from "swr";
+  CATEGORIES_SEARCH,
+  SUBCATEGORIES_SEARCH,
+  SUBDIVISIONS_SEARCH,
+} from "@/lib/graphql/queries/main/taxonomies/service";
 
-export default function ServiceInformation({ categories, tags }) {
-  const { info, setInfo, saveInfo, errors, handleStepsTypeChange } =
+export default function ServiceInformation() {
+  const { info, setInfo, saveInfo, errors, handleStepsTypeChange, type } =
     useCreateServiceStore();
 
-  const searchParams = useSearchParams();
+  const [taxonomyParams, setTaxonomyParams] = useState({
+    categoryTerm: "",
+    subcategoryTerm: "",
+    subdivisionTerm: "",
+  });
 
-  const locationParams = {
-    county_search: searchParams.get("counties") || "",
-    county: info.county.id,
-    area: info.area.id,
-    zipcode: info.zipcode.id,
+  // Fixed or Packages
+  // const handlePriceTypeChange = (e) => {
+  //   const isFixed = e.target.checked;
+  //   setInfo("fixed", !isFixed);
+  //   handleStepsTypeChange(!isFixed);
+  // };
+
+  const handleSubscriptionTypeChange = (e) => {
+    const isYearly = e.target.checked;
+    setInfo("subscription_type", isYearly ? "yearly" : "monthly");
   };
 
-  const categoryOptions = categories.map((category) => ({
-    value: Number(category.id),
-    label: category.attributes.label,
-  }));
+  const handleSearch = useCallback((field, term) => {
+    setTaxonomyParams((prev) => ({ ...prev, [`${field}Term`]: term }));
+  }, []);
 
-  const tagOptions = tags.map((tag) => ({
-    value: Number(tag.id),
-    label: tag.attributes.label,
-  }));
+  const handleSelect = (field, selected) => {
+    setInfo(field, {
+      id: Number(selected.id),
+      label: selected.label,
+    });
 
-  const handlePriceTypeChange = (e) => {
-    const isFixed = e.target.checked;
-    setInfo("fixed", !isFixed);
-    handleStepsTypeChange(!isFixed);
+    // Reset dependent fields
+    if (field === "category") {
+      setInfo("subcategory", { id: 0, label: "" });
+      setInfo("subdivision", { id: 0, label: "" });
+      setTaxonomyParams((prev) => ({
+        ...prev,
+        subcategoryTerm: "",
+        subdivisionTerm: "",
+      }));
+    } else if (field === "subcategory") {
+      setInfo("subdivision", { id: 0, label: "" });
+      setTaxonomyParams((prev) => ({ ...prev, subdivisionTerm: "" }));
+    }
   };
 
-  const fetcher = (...args) => fetch(...args).then((res) => res.json());
-
-  const { data: counties } = useSWR(
-    `https://api.doulitsa.gr/api/${COUNTY_SEARCH(
-      locationParams.county_search
-    )}`,
-    fetcher
+  const { data: categoriesRes, loading: categoriesLoading } = useQuery(
+    CATEGORIES_SEARCH,
+    {
+      variables: {
+        categoryTerm: taxonomyParams.categoryTerm,
+      },
+    }
   );
-  const { data: areas } = useSWR(
-    `https://api.doulitsa.gr/api/${AREAS_BY_COUNTY(locationParams.county)}`,
-    fetcher
+  const { data: subcategoriesRes, loading: subcategoriesLoading } = useQuery(
+    SUBCATEGORIES_SEARCH,
+    {
+      variables: {
+        categoryId: info.category.id,
+        subcategoryTerm: taxonomyParams.subcategoryTerm,
+      },
+    }
   );
-  const { data: zipcodes } = useSWR(
-    `https://api.doulitsa.gr/api/${ZIPCODES_BY_AREA(locationParams.area)}`,
-    fetcher
+  const { data: subdivisionsRes, loading: subdivisionsLoading } = useQuery(
+    SUBDIVISIONS_SEARCH,
+    {
+      variables: {
+        subcategoryId: info.subcategory.id,
+        subdivisionTerm: taxonomyParams.subdivisionTerm,
+      },
+    }
   );
 
-  const locationData = {
-    counties: counties?.data || [],
-    areas: areas?.data?.attributes?.areas?.data || [],
-    zipcodes: zipcodes?.data?.attributes?.zipcodes?.data || [],
+  const taxonomyData = {
+    categories: categoriesRes?.categories?.data || [],
+    subcategories: subcategoriesRes?.subcategories?.data || [],
+    subdivisions: subdivisionsRes?.subdivisions?.data || [],
   };
 
-  const locationOptions = {
-    counties: locationData.counties.map((county) => ({
-      value: county.id,
-      label: county.attributes.name,
+  const taxonomyOptions = {
+    categories: taxonomyData.categories.map((category) => ({
+      value: category.id,
+      label: category.attributes.label,
     })),
-    areas: locationData.areas.map((area) => ({
-      value: area.id,
-      label: area.attributes.name,
+    subcategories: taxonomyData.subcategories.map((subcategory) => ({
+      value: subcategory.id,
+      label: subcategory.attributes.label,
     })),
-    zipcodes: locationData.zipcodes.map((zipcode) => ({
-      value: zipcode.id,
-      label: zipcode.attributes.name,
+    subdivisions: taxonomyData.subdivisions.map((subdivision) => ({
+      value: subdivision.id,
+      label: subdivision.attributes.label,
     })),
   };
-
-  // console.log("category", info.zipcode);
-  // console.log("TAGS", info.tags);
 
   return (
     <div>
@@ -91,7 +115,7 @@ export default function ServiceInformation({ categories, tags }) {
         </div>
         <div className="form-style1">
           <div className="row">
-            <div className="mb20">
+            <div className="mb10">
               <InputB
                 label="Τίτλος"
                 id="service-title"
@@ -110,17 +134,6 @@ export default function ServiceInformation({ categories, tags }) {
           </div>
           <div className="row">
             <div className="mb10">
-              {/* <label className="heading-color ff-heading fw500 mb10">
-                Περιγραφή
-              </label>
-              <TextEditor
-                content={info.description}
-                limit={5000}
-                id="service-description"
-                name="service-description"
-                errors={errors}
-                onChange={(value) => setInfo("description", value.content)}
-              /> */}
               <TextArea
                 id="service-description"
                 name="service-description"
@@ -138,26 +151,59 @@ export default function ServiceInformation({ categories, tags }) {
             </div>
           </div>
           <div className="row">
-            <div className="col-sm-6">
+            <div className="col-sm-4">
               <div className="mb20">
                 <SelectInputSearch
-                  type="object"
-                  id="service-category"
+                  options={taxonomyOptions.categories}
                   name="service-category"
                   label="Κατηγορία"
                   labelPlural="κατηγορίες"
-                  query="category"
                   errors={errors}
+                  isLoading={categoriesLoading}
                   isSearchable={true}
-                  options={categoryOptions}
-                  defaultValue={info.category.label}
-                  onSelect={({ id, label }) =>
-                    setInfo("category", { id, label })
-                  }
+                  value={info.category}
+                  onSelect={(selected) => handleSelect("category", selected)}
+                  onSearch={(term) => handleSearch("category", term)}
                   capitalize
                 />
               </div>
             </div>
+            <div className="col-sm-4">
+              <div className="mb20">
+                <SelectInputSearch
+                  options={taxonomyOptions.subcategories}
+                  name="service-subcategory"
+                  label="Υποκατηγορία"
+                  labelPlural="υποκατηγορία"
+                  errors={errors}
+                  isLoading={subcategoriesLoading}
+                  isSearchable={true}
+                  value={info.subcategory}
+                  onSelect={(selected) => handleSelect("subcategory", selected)}
+                  onSearch={(term) => handleSearch("subcategory", term)}
+                  capitalize
+                />
+              </div>
+            </div>
+            <div className="col-sm-4">
+              <div className="mb20">
+                <SelectInputSearch
+                  options={taxonomyOptions.subdivisions}
+                  name="service-subdivision"
+                  label="Αντικείμενο"
+                  labelPlural="αντικείμενο"
+                  errors={errors}
+                  isLoading={subdivisionsLoading}
+                  isSearchable={true}
+                  value={info.subdivision}
+                  onSelect={(selected) => handleSelect("subdivision", selected)}
+                  onSearch={(term) => handleSearch("subdivision", term)}
+                  capitalize
+                />
+              </div>
+            </div>
+          </div>
+          {/* <div className="row">
             <div className="col-sm-6">
               <div className="mb20">
                 <SelectInputSearch
@@ -176,27 +222,9 @@ export default function ServiceInformation({ categories, tags }) {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
           <div className="row">
-            <div className="col-sm-4">
-              <div className="mb20 ">
-                <label htmlFor="pricing-type" className="fw500 dark-color ">
-                  Απλή Αμοιβή ή Πακέτα
-                </label>
-                <div className="form-check form-switch switch-style1">
-                  <input
-                    type="checkbox"
-                    role="switch"
-                    id="pricing-type"
-                    name="pricing-type"
-                    checked={!info.fixed}
-                    onChange={handlePriceTypeChange}
-                    className="form-check-input"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="col-sm-4">
+            <div className="col-sm-2">
               <div className="mb20">
                 <InputB
                   id="service-price"
@@ -218,90 +246,50 @@ export default function ServiceInformation({ categories, tags }) {
                 />
               </div>
             </div>
-            <div className="col-sm-4">
-              <div className="mb20">
-                <InputB
-                  id="service-time"
-                  name="service-time"
-                  label="Χρόνος Παράδοσης"
-                  type="number"
-                  min={1}
-                  append="Μέρες"
-                  defaultValue={info.time}
-                  value={info.time}
-                  onChange={(formattedValue) => setInfo("time", formattedValue)}
-                  className="form-control input-group"
-                  errors={errors}
-                  formatSymbols
-                />
+            {type.online && type.oneoff && (
+              <div className="col-sm-2">
+                <div className="mb20 fw400">
+                  <InputB
+                    id="service-time"
+                    name="service-time"
+                    label="Χρόνος Παράδοσης"
+                    type="number"
+                    min={1}
+                    append={info.time > 1 ? "Μέρες" : "Μέρα"}
+                    defaultValue={info.time}
+                    value={info.time}
+                    onChange={(formattedValue) =>
+                      setInfo("time", formattedValue)
+                    }
+                    className="form-control input-group"
+                    errors={errors}
+                    formatSymbols
+                  />
+                </div>
               </div>
-            </div>
-          </div>
-          <div className="row">
-            <h4>Τοποθεσία</h4>
-            <div className="col-sm-4">
-              <div className="mb20">
-                <SelectInputSearch
-                  type="object"
-                  id="service-location-county"
-                  name="service-location-county"
-                  label="Νομός"
-                  labelPlural="νομοί"
-                  query="counties"
-                  querySelection="county"
-                  errors={errors}
-                  isSearchable={true}
-                  options={locationOptions.counties}
-                  defaultValue={info.county.name}
-                  onSelect={({ id, title }) =>
-                    setInfo("county", { id, name: title })
-                  }
-                  capitalize
-                />
+            )}
+            {type.online && type.subscription && (
+              <div className="col-sm-2">
+                <div className="mb20 ">
+                  <label htmlFor="subscription-type" className="dark-color">
+                    Μηνιαία ή Ετήσια
+                  </label>
+                  <div className="form-check form-switch switch-style1">
+                    <input
+                      type="checkbox"
+                      role="switch"
+                      id="subscription-type"
+                      name="subscription-type"
+                      checked={
+                        info.subscription_type === "monthly" ? false : true
+                      }
+                      onChange={handleSubscriptionTypeChange}
+                      className="form-check-input"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="col-sm-4">
-              <div className="mb20">
-                <SelectInputSearch
-                  type="object"
-                  id="service-location-area"
-                  name="service-location-area"
-                  label="Περιοχή"
-                  labelPlural="περιοχές"
-                  query="areas"
-                  querySelection="area"
-                  errors={errors}
-                  isSearchable={true}
-                  options={locationOptions.areas}
-                  defaultValue={info.area.name}
-                  onSelect={({ id, title }) =>
-                    setInfo("area", { id, name: title })
-                  }
-                  capitalize
-                />
-              </div>
-            </div>
-            <div className="col-sm-4">
-              <div className="mb20">
-                <SelectInputSearch
-                  type="object"
-                  id="service-location-zipcode"
-                  name="service-location-zipcode"
-                  label="Τ.Κ"
-                  labelPlural="τ.κ"
-                  query="zipcodes"
-                  querySelection="zipcode"
-                  errors={errors}
-                  isSearchable={true}
-                  options={locationOptions.zipcodes}
-                  defaultValue={info.zipcode.name}
-                  onSelect={({ id, title }) =>
-                    setInfo("zipcode", { id, name: title })
-                  }
-                  capitalize
-                />
-              </div>
-            </div>
+            )}
           </div>
         </div>
         <button

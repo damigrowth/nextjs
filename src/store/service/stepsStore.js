@@ -1,7 +1,11 @@
-const initialStep = "info";
+const initialStep = "type";
 const initialFixedStepsTypeState = {
-  info: {
+  type: {
     previous: null,
+    next: "info",
+  },
+  info: {
+    previous: "type",
     next: "addons",
   },
   addons: {
@@ -18,8 +22,12 @@ const initialFixedStepsTypeState = {
   },
 };
 const initialPackagesStepsTypeState = {
-  info: {
+  type: {
     previous: null,
+    next: "info",
+  },
+  info: {
+    previous: "type",
     next: "packages",
   },
   packages: {

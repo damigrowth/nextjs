@@ -79,7 +79,7 @@ export const greekToLatinMap = {
   γγ: "g",
   γκ: "g",
   μπ: "b",
-  ντ: "d",
+  ντ: "nt",
   τσ: "ts",
   τζ: "tz",
   Αι: "ai",
@@ -94,7 +94,7 @@ export const greekToLatinMap = {
   Γγ: "g",
   Γκ: "g",
   Μπ: "b",
-  Ντ: "d",
+  Ντ: "Nt",
   Τσ: "ts",
   Τζ: "tz",
 };

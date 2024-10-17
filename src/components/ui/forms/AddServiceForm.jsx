@@ -11,6 +11,7 @@ import useCreateServiceStore from "@/store/service/createServiceStore";
 import ServiceSuccess from "../ServiceSuccess/ServiceSuccess";
 import ServicePackages from "../AddService/ServicePackages";
 import ServiceAddons from "../AddService/ServiceAddons";
+import ServiceType from "../AddService/ServiceType";
 
 function AddServiceButton() {
   const { pending } = useFormStatus();
@@ -28,7 +29,7 @@ function AddServiceButton() {
   );
 }
 
-export default function AddServiceForm({ categories, tags }) {
+export default function AddServiceForm({ base, coverage }) {
   const { service, saved, optional, step, steps, setStep, info, media } =
     useCreateServiceStore();
 
@@ -40,7 +41,7 @@ export default function AddServiceForm({ categories, tags }) {
 
   const [formState, formAction] = useFormState(createService, initialState);
 
-  const serviceUid = formState?.data?.attributes?.uid;
+  const serviceId = formState?.data?.id;
   const serviceTitle = formState?.data?.attributes?.title;
 
   const handleDisable = () => {
@@ -72,13 +73,12 @@ export default function AddServiceForm({ categories, tags }) {
           hidden
           readOnly
         />
-        {step === "info" && (
-          <ServiceInformation categories={categories} tags={tags} />
-        )}
-        {serviceUid ? (
-          <ServiceSuccess id={serviceUid} title={serviceTitle} />
+        {step === "info" && <ServiceInformation />}
+        {serviceId ? (
+          <ServiceSuccess id={serviceId} title={serviceTitle} />
         ) : (
           <>
+            {step === "type" && <ServiceType base={base} coverage={coverage} />}
             {step === "packages" && <ServicePackages />}
             {step === "addons" && <ServiceAddons />}
             {step === "faq" && <ServiceFaq />}

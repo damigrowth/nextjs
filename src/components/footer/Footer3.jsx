@@ -14,8 +14,8 @@ export default function Footer3() {
               <div className="link-style1 light-style at-home8 mb-4 mb-sm-5">
                 <h5 className="mb15">About</h5>
                 <div className="link-list">
-                  {about.map((item,i) => (
-                    <Link key={ i } href={item.path}>
+                  {about.map((item, i) => (
+                    <Link key={i} href={item.path}>
                       {item.name}
                     </Link>
                   ))}
@@ -26,8 +26,8 @@ export default function Footer3() {
               <div className="link-style1 light-style at-home8 mb-4 mb-sm-5">
                 <h5 className="mb15">Categories</h5>
                 <ul className="ps-0">
-                  {category.map((item,i) => (
-                    <li key={ i }>
+                  {category.map((item, i) => (
+                    <li key={i}>
                       <Link href={item.path}>{item.name}</Link>
                     </li>
                   ))}
@@ -38,8 +38,8 @@ export default function Footer3() {
               <div className="link-style1 light-style at-home8 mb-4 mb-sm-5">
                 <h5 className="mb15">Support</h5>
                 <ul className="ps-0">
-                  {support.map((item,i) => (
-                    <li key={ i }>
+                  {support.map((item, i) => (
+                    <li key={i}>
                       <Link href={item.path}>{item.name}</Link>
                     </li>
                   ))}
@@ -87,7 +87,7 @@ export default function Footer3() {
             <div className="col-md-6">
               <div className="text-center text-lg-start">
                 <p className="copyright-text mb-2 mb-md0 text-dark-light ff-heading">
-                  © Freeio. 2023{" "}
+                  © Doulitsa. 2023{" "}
                   <Link
                     href="https://themeforest.net/user/ib-themes/portfolio"
                     target="_blank"

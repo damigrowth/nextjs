@@ -1224,3 +1224,18 @@ a {
 .taxonomies-grid-list-item {
   margin-bottom: 8px;
 }
+
+.service-type-buttons {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 60px;
+}
+
+.service-type-buttons button {
+  visibility: hidden;
+}
+
+.service-type-buttons button.visible {
+  visibility: visible;
+}

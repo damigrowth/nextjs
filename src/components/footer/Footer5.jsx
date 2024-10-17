@@ -31,8 +31,8 @@ export default function Footer5() {
                     <div className="link-style1 mb-3">
                       <h6 className="text-white mb25">About</h6>
                       <div className="link-list">
-                        {about.map((item,i) => (
-                          <Link key={ i } href={item.path}>
+                        {about.map((item, i) => (
+                          <Link key={i} href={item.path}>
                             {item.name}
                           </Link>
                         ))}
@@ -43,8 +43,8 @@ export default function Footer5() {
                     <div className="link-style1 mb-3">
                       <h6 className="text-white mb25">Categories</h6>
                       <ul className="ps-0">
-                        {category.map((item,i) => (
-                          <li key={ i }>
+                        {category.map((item, i) => (
+                          <li key={i}>
                             <Link href={item.path}>{item.name}</Link>
                           </li>
                         ))}
@@ -55,8 +55,8 @@ export default function Footer5() {
                     <div className="link-style1 mb-3">
                       <h6 className="text-white mb25">Support</h6>
                       <ul className="ps-0">
-                        {support.map((item,i) => (
-                          <li key={ i }>
+                        {support.map((item, i) => (
+                          <li key={i}>
                             <Link href={item.path}>{item.name}</Link>
                           </li>
                         ))}
@@ -92,8 +92,8 @@ export default function Footer5() {
                     <div className="contact-info">
                       <p className="info-title mb-2">Need live support?</p>
                       <h5 className="info-mail">
-                        <a className="text-white" href="mailto:hi@freeio.com">
-                          hi@freeio.com
+                        <a className="text-white" href="mailto:hi@Doulitsa.com">
+                          hi@Doulitsa.com
                         </a>
                       </h5>
                     </div>
@@ -148,7 +148,7 @@ export default function Footer5() {
             <div className="col-sm-6">
               <div className="text-center text-lg-start">
                 <p className="copyright-text mb-2 mb-md-0 text-white-light ff-heading">
-                  © Freeio. 2023{" "}
+                  © Doulitsa. 2023{" "}
                   <Link
                     href="https://themeforest.net/user/ib-themes/portfolio"
                     target="_blank"

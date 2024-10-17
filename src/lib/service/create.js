@@ -29,7 +29,12 @@ export async function createService(prevState, formData) {
     // UPLOAD MEDIA
     // GET MEDIA IDS
     const files = formData.getAll("media-files");
-    const uploadedMedia = await uploadMedia(files);
+    const firstFileSize = files[0].size;
+    let uploadedMedia = [];
+
+    if (firstFileSize > 0) {
+      uploadedMedia = await uploadMedia(files);
+    }
 
     // console.log("UPLOADED MEDIA", uploadedMedia);
 
@@ -39,16 +44,17 @@ export async function createService(prevState, formData) {
     // CREATE SERVICE
     const payload = {
       data: {
+        type: service.type,
         fixed: service.fixed,
         title: service.title,
         description: service.description,
         price: service.price,
+        subscription_type: service.subscription_type,
         time: service.time,
         category: service.category.id,
-        tags: service.tags.map((el) => el.id),
-        county: service.county.id,
-        area: service.area.id,
-        zipcode: service.zipcode.id,
+        subcategory: service.subcategory.id,
+        subdivision: service.subdivision.id,
+        // tags: service.tags.map((el) => el.id),
         freelancer: freelancerId,
         status: 2,
         media: uploadedMedia,

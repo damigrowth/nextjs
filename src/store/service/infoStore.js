@@ -5,22 +5,17 @@ const initialObjectState = {
   label: "",
 };
 
-const initialLocationObjectState = {
-  id: 0,
-  name: "",
-};
-
 const initialInfoState = {
   fixed: true,
   title: "",
   description: "", // Array for the RichText editor
-  price: 0,
-  time: 0,
+  price: 10,
+  subscription_type: "monthly",
+  time: 1,
   category: initialObjectState,
-  tags: [],
-  county: initialLocationObjectState,
-  area: initialLocationObjectState,
-  zipcode: initialLocationObjectState,
+  subcategory: initialObjectState,
+  subdivision: initialObjectState,
+  // tags: [],
 };
 
 const initialErrorsState = {

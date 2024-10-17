@@ -11,6 +11,7 @@ const useSaveServiceStore = (set) => ({
   errors: initialErrorsState,
   service: {},
   optional: {
+    type: false,
     info: false,
     packages: false,
     addons: true,
@@ -18,19 +19,50 @@ const useSaveServiceStore = (set) => ({
     gallery: false,
   },
   saved: {
+    type: false,
     info: false,
     packages: false,
     addons: false,
     faq: false,
     gallery: false,
   },
+  saveType: () =>
+    set((state) => {
+      const typeStep = state.typeStep;
+
+      // Check if the type steps are done
+      if (typeStep !== 2) {
+        return {
+          errors: {
+            field: "service-type",
+            active: true,
+            message: "Ο τύπος της υπηρεσίας είναι υποχρεωτικός",
+          },
+        };
+      }
+
+      return {
+        ...state,
+        errors: initialErrorsState,
+        service: {
+          ...state.service,
+          type: state.type,
+        },
+        saved: {
+          ...state.saved,
+          type: true,
+        },
+      };
+    }),
   saveInfo: () =>
     set((state) => {
       const {
         title,
         description,
         category,
-        tags,
+        subcategory,
+        subdivision,
+        // tags,
         price,
         time,
         county,
@@ -38,6 +70,8 @@ const useSaveServiceStore = (set) => ({
         zipcode,
         fixed,
       } = state.info;
+
+      const { oneoff } = state.type;
 
       // Check if the title is over 1 characters
       if (title.length < 1) {
@@ -107,15 +141,17 @@ const useSaveServiceStore = (set) => ({
         }
       }
 
-      // Check if the time is bellow 10€
-      if (time < 1) {
-        return {
-          errors: {
-            field: "service-time",
-            active: true,
-            message: "Ο χρόνος παράδωσης είναι μικρότερος από 1 μέρα",
-          },
-        };
+      if (oneoff === true) {
+        // Check if the time is bellow 1
+        if (time < 1) {
+          return {
+            errors: {
+              field: "service-time",
+              active: true,
+              message: "Ο χρόνος παράδωσης είναι μικρότερος από 1 μέρα",
+            },
+          };
+        }
       }
 
       // Check if category is empty
@@ -129,49 +165,38 @@ const useSaveServiceStore = (set) => ({
         };
       }
 
-      // Check if tags are empty
-      if (tags.length < 1) {
+      // Check if subcategory is empty
+      if (subcategory.id === 0) {
         return {
           errors: {
-            field: "service-tags",
+            field: "service-subcategory",
             active: true,
-            message: "Τα χαρακτηριστικά είναι υποχρεωτικά",
+            message: "Η υποκατηγορία είναι υποχρεωτική",
           },
         };
       }
 
-      // Check if the location county is empty
-      if (county.id === 0) {
+      // Check if subdivision is empty
+      if (subdivision.id === 0) {
         return {
           errors: {
-            field: "service-location-county",
+            field: "service-subdivision",
             active: true,
-            message: "Ο νομός είναι υποχρεωτικός",
+            message: "Το αντικείμενο είναι υποχρεωτικό",
           },
         };
       }
 
-      // Check if the location area is empty
-      if (area.id === 0) {
-        return {
-          errors: {
-            field: "service-location-area",
-            active: true,
-            message: "Η περιοχή είναι υποχρεωτική",
-          },
-        };
-      }
-
-      // Check if the location zipcode is empty
-      if (zipcode.id === 0) {
-        return {
-          errors: {
-            field: "service-location-zipcode",
-            active: true,
-            message: "Ο τ.κ είναι υποχρεωτικός",
-          },
-        };
-      }
+      // // Check if tags are empty
+      // if (tags.length < 1) {
+      //   return {
+      //     errors: {
+      //       field: "service-tags",
+      //       active: true,
+      //       message: "Τα χαρακτηριστικά είναι υποχρεωτικά",
+      //     },
+      //   };
+      // }
 
       return {
         ...state,

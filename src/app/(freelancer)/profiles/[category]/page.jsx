@@ -4,7 +4,8 @@ import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
 import { FREELANCER_CATEGORIES_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 
 export const metadata = {
-  title: "Freeio - Freelance Marketplace React/Next Js Template | Freelancer 2",
+  title:
+    "Doulitsa - Freelance Marketplace React/Next Js Template | Freelancer 2",
 };
 
 export default async function page({ params, searchParams }) {

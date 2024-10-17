@@ -95,7 +95,7 @@ export default function InputB({
       </div>
       {errors?.field === name ? (
         <div>
-          <p className="text-danger">{errors.message}</p>
+          <p className="text-danger mb0 pb0">{errors.message}</p>
         </div>
       ) : null}
     </>

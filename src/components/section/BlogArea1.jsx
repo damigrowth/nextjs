@@ -29,7 +29,7 @@ export default function BlogArea1() {
           <div className="row">
             <div className="col-lg-12">
               <div className="main-title mb50">
-                <h2 className="title">Freeio Blog</h2>
+                <h2 className="title">Doulitsa Blog</h2>
                 <p className="text mb-0">
                   Give your visitor a smooth online experience with a solid UX
                   design
@@ -70,10 +70,10 @@ export default function BlogArea1() {
                         ? item
                         : item.category === getCurrentTab
                         ? true
-                        : false,
+                        : false
                     )
-                    .map((item,i) => (
-                      <div key={ i } className="col-sm-6 col-xl-3">
+                    .map((item, i) => (
+                      <div key={i} className="col-sm-6 col-xl-3">
                         <BlogCard2 data={item} />
                       </div>
                     ))}

@@ -1,11 +1,11 @@
 @charset "UTF-8";
 /*
-Project/Template Name:  Freeio - Freelance Marketplace HTML Template
+Project/Template Name:  Doulitsa - Freelance Marketplace HTML Template
 Template Url: 
 Author: CreativeLayers
 Author Url: https://themeforest.net/user/creativelayers/portfolio
 Version: 1.0.0
-Description: Freeio - Freelance Marketplace HTML Template
+Description: Doulitsa - Freelance Marketplace HTML Template
 Tag:  bidding, fiverr, freelance marketplace, freelancers, freelancing, gigs, hiring, job board, job portal, job posting, jobs marketplace, peopleperhour, proposals, sell services, upwork
 */
 /* == Table Of Content  == */
@@ -7349,6 +7349,14 @@ textarea {
   color: #ffffff;
 }
 
+.btn-thm:disabled {
+  background-color: #1f4b3f;
+  border: #1f4b3f;
+  opacity: 0.5;
+  color: #ffffff;
+  pointer-events: none;
+}
+
 .btn-dark {
   background-color: var(--headings-color);
   border: 1px solid var(--headings-color);
@@ -7499,7 +7507,19 @@ textarea {
   border: none;
   color: #ffffff;
 }
+.btn-thm2:disabled {
+  background-color: #1f4b3f;
+  border: none;
+  opacity: 0.5;
+  color: #ffffff;
+  pointer-events: none;
+}
 .btn-thm2:hover {
+  background-color: #5bbb7b;
+  border-color: #1f4b3f;
+}
+
+.btn-thm2.active {
   background-color: #5bbb7b;
   border-color: #1f4b3f;
 }
