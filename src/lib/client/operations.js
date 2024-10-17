@@ -74,7 +74,7 @@ export const getData = cache(async (query, variables) => {
         query: queryString,
         variables,
       }),
-      next: { revalidate: 900 }, // 15 minutes
+      next: { revalidate: 60 }, // 1 minute
     });
 
     if (!response.ok) {
