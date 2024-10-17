@@ -1,18 +1,40 @@
 import { getData } from "../client/operations";
-import { FREELANCER_BY_USERNAME } from "../graphql/queries/main/freelancer";
+import {
+  FREELANCER_BY_ID,
+  FREELANCER_BY_USERNAME,
+} from "../graphql/queries/main/freelancer";
 import {
   ALL_REVIEWS_RATINGS_BY_FREELANCER,
   REVIEWS_BY_FREELANCER,
 } from "../graphql/queries/main/reviews";
 import { FEATURED_SERVICES_BY_FREELANCER } from "../graphql/queries/main/service";
 
-import { getUser } from "../user/user";
+import { getUser, getUserId } from "../user/user";
 
 export async function getFreelancerId() {
   const user = await getUser();
   const id = user.freelancer.data.id;
   const freelancerId = Number(id);
   return { freelancerId };
+}
+
+export async function getFreelancer() {
+  try {
+    let freelancer = null;
+    const uid = await getUserId();
+    const { freelancers } = await getData(FREELANCER_BY_ID, {
+      id: uid,
+    });
+
+    if (freelancers?.data?.length > 0) {
+      freelancer = freelancers.data[0].attributes;
+    }
+
+    return { freelancer };
+  } catch (error) {
+    console.error("Error fetching freelancer by username:", error);
+    return null;
+  }
 }
 
 export async function getFreelancerByUsername(username) {
