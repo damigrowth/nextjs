@@ -49,7 +49,8 @@ export async function createService(prevState, formData) {
         title: service.title,
         description: service.description,
         price: service.price,
-        subscription_type: service.subscription_type,
+        subscription_type:
+          service.type.subscription === true ? service.subscription_type : null,
         time: service.time,
         category: service.category.id,
         subcategory: service.subcategory.id,

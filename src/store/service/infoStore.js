@@ -10,7 +10,7 @@ const initialInfoState = {
   title: "",
   description: "", // Array for the RichText editor
   price: 10,
-  subscription_type: "monthly",
+  subscription_type: "month",
   time: 1,
   category: initialObjectState,
   subcategory: initialObjectState,
