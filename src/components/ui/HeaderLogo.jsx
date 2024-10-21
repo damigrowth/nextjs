@@ -14,8 +14,8 @@ export default function HeaderLogo() {
         <Image
           width={133}
           height={40}
-          src="/images/header-logo-dark.svg"
-          alt="/Header Logo"
+          src="/images/doulitsa-logo.svg"
+          alt="Doulitsa Logo"
         />
       </Link>
       {pathName === "/" && (
@@ -23,8 +23,8 @@ export default function HeaderLogo() {
           <Image
             width={133}
             height={40}
-            src="/images/header-logo-dark.svg"
-            alt="Header Logo"
+            src="/images/doulitsa-logo.svg"
+            alt="Doulitsa Logo"
           />
         </Link>
       )}

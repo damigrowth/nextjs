@@ -75,11 +75,11 @@ export default async function Footer({ footer }) {
               <div className="footer-widget mb-4 mb-lg-5">
                 <Link className="footer-logo" href="/">
                   <Image
-                    height={40}
-                    width={133}
+                    height={45}
+                    width={123}
                     className="mb40 object-fit-contain"
-                    src="/images/header-logo-white.svg"
-                    alt="logo"
+                    src="/images/doulitsa-logo-white.svg"
+                    alt="Doulitsa logo"
                   />
                 </Link>
                 <div className="row mb-4 mb-lg-5">
