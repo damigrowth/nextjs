@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { USER_PARTIAL } from "../../fragments/entities/user";
-import { BASE, COVERAGE } from "../../fragments/components/location";
+import { COVERAGE } from "../../fragments/components/location";
 import { SOCIALS } from "../../fragments/components/socials";
 import { FREELANCER_TYPE } from "../../fragments/entities/freelancer";
 import {
@@ -39,8 +39,8 @@ const FREELANCER_PARTIAL_RELATIONS = gql`
     user {
       ...UserPartial
     }
-    base {
-      ...Base
+    coverage {
+      ...Coverage
     }
     type {
       ...FreelancerType
@@ -65,7 +65,7 @@ const FREELANCER_PARTIAL_RELATIONS = gql`
     }
   }
   ${USER_PARTIAL}
-  ${BASE}
+  ${COVERAGE}
   ${SOCIALS}
   ${FREELANCER_TYPE}
   ${FREELANCER_CATEGORY}
@@ -125,9 +125,6 @@ const FREELANCER_RELATIONS = gql`
     skills {
       ...Skills
     }
-    base {
-      ...Base
-    }
     coverage {
       ...Coverage
     }
@@ -175,7 +172,6 @@ const FREELANCER_RELATIONS = gql`
   ${SERVICES}
   ${ORDERS}
   ${SKILLS}
-  ${BASE}
   ${COVERAGE}
   ${SOCIALS}
   ${FREELANCER_TYPE}

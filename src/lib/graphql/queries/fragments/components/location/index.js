@@ -1,49 +1,21 @@
 import { gql } from "@apollo/client";
+import { AREA, AREAS, COUNTY } from "../../entities/location";
 
 const COVERAGE = gql`
   fragment Coverage on ComponentLocationCoverage {
     online
-    onbase
     onsite
-    counties {
-      data {
-        id
-        attributes {
-          name
-        }
-      }
-    }
-  }
-`;
-
-const BASE = gql`
-  fragment Base on ComponentLocationLocation {
-    online
+    onbase
+    address
     county {
-      data {
-        id
-        attributes {
-          name
-        }
-      }
+      ...County
     }
-    area {
-      data {
-        id
-        attributes {
-          name
-        }
-      }
-    }
-    zipcode {
-      data {
-        id
-        attributes {
-          name
-        }
-      }
+    areas {
+      ...Areas
     }
   }
+  ${AREAS}
+  ${COUNTY}
 `;
 
-export { COVERAGE, BASE };
+export { COVERAGE };

@@ -1239,3 +1239,11 @@ a {
 .service-type-buttons button.visible {
   visibility: visible;
 }
+
+.user-online {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  background-color: #00c875;
+}

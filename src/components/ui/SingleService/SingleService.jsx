@@ -26,7 +26,6 @@ export default async function SingleService({
   const {
     title,
     views,
-    area,
     category,
     subcategory,
     subdivision,
@@ -40,6 +39,7 @@ export default async function SingleService({
     packages,
     faq,
     rating,
+    subscription_type,
     reviews_total,
     rating_global,
     rating_stars_1,
@@ -47,6 +47,7 @@ export default async function SingleService({
     rating_stars_3,
     rating_stars_4,
     rating_stars_5,
+    type,
     freelancer: freelancerUser,
   } = service;
 
@@ -95,10 +96,11 @@ export default async function SingleService({
                 />
 
                 <Info
-                  area={area.data?.attributes?.name}
+                  coverage={freelancer?.coverage}
                   category={subdivision.data?.attributes}
                   subcategory={subcategory.data?.attributes}
                   time={time}
+                  type={{ ...type, subscription_type }}
                 />
               </div>
               <div className="service-about">
