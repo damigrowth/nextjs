@@ -30,15 +30,21 @@ export default function ServiceCard({ service }) {
 
   const user = freelancer?.data?.attributes?.user?.data?.attributes;
 
+  let image = null;
+  const fallbackImage = "/images/fallback/service.png";
+
+  if (media.data.length > 0) {
+    image = getBestDimensions(media.data[0].attributes.formats).url;
+  } else {
+    image = fallbackImage;
+  }
+
   return (
     <div className="data-loading-element listing-style1 list-style d-block d-xl-flex align-items-center">
       {media.data.length > 1 ? (
         <ServiceCardMedia media={media?.data} path={`/s/${slug}`} />
       ) : (
-        <ServiceCardImage
-          image={getBestDimensions(media.data[0].attributes.formats).url}
-          path={`/s/${slug}`}
-        />
+        <ServiceCardImage image={image} path={`/s/${slug}`} />
       )}
 
       <div className="list-content flex-grow-1 ms-1 bgc-white">

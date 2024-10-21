@@ -10,5 +10,7 @@ export const getBestDimensions = (formats) => {
       return formats.small;
     }
     return formats.thumbnail;
+  } else {
+    return null;
   }
 };

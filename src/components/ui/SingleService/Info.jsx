@@ -1,7 +1,6 @@
 import React from "react";
 
 export default function Info({ time, category, subcategory, coverage, type }) {
-  console.log("type", type);
   const {
     online,
     presence,
@@ -12,7 +11,9 @@ export default function Info({ time, category, subcategory, coverage, type }) {
     subscription_type,
   } = type;
 
-  const { address, areas, county } = coverage;
+  const address = coverage?.address;
+  const areas = coverage?.areas;
+  const county = coverage?.county;
 
   return (
     <div className="row">
