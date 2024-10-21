@@ -111,10 +111,16 @@ export default async function SingleService({
                   payment_methods={freelancer.payment_methods}
                   settlement_methods={freelancer.settlement_methods}
                 />
-                {media.data.length > 1 ? (
-                  <Gallery images={media.data} />
-                ) : (
-                  <FeaturedImage formats={media.data[0].attributes.formats} />
+                {media.data.length > 0 && (
+                  <>
+                    {media.data.length > 1 ? (
+                      <Gallery images={media.data} />
+                    ) : (
+                      <FeaturedImage
+                        formats={media?.data[0]?.attributes?.formats}
+                      />
+                    )}
+                  </>
                 )}
                 {fixed ? null : <Packages packages={packages} />}
                 {addons?.length > 0 && <Addons addons={addons} price={price} />}
