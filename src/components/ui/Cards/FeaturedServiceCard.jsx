@@ -54,8 +54,10 @@ export default function FeaturedServiceCard({ service }) {
         <p className="list-text body-color fz14 mb-1">
           {category.data?.attributes?.label}
         </p>
-        <h5 className="list-title">
-          <Link href={`/s/${slug}`}>{title.slice(0, 40) + "..."}</Link>
+        <h5 className="service-card-title">
+          <Link href={`/s/${slug}`}>
+            {title.length > 60 ? `${title.slice(0, 60)}...` : title}
+          </Link>
         </h5>
         <div className="review-meta d-flex align-items-center">
           {freelancerReviewsTotal && (

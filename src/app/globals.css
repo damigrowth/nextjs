@@ -1247,3 +1247,13 @@ a {
   display: inline-block;
   background-color: #00c875;
 }
+
+.service-card-title {
+  margin-bottom: 10px;
+  width: 100%;
+  height: 45px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
