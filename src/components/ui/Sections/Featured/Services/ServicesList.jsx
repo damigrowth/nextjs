@@ -22,7 +22,8 @@ export default function ServicesList({ services }) {
         .map((service, i) => {
           if (
             !service?.attributes?.freelancer?.data?.attributes?.user?.data
-              ?.attributes
+              ?.attributes ||
+            service.attributes.media?.data?.length === 0
           ) {
             return null;
           }

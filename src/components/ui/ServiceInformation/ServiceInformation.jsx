@@ -30,8 +30,8 @@ export default function ServiceInformation() {
   // };
 
   const handleSubscriptionTypeChange = (e) => {
-    const isYearly = e.target.checked;
-    setInfo("subscription_type", isYearly ? "yearly" : "monthly");
+    const isTypeYear = e.target.checked;
+    setInfo("subscription_type", isTypeYear ? "year" : "month");
   };
 
   const handleSearch = useCallback((field, term) => {
@@ -281,7 +281,7 @@ export default function ServiceInformation() {
                       id="subscription-type"
                       name="subscription-type"
                       checked={
-                        info.subscription_type === "monthly" ? false : true
+                        info.subscription_type === "month" ? false : true
                       }
                       onChange={handleSubscriptionTypeChange}
                       className="form-check-input"

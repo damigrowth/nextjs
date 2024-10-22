@@ -33,7 +33,6 @@ export default function FreelancerProfile({
   const {
     user: userData,
     tagline,
-    base,
     coverage,
     socials,
     image,
@@ -79,7 +78,7 @@ export default function FreelancerProfile({
     <section className="pt10 pb90 pb30-md">
       <FreelancerSchema
         displayName={user?.displayName}
-        location={base?.county?.data?.attributes?.name}
+        location={coverage?.county?.data?.attributes?.name}
         rating={rating}
         reviews_total={reviews_total}
         reviews={reviews}
@@ -94,7 +93,6 @@ export default function FreelancerProfile({
               lastName={user?.lastName}
               displayName={user?.displayName}
               tagline={tagline}
-              address={user?.address}
               socials={socials}
               image={user.image.data?.attributes?.formats?.thumbnail?.url}
               rating={rating}
@@ -158,7 +156,6 @@ export default function FreelancerProfile({
           <StickySidebar>
             <Info
               rate={rate}
-              base={base?.area?.data?.attributes?.name}
               coverage={coverage}
               commencement={commencement}
               website={website}

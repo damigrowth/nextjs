@@ -20,6 +20,15 @@ export default function FeaturedServiceCard({ service }) {
   const freelancerRating = freelancer.data.attributes.rating;
   const freelancerReviewsTotal = freelancer.data.attributes.reviews_total;
 
+  let image = null;
+  const fallbackImage = "/images/fallback/service.png";
+
+  if (media.data.length > 0) {
+    image = getBestDimensions(media.data[0].attributes.formats).url;
+  } else {
+    image = fallbackImage;
+  }
+
   return (
     <div className="listing-style1 bdrs16">
       <div className="list-thumb">
@@ -28,7 +37,7 @@ export default function FeaturedServiceCard({ service }) {
             height={247}
             width={331}
             className="w-100"
-            src={getBestDimensions(media.data[0]?.attributes?.formats).url}
+            src={image}
             alt={`featured-service-${title}-freelancer-${freelancer?.data?.attributes?.username}`}
           />
         </Link>
@@ -45,8 +54,10 @@ export default function FeaturedServiceCard({ service }) {
         <p className="list-text body-color fz14 mb-1">
           {category.data?.attributes?.label}
         </p>
-        <h5 className="list-title">
-          <Link href={`/s/${slug}`}>{title.slice(0, 40) + "..."}</Link>
+        <h5 className="service-card-title">
+          <Link href={`/s/${slug}`}>
+            {title.length > 60 ? `${title.slice(0, 60)}...` : title}
+          </Link>
         </h5>
         <div className="review-meta d-flex align-items-center">
           {freelancerReviewsTotal && (

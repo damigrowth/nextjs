@@ -5,12 +5,12 @@ import {
   SUBCATEGORY_ENTITY,
   SUBDIVISION_ENTITY,
 } from "../../fragments/taxonomies/service";
-import { AREA } from "../../fragments/entities/location";
 import { ADDONS, FAQ, PACKAGES } from "../../fragments/components/pricing";
 import { MULTIPLE_IMAGES, STATUS } from "../../fragments/global";
 import { RATING } from "../../fragments/entities/rating";
 import { TAG } from "../../fragments/entities/tag";
 import { FREELANCER_BASIC } from "../../fragments/entities/freelancer";
+import { SERVICE_TYPE } from "../../fragments/components/service";
 
 const SERVICE_MAIN = gql`
   fragment ServiceMain on Service {
@@ -21,6 +21,7 @@ const SERVICE_MAIN = gql`
     description
     fixed
     rating
+    subscription_type
     reviews_total
     rating_stars_1
     rating_stars_2
@@ -50,9 +51,6 @@ const SERVICE_RELATIONS = gql`
         ...SubdivisionEntity
       }
     }
-    area {
-      ...Area
-    }
     packages {
       ...Packages
     }
@@ -76,6 +74,9 @@ const SERVICE_RELATIONS = gql`
         ...Tag
       }
     }
+    type {
+      ...ServiceType
+    }
     seo {
       metaTitle
       metaDescription
@@ -83,7 +84,6 @@ const SERVICE_RELATIONS = gql`
   }
   ${FREELANCER_PARTIAL}
   ${CATEGORY}
-  ${AREA}
   ${PACKAGES}
   ${ADDONS}
   ${FAQ}
@@ -93,6 +93,7 @@ const SERVICE_RELATIONS = gql`
   ${TAG}
   ${SUBCATEGORY_ENTITY}
   ${SUBDIVISION_ENTITY}
+  ${SERVICE_TYPE}
 `;
 
 const SERVICE_SEO = gql`
