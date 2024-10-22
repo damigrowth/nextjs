@@ -41,7 +41,6 @@ export default function MegaMenu({ categories, staticMenuClass }) {
                 href={`/ipiresies/${category.slug}`}
                 className="dropdown"
                 prefetch={false}
-                scroll={false}
               >
                 <span className={`menu-icn ${category.icon}`} />
                 <span className="menu-title">{category.label}</span>
