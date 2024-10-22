@@ -190,7 +190,7 @@ h1 {
 
 .h2,
 h2 {
-  font-size: 32px;
+  font-size: 24px;
 }
 
 .h3,
@@ -2435,7 +2435,9 @@ li {
 .service-v1-vector {
   position: absolute;
   right: 5%;
-  border: 2px #898989 solid;
+  border: 2px solid #fbf7ed;
+  height: 180px;
+  width: 320px;
   border-radius: 10px;
 }
 
@@ -4473,7 +4475,8 @@ section {
   background-color: #fbf7ed;
   background-repeat: no-repeat;
   background-size: cover;
-  height: 300px;
+  /* height: 300px; */
+  max-height: 180px;
 }
 @media (max-width: 767.98px) {
   .cta-service-v1.freelancer-single-style {

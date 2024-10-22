@@ -8,13 +8,13 @@ export default function TaxonomiesArchive({ archive }) {
   const { subcategories, subdivisions } = archive;
 
   return (
-    <>
+    <div className="taxonomies-archive">
       {subdivisions.length > 0 && (
         <TaxonomiesSwiper taxonomies={subdivisions} />
       )}
       {subcategories.length > 0 && (
         <TaxonomiesGrid taxonomies={subcategories} />
       )}
-    </>
+    </div>
   );
 }

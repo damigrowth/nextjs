@@ -13,9 +13,9 @@ export default function TaxonomiesSwiper({ taxonomies }) {
   }, []);
 
   return (
-    <section>
+    <section className="pb30 pt25">
       <div className="container taxonomies-swiper">
-        <h2 className="mb40">Πιο δημοφιλείς εργασίες</h2>
+        <h2 className="mb20">Πιο δημοφιλείς εργασίες</h2>
         {swiperLoaded && (
           <Swiper
             spaceBetween={15}
