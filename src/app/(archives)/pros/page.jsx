@@ -41,6 +41,8 @@ export default async function page({ params, searchParams }) {
     cov_o,
     cov_c,
     cov_c_s,
+    cc_p,
+    cc_ps,
     type,
     cat,
     cat_s,
@@ -70,6 +72,8 @@ export default async function page({ params, searchParams }) {
     verified: addFilter(ver === "", true),
     coverageOnline: addFilter(cov_o === "", true),
     coverageCounties: addFilter(cov_c && cov_c.length > 0, toIntArray(cov_c)),
+    coverageCountyPage: addFilter(cc_p, parseInt(cc_p, 10)),
+    coverageCountyPageSize: addFilter(cc_ps, parseInt(cc_ps, 10)),
     page: !page || parseInt(page, 10) < 1 ? 1 : parseInt(page, 10),
     sort: sort ? sort : "publishedAt:desc",
   };
@@ -83,6 +87,8 @@ export default async function page({ params, searchParams }) {
 
   const { counties } = await getData(COUNTIES_SEARCH, {
     name: coverageCountySearch,
+    coverageCountyPage: paramsFilters.coverageCountyPage,
+    coverageCountyPageSize: paramsFilters.coverageCountyPageSize,
   });
 
   return (
@@ -104,7 +110,7 @@ export default async function page({ params, searchParams }) {
       <FreelancersArchive
         taxonomies={taxonomies}
         categories={categoriesSearch?.data}
-        counties={counties?.data}
+        counties={counties}
         searchParams={searchParams}
         paramsFilters={paramsFilters}
         childPath
