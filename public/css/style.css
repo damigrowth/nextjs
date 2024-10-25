@@ -7554,6 +7554,13 @@ textarea {
   border: 2px solid #5bbb7b;
 }
 
+.btn-white:disabled {
+  background-color: #ffffff;
+  border: 2px solid #ffffff;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .btn-white2 {
   border: 2px solid var(--headings-color);
 }
