@@ -2,7 +2,7 @@ import { getBestDimensions } from "@/utils/imageDimensions";
 import Image from "next/image";
 import React from "react";
 
-export default function FeaturedImage({ formats }) {
+export default function FeaturedFile({ formats }) {
   const image = getBestDimensions(formats);
 
   return (

@@ -13,7 +13,7 @@ import Skills from "./Skills";
 import Features from "./Features";
 import Industries from "./Industries";
 import FeaturedServices from "./FeaturedServices";
-import Gallery from "@/components/ui/Gallery/Gallery";
+import Gallery from "@/components/ui/SingleService/FeaturedFiles";
 import Reviews from "../../Reviews/Reviews";
 import AddModelReviewForm from "../../forms/AddModelReviewForm";
 import Terms from "./Terms";

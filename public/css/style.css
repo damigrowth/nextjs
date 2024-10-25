@@ -10247,11 +10247,13 @@ input:focus-visible {
 /*	Shop Details Pages Styles */
 .service-single-sldier {
   position: relative;
+  background-color: #404040;
+  padding: 2rem 4rem;
+  border-radius: 12px;
 }
 .service-single-sldier:after {
-  background-color: #404040;
-  border-radius: 4px;
-  bottom: 130px;
+  /* background-color: #404040; */
+  /* bottom: 110px; */
   content: "";
   position: absolute;
   left: 0;

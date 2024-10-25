@@ -10,7 +10,7 @@ import { getData } from "@/lib/api";
 import AddServiceReviewForm from "../ui/forms/AddModelReviewForm";
 import Packages from "../ui/SingleService/Packages";
 import Addons from "../ui/SingleService/Addons";
-import Gallery from "../ui/Gallery/Gallery";
+import Gallery from "../ui/SingleService/FeaturedFiles";
 import Description from "../ui/SingleService/Description";
 import Faq from "../ui/SingleService/Faq";
 import Reviews from "../ui/SingleService/Reviews";

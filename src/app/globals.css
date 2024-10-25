@@ -1267,3 +1267,29 @@ a {
   max-width: 1430px;
   padding-left: 5%;
 }
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper .swiper-slide {
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 560px;
+  /* object-fit: contain; */
+  object-fit: cover;
+}
+
+.swiper-slide video {
+  width: 100%;
+  /* height: 560px; */
+}
