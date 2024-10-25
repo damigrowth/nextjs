@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { SINGLE_IMAGE } from "../../../fragments/global";
+import { PAGINATION, SINGLE_IMAGE } from "../../../fragments/global";
 
 // const FREELANCER_CATEGORIES = gql`
 //   query GetFreelancerCategories {
@@ -172,6 +172,72 @@ const FREELANCERS_ARCHIVE_SEO = gql`
   ${SINGLE_IMAGE}
 `;
 
+const FREELANCER_CATEGORIES_SEARCH_FILTERED = gql`
+  query FreelancerCategoriesSearchFiltered(
+    $searchTerm: String
+    $categoriesPage: Int
+    $categoriesPageSize: Int
+  ) {
+    categoriesSearch: freelancerCategories(
+      filters: {
+        and: [
+          { label: { containsi: $searchTerm } }
+          { freelancers: { id: { not: { null: true } } } }
+        ]
+      }
+      pagination: { page: $categoriesPage, pageSize: $categoriesPageSize }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          plural
+          slug
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+`;
+
+const FREELANCER_SUBCATEGORIES_SEARCH_FILTERED = gql`
+  query FreelancerSubcategoriesSearch(
+    $type: String
+    $searchTerm: String
+    $categorySlug: String
+    $subcategoriesPage: Int
+    $subcategoriesPageSize: Int
+  ) {
+    subcategoriesSearch: freelancerSubcategories(
+      filters: {
+        and: [
+          { type: { slug: { eq: $type } } }
+          { label: { containsi: $searchTerm } }
+          { category: { slug: { eq: $categorySlug } } }
+          { freelancers: { id: { not: { null: true } } } }
+        ]
+      }
+      pagination: { page: $subcategoriesPage, pageSize: $subcategoriesPageSize }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          plural
+          slug
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+`;
+
 export {
   FREELANCER_CATEGORIES,
   FREELANCER_CATEGORIES_SEARCH,
@@ -179,4 +245,6 @@ export {
   FREELANCER_SUBCATEGORIES_SEARCH,
   FREELANCER_TAXONOMIES_BY_SLUG,
   FREELANCERS_ARCHIVE_SEO,
+  FREELANCER_CATEGORIES_SEARCH_FILTERED,
+  FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
 };

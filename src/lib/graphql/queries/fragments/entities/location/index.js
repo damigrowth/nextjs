@@ -44,4 +44,15 @@ const ZIPCODE = gql`
   }
 `;
 
-export { COUNTY, AREA, AREAS, ZIPCODE };
+const COUNTIES = gql`
+  fragment Counties on ComponentLocationCoverageFiltersInput {
+    data {
+      id
+      attributes {
+        name
+      }
+    }
+  }
+`;
+
+export { COUNTY, AREA, AREAS, ZIPCODE, COUNTIES };
