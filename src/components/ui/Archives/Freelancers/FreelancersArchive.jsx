@@ -19,6 +19,7 @@ export default function FreelancersArchive({
   counties,
   searchParams,
   paramsFilters,
+  selectData,
   childPath,
 }) {
   // Remove 'cov_c_s' from searchParams
@@ -31,9 +32,7 @@ export default function FreelancersArchive({
       heading: "Κατηγορία",
       params: ["cat"],
       childPath,
-      component: (
-        <Category currCategory={taxonomies.current} categories={categories} />
-      ),
+      component: <Category selectData={selectData} />,
     },
     { heading: "Εργατοώρα", params: ["min", "max"], component: <Rate /> },
     {
@@ -49,7 +48,7 @@ export default function FreelancersArchive({
     {
       heading: "Περιοχές Εξυπηρέτησης",
       params: ["cov_o", "cov_c"],
-      component: <Coverage counties={counties} />,
+      component: <Coverage selectData={selectData} />,
     },
     { heading: "Εμπειρία σε έτη", params: ["exp"], component: <Experience /> },
     {

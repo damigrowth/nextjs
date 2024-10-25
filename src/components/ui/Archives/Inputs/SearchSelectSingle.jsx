@@ -192,34 +192,39 @@ export default function SearchSelectSingle({
 
     let newPath;
 
-    switch (root) {
-      case "pros":
-      case "companies":
-        if (!parent) {
-          newPath = `/${root}/${value}`;
-        } else if (!child) {
-          newPath = `/${root}/${parent}/${value}`;
-        } else {
-          newPath = `/${root}/${parent}/${value}`;
-        }
-        break;
-
-      case "ipiresies":
-        if (!parent) {
-          newPath = `/${root}/${value}`;
-        } else if (!child) {
-          newPath = `/${root}/${parent}/${value}`;
-        } else if (!last) {
-          newPath = `/${root}/${parent}/${child}/${value}`;
-        } else {
-          newPath = `/${root}/${parent}/${child}/${value}`;
-        }
-        break;
-
-      default:
-        newPath = `/${root}`;
-        break;
+    if (!parent) {
+      newPath = `/${root}/${value}`;
+    } else if (!child) {
+      newPath = `/${root}/${parent}/${value}`;
+    } else {
+      newPath = `/${root}/${parent}/${value}`;
     }
+    // switch (root) {
+    //   case "pros":
+    //   case "companies":
+    //     if (!parent) {
+    //       newPath = `/${root}/${value}`;
+    //     } else if (!child) {
+    //       newPath = `/${root}/${parent}/${value}`;
+    //     } else {
+    //       newPath = `/${root}/${parent}/${value}`;
+    //     }
+    //     break;
+
+    //   case "ipiresies":
+    //     if (!parent) {
+    //       newPath = `/${root}/${value}`;
+    //     } else if (!child) {
+    //       newPath = `/${root}/${parent}/${value}`;
+    //     } else {
+    //       newPath = `/${root}/${parent}/${value}`;
+    //     }
+    //     break;
+
+    //   default:
+    //     newPath = `/${root}`;
+    //     break;
+    // }
 
     const queryString = searchParams.toString();
     return `${newPath}${queryString ? `?${queryString}` : ""}`;

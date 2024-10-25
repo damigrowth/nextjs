@@ -1,8 +1,8 @@
 import React from "react";
 import SearchSelectSingle from "../../Inputs/SearchSelectSingle";
 
-export default function Category({ currCategory, categories }) {
-  const options = categories.reduce((acc, cat) => {
+export default function Category({ selectData }) {
+  const options = selectData.options[0].reduce((acc, cat) => {
     const plural = cat.attributes.plural;
     if (!acc.some((option) => option.label === plural)) {
       acc.push({ value: cat.attributes.slug, label: plural });
@@ -12,12 +12,15 @@ export default function Category({ currCategory, categories }) {
 
   return (
     <SearchSelectSingle
-      rootLabel="Όλες οι κατηγορίες"
-      defaultLabel={currCategory ? `${currCategory}` : "Όλες οι κατηγορίες"}
-      paramOptionName="cat"
-      paramSearchName="cat_s"
-      options={options}
       parentPathLink="profiles"
+      options={options}
+      rootLabel={selectData.rootLabel[0]}
+      defaultLabel={selectData.defaultLabel[0]}
+      paramOptionName={selectData.option[0]}
+      paramSearchName={selectData.search[0]}
+      paramPageName={selectData.page[0]}
+      paramPageSizeName={selectData.pageSize[0]}
+      pagination={selectData.pagination[0]}
       navigates
     />
   );
