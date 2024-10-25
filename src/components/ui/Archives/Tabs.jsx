@@ -13,6 +13,7 @@ export default function Tabs({
   plural,
   freelancerCategory,
   serviceCategory,
+  categoriesRoute,
 }) {
   const pathName = usePathname();
   const searchParams = useSearchParams();
@@ -36,7 +37,7 @@ export default function Tabs({
               <ul className="mb0 d-flex ps-0">
                 <li>
                   <Link
-                    href={generateLink(`/${parentPathLink}`)}
+                    href={`/${categoriesRoute ? "categories" : parentPathLink}`}
                     className={!category ? "active" : ""}
                   >
                     {parentPathLabel}
@@ -45,9 +46,9 @@ export default function Tabs({
                 {categories.map((cat, index) => (
                   <li key={index}>
                     <Link
-                      href={generateLink(
-                        `/${parentPathLink}/${cat.attributes.slug}`
-                      )}
+                      href={`/${
+                        categoriesRoute ? "categories" : parentPathLink
+                      }/${cat.attributes.slug}`}
                       className={
                         category === cat.attributes.slug ||
                         freelancerCategory === cat.attributes.slug ||

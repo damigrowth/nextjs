@@ -23,16 +23,14 @@ export default function TaxonomiesGrid({ taxonomies }) {
                 />
               </div>
               <div className="taxonomies-grid-info">
-                <Link
-                  href={`/ipiresies/${taxonomy.category.data.attributes.slug}/${taxonomy.slug}`}
-                >
+                <Link href={`/ipiresies/${taxonomy.slug}`}>
                   <h3 className="taxonomies-grid-title">{taxonomy.label}</h3>
                 </Link>
                 <ul className="taxonomies-grid-list">
                   {taxonomy.subdivisions.data.map((subdivision, subIndex) => (
                     <li key={subIndex} className="taxonomies-grid-list-item">
                       <Link
-                        href={`/ipiresies/${taxonomy.category.data.attributes.slug}/${taxonomy.slug}/${subdivision.attributes.slug}`}
+                        href={`/ipiresies/${taxonomy.slug}/${subdivision.attributes.slug}`}
                       >
                         {subdivision.attributes.label}
                       </Link>

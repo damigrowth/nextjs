@@ -34,7 +34,7 @@ export default function TaxonomiesSwiper({ taxonomies }) {
             {taxonomies.map((taxonomy, i) => (
               <SwiperSlide key={i}>
                 <Link
-                  href={`/ipiresies/${taxonomy.category.data.attributes.slug}/${taxonomy.subcategory.data.attributes.slug}/${taxonomy.slug}`}
+                  href={`/ipiresies/${taxonomy.subcategory.data.attributes.slug}/${taxonomy.slug}`}
                   className="taxonomies-swiper-card"
                 >
                   <span>{taxonomy.label}</span>
