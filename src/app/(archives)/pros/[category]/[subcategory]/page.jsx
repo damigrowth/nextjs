@@ -6,7 +6,7 @@ import { getData } from "@/lib/client/operations";
 import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
 import {
   FREELANCER_CATEGORIES,
-  FREELANCER_SUBCATEGORIES_SEARCH,
+  FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
   FREELANCER_TAXONOMIES_BY_SLUG,
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import { Meta } from "@/utils/Seo/Meta/Meta";
@@ -58,11 +58,14 @@ export default async function page({ params, searchParams }) {
     pay_m,
     con_t,
     cov_o,
-    cov_c,
-    cov_c_s,
-    type,
-    cat,
-    cat_s,
+    covc,
+    covc_s,
+    covc_p,
+    covc_ps,
+    subc,
+    subc_s,
+    subc_p,
+    subc_ps,
     exp,
     top,
     ver,
@@ -88,26 +91,52 @@ export default async function page({ params, searchParams }) {
     top: addFilter(top === "", true),
     verified: addFilter(ver === "", true),
     coverageOnline: addFilter(cov_o === "", true),
-    coverageCounties: addFilter(cov_c && cov_c.length > 0, toIntArray(cov_c)),
+    coverageCounty: addFilter(covc, parseInt(covc, 10)),
+    coverageCountyPage: addFilter(covc_p, parseInt(covc_p, 10)),
+    coverageCountyPageSize: addFilter(covc_ps, parseInt(covc_ps, 10)),
+    subcategoriesPage: addFilter(subc_p, parseInt(subc_p, 10)),
+    subcategoriesPageSize: addFilter(subc_ps, parseInt(subc_ps, 10)),
     page: !page || parseInt(page, 10) < 1 ? 1 : parseInt(page, 10),
     sort: sort ? sort : "publishedAt:desc",
   };
 
-  let categorySearch = cat_s ? cat_s : undefined;
-  let coverageCountySearch = cov_c_s ? cov_c_s : undefined;
+  let subcategorySearch = subc_s ? subc_s : undefined;
+  let coverageCountySearch = covc_s ? covc_s : undefined;
 
   const { subcategoriesSearch } = await getData(
-    FREELANCER_SUBCATEGORIES_SEARCH,
+    FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
     {
       type: "freelancer",
       categorySlug: category,
-      searchTerm: categorySearch,
+      searchTerm: subcategorySearch,
+      subcategoriesPage: paramsFilters.subcategoriesPage,
+      subcategoriesPageSize: paramsFilters.subcategoriesPageSize,
     }
   );
 
   const { counties } = await getData(COUNTIES_SEARCH, {
     name: coverageCountySearch,
+    coverageCountyPage: paramsFilters.coverageCountyPage,
+    coverageCountyPageSize: paramsFilters.coverageCountyPageSize,
   });
+
+  const selectData = {
+    option: ["subc", "covc"],
+    search: ["subc_s", "covc_s"],
+    page: ["subc_p", "covc_p"],
+    pageSize: ["subc_ps", "covc_ps"],
+    disabled: "cov_o",
+    options: [subcategoriesSearch?.data, counties?.data],
+    pagination: [
+      subcategoriesSearch?.meta?.pagination,
+      counties?.meta?.pagination,
+    ],
+    rootLabel: ["Όλες οι κατηγορίες", "Όλες οι περιοχές"],
+    defaultLabel: [
+      `${taxonomies.current ? taxonomies.current : "Όλες οι κατηγορίες"}`,
+      "Όλες οι περιοχές",
+    ],
+  };
 
   return (
     <>
@@ -134,6 +163,7 @@ export default async function page({ params, searchParams }) {
         counties={counties?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}
+        selectData={selectData}
         childPath
       />
     </>
