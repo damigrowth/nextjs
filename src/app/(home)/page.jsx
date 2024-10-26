@@ -23,6 +23,7 @@ export async function generateMetadata() {
     descriptionTemplate:
       "Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.",
     size: 160,
+    url: "/",
   });
 
   return meta;

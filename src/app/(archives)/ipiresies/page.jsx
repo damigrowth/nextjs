@@ -17,6 +17,7 @@ export async function generateMetadata() {
     descriptionTemplate:
       "Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας.",
     size: 150,
+    url: "/ipiresies",
   });
 
   return meta;

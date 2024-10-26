@@ -23,6 +23,7 @@ import Protected from "@/components/auth/Protected";
 export default function FreelancerProfile({
   freelancer,
   uid,
+  username,
   services,
   servicesPage,
   servicesMeta,
@@ -77,6 +78,7 @@ export default function FreelancerProfile({
   return (
     <section className="pt10 pb90 pb30-md">
       <FreelancerSchema
+        username={username}
         displayName={user?.displayName}
         location={coverage?.county?.data?.attributes?.name}
         rating={rating}

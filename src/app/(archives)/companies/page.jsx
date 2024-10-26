@@ -17,6 +17,7 @@ export async function generateMetadata() {
     descriptionTemplate:
       "Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές.",
     size: 150,
+    url: "/companies",
   });
 
   return meta;

@@ -10,8 +10,6 @@ import {
 import { Meta } from "@/utils/Seo/Meta/Meta";
 import TaxonomiesArchive from "@/components/ui/Archives/Taxonomies/TaxonomiesArchive";
 
-export const revalidate = 3600;
-
 // Static SEO
 export async function generateMetadata() {
   const { meta } = await Meta({
@@ -19,6 +17,7 @@ export async function generateMetadata() {
     descriptionTemplate:
       "Ανακαλύψτε τις κατηγορίες υπηρεσιών που χρειάζεστε απο τους επαγγελματίες μας.",
     size: 150,
+    url: "/categories",
   });
 
   return meta;

@@ -14,7 +14,7 @@ import { inspect } from "@/utils/inspect";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
-  const { subdivision } = params;
+  const { subcategory, subdivision } = params;
 
   const data = {
     type: "subdivision",
@@ -22,6 +22,7 @@ export async function generateMetadata({ params }) {
     titleTemplate: "%arcCategory% - Βρες τις καλύτερες Υπηρεσίες στη Doulitsa",
     descriptionTemplate: "%arcCategoryDesc%",
     size: 100,
+    url: `/ipiresies/${subcategory}/${subdivision}`,
   };
 
   const { meta } = await Meta(data);

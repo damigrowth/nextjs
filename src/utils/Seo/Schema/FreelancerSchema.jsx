@@ -1,8 +1,8 @@
 import React from "react";
 import JsonLd from "./JsonLd";
-import { headers } from "next/headers";
 
 export default function FreelancerSchema({
+  username,
   displayName,
   location,
   rating,
@@ -10,9 +10,6 @@ export default function FreelancerSchema({
   reviews,
   profileImage,
 }) {
-  const headersList = headers();
-  const url = headersList.get("x-current-path") || "/";
-
   const reviewsData = reviews.map((review) => ({
     "@type": "Review",
     reviewRating: {
@@ -40,7 +37,7 @@ export default function FreelancerSchema({
       reviewCount: reviews_total,
     },
     review: reviewsData,
-    url: `${process.env.LIVE_URL}${url}`,
+    url: `${process.env.LIVE_URL}/${username}`,
     image: profileImage,
     sameAs: `${process.env.LIVE_URL}`,
   };

@@ -23,6 +23,7 @@ export async function generateMetadata({ params }) {
     descriptionTemplate:
       "Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές. %arcCategoryDesc%",
     size: 200,
+    url: `/companies/${category}`,
   };
 
   const { meta } = await Meta(data);

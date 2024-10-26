@@ -10,8 +10,6 @@ import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
 import TaxonomiesArchive from "@/components/ui/Archives/Taxonomies/TaxonomiesArchive";
 
-export const revalidate = 3600;
-
 // Dynamic SEO
 export async function generateMetadata({ params }) {
   const { category } = params;
@@ -22,6 +20,7 @@ export async function generateMetadata({ params }) {
     titleTemplate: "%arcCategory% - Βρες τις καλύτερες Υπηρεσίες στη Doulitsa",
     descriptionTemplate: "%arcCategoryDesc%",
     size: 100,
+    url: `/categories/${category}`,
   };
 
   const { meta } = await Meta(data);

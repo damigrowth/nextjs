@@ -22,6 +22,7 @@ export async function generateMetadata({ params }) {
     descriptionTemplate:
       "Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές. %arcCategoryDesc%",
     size: 200,
+    url: `/pros/${category}`,
   };
 
   const { meta } = await Meta(data);

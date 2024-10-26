@@ -21,6 +21,7 @@ export async function generateMetadata({ params }) {
     titleTemplate: "%displayName% - %type% - %category%. %tagline%",
     descriptionTemplate: "%description%",
     size: 160,
+    url: `/profile/${username}`,
   };
 
   const { meta } = await Meta(data);
@@ -83,6 +84,7 @@ export default async function page({ params, searchParams }) {
         />
         <FreelancerProfile
           uid={uid}
+          username={username}
           freelancer={freelancer}
           services={services}
           servicesMeta={servicesMeta}

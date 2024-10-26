@@ -17,6 +17,7 @@ import ServiceSchema from "@/utils/Seo/Schema/ServiceSchema";
 import Protected from "@/components/auth/Protected";
 
 export default async function SingleService({
+  slug,
   serviceId,
   service,
   reviews,
@@ -68,6 +69,7 @@ export default async function SingleService({
   return (
     <section className="pt10 pb90 pb30-md bg-orange">
       <ServiceSchema
+        slug={slug}
         title={title}
         displayName={user.displayName}
         price={price}

@@ -18,6 +18,7 @@ export async function generateMetadata() {
     descriptionTemplate:
       "Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές.",
     size: 150,
+    url: "/pros",
   });
 
   return meta;

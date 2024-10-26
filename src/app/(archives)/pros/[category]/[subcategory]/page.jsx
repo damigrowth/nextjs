@@ -13,7 +13,7 @@ import { Meta } from "@/utils/Seo/Meta/Meta";
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
-  const { subcategory } = params;
+  const { category, subcategory } = params;
 
   const data = {
     type: "freelancerSubcategory",
@@ -22,6 +22,7 @@ export async function generateMetadata({ params }) {
     descriptionTemplate:
       "Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές. %arcCategoryDesc%",
     size: 200,
+    url: `/pros/${category}/${subcategory}`,
   };
 
   const { meta } = await Meta(data);

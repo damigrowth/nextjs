@@ -18,8 +18,6 @@ import { isAuthenticated } from "@/lib/auth/authenticated";
 import { getUser } from "@/lib/user/user";
 import { ApolloWrapper } from "@/lib/client/apollo-wrapper";
 
-export const revalidate = 3600;
-
 if (typeof window !== "undefined") {
   import("bootstrap");
 }
@@ -61,9 +59,7 @@ export default async function RootLayout({ children, params }) {
               />
             )}
             <div className="body_content">
-              <ApolloWrapper>
-                {children}
-                </ApolloWrapper>
+              <ApolloWrapper>{children}</ApolloWrapper>
               {(!isUnderMaintenance || authenticated) && (
                 <Footer footer={footerData} />
               )}

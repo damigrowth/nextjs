@@ -21,6 +21,7 @@ export async function generateMetadata({ params }) {
     titleTemplate: "%arcCategory% - Βρες τις καλύτερες Υπηρεσίες στη Doulitsa",
     descriptionTemplate: "%arcCategoryDesc%",
     size: 100,
+    url: `/ipiresies/${subcategory}`,
   };
 
   const { meta } = await Meta(data);

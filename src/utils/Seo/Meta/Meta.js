@@ -11,6 +11,7 @@ export async function Meta({
   titleTemplate,
   descriptionTemplate,
   size,
+  url,
 }) {
   try {
     if (type) {
@@ -31,6 +32,7 @@ export async function Meta({
         description,
         size,
         image,
+        url,
       });
 
       return { meta };
@@ -39,6 +41,7 @@ export async function Meta({
         title: titleTemplate,
         description: descriptionTemplate,
         size: 150,
+        url,
       });
 
       return { meta };

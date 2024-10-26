@@ -19,6 +19,7 @@ export async function generateMetadata({ params }) {
     titleTemplate: "%title% από %displayName%",
     descriptionTemplate: "%category% - %description%",
     size: 100,
+    url: `/s/${slug}`,
   };
 
   const { meta } = await Meta(data);
@@ -61,16 +62,17 @@ export default async function page({ params, searchParams }) {
             subcategory={service?.subcategory}
           />
           <SingleService
+            slug={slug}
             serviceId={uid}
             service={service}
             reviews={reviews}
             reviewsPage={reviewsPage}
             reviewsMeta={reviewsMeta}
           />
-          <FeaturedServices
+          {/* <FeaturedServices
             category={service?.category?.data?.attributes?.slug}
             subcategory={service?.subcategory?.data?.attributes?.slug}
-          />
+          /> */}
         </div>
       </>
     );
