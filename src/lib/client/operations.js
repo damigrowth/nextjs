@@ -77,6 +77,8 @@ export const getData = cache(async (query, variables) => {
       next: { revalidate: 60 }, // 1 minute
     });
 
+    console.log("📡 Response status:", response.status);
+
     if (!response.ok) {
       const errorData = await response.json();
       console.error("GraphQL error:", errorData.errors);
