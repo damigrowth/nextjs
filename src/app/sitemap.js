@@ -2,10 +2,13 @@ import { getData } from "@/lib/client/operations";
 import { FREELANCERS_ALL } from "@/lib/graphql/queries/main/freelancer";
 import { SERVICES_ALL } from "@/lib/graphql/queries/main/service";
 
-export default async function sitemap() {
-  // Default entries that don't depend on API data
-  const baseUrl = process.env.LIVE_URL || "https://doulitsa.gr";
+export const dynamic = "force-dynamic";
 
+export default async function sitemap() {
+  const { allServices } = await getData(SERVICES_ALL);
+  const { allFreelancers } = await getData(FREELANCERS_ALL);
+
+  // Main paths
   const mainPaths = [
     "ipiresies",
     "pros",
@@ -14,7 +17,11 @@ export default async function sitemap() {
     "not-found",
     "dashboard",
   ];
+
+  // Company subpaths
   const companyPaths = ["terms", "privacy", "contact", "about"];
+
+  // Dashboard subpaths
   const dashboardPaths = [
     "account",
     "add-services",
@@ -31,80 +38,52 @@ export default async function sitemap() {
     "statements",
   ];
 
-  // Create static URLs first
-  const staticEntries = [
+  const mainUrls = mainPaths.map((path) => ({
+    url: `${process.env.LIVE_URL}/${path}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  const companyUrls = companyPaths.map((path) => ({
+    url: `${process.env.LIVE_URL}/co/${path}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  const dashboardUrls = dashboardPaths.map((path) => ({
+    url: `${process.env.LIVE_URL}/dashboard/${path}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  const servicesUrls = allServices.data.map((item) => ({
+    url: `${process.env.LIVE_URL}/s/${item.attributes.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.5,
+  }));
+
+  const freelancersUrls = allFreelancers.data.map((item) => ({
+    url: `${process.env.LIVE_URL}/profile/${item.attributes.username}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.5,
+  }));
+
+  return [
     {
-      url: baseUrl,
+      url: `${process.env.LIVE_URL}`,
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 1,
     },
-    ...mainPaths.map((path) => ({
-      url: `${baseUrl}/${path}`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    })),
-    ...companyPaths.map((path) => ({
-      url: `${baseUrl}/co/${path}`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    })),
-    ...dashboardPaths.map((path) => ({
-      url: `${baseUrl}/dashboard/${path}`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    })),
+    ...mainUrls,
+    ...companyUrls,
+    ...dashboardUrls,
+    ...servicesUrls,
+    ...freelancersUrls,
   ];
-
-  try {
-    // Fetch dynamic data with error handling
-    const [servicesResult, freelancersResult] = await Promise.allSettled([
-      getData(SERVICES_ALL),
-      getData(FREELANCERS_ALL),
-    ]);
-
-    const dynamicEntries = [];
-
-    // Handle services data
-    if (
-      servicesResult.status === "fulfilled" &&
-      servicesResult.value?.allServices?.data
-    ) {
-      const servicesUrls = servicesResult.value.allServices.data.map(
-        (item) => ({
-          url: `${baseUrl}/s/${item.attributes.slug}`,
-          lastModified: new Date(),
-          changeFrequency: "monthly",
-          priority: 0.5,
-        })
-      );
-      dynamicEntries.push(...servicesUrls);
-    }
-
-    // Handle freelancers data
-    if (
-      freelancersResult.status === "fulfilled" &&
-      freelancersResult.value?.allFreelancers?.data
-    ) {
-      const freelancersUrls = freelancersResult.value.allFreelancers.data.map(
-        (item) => ({
-          url: `${baseUrl}/profile/${item.attributes.username}`,
-          lastModified: new Date(),
-          changeFrequency: "monthly",
-          priority: 0.5,
-        })
-      );
-      dynamicEntries.push(...freelancersUrls);
-    }
-
-    // Return combined static and dynamic entries
-    return [...staticEntries, ...dynamicEntries];
-  } catch (error) {
-    // If API calls fail, return just the static entries
-    console.error("Error generating dynamic sitemap entries:", error);
-    return staticEntries;
-  }
 }
