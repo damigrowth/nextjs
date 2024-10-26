@@ -11,6 +11,8 @@ import Tabs from "@/components/ui/Archives/Tabs";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
 
+export const revalidate = 3600;
+
 // Dynamic SEO
 export async function generateMetadata({ params }) {
   const { subcategory } = params;

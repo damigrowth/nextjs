@@ -12,6 +12,8 @@ import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
 import { inspect } from "@/utils/inspect";
 
+export const revalidate = 3600;
+
 // Dynamic SEO
 export async function generateMetadata({ params }) {
   const { subcategory, subdivision } = params;

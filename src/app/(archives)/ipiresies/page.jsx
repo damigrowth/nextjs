@@ -10,6 +10,8 @@ import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 
+export const revalidate = 3600;
+
 // Dynamic SEO
 export async function generateMetadata() {
   const { meta } = await Meta({

@@ -10,6 +10,8 @@ import {
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 
+export const revalidate = 3600;
+
 // Static SEO
 export async function generateMetadata() {
   const { meta } = await Meta({
