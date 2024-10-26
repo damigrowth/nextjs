@@ -23,16 +23,16 @@ if (typeof window !== "undefined") {
 }
 
 export default async function RootLayout({ children, params }) {
-  const { serverStatus } = await checkServerHealth();
+  // const { serverStatus } = await checkServerHealth();
 
-  if (!serverStatus)
-    return (
-      <html>
-        <body>
-          <ServerDown />
-        </body>
-      </html>
-    );
+  // if (!serverStatus)
+  //   return (
+  //     <html>
+  //       <body>
+  //         <ServerDown />
+  //       </body>
+  //     </html>
+  //   );
 
   const isUnderMaintenance = false;
 
