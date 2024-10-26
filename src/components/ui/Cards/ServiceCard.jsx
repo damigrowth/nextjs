@@ -1,10 +1,10 @@
 import UserImage from "@/components/user/UserImage";
 import Link from "next/link";
 import React from "react";
-import ServiceCardMedia from "./ServiceCardMedia";
+import ServiceCardFiles from "./ServiceCardFiles";
 import Badges from "@/components/user/Badges";
 import CardReviews from "../Reviews/CardReviews";
-import ServiceCardImage from "./ServiceCardImage";
+import ServiceCardFile from "./ServiceCardFile";
 import { getBestDimensions } from "@/utils/imageDimensions";
 
 export default function ServiceCard({ service }) {
@@ -30,21 +30,18 @@ export default function ServiceCard({ service }) {
 
   const user = freelancer?.data?.attributes?.user?.data?.attributes;
 
-  let image = null;
-  const fallbackImage = "/images/fallback/service.png";
-
-  if (media.data.length > 0) {
-    image = getBestDimensions(media.data[0].attributes.formats).url;
-  } else {
-    image = fallbackImage;
-  }
-
   return (
     <div className="data-loading-element listing-style1 list-style d-block d-xl-flex align-items-center">
       {media.data.length > 1 ? (
-        <ServiceCardMedia media={media?.data} path={`/s/${slug}`} />
+        <ServiceCardFiles
+          media={media?.data?.map((item) => item.attributes)}
+          path={`/s/${slug}`}
+        />
       ) : (
-        <ServiceCardImage image={image} path={`/s/${slug}`} />
+        <ServiceCardFile
+          file={media?.data[0]?.attributes}
+          path={`/s/${slug}`}
+        />
       )}
 
       <div className="list-content flex-grow-1 ms-1 bgc-white">

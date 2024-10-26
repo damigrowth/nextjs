@@ -61,6 +61,7 @@ export default function FeaturedFiles({ files, title, border }) {
                           alt={`gallery-image-${i}`}
                           width={imageWidth}
                           height={imageHeight}
+                          className="big-slide-image"
                         />
                       </SwiperSlide>
                     );
