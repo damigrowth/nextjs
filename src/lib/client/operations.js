@@ -47,16 +47,16 @@ export const checkServerHealth = async () => {
 export const getData = cache(async (query, variables) => {
   try {
     // Validate environment variables
-    if (!STRAPI_GRAPHQL) {
+    if (!process.env.STRAPI_GRAPHQL_URL) {
       console.error("STRAPI_GRAPHQL is not defined");
       return null;
     }
-    if (!STRAPI_TOKEN) {
+    if (!process.env.STRAPI_API_TOKEN) {
       console.error("STRAPI_TOKEN is not defined");
       return null;
     }
 
-    const url = STRAPI_GRAPHQL;
+    const url = process.env.STRAPI_GRAPHQL_URL;
     let queryString;
 
     if (typeof query === "string") {
@@ -73,14 +73,14 @@ export const getData = cache(async (query, variables) => {
     // Log request details (only in development)
     if (process.env.NODE_ENV === "development") {
       console.log("Making request to:", url);
-      console.log("Auth token present:", !!STRAPI_TOKEN);
+      console.log("Auth token present:", !!process.env.STRAPI_API_TOKEN);
     }
 
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
+        Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}`,
       },
       body: JSON.stringify({
         query: queryString,
