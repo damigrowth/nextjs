@@ -45,80 +45,49 @@ export const checkServerHealth = async () => {
 };
 
 export const getData = cache(async (query, variables) => {
+  validateEnvVars();
+
+  const url = STRAPI_GRAPHQL;
+  let queryString;
+
+  if (typeof query === "string") {
+    // If query is already a string, use it directly
+    queryString = query;
+  } else {
+    // If query is an AST object, print it
+    try {
+      queryString = print(query);
+    } catch (error) {
+      console.error("Error printing query:", error);
+      throw new Error("Invalid GraphQL query");
+    }
+  }
+
   try {
-    // Validate environment variables
-    if (!process.env.STRAPI_GRAPHQL_URL) {
-      console.error("STRAPI_GRAPHQL is not defined");
-      return null;
-    }
-    if (!process.env.STRAPI_API_TOKEN) {
-      console.error("STRAPI_TOKEN is not defined");
-      return null;
-    }
-
-    const url = process.env.STRAPI_GRAPHQL_URL;
-    let queryString;
-
-    if (typeof query === "string") {
-      queryString = query;
-    } else {
-      try {
-        queryString = print(query);
-      } catch (error) {
-        console.error("Error printing query:", error);
-        return null;
-      }
-    }
-
-    // Log request details (only in development)
-    if (process.env.NODE_ENV === "development") {
-      console.log("Making request to:", url);
-      console.log("Auth token present:", !!process.env.STRAPI_API_TOKEN);
-    }
-
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}`,
+        Authorization: `Bearer ${STRAPI_TOKEN}`,
       },
       body: JSON.stringify({
         query: queryString,
         variables,
       }),
-      next: { revalidate: 60 },
+      next: { revalidate: 60 }, // 1 minute
     });
 
-    // Handle different response statuses
-    if (response.status === 403) {
-      console.error("Authentication failed. Please check your STRAPI_TOKEN.");
-      console.log(response.json());
-      // return null;
-    }
-
     if (!response.ok) {
-      console.error(`HTTP error! status: ${response.status}`);
-      const text = await response.text();
-      console.error("Error response:", text);
-      return null;
+      const errorData = await response.json();
+      console.error("GraphQL error:", errorData.errors);
+      // throw new Error(JSON.stringify(errorData.errors));
     }
 
     const jsonResponse = await response.json();
-
-    // Check for GraphQL errors
-    if (jsonResponse.errors) {
-      console.error("GraphQL errors:", jsonResponse.errors);
-      return null;
-    }
-
     return jsonResponse.data;
   } catch (error) {
-    console.error("getData error details:", {
-      url: STRAPI_GRAPHQL,
-      error: error.message,
-      stack: error.stack,
-    });
-    return null;
+    console.error("Server error:", error);
+    throw error;
   }
 });
 
