@@ -45,23 +45,37 @@ export const checkServerHealth = async () => {
 };
 
 export const getData = cache(async (query, variables) => {
-  validateEnvVars();
-
-  const url = STRAPI_GRAPHQL;
-  let queryString;
-
-  if (typeof query === "string") {
-    queryString = query;
-  } else {
-    try {
-      queryString = print(query);
-    } catch (error) {
-      console.error("Error printing query:", error);
-      throw new Error("Invalid GraphQL query");
-    }
-  }
-
   try {
+    // Validate environment variables
+    if (!STRAPI_GRAPHQL) {
+      console.error("STRAPI_GRAPHQL is not defined");
+      return null;
+    }
+    if (!STRAPI_TOKEN) {
+      console.error("STRAPI_TOKEN is not defined");
+      return null;
+    }
+
+    const url = STRAPI_GRAPHQL;
+    let queryString;
+
+    if (typeof query === "string") {
+      queryString = query;
+    } else {
+      try {
+        queryString = print(query);
+      } catch (error) {
+        console.error("Error printing query:", error);
+        return null;
+      }
+    }
+
+    // Log request details (only in development)
+    if (process.env.NODE_ENV === "development") {
+      console.log("Making request to:", url);
+      console.log("Auth token present:", !!STRAPI_TOKEN);
+    }
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -75,45 +89,34 @@ export const getData = cache(async (query, variables) => {
       next: { revalidate: 60 },
     });
 
-    // First check if the response is OK
+    // Handle different response statuses
+    if (response.status === 403) {
+      console.error("Authentication failed. Please check your STRAPI_TOKEN.");
+      return null;
+    }
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    // Check the content type to ensure we're getting JSON
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      // Get the text response to help with debugging
+      console.error(`HTTP error! status: ${response.status}`);
       const text = await response.text();
-      console.error("Received non-JSON response:", text.substring(0, 200)); // Log first 200 chars
-      throw new Error(`Expected JSON response but got ${contentType}`);
+      console.error("Error response:", text);
+      return null;
     }
 
-    // Now we can safely parse JSON
     const jsonResponse = await response.json();
 
     // Check for GraphQL errors
     if (jsonResponse.errors) {
       console.error("GraphQL errors:", jsonResponse.errors);
-      throw new Error(JSON.stringify(jsonResponse.errors));
+      return null;
     }
 
-    // If we have data, return it
-    if (jsonResponse.data) {
-      return jsonResponse.data;
-    }
-
-    // If we have no data but no errors, that's unexpected
-    throw new Error("No data received from GraphQL endpoint");
+    return jsonResponse.data;
   } catch (error) {
-    // Log the full error for debugging
     console.error("getData error details:", {
-      url,
+      url: STRAPI_GRAPHQL,
       error: error.message,
       stack: error.stack,
     });
-
-    // Return null instead of throwing to allow graceful fallback
     return null;
   }
 });
