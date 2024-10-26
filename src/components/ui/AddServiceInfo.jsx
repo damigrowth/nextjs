@@ -1,7 +1,7 @@
 import AddServiceForm from "@/components/ui/forms/AddServiceForm";
 import DashboardNavigation from "../dashboard/header/DashboardNavigation";
 
-export default async function AddServiceInfo({ base, coverage }) {
+export default async function AddServiceInfo({ coverage }) {
   return (
     <>
       <div className="dashboard__content hover-bgc-color">
@@ -10,7 +10,7 @@ export default async function AddServiceInfo({ base, coverage }) {
             <DashboardNavigation />
           </div>
           <div className="col-lg-12">
-            <AddServiceForm base={base} coverage={coverage} />
+            <AddServiceForm coverage={coverage} />
           </div>
         </div>
       </div>

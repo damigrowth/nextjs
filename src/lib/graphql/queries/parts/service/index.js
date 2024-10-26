@@ -6,7 +6,7 @@ import {
   SUBDIVISION_ENTITY,
 } from "../../fragments/taxonomies/service";
 import { ADDONS, FAQ, PACKAGES } from "../../fragments/components/pricing";
-import { MULTIPLE_IMAGES, STATUS } from "../../fragments/global";
+import { MULTIPLE_FILES, STATUS } from "../../fragments/global";
 import { RATING } from "../../fragments/entities/rating";
 import { TAG } from "../../fragments/entities/tag";
 import { FREELANCER_BASIC } from "../../fragments/entities/freelancer";
@@ -61,7 +61,7 @@ const SERVICE_RELATIONS = gql`
       ...Faq
     }
     media {
-      ...MultipleImages
+      ...MultipleFiles
     }
     status {
       ...Status
@@ -87,7 +87,7 @@ const SERVICE_RELATIONS = gql`
   ${PACKAGES}
   ${ADDONS}
   ${FAQ}
-  ${MULTIPLE_IMAGES}
+  ${MULTIPLE_FILES}
   ${STATUS}
   ${RATING}
   ${TAG}
@@ -123,14 +123,14 @@ const SERVICE_SEO = gql`
       }
     }
     media {
-      ...MultipleImages
+      ...MultipleFiles
     }
     seo {
       metaTitle
       metaDescription
     }
   }
-  ${MULTIPLE_IMAGES}
+  ${MULTIPLE_FILES}
 `;
 
 const SERVICE_PARTIAL_MAIN = gql`
@@ -162,7 +162,7 @@ const SERVICE_PARTIAL_RELATIONS = gql`
       }
     }
     media {
-      ...MultipleImages
+      ...MultipleFiles
     }
     freelancer {
       data {
@@ -175,7 +175,7 @@ const SERVICE_PARTIAL_RELATIONS = gql`
   }
   ${CATEGORY}
   ${SUBCATEGORY_ENTITY}
-  ${MULTIPLE_IMAGES}
+  ${MULTIPLE_FILES}
   ${FREELANCER_BASIC}
 `;
 
@@ -217,11 +217,11 @@ const FEATURED_SERVICE_RELATIONS = gql`
       }
     }
     media {
-      ...MultipleImages
+      ...MultipleFiles
     }
   }
   ${CATEGORY}
-  ${MULTIPLE_IMAGES}
+  ${MULTIPLE_FILES}
 `;
 
 const FEATURED_SERVICE = gql`

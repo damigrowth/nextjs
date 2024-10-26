@@ -11,10 +11,10 @@ import SidebarModal from "../SidebarModal";
 
 export default function ServicesArchive({
   taxonomies,
-  categories,
   searchParams,
   paramsFilters,
   childPath,
+  selectData,
 }) {
   // Remove 'cat_s' from searchParams
   const filteredSearchParams = Object.fromEntries(
@@ -26,9 +26,7 @@ export default function ServicesArchive({
       heading: "Κατηγορία",
       params: ["cat"],
       childPath,
-      component: (
-        <Category currCategory={taxonomies.current} categories={categories} />
-      ),
+      component: <Category selectData={selectData} />,
     },
     { heading: "Τιμή", params: ["min", "max"], component: <Price /> },
     { heading: "Χρόνος παράδοσης", params: ["time"], component: <Time /> },

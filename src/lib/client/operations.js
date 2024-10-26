@@ -80,7 +80,7 @@ export const getData = cache(async (query, variables) => {
     if (!response.ok) {
       const errorData = await response.json();
       console.error("GraphQL error:", errorData.errors);
-      throw new Error(JSON.stringify(errorData.errors));
+      // throw new Error(JSON.stringify(errorData.errors));
     }
 
     const jsonResponse = await response.json();

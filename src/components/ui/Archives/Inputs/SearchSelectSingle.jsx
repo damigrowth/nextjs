@@ -1,13 +1,18 @@
 "use client";
 
-import React, { useEffect, useOptimistic, useTransition } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useOptimistic,
+  useTransition,
+  useState,
+} from "react";
 import {
   useParams,
   usePathname,
   useRouter,
   useSearchParams,
 } from "next/navigation";
-import BorderSpinner from "../../Spinners/BorderSpinner";
 import Link from "next/link";
 import { getPathname } from "@/utils/paths";
 import { RotatingLines } from "react-loader-spinner";
@@ -17,16 +22,19 @@ export default function SearchSelectSingle({
   defaultLabel,
   paramOptionName,
   paramSearchName,
+  paramPageName,
+  paramPageSizeName,
   paramDisabledName,
   options,
   navigates,
+  onSearch,
+  pagination,
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
   const searchParams = useSearchParams();
 
-  // Route segments
   const root = getPathname(pathname, 0);
   const parent = getPathname(pathname, 1);
   const child = getPathname(pathname, 2);
@@ -35,20 +43,18 @@ export default function SearchSelectSingle({
   const rootOption = { value: "", label: rootLabel };
   const defaultOption = { value: "default", label: defaultLabel };
 
-  // Include rootOption and defaultOption in allOptions, but only rootOption in filterableOptions
   const allOptions = [rootOption, defaultOption, ...options];
   const filterableOptions = [rootOption, ...options];
 
   const getInitialSearch = () => searchParams.get(paramSearchName) || "";
   const [search, setSearch] = useOptimistic(getInitialSearch());
 
-  // Initial Option
   const getInitialSelectedOption = () => {
     const searchParamValue = searchParams.get(paramOptionName);
 
     if (searchParamValue) {
       return (
-        allOptions.find((opt) => opt.value === child || opt.value === last) ||
+        allOptions.find((opt) => opt.value === searchParamValue) ||
         defaultOption
       );
     }
@@ -68,24 +74,15 @@ export default function SearchSelectSingle({
     getInitialSelectedOption()
   );
 
-  const getInitialSelectedLink = () => {
-    if (last) {
-      return allOptions.find((opt) => opt.value === last) || defaultOption;
-    }
-
-    if (child) {
-      return allOptions.find((opt) => opt.value === child) || defaultOption;
-    }
-
-    return defaultOption;
-  };
-
   const [selectedLink, setSelectedLink] = useOptimistic(
-    getInitialSelectedLink()
+    getInitialSelectedOption()
   );
 
   const [isPending, startTransition] = useTransition();
   const [isSearchPending, startSearchTransition] = useTransition();
+  const [isLoadMorePending, startLoadMoreTransition] = useTransition();
+
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     startTransition(() => {
@@ -105,7 +102,7 @@ export default function SearchSelectSingle({
         params.set(paramOptionName, data.value);
         params.delete(paramSearchName);
       }
-      params.set("page", 1);
+      params.set(paramPageName, "1");
 
       router.push(pathname + "?" + params.toString(), { scroll: false });
     });
@@ -116,9 +113,52 @@ export default function SearchSelectSingle({
       setSearch(text);
       const params = new URLSearchParams(searchParams.toString());
       params.set(paramSearchName, text);
-      params.set("page", 1);
+      params.set(paramPageName, "1");
 
-      router.replace(pathname + "?" + params.toString(), { scroll: false });
+      if (onSearch) {
+        onSearch(
+          text,
+          1,
+          parseInt(searchParams.get(paramPageSizeName) || "10")
+        );
+      } else {
+        router.replace(pathname + "?" + params.toString(), { scroll: false });
+      }
+    });
+  };
+
+  const handleScroll = () => {
+    if (dropdownRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = dropdownRef.current;
+      if (
+        scrollTop + clientHeight >= scrollHeight - 5 &&
+        !isSearchPending &&
+        !isLoadMorePending &&
+        pagination &&
+        pagination.page * pagination.pageSize < pagination.total
+      ) {
+        loadMore();
+      }
+    }
+  };
+
+  const loadMore = () => {
+    startLoadMoreTransition(() => {
+      const nextPage = (pagination?.page || 0) + 1;
+      const currentPageSize = parseInt(
+        searchParams.get(paramPageSizeName) || "10"
+      );
+      const newPageSize = Math.min(currentPageSize + 10, pagination.total);
+
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(paramPageName, "1");
+      params.set(paramPageSizeName, newPageSize.toString());
+
+      if (onSearch) {
+        onSearch(search, 1, newPageSize);
+      } else {
+        router.push(pathname + "?" + params.toString(), { scroll: false });
+      }
     });
   };
 
@@ -132,7 +172,7 @@ export default function SearchSelectSingle({
       key={i}
       name={`select-${paramOptionName}-${i}`}
       className={`dropdown-item ${
-        selectedOption?.label === item?.label ? "selected active" : ""
+        selectedOption?.value === item?.value ? "selected active" : ""
       }`}
       onClick={() => {
         selectHandler(item);
@@ -144,52 +184,47 @@ export default function SearchSelectSingle({
       </a>
     </li>
   ));
+
   const generateLink = (value) => {
     if (value === "" || value === "default") {
-      // If value is empty or default, return to the root
       return `/${root}`;
     }
 
     let newPath;
 
-    switch (root) {
-      case "pros":
-      case "companies":
-        // Both "pros" and "companies" have fewer segments (parent, child)
-        if (!parent) {
-          // If no parent, use root and value as parent
-          newPath = `/${root}/${value}`;
-        } else if (!child) {
-          // If no child, use root, parent, and value as child
-          newPath = `/${root}/${parent}/${value}`;
-        } else {
-          // If child exists, replace child with value (no deeper nesting)
-          newPath = `/${root}/${parent}/${value}`;
-        }
-        break;
-
-      case "ipiresies":
-        // "ipiresies" allows deeper nesting with more segments (parent, child, last)
-        if (!parent) {
-          // If no parent, use root and value as parent
-          newPath = `/${root}/${value}`;
-        } else if (!child) {
-          // If no child, use root, parent, and value as child
-          newPath = `/${root}/${parent}/${value}`;
-        } else if (!last) {
-          // If no last, use root, parent, child, and value as last
-          newPath = `/${root}/${parent}/${child}/${value}`;
-        } else {
-          // If all segments are present, replace the last with value
-          newPath = `/${root}/${parent}/${child}/${value}`;
-        }
-        break;
-
-      default:
-        // Handle cases where root doesn't match "pros", "companies", or "ipiresies"
-        newPath = `/${root}`;
-        break;
+    if (!parent) {
+      newPath = `/${root}/${value}`;
+    } else if (!child) {
+      newPath = `/${root}/${parent}/${value}`;
+    } else {
+      newPath = `/${root}/${parent}/${value}`;
     }
+    // switch (root) {
+    //   case "pros":
+    //   case "companies":
+    //     if (!parent) {
+    //       newPath = `/${root}/${value}`;
+    //     } else if (!child) {
+    //       newPath = `/${root}/${parent}/${value}`;
+    //     } else {
+    //       newPath = `/${root}/${parent}/${value}`;
+    //     }
+    //     break;
+
+    //   case "ipiresies":
+    //     if (!parent) {
+    //       newPath = `/${root}/${value}`;
+    //     } else if (!child) {
+    //       newPath = `/${root}/${parent}/${value}`;
+    //     } else {
+    //       newPath = `/${root}/${parent}/${value}`;
+    //     }
+    //     break;
+
+    //   default:
+    //     newPath = `/${root}`;
+    //     break;
+    // }
 
     const queryString = searchParams.toString();
     return `${newPath}${queryString ? `?${queryString}` : ""}`;
@@ -219,7 +254,6 @@ export default function SearchSelectSingle({
 
   return (
     <div
-      // data-pending={isPending ? "" : undefined}
       search-pending={isSearchPending ? "" : undefined}
       className="card-body card-body px-0 pt-0"
     >
@@ -252,9 +286,9 @@ export default function SearchSelectSingle({
               <div className="inner show position-relative">
                 <div className="search-content-spinner">
                   <RotatingLines
-                    visible={true}
-                    height="30"
-                    width="30"
+                    visible={isSearchPending}
+                    height="25"
+                    width="25"
                     color="grey"
                     strokeWidth="4"
                     animationDuration="0.65"
@@ -265,12 +299,14 @@ export default function SearchSelectSingle({
                   />
                 </div>
                 <ul
+                  ref={dropdownRef}
                   className="dropdown-menu inner show search-loading-element"
                   style={{
                     overflowY: "auto",
                     maxHeight: "250px",
                     minHeight: "auto",
                   }}
+                  onScroll={handleScroll}
                 >
                   {navigates ? (
                     listLinks.length !== 0 ? (
@@ -287,6 +323,22 @@ export default function SearchSelectSingle({
                   ) : (
                     <li className="no-results">
                       {isSearchPending ? "" : `Κανένα αποτέλεσμα για ${search}`}
+                    </li>
+                  )}
+                  {isLoadMorePending && (
+                    <li className="text-center">
+                      <RotatingLines
+                        visible={true}
+                        height="25"
+                        width="25"
+                        color="grey"
+                        strokeWidth="4"
+                        animationDuration="0.65"
+                        ariaLabel="rotating-lines-loading"
+                        wrapperStyle={{}}
+                        wrapperClass=""
+                        className="loading-more-spinner"
+                      />
                     </li>
                   )}
                 </ul>

@@ -1,8 +1,6 @@
 import DashboardInfo from "@/components/dashboard/section/DashboardInfo";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import MobileNavigation2 from "@/components/header/MobileNavigation2";
-import { cookies } from "next/headers";
-import { getUser } from "@/lib/user/user";
 
 export const metadata = {
   title: "Doulitsa - Freelance Marketplace React/Next Js Template | Dashboard",

@@ -8,6 +8,7 @@ export default function Breadcrumb({
   subcategory,
   subdivision,
   plural,
+  categoriesRoute,
 }) {
   return (
     <section className="breadcumb-section">
@@ -19,7 +20,11 @@ export default function Breadcrumb({
                 <Link href="/">Αρχική</Link>
                 <Link href={`/${parentPathLink}`}>{parentPathLabel}</Link>
                 {category && (
-                  <Link href={`/${parentPathLink}/${category.slug}`}>
+                  <Link
+                    href={`/${
+                      categoriesRoute ? "categories" : parentPathLink
+                    }/${category.slug}`}
+                  >
                     {plural ? category.plural : category.label}
                   </Link>
                 )}
@@ -27,7 +32,11 @@ export default function Breadcrumb({
                   <>
                     {subcategory && (
                       <Link
-                        href={`/${parentPathLink}/${category.slug}/${subcategory.slug}`}
+                        href={
+                          categoriesRoute
+                            ? `/${parentPathLink}/${subcategory.slug}`
+                            : `/${parentPathLink}/${category.slug}/${subcategory.slug}`
+                        }
                       >
                         {plural ? subcategory.plural : subcategory.label}
                       </Link>
@@ -37,7 +46,11 @@ export default function Breadcrumb({
                   <>
                     {subcategory && (
                       <Link
-                        href={`/${parentPathLink}/${category.slug}/${subcategory.slug}`}
+                        href={
+                          categoriesRoute
+                            ? `/${parentPathLink}/${subcategory.slug}`
+                            : `/${parentPathLink}/${category.slug}/${subcategory.slug}`
+                        }
                       >
                         {plural ? subcategory.plural : subcategory.label}
                       </Link>

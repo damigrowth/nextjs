@@ -88,7 +88,7 @@ const FREELANCERS_ARCHIVE = gql`
     $paymentMethods: [ID]
     $contactTypes: [ID]
     $coverageOnline: Boolean
-    $coverageCounties: [ID]
+    $coverageCounty: ID
     $type: String
     $cat: String
     $sub: String
@@ -106,7 +106,10 @@ const FREELANCERS_ARCHIVE = gql`
         contactTypes: { id: { in: $contactTypes } }
         coverage: {
           online: { eq: $coverageOnline }
-          counties: { id: { in: $coverageCounties } }
+          or: [
+            { county: { id: { eq: $coverageCounty } } }
+            { areas: { county: { id: { eq: $coverageCounty } } } }
+          ]
         }
         category: { slug: { eq: $cat } }
         subcategory: { slug: { eq: $sub } }

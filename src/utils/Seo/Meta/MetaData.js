@@ -3,10 +3,7 @@
 import { truncateText } from "@/utils/truncateText";
 import { headers } from "next/headers";
 
-export async function MetaData({ title, description, size, image }) {
-  const headersList = headers();
-  const url = headersList.get("x-current-path") || "/";
-
+export async function MetaData({ title, description, size, image, url }) {
   const truncatedDescription = truncateText(description, size);
   const fallbackDescription =
     "Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.";

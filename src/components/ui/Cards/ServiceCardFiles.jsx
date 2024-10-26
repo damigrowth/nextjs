@@ -10,7 +10,9 @@ import { Navigation, Pagination } from "swiper";
 import Image from "next/image";
 import { getBestDimensions } from "@/utils/imageDimensions";
 
-export default function ServiceCardMedia({ media, path }) {
+export default function ServiceCardFiles({ media, path }) {
+  const fallbackImage = "/images/fallback/service.png";
+
   return (
     <Link href={path}>
       <div className="list-thumb flex-shrink-0 height">
@@ -28,15 +30,21 @@ export default function ServiceCardMedia({ media, path }) {
               clickable: true,
             }}
           >
-            {media.map((item, index) => (
+            {media.map(({ formats, url }, index) => (
               <SwiperSlide key={index}>
-                <Image
-                  height={245}
-                  width={329}
-                  className="w-100 h-100 object-fit-cover"
-                  src={getBestDimensions(item.attributes.formats).url}
-                  alt="thumbnail"
-                />
+                {formats ? (
+                  <Image
+                    height={245}
+                    width={329}
+                    className="small-slide-image"
+                    src={getBestDimensions(formats).url || fallbackImage}
+                    alt="service-thumbnail"
+                  />
+                ) : (
+                  <video controls preload="none">
+                    <source src={url} type="video/mp4" />.
+                  </video>
+                )}
               </SwiperSlide>
             ))}
             <div className="swiper__parent">

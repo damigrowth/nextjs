@@ -13,9 +13,9 @@ export default function TaxonomiesSwiper({ taxonomies }) {
   }, []);
 
   return (
-    <section>
+    <section className="pb30 pt25">
       <div className="container taxonomies-swiper">
-        <h2 className="mb40">Πιο δημοφιλείς εργασίες</h2>
+        <h2 className="mb20">Πιο δημοφιλείς εργασίες</h2>
         {swiperLoaded && (
           <Swiper
             spaceBetween={15}
@@ -31,17 +31,18 @@ export default function TaxonomiesSwiper({ taxonomies }) {
               },
             }}
           >
-            {taxonomies.map((taxonomy, i) => (
-              <SwiperSlide key={i}>
-                <Link
-                  href={`/ipiresies/${taxonomy.category.data.attributes.slug}/${taxonomy.subcategory.data.attributes.slug}/${taxonomy.slug}`}
-                  className="taxonomies-swiper-card"
-                >
-                  <span>{taxonomy.label}</span>
-                  <span className="fas fa-angle-right"></span>
-                </Link>
-              </SwiperSlide>
-            ))}
+            {taxonomies &&
+              taxonomies.map((taxonomy, i) => (
+                <SwiperSlide key={i}>
+                  <Link
+                    href={`/ipiresies/${taxonomy.subcategory.data.attributes.slug}/${taxonomy.slug}`}
+                    className="taxonomies-swiper-card"
+                  >
+                    <span>{taxonomy.label}</span>
+                    <span className="fas fa-angle-right"></span>
+                  </Link>
+                </SwiperSlide>
+              ))}
           </Swiper>
         )}
       </div>

@@ -11,12 +11,14 @@ const SINGLE_IMAGE = gql`
   }
 `;
 
-const MULTIPLE_IMAGES = gql`
-  fragment MultipleImages on UploadFileRelationResponseCollection {
+const MULTIPLE_FILES = gql`
+  fragment MultipleFiles on UploadFileRelationResponseCollection {
     data {
       id
       attributes {
+        name
         formats
+        url
       }
     }
   }
@@ -55,4 +57,4 @@ const STATUS = gql`
   }
 `;
 
-export { SINGLE_IMAGE, MULTIPLE_IMAGES, PAGINATION, TYPE, STATUS };
+export { SINGLE_IMAGE, MULTIPLE_FILES, PAGINATION, TYPE, STATUS };

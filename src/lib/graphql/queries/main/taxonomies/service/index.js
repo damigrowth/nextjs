@@ -71,26 +71,7 @@ const SUBCATEGORIES = gql`
 `;
 
 const TAXONOMIES_BY_SLUG = gql`
-  query TaxonomiesBySlug(
-    $category: String
-    $subcategory: String
-    $subdivision: String
-  ) {
-    categoryBySlug: categories(
-      filters: { slug: { eq: $category } }
-      sort: "label:asc"
-    ) {
-      data {
-        attributes {
-          label
-          slug
-          description
-          image {
-            ...SingleImage
-          }
-        }
-      }
-    }
+  query TaxonomiesBySlug($subcategory: String, $subdivision: String) {
     subcategoryBySlug: subcategories(
       filters: { slug: { eq: $subcategory } }
       sort: "label:asc"
@@ -102,6 +83,14 @@ const TAXONOMIES_BY_SLUG = gql`
           description
           image {
             ...SingleImage
+          }
+          category {
+            data {
+              attributes {
+                label
+                slug
+              }
+            }
           }
         }
       }
@@ -117,6 +106,14 @@ const TAXONOMIES_BY_SLUG = gql`
           description
           image {
             ...SingleImage
+          }
+          category {
+            data {
+              attributes {
+                label
+                slug
+              }
+            }
           }
         }
       }
@@ -373,16 +370,17 @@ const SUBDIVISIONS_SEARCH = gql`
 const SUBCATEGORIES_SEARCH_FILTERED = gql`
   query SubcategoriesSearchFiltered(
     $searchTerm: String
-    $categorySlug: String
+    $subcategoryPage: Int
+    $subcategoryPageSize: Int
   ) {
     subcategoriesSearch: subcategories(
       filters: {
         and: [
           { label: { containsi: $searchTerm } }
-          { category: { slug: { eq: $categorySlug } } }
           { services: { id: { not: { null: true } } } }
         ]
       }
+      pagination: { page: $subcategoryPage, pageSize: $subcategoryPageSize }
       sort: "label:asc"
     ) {
       data {
@@ -391,13 +389,20 @@ const SUBCATEGORIES_SEARCH_FILTERED = gql`
           slug
         }
       }
+      meta {
+        ...Pagination
+      }
     }
   }
+  ${PAGINATION}
 `;
+
 const SUBDIVISIONS_SEARCH_FILTERED = gql`
   query SubdivisionsSearchFiltered(
     $searchTerm: String
     $subcategorySlug: String
+    $subdivisionPage: Int
+    $subdivisionPageSize: Int
   ) {
     subdivisionsSearch: subdivisions(
       filters: {
@@ -407,6 +412,7 @@ const SUBDIVISIONS_SEARCH_FILTERED = gql`
           { services: { id: { not: { null: true } } } }
         ]
       }
+      pagination: { page: $subdivisionPage, pageSize: $subdivisionPageSize }
       sort: "label:asc"
     ) {
       data {
@@ -415,8 +421,12 @@ const SUBDIVISIONS_SEARCH_FILTERED = gql`
           slug
         }
       }
+      meta {
+        ...Pagination
+      }
     }
   }
+  ${PAGINATION}
 `;
 
 export {

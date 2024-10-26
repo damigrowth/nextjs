@@ -11,7 +11,7 @@ export default function Banner({ heading, description, image, withVideo }) {
   return (
     <>
       <section className="breadcumb-section pt-0">
-        <div className="cta-service-v1 cta-banner mx-auto maxw1700 pt120 pb120 bdrs16 position-relative overflow-hidden d-flex align-items-center mx20-lg px30-lg bg-white">
+        <div className="cta-service-v1 cta-banner archives-banner mx-auto bdrs16 position-relative overflow-hidden d-flex align-items-center mx20-lg px30-lg bg-white">
           <Image
             height={226}
             width={198}

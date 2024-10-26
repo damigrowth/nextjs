@@ -1,16 +1,32 @@
 import { gql } from "@apollo/client";
+import { PAGINATION } from "../../fragments/global";
 
 const COUNTIES_SEARCH = gql`
-  query CountiesSearch($name: String) {
-    counties(filters: { name: { containsi: $name } }, sort: "name:asc") {
+  query CountiesSearch(
+    $name: String
+    $coverageCountyPage: Int
+    $coverageCountyPageSize: Int
+  ) {
+    counties(
+      filters: { name: { containsi: $name } }
+      sort: "name:asc"
+      pagination: {
+        page: $coverageCountyPage
+        pageSize: $coverageCountyPageSize
+      }
+    ) {
       data {
         id
         attributes {
           name
         }
       }
+      meta {
+        ...Pagination
+      }
     }
   }
+  ${PAGINATION}
 `;
 
 const AREAS_SEARCH = gql`

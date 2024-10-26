@@ -12,9 +12,13 @@ import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
 import { inspect } from "@/utils/inspect";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+export const dynamicParams = true;
+
 // Dynamic SEO
 export async function generateMetadata({ params }) {
-  const { subdivision } = params;
+  const { subcategory, subdivision } = params;
 
   const data = {
     type: "subdivision",
@@ -22,6 +26,7 @@ export async function generateMetadata({ params }) {
     titleTemplate: "%arcCategory% - Βρες τις καλύτερες Υπηρεσίες στη Doulitsa",
     descriptionTemplate: "%arcCategoryDesc%",
     size: 100,
+    url: `/ipiresies/${subcategory}/${subdivision}`,
   };
 
   const { meta } = await Meta(data);
@@ -30,18 +35,20 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function page({ params, searchParams }) {
-  const { category, subcategory, subdivision } = params;
+  const { subcategory, subdivision } = params;
 
   const { categories } = await getData(CATEGORIES);
 
-  const { categoryBySlug, subcategoryBySlug, subdivisionBySlug } =
-    await getData(TAXONOMIES_BY_SLUG, {
-      category,
+  const { subcategoryBySlug, subdivisionBySlug } = await getData(
+    TAXONOMIES_BY_SLUG,
+    {
       subcategory,
       subdivision,
-    });
+    }
+  );
 
-  const currCategory = categoryBySlug?.data[0]?.attributes;
+  const currCategory =
+    subdivisionBySlug?.data[0]?.attributes?.category?.data?.attributes;
   const currSubcategory = subcategoryBySlug?.data[0]?.attributes;
   const currSubdivision = subdivisionBySlug?.data[0]?.attributes;
 
@@ -52,7 +59,19 @@ export default async function page({ params, searchParams }) {
     subdivision: currSubdivision,
   };
 
-  const { search, min, max, time, cat, cat_s, ver, page, sort } = searchParams;
+  const {
+    search,
+    min,
+    max,
+    time,
+    cat,
+    cat_s,
+    subd_p,
+    subd_ps,
+    ver,
+    page,
+    sort,
+  } = searchParams;
 
   const addFilter = (condition, value) => (condition ? value : undefined);
 
@@ -62,6 +81,8 @@ export default async function page({ params, searchParams }) {
     max: addFilter(max, parseInt(max, 10)),
     time: addFilter(time, parseInt(time, 10)),
     cat: subdivision,
+    subdivisionPage: addFilter(subd_p, parseInt(subd_p, 10)),
+    subdivisionPageSize: addFilter(subd_ps, parseInt(subd_ps, 10)),
     verified: addFilter(ver === "", true),
     page: !page || parseInt(page, 10) < 1 ? 1 : parseInt(page, 10),
     sort: sort ? sort : "publishedAt:desc",
@@ -72,7 +93,22 @@ export default async function page({ params, searchParams }) {
   const { subdivisionsSearch } = await getData(SUBDIVISIONS_SEARCH_FILTERED, {
     subcategorySlug: subcategory,
     searchTerm: categorySearch,
+    subdivisionPage: paramsFilters.subdivisionPage,
+    subdivisionPageSize: paramsFilters.subdivisionPageSize,
   });
+
+  const selectData = {
+    option: "cat",
+    search: "cat_s",
+    page: "subd_p",
+    pageSize: "subd_ps",
+    options: subdivisionsSearch?.data,
+    pagination: subdivisionsSearch?.meta?.pagination,
+    rootLabel: "Όλες οι κατηγορίες",
+    defaultLabel: `${
+      taxonomies.current ? taxonomies.current : "Όλες οι κατηγορίες"
+    }`,
+  };
 
   return (
     <>
@@ -80,6 +116,7 @@ export default async function page({ params, searchParams }) {
         parentPathLabel="Όλες οι κατηγορίες"
         parentPathLink="ipiresies"
         categories={categories?.data}
+        categoriesRoute={true}
       />
       <Breadcrumb
         parentPathLabel="Υπηρεσίες"
@@ -87,6 +124,7 @@ export default async function page({ params, searchParams }) {
         category={currCategory}
         subcategory={currSubcategory}
         subdivision={currSubdivision}
+        categoriesRoute={true}
       />
       <Banner
         heading={currSubdivision.label}
@@ -98,6 +136,7 @@ export default async function page({ params, searchParams }) {
         categories={subdivisionsSearch?.data}
         searchParams={searchParams}
         paramsFilters={paramsFilters}
+        selectData={selectData}
         childPath
       />
     </>

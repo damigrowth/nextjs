@@ -8,7 +8,6 @@ export default function MegaMenuPillar({ subcategory }) {
         className="h6 p0 mb10 fz15 fw600"
         href={`/ipiresies/${subcategory.slug}`}
         prefetch={false}
-        scroll={false}
       >
         {subcategory.label}
       </Link>
@@ -18,7 +17,6 @@ export default function MegaMenuPillar({ subcategory }) {
             <Link
               href={`/ipiresies/${subcategory.slug}/${subdivision.slug}`}
               prefetch={false}
-              scroll={false}
             >
               {subdivision.label}
             </Link>

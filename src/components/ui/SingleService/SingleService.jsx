@@ -9,14 +9,15 @@ import OrderPackages from "./OrderPackages";
 import OrderFixed from "./OrderFixed";
 import ContactDetails from "./ContactDetails";
 import StickySidebar from "@/components/ui/sticky/StickySidebar";
-import Gallery from "../Gallery/Gallery";
+import FeaturedFiles from "./FeaturedFiles";
 import Reviews from "../Reviews/Reviews";
 import Terms from "./Terms";
-import FeaturedImage from "./FeaturedImage";
+import FeaturedFile from "./FeaturedFile";
 import ServiceSchema from "@/utils/Seo/Schema/ServiceSchema";
 import Protected from "@/components/auth/Protected";
 
 export default async function SingleService({
+  slug,
   serviceId,
   service,
   reviews,
@@ -68,6 +69,7 @@ export default async function SingleService({
   return (
     <section className="pt10 pb90 pb30-md bg-orange">
       <ServiceSchema
+        slug={slug}
         title={title}
         displayName={user.displayName}
         price={price}
@@ -114,9 +116,10 @@ export default async function SingleService({
                 {media.data.length > 0 && (
                   <>
                     {media.data.length > 1 ? (
-                      <Gallery images={media.data} />
+                      <FeaturedFiles files={media.data} />
                     ) : (
-                      <FeaturedImage
+                      <FeaturedFile
+                        file={null}
                         formats={media?.data[0]?.attributes?.formats}
                       />
                     )}

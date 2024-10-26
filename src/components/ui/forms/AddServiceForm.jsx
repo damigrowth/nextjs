@@ -1,8 +1,6 @@
 "use client";
 
-import React from "react";
-import { useFormState, useFormStatus } from "react-dom";
-
+import React, { useActionState } from "react";
 import ServiceGallery from "../AddService/ServiceGallery";
 import { createService } from "@/lib/service/create";
 import ServiceFaq from "../ServiceFaq/ServiceFaq";
@@ -13,12 +11,14 @@ import ServicePackages from "../AddService/ServicePackages";
 import ServiceAddons from "../AddService/ServiceAddons";
 import ServiceType from "../AddService/ServiceType";
 
-function AddServiceButton() {
-  const { pending } = useFormStatus();
+function AddServiceButton({ isPending }) {
   return (
-    <button disabled={pending} className="ud-btn btn-dark default-box-shadow2">
-      {pending ? "Δημοσίευση Υπηρεσίας..." : "Δημοσίευση Υπηρεσίας"}
-      {pending ? (
+    <button
+      disabled={isPending}
+      className="ud-btn btn-dark default-box-shadow2"
+    >
+      {isPending ? "Δημοσίευση Υπηρεσίας..." : "Δημοσίευση Υπηρεσίας"}
+      {isPending ? (
         <div className="spinner-border spinner-border-sm ml10" role="status">
           <span className="sr-only"></span>
         </div>
@@ -29,7 +29,7 @@ function AddServiceButton() {
   );
 }
 
-export default function AddServiceForm({ base, coverage }) {
+export default function AddServiceForm({ coverage }) {
   const { service, saved, optional, step, steps, setStep, info, media } =
     useCreateServiceStore();
 
@@ -39,7 +39,10 @@ export default function AddServiceForm({ base, coverage }) {
     message: null,
   };
 
-  const [formState, formAction] = useFormState(createService, initialState);
+  const [formState, formAction, isPending] = useActionState(
+    createService,
+    initialState
+  );
 
   const serviceId = formState?.data?.id;
   const serviceTitle = formState?.data?.attributes?.title;
@@ -78,11 +81,11 @@ export default function AddServiceForm({ base, coverage }) {
           <ServiceSuccess id={serviceId} title={serviceTitle} />
         ) : (
           <>
-            {step === "type" && <ServiceType base={base} coverage={coverage} />}
+            {step === "type" && <ServiceType coverage={coverage} />}
             {step === "packages" && <ServicePackages />}
             {step === "addons" && <ServiceAddons />}
             {step === "faq" && <ServiceFaq />}
-            {step === "gallery" && <ServiceGallery />}
+            {step === "gallery" && <ServiceGallery isPending={isPending} />}
             <div className="row pt10 ">
               <div className="col-sm-6 text-start">
                 {steps[step].previous ? (
@@ -90,6 +93,7 @@ export default function AddServiceForm({ base, coverage }) {
                     type="button"
                     onClick={() => setStep(steps[step].previous)}
                     className="ud-btn btn-white bdrs4 d-flex align-items-center gap-2 default-box-shadow p3"
+                    disabled={isPending}
                   >
                     <span className="d-flex align-items-center flaticon-left fz20" />
                     <span>Πίσω</span>
@@ -98,7 +102,7 @@ export default function AddServiceForm({ base, coverage }) {
               </div>
               {saved.gallery === true ? (
                 <div className="d-flex justify-content-center">
-                  <AddServiceButton />
+                  <AddServiceButton isPending={isPending} />
                 </div>
               ) : (
                 <div className="col-sm-6 text-end d-flex justify-content-end align-items-center">

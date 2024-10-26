@@ -1,8 +1,8 @@
 import React from "react";
 import JsonLd from "./JsonLd";
-import { headers } from "next/headers";
 
 export default function ServiceSchema({
+  slug,
   title,
   displayName,
   price,
@@ -11,9 +11,6 @@ export default function ServiceSchema({
   reviews,
   faq,
 }) {
-  const headersList = headers();
-  const url = headersList.get("x-current-path") || "/";
-
   const reviewsData = reviews.map((review) => ({
     "@type": "Review",
     reviewRating: {
@@ -53,7 +50,7 @@ export default function ServiceSchema({
       "@type": "Offer",
       priceCurrency: "EUR",
       price: price,
-      url: `${process.env.LIVE_URL}/${url}`,
+      url: `${process.env.LIVE_URL}/${slug}`,
       availability: "http://schema.org/InStock",
     },
     aggregateRating: {

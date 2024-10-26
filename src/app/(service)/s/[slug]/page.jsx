@@ -9,6 +9,10 @@ import { Meta } from "@/utils/Seo/Meta/Meta";
 import { CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/service";
 import FeaturedServices from "@/components/ui/SingleService/Featured";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+export const dynamicParams = true;
+
 // Dynamic SEO
 export async function generateMetadata({ params }) {
   const { slug } = params;
@@ -19,6 +23,7 @@ export async function generateMetadata({ params }) {
     titleTemplate: "%title% από %displayName%",
     descriptionTemplate: "%category% - %description%",
     size: 100,
+    url: `/s/${slug}`,
   };
 
   const { meta } = await Meta(data);
@@ -45,7 +50,7 @@ export default async function page({ params, searchParams }) {
     );
 
     const { categories } = await getData(CATEGORIES);
-
+    // TODO: Featured Services multi media
     return (
       <>
         <Tabs
@@ -61,16 +66,17 @@ export default async function page({ params, searchParams }) {
             subcategory={service?.subcategory}
           />
           <SingleService
+            slug={slug}
             serviceId={uid}
             service={service}
             reviews={reviews}
             reviewsPage={reviewsPage}
             reviewsMeta={reviewsMeta}
           />
-          <FeaturedServices
+          {/* <FeaturedServices
             category={service?.category?.data?.attributes?.slug}
             subcategory={service?.subcategory?.data?.attributes?.slug}
-          />
+          /> */}
         </div>
       </>
     );

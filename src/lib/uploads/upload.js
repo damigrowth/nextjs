@@ -30,8 +30,6 @@ export async function uploadMedia(files) {
   const mediaIds = response.map((media) => media.id);
   uploadedMedia.push(...mediaIds);
 
-  console.log("response", uploadedMedia);
-
   return uploadedMedia;
 }
 

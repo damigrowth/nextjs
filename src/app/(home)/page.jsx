@@ -14,8 +14,10 @@ import { FEATURED_SERVICES } from "@/lib/graphql/queries/main/service";
 import { FEATURED_FREELANCERS } from "@/lib/graphql/queries/main/freelancer";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 
-// Static SEO
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
+// Static SEO
 export async function generateMetadata() {
   const { meta } = await Meta({
     titleTemplate:
@@ -23,6 +25,7 @@ export async function generateMetadata() {
     descriptionTemplate:
       "Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.",
     size: 160,
+    url: "/",
   });
 
   return meta;

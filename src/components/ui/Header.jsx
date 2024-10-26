@@ -72,16 +72,12 @@ export default function Header({ authenticated, user, header }) {
                       <Link
                         className="login-info mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent"
                         href="/login"
-                        prefetch={false}
-                        scroll={false}
                       >
                         Σύνδεση
                       </Link>
                       <Link
                         className="ud-btn btn-dark add-joining bdrs50 text-white"
                         href="/register"
-                        prefetch={false}
-                        scroll={false}
                       >
                         Εγγραφή
                       </Link>

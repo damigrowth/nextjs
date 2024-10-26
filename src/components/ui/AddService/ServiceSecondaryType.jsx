@@ -3,7 +3,7 @@
 import React from "react";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 
-export default function ServiceSecondaryType({ base, coverage }) {
+export default function ServiceSecondaryType({ coverage }) {
   const { type, setType, saveType } = useCreateServiceStore();
 
   const handleTypeChange = (currType) => {
@@ -47,14 +47,14 @@ export default function ServiceSecondaryType({ base, coverage }) {
             Προσφέρετε τη συγκεκριμένη υπηρεσία, <br /> σε δικό σας χώρο ή στον
             χώρο του πελάτη;
           </h4>
-          {!base && (
+          {!coverage.onbase && (
             <p className="pb10 text-danger">
               Δεν μπορείτε να επιλέξετε "Στην έδρα μου"
               <br /> γιατί δεν έχετε συμπληρώσει την Περιοχή και την Διεύθυνση
               στο προφίλ σας.
             </p>
           )}
-          {!coverage && (
+          {!coverage.onsite && (
             <p className="pb10 text-danger">
               Δεν μπορείτε να επιλέξετε "Στον χώρο του πελάτη"
               <br /> γιατί δεν έχετε συμπληρώσει τις Περιοχές Εξυπηρέτησης στο
@@ -64,21 +64,21 @@ export default function ServiceSecondaryType({ base, coverage }) {
           <div className="mb20-lg mb30">
             <button
               className={`ud-btn btn-thm2 add-joining mr10-lg mr20 ${
-                type.onsite ? "active" : ""
+                type.onbase ? "active" : ""
               }`}
               type="button"
-              onClick={() => handleTypeChange("onsite")}
-              disabled={!base}
+              onClick={() => handleTypeChange("onbase")}
+              disabled={!coverage.onbase}
             >
               Στην έδρα μου
             </button>
             <button
               className={`ud-btn btn-thm2 add-joining ${
-                type.onbase ? "active" : ""
+                type.onsite ? "active" : ""
               }`}
               type="button"
-              onClick={() => handleTypeChange("onbase")}
-              disabled={!coverage}
+              onClick={() => handleTypeChange("onsite")}
+              disabled={!coverage.onsite}
             >
               Στον χώρο του πελάτη
             </button>

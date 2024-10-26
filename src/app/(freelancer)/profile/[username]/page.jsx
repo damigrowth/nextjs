@@ -11,6 +11,10 @@ import Tabs from "@/components/ui/Archives/Tabs";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 import { FREELANCER_CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+export const dynamicParams = true;
+
 // Dynamic SEO
 export async function generateMetadata({ params }) {
   const { username } = params;
@@ -21,6 +25,7 @@ export async function generateMetadata({ params }) {
     titleTemplate: "%displayName% - %type% - %category%. %tagline%",
     descriptionTemplate: "%description%",
     size: 160,
+    url: `/profile/${username}`,
   };
 
   const { meta } = await Meta(data);
@@ -83,6 +88,7 @@ export default async function page({ params, searchParams }) {
         />
         <FreelancerProfile
           uid={uid}
+          username={username}
           freelancer={freelancer}
           services={services}
           servicesMeta={servicesMeta}

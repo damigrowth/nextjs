@@ -9,13 +9,13 @@ export const metadata = {
 
 export default async function page() {
   const { freelancer } = await getFreelancer();
-  const { base, coverage } = freelancer;
+  const { coverage } = freelancer;
 
   return (
     <>
       <MobileNavigation2 />
       <DashboardLayout>
-        <AddServiceInfo base={base} coverage={coverage} />
+        <AddServiceInfo coverage={coverage} />
       </DashboardLayout>
     </>
   );

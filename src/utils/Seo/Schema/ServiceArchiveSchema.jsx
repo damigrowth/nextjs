@@ -12,11 +12,17 @@ export default function ServiceArchiveSchema({ entities, taxonomies }) {
       : null
   );
 
-  const taxonomiesLabels = `${
-    taxonomies.category ? " - " + taxonomies.category.label : ""
-  }${taxonomies.subcategory ? " - " + taxonomies.subcategory.label : ""}${
-    taxonomies.subdivision ? " - " + taxonomies.subdivision.label : ""
-  }`;
+  let taxonomiesLabels = "";
+
+  if (taxonomies) {
+    taxonomiesLabels = `${
+      taxonomies.category ? " - " + taxonomies.category.label : ""
+    }${taxonomies.subcategory ? " - " + taxonomies.subcategory.label : ""}${
+      taxonomies.subdivision ? " - " + taxonomies.subdivision.label : ""
+    }`;
+  } else {
+    taxonomiesLabels = "";
+  }
 
   const data = {
     "@context": "https://schema.org",

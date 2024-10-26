@@ -17,7 +17,7 @@ import { SIZE } from "../../fragments/entities/size";
 import { SPECIALISATIONS } from "../../fragments/entities/specialisation";
 import { MIN_BUDGETS } from "../../fragments/entities/budget";
 import { INDUSTRIES } from "../../fragments/entities/industry";
-import { MULTIPLE_IMAGES } from "../../fragments/global";
+import { MULTIPLE_FILES } from "../../fragments/global";
 import { RATING } from "../../fragments/entities/rating";
 
 const FREELANCER_PARTIAL_MAIN = gql`
@@ -162,7 +162,7 @@ const FREELANCER_RELATIONS = gql`
       ...SettlementMethod
     }
     portfolio {
-      ...MultipleImages
+      ...MultipleFiles
     }
     rating_global {
       ...Rating
@@ -184,7 +184,7 @@ const FREELANCER_RELATIONS = gql`
   ${CONTACT_TYPES}
   ${PAYMENT_METHOD}
   ${SETTLEMENT_METHOD}
-  ${MULTIPLE_IMAGES}
+  ${MULTIPLE_FILES}
   ${RATING}
 `;
 
