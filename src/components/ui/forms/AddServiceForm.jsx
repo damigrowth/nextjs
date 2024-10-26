@@ -29,7 +29,7 @@ function AddServiceButton({ isPending }) {
   );
 }
 
-export default function AddServiceForm({ base, coverage }) {
+export default function AddServiceForm({ coverage }) {
   const { service, saved, optional, step, steps, setStep, info, media } =
     useCreateServiceStore();
 
@@ -81,7 +81,7 @@ export default function AddServiceForm({ base, coverage }) {
           <ServiceSuccess id={serviceId} title={serviceTitle} />
         ) : (
           <>
-            {step === "type" && <ServiceType base={base} coverage={coverage} />}
+            {step === "type" && <ServiceType coverage={coverage} />}
             {step === "packages" && <ServicePackages />}
             {step === "addons" && <ServiceAddons />}
             {step === "faq" && <ServiceFaq />}

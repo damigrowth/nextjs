@@ -3,7 +3,7 @@
 import React from "react";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 
-export default function ServicePrimaryType({ base, coverage }) {
+export default function ServicePrimaryType({ coverage }) {
   const { type, setType } = useCreateServiceStore();
 
   return (
@@ -11,7 +11,7 @@ export default function ServicePrimaryType({ base, coverage }) {
       <h4 className="list-title pb10">
         Προσφέρετε την υπηρεσία, <br /> online ή με την φυσική σας παρουσία?
       </h4>
-      {!base && !coverage && (
+      {!coverage.onbase && !coverage.onsite && (
         <p className="pb10 text-danger">
           Δεν μπορείτε να επιλέξετε "Φυσική παρουσία"
           <br /> γιατί δεν έχετε συμπληρώσει την Περιοχή και την Διεύθυνση ή τις
@@ -35,7 +35,7 @@ export default function ServicePrimaryType({ base, coverage }) {
           }`}
           type="button"
           onClick={() => setType("presence")}
-          disabled={!base && !coverage}
+          disabled={!coverage.onbase && !coverage.onsite}
         >
           Φυσική Παρουσία
         </button>
