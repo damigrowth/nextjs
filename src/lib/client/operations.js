@@ -92,7 +92,8 @@ export const getData = cache(async (query, variables) => {
     // Handle different response statuses
     if (response.status === 403) {
       console.error("Authentication failed. Please check your STRAPI_TOKEN.");
-      return null;
+      console.log(response.json());
+      // return null;
     }
 
     if (!response.ok) {
