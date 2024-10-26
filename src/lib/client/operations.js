@@ -51,10 +51,8 @@ export const getData = cache(async (query, variables) => {
   let queryString;
 
   if (typeof query === "string") {
-    // If query is already a string, use it directly
     queryString = query;
   } else {
-    // If query is an AST object, print it
     try {
       queryString = print(query);
     } catch (error) {
@@ -74,20 +72,49 @@ export const getData = cache(async (query, variables) => {
         query: queryString,
         variables,
       }),
-      next: { revalidate: 60 }, // 1 minute
+      next: { revalidate: 60 },
     });
 
+    // First check if the response is OK
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("GraphQL error:", errorData.errors);
-      // throw new Error(JSON.stringify(errorData.errors));
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
+    // Check the content type to ensure we're getting JSON
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      // Get the text response to help with debugging
+      const text = await response.text();
+      console.error("Received non-JSON response:", text.substring(0, 200)); // Log first 200 chars
+      throw new Error(`Expected JSON response but got ${contentType}`);
+    }
+
+    // Now we can safely parse JSON
     const jsonResponse = await response.json();
-    return jsonResponse.data;
+
+    // Check for GraphQL errors
+    if (jsonResponse.errors) {
+      console.error("GraphQL errors:", jsonResponse.errors);
+      throw new Error(JSON.stringify(jsonResponse.errors));
+    }
+
+    // If we have data, return it
+    if (jsonResponse.data) {
+      return jsonResponse.data;
+    }
+
+    // If we have no data but no errors, that's unexpected
+    throw new Error("No data received from GraphQL endpoint");
   } catch (error) {
-    console.error("Server error:", error);
-    throw error;
+    // Log the full error for debugging
+    console.error("getData error details:", {
+      url,
+      error: error.message,
+      stack: error.stack,
+    });
+
+    // Return null instead of throwing to allow graceful fallback
+    return null;
   }
 });
 
