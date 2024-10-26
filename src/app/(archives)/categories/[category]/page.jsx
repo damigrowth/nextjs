@@ -10,7 +10,9 @@ import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
 import TaxonomiesArchive from "@/components/ui/Archives/Taxonomies/TaxonomiesArchive";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 3600;
+export const dynamicParams = true;
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
