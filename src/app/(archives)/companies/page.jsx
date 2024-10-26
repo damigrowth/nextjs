@@ -10,7 +10,9 @@ import {
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 3600;
+export const dynamicParams = true;
 
 // Static SEO
 export async function generateMetadata() {

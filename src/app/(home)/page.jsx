@@ -14,8 +14,10 @@ import { FEATURED_SERVICES } from "@/lib/graphql/queries/main/service";
 import { FEATURED_FREELANCERS } from "@/lib/graphql/queries/main/freelancer";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 
-// Static SEO
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
+// Static SEO
 export async function generateMetadata() {
   const { meta } = await Meta({
     titleTemplate:

@@ -11,6 +11,10 @@ import Tabs from "@/components/ui/Archives/Tabs";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 import { FREELANCER_CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+export const dynamicParams = true;
+
 // Dynamic SEO
 export async function generateMetadata({ params }) {
   const { username } = params;
