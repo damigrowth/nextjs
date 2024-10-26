@@ -31,17 +31,18 @@ export default function TaxonomiesSwiper({ taxonomies }) {
               },
             }}
           >
-            {taxonomies.map((taxonomy, i) => (
-              <SwiperSlide key={i}>
-                <Link
-                  href={`/ipiresies/${taxonomy.subcategory.data.attributes.slug}/${taxonomy.slug}`}
-                  className="taxonomies-swiper-card"
-                >
-                  <span>{taxonomy.label}</span>
-                  <span className="fas fa-angle-right"></span>
-                </Link>
-              </SwiperSlide>
-            ))}
+            {taxonomies &&
+              taxonomies.map((taxonomy, i) => (
+                <SwiperSlide key={i}>
+                  <Link
+                    href={`/ipiresies/${taxonomy.subcategory.data.attributes.slug}/${taxonomy.slug}`}
+                    className="taxonomies-swiper-card"
+                  >
+                    <span>{taxonomy.label}</span>
+                    <span className="fas fa-angle-right"></span>
+                  </Link>
+                </SwiperSlide>
+              ))}
           </Swiper>
         )}
       </div>
