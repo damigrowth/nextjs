@@ -13,12 +13,13 @@ import Skills from "./Skills";
 import Features from "./Features";
 import Industries from "./Industries";
 import FeaturedServices from "./FeaturedServices";
-import Gallery from "@/components/ui/SingleService/FeaturedFiles";
+import FeaturedFiles from "@/components/ui/SingleService/FeaturedFiles";
 import Reviews from "../../Reviews/Reviews";
 import AddModelReviewForm from "../../forms/AddModelReviewForm";
 import Terms from "./Terms";
 import FreelancerSchema from "@/utils/Seo/Schema/FreelancerSchema";
 import Protected from "@/components/auth/Protected";
+import FeaturedFile from "../../SingleService/FeaturedFile";
 
 export default function FreelancerProfile({
   freelancer,
@@ -125,9 +126,22 @@ export default function FreelancerProfile({
                 meta={servicesMeta}
                 servicesPage={servicesPage}
               />
-              {portfolio?.data?.length > 0 && (
-                <Gallery images={portfolio?.data} title="Portfolio" border />
+              {portfolio.data.length > 0 && (
+                <>
+                  {portfolio.data.length > 1 ? (
+                    <FeaturedFiles
+                      files={portfolio.data}
+                      title="Portfolio"
+                      border
+                    />
+                  ) : (
+                    <FeaturedFile
+                      formats={portfolio?.data[0]?.attributes?.formats}
+                    />
+                  )}
+                </>
               )}
+
               <Terms heading="Όροι Συνεργασίας" text={terms} border />
               <Reviews
                 reviews={reviews}

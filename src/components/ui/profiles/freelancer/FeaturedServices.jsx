@@ -20,25 +20,19 @@ export default async function FeaturedServices({
       </h4>
 
       <div className="row mb35">
-        {services.map((service, i) => {
-          const image = getBestDimensions(
-            service.attributes?.media?.data[0]?.attributes?.formats
-          );
-          const imageUrl = image.url;
-          return (
-            <div className="col-sm-6 col-xl-4" key={i}>
-              <ServiceCard
-                image={imageUrl}
-                price={service.attributes.price}
-                category={service.attributes.category.data.attributes.label}
-                title={service.attributes.title}
-                rating={service.attributes.rating}
-                reviews_total={service.attributes.reviews_total}
-                slug={service.attributes.slug}
-              />
-            </div>
-          );
-        })}
+        {services.map((service, i) => (
+          <div className="col-sm-6 col-xl-4" key={i}>
+            <ServiceCard
+              media={service.attributes.media.data}
+              price={service.attributes.price}
+              category={service.attributes.category.data.attributes.label}
+              title={service.attributes.title}
+              rating={service.attributes.rating}
+              reviews_total={service.attributes.reviews_total}
+              slug={service.attributes.slug}
+            />
+          </div>
+        ))}
       </div>
 
       <LoadMoreBtn

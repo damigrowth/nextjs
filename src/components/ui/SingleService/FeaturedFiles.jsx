@@ -20,8 +20,6 @@ export default function FeaturedFiles({ files, title, border }) {
 
   const galleryFiles = files.map((image) => image.attributes);
 
-  console.log("formats", galleryFiles);
-
   return (
     <>
       {title && <h4>{title}</h4>}

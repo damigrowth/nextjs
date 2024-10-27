@@ -3,10 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import CardReviews from "../../Reviews/CardReviews";
+import ServiceCardFiles from "../../Cards/ServiceCardFiles";
+import ServiceCardFile from "../../Cards/ServiceCardFile";
 // import { useState } from "react";
 
 export default function ServiceCard({
-  image,
+  media,
   price,
   category,
   title,
@@ -21,19 +23,44 @@ export default function ServiceCard({
       ? title.slice(0, maxTitleLength) + "..."
       : title;
 
+  const fallbackImage = "/images/fallback/service.png";
+
   return (
     <>
       <div className="listing-style1">
         <div className="list-thumb">
-          <Link href={`/s/${slug}`}>
-            <Image
-              height={190}
-              width={255}
-              className="w-100 h-100 object-fit-cover"
-              src={image}
-              alt={title}
+          {media.length === 0 && (
+            <Link href={`/s/${slug}`}>
+              <Image
+                height={190}
+                width={255}
+                className="w-100 h-100 object-fit-cover"
+                src={fallbackImage}
+                alt={title}
+              />
+            </Link>
+          )}
+          {media.length > 1 ? (
+            <ServiceCardFiles
+              media={media.map((item) => item.attributes)}
+              path={`/s/${slug}`}
             />
-          </Link>
+          ) : (
+            <ServiceCardFile file={media[0]?.attributes} path={`/s/${slug}`} />
+          )}
+          {/* <Link href={`/s/${slug}`}>
+            {media.length === 0 && (
+              <Image
+                height={190}
+                width={255}
+                className="w-100 h-100 object-fit-cover"
+                src={"/images/service-fallback.png"}
+                alt={title}
+              />
+            )}
+
+            {media.length > 1 && <div>multiple images</div>}
+          </Link> */}
           {/* <a
             onClick={() => setFavActive(!isFavActive)}
             className={`listing-fav fz12 ${isFavActive ? "ui-fav-active" : ""}`}
