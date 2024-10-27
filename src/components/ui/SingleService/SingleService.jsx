@@ -119,7 +119,6 @@ export default async function SingleService({
                       <FeaturedFiles files={media.data} />
                     ) : (
                       <FeaturedFile
-                        file={null}
                         formats={media?.data[0]?.attributes?.formats}
                       />
                     )}
