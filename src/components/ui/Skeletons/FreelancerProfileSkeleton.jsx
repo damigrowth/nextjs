@@ -162,7 +162,10 @@ export default function FreelancerProfileSkeleton() {
                 </h3>
                 <div className="category-list mt20">
                   {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2 mb15">
+                    <div
+                      key={i}
+                      className="list-item d-flex align-items-center justify-content-between bdrb1 pb-2 mb15"
+                    >
                       <div className="text d-flex align-items-center">
                         <Skeleton
                           width={25}
