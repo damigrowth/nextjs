@@ -1,6 +1,13 @@
 import React from "react";
 
-export default function Info({ time, category, subcategory, coverage, type }) {
+export default function Info({
+  visibility,
+  time,
+  category,
+  subcategory,
+  coverage,
+  type,
+}) {
   const {
     online,
     presence,
@@ -11,7 +18,7 @@ export default function Info({ time, category, subcategory, coverage, type }) {
     subscription_type,
   } = type;
 
-  const address = coverage?.address;
+  const address = visibility && coverage?.address;
   const areas = coverage?.areas;
   const county = coverage?.county;
 
