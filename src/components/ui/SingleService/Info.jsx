@@ -81,13 +81,13 @@ export default function Info({ time, category, subcategory, coverage, type }) {
         </div>
       )}
       {presence && onbase && address && county?.data && (
-        <div className="col-sm-6 col-md-4">
+        <div className="col-sm-12 col-md-8">
           <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
             <div className="icon flex-shrink-0">
               <span className="flaticon-tracking" />
             </div>
             <div className="details">
-              <h5 className="title">Περιοχή</h5>
+              <h5 className="title">Διεύθυνση</h5>
               <p className="mb-0 text">
                 {address}, {county?.data?.attributes?.name}
               </p>
@@ -96,13 +96,13 @@ export default function Info({ time, category, subcategory, coverage, type }) {
         </div>
       )}
       {presence && onsite && areas?.data?.length > 0 && (
-        <div className="col-sm-6 col-md-4">
+        <div className="col-sm-12 col-md-8">
           <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
             <div className="icon flex-shrink-0">
               <span className="flaticon-tracking" />
             </div>
             <div className="details">
-              <h5 className="title">Περιοχή</h5>
+              <h5 className="title">Περιοχές Εξυπηρέτησης</h5>
               <p className="mb-0 text">
                 {areas.data.map((area) => area?.attributes?.name).join(", ")}
               </p>
