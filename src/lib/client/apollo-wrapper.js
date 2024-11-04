@@ -10,8 +10,6 @@ import {
 import { STRAPI_GRAPHQL, STRAPI_TOKEN } from "../strapi";
 
 function makeClient() {
-  console.log("ENV VARS", STRAPI_GRAPHQL, STRAPI_TOKEN);
-
   const httpLink = new HttpLink({
     uri: "/api/graphql",
     // headers: {
