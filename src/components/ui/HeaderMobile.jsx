@@ -14,7 +14,7 @@ export default function HeaderMobile({ user, authenticated }) {
                 <Image
                   height={40}
                   width={133}
-                  src="/images/header-logo-dark.svg"
+                  src="/images/doulitsa-logo.svg"
                   alt="Header Logo"
                 />
               </Link>

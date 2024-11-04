@@ -145,9 +145,7 @@ export default function Search() {
                     >
                       <Link
                         // onClick={() => selectSearch(item)}
-                        href={`/ipiresies/${
-                          !categorySlug ? sub.parentSlug : categorySlug
-                        }/${sub.slug}`}
+                        href={`/ipiresies/${sub.slug}`}
                         className="info-product"
                       >
                         <div className="item_title">{sub.label}</div>

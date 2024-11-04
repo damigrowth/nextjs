@@ -28,7 +28,7 @@ export default function NavMenuMobile({ header }) {
     {
       id: 2,
       name: "Υπηρεσίες",
-      path: "/ipiresies",
+      path: "/categories",
     },
     {
       id: 3,

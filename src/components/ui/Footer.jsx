@@ -78,7 +78,7 @@ export default async function Footer({ footer }) {
                     height={45}
                     width={123}
                     className="mb40 object-fit-contain"
-                    src="/images/doulitsa-logo-white.svg"
+                    src="/images/doulitsa-logo.svg"
                     alt="Doulitsa logo"
                   />
                 </Link>

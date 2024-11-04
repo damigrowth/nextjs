@@ -8,6 +8,7 @@ import Tabs from "@/components/ui/Archives/Tabs";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 import { CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/service";
 import FeaturedServices from "@/components/ui/SingleService/Featured";
+import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -55,15 +56,17 @@ export default async function page({ params, searchParams }) {
       <>
         <Tabs
           parentPathLabel="Όλες οι κατηγορίες"
-          parentPathLink="ipiresies"
+          parentPathLink="categories"
           categories={categories?.data}
-          serviceCategory={service?.category?.data?.attributes?.slug}
         />
         <div className="bgc-thm3">
-          <ServiceBreadcrumb
-            subjectTitle={service?.title}
-            category={service?.category}
-            subcategory={service?.subcategory}
+          <Breadcrumb
+            parentPathLabel="Υπηρεσίες"
+            parentPathLink="categories"
+            category={service?.category?.data?.attributes}
+            subcategory={service?.subcategory?.data?.attributes}
+            subdivision={service?.subdivision?.data?.attributes}
+            categoriesRoute={true}
           />
           <SingleService
             slug={slug}

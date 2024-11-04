@@ -98,6 +98,7 @@ export default async function SingleService({
                 />
 
                 <Info
+                  visibility={user.visibility.address}
                   coverage={freelancer?.coverage}
                   category={subdivision.data?.attributes}
                   subcategory={subcategory.data?.attributes}
@@ -183,8 +184,8 @@ export default async function SingleService({
               rating={freelancer.rating}
               totalReviews={freelancer.reviews_total}
               socials={freelancer.socials}
-              email={user.email}
-              phone={user.phone}
+              email={user.visibility.email && user.email}
+              phone={user.visibility.phone && user.phone}
               website={freelancer.website}
               type={freelancer.type}
               category={freelancer.subcategory}
