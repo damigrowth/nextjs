@@ -13,28 +13,38 @@ export default function ServiceType({ coverage }) {
       <div className="bdrb1">
         <h3 className="list-title pb5">Τύπος υπηρεσίας</h3>
       </div>
-      {typeStep === 0 && <ServicePrimaryType coverage={coverage} />}
-      {(typeStep === 1 || typeStep === 2) && (
-        <ServiceSecondaryType coverage={coverage} />
+      {!coverage ? (
+        <p className="pb10 text-danger pt20">
+          Δεν μπορείτε να προχωρήσετε γιατί δεν έχετε συμπληρώσει <br />
+          την Περιοχή και την Διεύθυνση ή τις Περιοχές Εξυπηρέτησης στο προφίλ
+          σας.
+        </p>
+      ) : (
+        <>
+          {typeStep === 0 && <ServicePrimaryType coverage={coverage} />}
+          {(typeStep === 1 || typeStep === 2) && (
+            <ServiceSecondaryType coverage={coverage} />
+          )}
+          {errors?.field === "service-type" ? (
+            <div>
+              <p className="text-danger">{errors.message}</p>
+            </div>
+          ) : null}
+          <div className="service-type-buttons">
+            <button
+              type="button"
+              onClick={() => goBack()}
+              className={`ud-btn btn-white bdrs4 d-flex align-items-center gap-2 default-box-shadow p3 ${
+                (typeStep === 1 || typeStep === 2) && "visible"
+              }`}
+            >
+              <span className="d-flex align-items-center flaticon-left fz20" />
+              <span>Πίσω</span>
+            </button>
+            <input id="service-type" name="service-type" type="hidden" />
+          </div>
+        </>
       )}
-      {errors?.field === "service-type" ? (
-        <div>
-          <p className="text-danger">{errors.message}</p>
-        </div>
-      ) : null}
-      <div className="service-type-buttons">
-        <button
-          type="button"
-          onClick={() => goBack()}
-          className={`ud-btn btn-white bdrs4 d-flex align-items-center gap-2 default-box-shadow p3 ${
-            (typeStep === 1 || typeStep === 2) && "visible"
-          }`}
-        >
-          <span className="d-flex align-items-center flaticon-left fz20" />
-          <span>Πίσω</span>
-        </button>
-        <input id="service-type" name="service-type" type="hidden" />
-      </div>
     </div>
   );
 }
