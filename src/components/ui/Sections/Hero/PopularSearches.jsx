@@ -9,7 +9,7 @@ export default function PopularSearches({ subcategories }) {
       <div className="home9-tags at-home12 d-md-flex align-items-center animate-up-4">
         {subcategories.map((sub, i) => (
           <Link
-            href={`/ipiresies/${sub.categorySlug}/${sub.slug}`}
+            href={`/ipiresies/${sub.slug}`}
             key={i}
             className="bdrs60 mb-md-0 "
           >
