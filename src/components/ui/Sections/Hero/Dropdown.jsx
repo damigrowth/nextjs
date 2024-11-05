@@ -1,9 +1,16 @@
 "use client";
 
 import useHomeStore from "@/store/home/homeStore";
+import { useRef } from "react";
+import { searchSubcategories } from "@/lib/search/subcategories";
 
 export default function Dropdown({ categories }) {
-  const { categorySelect, setCategorySelect } = useHomeStore();
+  const { categorySelect, setCategorySelect, setSearchTerm } = useHomeStore();
+
+  const handleCategorySelect = (category) => {
+    setSearchTerm(""); // Reset search term when category changes
+    setCategorySelect(category); // This will trigger a search in Search.jsx due to categorySelect dependency
+  };
 
   return (
     <div className="dropdown bootstrap-select">
@@ -26,7 +33,7 @@ export default function Dropdown({ categories }) {
         <div className="inner show">
           <ul className="dropdown-menu inner show">
             <li
-              onClick={() => setCategorySelect(null)}
+              onClick={() => handleCategorySelect(null)}
               key="0"
               className="selected active"
             >
@@ -40,7 +47,7 @@ export default function Dropdown({ categories }) {
             </li>
             {categories.map((category, index) => (
               <li
-                onClick={() => setCategorySelect(category)}
+                onClick={() => handleCategorySelect(category)}
                 key={index}
                 className="selected active"
               >
