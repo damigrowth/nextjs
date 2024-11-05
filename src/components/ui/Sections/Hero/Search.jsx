@@ -5,15 +5,8 @@ import useHomeStore from "@/store/home/homeStore";
 import HomeSchema from "@/utils/Seo/Schema/HomeSchema";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, {
-  useActionState,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useActionState, useCallback, useEffect, useRef } from "react";
 
-// Debounce function to delay execution
 const debounce = (func, delay) => {
   let timeoutId;
   return (...args) => {
@@ -26,8 +19,9 @@ const debounce = (func, delay) => {
 
 export default function Search() {
   const router = useRouter();
-
   const [res, action, pending] = useActionState(searchSubcategories);
+  const formRef = useRef(null);
+  const isInitialMount = useRef(true);
 
   const {
     searchTerm,
@@ -40,32 +34,53 @@ export default function Search() {
 
   const categorySlug = categorySelect?.attributes?.slug || "";
 
-  const formRef = useRef(null);
-
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      if (!categorySlug) {
-        router.push(`/ipiresies?search=${searchTerm}`);
-      } else {
-        router.push(`/ipiresies/${categorySlug}?search=${searchTerm}`);
-      }
+  // Trigger search when category changes, but not on initial mount
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
     }
-  };
 
-  // Debounced form submit
+    const timeoutId = setTimeout(() => {
+      formRef.current?.requestSubmit();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [categorySelect]);
+
+  const handleSearch = useCallback(
+    (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const searchPath = categorySlug
+          ? `/ipiresies/${categorySlug}?search=${searchTerm}`
+          : `/ipiresies?search=${searchTerm}`;
+        router.push(searchPath);
+      }
+    },
+    [categorySlug, searchTerm, router]
+  );
+
   const debouncedSubmit = useCallback(
     debounce(() => {
-      if (formRef.current) {
-        formRef.current.requestSubmit();
+      if (!isInitialMount.current) {
+        formRef.current?.requestSubmit();
       }
-    }, 1500),
+    }, 500),
     []
   );
 
-  // Trigger form submit when input changes
+  const handleSubcategoryClick = useCallback(
+    (sub) => {
+      setSearchTerm("");
+      blurDropdown();
+      router.push(`/ipiresies/${sub.parentSlug}/${sub.slug}`);
+    },
+    [router, setSearchTerm, blurDropdown]
+  );
+
   useEffect(() => {
-    if (searchTerm !== "") {
+    if (searchTerm && !isInitialMount.current) {
       debouncedSubmit();
     }
   }, [searchTerm, debouncedSubmit]);
@@ -74,17 +89,22 @@ export default function Search() {
     <>
       <HomeSchema
         searchTarget={
-          !categorySlug
-            ? `/ipiresies?search=${searchTerm}`
-            : `/ipiresies/${categorySlug}?search=${searchTerm}`
+          categorySlug
+            ? `/ipiresies/${categorySlug}?search=${searchTerm}`
+            : `/ipiresies?search=${searchTerm}`
         }
-        searchInput={`searchTerm`}
+        searchInput="searchTerm"
       />
       <form
         ref={formRef}
         action={action}
         className="form-search position-relative"
         autoComplete="off"
+        onSubmit={(e) => {
+          if (isInitialMount.current) {
+            e.preventDefault();
+          }
+        }}
       >
         <div className="box-search">
           {pending ? (
@@ -93,7 +113,7 @@ export default function Search() {
               role="status"
               style={{ bottom: "20px" }}
             >
-              <span className="sr-only"></span>
+              <span className="sr-only">Loading...</span>
             </div>
           ) : (
             <span className="icon far fa-magnifying-glass" />
@@ -115,41 +135,36 @@ export default function Search() {
             onBlur={blurDropdown}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(e) => handleSearch(e)}
+            onKeyDown={handleSearch}
+            aria-label="Search services"
           />
           {res?.data?.length > 0 && (
             <div
               className="search-suggestions"
-              style={
-                isSearchDropdownOpen
-                  ? {
-                      visibility: "visible",
-                      opacity: "1",
-                      top: "70px",
-                    }
-                  : {
-                      visibility: "hidden",
-                      opacity: "0",
-                      top: "100px",
-                    }
-              }
+              style={{
+                visibility: isSearchDropdownOpen ? "visible" : "hidden",
+                opacity: isSearchDropdownOpen ? "1" : "0",
+                top: isSearchDropdownOpen ? "70px" : "100px",
+                transition: "all 0.3s ease",
+              }}
             >
-              {/* <h6 className="fz14 ml30 mt25 mb-3">Δημοφιλείς Αναζητήσεις</h6> */}
-
               <div className="box-suggestions">
                 <ul className="px-0 m-0 pb-4">
                   {res.data.map((sub, index) => (
-                    <li
-                      key={index}
-                      // className={searchTerm === item ? "ui-list-active" : ""}
-                    >
-                      <Link
-                        // onClick={() => selectSearch(item)}
-                        href={`/ipiresies/${sub.slug}`}
-                        className="info-product"
+                    <li key={sub.slug || index}>
+                      <div
+                        className="info-product cursor-pointer"
+                        onClick={() => handleSubcategoryClick(sub)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleSubcategoryClick(sub);
+                          }
+                        }}
+                        role="button"
+                        tabIndex={0}
                       >
                         <div className="item_title">{sub.label}</div>
-                      </Link>
+                      </div>
                     </li>
                   ))}
                 </ul>

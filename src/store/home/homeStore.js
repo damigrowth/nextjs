@@ -7,7 +7,12 @@ const useHomeStore = create((set) => ({
   focusDropdown: () => set(() => ({ isSearchDropdownOpen: true })),
   blurDropdown: () => set(() => ({ isSearchDropdownOpen: false })),
   categorySelect: null,
-  setCategorySelect: (payload) => set(() => ({ categorySelect: payload })),
+  setCategorySelect: (payload) =>
+    set(() => ({
+      categorySelect: payload,
+      searchTerm: "", // Reset searchTerm
+      isSearchDropdownOpen: true, // Show dropdown with category results
+    })),
   featuredCategory: "",
   setFeaturedCategory: (payload) => set(() => ({ featuredCategory: payload })),
   taxonomy: 0,
