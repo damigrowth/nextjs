@@ -45,4 +45,17 @@ const FEATURED_CATEGORIES = gql`
   ${CATEGORY_FULL}
 `;
 
-export { ALL_TAXONOMIES, FEATURED_CATEGORIES };
+const CATEGORIES_ALL = gql`
+  query CategoriesAll {
+    allCategories: categories(sort: "label:asc") {
+      data {
+        attributes {
+          label
+          slug
+        }
+      }
+    }
+  }
+`;
+
+export { ALL_TAXONOMIES, FEATURED_CATEGORIES, CATEGORIES_ALL };
