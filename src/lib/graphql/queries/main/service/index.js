@@ -198,6 +198,31 @@ const SERVICES_ALL = gql`
   }
 `;
 
+const SERVICES_ARCHIVE_ALL = gql`
+  query ServicesArchiveAll {
+    allServicesArchive: subcategories(
+      filters: { and: [{ services: { id: { not: { null: true } } } }] }
+      pagination: { page: 1, pageSize: 1000 }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+          subdivisions {
+            data {
+              attributes {
+                label
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export {
   SERVICE_BY_SLUG,
   SERVICE_PAGE_SEO,
@@ -208,4 +233,5 @@ export {
   SERVICES_ARCHIVE,
   SERVICES_BY_CATEGORY,
   SERVICES_ALL,
+  SERVICES_ARCHIVE_ALL,
 };
