@@ -20,4 +20,4 @@ Disallow: /payment/*
 Host: https://doulitsa.gr
 
 # Sitemaps
-Sitemap: https://doulitsa.gr/sitemap
+Sitemap: https://doulitsa.gr/sitemap.xml

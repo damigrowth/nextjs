@@ -238,6 +238,34 @@ const FREELANCER_SUBCATEGORIES_SEARCH_FILTERED = gql`
   ${PAGINATION}
 `;
 
+const FREELANCERS_ARCHIVE_ALL = gql`
+  query FreelancersArchiveAll($type: String) {
+    allFreelancersArchive: freelancerSubcategories(
+      filters: {
+        and: [
+          { type: { slug: { eq: $type } } }
+          { freelancers: { id: { not: { null: true } } } }
+        ]
+      }
+      pagination: { page: 1, pageSize: 1000 }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          slug
+          category {
+            data {
+              attributes {
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export {
   FREELANCER_CATEGORIES,
   FREELANCER_CATEGORIES_SEARCH,
@@ -247,4 +275,5 @@ export {
   FREELANCERS_ARCHIVE_SEO,
   FREELANCER_CATEGORIES_SEARCH_FILTERED,
   FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
+  FREELANCERS_ARCHIVE_ALL,
 };

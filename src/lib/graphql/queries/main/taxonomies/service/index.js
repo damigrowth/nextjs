@@ -429,6 +429,31 @@ const SUBDIVISIONS_SEARCH_FILTERED = gql`
   ${PAGINATION}
 `;
 
+const SERVICES_ARCHIVE_ALL = gql`
+  query ServicesArchiveAll {
+    allServicesArchive: subcategories(
+      filters: { and: [{ services: { id: { not: { null: true } } } }] }
+      pagination: { page: 1, pageSize: 1000 }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+          subdivisions {
+            data {
+              attributes {
+                label
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export {
   CATEGORIES,
   SUBCATEGORIES,
@@ -443,4 +468,5 @@ export {
   SUBDIVISIONS_SEARCH,
   SUBCATEGORIES_SEARCH_FILTERED,
   SUBDIVISIONS_SEARCH_FILTERED,
+  SERVICES_ARCHIVE_ALL,
 };
