@@ -2,9 +2,9 @@ import { getData } from "@/lib/client/operations";
 import { FREELANCERS_ALL } from "@/lib/graphql/queries/main/freelancer";
 import { SERVICES_ALL } from "@/lib/graphql/queries/main/service";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-export const dynamicParams = true;
+// export const dynamic = "force-dynamic";
+// export const revalidate = 0;
+// export const dynamicParams = true;
 
 export default async function sitemap() {
   const { allServices } = await getData(SERVICES_ALL);
