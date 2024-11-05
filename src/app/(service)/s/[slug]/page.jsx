@@ -62,7 +62,7 @@ export default async function page({ params, searchParams }) {
         <div className="bgc-thm3">
           <Breadcrumb
             parentPathLabel="Υπηρεσίες"
-            parentPathLink="categories"
+            parentPathLink="ipiresies"
             category={service?.category?.data?.attributes}
             subcategory={service?.subcategory?.data?.attributes}
             subdivision={service?.subdivision?.data?.attributes}
