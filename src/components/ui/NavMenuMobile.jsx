@@ -56,7 +56,7 @@ export default function NavMenuMobile({ header }) {
               alt="Header Logo"
               width="133"
               height="40"
-              src="/images/header-logo2.svg"
+              src="/images/doulitsa-logo.svg"
             />
           </Link>
           <button
