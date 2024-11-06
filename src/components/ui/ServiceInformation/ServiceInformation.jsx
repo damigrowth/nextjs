@@ -109,7 +109,7 @@ export default function ServiceInformation() {
 
   return (
     <div>
-      <div className="ps-widget bgc-white bdrs4 p30 mb30 position-relative">
+      <div className="ps-widget bdrs4 p30 mb30 position-relative">
         <div className="bdrb1 pb15 mb25">
           <h3 className="list-title">Βασικές Πληροφορίες</h3>
         </div>

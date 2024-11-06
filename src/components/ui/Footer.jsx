@@ -2,26 +2,14 @@ import Link from "next/link";
 import React from "react";
 import Image from "next/image";
 import Socials from "./Socials";
+import {
+  accountLinks,
+  firstColumnLinks,
+  proLinks,
+  secondColumnLinks,
+} from "@/data/global/footer";
 
-export default async function Footer({ footer }) {
-  const companyLinks = footer.data.attributes.company.data;
-  const categoryLinks = footer.data.attributes.categories.data;
-
-  const accountLinks = [
-    {
-      label: "Σύνδεση",
-      slug: "/login",
-    },
-    {
-      label: "Εγγραφή",
-      slug: "/register",
-    },
-    {
-      label: "Καταχώριση Υπηρεσίας",
-      slug: "/add-services",
-    },
-  ];
-
+export default async function Footer() {
   return (
     <>
       <section className="footer-style1 at-home2 pb-0 pt60">
@@ -32,9 +20,9 @@ export default async function Footer({ footer }) {
                 <div className="row justify-content-between">
                   <div className="col-auto">
                     <div className="link-style1 mb-3">
-                      <h6 className="text-white mb25">Σχετικά</h6>
+                      <h6 className="text-white mb10">Σχετικά</h6>
                       <div className="link-list">
-                        {companyLinks.map((item, i) => (
+                        {firstColumnLinks.map((item, i) => (
                           <Link key={i} href={`/co/${item.attributes.slug}`}>
                             {item.attributes.title}
                           </Link>
@@ -44,9 +32,9 @@ export default async function Footer({ footer }) {
                   </div>
                   <div className="col-auto">
                     <div className="link-style1 mb-3">
-                      <h6 className="text-white mb25">Υπηρεσίες</h6>
+                      <h6 className="text-white mb10">Υπηρεσίες</h6>
                       <ul className="ps-0">
-                        {categoryLinks.map((item, i) => (
+                        {secondColumnLinks.map((item, i) => (
                           <li key={i}>
                             <Link href={`/ipiresies/${item.attributes.slug}`}>
                               {item.attributes.label}
@@ -58,9 +46,19 @@ export default async function Footer({ footer }) {
                   </div>
                   <div className="col-auto">
                     <div className="link-style1 mb-3">
-                      <h6 className="text-white mb25">Ο Λογαριασμός μου</h6>
+                      <h6 className="text-white mb10">Ο Λογαριασμός μου</h6>
                       <ul className="ps-0">
                         {accountLinks.map((item, i) => (
+                          <li key={i}>
+                            <Link href={item.slug}>{item.label}</Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="link-style1 mb-3 pt10">
+                      <h6 className="text-white mb10 ">Επαγγελματικά Προφίλ</h6>
+                      <ul className="ps-0">
+                        {proLinks.map((item, i) => (
                           <li key={i}>
                             <Link href={item.slug}>{item.label}</Link>
                           </li>

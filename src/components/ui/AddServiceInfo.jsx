@@ -4,7 +4,7 @@ import DashboardNavigation from "../dashboard/header/DashboardNavigation";
 export default async function AddServiceInfo({ coverage }) {
   return (
     <>
-      <div className="dashboard__content hover-bgc-color">
+      <div className="dashboard__content ">
         <div className="row pb40">
           <div className="col-lg-12">
             <DashboardNavigation />

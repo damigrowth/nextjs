@@ -47,7 +47,7 @@ export default function PayoutInfo() {
                     </tr>
                   </thead>
                   <tbody className="t-body">
-                    {payout.map((item,i) => (
+                    {payout.map((item, i) => (
                       <PayoutCard1 key={i} data={item} />
                     ))}
                   </tbody>
@@ -57,7 +57,7 @@ export default function PayoutInfo() {
                 </div>
               </div>
             </div>
-            <div className="ps-widget bgc-white bdrs4 p30 mb30 position-relative">
+            <div className="ps-widget bdrs4 p30 mb30 position-relative">
               <div className="row">
                 <div className="col-lg-9">
                   <PaymentMethod />

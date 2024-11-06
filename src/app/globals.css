@@ -1002,7 +1002,7 @@ a {
   color: var(--headings-color);
   line-height: 1.3125;
   font-weight: 700;
-  font-size: 32px;
+  font-size: 2em;
   margin-top: 0;
   margin-bottom: 0.5rem;
 }

@@ -20,7 +20,7 @@ export default function DashboardLayout({ children }) {
           <DashboardSidebar />
           <div className="dashboard__main pl0-md">
             {children}
-            <DashboardFooter />
+            {/* <DashboardFooter /> */}
           </div>
         </div>
       </div>

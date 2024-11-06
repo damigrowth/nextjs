@@ -38,7 +38,7 @@ export default function MegaMenu({ categories, staticMenuClass }) {
           {categories.map((category) => (
             <li key={category.id}>
               <Link
-                href={`/ipiresies/${category.slug}`}
+                href={`/categories/${category.slug}`}
                 className="dropdown"
                 prefetch={false}
               >

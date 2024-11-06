@@ -3,7 +3,7 @@ import React from "react";
 
 export default function ServiceSuccess({ id, title }) {
   return (
-    <div className="ps-widget bgc-white bdrs12 p30 mb30 overflow-hidden position-relative">
+    <div className="ps-widget bdrs12 p30 mb30 overflow-hidden position-relative">
       <div className="success-container">
         <div className="success-icon bgc-thm">
           <i className="flaticon-success vam fz40 text-white " />

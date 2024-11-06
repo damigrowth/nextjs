@@ -156,7 +156,7 @@ export default function ServiceGallery({ isPending }) {
   return (
     <>
       <div
-        className={`ps-widget bgc-white bdrs12 p30 mb30 overflow-hidden position-relative ${
+        className={`ps-widget bdrs12 p30 mb30 overflow-hidden position-relative ${
           isPending ? "section-disabled" : ""
         }`}
       >

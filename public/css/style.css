@@ -922,7 +922,7 @@ li {
   flex-shrink: 0;
   height: calc(100% - 90px);
   left: 0;
-  margin-top: 80px;
+  margin-top: 40px;
   overflow-y: scroll;
   padding: 30px 30px 30px 0;
   padding-bottom: 40px;
@@ -944,7 +944,7 @@ li {
 }
 
 .dashboard__main {
-  margin-top: 85px;
+  margin-top: 40px;
   padding-left: 300px;
   width: 100%;
 }
@@ -958,6 +958,7 @@ li {
   border-radius: 4px;
   padding: 60px 60px 20px;
   width: 100%;
+  background-color: #fbf7ed;
 }
 @media (max-width: 767.98px) {
   .dashboard__content {
@@ -2434,8 +2435,8 @@ li {
 
 .service-v1-vector {
   position: absolute;
-  right: 5%;
-  border: 2px solid #fbf7ed;
+  right: 12%;
+  border: 2px solid #ffffff;
   height: 180px;
   width: 320px;
   border-radius: 10px;
@@ -4481,7 +4482,11 @@ section {
   /* height: 300px; */
   max-height: 180px;
 }
-@media (max-width: 767.98px) {
+@media (max-width: 1200px) {
+  .cta-service-v1 {
+    max-height: 380px;
+  }
+
   .cta-service-v1.freelancer-single-style {
     height: auto;
   }

@@ -15,7 +15,7 @@ export default function NewAddonInputs() {
   return (
     <>
       <div className="mt20">
-        <div className="bgc-gray-3 bdrs4 p30">
+        <div className="bdrs4 p30">
           <div className="row">
             <div className="col-sm-9">
               <div className="mb20 form-group">
