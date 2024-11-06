@@ -20,7 +20,7 @@ export default function NewFeatureInputs() {
   return (
     <>
       <div className="mt20">
-        <div className="bgc-gray-3 bdrs4 p30">
+        <div className="bdrs4 p30">
           <div className="col-sm-12">
             <div className="mb20 d-flex align-items-center">
               <label

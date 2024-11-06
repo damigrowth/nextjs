@@ -10,7 +10,10 @@ export default function AddonsList() {
   // console.log(features);
   return (
     <div className="table-style2 table-responsive bdr1 mb30 mt30">
-      <table className="table table-borderless mb-0">
+      <table
+        className="table table-borderless mb-0"
+        style={{ backgroundColor: "white" }}
+      >
         <colgroup>
           <col style={{ width: "65%" }} />
           <col style={{ width: "20%" }} />

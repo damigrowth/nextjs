@@ -14,7 +14,7 @@ export default function NewFaqInputs() {
   return (
     <>
       <div className="mt20">
-        <div className="bgc-gray-3 bdrs4 p30">
+        <div className="bdrs4 p30">
           <div className="row">
             <div className="mb20 form-group">
               <InputB

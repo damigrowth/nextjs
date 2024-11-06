@@ -31,6 +31,7 @@ export default function FaqList() {
                     }`}
                     type="button"
                     onClick={() => toggleAccordion(index)}
+                    style={{ backgroundColor: "white" }}
                   >
                     {faqItem.question}
                     <div className="pr35">
@@ -60,7 +61,12 @@ export default function FaqList() {
                   aria-labelledby={`heading${index}`}
                   data-bs-parent="#accordion"
                 >
-                  <div className="accordion-body">{faqItem.answer}</div>
+                  <div
+                    className="accordion-body"
+                    style={{ backgroundColor: "white" }}
+                  >
+                    {faqItem.answer}
+                  </div>
                 </div>
               </div>
               {editingMode && editingInput === index ? (

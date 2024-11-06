@@ -958,6 +958,7 @@ li {
   border-radius: 4px;
   padding: 60px 60px 20px;
   width: 100%;
+  background-color: #fbf7ed;
 }
 @media (max-width: 767.98px) {
   .dashboard__content {

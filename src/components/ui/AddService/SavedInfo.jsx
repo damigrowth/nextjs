@@ -29,7 +29,7 @@ export default function SavedInfo() {
         </div>
         <div className="row">
           <div className="col-xl-12">
-            <div className="ps-widget bgc-white bdrs4 p30 mb30 position-relative">
+            <div className="ps-widget bdrs4 p30 mb30 position-relative">
               <div className="navtab-style1">
                 <nav>
                   <div className="nav nav-tabs mb30">
