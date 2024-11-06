@@ -4481,7 +4481,11 @@ section {
   /* height: 300px; */
   max-height: 180px;
 }
-@media (max-width: 767.98px) {
+@media (max-width: 1200px) {
+  .cta-service-v1 {
+    max-height: 380px;
+  }
+
   .cta-service-v1.freelancer-single-style {
     height: auto;
   }
