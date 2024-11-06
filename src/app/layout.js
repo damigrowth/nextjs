@@ -17,12 +17,15 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { isAuthenticated } from "@/lib/auth/authenticated";
 import { getUser } from "@/lib/user/user";
 import { ApolloWrapper } from "@/lib/client/apollo-wrapper";
+import { headers } from "next/headers";
 
 if (typeof window !== "undefined") {
   import("bootstrap");
 }
 
 export default async function RootLayout({ children, params }) {
+  const headersList = headers();
+  const pathname = headersList.get("x-current-path");
   // const { serverStatus } = await checkServerHealth();
 
   // if (!serverStatus)
@@ -43,11 +46,11 @@ export default async function RootLayout({ children, params }) {
 
   const gaId = process.env.GA_ID;
 
-  const isFooterPath = footer.includes(params.path);
+  const isFooterPath = footer.includes(pathname);
 
   return (
     <html lang="el">
-      <Body path={params.path}>
+      <Body>
         <InstallBootstrap />
         {!isFooterPath ? (
           <div className="wrapper ovh mm-page mm-slideout">
@@ -76,16 +79,4 @@ export default async function RootLayout({ children, params }) {
       </Body>
     </html>
   );
-}
-
-export async function generateStaticParams() {
-  // Generate static params for all possible paths
-  const paths = [
-    { path: "" },
-    { path: "register" },
-    { path: "login" },
-    ...footer.map((path) => ({ path: path.slice(1) })),
-  ];
-
-  return paths;
 }
