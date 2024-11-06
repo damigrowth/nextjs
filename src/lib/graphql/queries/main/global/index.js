@@ -48,28 +48,6 @@ const ROOT_LAYOUT = gql`
         }
       }
     }
-    footer {
-      data {
-        attributes {
-          company {
-            data {
-              attributes {
-                title
-                slug
-              }
-            }
-          }
-          categories(sort: "label:asc") {
-            data {
-              attributes {
-                label
-                slug
-              }
-            }
-          }
-        }
-      }
-    }
   }
 `;
 

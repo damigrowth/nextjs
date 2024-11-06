@@ -39,7 +39,7 @@ export default async function RootLayout({ children, params }) {
   const { authenticated } = await isAuthenticated();
   const user = await getUser();
 
-  const { header: headerData, footer: footerData } = await getData(ROOT_LAYOUT);
+  const { header: headerData } = await getData(ROOT_LAYOUT);
 
   const gaId = process.env.GA_ID;
 
@@ -60,9 +60,7 @@ export default async function RootLayout({ children, params }) {
             )}
             <div className="body_content">
               <ApolloWrapper>{children}</ApolloWrapper>
-              {(!isUnderMaintenance || authenticated) && (
-                <Footer footer={footerData} />
-              )}
+              {(!isUnderMaintenance || authenticated) && <Footer />}
               <BottomToTop />
             </div>
           </div>
