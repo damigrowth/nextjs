@@ -18,6 +18,7 @@ import { isAuthenticated } from "@/lib/auth/authenticated";
 import { getUser } from "@/lib/user/user";
 import { ApolloWrapper } from "@/lib/client/apollo-wrapper";
 import { headers } from "next/headers";
+import { CookiesBanner } from "@/components/ui/banners/CookiesBanner";
 
 if (typeof window !== "undefined") {
   import("bootstrap");
@@ -76,6 +77,7 @@ export default async function RootLayout({ children, params }) {
         <NavMenuMobile header={headerData} />
         <SpeedInsights />
         <GoogleAnalytics gaId={gaId} />
+        <CookiesBanner />
       </Body>
     </html>
   );
