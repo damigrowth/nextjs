@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getBestDimensions } from "@/utils/imageDimensions";
+import { MediaPlayer } from "../media/MediaPlayer";
 
 export default function ServiceCardFile({ file, path }) {
   const fallbackImage = "/images/fallback/service.png";
@@ -18,7 +19,7 @@ export default function ServiceCardFile({ file, path }) {
             alt="service-thumbnail"
           />
         )}
-        {file?.formats && (
+        {file?.formats ? (
           <Image
             height={245}
             width={329}
@@ -26,11 +27,10 @@ export default function ServiceCardFile({ file, path }) {
             src={getBestDimensions(file.formats).url}
             alt="service-thumbnail"
           />
-        )}
-        {file?.url && (
-          <video width={329} height={245} controls preload="none">
-            <source src={file.url} type="video/mp4" />.
-          </video>
+        ) : (
+          <div className="d-flex align-items-center justify-content-center h-100 bg-dark">
+            <MediaPlayer url={file.url} />
+          </div>
         )}
       </div>
     </Link>

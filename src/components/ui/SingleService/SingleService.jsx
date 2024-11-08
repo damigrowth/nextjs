@@ -121,6 +121,7 @@ export default async function SingleService({
                     ) : (
                       <FeaturedFile
                         formats={media?.data[0]?.attributes?.formats}
+                        file={media?.data[0]}
                       />
                     )}
                   </>
