@@ -9,6 +9,8 @@ import "swiper/css/thumbs";
 import { FreeMode, Navigation, Thumbs } from "swiper";
 import Image from "next/image";
 import { getBestDimensions } from "@/utils/imageDimensions";
+import { MediaPlayer } from "../media/MediaPlayer";
+import { MediaThumb } from "../media/MediaThumb";
 
 export default function FeaturedFiles({ files, title, border }) {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
@@ -66,9 +68,7 @@ export default function FeaturedFiles({ files, title, border }) {
                   } else {
                     return (
                       <SwiperSlide key={i}>
-                        <video controls preload="none">
-                          <source src={url} type="video/mp4" />.
-                        </video>
+                        <MediaPlayer url={url} />
                       </SwiperSlide>
                     );
                   }
@@ -96,8 +96,6 @@ export default function FeaturedFiles({ files, title, border }) {
           >
             {galleryFiles.map(({ formats, url }, i) => {
               if (formats) {
-                console.log(formats);
-
                 const imageWidth = formats.small.width;
                 const imageHeight = formats.small.height;
                 const imageUrl = formats.small.url;
@@ -115,27 +113,7 @@ export default function FeaturedFiles({ files, title, border }) {
               } else {
                 return (
                   <SwiperSlide key={i}>
-                    <div
-                      style={{
-                        position: "relative",
-                        width: "300px",
-                        height: "300px",
-                        backgroundColor: "#404040",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <i
-                        className="fas fa-video"
-                        style={{
-                          fontSize: "48px",
-                          color: "white",
-                          opacity: 0.8,
-                        }}
-                      ></i>
-                    </div>
+                    <MediaThumb url={url} />
                   </SwiperSlide>
                 );
               }
