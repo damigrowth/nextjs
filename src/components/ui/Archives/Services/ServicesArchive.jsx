@@ -8,6 +8,7 @@ import Content from "./Content";
 import ContentSkeleton from "./ContentSkeleton";
 import BorderSpinner from "../../Spinners/BorderSpinner";
 import SidebarModal from "../SidebarModal";
+import Tags from "./Filters/Tags";
 
 export default function ServicesArchive({
   taxonomies,
@@ -15,10 +16,18 @@ export default function ServicesArchive({
   paramsFilters,
   childPath,
   selectData,
+  multiSelectData,
 }) {
   // Remove 'cat_s' from searchParams
   const filteredSearchParams = Object.fromEntries(
-    Object.entries(searchParams).filter(([key]) => key !== "cat_s")
+    Object.entries(searchParams).filter(
+      ([key]) =>
+        key !== "cat_s" &&
+        key !== "tags_s" &&
+        key !== "tags_p" &&
+        key !== "cov_c_s" &&
+        key !== "tags_ps"
+    )
   );
 
   const filters = [
@@ -27,6 +36,11 @@ export default function ServicesArchive({
       params: ["cat"],
       childPath,
       component: <Category selectData={selectData} />,
+    },
+    {
+      heading: "Tags",
+      params: ["tags"],
+      component: <Tags selectData={multiSelectData} />,
     },
     { heading: "Τιμή", params: ["min", "max"], component: <Price /> },
     { heading: "Χρόνος παράδοσης", params: ["time"], component: <Time /> },
