@@ -1,5 +1,5 @@
 import React from "react";
-import SearchSelectSingle from "../../Inputs/SearchSelectSingle";
+import SearchSelect from "../../Inputs/SearchSelect";
 
 export default function Category({ selectData }) {
   const optionsData = selectData.options.map((cat) => ({
@@ -8,7 +8,7 @@ export default function Category({ selectData }) {
   }));
 
   return (
-    <SearchSelectSingle
+    <SearchSelect
       rootLabel={selectData.rootLabel}
       defaultLabel={selectData.defaultLabel}
       paramOptionName={selectData.option}

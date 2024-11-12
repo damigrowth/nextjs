@@ -10,6 +10,7 @@ import {
 import Tabs from "@/components/ui/Archives/Tabs";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
+import { TAGS_SEARCH } from "@/lib/graphql/queries/main/taxonomies/service/tag";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -63,6 +64,10 @@ export default async function page({ params, searchParams }) {
     cat_s,
     subd_p,
     subd_ps,
+    tags,
+    tags_s,
+    tags_p,
+    tags_ps,
     ver,
     page,
     sort,
@@ -78,12 +83,16 @@ export default async function page({ params, searchParams }) {
     cat: subcategory,
     subdivisionPage: addFilter(subd_p, parseInt(subd_p, 10)),
     subdivisionPageSize: addFilter(subd_ps, parseInt(subd_ps, 10)),
+    tagsPage: addFilter(tags_p, parseInt(tags_p, 10)) || 1,
+    tagsPageSize: addFilter(tags_ps, parseInt(tags_ps, 10)) || 10,
+    tags: tags?.split(",").filter(Boolean) || [],
     verified: addFilter(ver === "", true),
     page: !page || parseInt(page, 10) < 1 ? 1 : parseInt(page, 10),
     sort: sort ? sort : "publishedAt:desc",
   };
 
   let categorySearch = cat_s ? cat_s : undefined;
+  let tagsSearch = tags_s ? tags_s : undefined;
 
   const { subdivisionsSearch } = await getData(SUBDIVISIONS_SEARCH_FILTERED, {
     subcategorySlug: subcategory,
@@ -91,6 +100,17 @@ export default async function page({ params, searchParams }) {
     subdivisionPage: paramsFilters.subdivisionPage,
     subdivisionPageSize: paramsFilters.subdivisionPageSize,
   });
+
+  const { tagsBySearch, tagsBySlug } = await getData(
+    TAGS_SEARCH,
+    {
+      label: tagsSearch,
+      tagsPage: paramsFilters.tagsPage,
+      tagsPageSize: paramsFilters.tagsPageSize,
+      slugs: paramsFilters.tags,
+    },
+    "tags"
+  );
 
   const selectData = {
     option: "cat",
@@ -103,6 +123,24 @@ export default async function page({ params, searchParams }) {
     defaultLabel: `${
       taxonomies.current ? taxonomies.current : "Όλες οι κατηγορίες"
     }`,
+  };
+
+  const multiSelectData = {
+    option: "tags",
+    search: "tags_s",
+    page: "tags_p",
+    pageSize: "tags_ps",
+    rootLabel: "Όλα τα tags",
+    defaultLabel: "Όλα τα tags",
+    // Combine both results and remove duplicates by slug
+    options: [
+      ...new Map(
+        [...(tagsBySearch?.data || []), ...(tagsBySlug?.data || [])].map(
+          (item) => [item.attributes.slug, item]
+        )
+      ).values(),
+    ],
+    pagination: tagsBySearch?.meta?.pagination,
   };
 
   return (
@@ -132,6 +170,7 @@ export default async function page({ params, searchParams }) {
         searchParams={searchParams}
         paramsFilters={paramsFilters}
         selectData={selectData}
+        multiSelectData={multiSelectData}
         childPath
       />
     </>
