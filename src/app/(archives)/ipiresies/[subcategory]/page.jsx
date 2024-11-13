@@ -85,7 +85,7 @@ export default async function page({ params, searchParams }) {
     subdivisionPageSize: addFilter(subd_ps, parseInt(subd_ps, 10)),
     tagsPage: addFilter(tags_p, parseInt(tags_p, 10)) || 1,
     tagsPageSize: addFilter(tags_ps, parseInt(tags_ps, 10)) || 10,
-    tags: tags?.split(",").filter(Boolean) || [],
+    tags: tags?.split(",").filter(Boolean),
     verified: addFilter(ver === "", true),
     page: !page || parseInt(page, 10) < 1 ? 1 : parseInt(page, 10),
     sort: sort ? sort : "publishedAt:desc",

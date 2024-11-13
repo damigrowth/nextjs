@@ -118,6 +118,7 @@ const SERVICES_ARCHIVE = gql`
     $max: Int
     $time: Int
     $cat: String
+    $tags: [String]
     $verified: Boolean
     $page: Int
     $sort: [String]
@@ -139,6 +140,7 @@ const SERVICES_ARCHIVE = gql`
               { category: { slug: { eq: $cat } } }
               { subcategory: { slug: { eq: $cat } } }
               { subdivision: { slug: { eq: $cat } } }
+              { tags: { slug: { in: $tags } } }
             ]
           }
           { freelancer: { user: { verified: { eq: $verified } } } }

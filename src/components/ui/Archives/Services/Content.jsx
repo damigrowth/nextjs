@@ -7,6 +7,8 @@ import ServiceGrid from "./ServiceGrid";
 import { SERVICES_ARCHIVE } from "@/lib/graphql/queries/main/service";
 
 export default async function Content({ paramsFilters, taxonomies }) {
+  console.log(paramsFilters);
+
   const { services } = await getData(SERVICES_ARCHIVE, paramsFilters);
 
   return (
