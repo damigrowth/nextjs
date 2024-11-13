@@ -25,8 +25,12 @@ export default function ServicesArchive({
         key !== "cat_s" &&
         key !== "tags_s" &&
         key !== "tags_p" &&
+        key !== "tags_ps" &&
         key !== "cov_c_s" &&
-        key !== "tags_ps"
+        key !== "covc_p" &&
+        key !== "covc_ps" &&
+        key !== "cat_p" &&
+        key !== "cat_ps"
     )
   );
 
