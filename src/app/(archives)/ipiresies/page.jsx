@@ -9,6 +9,7 @@ import Tabs from "@/components/ui/Archives/Tabs";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
+import { TAGS_SEARCH } from "@/lib/graphql/queries/main/taxonomies/service/tag";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -39,6 +40,10 @@ export default async function page({ searchParams }) {
     cat_s,
     subc_p,
     subc_ps,
+    tags,
+    tags_s,
+    tags_p,
+    tags_ps,
     ver,
     page,
     sort,
@@ -54,18 +59,33 @@ export default async function page({ searchParams }) {
     cat: addFilter(cat, parseInt(cat, 10)),
     subcategoryPage: addFilter(subc_p, parseInt(subc_p, 10)),
     subcategoryPageSize: addFilter(subc_ps, parseInt(subc_ps, 10)),
+    tagsPage: addFilter(tags_p, parseInt(tags_p, 10)) || 1,
+    tagsPageSize: addFilter(tags_ps, parseInt(tags_ps, 10)) || 10,
+    tags: tags?.split(",").filter(Boolean),
     verified: addFilter(ver === "", true),
     page: !page || parseInt(page, 10) < 1 ? 1 : parseInt(page, 10),
     sort: sort ? sort : "publishedAt:desc",
   };
 
   let categorySearch = cat_s ? cat_s : undefined;
+  let tagsSearch = tags_s ? tags_s : undefined;
 
   const { subcategoriesSearch } = await getData(SUBCATEGORIES_SEARCH_FILTERED, {
     searchTerm: categorySearch,
     subcategoryPage: paramsFilters.subcategoryPage,
     subcategoryPageSize: paramsFilters.subcategoryPageSize,
   });
+
+  const { tagsBySearch, tagsBySlug } = await getData(
+    TAGS_SEARCH,
+    {
+      label: tagsSearch,
+      tagsPage: paramsFilters.tagsPage,
+      tagsPageSize: paramsFilters.tagsPageSize,
+      slugs: paramsFilters.tags,
+    },
+    "tags"
+  );
 
   const selectData = {
     option: "cat",
@@ -77,6 +97,24 @@ export default async function page({ searchParams }) {
     rootLabel: "Όλες οι κατηγορίες",
     defaultLabel: "Όλες οι κατηγορίες",
     // defaultLabel={currCategory ? `${currCategory}` : "Όλες οι κατηγορίες"}
+  };
+
+  const multiSelectData = {
+    option: "tags",
+    search: "tags_s",
+    page: "tags_p",
+    pageSize: "tags_ps",
+    rootLabel: "Όλα τα tags",
+    defaultLabel: "Όλα τα tags",
+    // Combine both results and remove duplicates by slug
+    options: [
+      ...new Map(
+        [...(tagsBySearch?.data || []), ...(tagsBySlug?.data || [])].map(
+          (item) => [item.attributes.slug, item]
+        )
+      ).values(),
+    ],
+    pagination: tagsBySearch?.meta?.pagination,
   };
 
   return (
@@ -95,6 +133,7 @@ export default async function page({ searchParams }) {
         searchParams={searchParams}
         paramsFilters={paramsFilters}
         selectData={selectData}
+        multiSelectData={multiSelectData}
         childPath
       />
     </>
