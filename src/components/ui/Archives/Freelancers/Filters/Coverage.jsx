@@ -1,6 +1,6 @@
 import React from "react";
 import Switch from "../../Inputs/Switch";
-import SearchSelectSingle from "../../Inputs/SearchSelectSingle";
+import SearchSelect from "../../Inputs/SearchSelect";
 
 export default function Coverage({ selectData }) {
   const countiesData = selectData.options[1] || [];
@@ -12,7 +12,7 @@ export default function Coverage({ selectData }) {
   return (
     <>
       <Switch paramName="cov_o" label={"Online"} />
-      <SearchSelectSingle
+      <SearchSelect
         options={options}
         defaultLabel={selectData.defaultLabel[1]}
         paramOptionName={selectData.option[1]}

@@ -1,23 +1,18 @@
 "use client";
 
-import React, {
-  useEffect,
-  useRef,
-  useOptimistic,
-  useTransition,
-  useState,
-} from "react";
+import React, { useEffect, useRef, useOptimistic, useTransition } from "react";
 import {
   useParams,
   usePathname,
   useRouter,
   useSearchParams,
 } from "next/navigation";
+import Select from "react-select";
 import Link from "next/link";
 import { getPathname } from "@/utils/paths";
 import { RotatingLines } from "react-loader-spinner";
 
-export default function SearchSelectSingle({
+export default function SearchSelect({
   rootLabel,
   defaultLabel,
   paramOptionName,
@@ -29,6 +24,7 @@ export default function SearchSelectSingle({
   navigates,
   onSearch,
   pagination,
+  isMulti = false,
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -49,6 +45,7 @@ export default function SearchSelectSingle({
   const getInitialSearch = () => searchParams.get(paramSearchName) || "";
   const [search, setSearch] = useOptimistic(getInitialSearch());
 
+  // Single select initialization
   const getInitialSelectedOption = () => {
     const searchParamValue = searchParams.get(paramOptionName);
 
@@ -70,8 +67,26 @@ export default function SearchSelectSingle({
     return defaultOption;
   };
 
+  // Multi select initialization
+  const getInitialSelectedOptions = () => {
+    const searchParamValues =
+      searchParams.get(paramOptionName)?.split(",").filter(Boolean) || [];
+
+    if (searchParamValues.length > 0) {
+      return searchParamValues
+        .map((value) => allOptions.find((opt) => opt.value === value))
+        .filter(Boolean);
+    }
+
+    return [];
+  };
+
   const [selectedOption, setSelectedOption] = useOptimistic(
     getInitialSelectedOption()
+  );
+
+  const [selectedOptions, setSelectedOptions] = useOptimistic(
+    getInitialSelectedOptions()
   );
 
   const [selectedLink, setSelectedLink] = useOptimistic(
@@ -87,10 +102,15 @@ export default function SearchSelectSingle({
   useEffect(() => {
     startTransition(() => {
       setSearch(getInitialSearch());
-      setSelectedOption(getInitialSelectedOption());
+      if (isMulti) {
+        setSelectedOptions(getInitialSelectedOptions());
+      } else {
+        setSelectedOption(getInitialSelectedOption());
+      }
     });
   }, [searchParams, paramSearchName, paramOptionName]);
 
+  // Single select handler
   const selectHandler = (data) => {
     startTransition(() => {
       setSelectedOption(data);
@@ -105,6 +125,35 @@ export default function SearchSelectSingle({
       params.set(paramPageName, "1");
 
       router.push(pathname + "?" + params.toString(), { scroll: false });
+    });
+  };
+
+  // Multi select handler
+  const multiSelectHandler = (selectedItems) => {
+    startTransition(() => {
+      setSelectedOptions(selectedItems);
+      const params = new URLSearchParams(searchParams.toString());
+
+      if (
+        !selectedItems ||
+        selectedItems.length === 0 ||
+        (selectedItems.length === 1 &&
+          (selectedItems[0].value === "" ||
+            selectedItems[0].value === "default"))
+      ) {
+        params.delete(paramOptionName);
+      } else {
+        const values = selectedItems
+          .filter((item) => item.value !== "" && item.value !== "default")
+          .map((item) => item.value)
+          .join(",");
+        // Using encodeURI instead of the default URL encoding
+        params.set(paramOptionName, values);
+      }
+      params.set(paramPageName, "1");
+      // Construct the URL manually to preserve commas
+      const queryString = params.toString().replace(/%2C/g, ",");
+      router.push(`${pathname}?${queryString}`, { scroll: false });
     });
   };
 
@@ -167,6 +216,107 @@ export default function SearchSelectSingle({
   const searchFilter = (item) =>
     item?.label?.toLowerCase().includes(search.toLowerCase());
 
+  const generateLink = (value) => {
+    if (value === "" || value === "default") {
+      return `/${root}`;
+    }
+
+    let newPath;
+
+    if (!parent) {
+      newPath = `/${root}/${value}`;
+    } else if (!child) {
+      newPath = `/${root}/${parent}/${value}`;
+    } else {
+      newPath = `/${root}/${parent}/${value}`;
+    }
+
+    const queryString = searchParams.toString();
+    return `${newPath}${queryString ? `?${queryString}` : ""}`;
+  };
+
+  const selectLinkHandler = (item) => {
+    setSelectedLink(item);
+  };
+
+  // Styles for react-select
+  const customStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      backgroundColor: "var(--light-color)",
+      borderColor: state.isFocused ? "var(--primary-color)" : "#ddd",
+      boxShadow: state.isFocused ? "0 0 0 1px var(--primary-color)" : "none",
+      "&:hover": {
+        borderColor: state.isFocused ? "var(--primary-color)" : "#ddd",
+      },
+    }),
+    menu: (provided) => ({
+      ...provided,
+      zIndex: 9999,
+    }),
+    loadingIndicator: (provided) => ({
+      ...provided,
+      display: isSearchPending || isLoadMorePending ? "block" : "none",
+    }),
+  };
+
+  if (isMulti) {
+    return (
+      <div
+        search-pending={isSearchPending ? "" : undefined}
+        className="card-body card-body px-0 pt-0"
+      >
+        <div className="form-style1">
+          <Select
+            isMulti={true}
+            options={filterableOptions}
+            value={selectedOptions}
+            onChange={multiSelectHandler}
+            onInputChange={(value) => searchHandler(value)}
+            isDisabled={isDisabled()}
+            isLoading={isSearchPending}
+            filterOption={(option, inputValue) =>
+              option.label.toLowerCase().includes(inputValue.toLowerCase())
+            }
+            styles={customStyles}
+            placeholder={rootLabel}
+            onMenuScrollToBottom={loadMore}
+            closeMenuOnSelect={false}
+            components={{
+              LoadingIndicator: () => (
+                <RotatingLines
+                  visible={true}
+                  height="20"
+                  width="20"
+                  color="grey"
+                  strokeWidth="4"
+                  animationDuration="0.65"
+                  ariaLabel="rotating-lines-loading"
+                />
+              ),
+            }}
+            noOptionsMessage={({ inputValue }) =>
+              isSearchPending ? "" : `Κανένα αποτέλεσμα για ${inputValue}`
+            }
+          />
+        </div>
+        {/* {isLoadMorePending && (
+          <div className="text-center mt-2">
+            <RotatingLines
+              visible={true}
+              height="25"
+              width="25"
+              color="grey"
+              strokeWidth="4"
+              animationDuration="0.65"
+              ariaLabel="rotating-lines-loading"
+            />
+          </div>
+        )} */}
+      </div>
+    );
+  }
+
   const listFilters = filterableOptions.filter(searchFilter).map((item, i) => (
     <li
       key={i}
@@ -184,55 +334,6 @@ export default function SearchSelectSingle({
       </a>
     </li>
   ));
-
-  const generateLink = (value) => {
-    if (value === "" || value === "default") {
-      return `/${root}`;
-    }
-
-    let newPath;
-
-    if (!parent) {
-      newPath = `/${root}/${value}`;
-    } else if (!child) {
-      newPath = `/${root}/${parent}/${value}`;
-    } else {
-      newPath = `/${root}/${parent}/${value}`;
-    }
-    // switch (root) {
-    //   case "pros":
-    //   case "companies":
-    //     if (!parent) {
-    //       newPath = `/${root}/${value}`;
-    //     } else if (!child) {
-    //       newPath = `/${root}/${parent}/${value}`;
-    //     } else {
-    //       newPath = `/${root}/${parent}/${value}`;
-    //     }
-    //     break;
-
-    //   case "ipiresies":
-    //     if (!parent) {
-    //       newPath = `/${root}/${value}`;
-    //     } else if (!child) {
-    //       newPath = `/${root}/${parent}/${value}`;
-    //     } else {
-    //       newPath = `/${root}/${parent}/${value}`;
-    //     }
-    //     break;
-
-    //   default:
-    //     newPath = `/${root}`;
-    //     break;
-    // }
-
-    const queryString = searchParams.toString();
-    return `${newPath}${queryString ? `?${queryString}` : ""}`;
-  };
-
-  const selectLinkHandler = (item) => {
-    setSelectedLink(item);
-  };
 
   const listLinks = filterableOptions.filter(searchFilter).map((item, i) => (
     <li

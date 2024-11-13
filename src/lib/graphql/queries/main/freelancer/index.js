@@ -91,6 +91,7 @@ const FREELANCERS_ARCHIVE = gql`
     $coverageCounty: ID
     $type: String
     $cat: String
+    $skills: [String]
     $sub: String
     $experience: Int
     $top: Boolean
@@ -112,6 +113,7 @@ const FREELANCERS_ARCHIVE = gql`
           ]
         }
         category: { slug: { eq: $cat } }
+        skills: { slug: { in: $skills } }
         subcategory: { slug: { eq: $sub } }
         yearsOfExperience: { gte: $experience }
         topLevel: { eq: $top }

@@ -1,5 +1,5 @@
 import React from "react";
-import SearchSelectSingle from "../../Inputs/SearchSelectSingle";
+import SearchSelect from "../../Inputs/SearchSelect";
 
 export default function Category({ selectData }) {
   const options = selectData.options[0].reduce((acc, cat) => {
@@ -11,7 +11,7 @@ export default function Category({ selectData }) {
   }, []);
 
   return (
-    <SearchSelectSingle
+    <SearchSelect
       parentPathLink="profiles"
       options={options}
       rootLabel={selectData.rootLabel[0]}

@@ -61,7 +61,7 @@ export function CookiesBanner() {
       {showBanner && !showPreferences && (
         <div className="cookie-banner-wrapper cookies-banner">
           <div className="d-flex justify-content-between align-items-start mb-3">
-            <h6 className="mb-0">Ο ιστότοπος χρησιμοποιεί cookies</h6>
+            <h6 className="mb-0">Αποδοχή Cookies</h6>
             <button
               className="btn-close"
               onClick={() => setShowBanner(false)}
@@ -72,11 +72,12 @@ export function CookiesBanner() {
           </div>
 
           <p className="small mb-3" style={{ fontSize: "13px", color: "#666" }}>
-            Εμείς και επιλεγμένοι συνεργάτες μας χρησιμοποιούμε cookies (ή
-            παρόμοιες τεχνολογίες) για τεχνικούς σκοπούς, για τη βελτίωση και
-            ανάλυση της χρήσης του ιστότοπου, για την υποστήριξη των προωθητικών
-            μας ενεργειών και για άλλους σκοπούς που περιγράφονται στην
-            <a href="/cookie-policy" className="text-decoration-none ms-1">
+            Χρησιμοποιούμε cookies για να σου προσφέρουμε μια κορυφαία
+            προσωποποιημένη εμπειρία στο doulitsa και να σε βοηθήσουμε να βρεις
+            εύκολα αυτό που ψάχνεις. Επιπλέον, αναλύουμε την επισκεψιμότητα και
+            ενδυναμώνουμε την ασφάλεια της πλατφόρμας, για να απολαμβάνεις τις
+            υπηρεσίες μας σε ένα περιβάλλον που εξελίσσεται συνεχώς.
+            <a href="/cookies" className="text-decoration-none ms-1">
               Πολιτική Cookies
             </a>
             .
