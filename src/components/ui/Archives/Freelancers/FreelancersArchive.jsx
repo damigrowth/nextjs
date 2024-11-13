@@ -12,6 +12,7 @@ import BorderSpinner from "../../Spinners/BorderSpinner";
 import SidebarModal from "../SidebarModal";
 import Top from "./Filters/Top";
 import Verified from "./Filters/Verified";
+import Skills from "./Filters/Skills";
 
 export default function FreelancersArchive({
   taxonomies,
@@ -20,11 +21,23 @@ export default function FreelancersArchive({
   searchParams,
   paramsFilters,
   selectData,
+  multiSelectData,
   childPath,
 }) {
   // Remove 'cov_c_s' from searchParams
   const filteredSearchParams = Object.fromEntries(
-    Object.entries(searchParams).filter(([key]) => key !== "cov_c_s")
+    Object.entries(searchParams).filter(
+      ([key]) =>
+        key !== "cat_s" &&
+        key !== "skills_s" &&
+        key !== "skills_p" &&
+        key !== "skills_ps" &&
+        key !== "cov_c_s" &&
+        key !== "covc_p" &&
+        key !== "covc_ps" &&
+        key !== "cat_p" &&
+        key !== "cat_ps"
+    )
   );
 
   const filters = [
@@ -33,6 +46,11 @@ export default function FreelancersArchive({
       params: ["cat"],
       childPath,
       component: <Category selectData={selectData} />,
+    },
+    {
+      heading: "Δεξιότητες",
+      params: ["skills"],
+      component: <Skills selectData={multiSelectData} />,
     },
     { heading: "Εργατοώρα", params: ["min", "max"], component: <Rate /> },
     {
