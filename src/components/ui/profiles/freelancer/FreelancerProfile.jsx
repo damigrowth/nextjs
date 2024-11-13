@@ -136,6 +136,7 @@ export default function FreelancerProfile({
                     />
                   ) : (
                     <FeaturedFile
+                      file={portfolio?.data[0]}
                       formats={portfolio?.data[0]?.attributes?.formats}
                     />
                   )}
