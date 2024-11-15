@@ -47,14 +47,16 @@ export const checkServerHealth = async () => {
 export const getData = cache(async (query, variables) => {
   validateEnvVars();
 
+  // Create a cache key based on query and variables
+  const cacheKey = { query: print(query), variables };
+  // console.log("🔑 Cache Key:", cacheKey); // This will help debug which queries are being made
+
   const url = STRAPI_GRAPHQL;
   let queryString;
 
   if (typeof query === "string") {
-    // If query is already a string, use it directly
     queryString = query;
   } else {
-    // If query is an AST object, print it
     try {
       queryString = print(query);
     } catch (error) {
@@ -74,16 +76,23 @@ export const getData = cache(async (query, variables) => {
         query: queryString,
         variables,
       }),
-      next: { revalidate: 60 }, // 1 minute
+      next: {
+        revalidate: 60,
+        tags: [`query-${cacheKey}`], // Add cache tag
+      },
     });
-
-    console.log("📡 Response status:", response.status);
 
     if (!response.ok) {
       const errorData = await response.json();
       console.error("GraphQL error:", errorData.errors);
-      // throw new Error(JSON.stringify(errorData.errors));
+      return null;
     }
+
+    // console.log(
+    //   `📡 Response status: ${response.status}, Component: ${
+    //     new Error().stack.split("\n")[2]
+    //   }`
+    // );
 
     const jsonResponse = await response.json();
     return jsonResponse.data;
