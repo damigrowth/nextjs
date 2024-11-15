@@ -8,7 +8,7 @@ export default function PackagesBtns({ packages }) {
 
   const handleSelectPackage = (pack) => {
     setOrder({ packages: [pack] });
-    console.log("PACKAGEBTNS", pack);
+    // console.log("PACKAGEBTNS", pack);
     calculateTotal();
   };
   return (
