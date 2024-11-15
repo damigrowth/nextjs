@@ -15,7 +15,8 @@ import { FEATURED_FREELANCERS } from "@/lib/graphql/queries/main/freelancer";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 3600;
+export const revalidate = 3600; // 1 hour
+export const fetchCache = "force-cache";
 
 // Static SEO
 export async function generateMetadata() {
@@ -32,6 +33,7 @@ export async function generateMetadata() {
 }
 
 export default async function page() {
+  //TODO: Add batch query - combine all queries
   const { featuredEntity: featuredCategoriesData } = await getData(
     FEATURED_CATEGORIES
   );
