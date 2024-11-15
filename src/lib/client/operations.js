@@ -44,42 +44,32 @@ export const checkServerHealth = async () => {
   }
 };
 
+// Optimized getData with better caching
 export const getData = cache(async (query, variables) => {
   validateEnvVars();
 
-  // Create a cache key based on query and variables
-  const cacheKey = { query: print(query), variables };
-  // console.log("🔑 Cache Key:", cacheKey); // This will help debug which queries are being made
-
-  const url = STRAPI_GRAPHQL;
-  let queryString;
-
-  if (typeof query === "string") {
-    queryString = query;
-  } else {
-    try {
-      queryString = print(query);
-    } catch (error) {
-      console.error("Error printing query:", error);
-      throw new Error("Invalid GraphQL query");
-    }
-  }
+  // Create unique cache key based on query and variables
+  const queryString = typeof query === "string" ? query : print(query);
+  const cacheKey = JSON.stringify({ query: queryString, variables });
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(STRAPI_GRAPHQL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${STRAPI_TOKEN}`,
+        "Cache-Control": "max-age=3600, s-maxage=3600", // Cache for 1 hour
       },
       body: JSON.stringify({
         query: queryString,
         variables,
       }),
-      next: {
-        revalidate: 60,
-        tags: [`query-${cacheKey}`], // Add cache tag
-      },
+      cache: "force-cache",
+      tags: [
+        "graphql",
+        `query-${cacheKey}`,
+        ...(variables?.cat ? [`category-${variables.cat}`] : []),
+      ],
     });
 
     if (!response.ok) {
@@ -87,12 +77,6 @@ export const getData = cache(async (query, variables) => {
       console.error("GraphQL error:", errorData.errors);
       return null;
     }
-
-    // console.log(
-    //   `📡 Response status: ${response.status}, Component: ${
-    //     new Error().stack.split("\n")[2]
-    //   }`
-    // );
 
     const jsonResponse = await response.json();
     return jsonResponse.data;
