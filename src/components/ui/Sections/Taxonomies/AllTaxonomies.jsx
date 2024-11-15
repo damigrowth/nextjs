@@ -3,10 +3,8 @@ import AllTaxonomiesTabs from "./AllTaxonomiesTabs";
 import AllTaxonomiesList from "./AllTaxonomiesList";
 
 export default function AllTaxonomies({
-  freelancerCategories = [],
-  skills = [],
-  tags = [],
-  categories = [],
+  freelancerSubcategories = [],
+  serviceSubcategories = [],
 }) {
   const groupItems = (items) => {
     const groupsArray = [];
@@ -16,30 +14,24 @@ export default function AllTaxonomies({
     return groupsArray;
   };
 
-  const freelancerCategoriesGroups = useMemo(
-    () => groupItems(freelancerCategories),
-    [freelancerCategories]
+  const freelancerGroups = useMemo(
+    () => groupItems(freelancerSubcategories),
+    [freelancerSubcategories]
   );
-  const skillsGroups = useMemo(() => groupItems(skills), [skills]);
-  const tagsGroups = useMemo(() => groupItems(tags), [tags]);
-  const categoriesGroups = useMemo(() => groupItems(categories), [categories]);
+
+  const serviceGroups = useMemo(
+    () => groupItems(serviceSubcategories),
+    [serviceSubcategories]
+  );
 
   const taxonomies = [
     {
       label: "Κατηγορίες Επαγγελμάτων",
-      data: freelancerCategoriesGroups,
-    },
-    {
-      label: "Δεξιότητες",
-      data: skillsGroups,
-    },
-    {
-      label: "Tags Υπηρεσιών",
-      data: tagsGroups,
+      data: freelancerGroups,
     },
     {
       label: "Κατηγορίες Υπηρεσιών",
-      data: categoriesGroups,
+      data: serviceGroups,
     },
   ];
 

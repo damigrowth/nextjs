@@ -44,45 +44,38 @@ export const checkServerHealth = async () => {
   }
 };
 
+// Optimized getData with better caching
 export const getData = cache(async (query, variables) => {
   validateEnvVars();
 
-  const url = STRAPI_GRAPHQL;
-  let queryString;
-
-  if (typeof query === "string") {
-    // If query is already a string, use it directly
-    queryString = query;
-  } else {
-    // If query is an AST object, print it
-    try {
-      queryString = print(query);
-    } catch (error) {
-      console.error("Error printing query:", error);
-      throw new Error("Invalid GraphQL query");
-    }
-  }
+  // Create unique cache key based on query and variables
+  const queryString = typeof query === "string" ? query : print(query);
+  const cacheKey = JSON.stringify({ query: queryString, variables });
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(STRAPI_GRAPHQL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${STRAPI_TOKEN}`,
+        "Cache-Control": "max-age=3600, s-maxage=3600", // Cache for 1 hour
       },
       body: JSON.stringify({
         query: queryString,
         variables,
       }),
-      next: { revalidate: 60 }, // 1 minute
+      cache: "force-cache",
+      tags: [
+        "graphql",
+        `query-${cacheKey}`,
+        ...(variables?.cat ? [`category-${variables.cat}`] : []),
+      ],
     });
-
-    console.log("📡 Response status:", response.status);
 
     if (!response.ok) {
       const errorData = await response.json();
       console.error("GraphQL error:", errorData.errors);
-      // throw new Error(JSON.stringify(errorData.errors));
+      return null;
     }
 
     const jsonResponse = await response.json();

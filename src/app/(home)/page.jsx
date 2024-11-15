@@ -7,7 +7,7 @@ import FeaturedFreelancers from "@/components/ui/Sections/Featured/Freelancers/F
 import AllTaxonomies from "@/components/ui/Sections/Taxonomies/AllTaxonomies";
 import Hero from "@/components/ui/Sections/Hero/Hero";
 import {
-  ALL_TAXONOMIES,
+  ALL_TOP_TAXONOMIES,
   FEATURED_CATEGORIES,
 } from "@/lib/graphql/queries/main/taxonomies";
 import { FEATURED_SERVICES } from "@/lib/graphql/queries/main/service";
@@ -15,7 +15,8 @@ import { FEATURED_FREELANCERS } from "@/lib/graphql/queries/main/freelancer";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 3600;
+export const revalidate = 3600; // 1 hour
+export const fetchCache = "force-cache";
 
 // Static SEO
 export async function generateMetadata() {
@@ -32,6 +33,7 @@ export async function generateMetadata() {
 }
 
 export default async function page() {
+  //TODO: Add batch query - combine all queries
   const { featuredEntity: featuredCategoriesData } = await getData(
     FEATURED_CATEGORIES
   );
@@ -44,8 +46,8 @@ export default async function page() {
     FEATURED_FREELANCERS
   );
 
-  const { freelancerCategories, skills, tags, categories } = await getData(
-    ALL_TAXONOMIES
+  const { topServiceSubcategories, topFreelancerSubcategories } = await getData(
+    ALL_TOP_TAXONOMIES
   );
 
   const featuredCategories =
@@ -69,10 +71,8 @@ export default async function page() {
       <FeaturedFreelancers freelancers={featuredFreelancers} />
       <Stats />
       <AllTaxonomies
-        freelancerCategories={freelancerCategories.data}
-        skills={skills.data}
-        tags={tags.data}
-        categories={categories.data}
+        freelancerSubcategories={topFreelancerSubcategories.subcategories}
+        serviceSubcategories={topServiceSubcategories.subcategories}
       />
     </>
   );

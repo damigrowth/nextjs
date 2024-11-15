@@ -21,7 +21,10 @@ const TAGS_SEARCH = gql`
     $slugs: [String!]
   ) {
     tagsBySearch: tags(
-      filters: { label: { containsi: $label } }
+      filters: {
+        label: { containsi: $label }
+        services: { id: { not: { null: true } } }
+      }
       pagination: { page: $tagsPage, pageSize: $tagsPageSize }
       sort: "label:asc"
     ) {
@@ -32,7 +35,12 @@ const TAGS_SEARCH = gql`
         ...Pagination
       }
     }
-    tagsBySlug: tags(filters: { slug: { in: $slugs } }) {
+    tagsBySlug: tags(
+      filters: {
+        slug: { in: $slugs }
+        services: { id: { not: { null: true } } }
+      }
+    ) {
       data {
         ...Tag
       }

@@ -74,15 +74,19 @@ export default function ServiceCard({
             <Link href={`/s/${slug}`}>{truncatedTitle}</Link>
           </h6>
           <CardReviews rating={rating} reviews_total={reviews_total} />
-          <hr className="my-2" />
-          <div className="list-meta mt15">
-            <div className="budget">
-              <p className="mb-0 body-color">
-                από
-                <span className="fz17 fw500 dark-color ms-1">{price}€</span>
-              </p>
-            </div>
-          </div>
+          {price > 0 && (
+            <>
+              <hr className="my-2" />
+              <div className="list-meta mt15">
+                <div className="budget">
+                  <p className="mb-0 body-color">
+                    από
+                    <span className="fz17 fw500 dark-color ms-1">{price}€</span>
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>
