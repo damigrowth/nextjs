@@ -17,6 +17,7 @@ const SKILLS_SEARCH = gql`
       filters: {
         label: { containsi: $label }
         category: { slug: { eq: $category } }
+        freelancers: { id: { not: { null: true } } }
       }
       pagination: { page: $skillsPage, pageSize: $skillsPageSize }
       sort: "label:asc"
@@ -27,7 +28,11 @@ const SKILLS_SEARCH = gql`
       }
     }
     skillsBySlug: skills(
-      filters: { slug: { in: $slugs }, category: { slug: { eq: $category } } }
+      filters: {
+        slug: { in: $slugs }
+        category: { slug: { eq: $category } }
+        freelancers: { id: { not: { null: true } } }
+      }
     ) {
       ...SkillEntity
     }
