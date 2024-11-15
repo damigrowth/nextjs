@@ -1,31 +1,66 @@
 import { gql } from "@apollo/client";
-import { FREELANCER_CATEGORY_ENTITY } from "../../fragments/taxonomies/freelancer";
-import { TAG_ENTITY } from "../../fragments/entities/tag";
-import { SKILL_ENTITY } from "../../fragments/entities/skill";
-import {
-  CATEGORY_ENTITY,
-  CATEGORY_FULL,
-} from "../../fragments/taxonomies/service";
+import { CATEGORY_FULL } from "../../fragments/taxonomies/service";
 
 const ALL_TAXONOMIES = gql`
   query AllTaxonomies {
-    freelancerCategories {
-      ...FreelancerCategoryEntity
+    freelancerSubcategories: freelancerSubcategories {
+      data {
+        attributes {
+          plural
+          label
+          slug
+        }
+      }
     }
-    skills(sort: "label:asc") {
-      ...SkillEntity
-    }
-    tags(sort: "label:asc") {
-      ...TagEntity
-    }
-    categories(sort: "label:asc") {
-      ...CategoryEntity
+    serviceSubcategories: subcategories(sort: "label:asc") {
+      data {
+        attributes {
+          label
+          slug
+        }
+      }
     }
   }
-  ${FREELANCER_CATEGORY_ENTITY}
-  ${TAG_ENTITY}
-  ${SKILL_ENTITY}
-  ${CATEGORY_ENTITY}
+`;
+
+const ALL_TOP_TAXONOMIES = gql`
+  query AllTopTaxonomies {
+    topFreelancerSubcategories: topFreelancerTaxonomiesByCategory(
+      category: ""
+    ) {
+      subcategories {
+        plural
+        slug
+        type {
+          data {
+            attributes {
+              slug
+            }
+          }
+        }
+        category {
+          data {
+            attributes {
+              slug
+            }
+          }
+        }
+      }
+    }
+    topServiceSubcategories: topServiceTaxonomiesByCategory(category: "") {
+      subcategories {
+        label
+        slug
+        category {
+          data {
+            attributes {
+              slug
+            }
+          }
+        }
+      }
+    }
+  }
 `;
 
 const FEATURED_CATEGORIES = gql`
@@ -58,4 +93,9 @@ const CATEGORIES_ALL = gql`
   }
 `;
 
-export { ALL_TAXONOMIES, FEATURED_CATEGORIES, CATEGORIES_ALL };
+export {
+  ALL_TAXONOMIES,
+  FEATURED_CATEGORIES,
+  CATEGORIES_ALL,
+  ALL_TOP_TAXONOMIES,
+};

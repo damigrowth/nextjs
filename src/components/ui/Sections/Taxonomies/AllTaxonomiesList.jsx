@@ -13,10 +13,26 @@ export default function AllTaxonomiesList({ list, tabIndex }) {
           <div key={i} className="col">
             <div className="skill-list-style1 mb20">
               <ul className="p-0 mb-0">
-                {tax.map(({ attributes }, i2) => (
+                {tax.map((item, i2) => (
                   <li key={i2}>
-                    <Link href={`/ipiresies/${attributes.slug}`}>
-                      {attributes.plural || attributes.label}
+                    <Link
+                      href={`/${
+                        item.type
+                          ? item.type.data.attributes.slug === "company"
+                            ? "companies"
+                            : "pros"
+                          : "ipiresies"
+                      }/${
+                        item.plural
+                          ? item.category
+                            ? item.category.data.attributes.slug +
+                              "/" +
+                              item.slug
+                            : ""
+                          : item.slug
+                      }`}
+                    >
+                      {item.plural || item.label}
                     </Link>
                   </li>
                 ))}
