@@ -56,9 +56,16 @@ export default function Breadcrumb({
                       </Link>
                     )}
                     {subdivision && (
-                      <div className="archive-breadcrump-active">
+                      <Link
+                        href={
+                          categoriesRoute
+                            ? `/${parentPathLink}/${subcategory.slug}/${subdivision.slug}`
+                            : `/${parentPathLink}/${category.slug}/${subcategory.slug}`
+                        }
+                        className="archive-breadcrump-active"
+                      >
                         {plural ? subdivision.plural : subdivision.label}
-                      </div>
+                      </Link>
                     )}
                   </>
                 )}
