@@ -2,7 +2,7 @@
 
 import useHomeStore from "@/store/home/homeStore";
 import { useRef } from "react";
-import { searchSubcategories } from "@/lib/search/subcategories";
+import { searchSubcategories } from "@/lib/search/home";
 
 export default function Dropdown({ categories }) {
   const { categorySelect, setCategorySelect, setSearchTerm } = useHomeStore();

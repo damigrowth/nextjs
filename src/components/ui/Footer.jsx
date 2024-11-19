@@ -23,7 +23,7 @@ export default async function Footer() {
                       <h6 className="text-white mb10">Σχετικά</h6>
                       <div className="link-list">
                         {firstColumnLinks.map((item, i) => (
-                          <Link key={i} href={`/co/${item.attributes.slug}`}>
+                          <Link key={i} href={`/${item.attributes.slug}`}>
                             {item.attributes.title}
                           </Link>
                         ))}
@@ -36,7 +36,7 @@ export default async function Footer() {
                       <ul className="ps-0">
                         {secondColumnLinks.map((item, i) => (
                           <li key={i}>
-                            <Link href={`/ipiresies/${item.attributes.slug}`}>
+                            <Link href={`/categories/${item.attributes.slug}`}>
                               {item.attributes.label}
                             </Link>
                           </li>

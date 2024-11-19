@@ -1,6 +1,6 @@
 "use client";
 
-import { searchSubcategories } from "@/lib/search/subcategories";
+import { homeSearch } from "@/lib/search/home";
 import useHomeStore from "@/store/home/homeStore";
 import HomeSchema from "@/utils/Seo/Schema/HomeSchema";
 import Link from "next/link";
@@ -19,7 +19,7 @@ const debounce = (func, delay) => {
 
 export default function Search() {
   const router = useRouter();
-  const [res, action, pending] = useActionState(searchSubcategories);
+  const [res, action, pending] = useActionState(homeSearch);
   const formRef = useRef(null);
   const isInitialMount = useRef(true);
 
@@ -52,9 +52,10 @@ export default function Search() {
     (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
-        const searchPath = categorySlug
-          ? `/ipiresies/${categorySlug}?search=${searchTerm}`
-          : `/ipiresies?search=${searchTerm}`;
+        const searchPath = `/ipiresies?search=${searchTerm}`;
+        // const searchPath = categorySlug
+        //   ? `/ipiresies/${categorySlug}?search=${searchTerm}`
+        //   : `/ipiresies?search=${searchTerm}`;
         router.push(searchPath);
       }
     },
@@ -70,11 +71,16 @@ export default function Search() {
     []
   );
 
-  const handleSubcategoryClick = useCallback(
-    (sub) => {
+  const handleResultClick = useCallback(
+    (item) => {
       setSearchTerm("");
       blurDropdown();
-      router.push(`/ipiresies/${sub.parentSlug}/${sub.slug}`);
+      if (item.type === "subcategory") {
+        router.push(`/ipiresies/${item.slug}`);
+      }
+      if (item.type === "subdivision") {
+        router.push(`/ipiresies/${item.parentSlug}/${item.slug}`);
+      }
     },
     [router, setSearchTerm, blurDropdown]
   );
@@ -151,13 +157,13 @@ export default function Search() {
               <div className="box-suggestions">
                 <ul className="px-0 m-0 pb-4">
                   {res.data.map((sub, index) => (
-                    <li key={sub.slug || index}>
+                    <li key={index}>
                       <div
                         className="info-product cursor-pointer"
-                        onClick={() => handleSubcategoryClick(sub)}
+                        onClick={() => handleResultClick(sub)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
-                            handleSubcategoryClick(sub);
+                            handleResultClick(sub);
                           }
                         }}
                         role="button"

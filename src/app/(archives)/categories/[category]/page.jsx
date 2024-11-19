@@ -47,12 +47,12 @@ export default async function page({ params }) {
     <>
       <Tabs
         parentPathLabel="Όλες οι κατηγορίες"
-        parentPathLink="category"
+        parentPathLink="categories"
         categories={categories?.data}
       />
       <Breadcrumb
         parentPathLabel="Υπηρεσίες"
-        parentPathLink="category"
+        parentPathLink="categories"
         category={archiveCategory}
       />
       <Banner

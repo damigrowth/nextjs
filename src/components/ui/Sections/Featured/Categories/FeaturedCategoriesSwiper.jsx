@@ -46,7 +46,7 @@ export default function FeaturedCategoriesSwiper({ categories }) {
                 <SwiperSlide key={index}>
                   <div className="item">
                     <div className="iconbox-style1 bdr1">
-                      <Link href={`/ipiresies/${item.attributes.slug}`}>
+                      <Link href={`/categories/${item.attributes.slug}`}>
                         <div className="icon">
                           <span className={item.attributes.icon}></span>
                         </div>
@@ -54,7 +54,7 @@ export default function FeaturedCategoriesSwiper({ categories }) {
                       <div className="details mt20">
                         {/* <p className="text mb5">{item.skill} skills</p> */}
                         <h4 className="title">
-                          <Link href={`/ipiresies/${item.attributes.slug}`}>
+                          <Link href={`/categories/${item.attributes.slug}`}>
                             {item.attributes.label}
                           </Link>
                         </h4>
@@ -64,7 +64,7 @@ export default function FeaturedCategoriesSwiper({ categories }) {
                             .map((sub, i) => (
                               <span key={i}>
                                 <Link
-                                  href={`/ipiresies/${item.attributes.slug}/${sub.attributes.slug}`}
+                                  href={`/ipiresies/${sub.attributes.slug}`}
                                 >
                                   {sub.attributes.label}
                                 </Link>

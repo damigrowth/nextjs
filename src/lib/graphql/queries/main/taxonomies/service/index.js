@@ -235,7 +235,7 @@ const TAXONOMIES_ARCHIVE = gql`
 
 const HOME_SEARCH = gql`
   query HomeSearch($searchTerm: String, $categorySlug: String) {
-    homeSearch: subcategories(
+    subcategories(
       filters: {
         and: [
           { label: { containsi: $searchTerm } }
@@ -249,7 +249,24 @@ const HOME_SEARCH = gql`
         attributes {
           label
           slug
-          category {
+        }
+      }
+    }
+    subdivisions(
+      filters: {
+        and: [
+          { label: { containsi: $searchTerm } }
+          { category: { slug: { eq: $categorySlug } } }
+          { services: { id: { not: { null: true } } } }
+        ]
+      }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+          subcategory {
             data {
               attributes {
                 label
