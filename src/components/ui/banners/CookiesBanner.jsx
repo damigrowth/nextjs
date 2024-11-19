@@ -7,6 +7,7 @@ import {
   getCookieConsent,
   setCookieConsent,
 } from "@/lib/cookies/consent";
+import Link from "next/link";
 
 export function CookiesBanner() {
   const [showBanner, setShowBanner] = useState(false);
@@ -74,12 +75,13 @@ export function CookiesBanner() {
           <p className="small mb-3" style={{ fontSize: "13px", color: "#666" }}>
             Χρησιμοποιούμε cookies για να σου προσφέρουμε μια κορυφαία
             προσωποποιημένη εμπειρία στο doulitsa και να σε βοηθήσουμε να βρεις
-            εύκολα αυτό που ψάχνεις. Επιπλέον, αναλύουμε την επισκεψιμότητα και
-            ενδυναμώνουμε την ασφάλεια της πλατφόρμας, για να απολαμβάνεις τις
-            υπηρεσίες μας σε ένα περιβάλλον που εξελίσσεται συνεχώς.
-            <a href="/cookies" className="text-decoration-none ms-1">
+            εύκολα αυτό που ψάχνεις. <br />
+            Επιπλέον, αναλύουμε την επισκεψιμότητα και ενδυναμώνουμε την
+            ασφάλεια της πλατφόρμας, για να απολαμβάνεις τις υπηρεσίες μας σε
+            ένα περιβάλλον που εξελίσσεται συνεχώς.
+            <Link href="/privacy" className="text-decoration-none ms-1">
               Πολιτική Cookies
-            </a>
+            </Link>
             .
           </p>
 
