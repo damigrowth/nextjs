@@ -25,7 +25,7 @@ export default async function FeaturedCategories({ categories }) {
           </div>
           <div className="col-lg-3">
             <div className="text-start text-lg-end mb-4 mb-lg-2">
-              <Link className="ud-btn2" href="/ipiresies">
+              <Link className="ud-btn2" href="/categories">
                 Όλες οι Κατηγορίες
                 <i className="fal fa-arrow-right-long"></i>
               </Link>
@@ -36,7 +36,7 @@ export default async function FeaturedCategories({ categories }) {
           {featuredCategories.map((item, i) => (
             <div key={i} className={item.classNames}>
               <div className="iconbox-style1 at-home12-v2">
-                <Link href={`/ipiresies/${item.attributes.slug}`}>
+                <Link href={`/categories/${item.attributes.slug}`}>
                   <div className="icon">
                     <span className={item.attributes.icon}></span>
                   </div>
@@ -44,7 +44,7 @@ export default async function FeaturedCategories({ categories }) {
                 <div className="details mt20">
                   {/* <p className="text mb5">{item.skills} skills</p> */}
                   <h4 className="title">
-                    <Link href={`/ipiresies/${item.attributes.slug}`}>
+                    <Link href={`/categories/${item.attributes.slug}`}>
                       {item.attributes.label}
                     </Link>
                   </h4>
@@ -53,9 +53,7 @@ export default async function FeaturedCategories({ categories }) {
                       .slice(0, 3)
                       .map((sub, i) => (
                         <span key={i}>
-                          <Link
-                            href={`/ipiresies/${item.attributes.slug}/${sub.attributes.slug}`}
-                          >
+                          <Link href={`/ipiresies/${sub.attributes.slug}`}>
                             {sub.attributes.label}
                           </Link>
                           {i < 2 &&
