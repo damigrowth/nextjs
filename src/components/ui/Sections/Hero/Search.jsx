@@ -73,14 +73,14 @@ export default function Search() {
 
   const handleResultClick = useCallback(
     (item) => {
-      setSearchTerm("");
-      blurDropdown();
       if (item.type === "subcategory") {
         router.push(`/ipiresies/${item.slug}`);
       }
       if (item.type === "subdivision") {
         router.push(`/ipiresies/${item.parentSlug}/${item.slug}`);
       }
+      setSearchTerm("");
+      blurDropdown();
     },
     [router, setSearchTerm, blurDropdown]
   );
