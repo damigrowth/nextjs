@@ -16,19 +16,19 @@ export default function AuthRoleOptions() {
   } else if (role === 0) {
     return (
       <div className="mb20-lg mb30">
-        <button
-          className="ud-btn btn-thm2 add-joining mr10-lg mr20"
+          <button
+          className="ud-btn btn-thm2 add-joining mr20"
           type="button"
           onClick={() => setAuthRole(4)}
         >
-          Εγγραφή ως Freelancer
+          Εγγραφή χρήστη
         </button>
         <button
-          className="ud-btn btn-thm2 add-joining"
+          className="ud-btn btn-thm2 add-joining mr10-lg"
           type="button"
           onClick={() => setAuthRole(3)}
         >
-          Εγγραφή ως Employer
+          Επαγγελματικό Προφίλ
         </button>
       </div>
     );
