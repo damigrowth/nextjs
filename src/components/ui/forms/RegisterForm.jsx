@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useRef, useActionState } from "react";
+import React, { useRef, useActionState, useEffect } from "react";
 import Input from "../../inputs/Input";
 import authStore from "@/store/authStore";
 import { register } from "@/lib/auth/register";
+import RadioSelect from "../Archives/Inputs/RadioSelect";
 
 function RegisterButton() {
   return (
@@ -14,41 +15,60 @@ function RegisterButton() {
 }
 
 const RegisterForm = () => {
-  const role = authStore((state) => state.role);
+  const { type, role, roles, setAuthRole } = authStore();
   const formRef = useRef(null);
-  
+
   const [state, formAction] = useActionState(register, {
     errors: {},
     message: null,
     role: role,
   });
 
-  if (role === 0) return null;
+  useEffect(() => {
+    if (state) {
+      state.errors = {};
+      state.message = null;
+      setAuthRole(null);
+    }
+    formRef.current?.reset();
+  }, [type]);
+
+  if (type === 0) return null;
 
   return (
     <form ref={formRef} action={formAction}>
-      <Input
-        state={state}
-        type="hidden"
-        id="role"
-        value={role}
-        defaultValue={role}
-        name="role"
+      <input
+        type="text"
+        name="type"
+        value={type}
+        readOnly
+        hidden
+        className="hidden"
       />
-
-      {role === 3 && (
+      {type === 2 && (
         <>
+          <div className="mb25">
+            <RadioSelect
+              id="role"
+              name="role"
+              options={roles}
+              value={role}
+              onChange={(e) => setAuthRole(Number(e.target.value))}
+            />
+          </div>
           <div className="mb25">
             <Input
               state={state}
               label="Επωνυμία"
               type="text"
-              id="companyName"
-              name="companyName"
+              id="brandName"
+              name="brandName"
               disabled={state?.loading}
-              errorId="companyName-error"
+              errorId="brandName-error"
               formatSpaces
               formatSymbols
+              formatNumbers
+              capitalize
             />
           </div>
           <div className="mb25">
@@ -62,11 +82,12 @@ const RegisterForm = () => {
               errorId="displayName-error"
               formatSpaces
               formatSymbols
+              formatNumbers
+              capitalize
             />
           </div>
         </>
       )}
-
       <div className="mb25">
         <Input
           state={state}
@@ -114,7 +135,7 @@ const RegisterForm = () => {
         <div className="mb20 text-danger">{state?.message}</div>
       )}
 
-      <div className="d-grid mb20">
+      <div className="d-grid mt40 mb20">
         <RegisterButton />
       </div>
     </form>

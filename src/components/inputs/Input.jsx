@@ -70,7 +70,7 @@ export default function Input({
         </label>
       )}
 
-      <div className="input-group">
+      <div className="input-group relative">
         <input
           type={type}
           min={min}
@@ -80,7 +80,9 @@ export default function Input({
           value={inputValue}
           defaultValue={defaultValue}
           name={name}
-          className="form-control"
+          className={`form-control ${
+            state?.errors?.[id] ? "border-danger" : ""
+          }`}
           autoComplete={autoComplete}
           disabled={pending}
           onChange={handleInputChange}
@@ -88,7 +90,11 @@ export default function Input({
         {append && <span className="input-group-text">{append}</span>}
       </div>
       {state?.errors?.[id] ? (
-        <div id={errorId} aria-live="polite" className="mt2 text-sm ">
+        <div
+          id={errorId}
+          aria-live="polite"
+          className="position-absolute m-0 pb-0 fz12"
+        >
           <p key={state.errors[id][0]} className="text-danger ">
             {state.errors[id][0]}
           </p>
