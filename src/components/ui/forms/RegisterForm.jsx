@@ -6,9 +6,29 @@ import authStore from "@/store/authStore";
 import { register } from "@/lib/auth/register";
 import RadioSelect from "../Archives/Inputs/RadioSelect";
 import FormButton from "../buttons/FormButton";
+import CheckSelect from "../Archives/Inputs/CheckSelect";
+import Link from "next/link";
+
+const consentOptions = [
+  {
+    value: true,
+    label: (
+      <span>
+        Αποδέχομαι τους{" "}
+        <Link href="/terms" target="_blank" className="text-thm">
+          Όρους Χρήσης
+        </Link>{" "}
+        και την{" "}
+        <Link href="/privacy" target="_blank" className="text-thm">
+          Πολιτική Απορρήτου
+        </Link>
+      </span>
+    ),
+  },
+];
 
 const RegisterForm = () => {
-  const { type, role, roles, setAuthRole } = authStore();
+  const { type, role, roles, setAuthRole, consent, setConsent } = authStore();
   const formRef = useRef(null);
 
   const [state, formAction, isPending] = useActionState(register, {
@@ -19,7 +39,8 @@ const RegisterForm = () => {
 
   // Handle Submit - role wasn't working right
   const handleSubmit = async (formData) => {
-    formData.set("role", role);
+    const currentRole = role === null ? "" : role;
+    formData.set("role", currentRole);
     return formAction(formData);
   };
 
@@ -58,7 +79,9 @@ const RegisterForm = () => {
               name="role"
               options={roles}
               value={role === null ? "" : role}
-              onChange={(e) => setAuthRole(Number(e.target.value))}
+              onChange={(e) =>
+                setAuthRole(e.target.value ? Number(e.target.value) : null)
+              }
               error={state?.errors?.role?.[0]}
             />
           </div>
@@ -118,6 +141,15 @@ const RegisterForm = () => {
           disabled={isPending}
           errorId="password-error"
           formatSpaces
+        />
+      </div>
+      <div className="mb15">
+        <CheckSelect
+          name="consent"
+          options={consentOptions}
+          values={consent}
+          onChange={setConsent}
+          error={state?.errors?.consent?.[0]}
         />
       </div>
 

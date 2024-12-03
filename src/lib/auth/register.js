@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 import {
   REGISTER_USER,
@@ -15,10 +14,18 @@ const schemas = {
     email: z.string().min(1, "Το email είναι υποχρεωτικό").email("Λάθος email"),
     username: z.string().min(4, "Το username είναι πολύ μικρό").max(25),
     password: z.string().min(6, "Ο κωδικός είναι πολύ μικρός").max(50),
+    consent: z.boolean().refine((val) => val === true, {
+      message: "Παρακαλώ αποδεχτείτε τους όρους χρήσης",
+    }),
   },
   professional: {
-    displayName: z.string().min(3, "Η επωνυμία είναι πολύ μικρή").max(25),
-    role: z.number().min(1, "Παρακαλώ επιλέξτε τύπο λογαριασμού"),
+    displayName: z
+      .string()
+      .min(3, "Το όνομα εμφάνισης είναι πολύ μικρό")
+      .max(25),
+    role: z.number().refine((val) => !isNaN(val) && val > 0, {
+      message: "Παρακαλώ επιλέξτε τύπο λογαριασμού",
+    }),
   },
 };
 
@@ -26,11 +33,13 @@ export async function register(prevState, formData) {
   try {
     const type = Number(formData.get("type"));
     const role = Number(formData.get("role"));
+    const consent = formData.get("consent") === "true";
 
     const userData = {
       email: formData.get("email"),
       username: formData.get("username"),
       password: formData.get("password"),
+      consent,
     };
 
     const schema =
@@ -43,7 +52,7 @@ export async function register(prevState, formData) {
         ? {
             ...userData,
             displayName: formData.get("displayName"),
-            role: role,
+            role,
           }
         : userData
     );
@@ -56,15 +65,21 @@ export async function register(prevState, formData) {
     }
 
     const result = await postData(REGISTER_USER, {
-      input: userData,
+      input: {
+        email: userData.email,
+        username: userData.username,
+        password: userData.password,
+      },
     });
 
     if (result.error) {
       const errors = {};
-      if (result.error.includes("Email"))
+      if (result.error.includes("Email")) {
         errors.email = ["Το email χρησιμοποιείται ήδη"];
-      if (result.error.includes("Username"))
+      }
+      if (result.error.includes("Username")) {
         errors.username = ["Το username χρησιμοποιείται ήδη"];
+      }
       return { errors, message: "Λάθος στοιχεία εγγραφής." };
     }
 
@@ -75,13 +90,18 @@ export async function register(prevState, formData) {
         id: user.id,
         roleId: role.toString(),
         displayName: validatedFields.data.displayName,
+        consent: validatedFields.data.consent,
       });
+
+      // Assign freelancer type based on role
+      const freelancerType = role === 4 ? 1 : 2;
 
       await postData(CREATE_FREELANCER, {
         data: {
           user: user.id,
           username: userData.username,
-          publishedAt: new Date().toISOString(), // Publish the profile
+          type: freelancerType,
+          //  publishedAt: new Date().toISOString()
         },
       });
     } else {
@@ -89,6 +109,7 @@ export async function register(prevState, formData) {
         id: user.id,
         roleId: "1",
         displayName: userData.username,
+        consent: validatedFields.data.consent,
       });
     }
 

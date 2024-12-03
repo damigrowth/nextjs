@@ -1,16 +1,6 @@
 "use client";
 
-import React from "react";
-
-export default function CheckSelect({ options, values, onChange }) {
-  const handleChange = (value) => {
-    const newValues = values.includes(String(value))
-      ? values.filter((v) => v !== String(value))
-      : [...values, String(value)];
-    
-    onChange(newValues);
-  };
-
+export default function CheckSelect({ options, value, onChange, name, error }) {
   return (
     <div className="card-body card-body px-0 pt-0">
       <div className="checkbox-style1 mb15">
@@ -19,14 +9,16 @@ export default function CheckSelect({ options, values, onChange }) {
             {option.label}
             <input
               type="checkbox"
-              name={`checkbox-consent-${i}`}
-              checked={values.includes(String(option.value))}
-              onChange={() => handleChange(option.value)}
+              name={name}
+              value="true"
+              checked={value}
+              onChange={(e) => onChange(e.target.checked)}
             />
             <span className="checkmark" />
           </label>
         ))}
       </div>
+      {error && <div className="mt10 text-danger">{error}</div>}
     </div>
   );
 }

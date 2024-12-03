@@ -18,17 +18,16 @@ export const UPDATE_USER = gql`
     $id: ID!
     $roleId: ID!
     $displayName: String!
-    $brandName: String
+    $consent: Boolean
   ) {
     updateUsersPermissionsUser(
       id: $id
-      data: { role: $roleId, displayName: $displayName, brandName: $brandName }
+      data: { role: $roleId, displayName: $displayName, consent: $consent }
     ) {
       data {
         id
         attributes {
           displayName
-          brandName
         }
       }
     }

@@ -5,6 +5,7 @@ const authStore = create((set) => ({
   type: 0,
   role: null,
   step: 0,
+  consent: false,
   roles: [
     {
       value: 5,
@@ -15,6 +16,7 @@ const authStore = create((set) => ({
       label: "Επαγγελματίας",
     },
   ],
+  setConsent: (consent) => set({ consent }),
   setAuthType: (payload) => set(() => ({ type: payload })),
   setAuthRole: (payload) =>
     set(() => ({
