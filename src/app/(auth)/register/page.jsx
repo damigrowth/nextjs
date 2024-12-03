@@ -1,4 +1,4 @@
-import AuthRoleOptions from "@/components/ui/forms/AuthRoleOptions";
+import AuthTypeOptions from "@/components/ui/forms/AuthTypeOptions";
 import Link from "next/link";
 import RegisterForm from "@/components/ui/forms/RegisterForm";
 import RegisterHeading from "@/components/ui/forms/RegisterHeading";
@@ -33,7 +33,7 @@ export default function page() {
                     </Link>
                   </p>
                 </div>
-                <AuthRoleOptions />
+                <AuthTypeOptions />
                 <RegisterForm />
               </div>
             </div>

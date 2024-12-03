@@ -101,15 +101,22 @@ export const postData = async (mutation, variables) => {
         },
       },
     });
-    return data;
+    return { data };
   } catch (error) {
-    if (error.graphQLErrors) {
-      console.log("GraphQL Errors:", error.graphQLErrors);
+    const fieldErrors = {};
+
+    if (error.graphQLErrors?.[0]?.extensions?.errors) {
+      Object.entries(error.graphQLErrors[0].extensions.errors).forEach(
+        ([key, value]) => {
+          fieldErrors[key] = value[0].message;
+        }
+      );
     }
-    if (error.networkError) {
-      console.log("Network Error:", error.networkError);
-    }
-    console.log("Failed to post GraphQL data!", error);
+
+    return {
+      error: error.graphQLErrors?.[0]?.message || "An error occurred",
+      errors: fieldErrors,
+    };
   }
 };
 
