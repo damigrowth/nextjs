@@ -5,24 +5,23 @@ import Input from "../../inputs/Input";
 import authStore from "@/store/authStore";
 import { register } from "@/lib/auth/register";
 import RadioSelect from "../Archives/Inputs/RadioSelect";
-
-function RegisterButton() {
-  return (
-    <button type="submit" className="ud-btn btn-thm default-box-shadow2">
-      Εγγραφή <i className="fal fa-arrow-right-long" />
-    </button>
-  );
-}
+import FormButton from "../buttons/FormButton";
 
 const RegisterForm = () => {
   const { type, role, roles, setAuthRole } = authStore();
   const formRef = useRef(null);
 
-  const [state, formAction] = useActionState(register, {
+  const [state, formAction, isPending] = useActionState(register, {
     errors: {},
     message: null,
-    role: role,
+    role: null,
   });
+
+  // Handle Submit - role wasn't working right
+  const handleSubmit = async (formData) => {
+    formData.set("role", role);
+    return formAction(formData);
+  };
 
   useEffect(() => {
     if (state) {
@@ -33,10 +32,16 @@ const RegisterForm = () => {
     formRef.current?.reset();
   }, [type]);
 
+  useEffect(() => {
+    if (state?.redirect) {
+      window.location.href = state.redirect;
+    }
+  }, [state?.redirect]);
+
   if (type === 0) return null;
 
   return (
-    <form ref={formRef} action={formAction}>
+    <form ref={formRef} action={handleSubmit}>
       <input
         type="text"
         name="type"
@@ -52,35 +57,20 @@ const RegisterForm = () => {
               id="role"
               name="role"
               options={roles}
-              value={role}
+              value={role === null ? "" : role}
               onChange={(e) => setAuthRole(Number(e.target.value))}
+              error={state?.errors?.role?.[0]}
             />
           </div>
           <div className="mb25">
             <Input
               state={state}
-              label="Επωνυμία"
-              type="text"
-              id="brandName"
-              name="brandName"
-              disabled={state?.loading}
-              errorId="brandName-error"
-              formatSpaces
-              formatSymbols
-              formatNumbers
-              capitalize
-            />
-          </div>
-          <div className="mb25">
-            <Input
-              state={state}
-              label="Όνομα εμφάνισης"
+              label="Επωνυμία / Όνομα εμφάνισης"
               type="text"
               id="displayName"
               name="displayName"
-              disabled={state?.loading}
+              disabled={isPending}
               errorId="displayName-error"
-              formatSpaces
               formatSymbols
               formatNumbers
               capitalize
@@ -95,7 +85,7 @@ const RegisterForm = () => {
           type="email"
           id="email"
           name="email"
-          disabled={state?.loading}
+          disabled={isPending}
           autoComplete="email"
           errorId="email-error"
           formatSpaces
@@ -109,7 +99,7 @@ const RegisterForm = () => {
           type="username"
           id="username"
           name="username"
-          disabled={state?.loading}
+          disabled={isPending}
           autoComplete="username"
           errorId="username-error"
           formatSpaces
@@ -125,18 +115,28 @@ const RegisterForm = () => {
           type="password"
           id="password"
           name="password"
-          disabled={state?.loading}
+          disabled={isPending}
           errorId="password-error"
           formatSpaces
         />
       </div>
 
       {state?.message && (
-        <div className="mb20 text-danger">{state?.message}</div>
+        <div
+          className={`mb20 ${state.success ? "text-success" : "text-danger"}`}
+        >
+          {state?.message}
+        </div>
       )}
 
       <div className="d-grid mt40 mb20">
-        <RegisterButton />
+        <FormButton
+          type="submit"
+          disabled={isPending}
+          loading={isPending}
+          text="Εγγραφή"
+          icon="arrow"
+        />
       </div>
     </form>
   );

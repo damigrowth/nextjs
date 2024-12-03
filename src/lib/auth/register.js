@@ -17,7 +17,8 @@ const schemas = {
     password: z.string().min(6, "Ο κωδικός είναι πολύ μικρός").max(50),
   },
   professional: {
-    brandName: z.string().min(3, "Η επωνυμία είναι πολύ μικρή").max(25),
+    displayName: z.string().min(3, "Η επωνυμία είναι πολύ μικρή").max(25),
+    role: z.number().min(1, "Παρακαλώ επιλέξτε τύπο λογαριασμού"),
   },
 };
 
@@ -41,18 +42,15 @@ export async function register(prevState, formData) {
       type === 2
         ? {
             ...userData,
-            brandName: formData.get("brandName"),
+            displayName: formData.get("displayName"),
+            role: role,
           }
         : userData
     );
 
     if (!validatedFields.success) {
       return {
-        errors: Object.fromEntries(
-          Object.entries(validatedFields.error.flatten().fieldErrors).map(
-            ([key, value]) => [key, value]
-          )
-        ),
+        errors: validatedFields.error.flatten().fieldErrors,
         message: "Λάθος στοιχεία εγγραφής.",
       };
     }
@@ -63,45 +61,43 @@ export async function register(prevState, formData) {
 
     if (result.error) {
       const errors = {};
-      if (result.error.includes("Email")) {
+      if (result.error.includes("Email"))
         errors.email = ["Το email χρησιμοποιείται ήδη"];
-      }
-      if (result.error.includes("Username")) {
+      if (result.error.includes("Username"))
         errors.username = ["Το username χρησιμοποιείται ήδη"];
-      }
-
-      return {
-        errors,
-        message: "Λάθος στοιχεία εγγραφής.",
-      };
+      return { errors, message: "Λάθος στοιχεία εγγραφής." };
     }
 
-    // const { jwt, user } = result.data.register;
+    const { jwt, user } = result.data.register;
 
-    // if (type === 2) {
-    //   await postData(UPDATE_USER, {
-    //     id: user.id,
-    //     roleId: role.toString(),
-    //     displayName: validatedFields.data.brandName,
-    //     brandName: validatedFields.data.brandName
-    //   });
+    if (type === 2) {
+      await postData(UPDATE_USER, {
+        id: user.id,
+        roleId: role.toString(),
+        displayName: validatedFields.data.displayName,
+      });
 
-    //   await postData(CREATE_FREELANCER, {
-    //     data: {
-    //       user: user.id,
-    //       username: userData.username
-    //     }
-    //   });
-    // } else {
-    //   await postData(UPDATE_USER, {
-    //     id: user.id,
-    //     roleId: "1",
-    //     displayName: userData.username
-    //   });
-    // }
+      await postData(CREATE_FREELANCER, {
+        data: {
+          user: user.id,
+          username: userData.username,
+          publishedAt: new Date().toISOString(), // Publish the profile
+        },
+      });
+    } else {
+      await postData(UPDATE_USER, {
+        id: user.id,
+        roleId: "1",
+        displayName: userData.username,
+      });
+    }
 
-    // cookies().set("jwt", jwt);
-    // redirect("/dashboard/profile");
+    cookies().set("jwt", jwt);
+    return {
+      success: true,
+      message: `Καλώς ήρθες ${userData.username}!`,
+      redirect: "/dashboard/profile",
+    };
   } catch (error) {
     console.error(error);
     return {

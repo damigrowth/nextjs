@@ -2,7 +2,14 @@
 
 import React from "react";
 
-export default function RadioSelect({ id, name, options, value, onChange }) {
+export default function RadioSelect({
+  id,
+  name,
+  options,
+  value,
+  onChange,
+  error,
+}) {
   return (
     <div className="card-body card-body px-0 pt-0">
       <div className="radiobox-style1">
@@ -41,6 +48,7 @@ export default function RadioSelect({ id, name, options, value, onChange }) {
           })}
         </div>
       </div>
+      {error && <div className="mt10 text-danger">{error}</div>}
     </div>
   );
 }
