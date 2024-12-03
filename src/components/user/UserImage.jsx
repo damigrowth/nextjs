@@ -12,6 +12,7 @@ export default function UserImage({
   firstName,
   lastName,
   displayName,
+  hideDisplayName,
   bigText,
   path,
   topLevel,
@@ -45,6 +46,7 @@ export default function UserImage({
           />
         ) : (
           <InitialsImage
+            displayName={displayName}
             firstName={firstName}
             lastName={lastName}
             width={width}
@@ -53,7 +55,7 @@ export default function UserImage({
           />
         )}
       </div>
-      {displayName && (
+      {displayName && !hideDisplayName && (
         <span className="fz14 lh-base ml10 ml5-xs">{displayName}</span>
       )}
     </>

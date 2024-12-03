@@ -57,7 +57,8 @@ export default function Header({ authenticated, user, header }) {
                     <UserImage
                       firstName={user.firstName}
                       lastName={user.lastName}
-                      // displayName={user.displayName}
+                      displayName={user.displayName}
+                      hideDisplayName
                       image={user?.image?.formats?.thumbnail?.url}
                       alt={
                         user?.image?.formats?.thumbnail?.provider_metadata
