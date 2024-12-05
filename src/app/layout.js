@@ -27,6 +27,9 @@ if (typeof window !== "undefined") {
 export default async function RootLayout({ children, params }) {
   const headersList = headers();
   const pathname = headersList.get("x-current-path");
+
+  const isDashboard = pathname?.startsWith("/dashboard");
+
   // const { serverStatus } = await checkServerHealth();
 
   // if (!serverStatus)
@@ -55,7 +58,7 @@ export default async function RootLayout({ children, params }) {
         <InstallBootstrap />
         {!isFooterPath ? (
           <div className="wrapper ovh mm-page mm-slideout">
-            {(!isUnderMaintenance || authenticated) && (
+            {(!isUnderMaintenance || authenticated) && !isDashboard && (
               <Header
                 authenticated={authenticated}
                 user={user}
