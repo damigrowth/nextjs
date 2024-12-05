@@ -6056,7 +6056,7 @@ section {
 }
 .form-style1 .form-control {
   border-radius: 8px;
-  border: 1px solid #e9e9e9;
+  border: 1px solid #8b8b8b;
   box-shadow: none;
   font-size: 15px;
   height: 55px;
@@ -7255,11 +7255,11 @@ textarea {
   border-radius: 4px;
   display: inline-block;
   font-family: sans-serif;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 15px;
   font-style: normal;
   letter-spacing: 0em;
-  padding: 13px 35px;
+  padding: 5px 20px;
   position: relative;
   overflow: hidden;
   text-align: center;
@@ -7700,7 +7700,7 @@ textarea {
 .radio-element .form-check-label {
   color: var(--headings-color);
   font-family: sans-serif;
-  font-weight: 400;
+  font-weight: 600;
   font-size: 15px;
   padding-left: 10px;
 }
@@ -7708,7 +7708,7 @@ textarea {
 .right-tags {
   color: var(--body-text-color);
   font-family: sans-serif;
-  font-weight: 400;
+  font-weight: 600;
   font-size: 15px;
   position: absolute;
   right: 0;
