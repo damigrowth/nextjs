@@ -1,19 +1,10 @@
 import Link from "next/link";
 import LoginForm from "@/components/ui/forms/LoginForm";
-// import { getMaintenanceStatus } from "@/lib/maintenance/maintenance";
-import { isAuthenticated } from "@/lib/auth/authenticated";
-import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function page() {
   const isUnderMaintenance = false;
-  // const { isUnderMaintenance } = await getMaintenanceStatus();
-  const { authenticated } = await isAuthenticated();
-
-  if (authenticated) {
-    redirect("/");
-  }
 
   return (
     <>
