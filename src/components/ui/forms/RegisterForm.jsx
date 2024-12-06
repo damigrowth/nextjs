@@ -3,11 +3,11 @@
 import React, { useRef, useActionState, useEffect } from "react";
 import Input from "../../inputs/Input";
 import authStore from "@/store/authStore";
-import { register } from "@/lib/auth/register";
 import RadioSelect from "../Archives/Inputs/RadioSelect";
 import FormButton from "../buttons/FormButton";
 import CheckSelect from "../Archives/Inputs/CheckSelect";
 import Link from "next/link";
+import { register } from "@/lib/auth";
 
 const consentOptions = [
   {

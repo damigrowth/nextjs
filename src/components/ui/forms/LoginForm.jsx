@@ -1,7 +1,7 @@
 "use client";
 
+import { login } from "@/lib/auth";
 import React, { useEffect, useState } from "react";
-import { login } from "@/lib/auth/login";
 import { useFormState, useFormStatus } from "react-dom";
 
 function LoginButton({ setLoading }) {
