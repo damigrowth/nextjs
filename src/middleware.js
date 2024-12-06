@@ -4,15 +4,12 @@ import { isAuthenticated } from "./lib/auth/authenticated";
 
 export async function middleware(request) {
   const currentPath = request.nextUrl.pathname;
-  // Add a new header x-current-path which passes the path to downstream components
   const requestHeaders = new Headers(request.headers);
-
   requestHeaders.set("x-current-path", currentPath);
 
   const isUnderMaintenance = false;
-  // const { isUnderMaintenance } = await getMaintenanceStatus();
   const { authenticated } = await isAuthenticated();
-  // List of paths that should be publicly accessible
+
   const maintenancePublicPaths = [
     "/maintenance",
     "/login",
@@ -26,35 +23,50 @@ export async function middleware(request) {
 
   const protectedPaths = [
     "/dashboard",
-    "/dashboard/invoices",
-    "/dashboard/customers",
-    "/add-services",
-    "/manage-services",
-    "/message",
-    "my-profile",
+    "/dashboard/create-projects",
+    "/dashboard/documents",
+    "/dashboard/invoice",
+    "/dashboard/manage-jobs",
+    "/dashboard/manage-projects",
+    "/dashboard/messages",
+    "/dashboard/orders",
+    "/dashboard/payouts",
+    "/dashboard/profile",
+    "/dashboard/proposal",
+    "/dashboard/reviews",
+    "/dashboard/saved",
+    "/dashboard/services",
   ];
 
+  // Check if path starts with /dashboard
+  const isDashboardPath = currentPath.startsWith("/dashboard");
+
   if (isUnderMaintenance) {
-    // Check if the current path starts with any of the public paths
     const isPublicPath = maintenancePublicPaths.some((path) =>
       currentPath.startsWith(path)
     );
 
-    // If the path is not public and the cookie is missing, redirect to the login page
     if (!isPublicPath && !authenticated) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   } else {
-    // Redirect to the login page if trying to access protected paths without a cookie
-    if (protectedPaths.includes(currentPath) && authenticated === false) {
+    // Handle dashboard paths
+    if (isDashboardPath && !authenticated) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    // Handle other protected paths
+    if (protectedPaths.includes(currentPath) && !authenticated) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
 
-  // return NextResponse.next();
-  // - This messes with the server actions
-  // return NextResponse.next({ headers });
-  // - This works
+  // Handle login page redirect when authenticated
+  const isLoginPage = currentPath === "/login";
+  if (isLoginPage && authenticated) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
   return NextResponse.next({
     headers: requestHeaders,
     request: {
