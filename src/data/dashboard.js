@@ -57,7 +57,7 @@ export const dasboardNavigation = [
     id: 10,
     name: "Αποσύνδεση",
     icon: "flaticon-logout",
-    path: "/dashboard/logout",
+    path: "/logout",
   },
 ];
 
