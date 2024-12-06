@@ -13,11 +13,14 @@ export default function NavMenuMobile({ header }) {
   const path = usePathname();
   const crossRef = useRef(null);
 
-  const categories = header.data.attributes.categories.data.map((item, i) => ({
-    id: i + 1,
-    name: item.attributes.label,
-    path: `/ipiresies/${item.attributes.slug}`,
-  }));
+  // Default categories if header is null
+  const categories = header?.data?.attributes?.categories?.data
+    ? header.data.attributes.categories.data.map((item, i) => ({
+        id: i + 1,
+        name: item.attributes.label,
+        path: `/ipiresies/${item.attributes.slug}`,
+      }))
+    : [];
 
   const menus = [
     {
