@@ -861,7 +861,7 @@ li {
   color: var(--headings-color);
   font-family: sans-serif;
   font-weight: 500;
-  padding: 14.5px 20px;
+  padding: 10px 20px;
   -webkit-transition: all 0.3s ease 0s ease;
   -moz-transition: all 0.3s ease 0s ease;
   -ms-transition: all 0.3s ease 0s ease;
@@ -873,9 +873,44 @@ li {
   font-size: 20px;
 }
 
+.dashboard_sidebar_list .sidebar_list_item button:hover,
+.dashboard_sidebar_list .sidebar_list_item button:active,
+.dashboard_sidebar_list .sidebar_list_item button:focus,
+.dashboard_sidebar_list .sidebar_list_item button.-is-active {
+  background-color: #222222;
+  color: #ffffff;
+}
+
+.dashboard_sidebar_list .sidebar_list_item button {
+  align-items: center;
+  display: flex;
+  width: 100%;
+  border-radius: 0 4px 4px 0;
+  color: var(--headings-color);
+  font-family: sans-serif;
+  font-weight: 500;
+  padding: 10px 20px;
+  border: none;
+  outline: none;
+  -webkit-transition: all 0.3s ease 0s ease;
+  -moz-transition: all 0.3s ease 0s ease;
+  -ms-transition: all 0.3s ease 0s ease;
+  -o-transition: all 0.3s ease 0s ease;
+  transition: all 0.3s ease 0s ease;
+}
+
+.dashboard_sidebar_list .sidebar_list_item button i {
+  font-size: 20px;
+}
+
 .dashboard {
   display: flex;
 }
+
+.dashboard_wrapper {
+  margin-top: 85px;
+}
+
 .dashboard.dsh_board_sidebar_hidden .dashboard__sidebar {
   transform: translateX(-100%);
 }
@@ -922,7 +957,7 @@ li {
   flex-shrink: 0;
   height: calc(100% - 90px);
   left: 0;
-  margin-top: 40px;
+  /* margin-top: 40px; */
   overflow-y: scroll;
   padding: 30px 30px 30px 0;
   padding-bottom: 40px;
@@ -944,7 +979,7 @@ li {
 }
 
 .dashboard__main {
-  margin-top: 40px;
+  /* margin-top: 40px; */
   padding-left: 300px;
   width: 100%;
 }
@@ -6056,7 +6091,7 @@ section {
 }
 .form-style1 .form-control {
   border-radius: 8px;
-  border: 1px solid #e9e9e9;
+  border: 1px solid #8b8b8b;
   box-shadow: none;
   font-size: 15px;
   height: 55px;
@@ -7255,11 +7290,11 @@ textarea {
   border-radius: 4px;
   display: inline-block;
   font-family: sans-serif;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 15px;
   font-style: normal;
   letter-spacing: 0em;
-  padding: 13px 35px;
+  padding: 5px 20px;
   position: relative;
   overflow: hidden;
   text-align: center;
@@ -7700,7 +7735,7 @@ textarea {
 .radio-element .form-check-label {
   color: var(--headings-color);
   font-family: sans-serif;
-  font-weight: 400;
+  font-weight: 600;
   font-size: 15px;
   padding-left: 10px;
 }
@@ -7708,7 +7743,7 @@ textarea {
 .right-tags {
   color: var(--body-text-color);
   font-family: sans-serif;
-  font-weight: 400;
+  font-weight: 600;
   font-size: 15px;
   position: absolute;
   right: 0;
