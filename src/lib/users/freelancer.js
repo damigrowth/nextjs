@@ -1,20 +1,46 @@
+import { getUserId, getUserMe } from "../auth/user";
 import { getData } from "../client/operations";
 import {
   FREELANCER_BY_ID,
   FREELANCER_BY_USERNAME,
+  FREELANCER_ID,
 } from "../graphql/queries/main/freelancer";
 import {
   ALL_REVIEWS_RATINGS_BY_FREELANCER,
   REVIEWS_BY_FREELANCER,
 } from "../graphql/queries/main/reviews";
 import { FEATURED_SERVICES_BY_FREELANCER } from "../graphql/queries/main/service";
-import { getUser, getUserId } from "../user/user";
 
 export async function getFreelancerId() {
-  const user = await getUser();
-  const id = user.freelancer.data.id;
-  const freelancerId = Number(id);
-  return { freelancerId };
+  try {
+    const uid = await getUserId();
+    const data = await getData(FREELANCER_ID, { id: uid });
+    const id = data?.freelancers?.data[0]?.id;
+
+    if (!id) {
+      return {
+        ok: false,
+        fid: null,
+        uid: uid,
+        error: "Freelancer not found",
+      };
+    }
+
+    return {
+      ok: true,
+      fid: id,
+      uid: uid,
+      error: null,
+    };
+  } catch (error) {
+    console.error("GraphQL getFreelancerId error:", error);
+    return {
+      ok: false,
+      fid: null,
+      uid: uid,
+      error: error.message || "Failed to fetch freelancer data",
+    };
+  }
 }
 
 export async function getFreelancer() {

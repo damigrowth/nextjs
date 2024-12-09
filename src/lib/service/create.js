@@ -41,7 +41,7 @@ export async function createService(prevState, formData) {
     // console.log("UPLOADED MEDIA", uploadedMedia);
 
     // GET FREELANCER ID
-    const { freelancerId } = await getFreelancerId();
+    const { fid } = await getFreelancerId();
 
     // CREATE SERVICE
     const payload = {
@@ -58,7 +58,7 @@ export async function createService(prevState, formData) {
         subcategory: service.subcategory.id,
         subdivision: service.subdivision.id,
         // tags: service.tags.map((el) => el.id),
-        freelancer: freelancerId,
+        freelancer: fid,
         status: 2,
         media: uploadedMedia,
       },
