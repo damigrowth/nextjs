@@ -13,6 +13,28 @@ import { print } from "graphql/language/printer";
 import { GET_ME } from "../graphql/queries/main/user";
 import { cache } from "react";
 
+export async function fetchWithRetry(url, options, retries = 3, backoff = 300) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+      return response;
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      await new Promise((resolve) =>
+        setTimeout(resolve, backoff * Math.pow(2, i))
+      );
+    }
+  }
+}
+
 /**
  * Checks server health by making an HTTP request to the server.
  *
@@ -44,47 +66,56 @@ export const checkServerHealth = async () => {
   }
 };
 
-// Optimized getData with better caching
-export const getData = cache(async (query, variables) => {
-  validateEnvVars();
+// Optimized getData with better caching and retry logic
+export const getData = cache(
+  async (query, variables, useCache = true, authToken = STRAPI_TOKEN) => {
+    validateEnvVars();
 
-  // Create unique cache key based on query and variables
-  const queryString = typeof query === "string" ? query : print(query);
-  const cacheKey = JSON.stringify({ query: queryString, variables });
+    const queryString = typeof query === "string" ? query : print(query);
+    const cacheKey = JSON.stringify({ query: queryString, variables });
 
-  try {
-    const response = await fetch(STRAPI_GRAPHQL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
-        "Cache-Control": "max-age=3600, s-maxage=3600", // Cache for 1 hour
-      },
-      body: JSON.stringify({
-        query: queryString,
-        variables,
-      }),
-      cache: "force-cache",
-      tags: [
-        "graphql",
-        `query-${cacheKey}`,
-        ...(variables?.cat ? [`category-${variables.cat}`] : []),
-      ],
-    });
+    try {
+      const response = await fetchWithRetry(STRAPI_GRAPHQL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+          ...(useCache && { "Cache-Control": "max-age=3600, s-maxage=3600" }),
+        },
+        body: JSON.stringify({
+          query: queryString,
+          variables,
+        }),
+        ...(useCache && {
+          cache: "force-cache",
+          tags: [
+            "graphql",
+            `query-${cacheKey}`,
+            ...(variables?.cat ? [`category-${variables.cat}`] : []),
+          ],
+        }),
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("GraphQL error:", errorData.errors);
-      return null;
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("GraphQL error:", errorData.errors);
+        return null;
+      }
+
+      const jsonResponse = await response.json();
+
+      if (jsonResponse.errors) {
+        console.error("GraphQL response errors:", jsonResponse.errors);
+        return null;
+      }
+
+      return jsonResponse.data;
+    } catch (error) {
+      console.error("Server error:", error);
+      throw error;
     }
-
-    const jsonResponse = await response.json();
-    return jsonResponse.data;
-  } catch (error) {
-    console.error("Server error:", error);
-    throw error;
   }
-});
+);
 
 // Generic GraphQL mutation function
 export const postData = async (mutation, variables) => {

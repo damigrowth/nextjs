@@ -1,8 +1,6 @@
 import Link from "next/link";
 import LoginForm from "@/components/ui/forms/LoginForm";
 
-export const dynamic = "force-dynamic";
-
 export default async function page() {
   const isUnderMaintenance = false;
 

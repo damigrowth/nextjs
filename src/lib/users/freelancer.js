@@ -8,7 +8,6 @@ import {
   REVIEWS_BY_FREELANCER,
 } from "../graphql/queries/main/reviews";
 import { FEATURED_SERVICES_BY_FREELANCER } from "../graphql/queries/main/service";
-
 import { getUser, getUserId } from "../user/user";
 
 export async function getFreelancerId() {

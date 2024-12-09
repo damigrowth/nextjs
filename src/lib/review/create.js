@@ -1,9 +1,9 @@
 "use server";
 
 import { z } from "zod";
-import { getUserId } from "../user/user";
 import { postData } from "../client/operations";
 import { POST_REVIEW } from "../graphql/mutations";
+import { getUserId } from "../auth/user";
 
 const reviewSchema = z.object({
   rating: z.number(),

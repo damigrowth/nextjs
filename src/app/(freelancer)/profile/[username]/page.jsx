@@ -3,7 +3,7 @@ import {
   getFeaturedServicesByFreelancer,
   getFreelancerByUsername,
   getReviewsByFreelancer,
-} from "@/lib/freelancer/freelancer";
+} from "@/lib/users/freelancer";
 import { redirect } from "next/navigation";
 import ProfileBreadcrumb from "@/components/ui/breadcrumbs/freelancer/ProfileBreadcrumb";
 import { getData } from "@/lib/client/operations";
