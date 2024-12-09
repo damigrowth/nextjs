@@ -5,21 +5,31 @@ import RecentServiceCard1 from "../card/RecentServiceCard1";
 import { job1 } from "@/data/job";
 import { getUser } from "@/lib/auth/user";
 import { getData } from "@/lib/client/operations";
-import { POPULAR_SERVICES_DASHBOARD } from "@/lib/graphql/queries/main/dashboard";
+import {
+  ALL_REVIEWS_RECEIVED_DASHBOARD,
+  ALL_SERVICES_DASHBOARD,
+  POPULAR_SERVICES_DASHBOARD,
+} from "@/lib/graphql/queries/main/dashboard";
 import Link from "next/link";
+import { getFreelancerId } from "@/lib/users/freelancer";
 
 export default async function DashboardInfo() {
-  const user = await getUser();
-  const services = user?.freelancer?.data?.attributes?.services?.data;
-  const totalServices = services?.length;
+  const { fid } = await getFreelancerId();
 
-  const reviews = user?.freelancer?.data?.attributes?.reviews_total;
-  const totalReviews = reviews === null ? 0 : reviews;
-
-  const freelancerId = user?.freelancer?.data?.id;
-  const popularServices = await getData(POPULAR_SERVICES_DASHBOARD, {
-    id: freelancerId,
+  const { services } = await getData(ALL_SERVICES_DASHBOARD, {
+    id: fid,
   });
+
+  const { reviews } = await getData(ALL_REVIEWS_RECEIVED_DASHBOARD, {
+    id: fid,
+  });
+
+  const popularServices = await getData(POPULAR_SERVICES_DASHBOARD, {
+    id: fid,
+  });
+
+  const totalServices = services?.meta?.pagination?.total || 0;
+  const totalReviews = reviews?.meta?.pagination?.total || 0;
 
   return (
     <>
