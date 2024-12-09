@@ -1,4 +1,3 @@
-// utils/formatDate.js
 import { format } from "date-fns";
 
 /**
