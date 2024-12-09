@@ -1,7 +1,7 @@
 "use server";
 
 import { postData } from "../client/operations";
-import { getFreelancerId } from "../freelancer/freelancer";
+import { getFreelancerId } from "../users/freelancer";
 import { POST_SERVICE } from "../graphql/mutations";
 import { uploadMedia } from "../uploads/upload";
 
@@ -36,6 +36,8 @@ export async function createService(prevState, formData) {
       uploadedMedia = await uploadMedia(files);
     }
 
+    // console.log("FILES", files);
+    // console.log("SIZE", firstFileSize);
     // console.log("UPLOADED MEDIA", uploadedMedia);
 
     // GET FREELANCER ID
