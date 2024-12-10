@@ -10,6 +10,7 @@ export async function middleware(request) {
 
   const user = await getUserMe();
   const authenticated = user.ok;
+  console.log("authenticated", authenticated);
 
   const maintenancePublicPaths = [
     "/maintenance",
