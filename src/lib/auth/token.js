@@ -15,13 +15,8 @@ const cookieConfig = {
  * @returns {Promise<string|null>}
  */
 export const getToken = async () => {
-  try {
-    const cookieStore = cookies();
-    return cookieStore.get(TOKEN_NAME)?.value ?? null;
-  } catch (error) {
-    console.error("Error getting auth token:", error);
-    return null;
-  }
+  const cookieStore = cookies();
+  return cookieStore.get(TOKEN_NAME)?.value ?? null;
 };
 
 /**
