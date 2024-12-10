@@ -7,6 +7,16 @@ import {
 import { PAGINATION } from "../../fragments/global";
 import { FREELANCER_REFERENCE } from "../../fragments/entities/freelancer";
 
+const FREELANCER_ID = gql`
+  query FreelancerId($id: ID!) {
+    freelancers(filters: { user: { id: { eq: $id } } }) {
+      data {
+        id
+      }
+    }
+  }
+`;
+
 const FREELANCER_TYPES = gql`
   query FreelancerTypes {
     freelancerTypes {
@@ -169,6 +179,7 @@ const FREELANCERS_ALL = gql`
 `;
 
 export {
+  FREELANCER_ID,
   FREELANCER_TYPES,
   FREELANCER_BY_ID,
   FREELANCER_BY_USERNAME,

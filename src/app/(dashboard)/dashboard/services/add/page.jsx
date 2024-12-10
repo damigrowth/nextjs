@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import MobileNavigation2 from "@/components/header/MobileNavigation2";
 import AddServiceInfo from "@/components/ui/AddServiceInfo";
-import { getFreelancer } from "@/lib/freelancer/freelancer";
+import { getFreelancer } from "@/lib/users/freelancer";
 
 export const metadata = {
   title: "Doulitsa",

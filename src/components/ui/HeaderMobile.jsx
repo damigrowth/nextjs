@@ -3,7 +3,7 @@ import UserImage from "../user/UserImage";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function HeaderMobile({ user, authenticated }) {
+export default function HeaderMobile({ user }) {
   return (
     <div className="mobilie_header_nav stylehome1">
       <div className="mobile-menu">
@@ -19,7 +19,7 @@ export default function HeaderMobile({ user, authenticated }) {
                 />
               </Link>
               <div className="d-flex align-items-center right-side text-end">
-                {authenticated ? (
+                {user ? (
                   <UserImage
                     firstName={user.firstName}
                     lastName={user.lastName}

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import UserImage from "../user/UserImage";
 import MegaMenu from "./MegaMenu";
@@ -7,7 +6,7 @@ import HeaderStickyWrapper from "./HeaderStickyWrapper";
 import HeaderMobile from "./HeaderMobile";
 import HeaderLogo from "./HeaderLogo";
 
-export default function Header({ authenticated, user, header }) {
+export default function Header({ user, header }) {
   const categories = header.data.attributes.categories.data.map((item, i) => ({
     id: i + 1,
     label: item.attributes.label,
@@ -53,7 +52,7 @@ export default function Header({ authenticated, user, header }) {
                     </span>
                   </Link>
 
-                  {authenticated ? (
+                  {user ? (
                     <UserImage
                       firstName={user.firstName}
                       lastName={user.lastName}
@@ -90,7 +89,7 @@ export default function Header({ authenticated, user, header }) {
           </div>
         </nav>
       </HeaderStickyWrapper>
-      <HeaderMobile user={user} authenticated={authenticated} />
+      <HeaderMobile user={user} />
     </>
   );
 }

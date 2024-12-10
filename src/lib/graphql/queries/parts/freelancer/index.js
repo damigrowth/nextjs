@@ -188,6 +188,80 @@ const FREELANCER_RELATIONS = gql`
   ${RATING}
 `;
 
+// New fragment without user field
+const FREELANCER_RELATIONS_WITHOUT_USER = gql`
+  fragment FreelancerRelationsWithoutUser on Freelancer {
+    services {
+      ...Services
+    }
+    orders {
+      ...Orders
+    }
+    skills {
+      ...Skills
+    }
+    coverage {
+      ...Coverage
+    }
+    socials {
+      ...Socials
+    }
+    type {
+      ...FreelancerType
+    }
+    category {
+      ...FreelancerCategory
+    }
+    subcategory {
+      ...FreelancerSubcategoryPartial
+    }
+    size {
+      ...Size
+    }
+    specialisations {
+      ...Specialisations
+    }
+    minBudgets {
+      ...MinBudgets
+    }
+    industries {
+      ...Industries
+    }
+    contactTypes {
+      ...ContactTypes
+    }
+    payment_methods {
+      ...PaymentMethod
+    }
+    settlement_methods {
+      ...SettlementMethod
+    }
+    portfolio {
+      ...MultipleFiles
+    }
+    rating_global {
+      ...Rating
+    }
+  }
+  ${SERVICES}
+  ${ORDERS}
+  ${SKILLS}
+  ${COVERAGE}
+  ${SOCIALS}
+  ${FREELANCER_TYPE}
+  ${FREELANCER_CATEGORY}
+  ${FREELANCER_SUBCATEGORY_PARTIAL}
+  ${SIZE}
+  ${SPECIALISATIONS}
+  ${MIN_BUDGETS}
+  ${INDUSTRIES}
+  ${CONTACT_TYPES}
+  ${PAYMENT_METHOD}
+  ${SETTLEMENT_METHOD}
+  ${MULTIPLE_FILES}
+  ${RATING}
+`;
+
 const FREELANCER_SEO = gql`
   fragment FreelancerSEO on Freelancer {
     user {
@@ -224,6 +298,7 @@ const FREELANCER_SEO = gql`
 export {
   FREELANCER_PARTIAL_MAIN,
   FREELANCER_PARTIAL_RELATIONS,
+  FREELANCER_RELATIONS_WITHOUT_USER,
   FREELANCER_PARTIAL,
   FREELANCER_MAIN,
   FREELANCER_RELATIONS,

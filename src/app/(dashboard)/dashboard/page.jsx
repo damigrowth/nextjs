@@ -1,19 +1,13 @@
 import DashboardInfo from "@/components/dashboard/section/DashboardInfo";
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
 
 export const metadata = {
-  title: "Doulitsa - Freelance Marketplace React/Next Js Template | Dashboard",
+  title: "Dashboard | Doulitsa",
 };
 
-export default async function page() {
-  // const user = await getUser();
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+// export const dynamicParams = true;
 
-  // console.log("USER - Dashboard ==>", user);
-  return (
-    <>
-      <DashboardLayout>
-        <DashboardInfo />
-      </DashboardLayout>
-    </>
-  );
+export default async function page() {
+  return <DashboardInfo />;
 }

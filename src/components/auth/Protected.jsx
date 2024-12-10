@@ -1,8 +1,9 @@
-import { isAuthenticated } from "@/lib/auth/authenticated";
+import { getUserMe } from "@/lib/auth/user";
 import Link from "next/link";
 
 export default async function Protected({ children, message }) {
-  const { authenticated } = await isAuthenticated();
+  const user = await getUserMe();
+  const authenticated = user.ok;
 
   if (authenticated === true) {
     return children;

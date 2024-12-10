@@ -3,16 +3,13 @@ import MobileNavigation2 from "@/components/header/MobileNavigation2";
 import ReviewsInfo from "@/components/ui/AddService/ReviewsInfo";
 
 export const metadata = {
-  title: "Doulitsa - Freelance Marketplace React/Next Js Template | Review",
+  title: "Αξιολογήσεις | Doulitsa",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+// export const dynamicParams = true;
+
 export default function page() {
-  return (
-    <>
-      <MobileNavigation2 />
-      <DashboardLayout>
-        <ReviewsInfo />
-      </DashboardLayout>
-    </>
-  );
+  return <ReviewsInfo />;
 }

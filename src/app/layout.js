@@ -9,75 +9,53 @@ import InstallBootstrap from "@/components/ui/InstallBootstrap";
 import Body from "@/components/ui/Body";
 import Footer from "@/components/ui/Footer";
 import NavMenuMobile from "@/components/ui/NavMenuMobile";
-import { checkServerHealth, getData } from "@/lib/client/operations";
+import { getData } from "@/lib/client/operations";
 import { ROOT_LAYOUT } from "@/lib/graphql/queries/main/global";
-import ServerDown from "@/components/ui/Errors/ServerDown";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { isAuthenticated } from "@/lib/auth/authenticated";
-import { getUser } from "@/lib/user/user";
 import { ApolloWrapper } from "@/lib/client/apollo-wrapper";
 import { headers } from "next/headers";
 import { CookiesBanner } from "@/components/ui/banners/CookiesBanner";
+import { getUserPartial } from "@/lib/auth/user";
+import PathChecker from "@/components/ui/PathChecker";
 
 if (typeof window !== "undefined") {
   import("bootstrap");
 }
 
-export default async function RootLayout({ children, params }) {
-  const headersList = headers();
-  const pathname = headersList.get("x-current-path");
-
-  const isDashboard = pathname?.startsWith("/dashboard");
-
-  // const { serverStatus } = await checkServerHealth();
-
-  // if (!serverStatus)
-  //   return (
-  //     <html>
-  //       <body>
-  //         <ServerDown />
-  //       </body>
-  //     </html>
-  //   );
-
+export default async function RootLayout({ children }) {
   const isUnderMaintenance = false;
 
-  const { authenticated } = await isAuthenticated();
-  const user = await getUser();
+  const user = await getUserPartial();
+  const authenticated = user ? true : false;
 
   const { header: headerData } = await getData(ROOT_LAYOUT);
 
   const gaId = process.env.GA_ID;
 
-  const isFooterPath = footer.includes(pathname);
-
   return (
     <html lang="el">
       <Body>
         <InstallBootstrap />
-        {!isFooterPath ? (
-          <div className="wrapper ovh mm-page mm-slideout">
-            {(!isUnderMaintenance || authenticated) && !isDashboard && (
-              <Header
-                authenticated={authenticated}
-                user={user}
-                header={headerData}
-              />
+        <div className="wrapper ovh mm-page mm-slideout">
+          {(!isUnderMaintenance || authenticated) && (
+            <PathChecker excludes="/dashboard">
+              <Header user={user} header={headerData} />
+            </PathChecker>
+          )}
+          <div className="body_content">
+            <ApolloWrapper>{children}</ApolloWrapper>
+            {(!isUnderMaintenance || authenticated) && (
+              <PathChecker excludes="/dashboard">
+                <Footer />
+              </PathChecker>
             )}
-            <div className="body_content">
-              <ApolloWrapper>{children}</ApolloWrapper>
-              {(!isUnderMaintenance || authenticated) && <Footer />}
-              <BottomToTop />
-            </div>
-          </div>
-        ) : (
-          <div className="wrapper mm-page mm-slideout">
-            {children}
             <BottomToTop />
           </div>
-        )}
-        <NavMenuMobile header={headerData} />
+        </div>
+        <PathChecker excludes="/dashboard">
+          <NavMenuMobile header={headerData} />
+        </PathChecker>
         <SpeedInsights />
         <GoogleAnalytics gaId={gaId} />
         <CookiesBanner />

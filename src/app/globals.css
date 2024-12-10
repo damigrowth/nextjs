@@ -1360,3 +1360,8 @@ a {
   height: 60px;
   padding: 0px 20px;
 }
+
+.listing-style1 .small-list .list-thumb {
+  height: auto;
+  border-radius: 8px;
+}

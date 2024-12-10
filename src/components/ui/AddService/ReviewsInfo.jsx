@@ -1,13 +1,24 @@
-"use client";
-
-import { useState } from "react";
 import DashboardNavigation from "@/components/dashboard/header/DashboardNavigation";
 import ReviewComment from "@/components/dashboard/element/ReviewComment";
+import { getData } from "@/lib/client/operations";
+import {
+  ALL_REVIEWS_GIVEN_DASHBOARD,
+  ALL_REVIEWS_RECEIVED_DASHBOARD,
+} from "@/lib/graphql/queries/main/dashboard";
+import { getFreelancerId } from "@/lib/users/freelancer";
 
-const tab = ["Services", "Project", "Jobs"];
+export default async function ReviewsInfo() {
+  const { fid, uid } = await getFreelancerId();
+  const { reviews: reviewsReceived } = await getData(
+    ALL_REVIEWS_RECEIVED_DASHBOARD,
+    {
+      id: fid,
+    }
+  );
 
-export default function ReviewsInfo() {
-  const [getCurrentTab, setCurrentTab] = useState(0);
+  const { reviews: reviewsGiven } = await getData(ALL_REVIEWS_GIVEN_DASHBOARD, {
+    id: uid,
+  });
 
   return (
     <>
@@ -18,7 +29,7 @@ export default function ReviewsInfo() {
           </div>
           <div className="col-lg-12">
             <div className="dashboard_title_area">
-              <h2>Reviews</h2>
+              <h2>Αξιολογήσεις</h2>
               <p className="text">Lorem ipsum dolor sit amet, consectetur.</p>
             </div>
           </div>
@@ -28,54 +39,64 @@ export default function ReviewsInfo() {
             <div className="ps-widget bgc-white bdrs4 p30 mb30 overflow-hidden position-relative">
               <div className="packages_table table-responsive">
                 <div className="navtab-style1">
-                  <nav>
-                    <div className="nav nav-tabs mb30">
-                      {tab.map((item, i) => (
-                        <button
-                          onClick={() => setCurrentTab(i)}
-                          key={i}
-                          className={`nav-link fw500 ps-0 ${
-                            getCurrentTab === i ? "active" : ""
-                          }`}
-                        >
-                          {item}
-                        </button>
-                      ))}
-                    </div>
-                  </nav>
-                  {getCurrentTab === 0 &&
-                    Array(3)
-                      .fill(3)
-                      .map((_, i) => (
-                        <div key={i} className="col-md-12">
+                  {reviewsReceived?.data?.map((review, i) => {
+                    const reviewer = review?.attributes?.user?.data?.attributes;
+
+                    if (!reviewer) {
+                      return null;
+                    } else {
+                      return (
+                        <div key={i}>
                           <ReviewComment
                             i={i}
-                            lenght={Array(3).fill(3).length}
+                            length={reviewsReceived?.data?.length}
+                            rating={review?.attributes?.rating}
+                            comment={review?.attributes?.comment}
+                            publishedAt={review?.attributes?.publishedAt}
+                            reviewer={reviewer}
                           />
                         </div>
-                      ))}
-                  {getCurrentTab === 1 &&
-                    Array(4)
-                      .fill(4)
-                      .map((_, i) => (
-                        <div key={i} className="col-md-12">
+                      );
+                    }
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-lg-12 mb50 mt30">
+          <div className="dashboard_title_area">
+            <h2>Αξιολογήσεις για άλλα προφίλ</h2>
+            <p className="text">Lorem ipsum dolor sit amet, consectetur.</p>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-xl-12">
+            <div className="ps-widget bgc-white bdrs4 p30 mb30 overflow-hidden position-relative">
+              <div className="packages_table table-responsive">
+                <div className="navtab-style1">
+                  {reviewsGiven?.data?.map((review, i) => {
+                    const receiver =
+                      review?.attributes?.freelancer?.data?.attributes?.user
+                        ?.data?.attributes;
+
+                    if (!receiver) {
+                      return null;
+                    } else {
+                      return (
+                        <div key={i}>
                           <ReviewComment
                             i={i}
-                            lenght={Array(4).fill(4).length}
+                            length={reviewsReceived?.data?.length}
+                            rating={review?.attributes?.rating}
+                            comment={review?.attributes?.comment}
+                            publishedAt={review?.attributes?.publishedAt}
+                            reviewer={receiver}
                           />
                         </div>
-                      ))}
-                  {getCurrentTab === 2 &&
-                    Array(3)
-                      .fill(3)
-                      .map((_, i) => (
-                        <div key={i} className="col-md-12">
-                          <ReviewComment
-                            i={i}
-                            lenght={Array(3).fill(3).length}
-                          />
-                        </div>
-                      ))}
+                      );
+                    }
+                  })}
                 </div>
               </div>
             </div>
