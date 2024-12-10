@@ -1,6 +1,5 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import {
@@ -10,14 +9,7 @@ import {
 } from "../graphql/mutations/user";
 import { postData } from "../client/operations";
 import { loginSchema, registerSchema } from "../validation/auth";
-
-const config = {
-  maxAge: 60 * 60 * 24 * 7, // 1 week
-  path: "/",
-  domain: process.env.HOST ?? "localhost",
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-};
+import { removeToken, setToken } from "./token";
 
 export async function register(prevState, formData) {
   try {
@@ -103,7 +95,7 @@ export async function register(prevState, formData) {
       });
     }
 
-    cookies().set("jwt", jwt, config);
+    await setToken(jwt);
     return {
       success: true,
       message: `Καλώς ήρθες ${userData.username}!`,
@@ -167,14 +159,12 @@ export async function login(prevState, formData) {
   if (!response.ok && data.error)
     return { ...prevState, message: data.error.message, errors: null };
   if (response.ok && data.jwt) {
-    console.log("jwt", data.jwt);
-
-    cookies().set("jwt", data.jwt, config);
+    await setToken(data.jwt);
     redirect("/dashboard");
   }
 }
 
 export async function logout() {
-  cookies().set("jwt", "", { ...config, maxAge: 0 });
+  await removeToken();
   redirect("/login");
 }

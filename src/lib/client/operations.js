@@ -1,5 +1,6 @@
 "use server";
 
+import { inspect } from "@/utils/inspect";
 import { getClient } from ".";
 import {
   STRAPI_GRAPHQL,
@@ -95,14 +96,14 @@ export const getData = cache(
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("GraphQL error:", errorData.errors);
+        console.error("GraphQL error:", inspect(errorData.errors));
         return null;
       }
 
       const jsonResponse = await response.json();
 
       if (jsonResponse.errors) {
-        console.error("GraphQL response errors:", jsonResponse.errors);
+        console.error("GraphQL response errors:", inspect(jsonResponse.errors));
         return null;
       }
 
