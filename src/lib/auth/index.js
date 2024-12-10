@@ -103,7 +103,7 @@ export async function register(prevState, formData) {
       });
     }
 
-    cookies().set("jwt", jwt);
+    cookies().set("jwt", jwt, config);
     return {
       success: true,
       message: `Καλώς ήρθες ${userData.username}!`,
@@ -143,7 +143,6 @@ const postLoginDetails = async (url, identifier, password) => {
 
 export async function login(prevState, formData) {
   const STRAPI_URL = process.env.STRAPI_API_URL;
-  const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
 
   if (!STRAPI_URL) throw new Error("Missing STRAPI_URL environment variable.");
 
@@ -168,6 +167,8 @@ export async function login(prevState, formData) {
   if (!response.ok && data.error)
     return { ...prevState, message: data.error.message, errors: null };
   if (response.ok && data.jwt) {
+    console.log("jwt", data.jwt);
+
     cookies().set("jwt", data.jwt, config);
     redirect("/dashboard");
   }
