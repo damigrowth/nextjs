@@ -3,7 +3,6 @@ import MostViewServiceCard1 from "../card/MostViewServiceCard1";
 import DashboardNavigation from "../header/DashboardNavigation";
 import RecentServiceCard1 from "../card/RecentServiceCard1";
 import { job1 } from "@/data/job";
-import { getUser } from "@/lib/auth/user";
 import { getData } from "@/lib/client/operations";
 import {
   ALL_REVIEWS_RECEIVED_DASHBOARD,
