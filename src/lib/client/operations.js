@@ -1,8 +1,6 @@
 "use server";
 
-import { inspect } from "@/utils/inspect";
 import { getClient } from ".";
-import { isAuthenticated } from "../auth/authenticated";
 import {
   STRAPI_GRAPHQL,
   STRAPI_TOKEN,
@@ -10,7 +8,6 @@ import {
   validateEnvVars,
 } from "../strapi";
 import { print } from "graphql/language/printer";
-import { GET_ME } from "../graphql/queries/main/user";
 import { cache } from "react";
 
 export async function fetchWithRetry(url, options, retries = 3, backoff = 300) {
@@ -175,41 +172,5 @@ export const putData = async (mutation, variables) => {
       console.log("Network Error:", error.networkError);
     }
     console.log("Failed to put GraphQL data!", error);
-  }
-};
-
-// Generic GraphQL mutation function
-export const getMe = async () => {
-  validateEnvVars();
-
-  const { authenticated, token } = await isAuthenticated();
-  if (!authenticated) {
-    console.error("User is not authenticated.");
-    return;
-  }
-
-  const client = getClient();
-
-  // TODO: CREATE ALL THE FIELDS FOR USER IN THE BACKEND
-  const query = GET_ME;
-
-  try {
-    const { data } = await client.query({
-      query,
-      context: {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    });
-    return data;
-  } catch (error) {
-    if (error.graphQLErrors) {
-      console.log("GraphQL Errors:", error.graphQLErrors);
-    }
-    if (error.networkError) {
-      console.log("Network Error:", error.networkError);
-    }
-    console.log("Failed to post GraphQL data!", error);
   }
 };
