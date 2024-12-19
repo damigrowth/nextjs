@@ -37,6 +37,9 @@ export default async function ReviewsInfo() {
           <div className="col-xl-12">
             <div className="ps-widget bgc-white bdrs4 p30 mb30 overflow-hidden position-relative">
               <div className="packages_table table-responsive">
+                {reviewsReceived?.data?.length === 0 && (
+                  <p>Χωρίς Αξιολογήσεις</p>
+                )}
                 <div className="navtab-style1">
                   {reviewsReceived?.data?.map((review, i) => {
                     const reviewer = review?.attributes?.user?.data?.attributes;
@@ -72,6 +75,9 @@ export default async function ReviewsInfo() {
           <div className="col-xl-12">
             <div className="ps-widget bgc-white bdrs4 p30 mb30 overflow-hidden position-relative">
               <div className="packages_table table-responsive">
+                {reviewsGiven?.data?.length === 0 && (
+                  <p>Χωρίς Αξιολογήσεις για άλλα προφίλ</p>
+                )}
                 <div className="navtab-style1">
                   {reviewsGiven?.data?.map((review, i) => {
                     const receiver =
