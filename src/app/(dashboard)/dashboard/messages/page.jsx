@@ -10,7 +10,7 @@ export const metadata = {
 export default function page() {
   return (
     <>
-      <MobileNavigation2 />
+      {/* <MobileNavigation2 /> */}
       <DashboardLayout>{/* <MessageInfo /> */}</DashboardLayout>
     </>
   );
