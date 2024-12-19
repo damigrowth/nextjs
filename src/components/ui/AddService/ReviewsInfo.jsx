@@ -30,7 +30,6 @@ export default async function ReviewsInfo() {
           <div className="col-lg-12">
             <div className="dashboard_title_area">
               <h2>Αξιολογήσεις</h2>
-              <p className="text">Lorem ipsum dolor sit amet, consectetur.</p>
             </div>
           </div>
         </div>
@@ -67,7 +66,6 @@ export default async function ReviewsInfo() {
         <div className="col-lg-12 mb50 mt30">
           <div className="dashboard_title_area">
             <h2>Αξιολογήσεις για άλλα προφίλ</h2>
-            <p className="text">Lorem ipsum dolor sit amet, consectetur.</p>
           </div>
         </div>
         <div className="row">

@@ -40,7 +40,6 @@ export default async function DashboardInfo() {
           <div className="col-lg-12">
             <div className="dashboard_title_area">
               <h2>Πίνακας Ελέγχου</h2>
-              <p className="text">Lorem ipsum dolor sit amet, consectetur.</p>
             </div>
           </div>
         </div>
