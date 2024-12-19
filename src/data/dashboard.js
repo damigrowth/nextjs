@@ -9,7 +9,7 @@ export const dasboardNavigation = [
     id: 2,
     name: "Μηνύματα",
     icon: "flaticon-chat",
-    path: "/dashboard/messages",
+    path: "#",
   },
   {
     id: 3,

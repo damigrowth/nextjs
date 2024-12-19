@@ -869,6 +869,21 @@ li {
   transition: all 0.3s ease 0s ease;
 }
 
+.dashboard_sidebar_list .sidebar_list_item .disabled {
+  align-items: center;
+  display: flex;
+  border-radius: 0 4px 4px 0;
+  color: var(--headings-color);
+  font-family: sans-serif;
+  font-weight: 500;
+  padding: 10px 20px;
+  opacity: 0.7;
+}
+
+.dashboard_sidebar_list .sidebar_list_item .disabled i {
+  font-size: 20px;
+}
+
 .dashboard_sidebar_list .sidebar_list_item a i {
   font-size: 20px;
 }

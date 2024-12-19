@@ -147,7 +147,7 @@ export default function DashboardHeader() {
                       >
                         <span className="flaticon-mail" />
                       </a>
-                      <div className="dropdown-menu">
+                      {/* <div className="dropdown-menu">
                         <div className="dboard_notific_dd px30 pt20 pb15">
                           <div className="notif_list d-flex align-items-start bdrb1 pb25 mb10">
                             <Image
@@ -193,7 +193,7 @@ export default function DashboardHeader() {
                             </Link>
                           </div>
                         </div>
-                      </div>
+                      </div> */}
                     </li>
                     <li className="d-none d-sm-block">
                       <a

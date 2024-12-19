@@ -8,6 +8,11 @@ export default function DashboardSidebar() {
   const path = usePathname();
 
   const renderNavItem = (item) => {
+    // Common class names for styling
+    const commonClasses = `items-center ${
+      path === item.path ? "-is-active" : ""
+    } ${item.path === "#" ? "disabled" : ""}`;
+
     // Special handling for logout item
     if (item.path === "/logout") {
       return (
@@ -25,12 +30,19 @@ export default function DashboardSidebar() {
       );
     }
 
+    // Disabled items rendered as div
+    if (item.path === "#") {
+      return (
+        <div className={commonClasses}>
+          <i className={`${item.icon} mr15`} />
+          {item.name}
+        </div>
+      );
+    }
+
     // Regular nav items as links
     return (
-      <Link
-        href={item.path}
-        className={`items-center ${path === item.path ? "-is-active" : ""}`}
-      >
+      <Link href={item.path} className={commonClasses}>
         <i className={`${item.icon} mr15`} />
         {item.name}
       </Link>
