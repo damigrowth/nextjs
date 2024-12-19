@@ -31,7 +31,6 @@ export default function NewAddonInputs() {
                   }
                   className="form-control input-group"
                   errors={errors}
-                  formatNumbers
                   formatSymbols
                   capitalize
                 />

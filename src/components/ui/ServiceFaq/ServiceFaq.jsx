@@ -9,7 +9,11 @@ export default function ServiceFaq() {
   return (
     <div className="ps-widget bdrs12 p30 mb30 overflow-hidden position-relative">
       <div className="bdrb1 ">
-        <h3 className="list-title">Συχνές Ερωτήσεις</h3>
+        <h3 className="list-title">Ερωτοαπαντήσεις</h3>
+        <p>
+          Πρόσθεσε κάποιες πιθανές απορίες που έχουν συνήθως οι πελάτες <br />
+          σχετικά με την υπηρεσία σου και τις απαντήσεις τους
+        </p>
       </div>
       <div className="text-start mt30">
         <button

@@ -50,4 +50,15 @@ const TAGS_SEARCH = gql`
   ${TAG}
 `;
 
-export { TAGS_SEARCH };
+const TAGS_SEARCH_SIMPLE = gql`
+  query TagsSearchSimple($label: String) {
+    tags(filters: { label: { containsi: $label } }, sort: "label:asc") {
+      data {
+        ...Tag
+      }
+    }
+  }
+  ${TAG}
+`;
+
+export { TAGS_SEARCH, TAGS_SEARCH_SIMPLE };

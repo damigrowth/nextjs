@@ -9,7 +9,12 @@ export default function ServiceAddons() {
   return (
     <div className="ps-widget bdrs12 p30 mb30 overflow-hidden position-relative">
       <div className="bdrb1 ">
-        <h3 className="list-title">Πρόσθετα</h3>
+        <h3 className="list-title">Πρόσθετες Υπηρεσίες</h3>
+        <p>
+          Πρόσθεσε επιπλέον παροχές που συνδέονται με τη συγκεκριμένη υπηρεσία
+          <br />
+          και θα προστεθούν στο συνολικό κόστος της υπηρεσίας που προσφέρεις.
+        </p>
       </div>
       <div className="text-start mt30">
         <button

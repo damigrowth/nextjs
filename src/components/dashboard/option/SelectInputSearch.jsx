@@ -39,6 +39,9 @@ export default function SelectInputSearch({
       }
     } else {
       setTerm(value);
+      if (onSearch) {
+        onSearch(value); // Added this line to trigger search for multi-select
+      }
     }
   }, 150);
 
@@ -69,7 +72,13 @@ export default function SelectInputSearch({
         id={id}
         name={name}
         options={options}
-        value={value.id === 0 ? { id: 0, label: "Επιλογή..." } : value}
+        value={
+          isMulti
+            ? value
+            : value.id === 0
+            ? { id: 0, label: "Επιλογή..." }
+            : value
+        }
         defaultValue={term}
         isMulti={isMulti}
         isDisabled={isDisabled}

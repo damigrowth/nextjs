@@ -11,6 +11,7 @@ import {
   SUBCATEGORIES_SEARCH,
   SUBDIVISIONS_SEARCH,
 } from "@/lib/graphql/queries/main/taxonomies/service";
+import { TAGS_SEARCH_SIMPLE } from "@/lib/graphql/queries/main/taxonomies/service/tag";
 
 export default function ServiceInformation() {
   const { info, setInfo, saveInfo, errors, handleStepsTypeChange, type } =
@@ -20,42 +21,39 @@ export default function ServiceInformation() {
     categoryTerm: "",
     subcategoryTerm: "",
     subdivisionTerm: "",
+    tagsTerm: "",
   });
-
-  // Fixed or Packages
-  // const handlePriceTypeChange = (e) => {
-  //   const isFixed = e.target.checked;
-  //   setInfo("fixed", !isFixed);
-  //   handleStepsTypeChange(!isFixed);
-  // };
-
-  const handleSubscriptionTypeChange = (e) => {
-    const isTypeYear = e.target.checked;
-    setInfo("subscription_type", isTypeYear ? "year" : "month");
-  };
 
   const handleSearch = useCallback((field, term) => {
     setTaxonomyParams((prev) => ({ ...prev, [`${field}Term`]: term }));
   }, []);
 
   const handleSelect = (field, selected) => {
-    setInfo(field, {
-      id: Number(selected.id),
-      label: selected.label,
-    });
+    if (field === "tags") {
+      // Handle multi-select for tags
+      setInfo("tags", selected || []);
+    } else {
+      setInfo(field, {
+        id: Number(selected.id),
+        label: selected.label,
+      });
 
-    // Reset dependent fields
-    if (field === "category") {
-      setInfo("subcategory", { id: 0, label: "" });
-      setInfo("subdivision", { id: 0, label: "" });
-      setTaxonomyParams((prev) => ({
-        ...prev,
-        subcategoryTerm: "",
-        subdivisionTerm: "",
-      }));
-    } else if (field === "subcategory") {
-      setInfo("subdivision", { id: 0, label: "" });
-      setTaxonomyParams((prev) => ({ ...prev, subdivisionTerm: "" }));
+      // Reset dependent fields
+      if (field === "category") {
+        setInfo("subcategory", { id: 0, label: "" });
+        setInfo("subdivision", { id: 0, label: "" });
+        setTaxonomyParams((prev) => ({
+          ...prev,
+          subcategoryTerm: "",
+          subdivisionTerm: "",
+        }));
+      } else if (field === "subcategory") {
+        setInfo("subdivision", { id: 0, label: "" });
+        setTaxonomyParams((prev) => ({
+          ...prev,
+          subdivisionTerm: "",
+        }));
+      }
     }
   };
 
@@ -107,6 +105,27 @@ export default function ServiceInformation() {
     })),
   };
 
+  const { data: tagsData, loading: tagsLoading } = useQuery(
+    TAGS_SEARCH_SIMPLE,
+    {
+      variables: {
+        label: taxonomyParams.tagsTerm,
+      },
+    }
+  );
+
+  const tagOptions =
+    tagsData?.tags?.data.map((tag) => ({
+      value: tag.id,
+      label: tag.attributes.label,
+    })) || [];
+
+  // Convert store tags format to react-select format for the value prop
+  const selectedTagsValue = info.tags.map((tag) => ({
+    value: tag.id,
+    label: tag.label,
+  }));
+
   return (
     <div>
       <div className="ps-widget bdrs4 p30 mb30 position-relative">
@@ -126,7 +145,6 @@ export default function ServiceInformation() {
                 onChange={(formattedValue) => setInfo("title", formattedValue)}
                 className="form-control input-group"
                 errors={errors}
-                formatNumbers
                 formatSymbols
                 capitalize
               />
@@ -203,26 +221,24 @@ export default function ServiceInformation() {
               </div>
             </div>
           </div>
-          {/* <div className="row">
-            <div className="col-sm-6">
-              <div className="mb20">
-                <SelectInputSearch
-                  options={tagOptions}
-                  id="service-tags"
-                  name="service-tags"
-                  label="Χαρακτηριστικά"
-                  labelPlural="χαρακτηριστικά"
-                  errors={errors}
-                  defaultValue={info.tags.map((tag) => ({
-                    value: tag.id,
-                    label: tag.label,
-                  }))}
-                  onSelect={(formattedArray) => setInfo("tags", formattedArray)}
-                  isMulti
-                />
-              </div>
+          <div className="row">
+            <div className="mb20">
+              <SelectInputSearch
+                options={tagOptions}
+                name="service-tags"
+                label="Tags"
+                labelPlural="tags"
+                errors={errors}
+                isLoading={tagsLoading}
+                isSearchable={true}
+                value={selectedTagsValue}
+                onSelect={(selected) => handleSelect("tags", selected)}
+                onSearch={(term) => handleSearch("tags", term)}
+                isMulti={true}
+                isClearable={true}
+              />
             </div>
-          </div> */}
+          </div>
           <div className="row">
             <div className="col-sm-2">
               <div className="mb20">
@@ -268,28 +284,31 @@ export default function ServiceInformation() {
                 </div>
               </div>
             )}
-            {type.online && type.subscription && (
-              <div className="col-sm-2">
-                <div className="mb20 ">
-                  <label htmlFor="subscription-type" className="dark-color">
-                    Μηνιαία ή Ετήσια
-                  </label>
-                  <div className="form-check form-switch switch-style1">
-                    <input
-                      type="checkbox"
-                      role="switch"
-                      id="subscription-type"
-                      name="subscription-type"
-                      checked={
-                        info.subscription_type === "month" ? false : true
-                      }
-                      onChange={handleSubscriptionTypeChange}
-                      className="form-check-input"
-                    />
-                  </div>
-                </div>
+            {/* {type.online && type.subscription && ( */}
+
+            <div className="col-sm-2">
+              <div className="mb20 ">
+                <SelectInputSearch
+                  options={[
+                    { value: "month", label: "Μηνιαία Συνδρομή" },
+                    { value: "year", label: "Ετήσια Συνδρομή" },
+                  ]}
+                  name="subscription-type"
+                  label="Τύπος Συνδρομής"
+                  labelPlural="τύποι συνδρομής"
+                  errors={errors}
+                  isLoading={false}
+                  isSearchable={false}
+                  value={info.subscription_type}
+                  onSelect={(selected) =>
+                    handleSelect("subscription_type", selected)
+                  }
+                  // onSearch={(term) => handleSearch("subscription_type", term)}
+                  // capitalize
+                />
               </div>
-            )}
+            </div>
+            {/* )} */}
           </div>
         </div>
         <button

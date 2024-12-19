@@ -13,10 +13,8 @@ export default async function page() {
 
   return (
     <>
-      <MobileNavigation2 />
-      <DashboardLayout>
-        <AddServiceInfo coverage={coverage} />
-      </DashboardLayout>
+      {/* <MobileNavigation2 /> */}
+      <AddServiceInfo coverage={coverage} />
     </>
   );
 }

@@ -15,7 +15,7 @@ const initialInfoState = {
   category: initialObjectState,
   subcategory: initialObjectState,
   subdivision: initialObjectState,
-  // tags: [],
+  tags: [],
 };
 
 const initialErrorsState = {
