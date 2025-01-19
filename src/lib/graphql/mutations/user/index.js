@@ -91,3 +91,26 @@ export const UPDATE_FREELANCER = gql`
   }
 `;
 
+export const FORGOT_PASSWORD = gql`
+  mutation ForgotPassword($email: String!) {
+    forgotPassword(email: $email) {
+      ok
+    }
+  }
+`;
+
+export const RESET_PASSWORD = gql`
+  mutation ResetPassword(
+    $resetCode: String!
+    $password: String!
+    $passwordConfirmation: String!
+  ) {
+    resetPassword(
+      code: $resetCode
+      password: $password
+      passwordConfirmation: $passwordConfirmation
+    ) {
+      jwt
+    }
+  }
+`;
