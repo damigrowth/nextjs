@@ -168,3 +168,61 @@ export async function logout() {
   await removeToken();
   redirect("/login");
 }
+
+export async function forgotPassword(prevState, formData) {
+  try {
+    const email = formData.get("email");
+
+    const result = await postData(FORGOT_PASSWORD, {
+      email,
+    });
+
+    if (result.error) {
+      return { message: result.error };
+    }
+
+    if (result.data?.forgotPassword?.ok) {
+      return {
+        success: true,
+        errors: {},
+        message:
+          "Εάν το email υπάρχει στο σύστημά μας, θα λάβετε σύντομα ένα σύνδεσμο επαναφοράς κωδικού στο inbox σας.",
+      };
+    }
+  } catch (error) {
+    console.error(error);
+    return {
+      errors: {},
+      message: "Προέκυψε σφάλμα. Παρακαλώ δοκιμάστε ξανά αργότερα.",
+    };
+  }
+}
+
+export async function resetPassword(prevState, formData) {
+  const password = formData.get("password");
+  const passwordConfirmation = formData.get("passwordConfirmation");
+  const resetCode = formData.get("resetCode");
+
+  const response = await postData(RESET_PASSWORD, {
+    password,
+    passwordConfirmation,
+    resetCode,
+  });
+
+  if (response.error?.includes("Λανθασμένος κωδικός επιβεβαίωσης")) {
+    return {
+      success: false,
+      message:
+        "Ο σύνδεσμος επαναφοράς έχει λήξει. Παρακαλώ χρησιμοποιήστε νέο σύνδεσμο επαναφοράς κωδικού.",
+    };
+  }
+
+  if (response?.data?.resetPassword?.jwt) {
+    await logout();
+  }
+
+  return {
+    success: true,
+    message: "Ο κωδικός σας άλλαξε με επιτυχία!",
+  };
+}
