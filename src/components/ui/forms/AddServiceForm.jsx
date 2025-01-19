@@ -100,25 +100,29 @@ export default function AddServiceForm({ coverage }) {
                   </button>
                 ) : null}
               </div>
-              {saved.gallery === true ? (
+              <div className="col-sm-6 text-end d-flex justify-content-end align-items-center">
+                {steps[step].next ? (
+                  <button
+                    type="button"
+                    disabled={handleDisable()}
+                    onClick={() => setStep(steps[step].next)}
+                    className={`ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3 ${
+                      handleDisable() ? "btn-dark-disabled" : ""
+                    }`}
+                  >
+                    <span>Επόμενο</span>
+                    <span className="d-flex align-items-center flaticon-right fz20" />
+                  </button>
+                ) : null}
+              </div>
+              {saved.gallery === true && (
                 <div className="d-flex justify-content-center">
+                  {formState.errors && (
+                    <div className="mb10">
+                      <p className="text-danger">{formState.message}</p>
+                    </div>
+                  )}
                   <AddServiceButton isPending={isPending} />
-                </div>
-              ) : (
-                <div className="col-sm-6 text-end d-flex justify-content-end align-items-center">
-                  {steps[step].next ? (
-                    <button
-                      type="button"
-                      disabled={handleDisable()}
-                      onClick={() => setStep(steps[step].next)}
-                      className={`ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3 ${
-                        handleDisable() ? "btn-dark-disabled" : ""
-                      }`}
-                    >
-                      <span>Επόμενο</span>
-                      <span className="d-flex align-items-center flaticon-right fz20" />
-                    </button>
-                  ) : null}
                 </div>
               )}
             </div>
