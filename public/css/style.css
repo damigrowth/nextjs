@@ -791,6 +791,13 @@ li {
 .user_setting {
   position: relative;
 }
+
+.user_setting .dropdown .btn {
+  padding: 0;
+  outline: none;
+  border: none;
+}
+
 .user_setting .dropdown-menu {
   padding: 0;
 }
@@ -997,7 +1004,13 @@ li {
   /* margin-top: 40px; */
   padding-left: 300px;
   width: 100%;
+  /* height: 100vh; */
 }
+
+/* .dashboard__main > div {
+  height: 100%;
+} */
+
 @media (max-width: 991.98px) {
   .dashboard__main {
     margin-top: 0px;
@@ -1008,7 +1021,7 @@ li {
   border-radius: 4px;
   padding: 60px 60px 20px;
   width: 100%;
-  background-color: #fbf7ed;
+  /* background-color: #fbf7ed; */
 }
 @media (max-width: 767.98px) {
   .dashboard__content {
@@ -1203,6 +1216,7 @@ li {
 }
 .dashboard-img-service .listing-style1.list-style .list-thumb {
   width: 122px;
+  height: 91px;
 }
 .dashboard-img-service .list-title {
   line-height: 28px;
@@ -1516,7 +1530,7 @@ li {
 .listing-style1 .list-thumb {
   overflow: hidden;
   position: relative;
-  height: 200px;
+  /* height: 90px; */
 }
 .listing-style1 img {
   -webkit-transition: all 0.4s ease;
@@ -9444,6 +9458,11 @@ li.mm-listitem:focus {
 .navpill-style2 {
   position: relative;
 }
+
+.navtab-style1 .t-head th:last-child {
+  text-align: end;
+}
+
 .navpill-style2 .nav-item {
   margin-right: 10px;
 }
@@ -13300,4 +13319,11 @@ header.nav-homepage-style .sidemenu-btn {
 
 section.pb40-md.pb90 > div > div.row.d-block.d-lg-none > div > div.row {
   justify-content: center;
+}
+
+.initials-image-text {
+  width: 40px;
+  height: 30px;
+  text-align: center;
+  line-height: normal;
 }
