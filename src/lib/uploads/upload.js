@@ -1,77 +1,39 @@
 import { faker } from "@faker-js/faker";
-import { postData, postMedia } from "../api";
-
-const convertToBlob = async (url) => {
-  try {
-    // console.log("BLOB URL", url);
-    const response = await fetch(url);
-    const blob = await response.blob();
-    // console.log("BLOB", blob);
-
-    return blob;
-  } catch (error) {
-    console.error("Error converting to Blob:", error);
-    throw new Error("Failed to convert to Blob");
-  }
-};
+import { UPLOAD } from "../graphql/mutations";
+import { postData } from "../client/operations";
+import { postMedia } from "../api";
 
 // Upload media to Strapi
-export async function uploadMedia(files) {
+export async function uploadMedia(files, options = {}) {
+  // Early return if no valid files
+  if (!files?.length) return [];
+
   const formData = new FormData();
-  const uploadedMedia = [];
 
-  for (const file of files) {
-    const fileName = file.name || `${faker.date.recent()}`;
+  // Add all files at once with proper naming
+  files.forEach((file, index) => {
+    const fileName = file.name || `upload-${Date.now()}-${index}`;
     formData.append("files", file, fileName);
+
+    // Add reference data if provided
+    if (options.ref) {
+      formData.append("ref", options.ref);
+      formData.append("refId", options.refId);
+      formData.append("field", options.field);
+    }
+  });
+
+  try {
+    const response = await postMedia("upload", formData);
+
+    if (!response || response.error) {
+      console.error("Upload failed:", response?.error || "Unknown error");
+      throw new Error("Failed to upload media");
+    }
+
+    return response.map((media) => media.id);
+  } catch (error) {
+    console.error("Upload error:", error);
+    throw error;
   }
-
-  const response = await postMedia("upload", formData);
-
-  const mediaIds = response.map((media) => media.id);
-  uploadedMedia.push(...mediaIds);
-
-  return uploadedMedia;
 }
-
-// Upload media straight to Cloudinary
-// export async function uploadMedia(files) {
-//   const uploadedMedia = [];
-
-//   try {
-//     const formData = new FormData();
-//     formData.append("upload_preset", "doulitsa");
-//     formData.append("cloud_name", "ddejhvzbf");
-//     formData.append("api_key", "552113138292579");
-//     formData.append("timestamp", (Date.now() / 1000) | 0);
-
-//     for (const file of files) {
-//       formData.append("file", file);
-
-//       const requestOptions = {
-//         method: "POST",
-//         body: formData,
-//       };
-
-//       const uploadResponse = await fetch(
-//         "https://api.cloudinary.com/v1_1/ddejhvzbf/image/upload",
-//         requestOptions
-//       );
-
-//       if (!uploadResponse.ok) {
-//         const errorData = await uploadResponse.json();
-//         throw new Error(
-//           `Failed to upload file ${file.name}: ${errorData.error.message}`
-//         );
-//       }
-
-//       const data = await uploadResponse.json();
-//       uploadedMedia.push(data.secure_url);
-//     }
-
-//     console.log("Media uploaded successfully");
-//     return uploadedMedia;
-//   } catch (error) {
-//     console.error("Error uploading media:", error);
-//     throw new Error("Failed to upload media");
-//   }
-// }

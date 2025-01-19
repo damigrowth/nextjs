@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
-import { DISLIKES, LIKES, USER_PARTIAL } from "../../fragments/entities/user";
 import { SERVICE } from "../../fragments/entities/service";
 import { STATUS, TYPE } from "../../fragments/global";
+import { FREELANCER_PARTIAL } from "../freelancer";
+import { DISLIKES, LIKES } from "../../fragments/entities/review";
 
 const REVIEW_MAIN = gql`
   fragment ReviewMain on Review {
@@ -15,8 +16,11 @@ const REVIEW_MAIN = gql`
 
 const REVIEW_RELATIONS = gql`
   fragment ReviewRelations on Review {
+    freelancer {
+      ...FreelancerPartial
+    }
     user {
-      ...UserPartial
+      ...FreelancerPartial
     }
     service {
       ...Service
@@ -34,7 +38,7 @@ const REVIEW_RELATIONS = gql`
       ...Dislikes
     }
   }
-  ${USER_PARTIAL}
+  ${FREELANCER_PARTIAL}
   ${SERVICE}
   ${TYPE}
   ${STATUS}

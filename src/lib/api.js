@@ -1,67 +1,75 @@
 "use server";
 
-import { STRAPI_TOKEN, STRAPI_URL, validateEnvVars } from "./strapi";
+import { getToken } from "./auth/token";
+import {
+  STRAPI_API_URL,
+  STRAPI_TOKEN,
+  STRAPI_URL,
+  validateEnvVars,
+} from "./strapi";
 
 //* REST API *//
-export const getPublicData = async (query) => {
-  const url = `${STRAPI_URL}/${query}`;
+// export const getPublicData = async (query) => {
+//   const url = `${STRAPI_URL}/${query}`;
 
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-cache",
-    });
+//   try {
+//     const response = await fetch(url, {
+//       method: "GET",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       cache: "no-cache",
+//     });
 
-    const data = await response.json();
+//     const data = await response.json();
 
-    if (!response.ok && data.error) console.log(data.error.message);
-    if (response.ok) {
-      return data;
-    }
-  } catch (error) {
-    console.error("Server error. Please try again later.", error);
-    return { error: "Server error. Please try again later." };
-  }
-};
+//     if (!response.ok && data.error) console.log(data.error.message);
+//     if (response.ok) {
+//       return data;
+//     }
+//   } catch (error) {
+//     console.error("Server error. Please try again later.", error);
+//     return { error: "Server error. Please try again later." };
+//   }
+// };
 
-export const getData = async (query) => {
+// export const getData = async (query) => {
+//   validateEnvVars();
+
+//   const url = `${STRAPI_URL}/${query}`;
+
+//   try {
+//     const response = await fetch(url, {
+//       method: "GET",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${STRAPI_TOKEN}`,
+//       },
+
+//       cache: "no-cache",
+//     });
+
+//     const data = await response.json();
+
+//     if (!response.ok && data.error) console.log(data.error.message);
+//     if (response.ok) {
+//       return data;
+//     }
+//   } catch (error) {
+//     console.error("Server error. Please try again later.", error);
+//     return { error: "Server error. Please try again later." };
+//   }
+// };
+
+export async function postData(endpoint, data) {
   validateEnvVars();
-
-  const url = `${STRAPI_URL}/${query}`;
-
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
-      },
-
-      cache: "no-cache",
-    });
-
-    const data = await response.json();
-
-    if (!response.ok && data.error) console.log(data.error.message);
-    if (response.ok) {
-      return data;
-    }
-  } catch (error) {
-    console.error("Server error. Please try again later.", error);
-    return { error: "Server error. Please try again later." };
-  }
-};
-
-export const postData = async (url, payload) => {
-  validateEnvVars();
-
-  const endpoint = `${STRAPI_URL}/${url}`;
+  // Log full request details
+  console.log("Request URL:", `${STRAPI_API_URL}/api/${endpoint}`);
+  console.log("Authorization:", `Bearer ${STRAPI_TOKEN.substring(0, 5)}...`); // Only show first 5 chars
+  console.log("Sending data:", data);
 
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(`${STRAPI_API_URL}/${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -69,19 +77,23 @@ export const postData = async (url, payload) => {
       },
       body: JSON.stringify({
         data: {
-          ...payload,
+          ...data,
         },
-      }),
-      cache: "no-cache",
+      }), // data is already in the correct format
     });
 
-    const data = await response.json();
-    return data;
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("RESPONSE", errorData);
+      return errorData;
+    }
+
+    return await response.json();
   } catch (error) {
-    console.error("Server error. Please try again later.", error);
-    return { error: "Server error. Please try again later." };
+    console.error("Error posting data:", error);
+    return { error: error.message };
   }
-};
+}
 
 export const putData = async (url, payload) => {
   validateEnvVars();
@@ -139,16 +151,16 @@ export const patchData = async (url, payload) => {
   }
 };
 
-export const postMedia = async (url, payload) => {
-  validateEnvVars();
+export const postMedia = async (url, payload, jwt) => {
+  const endpoint = `${STRAPI_URL}/api/${url}`;
 
-  const endpoint = `${STRAPI_URL}/${url}`;
+  const token = (await getToken()) || jwt;
 
   try {
     const response = await fetch(endpoint, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: payload,
     });

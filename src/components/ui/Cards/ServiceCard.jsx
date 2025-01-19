@@ -8,17 +8,8 @@ import ServiceCardFile from "./ServiceCardFile";
 import { getBestDimensions } from "@/utils/imageDimensions";
 
 export default function ServiceCard({ service }) {
-  const {
-    title,
-    price,
-    rating,
-    reviews_total,
-    slug,
-    category,
-    subcategory,
-    media,
-    freelancer,
-  } = service.attributes;
+  const { title, price, slug, category, subcategory, media, freelancer } =
+    service.attributes;
 
   if (!freelancer.data) {
     return null;
@@ -28,7 +19,18 @@ export default function ServiceCard({ service }) {
     return null;
   }
 
-  const user = freelancer?.data?.attributes?.user?.data?.attributes;
+  const freelancerData = freelancer.data.attributes;
+  const {
+    firstName,
+    lastName,
+    displayName,
+    image: avatar,
+    username,
+    verified,
+    topLevel,
+    rating,
+    reviews_total,
+  } = freelancerData;
 
   return (
     <div className="data-loading-element listing-style1 list-style d-block d-xl-flex align-items-center">
@@ -59,32 +61,24 @@ export default function ServiceCard({ service }) {
                 " - " + subcategory?.data?.attributes?.label}
             </p>
           </div>
-          <CardReviews
-            rating={freelancer.data.attributes.rating}
-            reviews_total={freelancer.data.attributes.reviews_total}
-          />
+          <CardReviews rating={rating} reviews_total={reviews_total} />
         </div>
 
         <hr className="my-2" />
         <div className="list-meta d-flex justify-content-between align-items-center mt15">
           <div className="archive-service-card-user-meta">
             <UserImage
-              firstName={user.firstName}
-              lastName={user.lastName}
-              displayName={user.displayName}
-              image={user?.image?.data?.attributes?.formats?.thumbnail?.url}
-              alt={
-                user?.image?.formats?.thumbnail?.provider_metadata?.public_id
-              }
+              firstName={firstName}
+              lastName={lastName}
+              displayName={displayName}
+              image={avatar?.data?.attributes?.formats?.thumbnail?.url}
+              alt={avatar?.formats?.thumbnail?.provider_metadata?.public_id}
               width={30}
               height={30}
-              path={`/profile/${freelancer?.data?.attributes?.username}`}
+              path={`/profile/${username}`}
             />
 
-            <Badges
-              verified={user?.verified}
-              topLevel={freelancer?.data?.attributes?.topLevel}
-            />
+            <Badges verified={verified} topLevel={topLevel} />
           </div>
           {price > 0 && (
             <div className="budget">

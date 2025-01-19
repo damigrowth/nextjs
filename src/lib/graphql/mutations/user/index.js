@@ -1,5 +1,13 @@
 import { gql } from "@apollo/client";
 
+export const LOGIN_USER = gql`
+  mutation Login($identifier: String!, $password: String!) {
+    login(input: { identifier: $identifier, password: $password }) {
+      jwt
+    }
+  }
+`;
+
 export const REGISTER_USER = gql`
   mutation Register($input: UsersPermissionsRegisterInput!) {
     register(input: $input) {
@@ -14,20 +22,40 @@ export const REGISTER_USER = gql`
 `;
 
 export const UPDATE_USER = gql`
-  mutation UpdateUserRole(
+  mutation UpdateUser(
     $id: ID!
-    $roleId: ID!
-    $displayName: String!
+    $roleId: ID
+    $displayName: String
     $consent: Boolean
+    $freelancer: ID
+    $username: String
   ) {
     updateUsersPermissionsUser(
       id: $id
-      data: { role: $roleId, displayName: $displayName, consent: $consent }
+      data: {
+        role: $roleId
+        freelancer: $freelancer
+        username: $username
+        displayName: $displayName
+        consent: $consent
+      }
     ) {
       data {
         id
         attributes {
-          displayName
+          freelancer {
+            data {
+              id
+            }
+          }
+          role {
+            data {
+              id
+              attributes {
+                name
+              }
+            }
+          }
         }
       }
     }
@@ -41,8 +69,48 @@ export const CREATE_FREELANCER = gql`
         id
         attributes {
           username
+          email
+          type {
+            data {
+              id
+            }
+          }
         }
       }
+    }
+  }
+`;
+
+export const UPDATE_FREELANCER = gql`
+  mutation UpdateFreelancer($id: ID!, $data: FreelancerInput!) {
+    updateFreelancer(id: $id, data: $data) {
+      data {
+        id
+      }
+    }
+  }
+`;
+
+export const FORGOT_PASSWORD = gql`
+  mutation ForgotPassword($email: String!) {
+    forgotPassword(email: $email) {
+      ok
+    }
+  }
+`;
+
+export const RESET_PASSWORD = gql`
+  mutation ResetPassword(
+    $resetCode: String!
+    $password: String!
+    $passwordConfirmation: String!
+  ) {
+    resetPassword(
+      code: $resetCode
+      password: $password
+      passwordConfirmation: $passwordConfirmation
+    ) {
+      jwt
     }
   }
 `;

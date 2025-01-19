@@ -41,7 +41,7 @@ export async function createService(prevState, formData) {
     // console.log("UPLOADED MEDIA", uploadedMedia);
 
     // GET FREELANCER ID
-    const { fid } = await getFreelancerId();
+    const fid = await getFreelancerId();
 
     // CREATE SERVICE
     const payload = {

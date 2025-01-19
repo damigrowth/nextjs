@@ -33,8 +33,14 @@ export default function FreelancerProfile({
   reviewsPage,
 }) {
   const {
-    user: userData,
+    firstName,
+    lastName,
+    displayName,
+    verified,
+    email,
+    phone,
     tagline,
+    visibility,
     coverage,
     socials,
     image,
@@ -66,8 +72,6 @@ export default function FreelancerProfile({
     rating_stars_5,
   } = freelancer;
 
-  const user = userData?.data?.attributes;
-
   const ratingStars = [
     rating_stars_1,
     rating_stars_2,
@@ -80,29 +84,29 @@ export default function FreelancerProfile({
     <section className="pt10 pb90 pb30-md">
       <FreelancerSchema
         username={username}
-        displayName={user?.displayName}
+        displayName={displayName}
         location={coverage?.county?.data?.attributes?.name}
         rating={rating}
         reviews_total={reviews_total}
         reviews={reviews}
-        profileImage={user.image.data?.attributes?.formats?.thumbnail?.url}
+        profileImage={image.data?.attributes?.formats?.thumbnail?.url}
       />
       <div className="container">
         <div className="row wow fadeInUp">
           <div className="col-lg-8">
             <Meta
               topLevel={topLevel}
-              firstName={user?.firstName}
-              lastName={user?.lastName}
-              displayName={user?.displayName}
+              firstName={firstName}
+              lastName={lastName}
+              displayName={displayName}
               tagline={tagline}
               socials={socials}
-              image={user.image.data?.attributes?.formats?.thumbnail?.url}
+              image={image.data?.attributes?.formats?.thumbnail?.url}
               rating={rating}
               totalReviews={reviews_total}
-              verified={user?.verified}
+              verified={verified}
               coverage={coverage}
-              visibility={user?.visibility}
+              visibility={visibility}
             />
             <Metrics
               subcategory={subcategory?.data?.attributes?.label}
@@ -176,9 +180,8 @@ export default function FreelancerProfile({
               coverage={coverage}
               commencement={commencement}
               website={website}
-              phone={user.visibility.phone && user.phone}
-              email={user.visibility.email && user.email}
-              visibility={user?.visibility}
+              phone={visibility?.data?.attributes?.phone && phone}
+              email={visibility?.data?.attributes?.email && email}
             />
             <Skills
               skills={skills?.data}

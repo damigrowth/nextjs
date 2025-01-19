@@ -4,7 +4,7 @@ import { useState } from "react";
 import FaqListEdit from "./FaqListEdit";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 
-export default function FaqList() {
+export default function FaqList({ custom }) {
   const { faq, deleteFaq, editFaq, editingMode, editingInput } =
     useCreateServiceStore();
   const [activeItem, setActiveItem] = useState(0);
@@ -15,7 +15,13 @@ export default function FaqList() {
 
   return (
     <>
-      <div className="accordion-style1 faq-page mb-4 mb-lg-5 mt30">
+      <div
+        className={
+          custom
+            ? "accordion-style1 faq-page"
+            : "accordion-style1 faq-page mb-4 mb-lg-5 mt30"
+        }
+      >
         <div className="accordion" id="accordion">
           {faq.map((faqItem, index) => (
             <div key={index}>

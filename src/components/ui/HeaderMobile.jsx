@@ -2,8 +2,9 @@ import React from "react";
 import UserImage from "../user/UserImage";
 import Link from "next/link";
 import Image from "next/image";
+import UserMenu from "../dashboard/header/UserMenu";
 
-export default function HeaderMobile({ user }) {
+export default function HeaderMobile() {
   return (
     <div className="mobilie_header_nav stylehome1">
       <div className="mobile-menu">
@@ -19,24 +20,7 @@ export default function HeaderMobile({ user }) {
                 />
               </Link>
               <div className="d-flex align-items-center right-side text-end">
-                {user ? (
-                  <UserImage
-                    firstName={user.firstName}
-                    lastName={user.lastName}
-                    // displayName={user.displayName}
-                    image={user?.image?.formats?.thumbnail?.url}
-                    alt={
-                      user?.image?.formats?.thumbnail?.provider_metadata
-                        ?.public_id
-                    }
-                    width={40}
-                    height={40}
-                    path={`/dashboard`}
-                  />
-                ) : (
-                  <Link href="/login">Σύνδεση</Link>
-                )}
-
+                <UserMenu isMobile />
                 <a
                   className="menubar ml30"
                   data-bs-toggle="offcanvas"

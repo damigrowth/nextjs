@@ -5,6 +5,7 @@ import NavMenu from "./NavMenu";
 import HeaderStickyWrapper from "./HeaderStickyWrapper";
 import HeaderMobile from "./HeaderMobile";
 import HeaderLogo from "./HeaderLogo";
+import UserMenu from "../dashboard/header/UserMenu";
 
 export default function Header({ user, header }) {
   const categories = header.data.attributes.categories.data.map((item, i) => ({
@@ -51,45 +52,14 @@ export default function Header({ user, header }) {
                       Καταχώριση Επαγγελματία
                     </span>
                   </Link>
-
-                  {user ? (
-                    <UserImage
-                      firstName={user.firstName}
-                      lastName={user.lastName}
-                      displayName={user.displayName}
-                      hideDisplayName
-                      image={user?.image?.formats?.thumbnail?.url}
-                      alt={
-                        user?.image?.formats?.thumbnail?.provider_metadata
-                          ?.public_id
-                      }
-                      width={40}
-                      height={40}
-                      path={`/dashboard`}
-                    />
-                  ) : (
-                    <>
-                      <Link
-                        className="login-info mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent"
-                        href="/login"
-                      >
-                        Σύνδεση
-                      </Link>
-                      <Link
-                        className="ud-btn btn-dark add-joining bdrs50 text-white"
-                        href="/register"
-                      >
-                        Εγγραφή
-                      </Link>
-                    </>
-                  )}
+                  <UserMenu />
                 </div>
               </div>
             </div>
           </div>
         </nav>
       </HeaderStickyWrapper>
-      <HeaderMobile user={user} />
+      <HeaderMobile />
     </>
   );
 }

@@ -15,6 +15,7 @@ import Terms from "./Terms";
 import FeaturedFile from "./FeaturedFile";
 import ServiceSchema from "@/utils/Seo/Schema/ServiceSchema";
 import Protected from "@/components/auth/Protected";
+import { getUserId } from "@/lib/auth/user";
 
 export default async function SingleService({
   slug,
@@ -49,14 +50,40 @@ export default async function SingleService({
     rating_stars_4,
     rating_stars_5,
     type,
-    freelancer: freelancerUser,
+    freelancer,
   } = service;
 
-  const userId = freelancerUser.data.attributes.user.data.id;
-  const user = freelancerUser.data.attributes.user.data.attributes;
+  const userId = await getUserId();
 
-  const freelancerId = freelancerUser.data.id;
-  const freelancer = freelancerUser.data.attributes;
+  const freelancerId = freelancer.data.id;
+  const freelancerData = freelancer.data.attributes;
+
+  const {
+    displayName,
+    rating: freelancerRating,
+    reviews_total: freelancerReviewsTotal,
+    firstName,
+    lastName,
+    username,
+    verified,
+    topLevel,
+    visibility,
+    coverage,
+    contactTypes,
+    payment_methods,
+    settlement_methods,
+    terms,
+    commencement,
+    socials,
+    website,
+    tagline,
+    rate,
+    base,
+    address,
+    email,
+    phone,
+    image,
+  } = freelancerData;
 
   const ratingStars = [
     rating_stars_1,
@@ -71,7 +98,7 @@ export default async function SingleService({
       <ServiceSchema
         slug={slug}
         title={title}
-        displayName={user.displayName}
+        displayName={displayName}
         price={price}
         rating={rating}
         reviews_total={reviews_total}
@@ -85,21 +112,21 @@ export default async function SingleService({
               <div className="row  px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
                 <Meta
                   title={title}
-                  firstName={user.firstName}
-                  lastName={user.lastName}
-                  displayName={user.displayName}
-                  username={freelancer.username}
-                  image={user.image.data?.attributes?.formats?.thumbnail?.url}
+                  firstName={firstName}
+                  lastName={lastName}
+                  displayName={displayName}
+                  username={username}
+                  image={image.data?.attributes?.formats?.thumbnail?.url}
                   views={views?.data?.length}
-                  verified={user?.verified}
-                  topLevel={freelancer?.topLevel}
-                  rating={freelancer.rating}
-                  totalReviews={freelancer.reviews_total}
+                  verified={verified}
+                  topLevel={topLevel}
+                  rating={freelancerRating}
+                  totalReviews={freelancerReviewsTotal}
                 />
 
                 <Info
-                  visibility={user.visibility.address}
-                  coverage={freelancer?.coverage}
+                  visibility={visibility?.data?.attributes?.address}
+                  coverage={coverage}
                   category={subdivision.data?.attributes}
                   subcategory={subcategory.data?.attributes}
                   time={time}
@@ -110,9 +137,9 @@ export default async function SingleService({
                 <Description
                   description={description}
                   tags={tags.data}
-                  contactTypes={freelancer.contactTypes}
-                  payment_methods={freelancer.payment_methods}
-                  settlement_methods={freelancer.settlement_methods}
+                  contactTypes={contactTypes}
+                  payment_methods={payment_methods}
+                  settlement_methods={settlement_methods}
                 />
                 {media.data.length > 0 && (
                   <>
@@ -129,7 +156,7 @@ export default async function SingleService({
                 {fixed ? null : <Packages packages={packages} />}
                 {addons?.length > 0 && <Addons addons={addons} price={price} />}
                 {faq?.length > 0 && <Faq faq={faq} />}
-                <Terms heading="Όροι Συνεργασίας" text={freelancer?.terms} />
+                <Terms heading="Όροι Συνεργασίας" text={terms} />
                 {/* <hr className="opacity-100 mb15" /> */}
                 <Reviews
                   reviews={reviews}
@@ -153,14 +180,7 @@ export default async function SingleService({
           </div>
           <StickySidebar>
             {fixed ? (
-              <OrderFixed
-                price={price}
-                addons={addons}
-                serviceId={serviceId}
-                freelancerId={freelancerId}
-                userId={userId}
-                username={freelancer.username}
-              />
+              <OrderFixed price={price} addons={addons} username={username} />
             ) : (
               <OrderPackages
                 packages={packages}
@@ -168,29 +188,29 @@ export default async function SingleService({
                 serviceId={serviceId}
                 freelancerId={freelancerId}
                 userId={userId}
-                username={freelancer.username}
+                username={username}
               />
             )}
             <ContactDetails
-              firstName={user.firstName}
-              lastName={user.lastName}
-              displayName={user.displayName}
-              username={freelancer.username}
-              tagline={freelancer.tagline}
-              topLevel={freelancer.topLevel}
-              verified={user?.verified}
-              base={freelancer.base}
-              rate={freelancer.rate}
-              image={user.image?.data?.attributes?.formats?.thumbnail?.url}
-              rating={freelancer.rating}
-              totalReviews={freelancer.reviews_total}
-              socials={freelancer.socials}
-              email={user.visibility.email && user.email}
-              phone={user.visibility.phone && user.phone}
-              website={freelancer.website}
-              type={freelancer.type}
-              category={freelancer.subcategory}
-              commencement={freelancer.commencement}
+              firstName={firstName}
+              lastName={lastName}
+              displayName={displayName}
+              username={username}
+              tagline={tagline}
+              topLevel={topLevel}
+              verified={verified}
+              base={base}
+              rate={rate}
+              image={image?.data?.attributes?.formats?.thumbnail?.url}
+              rating={freelancerRating}
+              totalReviews={freelancerReviewsTotal}
+              socials={socials}
+              email={visibility?.data?.attributes?.remail && email}
+              phone={visibility?.data?.attributes?.phone && phone}
+              website={website}
+              type={type}
+              category={subcategory}
+              commencement={commencement}
             />
           </StickySidebar>
         </div>

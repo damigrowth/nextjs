@@ -1,9 +1,6 @@
+import { SKILL_ENTITY } from "@/lib/graphql/queries/fragments/entities/skill";
+import { PAGINATION } from "@/lib/graphql/queries/fragments/global";
 import { gql } from "@apollo/client";
-
-const {
-  SKILL_ENTITY,
-} = require("@/lib/graphql/queries/fragments/entities/skill");
-const { PAGINATION } = require("@/lib/graphql/queries/fragments/global");
 
 const SKILLS_SEARCH = gql`
   query SkillsSearch(

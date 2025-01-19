@@ -31,23 +31,25 @@ export default async function Reviews({
             <ul>
               {reviews.map(({ attributes: review, id }, i) => {
                 return (
-                  review.user.data && (
+                  review.freelancer.data && (
                     <li key={i}>
                       <Review
                         reviewId={Number(id)}
                         showReviewsModel={showReviewsModel}
                         service={review.service.data.attributes}
-                        firstName={review.user.data.attributes.firstName}
-                        lastName={review.user.data.attributes.lastName}
-                        displayName={review.user.data.attributes.displayName}
+                        firstName={review.freelancer.data.attributes.firstName}
+                        lastName={review.freelancer.data.attributes.lastName}
+                        displayName={
+                          review.freelancer.data.attributes.displayName
+                        }
                         image={
-                          review?.user?.data?.attributes?.image?.data
+                          review?.freelancer?.data?.attributes?.image?.data
                             ?.attributes?.formats?.thumbnail?.url
                         }
                         date={review.publishedAt}
                         comment={review.comment}
-                        likes={review.likes.data}
-                        dislikes={review.dislikes.data}
+                        likes={review.likes?.data}
+                        dislikes={review.dislikes?.data}
                         rating={review.rating}
                       />
                     </li>

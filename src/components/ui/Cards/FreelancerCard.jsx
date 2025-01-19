@@ -7,40 +7,35 @@ import React from "react";
 export default function FreelancerCard({ freelancer, linkedName }) {
   const {
     username,
-    tagline,
+    firstName,
+    lastName,
+    displayName,
+    image,
+    verified,
     rating,
     reviews_total,
-    rate,
     topLevel,
     specialisations,
     category,
     subcategory,
-    type,
   } = freelancer;
-
-  const user = freelancer.user?.data?.attributes;
 
   return (
     <>
       <div className="data-loading-element freelancer-style1 text-center bdr1 hover-box-shadow">
         <div className="thumb w90 mb25 mx-auto position-relative rounded-circle">
-          {/* <Image
-            height={90}
-            width={90}
-            className="rounded-circle mx-auto"
-            src={freelancer?.user?.data?.attributes?.formats?.thumbnail?.url}
-            alt="thumb"
-          /> */}
           <UserImage
             height={90}
             width={90}
-            image={user.image.data?.attributes?.formats?.thumbnail?.url}
+            image={image.data?.attributes?.formats?.thumbnail?.url}
             alt="user-image"
-            firstName={user.firstName}
-            lastName={user.lastName}
+            firstName={firstName}
+            lastName={lastName}
+            displayName={displayName}
             bigText
             path={`/profile/${username}`}
             topLevel={topLevel}
+            hideDisplayName
           />
         </div>
         <div className="review">
@@ -49,16 +44,15 @@ export default function FreelancerCard({ freelancer, linkedName }) {
               href={`/profile/${username}`}
               className="d-flex align-items-center justify-content-center mb-1"
             >
-              <h5 className="title m0 mr5 text-bold">{user.displayName}</h5>
-              <VerifiedBadge verified={user?.verified} />
+              <h5 className="title m0 mr5 text-bold">{displayName}</h5>
+              <VerifiedBadge verified={verified} />
             </Link>
           ) : (
             <div className="d-flex align-items-center justify-content-center mb-1">
-              <h5 className="title m0 mr5 text-bold">{user.displayName}</h5>
-              <VerifiedBadge verified={user?.verified} />
+              <h5 className="title m0 mr5 text-bold">{displayName}</h5>
+              <VerifiedBadge verified={verified} />
             </div>
           )}
-
           <p className="mb-0 text-bold">
             {subcategory?.data
               ? subcategory?.data?.attributes?.label
@@ -77,13 +71,6 @@ export default function FreelancerCard({ freelancer, linkedName }) {
           ) : (
             <div className="empty-card-reviews"></div>
           )}
-          {/* <div className="review">
-            <p>
-              <i className="fas fa-star fz10 review-color pr10" />
-              <span className="dark-color fw500">{rating}</span>
-              {`(${reviews_total} αξιολογήσεις)`}
-            </p>
-          </div> */}
           {specialisations?.data?.length > 0 ? (
             <div className="card-tags">
               {specialisations.data.map((el, i) => (

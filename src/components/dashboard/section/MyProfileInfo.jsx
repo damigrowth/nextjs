@@ -1,3 +1,4 @@
+import EditProfileForm from "@/components/ui/forms/EditProfileForm";
 import DashboardNavigation from "../header/DashboardNavigation";
 import Award from "./Award";
 import ChangePassword from "./ChangePassword";
@@ -6,6 +7,7 @@ import Education from "./Education";
 import ProfileDetails from "./ProfileDetails";
 import Skill from "./Skill";
 import WorkExperience from "./WorkExperience";
+import Image from "next/image";
 
 export default function MyProfileInfo() {
   return (
@@ -17,20 +19,23 @@ export default function MyProfileInfo() {
           </div>
           <div className="col-lg-9">
             <div className="dashboard_title_area">
-              <h2>My Profile</h2>
-              <p className="text">Lorem ipsum dolor sit amet, consectetur.</p>
+              <h2>Διαχείρηση Προφίλ</h2>
+              {/* <p className="text">Lorem ipsum dolor sit amet, consectetur.</p> */}
             </div>
           </div>
         </div>
         <div className="row">
           <div className="col-xl-12">
-            <ProfileDetails />
-            <Skill />
+            <div className="ps-widget bgc-white bdrs4 p30 mb30 overflow-hidden position-relative">
+              <EditProfileForm />
+            </div>
+            {/* <ProfileDetails /> */}
+            {/* <Skill />
             <Education />
             <WorkExperience />
             <Award />
             <ChangePassword />
-            <ConfirmPassword />
+            <ConfirmPassword /> */}
           </div>
         </div>
       </div>

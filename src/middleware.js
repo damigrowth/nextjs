@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { getUserMe } from "./lib/auth/user";
 import { getTokenFromRequest } from "./lib/auth/token";
 
 export async function middleware(request) {
@@ -11,7 +10,7 @@ export async function middleware(request) {
 
   const token = getTokenFromRequest(request);
   const authenticated = Boolean(token);
-  console.log("authenticated", authenticated);
+  // console.log("authenticated", authenticated);
 
   const maintenancePublicPaths = [
     "/maintenance",

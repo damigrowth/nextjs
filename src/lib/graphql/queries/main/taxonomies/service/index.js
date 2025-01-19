@@ -234,10 +234,20 @@ const TAXONOMIES_ARCHIVE = gql`
 `;
 
 const HOME_SEARCH = gql`
-  query HomeSearch($searchTerm: String, $categorySlug: String) {
+  query HomeSearch(
+    $searchTerm: String
+    $searchSlug: String
+    $categorySlug: String
+  ) {
     subcategories(
       filters: {
         and: [
+          {
+            or: [
+              { label: { containsi: $searchTerm } }
+              { slug: { contains: $searchSlug } }
+            ]
+          }
           { label: { containsi: $searchTerm } }
           { category: { slug: { eq: $categorySlug } } }
           { services: { id: { not: { null: true } } } }
@@ -255,7 +265,12 @@ const HOME_SEARCH = gql`
     subdivisions(
       filters: {
         and: [
-          { label: { containsi: $searchTerm } }
+          {
+            or: [
+              { label: { containsi: $searchTerm } }
+              { slug: { contains: $searchSlug } }
+            ]
+          }
           { category: { slug: { eq: $categorySlug } } }
           { services: { id: { not: { null: true } } } }
         ]

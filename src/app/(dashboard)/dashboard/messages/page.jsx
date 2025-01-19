@@ -4,16 +4,14 @@ import MessageInfo from "@/components/dashboard/section/MessageInfo";
 import MobileNavigation2 from "@/components/header/MobileNavigation2";
 
 export const metadata = {
-  title: "Doulitsa - Freelance Marketplace React/Next Js Template | Message",
+  title: "Μηνύματα | Doulitsa",
 };
 
 export default function page() {
   return (
     <>
-      <MobileNavigation2 />
-      <DashboardLayout>
-        <MessageInfo />
-      </DashboardLayout>
+      {/* <MobileNavigation2 /> */}
+      <DashboardLayout>{/* <MessageInfo /> */}</DashboardLayout>
     </>
   );
 }

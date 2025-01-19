@@ -27,7 +27,7 @@ export default async function Review({
   const uid = await getUserId();
 
   const reactions = {
-    likes: likes.map(({ id }) => Number(id)),
+    likes: likes ? likes.map(({ id }) => Number(id)) : [],
     // dislikes: dislikes.map(({ id }) => Number(id)),
     uid,
     reviewId,
@@ -70,7 +70,7 @@ export default async function Review({
         </div>
       </div>
       <p className="text mt20 mb20">{comment}</p>
-      <ReviewReactions data={reactions} />
+      {/* <ReviewReactions data={reactions} /> */}
     </div>
   );
 }

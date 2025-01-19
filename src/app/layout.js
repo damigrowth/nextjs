@@ -29,7 +29,7 @@ export default async function RootLayout({ children }) {
   const user = await getUserPartial();
   const authenticated = user ? true : false;
 
-  const { header: headerData } = await getData(ROOT_LAYOUT);
+  const { header: headerData } = await getData(ROOT_LAYOUT, null, "HEADER");
 
   const gaId = process.env.GA_ID;
 

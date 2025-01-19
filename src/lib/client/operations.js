@@ -10,6 +10,8 @@ import {
 } from "../strapi";
 import { print } from "graphql/language/printer";
 import { cache } from "react";
+import { getToken } from "../auth/token";
+import { CACHE_CONFIG } from "../cache/config";
 
 export async function fetchWithRetry(url, options, retries = 3, backoff = 300) {
   for (let i = 0; i < retries; i++) {
@@ -66,46 +68,48 @@ export const checkServerHealth = async () => {
 
 // Optimized getData with better caching and retry logic
 export const getData = cache(
-  async (query, variables, useCache = true, authToken = STRAPI_TOKEN) => {
+  async (query, variables, cacheKey = "NO_CACHE") => {
     validateEnvVars();
+    const token = await getToken();
 
     const queryString = typeof query === "string" ? query : print(query);
-    const cacheKey = JSON.stringify({ query: queryString, variables });
+    const cacheConfig = CACHE_CONFIG[cacheKey] || {};
+    const { key, ttl } = cacheConfig;
+
+    const cacheHeaders = key
+      ? { "Cache-Control": `max-age=${ttl}, s-maxage=${ttl}` }
+      : {};
 
     try {
       const response = await fetchWithRetry(STRAPI_GRAPHQL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-          ...(useCache && { "Cache-Control": "max-age=3600, s-maxage=3600" }),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...cacheHeaders,
         },
         body: JSON.stringify({
           query: queryString,
           variables,
         }),
-        ...(useCache && {
+        ...(key && {
           cache: "force-cache",
-          tags: [
-            "graphql",
-            `query-${cacheKey}`,
-            ...(variables?.cat ? [`category-${variables.cat}`] : []),
-          ],
+          tags: ["graphql", key],
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         console.error("GraphQL error:", inspect(errorData.errors));
-        return null;
+        throw new Error(`Request failed with status ${response.status}`);
       }
 
       const jsonResponse = await response.json();
 
-      if (jsonResponse.errors) {
-        console.error("GraphQL response errors:", inspect(jsonResponse.errors));
-        return null;
-      }
+      // TODO: Need to fix all forbidden errors!
+      // if (jsonResponse.errors) {
+      //   console.log("GraphQL response errors:", jsonResponse);
+      // }
 
       return jsonResponse.data;
     } catch (error) {
@@ -116,8 +120,8 @@ export const getData = cache(
 );
 
 // Generic GraphQL mutation function
-export const postData = async (mutation, variables) => {
-  validateEnvVars();
+export const postData = async (mutation, variables, jwt) => {
+  const token = (await getToken()) || jwt;
   const client = getClient();
 
   try {
@@ -126,12 +130,18 @@ export const postData = async (mutation, variables) => {
       variables,
       context: {
         headers: {
-          Authorization: `Bearer ${STRAPI_TOKEN}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       },
     });
     return { data };
   } catch (error) {
+    console.error("GraphQL Error:", {
+      message: error.message,
+      graphQLErrors: error.graphQLErrors,
+      networkError: error.networkError,
+    });
+
     const fieldErrors = {};
 
     if (error.graphQLErrors?.[0]?.extensions?.errors) {

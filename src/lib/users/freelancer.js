@@ -1,4 +1,4 @@
-import { getUserId, getUserMe } from "../auth/user";
+import { getUser, getUserId } from "../auth/user";
 import { getData } from "../client/operations";
 import {
   FREELANCER_BY_ID,
@@ -12,40 +12,16 @@ import {
 import { FEATURED_SERVICES_BY_FREELANCER } from "../graphql/queries/main/service";
 
 export async function getFreelancerId() {
-  try {
-    const uid = await getUserId();
-    const data = await getData(FREELANCER_ID, { id: uid });
-    const id = data?.freelancers?.data[0]?.id;
-
-    if (!id) {
-      return {
-        ok: false,
-        fid: null,
-        uid: uid,
-        error: "Freelancer not found",
-      };
-    }
-
-    return {
-      ok: true,
-      fid: id,
-      uid: uid,
-      error: null,
-    };
-  } catch (error) {
-    console.error("GraphQL getFreelancerId error:", error);
-    return {
-      ok: false,
-      fid: null,
-      uid: uid,
-      error: error.message || "Failed to fetch freelancer data",
-    };
-  }
+  const user = await getUser();
+  const freelancerId = user.freelancer.data.id;
+  const id = freelancerId ? freelancerId : null;
+  return id;
 }
 
 export async function getFreelancer() {
   let freelancer = null;
   const uid = await getUserId();
+
   const { freelancers } = await getData(FREELANCER_BY_ID, {
     id: uid,
   });

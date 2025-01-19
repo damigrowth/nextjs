@@ -1,7 +1,7 @@
 import DashboardInfo from "@/components/dashboard/section/DashboardInfo";
 
 export const metadata = {
-  title: "Dashboard | Doulitsa",
+  title: "Πίνακας Ελέγχου",
 };
 
 export const dynamic = "force-dynamic";

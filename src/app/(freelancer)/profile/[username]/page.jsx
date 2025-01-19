@@ -64,9 +64,9 @@ export default async function page({ params, searchParams }) {
 
     const { categories } = await getData(FREELANCER_CATEGORIES);
 
-    const emailSubjectTitle = `${
-      freelancer?.user?.data?.attributes?.displayName
-    } ${freelancer?.type?.data?.attributes?.label} ${
+    const emailSubjectTitle = `${freelancer?.displayName} ${
+      freelancer?.type?.data?.attributes?.label
+    } ${
       freelancer?.subcategory?.data
         ? freelancer?.subcategory?.data?.attributes?.label
         : ""

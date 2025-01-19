@@ -791,6 +791,13 @@ li {
 .user_setting {
   position: relative;
 }
+
+.user_setting .dropdown .btn {
+  padding: 0;
+  outline: none;
+  border: none;
+}
+
 .user_setting .dropdown-menu {
   padding: 0;
 }
@@ -803,7 +810,7 @@ li {
   box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
   /* padding: 20px 30px; */
   width: 330px;
-  transform: translate(-272px, 60px) !important;
+  /* transform: translate(-272px, 60px) !important; */
 }
 .user_setting .dropdown-menu .dropdown-item {
   border-radius: 4px;
@@ -867,6 +874,21 @@ li {
   -ms-transition: all 0.3s ease 0s ease;
   -o-transition: all 0.3s ease 0s ease;
   transition: all 0.3s ease 0s ease;
+}
+
+.dashboard_sidebar_list .sidebar_list_item .disabled {
+  align-items: center;
+  display: flex;
+  border-radius: 0 4px 4px 0;
+  color: var(--headings-color);
+  font-family: sans-serif;
+  font-weight: 500;
+  padding: 10px 20px;
+  opacity: 0.7;
+}
+
+.dashboard_sidebar_list .sidebar_list_item .disabled i {
+  font-size: 20px;
 }
 
 .dashboard_sidebar_list .sidebar_list_item a i {
@@ -982,7 +1004,13 @@ li {
   /* margin-top: 40px; */
   padding-left: 300px;
   width: 100%;
+  /* height: 100vh; */
 }
+
+/* .dashboard__main > div {
+  height: 100%;
+} */
+
 @media (max-width: 991.98px) {
   .dashboard__main {
     margin-top: 0px;
@@ -993,7 +1021,7 @@ li {
   border-radius: 4px;
   padding: 60px 60px 20px;
   width: 100%;
-  background-color: #fbf7ed;
+  /* background-color: #fbf7ed; */
 }
 @media (max-width: 767.98px) {
   .dashboard__content {
@@ -1188,6 +1216,7 @@ li {
 }
 .dashboard-img-service .listing-style1.list-style .list-thumb {
   width: 122px;
+  height: 91px;
 }
 .dashboard-img-service .list-title {
   line-height: 28px;
@@ -1501,7 +1530,7 @@ li {
 .listing-style1 .list-thumb {
   overflow: hidden;
   position: relative;
-  height: 200px;
+  /* height: 90px; */
 }
 .listing-style1 img {
   -webkit-transition: all 0.4s ease;
@@ -9429,6 +9458,11 @@ li.mm-listitem:focus {
 .navpill-style2 {
   position: relative;
 }
+
+.navtab-style1 .t-head th:last-child {
+  text-align: end;
+}
+
 .navpill-style2 .nav-item {
   margin-right: 10px;
 }
@@ -13285,4 +13319,9 @@ header.nav-homepage-style .sidemenu-btn {
 
 section.pb40-md.pb90 > div > div.row.d-block.d-lg-none > div > div.row {
   justify-content: center;
+}
+
+.initials-image-text {
+  text-align: center;
+  line-height: normal;
 }

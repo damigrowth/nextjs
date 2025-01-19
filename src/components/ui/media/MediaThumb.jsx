@@ -1,13 +1,13 @@
 import { getMediaType } from "@/utils/media";
 
-export const MediaThumb = ({ url }) => {
+export const MediaThumb = ({ url, width, height, fontSize }) => {
   const mediaType = getMediaType(url);
   return (
     <div
       style={{
         position: "relative",
-        width: "300px",
-        height: "300px",
+        width: width ? `${width}px` : "300px",
+        height: height ? `${height}px` : "300px",
         backgroundColor: "#404040",
         display: "flex",
         justifyContent: "center",
@@ -18,7 +18,7 @@ export const MediaThumb = ({ url }) => {
       <i
         className={mediaType === "video" ? "fas fa-video" : "fas fa-music"}
         style={{
-          fontSize: "48px",
+          fontSize: fontSize ? `${fontSize}px` : "48px",
           color: "white",
           opacity: 0.8,
         }}

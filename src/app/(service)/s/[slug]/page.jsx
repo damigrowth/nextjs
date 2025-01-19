@@ -35,7 +35,7 @@ export async function generateMetadata({ params }) {
 export default async function page({ params, searchParams }) {
   const { slug } = params;
 
-  const { service, uid } = await getServiceBySlug(slug);
+  const { service, serviceId } = await getServiceBySlug(slug);
 
   if (!service) {
     redirect("/not-found");
@@ -45,7 +45,7 @@ export default async function page({ params, searchParams }) {
     const reviewsPageSize = reviewsPage * 3;
 
     const { reviews, reviewsMeta } = await getReviewsByService(
-      uid,
+      serviceId,
       1,
       reviewsPageSize
     );
@@ -70,7 +70,7 @@ export default async function page({ params, searchParams }) {
           />
           <SingleService
             slug={slug}
-            serviceId={uid}
+            serviceId={serviceId}
             service={service}
             reviews={reviews}
             reviewsPage={reviewsPage}
