@@ -47,7 +47,9 @@ export default async function page() {
   );
 
   const { topServiceSubcategories, topFreelancerSubcategories } = await getData(
-    ALL_TOP_TAXONOMIES
+    ALL_TOP_TAXONOMIES,
+    null,
+    "TOP"
   );
 
   const featuredCategories =
