@@ -9,30 +9,30 @@ export async function getServiceBySlug(slug) {
   try {
     let service = null;
 
-    let uid = null;
+    let serviceId = null;
 
     const { services } = await getData(SERVICE_BY_SLUG, { slug });
 
     if (services?.data?.length > 0) {
       service = services.data[0].attributes;
 
-      uid = Number(services.data[0].id);
+      serviceId = Number(services.data[0].id);
     }
 
-    return { service, uid };
+    return { service, serviceId };
   } catch (error) {
     console.error("Error fetching freelancer by slug:", error);
     return null;
   }
 }
 
-export async function getReviewsByService(uid, page, pageSize) {
+export async function getReviewsByService(serviceId, page, pageSize) {
   try {
     let reviews = [];
     let reviewsMeta = null;
 
     const res = await getData(REVIEWS_BY_SERVICE, {
-      id: uid,
+      id: serviceId,
       page: page,
       pageSize: pageSize,
     });
@@ -51,12 +51,12 @@ export async function getReviewsByService(uid, page, pageSize) {
   }
 }
 
-export async function getAllReviewsRatingsByService(uid, pageSize) {
+export async function getAllReviewsRatingsByService(serviceId, pageSize) {
   try {
     let allReviewsRatings = [];
 
     const { reviews } = await getData(ALL_REVIEWS_RATINGS_BY_SERVICE, {
-      id: uid,
+      id: serviceId,
       pageSize: pageSize,
     });
 
