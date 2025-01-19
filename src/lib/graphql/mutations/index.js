@@ -37,6 +37,16 @@ const POST_SERVICE = gql`
   }
 `;
 
+const EDIT_SERVICE = gql`
+  mutation EditService($id: ID!, $data: ServiceInput!) {
+    updateService(id: $id, data: $data) {
+      data {
+        id
+      }
+    }
+  }
+`;
+
 const UPDATE_FREELANCER_RATING = gql`
   mutation updateFreelancerRating($id: ID!, $data: FreelancerInput!) {
     updateFreelancer(id: $id, data: $data) {
@@ -104,12 +114,34 @@ const CONTACT = gql`
   }
 `;
 
+const UPLOAD = gql`
+  mutation Upload(
+    $refId: ID
+    $ref: String
+    $field: String
+    $info: FileInfoInput
+    $file: Upload!
+  ) {
+    upload(refId: $refId, ref: $ref, field: $field, info: $info, file: $file) {
+      data {
+        id
+        attributes {
+          hash
+          name
+        }
+      }
+    }
+  }
+`;
+
 export {
   POST_REVIEW,
   POST_SERVICE,
+  EDIT_SERVICE,
   UPDATE_FREELANCER_RATING,
   UPDATE_SERVICE_RATING,
   UPDATE_REVIEW,
   UPDATE_SERVICE_SLUG,
   CONTACT,
+  UPLOAD,
 };

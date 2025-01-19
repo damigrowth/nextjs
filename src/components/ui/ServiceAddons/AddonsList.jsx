@@ -4,12 +4,18 @@ import React, { useEffect, useState } from "react";
 import AddonListItem from "./AddonListItem";
 import useCreateServiceStore from "@/store/service/createServiceStore";
 
-export default function AddonsList() {
+export default function AddonsList({ custom }) {
   const { addons } = useCreateServiceStore();
 
   // console.log(features);
   return (
-    <div className="table-style2 table-responsive bdr1 mb30 mt30">
+    <div
+      className={
+        custom
+          ? "table-style2 table-responsive bdr1"
+          : "table-style2 table-responsive bdr1 mb30 mt30"
+      }
+    >
       <table
         className="table table-borderless mb-0"
         style={{ backgroundColor: "white" }}
