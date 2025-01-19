@@ -17,12 +17,9 @@ const ME_QUERY = `
 `;
 
 export async function getUserMe() {
-  const token = await getToken();
-  if (!token) return { ok: false, data: null, error: null };
-
   try {
     // Use getData with the auth header
-    const response = await getData(ME_QUERY, null, false, token);
+    const response = await getData(ME_QUERY, null);
 
     if (!response?.me) {
       return {
@@ -45,6 +42,14 @@ export async function getUserMe() {
       error: error.message || "Failed to fetch user data",
     };
   }
+}
+
+export async function getAccess(roles) {
+  const me = await getUserMe();
+
+  const roleArray = Array.isArray(roles) ? roles : [roles];
+
+  return roleArray.includes(me.data.role.type);
 }
 
 export async function getUserId() {

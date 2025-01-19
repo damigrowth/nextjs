@@ -1,5 +1,6 @@
 // Strapi Url and Token
 export const STRAPI_URL = process.env.STRAPI_URL;
+export const STRAPI_API_URL = process.env.STRAPI_API_URL;
 export const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
 export const STRAPI_GRAPHQL = process.env.STRAPI_GRAPHQL_URL;
 
