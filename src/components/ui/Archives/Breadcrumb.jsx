@@ -55,7 +55,7 @@ export default function Breadcrumb({
                         {plural ? subcategory.plural : subcategory.label}
                       </Link>
                     )}
-                    {subdivision && (
+                    {subcategory && subdivision && (
                       <Link
                         href={
                           categoriesRoute

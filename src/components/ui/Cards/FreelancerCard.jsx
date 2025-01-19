@@ -31,9 +31,11 @@ export default function FreelancerCard({ freelancer, linkedName }) {
             alt="user-image"
             firstName={firstName}
             lastName={lastName}
+            displayName={displayName}
             bigText
             path={`/profile/${username}`}
             topLevel={topLevel}
+            hideDisplayName
           />
         </div>
         <div className="review">
