@@ -1,20 +1,24 @@
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
+// page.jsx
 import ManageServiceInfo from "@/components/dashboard/section/ManageServiceInfo";
-
-import MobileNavigation2 from "@/components/header/MobileNavigation2";
+import { getFreelancerId } from "@/lib/users/freelancer";
 
 export const metadata = {
-  title:
-    "Doulitsa - Freelance Marketplace React/Next Js Template | Manage Services",
+  title: "Διαχείρηση Υπηρεσιών",
 };
 
-export default function page() {
-  return (
-    <>
-      <MobileNavigation2 />
-      <DashboardLayout>
-        <ManageServiceInfo />
-      </DashboardLayout>
-    </>
-  );
+export default async function ServicesPage({ searchParams }) {
+  const fid = await getFreelancerId();
+  if (!fid) {
+    return (
+      <div className="dashboard__content">
+        <div className="alert alert-danger">
+          <strong>Δεν βρέθηκε το προφίλ freelancer</strong>
+        </div>
+      </div>
+    );
+  }
+
+  const page = Number(searchParams?.page) || 1;
+
+  return <ManageServiceInfo fid={fid} page={page} />;
 }
