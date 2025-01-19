@@ -1310,14 +1310,6 @@ a {
   object-fit: cover;
 }
 
-.swiper-slide .small-slide-image {
-  display: block;
-  width: 100%;
-  height: 200px;
-  /* object-fit: contain; */
-  object-fit: cover;
-}
-
 .swiper-slide video {
   width: 100%;
   /* height: 560px; */
@@ -1364,4 +1356,18 @@ a {
 .listing-style1 .small-list .list-thumb {
   height: auto;
   border-radius: 8px;
+}
+
+.password-toggle {
+  all: unset;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  font-size: 18px;
+  opacity: 0.3;
+  cursor: pointer;
+  z-index: 10;
+  background-color: transparent;
 }
