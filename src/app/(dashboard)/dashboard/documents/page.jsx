@@ -1,19 +1,9 @@
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import StatementInfo from "@/components/dashboard/section/StatementInfo";
 
-import MobileNavigation2 from "@/components/header/MobileNavigation2";
-
 export const metadata = {
-  title: "Doulitsa - Freelance Marketplace React/Next Js Template | Statement",
+  title: "Παραστατικά",
 };
 
 export default function page() {
-  return (
-    <>
-      <MobileNavigation2 />
-      <DashboardLayout>
-        <StatementInfo />
-      </DashboardLayout>
-    </>
-  );
+  return <StatementInfo />;
 }
