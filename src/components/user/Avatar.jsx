@@ -19,7 +19,7 @@ export default function Avatar({ firstName, lastName, avatar }) {
             height={43}
           />
         ) : (
-          <span className="w-42">{initials}</span>
+          <span className="w-42 h-30">{initials}</span>
         )}
       </Link>
     </div>
