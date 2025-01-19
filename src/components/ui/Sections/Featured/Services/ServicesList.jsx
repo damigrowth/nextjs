@@ -21,8 +21,7 @@ export default function ServicesList({ services }) {
         .slice(0, 4)
         .map((service, i) => {
           if (
-            !service?.attributes?.freelancer?.data?.attributes?.user?.data
-              ?.attributes ||
+            !service?.attributes?.freelancer?.data?.attributes ||
             service.attributes.media?.data?.length === 0
           ) {
             return null;

@@ -66,7 +66,7 @@ export default function ContactDetails({
             website={website}
           />
         </div>
-        <hr className="opacity-100" />
+        <hr className="opacity-80" />
         <div className="details">
           <div className="fl-meta d-flex align-items-center justify-content-between">
             <div className="contact-meta-info left">

@@ -6,19 +6,19 @@ import Link from "next/link";
 import React from "react";
 
 export default function FeaturedServiceCard({ service }) {
+  const { media, category, title, slug, freelancer, price } = service;
+
+  const freelancerData = freelancer.data.attributes;
+
   const {
-    media,
-    category,
-    title,
-    slug,
+    username,
+    firstName,
+    lastName,
+    displayName,
+    image: avatar,
     rating,
     reviews_total,
-    freelancer,
-    price,
-  } = service;
-
-  const freelancerRating = freelancer.data.attributes.rating;
-  const freelancerReviewsTotal = freelancer.data.attributes.reviews_total;
+  } = freelancerData;
 
   let image = null;
   const fallbackImage = "/images/fallback/service.png";
@@ -60,16 +60,14 @@ export default function FeaturedServiceCard({ service }) {
           </Link>
         </h5>
         <div className="review-meta d-flex align-items-center">
-          {freelancerReviewsTotal && (
+          {reviews_total && (
             <>
               <i className="fas fa-star fz10 review-color me-2" />
               <p className="mb-0 body-color fz14">
-                <span className="dark-color me-2">
-                  {formatRating(freelancerRating)}
-                </span>
-                {freelancerReviewsTotal > 1
-                  ? `(${freelancerReviewsTotal} αξιολογήσεις)`
-                  : `(${freelancerReviewsTotal} αξιολόγηση)`}
+                <span className="dark-color me-2">{formatRating(rating)}</span>
+                {reviews_total > 1
+                  ? `(${reviews_total} αξιολογήσεις)`
+                  : `(${reviews_total} αξιολόγηση)`}
               </p>
             </>
           )}
@@ -77,20 +75,13 @@ export default function FeaturedServiceCard({ service }) {
         <hr className="my-2" />
         <div className="list-meta d-flex justify-content-between align-items-center mt15">
           <UserImage
-            image={
-              freelancer.data.attributes.user.data.attributes.image.data
-                .attributes.formats.thumbnail.url
-            }
+            image={avatar.data.attributes.formats.thumbnail.url}
             width={30}
             height={30}
-            firstName={
-              freelancer.data.attributes.user.data.attributes.firstName
-            }
-            lastName={freelancer.data.attributes.user.data.attributes.lastName}
-            displayName={
-              freelancer.data.attributes.user.data.attributes.displayName
-            }
-            path={`/profile/${freelancer.data.attributes.username}`}
+            firstName={firstName}
+            lastName={lastName}
+            displayName={displayName}
+            path={`/profile/${username}`}
           />
           {price > 0 && (
             <div className="budget">

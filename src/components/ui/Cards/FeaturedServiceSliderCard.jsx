@@ -14,19 +14,19 @@ import { formatRating } from "@/utils/formatRating";
 import { getBestDimensions } from "@/utils/imageDimensions";
 
 export default function FeaturedServiceSliderCard({ service }) {
+  const { media, category, title, slug, freelancer, price } = service;
+
+  const freelancerData = freelancer.data.attributes;
+
   const {
-    media,
-    category,
-    title,
-    slug,
+    username,
+    firstName,
+    lastName,
+    displayName,
+    image: avatar,
     rating,
     reviews_total,
-    freelancer,
-    price,
-  } = service;
-
-  const freelancerRating = freelancer.data.attributes.rating;
-  const freelancerReviewsTotal = freelancer.data.attributes.reviews_total;
+  } = freelancerData;
 
   const [showSwiper, setShowSwiper] = useState(false);
 
@@ -112,16 +112,16 @@ export default function FeaturedServiceSliderCard({ service }) {
             </Link>
           </h5>
           <div className="review-meta d-flex align-items-center">
-            {freelancerReviewsTotal && (
+            {reviews_total && (
               <>
                 <i className="fas fa-star fz10 review-color me-2" />
                 <p className="mb-0 body-color fz14">
                   <span className="dark-color me-2">
-                    {formatRating(freelancerRating)}
+                    {formatRating(rating)}
                   </span>
-                  {freelancerReviewsTotal > 1
-                    ? `(${freelancerReviewsTotal} αξιολογήσεις)`
-                    : `(${freelancerReviewsTotal} αξιολόγηση)`}
+                  {reviews_total > 1
+                    ? `(${reviews_total} αξιολογήσεις)`
+                    : `(${reviews_total} αξιολόγηση)`}
                 </p>
               </>
             )}
@@ -130,21 +130,15 @@ export default function FeaturedServiceSliderCard({ service }) {
           <div className="list-meta d-flex justify-content-between align-items-center mt15">
             <UserImage
               image={
-                freelancer.data.attributes.user.data.attributes.image.data
-                  .attributes.formats.thumbnail.url
+                avatar?.data?.attributes?.formats?.thumbnail?.url ||
+                "/Avatar.png"
               }
               width={30}
               height={30}
-              firstName={
-                freelancer.data.attributes.user.data.attributes.firstName
-              }
-              lastName={
-                freelancer.data.attributes.user.data.attributes.lastName
-              }
-              displayName={
-                freelancer.data.attributes.user.data.attributes.displayName
-              }
-              path={`/profile/${freelancer.data.attributes.username}`}
+              firstName={firstName}
+              lastName={lastName}
+              displayName={displayName}
+              path={`/profile/${username}`}
             />
             {price > 0 && (
               <div className="budget">
