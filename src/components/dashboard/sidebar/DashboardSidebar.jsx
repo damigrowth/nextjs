@@ -1,10 +1,17 @@
 "use client";
-import { dasboardNavigation } from "@/data/dashboard";
+import {
+  dashboardNavigation,
+  hasAccessAccountNav,
+  hasAccessMainNav,
+  hasAccessServicesNav,
+  noAccessAccountNav,
+  noAccessMainNav,
+} from "@/data/dashboard";
 import { logout } from "@/lib/auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function DashboardSidebar() {
+export default function DashboardSidebar({ hasAccess }) {
   const path = usePathname();
 
   const renderNavItem = (item) => {
@@ -49,27 +56,29 @@ export default function DashboardSidebar() {
     );
   };
 
+  const mainNav = hasAccess ? hasAccessMainNav : noAccessMainNav;
+  const accountNav = hasAccess ? hasAccessAccountNav : noAccessAccountNav;
+
   return (
     <div className="dashboard__sidebar d-none d-lg-block">
       <div className="dashboard_sidebar_list">
-        {/* Dashboard items */}
-        {dasboardNavigation.slice(0, 5).map((item, i) => (
+        {mainNav.map((item, i) => (
           <div key={i} className="sidebar_list_item mb-1">
             {renderNavItem(item)}
           </div>
         ))}
-
-        {/* Services section */}
-        <p className="fz15 fw400 ff-heading pl30 mt30">Υπηρεσίες</p>
-        {dasboardNavigation.slice(5, 7).map((item, i) => (
-          <div key={i} className="sidebar_list_item mb-1">
-            {renderNavItem(item)}
-          </div>
-        ))}
-
-        {/* Account section */}
+        {hasAccess && (
+          <>
+            <p className="fz15 fw400 ff-heading pl30 mt30">Υπηρεσίες</p>
+            {hasAccessServicesNav.map((item, i) => (
+              <div key={i} className="sidebar_list_item mb-1">
+                {renderNavItem(item)}
+              </div>
+            ))}
+          </>
+        )}
         <p className="fz15 fw400 ff-heading pl30 mt30">Λογαριασμός</p>
-        {dasboardNavigation.slice(7, 10).map((item, i) => (
+        {accountNav.map((item, i) => (
           <div key={i} className="sidebar_list_item mb-1">
             {renderNavItem(item)}
           </div>
