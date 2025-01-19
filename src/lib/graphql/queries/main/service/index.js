@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { PAGINATION } from "../../fragments/global";
+import { MULTIPLE_FILES, PAGINATION } from "../../fragments/global";
 import {
   FEATURED_SERVICE,
   FEATURED_SERVICE_MAIN,
@@ -10,6 +10,27 @@ import {
   SERVICE_RELATIONS,
   SERVICE_SEO,
 } from "../../parts/service";
+import {
+  CATEGORY,
+  SUBCATEGORY_ENTITY,
+  SUBDIVISION_ENTITY,
+} from "../../fragments/taxonomies/service";
+
+const SERVICE_BY_ID = gql`
+  query ServiceById($id: ID!) {
+    service(id: $id) {
+      data {
+        id
+        attributes {
+          ...ServiceMain
+          ...ServiceRelations
+        }
+      }
+    }
+  }
+  ${SERVICE_MAIN}
+  ${SERVICE_RELATIONS}
+`;
 
 const SERVICE_BY_SLUG = gql`
   query GetService($slug: String!) {
@@ -143,7 +164,7 @@ const SERVICES_ARCHIVE = gql`
               { tags: { slug: { in: $tags } } }
             ]
           }
-          { freelancer: { user: { verified: { eq: $verified } } } }
+          { freelancer: { verified: { eq: $verified } } }
         ]
       }
       sort: $sort
@@ -200,7 +221,59 @@ const SERVICES_ALL = gql`
   }
 `;
 
+const SERVICES_BY_FREELANCER = gql`
+  query ServicesByFreelancer($id: ID!, $page: Int, $pageSize: Int) {
+    services(
+      filters: { freelancer: { id: { eq: $id } } }
+      sort: "updatedAt:desc"
+      pagination: { page: $page, pageSize: $pageSize }
+    ) {
+      data {
+        id
+        attributes {
+          title
+          slug
+          category {
+            data {
+              ...Category
+            }
+          }
+          subcategory {
+            data {
+              ...SubcategoryEntity
+            }
+          }
+          subdivision {
+            data {
+              ...SubdivisionEntity
+            }
+          }
+          status {
+            data {
+              attributes {
+                type
+              }
+            }
+          }
+          media {
+            ...MultipleFiles
+          }
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${CATEGORY}
+  ${SUBCATEGORY_ENTITY}
+  ${SUBDIVISION_ENTITY}
+  ${MULTIPLE_FILES}
+  ${PAGINATION}
+`;
+
 export {
+  SERVICE_BY_ID,
   SERVICE_BY_SLUG,
   SERVICE_PAGE_SEO,
   COUNT_SERVICES_BY_RATING,
@@ -210,4 +283,5 @@ export {
   SERVICES_ARCHIVE,
   SERVICES_BY_CATEGORY,
   SERVICES_ALL,
+  SERVICES_BY_FREELANCER,
 };

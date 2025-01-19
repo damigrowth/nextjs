@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { USER_PARTIAL } from "../../fragments/entities/user";
 import { COVERAGE } from "../../fragments/components/location";
 import { SOCIALS } from "../../fragments/components/socials";
 import { FREELANCER_TYPE } from "../../fragments/entities/freelancer";
@@ -17,14 +16,22 @@ import { SIZE } from "../../fragments/entities/size";
 import { SPECIALISATIONS } from "../../fragments/entities/specialisation";
 import { MIN_BUDGETS } from "../../fragments/entities/budget";
 import { INDUSTRIES } from "../../fragments/entities/industry";
-import { MULTIPLE_FILES } from "../../fragments/global";
+import { MULTIPLE_FILES, SINGLE_IMAGE } from "../../fragments/global";
 import { RATING } from "../../fragments/entities/rating";
+import { VISIBILITY } from "../../fragments/components/global";
 
 const FREELANCER_PARTIAL_MAIN = gql`
   fragment FreelancerPartialMain on Freelancer {
+    username
+    firstName
+    lastName
+    displayName
+    email
+    phone
+    verified
+    address
     tagline
     rate
-    username
     terms
     topLevel
     commencement
@@ -36,8 +43,11 @@ const FREELANCER_PARTIAL_MAIN = gql`
 
 const FREELANCER_PARTIAL_RELATIONS = gql`
   fragment FreelancerPartialRelations on Freelancer {
-    user {
-      ...UserPartial
+    image {
+      ...SingleImage
+    }
+    visibility {
+      ...Visibility
     }
     coverage {
       ...Coverage
@@ -64,7 +74,8 @@ const FREELANCER_PARTIAL_RELATIONS = gql`
       ...SettlementMethod
     }
   }
-  ${USER_PARTIAL}
+  ${SINGLE_IMAGE}
+  ${VISIBILITY}
   ${COVERAGE}
   ${SOCIALS}
   ${FREELANCER_TYPE}
@@ -92,6 +103,13 @@ const FREELANCER_PARTIAL = gql`
 const FREELANCER_MAIN = gql`
   fragment FreelancerMain on Freelancer {
     username
+    firstName
+    lastName
+    displayName
+    email
+    phone
+    verified
+    address
     website
     tagline
     rate
@@ -113,8 +131,11 @@ const FREELANCER_MAIN = gql`
 
 const FREELANCER_RELATIONS = gql`
   fragment FreelancerRelations on Freelancer {
-    user {
-      ...UserPartial
+    image {
+      ...SingleImage
+    }
+    visibility {
+      ...Visibility
     }
     services {
       ...Services
@@ -168,7 +189,8 @@ const FREELANCER_RELATIONS = gql`
       ...Rating
     }
   }
-  ${USER_PARTIAL}
+  ${SINGLE_IMAGE}
+  ${VISIBILITY}
   ${SERVICES}
   ${ORDERS}
   ${SKILLS}
@@ -191,6 +213,12 @@ const FREELANCER_RELATIONS = gql`
 // New fragment without user field
 const FREELANCER_RELATIONS_WITHOUT_USER = gql`
   fragment FreelancerRelationsWithoutUser on Freelancer {
+    image {
+      ...SingleImage
+    }
+    visibility {
+      ...Visibility
+    }
     services {
       ...Services
     }
@@ -243,6 +271,8 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
       ...Rating
     }
   }
+  ${SINGLE_IMAGE}
+  ${VISIBILITY}
   ${SERVICES}
   ${ORDERS}
   ${SKILLS}
@@ -264,13 +294,7 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
 
 const FREELANCER_SEO = gql`
   fragment FreelancerSEO on Freelancer {
-    user {
-      data {
-        attributes {
-          displayName
-        }
-      }
-    }
+    displayName
     description
     tagline
     type {

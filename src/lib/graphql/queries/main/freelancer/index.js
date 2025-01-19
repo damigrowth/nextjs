@@ -127,7 +127,7 @@ const FREELANCERS_ARCHIVE = gql`
         subcategory: { slug: { eq: $sub } }
         yearsOfExperience: { gte: $experience }
         topLevel: { eq: $top }
-        user: { verified: { eq: $verified } }
+        verified: { eq: $verified }
       }
       sort: $sort
       pagination: { page: $page, pageSize: 20 }

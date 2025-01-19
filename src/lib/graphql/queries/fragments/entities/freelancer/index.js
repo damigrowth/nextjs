@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
-import { USER_PARTIAL } from "../user";
 import { SPECIALISATIONS } from "../specialisation";
 import {
   FREELANCER_CATEGORY,
-  FREELANCER_SUBCATEGORY,
   FREELANCER_SUBCATEGORY_PARTIAL,
 } from "../../taxonomies/freelancer";
+import { SINGLE_IMAGE } from "../../global";
+import { VISIBILITY } from "../../components/global";
 
 const FREELANCER_TYPE = gql`
   fragment FreelancerType on FreelancerTypeEntityResponse {
@@ -22,16 +22,27 @@ const FREELANCER_TYPE = gql`
 const FREELANCER_BASIC = gql`
   fragment FreelancerBasic on Freelancer {
     username
+    firstName
+    lastName
+    displayName
+    email
+    phone
+    verified
+    address
+    image {
+      ...SingleImage
+    }
+    visibility {
+      ...Visibility
+    }
     tagline
     rating
     reviews_total
     rate
     topLevel
-    user {
-      ...UserPartial
-    }
   }
-  ${USER_PARTIAL}
+  ${SINGLE_IMAGE}
+  ${VISIBILITY}
 `;
 
 const FREELANCER_REFERENCE = gql`
@@ -42,8 +53,18 @@ const FREELANCER_REFERENCE = gql`
     reviews_total
     rate
     topLevel
-    user {
-      ...UserPartial
+    firstName
+    lastName
+    displayName
+    email
+    phone
+    verified
+    address
+    image {
+      ...SingleImage
+    }
+    visibility {
+      ...Visibility
     }
     specialisations {
       ...Specialisations
@@ -59,7 +80,8 @@ const FREELANCER_REFERENCE = gql`
     }
   }
 
-  ${USER_PARTIAL}
+  ${SINGLE_IMAGE}
+  ${VISIBILITY}
   ${SPECIALISATIONS}
   ${FREELANCER_CATEGORY}
   ${FREELANCER_SUBCATEGORY_PARTIAL}

@@ -104,14 +104,8 @@ const SERVICE_SEO = gql`
     freelancer {
       data {
         attributes {
-          user {
-            data {
-              attributes {
-                firstName
-                displayName
-              }
-            }
-          }
+          firstName
+          displayName
         }
       }
     }
