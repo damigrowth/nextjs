@@ -19,6 +19,7 @@ import { INDUSTRIES } from "../../fragments/entities/industry";
 import { MULTIPLE_FILES, SINGLE_IMAGE } from "../../fragments/global";
 import { RATING } from "../../fragments/entities/rating";
 import { VISIBILITY } from "../../fragments/components/global";
+import { REVIEW_DISLIKES, REVIEW_LIKES } from "../../fragments/entities/review";
 
 const FREELANCER_PARTIAL_MAIN = gql`
   fragment FreelancerPartialMain on Freelancer {
@@ -73,6 +74,12 @@ const FREELANCER_PARTIAL_RELATIONS = gql`
     settlement_methods {
       ...SettlementMethod
     }
+    review_likes {
+      ...ReviewLikes
+    }
+    review_dislikes {
+      ...ReviewDislikes
+    }
   }
   ${SINGLE_IMAGE}
   ${VISIBILITY}
@@ -84,6 +91,8 @@ const FREELANCER_PARTIAL_RELATIONS = gql`
   ${CONTACT_TYPES}
   ${PAYMENT_METHOD}
   ${SETTLEMENT_METHOD}
+  ${REVIEW_LIKES}
+  ${REVIEW_DISLIKES}
 `;
 
 const FREELANCER_PARTIAL = gql`
@@ -188,6 +197,12 @@ const FREELANCER_RELATIONS = gql`
     rating_global {
       ...Rating
     }
+    review_likes {
+      ...ReviewLikes
+    }
+    review_dislikes {
+      ...ReviewDislikes
+    }
   }
   ${SINGLE_IMAGE}
   ${VISIBILITY}
@@ -208,6 +223,8 @@ const FREELANCER_RELATIONS = gql`
   ${SETTLEMENT_METHOD}
   ${MULTIPLE_FILES}
   ${RATING}
+  ${REVIEW_LIKES}
+  ${REVIEW_DISLIKES}
 `;
 
 // New fragment without user field
@@ -270,6 +287,12 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
     rating_global {
       ...Rating
     }
+    review_likes {
+      ...ReviewLikes
+    }
+    review_dislikes {
+      ...ReviewDislikes
+    }
   }
   ${SINGLE_IMAGE}
   ${VISIBILITY}
@@ -290,6 +313,8 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
   ${SETTLEMENT_METHOD}
   ${MULTIPLE_FILES}
   ${RATING}
+  ${REVIEW_LIKES}
+  ${REVIEW_DISLIKES}
 `;
 
 const FREELANCER_SEO = gql`

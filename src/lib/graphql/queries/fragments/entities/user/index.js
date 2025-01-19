@@ -75,20 +75,4 @@ const USER_PARTIAL = gql`
   ${VISIBILITY}
 `;
 
-const LIKES = gql`
-  fragment Likes on UsersPermissionsUserRelationResponseCollection {
-    data {
-      id
-    }
-  }
-`;
-
-const DISLIKES = gql`
-  fragment Dislikes on UsersPermissionsUserRelationResponseCollection {
-    data {
-      id
-    }
-  }
-`;
-
-export { ROLE, VERIFICATION, USER_REFERENCE, USER_PARTIAL, LIKES, DISLIKES };
+export { ROLE, VERIFICATION, USER_REFERENCE, USER_PARTIAL };
