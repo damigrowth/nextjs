@@ -3,16 +3,9 @@ import MobileNavigation2 from "@/components/header/MobileNavigation2";
 import SavedInfo from "@/components/ui/AddService/SavedInfo";
 
 export const metadata = {
-  title: "Doulitsa - Freelance Marketplace React/Next Js Template | Saved",
+  title: "Αποθηκευμένα",
 };
 
 export default function page() {
-  return (
-    <>
-      <MobileNavigation2 />
-      <DashboardLayout>
-        <SavedInfo />
-      </DashboardLayout>
-    </>
-  );
+  return <SavedInfo />;
 }
