@@ -1,6 +1,4 @@
 "use client";
-
-import React, { useEffect, useRef, useState } from "react";
 import {
   capitalizeFirstLetter,
   cutNumbers,
@@ -8,8 +6,7 @@ import {
   cutSymbols,
   restrictCapitalLetters,
 } from "@/utils/InputFormats/formats";
-
-import ReactInputMask from "react-input-mask";
+import React, { useState } from "react";
 import { useFormStatus } from "react-dom";
 
 export default function Input({
@@ -35,10 +32,8 @@ export default function Input({
   append,
 }) {
   const { pending } = useFormStatus();
-
-  //? Capitalize first letters and only digits inputs
-
   const [inputValue, setInputValue] = useState(value || defaultValue);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (event) => {
     let formattedValue = event.target.value;
@@ -70,9 +65,11 @@ export default function Input({
         </label>
       )}
 
-      <div className="input-group relative">
+      <div className="position-relative">
         <input
-          type={type}
+          type={
+            type === "password" ? (showPassword ? "text" : "password") : type
+          }
           min={min}
           max={max}
           placeholder={placeholder}
@@ -87,6 +84,17 @@ export default function Input({
           disabled={pending}
           onChange={handleInputChange}
         />
+        {type === "password" && (
+          <button
+            type="button"
+            className="password-toggle"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            <i
+              className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
+            ></i>
+          </button>
+        )}
         {append && <span className="input-group-text">{append}</span>}
       </div>
       {state?.errors?.[id] ? (
