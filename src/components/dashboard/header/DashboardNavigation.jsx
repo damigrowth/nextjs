@@ -1,5 +1,5 @@
 "use client";
-import { dasboardNavigation } from "@/data/dashboard";
+import { dashboardNavigation } from "@/data/dashboard";
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
@@ -36,7 +36,7 @@ export default function DashboardNavigation() {
             <i className="fa fa-bars pr10" /> Διαχείριση
           </button>
           <ul className={`dropdown-content ${isActive ? "show" : ""}`}>
-            {dasboardNavigation.slice(0, 8).map((item, i) => (
+            {dashboardNavigation.slice(0, 8).map((item, i) => (
               <li
                 className={
                   path === item.path ? "mobile-dasboard-menu-active" : ""
@@ -48,7 +48,7 @@ export default function DashboardNavigation() {
               </li>
             ))}
 
-            {dasboardNavigation.slice(8, 13).map((item, i) => (
+            {dashboardNavigation.slice(8, 13).map((item, i) => (
               <li
                 className={
                   path === item.path ? "mobile-dasboard-menu-active" : ""
@@ -60,7 +60,7 @@ export default function DashboardNavigation() {
               </li>
             ))}
 
-            {dasboardNavigation.slice(13, 15).map((item, i) => (
+            {dashboardNavigation.slice(13, 15).map((item, i) => (
               <li
                 className={
                   path === item.path ? "mobile-dasboard-menu-active" : ""
