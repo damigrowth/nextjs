@@ -25,16 +25,6 @@ export default function ServiceCardFile({ file, path, width, height }) {
     return (
       <Link href={path}>
         <div className="list-thumb flex-shrink-0 height">
-          {!file && (
-            <Image
-              height={height || 245}
-              width={width || 329}
-              className="w-100 h-100 object-fit-cover"
-              src={fallbackImage}
-              alt="service-thumbnail"
-            />
-          )}
-
           {file.formats ? (
             <Image
               height={height || 245}

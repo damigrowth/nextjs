@@ -152,7 +152,7 @@ export const patchData = async (url, payload) => {
 };
 
 export const postMedia = async (url, payload, jwt) => {
-  const endpoint = `${STRAPI_URL}/api/${url}`;
+  const endpoint = `${STRAPI_API_URL}/${url}`;
 
   const token = (await getToken()) || jwt;
 

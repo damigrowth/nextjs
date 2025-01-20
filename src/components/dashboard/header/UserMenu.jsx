@@ -3,6 +3,7 @@ import UserMenuLink from "./UserMenuLink";
 import { getAccess, getUser } from "@/lib/auth/user";
 import UserImage from "@/components/user/UserImage";
 import Link from "next/link";
+import LogoutLink from "./LogoutLink";
 
 export default async function UserMenu({ isMobile }) {
   const user = await getUser();
@@ -29,9 +30,13 @@ export default async function UserMenu({ isMobile }) {
           </div>
           <div className="dropdown-menu">
             <div className="user_setting_content">
-              {allNav.map((item, i) => (
-                <UserMenuLink key={i} item={item} index={i} />
-              ))}
+              {allNav.map((item, i) => {
+                if (item.path === "/logout") {
+                  return <LogoutLink item={item} key={i} custom />;
+                } else {
+                  return <UserMenuLink key={i} item={item} index={i} />;
+                }
+              })}
             </div>
           </div>
         </div>

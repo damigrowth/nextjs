@@ -29,24 +29,18 @@ export default function ServiceCard({
     <>
       <div className="listing-style1">
         <div className="list-thumb">
-          {media.length === 0 && (
-            <Link href={`/s/${slug}`}>
-              <Image
-                height={190}
-                width={255}
-                className="w-100 h-100 object-fit-cover"
-                src={fallbackImage}
-                alt={title}
-              />
-            </Link>
-          )}
           {media.length > 1 ? (
             <ServiceCardFiles
               media={media.map((item) => item.attributes)}
               path={`/s/${slug}`}
             />
           ) : (
-            <ServiceCardFile file={media[0]?.attributes} path={`/s/${slug}`} />
+            <ServiceCardFile
+              file={media[0]?.attributes}
+              path={`/s/${slug}`}
+              width={255}
+              height={190}
+            />
           )}
           {/* <Link href={`/s/${slug}`}>
             {media.length === 0 && (

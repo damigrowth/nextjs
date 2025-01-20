@@ -75,6 +75,10 @@ export async function register(prevState, formData) {
             email: userData.email,
             displayName: userData.username,
             type: "3",
+            coverage: {
+              online: true,
+            },
+            publishedAt: new Date().toISOString(),
           },
         },
         jwt
@@ -107,6 +111,10 @@ export async function register(prevState, formData) {
             email: userData.email,
             displayName: validatedFields.data.displayName,
             type: freelancerType.toString(),
+            coverage: {
+              online: true,
+            },
+            publishedAt: new Date().toISOString(),
           },
         },
         jwt

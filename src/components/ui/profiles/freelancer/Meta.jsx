@@ -44,12 +44,15 @@ export default function Meta({
               <div className="position-relative freelancer-single-style">
                 {/* <span className="online"></span> */}
                 <UserImage
+                  displayName={displayName}
                   firstName={firstName}
                   lastName={lastName}
                   image={image}
                   width={90}
                   height={91}
                   topLevel={topLevel}
+                  bigText
+                  hideDisplayName
                 />
               </div>
               <div className="ml20 ml0-xs">

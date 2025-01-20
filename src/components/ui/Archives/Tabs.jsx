@@ -3,7 +3,6 @@
 import { getPathname } from "@/utils/paths";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useRouter } from "next/router";
 import React from "react";
 
 export default function Tabs({
@@ -16,17 +15,7 @@ export default function Tabs({
   categoriesRoute,
 }) {
   const pathName = usePathname();
-  const searchParams = useSearchParams();
-
   const category = getPathname(pathName, 1);
-
-  // Serialize search parameters to a query string
-  const queryString = searchParams.toString();
-
-  // Generate the URL with query string
-  const generateLink = (path) => {
-    return queryString ? `${path}?${queryString}` : path;
-  };
 
   return (
     <section className="categories_list_section overflow-hidden">

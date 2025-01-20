@@ -10,6 +10,7 @@ import {
 import { logout } from "@/lib/auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import LogoutLink from "../header/LogoutLink";
 
 export default function DashboardSidebar({ hasAccess }) {
   const path = usePathname();
@@ -22,19 +23,7 @@ export default function DashboardSidebar({ hasAccess }) {
 
     // Special handling for logout item
     if (item.path === "/logout") {
-      return (
-        <form action={logout}>
-          <button
-            type="submit"
-            className={`items-center btn ${
-              path === item.path ? "-is-active" : ""
-            }`}
-          >
-            <i className={`${item.icon} mr15`} />
-            {item.name}
-          </button>
-        </form>
-      );
+      return <LogoutLink item={item} />;
     }
 
     // Disabled items rendered as div
