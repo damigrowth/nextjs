@@ -237,7 +237,7 @@ a {
 }
 
 .listing-style1 .height {
-  width: 329px;
+  /* width: 329px; */
   height: 189px;
   /* max-width: 329px; */
   /* display: flex;
