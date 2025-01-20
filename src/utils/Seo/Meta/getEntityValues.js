@@ -2,7 +2,8 @@ import { getBestDimensions } from "@/utils/imageDimensions";
 
 export function getEntityValues(entity, property) {
   const title = entity.title;
-  const displayName = entity?.freelancer?.data?.attributes?.displayName;
+  const displayName =
+    entity?.displayName || entity?.freelancer?.data?.attributes?.displayName;
   const category = entity.category?.data?.attributes?.label;
   const description = entity.description;
   const type = entity?.type?.data?.attributes?.label;
