@@ -96,9 +96,9 @@ export default function FreelancerProfile({
           <div className="col-lg-8">
             <Meta
               topLevel={topLevel}
+              displayName={displayName}
               firstName={firstName}
               lastName={lastName}
-              displayName={displayName}
               tagline={tagline}
               socials={socials}
               image={image.data?.attributes?.formats?.thumbnail?.url}
@@ -125,7 +125,6 @@ export default function FreelancerProfile({
               />
               <Industries industries={industries?.data} />
               <FeaturedServices
-                uid={uid}
                 services={services}
                 meta={servicesMeta}
                 servicesPage={servicesPage}

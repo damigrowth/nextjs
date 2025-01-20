@@ -4,7 +4,6 @@ import { getBestDimensions } from "@/utils/imageDimensions";
 import LoadMoreBtn from "./LoadMoreBtn";
 
 export default async function FeaturedServices({
-  uid,
   services,
   meta,
   servicesPage,
