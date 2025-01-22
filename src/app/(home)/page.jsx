@@ -13,6 +13,8 @@ import {
 import { FEATURED_SERVICES } from "@/lib/graphql/queries/main/service";
 import { FEATURED_FREELANCERS } from "@/lib/graphql/queries/main/freelancer";
 import { Meta } from "@/utils/Seo/Meta/Meta";
+import { inspect } from "@/utils/inspect";
+import { getFreelancerId } from "@/lib/users/freelancer";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600; // 1 hour
@@ -33,6 +35,8 @@ export async function generateMetadata() {
 }
 
 export default async function page() {
+  const fid = await getFreelancerId();
+
   //TODO: Add batch query - combine all queries
   const { featuredEntity: featuredCategoriesData } = await getData(
     FEATURED_CATEGORIES
@@ -41,7 +45,6 @@ export default async function page() {
   const { featuredEntity: featuredServicesData } = await getData(
     FEATURED_SERVICES
   );
-
   const { featuredEntity: featuredFreelancersData } = await getData(
     FEATURED_FREELANCERS
   );
@@ -69,8 +72,9 @@ export default async function page() {
       <FeaturedServices
         categories={featuredCategories}
         services={featuredServices}
+        fid={fid}
       />
-      <FeaturedFreelancers freelancers={featuredFreelancers} />
+      <FeaturedFreelancers freelancers={featuredFreelancers} fid={fid} />
       <Stats />
       <AllTaxonomies
         freelancerSubcategories={topFreelancerSubcategories.subcategories}

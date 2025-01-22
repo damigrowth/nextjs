@@ -96,9 +96,11 @@ export default function FeaturedFiles({ files, title, border }) {
           >
             {galleryFiles.map(({ formats, url }, i) => {
               if (formats) {
-                const imageWidth = formats.small.width;
-                const imageHeight = formats.small.height;
-                const imageUrl = formats.small.url;
+                const imageWidth =
+                  formats?.small?.width || formats.thumbnail.width;
+                const imageHeight =
+                  formats?.small?.height || formats.thumbnail.height;
+                const imageUrl = formats?.small?.url || formats.thumbnail.url;
 
                 return (
                   <SwiperSlide key={i}>

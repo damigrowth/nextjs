@@ -15,6 +15,7 @@ export default function FreelancersList({ freelancers }) {
   useEffect(() => {
     setShowSwiper(true);
   }, []);
+
   return (
     <div className="navi_pagi_bottom_center">
       {showSwiper && (
@@ -26,7 +27,7 @@ export default function FreelancersList({ freelancers }) {
           }}
           modules={[Navigation, Pagination]}
           className="mySwiper"
-          loop={true}
+          loop={false} // Changed to false to prevent repetition
           pagination={{
             el: ".swiper__pagination__013",
             clickable: true,
@@ -39,22 +40,16 @@ export default function FreelancersList({ freelancers }) {
               slidesPerView: 2,
             },
             992: {
-              slidesPerView: 3,
+              slidesPerView: Math.min(3, freelancers.length), // Don't show more slides than items
             },
             1200: {
-              slidesPerView: 4,
+              slidesPerView: Math.min(4, freelancers.length), // Don't show more slides than items
             },
           }}
         >
-          {freelancers.slice(0, 4).map((freelancer, index) => (
+          {freelancers.map((freelancer, index) => (
             <SwiperSlide key={index}>
               <FreelancerCard freelancer={freelancer.attributes} linkedName />
-              {/* <HeighestRetedCard3
-                itemClass={
-                  "freelancer-style1 text-center bdr1 bdrs16 hover-box-shadow"
-                }
-                data={item}
-              /> */}
             </SwiperSlide>
           ))}
         </Swiper>
