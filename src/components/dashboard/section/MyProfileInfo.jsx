@@ -1,4 +1,4 @@
-import EditProfileForm from "@/components/ui/forms/EditProfileForm";
+import EditProfileForm from "@/components/ui/forms/EditProfile/EditProfileForm";
 import DashboardNavigation from "../header/DashboardNavigation";
 import Award from "./Award";
 import ChangePassword from "./ChangePassword";
@@ -9,7 +9,7 @@ import Skill from "./Skill";
 import WorkExperience from "./WorkExperience";
 import Image from "next/image";
 
-export default function MyProfileInfo() {
+export default function MyProfileInfo({ freelancer }) {
   return (
     <>
       <div className="dashboard__content hover-bgc-color">
@@ -27,7 +27,7 @@ export default function MyProfileInfo() {
         <div className="row">
           <div className="col-xl-12">
             <div className="ps-widget bgc-white bdrs4 p30 mb30 overflow-hidden position-relative">
-              <EditProfileForm />
+              <EditProfileForm freelancer={freelancer} />
             </div>
             {/* <ProfileDetails /> */}
             {/* <Skill />

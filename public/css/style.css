@@ -1548,7 +1548,7 @@ li {
   color: var(--headings-color);
   border-radius: 50%;
   height: 36px;
-  line-height: 36px;
+  line-height: 23px;
   position: absolute;
   right: 20px;
   top: 20px;
@@ -1584,6 +1584,9 @@ li {
   width: 93%;
   margin-bottom: 10px;
   /* height: 60px; */
+}
+.list-title.heading {
+  font-weight: 700;
 }
 .listing-style1 .list-title a {
   font-weight: bold;
