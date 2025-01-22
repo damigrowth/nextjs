@@ -134,6 +134,121 @@ const UPLOAD = gql`
   }
 `;
 
+const LOGIN_USER = gql`
+  mutation Login($identifier: String!, $password: String!) {
+    login(input: { identifier: $identifier, password: $password }) {
+      jwt
+    }
+  }
+`;
+
+const REGISTER_USER = gql`
+  mutation Register($input: UsersPermissionsRegisterInput!) {
+    register(input: $input) {
+      jwt
+      user {
+        id
+        username
+        email
+      }
+    }
+  }
+`;
+
+const UPDATE_USER = gql`
+  mutation UpdateUser(
+    $id: ID!
+    $roleId: ID
+    $displayName: String
+    $consent: Boolean
+    $freelancer: ID
+    $username: String
+  ) {
+    updateUsersPermissionsUser(
+      id: $id
+      data: {
+        role: $roleId
+        freelancer: $freelancer
+        username: $username
+        displayName: $displayName
+        consent: $consent
+      }
+    ) {
+      data {
+        id
+        attributes {
+          freelancer {
+            data {
+              id
+            }
+          }
+          role {
+            data {
+              id
+              attributes {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const CREATE_FREELANCER = gql`
+  mutation CreateFreelancer($data: FreelancerInput!) {
+    createFreelancer(data: $data) {
+      data {
+        id
+        attributes {
+          username
+          email
+          type {
+            data {
+              id
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const UPDATE_FREELANCER = gql`
+  mutation UpdateFreelancer($id: ID!, $data: FreelancerInput!) {
+    updateFreelancer(id: $id, data: $data) {
+      data {
+        id
+      }
+    }
+  }
+`;
+
+const FORGOT_PASSWORD = gql`
+  mutation ForgotPassword($email: String!) {
+    forgotPassword(email: $email) {
+      ok
+    }
+  }
+`;
+
+const RESET_PASSWORD = gql`
+  mutation ResetPassword(
+    $resetCode: String!
+    $password: String!
+    $passwordConfirmation: String!
+  ) {
+    resetPassword(
+      code: $resetCode
+      password: $password
+      passwordConfirmation: $passwordConfirmation
+    ) {
+      jwt
+    }
+  }
+`;
+
 const SAVED_SERVICE = gql`
   query SavedService($serviceId: String!) {
     checkSavedService(serviceId: $serviceId) {
@@ -198,4 +313,17 @@ export {
   UPDATE_SERVICE_SLUG,
   CONTACT,
   UPLOAD,
+  LOGIN_USER,
+  REGISTER_USER,
+  UPDATE_USER,
+  CREATE_FREELANCER,
+  UPDATE_FREELANCER,
+  FORGOT_PASSWORD,
+  RESET_PASSWORD,
+  SAVED_SERVICE,
+  SAVED_FREELANCER,
+  SAVE_SERVICE,
+  UNSAVE_SERVICE,
+  SAVE_FREELANCER,
+  UNSAVE_FREELANCER,
 };

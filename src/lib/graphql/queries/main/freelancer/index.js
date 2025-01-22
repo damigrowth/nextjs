@@ -4,8 +4,13 @@ import {
   FREELANCER_RELATIONS,
   FREELANCER_SEO,
 } from "../../parts/freelancer";
-import { PAGINATION } from "../../fragments/global";
+import { PAGINATION, SINGLE_IMAGE } from "../../fragments/global";
 import { FREELANCER_REFERENCE } from "../../fragments/entities/freelancer";
+import {
+  FREELANCER_CATEGORY,
+  FREELANCER_SUBCATEGORY_PARTIAL,
+} from "../../fragments/taxonomies/freelancer";
+import { SPECIALISATIONS } from "../../fragments/entities/specialisation";
 
 const FREELANCER_ID = gql`
   query FreelancerId($id: ID!) {
@@ -155,7 +160,26 @@ const FEATURED_FREELANCERS = gql`
           freelancers {
             data {
               attributes {
-                ...FreelancerReference
+                username
+                firstName
+                lastName
+                displayName
+                rating
+                reviews_total
+                topLevel
+                verified
+                image {
+                  ...SingleImage
+                }
+                specialisations {
+                  ...Specialisations
+                }
+                category {
+                  ...FreelancerCategory
+                }
+                subcategory {
+                  ...FreelancerSubcategoryPartial
+                }
               }
             }
           }
@@ -163,7 +187,10 @@ const FEATURED_FREELANCERS = gql`
       }
     }
   }
-  ${FREELANCER_REFERENCE}
+  ${SINGLE_IMAGE}
+  ${SPECIALISATIONS}
+  ${FREELANCER_CATEGORY}
+  ${FREELANCER_SUBCATEGORY_PARTIAL}
 `;
 
 const FREELANCERS_ALL = gql`

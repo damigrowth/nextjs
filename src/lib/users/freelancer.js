@@ -27,7 +27,10 @@ export async function getFreelancer() {
   });
 
   if (freelancers?.data?.length > 0) {
-    freelancer = freelancers.data[0].attributes;
+    freelancer = {
+      id: freelancers.data[0].id,
+      ...freelancers.data[0].attributes,
+    };
   }
 
   return { freelancer };

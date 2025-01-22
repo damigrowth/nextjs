@@ -6,10 +6,13 @@ import {
   SUBDIVISION_ENTITY,
 } from "../../fragments/taxonomies/service";
 import { ADDONS, FAQ, PACKAGES } from "../../fragments/components/pricing";
-import { MULTIPLE_FILES, STATUS } from "../../fragments/global";
+import { MULTIPLE_FILES, SINGLE_IMAGE, STATUS } from "../../fragments/global";
 import { RATING } from "../../fragments/entities/rating";
 import { TAG } from "../../fragments/entities/tag";
-import { FREELANCER_BASIC } from "../../fragments/entities/freelancer";
+import {
+  FREELANCER_BASIC,
+  FREELANCER_SMALL,
+} from "../../fragments/entities/freelancer";
 import { SERVICE_TYPE } from "../../fragments/components/service";
 
 const SERVICE_MAIN = gql`
@@ -159,18 +162,14 @@ const SERVICE_PARTIAL_RELATIONS = gql`
       ...MultipleFiles
     }
     freelancer {
-      data {
-        id
-        attributes {
-          ...FreelancerBasic
-        }
-      }
+      ...FreelancerSmall
     }
   }
   ${CATEGORY}
   ${SUBCATEGORY_ENTITY}
   ${MULTIPLE_FILES}
-  ${FREELANCER_BASIC}
+  ${SINGLE_IMAGE}
+  ${FREELANCER_SMALL}
 `;
 
 const SERVICE_PARTIAL = gql`
