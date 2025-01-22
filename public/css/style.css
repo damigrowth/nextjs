@@ -13331,4 +13331,5 @@ section.pb40-md.pb90 > div > div.row.d-block.d-lg-none > div > div.row {
 .initials-image-text {
   text-align: center;
   line-height: normal;
+  margin-top: -1px;
 }
