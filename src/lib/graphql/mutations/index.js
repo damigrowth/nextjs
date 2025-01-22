@@ -134,6 +134,60 @@ const UPLOAD = gql`
   }
 `;
 
+const SAVED_SERVICE = gql`
+  query SavedService($serviceId: String!) {
+    checkSavedService(serviceId: $serviceId) {
+      isSaved
+      serviceId
+    }
+  }
+`;
+
+const SAVED_FREELANCER = gql`
+  query SavedFreelancer($freelancerId: String!) {
+    checkSavedFreelancer(freelancerId: $freelancerId) {
+      isSaved
+      freelancerId
+    }
+  }
+`;
+
+const SAVE_SERVICE = gql`
+  mutation SaveService($serviceId: String!) {
+    saveService(serviceId: $serviceId) {
+      success
+      message
+    }
+  }
+`;
+
+const UNSAVE_SERVICE = gql`
+  mutation UnsaveService($serviceId: String!) {
+    unsaveService(serviceId: $serviceId) {
+      success
+      message
+    }
+  }
+`;
+
+const SAVE_FREELANCER = gql`
+  mutation SaveFreelancer($freelancerId: String!) {
+    saveFreelancer(freelancerId: $freelancerId) {
+      success
+      message
+    }
+  }
+`;
+
+const UNSAVE_FREELANCER = gql`
+  mutation UnsaveFreelancer($freelancerId: String!) {
+    unsaveFreelancer(freelancerId: $freelancerId) {
+      success
+      message
+    }
+  }
+`;
+
 export {
   POST_REVIEW,
   POST_SERVICE,

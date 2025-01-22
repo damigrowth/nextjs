@@ -4,11 +4,19 @@ import { getBestDimensions } from "@/utils/imageDimensions";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import SaveFrom from "../forms/SaveForm";
+import { getSavedStatus } from "@/lib/save";
 
-export default function FeaturedServiceCard({ service }) {
-  const { media, category, title, slug, freelancer, price } = service;
+export default async function FeaturedServiceCard({
+  service,
+  fid,
+  showDelete,
+}) {
+  const { id, media, category, title, slug, freelancer, price } = service;
 
-  const freelancerData = freelancer.data.attributes;
+  const freelancerData = freelancer?.data?.attributes;
+
+  if (!freelancerData) return null;
 
   const {
     username,
@@ -29,6 +37,8 @@ export default function FeaturedServiceCard({ service }) {
     image = fallbackImage;
   }
 
+  const savedStatus = await getSavedStatus("service", id);
+
   return (
     <div className="listing-style1 bdrs16">
       <div className="list-thumb">
@@ -39,15 +49,17 @@ export default function FeaturedServiceCard({ service }) {
             className="w-100"
             src={image}
             alt={`featured-service-${title}-freelancer-${freelancer?.data?.attributes?.username}`}
+            style={{ objectFit: "cover" }}
           />
         </Link>
-        {/* <a
-            onClick={() => setFavActive(!isFavActive)}
-            className={`listing-fav fz12 ${isFavActive ? "ui-fav-active" : ""}`}
-          className="listing-fav fz12 "
-        >
-          <span className="far fa-heart" />
-        </a> */}
+        {fid && (
+          <SaveFrom
+            type="service"
+            id={id}
+            initialSavedStatus={savedStatus}
+            showDelete={showDelete}
+          />
+        )}
       </div>
       {/* <div className={`list-content ${isContentExpanded ? "px-0" : ""}`}> */}
       <div className="list-content">
@@ -75,7 +87,7 @@ export default function FeaturedServiceCard({ service }) {
         <hr className="my-2" />
         <div className="list-meta d-flex justify-content-between align-items-center mt15">
           <UserImage
-            image={avatar.data.attributes.formats.thumbnail.url}
+            image={avatar?.data?.attributes?.formats?.thumbnail?.url}
             width={30}
             height={30}
             firstName={firstName}

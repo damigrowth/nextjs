@@ -1,41 +1,43 @@
-"use client";
-
+// ServicesList.jsx (server component)
 import FeaturedServiceCard from "@/components/ui/Cards/FeaturedServiceCard";
 import FeaturedServiceSliderCard from "@/components/ui/Cards/FeaturedServiceSliderCard";
-import useHomeStore from "@/store/home/homeStore";
-import React from "react";
+import ServicesListWrapper from "./ServicesListWrapper";
 
-export default function ServicesList({ services }) {
-  const { featuredCategory } = useHomeStore();
-
+export default function ServicesList({ services, fid }) {
   return (
-    <div className="row">
-      {services
-
-        .filter((item) =>
-          featuredCategory === ""
-            ? item
-            : item.attributes.category?.data?.attributes?.slug ===
-                featuredCategory && item
-        )
-        .slice(0, 4)
-        .map((service, i) => {
+    <ServicesListWrapper>
+      <div className="row">
+        {services.map((service, i) => {
           if (
             !service?.attributes?.freelancer?.data?.attributes ||
             service.attributes.media?.data?.length === 0
           ) {
             return null;
           }
+
           return (
-            <div key={i} className="col-sm-6 col-xl-3">
+            <div
+              key={i}
+              className="col-sm-6 col-xl-3"
+              data-category={
+                service.attributes.category?.data?.attributes?.slug || ""
+              }
+            >
               {service.attributes.media?.data?.length > 1 ? (
-                <FeaturedServiceSliderCard service={service.attributes} />
+                <FeaturedServiceSliderCard
+                  service={{ id: service.id, ...service.attributes }}
+                  fid={fid}
+                />
               ) : (
-                <FeaturedServiceCard service={service.attributes} />
+                <FeaturedServiceCard
+                  service={{ id: service.id, ...service.attributes }}
+                  fid={fid}
+                />
               )}
             </div>
           );
         })}
-    </div>
+      </div>
+    </ServicesListWrapper>
   );
 }

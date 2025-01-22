@@ -1,10 +1,8 @@
-"use client";
-
 import React from "react";
 import CategoryTabs from "./CategoryTabs";
 import ServicesList from "./ServicesList";
 
-export default function FeaturedServices({ categories, services }) {
+export default function FeaturedServices({ categories, services, fid }) {
   return (
     <section className={`pt-0 pb100`}>
       <div className="container">
@@ -25,7 +23,7 @@ export default function FeaturedServices({ categories, services }) {
         </div>
         <div className="row">
           <div className="col-lg-12">
-            <ServicesList services={services} />
+            <ServicesList services={services} fid={fid} />
           </div>
         </div>
       </div>
