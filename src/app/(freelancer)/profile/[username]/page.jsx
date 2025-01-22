@@ -10,6 +10,7 @@ import { getData } from "@/lib/client/operations";
 import Tabs from "@/components/ui/Archives/Tabs";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 import { FREELANCER_CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import { getSavedStatus } from "@/lib/save";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -72,6 +73,8 @@ export default async function page({ params, searchParams }) {
         : ""
     }`;
 
+    const savedStatus = await getSavedStatus("freelancer", uid);
+
     return (
       <>
         <Tabs
@@ -85,6 +88,8 @@ export default async function page({ params, searchParams }) {
           type={type}
           subcategory={freelancer?.subcategory}
           subjectTitle={emailSubjectTitle}
+          id={uid}
+          savedStatus={savedStatus}
         />
         <FreelancerProfile
           uid={uid}
