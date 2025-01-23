@@ -13,7 +13,7 @@ export function TabContent({ services, freelancers, fid }) {
             <ServicesTab services={services} fid={fid} />
           </div>
           <div data-tab="1">
-            <FreelancersTab freelancers={freelancers} />
+            <FreelancersTab freelancers={freelancers} fid={fid} />
           </div>
         </div>
       </TabWrapper>

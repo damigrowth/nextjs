@@ -3,9 +3,7 @@ import { TabContent } from "./TabContent";
 import { product1, project1 } from "@/data/product";
 import { DashboardHeader } from "./DashboardHeader";
 
-export default function SavedInfo({ services, fid }) {
-  const freelancers = project1.slice(0, 6);
-
+export default function SavedInfo({ services, freelancers, fid }) {
   return (
     <div className="dashboard__content hover-bgc-color">
       <DashboardHeader title="Αποθηκευμένα" />

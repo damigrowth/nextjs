@@ -1,14 +1,27 @@
 import ProjectCard1 from "@/components/card/ProjectCard1";
+import FreelancerCard from "../../Cards/FreelancerCard";
 
 // FreelancersTab.jsx (Server Component)
-export function FreelancersTab({ freelancers }) {
+export function FreelancersTab({ freelancers, fid }) {
   return (
     <div className="row">
-      {freelancers.slice(0, 6).map((item, i) => (
-        <div key={i} className="col-md-6 col-lg-12 col-xl-6">
-          <ProjectCard1 data={item} />
-        </div>
-      ))}
+      {freelancers.length > 0 ? (
+        freelancers.map(
+          (freelancer, i) =>
+            freelancer?.username && (
+              <div key={i} className="col-sm-6 col-xl-4">
+                <FreelancerCard
+                  freelancer={freelancer}
+                  fid={fid}
+                  showDelete={true}
+                  linkedName
+                />
+              </div>
+            )
+        )
+      ) : (
+        <div>Δεν βρέθηκαν αποθηκευμένα προφίλ</div>
+      )}
     </div>
   );
 }

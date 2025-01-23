@@ -28,13 +28,13 @@ export default function SaveForm({
 
   if (showDelete) {
     return (
-      <form action={unsaveAction} className="flex">
+      <form action={unsaveAction} className="save-button-form">
         <input type="hidden" name="type" value={type} />
         <input type="hidden" name="id" value={id} />
         <button
           type="submit"
           disabled={isUnsavePending}
-          className="btn tag-del"
+          className="btn bg-white"
           style={{ zIndex: 100 }}
         >
           <span
@@ -73,7 +73,10 @@ export default function SaveForm({
   };
 
   return (
-    <form action={saved ? unsaveAction : saveAction} className="flex">
+    <form
+      action={saved ? unsaveAction : saveAction}
+      className="save-button-form"
+    >
       <input type="hidden" name="type" value={type} />
       <input type="hidden" name="id" value={id} />
       <button
