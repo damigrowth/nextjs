@@ -20,7 +20,11 @@ export default async function Footer() {
                 <div className="row justify-content-between">
                   <div className="col-auto">
                     <div className="link-style1 mb-3">
-                      <h6 className="text-white mb10">Σχετικά</h6>
+                      <h6 className="mb10">
+                        <Link href={"/about"} className="text-white">
+                          Σχετικά
+                        </Link>
+                      </h6>
                       <div className="link-list">
                         {firstColumnLinks.map((item, i) => (
                           <Link key={i} href={`/${item.attributes.slug}`}>
@@ -32,7 +36,11 @@ export default async function Footer() {
                   </div>
                   <div className="col-auto">
                     <div className="link-style1 mb-3">
-                      <h6 className="text-white mb10">Υπηρεσίες</h6>
+                      <h6 className="mb10">
+                        <Link href={"/categories"} className="text-white">
+                          Υπηρεσίες
+                        </Link>
+                      </h6>
                       <ul className="ps-0">
                         {secondColumnLinks.map((item, i) => (
                           <li key={i}>
@@ -46,7 +54,11 @@ export default async function Footer() {
                   </div>
                   <div className="col-auto">
                     <div className="link-style1 mb-3">
-                      <h6 className="text-white mb10">Ο Λογαριασμός μου</h6>
+                      <h6 className="mb10">
+                        <Link href={"/dashboard"} className="text-white">
+                          Ο Λογαριασμός μου
+                        </Link>
+                      </h6>
                       <ul className="ps-0">
                         {accountLinks.map((item, i) => (
                           <li key={i}>
