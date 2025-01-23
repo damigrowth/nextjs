@@ -9,6 +9,7 @@ export default function ProfileBreadcrumb({
   subjectTitle,
   id,
   savedStatus,
+  hideSaveButton,
 }) {
   const parentSlug = type === "company" ? "companies" : "pros";
 
@@ -56,6 +57,7 @@ export default function ProfileBreadcrumb({
                 subjectTitle={subjectTitle}
                 id={id}
                 savedStatus={savedStatus}
+                hideSaveButton={hideSaveButton}
               />
             </div>
           </div>

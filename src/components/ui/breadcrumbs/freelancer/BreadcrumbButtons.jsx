@@ -3,7 +3,12 @@
 import React, { useState } from "react";
 import SaveForm from "../../forms/SaveForm";
 
-export default function BreadcrumbButtons({ subjectTitle, id, savedStatus }) {
+export default function BreadcrumbButtons({
+  subjectTitle,
+  id,
+  savedStatus,
+  hideSaveButton,
+}) {
   const [shareToggle, setShareToggle] = useState(false);
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
@@ -68,12 +73,14 @@ export default function BreadcrumbButtons({ subjectTitle, id, savedStatus }) {
           </div>
         )}
       </a>
-      <SaveForm
-        type="service"
-        id={id}
-        variant="text"
-        initialSavedStatus={savedStatus}
-      />
+      {!hideSaveButton && (
+        <SaveForm
+          type="service"
+          id={id}
+          variant="text"
+          initialSavedStatus={savedStatus}
+        />
+      )}
     </div>
   );
 }

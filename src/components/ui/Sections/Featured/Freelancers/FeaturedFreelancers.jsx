@@ -1,8 +1,17 @@
 import React from "react";
 import Link from "next/link";
-import FreelancersList from "./FreelancersList";
+import FreelancerCard from "@/components/ui/Cards/FreelancerCard";
+import FreelancersListWrapper from "./FreelancersListWrapper";
 
-export default function FeaturedFreelancers({ freelancers }) {
+export default function FeaturedFreelancers({
+  freelancers: freelancersData,
+  fid,
+}) {
+  const freelancers = freelancersData.map((freelancer) => ({
+    id: freelancer.id,
+    ...freelancer.attributes,
+  }));
+
   return (
     <>
       <section className="bgc-dark pb90 pb30-md">
@@ -30,7 +39,16 @@ export default function FeaturedFreelancers({ freelancers }) {
           </div>
           <div className="row wow fadeInUp">
             <div className="col-lg-12">
-              <FreelancersList freelancers={freelancers} />
+              <FreelancersListWrapper>
+                {freelancers.map((freelancer, index) => (
+                  <FreelancerCard
+                    key={index}
+                    freelancer={freelancer}
+                    fid={fid}
+                    linkedName
+                  />
+                ))}
+              </FreelancersListWrapper>
               <div className="row justify-content-center">
                 <div className="col-auto">
                   <button className="swiper__btn swiper__btn-2 btn__prev__013">
