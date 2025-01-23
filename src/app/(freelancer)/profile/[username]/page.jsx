@@ -2,6 +2,7 @@ import FreelancerProfile from "@/components/ui/profiles/freelancer/FreelancerPro
 import {
   getFeaturedServicesByFreelancer,
   getFreelancerByUsername,
+  getFreelancerId,
   getReviewsByFreelancer,
 } from "@/lib/users/freelancer";
 import { redirect } from "next/navigation";
@@ -37,7 +38,9 @@ export async function generateMetadata({ params }) {
 export default async function page({ params, searchParams }) {
   const { username } = params;
 
-  const { freelancer, uid } = await getFreelancerByUsername(username);
+  const fid = await getFreelancerId();
+
+  const { freelancer, freelancerId } = await getFreelancerByUsername(username);
 
   if (!freelancer) {
     redirect("/not-found");
@@ -51,13 +54,13 @@ export default async function page({ params, searchParams }) {
     const reviewsPageSize = reviewsPage * 3;
 
     const { reviews, reviewsMeta } = await getReviewsByFreelancer(
-      uid,
+      freelancerId,
       1,
       reviewsPageSize
     );
 
     const { services, servicesMeta } = await getFeaturedServicesByFreelancer(
-      uid,
+      freelancerId,
       servicesPageSize
     );
 
@@ -73,7 +76,11 @@ export default async function page({ params, searchParams }) {
         : ""
     }`;
 
-    const savedStatus = await getSavedStatus("freelancer", uid);
+    let savedStatus = null;
+
+    if (fid !== freelancerId) {
+      savedStatus = await getSavedStatus("freelancer", freelancerId);
+    }
 
     return (
       <>
@@ -88,11 +95,12 @@ export default async function page({ params, searchParams }) {
           type={type}
           subcategory={freelancer?.subcategory}
           subjectTitle={emailSubjectTitle}
-          id={uid}
+          id={freelancerId}
           savedStatus={savedStatus}
+          hideSaveButton={fid === freelancerId}
         />
         <FreelancerProfile
-          uid={uid}
+          uid={freelancerId}
           username={username}
           freelancer={freelancer}
           services={services}

@@ -1,8 +1,5 @@
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import MobileNavigation2 from "@/components/header/MobileNavigation2";
 import SavedInfo from "@/components/ui/dashboard/saved/SavedInfo";
 import { getFreelancer } from "@/lib/users/freelancer";
-import { inspect } from "@/utils/inspect";
 
 export const metadata = {
   title: "Αποθηκευμένα",
@@ -18,5 +15,19 @@ export default async function page({ searchParams }) {
         }))
       : null;
 
-  return <SavedInfo services={saved_services} fid={freelancer.id} />;
+  const saved_freelancers =
+    freelancer.saved_freelancers.data.length > 0
+      ? freelancer.saved_freelancers.data.map((freelancer) => ({
+          id: freelancer.id,
+          ...freelancer.attributes,
+        }))
+      : null;
+
+  return (
+    <SavedInfo
+      services={saved_services}
+      freelancers={saved_freelancers}
+      fid={freelancer.id}
+    />
+  );
 }
