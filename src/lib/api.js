@@ -95,24 +95,18 @@ export async function postData(endpoint, data) {
   }
 }
 
-export const putData = async (url, payload) => {
-  validateEnvVars();
-
-  const endpoint = `${STRAPI_URL}/${url}`;
+export const putData = async (url, payload, jwt) => {
+  const endpoint = `${STRAPI_API_URL}/${url}`;
+  const token = (await getToken()) || jwt;
 
   try {
     const response = await fetch(endpoint, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({
-        data: {
-          ...payload,
-        },
-      }),
-      cache: "no-cache",
+      body: JSON.stringify(payload),
     });
 
     const data = await response.json();

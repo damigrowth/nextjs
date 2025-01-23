@@ -1,10 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
+import SaveForm from "../../forms/SaveForm";
 
-export default function BreadcrumbButtons({ subjectTitle }) {
+export default function BreadcrumbButtons({
+  subjectTitle,
+  id,
+  savedStatus,
+  hideSaveButton,
+}) {
   const [shareToggle, setShareToggle] = useState(false);
-  const [saveToggle, setSaveToggle] = useState(false);
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
@@ -68,16 +73,14 @@ export default function BreadcrumbButtons({ subjectTitle }) {
           </div>
         )}
       </a>
-      <a onClick={() => setSaveToggle(!saveToggle)}>
-        <div
-          className={`share-save-widget d-flex align-items-center ml15 ${
-            saveToggle ? "active" : ""
-          }`}
-        >
-          <span className="icon flaticon-like dark-color fz12 mr10" />
-          <div className="h6 mb-0">Αποθήκευση</div>
-        </div>
-      </a>
+      {!hideSaveButton && (
+        <SaveForm
+          type="service"
+          id={id}
+          variant="text"
+          initialSavedStatus={savedStatus}
+        />
+      )}
     </div>
   );
 }

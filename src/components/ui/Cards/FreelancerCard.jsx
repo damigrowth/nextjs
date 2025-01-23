@@ -3,9 +3,17 @@ import VerifiedBadge from "@/components/user/VerifiedBadge";
 import { formatRating } from "@/utils/formatRating";
 import Link from "next/link";
 import React from "react";
+import SaveForm from "../forms/SaveForm";
+import { getSavedStatus } from "@/lib/save";
 
-export default function FreelancerCard({ freelancer, linkedName }) {
+export default async function FreelancerCard({
+  freelancer,
+  fid,
+  linkedName,
+  showDelete,
+}) {
   const {
+    id,
     username,
     firstName,
     lastName,
@@ -20,9 +28,24 @@ export default function FreelancerCard({ freelancer, linkedName }) {
     subcategory,
   } = freelancer;
 
+  let savedStatus = null;
+  let showSaveButton = false;
+
+  if (fid !== id) {
+    showSaveButton = true;
+    savedStatus = await getSavedStatus("freelancer", id);
+  }
   return (
     <>
-      <div className="data-loading-element freelancer-style1 text-center bdr1 hover-box-shadow">
+      <div className="data-loading-element freelancer-style1 text-center bdr1 hover-box-shadow posiiton-relative">
+        {showSaveButton && (
+          <SaveForm
+            type="freelancer"
+            id={id}
+            initialSavedStatus={savedStatus}
+            showDelete={showDelete}
+          />
+        )}
         <div className="thumb w90 mb25 mx-auto position-relative rounded-circle">
           <UserImage
             height={90}
@@ -56,7 +79,7 @@ export default function FreelancerCard({ freelancer, linkedName }) {
           <p className="mb-0 text-bold">
             {subcategory?.data
               ? subcategory?.data?.attributes?.label
-              : category?.data?.attributes?.label}
+              : category?.data?.attributes?.label || "\u00A0"}
           </p>
           {reviews_total > 0 ? (
             <p className="mb-0 fz14 list-inline-item ">
@@ -69,7 +92,7 @@ export default function FreelancerCard({ freelancer, linkedName }) {
               </span>
             </p>
           ) : (
-            <div className="empty-card-reviews"></div>
+            <div className="empty-card-reviews">&nbsp;</div>
           )}
           {specialisations?.data?.length > 0 ? (
             <div className="card-tags">
@@ -80,7 +103,7 @@ export default function FreelancerCard({ freelancer, linkedName }) {
               ))}
             </div>
           ) : (
-            <div className="empty-card-tags"></div>
+            <div className="empty-card-tags">&nbsp;</div>
           )}
           <div className="d-grid mt15">
             <Link

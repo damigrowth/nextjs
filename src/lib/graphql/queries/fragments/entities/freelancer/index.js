@@ -7,6 +7,27 @@ import {
 import { SINGLE_IMAGE } from "../../global";
 import { VISIBILITY } from "../../components/global";
 
+const FREELANCER_SMALL = gql`
+  fragment FreelancerSmall on FreelancerEntityResponse {
+    data {
+      id
+      attributes {
+        displayName
+        firstName
+        lastName
+        username
+        rating
+        reviews_total
+        topLevel
+        image {
+          ...SingleImage
+        }
+      }
+    }
+  }
+  ${SINGLE_IMAGE}
+`;
+
 const FREELANCER_TYPE = gql`
   fragment FreelancerType on FreelancerTypeEntityResponse {
     data {
@@ -88,4 +109,9 @@ const FREELANCER_REFERENCE = gql`
   ${FREELANCER_TYPE}
 `;
 
-export { FREELANCER_TYPE, FREELANCER_BASIC, FREELANCER_REFERENCE };
+export {
+  FREELANCER_TYPE,
+  FREELANCER_BASIC,
+  FREELANCER_REFERENCE,
+  FREELANCER_SMALL,
+};

@@ -18,7 +18,7 @@ export default function NavMenuMobile({ header }) {
     ? header.data.attributes.categories.data.map((item, i) => ({
         id: i + 1,
         name: item.attributes.label,
-        path: `/ipiresies/${item.attributes.slug}`,
+        path: `/categories/${item.attributes.slug}`,
       }))
     : [];
 

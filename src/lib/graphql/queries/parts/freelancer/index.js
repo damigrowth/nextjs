@@ -1,7 +1,10 @@
 import { gql } from "@apollo/client";
 import { COVERAGE } from "../../fragments/components/location";
 import { SOCIALS } from "../../fragments/components/socials";
-import { FREELANCER_TYPE } from "../../fragments/entities/freelancer";
+import {
+  FREELANCER_SMALL,
+  FREELANCER_TYPE,
+} from "../../fragments/entities/freelancer";
 import {
   FREELANCER_CATEGORY,
   FREELANCER_SUBCATEGORY_PARTIAL,
@@ -20,6 +23,11 @@ import { MULTIPLE_FILES, SINGLE_IMAGE } from "../../fragments/global";
 import { RATING } from "../../fragments/entities/rating";
 import { VISIBILITY } from "../../fragments/components/global";
 import { REVIEW_DISLIKES, REVIEW_LIKES } from "../../fragments/entities/review";
+import {
+  CATEGORY,
+  CATEGORY_ENTITY,
+  SUBCATEGORY_ENTITY,
+} from "../../fragments/taxonomies/service";
 
 const FREELANCER_PARTIAL_MAIN = gql`
   fragment FreelancerPartialMain on Freelancer {
@@ -203,6 +211,62 @@ const FREELANCER_RELATIONS = gql`
     review_dislikes {
       ...ReviewDislikes
     }
+    saved_services {
+      data {
+        id
+        attributes {
+          title
+          slug
+          price
+          rating
+          reviews_total
+          media {
+            ...MultipleFiles
+          }
+          category {
+            data {
+              ...Category
+            }
+          }
+          subcategory {
+            data {
+              ...SubcategoryEntity
+            }
+          }
+          freelancer {
+            ...FreelancerSmall
+          }
+        }
+      }
+    }
+    saved_freelancers {
+      data {
+        id
+        attributes {
+          username
+          firstName
+          lastName
+          displayName
+          verified
+          topLevel
+          rating
+          reviews_total
+          rate
+          visibility {
+            ...Visibility
+          }
+          image {
+            ...SingleImage
+          }
+          category {
+            ...FreelancerCategory
+          }
+          subcategory {
+            ...FreelancerSubcategoryPartial
+          }
+        }
+      }
+    }
   }
   ${SINGLE_IMAGE}
   ${VISIBILITY}
@@ -225,6 +289,10 @@ const FREELANCER_RELATIONS = gql`
   ${RATING}
   ${REVIEW_LIKES}
   ${REVIEW_DISLIKES}
+  ${MULTIPLE_FILES}
+  ${CATEGORY}
+  ${SUBCATEGORY_ENTITY}
+  ${FREELANCER_SMALL}
 `;
 
 // New fragment without user field

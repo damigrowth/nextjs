@@ -68,7 +68,7 @@ export const checkServerHealth = async () => {
 
 // Optimized getData with better caching and retry logic
 export const getData = cache(
-  async (query, variables, cacheKey = "NO_CACHE") => {
+  async (query, variables, cacheKey = "NO_CACHE", extraTags = []) => {
     validateEnvVars();
     const token = await getToken();
 
@@ -76,27 +76,27 @@ export const getData = cache(
     const cacheConfig = CACHE_CONFIG[cacheKey] || {};
     const { key, ttl } = cacheConfig;
 
-    const cacheHeaders = key
-      ? { "Cache-Control": `max-age=${ttl}, s-maxage=${ttl}` }
-      : {};
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(key ? { "Cache-Control": `max-age=${ttl}, s-maxage=${ttl}` } : {}),
+      },
+      body: JSON.stringify({
+        query: queryString,
+        variables,
+      }),
+      ...(key && {
+        next: {
+          revalidate: ttl || 0,
+          tags: ["graphql", key, ...extraTags].filter(Boolean),
+        },
+      }),
+    };
 
     try {
-      const response = await fetchWithRetry(STRAPI_GRAPHQL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          ...cacheHeaders,
-        },
-        body: JSON.stringify({
-          query: queryString,
-          variables,
-        }),
-        ...(key && {
-          cache: "force-cache",
-          tags: ["graphql", key],
-        }),
-      });
+      const response = await fetchWithRetry(STRAPI_GRAPHQL, options);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -141,6 +141,11 @@ export const postData = async (mutation, variables, jwt) => {
       graphQLErrors: error.graphQLErrors,
       networkError: error.networkError,
     });
+
+    // Log the full error response
+    if (error.networkError?.result) {
+      console.log("GraphQL Response Errors:", error.networkError.result.errors);
+    }
 
     const fieldErrors = {};
 

@@ -1548,7 +1548,7 @@ li {
   color: var(--headings-color);
   border-radius: 50%;
   height: 36px;
-  line-height: 36px;
+  line-height: 23px;
   position: absolute;
   right: 20px;
   top: 20px;
@@ -1584,6 +1584,9 @@ li {
   width: 93%;
   margin-bottom: 10px;
   /* height: 60px; */
+}
+.list-title.heading {
+  font-weight: 700;
 }
 .listing-style1 .list-title a {
   font-weight: bold;
@@ -6795,6 +6798,7 @@ textarea {
   padding: 30px;
   position: relative;
   width: 100%;
+  max-width: 320px;
   -webkit-transition: all 0.3s ease;
   -moz-transition: all 0.3s ease;
   -ms-transition: all 0.3s ease;
@@ -12721,6 +12725,10 @@ input:focus-visible {
   font-size: 100px;
 }
 
+.z100 {
+  z-index: 100;
+}
+
 .lh0 {
   line-height: 0px;
 }
@@ -13324,4 +13332,5 @@ section.pb40-md.pb90 > div > div.row.d-block.d-lg-none > div > div.row {
 .initials-image-text {
   text-align: center;
   line-height: normal;
+  margin-top: -1px;
 }

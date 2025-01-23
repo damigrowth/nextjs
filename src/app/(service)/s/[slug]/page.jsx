@@ -9,6 +9,7 @@ import { Meta } from "@/utils/Seo/Meta/Meta";
 import { CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/service";
 import FeaturedServices from "@/components/ui/SingleService/Featured";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
+import { getSavedStatus } from "@/lib/save";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -51,7 +52,9 @@ export default async function page({ params, searchParams }) {
     );
 
     const { categories } = await getData(CATEGORIES);
-    // TODO: Featured Services multi media
+
+    const savedStatus = await getSavedStatus("service", serviceId.toString());
+
     return (
       <>
         <Tabs
@@ -67,6 +70,9 @@ export default async function page({ params, searchParams }) {
             subcategory={service?.subcategory?.data?.attributes}
             subdivision={service?.subdivision?.data?.attributes}
             categoriesRoute={true}
+            subjectTitle={service?.title}
+            id={serviceId}
+            savedStatus={savedStatus}
           />
           <SingleService
             slug={slug}

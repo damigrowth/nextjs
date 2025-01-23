@@ -9,7 +9,7 @@ import {
   FORGOT_PASSWORD,
   RESET_PASSWORD,
   LOGIN_USER,
-} from "../graphql/mutations/user";
+} from "../graphql/mutations";
 import { postData } from "../client/operations";
 import { loginSchema, registerSchema } from "../validation/auth";
 import { removeToken, setToken } from "./token";

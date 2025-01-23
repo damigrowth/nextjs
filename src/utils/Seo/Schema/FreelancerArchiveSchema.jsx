@@ -7,11 +7,11 @@ export default function FreelancerArchiveSchema({
   taxonomies,
 }) {
   const entitiesData = entities.map((entity, i) =>
-    entity.attributes.username
+    entity.username
       ? {
           "@type": "ListItem",
           position: i + 1,
-          url: `${process.env.LIVE_URL}/profile/${entity.attributes.username}`,
+          url: `${process.env.LIVE_URL}/profile/${entity.username}`,
         }
       : null
   );

@@ -2,6 +2,7 @@ import FreelancerProfile from "@/components/ui/profiles/freelancer/FreelancerPro
 import {
   getFeaturedServicesByFreelancer,
   getFreelancerByUsername,
+  getFreelancerId,
   getReviewsByFreelancer,
 } from "@/lib/users/freelancer";
 import { redirect } from "next/navigation";
@@ -10,6 +11,7 @@ import { getData } from "@/lib/client/operations";
 import Tabs from "@/components/ui/Archives/Tabs";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 import { FREELANCER_CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import { getSavedStatus } from "@/lib/save";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -36,7 +38,9 @@ export async function generateMetadata({ params }) {
 export default async function page({ params, searchParams }) {
   const { username } = params;
 
-  const { freelancer, uid } = await getFreelancerByUsername(username);
+  const fid = await getFreelancerId();
+
+  const { freelancer, freelancerId } = await getFreelancerByUsername(username);
 
   if (!freelancer) {
     redirect("/not-found");
@@ -50,13 +54,13 @@ export default async function page({ params, searchParams }) {
     const reviewsPageSize = reviewsPage * 3;
 
     const { reviews, reviewsMeta } = await getReviewsByFreelancer(
-      uid,
+      freelancerId,
       1,
       reviewsPageSize
     );
 
     const { services, servicesMeta } = await getFeaturedServicesByFreelancer(
-      uid,
+      freelancerId,
       servicesPageSize
     );
 
@@ -72,6 +76,12 @@ export default async function page({ params, searchParams }) {
         : ""
     }`;
 
+    let savedStatus = null;
+
+    if (fid !== freelancerId) {
+      savedStatus = await getSavedStatus("freelancer", freelancerId);
+    }
+
     return (
       <>
         <Tabs
@@ -85,9 +95,12 @@ export default async function page({ params, searchParams }) {
           type={type}
           subcategory={freelancer?.subcategory}
           subjectTitle={emailSubjectTitle}
+          id={freelancerId}
+          savedStatus={savedStatus}
+          hideSaveButton={fid === freelancerId}
         />
         <FreelancerProfile
-          uid={uid}
+          uid={freelancerId}
           username={username}
           freelancer={freelancer}
           services={services}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import BreadcrumbButtons from "../breadcrumbs/freelancer/BreadcrumbButtons";
 
 export default function Breadcrumb({
   parentPathLabel,
@@ -9,12 +10,15 @@ export default function Breadcrumb({
   subdivision,
   plural,
   categoriesRoute,
+  subjectTitle,
+  id,
+  savedStatus,
 }) {
   return (
     <section className="breadcumb-section">
       <div className="container">
         <div className="row">
-          <div className="col-lg-12">
+          <div className="col-sm-8 col-lg-10">
             <div className="breadcumb-style1">
               <div className="breadcumb-list">
                 <Link href="/">Αρχική</Link>
@@ -72,6 +76,17 @@ export default function Breadcrumb({
               </div>
             </div>
           </div>
+          {subjectTitle && (
+            <div className="col-sm-4 col-lg-2">
+              <div className="d-flex align-items-center justify-content-sm-end">
+                <BreadcrumbButtons
+                  subjectTitle={subjectTitle}
+                  id={id}
+                  savedStatus={savedStatus}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
