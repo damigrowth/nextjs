@@ -28,7 +28,10 @@ export default function SaveForm({
 
   if (showDelete) {
     return (
-      <form action={unsaveAction} className="save-button-form">
+      <form
+        action={unsaveAction}
+        className={variant === "heart" && "save-button-form"}
+      >
         <input type="hidden" name="type" value={type} />
         <input type="hidden" name="id" value={id} />
         <button
@@ -75,7 +78,7 @@ export default function SaveForm({
   return (
     <form
       action={saved ? unsaveAction : saveAction}
-      className="save-button-form"
+      className={variant === "heart" && "save-button-form"}
     >
       <input type="hidden" name="type" value={type} />
       <input type="hidden" name="id" value={id} />
