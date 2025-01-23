@@ -27,7 +27,7 @@ export default async function page({ searchParams }) {
     <SavedInfo
       services={saved_services}
       freelancers={saved_freelancers}
-      fid={freelancer.id}
+      fid={freelancer?.id}
     />
   );
 }
