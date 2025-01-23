@@ -159,6 +159,7 @@ const FEATURED_FREELANCERS = gql`
         attributes {
           freelancers {
             data {
+              id
               attributes {
                 username
                 firstName

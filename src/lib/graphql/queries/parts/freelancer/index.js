@@ -242,6 +242,29 @@ const FREELANCER_RELATIONS = gql`
     saved_freelancers {
       data {
         id
+        attributes {
+          username
+          firstName
+          lastName
+          displayName
+          verified
+          topLevel
+          rating
+          reviews_total
+          rate
+          visibility {
+            ...Visibility
+          }
+          image {
+            ...SingleImage
+          }
+          category {
+            ...FreelancerCategory
+          }
+          subcategory {
+            ...FreelancerSubcategoryPartial
+          }
+        }
       }
     }
   }
