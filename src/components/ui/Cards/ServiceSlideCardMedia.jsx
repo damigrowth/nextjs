@@ -12,8 +12,8 @@ import { getBestDimensions } from "@/utils/imageDimensions";
 export default function ServiceSlideCardMedia({ media }) {
   const [showSwiper, setShowSwiper] = useState(false);
 
-  const mediaUrls = media.data.map(
-    (img) => getBestDimensions(img.attributes.formats).url
+  const mediaUrls = media.data.map((img) =>
+    getBestDimensions(img.attributes.formats)
   );
 
   useEffect(() => {
@@ -36,13 +36,13 @@ export default function ServiceSlideCardMedia({ media }) {
             clickable: true,
           }}
         >
-          {mediaUrls.map((url, index) => (
+          {mediaUrls.map((el, index) => (
             <SwiperSlide key={index}>
               <Image
                 height={247}
                 width={331}
                 className="w-100 object-fit-cover"
-                src={url}
+                src={el?.url || "/images/fallback/service.png"}
                 alt="thumbnail"
                 style={{ objectFit: "cover" }}
               />

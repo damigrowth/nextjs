@@ -5,7 +5,7 @@ import FreelancerCard from "../../Cards/FreelancerCard";
 export function FreelancersTab({ freelancers, fid }) {
   return (
     <div className="row">
-      {freelancers.length > 0 ? (
+      {freelancers && freelancers.length > 0 ? (
         freelancers.map(
           (freelancer, i) =>
             freelancer?.username && (
