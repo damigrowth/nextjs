@@ -1,8 +1,9 @@
 import Link from "next/link";
 import React from "react";
 import BreadcrumbButtons from "../breadcrumbs/freelancer/BreadcrumbButtons";
+import { getUserId } from "@/lib/auth/user";
 
-export default function Breadcrumb({
+export default async function Breadcrumb({
   parentPathLabel,
   parentPathLink,
   category,
@@ -14,6 +15,8 @@ export default function Breadcrumb({
   id,
   savedStatus,
 }) {
+  const userId = await getUserId();
+
   return (
     <section className="breadcumb-section">
       <div className="container">
@@ -83,6 +86,7 @@ export default function Breadcrumb({
                   subjectTitle={subjectTitle}
                   id={id}
                   savedStatus={savedStatus}
+                  hideSaveButton={userId === null}
                 />
               </div>
             </div>

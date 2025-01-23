@@ -97,7 +97,7 @@ export default async function page({ params, searchParams }) {
           subjectTitle={emailSubjectTitle}
           id={freelancerId}
           savedStatus={savedStatus}
-          hideSaveButton={fid === freelancerId}
+          hideSaveButton={fid === null || fid === freelancerId}
         />
         <FreelancerProfile
           uid={freelancerId}
