@@ -1,5 +1,6 @@
 "use client";
 
+import Input from "@/components/inputs/Input";
 import { login } from "@/lib/auth";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
@@ -45,30 +46,26 @@ const LoginForm = () => {
   return (
     <form action={formAction}>
       <div className="mb25">
-        <label htmlFor="identifier" className="form-label fw500 dark-color">
-          Email
-        </label>
-        <input
-          className="form-control"
-          type="text"
+        <Input
+          label={"Email"}
+          type="email"
           name="identifier"
           id="identifier"
           placeholder="Το email σου"
           disabled={loading}
+          className={"form-control"}
         />
       </div>
       <div className="mb15">
-        <label htmlFor="password" className="form-label fw500 dark-color">
-          Κωδικός
-        </label>
-        <input
-          className="form-control"
-          id="password"
-          name="password"
+        <Input
+          label={"Κωδικός"}
           type="password"
+          name="password"
+          id="password"
           placeholder="Ο κωδικός σου"
-          minLength={6}
           disabled={loading}
+          minLength={6}
+          className={"form-control"}
         />
       </div>
       <div className="checkbox-style1 d-block d-sm-flex align-items-center justify-content-between mb20">
