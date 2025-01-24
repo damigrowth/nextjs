@@ -28,16 +28,13 @@ export default function SaveForm({
 
   if (showDelete) {
     return (
-      <form
-        action={unsaveAction}
-        className={variant === "heart" && "save-button-form"}
-      >
+      <form action={unsaveAction} className="save-button-form">
         <input type="hidden" name="type" value={type} />
         <input type="hidden" name="id" value={id} />
         <button
           type="submit"
           disabled={isUnsavePending}
-          className="btn bg-white"
+          className="listing-fav fz12 btn"
           style={{ zIndex: 100 }}
         >
           <span
@@ -78,7 +75,8 @@ export default function SaveForm({
   return (
     <form
       action={saved ? unsaveAction : saveAction}
-      className={variant === "heart" && "save-button-form"}
+      // className={variant === "heart" ? "save-button-form" : ""}
+      className={"save-button-form"}
     >
       <input type="hidden" name="type" value={type} />
       <input type="hidden" name="id" value={id} />

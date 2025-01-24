@@ -14,6 +14,8 @@ export default async function FeaturedServiceSliderCard({
 
   const freelancerData = freelancer?.data?.attributes;
 
+  console.log("freelancerData", freelancer);
+
   if (!freelancerData) return null;
 
   const {
@@ -26,20 +28,23 @@ export default async function FeaturedServiceSliderCard({
     reviews_total,
   } = freelancerData;
 
-  const savedStatus = await getSavedStatus("service", id);
+  let savedStatus = null;
+
+  // if user is logged in and is not the same user, show save button
+  if (fid) {
+    savedStatus = await getSavedStatus("service", id);
+  }
 
   return (
     <>
       <div className="listing-style1 default-box-shadow1 bdrs16">
         <div className="list-thumb">
-          {fid && (
-            <SaveFrom
-              type="service"
-              id={id}
-              initialSavedStatus={savedStatus}
-              showDelete={showDelete}
-            />
-          )}
+          <SaveFrom
+            type="service"
+            id={id}
+            initialSavedStatus={savedStatus}
+            showDelete={showDelete}
+          />
           <div className="listing-thumbIn-slider position-relative navi_pagi_bottom_center slider-1-grid">
             <div className="item">
               <Link href={`/s/${slug}`}>
