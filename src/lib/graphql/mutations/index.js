@@ -303,6 +303,20 @@ const UNSAVE_FREELANCER = gql`
   }
 `;
 
+const CREATE_TAG = gql`
+  mutation CreateTag($data: TagInput!) {
+    createTag(data: $data) {
+      data {
+        id
+        attributes {
+          label
+          slug
+        }
+      }
+    }
+  }
+`;
+
 export {
   POST_REVIEW,
   POST_SERVICE,
@@ -326,4 +340,5 @@ export {
   UNSAVE_SERVICE,
   SAVE_FREELANCER,
   UNSAVE_FREELANCER,
+  CREATE_TAG,
 };
