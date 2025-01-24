@@ -1,6 +1,7 @@
 "use client";
 
 import { login } from "@/lib/auth";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 
@@ -76,7 +77,9 @@ const LoginForm = () => {
           <input type="checkbox" defaultChecked="checked" />
           <span className="checkmark" />
         </label> */}
-        <a className="fz14 ff-heading">Ξέχασες τον κωδικό σου?</a>
+        <Link href="/forgot-password" className="fz14 ff-heading">
+          Ξέχασες τον κωδικό σου?
+        </Link>
       </div>
       {formState?.message && (
         <div className="mb20 text-danger">{formState?.message}</div>
