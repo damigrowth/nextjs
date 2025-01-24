@@ -59,10 +59,15 @@ export default function AddServiceForm({ coverage }) {
       <div className="row">
         <div className="col-lg-9">
           <div className="dashboard_title_area">
-            <h2>Δημιουργία Υπηρεσίας</h2>
-            <p className="text">
-              Με αυτή την φόρμα μπορείτε να προσθέσετε καινούργιες υπηρεσίες.
-            </p>
+            {!serviceId && (
+              <>
+                <h2>Δημιουργία Υπηρεσίας</h2>
+                <p className="text">
+                  Με αυτή την φόρμα μπορείτε να προσθέσετε καινούργιες
+                  υπηρεσίες.
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -76,6 +81,8 @@ export default function AddServiceForm({ coverage }) {
           hidden
           readOnly
         />
+        {/* <ServiceInformation />
+        <AddServiceButton isPending={isPending} /> */}
         {step === "info" && <ServiceInformation />}
         {serviceId ? (
           <ServiceSuccess id={serviceId} title={serviceTitle} />
@@ -117,12 +124,14 @@ export default function AddServiceForm({ coverage }) {
               </div>
               {saved.gallery === true && (
                 <div className="d-flex justify-content-center">
-                  {formState.errors && (
-                    <div className="mb10">
-                      <p className="text-danger">{formState.message}</p>
-                    </div>
-                  )}
-                  <AddServiceButton isPending={isPending} />
+                  <div className="text-center">
+                    {formState.errors && (
+                      <div className="mb10">
+                        <p className="text-danger">{formState.message}</p>
+                      </div>
+                    )}
+                    <AddServiceButton isPending={isPending} />
+                  </div>
                 </div>
               )}
             </div>

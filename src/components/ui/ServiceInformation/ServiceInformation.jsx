@@ -24,9 +24,32 @@ export default function ServiceInformation() {
     tagsTerm: "",
   });
 
-  const handleSearch = useCallback((field, term) => {
-    setTaxonomyParams((prev) => ({ ...prev, [`${field}Term`]: term }));
-  }, []);
+  const [noResultsState, setNoResultsState] = useState({
+    category: false,
+    subcategory: false,
+    subdivision: false,
+    tags: false,
+  });
+
+  const handleSearch = useCallback(
+    (field, term) => {
+      // Reset noResults for this field when starting a new search
+      if (term === "") {
+        setNoResultsState((prev) => ({ ...prev, [field]: false }));
+      }
+
+      // Skip if we already know there are no results and adding more characters
+      if (
+        noResultsState[field] &&
+        term.length > taxonomyParams[`${field}Term`].length
+      ) {
+        return;
+      }
+
+      setTaxonomyParams((prev) => ({ ...prev, [`${field}Term`]: term }));
+    },
+    [noResultsState, taxonomyParams]
+  );
 
   const handleSelect = (field, selected) => {
     if (field === "tags") {
@@ -34,7 +57,7 @@ export default function ServiceInformation() {
       setInfo("tags", selected || []);
     } else {
       setInfo(field, {
-        id: Number(selected.id),
+        id: selected.id,
         label: selected.label,
       });
 
@@ -63,8 +86,15 @@ export default function ServiceInformation() {
       variables: {
         categoryTerm: taxonomyParams.categoryTerm,
       },
+      onCompleted: (data) => {
+        setNoResultsState((prev) => ({
+          ...prev,
+          category: data?.categories?.data?.length === 0,
+        }));
+      },
     }
   );
+
   const { data: subcategoriesRes, loading: subcategoriesLoading } = useQuery(
     SUBCATEGORIES_SEARCH,
     {
@@ -72,14 +102,27 @@ export default function ServiceInformation() {
         categoryId: info.category.id,
         subcategoryTerm: taxonomyParams.subcategoryTerm,
       },
+      onCompleted: (data) => {
+        setNoResultsState((prev) => ({
+          ...prev,
+          subcategory: data?.subcategories?.data?.length === 0,
+        }));
+      },
     }
   );
+
   const { data: subdivisionsRes, loading: subdivisionsLoading } = useQuery(
     SUBDIVISIONS_SEARCH,
     {
       variables: {
         subcategoryId: info.subcategory.id,
         subdivisionTerm: taxonomyParams.subdivisionTerm,
+      },
+      onCompleted: (data) => {
+        setNoResultsState((prev) => ({
+          ...prev,
+          subdivision: data?.subdivisions?.data?.length === 0,
+        }));
       },
     }
   );
@@ -111,6 +154,12 @@ export default function ServiceInformation() {
       variables: {
         label: taxonomyParams.tagsTerm,
       },
+      onCompleted: (data) => {
+        setNoResultsState((prev) => ({
+          ...prev,
+          tags: data?.tags?.data?.length === 0,
+        }));
+      },
     }
   );
 
@@ -125,6 +174,11 @@ export default function ServiceInformation() {
     value: tag.id,
     label: tag.label,
   }));
+
+  const subscriptionTypeOptions = [
+    { value: "month", label: "Μηνιαία Συνδρομή" },
+    { value: "year", label: "Ετήσια Συνδρομή" },
+  ];
 
   return (
     <div>
@@ -236,6 +290,7 @@ export default function ServiceInformation() {
                 onSearch={(term) => handleSearch("tags", term)}
                 isMulti={true}
                 isClearable={true}
+                allowNewTerms={true}
               />
             </div>
           </div>
@@ -284,31 +339,25 @@ export default function ServiceInformation() {
                 </div>
               </div>
             )}
-            {/* {type.online && type.subscription && ( */}
-
-            <div className="col-sm-2">
-              <div className="mb20 ">
-                <SelectInputSearch
-                  options={[
-                    { value: "month", label: "Μηνιαία Συνδρομή" },
-                    { value: "year", label: "Ετήσια Συνδρομή" },
-                  ]}
-                  name="subscription-type"
-                  label="Τύπος Συνδρομής"
-                  labelPlural="τύποι συνδρομής"
-                  errors={errors}
-                  isLoading={false}
-                  isSearchable={false}
-                  value={info.subscription_type}
-                  onSelect={(selected) =>
-                    handleSelect("subscription_type", selected)
-                  }
-                  // onSearch={(term) => handleSearch("subscription_type", term)}
-                  // capitalize
-                />
+            {type.online && type.subscription && (
+              <div className="col-sm-2">
+                <div className="mb20 ">
+                  <SelectInputSearch
+                    options={subscriptionTypeOptions}
+                    name="subscription-type"
+                    label="Τύπος Συνδρομής"
+                    labelPlural="τύποι συνδρομής"
+                    errors={errors}
+                    isLoading={false}
+                    isSearchable={false}
+                    value={info.subscription_type}
+                    onSelect={(selected) =>
+                      handleSelect("subscription_type", selected)
+                    }
+                  />
+                </div>
               </div>
-            </div>
-            {/* )} */}
+            )}
           </div>
         </div>
         <button
