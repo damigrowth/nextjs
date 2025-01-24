@@ -1379,7 +1379,7 @@ a {
   outline: none !important;
 }
 
-.save-button-form {
+/* .save-button-form {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1390,11 +1390,23 @@ a {
   width: max-content;
   height: 35px;
   border: 1px solid #e6e6e6;
-}
+} */
 
-.save-button-form button {
+/* .save-button-form button {
   width: 35px;
   height: 35px;
   padding: 0px;
   border-radius: 70px;
+} */
+
+.save-button-form button span {
+  display: flex;
+  width: 10px;
+  height: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.arc-service-card-image-wrapper {
+  width: 30%;
 }
