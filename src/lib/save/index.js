@@ -1,6 +1,6 @@
 "use server";
 
-import { inspect } from "@/utils/inspect";
+import { getUserMe } from "../auth/user";
 import { getData, postData } from "../client/operations";
 import {
   SAVE_FREELANCER,
@@ -11,6 +11,7 @@ import {
   UNSAVE_SERVICE,
 } from "../graphql/mutations";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function getSavedStatus(type, id) {
   const response = await getData(
@@ -26,6 +27,12 @@ export async function getSavedStatus(type, id) {
 }
 
 export async function saveCollectionEntry(prevState, formData) {
+  const me = await getUserMe();
+
+  if (!me.ok) {
+    redirect("/login");
+  }
+
   const type = formData.get("type");
   const id = formData.get("id");
 
@@ -33,6 +40,11 @@ export async function saveCollectionEntry(prevState, formData) {
     type === "service" ? SAVE_SERVICE : SAVE_FREELANCER,
     type === "service" ? { serviceId: id } : { freelancerId: id }
   );
+
+  console.log(type, "TYPE");
+  console.log(id, "ID");
+
+  console.log(response);
 
   if (response.error || response.errors) {
     return {
@@ -55,6 +67,12 @@ export async function saveCollectionEntry(prevState, formData) {
 }
 
 export async function unsaveCollectionEntry(prevState, formData) {
+  const me = await getUserMe();
+
+  if (!me.ok) {
+    redirect("/login");
+  }
+
   const type = formData.get("type");
   const id = formData.get("id");
 

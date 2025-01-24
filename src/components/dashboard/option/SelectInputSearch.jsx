@@ -25,10 +25,16 @@ export default function SelectInputSearch({
   formatSymbols,
   capitalize,
   lowerCase,
+  defaultPlaceholder = "Επιλογή...",
+  defaultEmptyMessage,
+  customStyles,
+  allowNewTerms = false,
+  newTermValue = "new",
 }) {
   const id = Date.now().toString();
   const [isMounted, setIsMounted] = useState(false);
   const [term, setTerm] = useState(defaultValue);
+  const [newTerms, setNewTerms] = useState([]);
 
   const handleSearch = useDebouncedCallback((value) => {
     if (!isMulti) {
@@ -40,66 +46,130 @@ export default function SelectInputSearch({
     } else {
       setTerm(value);
       if (onSearch) {
-        onSearch(value); // Added this line to trigger search for multi-select
+        onSearch(value);
       }
     }
   }, 150);
 
   const handleSelect = (option) => {
     if (isMulti) {
-      const formattedOptions = option.map((opt) => ({
-        id: opt.value,
-        label: opt.label,
-      }));
+      const formattedOptions =
+        option?.map((opt) => ({
+          id: opt.value,
+          label: opt.label,
+          isNewTerm: opt.isNewTerm,
+        })) || [];
       onSelect(formattedOptions);
     } else {
       const formattedOption = option
         ? {
             id: option.value,
             label: option.label,
+            isNewTerm: option.isNewTerm,
           }
         : null;
       onSelect(formattedOption);
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (
+      !allowNewTerms ||
+      !isMulti ||
+      !term ||
+      options.length > 0 ||
+      event.key !== "Enter"
+    )
+      return;
+
+    event.preventDefault();
+    addNewTerm(term);
+    setTerm("");
+  };
+
+  const handleBlur = () => {
+    if (!allowNewTerms || !isMulti || !term || options.length > 0) return;
+
+    addNewTerm(term);
+  };
+
+  const addNewTerm = (termValue) => {
+    const newTerm = {
+      value: newTermValue,
+      label: termValue,
+      isNewTerm: true,
+    };
+
+    setNewTerms((prev) => [...prev, newTerm]);
+    setTerm("");
+
+    const updatedValue = value ? [...value, newTerm] : [newTerm];
+    handleSelect(updatedValue);
+  };
+
   useEffect(() => setIsMounted(true), []);
+
+  const defaultStyles = {
+    control: (base) => ({
+      ...base,
+    }),
+    multiValue: (base) => ({
+      ...base,
+      borderRadius: "8px",
+    }),
+    multiValueLabel: (base) => ({
+      ...base,
+      fontSize: "15px",
+      paddingLeft: "10px",
+    }),
+    valueContainer: (base) => ({
+      ...base,
+      paddingLeft: "0px",
+    }),
+    multiValueRemove: (base) => ({
+      ...base,
+      borderTopRightRadius: "8px",
+      borderBottomRightRadius: "8px",
+    }),
+  };
 
   return isMounted ? (
     <fieldset className="form-style1">
-      <label className="heading-color ff-heading fw500 mb10">{label}</label>
+      {label && (
+        <label className="heading-color ff-heading fw500 mb10">{label}</label>
+      )}
       <Select
         id={id}
         name={name}
         options={options}
-        value={
-          isMulti
-            ? value
-            : value.id === 0
-            ? { id: 0, label: "Επιλογή..." }
-            : value
-        }
+        value={value}
         defaultValue={term}
         isMulti={isMulti}
         isDisabled={isDisabled}
         isLoading={isLoading}
         isClearable={isClearable}
         isSearchable={isSearchable}
-        inputValue={!isMulti ? term : undefined}
-        onInputChange={(newValue) => {
-          handleSearch(newValue);
+        inputValue={term}
+        onInputChange={(newValue, { action }) => {
+          if (action === "input-change") {
+            setTerm(newValue);
+            handleSearch(newValue);
+          }
         }}
-        onChange={(newValue) => {
-          handleSelect(newValue);
-        }}
-        placeholder="Επιλογή..."
-        noOptionsMessage={() => `Δεν βρέθηκαν ${labelPlural}`}
+        onChange={handleSelect}
+        placeholder={defaultPlaceholder}
+        noOptionsMessage={() =>
+          defaultEmptyMessage || `Δεν βρέθηκαν ${labelPlural}`
+        }
         classNamePrefix="select"
         className={
           isMulti
             ? "basic-multi-select select-input"
             : "basic-single select-input"
         }
+        onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
+        styles={customStyles || defaultStyles}
       />
       {errors?.field === name && (
         <div>

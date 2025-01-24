@@ -19,7 +19,7 @@ export default function ServiceSuccess({ id, title }) {
         </p>
         <div className="success-btns">
           <Link
-            href="/manage-services"
+            href="/dashboard/services"
             className="ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3"
           >
             Κατάσταση υπηρεσίας

@@ -4,6 +4,7 @@ import { postData } from "../client/operations";
 import { getFreelancerId } from "../users/freelancer";
 import { POST_SERVICE } from "../graphql/mutations";
 import { uploadMedia } from "../uploads/upload";
+import { createTags } from "../tags";
 
 // Create service
 export async function createService(prevState, formData) {
@@ -26,6 +27,29 @@ export async function createService(prevState, formData) {
     // PARSE SERVICE FIELDS
     const service = parseField("service", "JSON");
 
+    // Separate existing and new tags
+    const existingTags = service.tags
+      .filter((tag) => tag.id !== "new")
+      .map((tag) => tag.id);
+    const newTags = service.tags.filter((tag) => tag.id === "new");
+
+    // Create new tags if any exist
+    let allTagIds = existingTags;
+    if (newTags.length > 0) {
+      const result = await createTags(newTags);
+
+      if (result.error) {
+        return {
+          ...prevState,
+          message: result.message,
+          errors: result.message,
+          data: null,
+        };
+      }
+
+      allTagIds = [...existingTags, ...result.data.map((tag) => tag.id)];
+    }
+
     // UPLOAD MEDIA
     // GET MEDIA IDS
     const files = formData.getAll("media-files");
@@ -46,30 +70,29 @@ export async function createService(prevState, formData) {
     // CREATE SERVICE
     const payload = {
       data: {
+        freelancer: fid,
         type: service.type,
         fixed: service.fixed,
         title: service.title,
         description: service.description,
         price: service.price,
         subscription_type:
-          service.type.subscription === true ? service.subscription_type : null,
+          service.type.subscription === true
+            ? service.subscription_type.id
+            : null,
         time: service.time,
         category: service.category.id,
         subcategory: service.subcategory.id,
         subdivision: service.subdivision.id,
-        // tags: service.tags.map((el) => el.id),
-        freelancer: fid,
+        tags: allTagIds,
         status: 2,
         media: uploadedMedia,
       },
     };
 
-    // console.log("PAYLOAD", payload);
-
-    // const response = await postData("services", payload);
     const response = await postData(POST_SERVICE, payload);
 
-    if (!response?.createService?.data) {
+    if (!response?.data?.createService?.data) {
       return {
         ...prevState,
         message: "Η δημιουργία υπηρεσίας απέτυχε!",
@@ -81,7 +104,7 @@ export async function createService(prevState, formData) {
         ...prevState,
         message: "Η δημιουργία υπηρεσίας ολοκληρώθηκε επιτυχώς!",
         errors: null,
-        data: response.createService.data,
+        data: response.data.createService.data,
       };
     }
   } catch (error) {

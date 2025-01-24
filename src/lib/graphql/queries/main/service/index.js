@@ -156,6 +156,7 @@ const SERVICES_ARCHIVE = gql`
         and: [
           { price: { gte: $min, lte: $max } }
           { time: { lte: $time } }
+          { freelancer: { id: { notNull: true } } }
           {
             or: [
               { category: { slug: { eq: $cat } } }

@@ -10,6 +10,7 @@ import { CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/service";
 import FeaturedServices from "@/components/ui/SingleService/Featured";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import { getSavedStatus } from "@/lib/save";
+import { getFreelancerId } from "@/lib/users/freelancer";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -53,7 +54,13 @@ export default async function page({ params, searchParams }) {
 
     const { categories } = await getData(CATEGORIES);
 
-    const savedStatus = await getSavedStatus("service", serviceId.toString());
+    const fid = await getFreelancerId();
+
+    let savedStatus;
+
+    if (fid) {
+      savedStatus = await getSavedStatus("service", serviceId.toString());
+    }
 
     return (
       <>

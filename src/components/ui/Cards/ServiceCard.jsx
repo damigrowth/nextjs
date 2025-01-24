@@ -6,8 +6,11 @@ import Badges from "@/components/user/Badges";
 import CardReviews from "../Reviews/CardReviews";
 import ServiceCardFile from "./ServiceCardFile";
 import { getBestDimensions } from "@/utils/imageDimensions";
+import SaveForm from "../forms/SaveForm";
+import { getFreelancerId } from "@/lib/users/freelancer";
+import { getSavedStatus } from "@/lib/save";
 
-export default function ServiceCard({ service }) {
+export default async function ServiceCard({ service, fid }) {
   const { title, price, slug, category, subcategory, media, freelancer } =
     service.attributes;
 
@@ -32,24 +35,33 @@ export default function ServiceCard({ service }) {
     reviews_total,
   } = freelancerData;
 
+  let saveStatus = null;
+
+  if (fid) {
+    saveStatus = await getSavedStatus("service", service.id);
+  }
+
   return (
     <div className="data-loading-element listing-style1 list-style d-block d-xl-flex align-items-center">
-      {media.data.length > 1 ? (
-        <ServiceCardFiles
-          media={media?.data?.map((item) => item.attributes)}
-          path={`/s/${slug}`}
-        />
-      ) : (
-        <ServiceCardFile
-          file={media?.data[0]?.attributes}
-          path={`/s/${slug}`}
-        />
-      )}
-
+      <div className="arc-service-card-image-wrapper">
+        {media.data.length > 1 ? (
+          <ServiceCardFiles
+            media={media?.data?.map((item) => item.attributes)}
+            path={`/s/${slug}`}
+          />
+        ) : (
+          <ServiceCardFile
+            file={media?.data[0]?.attributes}
+            path={`/s/${slug}`}
+          />
+        )}
+      </div>
       <div className="list-content flex-grow-1 ms-1 bgc-white">
-        <a className="listing-fav fz12">
-          <span className="far fa-heart" />
-        </a>
+        <SaveForm
+          type="service"
+          initialSavedStatus={saveStatus}
+          id={service.id}
+        />
         <div className="archive-service-card-meta">
           <div>
             <h5 className="list-title">
