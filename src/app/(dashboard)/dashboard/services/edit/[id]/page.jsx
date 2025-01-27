@@ -4,7 +4,7 @@ import { getData } from "@/lib/client/operations";
 import { SERVICE_BY_ID } from "@/lib/graphql/queries/main/service";
 
 export const metadata = {
-  title: "Διαχείρηση Υπηρεσίας",
+  title: "Διαχείριση Υπηρεσίας",
 };
 
 const Wrapper = ({ children, title = "Επεξεργασία Υπηρεσίας" }) => (

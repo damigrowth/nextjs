@@ -145,7 +145,7 @@ export default async function DashboardInfo() {
           <div>
             Συμπλήρωσε τα στοιχεία σου στην{" "}
             <strong>
-              <Link href="/dashboard/profile">Διαχείρηση Προφίλ </Link>
+              <Link href="/dashboard/profile">Διαχείριση Προφίλ </Link>
             </strong>
             για να αποκτήσεις πρόσβαση σε περισσότερες λειτουργίες
           </div>

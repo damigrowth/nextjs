@@ -19,7 +19,7 @@ export default function MyProfileInfo({ freelancer }) {
           </div>
           <div className="col-lg-9">
             <div className="dashboard_title_area">
-              <h2>Διαχείρηση Προφίλ</h2>
+              <h2>Διαχείριση Προφίλ</h2>
               {/* <p className="text">Lorem ipsum dolor sit amet, consectetur.</p> */}
             </div>
           </div>

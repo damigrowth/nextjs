@@ -16,7 +16,7 @@ export default function ServiceFaq({ custom }) {
     >
       {!custom && (
         <div className="bdrb1 ">
-          <h3 className="list-title">Ερωτοαπαντήσεις</h3>
+          <h3 className="list-title">Ερωταπαντήσεις</h3>
           <p>
             Πρόσθεσε κάποιες πιθανές απορίες που έχουν συνήθως οι πελάτες <br />
             σχετικά με την υπηρεσία σου και τις απαντήσεις τους

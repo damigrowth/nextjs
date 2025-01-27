@@ -3,7 +3,7 @@ import ManageServiceInfo from "@/components/dashboard/section/ManageServiceInfo"
 import { getFreelancerId } from "@/lib/users/freelancer";
 
 export const metadata = {
-  title: "Διαχείρηση Υπηρεσιών",
+  title: "Διαχείριση Υπηρεσιών",
 };
 
 export default async function ServicesPage({ searchParams }) {
