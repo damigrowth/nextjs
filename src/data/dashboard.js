@@ -27,7 +27,8 @@ export const dashboardNavigation = [
     id: 5,
     name: "Παραγγελίες",
     icon: "flaticon-web",
-    path: "/dashboard/orders",
+    // path: "/dashboard/orders",
+    path: "#",
   },
   {
     id: 6,
@@ -51,7 +52,8 @@ export const dashboardNavigation = [
     id: 9,
     name: "Παραστατικά",
     icon: "flaticon-receipt",
-    path: "/dashboard/documents",
+    // path: "/dashboard/documents",
+    path: "#",
   },
   {
     id: 10,
@@ -90,7 +92,8 @@ export const hasAccessMainNav = [
     id: 5,
     name: "Παραγγελίες",
     icon: "flaticon-web",
-    path: "/dashboard/orders",
+    // path: "/dashboard/orders",
+    path: "#",
   },
 ];
 
@@ -120,7 +123,8 @@ export const hasAccessAccountNav = [
     id: 1,
     name: "Παραστατικά",
     icon: "flaticon-receipt",
-    path: "/dashboard/documents",
+    // path: "/dashboard/documents",
+    path: "#",
   },
   {
     id: 2,
@@ -165,7 +169,8 @@ export const noAccessMainNav = [
     id: 5,
     name: "Παραγγελίες",
     icon: "flaticon-web",
-    path: "/dashboard/orders",
+    // path: "/dashboard/orders",
+    path: "#",
   },
 ];
 

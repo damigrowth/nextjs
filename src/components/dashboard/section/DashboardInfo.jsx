@@ -93,7 +93,7 @@ export default async function DashboardInfo() {
               </div>
             </div>
             <div className="row">
-              <div className="col-md-6 col-xxl-4">
+              {/* <div className="col-md-6 col-xxl-4">
                 <div className="ps-widget bgc-white bdrs4 p30 mb30 overflow-hidden position-relative">
                   <div className="d-flex justify-content-between bdrb1 pb15 mb20">
                     <h5 className="title">Δημοφιλείς Υπηρεσίες</h5>
@@ -118,13 +118,13 @@ export default async function DashboardInfo() {
                     </div>
                   )}
                 </div>
-              </div>
+              </div> */}
               <div className="col-md-6 col-xxl-4">
                 <div className="ps-widget bgc-white bdrs4 p30 mb30 overflow-hidden position-relative">
                   <div className="d-flex justify-content-between bdrb1 pb15 mb30">
                     <h5 className="title">Τελευταία Μηνύματα</h5>
                     <a className="text-decoration-underline text-thm6">
-                      Περισσότερα
+                      Περισσότερα (Σύντομα)
                     </a>
                   </div>
                   <div className="dashboard-img-service">
