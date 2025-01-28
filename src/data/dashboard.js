@@ -134,10 +134,49 @@ export const hasAccessAccountNav = [
   },
 ];
 
-export const hasAccessAllNav = [
-  ...hasAccessMainNav,
-  ...hasAccessServicesNav,
-  ...hasAccessAccountNav,
+export const hasAccessUserMenuNav = [
+  {
+    id: 1,
+    name: "Πίνακας Ελέγχου",
+    icon: "flaticon-home",
+    path: "/dashboard",
+  },
+  {
+    id: 2,
+    name: "Μηνύματα",
+    icon: "flaticon-chat",
+    path: "#",
+  },
+  {
+    id: 3,
+    name: "Αποθηκευμένα",
+    icon: "flaticon-like",
+    path: "/dashboard/saved",
+  },
+  {
+    id: 0,
+    name: "Διαχείριση Υπηρεσιών",
+    icon: "flaticon-presentation",
+    path: "/dashboard/services",
+  },
+  {
+    id: 1,
+    name: "Προσθήκη Υπηρεσίας",
+    icon: "flaticon-document",
+    path: "/dashboard/services/add",
+  },
+  {
+    id: 0,
+    name: "Διαχείριση Προφιλ",
+    icon: "flaticon-photo",
+    path: "/dashboard/profile",
+  },
+  {
+    id: 2,
+    name: "Αποσύνδεση",
+    icon: "flaticon-logout",
+    path: "/logout",
+  },
 ];
 
 export const noAccessMainNav = [
@@ -189,7 +228,38 @@ export const noAccessAccountNav = [
   },
 ];
 
-export const noAccessAllNav = [...noAccessMainNav, ...noAccessAccountNav];
+export const noAccessUserMenuNav = [
+  {
+    id: 1,
+    name: "Πίνακας Ελέγχου",
+    icon: "flaticon-home",
+    path: "/dashboard",
+  },
+  {
+    id: 2,
+    name: "Μηνύματα",
+    icon: "flaticon-chat",
+    path: "#",
+  },
+  {
+    id: 3,
+    name: "Αποθηκευμένα",
+    icon: "flaticon-like",
+    path: "/dashboard/saved",
+  },
+  {
+    id: 0,
+    name: "Διαχείριση Προφιλ",
+    icon: "flaticon-photo",
+    path: "/dashboard/profile",
+  },
+  {
+    id: 2,
+    name: "Αποσύνδεση",
+    icon: "flaticon-logout",
+    path: "/logout",
+  },
+];
 
 export const invoice = [
   {

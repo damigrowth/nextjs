@@ -1,16 +1,18 @@
+import Link from "next/link";
 import NotificationItem from "./NotificationItem";
 
 export default function FavoritesMenu() {
   return (
     <li className="d-none d-sm-block">
-      <a
+      <Link
+        href="/dashboard/saved"
         className="text-center mr5 text-thm2 dropdown-toggle fz20"
-        type="button"
-        data-bs-toggle="dropdown"
+        // type="button"
+        // data-bs-toggle="dropdown"
       >
         <span className="flaticon-like" />
-      </a>
-      <div className="dropdown-menu">
+      </Link>
+      {/* <div className="dropdown-menu">
         <div className="dboard_notific_dd px30 pt10 pb15">
           <NotificationItem
             image="/images/resource/notif-1.png"
@@ -38,7 +40,7 @@ export default function FavoritesMenu() {
             text2="successfully"
           />
         </div>
-      </div>
+      </div> */}
     </li>
   );
 }

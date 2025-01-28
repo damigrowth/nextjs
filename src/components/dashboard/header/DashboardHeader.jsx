@@ -1,9 +1,8 @@
 import React from "react";
 import HeaderLogo from "./HeaderLogo";
 import ToggleButton from "./ToggleButton";
-import SearchBar from "./SearchBar";
 import HeaderMenus from "./HeaderMenus";
-import MobileSearchButton from "./MobileSearchButton";
+import NavMenu from "@/components/ui/NavMenu";
 
 export default function DashboardHeader() {
   return (
@@ -15,8 +14,11 @@ export default function DashboardHeader() {
               <div className="text-center text-lg-start d-flex align-items-center">
                 <HeaderLogo />
                 <ToggleButton />
-                <MobileSearchButton />
-                <SearchBar />
+                <div className="ml30">
+                  <NavMenu />
+                </div>
+                {/* <MobileSearchButton />
+                <SearchBar /> */}
               </div>
             </div>
             <HeaderMenus />

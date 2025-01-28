@@ -1410,3 +1410,7 @@ a {
 .arc-service-card-image-wrapper {
   width: 30%;
 }
+
+.dropdown-item.disabled {
+  opacity: 0.5;
+}

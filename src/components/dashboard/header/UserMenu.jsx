@@ -1,4 +1,4 @@
-import { hasAccessAllNav, noAccessAllNav } from "@/data/dashboard";
+import { hasAccessUserMenuNav, noAccessUserMenuNav } from "@/data/dashboard";
 import UserMenuLink from "./UserMenuLink";
 import { getAccess, getUser } from "@/lib/auth/user";
 import UserImage from "@/components/user/UserImage";
@@ -10,7 +10,7 @@ export default async function UserMenu({ isMobile }) {
 
   if (user) {
     const hasAccess = await getAccess(["freelancer", "company"]);
-    const allNav = hasAccess ? hasAccessAllNav : noAccessAllNav;
+    const allNav = hasAccess ? hasAccessUserMenuNav : noAccessUserMenuNav;
     return (
       <li className="user_setting">
         <div className="dropdown">

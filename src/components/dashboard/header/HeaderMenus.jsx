@@ -11,7 +11,9 @@ export default function HeaderMenus() {
           <NotificationsMenu />
           <MessagesMenu />
           <FavoritesMenu />
-          <UserMenu />
+          <div className="ml10">
+            <UserMenu />
+          </div>
         </ul>
       </div>
     </div>

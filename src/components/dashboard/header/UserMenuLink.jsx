@@ -9,7 +9,9 @@ export default function UserMenuLink({ item, index }) {
   return (
     <Link
       key={index}
-      className={`dropdown-item ${path === item.path ? "active" : ""}`}
+      className={`dropdown-item ${path === item.path ? "active" : ""} ${
+        item.path === "#" ? "disabled" : ""
+      }`}
       href={item.path}
     >
       <i className={`${item.icon} mr10`} />
