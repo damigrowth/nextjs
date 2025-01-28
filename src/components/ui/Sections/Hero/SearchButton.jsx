@@ -21,7 +21,7 @@ export default function SearchButton() {
 
   return (
     <button
-      className="ud-btn btn-dark w-100 bdrs60"
+      className="ud-btn btn-dark w-100 bdrs60 h-100"
       type="button"
       onClick={handleSearch}
     >

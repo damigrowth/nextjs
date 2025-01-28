@@ -135,7 +135,7 @@ export default function Search() {
             type="text"
             id="searchTerm"
             name="searchTerm"
-            placeholder="Τι υπηρεσία ψάχνετε;"
+            placeholder="Τι υπηρεσία ψάχνεις;"
             className="form-control"
             onFocus={focusDropdown}
             onBlur={blurDropdown}

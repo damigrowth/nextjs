@@ -17,7 +17,7 @@ export default function SearchBar({ categories }) {
           </div>
         </div>
         <div className="col-md-3 col-lg-2 col-xl-3">
-          <div className="text-center text-xl-start">
+          <div className="text-center text-xl-start h-100">
             <SearchButton />
           </div>
         </div>
