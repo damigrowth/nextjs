@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 const Wrapper = ({ children, title = "Επεξεργασία Υπηρεσίας" }) => (
-  <div className="dashboard__content hover-bgc-color">
+  <div className="dashboard__content dashboard-bg">
     <div className="row pb40">
       <div className="col-lg-12">
         <DashboardNavigation />
@@ -19,7 +19,9 @@ const Wrapper = ({ children, title = "Επεξεργασία Υπηρεσίας"
         </div>
       </div>
     </div>
-    <div className="col-lg-12 bgc-white bdrs4 p30 mb30">{children}</div>
+    <div className="col-lg-12 bgc-white bdrs4 p30 mb30 dashboard-bg">
+      {children}
+    </div>
   </div>
 );
 

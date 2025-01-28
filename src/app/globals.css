@@ -1439,3 +1439,7 @@ a {
     display: none;
   }
 }
+
+.dashboard-bg {
+  background-color: #fbf7ed;
+}

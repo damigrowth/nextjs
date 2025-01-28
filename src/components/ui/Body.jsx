@@ -15,7 +15,8 @@ export default function Body({ children }) {
           ? "bgc-thm4 mm-wrapper mm-wrapper--position-left-front"
           : ""
       } ${filtersModalToggled ? "menu-hidden-sidebar-content" : ""} ${
-        path.startsWith("/dashboard") ? "hover-bgc-color" : ""
+        // path.startsWith("/dashboard") ? "hover-bgc-color" : ""
+        path.startsWith("/dashboard") ? "" : ""
       } `}
     >
       {children}

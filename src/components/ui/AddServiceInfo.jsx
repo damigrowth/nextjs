@@ -4,7 +4,7 @@ import DashboardNavigation from "../dashboard/header/DashboardNavigation";
 export default async function AddServiceInfo({ coverage }) {
   return (
     <>
-      <div className="dashboard__content ">
+      <div className="dashboard__content dashboard-bg">
         <div className="row pb40">
           <div className="col-lg-12">
             <DashboardNavigation />
