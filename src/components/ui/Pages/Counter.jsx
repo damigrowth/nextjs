@@ -18,7 +18,7 @@ export default function Counter({ data }) {
                     <li>
                       <div className="timer">
                         <CountUp
-                          decimals={1}
+                          decimals={0}
                           end={item.end}
                           duration={2.75}
                           enableScrollSpy
