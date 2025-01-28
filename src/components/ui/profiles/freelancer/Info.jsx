@@ -93,7 +93,7 @@ export default function Info({
         </div>
 
         <div className="d-grid mt30">
-          <Link href="/contact" className="ud-btn btn-thm">
+          <Link href="#" className="ud-btn btn-thm">
             Επικοινωνία
             <i className="fal fa-arrow-right-long" />
           </Link>
