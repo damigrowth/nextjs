@@ -1003,7 +1003,7 @@ a {
   color: var(--headings-color);
   line-height: 1.3125;
   font-weight: 700;
-  font-size: 2em;
+  font-size: 1.5em;
   margin-top: 0;
   margin-bottom: 0.5rem;
 }
@@ -1413,4 +1413,29 @@ a {
 
 .dropdown-item.disabled {
   opacity: 0.5;
+}
+
+@media (max-width: 992px) {
+  .nav-pills {
+    width: 80%;
+    float: right;
+  }
+}
+@media (max-width: 767px) {
+  .heading-h2 {
+    font-size: 1.3em;
+  }
+  .heading-p {
+    font-size: 14px;
+  }
+  .archives-banner {
+    height: 200px;
+    padding-top: 20px;
+  }
+  .left-top-img {
+    display: none;
+  }
+  .right-bottom-img {
+    display: none;
+  }
 }
