@@ -95,8 +95,8 @@ export default async function Footer() {
                 <div className="row mb-4 mb-lg-5">
                   <div className="col-auto">
                     <div className="contact-info">
-                      <p className="info-title mb-2">Έχετε ερωτήσεις?</p>
-                      <h5 className="info-mail">
+                      <p className="mb-2 text-white">Έχετε ερωτήσεις?</p>
+                      <h5 className="info-mail ">
                         <a
                           className="text-white"
                           href="mailto:contact@doulitsa.gr"
@@ -117,7 +117,7 @@ export default async function Footer() {
             <div className="col-sm-6">
               <div className="text-center text-lg-start">
                 <p className="copyright-text mb-2 mb-md-0 text-white-light ff-heading">
-                  © Doulitsa 2024 All rights reserved.
+                  © Doulitsa 2025 All rights reserved.
                 </p>
               </div>
             </div>

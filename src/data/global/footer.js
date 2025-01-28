@@ -1,5 +1,5 @@
 export const firstColumnLinks = [
-  { attributes: { title: "Η πλατφόρμα", slug: "platform" } },
+  { attributes: { title: "Πλατφόρμα", slug: "about" } },
   { attributes: { title: "Συχνές Ερωτήσεις", slug: "faq" } },
   { attributes: { title: "Επικοινωνία", slug: "contact" } },
   { attributes: { title: "Πολιτική Απορρήτου", slug: "privacy" } },
@@ -33,10 +33,10 @@ export const accountLinks = [
     label: "Εγγραφή",
     slug: "/register",
   },
-  {
-    label: "Καταχώριση Υπηρεσίας",
-    slug: "/add-services",
-  },
+  // {
+  //   label: "Καταχώριση Υπηρεσίας",
+  //   slug: "/add-services",
+  // },
 ];
 
 export const proLinks = [
