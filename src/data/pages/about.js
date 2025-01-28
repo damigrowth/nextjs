@@ -107,34 +107,34 @@ export const data = {
 
     testimonials: [
       {
-        id: "pills-home",
+        id: "dimitris",
         title: "Σας συστήνω ανεπιφύλακτα",
-        text: "“Η επιχείρηση μου είναι μια μικρή ξενοδοχειακή μονάδα. Η Doulitsa με βοηθάει να βρω επαγγελματίες που δεν μπορούσα να προσλάβω σε μόνιμη θέση.”",
+        text: "“Η επιχείρηση μου είναι μια μικρή ξενοδοχειακή μονάδα. Η Doulitsa με βοηθάει να βρίσκω επαγγελματίες που δεν θα μπορούσα να προσλάβω σε μόνιμη θέση.”",
         author: {
           name: "Δημήτρης Κ.",
           category: "Ξενοδόχος",
-          image: "/images/testimonials/1.jpg",
+          image: "/images/testimonials/dimitris140.png",
         },
       },
       {
-        id: "pills-profile",
+        id: "katerina",
         title: "Πολύ καλή δουλειά",
-        text: "“Βρήκα γρήγορα έναν επαγγελματία designer για να μου σχεδιάσει ένα καινούργιο logo.”",
+        text: "“Βρήκα γρήγορα έναν επαγγελματία designer για να μου σχεδιάσει ένα καινούργιο logo και έμεινα απόλυτα ικανοποιημένη!”",
         author: {
-          name: "Manolis S.",
+          name: "Κατερίνα Ζ.",
           category: "Επιχειρηματίας",
-          image: "/images/testimonials/2.jpg",
+          image: "/images/testimonials/katerina140.png",
         },
         active: true,
       },
       {
-        id: "pills-contact",
+        id: "marios",
         title: "Είμαι πολύ ικανοποιημένος",
-        text: "“Μέσα από την πλατφόρμα μπόρεσα να παρουσιάσω όλη τη δουλειά μου και να βρω νέους πελάτες, αλλά και συνεργάτες.”",
+        text: "“Μέσα από την πλατφόρμα σας μπόρεσα να παρουσιάσω όλη τη δουλειά μου και να με εντοπίσουν νέους πελάτες, αλλά και συνεργάτες.”",
         author: {
-          name: "Courtney Henry",
+          name: "Μάριος Θ.",
           category: "Web Developer",
-          image: "/images/testimonials/3.jpg",
+          image: "/images/testimonials/marios140.png",
         },
       },
     ],

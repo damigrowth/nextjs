@@ -23,31 +23,33 @@ export const featuresData = [
 
 export const testimonials = [
   {
-    id: 1,
+    id: "dimitris",
     title: "Σας συστήνω ανεπιφύλακτα",
     comment:
-      "“Η επιχείρηση μου είναι μια μικρή ξενοδοχειακή μονάδα. Η Doulitsa με βοηθάει να βρω επαγγελματίες που δεν μπορούσα να προσλάβω σε μόνιμη θέση.”",
-    image: "/images/testimonials/testimonial-1.png",
+      "“Η επιχείρηση μου είναι μια μικρή ξενοδοχειακή μονάδα. Η Doulitsa με βοηθάει να βρίσκω επαγγελματίες που δεν θα μπορούσα να προσλάβω σε μόνιμη θέση.”",
+
     name: "Δημήτρης Κ.",
     category: "Ξενοδόχος",
+    image: "/images/testimonials/dimitris60.png",
   },
   {
-    id: 2,
+    id: "katerina",
     title: "Πολύ καλή δουλειά",
     comment:
-      "“Βρήκα γρήγορα έναν επαγγελματία designer για να μου σχεδιάσει ένα καινούργιο logo.”",
-    image: "/images/testimonials/testimonial-2.png",
-    name: "Manolis S.",
+      "“Βρήκα γρήγορα έναν επαγγελματία designer για να μου σχεδιάσει ένα καινούργιο logo και έμεινα απόλυτα ικανοποιημένη!”",
+    name: "Κατερίνα Ζ.",
     category: "Επιχειρηματίας",
+    image: "/images/testimonials/katerina60.png",
+    active: true,
   },
   {
-    id: 3,
+    id: "marios",
     title: "Είμαι πολύ ικανοποιημένος",
     comment:
-      "“Μέσα από την πλατφόρμα μπόρεσα να παρουσιάσω όλη τη δουλειά μου και να βρω νέους πελάτες, αλλά και συνεργάτες.”",
-    image: "/images/testimonials/testimonial-3.png",
-    name: "Courtney Henry",
+      "“Μέσα από την πλατφόρμα σας μπόρεσα να παρουσιάσω όλη τη δουλειά μου και να με εντοπίσουν νέους πελάτες, αλλά και συνεργάτες.”",
+    name: "Μάριος Θ.",
     category: "Web Developer",
+    image: "/images/testimonials/marios60.png",
   },
 ];
 
