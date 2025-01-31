@@ -10,17 +10,41 @@ const contactFormSchema = z.object({
   message: z
     .string()
     .min(10, "Το μήνυμα πρέπει να έχει τουλάχιστον 10 χαρακτήρες"),
+  captchaToken: z.string().min(1, "Το reCAPTCHA είναι υποχρεωτικό"),
 });
+
+async function verifyCaptcha(token) {
+  try {
+    const response = await fetch(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
+      }
+    );
+
+    const data = await response.json();
+    return data.success;
+  } catch (error) {
+    console.error("reCAPTCHA verification error:", error);
+    return false;
+  }
+}
 
 export async function submitContactForm(prevState, formData) {
   const name = formData.get("name");
   const email = formData.get("email");
   const message = formData.get("message");
+  const captchaToken = formData.get("captchaToken");
 
   const fields = {
     name,
     email,
     message,
+    captchaToken,
   };
 
   const validationResult = contactFormSchema.safeParse(fields);
@@ -36,8 +60,23 @@ export async function submitContactForm(prevState, formData) {
     };
   }
 
+  // Verify reCAPTCHA
+  const isCaptchaValid = await verifyCaptcha(captchaToken);
+  if (!isCaptchaValid) {
+    return {
+      success: false,
+      message: "Η επαλήθευση reCAPTCHA απέτυχε. Παρακαλώ δοκιμάστε ξανά.",
+    };
+  }
+
   try {
-    const data = await postData(CONTACT, { data: fields });
+    const data = await postData(CONTACT, {
+      data: {
+        name,
+        email,
+        message,
+      },
+    });
 
     if (!data.createEmail?.data?.id) {
       return {

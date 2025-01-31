@@ -47,6 +47,7 @@
     "react-countup": "^6.4.2",
     "react-dom": "19.0.0-rc-14a4699f-20240725",
     "react-dropzone": "^14.2.3",
+    "react-google-recaptcha": "^3.1.0",
     "react-hook-form": "^7.51.2",
     "react-input-mask": "^2.0.4",
     "react-json-view": "^1.21.3",
