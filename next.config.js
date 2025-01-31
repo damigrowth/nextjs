@@ -26,16 +26,6 @@ const nextConfig = {
         destination: "/pros",
         permanent: true,
       },
-      // {
-      //   source: "/register",
-      //   destination: "https://prelaunch.doulitsa.gr/",
-      //   permanent: false,
-      // },
-      {
-        source: "/become-seller",
-        destination: "https://prelaunch.doulitsa.gr/",
-        permanent: false,
-      },
     ];
   },
 };
