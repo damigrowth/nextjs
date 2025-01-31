@@ -18,6 +18,8 @@ import { headers } from "next/headers";
 import { CookiesBanner } from "@/components/ui/banners/CookiesBanner";
 import { getUser } from "@/lib/auth/user";
 import PathChecker from "@/components/ui/PathChecker";
+import NavMenuMobileWrapper from "@/components/ui/NavMenuMobileWrapper";
+import BodyWrapper from "@/components/ui/BodyWrapper";
 
 if (typeof window !== "undefined") {
   import("bootstrap");
@@ -54,7 +56,7 @@ export default async function RootLayout({ children }) {
           </div>
         </div>
         <PathChecker excludes="/dashboard">
-          <NavMenuMobile header={headerData} />
+          <NavMenuMobileWrapper header={headerData} />
         </PathChecker>
         <SpeedInsights />
         <GoogleAnalytics gaId={gaId} />
