@@ -9,146 +9,161 @@ import {
   FORGOT_PASSWORD,
   RESET_PASSWORD,
   LOGIN_USER,
+  EMAIL_CONFIRMATION,
 } from "../graphql/mutations";
 import { postData } from "../client/operations";
 import { loginSchema, registerSchema } from "../validation/auth";
 import { removeToken, setToken } from "./token";
 import { inspect } from "@/utils/inspect";
+import { cookies } from "next/headers";
 
 export async function register(prevState, formData) {
-  try {
-    const type = Number(formData.get("type"));
-    const role = Number(formData.get("role"));
-    const consent = formData.get("consent") === "true";
+  const type = Number(formData.get("type"));
+  const role = Number(formData.get("role"));
+  const consent = formData.get("consent") === "true";
 
-    const userData = {
-      email: formData.get("email"),
-      username: formData.get("username"),
-      password: formData.get("password"),
+  const userData = {
+    email: formData.get("email"),
+    username: formData.get("username"),
+    password: formData.get("password"),
+    consent,
+  };
+
+  // Store registration data in cookies
+  cookies().set(
+    "registration_data",
+    JSON.stringify({
+      type,
+      role,
+      displayName: type === 2 ? formData.get("displayName") : userData.username,
       consent,
-    };
+    })
+  );
 
-    const schema =
-      type === 2
-        ? z.object({ ...registerSchema.base, ...registerSchema.professional })
-        : z.object(registerSchema.base);
+  const result = await postData(REGISTER_USER, {
+    input: {
+      email: userData.email,
+      username: userData.username,
+      password: userData.password,
+    },
+  });
 
-    const validatedFields = schema.safeParse(
-      type === 2
-        ? {
-            ...userData,
-            displayName: formData.get("displayName"),
-            role,
-          }
-        : userData
-    );
+  if (result.error) {
+    return { message: result.error };
+  }
 
-    if (!validatedFields.success) {
-      return {
-        errors: validatedFields.error.flatten().fieldErrors,
-        message: "Λάθος στοιχεία εγγραφής.",
-      };
-    }
+  redirect("/register/success");
+}
 
-    const result = await postData(REGISTER_USER, {
-      input: {
-        email: userData.email,
-        username: userData.username,
-        password: userData.password,
-      },
-    });
+// Complete registration action
+export async function completeRegistration(prevState, formData) {
+  const code = formData.get("code");
 
-    if (result.error) {
-      return { message: result.error };
-    }
+  // First verify email with Strapi
+  const confirmationResult = await postData(EMAIL_CONFIRMATION, {
+    code,
+  });
 
-    const { jwt, user } = result.data.register;
-    const userId = user.id;
-
-    if (type === 1) {
-      const freelancer = await postData(
-        CREATE_FREELANCER,
-        {
-          data: {
-            user: userId,
-            username: userData.username,
-            email: userData.email,
-            displayName: userData.username,
-            type: "3",
-            coverage: {
-              online: true,
-            },
-            publishedAt: new Date().toISOString(),
-          },
-        },
-        jwt
-      );
-
-      const freelancerId = freelancer.data?.createFreelancer?.data?.id;
-
-      await postData(
-        UPDATE_USER,
-        {
-          id: userId,
-          roleId: "1",
-          freelancer: freelancerId,
-          username: userData.username,
-          displayName: userData.username,
-          consent: validatedFields.data.consent,
-        },
-        jwt
-      );
-    } else {
-      // Assign freelancer type based on role
-      const freelancerType = role === 4 ? 1 : 2;
-
-      const freelancer = await postData(
-        CREATE_FREELANCER,
-        {
-          data: {
-            user: userId,
-            username: userData.username,
-            email: userData.email,
-            displayName: validatedFields.data.displayName,
-            type: freelancerType.toString(),
-            coverage: {
-              online: true,
-            },
-            publishedAt: new Date().toISOString(),
-          },
-        },
-        jwt
-      );
-
-      const freelancerId = freelancer.data?.createFreelancer?.data?.id;
-
-      await postData(
-        UPDATE_USER,
-        {
-          id: userId,
-          roleId: role.toString(),
-          freelancer: freelancerId,
-          username: userData.username,
-          displayName: validatedFields.data.displayName,
-          consent: validatedFields.data.consent,
-        },
-        jwt
-      );
-    }
-
-    await setToken(jwt);
+  if (!confirmationResult?.data?.emailConfirmation?.jwt) {
     return {
-      success: true,
-      message: `Καλώς ήρθες ${userData.username}!`,
-      redirect: "/dashboard/profile",
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      errors: {},
-      message: "Server error. Please try again later.",
+      success: false,
+      message: "Σφάλμα ταυτοποίησης, ο σύνδεσμος έχει λήξει.",
     };
   }
+
+  const { jwt, user } = confirmationResult.data.emailConfirmation;
+  const userId = user.id;
+
+  // Get stored registration data
+  const registrationData = JSON.parse(
+    cookies().get("registration_data")?.value || "{}"
+  );
+
+  const { type, role, displayName, consent } = registrationData;
+
+  // Create freelancer profile based on type
+  if (type === 1) {
+    // Regural User type
+
+    const freelancer = await postData(
+      CREATE_FREELANCER,
+      {
+        data: {
+          user: userId,
+          username: user.username,
+          email: user.email,
+          displayName: user.username,
+          type: "3",
+          coverage: {
+            online: true,
+          },
+          publishedAt: new Date().toISOString(),
+        },
+      },
+      jwt
+    );
+
+    const freelancerId = freelancer.data?.createFreelancer?.data?.id;
+
+    await postData(
+      UPDATE_USER,
+      {
+        id: userId,
+        roleId: "1",
+        freelancer: freelancerId,
+        username: user.username,
+        displayName: user.username,
+        consent: consent,
+      },
+      jwt
+    );
+  } else {
+    // Freelancer User type
+    const freelancerType = role === 4 ? 1 : 2;
+
+    const freelancer = await postData(
+      CREATE_FREELANCER,
+      {
+        data: {
+          user: userId,
+          username: user.username,
+          email: user.email,
+          displayName: displayName,
+          type: freelancerType.toString(),
+          coverage: {
+            online: true,
+          },
+          publishedAt: new Date().toISOString(),
+        },
+      },
+      jwt
+    );
+
+    const freelancerId = freelancer.data?.createFreelancer?.data?.id;
+
+    await postData(
+      UPDATE_USER,
+      {
+        id: userId,
+        roleId: role.toString(),
+        freelancer: freelancerId,
+        username: user.username,
+        displayName: displayName,
+        consent: consent,
+      },
+      jwt
+    );
+  }
+
+  // Clean up stored data
+  cookies().delete("registration_data");
+
+  await setToken(jwt);
+  return {
+    success: true,
+    message: `Καλώς ήρθες ${user.username}!`,
+    redirect: true,
+  };
 }
 
 export async function login(prevState, formData) {
