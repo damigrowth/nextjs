@@ -8,7 +8,7 @@ import LogoutLink from "./LogoutLink";
 export default async function UserMenu({ isMobile }) {
   const user = await getUser();
 
-  if (user) {
+  if (user && user.confirmed) {
     const hasAccess = await getAccess(["freelancer", "company"]);
     const allNav = hasAccess ? hasAccessUserMenuNav : noAccessUserMenuNav;
     return (
