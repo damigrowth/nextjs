@@ -6,7 +6,6 @@ export const metadata = {
 };
 
 export default async function page() {
-  const { freelancer } = await getFreelancer();
-
+  const freelancer = await getFreelancer();
   return <MyProfileInfo freelancer={freelancer} />;
 }

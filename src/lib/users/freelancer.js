@@ -21,20 +21,18 @@ export async function getFreelancerId() {
 
 export async function getFreelancer() {
   let freelancer = null;
-  const uid = await getUserId();
+  const user = await getUser();
 
-  const { freelancers } = await getData(FREELANCER_BY_ID, {
-    id: uid,
-  });
+  const freelancerData = user?.freelancer?.data;
 
-  if (freelancers?.data?.length > 0) {
+  if (freelancerData) {
     freelancer = {
-      id: freelancers.data[0].id,
-      ...freelancers.data[0].attributes,
+      id: freelancerData.id,
+      ...freelancerData.attributes,
     };
   }
 
-  return { freelancer };
+  return freelancer;
 }
 
 export async function getFreelancerByUsername(username) {

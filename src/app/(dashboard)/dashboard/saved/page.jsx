@@ -6,7 +6,7 @@ export const metadata = {
 };
 
 export default async function page({ searchParams }) {
-  const { freelancer } = await getFreelancer();
+  const freelancer = await getFreelancer();
   const saved_services =
     freelancer.saved_services.data.length > 0
       ? freelancer.saved_services.data.map((service) => ({
