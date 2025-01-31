@@ -361,6 +361,62 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
     review_dislikes {
       ...ReviewDislikes
     }
+    saved_services {
+      data {
+        id
+        attributes {
+          title
+          slug
+          price
+          rating
+          reviews_total
+          media {
+            ...MultipleFiles
+          }
+          category {
+            data {
+              ...Category
+            }
+          }
+          subcategory {
+            data {
+              ...SubcategoryEntity
+            }
+          }
+          freelancer {
+            ...FreelancerSmall
+          }
+        }
+      }
+    }
+    saved_freelancers {
+      data {
+        id
+        attributes {
+          username
+          firstName
+          lastName
+          displayName
+          verified
+          topLevel
+          rating
+          reviews_total
+          rate
+          visibility {
+            ...Visibility
+          }
+          image {
+            ...SingleImage
+          }
+          category {
+            ...FreelancerCategory
+          }
+          subcategory {
+            ...FreelancerSubcategoryPartial
+          }
+        }
+      }
+    }
   }
   ${SINGLE_IMAGE}
   ${VISIBILITY}
@@ -383,6 +439,9 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
   ${RATING}
   ${REVIEW_LIKES}
   ${REVIEW_DISLIKES}
+  ${CATEGORY}
+  ${SUBCATEGORY_ENTITY}
+  ${FREELANCER_SMALL}
 `;
 
 const FREELANCER_SEO = gql`
