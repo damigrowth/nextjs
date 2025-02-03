@@ -9219,6 +9219,11 @@ li.mm-listitem:focus {
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
+
+#mega-menu ul.menu:not(.active) {
+  pointer-events: none;
+}
+
 @media (max-width: 1199.98px) {
   #mega-menu {
     max-width: 120px;
