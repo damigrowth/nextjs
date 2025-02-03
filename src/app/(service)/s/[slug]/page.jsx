@@ -49,7 +49,7 @@ export default async function page({ params, searchParams }) {
 
   const service = await getServiceById(serviceId);
 
-  if (!service) {
+  if (!service || service?.status?.data?.attributes?.type !== "Active") {
     redirect("/not-found");
   } else {
     let reviewsPage = parseInt(searchParams.reviews, 10);
