@@ -1445,31 +1445,15 @@ a {
 }
 
 .dashboard_footer {
-  /* Height 100px */
+  padding: 30px 60px;
   width: calc(100vw - 300px);
   float: right;
 }
 
+/* Base footer styles */
 .dashboard_footer .link-list {
   display: flex;
   gap: 1rem;
-  /* padding-left: 1.5rem; */
-}
-
-.dashboard_footer .footer-columns {
-  display: flex;
-}
-
-.dashboard_footer .contact-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.dashboard_footer .socials-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .dashboard_footer .footer-info {
@@ -1477,11 +1461,87 @@ a {
   gap: 5rem;
 }
 
+.dashboard_footer .contact-info,
+.dashboard_footer .socials-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .dashboard_footer .footer-logo {
   background-color: transparent;
   opacity: 0.85;
+  transition: opacity 0.3s;
 }
 
 .dashboard_footer .footer-logo:hover {
   opacity: 1;
+}
+
+/* Larger tablets and small laptops */
+@media (max-width: 1200px) {
+  .dashboard_footer .footer-info {
+    gap: 2rem;
+  }
+}
+
+/* Tablets and smaller screens */
+@media (max-width: 980px) {
+  .dashboard_footer {
+    width: 100%;
+    padding: 20px 30px;
+    float: none;
+  }
+
+  .dashboard_footer .link-list {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+}
+
+/* Mobile devices */
+@media (max-width: 768px) {
+  .dashboard_footer {
+    padding: 20px;
+  }
+
+  .dashboard_footer .footer-info {
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+
+  .dashboard_footer .link-list {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .dashboard_footer .contact-info {
+    text-align: left;
+  }
+
+  /* Adjust copyright and logo section */
+  .dashboard_footer .white-bdrt1 .row {
+    flex-direction: column-reverse;
+    gap: 1rem;
+  }
+
+  .dashboard_footer .copyright-text {
+    margin-bottom: 0 !important;
+  }
+
+  .dashboard_footer .mb40 {
+    margin-bottom: 20px;
+  }
+}
+
+/* Very small devices */
+@media (max-width: 480px) {
+  .dashboard_footer {
+    padding: 15px;
+  }
+
+  .dashboard_footer .footer-info {
+    gap: 1.5rem;
+  }
 }
