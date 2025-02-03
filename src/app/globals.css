@@ -1444,6 +1444,20 @@ a {
   background-color: #fbf7ed;
 }
 
+.dashboard-navmenu {
+  margin-left: 30px;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-navmenu {
+    display: none;
+  }
+
+  .dashboard_sidebar_toggle_icon {
+    display: none;
+  }
+}
+
 .dashboard_footer {
   padding: 30px 60px;
   width: calc(100vw - 300px);

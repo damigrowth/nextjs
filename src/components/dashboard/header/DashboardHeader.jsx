@@ -14,7 +14,7 @@ export default function DashboardHeader() {
               <div className="text-center text-lg-start d-flex align-items-center">
                 <HeaderLogo />
                 <ToggleButton />
-                <div className="ml30">
+                <div className="dashboard-navmenu">
                   <NavMenu />
                 </div>
                 {/* <MobileSearchButton />
