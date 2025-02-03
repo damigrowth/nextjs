@@ -49,8 +49,8 @@ const SERVICE_BY_SLUG = gql`
 `;
 
 const SERVICE_PAGE_SEO = gql`
-  query GetServiceSEO($slug: String!) {
-    service: services(filters: { slug: { eq: $slug } }) {
+  query GetServiceSEO($id: ID!) {
+    service(id: $id) {
       data {
         attributes {
           ...ServiceSEO

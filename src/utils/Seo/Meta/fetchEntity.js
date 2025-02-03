@@ -4,10 +4,7 @@ import { getData } from "@/lib/client/operations";
 import { FREELANCER_PAGE_SEO } from "@/lib/graphql/queries/main/freelancer";
 import { SERVICE_PAGE_SEO } from "@/lib/graphql/queries/main/service";
 import { FREELANCERS_ARCHIVE_SEO } from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import {
-  SERVICES_ARCHIVE_SEO,
-  TAXONOMIES_BY_SLUG,
-} from "@/lib/graphql/queries/main/taxonomies/service";
+import { SERVICES_ARCHIVE_SEO } from "@/lib/graphql/queries/main/taxonomies/service";
 
 const ENTITY_QUERIES = {
   service: SERVICE_PAGE_SEO,
@@ -25,7 +22,13 @@ export async function fetchEntity(type, params) {
 
   const data = await getData(query, params);
 
-  const entity = data?.[type]?.data?.[0]?.attributes;
+  let entity = null;
+
+  if (type === "service") {
+    entity = data?.[type]?.data?.attributes;
+  } else {
+    entity = data?.[type]?.data?.[0]?.attributes;
+  }
 
   return { entity };
 }

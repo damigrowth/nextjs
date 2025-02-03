@@ -1,7 +1,11 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import SingleService from "@/components/ui/SingleService/SingleService";
-import { getReviewsByService, getServiceBySlug } from "@/lib/service/service";
+import {
+  getReviewsByService,
+  getServiceById,
+  getServiceBySlug,
+} from "@/lib/service/service";
 import ServiceBreadcrumb from "@/components/ui/breadcrumbs/service/ServiceBreadcrumb";
 import { getData } from "@/lib/client/operations";
 import Tabs from "@/components/ui/Archives/Tabs";
@@ -20,9 +24,12 @@ export const dynamicParams = true;
 export async function generateMetadata({ params }) {
   const { slug } = params;
 
+  const parts = slug.split("-");
+  const serviceId = parts[parts.length - 1];
+
   const data = {
     type: "service",
-    params: { slug },
+    params: { id: serviceId },
     titleTemplate: "%title% από %displayName%",
     descriptionTemplate: "%category% - %description%",
     size: 100,
@@ -37,7 +44,10 @@ export async function generateMetadata({ params }) {
 export default async function page({ params, searchParams }) {
   const { slug } = params;
 
-  const { service, serviceId } = await getServiceBySlug(slug);
+  const parts = slug.split("-");
+  const serviceId = parts[parts.length - 1];
+
+  const service = await getServiceById(serviceId);
 
   if (!service) {
     redirect("/not-found");
@@ -47,7 +57,7 @@ export default async function page({ params, searchParams }) {
     const reviewsPageSize = reviewsPage * 3;
 
     const { reviews, reviewsMeta } = await getReviewsByService(
-      serviceId,
+      service.id,
       1,
       reviewsPageSize
     );
@@ -59,7 +69,7 @@ export default async function page({ params, searchParams }) {
     let savedStatus;
 
     if (fid) {
-      savedStatus = await getSavedStatus("service", serviceId.toString());
+      savedStatus = await getSavedStatus("service", service.id);
     }
 
     return (
@@ -78,12 +88,12 @@ export default async function page({ params, searchParams }) {
             subdivision={service?.subdivision?.data?.attributes}
             categoriesRoute={true}
             subjectTitle={service?.title}
-            id={serviceId}
+            id={service?.id}
             savedStatus={savedStatus}
           />
           <SingleService
             slug={slug}
-            serviceId={serviceId}
+            serviceId={service.id}
             service={service}
             reviews={reviews}
             reviewsPage={reviewsPage}

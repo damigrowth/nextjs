@@ -16,6 +16,7 @@ import FeaturedFile from "./FeaturedFile";
 import ServiceSchema from "@/utils/Seo/Schema/ServiceSchema";
 import Protected from "@/components/auth/Protected";
 import { getUserId } from "@/lib/auth/user";
+import { redirect } from "next/navigation";
 
 export default async function SingleService({
   slug,
@@ -52,6 +53,10 @@ export default async function SingleService({
     type,
     freelancer,
   } = service;
+
+  if (!freelancer?.data?.id) {
+    redirect("/not-found");
+  }
 
   const userId = await getUserId();
 
