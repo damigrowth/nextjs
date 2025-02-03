@@ -48,7 +48,7 @@ export default async function RootLayout({ children }) {
           <div className="body_content">
             <ApolloWrapper>{children}</ApolloWrapper>
             {(!isUnderMaintenance || authenticated) && (
-              <PathChecker>
+              <PathChecker excludes="/dashboard">
                 <Footer />
               </PathChecker>
             )}

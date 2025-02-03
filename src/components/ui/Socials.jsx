@@ -11,7 +11,7 @@ export default function Socials() {
       >
         <i className="fab fa-linkedin-in list-inline-item" />
       </a>
-      <h5 className="text-white mb20">Βρείτε μας στο Linkedin </h5>
+      <h5 className="text-white">Βρείτε μας στο Linkedin </h5>
 
       <div className="social-style1">
         {/* <a>

@@ -1021,7 +1021,8 @@ li {
   border-radius: 4px;
   padding: 60px 60px 20px;
   width: 100%;
-  /* background-color: #fbf7ed; */
+  /* 100vh - header / footer / padding */
+  min-height: calc(100vh - 250px);
 }
 @media (max-width: 767.98px) {
   .dashboard__content {

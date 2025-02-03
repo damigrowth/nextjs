@@ -1443,3 +1443,45 @@ a {
 .dashboard-bg {
   background-color: #fbf7ed;
 }
+
+.dashboard_footer {
+  /* Height 100px */
+  width: calc(100vw - 300px);
+  float: right;
+}
+
+.dashboard_footer .link-list {
+  display: flex;
+  gap: 1rem;
+  /* padding-left: 1.5rem; */
+}
+
+.dashboard_footer .footer-columns {
+  display: flex;
+}
+
+.dashboard_footer .contact-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dashboard_footer .socials-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dashboard_footer .footer-info {
+  display: flex;
+  gap: 5rem;
+}
+
+.dashboard_footer .footer-logo {
+  background-color: transparent;
+  opacity: 0.85;
+}
+
+.dashboard_footer .footer-logo:hover {
+  opacity: 1;
+}
