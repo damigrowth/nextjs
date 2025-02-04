@@ -1,3 +1,4 @@
+// UserMenu.jsx
 import { hasAccessUserMenuNav, noAccessUserMenuNav } from "@/data/dashboard";
 import UserMenuLink from "./UserMenuLink";
 import { getAccess, getUser } from "@/lib/auth/user";
@@ -11,6 +12,18 @@ export default async function UserMenu({ isMobile }) {
   if (user && user.confirmed) {
     const hasAccess = await getAccess(["freelancer", "company"]);
     const allNav = hasAccess ? hasAccessUserMenuNav : noAccessUserMenuNav;
+    const userProfilePath = `/profile/${user.username}`;
+
+    // Modify the nav items to use dynamic profile path or filter out profile for non-access users
+    const modifiedNav = allNav
+      .map((item) => {
+        if (item.path === "/profile") {
+          return hasAccess ? { ...item, path: userProfilePath } : null;
+        }
+        return item;
+      })
+      .filter(Boolean); // Remove null items
+
     return (
       <li className="user_setting">
         <div className="dropdown">
@@ -30,11 +43,19 @@ export default async function UserMenu({ isMobile }) {
           </div>
           <div className="dropdown-menu">
             <div className="user_setting_content">
-              {allNav.map((item, i) => {
+              {modifiedNav.map((item, i) => {
                 if (item.path === "/logout") {
-                  return <LogoutLink item={item} key={i} custom />;
+                  return (
+                    <div key={i}>
+                      <LogoutLink item={item} key={i} custom />
+                    </div>
+                  );
                 } else {
-                  return <UserMenuLink key={i} item={item} index={i} />;
+                  return (
+                    <div key={i}>
+                      <UserMenuLink key={i} item={item} />
+                    </div>
+                  );
                 }
               })}
             </div>
@@ -55,7 +76,7 @@ export default async function UserMenu({ isMobile }) {
           className="login-info mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent"
           href="/register"
         >
-          Εγγραφή
+          Εγγραφή
         </Link>
       </>
     ) : (
