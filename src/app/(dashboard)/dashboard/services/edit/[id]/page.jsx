@@ -1,4 +1,5 @@
 import DashboardNavigation from "@/components/dashboard/header/DashboardNavigation";
+import CancelServiceForm from "@/components/ui/forms/CancelServiceForm";
 import EditServiceForm from "@/components/ui/forms/EditServiceForm";
 import { getData } from "@/lib/client/operations";
 import { SERVICE_BY_ID } from "@/lib/graphql/queries/main/service";
@@ -26,8 +27,9 @@ const Wrapper = ({ children, title = "Επεξεργασία Υπηρεσίας"
 );
 
 export default async function ServiceEditPage({ params }) {
+  const { id } = await params;
   // Check if we have an ID
-  if (!params?.id) {
+  if (!id) {
     return (
       <Wrapper>
         <div className="alert alert-danger">
@@ -38,7 +40,7 @@ export default async function ServiceEditPage({ params }) {
   }
 
   // Fetch service data
-  const { service } = await getData(SERVICE_BY_ID, { id: params.id });
+  const { service } = await getData(SERVICE_BY_ID, { id });
 
   // Check response structure
   if (!service) {
@@ -76,6 +78,7 @@ export default async function ServiceEditPage({ params }) {
       <EditServiceForm
         service={{ id: service.data.id, ...service.data.attributes }}
       />
+      <CancelServiceForm />
     </Wrapper>
   );
 }
