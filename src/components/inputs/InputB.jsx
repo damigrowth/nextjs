@@ -9,8 +9,6 @@ import {
   restrictCapitalLetters,
 } from "@/utils/InputFormats/formats";
 
-import ReactInputMask from "react-input-mask";
-
 export default function InputB({
   label,
   type,
