@@ -15,8 +15,9 @@ const cookieConfig = {
  * @returns {Promise<string|null>}
  */
 export const getToken = async () => {
-  const cookieStore = cookies();
-  return cookieStore.get(TOKEN_NAME)?.value ?? null;
+  const cookieStore = await cookies();
+  const token = cookieStore.get(TOKEN_NAME)?.value ?? null;
+  return token;
 };
 
 /**

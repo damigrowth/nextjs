@@ -18,7 +18,9 @@ export default async function ServicesPage({ searchParams }) {
     );
   }
 
-  const page = Number(searchParams?.page) || 1;
+  const { page: pageNumber } = await searchParams;
+
+  const page = Number(pageNumber) || 1;
 
   return <ManageServiceInfo fid={fid} page={page} />;
 }
