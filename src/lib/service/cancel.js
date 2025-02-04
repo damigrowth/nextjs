@@ -10,9 +10,6 @@ export async function cancelService(prevState, formData) {
   const jwt = await getToken();
   const serviceId = formData.get("service-id");
 
-  console.log("jwt", jwt);
-  console.log("serviceId", serviceId);
-
   const payload = {
     id: serviceId,
     data: {
