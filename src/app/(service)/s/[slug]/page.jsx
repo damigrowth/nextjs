@@ -22,7 +22,7 @@ export const dynamicParams = true;
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
-  const { slug } = params;
+  const { slug } = await params;
 
   const parts = slug.split("-");
   const serviceId = parts[parts.length - 1];
@@ -42,22 +42,25 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function page({ params, searchParams }) {
-  const { slug } = params;
+  const { slug } = await params;
+  const { reviews: searchParamsReviews } = await searchParams;
 
   const parts = slug.split("-");
-  const serviceId = parts[parts.length - 1];
+  const paramsServiceId = parts[parts.length - 1];
 
-  const service = await getServiceById(serviceId);
+  const service = await getServiceById(paramsServiceId);
 
   if (!service || service?.status?.data?.attributes?.type !== "Active") {
     redirect("/not-found");
   } else {
-    let reviewsPage = parseInt(searchParams.reviews, 10);
+    const serviceId = service.id;
+
+    let reviewsPage = parseInt(searchParamsReviews, 10);
     reviewsPage = !reviewsPage || reviewsPage < 1 ? 1 : reviewsPage;
     const reviewsPageSize = reviewsPage * 3;
 
     const { reviews, reviewsMeta } = await getReviewsByService(
-      service.id,
+      serviceId,
       1,
       reviewsPageSize
     );
@@ -69,7 +72,7 @@ export default async function page({ params, searchParams }) {
     let savedStatus;
 
     if (fid) {
-      savedStatus = await getSavedStatus("service", service.id);
+      savedStatus = await getSavedStatus("service", serviceId);
     }
 
     return (
@@ -93,7 +96,7 @@ export default async function page({ params, searchParams }) {
           />
           <SingleService
             slug={slug}
-            serviceId={service.id}
+            serviceId={serviceId}
             service={service}
             reviews={reviews}
             reviewsPage={reviewsPage}

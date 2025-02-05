@@ -9,7 +9,7 @@ export function FreelancersTab({ freelancers, fid }) {
         freelancers.map(
           (freelancer, i) =>
             freelancer?.username && (
-              <div key={i} className="col-sm-6 col-xl-4">
+              <div key={freelancer.username} className="col-sm-6 col-xl-4">
                 <FreelancerCard
                   freelancer={freelancer}
                   fid={fid}

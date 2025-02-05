@@ -9,10 +9,10 @@ export function TabContent({ services, freelancers, fid }) {
       <TabWrapper>
         <TabNavigation />
         <div className="tab-content">
-          <div data-tab="0">
+          <div data-tab="0" key="0">
             <ServicesTab services={services} fid={fid} />
           </div>
-          <div data-tab="1">
+          <div data-tab="1" key="1">
             <FreelancersTab freelancers={freelancers} fid={fid} />
           </div>
         </div>
