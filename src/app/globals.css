@@ -1379,33 +1379,43 @@ a {
   outline: none !important;
 }
 
-/* .save-button-form {
+.save-button-form {
   display: flex;
   justify-content: center;
   align-items: center;
   position: absolute;
   top: 10px;
   right: 10px;
-  border-radius: 70px;
   width: max-content;
+  width: 35px;
   height: 35px;
-  border: 1px solid #e6e6e6;
-} */
+  padding: 0px;
+}
 
-/* .save-button-form button {
+.save-button-form button {
   width: 35px;
   height: 35px;
   padding: 0px;
   border-radius: 70px;
-} */
+  outline: none;
+  border: none;
+  border-color: transparent;
+  background-color: #fff;
+  border: 1px solid #e6e6e6;
+}
 
-.save-button-form button span {
+.save-button-form button:hover {
+  border: 1px solid #5bbb7b;
+  background-color: #fff;
+}
+
+/* .save-button-form button span {
   display: flex;
   width: 10px;
   height: 10px;
   justify-content: center;
   align-items: center;
-}
+} */
 
 .arc-service-card-image-wrapper {
   width: 30%;
