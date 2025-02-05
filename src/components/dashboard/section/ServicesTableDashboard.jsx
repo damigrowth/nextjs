@@ -1,4 +1,3 @@
-// ServicesTable.jsx
 import { getData } from "@/lib/client/operations";
 import { SERVICES_BY_FREELANCER } from "@/lib/graphql/queries/main/service";
 import Pagination1 from "@/components/section/Pagination1";
@@ -41,9 +40,18 @@ export default async function ServicesTableDashboard({ fid, page, pageSize }) {
           </tr>
         </thead>
         <tbody className="t-body">
-          {services.data.map((service, i) => (
-            <ManageServiceCard1 key={service.id || i} service={service} />
-          ))}
+          {services.data.map((service, i) => {
+            if (
+              service.attributes?.status?.data &&
+              service.attributes.status.data.attributes.type !== "Canceled"
+            ) {
+              return (
+                <ManageServiceCard1 key={service.id || i} service={service} />
+              );
+            } else {
+              return null;
+            }
+          })}
         </tbody>
       </table>
       <div className="mt30">
