@@ -76,7 +76,7 @@ export default function SaveForm({
     <form
       action={saved ? unsaveAction : saveAction}
       // className={variant === "heart" ? "save-button-form" : ""}
-      className={"save-button-form"}
+      className={variant === "heart" ? "save-button-form" : ""}
     >
       <input type="hidden" name="type" value={type} />
       <input type="hidden" name="id" value={id} />
