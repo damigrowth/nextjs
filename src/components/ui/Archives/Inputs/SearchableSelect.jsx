@@ -97,7 +97,27 @@ export default function SearchableSelect({
   const maxRetries = 3;
 
   const selectedValue = useMemo(() => {
-    if (!value) return null;
+    if (!value) return isMulti ? [] : null;
+
+    if (isMulti) {
+      // Handle array in data field
+      if (value.data && Array.isArray(value.data)) {
+        return value.data.map((item) => ({
+          value: item.id,
+          label: item.attributes?.name || item.label || "",
+        }));
+      }
+      // Handle direct array
+      if (Array.isArray(value)) {
+        return value.map((item) => ({
+          value: item.id,
+          label: item.attributes?.name || item.label || "",
+        }));
+      }
+      return [];
+    }
+
+    // Single select cases
     if (value.value && value.label) return value;
     if (value.id) {
       return {
@@ -106,7 +126,7 @@ export default function SearchableSelect({
       };
     }
     return null;
-  }, [value]);
+  }, [value, isMulti]);
 
   const loadOptions = async (search, prevOptions, { page }) => {
     const isPaginating = prevOptions?.length > 0;
@@ -142,6 +162,7 @@ export default function SearchableSelect({
         response.data?.map((item) => ({
           value: item.id,
           label: item.attributes.name,
+          data: item.attributes,
         })) || [];
 
       const pagination = response.meta?.pagination;
@@ -184,19 +205,27 @@ export default function SearchableSelect({
 
   const handleSelect = (option) => {
     if (!onSelect) return;
+
     if (isMulti) {
       const formattedOptions =
         option?.map((opt) => ({
           id: opt.value,
-          label: opt.label,
+          attributes: {
+            name: opt.label,
+          },
+          data: opt.data,
           isNewTerm: opt.isNewTerm,
         })) || [];
+
       onSelect(formattedOptions);
     } else {
       const formattedOption = option
         ? {
             id: option.value,
-            label: option.label,
+            attributes: {
+              name: option.label,
+            },
+            data: option.attributes,
             isNewTerm: option.isNewTerm,
           }
         : null;
@@ -268,6 +297,7 @@ export default function SearchableSelect({
     valueContainer: (base) => ({
       ...base,
       paddingLeft: "0px",
+      paddingRight: "0px",
     }),
     multiValueRemove: (base) => ({
       ...base,
