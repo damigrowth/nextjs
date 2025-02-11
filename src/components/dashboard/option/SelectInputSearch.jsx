@@ -16,6 +16,7 @@ export default function SelectInputSearch({
   defaultValue,
   onSearch,
   onSelect,
+  onMenuScrollToBottom,
   isDisabled,
   isLoading,
   isClearable,
@@ -52,6 +53,8 @@ export default function SelectInputSearch({
   }, 150);
 
   const handleSelect = (option) => {
+    if (!onSelect) return;
+
     if (isMulti) {
       const formattedOptions =
         option?.map((opt) => ({
@@ -107,6 +110,16 @@ export default function SelectInputSearch({
     handleSelect(updatedValue);
   };
 
+  const handleMenuScroll = (event) => {
+    const target = event.target;
+    if (
+      onMenuScrollToBottom &&
+      target.scrollHeight - target.scrollTop === target.clientHeight
+    ) {
+      onMenuScrollToBottom();
+    }
+  };
+
   useEffect(() => setIsMounted(true), []);
 
   const defaultStyles = {
@@ -131,6 +144,16 @@ export default function SelectInputSearch({
       borderTopRightRadius: "8px",
       borderBottomRightRadius: "8px",
     }),
+    menu: (base) => ({
+      ...base,
+      position: "absolute",
+      width: "100%",
+      zIndex: 2,
+    }),
+    menuList: (base) => ({
+      ...base,
+      maxHeight: "200px",
+    }),
   };
 
   return isMounted ? (
@@ -141,7 +164,7 @@ export default function SelectInputSearch({
       <Select
         id={id}
         name={name}
-        options={options}
+        options={[...options, ...newTerms]}
         value={value}
         defaultValue={term}
         isMulti={isMulti}
@@ -157,6 +180,7 @@ export default function SelectInputSearch({
           }
         }}
         onChange={handleSelect}
+        onMenuScrollToBottom={onMenuScrollToBottom}
         placeholder={defaultPlaceholder}
         noOptionsMessage={() =>
           defaultEmptyMessage || `Δεν βρέθηκαν ${labelPlural}`
@@ -170,6 +194,13 @@ export default function SelectInputSearch({
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         styles={customStyles || defaultStyles}
+        components={{
+          MenuList: ({ children, ...props }) => (
+            <div {...props} onScroll={handleMenuScroll}>
+              {children}
+            </div>
+          ),
+        }}
       />
       {errors?.field === name && (
         <div>

@@ -86,6 +86,7 @@ export default function SearchableSelect({
   allowNewTerms = false,
   newTermValue = "new",
   ariaLabel,
+  maxSelections,
 }) {
   const [isMounted, setIsMounted] = useState(false);
   const [loadingStates, setLoadingStates] = useState({
@@ -100,29 +101,35 @@ export default function SearchableSelect({
     if (!value) return isMulti ? [] : null;
 
     if (isMulti) {
-      // Handle array in data field
       if (value.data && Array.isArray(value.data)) {
         return value.data.map((item) => ({
           value: item.id,
-          label: item.attributes?.name || item.label || "",
+          label:
+            item.attributes?.name || item.attributes?.label || item.label || "",
+          data: item, // Preserve the full item
         }));
       }
-      // Handle direct array
       if (Array.isArray(value)) {
         return value.map((item) => ({
           value: item.id,
-          label: item.attributes?.name || item.label || "",
+          label:
+            item.attributes?.name || item.attributes?.label || item.label || "",
+          data: item, // Preserve the full item
         }));
       }
       return [];
     }
 
-    // Single select cases
     if (value.value && value.label) return value;
     if (value.id) {
       return {
         value: value.id,
-        label: value.label || value.attributes?.name || "",
+        label:
+          value.label ||
+          value.attributes?.name ||
+          value.attributes?.label ||
+          "",
+        data: value, // Preserve the full item
       };
     }
     return null;
@@ -161,8 +168,9 @@ export default function SearchableSelect({
       const options =
         response.data?.map((item) => ({
           value: item.id,
-          label: item.attributes.name,
-          data: item.attributes,
+          label:
+            item.attributes.name || item.attributes.label || item.label || "",
+          data: item, // Keep the complete item
         })) || [];
 
       const pagination = response.meta?.pagination;
@@ -210,25 +218,27 @@ export default function SearchableSelect({
       const formattedOptions =
         option?.map((opt) => ({
           id: opt.value,
-          attributes: {
-            name: opt.label,
-          },
-          data: opt.data,
+          attributes: opt.data.attributes,
+          data: opt.data, // Keep the complete item
           isNewTerm: opt.isNewTerm,
         })) || [];
 
-      onSelect(formattedOptions);
+      // Only limit if maxSelections is provided
+      const limitedOptions = maxSelections
+        ? formattedOptions.slice(0, maxSelections)
+        : formattedOptions;
+
+      onSelect(limitedOptions);
     } else {
       const formattedOption = option
         ? {
             id: option.value,
-            attributes: {
-              name: option.label,
-            },
-            data: option.attributes,
+            attributes: option.data.attributes,
+            data: option.data, // Keep the complete item
             isNewTerm: option.isNewTerm,
           }
         : null;
+
       onSelect(formattedOption);
     }
   };
@@ -328,6 +338,12 @@ export default function SearchableSelect({
       {label && (
         <label htmlFor={name} className="heading-color ff-heading fw500 mb10">
           {label}
+          {maxSelections && value?.data?.length > 0 && (
+            <span className="text-sm text-muted ml-2">
+              {" "}
+              ({value.data.length}/{maxSelections})
+            </span>
+          )}
         </label>
       )}
       <AsyncPaginate
