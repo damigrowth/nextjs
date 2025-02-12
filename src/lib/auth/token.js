@@ -16,7 +16,7 @@ const cookieConfig = {
  */
 export const getToken = async () => {
   const cookieStore = await cookies();
-  const token = cookieStore.get(TOKEN_NAME)?.value ?? null;
+  const token = (await cookieStore.get(TOKEN_NAME)?.value) ?? null;
   return token;
 };
 
@@ -35,32 +35,22 @@ export const isAuthenticated = async () => {
  * @param {Object} options - Optional cookie configuration overrides
  */
 export const setToken = async (token, options = {}) => {
-  try {
-    const cookieStore = cookies();
-    cookieStore.set(TOKEN_NAME, token, {
-      ...cookieConfig,
-      ...options,
-    });
-  } catch (error) {
-    console.error("Error setting auth token:", error);
-    throw error;
-  }
+  const cookieStore = await cookies();
+  await cookieStore.set(TOKEN_NAME, token, {
+    ...cookieConfig,
+    ...options,
+  });
 };
 
 /**
  * Remove the JWT token from cookies
  */
 export const removeToken = async () => {
-  try {
-    const cookieStore = cookies();
-    cookieStore.set(TOKEN_NAME, "", {
-      ...cookieConfig,
-      maxAge: 0,
-    });
-  } catch (error) {
-    console.error("Error removing auth token:", error);
-    throw error;
-  }
+  const cookieStore = await cookies();
+  await cookieStore.set(TOKEN_NAME, "", {
+    ...cookieConfig,
+    maxAge: 0,
+  });
 };
 
 /**

@@ -12,6 +12,7 @@ import { print } from "graphql/language/printer";
 import { cache } from "react";
 import { getToken } from "../auth/token";
 import { CACHE_CONFIG } from "../cache/config";
+import { normalizeQuery } from "@/utils/queries";
 
 export async function fetchWithRetry(url, options, retries = 3, backoff = 300) {
   for (let i = 0; i < retries; i++) {
@@ -72,7 +73,7 @@ export const getData = cache(
     validateEnvVars();
     const token = await getToken();
 
-    const queryString = typeof query === "string" ? query : print(query);
+    const queryString = normalizeQuery(query);
     const cacheConfig = CACHE_CONFIG[cacheKey] || {};
     const { key, ttl } = cacheConfig;
 
@@ -188,5 +189,49 @@ export const putData = async (mutation, variables) => {
       console.log("Network Error:", error.networkError);
     }
     console.log("Failed to put GraphQL data!", error);
+  }
+};
+
+/**
+ * Generic search function for Strapi collections with pagination
+ * @param {Object|string} query - GraphQL query
+ * @param {string} searchTerm - Search term
+ * @param {number} page - Page number
+ * @param {number} pageSize - Items per page
+ * @param {Object} additionalVariables - Any additional variables needed for the query
+ */
+export const searchData = async ({
+  query,
+  searchTerm,
+  page = 1,
+  pageSize = 10,
+  additionalVariables = {},
+  searchTermType = "name",
+}) => {
+  try {
+    const response = await getData(query, {
+      [searchTermType]: searchTerm || "",
+      ...additionalVariables,
+    });
+
+    // Get the collection name from the first key of the response
+    const collectionKey = Object.keys(response)[0];
+    const collection = response[collectionKey];
+
+    return {
+      data: collection?.data || [],
+      meta: collection?.meta,
+    };
+  } catch (error) {
+    console.error("Error searching collection:", error);
+    return {
+      data: [],
+      meta: {
+        pagination: {
+          page,
+          pageSize,
+        },
+      },
+    };
   }
 };
