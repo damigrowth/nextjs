@@ -17,8 +17,8 @@ import { ORDERS } from "../../fragments/entities/order";
 import { SKILLS } from "../../fragments/entities/skill";
 import { SIZE } from "../../fragments/entities/size";
 import { SPECIALISATIONS } from "../../fragments/entities/specialisation";
-import { MIN_BUDGETS } from "../../fragments/entities/budget";
-import { INDUSTRIES } from "../../fragments/entities/industry";
+import { MIN_BUDGETS_ENTITY } from "../../fragments/entities/budget";
+import { INDUSTRIES_ENTITY } from "../../fragments/entities/industry";
 import { MULTIPLE_FILES, SINGLE_IMAGE } from "../../fragments/global";
 import { RATING } from "../../fragments/entities/rating";
 import { VISIBILITY } from "../../fragments/components/global";
@@ -280,8 +280,8 @@ const FREELANCER_RELATIONS = gql`
   ${FREELANCER_SUBCATEGORY_PARTIAL}
   ${SIZE}
   ${SPECIALISATIONS}
-  ${MIN_BUDGETS}
-  ${INDUSTRIES}
+  ${MIN_BUDGETS_ENTITY}
+  ${INDUSTRIES_ENTITY}
   ${CONTACT_TYPES}
   ${PAYMENT_METHOD}
   ${SETTLEMENT_METHOD}
@@ -430,8 +430,8 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
   ${FREELANCER_SUBCATEGORY_PARTIAL}
   ${SIZE}
   ${SPECIALISATIONS}
-  ${MIN_BUDGETS}
-  ${INDUSTRIES}
+  ${MIN_BUDGETS_ENTITY}
+  ${INDUSTRIES_ENTITY}
   ${CONTACT_TYPES}
   ${PAYMENT_METHOD}
   ${SETTLEMENT_METHOD}

@@ -86,3 +86,5 @@ export async function updateAccountInfo(prevState, formData) {
   };
 }
 
+export async function updateBasicInfo(prevState, formData) {}
+

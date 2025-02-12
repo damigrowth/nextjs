@@ -266,6 +266,66 @@ const FREELANCERS_ARCHIVE_ALL = gql`
   }
 `;
 
+const FREELANCER_PROFILE_CATEGORIES = gql`
+  query FreelancerProfileCategories(
+    $label: String
+    $categoriesPage: Int
+    $categoriesPageSize: Int
+  ) {
+    freelancerCategories(
+      filters: { label: { containsi: $label } }
+      pagination: { page: $categoriesPage, pageSize: $categoriesPageSize }
+      sort: "label:asc"
+    ) {
+      data {
+        id
+        attributes {
+          label
+          plural
+          slug
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+`;
+
+const FREELANCER_PROFILE_SUBCATEGORIES = gql`
+  query FreelancerProfileCategories(
+    $label: String
+    $categorySlug: String
+    $type: String
+    $subcategoriesPage: Int
+    $subcategoriesPageSize: Int
+  ) {
+    freelancerSubcategories(
+      filters: {
+        label: { containsi: $label }
+        category: { slug: { eq: $categorySlug } }
+        type: { slug: { eq: $type } }
+      }
+      pagination: { page: $subcategoriesPage, pageSize: $subcategoriesPageSize }
+      sort: "label:asc"
+    ) {
+      data {
+        id
+        attributes {
+          label
+          plural
+          slug
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+`;
+
 export {
   FREELANCER_CATEGORIES,
   FREELANCER_CATEGORIES_SEARCH,
@@ -276,4 +336,6 @@ export {
   FREELANCER_CATEGORIES_SEARCH_FILTERED,
   FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
   FREELANCERS_ARCHIVE_ALL,
+  FREELANCER_PROFILE_CATEGORIES,
+  FREELANCER_PROFILE_SUBCATEGORIES,
 };
