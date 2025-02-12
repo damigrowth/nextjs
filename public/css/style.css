@@ -6202,6 +6202,10 @@ textarea {
   padding: 25px 20px;
 }
 
+textarea:focus-visible {
+  outline: none;
+}
+
 .form-control {
   border-radius: 8px;
   border: 2px solid transparent;
@@ -9596,6 +9600,13 @@ li.mm-listitem:focus {
 .navtab-style2 .nav-tabs {
   border-bottom: none;
 }
+
+/* .navtab-style1 .nav-with-bg {
+  background-color: #ffffff;
+  border-radius: 5px;
+  padding: 0rem 1rem;
+  width: fit-content;
+} */
 
 .dark-light-navtab {
   position: relative;
