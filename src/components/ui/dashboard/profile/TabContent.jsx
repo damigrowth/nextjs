@@ -21,7 +21,7 @@ export async function TabContent() {
     {
       index: 1,
       label: "Βασικά Στοιχεία",
-      content: <BasicInfoForm type={type} />,
+      content: <BasicInfoForm freelancer={freelancer} type={type} />,
     },
 
     {

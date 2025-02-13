@@ -1,6 +1,18 @@
 import { data } from "@/data/pages/about";
 import { create } from "zustand";
 
+const initialCoverage = {
+  online: false,
+  onsite: false,
+  onbase: false,
+  address: "",
+  county: { data: null },
+  area: { data: null },
+  zipcode: { data: null },
+  counties: { data: [] },
+  areas: { data: [] },
+};
+
 const useEditProfileStore = create((set) => ({
   // Basic Information
   currentTab: 0,
@@ -121,17 +133,7 @@ const useEditProfileStore = create((set) => ({
   skills: { data: [] },
   setSkills: (value) => set(() => ({ skills: value })),
 
-  coverage: {
-    online: false,
-    onsite: false,
-    onbase: false,
-    address: "",
-    county: { data: null },
-    area: { data: null },
-    zipcode: { data: null },
-    counties: { data: [] },
-    areas: { data: [] },
-  },
+  coverage: initialCoverage,
   setCoverage: (field, value) =>
     set((state) => ({
       coverage: {
@@ -139,6 +141,83 @@ const useEditProfileStore = create((set) => ({
         [field]: value,
       },
     })),
+
+  // Single method to handle all coverage mode switches
+  switchCoverageMode: (mode, freelancerCoverage) =>
+    set((state) => {
+      const newValue = !state.coverage[mode];
+
+      // Online mode logic
+      if (mode === "online") {
+        if (newValue) {
+          return {
+            coverage: {
+              ...initialCoverage,
+              online: true,
+            },
+          };
+        } else {
+          return {
+            coverage: {
+              ...state.coverage,
+              online: false,
+            },
+          };
+        }
+      }
+
+      // Onbase logic
+      if (mode === "onbase") {
+        if (newValue) {
+          return {
+            coverage: {
+              ...state.coverage,
+              online: false,
+              onbase: true,
+              address: freelancerCoverage.address,
+              zipcode: freelancerCoverage.zipcode,
+              county: freelancerCoverage.county,
+              area: freelancerCoverage.area,
+            },
+          };
+        } else {
+          return {
+            coverage: {
+              ...state.coverage,
+              onbase: false,
+              address: initialCoverage.address,
+              area: initialCoverage.area,
+              county: initialCoverage.county,
+              zipcode: initialCoverage.zipcode,
+            },
+          };
+        }
+      }
+
+      // Onsite logic
+      if (mode === "onsite") {
+        if (newValue) {
+          return {
+            coverage: {
+              ...state.coverage,
+              online: false,
+              onsite: true,
+              areas: freelancerCoverage.areas,
+              counties: freelancerCoverage.counties,
+            },
+          };
+        } else {
+          return {
+            coverage: {
+              ...state.coverage,
+              onsite: false,
+              areas: initialCoverage.areas,
+              counties: initialCoverage.counties,
+            },
+          };
+        }
+      }
+    }),
 
   type: { data: null },
   setType: (value) => set(() => ({ type: value })),

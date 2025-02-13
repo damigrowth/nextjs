@@ -21,8 +21,9 @@ import {
   FREELANCER_PROFILE_CATEGORIES,
   FREELANCER_PROFILE_SUBCATEGORIES,
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import Alert from "../../alerts/Alert";
 
-export default function BasicInfoForm({ type }) {
+export default function BasicInfoForm({ freelancer, type }) {
   const {
     image,
     setImage,
@@ -40,6 +41,7 @@ export default function BasicInfoForm({ type }) {
     setCommencement,
     coverage,
     setCoverage,
+    switchCoverageMode,
   } = useEditProfileStore();
 
   const initialState = {
@@ -146,37 +148,88 @@ export default function BasicInfoForm({ type }) {
   );
 
   const handleOnlineSwitch = () => {
-    setCoverage("online", !coverage.online);
-    setCoverage("onbase", false);
-    setCoverage("onsite", false);
+    switchCoverageMode("online", freelancer.coverage);
   };
+
   const handleOnbaseSwitch = () => {
-    setCoverage("onbase", !coverage.onbase);
-    setCoverage("online", false);
+    switchCoverageMode("onbase", freelancer.coverage);
   };
+
   const handleOnsiteSwitch = () => {
-    setCoverage("onsite", !coverage.onsite);
-    setCoverage("online", false);
+    switchCoverageMode("onsite", freelancer.coverage);
   };
 
   // Check for form changes
-  const hasChanges = useCallback(() => {
-    // TODO: Implement proper change detection
-    return true;
-  }, []);
+  const getChangedFields = () => {
+    const changes = {};
 
-  console.log("category: =>>>>", category);
+    if (image !== freelancer.image) {
+      changes.image = image;
+    }
+    if (tagline !== freelancer.tagline) {
+      changes.tagline = tagline;
+    }
+    if (description !== freelancer.description) {
+      changes.description = description;
+    }
+    if (category.data?.id !== freelancer.category.data?.id) {
+      changes.category = category;
+    }
+    if (subcategory.data?.id !== freelancer.subcategory.data?.id) {
+      changes.subcategory = subcategory;
+    }
+    if (rate !== freelancer.rate) {
+      changes.rate = Number(rate);
+    }
+    if (commencement !== freelancer.commencement) {
+      changes.commencement = Number(commencement);
+    }
+
+    // Check if coverage changed
+    const hasCoverageChanges =
+      JSON.stringify(coverage) !== JSON.stringify(freelancer.coverage);
+    if (hasCoverageChanges) {
+      changes.coverage = coverage;
+    }
+
+    return changes;
+  };
+
+  const hasChanges = () => {
+    return Object.keys(getChangedFields()).length > 0;
+  };
+
+  const handleSubmit = async (formData) => {
+    const changedFields = getChangedFields();
+    formData.append("id", freelancer.id);
+
+    // Special handling for image file
+    if (changedFields.image) {
+      formData.append("image", changedFields.image);
+      // Remove image from changedFields as we're handling it separately
+      delete changedFields.image;
+    }
+
+    formData.append("changes", JSON.stringify(changedFields));
+    return formAction(formData);
+  };
+
+  console.log("image", image);
+  console.log("freelancer image", freelancer.image);
+  // console.log("onbase:=>", coverage.onbase);
+  // console.log("onsite:=>", coverage.onsite);
 
   return (
-    <form action={formAction}>
+    <form action={handleSubmit}>
       <div className="form-style1">
         <div className="bdrb1 pb15 mb25">
           <h5 className="list-title heading">Βασικά Στοιχεία</h5>
         </div>
+        <label className="form-label fw500 dark-color">Εικόνα Προφιλ</label>
         <ProfileImageInput
-          value={image}
+          image={image?.data?.attributes?.formats?.thumbnail?.url}
           onChange={setImage}
-          error={formState.errors.image}
+          errors={formState?.errors?.image}
         />
 
         <div className="mb10 col-md-6">
@@ -188,7 +241,7 @@ export default function BasicInfoForm({ type }) {
             value={tagline}
             onChange={setTagline}
             className="form-control input-group"
-            error={formState.errors.tagline}
+            errors={formState?.errors?.tagline}
           />
         </div>
 
@@ -202,7 +255,7 @@ export default function BasicInfoForm({ type }) {
             counter
             value={description}
             onChange={setDescription}
-            error={formState.errors.description}
+            errors={formState?.errors?.description}
           />
         </div>
         <div className="row mb20">
@@ -225,6 +278,7 @@ export default function BasicInfoForm({ type }) {
               isClearable={true}
               formatSymbols
               capitalize
+              errors={formState?.errors?.category}
             />
           </div>
           <div className="col-md-3">
@@ -246,6 +300,7 @@ export default function BasicInfoForm({ type }) {
               formatSymbols
               capitalize
               key={`freelancerSubcategories-${category.data?.id}`}
+              errors={formState?.errors?.subcategory}
             />
           </div>
         </div>
@@ -265,7 +320,7 @@ export default function BasicInfoForm({ type }) {
               className="form-control input-group"
               append="€"
               formatSymbols
-              error={formState.errors.rate}
+              errors={formState?.errors?.rate}
             />
           </div>
           <div className="mb10 col-sm-2">
@@ -280,7 +335,7 @@ export default function BasicInfoForm({ type }) {
               onChange={setCommencement}
               className="form-control input-group"
               formatSymbols
-              error={formState.errors.commencement}
+              errors={formState?.errors?.commencement}
             />
           </div>
         </div>
@@ -315,6 +370,13 @@ export default function BasicInfoForm({ type }) {
                 onChange={handleOnsiteSwitch}
               />
             </div>
+            {formState?.errors?.coverage ? (
+              <div>
+                <p className="text-danger mb0 pb0">
+                  {formState.errors.coverage.message}
+                </p>
+              </div>
+            ) : null}
           </div>
           {coverage.onbase && (
             <div className="row mb10">
@@ -324,10 +386,10 @@ export default function BasicInfoForm({ type }) {
                   id="address"
                   name="address"
                   type="text"
-                  value={coverage.address}
+                  value={coverage.address || ""}
                   onChange={(value) => setCoverage("address", value)}
                   className="form-control input-group"
-                  error={formState.errors.address}
+                  errors={formState?.errors?.address}
                 />
               </div>
               <div className="col-md-3">
@@ -358,6 +420,7 @@ export default function BasicInfoForm({ type }) {
                   isClearable={true}
                   formatSymbols
                   capitalize
+                  errors={formState?.errors?.zipcode}
                 />
               </div>
               <div className="col-md-3">
@@ -368,6 +431,7 @@ export default function BasicInfoForm({ type }) {
                   isDisabled={true}
                   formatSymbols
                   capitalize
+                  errors={formState?.errors?.area}
                 />
               </div>
               <div className="col-md-3">
@@ -380,6 +444,7 @@ export default function BasicInfoForm({ type }) {
                   isDisabled={true}
                   formatSymbols
                   capitalize
+                  errors={formState?.errors?.county}
                 />
               </div>
             </div>
@@ -416,6 +481,7 @@ export default function BasicInfoForm({ type }) {
                   isClearable={true}
                   formatSymbols
                   capitalize
+                  errors={formState?.errors?.counties}
                 />
               </div>
               <div className="col-md-3">
@@ -441,24 +507,30 @@ export default function BasicInfoForm({ type }) {
                   capitalize
                   // Force re-mount
                   key={coverage.counties.data.map((c) => c.id).join("-")}
+                  errors={formState?.errors?.areas}
                 />
               </div>
             </div>
           )}
         </div>
 
+        {formState?.errors && (
+          <Alert
+            type="error"
+            message={formState.errors?.submit}
+            className="mt-3"
+          />
+        )}
+
+        {formState?.message && !formState?.errors?.submit && (
+          <Alert type="success" message={formState.message} className="mt-3" />
+        )}
+
         <SaveButton
+          orientation="end"
           isPending={isPending}
           hasChanges={hasChanges()}
-          orientation="end"
         />
-
-        {formState.errors.submit && (
-          <div className="mt10 text-error">{formState.errors.submit}</div>
-        )}
-        {formState.message && !formState.errors.submit && (
-          <div className="mt10 text-success">{formState.message}</div>
-        )}
       </div>
     </form>
   );
