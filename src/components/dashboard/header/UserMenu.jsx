@@ -33,7 +33,10 @@ export default async function UserMenu({ isMobile }) {
               lastName={user.lastName}
               displayName={user.displayName}
               hideDisplayName
-              image={user?.image?.formats?.thumbnail?.url}
+              image={
+                user?.freelancer?.data?.attributes?.image?.data?.attributes
+                  ?.formats?.thumbnail?.url
+              }
               alt={
                 user?.image?.formats?.thumbnail?.provider_metadata?.public_id
               }
