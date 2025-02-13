@@ -56,16 +56,15 @@ export default function AccountForm({ freelancer }) {
     return Object.keys(getChangedFields()).length > 0;
   };
 
+  const handleSubmit = async (formData) => {
+    const changedFields = getChangedFields();
+    formData.append("id", freelancer.id);
+    formData.append("changes", JSON.stringify(changedFields));
+    return formAction(formData);
+  };
+
   return (
-    <form
-      action={async (formData) => {
-        const changedFields = getChangedFields();
-        formData.append("id", freelancer.id);
-        formData.append("changes", JSON.stringify(changedFields));
-        return formAction(formData);
-      }}
-      className="ps-widget bdrs4 position-relative"
-    >
+    <form action={handleSubmit} className="ps-widget bdrs4 position-relative">
       <div className="form-style1">
         <div className="bdrb1 pb15 mb25">
           <h5 className="list-title heading">Λογαριασμός</h5>

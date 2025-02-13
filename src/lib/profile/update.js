@@ -4,27 +4,7 @@ import { z } from "zod";
 import { postData } from "../client/operations";
 import { UPDATE_FREELANCER } from "../graphql/mutations";
 import { revalidatePath } from "next/cache";
-
-const accountSchema = z.object({
-  displayName: z
-    .string()
-    .min(2, "Το όνομα προβολής πρέπει να έχει τουλάχιστον 2 χαρακτήρες")
-    .max(50, "Το όνομα προβολής δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες"),
-  phone: z
-    .string()
-    .regex(
-      /^\+?[0-9]{10,15}$/,
-      "Παρακαλώ εισάγετε έναν έγκυρο αριθμό τηλεφώνου"
-    )
-    .optional()
-    .nullable(),
-  address: z
-    .string()
-    .min(5, "Η διεύθυνση πρέπει να έχει τουλάχιστον 5 χαρακτήρες")
-    .max(200, "Η διεύθυνση δεν μπορεί να υπερβαίνει τους 200 χαρακτήρες")
-    .optional()
-    .nullable(),
-});
+import { accountSchema, basicInfoSchema } from "./validation";
 
 export async function updateAccountInfo(prevState, formData) {
   const changedFields = JSON.parse(formData.get("changes"));
