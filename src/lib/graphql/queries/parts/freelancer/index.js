@@ -28,6 +28,7 @@ import {
   CATEGORY_ENTITY,
   SUBCATEGORY_ENTITY,
 } from "../../fragments/taxonomies/service";
+import { BILLING_DETAILS } from "../../fragments/components/pricing";
 
 const FREELANCER_PARTIAL_MAIN = gql`
   fragment FreelancerPartialMain on Freelancer {
@@ -417,6 +418,9 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
         }
       }
     }
+    billing_details {
+      ...BillingDetails
+    }
   }
   ${SINGLE_IMAGE}
   ${VISIBILITY}
@@ -442,6 +446,7 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
   ${CATEGORY}
   ${SUBCATEGORY_ENTITY}
   ${FREELANCER_SMALL}
+  ${BILLING_DETAILS}
 `;
 
 const FREELANCER_SEO = gql`

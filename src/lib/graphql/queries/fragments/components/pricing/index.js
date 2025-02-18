@@ -83,6 +83,18 @@ const FAQ = gql`
   }
 `;
 
+const BILLING_DETAILS = gql`
+  fragment BillingDetails on ComponentPricingBillingDetails {
+    receipt
+    invoice
+    afm
+    doy
+    brandName
+    profession
+    address
+  }
+`;
+
 export {
   BASIC_PACKAGE,
   STANDARD_PACKAGE,
@@ -90,4 +102,5 @@ export {
   PACKAGES,
   ADDONS,
   FAQ,
+  BILLING_DETAILS,
 };
