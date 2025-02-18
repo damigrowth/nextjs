@@ -25,6 +25,9 @@ if (typeof window !== "undefined") {
   import("bootstrap");
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
 export default async function RootLayout({ children }) {
   const isUnderMaintenance = false;
 
