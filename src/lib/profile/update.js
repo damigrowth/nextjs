@@ -4,8 +4,15 @@ import { z } from "zod";
 import { postData } from "../client/operations";
 import { UPDATE_FREELANCER } from "../graphql/mutations";
 import { revalidatePath } from "next/cache";
-import { accountSchema, basicInfoSchema } from "./validation";
+import {
+  accountSchema,
+  additionalInfoSchema,
+  basicInfoSchema,
+  billingSchema,
+  presentationSchema,
+} from "../validation/profile";
 import { uploadMedia } from "../uploads/upload";
+import { handleMediaUpdate } from "../uploads/update";
 
 export async function updateAccountInfo(prevState, formData) {
   const changedFields = JSON.parse(formData.get("changes"));
@@ -153,6 +160,295 @@ export async function updateBasicInfo(prevState, formData) {
   };
 }
 
-export async function updatePresentationInfo(prevState, formData) {}
+export async function updatePresentationInfo(prevState, formData) {
+  const changedFields = JSON.parse(formData.get("changes") || "{}");
+  const id = formData.get("id");
 
-export async function updateAdditionalInfo(prevState, formData) {}
+  // Validate changed fields using the existing presentation schema
+  const partialSchema = z.object(
+    Object.keys(changedFields).reduce((acc, field) => {
+      acc[field] = presentationSchema.shape[field];
+      return acc;
+    }, {})
+  );
+
+  // Validate only changed fields
+  const validationResult = partialSchema.safeParse(changedFields);
+
+  if (!validationResult.success) {
+    // Transform Zod errors to match InputB's expected format
+    const fieldErrors = {};
+
+    Object.entries(validationResult.error.flatten().fieldErrors).forEach(
+      ([field, messages]) => {
+        if (messages && messages.length > 0) {
+          fieldErrors[field] = {
+            field,
+            message: messages[0],
+          };
+        }
+      }
+    );
+
+    return {
+      data: null,
+      errors: fieldErrors,
+      message: null,
+    };
+  }
+
+  // Prepare the payload
+  const payload = {};
+
+  // Add website if changed
+  if (changedFields.website) {
+    payload.website = changedFields.website;
+  }
+
+  // Add socials if changed
+  if (changedFields.socials) {
+    payload.socials = Object.fromEntries(
+      Object.entries(changedFields.socials)
+        .filter(([_, socialData]) => socialData.url?.trim())
+        .map(([platform, socialData]) => [
+          platform,
+          { url: socialData.url.trim() },
+        ])
+    );
+  }
+
+  // Add visibility if changed
+  if (changedFields.visibility) {
+    payload.visibility = changedFields.visibility;
+  }
+
+  // Handle media update
+  const remainingMediaIds = JSON.parse(formData.get("remaining-media") || "[]");
+  const deletedMediaIds = JSON.parse(formData.get("deleted-media") || "[]");
+  const files = formData.getAll("media-files");
+
+  const mediaOptions = {
+    refId: id,
+    ref: "api::freelancer.freelancer",
+    field: "portfolio",
+    namePrefix: "portfolio",
+  };
+
+  // Only handle media if there are changes
+  if (files.length > 0 || deletedMediaIds.length > 0) {
+    const finalMediaIds = await handleMediaUpdate({
+      remainingMediaIds,
+      files,
+      options: mediaOptions,
+      deletedMediaIds,
+    });
+
+    payload.portfolio = finalMediaIds;
+  }
+
+  // Remove empty values
+  Object.keys(payload).forEach((key) => {
+    if (
+      payload[key] === undefined ||
+      payload[key] === null ||
+      (Array.isArray(payload[key]) && payload[key].length === 0) ||
+      (typeof payload[key] === "object" &&
+        Object.keys(payload[key]).length === 0)
+    ) {
+      delete payload[key];
+    }
+  });
+
+  // Only proceed if there are changes
+  if (Object.keys(payload).length === 0) {
+    return {
+      data: null,
+      errors: null,
+      message: "Δεν υπάρχουν αλλαγές για αποθήκευση",
+    };
+  }
+
+  // Execute GraphQL mutation
+  const { data: gqlData, error } = await postData(UPDATE_FREELANCER, {
+    id,
+    data: payload,
+  });
+
+  if (error) {
+    return {
+      data: null,
+      errors: { submit: error.message },
+      message: null,
+    };
+  }
+
+  revalidatePath("/dashboard/profile");
+
+  return {
+    data: gqlData?.updateFreelancer?.data,
+    errors: null,
+    message: "Τα στοιχεία ενημερώθηκαν με επιτυχία",
+  };
+}
+
+export async function updateAdditionalInfo(prevState, formData) {
+  const id = formData.get("id");
+  const changedFieldsRaw = JSON.parse(formData.get("changes"));
+
+  // Prepare data for validation by transforming nested data structures
+  const changedFields = { ...changedFieldsRaw };
+  delete changedFields.id;
+
+  // Transform changed fields with nested data structure
+  [
+    "contactTypes",
+    "payment_methods",
+    "settlement_methods",
+    "minBudgets",
+    "industries",
+  ].forEach((field) => {
+    if (changedFields[field]) {
+      changedFields[field] = changedFields[field].data
+        ? changedFields[field].data.map((item) => item.id)
+        : [];
+    }
+  });
+
+  // Handle terms separately since it's a simple field
+  if (changedFields.terms !== undefined) {
+    changedFields.terms = formData.get("terms");
+  }
+
+  // Create schema for only the changed fields
+  const partialSchema = z.object(
+    Object.keys(changedFields).reduce((acc, field) => {
+      acc[field] = additionalInfoSchema.shape[field];
+      return acc;
+    }, {})
+  );
+
+  // Validate the changed fields
+  const validationResult = partialSchema.safeParse(changedFields);
+
+  if (!validationResult.success) {
+    return {
+      data: null,
+      errors: Object.fromEntries(
+        Object.entries(validationResult.error.flatten().fieldErrors)
+          .filter(([_, messages]) => messages?.length > 0)
+          .map(([field, messages]) => [field, { field, message: messages[0] }])
+      ),
+      message: null,
+    };
+  }
+
+  // Prepare the payload for the API
+  const payload = {};
+
+  // Handle terms field
+  if (validationResult.data.terms !== undefined) {
+    payload.terms = validationResult.data.terms;
+  }
+
+  // Handle array fields
+  [
+    "contactTypes",
+    "payment_methods",
+    "settlement_methods",
+    "minBudgets",
+    "industries",
+  ].forEach((field) => {
+    if (validationResult.data[field] !== undefined) {
+      payload[field] = validationResult.data[field];
+    }
+  });
+
+  // Make the API call
+  const { data, error } = await postData(UPDATE_FREELANCER, {
+    id,
+    data: payload,
+  });
+
+  if (error) {
+    return {
+      data: null,
+      errors: { submit: error },
+      message: null,
+    };
+  }
+
+  revalidatePath("/dashboard/profile");
+
+  return {
+    data: data.updateFreelancer.data,
+    errors: null,
+    message: "Τα στοιχεία ενημερώθηκαν με επιτυχία",
+  };
+}
+
+export async function updateBillingDetails(prevState, formData) {
+  const changedFields = JSON.parse(formData.get("changes"));
+
+  // Create a partial schema based on changed fields
+  const partialSchema = z.object(
+    Object.keys(changedFields).reduce((acc, field) => {
+      acc[field] = billingSchema.shape[field];
+      return acc;
+    }, {})
+  );
+
+  // Validate only changed fields
+  const validationResult = partialSchema.safeParse(changedFields);
+
+  if (!validationResult.success) {
+    const fieldErrors = {};
+
+    Object.entries(validationResult.error.flatten().fieldErrors).forEach(
+      ([field, messages]) => {
+        if (messages && messages.length > 0) {
+          fieldErrors[field] = {
+            field,
+            message: messages[0],
+          };
+        }
+      }
+    );
+
+    return {
+      data: null,
+      errors: fieldErrors,
+      message: null,
+    };
+  }
+
+  // Format the data for the billing_details field
+  const payload = {
+    billing_details: {
+      ...validationResult.data,
+      afm: validationResult.data.afm
+        ? validationResult.data.afm.toString()
+        : null,
+    },
+  };
+
+  const { data, error } = await postData(UPDATE_FREELANCER, {
+    id: formData.get("id"),
+    data: payload,
+  });
+
+  if (error) {
+    return {
+      data: null,
+      errors: { submit: error },
+      message: null,
+    };
+  }
+
+  revalidatePath("/dashboard/profile");
+
+  return {
+    data: data.updateFreelancer.data,
+    errors: null,
+    message: "Τα στοιχεία τιμολόγησης ενημερώθηκαν με επιτυχία",
+  };
+}
