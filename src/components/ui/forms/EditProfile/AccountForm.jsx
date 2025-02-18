@@ -5,8 +5,8 @@ import { updateAccountInfo } from "@/lib/profile/update";
 import { useActionState } from "react";
 import SaveButton from "../../buttons/SaveButton";
 import useEditProfileStore from "@/store/dashboard/profile";
-import { useEffect } from "react";
 import Alert from "../../alerts/Alert";
+import { useFormChanges } from "@/hook/useFormChanges";
 
 export default function AccountForm({ freelancer }) {
   const initialState = {
@@ -29,37 +29,21 @@ export default function AccountForm({ freelancer }) {
     setDisplayName,
     setPhone,
     setAddress,
-    setProfile,
   } = useEditProfileStore();
 
-  useEffect(() => {
-    setProfile(freelancer);
-  }, []);
-
-  const getChangedFields = () => {
-    const changes = {};
-
-    if (displayName !== freelancer.displayName) {
-      changes.displayName = displayName;
-    }
-    if (phone !== freelancer.phone) {
-      changes.phone = phone;
-    }
-    if (address !== freelancer.address) {
-      changes.address = address;
-    }
-
-    return changes;
+  const currentValues = { displayName, phone: Number(phone), address };
+  const originalValues = {
+    displayName: freelancer.displayName,
+    phone: Number(freelancer.phone),
+    address: freelancer.address,
   };
 
-  const hasChanges = () => {
-    return Object.keys(getChangedFields()).length > 0;
-  };
+  // Use custom hook to track changes
+  const { changes, hasChanges } = useFormChanges(currentValues, originalValues);
 
   const handleSubmit = async (formData) => {
-    const changedFields = getChangedFields();
     formData.append("id", freelancer.id);
-    formData.append("changes", JSON.stringify(changedFields));
+    formData.append("changes", JSON.stringify(changes));
     return formAction(formData);
   };
 
@@ -145,7 +129,7 @@ export default function AccountForm({ freelancer }) {
         <SaveButton
           orientation="end"
           isPending={isPending}
-          hasChanges={hasChanges()}
+          hasChanges={hasChanges}
         />
       </div>
     </form>
