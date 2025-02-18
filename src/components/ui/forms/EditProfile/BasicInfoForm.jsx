@@ -8,7 +8,6 @@ import useEditProfileStore from "@/store/dashboard/profile";
 import { useActionState } from "react";
 import { updateBasicInfo } from "@/lib/profile/update";
 import SaveButton from "../../buttons/SaveButton";
-import SwitchB from "../../Archives/Inputs/SwitchB";
 import {
   ONBASE_ZIPCODES,
   ONSITE_AREAS,
@@ -22,6 +21,8 @@ import {
   FREELANCER_PROFILE_SUBCATEGORIES,
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import Alert from "../../alerts/Alert";
+import SwitchB from "../../Archives/Inputs/SwitchB";
+import { useFormChanges } from "@/hook/useFormChanges";
 
 export default function BasicInfoForm({ freelancer, type }) {
   const {
@@ -54,6 +55,30 @@ export default function BasicInfoForm({ freelancer, type }) {
     updateBasicInfo,
     initialState
   );
+
+  const originalValues = {
+    image: freelancer.image,
+    tagline: freelancer.tagline,
+    description: freelancer.description,
+    category: freelancer.category,
+    subcategory: freelancer.subcategory,
+    rate: Number(freelancer.rate),
+    commencement: Number(freelancer.commencement),
+    coverage: freelancer.coverage,
+  };
+
+  const currentValues = {
+    image,
+    tagline,
+    description,
+    category,
+    subcategory,
+    rate: Number(rate),
+    commencement: Number(commencement),
+    coverage,
+  };
+
+  const { changes, hasChanges } = useFormChanges(currentValues, originalValues);
 
   // Handle Onbase and Onsite Searches
   const handleOnbaseZipcodes = useCallback(async (searchTerm, page = 1) => {
@@ -159,65 +184,20 @@ export default function BasicInfoForm({ freelancer, type }) {
     switchCoverageMode("onsite", freelancer.coverage);
   };
 
-  // Check for form changes
-  const getChangedFields = () => {
-    const changes = {};
-
-    if (image !== freelancer.image) {
-      changes.image = image;
-    }
-    if (tagline !== freelancer.tagline) {
-      changes.tagline = tagline;
-    }
-    if (description !== freelancer.description) {
-      changes.description = description;
-    }
-    if (category.data?.id !== freelancer.category.data?.id) {
-      changes.category = category;
-    }
-    if (subcategory.data?.id !== freelancer.subcategory.data?.id) {
-      changes.subcategory = subcategory;
-    }
-    if (rate !== freelancer.rate) {
-      changes.rate = Number(rate);
-    }
-    if (commencement !== freelancer.commencement) {
-      changes.commencement = Number(commencement);
-    }
-
-    // Check if coverage changed
-    const hasCoverageChanges =
-      JSON.stringify(coverage) !== JSON.stringify(freelancer.coverage);
-    if (hasCoverageChanges) {
-      changes.coverage = coverage;
-    }
-
-    return changes;
-  };
-
-  const hasChanges = () => {
-    return Object.keys(getChangedFields()).length > 0;
-  };
-
   const handleSubmit = async (formData) => {
-    const changedFields = getChangedFields();
     formData.append("id", freelancer.id);
 
-    // Special handling for image file
-    if (changedFields.image) {
-      formData.append("image", changedFields.image);
-      // Remove image from changedFields as we're handling it separately
-      delete changedFields.image;
+    // Handle image separately if it exists in changes
+    if (changes.image) {
+      formData.append("image", changes.image);
+      const { image, ...restChanges } = changes;
+      formData.append("changes", JSON.stringify(restChanges));
+    } else {
+      formData.append("changes", JSON.stringify(changes));
     }
 
-    formData.append("changes", JSON.stringify(changedFields));
     return formAction(formData);
   };
-
-  console.log("image", image);
-  console.log("freelancer image", freelancer.image);
-  // console.log("onbase:=>", coverage.onbase);
-  // console.log("onsite:=>", coverage.onsite);
 
   return (
     <form action={handleSubmit}>
@@ -529,7 +509,7 @@ export default function BasicInfoForm({ freelancer, type }) {
         <SaveButton
           orientation="end"
           isPending={isPending}
-          hasChanges={hasChanges()}
+          hasChanges={hasChanges}
         />
       </div>
     </form>
