@@ -20,7 +20,7 @@ export default function AboutContent({ data }) {
       <Testimonials data={data.testimonials} />
       <Cta2 data={data.cta2} />
       <Faq data={data.faq} />
-      <Pricing data={data.pricing} />
+      {/* <Pricing data={data.pricing} /> */}
     </>
   );
 }

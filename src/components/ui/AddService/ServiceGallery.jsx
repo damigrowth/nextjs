@@ -214,7 +214,7 @@ export default function ServiceGallery({ isPending, custom }) {
             ? `ps-widget bdrs12 p30 mb30 overflow-hidden position-relative ${
                 isPending ? "section-disabled" : ""
               }`
-            : `ps-widget mb30 overflow-hidden position-relative ${
+            : `ps-widget overflow-hidden position-relative ${
                 isPending ? "section-disabled" : ""
               }`
         }

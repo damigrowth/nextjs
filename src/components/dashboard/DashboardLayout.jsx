@@ -3,6 +3,7 @@ import DashboardHeader from "./header/DashboardHeader";
 import DashboardSidebar from "./sidebar/DashboardSidebar";
 import DashboardWrapper from "./DashboardWrapper";
 import { getAccess, getUser } from "@/lib/auth/user";
+import DashboardFooter from "./footer/DashboardFooter";
 
 export default async function DashboardLayout({ children }) {
   const hasAccess = await getAccess(["freelancer", "company"]);
@@ -16,6 +17,7 @@ export default async function DashboardLayout({ children }) {
           <div className="dashboard__main pl0-md">{children}</div>
         </DashboardWrapper>
       </div>
+      <DashboardFooter />
     </>
   );
 }

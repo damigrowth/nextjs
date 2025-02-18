@@ -3,8 +3,8 @@ export default function MessagesMenu() {
     <li className="d-none d-sm-block">
       <a
         className="text-center mr5 text-thm2 dropdown-toggle fz20"
-        type="button"
-        data-bs-toggle="dropdown"
+        // type="button"
+        // data-bs-toggle="dropdown"
       >
         <span className="flaticon-mail" />
       </a>

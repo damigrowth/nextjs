@@ -1,6 +1,6 @@
 export const data = {
   breadcrumb: {
-    title: "Keep calm & δώσε Doulitsa",
+    title: "Σχετικά με τη Doulitsa",
     description:
       "Χαλάρωσε, εδώ θα βρεις τους κατάλληλους επαγγελματίες για να κάνουν τη Doulitsa που θέλεις.",
   },
@@ -8,15 +8,15 @@ export const data = {
     heading: "Έλα και εσύ στην καλύτερη πλατφόρμα Επαγγελματιών",
     description:
       "Έλα και εσύ στη Doulitsa, την πλατφόρμα που επαναπροσδιορίζει τη σύνδεση επαγγελματιών με πελάτες. Από την πρώτη στιγμή απολαμβάνεις ευκολία, ασφάλεια και άμεση πρόσβαση σε κορυφαίους επαγγελματίες. Ανακάλυψε την επόμενη συνεργασία σου, με διαφάνεια, αξιοπιστία και σιγουριά. Η Doulitsa φέρνει νέες ευκαιρίες στην πόρτα σου!",
-    image: "/images/about/about-1.png",
+    image: "/images/about/about-page-image-1.png",
     list: [
       "Βρες ικανούς επαγγελματίες, άμεσα και αξιόπιστα.",
       "Ανακάλυψε υπηρεσίες με κορυφαίες αξιολογήσεις και ειδικές προσφορές!",
       "Μπες στην πιο εξελιγμένη κοινότητα επαγγελματιών και χρηστών.",
     ],
     button: {
-      text: "Find Talent",
-      link: "/pros",
+      text: "Βρες Υπηρεσίες",
+      link: "/categories",
     },
   },
   counter: {
@@ -46,7 +46,7 @@ export const data = {
   cta1: {
     title: "Είσαι έτοιμος για την επόμενη μεγάλη συνεργασία σου;",
     subtitle: "",
-    image: "/images/about/about-7.jpg",
+    image: "/images/about/about-page-image-2.png",
     alt: "alt-image",
     lists: [
       {
@@ -72,8 +72,8 @@ export const data = {
       title: "Μπες στην πιο εξελιγμένη κοινότητα επαγγελματιών και χρηστών.",
       description:
         "Εντόπισε τα ταλέντα και διάλεξε μια υπηρεσία που είναι Value for Money.",
-      buttonText: "Get Started",
-      buttonLink: "/contact",
+      buttonText: "Ξεκίνα τώρα",
+      buttonLink: "/register",
     },
     rightSection: {
       facts: [
@@ -107,40 +107,40 @@ export const data = {
 
     testimonials: [
       {
-        id: "pills-home",
+        id: "dimitris",
         title: "Σας συστήνω ανεπιφύλακτα",
-        text: "“Η επιχείρηση μου είναι μια μικρή ξενοδοχειακή μονάδα. Η Doulitsa με βοηθάει να βρω επαγγελματίες που δεν μπορούσα να προσλάβω σε μόνιμη θέση.”",
+        text: "“Η επιχείρηση μου είναι μια μικρή ξενοδοχειακή μονάδα. Η Doulitsa με βοηθάει να βρίσκω επαγγελματίες που δεν θα μπορούσα να προσλάβω σε μόνιμη θέση.”",
         author: {
           name: "Δημήτρης Κ.",
           category: "Ξενοδόχος",
-          image: "/images/testimonials/1.jpg",
+          image: "/images/testimonials/dimitris140.png",
         },
       },
       {
-        id: "pills-profile",
+        id: "katerina",
         title: "Πολύ καλή δουλειά",
-        text: "“Βρήκα γρήγορα έναν επαγγελματία designer για να μου σχεδιάσει ένα καινούργιο logo.”",
+        text: "“Βρήκα γρήγορα έναν επαγγελματία designer για να μου σχεδιάσει ένα καινούργιο logo και έμεινα απόλυτα ικανοποιημένη!”",
         author: {
-          name: "Manolis S.",
+          name: "Κατερίνα Ζ.",
           category: "Επιχειρηματίας",
-          image: "/images/testimonials/2.jpg",
+          image: "/images/testimonials/katerina140.png",
         },
         active: true,
       },
       {
-        id: "pills-contact",
+        id: "marios",
         title: "Είμαι πολύ ικανοποιημένος",
-        text: "“Μέσα από την πλατφόρμα μπόρεσα να παρουσιάσω όλη τη δουλειά μου και να βρω νέους πελάτες, αλλά και συνεργάτες.”",
+        text: "“Μέσα από την πλατφόρμα σας μπόρεσα να παρουσιάσω όλη τη δουλειά μου και να με εντοπίσουν νέους πελάτες, αλλά και συνεργάτες.”",
         author: {
-          name: "Courtney Henry",
+          name: "Μάριος Θ.",
           category: "Web Developer",
-          image: "/images/testimonials/3.jpg",
+          image: "/images/testimonials/marios140.png",
         },
       },
     ],
   },
   cta2: {
-    image: "/images/about/about-7.jpg",
+    image: "/images/about/about-page-image-3.png",
     title: "Ψάχνεις για κάποια Υπηρεσία;",
     subtitle: "Ξεκίνα την αναζήτηση και κάνε Doulitsa 😉",
     boxes: [
@@ -167,8 +167,7 @@ export const data = {
 
   faq: {
     title: "Συχνές Ερωτήσεις",
-    subtitle:
-      "Αν έχεις περισσότερες ερωτήσεις πήγαινε στη σελίδα <a href='/faq'>FAQ</a>.",
+    subtitle: "Αν έχεις περισσότερες ερωτήσεις πήγαινε στη σελίδα",
     questions: [
       {
         id: "One",

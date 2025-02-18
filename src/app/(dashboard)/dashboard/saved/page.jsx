@@ -5,8 +5,8 @@ export const metadata = {
   title: "Αποθηκευμένα",
 };
 
-export default async function page({ searchParams }) {
-  const { freelancer } = await getFreelancer();
+export default async function page() {
+  const freelancer = await getFreelancer();
   const saved_services =
     freelancer.saved_services.data.length > 0
       ? freelancer.saved_services.data.map((service) => ({

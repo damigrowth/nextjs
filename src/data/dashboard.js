@@ -2,13 +2,13 @@ export const dashboardNavigation = [
   {
     id: 1,
     name: "Πίνακας Ελέγχου",
-    icon: "flaticon-home",
+    icon: "flaticon-menu",
     path: "/dashboard",
   },
   {
     id: 2,
     name: "Μηνύματα",
-    icon: "flaticon-chat",
+    icon: "flaticon-mail",
     path: "#",
   },
   {
@@ -20,25 +20,26 @@ export const dashboardNavigation = [
   {
     id: 4,
     name: "Αξιολογήσεις",
-    icon: "flaticon-review-1",
+    icon: "flaticon-star",
     path: "/dashboard/reviews",
   },
   {
     id: 5,
     name: "Παραγγελίες",
-    icon: "flaticon-web",
-    path: "/dashboard/orders",
+    icon: "flaticon-calendar",
+    // path: "/dashboard/orders",
+    path: "#",
   },
   {
     id: 6,
     name: "Διαχείριση Υπηρεσιών",
-    icon: "flaticon-presentation",
+    icon: "flaticon-document",
     path: "/dashboard/services",
   },
   {
     id: 7,
     name: "Προσθήκη Υπηρεσίας",
-    icon: "flaticon-document",
+    icon: "flaticon-button",
     path: "/dashboard/services/add",
   },
   {
@@ -51,7 +52,8 @@ export const dashboardNavigation = [
     id: 9,
     name: "Παραστατικά",
     icon: "flaticon-receipt",
-    path: "/dashboard/documents",
+    // path: "/dashboard/documents",
+    path: "#",
   },
   {
     id: 10,
@@ -65,13 +67,13 @@ export const hasAccessMainNav = [
   {
     id: 1,
     name: "Πίνακας Ελέγχου",
-    icon: "flaticon-home",
+    icon: "flaticon-menu",
     path: "/dashboard",
   },
   {
     id: 2,
     name: "Μηνύματα",
-    icon: "flaticon-chat",
+    icon: "flaticon-mail",
     path: "#",
   },
   {
@@ -83,14 +85,15 @@ export const hasAccessMainNav = [
   {
     id: 4,
     name: "Αξιολογήσεις",
-    icon: "flaticon-review-1",
+    icon: "flaticon-star",
     path: "/dashboard/reviews",
   },
   {
     id: 5,
     name: "Παραγγελίες",
-    icon: "flaticon-web",
-    path: "/dashboard/orders",
+    icon: "flaticon-calendar",
+    // path: "/dashboard/orders",
+    path: "#",
   },
 ];
 
@@ -98,13 +101,13 @@ export const hasAccessServicesNav = [
   {
     id: 0,
     name: "Διαχείριση Υπηρεσιών",
-    icon: "flaticon-presentation",
+    icon: "flaticon-document",
     path: "/dashboard/services",
   },
   {
     id: 1,
     name: "Προσθήκη Υπηρεσίας",
-    icon: "flaticon-document",
+    icon: "flaticon-button",
     path: "/dashboard/services/add",
   },
 ];
@@ -120,7 +123,8 @@ export const hasAccessAccountNav = [
     id: 1,
     name: "Παραστατικά",
     icon: "flaticon-receipt",
-    path: "/dashboard/documents",
+    // path: "/dashboard/documents",
+    path: "#",
   },
   {
     id: 2,
@@ -130,23 +134,68 @@ export const hasAccessAccountNav = [
   },
 ];
 
-export const hasAccessAllNav = [
-  ...hasAccessMainNav,
-  ...hasAccessServicesNav,
-  ...hasAccessAccountNav,
+export const hasAccessUserMenuNav = [
+  {
+    id: 1,
+    name: "Προφίλ",
+    icon: "flaticon-website",
+    path: "/profile",
+  },
+  {
+    id: 2,
+    name: "Πίνακας Ελέγχου",
+    icon: "flaticon-menu",
+    path: "/dashboard",
+  },
+  {
+    id: 3,
+    name: "Μηνύματα",
+    icon: "flaticon-mail",
+    path: "#",
+  },
+  {
+    id: 4,
+    name: "Αποθηκευμένα",
+    icon: "flaticon-like",
+    path: "/dashboard/saved",
+  },
+  {
+    id: 5,
+    name: "Διαχείριση Υπηρεσιών",
+    icon: "flaticon-document",
+    path: "/dashboard/services",
+  },
+  {
+    id: 6,
+    name: "Προσθήκη Υπηρεσίας",
+    icon: "flaticon-button",
+    path: "/dashboard/services/add",
+  },
+  {
+    id: 7,
+    name: "Διαχείριση Προφίλ",
+    icon: "flaticon-photo",
+    path: "/dashboard/profile",
+  },
+  {
+    id: 8,
+    name: "Αποσύνδεση",
+    icon: "flaticon-logout",
+    path: "/logout",
+  },
 ];
 
 export const noAccessMainNav = [
   {
     id: 1,
     name: "Πίνακας Ελέγχου",
-    icon: "flaticon-home",
+    icon: "flaticon-menu",
     path: "/dashboard",
   },
   {
     id: 2,
     name: "Μηνύματα",
-    icon: "flaticon-chat",
+    icon: "flaticon-mail",
     path: "#",
   },
   {
@@ -158,14 +207,15 @@ export const noAccessMainNav = [
   {
     id: 4,
     name: "Αξιολογήσεις",
-    icon: "flaticon-review-1",
+    icon: "flaticon-star",
     path: "/dashboard/reviews",
   },
   {
     id: 5,
     name: "Παραγγελίες",
-    icon: "flaticon-web",
-    path: "/dashboard/orders",
+    icon: "flaticon-calendar",
+    // path: "/dashboard/orders",
+    path: "#",
   },
 ];
 
@@ -184,7 +234,38 @@ export const noAccessAccountNav = [
   },
 ];
 
-export const noAccessAllNav = [...noAccessMainNav, ...noAccessAccountNav];
+export const noAccessUserMenuNav = [
+  {
+    id: 1,
+    name: "Πίνακας Ελέγχου",
+    icon: "flaticon-menu",
+    path: "/dashboard",
+  },
+  {
+    id: 2,
+    name: "Μηνύματα",
+    icon: "flaticon-mail",
+    path: "#",
+  },
+  {
+    id: 3,
+    name: "Αποθηκευμένα",
+    icon: "flaticon-like",
+    path: "/dashboard/saved",
+  },
+  {
+    id: 0,
+    name: "Διαχείριση Προφιλ",
+    icon: "flaticon-photo",
+    path: "/dashboard/profile",
+  },
+  {
+    id: 2,
+    name: "Αποσύνδεση",
+    icon: "flaticon-logout",
+    path: "/logout",
+  },
+];
 
 export const invoice = [
   {

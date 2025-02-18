@@ -49,8 +49,8 @@ const SERVICE_BY_SLUG = gql`
 `;
 
 const SERVICE_PAGE_SEO = gql`
-  query GetServiceSEO($slug: String!) {
-    service: services(filters: { slug: { eq: $slug } }) {
+  query GetServiceSEO($id: ID!) {
+    service(id: $id) {
       data {
         attributes {
           ...ServiceSEO
@@ -84,7 +84,7 @@ const FEATURED_SERVICES_BY_FREELANCER = gql`
   ) {
     services(
       sort: "publishedAt:desc"
-      filters: { freelancer: { id: $id } }
+      filters: { freelancer: { id: $id }, status: { type: { eq: "Active" } } }
       pagination: { page: $page, pageSize: $pageSize }
     ) {
       data {
@@ -122,7 +122,7 @@ const FEATURED_SERVICES = gql`
     featuredEntity {
       data {
         attributes {
-          services {
+          services(filters: { status: { type: { eq: "Active" } } }) {
             ...FeaturedService
           }
         }
@@ -157,6 +157,7 @@ const SERVICES_ARCHIVE = gql`
           { price: { gte: $min, lte: $max } }
           { time: { lte: $time } }
           { freelancer: { id: { notNull: true } } }
+          { status: { type: { eq: "Active" } } }
           {
             or: [
               { category: { slug: { eq: $cat } } }
@@ -194,6 +195,7 @@ const SERVICES_BY_CATEGORY = gql`
       filters: {
         category: { slug: { eq: $category } }
         subcategory: { slug: { eq: $subcategory } }
+        status: { type: { eq: "Active" } }
       }
       pagination: { page: 1, pageSize: 4 }
     ) {

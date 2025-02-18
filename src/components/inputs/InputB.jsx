@@ -1,15 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  capitalizeFirstLetter,
-  cutNumbers,
-  cutSpaces,
-  cutSymbols,
-  restrictCapitalLetters,
-} from "@/utils/InputFormats/formats";
-
-import ReactInputMask from "react-input-mask";
+import { formatInput } from "@/utils/InputFormats/formats";
 
 export default function InputB({
   label,
@@ -34,50 +26,37 @@ export default function InputB({
   errors,
   onChange,
   className,
+  icon,
 }) {
   const handleInputChange = (event) => {
-    let formattedValue = event.target.value;
+    const formattedValue = formatInput({
+      value: event.target.value,
+      type,
+      maxLength,
+      formatNumbers,
+      formatSpaces,
+      formatSymbols,
+      capitalize,
+      lowerCase,
+    });
 
-    // Apply number formatting only if formatNumbers is true
-    if (formatNumbers) {
-      formattedValue = cutNumbers(formattedValue);
-    }
-    // Apply symbol formatting only if formatSymbols is true
-    if (formatSymbols) {
-      formattedValue = cutSymbols(formattedValue);
-    }
-    // Apply space formatting only if formatSpaces is true
-    if (formatSpaces) {
-      formattedValue = cutSpaces(formattedValue);
-    }
-    // Apply capitalization only if capitalize is true
-    if (capitalize) {
-      formattedValue = capitalizeFirstLetter(formattedValue);
-    }
-    // Apply lowercase restriction only if lowerCase is true
-    if (lowerCase) {
-      formattedValue = restrictCapitalLetters(formattedValue);
-    }
-    // Convert value to number only if type is "number"
-    if (type === "number") {
-      formattedValue = parseFloat(formattedValue);
-    }
-
-    // Call onChange callback with the formatted value
     onChange(formattedValue);
   };
 
+  // For number inputs, use type="text" but with number-specific handling
+  const inputType = type === "number" ? "text" : type;
+
   return (
-    <>
+    <div className="mb10">
       {hideLabel === undefined && (
         <label htmlFor={id} className="form-label fw500 dark-color">
+          {icon && <span className={`pr10 ${icon}`} />}
           {label}
         </label>
       )}
-
-      <div className="input-group pb10">
+      <div className="input-group">
         <input
-          type={type}
+          type={inputType}
           id={id}
           name={name}
           min={min}
@@ -90,6 +69,8 @@ export default function InputB({
           disabled={disabled}
           onChange={handleInputChange}
           className={className}
+          inputMode={type === "number" ? "numeric" : "text"}
+          pattern={type === "number" ? "[0-9]*" : undefined}
         />
         {append && <span className="input-group-text">{append}</span>}
       </div>
@@ -98,6 +79,6 @@ export default function InputB({
           <p className="text-danger mb0 pb0">{errors.message}</p>
         </div>
       ) : null}
-    </>
+    </div>
   );
 }

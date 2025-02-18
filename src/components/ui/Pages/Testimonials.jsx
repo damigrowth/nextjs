@@ -29,7 +29,7 @@ export default function Testimonials({ data }) {
                       <div className="testimonial-style2 at-about2 text-center">
                         <div className="testi-content text-center">
                           <span className="icon fas fa-quote-left" />
-                          <h4 className="testi-text">"{testimonial.text}"</h4>
+                          <h4 className="testi-text">{testimonial.text}</h4>
                         </div>
                       </div>
                     </div>
@@ -57,7 +57,7 @@ export default function Testimonials({ data }) {
                           <h6 className="title ml30 ml15-xl mb-0">
                             {testimonial.author.name}
                             <br />
-                            <small>{testimonial.author.position}</small>
+                            <small>{testimonial.author.category}</small>
                           </h6>
                         </div>
                       </a>

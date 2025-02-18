@@ -17,8 +17,8 @@ import { ORDERS } from "../../fragments/entities/order";
 import { SKILLS } from "../../fragments/entities/skill";
 import { SIZE } from "../../fragments/entities/size";
 import { SPECIALISATIONS } from "../../fragments/entities/specialisation";
-import { MIN_BUDGETS } from "../../fragments/entities/budget";
-import { INDUSTRIES } from "../../fragments/entities/industry";
+import { MIN_BUDGETS_ENTITY } from "../../fragments/entities/budget";
+import { INDUSTRIES_ENTITY } from "../../fragments/entities/industry";
 import { MULTIPLE_FILES, SINGLE_IMAGE } from "../../fragments/global";
 import { RATING } from "../../fragments/entities/rating";
 import { VISIBILITY } from "../../fragments/components/global";
@@ -28,6 +28,7 @@ import {
   CATEGORY_ENTITY,
   SUBCATEGORY_ENTITY,
 } from "../../fragments/taxonomies/service";
+import { BILLING_DETAILS } from "../../fragments/components/pricing";
 
 const FREELANCER_PARTIAL_MAIN = gql`
   fragment FreelancerPartialMain on Freelancer {
@@ -280,8 +281,8 @@ const FREELANCER_RELATIONS = gql`
   ${FREELANCER_SUBCATEGORY_PARTIAL}
   ${SIZE}
   ${SPECIALISATIONS}
-  ${MIN_BUDGETS}
-  ${INDUSTRIES}
+  ${MIN_BUDGETS_ENTITY}
+  ${INDUSTRIES_ENTITY}
   ${CONTACT_TYPES}
   ${PAYMENT_METHOD}
   ${SETTLEMENT_METHOD}
@@ -361,6 +362,65 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
     review_dislikes {
       ...ReviewDislikes
     }
+    saved_services {
+      data {
+        id
+        attributes {
+          title
+          slug
+          price
+          rating
+          reviews_total
+          media {
+            ...MultipleFiles
+          }
+          category {
+            data {
+              ...Category
+            }
+          }
+          subcategory {
+            data {
+              ...SubcategoryEntity
+            }
+          }
+          freelancer {
+            ...FreelancerSmall
+          }
+        }
+      }
+    }
+    saved_freelancers {
+      data {
+        id
+        attributes {
+          username
+          firstName
+          lastName
+          displayName
+          verified
+          topLevel
+          rating
+          reviews_total
+          rate
+          visibility {
+            ...Visibility
+          }
+          image {
+            ...SingleImage
+          }
+          category {
+            ...FreelancerCategory
+          }
+          subcategory {
+            ...FreelancerSubcategoryPartial
+          }
+        }
+      }
+    }
+    billing_details {
+      ...BillingDetails
+    }
   }
   ${SINGLE_IMAGE}
   ${VISIBILITY}
@@ -374,8 +434,8 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
   ${FREELANCER_SUBCATEGORY_PARTIAL}
   ${SIZE}
   ${SPECIALISATIONS}
-  ${MIN_BUDGETS}
-  ${INDUSTRIES}
+  ${MIN_BUDGETS_ENTITY}
+  ${INDUSTRIES_ENTITY}
   ${CONTACT_TYPES}
   ${PAYMENT_METHOD}
   ${SETTLEMENT_METHOD}
@@ -383,6 +443,10 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
   ${RATING}
   ${REVIEW_LIKES}
   ${REVIEW_DISLIKES}
+  ${CATEGORY}
+  ${SUBCATEGORY_ENTITY}
+  ${FREELANCER_SMALL}
+  ${BILLING_DETAILS}
 `;
 
 const FREELANCER_SEO = gql`

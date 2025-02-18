@@ -1,7 +1,11 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import SingleService from "@/components/ui/SingleService/SingleService";
-import { getReviewsByService, getServiceBySlug } from "@/lib/service/service";
+import {
+  getReviewsByService,
+  getServiceById,
+  getServiceBySlug,
+} from "@/lib/service/service";
 import ServiceBreadcrumb from "@/components/ui/breadcrumbs/service/ServiceBreadcrumb";
 import { getData } from "@/lib/client/operations";
 import Tabs from "@/components/ui/Archives/Tabs";
@@ -18,11 +22,14 @@ export const dynamicParams = true;
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
-  const { slug } = params;
+  const { slug } = await params;
+
+  const parts = slug.split("-");
+  const serviceId = parts[parts.length - 1];
 
   const data = {
     type: "service",
-    params: { slug },
+    params: { id: serviceId },
     titleTemplate: "%title% από %displayName%",
     descriptionTemplate: "%category% - %description%",
     size: 100,
@@ -35,14 +42,20 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function page({ params, searchParams }) {
-  const { slug } = params;
+  const { slug } = await params;
+  const { reviews: searchParamsReviews } = await searchParams;
 
-  const { service, serviceId } = await getServiceBySlug(slug);
+  const parts = slug.split("-");
+  const paramsServiceId = parts[parts.length - 1];
 
-  if (!service) {
+  const service = await getServiceById(paramsServiceId);
+
+  if (!service || service?.status?.data?.attributes?.type !== "Active") {
     redirect("/not-found");
   } else {
-    let reviewsPage = parseInt(searchParams.reviews, 10);
+    const serviceId = service.id;
+
+    let reviewsPage = parseInt(searchParamsReviews, 10);
     reviewsPage = !reviewsPage || reviewsPage < 1 ? 1 : reviewsPage;
     const reviewsPageSize = reviewsPage * 3;
 
@@ -59,7 +72,7 @@ export default async function page({ params, searchParams }) {
     let savedStatus;
 
     if (fid) {
-      savedStatus = await getSavedStatus("service", serviceId.toString());
+      savedStatus = await getSavedStatus("service", serviceId);
     }
 
     return (
@@ -78,7 +91,7 @@ export default async function page({ params, searchParams }) {
             subdivision={service?.subdivision?.data?.attributes}
             categoriesRoute={true}
             subjectTitle={service?.title}
-            id={serviceId}
+            id={service?.id}
             savedStatus={savedStatus}
           />
           <SingleService

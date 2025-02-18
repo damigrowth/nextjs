@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Faq({ data, className }) {
   return (
     <section className={`our-faqs pb50 ${className}`}>
@@ -6,7 +8,9 @@ export default function Faq({ data, className }) {
           <div className="col-lg-6 m-auto">
             <div className="main-title text-center">
               <h2 className="title">{data.title}</h2>
-              <p className="paragraph mt10">{data.subtitle}</p>
+              <p className="paragraph mt10">
+                {data.subtitle} <Link href="/faq">FAQ</Link>.
+              </p>
             </div>
           </div>
         </div>

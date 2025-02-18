@@ -9,11 +9,18 @@ export default function RadioSelect({
   value,
   onChange,
   error,
+  orientation = "vertical",
 }) {
   return (
     <div className="card-body card-body px-0 pt-0">
       <div className="radiobox-style1">
-        <div className="radio-element">
+        <div
+          className={
+            orientation && orientation === "horizontal"
+              ? "radio-element d-flex gap-4"
+              : "radio-element"
+          }
+        >
           {options.map((option, i) => {
             const isChecked = value === option.value;
             return (

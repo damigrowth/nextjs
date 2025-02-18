@@ -6,7 +6,6 @@ export default function Avatar({ firstName, lastName, avatar }) {
   const initials =
     firstName.slice(0, 1).toUpperCase() + lastName.slice(0, 1).toUpperCase();
 
-  //   console.log(avatar);
   return (
     <div className="profile-image">
       <Link href="/dashboard" className="">

@@ -11,16 +11,16 @@ export default async function page() {
   // const endpoint = "subcategories";
   // const filePath = "src/lib/populate/taxonomies/services_subcategories.csv";
 
-  const endpoint = "subdivisions";
-  const filePath = "src/lib/populate/taxonomies/services_subdivisions.csv";
+  const endpoint = "skills";
+  const filePath = "/skills.csv";
 
   await populateTaxonomies(
     0,
     endpoint,
     filePath,
     limit,
-    ["label", "subcategory", "category", "slug"],
-    "subcategory"
+    ["category", "label"],
+    "skill"
   );
 
   // await findColumnIds("subdivisions");

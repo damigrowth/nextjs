@@ -1,0 +1,55 @@
+import { gql } from "@apollo/client";
+import { PAGINATION } from "../../fragments/global";
+
+export const MIN_BUDGETS = gql`
+  query MinBudgets(
+    $name: String
+    $minBudgetsPage: Int
+    $minBudgetsPageSize: Int
+  ) {
+    budgets(
+      filters: { label: { containsi: $name } }
+      sort: "value:asc"
+      pagination: { page: $minBudgetsPage, pageSize: $minBudgetsPageSize }
+    ) {
+      data {
+        id
+        attributes {
+          value
+          label
+          slug
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+`;
+
+export const INDUSTRIES = gql`
+  query Industries(
+    $name: String
+    $industriesPage: Int
+    $industriesPageSize: Int
+  ) {
+    industries(
+      filters: { label: { containsi: $name } }
+      sort: "label:asc"
+      pagination: { page: $industriesPage, pageSize: $industriesPageSize }
+    ) {
+      data {
+        id
+        attributes {
+          label
+          slug
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+`;

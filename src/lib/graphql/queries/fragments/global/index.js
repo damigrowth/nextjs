@@ -18,6 +18,7 @@ const MULTIPLE_FILES = gql`
       attributes {
         name
         formats
+        size
         url
       }
     }

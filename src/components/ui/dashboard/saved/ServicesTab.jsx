@@ -15,7 +15,7 @@ export function ServicesTab({ services, fid }) {
       {services.map((service, i) => {
         if (!service?.freelancer?.data?.attributes) return null;
         return (
-          <div key={i} className="col-sm-6 col-xl-3">
+          <div key={service.id} className="col-sm-6 col-xl-3">
             {service.media?.data?.length > 1 ? (
               <FeaturedServiceSliderCard
                 service={service}

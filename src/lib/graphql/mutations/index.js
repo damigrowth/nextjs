@@ -317,6 +317,22 @@ const CREATE_TAG = gql`
   }
 `;
 
+const EMAIL_CONFIRMATION = gql`
+  mutation UserEmailConfirmation($code: String!) {
+    emailConfirmation(confirmation: $code) {
+      jwt
+      user {
+        id
+        email
+        username
+        role {
+          id
+        }
+      }
+    }
+  }
+`;
+
 export {
   POST_REVIEW,
   POST_SERVICE,
@@ -341,4 +357,5 @@ export {
   SAVE_FREELANCER,
   UNSAVE_FREELANCER,
   CREATE_TAG,
+  EMAIL_CONFIRMATION,
 };

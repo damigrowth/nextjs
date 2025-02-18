@@ -16,17 +16,22 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ApolloWrapper } from "@/lib/client/apollo-wrapper";
 import { headers } from "next/headers";
 import { CookiesBanner } from "@/components/ui/banners/CookiesBanner";
-import { getUserPartial } from "@/lib/auth/user";
+import { getUser } from "@/lib/auth/user";
 import PathChecker from "@/components/ui/PathChecker";
+import NavMenuMobileWrapper from "@/components/ui/NavMenuMobileWrapper";
+import BodyWrapper from "@/components/ui/BodyWrapper";
 
 if (typeof window !== "undefined") {
   import("bootstrap");
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
 export default async function RootLayout({ children }) {
   const isUnderMaintenance = false;
 
-  const user = await getUserPartial();
+  const user = await getUser();
   const authenticated = user ? true : false;
 
   const { header: headerData } = await getData(ROOT_LAYOUT, null, "HEADER");
@@ -54,7 +59,7 @@ export default async function RootLayout({ children }) {
           </div>
         </div>
         <PathChecker excludes="/dashboard">
-          <NavMenuMobile header={headerData} />
+          <NavMenuMobileWrapper header={headerData} />
         </PathChecker>
         <SpeedInsights />
         <GoogleAnalytics gaId={gaId} />

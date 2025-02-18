@@ -1,4 +1,5 @@
-import { hasAccessAllNav, noAccessAllNav } from "@/data/dashboard";
+// UserMenu.jsx
+import { hasAccessUserMenuNav, noAccessUserMenuNav } from "@/data/dashboard";
 import UserMenuLink from "./UserMenuLink";
 import { getAccess, getUser } from "@/lib/auth/user";
 import UserImage from "@/components/user/UserImage";
@@ -8,9 +9,21 @@ import LogoutLink from "./LogoutLink";
 export default async function UserMenu({ isMobile }) {
   const user = await getUser();
 
-  if (user) {
+  if (user && user.confirmed) {
     const hasAccess = await getAccess(["freelancer", "company"]);
-    const allNav = hasAccess ? hasAccessAllNav : noAccessAllNav;
+    const allNav = hasAccess ? hasAccessUserMenuNav : noAccessUserMenuNav;
+    const userProfilePath = `/profile/${user.username}`;
+
+    // Modify the nav items to use dynamic profile path or filter out profile for non-access users
+    const modifiedNav = allNav
+      .map((item) => {
+        if (item.path === "/profile") {
+          return hasAccess ? { ...item, path: userProfilePath } : null;
+        }
+        return item;
+      })
+      .filter(Boolean); // Remove null items
+
     return (
       <li className="user_setting">
         <div className="dropdown">
@@ -20,7 +33,10 @@ export default async function UserMenu({ isMobile }) {
               lastName={user.lastName}
               displayName={user.displayName}
               hideDisplayName
-              image={user?.image?.formats?.thumbnail?.url}
+              image={
+                user?.freelancer?.data?.attributes?.image?.data?.attributes
+                  ?.formats?.thumbnail?.url
+              }
               alt={
                 user?.image?.formats?.thumbnail?.provider_metadata?.public_id
               }
@@ -30,11 +46,19 @@ export default async function UserMenu({ isMobile }) {
           </div>
           <div className="dropdown-menu">
             <div className="user_setting_content">
-              {allNav.map((item, i) => {
+              {modifiedNav.map((item, i) => {
                 if (item.path === "/logout") {
-                  return <LogoutLink item={item} key={i} custom />;
+                  return (
+                    <div key={i}>
+                      <LogoutLink item={item} key={i} custom />
+                    </div>
+                  );
                 } else {
-                  return <UserMenuLink key={i} item={item} index={i} />;
+                  return (
+                    <div key={i}>
+                      <UserMenuLink key={i} item={item} />
+                    </div>
+                  );
                 }
               })}
             </div>
@@ -55,7 +79,7 @@ export default async function UserMenu({ isMobile }) {
           className="login-info mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent"
           href="/register"
         >
-          Εγγραφή
+          Εγγραφή
         </Link>
       </>
     ) : (

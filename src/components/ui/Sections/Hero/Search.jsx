@@ -34,6 +34,10 @@ export default function Search() {
 
   const categorySlug = categorySelect?.attributes?.slug || "";
 
+  const searchTarget = categorySlug
+    ? `/ipiresies/${categorySlug}?search=${searchTerm}`
+    : `/ipiresies?search=${searchTerm}`;
+
   // Trigger search when category changes, but not on initial mount
   useEffect(() => {
     if (isInitialMount.current) {
@@ -93,14 +97,7 @@ export default function Search() {
 
   return (
     <>
-      <HomeSchema
-        searchTarget={
-          categorySlug
-            ? `/ipiresies/${categorySlug}?search=${searchTerm}`
-            : `/ipiresies?search=${searchTerm}`
-        }
-        searchInput="searchTerm"
-      />
+      <HomeSchema searchTarget={searchTarget} searchInput="searchTerm" />
       <form
         ref={formRef}
         action={action}
@@ -135,7 +132,7 @@ export default function Search() {
             type="text"
             id="searchTerm"
             name="searchTerm"
-            placeholder="Τι υπηρεσία ψάχνετε;"
+            placeholder="Τι υπηρεσία ψάχνεις;"
             className="form-control"
             onFocus={focusDropdown}
             onBlur={blurDropdown}

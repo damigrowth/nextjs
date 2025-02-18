@@ -3,7 +3,24 @@ import {
   ALL_REVIEWS_RATINGS_BY_SERVICE,
   REVIEWS_BY_SERVICE,
 } from "../graphql/queries/main/reviews";
-import { SERVICE_BY_SLUG } from "../graphql/queries/main/service";
+import {
+  SERVICE_BY_ID,
+  SERVICE_BY_SLUG,
+} from "../graphql/queries/main/service";
+
+export async function getServiceById(id) {
+  try {
+    const { service } = await getData(SERVICE_BY_ID, { id });
+    if (service && service?.data?.id) {
+      return { id: service.data.id, ...service.data.attributes };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching freelancer by slug:", error);
+    return null;
+  }
+}
 
 export async function getServiceBySlug(slug) {
   try {

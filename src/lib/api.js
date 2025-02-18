@@ -63,10 +63,6 @@ import {
 
 export async function postData(endpoint, data) {
   validateEnvVars();
-  // Log full request details
-  console.log("Request URL:", `${STRAPI_API_URL}/api/${endpoint}`);
-  console.log("Authorization:", `Bearer ${STRAPI_TOKEN.substring(0, 5)}...`); // Only show first 5 chars
-  console.log("Sending data:", data);
 
   try {
     const response = await fetch(`${STRAPI_API_URL}/${endpoint}`, {

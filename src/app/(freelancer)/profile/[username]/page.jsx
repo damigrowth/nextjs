@@ -19,7 +19,7 @@ export const dynamicParams = true;
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
-  const { username } = params;
+  const { username } = await params;
 
   const data = {
     type: "freelancer",
@@ -36,20 +36,24 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function page({ params, searchParams }) {
-  const { username } = params;
+  const { username } = await params;
+  const { services: searchParmasServices, reviews: searchParmasReviews } =
+    await searchParams;
 
   const fid = await getFreelancerId();
 
-  const { freelancer, freelancerId } = await getFreelancerByUsername(username);
+  const { freelancer } = await getFreelancerByUsername(username);
 
   if (!freelancer) {
     redirect("/not-found");
   } else {
-    let servicesPage = parseInt(searchParams.services, 10);
+    const freelancerId = freelancer.id;
+
+    let servicesPage = parseInt(searchParmasServices, 10);
     servicesPage = !servicesPage || servicesPage < 1 ? 1 : servicesPage;
     const servicesPageSize = servicesPage * 3;
 
-    let reviewsPage = parseInt(searchParams.reviews, 10);
+    let reviewsPage = parseInt(searchParmasReviews, 10);
     reviewsPage = !reviewsPage || reviewsPage < 1 ? 1 : reviewsPage;
     const reviewsPageSize = reviewsPage * 3;
 

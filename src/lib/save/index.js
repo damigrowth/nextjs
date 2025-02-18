@@ -41,11 +41,6 @@ export async function saveCollectionEntry(prevState, formData) {
     type === "service" ? { serviceId: id } : { freelancerId: id }
   );
 
-  console.log(type, "TYPE");
-  console.log(id, "ID");
-
-  console.log(response);
-
   if (response.error || response.errors) {
     return {
       success: false,

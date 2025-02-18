@@ -1,17 +1,25 @@
 "use client";
 
 import { submitContactForm } from "@/lib/contact";
-import React, { useActionState } from "react";
+import React, { useActionState, useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function ContactForm({ form }) {
   const [state, formAction, isPending] = useActionState(submitContactForm, {
     success: false,
     message: "",
   });
+  const [captcha, setCaptcha] = useState("");
+
+  const handleSubmit = async (formData) => {
+    const data = new FormData(formData);
+    data.append("captchaToken", captcha);
+    await formAction(data);
+  };
 
   return (
     <>
-      <form action={formAction} className="form-style1">
+      <form action={handleSubmit} className="form-style1">
         <div className="row">
           <div className="col-md-6">
             <div className="mb20">
@@ -71,11 +79,15 @@ export default function ContactForm({ form }) {
             </div>
           </div>
           <div className="col-md-12">
-            <div>
+            <ReCAPTCHA
+              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+              onChange={setCaptcha}
+            />
+            <div className="mt20">
               <button
                 type="submit"
                 className="ud-btn btn-thm"
-                disabled={isPending}
+                disabled={isPending || !captcha}
               >
                 {form.buttonText}
                 {isPending ? (

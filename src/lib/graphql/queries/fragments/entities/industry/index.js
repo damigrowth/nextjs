@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-const INDUSTRIES = gql`
+const INDUSTRIES_ENTITY = gql`
   fragment Industries on IndustryRelationResponseCollection {
     data {
       id
@@ -12,4 +12,4 @@ const INDUSTRIES = gql`
   }
 `;
 
-export { INDUSTRIES };
+export { INDUSTRIES_ENTITY };

@@ -14,8 +14,6 @@ export default async function FeaturedServiceSliderCard({
 
   const freelancerData = freelancer?.data?.attributes;
 
-  console.log("freelancerData", freelancer);
-
   if (!freelancerData) return null;
 
   const {

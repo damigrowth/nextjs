@@ -11,11 +11,15 @@ export default function Body({ children }) {
   return (
     <body
       className={`${
-        path === "/register" || path === "/login"
+        path === "/register" ||
+        path === "/register/success" ||
+        path == "/email-confirmation" ||
+        path === "/login"
           ? "bgc-thm4 mm-wrapper mm-wrapper--position-left-front"
           : ""
       } ${filtersModalToggled ? "menu-hidden-sidebar-content" : ""} ${
-        path.startsWith("/dashboard") ? "hover-bgc-color" : ""
+        // path.startsWith("/dashboard") ? "hover-bgc-color" : ""
+        path.startsWith("/dashboard") ? "" : ""
       } `}
     >
       {children}

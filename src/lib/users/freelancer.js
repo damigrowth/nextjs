@@ -21,36 +21,34 @@ export async function getFreelancerId() {
 
 export async function getFreelancer() {
   let freelancer = null;
-  const uid = await getUserId();
+  const user = await getUser();
 
-  const { freelancers } = await getData(FREELANCER_BY_ID, {
-    id: uid,
-  });
+  const freelancerData = user?.freelancer?.data;
 
-  if (freelancers?.data?.length > 0) {
+  if (freelancerData) {
     freelancer = {
-      id: freelancers.data[0].id,
-      ...freelancers.data[0].attributes,
+      id: freelancerData.id,
+      ...freelancerData.attributes,
     };
   }
 
-  return { freelancer };
+  return freelancer;
 }
 
 export async function getFreelancerByUsername(username) {
   try {
     let freelancer = null;
-    let freelancerId = null;
 
     const { freelancers } = await getData(FREELANCER_BY_USERNAME, { username });
 
     if (freelancers?.data?.length > 0) {
-      freelancer = freelancers.data[0].attributes;
-
-      freelancerId = toString(freelancers.data[0].id);
+      freelancer = {
+        id: freelancers.data[0].id,
+        ...freelancers.data[0].attributes,
+      };
     }
 
-    return { freelancer, freelancerId };
+    return { freelancer };
   } catch (error) {
     console.error("Error fetching freelancer by username:", error);
     return null;
