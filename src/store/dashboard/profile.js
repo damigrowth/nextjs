@@ -13,6 +13,17 @@ const initialCoverage = {
   areas: { data: [] },
 };
 
+const initialSocials = {
+  facebook: { url: "" },
+  linkedin: { url: "" },
+  x: { url: "" },
+  youtube: { url: "" },
+  github: { url: "" },
+  instagram: { url: "" },
+  behance: { url: "" },
+  dribbble: { url: "" },
+};
+
 const useEditProfileStore = create((set) => ({
   // Basic Information
   currentTab: 0,
@@ -97,24 +108,12 @@ const useEditProfileStore = create((set) => ({
   setImage: (value) => set(() => ({ image: value })),
 
   // Socials
-  socials: {
-    facebook: { label: "Facebook", url: "" },
-    linkedin: { label: "LinkedIn", url: "" },
-    x: { label: "X", url: "" },
-    youtube: { label: "YouTube", url: "" },
-    github: { label: "GitHub", url: "" },
-    instagram: { label: "Instagram", url: "" },
-    behance: { label: "Behance", url: "" },
-    dribbble: null,
-  },
+  socials: initialSocials,
   setSocial: (platform, url) =>
     set((state) => ({
       socials: {
         ...state.socials,
-        [platform]: {
-          ...state.socials[platform],
-          url,
-        },
+        [platform]: { url },
       },
     })),
 
@@ -243,6 +242,18 @@ const useEditProfileStore = create((set) => ({
   settlement_methods: { data: [] },
   setSettlementMethods: (value) => set(() => ({ settlement_methods: value })),
 
+  billing_details: {
+    receipt: false,
+    invoice: false,
+    afm: null,
+    doy: null,
+    brandName: null,
+    profession: null,
+    address: null,
+  },
+
+  setBillingDetails: (value) => set(() => ({ billing_details: value })),
+
   // Bulk Actions
   setProfile: (freelancer) =>
     set(() => ({
@@ -274,7 +285,7 @@ const useEditProfileStore = create((set) => ({
         address: false,
       },
       image: freelancer.image || { data: null },
-      socials: freelancer.socials || {},
+      socials: freelancer.socials || initialSocials,
       terms: freelancer.terms || "",
       portfolio: freelancer.portfolio || { data: [] },
       services: freelancer.services || { data: [] },
@@ -298,6 +309,15 @@ const useEditProfileStore = create((set) => ({
       contactTypes: freelancer.contactTypes || { data: [] },
       payment_methods: freelancer.payment_methods || { data: [] },
       settlement_methods: freelancer.settlement_methods || { data: [] },
+      billing_details: freelancer.billing_details || {
+        receipt: false,
+        invoice: false,
+        afm: null,
+        doy: null,
+        brandName: null,
+        profession: null,
+        address: null,
+      },
     })),
 
   resetProfile: () =>
@@ -347,6 +367,15 @@ const useEditProfileStore = create((set) => ({
       contactTypes: { data: [] },
       payment_methods: { data: [] },
       settlement_methods: { data: [] },
+      billing_details: {
+        receipt: true,
+        invoice: false,
+        afm: null,
+        doy: null,
+        brandName: null,
+        profession: null,
+        address: null,
+      },
     })),
 }));
 
