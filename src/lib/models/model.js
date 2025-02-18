@@ -1,6 +1,6 @@
 "use server";
 
-import { getData } from "../api";
+import { getData } from "../client/operations";
 
 export async function fetchModel(model, query) {
   try {
