@@ -3,105 +3,80 @@
 import Input from "@/components/inputs/Input";
 import { login } from "@/lib/auth";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
-
-function LoginButton({ setLoading }) {
-  const { pending } = useFormStatus();
-
-  useEffect(() => {
-    if (pending) {
-      setLoading(true);
-    } else {
-      setLoading(false);
-    }
-  }, [pending]);
-
-  return (
-    <button
-      disabled={pending}
-      type="submit"
-      className="ud-btn btn-thm default-box-shadow2"
-    >
-      Σύνδεση
-      {pending ? (
-        <span className="spinner-border spinner-border-sm ml10" role="status">
-          <span className="sr-only"></span>
-        </span>
-      ) : (
-        <i className="fal fa-arrow-right-long" />
-      )}
-    </button>
-  );
-}
+import { useActionState } from "react";
 
 const LoginForm = () => {
-  const initialState = {};
-  const [formState, formAction] = useFormState(login, initialState);
+  const initialState = {
+    errors: {},
+    message: null,
+  };
 
-  const [loading, setLoading] = useState(false);
-
-  // console.log(formState);
+  const [state, formAction, isPending] = useActionState(login, initialState);
 
   return (
     <form action={formAction}>
       <div className="mb25">
         <Input
-          label={"Email"}
+          state={state}
+          label="Email"
           type="email"
           name="identifier"
           id="identifier"
           placeholder="Το email σου"
-          disabled={loading}
-          className={"form-control"}
+          disabled={isPending}
+          errorId="identifier-error"
+          formatSpaces
+          autoComplete="email"
         />
       </div>
       <div className="mb15">
         <Input
-          label={"Κωδικός"}
+          state={state}
+          label="Κωδικός"
           type="password"
           name="password"
           id="password"
           placeholder="Ο κωδικός σου"
-          disabled={loading}
+          disabled={isPending}
           minLength={6}
-          className={"form-control"}
+          errorId="password-error"
+          formatSpaces
+          autoComplete="current-password"
         />
       </div>
       <div className="checkbox-style1 d-block d-sm-flex align-items-center justify-content-between mb20">
-        {/* <label className="custom_checkbox fz14 ff-heading">
-          Θύμησε μου
-          <input type="checkbox" defaultChecked="checked" />
-          <span className="checkmark" />
-        </label> */}
         <Link href="/forgot-password" className="fz14 ff-heading">
           Ξέχασες τον κωδικό σου?
         </Link>
       </div>
-      {formState?.message && (
-        <div className="mb20 text-danger">{formState?.message}</div>
-      )}
-      <div className="d-grid mb20">
-        <LoginButton setLoading={setLoading} />
-      </div>
-      {/* <div className="hr_content mb20">
-        <hr />
-        <span className="hr_top_text">ή</span>
-      </div>
-      <div className="d-md-flex justify-content-between">
-        <button className="ud-btn btn-fb fz14 fw400 mb-2 mb-md-0" type="button">
-          <i className="fab fa-facebook-f pr10" /> Σύνδεση με Facebook
-        </button>
-        <button
-          className="ud-btn btn-google fz14 fw400 mb-2 mb-md-0"
-          type="button"
+
+      {state?.message && (
+        <div
+          className={`mb20 ${state.success ? "text-success" : "text-danger"}`}
         >
-          <i className="fab fa-google" /> Σύνδεση με Google
+          {state.message}
+        </div>
+      )}
+
+      <div className="d-grid mt40 mb20">
+        <button
+          disabled={isPending}
+          type="submit"
+          className="ud-btn btn-thm default-box-shadow2"
+        >
+          Σύνδεση
+          {isPending ? (
+            <span
+              className="spinner-border spinner-border-sm ml10"
+              role="status"
+            >
+              <span className="sr-only"></span>
+            </span>
+          ) : (
+            <i className="fal fa-arrow-right-long" />
+          )}
         </button>
-        <button className="ud-btn btn-apple fz14 fw400" type="button">
-          <i className="fab fa-apple" /> Σύνδεση με Apple
-        </button>
-      </div> */}
+      </div>
     </form>
   );
 };
