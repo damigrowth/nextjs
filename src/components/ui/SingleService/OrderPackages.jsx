@@ -31,7 +31,6 @@ export default function OrderPackages({
 
   const handleSelectPackage = (pack) => {
     setOrder({ packages: [pack] });
-    console.log("PACKAGE", pack);
     calculateTotal();
   };
 

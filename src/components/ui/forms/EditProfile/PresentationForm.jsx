@@ -44,10 +44,6 @@ function PresentationFormContent({ freelancer }) {
 
   // Handle media changes
   const handleMediaChange = (media, changes, context) => {
-    console.log("media", media);
-    console.log("changes", changes);
-    console.log("context", context);
-
     setMediaChanges(changes);
   };
 

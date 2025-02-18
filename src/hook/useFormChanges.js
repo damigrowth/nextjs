@@ -109,10 +109,5 @@ export const useFormChanges = (currentState, originalState) => {
 
   const hasChanges = Object.keys(changes).length > 0;
 
-  console.log("Current State", currentState);
-  console.log("Original State", originalState);
-  console.log("Changes", changes);
-  console.log("Has Changes", hasChanges);
-
   return { changes, hasChanges };
 };

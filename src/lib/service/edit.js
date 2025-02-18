@@ -58,8 +58,6 @@ export async function editService(prevState, formData) {
 
     const response = await postData(EDIT_SERVICE, payload);
 
-    console.log("RESPONSE", response);
-
     if (!response?.data?.updateService?.data) {
       return {
         ...prevState,

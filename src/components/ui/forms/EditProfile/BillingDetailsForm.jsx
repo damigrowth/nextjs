@@ -96,8 +96,6 @@ export default function BillingDetailsForm({ freelancer }) {
     return Object.keys(getChangedFields()).length > 0;
   };
 
-  console.log("hasChanges", getChangedFields());
-
   const handleSubmit = async (formData) => {
     const changedFields = getChangedFields();
     formData.append("id", freelancer.id);

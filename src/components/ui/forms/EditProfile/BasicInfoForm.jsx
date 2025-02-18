@@ -384,8 +384,6 @@ export default function BasicInfoForm({ freelancer, type }) {
                   pageSize={10}
                   onSearch={handleOnbaseZipcodes}
                   onSelect={(selected) => {
-                    console.log("selected", selected);
-
                     setCoverage("zipcode", {
                       data: selected,
                     });
@@ -444,10 +442,8 @@ export default function BasicInfoForm({ freelancer, type }) {
                   onSearch={handleOnsiteCounties}
                   onSelect={(selected) => {
                     const newCountyIds = selected.map((c) => c.id);
-                    console.log("Selected counties:", newCountyIds);
 
                     const currentAreas = coverage.areas.data || [];
-                    console.log("Current areas:", currentAreas);
 
                     const updatedAreas = currentAreas.filter((area) => {
                       const countyData = area.data?.attributes?.county?.data;

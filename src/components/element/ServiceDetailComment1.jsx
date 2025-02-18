@@ -8,7 +8,6 @@ export default function ServiceDetailComment1() {
 
   const handleRatingChange = (value) => {
     setRating(value);
-    console.log(value);
   };
   return (
     <>
