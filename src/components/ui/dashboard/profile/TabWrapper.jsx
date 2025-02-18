@@ -1,10 +1,14 @@
 "use client";
 
 import useEditProfileStore from "@/store/dashboard/profile";
-import React from "react";
+import React, { useEffect } from "react";
 
-export default function TabWrapper({ children }) {
-  const { currentTab } = useEditProfileStore();
+export default function TabWrapper({ children, freelancer }) {
+  const { currentTab, setProfile } = useEditProfileStore();
+
+  useEffect(() => {
+    setProfile(freelancer);
+  }, [freelancer, setProfile]);
 
   const [navigation, content] = React.Children.toArray(children);
   const tabs = React.Children.toArray(content.props.children);
@@ -14,9 +18,9 @@ export default function TabWrapper({ children }) {
   );
 
   return (
-    <>
+    <div className="navtab-style1">
       {navigation}
       {currentContent}
-    </>
+    </div>
   );
 }

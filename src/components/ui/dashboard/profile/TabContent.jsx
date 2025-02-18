@@ -27,30 +27,29 @@ export async function TabContent() {
     {
       index: type !== "user" ? 2 : null,
       label: type !== "user" ? "Παρουσίαση" : null,
-      content: type !== "user" ? <PresentationForm /> : null,
+      content:
+        type !== "user" ? <PresentationForm freelancer={freelancer} /> : null,
     },
     {
       index: 3,
       label: "Πρόσθετα Στοιχεία",
-      content: <AdditionalInfoForm />,
+      content: <AdditionalInfoForm freelancer={freelancer} />,
     },
     {
       index: 4,
       label: "Στοιχεία Τιμολόγησης",
-      content: <BillingDetailsForm />,
+      content: <BillingDetailsForm freelancer={freelancer} />,
     },
   ];
 
   return (
-    <div className="navtab-style1">
-      <TabWrapper>
-        <TabNavigation tabs={tabs.map((tab) => tab.label)} />
-        <div className="tab-content">
-          {tabs.map((tab) => (
-            <Tab key={tab.index} index={tab.index} content={tab.content} />
-          ))}
-        </div>
-      </TabWrapper>
-    </div>
+    <TabWrapper freelancer={freelancer}>
+      <TabNavigation tabs={tabs.map((tab) => tab.label)} />
+      <div className="tab-content">
+        {tabs.map((tab) => (
+          <Tab key={tab.index} index={tab.index} content={tab.content} />
+        ))}
+      </div>
+    </TabWrapper>
   );
 }
