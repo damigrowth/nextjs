@@ -15,8 +15,9 @@ import {
   paymentMethodsOptions,
   settlementMethodsOptions,
 } from "@/data/global/collections";
+import Alert from "../../alerts/Alert";
 
-export default function AdditionalInfoForm() {
+export default function AdditionalInfoForm({ freelancer }) {
   const {
     terms,
     setTerms,
@@ -73,12 +74,128 @@ export default function AdditionalInfoForm() {
     return data;
   }, []);
 
-  const hasChanges = () => {};
+  const getChangedFields = () => {
+    const changes = {};
 
-  // Handle Onbase and Onsite Searches
+    // Check terms changes
+    if (terms !== freelancer.terms) {
+      changes.terms = terms;
+    }
+
+    // Compare minBudgets with original freelancer data
+    const minBudgetsDataChanged =
+      minBudgets?.data?.length !== freelancer.minBudgets?.data?.length ||
+      minBudgets?.data?.some((item) => {
+        const original = freelancer.minBudgets?.data?.find(
+          (orig) => orig.id === item.id
+        );
+        return !original;
+      });
+
+    if (minBudgetsDataChanged) {
+      changes.minBudgets = minBudgets;
+    }
+
+    // Compare industries with original freelancer data
+    const industriesDataChanged =
+      industries?.data?.length !== freelancer.industries?.data?.length ||
+      industries?.data?.some((item) => {
+        const original = freelancer.industries?.data?.find(
+          (orig) => orig.id === item.id
+        );
+        return !original;
+      });
+
+    if (industriesDataChanged) {
+      changes.industries = industries;
+    }
+
+    // Compare contactTypes with original freelancer data
+    const contactTypesDataChanged =
+      contactTypes?.data?.length !== freelancer.contactTypes?.data?.length ||
+      contactTypes?.data?.some((item) => {
+        const original = freelancer.contactTypes?.data?.find(
+          (orig) => orig.id === item.id
+        );
+        return !original;
+      });
+
+    if (contactTypesDataChanged) {
+      changes.contactTypes = contactTypes;
+    }
+
+    // Compare payment_methods with original freelancer data
+    const paymentMethodsDataChanged =
+      payment_methods?.data?.length !==
+        freelancer.payment_methods?.data?.length ||
+      payment_methods?.data?.some((item) => {
+        const original = freelancer.payment_methods?.data?.find(
+          (orig) => orig.id === item.id
+        );
+        return !original;
+      });
+
+    if (paymentMethodsDataChanged) {
+      changes.payment_methods = payment_methods;
+    }
+
+    // Compare settlement_methods with original freelancer data
+    const settlementMethodsDataChanged =
+      settlement_methods?.data?.length !==
+        freelancer.settlement_methods?.data?.length ||
+      settlement_methods?.data?.some((item) => {
+        const original = freelancer.settlement_methods?.data?.find(
+          (orig) => orig.id === item.id
+        );
+        return !original;
+      });
+
+    if (settlementMethodsDataChanged) {
+      changes.settlement_methods = settlement_methods;
+    }
+
+    return changes;
+  };
+
+  const hasChanges = () => {
+    return Object.keys(getChangedFields()).length > 0;
+  };
+
+  const handleSubmit = async (formData) => {
+    const changedFields = getChangedFields();
+    if (!Object.keys(changedFields).length) return;
+
+    changedFields.id = freelancer.id;
+
+    // Convert the simple arrays to the correct format for validation
+    if (changedFields.contactTypes) {
+      formData.delete("contactTypes");
+      changedFields.contactTypes.data.forEach((item) => {
+        formData.append("contactTypes", item.id);
+      });
+    }
+
+    if (changedFields.payment_methods) {
+      formData.delete("payment_methods");
+      changedFields.payment_methods.data.forEach((item) => {
+        formData.append("payment_methods", item.id);
+      });
+    }
+
+    if (changedFields.settlement_methods) {
+      formData.delete("settlement_methods");
+      changedFields.settlement_methods.data.forEach((item) => {
+        formData.append("settlement_methods", item.id);
+      });
+    }
+
+    formData.append("id", freelancer.id);
+    formData.append("changes", JSON.stringify(changedFields));
+    return formAction(formData);
+  };
 
   return (
-    <form action={formAction}>
+    <form action={handleSubmit}>
       <div className="form-style1">
         <div className="bdrb1 pb15 mb25">
           <h5 className="list-title heading">Πρόσθετα Στοιχεία</h5>
@@ -90,7 +207,7 @@ export default function AdditionalInfoForm() {
               name="minBudgets"
               label="Ελάχιστο Budget"
               labelPlural="ελάχιστα budget"
-              value={minBudgets}
+              value={minBudgets.data}
               nameParam="label"
               pageParam="minBudgetsPage"
               pageSizeParam="minBudgetsPageSize"
@@ -111,6 +228,7 @@ export default function AdditionalInfoForm() {
               isMulti={true}
               isClearable={true}
               formatSymbols
+              errors={formState?.errors?.minBudgets}
             />
           </div>
           <div className="mb10 col-md-5">
@@ -118,7 +236,7 @@ export default function AdditionalInfoForm() {
               name="industries"
               label="Κύριοι Κλάδοι Πελατών"
               labelPlural="κύριοι κλάδοι πελατών"
-              value={industries}
+              value={industries.data}
               nameParam="label"
               pageParam="industriesPage"
               pageSizeParam="industriesPageSize"
@@ -133,6 +251,7 @@ export default function AdditionalInfoForm() {
               isClearable={true}
               formatSymbols
               maxSelections={3}
+              errors={formState?.errors?.industries}
             />
           </div>
         </div>
@@ -144,6 +263,7 @@ export default function AdditionalInfoForm() {
               onChange={setContactTypes}
               name="contactTypes"
               label="Τρόποι Επικοινωνίας"
+              error={formState?.errors?.contactTypes?.message}
             />
           </div>
           <div className="col-md-4">
@@ -153,6 +273,7 @@ export default function AdditionalInfoForm() {
               onChange={setPaymentMethods}
               name="payment_methods"
               label="Τρόποι Πληρωμής"
+              error={formState?.errors?.payment_methods?.message}
             />
           </div>
           <div className="col-md-4">
@@ -162,6 +283,7 @@ export default function AdditionalInfoForm() {
               onChange={setSettlementMethods}
               name="settlement_methods"
               label="Μέθοδοι Εξόφλησης"
+              error={formState?.errors?.settlement_methods?.message}
             />
           </div>
         </div>
@@ -176,16 +298,27 @@ export default function AdditionalInfoForm() {
             counter
             value={terms}
             onChange={setTerms}
-            error={formState.errors.terms}
+            errors={formState?.errors?.terms}
           />
         </div>
-        <SaveButton isPending={isPending} hasChanges={hasChanges()} />
-        {formState.errors.submit && (
-          <div className="mt10 text-error">{formState.errors.submit}</div>
+
+        {formState?.errors && (
+          <Alert
+            type="error"
+            message={formState.errors?.submit}
+            className="mt-3"
+          />
         )}
-        {formState.message && !formState.errors.submit && (
-          <div className="mt10 text-success">{formState.message}</div>
+
+        {formState?.message && !formState?.errors?.submit && (
+          <Alert type="success" message={formState.message} className="mt-3" />
         )}
+
+        <SaveButton
+          orientation="end"
+          isPending={isPending}
+          hasChanges={hasChanges()}
+        />
       </div>
     </form>
   );
