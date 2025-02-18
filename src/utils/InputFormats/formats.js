@@ -19,6 +19,10 @@ export const restrictCapitalLetters = (str) => {
   return str.toLowerCase();
 };
 
+export const keepOnlyNumbers = (str) => {
+  return str.toString().replace(/[^\d]/g, "");
+};
+
 export const formatInput = ({
   formatNumbers,
   formatSymbols,
@@ -29,6 +33,10 @@ export const formatInput = ({
   value,
 }) => {
   let formattedValue = value;
+
+  if (type === "number") {
+    formattedValue = keepOnlyNumbers(formattedValue);
+  }
 
   // Apply number formatting only if formatNumbers is true
   if (formatNumbers) {

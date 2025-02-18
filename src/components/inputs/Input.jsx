@@ -74,7 +74,7 @@ export default function Input({
           max={max}
           placeholder={placeholder}
           id={id}
-          value={inputValue}
+          value={inputValue || ""}
           defaultValue={defaultValue}
           name={name}
           className={`form-control ${

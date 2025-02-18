@@ -1,25 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { memo } from "react";
 
-export default function SwitchB({
+const SwitchB = memo(function SwitchB({
   label,
   initialValue,
   onChange,
   activeText,
   inactiveText,
 }) {
-  const [isActive, setIsActive] = useState(initialValue);
-
-  useEffect(() => {
-    setIsActive(initialValue);
-  }, [initialValue]);
-
-  const handleSwitchChange = () => {
-    const newValue = !isActive;
-    setIsActive(newValue);
+  const handleChange = (e) => {
     if (onChange) {
-      onChange(newValue);
+      // Pass the actual checked value from the event
+      onChange(e.target.checked);
     }
   };
 
@@ -37,17 +30,19 @@ export default function SwitchB({
             className="form-check-input mt-0"
             type="checkbox"
             id="flexSwitchCheckDefault"
-            checked={isActive}
-            onChange={handleSwitchChange}
+            checked={initialValue}
+            onChange={handleChange}
           />
           <label
             className="form-check-label mt-0"
             htmlFor="flexSwitchCheckDefault"
           >
-            {isActive ? activeText : inactiveText}
+            {initialValue ? activeText : inactiveText}
           </label>
         </div>
       </div>
     </div>
   );
-}
+});
+
+export default SwitchB;
