@@ -39,9 +39,11 @@ export default async function Review({
         <UserImage
           firstName={firstName}
           lastName={lastName}
+          displayName={displayName}
           image={image}
           width={50}
           height={50}
+          hideDisplayName={true}
         />
         <div className="ml20">
           <h6 className="mt-0 mb-0">{displayName}</h6>

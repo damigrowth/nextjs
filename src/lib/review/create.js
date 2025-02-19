@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { postData } from "../client/operations";
 import { POST_REVIEW } from "../graphql/mutations";
-import { getUserId } from "../auth/user";
+import { getFreelancerId } from "../users/freelancer";
 
 const reviewSchema = z.object({
   rating: z.number(),
@@ -12,14 +12,13 @@ const reviewSchema = z.object({
     .min(1, "Η αξιολόγηση είναι υποχρεωτική")
     .min(25, "Η αξιολόγηση είναι μικρή")
     .max(350, "Η μέγιστη αξιολόγηση είναι 350 χαρακτήρες"),
-  modelId: z.number(),
 });
 
 export async function createModelReview(prevState, formData) {
   try {
     const reviewData = formData.get("newReviewData");
     const review = JSON.parse(reviewData);
-    const uid = await getUserId();
+    const authorId = await getFreelancerId();
 
     // Validate review data using Zod schema
     const validation = reviewSchema.safeParse(review);
@@ -33,15 +32,16 @@ export async function createModelReview(prevState, formData) {
       return {
         errors: validationErrors,
         data: null,
+        message: null,
       };
     }
 
     const payload = {
       [review.modelType]: Number(review.modelId),
-      [review.tenantType]: Number(review.tenantId),
-      rating: review.rating,
+      receiver: review.tenantId,
+      rating: Number(review.rating),
       comment: review.comment,
-      user: uid,
+      author: authorId,
       type: 1,
       status: 2,
       publishedAt: null,
@@ -49,20 +49,33 @@ export async function createModelReview(prevState, formData) {
 
     const response = await postData(POST_REVIEW, { data: payload });
 
-    const reviewId = response?.createReview?.data?.id;
+    const reviewId = response?.data?.createReview?.data?.id;
 
     if (reviewId) {
       return {
         data: {
           id: reviewId,
         },
+        errors: {},
+        message: "Η αξιολόγησή σας υποβλήθηκε με επιτυχία!",
+      };
+    } else {
+      return {
+        errors: {
+          submit:
+            "Δεν ήταν δυνατή η υποβολή της αξιολόγησης. Προσπαθήστε ξανά.",
+        },
+        message: null,
+        data: null,
       };
     }
   } catch (error) {
     console.error(error);
     return {
-      errors: error?.message,
-      message: "Server error. Please try again later.",
+      errors: {
+        submit: "Σφάλμα διακομιστή. Παρακαλώ προσπαθήστε ξανά αργότερα.",
+      },
+      message: null,
       data: null,
     };
   }

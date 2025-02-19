@@ -21,7 +21,7 @@ const REVIEWS_BY_FREELANCER = gql`
   query reviewsByFreelancer($id: ID!, $page: Int, $pageSize: Int) {
     reviews(
       sort: "publishedAt:desc"
-      filters: { freelancer: { id: { eq: $id } } }
+      filters: { receiver: { id: { eq: $id } } }
       pagination: { page: $page, pageSize: $pageSize }
     ) {
       data {
@@ -44,7 +44,7 @@ const REVIEWS_BY_FREELANCER = gql`
 const ALL_REVIEWS_RATINGS_BY_FREELANCER = gql`
   query allReviewsRatingsByFreelancer($id: ID!, $pageSize: Int) {
     reviews(
-      filters: { freelancer: { id: { eq: $id } } }
+      filters: { receiver: { id: { eq: $id } } }
       pagination: { pageSize: $pageSize }
     ) {
       data {
