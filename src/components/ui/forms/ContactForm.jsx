@@ -80,7 +80,7 @@ export default function ContactForm({ form }) {
           </div>
           <div className="col-md-12">
             <ReCAPTCHA
-              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+              sitekey={process.env.RECAPTCHA_SITE_KEY}
               onChange={setCaptcha}
             />
             <div className="mt20">
