@@ -104,7 +104,7 @@ export default async function page({ params, searchParams }) {
           hideSaveButton={fid === freelancerId}
         />
         <FreelancerProfile
-          uid={freelancerId}
+          freelancerId={freelancerId}
           username={username}
           freelancer={freelancer}
           services={services}
@@ -113,6 +113,7 @@ export default async function page({ params, searchParams }) {
           reviews={reviews}
           reviewsMeta={reviewsMeta}
           reviewsPage={reviewsPage}
+          isOwner={fid === freelancerId}
         />
       </>
     );

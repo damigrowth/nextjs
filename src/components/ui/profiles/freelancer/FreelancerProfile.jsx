@@ -23,7 +23,7 @@ import FeaturedFile from "../../SingleService/FeaturedFile";
 
 export default function FreelancerProfile({
   freelancer,
-  uid,
+  freelancerId,
   username,
   services,
   servicesPage,
@@ -31,6 +31,7 @@ export default function FreelancerProfile({
   reviews,
   reviewsMeta,
   reviewsPage,
+  isOwner,
 }) {
   const {
     firstName,
@@ -164,12 +165,14 @@ export default function FreelancerProfile({
                     : "Κάνε σύνδεση για να αξιολογήσεις τον επαγγελματία."
                 }
               >
-                <AddModelReviewForm
-                  modelType="service"
-                  tenantType="freelancer"
-                  // modelId={serviceId} // TODO: Fetch all orders and get the services ids in an input
-                  tenantId={uid}
-                />
+                {!isOwner && (
+                  <AddModelReviewForm
+                    modelType="service"
+                    tenantType="freelancer"
+                    // modelId={serviceId} // TODO: Fetch all orders and get the services ids in an input
+                    tenantId={freelancerId}
+                  />
+                )}
               </Protected>
             </div>
           </div>

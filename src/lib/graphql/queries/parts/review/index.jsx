@@ -16,10 +16,10 @@ const REVIEW_MAIN = gql`
 
 const REVIEW_RELATIONS = gql`
   fragment ReviewRelations on Review {
-    freelancer {
+    receiver {
       ...FreelancerPartial
     }
-    user {
+    author {
       ...FreelancerPartial
     }
     service {

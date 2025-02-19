@@ -29,9 +29,6 @@ export default function ReviewComment({
           />
 
           <div className="ml20 ml0-xs mt20-xs">
-            <div className="del-edit">
-              <span className="flaticon-flag" />
-            </div>
             <h6 className="mt-0 mb-1">{reviewer?.displayName}</h6>
             <div className="d-flex align-items-center">
               <div>

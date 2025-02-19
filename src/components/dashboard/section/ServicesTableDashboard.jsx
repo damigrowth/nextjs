@@ -55,7 +55,11 @@ export default async function ServicesTableDashboard({ fid, page, pageSize }) {
         </tbody>
       </table>
       <div className="mt30">
-        <Pagination1 pagination={services.meta?.pagination} />
+        <Pagination1
+          pagination={services.meta.pagination}
+          paramKey="page"
+          itemLabel="Υπηρεσίες"
+        />
       </div>
     </div>
   );

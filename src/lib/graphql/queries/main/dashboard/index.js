@@ -56,15 +56,11 @@ export const POPULAR_SERVICES_DASHBOARD = gql`
   }
 `;
 
-// TODO: Solve the issue with the user field
 export const ALL_REVIEWS_RECEIVED_DASHBOARD = gql`
-  query AllReviewsReceivedDashboard($id: ID!) {
+  query AllReviewsReceivedDashboard($id: ID!, $page: Int) {
     reviews(
-      filters: {
-        freelancer: { id: { eq: $id } }
-        user: { id: { notNull: true } }
-      }
-      pagination: { page: 1, pageSize: 3 }
+      filters: { receiver: { id: { eq: $id } } }
+      pagination: { page: $page, pageSize: 3 }
       sort: "rating:desc"
     ) {
       data {
@@ -72,7 +68,7 @@ export const ALL_REVIEWS_RECEIVED_DASHBOARD = gql`
           rating
           comment
           publishedAt
-          user {
+          author {
             data {
               attributes {
                 firstName
@@ -100,10 +96,10 @@ export const ALL_REVIEWS_RECEIVED_DASHBOARD = gql`
 `;
 
 export const ALL_REVIEWS_GIVEN_DASHBOARD = gql`
-  query AllReviewsGivenDashboard($id: ID!) {
+  query AllReviewsGivenDashboard($id: ID!, $page: Int) {
     reviews(
-      filters: { user: { id: { eq: $id } } }
-      pagination: { page: 1, pageSize: 3 }
+      filters: { author: { id: { eq: $id } } }
+      pagination: { page: $page, pageSize: 3 }
       sort: "rating:desc"
     ) {
       data {
@@ -111,7 +107,7 @@ export const ALL_REVIEWS_GIVEN_DASHBOARD = gql`
           rating
           comment
           publishedAt
-          freelancer {
+          receiver {
             data {
               attributes {
                 firstName

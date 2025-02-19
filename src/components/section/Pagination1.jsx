@@ -2,7 +2,12 @@
 
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
-export default function Pagination1({ pagination }) {
+export default function Pagination1({
+  pagination,
+  paramKey = "page",
+  itemLabel = "Υπηρεσίες",
+  preserveParams = true,
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -10,8 +15,10 @@ export default function Pagination1({ pagination }) {
   const { page = 1, pageCount = 1, total = 0, pageSize = 5 } = pagination || {};
 
   const createPageURL = (pageNumber) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", pageNumber.toString());
+    const params = new URLSearchParams(
+      preserveParams ? searchParams : undefined
+    );
+    params.set(paramKey, pageNumber.toString());
     return `${pathname}?${params.toString()}`;
   };
 
@@ -107,8 +114,14 @@ export default function Pagination1({ pagination }) {
           </li>
         </ul>
         <p className="mt10 mb-0 pagination_page_count text-center">
-          {(page - 1) * pageSize + 1} – {Math.min(page * pageSize, total)} από{" "}
-          {total} Υπηρεσίες
+          {total > 0 ? (
+            <>
+              {(page - 1) * pageSize + 1} – {Math.min(page * pageSize, total)}{" "}
+              από {total} {itemLabel}
+            </>
+          ) : (
+            <>0 {itemLabel}</>
+          )}
         </p>
       </div>
     </>
