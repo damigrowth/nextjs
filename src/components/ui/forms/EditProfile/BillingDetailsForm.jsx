@@ -8,6 +8,7 @@ import InputB from "@/components/inputs/InputB";
 import Alert from "../../alerts/Alert";
 import SaveButton from "../../buttons/SaveButton";
 import RadioSelect from "../../Archives/Inputs/RadioSelect";
+import { useFormChanges } from "@/hook/useFormChanges";
 
 const billingOptions = [
   { value: "receipt", label: "Απόδειξη" },
@@ -26,12 +27,7 @@ export default function BillingDetailsForm({ freelancer }) {
     initialState
   );
 
-  const { billing_details, setBillingDetails } = useEditProfileStore(
-    (state) => ({
-      billing_details: state.billing_details,
-      setBillingDetails: state.setBillingDetails,
-    })
-  );
+  const { billing_details, setBillingDetails } = useEditProfileStore();
 
   const handleBillingTypeChange = (e) => {
     const selectedValue = e.target.value;
@@ -39,14 +35,6 @@ export default function BillingDetailsForm({ freelancer }) {
       ...billing_details,
       receipt: selectedValue === "receipt",
       invoice: selectedValue === "invoice",
-      // Reset fields when switching to receipt
-      ...(selectedValue === "receipt" && {
-        afm: null,
-        doy: null,
-        brandName: null,
-        profession: null,
-        address: null,
-      }),
     });
   };
 
@@ -57,49 +45,15 @@ export default function BillingDetailsForm({ freelancer }) {
     return ""; // Both false case
   };
 
-  // Check for form changes
-  const getChangedFields = () => {
-    const changes = {};
-    const current = billing_details || {};
-    const original = freelancer.billing_details || {};
-
-    // If original is empty AND we have any non-default values in current, include them
-    if (Object.keys(original).length === 0) {
-      // Only add fields that are different from initial state
-      if (current.receipt !== false) changes.receipt = current.receipt;
-      if (current.invoice !== false) changes.invoice = current.invoice;
-      if (current.afm) changes.afm = current.afm;
-      if (current.doy) changes.doy = current.doy;
-      if (current.brandName) changes.brandName = current.brandName;
-      if (current.profession) changes.profession = current.profession;
-      if (current.address) changes.address = current.address;
-    } else {
-      // Compare with original values if they exist
-      if (current.receipt !== original.receipt)
-        changes.receipt = current.receipt;
-      if (current.invoice !== original.invoice)
-        changes.invoice = current.invoice;
-      if (current.afm !== original.afm) changes.afm = current.afm;
-      if (current.doy !== original.doy) changes.doy = current.doy;
-      if (current.brandName !== original.brandName)
-        changes.brandName = current.brandName;
-      if (current.profession !== original.profession)
-        changes.profession = current.profession;
-      if (current.address !== original.address)
-        changes.address = current.address;
-    }
-
-    return changes;
-  };
-
-  const hasChanges = () => {
-    return Object.keys(getChangedFields()).length > 0;
-  };
+  // Use the same custom hook as AccountForm
+  const { changes, hasChanges } = useFormChanges(
+    billing_details,
+    freelancer.billing_details
+  );
 
   const handleSubmit = async (formData) => {
-    const changedFields = getChangedFields();
     formData.append("id", freelancer.id);
-    formData.append("changes", JSON.stringify(changedFields));
+    formData.append("billing_details", JSON.stringify(billing_details));
     return formAction(formData);
   };
 
@@ -234,7 +188,7 @@ export default function BillingDetailsForm({ freelancer }) {
         <SaveButton
           orientation="end"
           isPending={isPending}
-          hasChanges={hasChanges()}
+          hasChanges={hasChanges}
         />
       </div>
     </form>

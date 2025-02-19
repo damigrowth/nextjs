@@ -278,14 +278,13 @@ export const additionalInfoSchema = z.object({
     .nullable(),
 });
 
-export const billingSchema = z.object({
+export const billingSchemaOptional = z.object({
   receipt: z.boolean(),
   invoice: z.boolean(),
   afm: z
-    .number()
-    .int("Το ΑΦΜ πρέπει να είναι ακέραιος αριθμός")
+    .string()
     .min(1, "Το ΑΦΜ πρέπει να έχει τουλάχιστον 1 ψηφίο")
-    .max(9999999999, "Το ΑΦΜ δεν μπορεί να υπερβαίνει τα 10 ψηφία")
+    .max(10, "Το ΑΦΜ δεν μπορεί να υπερβαίνει τα 10 ψηφία")
     .optional()
     .nullable(),
   doy: z.string().min(2, "Το ΔΟΥ είναι υποχρεωτικό").optional().nullable(),
@@ -304,4 +303,44 @@ export const billingSchema = z.object({
     .min(2, "Η διεύθυνση είναι υποχρεωτική")
     .optional()
     .nullable(),
+});
+
+export const billingSchema = z.object({
+  receipt: z.boolean(),
+  invoice: z.boolean(),
+  afm: z
+    .string()
+    .min(1, "Το ΑΦΜ είναι υποχρεωτικό")
+    .nullable()
+    .refine((val) => val !== null, {
+      message: "Το ΑΦΜ είναι υποχρεωτικό",
+    }),
+  doy: z
+    .string()
+    .min(2, "Το ΔΟΥ είναι υποχρεωτικό")
+    .nullable()
+    .refine((val) => val !== null, {
+      message: "Το ΔΟΥ είναι υποχρεωτικό",
+    }),
+  brandName: z
+    .string()
+    .min(2, "Η επωνυμία είναι υποχρεωτική")
+    .nullable()
+    .refine((val) => val !== null, {
+      message: "Η επωνυμία είναι υποχρεωτική",
+    }),
+  profession: z
+    .string()
+    .min(2, "Το επάγγελμα είναι υποχρεωτικό")
+    .nullable()
+    .refine((val) => val !== null, {
+      message: "Το επάγγελμα είναι υποχρεωτικό",
+    }),
+  address: z
+    .string()
+    .min(2, "Η διεύθυνση είναι υποχρεωτική")
+    .nullable()
+    .refine((val) => val !== null, {
+      message: "Η διεύθυνση είναι υποχρεωτική",
+    }),
 });
