@@ -126,6 +126,12 @@ export async function updateBasicInfo(prevState, formData) {
     payload.category = validationResult.data.category.data.id;
   if (validationResult.data.subcategory?.data?.id)
     payload.subcategory = validationResult.data.subcategory.data.id;
+  if (validationResult.data.skills?.data) {
+    payload.skills = validationResult.data.skills.data.map((skill) => skill.id);
+  }
+  if (validationResult.data.specialization?.data?.id) {
+    payload.specialization = validationResult.data.specialization.data.id;
+  }
 
   // Handle coverage
   if (validationResult.data.coverage) {

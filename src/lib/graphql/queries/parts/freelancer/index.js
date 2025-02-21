@@ -16,7 +16,10 @@ import { SERVICES } from "../../fragments/entities/service";
 import { ORDERS } from "../../fragments/entities/order";
 import { SKILLS } from "../../fragments/entities/skill";
 import { SIZE } from "../../fragments/entities/size";
-import { SPECIALISATIONS } from "../../fragments/entities/specialisation";
+import {
+  SPECIALISATIONS,
+  SPECIALIZATION_ENTITY,
+} from "../../fragments/entities/specialisation";
 import { MIN_BUDGETS_ENTITY } from "../../fragments/entities/budget";
 import { INDUSTRIES_ENTITY } from "../../fragments/entities/industry";
 import { MULTIPLE_FILES, SINGLE_IMAGE } from "../../fragments/global";
@@ -335,6 +338,9 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
     specialisations {
       ...Specialisations
     }
+    specialization {
+      ...SpecializationEntity
+    }
     minBudgets {
       ...MinBudgets
     }
@@ -434,6 +440,7 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
   ${FREELANCER_SUBCATEGORY_PARTIAL}
   ${SIZE}
   ${SPECIALISATIONS}
+  ${SPECIALIZATION_ENTITY}
   ${MIN_BUDGETS_ENTITY}
   ${INDUSTRIES_ENTITY}
   ${CONTACT_TYPES}

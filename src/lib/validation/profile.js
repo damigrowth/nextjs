@@ -79,6 +79,28 @@ export const basicInfoSchema = z.object({
         .nullable(),
     })
     .optional(),
+  skills: z.object({
+    data: z.array(
+      z.object({
+        id: z.string(),
+        attributes: z.object({
+          slug: z.string(),
+        }),
+      })
+    ),
+  }),
+  specialization: z
+    .object({
+      data: z
+        .object({
+          id: z.string(),
+          attributes: z.object({
+            slug: z.string(),
+          }),
+        })
+        .nullable(),
+    })
+    .optional(),
   rate: z
     .number()
     .min(10, "Η ελάχιστη χρέωση είναι 10€")

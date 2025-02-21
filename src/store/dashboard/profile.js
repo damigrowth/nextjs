@@ -132,6 +132,9 @@ const useEditProfileStore = create((set) => ({
   skills: { data: [] },
   setSkills: (value) => set(() => ({ skills: value })),
 
+  specialization: { data: null },
+  setSpecialization: (value) => set(() => ({ specialization: value })),
+
   coverage: initialCoverage,
   setCoverage: (field, value) =>
     set((state) => ({
@@ -290,6 +293,7 @@ const useEditProfileStore = create((set) => ({
       portfolio: freelancer.portfolio || { data: [] },
       services: freelancer.services || { data: [] },
       skills: freelancer.skills || { data: [] },
+      specialization: freelancer.specialization || { data: null },
       coverage: freelancer.coverage || {
         online: false,
         onsite: false,
@@ -351,6 +355,7 @@ const useEditProfileStore = create((set) => ({
       portfolio: { data: [] },
       services: { data: [] },
       skills: { data: [] },
+      specialization: { data: null },
       coverage: {
         online: false,
         onsite: false,

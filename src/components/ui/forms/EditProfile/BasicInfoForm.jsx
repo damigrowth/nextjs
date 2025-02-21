@@ -23,6 +23,7 @@ import {
 import Alert from "../../alerts/Alert";
 import SwitchB from "../../Archives/Inputs/SwitchB";
 import { useFormChanges } from "@/hook/useFormChanges";
+import { FREELANCER_PROFILE_SKILLS } from "@/lib/graphql/queries/main/taxonomies/freelancer/skill";
 
 export default function BasicInfoForm({ freelancer, type }) {
   const {
@@ -36,6 +37,8 @@ export default function BasicInfoForm({ freelancer, type }) {
     setCategory,
     subcategory,
     setSubcategory,
+    skills,
+    setSkills,
     rate,
     setRate,
     commencement,
@@ -43,6 +46,8 @@ export default function BasicInfoForm({ freelancer, type }) {
     coverage,
     setCoverage,
     switchCoverageMode,
+    specialization,
+    setSpecialization,
   } = useEditProfileStore();
 
   const initialState = {
@@ -62,6 +67,8 @@ export default function BasicInfoForm({ freelancer, type }) {
     description: freelancer.description,
     category: freelancer.category,
     subcategory: freelancer.subcategory,
+    skills: freelancer.skills,
+    specialization: freelancer.specialization,
     rate: Number(freelancer.rate),
     commencement: Number(freelancer.commencement),
     coverage: freelancer.coverage,
@@ -73,6 +80,8 @@ export default function BasicInfoForm({ freelancer, type }) {
     description,
     category,
     subcategory,
+    skills,
+    specialization,
     rate: Number(rate),
     commencement: Number(commencement),
     coverage,
@@ -184,6 +193,47 @@ export default function BasicInfoForm({ freelancer, type }) {
     switchCoverageMode("onsite", freelancer.coverage);
   };
 
+  const handleSkillsSelect = (selected) => {
+    const newSkills = selected
+      ? selected.map((item) => ({
+          id: item.id,
+          attributes: item.attributes,
+        }))
+      : [];
+
+    setSkills({ data: newSkills });
+
+    // Check if current specialization exists in the new skills
+    if (
+      specialization.data &&
+      !newSkills.some((skill) => skill.id === specialization.data.id)
+    ) {
+      setSpecialization({ data: null });
+    }
+  };
+
+  const handleSpecializationSelect = (selected) => {
+    const specializationObj = selected
+      ? {
+          id: selected.id,
+          attributes: {
+            label: selected.data.label,
+            slug: selected.data.slug,
+          },
+        }
+      : null;
+
+    setSpecialization({
+      data: specializationObj,
+    });
+  };
+  const specializations =
+    skills.data?.map((skill) => ({
+      id: skill.id,
+      slug: skill.attributes?.slug,
+      label: skill.attributes?.label || skill.attributes?.name,
+    })) || [];
+
   const handleSubmit = async (formData) => {
     formData.append("id", freelancer.id);
 
@@ -283,6 +333,49 @@ export default function BasicInfoForm({ freelancer, type }) {
               errors={formState?.errors?.subcategory}
             />
           </div>
+        </div>
+        <div className="row mb10">
+          <div className="col-md-12">
+            <SearchableSelect
+              name="skills"
+              label="Δεξιότητες"
+              labelPlural="δεξιότητες"
+              value={skills.data}
+              nameParam="label"
+              pageParam="skillsPage"
+              pageSizeParam="skillsPageSize"
+              pageSize={10}
+              onSearch={handleSkills}
+              onSelect={handleSkillsSelect}
+              isMulti={true}
+              maxSelections={5}
+              isClearable={true}
+              formatSymbols
+              capitalize
+              errors={formState?.errors?.skills}
+              isDisabled={!isCategorySelected || !isSubcategorySelected}
+              resetDependency={category.data?.id}
+            />
+          </div>
+        </div>
+        <div className="col-md-3 mb20">
+          <SearchableSelect
+            name="specialization"
+            label="Εξειδίκευση"
+            labelPlural="εξειδικεύσεις"
+            value={specialization.data || null}
+            staticOptions={specializations}
+            onSelect={handleSpecializationSelect}
+            isMulti={false}
+            isClearable={true}
+            formatSymbols
+            capitalize
+            errors={formState?.errors?.specialization}
+            isDisabled={skills?.data?.length === 0}
+            resetDependency={
+              skills.data ? skills.data.map((s) => s.id).join("-") : "none"
+            }
+          />
         </div>
 
         <label className="form-label fw700 dark-color mb10">Υπηρεσία</label>

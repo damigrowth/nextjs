@@ -38,4 +38,29 @@ const SKILLS_SEARCH = gql`
   ${SKILL_ENTITY}
 `;
 
-export { SKILLS_SEARCH };
+const FREELANCER_PROFILE_SKILLS = gql`
+  query FreelancerProfileSkills(
+    $label: String
+    $categorySlug: String
+    $skillsPage: Int
+    $skillsPageSize: Int
+  ) {
+    skills(
+      filters: {
+        label: { containsi: $label }
+        category: { slug: { eq: $categorySlug } }
+      }
+      pagination: { page: $skillsPage, pageSize: $skillsPageSize }
+      sort: "label:asc"
+    ) {
+      ...SkillEntity
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+  ${SKILL_ENTITY}
+`;
+
+export { SKILLS_SEARCH, FREELANCER_PROFILE_SKILLS };
