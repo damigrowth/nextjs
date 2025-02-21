@@ -55,6 +55,13 @@ const imageSchema = z
 
 export const basicInfoSchema = z.object({
   image: imageSchema,
+  tagline: z
+    .string()
+    .min(5, "Η σύντομη περιγραφή πρέπει να έχει τουλάχιστον 5 χαρακτήρες")
+    .max(
+      120,
+      "Η σύντομη περιγραφή δεν μπορεί να υπερβαίνει τους 120 χαρακτήρες"
+    ),
   description: z
     .string()
     .min(80, "Η περιγραφή πρέπει να έχει τουλάχιστον 80 χαρακτήρες")

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import InputB from "@/components/inputs/InputB";
 import TextArea from "@/components/inputs/TextArea";
 import ProfileImageInput from "@/components/inputs/ProfileImageInput";
@@ -169,8 +169,8 @@ export default function BasicInfoForm({ freelancer, type }) {
         searchTermType: "label",
         page,
         additionalVariables: {
-          type: type,
-          categorySlug: category.data.attributes.slug || "",
+          // type: type?.attributes?.slug || "", // Access slug from type prop
+          categorySlug: category.data?.attributes?.slug || "",
           categoriesPage: page,
           categoriesPageSize: 10,
         },
@@ -178,7 +178,27 @@ export default function BasicInfoForm({ freelancer, type }) {
 
       return data;
     },
-    [category.data]
+    [category.data?.attributes?.slug, type]
+  );
+
+  const handleSkills = useCallback(
+    async (searchTerm, page = 1) => {
+      const query = normalizeQuery(FREELANCER_PROFILE_SKILLS);
+      const data = await searchData({
+        query,
+        searchTerm: searchTerm || "", // Handle empty search term
+        searchTermType: "label",
+        page,
+        additionalVariables: {
+          categorySlug: category.data?.attributes?.slug || "",
+          skillsPage: page,
+          skillsPageSize: 10,
+        },
+      });
+
+      return data;
+    },
+    [category.data?.attributes?.slug]
   );
 
   const handleOnlineSwitch = () => {
@@ -191,6 +211,38 @@ export default function BasicInfoForm({ freelancer, type }) {
 
   const handleOnsiteSwitch = () => {
     switchCoverageMode("onsite", freelancer.coverage);
+  };
+
+  // Handle category change
+  const handleCategorySelect = (selected) => {
+    const categoryObj = selected
+      ? {
+          id: selected.id,
+          attributes: {
+            label: selected.attributes.label,
+            slug: selected.attributes.slug,
+          },
+        }
+      : null;
+
+    setCategory({ data: categoryObj });
+    // Reset dependent fields when changing category
+    setSubcategory({ data: null });
+    setSkills({ data: [] });
+    setSpecialization({ data: null });
+  };
+
+  const handleSubcategorySelect = (selected) => {
+    const subcategoryObj = selected
+      ? {
+          id: selected.id,
+          attributes: {
+            label: selected.attributes.label,
+            slug: selected.attributes.slug,
+          },
+        }
+      : null;
+    setSubcategory({ data: subcategoryObj });
   };
 
   const handleSkillsSelect = (selected) => {
@@ -227,6 +279,25 @@ export default function BasicInfoForm({ freelancer, type }) {
       data: specializationObj,
     });
   };
+
+  const handleCountiesSelect = (selected) => {
+    const newCountyIds = selected ? selected.map((c) => c.id) : [];
+
+    const currentAreas = coverage.areas.data || [];
+
+    const updatedAreas = currentAreas.filter((area) => {
+      const countyData = area.data?.attributes?.county?.data;
+      return countyData && newCountyIds.includes(countyData.id);
+    });
+
+    setCoverage("counties", { data: selected });
+    setCoverage("areas", { data: updatedAreas });
+  };
+
+  // Check if category is selected
+  const isCategorySelected = !!category.data;
+  const isSubcategorySelected = !!subcategory.data;
+
   const specializations =
     skills.data?.map((skill) => ({
       id: skill.id,
@@ -248,6 +319,9 @@ export default function BasicInfoForm({ freelancer, type }) {
 
     return formAction(formData);
   };
+
+  console.log("specialization", specialization);
+  console.log("freelancer", freelancer);
 
   return (
     <form action={handleSubmit}>
@@ -300,10 +374,7 @@ export default function BasicInfoForm({ freelancer, type }) {
               pageSizeParam="categoriesPageSize"
               pageSize={10}
               onSearch={handleFreelancerCategories}
-              onSelect={(selected) => {
-                setCategory({ data: selected });
-                setSubcategory({ data: null });
-              }}
+              onSelect={handleCategorySelect}
               isMulti={false}
               isClearable={true}
               formatSymbols
@@ -322,15 +393,14 @@ export default function BasicInfoForm({ freelancer, type }) {
               pageSizeParam="subcategoriesPageSize"
               pageSize={10}
               onSearch={handleFreelancerSubcategories}
-              onSelect={(selected) => {
-                setSubcategory({ data: selected });
-              }}
+              onSelect={handleSubcategorySelect}
               isMulti={false}
               isClearable={true}
               formatSymbols
               capitalize
-              key={`freelancerSubcategories-${category.data?.id}`}
               errors={formState?.errors?.subcategory}
+              isDisabled={!isCategorySelected}
+              resetDependency={category.data?.id}
             />
           </div>
         </div>
@@ -533,19 +603,7 @@ export default function BasicInfoForm({ freelancer, type }) {
                   pageSizeParam="coverageCountiesPageSize"
                   pageSize={10}
                   onSearch={handleOnsiteCounties}
-                  onSelect={(selected) => {
-                    const newCountyIds = selected.map((c) => c.id);
-
-                    const currentAreas = coverage.areas.data || [];
-
-                    const updatedAreas = currentAreas.filter((area) => {
-                      const countyData = area.data?.attributes?.county?.data;
-                      return countyData && newCountyIds.includes(countyData.id);
-                    });
-
-                    setCoverage("counties", { data: selected });
-                    setCoverage("areas", { data: updatedAreas });
-                  }}
+                  onSelect={handleCountiesSelect}
                   isMulti={true}
                   isClearable={true}
                   formatSymbols
@@ -559,7 +617,6 @@ export default function BasicInfoForm({ freelancer, type }) {
                   label="Περιοχές"
                   labelPlural="περιοχές"
                   value={coverage.areas.data}
-                  // here might have an issue
                   nameParam="areaTerm"
                   pageParam="coverageAreasPage"
                   pageSizeParam="coverageAreasPageSize"
@@ -574,7 +631,6 @@ export default function BasicInfoForm({ freelancer, type }) {
                   isClearable={true}
                   formatSymbols
                   capitalize
-                  // Force re-mount
                   key={coverage.counties.data.map((c) => c.id).join("-")}
                   errors={formState?.errors?.areas}
                 />
