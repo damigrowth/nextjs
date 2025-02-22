@@ -321,6 +321,11 @@ export async function updateAdditionalInfo(prevState, formData) {
     }
   });
 
+  // Handle size field transformation
+  if (changedFields.size) {
+    changedFields.size = changedFields.size || null;
+  }
+
   // Handle terms separately since it's a simple field
   if (changedFields.terms !== undefined) {
     changedFields.terms = formData.get("terms");
@@ -355,6 +360,11 @@ export async function updateAdditionalInfo(prevState, formData) {
   // Handle terms field
   if (validationResult.data.terms !== undefined) {
     payload.terms = validationResult.data.terms;
+  }
+
+  // Handle size field
+  if (validationResult.data.size !== undefined) {
+    payload.size = validationResult.data.size.data.id;
   }
 
   // Handle array fields

@@ -245,6 +245,9 @@ const useEditProfileStore = create((set) => ({
   settlement_methods: { data: [] },
   setSettlementMethods: (value) => set(() => ({ settlement_methods: value })),
 
+  size: { data: null },
+  setSize: (value) => set(() => ({ size: value })),
+
   billing_details: {
     receipt: false,
     invoice: false,
@@ -313,6 +316,7 @@ const useEditProfileStore = create((set) => ({
       contactTypes: freelancer.contactTypes || { data: [] },
       payment_methods: freelancer.payment_methods || { data: [] },
       settlement_methods: freelancer.settlement_methods || { data: [] },
+      size: freelancer.size || { data: null },
       billing_details: freelancer.billing_details || {
         receipt: false,
         invoice: false,
@@ -372,6 +376,7 @@ const useEditProfileStore = create((set) => ({
       contactTypes: { data: [] },
       payment_methods: { data: [] },
       settlement_methods: { data: [] },
+      size: { data: null },
       billing_details: {
         receipt: true,
         invoice: false,

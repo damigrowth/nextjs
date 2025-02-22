@@ -275,6 +275,15 @@ export const presentationSchema = z.object({
 });
 
 export const additionalInfoSchema = z.object({
+  size: z
+    .object({
+      data: z
+        .object({
+          id: z.string(),
+        })
+        .nullable(),
+    })
+    .optional(),
   terms: z
     .string()
     .min(80, "Οι όροι συνεργασίας πρέπει να είναι τουλάχιστον 80 χαρακτήρες")

@@ -14,10 +14,11 @@ import {
   contactTypesOptions,
   paymentMethodsOptions,
   settlementMethodsOptions,
+  sizeOptions,
 } from "@/data/global/collections";
 import Alert from "../../alerts/Alert";
 
-export default function AdditionalInfoForm({ freelancer }) {
+export default function AdditionalInfoForm({ freelancer, type }) {
   const {
     terms,
     setTerms,
@@ -31,6 +32,8 @@ export default function AdditionalInfoForm({ freelancer }) {
     setPaymentMethods,
     settlement_methods,
     setSettlementMethods,
+    size,
+    setSize,
   } = useEditProfileStore();
 
   const initialState = {
@@ -76,6 +79,12 @@ export default function AdditionalInfoForm({ freelancer }) {
 
   const getChangedFields = () => {
     const changes = {};
+
+    const sizeDataChanged = size?.data?.id !== freelancer.size?.data?.id;
+
+    if (sizeDataChanged) {
+      changes.size = size;
+    }
 
     // Check terms changes
     if (terms !== freelancer.terms) {
@@ -157,6 +166,34 @@ export default function AdditionalInfoForm({ freelancer }) {
     return changes;
   };
 
+  const handleSizeSelect = (selected) => {
+    const sizeObj = selected
+      ? {
+          id: selected.id,
+          attributes: {
+            label: selected.data.label,
+            slug: selected.data.slug,
+          },
+        }
+      : null;
+
+    setSize({
+      data: sizeObj,
+    });
+  };
+  const handleMinBudgetsSelect = (selected) => {
+    // Sort the selected items by value
+    const sortedSelected = [...selected].sort((a, b) => {
+      const valueA = a.attributes?.value || 0;
+      const valueB = b.attributes?.value || 0;
+      return valueA - valueB;
+    });
+
+    setMinBudgets({
+      data: sortedSelected,
+    });
+  };
+
   const hasChanges = () => {
     return Object.keys(getChangedFields()).length > 0;
   };
@@ -166,6 +203,13 @@ export default function AdditionalInfoForm({ freelancer }) {
     if (!Object.keys(changedFields).length) return;
 
     changedFields.id = freelancer.id;
+
+    if (changedFields.size) {
+      formData.delete("size");
+      if (changedFields.size.data) {
+        formData.append("size", changedFields.size);
+      }
+    }
 
     // Convert the simple arrays to the correct format for validation
     if (changedFields.contactTypes) {
@@ -202,6 +246,22 @@ export default function AdditionalInfoForm({ freelancer }) {
         </div>
 
         <div className="row mb10">
+          {type === "company" && (
+            <div className="col-md-2">
+              <SearchableSelect
+                name="size"
+                label="Αριθμός Εργαζομένων"
+                labelPlural="αριθμοί εργαζομένων"
+                value={size.data} // Directly use data property
+                staticOptions={sizeOptions}
+                onSelect={handleSizeSelect}
+                isMulti={false}
+                isClearable={true}
+                errors={formState?.errors?.size}
+              />
+            </div>
+          )}
+
           <div className="col-md-4">
             <SearchableSelect
               name="minBudgets"
@@ -213,18 +273,7 @@ export default function AdditionalInfoForm({ freelancer }) {
               pageSizeParam="minBudgetsPageSize"
               pageSize={10}
               onSearch={handleMinBudgets}
-              onSelect={(selected) => {
-                // Sort the selected items by value
-                const sortedSelected = [...selected].sort((a, b) => {
-                  const valueA = a.attributes?.value || 0;
-                  const valueB = b.attributes?.value || 0;
-                  return valueA - valueB;
-                });
-
-                setMinBudgets({
-                  data: sortedSelected,
-                });
-              }}
+              onSelect={handleMinBudgetsSelect}
               isMulti={true}
               isClearable={true}
               formatSymbols
