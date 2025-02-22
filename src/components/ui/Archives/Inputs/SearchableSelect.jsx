@@ -87,6 +87,8 @@ export default function SearchableSelect({
   newTermValue = "new",
   ariaLabel,
   maxSelections,
+  staticOptions,
+  resetDependency,
 }) {
   const [isMounted, setIsMounted] = useState(false);
   const [loadingStates, setLoadingStates] = useState({
@@ -95,6 +97,7 @@ export default function SearchableSelect({
   });
   const [retryCount, setRetryCount] = useState(0);
   const [newTerms, setNewTerms] = useState([]);
+  const [optionsCacheKey, setOptionsCacheKey] = useState(0);
   const maxRetries = 3;
 
   const selectedValue = useMemo(() => {
@@ -144,6 +147,23 @@ export default function SearchableSelect({
     }));
 
     try {
+      if (staticOptions) {
+        // Handle static options
+        const filtered = staticOptions.filter((item) =>
+          item.label.toLowerCase().includes(search.toLowerCase())
+        );
+        const options = filtered.map((item) => ({
+          value: item.id,
+          label: item.label,
+          data: item,
+        }));
+        return {
+          options,
+          hasMore: false,
+          additional: { page: page + 1 },
+        };
+      }
+
       const formattedSearch = formatInput({
         value: search,
         capitalize,
@@ -331,6 +351,10 @@ export default function SearchableSelect({
     setIsMounted(true);
   }, []);
 
+  useEffect(() => {
+    setOptionsCacheKey((prev) => prev + 1);
+  }, [resetDependency]);
+
   if (!isMounted) return null;
 
   return (
@@ -385,6 +409,7 @@ export default function SearchableSelect({
         error={errors?.field === name ? errors.message : null}
         isRetrying={retryCount > 0}
         aria-label={ariaLabel || label}
+        cacheUniqs={[optionsCacheKey]}
       />
       {errors?.field === name && (
         <div className="mt-1">
