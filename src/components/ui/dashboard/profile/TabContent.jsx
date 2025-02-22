@@ -33,7 +33,7 @@ export async function TabContent() {
     {
       index: 3,
       label: "Πρόσθετα Στοιχεία",
-      content: <AdditionalInfoForm freelancer={freelancer} />,
+      content: <AdditionalInfoForm freelancer={freelancer} type={type} />,
     },
     {
       index: 4,

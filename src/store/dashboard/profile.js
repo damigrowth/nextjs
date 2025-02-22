@@ -132,6 +132,9 @@ const useEditProfileStore = create((set) => ({
   skills: { data: [] },
   setSkills: (value) => set(() => ({ skills: value })),
 
+  specialization: { data: null },
+  setSpecialization: (value) => set(() => ({ specialization: value })),
+
   coverage: initialCoverage,
   setCoverage: (field, value) =>
     set((state) => ({
@@ -242,6 +245,9 @@ const useEditProfileStore = create((set) => ({
   settlement_methods: { data: [] },
   setSettlementMethods: (value) => set(() => ({ settlement_methods: value })),
 
+  size: { data: null },
+  setSize: (value) => set(() => ({ size: value })),
+
   billing_details: {
     receipt: false,
     invoice: false,
@@ -290,6 +296,7 @@ const useEditProfileStore = create((set) => ({
       portfolio: freelancer.portfolio || { data: [] },
       services: freelancer.services || { data: [] },
       skills: freelancer.skills || { data: [] },
+      specialization: freelancer.specialization || { data: null },
       coverage: freelancer.coverage || {
         online: false,
         onsite: false,
@@ -309,6 +316,7 @@ const useEditProfileStore = create((set) => ({
       contactTypes: freelancer.contactTypes || { data: [] },
       payment_methods: freelancer.payment_methods || { data: [] },
       settlement_methods: freelancer.settlement_methods || { data: [] },
+      size: freelancer.size || { data: null },
       billing_details: freelancer.billing_details || {
         receipt: false,
         invoice: false,
@@ -351,6 +359,7 @@ const useEditProfileStore = create((set) => ({
       portfolio: { data: [] },
       services: { data: [] },
       skills: { data: [] },
+      specialization: { data: null },
       coverage: {
         online: false,
         onsite: false,
@@ -367,6 +376,7 @@ const useEditProfileStore = create((set) => ({
       contactTypes: { data: [] },
       payment_methods: { data: [] },
       settlement_methods: { data: [] },
+      size: { data: null },
       billing_details: {
         receipt: true,
         invoice: false,

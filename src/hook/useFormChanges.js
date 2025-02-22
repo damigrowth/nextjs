@@ -58,7 +58,11 @@ const normalizeValue = (value) => {
         return normalizeValue(value.data);
       }
 
-      // For single object
+      // For single object - FIXED: Handle null data properly
+      if (value.data === null) {
+        return null;
+      }
+
       return (
         value.data.id ||
         (value.data.attributes && value.data.attributes.id) ||

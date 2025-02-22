@@ -294,7 +294,7 @@ const FREELANCER_PROFILE_CATEGORIES = gql`
 `;
 
 const FREELANCER_PROFILE_SUBCATEGORIES = gql`
-  query FreelancerProfileCategories(
+  query FreelancerProfileSubcategories(
     $label: String
     $categorySlug: String
     $type: String

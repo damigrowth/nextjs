@@ -12,4 +12,16 @@ const SPECIALISATIONS = gql`
   }
 `;
 
-export { SPECIALISATIONS };
+const SPECIALIZATION_ENTITY = gql`
+  fragment SpecializationEntity on SkillEntityResponse {
+    data {
+      id
+      attributes {
+        label
+        slug
+      }
+    }
+  }
+`;
+
+export { SPECIALISATIONS, SPECIALIZATION_ENTITY };

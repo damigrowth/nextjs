@@ -86,3 +86,41 @@ export const settlementMethodsOptions = [
     slug: "miniaia",
   },
 ];
+
+export const sizeOptions = [
+  {
+    id: "1",
+    label: "1",
+    slug: "1",
+  },
+  {
+    id: "2",
+    label: "2-5",
+    slug: "2-5",
+  },
+  {
+    id: "3",
+    label: "6-10",
+    slug: "6-10",
+  },
+  {
+    id: "4",
+    label: "11-20",
+    slug: "11-20",
+  },
+  {
+    id: "5",
+    label: "21-50",
+    slug: "21-50",
+  },
+  {
+    id: "6",
+    label: "51-100",
+    slug: "51-100",
+  },
+  {
+    id: "7",
+    label: "101+",
+    slug: "101",
+  },
+];

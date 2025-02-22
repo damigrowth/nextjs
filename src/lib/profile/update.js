@@ -9,6 +9,7 @@ import {
   additionalInfoSchema,
   basicInfoSchema,
   billingSchema,
+  billingSchemaOptional,
   presentationSchema,
 } from "../validation/profile";
 import { uploadMedia } from "../uploads/upload";
@@ -125,6 +126,12 @@ export async function updateBasicInfo(prevState, formData) {
     payload.category = validationResult.data.category.data.id;
   if (validationResult.data.subcategory?.data?.id)
     payload.subcategory = validationResult.data.subcategory.data.id;
+  if (validationResult.data.skills?.data) {
+    payload.skills = validationResult.data.skills.data.map((skill) => skill.id);
+  }
+  if (validationResult.data.specialization?.data?.id) {
+    payload.specialization = validationResult.data.specialization.data.id;
+  }
 
   // Handle coverage
   if (validationResult.data.coverage) {
@@ -314,6 +321,11 @@ export async function updateAdditionalInfo(prevState, formData) {
     }
   });
 
+  // Handle size field transformation
+  if (changedFields.size) {
+    changedFields.size = changedFields.size || null;
+  }
+
   // Handle terms separately since it's a simple field
   if (changedFields.terms !== undefined) {
     changedFields.terms = formData.get("terms");
@@ -348,6 +360,11 @@ export async function updateAdditionalInfo(prevState, formData) {
   // Handle terms field
   if (validationResult.data.terms !== undefined) {
     payload.terms = validationResult.data.terms;
+  }
+
+  // Handle size field
+  if (validationResult.data.size !== undefined) {
+    payload.size = validationResult.data.size.data.id;
   }
 
   // Handle array fields
@@ -387,18 +404,16 @@ export async function updateAdditionalInfo(prevState, formData) {
 }
 
 export async function updateBillingDetails(prevState, formData) {
-  const changedFields = JSON.parse(formData.get("changes"));
+  const billing_details = JSON.parse(formData.get("billing_details"));
+  const id = formData.get("id");
 
-  // Create a partial schema based on changed fields
-  const partialSchema = z.object(
-    Object.keys(changedFields).reduce((acc, field) => {
-      acc[field] = billingSchema.shape[field];
-      return acc;
-    }, {})
-  );
+  // Choose validation schema based on invoice flag
+  const validationSchema = billing_details.invoice
+    ? billingSchema
+    : billingSchemaOptional;
 
-  // Validate only changed fields
-  const validationResult = partialSchema.safeParse(changedFields);
+  // Validate billing details with the appropriate schema
+  const validationResult = validationSchema.safeParse(billing_details);
 
   if (!validationResult.success) {
     const fieldErrors = {};
@@ -421,18 +436,22 @@ export async function updateBillingDetails(prevState, formData) {
     };
   }
 
-  // Format the data for the billing_details field
+  // Process the billing details, ensuring proper types
+  const processedBillingDetails = {
+    ...validationResult.data,
+    // If AFM exists and isn't null, ensure it's a string
+    ...(validationResult.data.afm !== null &&
+      validationResult.data.afm !== undefined && {
+        afm: validationResult.data.afm.toString(),
+      }),
+  };
+
   const payload = {
-    billing_details: {
-      ...validationResult.data,
-      afm: validationResult.data.afm
-        ? validationResult.data.afm.toString()
-        : null,
-    },
+    billing_details: processedBillingDetails,
   };
 
   const { data, error } = await postData(UPDATE_FREELANCER, {
-    id: formData.get("id"),
+    id,
     data: payload,
   });
 

@@ -15,6 +15,7 @@ const SKILLS = gql`
 const SKILL_ENTITY = gql`
   fragment SkillEntity on SkillEntityResponseCollection {
     data {
+      id
       attributes {
         label
         slug
