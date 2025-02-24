@@ -10,6 +10,7 @@ import ServiceSuccess from "../ServiceSuccess/ServiceSuccess";
 import ServicePackages from "../AddService/ServicePackages";
 import ServiceAddons from "../AddService/ServiceAddons";
 import ServiceType from "../AddService/ServiceType";
+import { NavigationButtons } from "../buttons/NavigationButtons";
 
 function AddServiceButton({ isPending }) {
   return (
@@ -125,6 +126,14 @@ export default function AddServiceForm({ coverage }) {
             {step === "addons" && <ServiceAddons />}
             {step === "faq" && <ServiceFaq />}
             {step === "gallery" && <ServiceGallery isPending={isPending} />}
+            <NavigationButtons
+              showPrevious={showPreviousButton()}
+              onPreviousClick={handlePreviousButton}
+              showNext={showNextButton()}
+              onNextClick={handleNextButton}
+              nextDisabled={handleDisable()}
+              isPending={isPending}
+            />
           </>
         )}
       </div>
