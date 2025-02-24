@@ -30,8 +30,18 @@ function AddServiceButton({ isPending }) {
 }
 
 export default function AddServiceForm({ coverage }) {
-  const { service, saved, optional, step, steps, setStep, info, media } =
-    useCreateServiceStore();
+  const {
+    service,
+    saved,
+    optional,
+    step,
+    steps,
+    setStep,
+    info,
+    media,
+    goBack,
+    typeStep,
+  } = useCreateServiceStore();
 
   const initialState = {
     data: null,
@@ -52,6 +62,29 @@ export default function AddServiceForm({ coverage }) {
       return false; // Not disabled if optional
     }
     return !saved[step]; // Disabled if not saved
+  };
+
+  const handlePreviousButton = () => {
+    if (step === "type") {
+      if (typeStep === 1 || typeStep === 2) {
+        goBack();
+      }
+    } else {
+      setStep(steps[step].previous);
+    }
+  };
+
+  const handleNextButton = () => {
+    setStep(steps[step].next);
+  };
+
+  const showPreviousButton = () => {
+    // Show previous button if there's a previous step or if we're in the type step with typeStep > 0
+    return steps[step].previous || (step === "type" && typeStep > 0);
+  };
+
+  const showNextButton = () => {
+    return steps[step].next;
   };
 
   return (
@@ -81,8 +114,7 @@ export default function AddServiceForm({ coverage }) {
           hidden
           readOnly
         />
-        {/* <ServiceInformation />
-        <AddServiceButton isPending={isPending} /> */}
+
         {step === "info" && <ServiceInformation />}
         {serviceId ? (
           <ServiceSuccess id={serviceId} title={serviceTitle} />
@@ -93,48 +125,6 @@ export default function AddServiceForm({ coverage }) {
             {step === "addons" && <ServiceAddons />}
             {step === "faq" && <ServiceFaq />}
             {step === "gallery" && <ServiceGallery isPending={isPending} />}
-            <div className="row pt10 ">
-              <div className="col-sm-6 text-start">
-                {steps[step].previous ? (
-                  <button
-                    type="button"
-                    onClick={() => setStep(steps[step].previous)}
-                    className="ud-btn btn-white bdrs4 d-flex align-items-center gap-2 default-box-shadow p3"
-                    disabled={isPending}
-                  >
-                    <span className="d-flex align-items-center flaticon-left fz20" />
-                    <span>Πίσω</span>
-                  </button>
-                ) : null}
-              </div>
-              <div className="col-sm-6 text-end d-flex justify-content-end align-items-center">
-                {steps[step].next ? (
-                  <button
-                    type="button"
-                    disabled={handleDisable()}
-                    onClick={() => setStep(steps[step].next)}
-                    className={`ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3 ${
-                      handleDisable() ? "btn-dark-disabled" : ""
-                    }`}
-                  >
-                    <span>Επόμενο</span>
-                    <span className="d-flex align-items-center flaticon-right fz20" />
-                  </button>
-                ) : null}
-              </div>
-              {saved.gallery === true && (
-                <div className="d-flex justify-content-center">
-                  <div className="text-center">
-                    {formState.errors && (
-                      <div className="mb10">
-                        <p className="text-danger">{formState.message}</p>
-                      </div>
-                    )}
-                    <AddServiceButton isPending={isPending} />
-                  </div>
-                </div>
-              )}
-            </div>
           </>
         )}
       </div>
