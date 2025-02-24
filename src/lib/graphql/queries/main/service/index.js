@@ -132,6 +132,7 @@ const FEATURED_SERVICES = gql`
   ${FEATURED_SERVICE}
 `;
 
+// TODO: Add $search for tags
 const SERVICES_ARCHIVE = gql`
   query ServicesArchive(
     $search: String
@@ -147,11 +148,12 @@ const SERVICES_ARCHIVE = gql`
     services(
       filters: {
         or: [
-          { title: { containsi: $search } }
-          { description: { containsi: $search } }
-          { category: { label: { containsi: $search } } }
-          { subcategory: { label: { containsi: $search } } }
-          { subdivision: { label: { containsi: $search } } }
+          { title_normalized: { containsi: $search } }
+          { description_normalized: { containsi: $search } }
+          { category: { label_normalized: { containsi: $search } } }
+          { subcategory: { label_normalized: { containsi: $search } } }
+          { subdivision: { label_normalized: { containsi: $search } } }
+          { tags: { label_normalized: { containsi: $search } } }
         ]
         and: [
           { price: { gte: $min, lte: $max } }

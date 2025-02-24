@@ -10,6 +10,7 @@ import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
 import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
 import { TAGS_SEARCH } from "@/lib/graphql/queries/main/taxonomies/service/tag";
+import { normalizeTerm } from "@/utils/normalizeTerm";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -47,12 +48,14 @@ export default async function page({ searchParams }) {
     ver,
     page,
     sort,
-  } = searchParams;
+  } = await searchParams;
+
+  const allSearchParams = await searchParams;
 
   const addFilter = (condition, value) => (condition ? value : undefined);
 
   const paramsFilters = {
-    search: search || undefined,
+    search: normalizeTerm(search) || undefined,
     min: addFilter(min, parseInt(min, 10)),
     max: addFilter(max, parseInt(max, 10)),
     time: addFilter(time, parseInt(time, 10)),
@@ -130,7 +133,7 @@ export default async function page({ searchParams }) {
         description="Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας."
       />
       <ServicesArchive
-        searchParams={searchParams}
+        searchParams={allSearchParams}
         paramsFilters={paramsFilters}
         selectData={selectData}
         multiSelectData={multiSelectData}
