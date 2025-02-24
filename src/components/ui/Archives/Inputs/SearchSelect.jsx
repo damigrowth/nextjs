@@ -7,10 +7,17 @@ import {
   useRouter,
   useSearchParams,
 } from "next/navigation";
-import Select from "react-select";
 import Link from "next/link";
 import { getPathname } from "@/utils/paths";
 import { RotatingLines } from "react-loader-spinner";
+
+// Dynamic import fix for hydration error
+import dynamic from "next/dynamic";
+
+const Select = dynamic(
+  () => import("react-select").then((mod) => mod.default),
+  { ssr: false }
+);
 
 export default function SearchSelect({
   rootLabel,

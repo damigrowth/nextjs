@@ -16,7 +16,7 @@ export const dynamicParams = true;
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
-  const { category } = params;
+  const { category } = await params;
 
   const data = {
     type: "category",
@@ -33,7 +33,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function page({ params }) {
-  const { category } = params;
+  const { category } = await params;
 
   const { categories } = await getData(CATEGORIES);
 

@@ -18,7 +18,7 @@ export const dynamicParams = true;
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
-  const { subcategory } = params;
+  const { subcategory } = await params;
 
   const data = {
     type: "subcategory",
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function page({ params, searchParams }) {
-  const { subcategory } = params;
+  const { subcategory } = await params;
 
   const { categories } = await getData(CATEGORIES);
 
@@ -71,7 +71,9 @@ export default async function page({ params, searchParams }) {
     ver,
     page,
     sort,
-  } = searchParams;
+  } = await searchParams;
+
+  const allSearchParams = await searchParams;
 
   const addFilter = (condition, value) => (condition ? value : undefined);
 
@@ -167,7 +169,7 @@ export default async function page({ params, searchParams }) {
       <ServicesArchive
         taxonomies={taxonomies}
         categories={subdivisionsSearch?.data}
-        searchParams={searchParams}
+        searchParams={allSearchParams}
         paramsFilters={paramsFilters}
         selectData={selectData}
         multiSelectData={multiSelectData}

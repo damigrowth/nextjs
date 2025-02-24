@@ -18,7 +18,7 @@ export const dynamicParams = true;
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
-  const { category } = params;
+  const { category } = await params;
 
   const data = {
     type: "freelancerCategory",
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function page({ params, searchParams }) {
-  const { category, subcategory } = params;
+  const { category, subcategory } = await params;
 
   const { categories } = await getData(FREELANCER_CATEGORIES);
 
@@ -72,7 +72,9 @@ export default async function page({ params, searchParams }) {
     ver,
     sort,
     page,
-  } = searchParams;
+  } = await searchParams;
+
+  const allSearchParams = await searchParams;
 
   // Utility function to convert a comma-separated string to an array of integers
   const toIntArray = (str) =>
@@ -160,7 +162,7 @@ export default async function page({ params, searchParams }) {
         taxonomies={taxonomies}
         categories={subcategoriesSearch?.data}
         counties={counties?.data}
-        searchParams={searchParams}
+        searchParams={allSearchParams}
         paramsFilters={paramsFilters}
         selectData={selectData}
         childPath
