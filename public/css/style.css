@@ -6831,6 +6831,13 @@ textarea:focus-visible {
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
+
+@media screen and (max-width: 767px) {
+  .freelancer-style1 {
+    max-width: 100%;
+  }
+}
+
 .freelancer-style1 .meta {
   color: var(--headings-color);
 }
