@@ -183,7 +183,7 @@ export default async function page({ params, searchParams }) {
   return (
     <>
       <Tabs
-        parentPathLabel="Όλες οι κατηγορίες"
+        parentPathLabel="Όλοι οι Επαγγελματίες"
         parentPathLink="pros"
         categories={categories?.data}
       />

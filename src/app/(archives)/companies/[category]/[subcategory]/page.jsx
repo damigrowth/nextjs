@@ -148,7 +148,7 @@ export default async function page({ params, searchParams }) {
   return (
     <>
       <Tabs
-        parentPathLabel="Όλες οι κατηγορίες"
+        parentPathLabel="Όλες οι Επιχειρήσεις"
         parentPathLink="companies"
         categories={categories?.data}
       />
