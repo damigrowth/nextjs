@@ -59,7 +59,7 @@ export default function ManageServiceInfo({ fid, page }) {
                   </div>
                 }
               >
-                <ServicesTableDashboard fid={fid} page={page} pageSize={5} />
+                <ServicesTableDashboard fid={fid} page={page} pageSize={10} />
               </Suspense>
             </div>
           </div>

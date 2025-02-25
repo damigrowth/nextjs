@@ -229,7 +229,13 @@ const SERVICES_ALL = gql`
 const SERVICES_BY_FREELANCER = gql`
   query ServicesByFreelancer($id: ID!, $page: Int, $pageSize: Int) {
     services(
-      filters: { freelancer: { id: { eq: $id } } }
+      filters: {
+        freelancer: { id: { eq: $id } }
+        or: [
+          { status: { type: { eq: "Active" } } }
+          { status: { type: { eq: "Pending" } } }
+        ]
+      }
       sort: "updatedAt:desc"
       pagination: { page: $page, pageSize: $pageSize }
     ) {

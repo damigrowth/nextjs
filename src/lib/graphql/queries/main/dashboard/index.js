@@ -4,7 +4,13 @@ import { PAGINATION } from "../../fragments/global";
 export const ALL_SERVICES_DASHBOARD = gql`
   query AllServicesDashboard($id: ID!) {
     services(
-      filters: { freelancer: { id: { eq: $id } } }
+      filters: {
+        freelancer: { id: { eq: $id } }
+        or: [
+          { status: { type: { eq: "Active" } } }
+          { status: { type: { eq: "Pending" } } }
+        ]
+      }
       pagination: { page: 1, pageSize: 3 }
       sort: "publishedAt:desc"
     ) {
