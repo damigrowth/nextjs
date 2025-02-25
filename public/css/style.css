@@ -10399,8 +10399,8 @@ input:focus-visible {
 .service-single-sldier {
   position: relative;
   background-color: #404040;
-  padding: 1rem 1rem;
-  border-radius: 12px;
+  /* padding: 1rem 1rem; */
+  border-radius: 5px;
 }
 .service-single-sldier:after {
   /* background-color: #404040; */
