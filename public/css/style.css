@@ -788,6 +788,19 @@ li {
   width: auto;
 }
 
+.user_setting_content span {
+  height: fit-content;
+  line-height: 1.7rem;
+}
+
+.user_setting_content form {
+  line-height: 1.7rem;
+}
+
+.dropdown-menu .user_setting_content {
+  z-index: 1000;
+}
+
 .user_setting {
   position: relative;
 }
