@@ -1,6 +1,5 @@
 "use server";
 
-import { normalizeGreek } from "@/utils/normalizeGreek";
 import { getData } from "../client/operations";
 import { HOME_SEARCH } from "../graphql/queries/main/taxonomies/service";
 import { normalizeTerm } from "@/utils/normalizeTerm";
