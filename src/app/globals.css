@@ -1426,6 +1426,12 @@ a {
   width: 30%;
 }
 
+@media (max-width: 1200px) {
+  .arc-service-card-image-wrapper {
+    width: 100%;
+  }
+}
+
 .dropdown-item.disabled {
   opacity: 0.5;
 }
