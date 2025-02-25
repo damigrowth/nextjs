@@ -37,8 +37,6 @@ export default async function FeaturedServiceCard({
     image = fallbackImage;
   }
 
-  const savedStatus = await getSavedStatus("service", id);
-
   return (
     <div className="listing-style1 bdrs16">
       <div className="list-thumb">
@@ -52,14 +50,7 @@ export default async function FeaturedServiceCard({
             style={{ objectFit: "cover" }}
           />
         </Link>
-        {fid && (
-          <SaveFrom
-            type="service"
-            id={id}
-            initialSavedStatus={savedStatus}
-            showDelete={showDelete}
-          />
-        )}
+        {fid && <SaveFrom type="service" id={id} showDelete={showDelete} />}
       </div>
       {/* <div className={`list-content ${isContentExpanded ? "px-0" : ""}`}> */}
       <div className="list-content">

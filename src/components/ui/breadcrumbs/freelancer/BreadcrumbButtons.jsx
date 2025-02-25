@@ -7,6 +7,7 @@ export default function BreadcrumbButtons({
   subjectTitle,
   id,
   savedStatus,
+  saveType,
   hideSaveButton,
 }) {
   const [shareToggle, setShareToggle] = useState(false);
@@ -73,14 +74,7 @@ export default function BreadcrumbButtons({
           </div>
         )}
       </a>
-      {!hideSaveButton && (
-        <SaveForm
-          type="service"
-          id={id}
-          variant="text"
-          initialSavedStatus={savedStatus}
-        />
-      )}
+      {!hideSaveButton && <SaveForm type={saveType} id={id} variant="text" />}
     </div>
   );
 }

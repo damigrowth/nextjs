@@ -1,57 +1,90 @@
 "use client";
 
-import { saveCollectionEntry, unsaveCollectionEntry } from "@/lib/save";
-import { useActionState } from "react";
+import { useQuery, useMutation } from "@apollo/client";
+import { useEffect, useState } from "react";
+import {
+  SAVED_SERVICE,
+  SAVED_FREELANCER,
+  SAVE_SERVICE,
+  SAVE_FREELANCER,
+  UNSAVE_SERVICE,
+  UNSAVE_FREELANCER,
+} from "@/lib/graphql/mutations";
+import { revalidateSaved } from "@/lib/save";
 
 export default function SaveForm({
   type,
   id,
-  initialSavedStatus = false,
   showDelete = false,
   className = "",
   variant = "heart",
 }) {
-  const [saveState, saveAction, isSavePending] = useActionState(
-    saveCollectionEntry,
-    { success: null, errors: {}, isSaved: initialSavedStatus }
+  const [optimisticSaved, setOptimisticSaved] = useState(false);
+  const QUERY = type === "service" ? SAVED_SERVICE : SAVED_FREELANCER;
+  const variables =
+    type === "service" ? { serviceId: id } : { freelancerId: id };
+
+  const {
+    data,
+    loading: queryLoading,
+    refetch,
+  } = useQuery(QUERY, {
+    variables,
+    skip: !id,
+    fetchPolicy: "cache-first",
+  });
+
+  const [saveItem] = useMutation(
+    type === "service" ? SAVE_SERVICE : SAVE_FREELANCER,
+    {
+      onCompleted: () => refetch(),
+    }
+  );
+  const [unsaveItem] = useMutation(
+    type === "service" ? UNSAVE_SERVICE : UNSAVE_FREELANCER,
+    {
+      onCompleted: () => refetch(),
+    }
   );
 
-  const [unsaveState, unsaveAction, isUnsavePending] = useActionState(
-    unsaveCollectionEntry,
-    { success: null, errors: {}, isSaved: initialSavedStatus }
-  );
+  useEffect(() => {
+    if (data) {
+      const saved =
+        type === "service"
+          ? data.checkSavedService?.isSaved
+          : data.checkSavedFreelancer?.isSaved;
+      setOptimisticSaved(!!saved);
+    }
+  }, [data, type]);
 
-  // Determine saved state from action results or initial state
-  const saved =
-    saveState?.success || (!unsaveState?.success && initialSavedStatus);
-  const isLoading = isSavePending || isUnsavePending;
+  const handleSave = async () => {
+    const previousState = optimisticSaved;
+    setOptimisticSaved(!previousState);
 
-  if (showDelete) {
-    return (
-      <form action={unsaveAction} className="save-button-form">
-        <input type="hidden" name="type" value={type} />
-        <input type="hidden" name="id" value={id} />
-        <button
-          type="submit"
-          disabled={isUnsavePending}
-          className="listing-fav fz12 btn"
-          style={{ zIndex: 100 }}
-        >
-          <span
-            className={`flaticon-delete ${isUnsavePending ? "opacity-50" : ""}`}
-          />
-        </button>
-      </form>
-    );
-  }
+    try {
+      if (previousState) {
+        await unsaveItem({ variables });
+      } else {
+        await saveItem({ variables });
+      }
+
+      await revalidateSaved(type, id);
+    } catch (error) {
+      setOptimisticSaved(previousState);
+      console.error("Save error:", error);
+    }
+  };
+
+  const isLoading = queryLoading;
+  const displaySaved = data ? optimisticSaved : false;
 
   const renderContent = () => {
     if (variant === "heart") {
       return (
         <span
-          className={`${saved ? "fas fa-heart" : "far fa-heart"} ${
-            isLoading ? "opacity-50" : ""
-          }`}
+          className={`${
+            displaySaved ? "fas fa-heart ui-fav-active" : "far fa-heart"
+          } ${isLoading ? "opacity-75" : ""}`}
         />
       );
     }
@@ -59,45 +92,54 @@ export default function SaveForm({
     return (
       <div
         className={`share-save-widget d-flex align-items-center ml15 ${
-          saved ? "active" : ""
+          displaySaved ? "active" : ""
         }`}
       >
         <span
           className={`icon dark-color fz12 mr10 ${
-            saved ? "fas fa-heart" : "far fa-heart"
-          } ${saved ? "ui-fav-active" : ""}`}
+            displaySaved ? "fas fa-heart ui-fav-active" : "far fa-heart"
+          }`}
         />
-        <div className="h6 mb-0">{saved ? "Αποθηκεύτηκε" : "Αποθήκευση"}</div>
+        <div className="h6 mb-0">
+          {displaySaved ? "Αποθηκεύτηκε" : "Αποθήκευση"}
+        </div>
       </div>
     );
   };
 
+  if (showDelete) {
+    return (
+      <div className="save-button-form">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={isLoading}
+          className="listing-fav fz12 btn relative"
+          style={{ zIndex: 100 }}
+        >
+          <span
+            className={`flaticon-delete ${isLoading ? "opacity-75" : ""}`}
+          />
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <form
-      action={saved ? unsaveAction : saveAction}
-      // className={variant === "heart" ? "save-button-form" : ""}
-      className={variant === "heart" ? "save-button-form" : ""}
-    >
-      <input type="hidden" name="type" value={type} />
-      <input type="hidden" name="id" value={id} />
+    <div className={variant === "heart" ? "save-button-form" : ""}>
       <button
-        type="submit"
+        type="button"
+        onClick={handleSave}
         disabled={isLoading}
         className={`${
           variant === "heart"
-            ? `listing-fav fz12 btn ${saved ? "ui-fav-active" : ""}`
+            ? `listing-fav fz12 btn ${displaySaved ? "ui-fav-active" : ""}`
             : "btn-none"
-        } ${className}`}
+        } ${className} ${isLoading ? "opacity-50 pe-none" : ""}`}
         style={{ zIndex: 100 }}
       >
         {renderContent()}
       </button>
-
-      {(saveState?.errors?.general || unsaveState?.errors?.general) && (
-        <span className="text-red-500 text-sm">
-          {saveState?.errors?.general || unsaveState?.errors?.general}
-        </span>
-      )}
-    </form>
+    </div>
   );
 }

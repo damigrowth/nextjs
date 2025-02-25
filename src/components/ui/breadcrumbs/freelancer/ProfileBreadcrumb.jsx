@@ -57,6 +57,7 @@ export default function ProfileBreadcrumb({
                 subjectTitle={subjectTitle}
                 id={id}
                 savedStatus={savedStatus}
+                saveType={"freelancer"}
                 hideSaveButton={hideSaveButton}
               />
             </div>

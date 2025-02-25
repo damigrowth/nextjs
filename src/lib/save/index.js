@@ -13,6 +13,14 @@ import {
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
+export async function revalidateSaved(type, id) {
+  revalidateTag(`saved-${type}-${id}`);
+  revalidateTag("saved-status");
+  // revalidateTag("home-services");
+  revalidatePath("/dashboard/saved");
+  // revalidatePath("/");
+}
+
 export async function getSavedStatus(type, id) {
   const response = await getData(
     type === "service" ? SAVED_SERVICE : SAVED_FREELANCER,
