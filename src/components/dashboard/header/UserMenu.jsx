@@ -68,20 +68,20 @@ export default async function UserMenu({ isMobile }) {
     );
   } else {
     return !isMobile ? (
-      <>
+      <div className="auth-btns">
         <Link
-          className="login-info mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent"
+          className="mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent"
           href="/login"
         >
           Σύνδεση
         </Link>
         <Link
-          className="login-info mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent"
+          className="mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent"
           href="/register"
         >
           Εγγραφή
         </Link>
-      </>
+      </div>
     ) : (
       <Link href="/login">Σύνδεση</Link>
     );

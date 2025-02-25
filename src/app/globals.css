@@ -1580,3 +1580,7 @@ a {
   outline: none;
   border: none;
 }
+
+.auth-btns a:hover {
+  color: #fff;
+}

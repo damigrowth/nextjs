@@ -8452,11 +8452,17 @@ header.menu-home10.stricky.stricky-fixed
   a.list-item:before {
   background-color: #222222;
 }
+.header-fixed {
+  position: fixed;
+}
+.header-initial {
+  position: initial;
+}
 header.nav-homepage-style {
   background-color: transparent;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   padding: 7px 0;
-  position: fixed;
+  /* position: fixed; */
   width: 100%;
   z-index: 3;
 }
@@ -8676,10 +8682,10 @@ header.nav-homepage-style.at-home5 {
 header.nav-homepage-style.at-home3 .ace-responsive-menu a {
   color: var(--headings-color);
 }
-header.nav-homepage-style.at-home3 .sidemenu-btn,
+/* header.nav-homepage-style.at-home3 .sidemenu-btn,
 header.nav-homepage-style.at-home3 .login-info {
   color: var(--headings-color);
-}
+} */
 header.nav-homepage-style.at-home5 .ace-responsive-menu .sub-menu {
   margin-top: 1px;
 }
