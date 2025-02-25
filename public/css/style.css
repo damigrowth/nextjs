@@ -788,6 +788,19 @@ li {
   width: auto;
 }
 
+.user_setting_content span {
+  height: fit-content;
+  line-height: 1.7rem;
+}
+
+.user_setting_content form {
+  line-height: 1.7rem;
+}
+
+.dropdown-menu .user_setting_content {
+  z-index: 1000;
+}
+
 .user_setting {
   position: relative;
 }
@@ -822,11 +835,7 @@ li {
   overflow: hidden;
   font-size: 17px;
   padding: 15.5px 30px;
-  -webkit-transition: all 0.3s ease 0s ease;
-  -moz-transition: all 0.3s ease 0s ease;
-  -ms-transition: all 0.3s ease 0s ease;
-  -o-transition: all 0.3s ease 0s ease;
-  transition: all 0.3s ease 0s ease;
+  transition: unset;
 }
 
 .user_setting .dropdown-menu .dropdown-item a {
@@ -865,16 +874,17 @@ li {
 .user_setting .dropdown-menu .dropdown-item.active span,
 .user_setting .dropdown-menu .dropdown-item:hover,
 .user_setting .dropdown-menu .dropdown-item:hover span {
-  background-color: #1f4b3f;
-  color: #ffffff;
+  background-color: #222;
+  color: #fff;
+  transition: unset;
 }
 
 .dashboard_sidebar_list .sidebar_list_item a:hover,
 .dashboard_sidebar_list .sidebar_list_item a:active,
 .dashboard_sidebar_list .sidebar_list_item a:focus,
 .dashboard_sidebar_list .sidebar_list_item a.-is-active {
-  background-color: #222222;
-  color: #ffffff;
+  background-color: #222;
+  color: #fff;
 }
 
 .dashboard_sidebar_list .sidebar_list_item a {
@@ -885,11 +895,7 @@ li {
   font-family: sans-serif;
   font-weight: 500;
   padding: 10px 20px;
-  -webkit-transition: all 0.3s ease 0s ease;
-  -moz-transition: all 0.3s ease 0s ease;
-  -ms-transition: all 0.3s ease 0s ease;
-  -o-transition: all 0.3s ease 0s ease;
-  transition: all 0.3s ease 0s ease;
+  transition: unset;
 }
 
 .dashboard_sidebar_list .sidebar_list_item .disabled {
@@ -1638,8 +1644,8 @@ li {
 .listing-style1:hover {
   -webkit-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
   -moz-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
-  -o-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
-  box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
+  -o-box-shadow: 0 6px 15px rgba(64, 79, 104, 0.23);
+  box-shadow: 0 6px 15px rgba(64, 79, 104, 0.23);
 }
 .listing-style1 .list-agent {
   position: absolute;
@@ -3162,6 +3168,10 @@ li {
 .home9-tags.at-home12 a {
   background-color: #ffffff;
   color: #222222;
+}
+.home9-tags.at-home12 a:hover {
+  background-color: #5bbb7b;
+  color: #fff;
 }
 .home9-tags.at-home16 a {
   background-color: #ffffff;
@@ -6831,6 +6841,13 @@ textarea:focus-visible {
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
+
+@media screen and (max-width: 767px) {
+  .freelancer-style1 {
+    max-width: 100%;
+  }
+}
+
 .freelancer-style1 .meta {
   color: var(--headings-color);
 }
@@ -6867,8 +6884,8 @@ textarea:focus-visible {
 .freelancer-style1.hover-box-shadow:hover {
   -webkit-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
   -moz-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
-  -o-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
-  box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
+  -o-box-shadow: 0 6px 15px rgba(64, 79, 104, 0.23);
+  box-shadow: 0 6px 15px rgb(64 79 104 / 23%);
 }
 .freelancer-style1.at-home7:hover {
   border: 1px solid #222222;
@@ -8448,11 +8465,17 @@ header.menu-home10.stricky.stricky-fixed
   a.list-item:before {
   background-color: #222222;
 }
+.header-fixed {
+  position: fixed;
+}
+.header-initial {
+  position: initial;
+}
 header.nav-homepage-style {
   background-color: transparent;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   padding: 7px 0;
-  position: fixed;
+  /* position: fixed; */
   width: 100%;
   z-index: 3;
 }
@@ -8672,10 +8695,10 @@ header.nav-homepage-style.at-home5 {
 header.nav-homepage-style.at-home3 .ace-responsive-menu a {
   color: var(--headings-color);
 }
-header.nav-homepage-style.at-home3 .sidemenu-btn,
+/* header.nav-homepage-style.at-home3 .sidemenu-btn,
 header.nav-homepage-style.at-home3 .login-info {
   color: var(--headings-color);
-}
+} */
 header.nav-homepage-style.at-home5 .ace-responsive-menu .sub-menu {
   margin-top: 1px;
 }
@@ -10376,8 +10399,8 @@ input:focus-visible {
 .service-single-sldier {
   position: relative;
   background-color: #404040;
-  padding: 1rem 1rem;
-  border-radius: 12px;
+  /* padding: 1rem 1rem; */
+  border-radius: 5px;
 }
 .service-single-sldier:after {
   /* background-color: #404040; */

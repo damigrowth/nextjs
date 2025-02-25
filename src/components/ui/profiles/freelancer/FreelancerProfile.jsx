@@ -135,7 +135,7 @@ export default function FreelancerProfile({
                   {portfolio.data.length > 1 ? (
                     <FeaturedFiles
                       files={portfolio.data}
-                      title="Portfolio"
+                      title="Δείγμα Εργασιών"
                       border
                     />
                   ) : (

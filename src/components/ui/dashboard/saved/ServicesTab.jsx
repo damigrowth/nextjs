@@ -3,7 +3,7 @@ import FeaturedServiceSliderCard from "../../Cards/FeaturedServiceSliderCard";
 import FeaturedServiceCard from "../../Cards/FeaturedServiceCard";
 
 export function ServicesTab({ services, fid }) {
-  if (!services) {
+  if (!services || services?.length === 0) {
     return (
       <div className="row">
         <p>Δεν βρέθηκαν αποθηκευμένες υπηρεσίες</p>

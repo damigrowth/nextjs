@@ -2,6 +2,7 @@
 
 import { getData } from "../client/operations";
 import { HOME_SEARCH } from "../graphql/queries/main/taxonomies/service";
+import { normalizeTerm } from "@/utils/normalizeTerm";
 
 export async function homeSearch(prevState, formData) {
   try {
@@ -10,8 +11,15 @@ export async function homeSearch(prevState, formData) {
 
     const searchTerm = formData.get("searchTerm");
 
+    // Normalize the search term before sending to getData
+    // TODO: It needs to search only with the slug because in both it doesn't return the data
+    // const normalizedSearchTerm = normalizeGreek(searchTerm);
+    const normalizedSearchTerm = normalizeTerm(searchTerm);
+
+    // console.log("Normalized", normalizedSearchTerm);
+
     const { subcategories, subdivisions } = await getData(HOME_SEARCH, {
-      searchTerm: searchTerm,
+      searchTerm: normalizedSearchTerm,
       categorySlug: category || undefined,
     });
 
@@ -44,7 +52,6 @@ export async function homeSearch(prevState, formData) {
       },
       []
     );
-
 
     const slicedData = mergedData.slice(0, 7);
 

@@ -28,7 +28,7 @@ export default function FeaturedFiles({ files, title, border }) {
       <div className="scrollbalance-inner">
         <div className="service-single-sldier vam_nav_style slider-1-grid owl-carousel owl-theme owl-loaded owl-drag">
           <div
-            className="thumb"
+            className="thumb px50 py25-sm px30-sm py30"
             // style={{ borderRadius: "20px", overflow: "hidden" }}
           >
             {showSwiper && (

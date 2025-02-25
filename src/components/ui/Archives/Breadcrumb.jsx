@@ -83,6 +83,7 @@ export default async function Breadcrumb({
                   subjectTitle={subjectTitle}
                   id={id}
                   savedStatus={savedStatus}
+                  saveType={"service"}
                 />
               </div>
             </div>

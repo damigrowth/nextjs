@@ -29,7 +29,10 @@ export const CACHE_CONFIG = {
   },
   SAVED_STATUS: {
     key: "saved-status",
-    ttl: 60 * 60, // 1 hour
-    tags: (type, id) => [`saved-${type}`, `saved-${type}-${id}`],
+    ttl: 60 * 60,
+  },
+  HOME_SERVICES: {
+    key: "home-services",
+    ttl: 60 * 60,
   },
 };

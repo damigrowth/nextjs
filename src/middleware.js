@@ -65,7 +65,13 @@ export async function middleware(request) {
 
   // Handle login page redirect when authenticated
   const isLoginPage = currentPath === "/login";
+  const isRegisterPage = currentPath === "/register";
+
   if (isLoginPage && authenticated) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  if (isRegisterPage && authenticated) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 

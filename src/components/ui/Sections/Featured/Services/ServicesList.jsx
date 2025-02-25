@@ -1,4 +1,3 @@
-// ServicesList.jsx (server component)
 import FeaturedServiceCard from "@/components/ui/Cards/FeaturedServiceCard";
 import FeaturedServiceSliderCard from "@/components/ui/Cards/FeaturedServiceSliderCard";
 import ServicesListWrapper from "./ServicesListWrapper";

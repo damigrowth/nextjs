@@ -38,7 +38,7 @@ export default async function FreelancerCard({
   }
   return (
     <>
-      <div className="data-loading-element freelancer-style1 text-center bdr1 hover-box-shadow posiiton-relative">
+      <div className="data-loading-element freelancer-style1 text-center bdr1 hover-box-shadow posiiton-relative w-100">
         {showSaveButton && (
           <SaveForm
             type="freelancer"

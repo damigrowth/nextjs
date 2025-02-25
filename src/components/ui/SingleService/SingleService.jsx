@@ -72,6 +72,8 @@ export default async function SingleService({
     username,
     verified,
     topLevel,
+    type: freelancerType,
+    subcategory: freelancerSubcategory,
     visibility,
     coverage,
     contactTypes,
@@ -213,8 +215,8 @@ export default async function SingleService({
               email={visibility?.data?.attributes?.remail && email}
               phone={visibility?.data?.attributes?.phone && phone}
               website={website}
-              type={type}
-              category={subcategory}
+              type={freelancerType}
+              category={freelancerSubcategory}
               commencement={commencement}
             />
           </StickySidebar>

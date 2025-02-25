@@ -43,7 +43,10 @@ export default async function page() {
   );
 
   const { featuredEntity: featuredServicesData } = await getData(
-    FEATURED_SERVICES
+    FEATURED_SERVICES,
+    null,
+    "HOME_SERVICES",
+    ["home-services"]
   );
   const { featuredEntity: featuredFreelancersData } = await getData(
     FEATURED_FREELANCERS
