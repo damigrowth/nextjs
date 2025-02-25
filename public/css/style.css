@@ -822,11 +822,7 @@ li {
   overflow: hidden;
   font-size: 17px;
   padding: 15.5px 30px;
-  -webkit-transition: all 0.3s ease 0s ease;
-  -moz-transition: all 0.3s ease 0s ease;
-  -ms-transition: all 0.3s ease 0s ease;
-  -o-transition: all 0.3s ease 0s ease;
-  transition: all 0.3s ease 0s ease;
+  transition: unset;
 }
 
 .user_setting .dropdown-menu .dropdown-item a {
@@ -865,16 +861,17 @@ li {
 .user_setting .dropdown-menu .dropdown-item.active span,
 .user_setting .dropdown-menu .dropdown-item:hover,
 .user_setting .dropdown-menu .dropdown-item:hover span {
-  background-color: #1f4b3f;
-  color: #ffffff;
+  background-color: #222;
+  color: #fff;
+  transition: unset;
 }
 
 .dashboard_sidebar_list .sidebar_list_item a:hover,
 .dashboard_sidebar_list .sidebar_list_item a:active,
 .dashboard_sidebar_list .sidebar_list_item a:focus,
 .dashboard_sidebar_list .sidebar_list_item a.-is-active {
-  background-color: #222222;
-  color: #ffffff;
+  background-color: #222;
+  color: #fff;
 }
 
 .dashboard_sidebar_list .sidebar_list_item a {
@@ -885,11 +882,7 @@ li {
   font-family: sans-serif;
   font-weight: 500;
   padding: 10px 20px;
-  -webkit-transition: all 0.3s ease 0s ease;
-  -moz-transition: all 0.3s ease 0s ease;
-  -ms-transition: all 0.3s ease 0s ease;
-  -o-transition: all 0.3s ease 0s ease;
-  transition: all 0.3s ease 0s ease;
+  transition: unset;
 }
 
 .dashboard_sidebar_list .sidebar_list_item .disabled {
@@ -1638,8 +1631,8 @@ li {
 .listing-style1:hover {
   -webkit-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
   -moz-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
-  -o-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
-  box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
+  -o-box-shadow: 0 6px 15px rgba(64, 79, 104, 0.23);
+  box-shadow: 0 6px 15px rgba(64, 79, 104, 0.23);
 }
 .listing-style1 .list-agent {
   position: absolute;
@@ -3162,6 +3155,10 @@ li {
 .home9-tags.at-home12 a {
   background-color: #ffffff;
   color: #222222;
+}
+.home9-tags.at-home12 a:hover {
+  background-color: #5bbb7b;
+  color: #fff;
 }
 .home9-tags.at-home16 a {
   background-color: #ffffff;
@@ -6874,8 +6871,8 @@ textarea:focus-visible {
 .freelancer-style1.hover-box-shadow:hover {
   -webkit-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
   -moz-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
-  -o-box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
-  box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
+  -o-box-shadow: 0 6px 15px rgba(64, 79, 104, 0.23);
+  box-shadow: 0 6px 15px rgb(64 79 104 / 23%);
 }
 .freelancer-style1.at-home7:hover {
   border: 1px solid #222222;
