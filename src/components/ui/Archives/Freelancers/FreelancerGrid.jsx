@@ -32,7 +32,9 @@ export default async function FreelancerGrid({
             )
         )
       ) : (
-        <div>Δεν βρέθηκαν επαγγελματίες</div>
+        <div>
+          Δεν βρέθηκαν {type === "company" ? "επιχειρήσεις" : "επαγγελματίες"}
+        </div>
       )}
     </div>
   );
