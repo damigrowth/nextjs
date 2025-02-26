@@ -3,7 +3,7 @@
 import InputB from "@/components/inputs/InputB";
 import TextArea from "@/components/inputs/TextArea";
 import React, { useCallback, useState } from "react";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
 import { useQuery } from "@apollo/client";
 import {
   CATEGORIES_SEARCH,

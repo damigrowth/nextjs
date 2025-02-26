@@ -3,13 +3,15 @@
 import React from "react";
 import FeaturesListEdit from "../ServicePackages/FeaturesListEdit";
 import AddonsListEdit from "./AddonsListEdit";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import useEditServiceStore from "@/store/service/edit/editServiceStore";
 
-export default function AddonListItem({ addon, index }) {
+export default function AddonListItem({ addon, index, editMode = false }) {
+  // Choose the appropriate store based on editMode prop
+  const store = editMode ? useEditServiceStore : useCreateServiceStore;
+
   const { editAddon, editingAddon, editingInput, editingMode, deleteAddon } =
-    useCreateServiceStore();
-
-  // console.log("editingAddon", editingAddon);
+    store();
   return (
     <React.Fragment key={index}>
       <tr className="bgc-thm3">
@@ -39,7 +41,7 @@ export default function AddonListItem({ addon, index }) {
         </th>
       </tr>
       {editingMode && editingInput === index ? (
-        <AddonsListEdit index={index} />
+        <AddonsListEdit index={index} editMode={editMode} />
       ) : null}
     </React.Fragment>
   );

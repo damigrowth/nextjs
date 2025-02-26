@@ -2,7 +2,7 @@
 
 import React from "react";
 import FeaturesListEdit from "./FeaturesListEdit";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
 
 export default function FeaturesListItem({ feature, index }) {
   const { deleteFeature, editFeature, editingInput, editingMode } =

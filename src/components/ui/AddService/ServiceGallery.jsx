@@ -1,10 +1,17 @@
 "use client";
 
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import useEditServiceStore from "@/store/service/edit/editServiceStore";
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 
-export default function ServiceGallery({ isPending, custom }) {
+export default function ServiceGallery({
+  isPending,
+  custom,
+  editMode = false,
+}) {
+  const store = editMode ? useEditServiceStore : useCreateServiceStore;
+
   const {
     media,
     setMedia,
@@ -13,7 +20,7 @@ export default function ServiceGallery({ isPending, custom }) {
     setLoading,
     gallery,
     saveGallery,
-  } = useCreateServiceStore();
+  } = store();
 
   const [totalSize, setTotalSize] = useState(0);
   const [error, setError] = useState("");

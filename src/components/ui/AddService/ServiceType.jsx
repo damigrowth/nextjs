@@ -3,7 +3,7 @@
 import React from "react";
 import ServicePrimaryType from "./ServicePrimaryType";
 import ServiceSecondaryType from "./ServiceSecondaryType";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
 
 export default function ServiceType({ coverage }) {
   const { typeStep, goBack, errors } = useCreateServiceStore();

@@ -1,19 +1,21 @@
 "use client";
 
 import InputB from "@/components/inputs/InputB";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import useEditServiceStore from "@/store/service/edit/editServiceStore";
 import React from "react";
 
-export default function FaqListEdit({ index }) {
+export default function FaqListEdit({ index, editMode = false }) {
+  // Choose the appropriate store based on editMode prop
+  const store = editMode ? useEditServiceStore : useCreateServiceStore;
+
   const {
     editingFaq,
     errors,
     cancelEditingFaq,
     saveEditingFaq,
     setEditingFaq,
-  } = useCreateServiceStore();
-
-  // console.log("errors", errors);
+  } = store();
 
   return (
     <div colSpan="10" className="table-editing-bg pt30 pb30">

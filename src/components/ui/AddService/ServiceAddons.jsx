@@ -1,10 +1,14 @@
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
 import NewAddonInputs from "../ServiceAddons/NewAddonInputs";
 import AddonsList from "../ServiceAddons/AddonsList";
+import useEditServiceStore from "@/store/service/edit/editServiceStore";
 
-export default function ServiceAddons({ custom }) {
+export default function ServiceAddons({ custom, editMode = false }) {
+  // Choose the appropriate store based on editMode prop
+  const store = editMode ? useEditServiceStore : useCreateServiceStore;
+
   const { addons, saveAddons, showNewAddonInputs, handleShowNewAddonInputs } =
-    useCreateServiceStore();
+    store();
 
   return (
     <div
@@ -36,8 +40,10 @@ export default function ServiceAddons({ custom }) {
           </button>
         )}
 
-        {!custom && showNewAddonInputs && <NewAddonInputs />}
-        <AddonsList custom={custom} />
+        {!custom && showNewAddonInputs && (
+          <NewAddonInputs editMode={editMode} />
+        )}
+        <AddonsList custom={custom} editMode={editMode} />
       </div>
       {custom && (
         <button
@@ -50,7 +56,7 @@ export default function ServiceAddons({ custom }) {
         </button>
       )}
 
-      {custom && showNewAddonInputs && <NewAddonInputs />}
+      {custom && showNewAddonInputs && <NewAddonInputs editMode={editMode} />}
       {!custom && (
         <button
           type="button"

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
 
 export default function ServiceSecondaryType({ coverage }) {
   const { type, setType, saveType } = useCreateServiceStore();

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import FeaturesListEdit from "./FeaturesListEdit";
 import FeaturesListItem from "./FeaturesListItem";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
 
 export default function FeaturesList() {
   const { packages, tier } = useCreateServiceStore();

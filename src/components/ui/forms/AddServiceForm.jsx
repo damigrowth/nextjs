@@ -5,7 +5,7 @@ import ServiceGallery from "../AddService/ServiceGallery";
 import { createService } from "@/lib/service/create";
 import ServiceFaq from "../ServiceFaq/ServiceFaq";
 import ServiceInformation from "../ServiceInformation/ServiceInformation";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
 import ServiceSuccess from "../ServiceSuccess/ServiceSuccess";
 import ServicePackages from "../AddService/ServicePackages";
 import ServiceAddons from "../AddService/ServiceAddons";

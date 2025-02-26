@@ -1,16 +1,15 @@
 "use client";
 
 import InputB from "@/components/inputs/InputB";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import useEditServiceStore from "@/store/service/edit/editServiceStore";
 import React from "react";
 
-export default function NewFaqInputs() {
-  const { newFaq, setNewFaq, clearNewFaq, saveNewFaq, errors } =
-    useCreateServiceStore();
+export default function NewFaqInputs({ editMode = false }) {
+  // Choose the appropriate store based on editMode prop
+  const store = editMode ? useEditServiceStore : useCreateServiceStore;
 
-  // console.log("ERRORS", errors);
-  // console.log("newFaq", newFaq);
-
+  const { newFaq, setNewFaq, clearNewFaq, saveNewFaq, errors } = store();
   return (
     <>
       <div className="mt20">

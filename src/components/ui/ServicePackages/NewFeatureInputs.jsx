@@ -1,7 +1,7 @@
 "use client";
 
 import InputB from "@/components/inputs/InputB";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
 import React from "react";
 
 export default function NewFeatureInputs() {

@@ -2,16 +2,23 @@
 
 import { useState } from "react";
 import FaqListEdit from "./FaqListEdit";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import useEditServiceStore from "@/store/service/edit/editServiceStore";
 
-export default function FaqList({ custom }) {
-  const { faq, deleteFaq, editFaq, editingMode, editingInput } =
-    useCreateServiceStore();
+export default function FaqList({ custom, editMode = false }) {
+  // Choose the appropriate store based on editMode prop
+  const store = editMode ? useEditServiceStore : useCreateServiceStore;
+
+  const { faq, deleteFaq, editFaq, editingMode, editingInput } = store();
   const [activeItem, setActiveItem] = useState(0);
 
   const toggleAccordion = (index) => {
     setActiveItem(index === activeItem ? null : index);
   };
+
+  console.log("faq", faq);
+  console.log("editingInput", editingInput);
+  console.log("editingMode", editingMode);
 
   return (
     <>
@@ -76,7 +83,7 @@ export default function FaqList({ custom }) {
                 </div>
               </div>
               {editingMode && editingInput === index ? (
-                <FaqListEdit index={index} />
+                <FaqListEdit index={index} editMode={editMode} />
               ) : null}
             </div>
           ))}

@@ -2,10 +2,14 @@
 
 import InputB from "@/components/inputs/InputB";
 import TextArea from "@/components/inputs/TextArea";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import useEditServiceStore from "@/store/service/edit/editServiceStore";
 import React from "react";
 
-export default function AddonsListEdit({ index }) {
+export default function AddonsListEdit({ index, editMode = false }) {
+  // Choose the appropriate store based on editMode prop
+  const store = editMode ? useEditServiceStore : useCreateServiceStore;
+
   const {
     newAddon,
     editingAddon,
@@ -13,9 +17,7 @@ export default function AddonsListEdit({ index }) {
     cancelEditingAddon,
     saveEditingAddon,
     setEditingAddon,
-  } = useCreateServiceStore();
-
-  // console.log("errors", errors);
+  } = store();
 
   return (
     <tr>
