@@ -187,7 +187,6 @@ export default function ServiceInformation() {
   );
 
   const handleTagsSelect = (selected) => {
-    console.log("handleTagsSelect", selected);
     const formattedTags = selected
       ? selected.map((tag) => ({
           id: tag.id,
@@ -200,8 +199,6 @@ export default function ServiceInformation() {
 
     setInfo("tags", formattedTags);
   };
-
-  console.log("info tags", info.tags);
 
   const selectedTagsValue = {
     data: info.tags.map((tag) => ({
