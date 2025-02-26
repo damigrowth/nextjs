@@ -237,13 +237,12 @@ export default function SearchableSelect({
     if (isMulti) {
       const formattedOptions =
         option?.map((opt) => ({
-          id: opt.value,
+          id: opt.value || opt.id,
           attributes: opt.data.attributes,
           data: opt.data, // Keep the complete item
           isNewTerm: opt.isNewTerm,
         })) || [];
 
-      // Only limit if maxSelections is provided
       const limitedOptions = maxSelections
         ? formattedOptions.slice(0, maxSelections)
         : formattedOptions;
@@ -282,9 +281,21 @@ export default function SearchableSelect({
       lowerCase,
     });
 
+    let uniqueId = `${newTermValue}-${Date.now()}`;
+
     const newTerm = {
-      value: `${newTermValue}-${Date.now()}`,
+      id: uniqueId,
+      value: uniqueId,
       label: termValue,
+      data: {
+        id: uniqueId,
+        attributes: {
+          label: termValue,
+        },
+      },
+      attributes: {
+        label: termValue,
+      },
       isNewTerm: true,
     };
 
