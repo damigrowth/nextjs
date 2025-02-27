@@ -50,7 +50,7 @@ export default function AddonsListEdit({ id, editMode = false }) {
                   id="editing-addon-price"
                   name="editing-addon-price"
                   min={5}
-                  max={1000}
+                  max={10000}
                   value={editingAddon.price}
                   onChange={(formattedValue) =>
                     setEditingAddon("price", formattedValue)

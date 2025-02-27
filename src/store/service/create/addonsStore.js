@@ -109,11 +109,11 @@ const useAddonsStore = (set, get) => ({
         };
       }
 
-      if (newAddon.price > 1000) {
+      if (newAddon.price > 10000) {
         return {
           errors: {
             field: "addon-price",
-            message: "H μέγιστη τιμή είναι 1000€",
+            message: "H μέγιστη τιμή είναι 10000€",
             active: true,
           },
         };
@@ -216,11 +216,11 @@ const useAddonsStore = (set, get) => ({
         };
       }
 
-      if (editingAddon.price > 1000) {
+      if (editingAddon.price > 10000) {
         return {
           errors: {
             field: "editing-addon-price",
-            message: "H μέγιστη τιμή είναι 1000€",
+            message: "H μέγιστη τιμή είναι 10000€",
             active: true,
           },
         };
