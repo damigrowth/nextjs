@@ -19,7 +19,7 @@ export default function FaqListEdit({ index, editMode = false }) {
 
   return (
     <div colSpan="10" className="table-editing-bg pt30 pb30">
-      <h5 className="table-editing-bg ml30 p0">Επεξεργασία παροχής</h5>
+      <h5 className="table-editing-bg ml30 p0">Επεξεργασία ερώτησης</h5>
       <div className="table-editing-bg p0 mt30">
         <div className="px30">
           <div className="row">
@@ -36,8 +36,6 @@ export default function FaqListEdit({ index, editMode = false }) {
                 }
                 className="form-control input-group"
                 errors={errors}
-                formatNumbers
-                formatSymbols
                 capitalize
               />
             </div>
@@ -56,8 +54,6 @@ export default function FaqListEdit({ index, editMode = false }) {
                 }
                 className="form-control input-group"
                 errors={errors}
-                formatNumbers
-                formatSymbols
                 capitalize
               />
             </div>
@@ -73,7 +69,7 @@ export default function FaqListEdit({ index, editMode = false }) {
                 onClick={cancelEditingFaq}
                 className="ud-btn btn-dark-border"
               >
-                Ακύρωση
+                Ακύρωση Επεξεργασίας
               </button>
             </div>
             <div className="col-sm-6 text-end">
@@ -82,7 +78,7 @@ export default function FaqListEdit({ index, editMode = false }) {
                 onClick={saveEditingFaq}
                 className="ud-btn btn-thm"
               >
-                Αποθήκευση
+                Ολοκλήρωση Επεξεργασίας
               </button>
             </div>
           </div>

@@ -32,7 +32,6 @@ export default function NewAddonInputs({ editMode = false }) {
                   }
                   className="form-control input-group"
                   errors={errors}
-                  formatSymbols
                   capitalize
                 />
               </div>
@@ -72,7 +71,6 @@ export default function NewAddonInputs({ editMode = false }) {
                 }
                 errors={errors}
                 capitalize
-                formatSymbols
                 counter
               />
             </div>
@@ -90,7 +88,7 @@ export default function NewAddonInputs({ editMode = false }) {
                 onClick={clearNewAddon}
                 className="ud-btn btn-dark-border  "
               >
-                Ακύρωση
+                Ακύρωση Επεξεργασίας
               </button>
             </div>
             <div className="col-sm-6 text-end">
@@ -99,7 +97,7 @@ export default function NewAddonInputs({ editMode = false }) {
                 onClick={saveNewAddon}
                 className="ud-btn btn-thm "
               >
-                Αποθήκευση
+                Ολοκλήρωση Επεξεργασίας
               </button>
             </div>
           </div>

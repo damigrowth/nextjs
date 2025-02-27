@@ -66,7 +66,7 @@ export default function NewFaqInputs({ editMode = false }) {
                 onClick={clearNewFaq}
                 className="ud-btn btn-dark-border  "
               >
-                Ακύρωση
+                Ακύρωση Επεξεργασίας
               </button>
             </div>
             <div className="col-sm-6 text-end">
@@ -75,7 +75,7 @@ export default function NewFaqInputs({ editMode = false }) {
                 onClick={saveNewFaq}
                 className="ud-btn btn-thm "
               >
-                Αποθήκευση
+                Ολοκλήρωση Επεξεργασίας
               </button>
             </div>
           </div>
