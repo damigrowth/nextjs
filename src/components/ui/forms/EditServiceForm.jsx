@@ -2,7 +2,7 @@
 
 import InputB from "@/components/inputs/InputB";
 import TextArea from "@/components/inputs/TextArea";
-import React, { useEffect, useActionState } from "react";
+import React, { useEffect, useActionState, useState, useCallback } from "react";
 import SwitchB from "../Archives/Inputs/SwitchB";
 import ServiceGallery from "../AddService/ServiceGallery";
 import ServiceFaq from "../ServiceFaq/ServiceFaq";
@@ -11,6 +11,15 @@ import ServiceAddons from "../AddService/ServiceAddons";
 import useEditServiceStore from "@/store/service/edit/editServiceStore";
 import SaveButton from "../buttons/SaveButton";
 import Alert from "../alerts/Alert";
+import SearchableSelect from "../Archives/Inputs/SearchableSelect";
+import { normalizeQuery } from "@/utils/queries";
+import { searchData } from "@/lib/client/operations";
+import {
+  CATEGORIES_SEARCH,
+  SUBCATEGORIES_SEARCH,
+  SUBDIVISIONS_SEARCH,
+} from "@/lib/graphql/queries/main/taxonomies/service";
+import { TAGS_SEARCH_SIMPLE } from "@/lib/graphql/queries/main/taxonomies/service/tag";
 
 export default function EditServiceForm({ service }) {
   const initialState = {
@@ -44,6 +53,186 @@ export default function EditServiceForm({ service }) {
     initializeWithService(service);
   }, [service]);
 
+  // State for taxonomy search params and results
+  const [taxonomyParams, setTaxonomyParams] = useState({
+    categoryTerm: "",
+    subcategoryTerm: "",
+    subdivisionTerm: "",
+    tagsTerm: "",
+  });
+
+  const [noResultsState, setNoResultsState] = useState({
+    category: false,
+    subcategory: false,
+    subdivision: false,
+    tags: false,
+  });
+
+  // Handler functions for taxonomy search
+  const handleCategorySearch = useCallback(async (searchTerm, page = 1) => {
+    const query = normalizeQuery(CATEGORIES_SEARCH);
+    const data = await searchData({
+      query,
+      searchTerm,
+      page,
+      additionalVariables: {
+        categoryTerm: searchTerm,
+        categoriesPage: page,
+        categoriesPageSize: 10,
+      },
+    });
+
+    if (data && data.data) {
+      setNoResultsState((prev) => ({
+        ...prev,
+        category: data.data.length === 0,
+      }));
+    }
+
+    return data;
+  }, []);
+
+  const handleSubcategorySearch = useCallback(
+    async (searchTerm, page = 1) => {
+      const query = normalizeQuery(SUBCATEGORIES_SEARCH);
+      const data = await searchData({
+        query,
+        searchTerm,
+        page,
+        additionalVariables: {
+          categoryId: info.category.id,
+          subcategoryTerm: searchTerm,
+          subcategoriesPage: page,
+          subcategoriesPageSize: 10,
+        },
+      });
+
+      if (data && data.data) {
+        setNoResultsState((prev) => ({
+          ...prev,
+          subcategory: data.data.length === 0,
+        }));
+      }
+
+      return data;
+    },
+    [info.category.id]
+  );
+
+  const handleSubdivisionSearch = useCallback(
+    async (searchTerm, page = 1) => {
+      const query = normalizeQuery(SUBDIVISIONS_SEARCH);
+      const data = await searchData({
+        query,
+        searchTerm,
+        page,
+        additionalVariables: {
+          subcategoryId: info.subcategory.id,
+          subdivisionTerm: searchTerm,
+          subdivisionsPage: page,
+          subdivisionsPageSize: 10,
+        },
+      });
+
+      if (data && data.data) {
+        setNoResultsState((prev) => ({
+          ...prev,
+          subdivision: data.data.length === 0,
+        }));
+      }
+
+      return data;
+    },
+    [info.subcategory.id]
+  );
+
+  const handleTagsSearch = useCallback(async (searchTerm, page = 1) => {
+    const query = normalizeQuery(TAGS_SEARCH_SIMPLE);
+    const data = await searchData({
+      query,
+      searchTerm,
+      searchTermType: "label",
+      page,
+      additionalVariables: {
+        label: searchTerm,
+        tagsPage: page,
+        tagsPageSize: 10,
+      },
+    });
+
+    if (data && data.data) {
+      setNoResultsState((prev) => ({
+        ...prev,
+        tags: data.data.length === 0,
+      }));
+    }
+
+    return data;
+  }, []);
+
+  // Selection handlers for taxonomy fields
+  const handleCategorySelect = useCallback(
+    (selected) => {
+      setInfo("category", {
+        id: selected ? selected.id : 0,
+        label: selected ? selected.attributes.label : "",
+      });
+
+      // Reset dependent fields
+      setInfo("subcategory", { id: 0, label: "" });
+      setInfo("subdivision", { id: 0, label: "" });
+      setTaxonomyParams((prev) => ({
+        ...prev,
+        subcategoryTerm: "",
+        subdivisionTerm: "",
+      }));
+    },
+    [setInfo, setTaxonomyParams]
+  );
+
+  const handleSubcategorySelect = useCallback(
+    (selected) => {
+      setInfo("subcategory", {
+        id: selected ? selected.id : 0,
+        label: selected ? selected.attributes.label : "",
+      });
+
+      // Reset subdivision when subcategory changes
+      setInfo("subdivision", { id: 0, label: "" });
+      setTaxonomyParams((prev) => ({
+        ...prev,
+        subdivisionTerm: "",
+      }));
+    },
+    [setInfo, setTaxonomyParams]
+  );
+
+  const handleSubdivisionSelect = useCallback(
+    (selected) => {
+      setInfo("subdivision", {
+        id: selected ? selected.id : 0,
+        label: selected ? selected.attributes.label : "",
+      });
+    },
+    [setInfo]
+  );
+
+  const handleTagsSelect = (selected) => {
+    const formattedTags = selected
+      ? selected.map((tag) => ({
+          id: tag.id,
+          label: tag.data?.attributes?.label || "",
+          isNewTerm: tag.isNewTerm || false,
+          data: tag.data || null,
+          attributes: tag.attributes || null,
+        }))
+      : [];
+
+    setInfo("tags", formattedTags);
+  };
+
+  // Format selected values for SearchableSelect components
+
   const handleSubmit = async (formData) => {
     if (!hasChanges()) return;
 
@@ -68,6 +257,14 @@ export default function EditServiceForm({ service }) {
     formData.append("status", status);
     formData.append("addons", JSON.stringify(addons));
     formData.append("faq", JSON.stringify(faq));
+
+    // Add taxonomy data
+    formData.append("service-category", info.category.id);
+    formData.append("service-subcategory", info.subcategory.id);
+    formData.append("service-subdivision", info.subdivision.id);
+
+
+    formData.append("service-tags", JSON.stringify(info.tags));
 
     // Handle media
     const remainingMediaIds = media
@@ -144,6 +341,102 @@ export default function EditServiceForm({ service }) {
               />
             </div>
           </div>
+
+          {/* New taxonomy fields section */}
+          <div className="row">
+            <div className="col-sm-4">
+              <div className="mb20">
+                <SearchableSelect
+                  name="service-category"
+                  label="Κατηγορία"
+                  labelPlural="κατηγορίες"
+                  value={info.category}
+                  nameParam="label"
+                  pageParam="categoriesPage"
+                  pageSizeParam="categoriesPageSize"
+                  pageSize={10}
+                  onSearch={handleCategorySearch}
+                  onSelect={handleCategorySelect}
+                  isMulti={false}
+                  isClearable={true}
+                  formatSymbols
+                  capitalize
+                  errors={errors?.field === "category" ? errors : null}
+                />
+              </div>
+            </div>
+            <div className="col-sm-4">
+              <div className="mb20">
+                <SearchableSelect
+                  name="service-subcategory"
+                  label="Υποκατηγορία"
+                  labelPlural="υποκατηγορίες"
+                  value={info.subcategory}
+                  nameParam="label"
+                  pageParam="subcategoriesPage"
+                  pageSizeParam="subcategoriesPageSize"
+                  pageSize={10}
+                  onSearch={handleSubcategorySearch}
+                  onSelect={handleSubcategorySelect}
+                  isMulti={false}
+                  isClearable={true}
+                  formatSymbols
+                  capitalize
+                  errors={errors?.field === "subcategory" ? errors : null}
+                  isDisabled={!info.category.id}
+                  resetDependency={info.category.id}
+                />
+              </div>
+            </div>
+            <div className="col-sm-4">
+              <div className="mb20">
+                <SearchableSelect
+                  name="service-subdivision"
+                  label="Αντικείμενο"
+                  labelPlural="αντικείμενα"
+                  value={info.subdivision}
+                  nameParam="label"
+                  pageParam="subdivisionsPage"
+                  pageSizeParam="subdivisionsPageSize"
+                  pageSize={10}
+                  onSearch={handleSubdivisionSearch}
+                  onSelect={handleSubdivisionSelect}
+                  isMulti={false}
+                  isClearable={true}
+                  formatSymbols
+                  capitalize
+                  errors={errors?.field === "subdivision" ? errors : null}
+                  isDisabled={!info.subcategory.id}
+                  resetDependency={info.subcategory.id}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="row">
+            <div className="mb20">
+              <SearchableSelect
+                name="service-tags"
+                label="Tags"
+                labelPlural="tags"
+                value={info.tags}
+                nameParam="label"
+                searchTermType="label"
+                pageParam="tagsPage"
+                pageSizeParam="tagsPageSize"
+                pageSize={10}
+                onSearch={handleTagsSearch}
+                onSelect={handleTagsSelect}
+                isMulti={true}
+                isClearable={true}
+                formatSymbols
+                capitalize
+                errors={errors?.field === "tags" ? errors : null}
+                allowNewTerms={true}
+                newTermValue="new"
+              />
+            </div>
+          </div>
+          {/* End of new taxonomy fields section */}
 
           <div className="row">
             <div className="col-sm-2">

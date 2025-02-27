@@ -21,7 +21,7 @@ const useEditServiceStore = create((set, get) => ({
 
   // Edit-specific state
   serviceId: null,
-  status: "", // To track Active/Paused status
+  status: "",
   initialValues: {
     title: "",
     description: "",
@@ -30,6 +30,10 @@ const useEditServiceStore = create((set, get) => ({
     addons: [],
     faq: [],
     media: [],
+    category: { id: 0, label: "" },
+    subcategory: { id: 0, label: "" },
+    subdivision: { id: 0, label: "" },
+    tags: [],
   },
 
   // Initialize with service data
@@ -52,6 +56,10 @@ const useEditServiceStore = create((set, get) => ({
         description: service.description,
         price: service.price,
         status: service.status.data.attributes.type,
+        category: service.category.data,
+        subcategory: service.subcategory.data,
+        subdivision: service.subdivision.data,
+        tags: service.tags?.data || [],
       },
     });
 
@@ -109,6 +117,10 @@ const useEditServiceStore = create((set, get) => ({
       state.info.title !== initialValues.title ||
       state.info.description !== initialValues.description ||
       state.info.price !== initialValues.price ||
+      state.info.category?.id !== initialValues.category?.id ||
+      state.info.subcategory?.id !== initialValues.subcategory?.id ||
+      state.info.subdivision?.id !== initialValues.subdivision?.id ||
+      JSON.stringify(state.info.tags) !== JSON.stringify(initialValues.tags) ||
       JSON.stringify(state.addons) !== JSON.stringify(initialValues.addons) ||
       JSON.stringify(state.faq) !== JSON.stringify(initialValues.faq) ||
       state.media.some((item) => item.file instanceof File) ||
