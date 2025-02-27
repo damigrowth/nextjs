@@ -161,7 +161,9 @@ export default async function SingleService({
                   </>
                 )}
                 {fixed ? null : <Packages packages={packages} />}
-                {addons?.length > 0 && <Addons addons={addons} price={price} />}
+                {addons?.length > 0 && (
+                  <Addons addons={addons} price={price} username={username} />
+                )}
                 {faq?.length > 0 && <Faq faq={faq} />}
                 <Terms heading="Όροι Συνεργασίας" text={terms} />
                 {/* <hr className="opacity-100 mb15" /> */}
