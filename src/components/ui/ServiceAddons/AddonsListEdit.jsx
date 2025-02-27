@@ -82,25 +82,21 @@ export default function AddonsListEdit({ id, editMode = false }) {
         </div>
         <div className="table-editing-bg p0 mt30">
           <div className="px30">
-            <div className="row">
-              <div className="col-sm-6 text-start">
-                <button
-                  type="button"
-                  onClick={cancelEditingAddon}
-                  className="ud-btn btn-dark-border"
-                >
-                  Ακύρωση Επεξεργασίας
-                </button>
-              </div>
-              <div className="col-sm-6 text-end">
-                <button
-                  type="button"
-                  onClick={saveEditingAddon}
-                  className="ud-btn btn-thm"
-                >
-                  Ολοκλήρωση Επεξεργασίας
-                </button>
-              </div>
+            <div className="editing-btns">
+              <button
+                type="button"
+                onClick={cancelEditingAddon}
+                className="ud-btn btn-dark-border"
+              >
+                Ακύρωση Επεξεργασίας
+              </button>
+              <button
+                type="button"
+                onClick={saveEditingAddon}
+                className="ud-btn btn-thm"
+              >
+                Ολοκλήρωση Επεξεργασίας
+              </button>
             </div>
           </div>
         </div>

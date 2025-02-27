@@ -1607,3 +1607,11 @@ a {
   left: 0;
   width: 100%;
 }
+
+.editing-btns {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-right: 10px;
+}
