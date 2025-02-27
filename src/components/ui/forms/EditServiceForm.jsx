@@ -39,8 +39,6 @@ export default function EditServiceForm({ service }) {
     initializeWithService,
   } = useEditServiceStore();
 
-  console.log("info", info);
-
   // Initialize store with service data on component mount
   useEffect(() => {
     initializeWithService(service);

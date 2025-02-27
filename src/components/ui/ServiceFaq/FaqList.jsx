@@ -16,10 +16,6 @@ export default function FaqList({ custom, editMode = false }) {
     setActiveItem(index === activeItem ? null : index);
   };
 
-  console.log("faq", faq);
-  console.log("editingInput", editingInput);
-  console.log("editingMode", editingMode);
-
   return (
     <>
       <div
