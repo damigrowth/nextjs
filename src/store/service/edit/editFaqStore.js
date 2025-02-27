@@ -16,8 +16,8 @@ const useEditFaqStore = (set, get) => ({
   newFaq: initialFaqState,
   editingFaq: initialFaqState,
   showNewFaqInputs: false,
-  editingMode: false,
-  editingInput: 0,
+  faqEditingMode: false,
+  faqEditingInput: 0,
   errors: initialErrorsState,
   setNewFaq: (key, value) =>
     set((state) => ({
@@ -37,8 +37,8 @@ const useEditFaqStore = (set, get) => ({
   editFaq: (index) =>
     set((state) => ({
       ...state,
-      editingMode: true,
-      editingInput: index,
+      faqEditingMode: true,
+      faqEditingInput: index,
       editingFaq: { ...state.faq[index] },
     })),
 
@@ -130,8 +130,8 @@ const useEditFaqStore = (set, get) => ({
   cancelEditingFaq: () =>
     set((state) => ({
       ...state,
-      editingMode: false,
-      editingInput: 0,
+      faqEditingMode: false,
+      faqEditingInput: 0,
       editingFaq: initialFaqState,
     })),
   saveEditingFaq: () =>
@@ -190,8 +190,8 @@ const useEditFaqStore = (set, get) => ({
         errors: initialErrorsState,
         faq: updatedFaq,
         editingFaq: initialFaqState,
-        editingInput: 0,
-        editingMode: false,
+        faqEditingInput: 0,
+        faqEditingMode: false,
       };
     }),
 });

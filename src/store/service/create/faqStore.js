@@ -11,13 +11,13 @@ const initialErrorsState = {
   active: false,
 };
 
-const useFaqStore = ((set, get) => ({
+const useFaqStore = (set, get) => ({
   faq: [],
   newFaq: initialFaqState,
   editingFaq: initialFaqState,
   showNewFaqInputs: false,
-  editingMode: false,
-  editingInput: 0,
+  faqEditingMode: false,
+  faqEditingInput: 0,
   errors: initialErrorsState,
   setNewFaq: (key, value) =>
     set((state) => ({
@@ -37,8 +37,8 @@ const useFaqStore = ((set, get) => ({
   editFaq: (index) =>
     set((state) => ({
       ...state,
-      editingMode: true,
-      editingInput: index,
+      faqEditingMode: true,
+      faqEditingInput: index,
       editingFaq: { ...state.faq[index] },
     })),
 
@@ -108,8 +108,6 @@ const useFaqStore = ((set, get) => ({
         };
       }
 
-    
-
       // Update the Faqs list with the new Faq
       const updatedFaq = [...state.faq, newFaq];
 
@@ -132,8 +130,8 @@ const useFaqStore = ((set, get) => ({
   cancelEditingFaq: () =>
     set((state) => ({
       ...state,
-      editingMode: false,
-      editingInput: 0,
+      faqEditingMode: false,
+      faqEditingInput: 0,
       editingFaq: initialFaqState,
     })),
   saveEditingFaq: () =>
@@ -187,16 +185,15 @@ const useFaqStore = ((set, get) => ({
         };
       }
 
-
       // Reset the editing state
       return {
         errors: initialErrorsState,
         faq: updatedFaq,
         editingFaq: initialFaqState,
-        editingInput: 0,
-        editingMode: false,
+        faqEditingInput: 0,
+        faqEditingMode: false,
       };
     }),
-}));
+});
 
 export default useFaqStore;

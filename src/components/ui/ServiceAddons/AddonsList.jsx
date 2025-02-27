@@ -40,11 +40,11 @@ export default function AddonsList({ custom, editMode = false }) {
         </thead>
         {addons.length ? (
           <tbody className="t-body">
-            {addons.map((addon, index) => (
+            {addons.map((addon, id) => (
               <AddonListItem
                 addon={addon}
-                index={index}
-                key={index}
+                id={id}
+                key={id}
                 editMode={editMode}
               />
             ))}

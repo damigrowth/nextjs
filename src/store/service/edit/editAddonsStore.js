@@ -17,8 +17,8 @@ const useEditAddonsStore = (set, get) => ({
   newAddon: initialAddonState,
   editingAddon: initialAddonState,
   showNewAddonInputs: false,
-  editingMode: false,
-  editingInput: 0,
+  addonEditingMode: false,
+  addonEditingInput: 0,
   errors: initialErrorsState,
   setNewAddon: (key, value) =>
     set((state) => ({
@@ -38,8 +38,8 @@ const useEditAddonsStore = (set, get) => ({
   editAddon: (index) =>
     set((state) => ({
       ...state,
-      editingMode: true,
-      editingInput: index,
+      addonEditingMode: true,
+      addonEditingInput: index,
       editingAddon: { ...state.addons[index] },
     })),
 
@@ -161,19 +161,19 @@ const useEditAddonsStore = (set, get) => ({
   cancelEditingAddon: () =>
     set((state) => ({
       ...state,
-      editingMode: false,
-      editingInput: 0,
+      addonEditingMode: false,
+      addonEditingInput: 0,
       editingAddon: initialAddonState,
     })),
   saveEditingAddon: () =>
     set((state) => {
-      const { editingAddon, editingInput } = state;
+      const { editingAddon, addonEditingInput } = state;
 
       // Make a copy of the addons array
       const updatedAddons = [...state.addons];
 
       // Update the addon at the editing index with the edited values
-      updatedAddons[editingInput] = editingAddon;
+      updatedAddons[addonEditingInput] = editingAddon;
 
       // Validation checks
       if (editingAddon.title.length === 0) {
@@ -251,8 +251,8 @@ const useEditAddonsStore = (set, get) => ({
         errors: initialErrorsState,
         addons: updatedAddons,
         editingAddon: initialAddonState,
-        editingInput: 0,
-        editingMode: false,
+        addonEditingInput: 0,
+        addonEditingMode: false,
       };
     }),
 });

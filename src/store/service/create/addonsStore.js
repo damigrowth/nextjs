@@ -17,8 +17,8 @@ const useAddonsStore = (set, get) => ({
   newAddon: initialAddonState,
   editingAddon: initialAddonState,
   showNewAddonInputs: false,
-  editingMode: false,
-  editingInput: 0,
+  addonEditingMode: false,
+  addonEditingInput: 0,
   errors: initialErrorsState,
   setNewAddon: (key, value) =>
     set((state) => ({
@@ -38,8 +38,8 @@ const useAddonsStore = (set, get) => ({
   editAddon: (index) =>
     set((state) => ({
       ...state,
-      editingMode: true,
-      editingInput: index,
+      addonEditingMode: true,
+      addonEditingInput: index,
       editingAddon: { ...state.addons[index] },
     })),
 
@@ -161,8 +161,8 @@ const useAddonsStore = (set, get) => ({
   cancelEditingAddon: () =>
     set((state) => ({
       ...state,
-      editingMode: false,
-      editingInput: 0,
+      addonEditingMode: false,
+      addonEditingInput: 0,
       editingAddon: initialAddonState,
     })),
   saveEditingAddon: () =>
@@ -251,8 +251,8 @@ const useAddonsStore = (set, get) => ({
         errors: initialErrorsState,
         addons: updatedAddons,
         editingAddon: initialAddonState,
-        editingInput: 0,
-        editingMode: false,
+        addonEditingInput: 0,
+        addonEditingMode: false,
       };
     }),
 });

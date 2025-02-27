@@ -9,12 +9,14 @@ export default function FaqList({ custom, editMode = false }) {
   // Choose the appropriate store based on editMode prop
   const store = editMode ? useEditServiceStore : useCreateServiceStore;
 
-  const { faq, deleteFaq, editFaq, editingMode, editingInput } = store();
+  const { faq, deleteFaq, editFaq, faqEditingMode, faqEditingInput } = store();
   const [activeItem, setActiveItem] = useState(0);
 
-  const toggleAccordion = (index) => {
-    setActiveItem(index === activeItem ? null : index);
+  const toggleAccordion = (id) => {
+    setActiveItem(id === activeItem ? null : id);
   };
+
+  console.log("faq", faq);
 
   return (
     <>
@@ -26,27 +28,27 @@ export default function FaqList({ custom, editMode = false }) {
         }
       >
         <div className="accordion" id="accordion">
-          {faq.map((faqItem, index) => (
-            <div key={index}>
+          {faq.map((faqItem, id) => (
+            <div key={id}>
               <div
                 className={`accordion-item ${
-                  activeItem === index ? "active" : "collapsed"
+                  activeItem === id ? "active" : "collapsed"
                 }`}
               >
-                <h2 className="accordion-header" id={`heading${index}`}>
+                <h2 className="accordion-header" id={`heading${id}`}>
                   <button
                     className={`accordion-button justify-content-between ${
-                      activeItem === index ? "" : "collapsed"
+                      activeItem === id ? "" : "collapsed"
                     }`}
                     type="button"
-                    onClick={() => toggleAccordion(index)}
+                    onClick={() => toggleAccordion(id)}
                     style={{ backgroundColor: "white" }}
                   >
                     {faqItem.question}
                     <div className="pr35">
                       <button
                         type="button"
-                        onClick={() => deleteFaq(index)}
+                        onClick={() => deleteFaq(id)}
                         className="btn float-end p0"
                       >
                         <span className="text-thm2 flaticon-delete fz16 d-flex p-2 " />
@@ -54,7 +56,7 @@ export default function FaqList({ custom, editMode = false }) {
 
                       <button
                         type="button"
-                        onClick={() => editFaq(index)}
+                        onClick={() => editFaq(id)}
                         className="btn float-end p0"
                       >
                         <span className="text-thm2 flaticon-pencil fz16 d-flex p-2" />
@@ -63,11 +65,11 @@ export default function FaqList({ custom, editMode = false }) {
                   </button>
                 </h2>
                 <div
-                  id={`collapse${index}`}
+                  id={`collapse${id}`}
                   className={`accordion-collapse collapse ${
-                    activeItem === index ? "show" : ""
+                    activeItem === id ? "show" : ""
                   }`}
-                  aria-labelledby={`heading${index}`}
+                  aria-labelledby={`heading${id}`}
                   data-bs-parent="#accordion"
                 >
                   <div
@@ -78,8 +80,8 @@ export default function FaqList({ custom, editMode = false }) {
                   </div>
                 </div>
               </div>
-              {editingMode && editingInput === index ? (
-                <FaqListEdit index={index} editMode={editMode} />
+              {faqEditingMode && faqEditingInput === id ? (
+                <FaqListEdit id={id} editMode={editMode} />
               ) : null}
             </div>
           ))}

@@ -5,7 +5,7 @@ import useCreateServiceStore from "@/store/service/create/createServiceStore";
 import useEditServiceStore from "@/store/service/edit/editServiceStore";
 import React from "react";
 
-export default function FaqListEdit({ index, editMode = false }) {
+export default function FaqListEdit({ id, editMode = false }) {
   // Choose the appropriate store based on editMode prop
   const store = editMode ? useEditServiceStore : useCreateServiceStore;
 
