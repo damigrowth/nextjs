@@ -16,8 +16,6 @@ export default function FaqList({ custom, editMode = false }) {
     setActiveItem(id === activeItem ? null : id);
   };
 
-  console.log("faq", faq);
-
   return (
     <>
       <div
