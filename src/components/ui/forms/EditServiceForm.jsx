@@ -19,7 +19,7 @@ import {
   SUBCATEGORIES_SEARCH,
   SUBDIVISIONS_SEARCH,
 } from "@/lib/graphql/queries/main/taxonomies/service";
-import { TAGS_SEARCH_SIMPLE } from "@/lib/graphql/queries/main/taxonomies/service/tag";
+import { TAGS_SEARCH_BY_CATEGORY } from "@/lib/graphql/queries/main/taxonomies/service/tag";
 
 export default function EditServiceForm({ service }) {
   const initialState = {
@@ -147,7 +147,7 @@ export default function EditServiceForm({ service }) {
   );
 
   const handleTagsSearch = useCallback(async (searchTerm, page = 1) => {
-    const query = normalizeQuery(TAGS_SEARCH_SIMPLE);
+    const query = normalizeQuery(TAGS_SEARCH_BY_CATEGORY);
     const data = await searchData({
       query,
       searchTerm,
@@ -169,6 +169,17 @@ export default function EditServiceForm({ service }) {
 
     return data;
   }, []);
+
+  const selectedTagsValue = {
+    data: info.tags.map((tag) => ({
+      id: tag.id,
+      value: tag.id,
+      label: tag.data?.attributes?.label || tag.label || "",
+      isNewTerm: tag.isNewTerm || false,
+      data: tag.data || null,
+      attributes: tag.attributes || null,
+    })),
+  };
 
   // Selection handlers for taxonomy fields
   const handleCategorySelect = useCallback(
@@ -418,7 +429,7 @@ export default function EditServiceForm({ service }) {
                 name="service-tags"
                 label="Tags"
                 labelPlural="tags"
-                value={info.tags}
+                value={selectedTagsValue}
                 nameParam="label"
                 searchTermType="label"
                 pageParam="tagsPage"
@@ -433,6 +444,7 @@ export default function EditServiceForm({ service }) {
                 errors={errors?.field === "tags" ? errors : null}
                 allowNewTerms={true}
                 newTermValue="new"
+                showOptionsOnType={true}
               />
             </div>
           </div>

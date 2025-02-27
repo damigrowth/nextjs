@@ -89,6 +89,7 @@ export default function SearchableSelect({
   maxSelections,
   staticOptions,
   resetDependency,
+  showOptionsOnType = false, // New prop to control dropdown visibility
 }) {
   const [isMounted, setIsMounted] = useState(false);
   const [loadingStates, setLoadingStates] = useState({
@@ -98,6 +99,8 @@ export default function SearchableSelect({
   const [retryCount, setRetryCount] = useState(0);
   const [newTerms, setNewTerms] = useState([]);
   const [optionsCacheKey, setOptionsCacheKey] = useState(0);
+  const [menuIsOpen, setMenuIsOpen] = useState(false); // State to control menu visibility
+  const [inputValue, setInputValue] = useState(""); // Track user input
   const maxRetries = 3;
 
   const selectedValue = useMemo(() => {
@@ -259,6 +262,12 @@ export default function SearchableSelect({
         : null;
 
       onSelect(formattedOption);
+
+      // Close the menu after selection for single select
+      if (!isMulti) {
+        setMenuIsOpen(false);
+        setInputValue("");
+      }
     }
   };
 
@@ -300,8 +309,33 @@ export default function SearchableSelect({
     };
 
     setNewTerms((prev) => [...prev, newTerm]);
-    const updatedValue = value ? [...value, newTerm] : [newTerm];
+    const updatedValue = value ? [...value.data, newTerm] : [newTerm];
     handleSelect(updatedValue);
+  };
+
+  // Handle input change to control dropdown visibility
+  const handleInputChange = (newValue, { action }) => {
+    setInputValue(newValue);
+
+    // Show dropdown when user types something, hide when input is cleared
+    if (showOptionsOnType) {
+      if (newValue && newValue.trim() !== "") {
+        setMenuIsOpen(true);
+      } else if (action === "input-change" && newValue === "") {
+        setMenuIsOpen(false);
+      }
+    }
+  };
+
+  // Handle menu open/close events
+  const handleMenuOpen = () => {
+    if (!showOptionsOnType || (inputValue && inputValue.trim() !== "")) {
+      setMenuIsOpen(true);
+    }
+  };
+
+  const handleMenuClose = () => {
+    setMenuIsOpen(false);
   };
 
   const selectStyles = {
@@ -421,6 +455,10 @@ export default function SearchableSelect({
         isRetrying={retryCount > 0}
         aria-label={ariaLabel || label}
         cacheUniqs={[optionsCacheKey]}
+        menuIsOpen={showOptionsOnType ? menuIsOpen : undefined}
+        onMenuOpen={handleMenuOpen}
+        onMenuClose={handleMenuClose}
+        onInputChange={handleInputChange}
       />
       {errors?.field === name && (
         <div className="mt-1">
