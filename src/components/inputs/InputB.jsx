@@ -40,11 +40,13 @@ export default function InputB({
       lowerCase,
     });
 
-    onChange(formattedValue);
+    // For number inputs, if empty or NaN, set to min
+    if (type === "number" && (formattedValue === "" || isNaN(formattedValue))) {
+      onChange(min !== undefined ? Number(min) : 0);
+    } else {
+      onChange(formattedValue);
+    }
   };
-
-  // For number inputs, use type="text" but with number-specific handling
-  const inputType = type === "number" ? "text" : type;
 
   return (
     <div className="mb10">
@@ -56,7 +58,7 @@ export default function InputB({
       )}
       <div className="input-group">
         <input
-          type={inputType}
+          type={type}
           id={id}
           name={name}
           min={min}
