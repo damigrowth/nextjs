@@ -1,7 +1,7 @@
 import Pagination1 from "@/components/section/Pagination1";
 import { TabContent } from "./TabContent";
 import { product1, project1 } from "@/data/product";
-import { DashboardHeader } from "./DashboardHeader";
+import { DashboardHeader } from "../DashboardHeader";
 
 export default function SavedInfo({ services, freelancers, fid }) {
   return (

@@ -12,7 +12,7 @@ export default async function ServicesPage({ searchParams }) {
     return (
       <div className="dashboard__content">
         <div className="alert alert-danger">
-          <strong>Δεν βρέθηκε το προφίλ freelancer</strong>
+          <strong>Δεν βρέθηκε το προφίλ</strong>
         </div>
       </div>
     );

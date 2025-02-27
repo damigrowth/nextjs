@@ -1,4 +1,4 @@
-import { DashboardHeader } from "@/components/ui/dashboard/saved/DashboardHeader";
+import { DashboardHeader } from "@/components/ui/dashboard/DashboardHeader";
 import { TabContent } from "@/components/ui/dashboard/profile/TabContent";
 
 export default function MyProfileInfo() {
