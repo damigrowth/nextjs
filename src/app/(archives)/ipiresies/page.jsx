@@ -55,7 +55,7 @@ export default async function page({ searchParams }) {
   const addFilter = (condition, value) => (condition ? value : undefined);
 
   const paramsFilters = {
-    search: normalizeTerm(search) || undefined,
+    search: normalizeTerm(search || "") || undefined,
     min: addFilter(min, parseInt(min, 10)),
     max: addFilter(max, parseInt(max, 10)),
     time: addFilter(time, parseInt(time, 10)),
