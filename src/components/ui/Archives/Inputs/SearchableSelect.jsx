@@ -241,7 +241,7 @@ export default function SearchableSelect({
       const formattedOptions =
         option?.map((opt) => ({
           id: opt.value || opt.id,
-          attributes: opt.data.attributes,
+          attributes: opt?.attributes || opt?.data?.attributes,
           data: opt.data, // Keep the complete item
           isNewTerm: opt.isNewTerm,
         })) || [];
@@ -251,6 +251,7 @@ export default function SearchableSelect({
         : formattedOptions;
 
       onSelect(limitedOptions);
+      setInputValue("");
     } else {
       const formattedOption = option
         ? {
@@ -311,6 +312,7 @@ export default function SearchableSelect({
     setNewTerms((prev) => [...prev, newTerm]);
     const updatedValue = value ? [...value.data, newTerm] : [newTerm];
     handleSelect(updatedValue);
+    setInputValue("");
   };
 
   // Handle input change to control dropdown visibility
@@ -459,6 +461,7 @@ export default function SearchableSelect({
         onMenuOpen={handleMenuOpen}
         onMenuClose={handleMenuClose}
         onInputChange={handleInputChange}
+        inputValue={inputValue}
       />
       {errors?.field === name && (
         <div className="mt-1">

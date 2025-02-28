@@ -527,6 +527,7 @@ a {
   font-size: 15px;
   font-weight: 400;
   color: var(--body-text-color);
+  background-color: white;
   line-height: 28px;
   -webkit-font-smoothing: antialiased;
   border-radius: 8px;

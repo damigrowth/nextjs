@@ -577,6 +577,7 @@ export default function BasicInfoForm({ freelancer, type }) {
               errors={formState?.errors?.skills}
               isDisabled={!isCategorySelected || !isSubcategorySelected}
               resetDependency={category.data?.id}
+              showOptionsOnType={true}
             />
           </div>
         </div>
