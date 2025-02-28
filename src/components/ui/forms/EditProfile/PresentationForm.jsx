@@ -9,13 +9,9 @@ import SwitchB from "../../Archives/Inputs/SwitchB";
 import Alert from "../../alerts/Alert";
 import { useRef, useState, useEffect } from "react";
 import useEditProfileStore from "@/store/dashboard/profile";
-import {
-  MediaProvider,
-  MediaUpload,
-  useMediaUpload,
-} from "@/components/inputs/MediaUpload";
+import MediaGallery from "@/components/inputs/MediaGallery";
 
-function PresentationFormContent({ freelancer }) {
+export default function PresentationForm({ freelancer }) {
   const { website, setWebsite, visibility, setVisibility, socials, setSocial } =
     useEditProfileStore();
 
@@ -38,13 +34,28 @@ function PresentationFormContent({ freelancer }) {
   );
 
   // Media changes state
-  const [mediaChanges, setMediaChanges] = useState(null);
-
-  const { media, deletedMediaIds } = useMediaUpload();
+  const [mediaState, setMediaState] = useState({
+    media: freelancer.portfolio?.data || [],
+    deletedMediaIds: [],
+    hasChanges: false,
+  });
 
   // Handle media changes
-  const handleMediaChange = (media, changes, context) => {
-    setMediaChanges(changes);
+  const handleMediaUpdate = (media, deletedIds) => {
+    setMediaState({
+      media,
+      deletedMediaIds: deletedIds,
+      hasChanges: true,
+    });
+  };
+
+  // Handle media save
+  const handleMediaSave = async (media, deletedIds) => {
+    // Reset the hasChanges flag after successful save
+    setMediaState((prev) => ({
+      ...prev,
+      hasChanges: false,
+    }));
   };
 
   // Detect form changes
@@ -56,13 +67,12 @@ function PresentationFormContent({ freelancer }) {
       JSON.stringify(visibility) !==
       JSON.stringify(initialValues.current.visibility);
 
-    // Explicitly check media changes
-    const mediaHasChanges =
-      mediaChanges?.hasChanges ||
-      (mediaChanges?.deletedFiles && mediaChanges.deletedFiles.length > 0);
-
+    // Include media changes in the overall form changes
     return (
-      socialChanged || websiteChanged || visibilityChanged || mediaHasChanges
+      socialChanged ||
+      websiteChanged ||
+      visibilityChanged ||
+      mediaState.hasChanges
     );
   };
 
@@ -94,10 +104,7 @@ function PresentationFormContent({ freelancer }) {
     }
 
     // Only proceed if there are changes
-    if (
-      Object.keys(changes).length === 0 &&
-      (!mediaChanges || !mediaChanges.hasChanges)
-    ) {
+    if (Object.keys(changes).length === 0 && !mediaState.hasChanges) {
       return;
     }
 
@@ -106,34 +113,30 @@ function PresentationFormContent({ freelancer }) {
     formData.append("changes", JSON.stringify(changes));
 
     // Prepare media information
-    if (mediaChanges?.hasChanges) {
+    if (mediaState.hasChanges) {
       // Append new files
-      const validNewFiles = mediaChanges.newFiles.filter(
-        (file) => file.size > 0 && file.name !== "undefined"
+      const newFiles = mediaState.media.filter(
+        (item) => item.file instanceof File
       );
 
-      validNewFiles.forEach((file) => {
-        formData.append("media-files", file);
+      newFiles.forEach((item) => {
+        formData.append("media-files", item.file);
       });
 
       // Get remaining media IDs
-      const remainingMediaIds = media
+      const remainingMediaIds = mediaState.media
         .filter((item) => item.file.attributes)
         .map((item) => item.file.id);
 
       formData.append("remaining-media", JSON.stringify(remainingMediaIds));
-      formData.append("deleted-media", JSON.stringify(deletedMediaIds));
+      formData.append(
+        "deleted-media",
+        JSON.stringify(mediaState.deletedMediaIds)
+      );
     }
 
     return formAction(formData);
   };
-
-  // Reset media when freelancer portfolio changes
-  useEffect(() => {
-    // This effect ensures that if the freelancer's portfolio changes,
-    // the media state is reset
-    setMediaChanges(null);
-  }, [freelancer.portfolio?.data]);
 
   return (
     <form action={handleSubmit}>
@@ -141,37 +144,6 @@ function PresentationFormContent({ freelancer }) {
         <div className="bdrb1 pb15 mb25">
           <h5 className="list-title heading">Παρουσίαση</h5>
         </div>
-
-        <div className="mb10 col-md-3">
-          <InputB
-            label="Ιστότοπος"
-            id="website"
-            name="website"
-            type="url"
-            value={website}
-            onChange={setWebsite}
-            className="form-control input-group"
-            errors={formState?.errors?.website}
-          />
-        </div>
-
-        <label className="form-label fw700 dark-color">Κοινωνικά Δίκτυα</label>
-        <SocialsInputs
-          data={socials}
-          username={freelancer.username}
-          onChange={setSocial}
-          errors={formState?.errors}
-        />
-
-        <label className="form-label fw700 dark-color mb0">
-          Δείγμα εργασιών
-        </label>
-        <MediaUpload
-          context="presentation"
-          onMediaChange={handleMediaChange}
-          isPending={isPending}
-        />
-
         <label className="form-label fw700 dark-color mb10">
           Εμφάνιση στο προφίλ
         </label>
@@ -202,6 +174,41 @@ function PresentationFormContent({ freelancer }) {
           </div>
         </div>
 
+        <div className="mb10 col-md-3">
+          <InputB
+            label="Ιστότοπος"
+            id="website"
+            name="website"
+            type="url"
+            placeholder="https://selida.gr"
+            value={website}
+            onChange={setWebsite}
+            className="form-control input-group"
+            errors={formState?.errors?.website}
+          />
+        </div>
+
+        <label className="form-label fw700 dark-color">Κοινωνικά Δίκτυα</label>
+        <SocialsInputs
+          data={socials}
+          username={freelancer.username}
+          onChange={setSocial}
+          errors={formState?.errors}
+        />
+
+        <label className="form-label fw700 dark-color mb0">
+          Δείγμα εργασιών
+        </label>
+        <MediaGallery
+          initialMedia={freelancer.portfolio?.data || []}
+          onUpdate={handleMediaUpdate}
+          onSave={handleMediaSave}
+          isPending={isPending}
+          custom={true}
+          maxSize={15}
+          maxVideos={3}
+          maxAudio={3}
+        />
         {formState?.errors && (
           <Alert
             type="error"
@@ -221,13 +228,5 @@ function PresentationFormContent({ freelancer }) {
         />
       </div>
     </form>
-  );
-}
-
-export default function PresentationForm({ freelancer }) {
-  return (
-    <MediaProvider initialMedia={freelancer.portfolio?.data || []}>
-      <PresentationFormContent freelancer={freelancer} />
-    </MediaProvider>
   );
 }
