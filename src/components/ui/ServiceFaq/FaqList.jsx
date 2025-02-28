@@ -33,8 +33,8 @@ export default function FaqList({ custom, editMode = false }) {
                   activeItem === id ? "active" : "collapsed"
                 }`}
               >
-                <h2 className="accordion-header" id={`heading${id}`}>
-                  <button
+                <h4 className="accordion-header" id={`heading${id}`}>
+                  <div
                     className={`accordion-button justify-content-between ${
                       activeItem === id ? "" : "collapsed"
                     }`}
@@ -60,8 +60,8 @@ export default function FaqList({ custom, editMode = false }) {
                         <span className="text-thm2 flaticon-pencil fz16 d-flex p-2" />
                       </button>
                     </div>
-                  </button>
-                </h2>
+                  </div>
+                </h4>
                 <div
                   id={`collapse${id}`}
                   className={`accordion-collapse collapse ${

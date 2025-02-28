@@ -25,20 +25,19 @@ export default function AccountForm({ freelancer }) {
     username,
     displayName,
     phone,
-    address,
     setDisplayName,
     setPhone,
-    setAddress,
+    address,
   } = useEditProfileStore();
 
   const currentValues = { displayName, phone: Number(phone), address };
   const originalValues = {
     displayName: freelancer.displayName,
     phone: Number(freelancer.phone),
-    address: freelancer.address,
+    address: freelancer.coverage.address,
   };
 
-  // Use custom hook to track changes
+  // // Use custom hook to track changes
   const { changes, hasChanges } = useFormChanges(currentValues, originalValues);
 
   const handleSubmit = async (formData) => {
@@ -107,9 +106,8 @@ export default function AccountForm({ freelancer }) {
               name="address"
               type="text"
               value={address}
-              onChange={setAddress}
+              disabled={true}
               className="form-control input-group"
-              errors={formState?.errors?.address}
             />
           </div>
         </div>

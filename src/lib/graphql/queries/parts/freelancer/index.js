@@ -42,7 +42,6 @@ const FREELANCER_PARTIAL_MAIN = gql`
     email
     phone
     verified
-    address
     tagline
     rate
     terms
@@ -130,7 +129,6 @@ const FREELANCER_MAIN = gql`
     email
     phone
     verified
-    address
     website
     tagline
     rate

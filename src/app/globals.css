@@ -1615,3 +1615,11 @@ a {
   gap: 10px;
   padding-right: 10px;
 }
+
+.dashboard__content form label {
+  font-weight: bold;
+}
+
+.dashboard__content form .ff-heading {
+  font-weight: bold;
+}
