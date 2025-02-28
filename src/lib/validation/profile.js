@@ -13,12 +13,6 @@ export const accountSchema = z.object({
     )
     .optional()
     .nullable(),
-  address: z
-    .string()
-    .min(5, "Η διεύθυνση πρέπει να έχει τουλάχιστον 5 χαρακτήρες")
-    .max(200, "Η διεύθυνση δεν μπορεί να υπερβαίνει τους 200 χαρακτήρες")
-    .optional()
-    .nullable(),
 });
 
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB
