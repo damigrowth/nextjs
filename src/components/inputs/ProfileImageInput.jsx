@@ -103,12 +103,12 @@ export default function ProfileImageInput({ image, onChange, errors }) {
         <div className="profile-content ml20 ml0-xs">
           <div className="d-flex flex-column">
             <div className="d-flex align-items-center">
-              <a
+              {/* <a
                 className="tag-delt text-thm2 cursor-pointer"
                 onClick={handleDelete}
               >
                 <span className="flaticon-delete text-thm2" />
-              </a>
+              </a> */}
               <label className="mb0">
                 <input
                   type="file"
@@ -116,7 +116,7 @@ export default function ProfileImageInput({ image, onChange, errors }) {
                   className="d-none"
                   onChange={handleImageChange}
                 />
-                <a className="upload-btn ml10 cursor-pointer">
+                <a className="upload-btn cursor-pointer">
                   <span className="flaticon-photo-camera mr5"></span>
                   {hasImage ? "Αλλαγή Εικόνας" : "Μεταφόρτωση Εικόνας"}
                 </a>

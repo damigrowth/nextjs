@@ -401,85 +401,6 @@ export default function BasicInfoForm({ freelancer, type }) {
             />
           </div>
         </div>
-        <div className="row mb10">
-          <div className="col-md-12">
-            <SearchableSelect
-              name="skills"
-              label="Δεξιότητες"
-              labelPlural="δεξιότητες"
-              value={skills.data}
-              nameParam="label"
-              pageParam="skillsPage"
-              pageSizeParam="skillsPageSize"
-              pageSize={10}
-              onSearch={handleSkills}
-              onSelect={handleSkillsSelect}
-              isMulti={true}
-              maxSelections={5}
-              isClearable={true}
-              formatSymbols
-              capitalize
-              errors={formState?.errors?.skills}
-              isDisabled={!isCategorySelected || !isSubcategorySelected}
-              resetDependency={category.data?.id}
-            />
-          </div>
-        </div>
-        <div className="col-md-3 mb20">
-          <SearchableSelect
-            name="specialization"
-            label="Εξειδίκευση"
-            labelPlural="εξειδικεύσεις"
-            value={specialization.data || null}
-            staticOptions={specializations}
-            onSelect={handleSpecializationSelect}
-            isMulti={false}
-            isClearable={true}
-            formatSymbols
-            capitalize
-            errors={formState?.errors?.specialization}
-            isDisabled={skills?.data?.length === 0}
-            resetDependency={
-              skills.data ? skills.data.map((s) => s.id).join("-") : "none"
-            }
-          />
-        </div>
-
-        <label className="form-label fw700 dark-color mb10">Υπηρεσία</label>
-        <div className="row">
-          <div className="mb10 col-sm-2">
-            <InputB
-              label="Εργατοώρα"
-              id="rate"
-              name="rate"
-              type="number"
-              min={10}
-              max={50000}
-              value={rate}
-              onChange={setRate}
-              className="form-control input-group"
-              append="€"
-              formatSymbols
-              errors={formState?.errors?.rate}
-            />
-          </div>
-          <div className="mb10 col-sm-2">
-            <InputB
-              label="Έτος έναρξης δραστηριότητας"
-              id="commencement"
-              name="commencement"
-              type="number"
-              min={1900}
-              max={2025}
-              value={commencement}
-              onChange={setCommencement}
-              className="form-control input-group"
-              formatSymbols
-              errors={formState?.errors?.commencement}
-            />
-          </div>
-        </div>
-
         <div>
           <label className="form-label fw700 dark-color mb10">Κάλυψη</label>
           <div className="row ">
@@ -634,6 +555,84 @@ export default function BasicInfoForm({ freelancer, type }) {
               </div>
             </div>
           )}
+        </div>
+        <div className="row mb10">
+          <div className="col-md-12">
+            <SearchableSelect
+              name="skills"
+              label="Δεξιότητες"
+              labelPlural="δεξιότητες"
+              value={skills.data}
+              nameParam="label"
+              pageParam="skillsPage"
+              pageSizeParam="skillsPageSize"
+              pageSize={10}
+              onSearch={handleSkills}
+              onSelect={handleSkillsSelect}
+              isMulti={true}
+              maxSelections={5}
+              isClearable={true}
+              formatSymbols
+              capitalize
+              errors={formState?.errors?.skills}
+              isDisabled={!isCategorySelected || !isSubcategorySelected}
+              resetDependency={category.data?.id}
+            />
+          </div>
+        </div>
+        <div className="col-md-3 mb20">
+          <SearchableSelect
+            name="specialization"
+            label="Εξειδίκευση"
+            labelPlural="εξειδικεύσεις"
+            value={specialization.data || null}
+            staticOptions={specializations}
+            onSelect={handleSpecializationSelect}
+            isMulti={false}
+            isClearable={true}
+            formatSymbols
+            capitalize
+            errors={formState?.errors?.specialization}
+            isDisabled={skills?.data?.length === 0}
+            resetDependency={
+              skills.data ? skills.data.map((s) => s.id).join("-") : "none"
+            }
+          />
+        </div>
+
+        <label className="form-label fw700 dark-color mb10">Υπηρεσία</label>
+        <div className="row">
+          <div className="mb10 col-sm-2">
+            <InputB
+              label="Εργατοώρα"
+              id="rate"
+              name="rate"
+              type="number"
+              min={10}
+              max={50000}
+              value={rate}
+              onChange={setRate}
+              className="form-control input-group"
+              append="€"
+              formatSymbols
+              errors={formState?.errors?.rate}
+            />
+          </div>
+          <div className="mb10 col-sm-3">
+            <InputB
+              label="Έτος έναρξης δραστηριότητας"
+              id="commencement"
+              name="commencement"
+              type="number"
+              min={1900}
+              max={2025}
+              value={commencement}
+              onChange={setCommencement}
+              className="form-control input-group"
+              formatSymbols
+              errors={formState?.errors?.commencement}
+            />
+          </div>
         </div>
 
         {formState?.errors && (
