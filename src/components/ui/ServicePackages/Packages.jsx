@@ -5,7 +5,7 @@ import NewFeatureInputs from "./NewFeatureInputs";
 import FeaturesList from "./FeaturesList";
 import InputB from "@/components/inputs/InputB";
 import TextArea from "@/components/inputs/TextArea";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
 
 export default function Packages() {
   const {

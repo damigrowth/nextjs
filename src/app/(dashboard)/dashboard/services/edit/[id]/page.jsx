@@ -1,25 +1,21 @@
-import DashboardNavigation from "@/components/dashboard/header/DashboardNavigation";
+import { DashboardHeader } from "@/components/ui/dashboard/DashboardHeader";
 import CancelServiceForm from "@/components/ui/forms/CancelServiceForm";
 import EditServiceForm from "@/components/ui/forms/EditServiceForm";
 import { getData } from "@/lib/client/operations";
 import { SERVICE_BY_ID } from "@/lib/graphql/queries/main/service";
 
 export const metadata = {
-  title: "Διαχείριση Υπηρεσίας",
+  title: "Επεξεργασία Υπηρεσίας",
 };
 
 const Wrapper = ({ children, title = "Επεξεργασία Υπηρεσίας" }) => (
   <div className="dashboard__content dashboard-bg">
-    <div className="row pb40">
-      <div className="col-lg-12">
-        <DashboardNavigation />
-      </div>
-      <div className="col-lg-9">
-        <div className="dashboard_title_area">
-          <h2>{title}</h2>
-        </div>
-      </div>
-    </div>
+    <DashboardHeader
+      title={title}
+      buttonText="Διαχείρηση Υπηρεσιών"
+      buttonHref="/dashboard/services"
+      showButton={true}
+    />
     <div className="col-lg-12 bgc-white bdrs4 p30 mb30 dashboard-bg">
       {children}
     </div>

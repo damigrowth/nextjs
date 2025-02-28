@@ -4,7 +4,7 @@ import useServiceOrderStore from "@/store/order/service";
 import React, { useEffect } from "react";
 import Buy from "./Buy";
 
-export default function Addons({ addons, small, price }) {
+export default function Addons({ addons, small, price, username }) {
   const { order, setOrder, calculateTotal } = useServiceOrderStore();
 
   const handleSelectAddons = (addon) => {
@@ -84,7 +84,7 @@ export default function Addons({ addons, small, price }) {
           </div>
           {price && (
             <div className="pt10 pb20">
-              <Buy price={price} />
+              <Buy price={price} username={username} />
             </div>
           )}
         </nav>

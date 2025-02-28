@@ -320,9 +320,6 @@ export default function BasicInfoForm({ freelancer, type }) {
     return formAction(formData);
   };
 
-  console.log("specialization", specialization);
-  console.log("freelancer", freelancer);
-
   return (
     <form action={handleSubmit}>
       <div className="form-style1">

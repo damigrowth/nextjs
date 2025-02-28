@@ -11,6 +11,7 @@ import Tabs from "@/components/ui/Archives/Tabs";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
 import { TAGS_SEARCH } from "@/lib/graphql/queries/main/taxonomies/service/tag";
+import { normalizeTerm } from "@/utils/normalizeTerm";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -78,7 +79,7 @@ export default async function page({ params, searchParams }) {
   const addFilter = (condition, value) => (condition ? value : undefined);
 
   const paramsFilters = {
-    search: search || undefined,
+    search: normalizeTerm(search || "") || undefined,
     min: addFilter(min, parseInt(min, 10)),
     max: addFilter(max, parseInt(max, 10)),
     time: addFilter(time, parseInt(time, 10)),

@@ -1,11 +1,13 @@
+import useEditServiceStore from "@/store/service/edit/editServiceStore";
 import FaqList from "./FaqList";
 import NewFaqInputs from "./NewFaqInputs";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
 
-export default function ServiceFaq({ custom }) {
-  const { faq, saveFaq, showNewFaqInputs, handleShowNewFaqInputs } =
-    useCreateServiceStore();
+export default function ServiceFaq({ custom, editMode = false }) {
+  // Choose the appropriate store based on editMode prop
+  const store = editMode ? useEditServiceStore : useCreateServiceStore;
 
+  const { faq, saveFaq, showNewFaqInputs, handleShowNewFaqInputs } = store();
   return (
     <div
       className={
@@ -25,7 +27,7 @@ export default function ServiceFaq({ custom }) {
       )}
 
       <div className={!custom ? "text-start mt30" : "text-start"}>
-        <FaqList custom={custom} />
+        <FaqList custom={custom} editMode={editMode} />
       </div>
 
       <button
@@ -36,7 +38,7 @@ export default function ServiceFaq({ custom }) {
         <span>Νέα Ερώτηση</span>
         <span className="d-flex align-items-center flaticon-button fz20" />
       </button>
-      {showNewFaqInputs && <NewFaqInputs />}
+      {showNewFaqInputs && <NewFaqInputs editMode={editMode} />}
       {!custom && (
         <button
           type="button"

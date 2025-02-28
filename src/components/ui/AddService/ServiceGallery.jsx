@@ -1,10 +1,17 @@
 "use client";
 
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import useEditServiceStore from "@/store/service/edit/editServiceStore";
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 
-export default function ServiceGallery({ isPending, custom }) {
+export default function ServiceGallery({
+  isPending,
+  custom,
+  editMode = false,
+}) {
+  const store = editMode ? useEditServiceStore : useCreateServiceStore;
+
   const {
     media,
     setMedia,
@@ -13,7 +20,7 @@ export default function ServiceGallery({ isPending, custom }) {
     setLoading,
     gallery,
     saveGallery,
-  } = useCreateServiceStore();
+  } = store();
 
   const [totalSize, setTotalSize] = useState(0);
   const [error, setError] = useState("");
@@ -22,11 +29,46 @@ export default function ServiceGallery({ isPending, custom }) {
   useEffect(() => {
     const calculateSize = () => {
       const newTotalSize = media.reduce((sum, item) => {
-        // Handle both new uploads and existing Strapi media
+        // Handle new uploads (File objects) - convert from bytes to MB
         if (item.file instanceof File) {
           return sum + item.file.size / (1024 * 1024);
-        } else if (item.file?.attributes?.formats?.thumbnail?.size) {
-          return sum + item.file.attributes.formats.thumbnail.size;
+        }
+        // Handle existing Strapi media
+        else if (item.file?.attributes) {
+          // Check for direct size attribute (server returns sizes in KB)
+          if (typeof item.file.attributes.size === "number") {
+            // Convert KB to MB
+            return sum + item.file.attributes.size / 1024;
+          }
+
+          // Fallback: If no direct size attribute, check formats
+          if (item.file.attributes.formats) {
+            // Try formats in order of preference
+            const formats = [
+              "original",
+              "large",
+              "medium",
+              "small",
+              "thumbnail",
+            ];
+            for (const format of formats) {
+              if (item.file.attributes.formats[format]?.size) {
+                // Convert KB to MB (server returns sizes in KB)
+                return sum + item.file.attributes.formats[format].size / 1024;
+              }
+            }
+          }
+
+          // Last resort: estimate based on mime type if no size found
+          if (item.file.attributes.mime) {
+            if (item.file.attributes.mime.startsWith("image/")) {
+              return sum + 0.5; // ~0.5MB for images
+            } else if (item.file.attributes.mime.startsWith("video/")) {
+              return sum + 5; // ~5MB for videos
+            } else if (item.file.attributes.mime.startsWith("audio/")) {
+              return sum + 2; // ~2MB for audio
+            }
+          }
         }
         return sum;
       }, 0);
@@ -145,16 +187,99 @@ export default function ServiceGallery({ isPending, custom }) {
   const renderMediaPreview = (item) => {
     // For existing media from Strapi
     if (item.file.attributes) {
-      return (
-        <Image
-          height={119}
-          width={136}
-          className="object-fit-cover"
-          src={item.file.attributes.url}
-          style={{ height: "166px", width: "190px" }}
-          alt={item.file.attributes.name}
-        />
-      );
+      // Determine media type based on available information
+      let mediaType = "unknown";
+
+      // Try to get mime type from formats if available
+      if (
+        item.file.attributes.formats &&
+        Object.keys(item.file.attributes.formats).length > 0
+      ) {
+        // If it has formats, it's likely an image
+        const format = Object.values(item.file.attributes.formats)[0];
+        if (format && format.mime) {
+          mediaType = getMediaType(format.mime);
+        }
+      }
+      // Otherwise try to guess from the URL or file extension
+      else {
+        const url = item.file.attributes.url;
+        const urlPath = new URL(url).pathname;
+
+        // Check if URL contains video/upload and ends with audio extension
+        if (
+          urlPath.includes("/video/upload/") &&
+          (urlPath.endsWith(".mp3") ||
+            urlPath.endsWith(".wav") ||
+            urlPath.endsWith(".ogg") ||
+            urlPath.endsWith(".m4a"))
+        ) {
+          mediaType = "audio";
+        }
+        // Check for video extensions
+        else if (
+          urlPath.endsWith(".mp4") ||
+          urlPath.endsWith(".webm") ||
+          urlPath.endsWith(".mov") ||
+          urlPath.endsWith(".avi")
+        ) {
+          mediaType = "video";
+        }
+        // Check if URL contains image/upload (Cloudinary pattern)
+        else if (urlPath.includes("/image/upload/")) {
+          mediaType = "image";
+        }
+      }
+
+      switch (mediaType) {
+        case "image":
+          return (
+            <Image
+              height={119}
+              width={136}
+              className="object-fit-cover"
+              src={item.file.attributes.url}
+              style={{ height: "166px", width: "190px" }}
+              alt={item.file.attributes.name}
+            />
+          );
+        case "video":
+          return (
+            <video
+              className="object-fit-cover"
+              style={{ height: "166px", width: "190px" }}
+              controls
+            >
+              <source
+                src={item.file.attributes.url}
+                type={item.file.attributes.mime}
+              />
+              Το πρόγραμμα περιήγησης σας δεν υποστηρίζει το tag βίντεο.
+            </video>
+          );
+        case "audio":
+          return (
+            <div
+              className="audio-preview"
+              style={{
+                height: "166px",
+                width: "190px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#f0f0f0",
+              }}
+            >
+              <i className="fa-solid fa-music fa-3x"></i>
+              <audio controls className="mt-2">
+                <source
+                  src={item.file.attributes.url}
+                  type={item.file.attributes.mime}
+                />
+              </audio>
+            </div>
+          );
+      }
     }
 
     // For new uploads
@@ -186,18 +311,11 @@ export default function ServiceGallery({ isPending, custom }) {
           );
         case "audio":
           return (
-            <div
-              className="audio-preview"
-              style={{
-                height: "166px",
-                width: "190px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#f0f0f0",
-              }}
-            >
+            <div className="audio-preview">
               <i className="fa-solid fa-music fa-3x"></i>
+              <audio controls>
+                <source src={item.url} type={item.file.type} />
+              </audio>
             </div>
           );
       }

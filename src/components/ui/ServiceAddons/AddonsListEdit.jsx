@@ -2,10 +2,14 @@
 
 import InputB from "@/components/inputs/InputB";
 import TextArea from "@/components/inputs/TextArea";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import useEditServiceStore from "@/store/service/edit/editServiceStore";
 import React from "react";
 
-export default function AddonsListEdit({ index }) {
+export default function AddonsListEdit({ id, editMode = false }) {
+  // Choose the appropriate store based on editMode prop
+  const store = editMode ? useEditServiceStore : useCreateServiceStore;
+
   const {
     newAddon,
     editingAddon,
@@ -13,9 +17,7 @@ export default function AddonsListEdit({ index }) {
     cancelEditingAddon,
     saveEditingAddon,
     setEditingAddon,
-  } = useCreateServiceStore();
-
-  // console.log("errors", errors);
+  } = store();
 
   return (
     <tr>
@@ -38,7 +40,6 @@ export default function AddonsListEdit({ index }) {
                   }
                   className="form-control input-group"
                   errors={errors}
-                  formatSymbols
                   capitalize
                 />
               </div>
@@ -49,7 +50,7 @@ export default function AddonsListEdit({ index }) {
                   id="editing-addon-price"
                   name="editing-addon-price"
                   min={5}
-                  max={1000}
+                  max={10000}
                   value={editingAddon.price}
                   onChange={(formattedValue) =>
                     setEditingAddon("price", formattedValue)
@@ -74,8 +75,6 @@ export default function AddonsListEdit({ index }) {
                 }
                 errors={errors}
                 capitalize
-                formatSymbols
-                formatNumbers
                 counter
               />
             </div>
@@ -83,25 +82,21 @@ export default function AddonsListEdit({ index }) {
         </div>
         <div className="table-editing-bg p0 mt30">
           <div className="px30">
-            <div className="row">
-              <div className="col-sm-6 text-start">
-                <button
-                  type="button"
-                  onClick={cancelEditingAddon}
-                  className="ud-btn btn-dark-border"
-                >
-                  Ακύρωση
-                </button>
-              </div>
-              <div className="col-sm-6 text-end">
-                <button
-                  type="button"
-                  onClick={saveEditingAddon}
-                  className="ud-btn btn-thm"
-                >
-                  Αποθήκευση
-                </button>
-              </div>
+            <div className="editing-btns">
+              <button
+                type="button"
+                onClick={cancelEditingAddon}
+                className="ud-btn btn-dark-border"
+              >
+                Ακύρωση Επεξεργασίας
+              </button>
+              <button
+                type="button"
+                onClick={saveEditingAddon}
+                className="ud-btn btn-thm"
+              >
+                Ολοκλήρωση Επεξεργασίας
+              </button>
             </div>
           </div>
         </div>

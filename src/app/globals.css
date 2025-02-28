@@ -1590,3 +1590,28 @@ a {
 .auth-btns a:hover {
   color: #fff;
 }
+
+.audio-preview {
+  position: relative;
+  height: 166px;
+  width: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: "#f0f0f0";
+}
+
+.audio-preview audio {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+.editing-btns {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-right: 10px;
+}

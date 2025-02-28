@@ -89,6 +89,7 @@ export default function SearchableSelect({
   maxSelections,
   staticOptions,
   resetDependency,
+  showOptionsOnType = false, // New prop to control dropdown visibility
 }) {
   const [isMounted, setIsMounted] = useState(false);
   const [loadingStates, setLoadingStates] = useState({
@@ -98,6 +99,8 @@ export default function SearchableSelect({
   const [retryCount, setRetryCount] = useState(0);
   const [newTerms, setNewTerms] = useState([]);
   const [optionsCacheKey, setOptionsCacheKey] = useState(0);
+  const [menuIsOpen, setMenuIsOpen] = useState(false); // State to control menu visibility
+  const [inputValue, setInputValue] = useState(""); // Track user input
   const maxRetries = 3;
 
   const selectedValue = useMemo(() => {
@@ -237,13 +240,12 @@ export default function SearchableSelect({
     if (isMulti) {
       const formattedOptions =
         option?.map((opt) => ({
-          id: opt.value,
+          id: opt.value || opt.id,
           attributes: opt.data.attributes,
           data: opt.data, // Keep the complete item
           isNewTerm: opt.isNewTerm,
         })) || [];
 
-      // Only limit if maxSelections is provided
       const limitedOptions = maxSelections
         ? formattedOptions.slice(0, maxSelections)
         : formattedOptions;
@@ -260,6 +262,12 @@ export default function SearchableSelect({
         : null;
 
       onSelect(formattedOption);
+
+      // Close the menu after selection for single select
+      if (!isMulti) {
+        setMenuIsOpen(false);
+        setInputValue("");
+      }
     }
   };
 
@@ -282,15 +290,52 @@ export default function SearchableSelect({
       lowerCase,
     });
 
+    let uniqueId = `${newTermValue}-${Date.now()}`;
+
     const newTerm = {
-      value: `${newTermValue}-${Date.now()}`,
+      id: uniqueId,
+      value: uniqueId,
       label: termValue,
+      data: {
+        id: uniqueId,
+        attributes: {
+          label: termValue,
+        },
+      },
+      attributes: {
+        label: termValue,
+      },
       isNewTerm: true,
     };
 
     setNewTerms((prev) => [...prev, newTerm]);
-    const updatedValue = value ? [...value, newTerm] : [newTerm];
+    const updatedValue = value ? [...value.data, newTerm] : [newTerm];
     handleSelect(updatedValue);
+  };
+
+  // Handle input change to control dropdown visibility
+  const handleInputChange = (newValue, { action }) => {
+    setInputValue(newValue);
+
+    // Show dropdown when user types something, hide when input is cleared
+    if (showOptionsOnType) {
+      if (newValue && newValue.trim() !== "") {
+        setMenuIsOpen(true);
+      } else if (action === "input-change" && newValue === "") {
+        setMenuIsOpen(false);
+      }
+    }
+  };
+
+  // Handle menu open/close events
+  const handleMenuOpen = () => {
+    if (!showOptionsOnType || (inputValue && inputValue.trim() !== "")) {
+      setMenuIsOpen(true);
+    }
+  };
+
+  const handleMenuClose = () => {
+    setMenuIsOpen(false);
   };
 
   const selectStyles = {
@@ -410,6 +455,10 @@ export default function SearchableSelect({
         isRetrying={retryCount > 0}
         aria-label={ariaLabel || label}
         cacheUniqs={[optionsCacheKey]}
+        menuIsOpen={showOptionsOnType ? menuIsOpen : undefined}
+        onMenuOpen={handleMenuOpen}
+        onMenuClose={handleMenuClose}
+        onInputChange={handleInputChange}
       />
       {errors?.field === name && (
         <div className="mt-1">

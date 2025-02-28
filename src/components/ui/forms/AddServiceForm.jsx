@@ -5,30 +5,14 @@ import ServiceGallery from "../AddService/ServiceGallery";
 import { createService } from "@/lib/service/create";
 import ServiceFaq from "../ServiceFaq/ServiceFaq";
 import ServiceInformation from "../ServiceInformation/ServiceInformation";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
 import ServiceSuccess from "../ServiceSuccess/ServiceSuccess";
 import ServicePackages from "../AddService/ServicePackages";
 import ServiceAddons from "../AddService/ServiceAddons";
 import ServiceType from "../AddService/ServiceType";
 import { NavigationButtons } from "../buttons/NavigationButtons";
-
-function AddServiceButton({ isPending }) {
-  return (
-    <button
-      disabled={isPending}
-      className="ud-btn btn-dark default-box-shadow2"
-    >
-      {isPending ? "Δημοσίευση Υπηρεσίας..." : "Δημοσίευση Υπηρεσίας"}
-      {isPending ? (
-        <div className="spinner-border spinner-border-sm ml10" role="status">
-          <span className="sr-only"></span>
-        </div>
-      ) : (
-        <span className="pl10">🚀</span>
-      )}
-    </button>
-  );
-}
+import Alert from "../alerts/Alert";
+import SaveButton from "../buttons/SaveButton";
 
 export default function AddServiceForm({ coverage }) {
   const {
@@ -126,6 +110,8 @@ export default function AddServiceForm({ coverage }) {
             {step === "addons" && <ServiceAddons />}
             {step === "faq" && <ServiceFaq />}
             {step === "gallery" && <ServiceGallery isPending={isPending} />}
+            <Alert />
+            {formState.errors && <Alert message={formState.message} />}
             <NavigationButtons
               showPrevious={showPreviousButton()}
               onPreviousClick={handlePreviousButton}
@@ -133,6 +119,20 @@ export default function AddServiceForm({ coverage }) {
               onNextClick={handleNextButton}
               nextDisabled={handleDisable()}
               isPending={isPending}
+            />
+
+            <SaveButton
+              isPending={isPending}
+              defaultText="Δημοσίευση Υπηρεσίας"
+              loadingText="Δημοσίευση Υπηρεσίας..."
+              emoji="🚀"
+              icon={null}
+              orientation="center"
+              hidden={
+                step !== "gallery" ||
+                saved.type === false ||
+                saved.info === false
+              }
             />
           </>
         )}

@@ -6,6 +6,7 @@ import { EDIT_SERVICE, UPDATE_SERVICE } from "../graphql/mutations";
 import { getToken } from "../auth/token";
 import { handleMediaUpdate } from "../uploads/update";
 import { revalidatePath } from "next/cache";
+import { createTags } from "../tags";
 
 export async function editService(prevState, formData) {
   // const jwt = await getToken();
@@ -20,6 +21,43 @@ export async function editService(prevState, formData) {
     const status = formData.get("status");
     const addons = JSON.parse(formData.get("addons"));
     const faq = JSON.parse(formData.get("faq"));
+
+    // Parse taxonomy fields
+    const categoryId = parseInt(formData.get("service-category"));
+    const subcategoryId = parseInt(formData.get("service-subcategory"));
+    const subdivisionId = parseInt(formData.get("service-subdivision"));
+
+    // Get all tag values from formData - the last one is the complete JSON string
+    const tagValues = formData.getAll("service-tags");
+    // Get the last entry which contains the full JSON string of all tags
+    const tagJsonString = tagValues[tagValues.length - 1];
+    const tags = JSON.parse(tagJsonString || "[]");
+
+    // Separate existing and new tags
+    const existingTags = tags
+      .filter((tag) => !tag.isNewTerm && !tag.id.startsWith("new-"))
+      .map((tag) => tag.id);
+
+    const newTags = tags.filter(
+      (tag) => tag.isNewTerm || tag.id.startsWith("new-")
+    );
+
+    // Create new tags if any exist
+    let allTagIds = existingTags;
+    if (newTags.length > 0) {
+      const result = await createTags(newTags);
+
+      if (result.error) {
+        return {
+          ...prevState,
+          message: result.message,
+          errors: result.message,
+          data: null,
+        };
+      }
+
+      allTagIds = [...existingTags, ...result.data.map((tag) => tag.id)];
+    }
 
     // Handle media
     const remainingMediaIds = JSON.parse(
@@ -53,6 +91,11 @@ export async function editService(prevState, formData) {
         addons,
         faq,
         media: finalMediaIds,
+        // Add taxonomy relations
+        category: categoryId ? categoryId : null,
+        subcategory: subcategoryId ? subcategoryId : null,
+        subdivision: subdivisionId ? subdivisionId : null,
+        tags: allTagIds,
       },
     };
 

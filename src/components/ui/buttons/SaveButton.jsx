@@ -1,16 +1,20 @@
 "use client";
 
 export default function SaveButton({
+  hidden = false,
   isPending = false,
   hasChanges = true,
   loadingText = "Ενημέρωση Στοιχείων...",
   defaultText = "Ενημέρωση Στοιχείων",
   icon = "fa-solid fa-floppy-disk",
+  emoji = "",
   variant = "dark",
   orientation = "left",
   className = "",
   ...props
 }) {
+  if (hidden) return null;
+
   const isDisabled = !hasChanges || isPending;
 
   const buttonClasses = `
@@ -39,7 +43,7 @@ export default function SaveButton({
             <span className="sr-only"></span>
           </div>
         ) : (
-          <i className={icon}></i>
+          <>{icon ? <i className={icon}></i> : ` ${emoji}`}</>
         )}
       </button>
     </div>

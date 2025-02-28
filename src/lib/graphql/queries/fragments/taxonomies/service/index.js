@@ -15,6 +15,7 @@ const CATEGORY = gql`
 const CATEGORY_ENTITY = gql`
   fragment CategoryEntity on CategoryEntityResponseCollection {
     data {
+      id
       attributes {
         label
         slug
@@ -25,6 +26,7 @@ const CATEGORY_ENTITY = gql`
 
 const SUBCATEGORY_ENTITY = gql`
   fragment SubcategoryEntity on SubcategoryEntity {
+    id
     attributes {
       label
       slug
@@ -34,6 +36,7 @@ const SUBCATEGORY_ENTITY = gql`
 
 const SUBDIVISION_ENTITY = gql`
   fragment SubdivisionEntity on SubdivisionEntity {
+    id
     attributes {
       label
       slug

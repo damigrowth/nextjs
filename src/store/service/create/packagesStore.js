@@ -79,8 +79,8 @@ const usePackagesStore = (set, get) => ({
   newFeature: initialFeatureState,
   editingFeature: initialFeatureState,
   showNewFeatureInputs: false,
-  editingMode: false,
-  editingInput: 0,
+  packagesEditingMode: false,
+  packagesEditingInput: 0,
   errors: initialErrorsState,
   setPackageValues: (key, value) =>
     set((state) => ({
@@ -101,8 +101,8 @@ const usePackagesStore = (set, get) => ({
   clearEditingFeature: () =>
     set({
       editingFeature: initialFeatureState,
-      editingInput: 0,
-      editingMode: false,
+      packagesEditingInput: 0,
+      packagesEditingMode: false,
     }),
   handleNewFeatureChange: (key, value) =>
     set((state) => ({
@@ -225,8 +225,8 @@ const usePackagesStore = (set, get) => ({
 
       return {
         ...state,
-        editingInput: index,
-        editingMode: false,
+        packagesEditingInput: index,
+        packagesEditingMode: false,
         packages: updatedPackages,
       };
     }),
@@ -234,16 +234,16 @@ const usePackagesStore = (set, get) => ({
   editFeature: (index) =>
     set((state) => ({
       ...state,
-      editingMode: true,
-      editingInput: index,
+      packagesEditingMode: true,
+      packagesEditingInput: index,
       editingFeature: { ...state.packages[state.tier].features[index] },
     })),
 
   cancelEditingFeature: () =>
     set((state) => ({
       ...state,
-      editingMode: false,
-      editingInput: 0,
+      packagesEditingMode: false,
+      packagesEditingInput: 0,
       editingFeature: initialFeatureState,
     })),
 
@@ -322,8 +322,8 @@ const usePackagesStore = (set, get) => ({
           errors: initialErrorsState,
           packages: updatedPackages,
           editingFeature: initialFeatureState,
-          editingInput: 0,
-          editingMode: false,
+          packagesEditingInput: 0,
+          packagesEditingMode: false,
         };
       } else {
         console.error("Invalid editing input index");

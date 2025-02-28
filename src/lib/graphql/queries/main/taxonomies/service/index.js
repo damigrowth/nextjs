@@ -331,9 +331,14 @@ const TAXONOMIES_SEARCH = gql`
 `;
 
 const CATEGORIES_SEARCH = gql`
-  query CategoriesSearch($categoryTerm: String) {
+  query CategoriesSearch(
+    $categoryTerm: String
+    $categoriesPage: Int
+    $categoriesPageSize: Int
+  ) {
     categories(
       filters: { label: { containsi: $categoryTerm } }
+      pagination: { page: $categoriesPage, pageSize: $categoriesPageSize }
       sort: "label:asc"
     ) {
       data {
@@ -342,17 +347,27 @@ const CATEGORIES_SEARCH = gql`
           label
         }
       }
+      meta {
+        ...Pagination
+      }
     }
   }
+  ${PAGINATION}
 `;
 
 const SUBCATEGORIES_SEARCH = gql`
-  query SubcategoriesSearch($categoryId: ID, $subcategoryTerm: String) {
+  query SubcategoriesSearch(
+    $categoryId: ID
+    $subcategoryTerm: String
+    $subcategoriesPage: Int
+    $subcategoriesPageSize: Int
+  ) {
     subcategories(
       filters: {
         category: { id: { eq: $categoryId } }
         label: { containsi: $subcategoryTerm }
       }
+      pagination: { page: $subcategoriesPage, pageSize: $subcategoriesPageSize }
       sort: "label:asc"
     ) {
       data {
@@ -361,17 +376,27 @@ const SUBCATEGORIES_SEARCH = gql`
           label
         }
       }
+      meta {
+        ...Pagination
+      }
     }
   }
+  ${PAGINATION}
 `;
 
 const SUBDIVISIONS_SEARCH = gql`
-  query SubdivisionsSearch($subcategoryId: ID, $subdivisionTerm: String) {
+  query SubdivisionsSearch(
+    $subcategoryId: ID
+    $subdivisionTerm: String
+    $subdivisionsPage: Int
+    $subdivisionsPageSize: Int
+  ) {
     subdivisions(
       filters: {
         subcategory: { id: { eq: $subcategoryId } }
         label: { containsi: $subdivisionTerm }
       }
+      pagination: { page: $subdivisionsPage, pageSize: $subdivisionsPageSize }
       sort: "label:asc"
     ) {
       data {
@@ -380,8 +405,12 @@ const SUBDIVISIONS_SEARCH = gql`
           label
         }
       }
+      meta {
+        ...Pagination
+      }
     }
   }
+  ${PAGINATION}
 `;
 
 const SUBCATEGORIES_SEARCH_FILTERED = gql`

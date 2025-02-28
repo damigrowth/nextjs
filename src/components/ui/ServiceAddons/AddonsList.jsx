@@ -2,12 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import AddonListItem from "./AddonListItem";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import useEditServiceStore from "@/store/service/edit/editServiceStore";
 
-export default function AddonsList({ custom }) {
-  const { addons } = useCreateServiceStore();
+export default function AddonsList({ custom, editMode = false }) {
+  // Choose the appropriate store based on editMode prop
+  const store = editMode ? useEditServiceStore : useCreateServiceStore;
 
-  // console.log(features);
+  const { addons } = store();
+
   return (
     <div
       className={
@@ -37,8 +40,13 @@ export default function AddonsList({ custom }) {
         </thead>
         {addons.length ? (
           <tbody className="t-body">
-            {addons.map((addon, index) => (
-              <AddonListItem addon={addon} index={index} key={index} />
+            {addons.map((addon, id) => (
+              <AddonListItem
+                addon={addon}
+                id={id}
+                key={id}
+                editMode={editMode}
+              />
             ))}
           </tbody>
         ) : null}

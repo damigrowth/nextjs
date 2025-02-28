@@ -2,15 +2,16 @@
 
 import InputB from "@/components/inputs/InputB";
 import TextArea from "@/components/inputs/TextArea";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import useEditServiceStore from "@/store/service/edit/editServiceStore";
 import React from "react";
 
-export default function NewAddonInputs() {
-  const { newAddon, setNewAddon, clearNewAddon, saveNewAddon, errors } =
-    useCreateServiceStore();
+export default function NewAddonInputs({ editMode = false }) {
+  // Choose the appropriate store based on editMode prop
+  const store = editMode ? useEditServiceStore : useCreateServiceStore;
 
-  // console.log("ERRORS", errors);
-  // console.log("newAddon", newAddon);
+  const { newAddon, setNewAddon, clearNewAddon, saveNewAddon, errors } =
+    store();
 
   return (
     <>
@@ -31,7 +32,6 @@ export default function NewAddonInputs() {
                   }
                   className="form-control input-group"
                   errors={errors}
-                  formatSymbols
                   capitalize
                 />
               </div>
@@ -71,7 +71,6 @@ export default function NewAddonInputs() {
                 }
                 errors={errors}
                 capitalize
-                formatSymbols
                 counter
               />
             </div>
@@ -89,7 +88,7 @@ export default function NewAddonInputs() {
                 onClick={clearNewAddon}
                 className="ud-btn btn-dark-border  "
               >
-                Ακύρωση
+                Ακύρωση Επεξεργασίας
               </button>
             </div>
             <div className="col-sm-6 text-end">
@@ -98,7 +97,7 @@ export default function NewAddonInputs() {
                 onClick={saveNewAddon}
                 className="ud-btn btn-thm "
               >
-                Αποθήκευση
+                Ολοκλήρωση Επεξεργασίας
               </button>
             </div>
           </div>

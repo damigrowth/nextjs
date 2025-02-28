@@ -3,15 +3,22 @@
 import React from "react";
 import FeaturesListEdit from "../ServicePackages/FeaturesListEdit";
 import AddonsListEdit from "./AddonsListEdit";
-import useCreateServiceStore from "@/store/service/createServiceStore";
+import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import useEditServiceStore from "@/store/service/edit/editServiceStore";
 
-export default function AddonListItem({ addon, index }) {
-  const { editAddon, editingAddon, editingInput, editingMode, deleteAddon } =
-    useCreateServiceStore();
+export default function AddonListItem({ addon, id, editMode = false }) {
+  // Choose the appropriate store based on editMode prop
+  const store = editMode ? useEditServiceStore : useCreateServiceStore;
 
-  // console.log("editingAddon", editingAddon);
+  const {
+    editAddon,
+    editingAddon,
+    addonEditingInput,
+    addonEditingMode,
+    deleteAddon,
+  } = store();
   return (
-    <React.Fragment key={index}>
+    <React.Fragment key={id}>
       <tr className="bgc-thm3">
         <th>
           <h5>{addon.title}</h5>
@@ -23,7 +30,7 @@ export default function AddonListItem({ addon, index }) {
         <th className="pl0">
           <button
             type="button"
-            onClick={() => deleteAddon(index)}
+            onClick={() => deleteAddon(id)}
             className="btn float-end p0"
           >
             <span className="text-thm2 flaticon-delete fz16 d-flex p-2 " />
@@ -31,15 +38,15 @@ export default function AddonListItem({ addon, index }) {
 
           <button
             type="button"
-            onClick={() => editAddon(index)}
+            onClick={() => editAddon(id)}
             className="btn float-end p0"
           >
             <span className="text-thm2 flaticon-pencil fz16 d-flex p-2" />
           </button>
         </th>
       </tr>
-      {editingMode && editingInput === index ? (
-        <AddonsListEdit index={index} />
+      {addonEditingMode && addonEditingInput === id ? (
+        <AddonsListEdit id={id} editMode={editMode} />
       ) : null}
     </React.Fragment>
   );

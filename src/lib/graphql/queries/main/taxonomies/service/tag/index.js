@@ -61,4 +61,27 @@ const TAGS_SEARCH_SIMPLE = gql`
   ${TAG}
 `;
 
-export { TAGS_SEARCH, TAGS_SEARCH_SIMPLE };
+const TAGS_SEARCH_BY_CATEGORY = gql`
+  query TagsSearchByCategory(
+    $label: String
+    $tagsPage: Int
+    $tagsPageSize: Int
+  ) {
+    tags(
+      filters: { label: { containsi: $label } }
+      pagination: { page: $tagsPage, pageSize: $tagsPageSize }
+      sort: "label:asc"
+    ) {
+      data {
+        ...Tag
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${TAG}
+  ${PAGINATION}
+`;
+
+export { TAGS_SEARCH, TAGS_SEARCH_SIMPLE, TAGS_SEARCH_BY_CATEGORY };
