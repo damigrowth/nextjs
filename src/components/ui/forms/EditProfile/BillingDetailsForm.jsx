@@ -193,6 +193,7 @@ export default function BillingDetailsForm({ freelancer }) {
         )}
 
         <SaveButton
+          variant="primary"
           orientation="end"
           isPending={isPending}
           hasChanges={hasChanges}

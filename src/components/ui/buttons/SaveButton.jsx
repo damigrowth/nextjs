@@ -20,7 +20,7 @@ export default function SaveButton({
   const buttonClasses = `
     ud-btn 
     ${variant === "dark" ? "btn-dark" : ""} 
-    ${variant === "primary" ? "btn-primary" : ""} 
+    ${variant === "primary" ? "btn-thm" : ""} 
     ${variant === "outline" ? "btn-outline" : ""} 
     ${isDisabled ? `btn-${variant}-disabled` : ""} 
     mt20 

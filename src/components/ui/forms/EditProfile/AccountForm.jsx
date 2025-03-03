@@ -128,6 +128,7 @@ export default function AccountForm({ freelancer }) {
           orientation="end"
           isPending={isPending}
           hasChanges={hasChanges}
+          variant="primary"
         />
       </div>
     </form>

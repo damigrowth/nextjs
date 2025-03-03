@@ -343,6 +343,7 @@ export default function AdditionalInfoForm({ freelancer, type }) {
         )}
 
         <SaveButton
+          variant="primary"
           orientation="end"
           isPending={isPending}
           hasChanges={hasChanges()}
