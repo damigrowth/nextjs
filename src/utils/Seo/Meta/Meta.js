@@ -12,6 +12,7 @@ export async function Meta({
   descriptionTemplate,
   size,
   url,
+  customUrl,
 }) {
   try {
     if (type) {
@@ -32,7 +33,7 @@ export async function Meta({
         description,
         size,
         image,
-        url,
+        url: !url ? `${customUrl}/${entity.slug}` : url,
       });
 
       return { meta };
@@ -41,7 +42,7 @@ export async function Meta({
         title: titleTemplate,
         description: descriptionTemplate,
         size: 150,
-        url,
+        url: !url ? `${customUrl}/${entity.slug}` : url,
       });
 
       return { meta };

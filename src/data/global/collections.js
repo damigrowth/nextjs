@@ -124,3 +124,41 @@ export const sizeOptions = [
     slug: "101",
   },
 ];
+
+export const budgetOptions = [
+  {
+    id: "1",
+    label: "0€",
+    slug: "0",
+  },
+  {
+    id: "2",
+    label: "100€",
+    slug: "100",
+  },
+  {
+    id: "3",
+    label: "500€",
+    slug: "500",
+  },
+  {
+    id: "4",
+    label: "1000€",
+    slug: "1000",
+  },
+  {
+    id: "5",
+    label: "5000€",
+    slug: "5000",
+  },
+  {
+    id: "6",
+    label: "10000€",
+    slug: "10000",
+  },
+  {
+    id: "7",
+    label: "50€",
+    slug: "50",
+  },
+];

@@ -60,7 +60,7 @@ const SocialsInputs = ({ data = {}, username, onChange, errors }) => {
             type="url"
             value={data[platform]?.url || ""}
             onChange={(value) => handleInputChange(platform, value)}
-            placeholder={`${config.placeholder}${username}`}
+            placeholder={`${config.placeholder}username`}
             className="form-control"
             errors={errors?.[platform]}
             icon={`fab fa-${config.icon}`}

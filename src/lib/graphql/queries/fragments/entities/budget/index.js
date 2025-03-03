@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
-const MIN_BUDGETS_ENTITY = gql`
-  fragment MinBudgets on BudgetRelationResponseCollection {
+const MIN_BUDGET_ENTITY = gql`
+  fragment MinBudget on BudgetEntityResponse {
     data {
       id
       attributes {
@@ -13,4 +13,4 @@ const MIN_BUDGETS_ENTITY = gql`
   }
 `;
 
-export { MIN_BUDGETS_ENTITY };
+export { MIN_BUDGET_ENTITY };

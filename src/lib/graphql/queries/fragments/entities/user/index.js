@@ -61,7 +61,6 @@ const USER_PARTIAL = gql`
         email
         phone
         confirmed
-        address
         image {
           ...SingleImage
         }

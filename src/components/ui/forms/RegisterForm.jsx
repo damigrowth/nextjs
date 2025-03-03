@@ -11,7 +11,7 @@ import { register } from "@/lib/auth";
 
 const consentOptions = [
   {
-    value: true,
+    id: "terms",
     label: (
       <span>
         Αποδέχομαι τους{" "}
@@ -147,8 +147,10 @@ const RegisterForm = () => {
         <CheckSelect
           name="consent"
           options={consentOptions}
-          values={consent}
-          onChange={setConsent}
+          selectedValues={consent || []} // Make sure it's an array
+          onChange={(selected) =>
+            setConsent(selected.data?.map((item) => item.id) || [])
+          }
           error={state?.errors?.consent?.[0]}
         />
       </div>

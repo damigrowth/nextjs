@@ -181,6 +181,20 @@ export default function EditServiceForm({ service }) {
     })),
   };
 
+  const handleTagsSelect = (selected) => {
+    const formattedTags = selected
+      ? selected.map((tag) => ({
+          id: tag.id,
+          label: tag.data?.attributes?.label || "",
+          isNewTerm: tag.isNewTerm || false,
+          data: tag.data || null,
+          attributes: tag.attributes || null,
+        }))
+      : [];
+
+    setInfo("tags", formattedTags);
+  };
+
   // Selection handlers for taxonomy fields
   const handleCategorySelect = useCallback(
     (selected) => {
@@ -228,20 +242,6 @@ export default function EditServiceForm({ service }) {
     [setInfo]
   );
 
-  const handleTagsSelect = (selected) => {
-    const formattedTags = selected
-      ? selected.map((tag) => ({
-          id: tag.id,
-          label: tag.data?.attributes?.label || "",
-          isNewTerm: tag.isNewTerm || false,
-          data: tag.data || null,
-          attributes: tag.attributes || null,
-        }))
-      : [];
-
-    setInfo("tags", formattedTags);
-  };
-
   // Format selected values for SearchableSelect components
 
   const handleSubmit = async (formData) => {
@@ -273,7 +273,6 @@ export default function EditServiceForm({ service }) {
     formData.append("service-category", info.category.id);
     formData.append("service-subcategory", info.subcategory.id);
     formData.append("service-subdivision", info.subdivision.id);
-
 
     formData.append("service-tags", JSON.stringify(info.tags));
 

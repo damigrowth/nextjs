@@ -49,7 +49,6 @@ const FREELANCER_BASIC = gql`
     email
     phone
     verified
-    address
     image {
       ...SingleImage
     }
@@ -80,7 +79,6 @@ const FREELANCER_REFERENCE = gql`
     email
     phone
     verified
-    address
     image {
       ...SingleImage
     }

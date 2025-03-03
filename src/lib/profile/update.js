@@ -311,7 +311,7 @@ export async function updateAdditionalInfo(prevState, formData) {
     "contactTypes",
     "payment_methods",
     "settlement_methods",
-    "minBudgets",
+    "minBudget",
     "industries",
   ].forEach((field) => {
     if (changedFields[field]) {
@@ -372,7 +372,7 @@ export async function updateAdditionalInfo(prevState, formData) {
     "contactTypes",
     "payment_methods",
     "settlement_methods",
-    "minBudgets",
+    "minBudget",
     "industries",
   ].forEach((field) => {
     if (validationResult.data[field] !== undefined) {

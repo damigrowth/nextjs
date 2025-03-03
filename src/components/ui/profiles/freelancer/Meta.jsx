@@ -67,16 +67,29 @@ export default function Meta({
                 {coverage.onbase &&
                   coverage?.address &&
                   visibility?.address && (
-                    <p className="mb-0 dark-color fz15 fw500 list-inline-item mb5-sm ml0-xs">
+                    <p className="mb-0 dark-color fz15 fw500 list-inline-item mr15 mb5-sm ml0-xs">
                       <i className="flaticon-home-1 gray-icon vam fz18"></i>{" "}
                       {coverage.address}
                     </p>
                   )}
                 {coverage.onsite &&
+                  coverage?.counties?.data &&
+                  coverage.counties.data.length > 0 && (
+                    <p className="mb-0 mr-0 mr5 dark-color fz15 fw500 list-inline-item mb5-sm ml0-xs">
+                      <i className="flaticon-tracking gray-icon vam fz18"></i>{" "}
+                      {coverage.counties.data.map(
+                        (el, i, arr) =>
+                          `${el.attributes.name}${
+                            i < arr.length - 1 ? ", " : ""
+                          }`
+                      )}
+                    </p>
+                  )}
+                {coverage.onsite &&
                   coverage?.areas?.data &&
                   coverage.areas.data.length > 0 && (
-                    <p className="mb-0 dark-color fz15 fw500 list-inline-item ml15 mb5-sm ml0-xs">
-                      <i className="flaticon-tracking gray-icon vam fz18"></i>{" "}
+                    <p className="mb-0 dark-color fz15 fw500 list-inline-item mb5-sm ml0-xs">
+                      {" - "}
                       {coverage.areas.data.map(
                         (el, i, arr) =>
                           `${el.attributes.name}${
