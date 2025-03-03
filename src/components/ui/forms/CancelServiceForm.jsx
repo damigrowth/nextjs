@@ -2,7 +2,7 @@
 
 import DeleteModal from "@/components/dashboard/modal/DeleteModal";
 import { useParams } from "next/navigation";
-import React, { useActionState, useRef } from "react";
+import React, { useActionState, useEffect, useRef } from "react";
 import { cancelService } from "@/lib/service/cancel";
 
 export default function CancelServiceForm() {
@@ -12,6 +12,15 @@ export default function CancelServiceForm() {
     message: null,
     error: false,
   });
+
+  useEffect(() => {
+    if (formState.success) {
+      // Navigate with a refresh by using window.location instead of router
+      setTimeout(() => {
+        window.location.href = "/dashboard/services";
+      }, 300);
+    }
+  }, [formState.success]);
 
   const handleSubmit = (formData) => {
     formData.append("service-id", params.id);
