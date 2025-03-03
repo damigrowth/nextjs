@@ -33,7 +33,7 @@ export async function generateMetadata({ params }) {
     titleTemplate: "%title% από %displayName%",
     descriptionTemplate: "%category% - %description%",
     size: 100,
-    url: `/s/${slug}`,
+    customUrl: `/s`,
   };
 
   const { meta } = await Meta(data);
