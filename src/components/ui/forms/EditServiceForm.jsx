@@ -92,6 +92,8 @@ export default function EditServiceForm({ service }) {
     return data;
   }, []);
 
+  const categoryId = info?.category?.id;
+
   const handleSubcategorySearch = useCallback(
     async (searchTerm, page = 1) => {
       const query = normalizeQuery(SUBCATEGORIES_SEARCH);
@@ -100,7 +102,7 @@ export default function EditServiceForm({ service }) {
         searchTerm,
         page,
         additionalVariables: {
-          categoryId: info.category.id,
+          categoryId: categoryId || null,
           subcategoryTerm: searchTerm,
           subcategoriesPage: page,
           subcategoriesPageSize: 10,
@@ -116,8 +118,10 @@ export default function EditServiceForm({ service }) {
 
       return data;
     },
-    [info.category.id]
+    [categoryId]
   );
+
+  const subcategoryId = info?.subcategory?.id;
 
   const handleSubdivisionSearch = useCallback(
     async (searchTerm, page = 1) => {
@@ -127,7 +131,7 @@ export default function EditServiceForm({ service }) {
         searchTerm,
         page,
         additionalVariables: {
-          subcategoryId: info.subcategory.id,
+          subcategoryId: subcategoryId || null,
           subdivisionTerm: searchTerm,
           subdivisionsPage: page,
           subdivisionsPageSize: 10,
@@ -143,7 +147,7 @@ export default function EditServiceForm({ service }) {
 
       return data;
     },
-    [info.subcategory.id]
+    [subcategoryId]
   );
 
   const handleTagsSearch = useCallback(async (searchTerm, page = 1) => {
@@ -393,8 +397,8 @@ export default function EditServiceForm({ service }) {
                   formatSymbols
                   capitalize
                   errors={errors?.field === "subcategory" ? errors : null}
-                  isDisabled={!info.category.id}
-                  resetDependency={info.category.id}
+                  isDisabled={!info?.category?.id}
+                  resetDependency={info?.category?.id}
                 />
               </div>
             </div>
@@ -416,8 +420,8 @@ export default function EditServiceForm({ service }) {
                   formatSymbols
                   capitalize
                   errors={errors?.field === "subdivision" ? errors : null}
-                  isDisabled={!info.subcategory.id}
-                  resetDependency={info.subcategory.id}
+                  isDisabled={!info?.subcategory?.id}
+                  resetDependency={info?.subcategory?.id}
                 />
               </div>
             </div>

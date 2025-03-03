@@ -103,7 +103,7 @@ export default async function SingleService({
   return (
     <section className="pt10 pb90 pb30-md bg-orange">
       <ServiceSchema
-        slug={slug}
+        slug={service.slug}
         title={title}
         displayName={displayName}
         price={price}

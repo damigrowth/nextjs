@@ -3,7 +3,8 @@ import { getToken } from "@/lib/auth/token";
 import { getUser } from "@/lib/auth/user";
 
 export default async function page({ searchParams }) {
-  const confirmationCode = searchParams?.code || "";
+  const params = await searchParams;
+  const confirmationCode = params?.code || "";
 
   return (
     <section className="our-register">
