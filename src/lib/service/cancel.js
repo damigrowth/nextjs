@@ -13,7 +13,7 @@ export async function cancelService(prevState, formData) {
   const payload = {
     id: serviceId,
     data: {
-      status: 5, // Assuming 3 is the status code for canceled
+      status: 5, // Assuming 5 is the status code for canceled
     },
   };
 
@@ -23,11 +23,17 @@ export async function cancelService(prevState, formData) {
     return {
       message: "Η διαγραφή της υπηρεσίας απέτυχε!",
       error: true,
+      success: false,
     };
   }
 
   // Revalidate edit service page
   revalidatePath(`/dashboard/services`);
 
-  redirect("/dashboard/services");
+  // Return success instead of redirecting
+  return {
+    message: "Η υπηρεσία διαγράφηκε με επιτυχία!",
+    error: false,
+    success: true,
+  };
 }
