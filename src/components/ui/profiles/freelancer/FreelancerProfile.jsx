@@ -52,7 +52,7 @@ export default function FreelancerProfile({
     yearsOfExperience,
     type,
     website,
-    minBudgets,
+    minBudget,
     size,
     contactTypes,
     payment_methods,
@@ -118,7 +118,7 @@ export default function FreelancerProfile({
             <div className="service-about">
               <Description heading="Περιγραφή" text={description} />
               <Features
-                minBudgets={minBudgets?.data}
+                minBudget={minBudget?.data}
                 size={size?.data?.attributes}
                 contactTypes={contactTypes?.data}
                 payment_methods={payment_methods?.data}

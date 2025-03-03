@@ -287,10 +287,10 @@ export const additionalInfoSchema = z.object({
     )
     .optional()
     .nullable(),
-  minBudgets: z.array(z.string()).optional().nullable(),
+  minBudget: z.object(z.string()).optional().nullable(),
   industries: z
     .array(z.string())
-    .max(3, "Μπορείτε να επιλέξετε έως 3 κλάδους")
+    .max(10, "Μπορείτε να επιλέξετε έως 3 κλάδους")
     .optional()
     .nullable(),
   contactTypes: z

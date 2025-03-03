@@ -230,8 +230,8 @@ const useEditProfileStore = create((set) => ({
   subcategory: { data: null },
   setSubcategory: (value) => set(() => ({ subcategory: value })),
 
-  minBudgets: { data: [] },
-  setMinBudgets: (value) => set(() => ({ minBudgets: value })),
+  minBudget: { data: null },
+  setMinBudget: (value) => set(() => ({ minBudget: value })),
 
   industries: { data: [] },
   setIndustries: (value) => set(() => ({ industries: value })),
@@ -311,7 +311,7 @@ const useEditProfileStore = create((set) => ({
       type: freelancer.type || { data: null },
       category: freelancer.category || { data: null },
       subcategory: freelancer.subcategory || { data: null },
-      minBudgets: freelancer.minBudgets || { data: [] },
+      minBudget: freelancer.minBudget || { data: null },
       industries: freelancer.industries || { data: [] },
       contactTypes: freelancer.contactTypes || { data: [] },
       payment_methods: freelancer.payment_methods || { data: [] },
@@ -371,7 +371,7 @@ const useEditProfileStore = create((set) => ({
       type: { data: null },
       category: { data: null },
       subcategory: { data: null },
-      minBudgets: { data: [] },
+      minBudget: { data: null },
       industries: { data: [] },
       contactTypes: { data: [] },
       payment_methods: { data: [] },

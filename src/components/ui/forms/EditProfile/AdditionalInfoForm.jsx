@@ -6,11 +6,12 @@ import { useActionState, useCallback } from "react";
 import { updateAdditionalInfo } from "@/lib/profile/update";
 import SaveButton from "../../buttons/SaveButton";
 import SearchableSelect from "../../Archives/Inputs/SearchableSelect";
-import { INDUSTRIES, MIN_BUDGETS } from "@/lib/graphql/queries/main/additional";
+import { INDUSTRIES } from "@/lib/graphql/queries/main/additional";
 import { normalizeQuery } from "@/utils/queries";
 import { searchData } from "@/lib/client/operations";
 import CheckSelect from "../../Archives/Inputs/CheckSelect";
 import {
+  budgetOptions,
   contactTypesOptions,
   paymentMethodsOptions,
   settlementMethodsOptions,
@@ -22,8 +23,8 @@ export default function AdditionalInfoForm({ freelancer, type }) {
   const {
     terms,
     setTerms,
-    minBudgets,
-    setMinBudgets,
+    minBudget,
+    setMinBudget,
     industries,
     setIndustries,
     contactTypes,
@@ -46,21 +47,6 @@ export default function AdditionalInfoForm({ freelancer, type }) {
     updateAdditionalInfo,
     initialState
   );
-
-  const handleMinBudgets = useCallback(async (searchTerm, page = 1) => {
-    const query = normalizeQuery(MIN_BUDGETS);
-    const data = await searchData({
-      query,
-      searchTerm,
-      page,
-      additionalVariables: {
-        minBudgetsPage: page,
-        minBudgetsPageSize: 10,
-      },
-    });
-
-    return data;
-  }, []);
 
   const handleIndustries = useCallback(async (searchTerm, page = 1) => {
     const query = normalizeQuery(INDUSTRIES);
@@ -91,18 +77,12 @@ export default function AdditionalInfoForm({ freelancer, type }) {
       changes.terms = terms;
     }
 
-    // Compare minBudgets with original freelancer data
-    const minBudgetsDataChanged =
-      minBudgets?.data?.length !== freelancer.minBudgets?.data?.length ||
-      minBudgets?.data?.some((item) => {
-        const original = freelancer.minBudgets?.data?.find(
-          (orig) => orig.id === item.id
-        );
-        return !original;
-      });
+    // Compare minBudget with original freelancer data
+    const minBudgetDataChanged =
+      minBudget?.data?.id !== freelancer.minBudget?.data?.id;
 
-    if (minBudgetsDataChanged) {
-      changes.minBudgets = minBudgets;
+    if (minBudgetDataChanged) {
+      changes.minBudget = minBudget;
     }
 
     // Compare industries with original freelancer data
@@ -181,16 +161,20 @@ export default function AdditionalInfoForm({ freelancer, type }) {
       data: sizeObj,
     });
   };
-  const handleMinBudgetsSelect = (selected) => {
-    // Sort the selected items by value
-    const sortedSelected = [...selected].sort((a, b) => {
-      const valueA = a.attributes?.value || 0;
-      const valueB = b.attributes?.value || 0;
-      return valueA - valueB;
-    });
 
-    setMinBudgets({
-      data: sortedSelected,
+  const handleMinBudgetSelect = (selected) => {
+    const minBudgetObj = selected
+      ? {
+          id: selected.id,
+          attributes: {
+            label: selected.data.label,
+            slug: selected.data.slug,
+          },
+        }
+      : null;
+
+    setMinBudget({
+      data: minBudgetObj,
     });
   };
 
@@ -245,66 +229,7 @@ export default function AdditionalInfoForm({ freelancer, type }) {
           <h5 className="list-title heading">Πρόσθετα Στοιχεία</h5>
         </div>
 
-        <div className="row mb10">
-          {type === "company" && (
-            <div className="col-md-2">
-              <SearchableSelect
-                name="size"
-                label="Αριθμός Εργαζομένων"
-                labelPlural="αριθμοί εργαζομένων"
-                value={size.data} // Directly use data property
-                staticOptions={sizeOptions}
-                onSelect={handleSizeSelect}
-                isMulti={false}
-                isClearable={true}
-                errors={formState?.errors?.size}
-              />
-            </div>
-          )}
-
-          <div className="col-md-4">
-            <SearchableSelect
-              name="minBudgets"
-              label="Ελάχιστο Budget"
-              labelPlural="ελάχιστα budget"
-              value={minBudgets.data}
-              nameParam="label"
-              pageParam="minBudgetsPage"
-              pageSizeParam="minBudgetsPageSize"
-              pageSize={10}
-              onSearch={handleMinBudgets}
-              onSelect={handleMinBudgetsSelect}
-              isMulti={true}
-              isClearable={true}
-              formatSymbols
-              errors={formState?.errors?.minBudgets}
-            />
-          </div>
-          <div className="mb10 col-md-5">
-            <SearchableSelect
-              name="industries"
-              label="Κύριοι Κλάδοι Πελατών"
-              labelPlural="κύριοι κλάδοι πελατών"
-              value={industries.data}
-              nameParam="label"
-              pageParam="industriesPage"
-              pageSizeParam="industriesPageSize"
-              pageSize={10}
-              onSearch={handleIndustries}
-              onSelect={(selected) => {
-                setIndustries({
-                  data: selected,
-                });
-              }}
-              isMulti={true}
-              isClearable={true}
-              formatSymbols
-              maxSelections={3}
-              errors={formState?.errors?.industries}
-            />
-          </div>
-        </div>
-        <div className="row mb10">
+        <div className="row mb20">
           <div className="col-md-4">
             <CheckSelect
               options={contactTypesOptions}
@@ -336,12 +261,66 @@ export default function AdditionalInfoForm({ freelancer, type }) {
             />
           </div>
         </div>
+        <div className="row mb10">
+          {type === "company" && (
+            <div className="col-md-2">
+              <SearchableSelect
+                name="size"
+                label="Αριθμός Εργαζομένων"
+                labelPlural="αριθμοί εργαζομένων"
+                value={size.data} // Directly use data property
+                staticOptions={sizeOptions}
+                onSelect={handleSizeSelect}
+                isMulti={false}
+                isClearable={true}
+                errors={formState?.errors?.size}
+              />
+            </div>
+          )}
 
+          <div className="col-md-4">
+            <SearchableSelect
+              name="minBudget"
+              label="Ελάχιστο Budget"
+              labelPlural="ελάχιστα budget"
+              value={minBudget.data}
+              staticOptions={budgetOptions}
+              onSelect={handleMinBudgetSelect}
+              isMulti={false}
+              isClearable={false}
+              errors={formState?.errors?.minBudget}
+            />
+          </div>
+          <div className="mb10 col-md-8">
+            <SearchableSelect
+              name="industries"
+              label="Κύριοι Κλάδοι Πελατών"
+              labelPlural="κύριοι κλάδοι πελατών"
+              value={industries.data}
+              nameParam="label"
+              pageParam="industriesPage"
+              pageSizeParam="industriesPageSize"
+              pageSize={10}
+              maxSelections={10}
+              onSearch={handleIndustries}
+              onSelect={(selected) => {
+                setIndustries({
+                  data: selected,
+                });
+              }}
+              isMulti={true}
+              isClearable={true}
+              formatSymbols
+              errors={formState?.errors?.industries}
+            />
+          </div>
+        </div>
         <div className="row mb10">
           <TextArea
             id="terms"
             name="terms"
             label="Όροι Συνεργασίας"
+            placeholder="Εάν έχετε κάποιους συγκεκριμένους όρους που πρέπει να γνωρίζουν όσοι θέλουν να συνεργαστούν μαζί σας μπορείτε να τους συμπληρώσετε εδώ."
             minLength={80}
             maxLength={5000}
             counter

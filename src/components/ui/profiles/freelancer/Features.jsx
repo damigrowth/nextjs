@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function Features({
-  minBudgets,
+  minBudget,
   size,
   contactTypes,
   payment_methods,
@@ -9,15 +9,15 @@ export default function Features({
 }) {
   const sizeNumber = Number(size?.slug);
 
-  // Function to find the smallest budget
-  const getSmallestBudget = (budgets) => {
-    if (!budgets || budgets.length === 0) return null;
-    return budgets.reduce((min, budget) =>
-      budget.attributes.value < min.attributes.value ? budget : min
-    );
-  };
+  // // Function to find the smallest budget
+  // const getSmallestBudget = (budgets) => {
+  //   if (!budgets || budgets.length === 0) return null;
+  //   return budgets.reduce((min, budget) =>
+  //     budget.attributes.value < min.attributes.value ? budget : min
+  //   );
+  // };
 
-  const smallestBudget = getSmallestBudget(minBudgets);
+  // const smallestBudget = getSmallestBudget(minBudget);
 
   return (
     <>
@@ -92,7 +92,7 @@ export default function Features({
           </div>
         )}
 
-        {minBudgets.length > 0 && (
+        {minBudget && (
           <div className="col-sm-6 col-xl-4">
             <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
               <div className="icon flex-shrink-0">
@@ -100,7 +100,7 @@ export default function Features({
               </div>
               <div className="details">
                 <h5 className="title">Ελάχιστο Budget</h5>
-                <p className="mb-0 text">{smallestBudget?.attributes?.label}</p>
+                <p className="mb-0 text">{minBudget?.attributes?.label}</p>
               </div>
             </div>
           </div>

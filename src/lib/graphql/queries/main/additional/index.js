@@ -1,16 +1,12 @@
 import { gql } from "@apollo/client";
 import { PAGINATION } from "../../fragments/global";
 
-export const MIN_BUDGETS = gql`
-  query MinBudgets(
-    $name: String
-    $minBudgetsPage: Int
-    $minBudgetsPageSize: Int
-  ) {
+export const MIN_BUDGET = gql`
+  query MinBudget($name: String, $minBudgetPage: Int, $minBudgetPageSize: Int) {
     budgets(
       filters: { label: { containsi: $name } }
       sort: "value:asc"
-      pagination: { page: $minBudgetsPage, pageSize: $minBudgetsPageSize }
+      pagination: { page: $minBudgetPage, pageSize: $minBudgetPageSize }
     ) {
       data {
         id
