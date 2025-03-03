@@ -45,10 +45,17 @@ export default function BillingDetailsForm({ freelancer }) {
     return ""; // Both false case
   };
 
-  // Use the same custom hook as AccountForm
   const { changes, hasChanges } = useFormChanges(
     billing_details,
-    freelancer.billing_details
+    freelancer?.billing_details || {
+      receipt: false,
+      invoice: false,
+      afm: null,
+      doy: null,
+      brandName: null,
+      profession: null,
+      address: null,
+    }
   );
 
   const handleSubmit = async (formData) => {

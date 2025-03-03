@@ -34,7 +34,7 @@ export default function AccountForm({ freelancer }) {
   const originalValues = {
     displayName: freelancer.displayName,
     phone: Number(freelancer.phone),
-    address: freelancer.coverage.address,
+    address: freelancer?.coverage?.address || "",
   };
 
   // // Use custom hook to track changes

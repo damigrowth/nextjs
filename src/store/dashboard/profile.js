@@ -271,7 +271,7 @@ const useEditProfileStore = create((set) => ({
       email: freelancer.email || "",
       phone: freelancer.phone || null,
       verified: freelancer.verified || false,
-      address: freelancer.coverage.address || "", // Setting it from the coverage address
+      address: freelancer?.coverage?.address || "", // Setting it from the coverage address
       website: freelancer.website || "",
       tagline: freelancer.tagline || "",
       rate: freelancer.rate || 0,

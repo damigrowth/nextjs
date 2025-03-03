@@ -30,7 +30,7 @@ export async function register(prevState, formData) {
   };
 
   // Store registration data in cookies
-  cookies().set(
+  (await cookies()).set(
     "registration_data",
     JSON.stringify({
       type,
@@ -74,17 +74,15 @@ export async function completeRegistration(prevState, formData) {
   const { jwt, user } = confirmationResult.data.emailConfirmation;
   const userId = user.id;
 
+  const cookieData = (await cookies()).get("registration_data")?.value;
   // Get stored registration data
-  const registrationData = JSON.parse(
-    cookies().get("registration_data")?.value || "{}"
-  );
+  const registrationData = JSON.parse(cookieData || "{}");
 
   const { type, role, displayName, consent } = registrationData;
 
   // Create freelancer profile based on type
   if (type === 1) {
     // Regural User type
-
     const freelancer = await postData(
       CREATE_FREELANCER,
       {
@@ -94,9 +92,9 @@ export async function completeRegistration(prevState, formData) {
           email: user.email,
           displayName: user.username,
           type: "3",
-          coverage: {
-            online: true,
-          },
+          // coverage: {
+          //   online: true,
+          // },
           publishedAt: new Date().toISOString(),
         },
       },
@@ -130,9 +128,9 @@ export async function completeRegistration(prevState, formData) {
           email: user.email,
           displayName: displayName,
           type: freelancerType.toString(),
-          coverage: {
-            online: true,
-          },
+          // coverage: {
+          //   online: true,
+          // },
           publishedAt: new Date().toISOString(),
         },
       },
@@ -156,7 +154,7 @@ export async function completeRegistration(prevState, formData) {
   }
 
   // Clean up stored data
-  cookies().delete("registration_data");
+  (await cookies()).delete("registration_data");
 
   await setToken(jwt);
   return {

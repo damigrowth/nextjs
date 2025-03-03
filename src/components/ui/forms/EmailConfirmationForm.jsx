@@ -13,12 +13,18 @@ export default function EmailConfirmationForm({ confirmationCode }) {
 
   const router = useRouter();
 
-  // Handle initial form submission with code
   useEffect(() => {
     if (confirmationCode) {
-      const formData = new FormData();
-      formData.set("code", confirmationCode);
-      formAction(formData);
+      const submitForm = () => {
+        const formData = new FormData();
+        formData.set("code", confirmationCode);
+        formAction(formData);
+      };
+
+      // Use startTransition to wrap the action dispatch
+      React.startTransition(() => {
+        submitForm();
+      });
     }
   }, [confirmationCode, formAction]);
 
@@ -26,7 +32,7 @@ export default function EmailConfirmationForm({ confirmationCode }) {
   useEffect(() => {
     if (state?.success && state?.redirect) {
       const timer = setTimeout(() => {
-        router.push("/dashboard/profile");
+        router.push("/dashboard");
         router.refresh();
       }, 2000); // Give user time to see success message
 
