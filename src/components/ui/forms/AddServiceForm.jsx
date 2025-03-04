@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useActionState } from "react";
+import React, { useActionState, useState, useEffect } from "react";
 import ServiceGallery from "../AddService/ServiceGallery";
 import { createService } from "@/lib/service/create";
 import ServiceFaq from "../ServiceFaq/ServiceFaq";
@@ -26,7 +26,18 @@ export default function AddServiceForm({ coverage }) {
     media,
     goBack,
     typeStep,
+    saveType,
+    saveInfo,
+    savePackages,
+    saveAddons,
+    saveFaq,
+    saveGallery,
+    errors,
+    resetAll,
   } = useCreateServiceStore();
+
+  const [savingStep, setSavingStep] = useState(false);
+  const [validationErrors, setValidationErrors] = useState(null);
 
   const initialState = {
     data: null,
@@ -42,11 +53,64 @@ export default function AddServiceForm({ coverage }) {
   const serviceId = formState?.data?.id;
   const serviceTitle = formState?.data?.attributes?.title;
 
+  // Reset state on component mount and after successful submission
+  useEffect(() => {
+    // Reset when component mounts
+    resetAll();
+
+    // Reset when serviceId changes (successful submission)
+    if (serviceId) {
+      resetAll();
+    }
+  }, [resetAll, serviceId]);
+
+  // Check if the current step form is valid without requiring it to be saved
   const handleDisable = () => {
     if (optional[step]) {
       return false; // Not disabled if optional
     }
-    return !saved[step]; // Disabled if not saved
+
+    // For each step, check if required fields are filled
+    switch (step) {
+      case "type":
+        // Check if type selection is complete (reached step 2)
+        return typeStep !== 2;
+
+      case "info":
+        // Check if basic info is filled
+        return (
+          !info.title ||
+          info.title.length < 10 ||
+          !info.description ||
+          info.description.length < 80 ||
+          info.category.id === 0 ||
+          info.subcategory.id === 0 ||
+          info.subdivision.id === 0 ||
+          (info.fixed && (info.price < 10 || info.price > 50000))
+        );
+
+      case "packages":
+        // If packages step is used, check basic package information
+        if (!info.fixed) {
+          const { packages } = useCreateServiceStore.getState();
+          return (
+            packages.basic.features.length < 4 ||
+            !packages.basic.description ||
+            !packages.standard.description ||
+            !packages.premium.description
+          );
+        }
+        return false;
+
+      case "gallery":
+        // Check if media is uploaded
+        const { media } = useCreateServiceStore.getState();
+        return media.length === 0;
+
+      // For addons and faq, they're usually optional
+      default:
+        return false;
+    }
   };
 
   const handlePreviousButton = () => {
@@ -59,8 +123,78 @@ export default function AddServiceForm({ coverage }) {
     }
   };
 
-  const handleNextButton = () => {
-    setStep(steps[step].next);
+  const handleSaveCurrentStep = async () => {
+    setSavingStep(true);
+    setValidationErrors(null);
+
+    let success = false;
+
+    try {
+      // First, clear any existing errors
+      useCreateServiceStore.setState((state) => ({
+        ...state,
+        errors: { active: false, field: "", message: "" },
+      }));
+
+      switch (step) {
+        case "type":
+          // Save type and validate
+          saveType();
+          success = !errors || !errors.active;
+          break;
+        case "info":
+          // Save info and validate
+          saveInfo();
+          success = !errors || !errors.active;
+          break;
+        case "packages":
+          // Save packages and validate
+          savePackages();
+          success = !errors || !errors.active;
+          break;
+        case "addons":
+          // Save addons
+          saveAddons();
+          success = true; // Always true as it's optional
+          break;
+        case "faq":
+          // Save faq
+          saveFaq();
+          success = true; // Always true as it's optional
+          break;
+        case "gallery":
+          // Save gallery and validate
+          saveGallery();
+          success = !errors || !errors.active;
+          break;
+        default:
+          success = true;
+      }
+
+      // If there are errors after save attempt, record them
+      const currentErrors = useCreateServiceStore.getState().errors;
+      if (currentErrors && currentErrors.active) {
+        setValidationErrors(currentErrors);
+        success = false;
+      }
+    } catch (error) {
+      console.error("Error saving step:", error);
+      success = false;
+    } finally {
+      setSavingStep(false);
+    }
+
+    return success;
+  };
+
+  const handleNextButton = async () => {
+    // First save the current step
+    const success = await handleSaveCurrentStep();
+
+    // Only proceed to next step if save was successful
+    if (success) {
+      setStep(steps[step].next);
+    }
   };
 
   const showPreviousButton = () => {
@@ -110,15 +244,29 @@ export default function AddServiceForm({ coverage }) {
             {step === "addons" && <ServiceAddons />}
             {step === "faq" && <ServiceFaq />}
             {step === "gallery" && <ServiceGallery isPending={isPending} />}
-            <Alert />
-            {formState.errors && <Alert message={formState.message} />}
+
+            {/* Display any errors */}
+            {errors && errors.active && (
+              <Alert message={errors.message} type="danger" />
+            )}
+
+            {/* Display validation errors from state */}
+            {validationErrors && validationErrors.active && (
+              <Alert message={validationErrors.message} type="danger" />
+            )}
+
+            {/* Display form submission errors */}
+            {formState.errors && (
+              <Alert message={formState.message} type="danger" />
+            )}
+
             <NavigationButtons
               showPrevious={showPreviousButton()}
               onPreviousClick={handlePreviousButton}
               showNext={showNextButton()}
               onNextClick={handleNextButton}
               nextDisabled={handleDisable()}
-              isPending={isPending}
+              isPending={savingStep || isPending}
             />
 
             <SaveButton

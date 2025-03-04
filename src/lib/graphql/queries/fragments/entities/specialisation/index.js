@@ -1,17 +1,5 @@
 import { gql } from "@apollo/client";
 
-const SPECIALISATIONS = gql`
-  fragment Specialisations on SkillRelationResponseCollection {
-    data {
-      id
-      attributes {
-        label
-        slug
-      }
-    }
-  }
-`;
-
 const SPECIALIZATION_ENTITY = gql`
   fragment SpecializationEntity on SkillEntityResponse {
     data {
@@ -24,4 +12,4 @@ const SPECIALIZATION_ENTITY = gql`
   }
 `;
 
-export { SPECIALISATIONS, SPECIALIZATION_ENTITY };
+export { SPECIALIZATION_ENTITY };

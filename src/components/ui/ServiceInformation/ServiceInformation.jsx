@@ -16,7 +16,7 @@ import { normalizeQuery } from "@/utils/queries";
 import { searchData } from "@/lib/client/operations";
 
 export default function ServiceInformation() {
-  const { info, setInfo, saveInfo, errors, handleStepsTypeChange, type } =
+  const { info, setInfo, errors, handleStepsTypeChange, type } =
     useCreateServiceStore();
 
   const [taxonomyParams, setTaxonomyParams] = useState({
@@ -477,14 +477,7 @@ export default function ServiceInformation() {
             )}
           </div>
         </div>
-        <button
-          type="button"
-          className="ud-btn btn-thm mt20 no-rotate"
-          onClick={saveInfo}
-        >
-          Αποθήκευση
-          <i className="fa-solid fa-floppy-disk"></i>
-        </button>
+        {/* Remove the save button - saving will be handled by the Next button */}
       </div>
     </div>
   );

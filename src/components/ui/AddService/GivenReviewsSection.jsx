@@ -22,7 +22,7 @@ export async function GivenReviewsSection({ searchParamsData }) {
       <div className="row">
         <div className="col-lg-12 mb30">
           <div className="dashboard_title_area">
-            <h2>Αξιολογήσεις που έδωσα</h2>
+            <h2>Αξιολογήσεις προς επαγγελματικά προφίλ</h2>
           </div>
         </div>
       </div>

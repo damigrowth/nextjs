@@ -7,6 +7,7 @@ import useFaqStore from "./faqStore";
 import useSaveServiceStore from "./saveServiceStore";
 import useGalleryStore from "./galleryStore";
 import useTypeStore from "./typeStore";
+import resetStores from "./resetStores";
 
 const useCreateServiceStore = create((set) => ({
   ...useStepsStore(set),
@@ -17,6 +18,7 @@ const useCreateServiceStore = create((set) => ({
   ...useFaqStore(set),
   ...useGalleryStore(set),
   ...useSaveServiceStore(set),
+  ...resetStores(set),
 }));
 
 export default useCreateServiceStore;

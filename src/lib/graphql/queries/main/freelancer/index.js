@@ -10,7 +10,7 @@ import {
   FREELANCER_CATEGORY,
   FREELANCER_SUBCATEGORY_PARTIAL,
 } from "../../fragments/taxonomies/freelancer";
-import { SPECIALISATIONS } from "../../fragments/entities/specialisation";
+import { SPECIALIZATION_ENTITY } from "../../fragments/entities/specialisation";
 
 const FREELANCER_ID = gql`
   query FreelancerId($id: ID!) {
@@ -172,8 +172,8 @@ const FEATURED_FREELANCERS = gql`
                 image {
                   ...SingleImage
                 }
-                specialisations {
-                  ...Specialisations
+                specialization {
+                  ...SpecializationEntity
                 }
                 category {
                   ...FreelancerCategory
@@ -189,7 +189,7 @@ const FEATURED_FREELANCERS = gql`
     }
   }
   ${SINGLE_IMAGE}
-  ${SPECIALISATIONS}
+  ${SPECIALIZATION_ENTITY}
   ${FREELANCER_CATEGORY}
   ${FREELANCER_SUBCATEGORY_PARTIAL}
 `;

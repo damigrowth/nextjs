@@ -86,6 +86,8 @@ export async function createService(prevState, formData) {
         subdivision: service.subdivision.id,
         tags: allTagIds,
         status: 2,
+        addons: service.addons,
+        faq: service.faq,
         media: uploadedMedia,
       },
     };

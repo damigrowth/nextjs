@@ -18,20 +18,26 @@ export function PreviousButton({ onClick, show, disabled }) {
   );
 }
 
-export function NextButton({ onClick, show, disabled, isDisabled }) {
+export function NextButton({ onClick, show, disabled, isDisabled, isPending }) {
   if (!show) return null;
 
   return (
     <button
       type="button"
-      disabled={disabled}
+      disabled={disabled || isPending}
       onClick={onClick}
       className={`ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3 ${
         isDisabled ? "btn-dark-disabled" : ""
       }`}
     >
-      <span>Επόμενο</span>
-      <span className="d-flex align-items-center flaticon-right fz20" />
+      <span>{isPending ? "Αποθήκευση..." : "Επόμενο"}</span>
+      {isPending ? (
+        <div className="spinner-border spinner-border-sm" role="status">
+          <span className="sr-only"></span>
+        </div>
+      ) : (
+        <span className="d-flex align-items-center flaticon-right fz20" />
+      )}
     </button>
   );
 }
@@ -59,6 +65,7 @@ export function NavigationButtons({
           show={showNext}
           disabled={nextDisabled}
           isDisabled={nextDisabled}
+          isPending={isPending}
         />
       </div>
     </div>

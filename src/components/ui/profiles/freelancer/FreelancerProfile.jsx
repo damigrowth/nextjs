@@ -58,7 +58,7 @@ export default function FreelancerProfile({
     payment_methods,
     settlement_methods,
     skills,
-    specialisations,
+    specialization,
     industries,
     topLevel,
     portfolio,
@@ -185,7 +185,7 @@ export default function FreelancerProfile({
             />
             <Skills
               skills={skills?.data}
-              specialisations={specialisations?.data}
+              specialization={specialization?.data}
             />
           </StickySidebar>
         </div>

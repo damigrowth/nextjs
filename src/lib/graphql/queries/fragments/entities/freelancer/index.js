@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { SPECIALISATIONS } from "../specialisation";
+import { SPECIALIZATION_ENTITY } from "../specialisation";
 import {
   FREELANCER_CATEGORY,
   FREELANCER_SUBCATEGORY_PARTIAL,
@@ -85,8 +85,8 @@ const FREELANCER_REFERENCE = gql`
     visibility {
       ...Visibility
     }
-    specialisations {
-      ...Specialisations
+    specialization {
+      ...SpecializationEntity
     }
     type {
       ...FreelancerType
@@ -101,7 +101,7 @@ const FREELANCER_REFERENCE = gql`
 
   ${SINGLE_IMAGE}
   ${VISIBILITY}
-  ${SPECIALISATIONS}
+  ${SPECIALIZATION_ENTITY}
   ${FREELANCER_CATEGORY}
   ${FREELANCER_SUBCATEGORY_PARTIAL}
   ${FREELANCER_TYPE}

@@ -23,7 +23,7 @@ export default async function FreelancerCard({
     rating,
     reviews_total,
     topLevel,
-    specialisations,
+    specialization,
     category,
     subcategory,
   } = freelancer;
@@ -95,13 +95,11 @@ export default async function FreelancerCard({
           ) : (
             <div className="empty-card-reviews">&nbsp;</div>
           )}
-          {specialisations?.data?.length > 0 ? (
+          {specialization?.data ? (
             <div className="card-tags">
-              {specialisations.data.map((el, i) => (
-                <span key={i} className="card-tag">
-                  {el.attributes.label}
-                </span>
-              ))}
+              <span className="card-tag">
+                {specialization.data.attributes.label}
+              </span>
             </div>
           ) : (
             <div className="empty-card-tags">&nbsp;</div>
