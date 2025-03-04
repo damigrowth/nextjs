@@ -16,10 +16,7 @@ import { SERVICES } from "../../fragments/entities/service";
 import { ORDERS } from "../../fragments/entities/order";
 import { SKILLS } from "../../fragments/entities/skill";
 import { SIZE } from "../../fragments/entities/size";
-import {
-  SPECIALISATIONS,
-  SPECIALIZATION_ENTITY,
-} from "../../fragments/entities/specialisation";
+import { SPECIALIZATION_ENTITY } from "../../fragments/entities/specialisation";
 import { MIN_BUDGET_ENTITY } from "../../fragments/entities/budget";
 import { INDUSTRIES_ENTITY } from "../../fragments/entities/industry";
 import { MULTIPLE_FILES, SINGLE_IMAGE } from "../../fragments/global";
@@ -183,8 +180,8 @@ const FREELANCER_RELATIONS = gql`
     size {
       ...Size
     }
-    specialisations {
-      ...Specialisations
+    specialization {
+      ...SpecializationEntity
     }
     minBudget {
       ...MinBudget
@@ -281,7 +278,7 @@ const FREELANCER_RELATIONS = gql`
   ${FREELANCER_CATEGORY}
   ${FREELANCER_SUBCATEGORY_PARTIAL}
   ${SIZE}
-  ${SPECIALISATIONS}
+  ${SPECIALIZATION_ENTITY}
   ${MIN_BUDGET_ENTITY}
   ${INDUSTRIES_ENTITY}
   ${CONTACT_TYPES}
@@ -332,9 +329,6 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
     }
     size {
       ...Size
-    }
-    specialisations {
-      ...Specialisations
     }
     specialization {
       ...SpecializationEntity
@@ -437,7 +431,6 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
   ${FREELANCER_CATEGORY}
   ${FREELANCER_SUBCATEGORY_PARTIAL}
   ${SIZE}
-  ${SPECIALISATIONS}
   ${SPECIALIZATION_ENTITY}
   ${MIN_BUDGET_ENTITY}
   ${INDUSTRIES_ENTITY}
