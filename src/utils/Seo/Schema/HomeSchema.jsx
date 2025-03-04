@@ -18,8 +18,5 @@ export default function HomeSchema({ searchTarget, searchInput }) {
     },
   };
 
-  // Use JSON.stringify with null and 2 to ensure consistent formatting
-  const serializedData = JSON.stringify(data);
-
-  return <JsonLd data={serializedData} />;
+  return <JsonLd data={data} />;
 }
