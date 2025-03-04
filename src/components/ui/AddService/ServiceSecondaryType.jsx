@@ -2,6 +2,7 @@
 
 import React from "react";
 import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import Alert from "../alerts/Alert";
 
 export default function ServiceSecondaryType({ coverage }) {
   const { type, setType, saveType } = useCreateServiceStore();
@@ -47,21 +48,8 @@ export default function ServiceSecondaryType({ coverage }) {
             Προσφέρετε τη συγκεκριμένη υπηρεσία, <br /> σε δικό σας χώρο ή στον
             χώρο του πελάτη;
           </h4>
-          {!coverage.onbase && (
-            <p className="pb10 text-danger">
-              Δεν μπορείτε να επιλέξετε "Στην έδρα μου"
-              <br /> γιατί δεν έχετε συμπληρώσει την Περιοχή και την Διεύθυνση
-              στο προφίλ σας.
-            </p>
-          )}
-          {!coverage.onsite && (
-            <p className="pb10 text-danger">
-              Δεν μπορείτε να επιλέξετε "Στον χώρο του πελάτη"
-              <br /> γιατί δεν έχετε συμπληρώσει τις Περιοχές Εξυπηρέτησης στο
-              προφίλ σας.
-            </p>
-          )}
-          <div className="mb20-lg mb30">
+
+          <div className="mb20-lg mb20">
             <button
               className={`ud-btn btn-thm2 add-joining mr10-lg mr20 ${
                 type.onbase ? "active" : ""
@@ -83,6 +71,18 @@ export default function ServiceSecondaryType({ coverage }) {
               Στον χώρο του πελάτη
             </button>
           </div>
+          {!coverage.onbase && (
+            <Alert
+              type="info"
+              message={`Δεν μπορείτε να επιλέξετε "Στην έδρα μου" γιατί δεν έχετε συμπληρώσει την Περιοχή και την Διεύθυνση στο προφίλ σας.`}
+            />
+          )}
+          {!coverage.onsite && (
+            <Alert
+              type="info"
+              message={`Δεν μπορείτε να επιλέξετε "Στον χώρο του πελάτη" γιατί δεν έχετε συμπληρώσει τις Περιοχές Εξυπηρέτησης στο προφίλ σας.`}
+            />
+          )}
         </div>
       )}
     </>

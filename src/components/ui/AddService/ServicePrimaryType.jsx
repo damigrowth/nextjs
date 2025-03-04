@@ -2,6 +2,7 @@
 
 import React from "react";
 import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import Alert from "../alerts/Alert";
 
 export default function ServicePrimaryType({ coverage }) {
   const { type, setType } = useCreateServiceStore();
@@ -11,14 +12,8 @@ export default function ServicePrimaryType({ coverage }) {
       <h4 className="list-title pb10">
         Προσφέρετε την υπηρεσία, <br /> online ή με την φυσική σας παρουσία?
       </h4>
-      {!coverage.onbase && !coverage.onsite && (
-        <p className="pb10 text-danger">
-          Δεν μπορείτε να επιλέξετε "Φυσική παρουσία"
-          <br /> γιατί δεν έχετε συμπληρώσει την Περιοχή και την Διεύθυνση ή τις
-          Περιοχές Εξυπηρέτησης στο προφίλ σας.
-        </p>
-      )}
-      <div className="mb20-lg mt20 mb30">
+
+      <div className="mb20-lg mt20 mb20">
         <button
           className={`ud-btn btn-thm2 add-joining mr10-lg mr20 ${
             type.online ? "active" : ""
@@ -40,6 +35,13 @@ export default function ServicePrimaryType({ coverage }) {
           Φυσική Παρουσία
         </button>
       </div>
+      {!coverage.onbase && !coverage.onsite && (
+        <Alert
+          type="info"
+          message={`Δεν μπορείτε να επιλέξετε "Φυσική παρουσία" γιατί δεν έχετε συμπληρώσει την Περιοχή και την Διεύθυνση ή τις
+          Περιοχές Εξυπηρέτησης στο προφίλ σας. `}
+        />
+      )}
     </div>
   );
 }

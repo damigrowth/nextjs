@@ -4,6 +4,7 @@ import React from "react";
 import ServicePrimaryType from "./ServicePrimaryType";
 import ServiceSecondaryType from "./ServiceSecondaryType";
 import useCreateServiceStore from "@/store/service/create/createServiceStore";
+import Alert from "../alerts/Alert";
 
 export default function ServiceType({ coverage }) {
   const { typeStep, goBack, errors } = useCreateServiceStore();
@@ -14,12 +15,13 @@ export default function ServiceType({ coverage }) {
         <h3 className="list-title pb5">Τύπος υπηρεσίας</h3>
         <input id="service-type" name="service-type" type="hidden" />
       </div>
+
       {!coverage ? (
-        <p className="pb10 text-danger pt20">
-          Δεν μπορείτε να προχωρήσετε γιατί δεν έχετε συμπληρώσει <br />
-          την Περιοχή και την Διεύθυνση ή τις Περιοχές Εξυπηρέτησης στο προφίλ
-          σας.
-        </p>
+        <Alert
+          type="info"
+          message="Δεν μπορείτε να προχωρήσετε γιατί δεν έχετε συμπληρώσει την Περιοχή και την Διεύθυνση ή τις Περιοχές Εξυπηρέτησης στο προφίλ
+          σας."
+        />
       ) : (
         <>
           {typeStep === 0 && <ServicePrimaryType coverage={coverage} />}
