@@ -23,7 +23,7 @@ export default function ManageServiceCard1({ service }) {
               {media.length > 1 ? (
                 <ServiceCardFiles
                   media={media.map((item) => item.attributes)}
-                  path={`/s/${service.attributes.slug}`}
+                  path={`/dashboard/services/edit/${service.id}`}
                   height={91}
                   width={122}
                   fontSize={25}
@@ -40,8 +40,15 @@ export default function ManageServiceCard1({ service }) {
             </div>
             <div className="list-content flex-grow-1 py-0 pl15 pl0-lg">
               <h6 className="list-title mb-0">
-                <Link href={`/s/${service.attributes.slug}`}>
+                <Link href={`/dashboard/services/edit/${service.id}`}>
                   {service.attributes.title}
+                </Link>
+                <Link
+                  href={`/s/${service.attributes.slug}`}
+                  target="_blank"
+                  className="ml10"
+                >
+                  <i class="fa-solid fa-eye"></i>
                 </Link>
               </h6>
             </div>
