@@ -1,26 +1,32 @@
 "use client";
 
-import { createModelReview } from "@/lib/review/create";
-import { useActionState, useState } from "react";
+import { createReview } from "@/lib/review/create";
+import { useActionState, useCallback, useState } from "react";
 import ReviewSuccess from "../Reviews/ReviewSuccess";
 import Rating from "../rating/Rating";
 import TextArea from "@/components/inputs/TextArea";
 import Alert from "../alerts/Alert";
 import SaveButton from "../buttons/SaveButton";
+import { SERVICES_BY_FREELANCER_FOR_REVIEWS } from "@/lib/graphql/queries/main/service";
+import { normalizeQuery } from "@/utils/queries";
+import { searchData } from "@/lib/client/operations";
+import SearchableSelect from "../Archives/Inputs/SearchableSelect";
+import { normalizeTerm } from "@/utils/normalizeTerm";
 
-export default function AddModelReviewForm({
-  modelType,
-  tenantType,
-  modelId,
-  tenantId,
-}) {
+export default function AddModelReviewForm({ type, serviceId, freelancerId }) {
   const initialFormData = {
+    type: type,
+    service:
+      type === "service"
+        ? { id: serviceId, label: "", value: "" }
+        : {
+            id: "",
+            label: "",
+            value: "",
+          },
+    receiver: freelancerId,
     rating: 1,
     comment: "",
-    modelType,
-    tenantType,
-    modelId,
-    tenantId,
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -33,7 +39,7 @@ export default function AddModelReviewForm({
 
   // Using useActionState instead of useFormState
   const [formState, formAction, isPending] = useActionState(
-    createModelReview,
+    createReview,
     initialState
   );
 
@@ -51,7 +57,7 @@ export default function AddModelReviewForm({
     }));
   };
 
-  const handleSubmit = (formDataObj) => {
+  const handleSubmit = () => {
     const reviewData = new FormData();
     reviewData.append("newReviewData", JSON.stringify(formData));
     return formAction(reviewData);
@@ -62,7 +68,36 @@ export default function AddModelReviewForm({
   // Check if form has changes compared to initial state
   const hasChanges =
     formData.rating !== initialFormData.rating ||
-    formData.comment !== initialFormData.comment;
+    formData.comment !== initialFormData.comment ||
+    formData.service.id !== "";
+
+  const handleServices = useCallback(async (searchTerm, page = 1) => {
+    const query = normalizeQuery(SERVICES_BY_FREELANCER_FOR_REVIEWS);
+    const data = await searchData({
+      query,
+      searchTerm: normalizeTerm(searchTerm),
+      searchTermType: "title",
+      page,
+      additionalVariables: {
+        id: freelancerId,
+        page: page,
+        pageSize: 10,
+      },
+    });
+
+    return data;
+  }, []);
+
+  const handleServiceSelect = (selected) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      service: {
+        id: selected ? selected.id : "",
+        label: selected ? selected.data.attributes.title : "",
+        value: selected ? selected.id : "",
+      },
+    }));
+  };
 
   return (
     <>
@@ -72,9 +107,33 @@ export default function AddModelReviewForm({
         <div className="bsp_reveiw_wrt mb20">
           <form action={handleSubmit} className="comments_form mt30 mb30-md">
             <h6 className="fz17">Πρόσθεσε Αξιολόγηση</h6>
-            <p className="text">
-              Θα πρέπει να έχετε λάβει κάποια υπηρεσία για να βάλετε βαθμολογία.
-            </p>
+            {type === "freelancer" && (
+              <>
+                <p className="text">
+                  Θα πρέπει να έχετε επιλέξετε μία από τις υπηρεσίες για να
+                  βάλετε βαθμολογία.
+                </p>
+                <div className="mb20 col-md-12">
+                  <SearchableSelect
+                    name="service"
+                    label="Υπηρεσία"
+                    labelPlural="υπηρεσίες"
+                    value={formData.service}
+                    nameParam="title"
+                    pageParam="page"
+                    pageSizeParam="pageSize"
+                    pageSize={10}
+                    maxSelections={1}
+                    onSearch={handleServices}
+                    onSelect={handleServiceSelect}
+                    isMulti={false}
+                    isClearable={true}
+                    // errors={formState?.errors?.industries}
+                  />
+                </div>{" "}
+              </>
+            )}
+
             <div className="mb10">
               <h6>Βαθμολογία</h6>
               <Rating

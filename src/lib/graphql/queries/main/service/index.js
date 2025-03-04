@@ -283,6 +283,37 @@ const SERVICES_BY_FREELANCER = gql`
   ${PAGINATION}
 `;
 
+const SERVICES_BY_FREELANCER_FOR_REVIEWS = gql`
+  query ServicesByFreelancerForReviews(
+    $id: ID!
+    $title: String
+    $page: Int
+    $pageSize: Int
+  ) {
+    services(
+      filters: {
+        title_normalized: { containsi: $title }
+        freelancer: { id: { eq: $id } }
+        status: { type: { eq: "Active" } }
+      }
+      sort: "updatedAt:desc"
+      pagination: { page: $page, pageSize: $pageSize }
+    ) {
+      data {
+        id
+        attributes {
+          title
+          slug
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+`;
+
 export {
   SERVICE_BY_ID,
   SERVICE_BY_SLUG,
@@ -295,4 +326,5 @@ export {
   SERVICES_BY_CATEGORY,
   SERVICES_ALL,
   SERVICES_BY_FREELANCER,
+  SERVICES_BY_FREELANCER_FOR_REVIEWS,
 };
