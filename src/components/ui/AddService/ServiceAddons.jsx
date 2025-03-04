@@ -7,8 +7,7 @@ export default function ServiceAddons({ custom, editMode = false }) {
   // Choose the appropriate store based on editMode prop
   const store = editMode ? useEditServiceStore : useCreateServiceStore;
 
-  const { addons, saveAddons, showNewAddonInputs, handleShowNewAddonInputs } =
-    store();
+  const { addons, showNewAddonInputs, handleShowNewAddonInputs } = store();
 
   return (
     <div
@@ -57,17 +56,7 @@ export default function ServiceAddons({ custom, editMode = false }) {
       )}
 
       {custom && showNewAddonInputs && <NewAddonInputs editMode={editMode} />}
-      {!custom && (
-        <button
-          type="button"
-          className="ud-btn btn-thm mt20 no-rotate"
-          disabled={addons.length === 0}
-          onClick={saveAddons}
-        >
-          Αποθήκευση
-          <i className="fa-solid fa-floppy-disk"></i>
-        </button>
-      )}
+      {/* Remove save button - saving will be handled by the Next button */}
     </div>
   );
 }

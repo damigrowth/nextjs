@@ -410,7 +410,7 @@ export default function ServiceGallery({
             ))}
           </div>
         </div>
-        {!custom && (
+        {/* {!custom && (
           <button
             type="button"
             className="ud-btn no-rotate btn-thm"
@@ -429,7 +429,7 @@ export default function ServiceGallery({
               <i className="fa-solid fa-floppy-disk"></i>
             )}
           </button>
-        )}
+        )} */}
       </div>
     </>
   );

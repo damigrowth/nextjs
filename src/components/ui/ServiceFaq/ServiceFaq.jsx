@@ -7,7 +7,8 @@ export default function ServiceFaq({ custom, editMode = false }) {
   // Choose the appropriate store based on editMode prop
   const store = editMode ? useEditServiceStore : useCreateServiceStore;
 
-  const { faq, saveFaq, showNewFaqInputs, handleShowNewFaqInputs } = store();
+  const { faq, showNewFaqInputs, handleShowNewFaqInputs } = store();
+
   return (
     <div
       className={
@@ -39,17 +40,7 @@ export default function ServiceFaq({ custom, editMode = false }) {
         <span className="d-flex align-items-center flaticon-button fz20" />
       </button>
       {showNewFaqInputs && <NewFaqInputs editMode={editMode} />}
-      {!custom && (
-        <button
-          type="button"
-          className="ud-btn btn-thm mt20 no-rotate"
-          disabled={faq.length === 0}
-          onClick={saveFaq}
-        >
-          Αποθήκευση
-          <i className="fa-solid fa-floppy-disk"></i>
-        </button>
-      )}
+      {/* Remove save button - saving will be handled by the Next button */}
     </div>
   );
 }
