@@ -67,7 +67,7 @@ export const ALL_REVIEWS_RECEIVED_DASHBOARD = gql`
     reviews(
       filters: { receiver: { id: { eq: $id } } }
       pagination: { page: $page, pageSize: 3 }
-      sort: "rating:desc"
+      sort: "publishedAt:desc"
     ) {
       data {
         attributes {
@@ -106,7 +106,7 @@ export const ALL_REVIEWS_GIVEN_DASHBOARD = gql`
     reviews(
       filters: { author: { id: { eq: $id } } }
       pagination: { page: $page, pageSize: 3 }
-      sort: "rating:desc"
+      sort: "publishedAt:desc"
     ) {
       data {
         attributes {

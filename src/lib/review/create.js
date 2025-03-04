@@ -14,7 +14,7 @@ const reviewSchema = z.object({
     .max(350, "Η μέγιστη αξιολόγηση είναι 350 χαρακτήρες"),
 });
 
-export async function createModelReview(prevState, formData) {
+export async function createReview(prevState, formData) {
   try {
     const reviewData = formData.get("newReviewData");
     const review = JSON.parse(reviewData);
@@ -37,11 +37,11 @@ export async function createModelReview(prevState, formData) {
     }
 
     const payload = {
-      [review.modelType]: Number(review.modelId),
-      receiver: review.tenantId,
+      service: review.service.id,
+      receiver: review.receiver,
+      author: authorId,
       rating: Number(review.rating),
       comment: review.comment,
-      author: authorId,
       type: 1,
       status: 2,
       publishedAt: null,

@@ -178,10 +178,9 @@ export default async function SingleService({
                 />
                 <Protected message="Κάνε σύνδεση για να αξιολογήσεις την υπηρεσία.">
                   <AddModelReviewForm
-                    modelType="service"
-                    tenantType="freelancer"
-                    modelId={serviceId}
-                    tenantId={freelancerId}
+                    type="service"
+                    serviceId={serviceId}
+                    freelancerId={freelancerId}
                   />
                 </Protected>
               </div>

@@ -192,7 +192,11 @@ export default function SearchableSelect({
         response.data?.map((item) => ({
           value: item.id,
           label:
-            item.attributes.name || item.attributes.label || item.label || "",
+            item.attributes.name ||
+            item.attributes.label ||
+            item.attributes.title ||
+            item.label ||
+            "",
           data: item, // Keep the complete item
         })) || [];
 

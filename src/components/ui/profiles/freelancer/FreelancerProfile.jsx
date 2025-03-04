@@ -167,10 +167,8 @@ export default function FreelancerProfile({
               >
                 {!isOwner && (
                   <AddModelReviewForm
-                    modelType="service"
-                    tenantType="freelancer"
-                    // modelId={serviceId} // TODO: Fetch all orders and get the services ids in an input
-                    tenantId={freelancerId}
+                    type="freelancer"
+                    freelancerId={freelancerId}
                   />
                 )}
               </Protected>
