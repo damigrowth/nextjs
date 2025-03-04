@@ -32,7 +32,7 @@ export default function ManageServiceCard1({ service }) {
               ) : (
                 <ServiceCardFile
                   file={media[0]?.attributes}
-                  path={`/s/${service.attributes.slug}`}
+                  path={`/dashboard/services/edit/${service.id}`}
                   height={91}
                   width={122}
                 />
