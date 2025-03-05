@@ -50,7 +50,14 @@ export default async function FeaturedServiceCard({
             style={{ objectFit: "cover" }}
           />
         </Link>
-        {fid && <SaveFrom type="service" id={id} showDelete={showDelete} />}
+        {fid && (
+          <SaveFrom
+            type="service"
+            id={id}
+            showDelete={showDelete}
+            isAuthenticated={fid ? true : false}
+          />
+        )}
       </div>
       {/* <div className={`list-content ${isContentExpanded ? "px-0" : ""}`}> */}
       <div className="list-content">

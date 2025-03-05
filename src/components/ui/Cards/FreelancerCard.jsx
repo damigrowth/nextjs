@@ -45,6 +45,7 @@ export default async function FreelancerCard({
             id={id}
             initialSavedStatus={savedStatus}
             showDelete={showDelete}
+            isAuthenticated={fid ? true : false}
           />
         )}
         <div className="thumb w90 mb25 mx-auto position-relative rounded-circle">

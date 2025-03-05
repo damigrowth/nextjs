@@ -10,6 +10,7 @@ export default function ProfileBreadcrumb({
   id,
   savedStatus,
   hideSaveButton,
+  isAuthenticated,
 }) {
   const parentSlug = type === "company" ? "companies" : "pros";
 
@@ -59,6 +60,7 @@ export default function ProfileBreadcrumb({
                 savedStatus={savedStatus}
                 saveType={"freelancer"}
                 hideSaveButton={hideSaveButton}
+                isAuthenticated={isAuthenticated}
               />
             </div>
           </div>

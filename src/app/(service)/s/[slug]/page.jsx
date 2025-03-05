@@ -89,6 +89,7 @@ export default async function page({ params, searchParams }) {
             subjectTitle={service?.title}
             id={service?.id}
             savedStatus={savedStatus}
+            isAuthenticated={fid ? true : false}
           />
           <SingleService
             slug={slug}

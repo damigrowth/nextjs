@@ -9,6 +9,7 @@ export default function BreadcrumbButtons({
   savedStatus,
   saveType,
   hideSaveButton,
+  isAuthenticated,
 }) {
   const [shareToggle, setShareToggle] = useState(false);
 
@@ -74,7 +75,14 @@ export default function BreadcrumbButtons({
           </div>
         )}
       </a>
-      {!hideSaveButton && <SaveForm type={saveType} id={id} variant="text" />}
+      {!hideSaveButton && (
+        <SaveForm
+          type={saveType}
+          id={id}
+          variant="text"
+          isAuthenticated={isAuthenticated}
+        />
+      )}
     </div>
   );
 }

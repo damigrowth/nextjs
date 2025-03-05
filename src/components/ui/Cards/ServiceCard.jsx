@@ -61,6 +61,7 @@ export default async function ServiceCard({ service, fid }) {
           type="service"
           initialSavedStatus={saveStatus}
           id={service.id}
+          isAuthenticated={fid ? true : false}
         />
         <div className="archive-service-card-meta">
           <div>

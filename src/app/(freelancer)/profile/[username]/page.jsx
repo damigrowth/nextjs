@@ -101,6 +101,7 @@ export default async function page({ params, searchParams }) {
           id={freelancerId}
           savedStatus={savedStatus}
           hideSaveButton={fid === freelancerId}
+          isAuthenticated={fid ? true : false}
         />
         <FreelancerProfile
           freelancerId={freelancerId}
