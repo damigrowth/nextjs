@@ -166,11 +166,7 @@ export default async function page({ params, searchParams }) {
 
   return (
     <>
-      <Tabs
-        parentPathLabel="Όλοι οι Επαγγελματίες"
-        parentPathLink="pros"
-        categories={categories?.data}
-      />
+      <Tabs type="freelancer" categories={categories?.data} />
       <Breadcrumb
         parentPathLabel="Επαγγελματίες"
         parentPathLink="pros"

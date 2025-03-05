@@ -122,11 +122,7 @@ export default async function page({ searchParams }) {
 
   return (
     <>
-      <Tabs
-        parentPathLabel="Όλες οι κατηγορίες"
-        parentPathLink="categories"
-        categories={categories?.data}
-      />
+      <Tabs type="categories" categories={categories?.data} />
       <Breadcrumb parentPathLabel="Υπηρεσίες" parentPathLink="ipiresies" />
       <Banner
         heading="Όλες οι Υπηρεσίες"

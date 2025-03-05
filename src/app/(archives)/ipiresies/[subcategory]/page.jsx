@@ -149,8 +149,7 @@ export default async function page({ params, searchParams }) {
   return (
     <>
       <Tabs
-        parentPathLabel="Όλες οι κατηγορίες"
-        parentPathLink="ipiresies"
+        type="service"
         categories={categories?.data}
         categoriesRoute={true}
       />
