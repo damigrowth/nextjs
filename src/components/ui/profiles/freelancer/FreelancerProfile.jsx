@@ -166,10 +166,16 @@ export default function FreelancerProfile({
                 }
               >
                 {!isOwner && (
-                  <AddModelReviewForm
-                    type="freelancer"
-                    freelancerId={freelancerId}
-                  />
+                  <>
+                    {services.length > 0 ? (
+                      <AddModelReviewForm
+                        type="freelancer"
+                        freelancerId={freelancerId}
+                      />
+                    ) : (
+                      <div></div>
+                    )}
+                  </>
                 )}
               </Protected>
             </div>

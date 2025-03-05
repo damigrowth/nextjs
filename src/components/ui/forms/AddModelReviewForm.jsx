@@ -128,7 +128,6 @@ export default function AddModelReviewForm({ type, serviceId, freelancerId }) {
                     onSelect={handleServiceSelect}
                     isMulti={false}
                     isClearable={true}
-                    // errors={formState?.errors?.industries}
                   />
                 </div>{" "}
               </>
@@ -153,45 +152,61 @@ export default function AddModelReviewForm({ type, serviceId, freelancerId }) {
             </div>
             <div className="row">
               <div className="col-md-12">
-                <div className="mb-4">
-                  <TextArea
-                    label="Αξιολόγηση"
-                    id="comment"
-                    name="comment"
-                    minLength={25}
-                    maxLength={350}
-                    counter
-                    disabled={isPending}
-                    errors={formState?.errors?.comment}
-                    value={formData.comment}
-                    defaultValue={formData.comment}
-                    onChange={(formattedValue) =>
-                      handleCommentChange(formattedValue)
-                    }
-                    capitalize
-                  />
-                </div>
+                <TextArea
+                  label="Αξιολόγηση"
+                  id="comment"
+                  name="comment"
+                  minLength={25}
+                  maxLength={350}
+                  counter
+                  disabled={isPending}
+                  errors={formState?.errors?.comment}
+                  value={formData.comment}
+                  defaultValue={formData.comment}
+                  onChange={(formattedValue) =>
+                    handleCommentChange(formattedValue)
+                  }
+                  capitalize
+                />
               </div>
 
-              {formState?.errors && formState.errors.submit && (
-                <div className="col-md-12">
-                  <Alert
-                    type="error"
-                    message={formState.errors.submit}
-                    className="mt-3"
-                  />
-                </div>
-              )}
+              {formState?.errors &&
+                Object.keys(formState.errors).length > 0 && (
+                  <div className="col-md-12">
+                    <Alert
+                      type="error"
+                      message={
+                        <div>
+                          {formState.errors.submit && (
+                            <div>{formState.errors.submit}</div>
+                          )}
+                          {formState.errors.service && (
+                            <div>{formState.errors.service}</div>
+                          )}
+                          {formState.errors.rating && (
+                            <div>{formState.errors.rating}</div>
+                          )}
+                          {formState.errors.comment && (
+                            <div>{formState.errors.comment}</div>
+                          )}
+                        </div>
+                      }
+                      className="mt-3"
+                    />
+                  </div>
+                )}
 
-              {formState?.message && !formState?.errors?.submit && (
-                <div className="col-md-12">
-                  <Alert
-                    type="success"
-                    message={formState.message}
-                    className="mt-3"
-                  />
-                </div>
-              )}
+              {formState?.message &&
+                (!formState?.errors ||
+                  Object.keys(formState.errors).length === 0) && (
+                  <div className="col-md-12">
+                    <Alert
+                      type="success"
+                      message={formState.message}
+                      className="mt-3"
+                    />
+                  </div>
+                )}
 
               <SaveButton
                 isPending={isPending}

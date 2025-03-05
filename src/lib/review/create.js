@@ -5,14 +5,38 @@ import { postData } from "../client/operations";
 import { POST_REVIEW } from "../graphql/mutations";
 import { getFreelancerId } from "../users/freelancer";
 
-const reviewSchema = z.object({
-  rating: z.number(),
-  comment: z
-    .string()
-    .min(1, "Η αξιολόγηση είναι υποχρεωτική")
-    .min(25, "Η αξιολόγηση είναι μικρή")
-    .max(350, "Η μέγιστη αξιολόγηση είναι 350 χαρακτήρες"),
-});
+const reviewSchema = z
+  .object({
+    type: z.string(),
+    rating: z
+      .number({
+        required_error:
+          "Πρέπει να επιλέξετε Βαθμολογία για να υποβάλετε την αξιολόγηση.",
+      })
+      .min(
+        1,
+        "Πρέπει να επιλέξετε Βαθμολογία για να υποβάλετε την αξιολόγηση."
+      ),
+    service: z.object({
+      id: z.string().optional(),
+    }),
+    comment: z
+      .string()
+      .min(1, "Η αξιολόγηση είναι υποχρεωτική")
+      .min(25, "Η αξιολόγηση είναι μικρή")
+      .max(350, "Η μέγιστη αξιολόγηση είναι 350 χαρακτήρες"),
+  })
+  .superRefine((data, ctx) => {
+    // Only require service for freelancer type reviews
+    if (data.type === "freelancer" && (!data.service || !data.service.id)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Πρέπει να επιλέξετε Υπηρεσία για να υποβάλετε την αξιολόγηση.",
+        path: ["service"],
+      });
+    }
+  });
 
 export async function createReview(prevState, formData) {
   try {
@@ -25,7 +49,11 @@ export async function createReview(prevState, formData) {
 
     if (!validation.success) {
       const validationErrors = validation.error.errors.reduce((acc, error) => {
-        acc[error.path[0]] = error.message;
+        if (error.path.length > 1 && error.path[0] === "service") {
+          acc["service"] = error.message;
+        } else {
+          acc[error.path[0]] = error.message;
+        }
         return acc;
       }, {});
 
