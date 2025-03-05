@@ -6,6 +6,7 @@ export default function ServiceBreadcrumb({
   subjectTitle,
   category,
   subcategory,
+  isAuthenticated,
 }) {
   return (
     <section className="breadcumb-section">
@@ -31,7 +32,10 @@ export default function ServiceBreadcrumb({
           </div>
           <div className="col-sm-4 col-lg-2">
             <div className="d-flex align-items-center justify-content-sm-end">
-              <BreadcrumbButtons subjectTitle={subjectTitle} />
+              <BreadcrumbButtons
+                subjectTitle={subjectTitle}
+                isAuthenticated={isAuthenticated}
+              />
             </div>
           </div>
         </div>

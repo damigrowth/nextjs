@@ -45,11 +45,7 @@ export default async function page({ params }) {
 
   return (
     <>
-      <Tabs
-        parentPathLabel="Όλες οι κατηγορίες"
-        parentPathLink="categories"
-        categories={categories?.data}
-      />
+      <Tabs type="categories" categories={categories?.data} />
       <Breadcrumb
         parentPathLabel="Υπηρεσίες"
         parentPathLink="categories"

@@ -13,6 +13,7 @@ export default async function Breadcrumb({
   subjectTitle,
   id,
   savedStatus,
+  isAuthenticated,
 }) {
   return (
     <section className="breadcumb-section">
@@ -84,6 +85,7 @@ export default async function Breadcrumb({
                   id={id}
                   savedStatus={savedStatus}
                   saveType={"service"}
+                  isAuthenticated={isAuthenticated}
                 />
               </div>
             </div>

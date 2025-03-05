@@ -42,6 +42,7 @@ export default async function FeaturedServiceSliderCard({
             id={id}
             initialSavedStatus={savedStatus}
             showDelete={showDelete}
+            isAuthenticated={fid ? true : false}
           />
           <div className="listing-thumbIn-slider position-relative navi_pagi_bottom_center slider-1-grid">
             <div className="item">

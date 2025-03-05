@@ -77,11 +77,7 @@ export default async function page({ params, searchParams }) {
 
     return (
       <>
-        <Tabs
-          parentPathLabel="Όλες οι κατηγορίες"
-          parentPathLink="categories"
-          categories={categories?.data}
-        />
+        <Tabs type="categories" categories={categories?.data} />
         <div className="bgc-thm3">
           <Breadcrumb
             parentPathLabel="Υπηρεσίες"
@@ -93,6 +89,7 @@ export default async function page({ params, searchParams }) {
             subjectTitle={service?.title}
             id={service?.id}
             savedStatus={savedStatus}
+            isAuthenticated={fid ? true : false}
           />
           <SingleService
             slug={slug}

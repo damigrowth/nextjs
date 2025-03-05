@@ -4,7 +4,7 @@ import { submitContactForm } from "@/lib/contact";
 import React, { useActionState, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 
-export default function ContactForm({ form }) {
+export default function ContactForm({ form, siteKey }) {
   const [state, formAction, isPending] = useActionState(submitContactForm, {
     success: false,
     message: "",
@@ -79,10 +79,7 @@ export default function ContactForm({ form }) {
             </div>
           </div>
           <div className="col-md-12">
-            <ReCAPTCHA
-              sitekey={process.env.RECAPTCHA_SITE_KEY}
-              onChange={setCaptcha}
-            />
+            <ReCAPTCHA sitekey={siteKey} onChange={setCaptcha} />
             <div className="mt20">
               <button
                 type="submit"

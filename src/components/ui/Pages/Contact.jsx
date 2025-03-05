@@ -4,6 +4,8 @@ import ContactForm from "../forms/ContactForm";
 export default function Contact({ data }) {
   const { title, description, address, phone, email, form } = data;
 
+  const siteKey = process.env.RECAPTCHA_SITE_KEY;
+
   return (
     <section className="pt-0">
       <div className="container">
@@ -38,7 +40,7 @@ export default function Contact({ data }) {
             <div className="contact-page-form default-box-shadow1 bdrs8 bdr1 p50 mb30-md bgc-white">
               <h4 className="form-title mb25">{form.title}</h4>
               <p className="text mb30">{form.description}</p>
-              <ContactForm form={form} />
+              <ContactForm form={form} siteKey={siteKey} />
             </div>
           </div>
         </div>

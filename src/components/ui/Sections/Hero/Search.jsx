@@ -22,6 +22,7 @@ export default function Search() {
   const [res, action, pending] = useActionState(homeSearch);
   const formRef = useRef(null);
   const isInitialMount = useRef(true);
+  const preventBlurRef = useRef(false);
 
   const {
     searchTerm,
@@ -89,6 +90,20 @@ export default function Search() {
     [router, setSearchTerm, blurDropdown]
   );
 
+  const handleMouseDown = () => {
+    preventBlurRef.current = true;
+  };
+
+  const handleMouseUp = () => {
+    preventBlurRef.current = false;
+  };
+
+  const handleInputBlur = () => {
+    if (!preventBlurRef.current) {
+      blurDropdown();
+    }
+  };
+
   useEffect(() => {
     if (searchTerm && !isInitialMount.current) {
       debouncedSubmit();
@@ -135,7 +150,7 @@ export default function Search() {
             placeholder="Τι υπηρεσία ψάχνεις;"
             className="form-control"
             onFocus={focusDropdown}
-            onBlur={blurDropdown}
+            onBlur={handleInputBlur}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleSearch}
@@ -150,6 +165,8 @@ export default function Search() {
                 top: isSearchDropdownOpen ? "70px" : "100px",
                 transition: "all 0.3s ease",
               }}
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
             >
               <div className="box-suggestions">
                 <ul className="px-0 m-0 pb-4">

@@ -10,13 +10,15 @@ export default function Skills({ skills, specialization }) {
     <div className="sidebar-widget mb30 pb20 bdrs8">
       <h4 className="widget-title">Δεξιότητες</h4>
       <ul className="tags mt20">
-        <li>
-          <p className="specialisation">{specialization.attributes.label}</p>
-        </li>
+        {specialization?.attributes && (
+          <li>
+            <p className="specialisation">{specialization.attributes.label}</p>
+          </li>
+        )}
         {skills
           .filter(
             (skill) =>
-              skill.attributes.label !== specialization.attributes.label
+              skill.attributes.label !== specialization?.attributes?.label
           )
           .map((skill, i) => (
             <li key={i}>

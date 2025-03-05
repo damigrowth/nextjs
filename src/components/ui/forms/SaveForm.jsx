@@ -11,6 +11,7 @@ import {
   UNSAVE_FREELANCER,
 } from "@/lib/graphql/mutations";
 import { revalidateSaved } from "@/lib/save";
+import { useRouter } from "next/navigation";
 
 export default function SaveForm({
   type,
@@ -18,7 +19,10 @@ export default function SaveForm({
   showDelete = false,
   className = "",
   variant = "heart",
+  isAuthenticated = false,
 }) {
+  const router = useRouter();
+
   const [optimisticSaved, setOptimisticSaved] = useState(false);
   const QUERY = type === "service" ? SAVED_SERVICE : SAVED_FREELANCER;
   const variables =
@@ -58,6 +62,10 @@ export default function SaveForm({
   }, [data, type]);
 
   const handleSave = async () => {
+    if (!isAuthenticated) {
+      router.push("/login");
+      return; // Important: exit the function early
+    }
     const previousState = optimisticSaved;
     setOptimisticSaved(!previousState);
 
