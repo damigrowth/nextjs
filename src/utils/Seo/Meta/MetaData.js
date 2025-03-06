@@ -9,18 +9,16 @@ export async function MetaData({ title, description, size, image, url }) {
     "Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.";
 
   const fallbackImage = "/images/fallback/doulitsa.png";
-
-  // const fallbackImage =
-  //   "https://res.cloudinary.com/ddejhvzbf/image/upload/v1723560374/doulitsa_92f5bf4005.png";
+  const baseUrl = process.env.LIVE_URL;
 
   const meta = {
-    metadataBase: new URL(`${process.env.LIVE_URL}`),
+    metadataBase: new URL(baseUrl),
     title,
     description: truncatedDescription || fallbackDescription,
     openGraph: {
       title,
       description: truncatedDescription || fallbackDescription,
-      url: `${process.env.LIVE_URL}${url}`,
+      url: `${baseUrl}${url}`,
       siteName: "Doulitsa",
       images: [
         {
@@ -48,11 +46,12 @@ export async function MetaData({ title, description, size, image, url }) {
       ],
     },
     alternates: {
-      canonical: `${process.env.LIVE_URL}${url}`,
+      canonical: `${baseUrl}${url}`,
       languages: {
-        "el-GR": `${process.env.LIVE_URL}${url}`,
+        "el-GR": `${baseUrl}${url}`,
       },
     },
   };
+
   return { meta };
 }

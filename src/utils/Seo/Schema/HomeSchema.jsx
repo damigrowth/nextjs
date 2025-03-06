@@ -1,17 +1,13 @@
 import React from "react";
 import JsonLd from "./JsonLd";
 
-export default function HomeSchema({ searchTarget, searchInput }) {
-  const baseUrl = "https://doulitsa.gr";
-  const logoUrl = "https://doulitsa.gr/images/doulitsa-logo.svg";
+export default function HomeSchema() {
+  const baseUrl = process.env.LIVE_URL;
+  const logoUrl = `${baseUrl}/images/doulitsa-logo.svg`;
 
-  // Convert the dynamic searchTarget to a template URL
-  // Replace the actual search term with the standard search_term_string placeholder
-  const searchUrlTemplate = searchTarget.includes("?search=")
-    ? searchTarget.replace(/\?search=.+$/, "?search={search_term_string}")
-    : searchTarget;
+  const searchUrlTemplate = `/ipiresies?search={search_term_string}`;
 
-  const data = {
+  const schema = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Doulitsa",
@@ -28,5 +24,5 @@ export default function HomeSchema({ searchTarget, searchInput }) {
     },
   };
 
-  return <JsonLd data={data} />;
+  return <JsonLd data={schema} />;
 }
