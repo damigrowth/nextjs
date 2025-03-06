@@ -39,6 +39,10 @@ export default function Search() {
     ? `/ipiresies/${categorySlug}?search=${searchTerm}`
     : `/ipiresies?search=${searchTerm}`;
 
+  const schemaSearchTarget = categorySlug
+    ? `/ipiresies/${categorySlug}?search={search_term_string}`
+    : `/ipiresies?search={search_term_string}`;
+
   // Trigger search when category changes, but not on initial mount
   useEffect(() => {
     if (isInitialMount.current) {
@@ -112,7 +116,10 @@ export default function Search() {
 
   return (
     <>
-      <HomeSchema searchTarget={searchTarget} searchInput="searchTerm" />
+      <HomeSchema
+        searchTarget={schemaSearchTarget}
+        searchInput="search_term_string"
+      />
       <form
         ref={formRef}
         action={action}
