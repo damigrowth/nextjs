@@ -2,8 +2,6 @@
 
 import { homeSearch } from "@/lib/search/home";
 import useHomeStore from "@/store/home/homeStore";
-import HomeSchema from "@/utils/Seo/Schema/HomeSchema";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useActionState, useCallback, useEffect, useRef } from "react";
 
@@ -34,14 +32,6 @@ export default function Search() {
   } = useHomeStore();
 
   const categorySlug = categorySelect?.attributes?.slug || "";
-
-  const searchTarget = categorySlug
-    ? `/ipiresies/${categorySlug}?search=${searchTerm}`
-    : `/ipiresies?search=${searchTerm}`;
-
-  const schemaSearchTarget = categorySlug
-    ? `/ipiresies/${categorySlug}?search={search_term_string}`
-    : `/ipiresies?search={search_term_string}`;
 
   // Trigger search when category changes, but not on initial mount
   useEffect(() => {
@@ -116,10 +106,6 @@ export default function Search() {
 
   return (
     <>
-      <HomeSchema
-        searchTarget={schemaSearchTarget}
-        searchInput="search_term_string"
-      />
       <form
         ref={formRef}
         action={action}

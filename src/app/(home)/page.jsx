@@ -15,6 +15,7 @@ import { FEATURED_FREELANCERS } from "@/lib/graphql/queries/main/freelancer";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 import { inspect } from "@/utils/inspect";
 import { getFreelancerId } from "@/lib/users/freelancer";
+import HomeSchema from "@/utils/Seo/Schema/HomeSchema";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600; // 1 hour
@@ -67,6 +68,7 @@ export default async function page() {
 
   return (
     <>
+      <HomeSchema />
       <Hero
         categories={featuredCategoriesData?.data?.attributes?.categories?.data}
       />
