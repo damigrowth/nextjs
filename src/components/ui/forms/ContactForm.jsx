@@ -12,9 +12,9 @@ export default function ContactForm({ form, siteKey }) {
   const [captcha, setCaptcha] = useState("");
 
   const handleSubmit = async (formData) => {
-    const data = new FormData(formData);
-    data.append("captchaToken", captcha);
-    await formAction(data);
+    // formData is already a FormData object, so we just append to it directly
+    formData.append("captchaToken", captcha);
+    await formAction(formData);
   };
 
   return (
