@@ -78,7 +78,7 @@ export async function submitContactForm(prevState, formData) {
       },
     });
 
-    if (!data.createEmail?.data?.id) {
+    if (!data?.data?.createEmail?.data?.id) {
       return {
         success: false,
         message: "Αποτυχία αποστολής μηνύματος. Παρακαλώ δοκιμάστε ξανά.",
