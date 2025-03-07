@@ -8,21 +8,9 @@ export default function ServiceSchema({
   price,
   rating,
   reviews_total,
-  reviews,
   faq,
+  image,
 }) {
-  const reviewsData = reviews.map((review) => ({
-    "@type": "Review",
-    reviewRating: {
-      "@type": "Rating",
-      ratingValue: review.attributes.rating,
-    },
-    author: {
-      "@type": "Person",
-      name: review?.attributes?.user?.data?.attributes?.displayName,
-    },
-  }));
-
   const faqData = faq.map((f, index) => ({
     "@type": "Question",
     name: `Ερώτηση ${index + 1}`,
@@ -38,6 +26,7 @@ export default function ServiceSchema({
     "@context": "https://schema.org",
     "@type": "Product",
     name: title,
+    image: image,
     brand: {
       "@type": "Brand",
       name: "Doulitsa",
@@ -58,7 +47,7 @@ export default function ServiceSchema({
       ratingValue: rating,
       reviewCount: reviews_total,
     },
-    review: reviewsData,
+    // review: reviewsData,
     mainEntity: {
       "@type": "FAQPage",
       mainEntity: faqData,

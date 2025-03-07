@@ -110,8 +110,8 @@ export default async function SingleService({
         price={price}
         rating={rating}
         reviews_total={reviews_total}
-        reviews={reviews}
         faq={faq}
+        image={image?.data?.attributes?.formats?.thumbnail?.url}
       />
       <div className="container">
         <div className="row wrap service-wrapper">
