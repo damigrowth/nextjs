@@ -333,6 +333,15 @@ const EMAIL_CONFIRMATION = gql`
   }
 `;
 
+const DELETE_ACCOUNT = gql`
+  mutation DeleteAccount($username: String!) {
+    deleteAccount(username: $username) {
+      success
+      message
+    }
+  }
+`;
+
 export {
   POST_REVIEW,
   POST_SERVICE,
@@ -358,4 +367,5 @@ export {
   UNSAVE_FREELANCER,
   CREATE_TAG,
   EMAIL_CONFIRMATION,
+  DELETE_ACCOUNT,
 };
