@@ -13,6 +13,7 @@ export default function HomeSchema() {
     name: "Doulitsa",
     url: baseUrl,
     logo: logoUrl,
+    sameAs: ["https://www.linkedin.com/company/doulitsa"],
     potentialAction: {
       "@type": "SearchAction",
       target: `${baseUrl}${searchUrlTemplate}`,
