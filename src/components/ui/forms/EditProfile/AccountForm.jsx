@@ -7,6 +7,8 @@ import SaveButton from "../../buttons/SaveButton";
 import useEditProfileStore from "@/store/dashboard/profile";
 import Alert from "../../alerts/Alert";
 import { useFormChanges } from "@/hook/useFormChanges";
+import DeleteAccountForm from "../DeleteAccountForm";
+import DeleteModal from "@/components/dashboard/modal/DeleteModal";
 
 export default function AccountForm({ freelancer }) {
   const initialState = {
@@ -47,90 +49,97 @@ export default function AccountForm({ freelancer }) {
   };
 
   return (
-    <form action={handleSubmit} className="ps-widget bdrs4 position-relative">
-      <div className="form-style1">
-        <div className="bdrb1 pb15 mb25">
-          <h5 className="list-title heading">Λογαριασμός</h5>
-        </div>
-        <div className="row">
-          <div className="mb10 col-md-3">
-            <InputB
-              label="Email"
-              id="email"
-              name="email"
-              type="email"
-              value={email}
-              className="form-control input-group"
-              disabled={true}
-            />
+    <>
+      <form action={handleSubmit} className="ps-widget bdrs4 position-relative">
+        <div className="form-style1">
+          <div className="bdrb1 pb15 mb25">
+            <h5 className="list-title heading">Λογαριασμός</h5>
           </div>
-          <div className="mb10 col-md-3">
-            <InputB
-              label="Username"
-              id="username"
-              name="username"
-              type="text"
-              value={username}
-              className="form-control input-group"
-              disabled={true}
-            />
+          <div className="row">
+            <div className="mb10 col-md-3">
+              <InputB
+                label="Email"
+                id="email"
+                name="email"
+                type="email"
+                value={email}
+                className="form-control input-group"
+                disabled={true}
+              />
+            </div>
+            <div className="mb10 col-md-3">
+              <InputB
+                label="Username"
+                id="username"
+                name="username"
+                type="text"
+                value={username}
+                className="form-control input-group"
+                disabled={true}
+              />
+            </div>
+            <div className="mb10 col-md-3">
+              <InputB
+                label="Όνομα προβολής"
+                id="displayName"
+                name="displayName"
+                type="text"
+                value={displayName}
+                onChange={setDisplayName}
+                className="form-control input-group"
+                errors={formState?.errors?.displayName}
+              />
+            </div>
+            <div className="mb10 col-md-3">
+              <InputB
+                label="Τηλέφωνο"
+                id="phone"
+                name="phone"
+                type="tel"
+                value={phone || ""}
+                onChange={setPhone}
+                className="form-control input-group"
+                errors={formState?.errors?.phone}
+              />
+            </div>
+            <div className="mb10 col-md-4">
+              <InputB
+                label="Διεύθυνση"
+                id="address"
+                name="address"
+                type="text"
+                value={address}
+                disabled={true}
+                className="form-control input-group"
+              />
+            </div>
           </div>
-          <div className="mb10 col-md-3">
-            <InputB
-              label="Όνομα προβολής"
-              id="displayName"
-              name="displayName"
-              type="text"
-              value={displayName}
-              onChange={setDisplayName}
-              className="form-control input-group"
-              errors={formState?.errors?.displayName}
-            />
-          </div>
-          <div className="mb10 col-md-3">
-            <InputB
-              label="Τηλέφωνο"
-              id="phone"
-              name="phone"
-              type="tel"
-              value={phone || ""}
-              onChange={setPhone}
-              className="form-control input-group"
-              errors={formState?.errors?.phone}
-            />
-          </div>
-          <div className="mb10 col-md-4">
-            <InputB
-              label="Διεύθυνση"
-              id="address"
-              name="address"
-              type="text"
-              value={address}
-              disabled={true}
-              className="form-control input-group"
-            />
-          </div>
-        </div>
 
-        {formState?.errors && (
-          <Alert
-            type="error"
-            message={formState.errors.submit}
-            className="mt-3"
+          {formState?.errors && (
+            <Alert
+              type="error"
+              message={formState.errors.submit}
+              className="mt-3"
+            />
+          )}
+
+          {formState?.message && !formState?.errors?.submit && (
+            <Alert
+              type="success"
+              message={formState.message}
+              className="mt-3"
+            />
+          )}
+
+          <SaveButton
+            orientation="end"
+            isPending={isPending}
+            hasChanges={hasChanges}
+            variant="primary"
           />
-        )}
-
-        {formState?.message && !formState?.errors?.submit && (
-          <Alert type="success" message={formState.message} className="mt-3" />
-        )}
-
-        <SaveButton
-          orientation="end"
-          isPending={isPending}
-          hasChanges={hasChanges}
-          variant="primary"
-        />
-      </div>
-    </form>
+        </div>
+      </form>
+      <DeleteAccountForm username={username} />
+    </>
   );
 }

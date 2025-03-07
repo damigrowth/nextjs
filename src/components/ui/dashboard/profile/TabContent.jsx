@@ -7,9 +7,16 @@ import PresentationForm from "../../forms/EditProfile/PresentationForm";
 import Tab from "./Tab";
 import TabNavigation from "./TabNavigation";
 import TabWrapper from "./TabWrapper";
+import { redirect } from "next/navigation";
 
 export async function TabContent() {
   const freelancer = await getFreelancer();
+
+  if (!freelancer) {
+    // Use Next.js redirect function directly
+    redirect("/login");
+  }
+
   const type = freelancer.type.data.attributes.slug;
 
   const tabs = [

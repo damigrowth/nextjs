@@ -38,7 +38,7 @@ export default function CancelServiceForm() {
         type="button"
         className="ud-btn btn-raw bg-danger text-white no-rotate"
         data-bs-toggle="modal"
-        data-bs-target="#deleteModal"
+        data-bs-target="#cancelServiceModal"
       >
         Διαγραφή
         <i className="fa-solid fa-trash ms-2"></i>
@@ -56,6 +56,7 @@ export default function CancelServiceForm() {
 
       <form ref={formRef} action={handleSubmit}>
         <DeleteModal
+          id="cancelServiceModal"
           title={
             <>
               Είσαι σίγουρος ότι θες
