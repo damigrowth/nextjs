@@ -54,7 +54,9 @@ const FREELANCER_BY_ID = gql`
 
 const FREELANCER_BY_USERNAME = gql`
   query GetFreelancer($username: String!) {
-    freelancers(filters: { username: { eq: $username } }) {
+    freelancers(
+      filters: { username: { eq: $username }, type: { slug: { ne: "user" } } }
+    ) {
       data {
         id
         attributes {
@@ -116,7 +118,7 @@ const FREELANCERS_ARCHIVE = gql`
   ) {
     freelancers(
       filters: {
-        type: { slug: { eq: $type } }
+        type: { and: [{ slug: { eq: $type } }, { slug: { ne: "user" } }] }
         rate: { gte: $min, lte: $max }
         payment_methods: { id: { in: $paymentMethods } }
         contactTypes: { id: { in: $contactTypes } }
@@ -157,7 +159,7 @@ const FEATURED_FREELANCERS = gql`
     featuredEntity {
       data {
         attributes {
-          freelancers {
+          freelancers(filters: { type: { slug: { ne: "user" } } }) {
             data {
               id
               attributes {
