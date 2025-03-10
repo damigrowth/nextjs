@@ -212,10 +212,7 @@ export default function ServiceInformation() {
 
   const handleSubscriptionTypeSelect = useCallback(
     (selected) => {
-      setInfo(
-        "subscription_type",
-        selected ? selected.value || "month" : "month"
-      );
+      setInfo("subscription_type", selected.data ? selected.data.value : null);
     },
     [setInfo]
   );
