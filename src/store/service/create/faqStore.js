@@ -136,13 +136,13 @@ const useFaqStore = (set, get) => ({
     })),
   saveEditingFaq: () =>
     set((state) => {
-      const { editingFaq, editingInput } = state;
+      const { editingFaq, faqEditingInput } = state;
 
       // Make a copy of the Faqs array
       const updatedFaq = [...state.faq];
 
       // Update the Faq at the editing index with the edited values
-      updatedFaq[editingInput] = editingFaq;
+      updatedFaq[faqEditingInput] = editingFaq;
 
       // Validation checks
       if (editingFaq.question.length === 0) {

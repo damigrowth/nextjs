@@ -20,13 +20,21 @@ import { cookies } from "next/headers";
 export async function register(prevState, formData) {
   const type = Number(formData.get("type"));
   const role = Number(formData.get("role"));
-  const consent = formData.get("consent") === "true";
+  const consent = formData.get("consent");
+
+  if (!consent) {
+    return {
+      errors: {
+        consent: ["Πρέπει να αποδεχτείτε τους όρους και τις προϋποθέσεις"],
+      },
+    };
+  }
 
   const userData = {
     email: formData.get("email"),
     username: formData.get("username"),
     password: formData.get("password"),
-    consent,
+    consent: true,
   };
 
   // Store registration data in cookies
@@ -36,7 +44,7 @@ export async function register(prevState, formData) {
       type,
       role,
       displayName: type === 2 ? formData.get("displayName") : userData.username,
-      consent,
+      consent: true,
     })
   );
 

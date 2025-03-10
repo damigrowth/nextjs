@@ -10,7 +10,7 @@ import {
   SUBCATEGORIES_SEARCH,
   SUBDIVISIONS_SEARCH,
 } from "@/lib/graphql/queries/main/taxonomies/service";
-import { TAGS_SEARCH_SIMPLE } from "@/lib/graphql/queries/main/taxonomies/service/tag";
+import { TAGS_SEARCH_COMPLETE } from "@/lib/graphql/queries/main/taxonomies/service/tag";
 import SearchableSelect from "../Archives/Inputs/SearchableSelect";
 import { normalizeQuery } from "@/utils/queries";
 import { searchData } from "@/lib/client/operations";
@@ -114,31 +114,6 @@ export default function ServiceInformation() {
     [info.subcategory.id]
   );
 
-  const handleTagsSearch = useCallback(async (searchTerm, page = 1) => {
-    const query = normalizeQuery(TAGS_SEARCH_SIMPLE);
-    const data = await searchData({
-      query,
-      searchTerm,
-      searchTermType: "label",
-      page,
-      additionalVariables: {
-        label: searchTerm,
-        tagsPage: page,
-        tagsPageSize: 10,
-      },
-    });
-
-    // Set no results state
-    if (data && data.data) {
-      setNoResultsState((prev) => ({
-        ...prev,
-        tags: data.data.length === 0,
-      }));
-    }
-
-    return data;
-  }, []);
-
   // Split handlers for different field types
   const handleCategorySelect = useCallback(
     (selected) => {
@@ -186,6 +161,42 @@ export default function ServiceInformation() {
     [setInfo]
   );
 
+  const handleTagsSearch = useCallback(async (searchTerm, page = 1) => {
+    const query = normalizeQuery(TAGS_SEARCH_COMPLETE);
+    const data = await searchData({
+      query,
+      searchTerm,
+      searchTermType: "label",
+      page,
+      additionalVariables: {
+        label: searchTerm,
+        tagsPage: page,
+        tagsPageSize: 10,
+      },
+    });
+
+    // Set no results state
+    if (data && data.data) {
+      setNoResultsState((prev) => ({
+        ...prev,
+        tags: data.data.length === 0,
+      }));
+    }
+
+    return data;
+  }, []);
+
+  const selectedTagsValue = {
+    data: info.tags.map((tag) => ({
+      id: tag.id,
+      value: tag.id,
+      label: tag.data?.attributes?.label || tag.label || "",
+      isNewTerm: tag.isNewTerm || false,
+      data: tag.data || null,
+      attributes: tag.attributes || null,
+    })),
+  };
+
   const handleTagsSelect = (selected) => {
     const formattedTags = selected
       ? selected.map((tag) => ({
@@ -200,22 +211,9 @@ export default function ServiceInformation() {
     setInfo("tags", formattedTags);
   };
 
-  const selectedTagsValue = {
-    data: info.tags.map((tag) => ({
-      id: tag.id,
-      label: tag?.data?.attributes?.label || "",
-      isNewTerm: tag.isNewTerm || false,
-      data: tag.data || null,
-      attributes: tag.attributes || null,
-    })),
-  };
-
   const handleSubscriptionTypeSelect = useCallback(
     (selected) => {
-      setInfo(
-        "subscription_type",
-        selected ? selected.value || "month" : "month"
-      );
+      setInfo("subscription_type", selected.data ? selected.data.value : null);
     },
     [setInfo]
   );
@@ -392,7 +390,7 @@ export default function ServiceInformation() {
                 name="service-tags"
                 label="Tags"
                 labelPlural="tags"
-                value={selectedTagsValue.data}
+                value={selectedTagsValue}
                 nameParam="label"
                 searchTermType="label"
                 pageParam="tagsPage"
@@ -407,6 +405,7 @@ export default function ServiceInformation() {
                 errors={errors?.field === "tags" ? errors : null}
                 allowNewTerms={true}
                 newTermValue="new"
+                showOptionsOnType={true}
               />
             </div>
           </div>

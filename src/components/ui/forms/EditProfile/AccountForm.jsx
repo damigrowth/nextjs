@@ -22,21 +22,13 @@ export default function AccountForm({ freelancer }) {
     initialState
   );
 
-  const {
-    email,
-    username,
-    displayName,
-    phone,
-    setDisplayName,
-    setPhone,
-    address,
-  } = useEditProfileStore();
+  const { email, username, displayName, phone, setDisplayName, setPhone } =
+    useEditProfileStore();
 
-  const currentValues = { displayName, phone: Number(phone), address };
+  const currentValues = { displayName, phone: Number(phone) };
   const originalValues = {
     displayName: freelancer.displayName,
     phone: Number(freelancer.phone),
-    address: freelancer?.coverage?.address || "",
   };
 
   // // Use custom hook to track changes
@@ -96,21 +88,11 @@ export default function AccountForm({ freelancer }) {
                 id="phone"
                 name="phone"
                 type="tel"
-                value={phone || ""}
+                maxLength={10}
+                value={phone || 0}
                 onChange={setPhone}
                 className="form-control input-group"
                 errors={formState?.errors?.phone}
-              />
-            </div>
-            <div className="mb10 col-md-4">
-              <InputB
-                label="Διεύθυνση"
-                id="address"
-                name="address"
-                type="text"
-                value={address}
-                disabled={true}
-                className="form-control input-group"
               />
             </div>
           </div>

@@ -48,7 +48,7 @@ export default function ManageServiceCard1({ service }) {
                   target="_blank"
                   className="ml10"
                 >
-                  <i class="fa-solid fa-eye"></i>
+                  <i className="fa-solid fa-eye"></i>
                 </Link>
               </h6>
             </div>

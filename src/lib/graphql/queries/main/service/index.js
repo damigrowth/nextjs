@@ -32,6 +32,22 @@ const SERVICE_BY_ID = gql`
   ${SERVICE_RELATIONS}
 `;
 
+const SERVICES_BY_ID = gql`
+  query ServiceByIdPublic($id: ID!) {
+    services(filters: { id: { eq: $id } }) {
+      data {
+        id
+        attributes {
+          ...ServiceMain
+          ...ServiceRelations
+        }
+      }
+    }
+  }
+  ${SERVICE_MAIN}
+  ${SERVICE_RELATIONS}
+`;
+
 const SERVICE_BY_SLUG = gql`
   query GetService($slug: String!) {
     services(filters: { slug: { eq: $slug } }) {
@@ -50,7 +66,7 @@ const SERVICE_BY_SLUG = gql`
 
 const SERVICE_PAGE_SEO = gql`
   query GetServiceSEO($id: ID!) {
-    service(id: $id) {
+    services(filters: { id: { eq: $id } }) {
       data {
         attributes {
           ...ServiceSEO
@@ -316,6 +332,7 @@ const SERVICES_BY_FREELANCER_FOR_REVIEWS = gql`
 
 export {
   SERVICE_BY_ID,
+  SERVICES_BY_ID,
   SERVICE_BY_SLUG,
   SERVICE_PAGE_SEO,
   COUNT_SERVICES_BY_RATING,

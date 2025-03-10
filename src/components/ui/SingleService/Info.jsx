@@ -10,17 +10,19 @@ export default function Info({
 }) {
   const {
     online,
+    onbase,
+    onsite,
     presence,
     oneoff,
     subscription,
-    onbase,
-    onsite,
     subscription_type,
   } = type;
 
   const address = visibility && coverage?.address;
-  const areas = coverage?.areas;
-  const county = coverage?.county;
+  const county = coverage?.county?.data?.attributes?.name;
+  const counties = coverage?.counties?.data;
+  const area = coverage?.area?.data?.attributes?.name;
+  const areas = coverage?.areas?.data;
 
   return (
     <div className="row">
@@ -87,7 +89,7 @@ export default function Info({
           </div>
         </div>
       )}
-      {presence && onbase && address && county?.data && (
+      {presence && onbase && address && county && (
         <div className="col-sm-12 col-md-8">
           <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
             <div className="icon flex-shrink-0">
@@ -96,13 +98,13 @@ export default function Info({
             <div className="details">
               <h5 className="title">Διεύθυνση</h5>
               <p className="mb-0 text">
-                {address}, {county?.data?.attributes?.name}
+                {address}, {county}
               </p>
             </div>
           </div>
         </div>
       )}
-      {presence && onsite && areas?.data?.length > 0 && (
+      {presence && onsite && (
         <div className="col-sm-12 col-md-8">
           <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
             <div className="icon flex-shrink-0">
@@ -111,7 +113,11 @@ export default function Info({
             <div className="details">
               <h5 className="title">Περιοχές Εξυπηρέτησης</h5>
               <p className="mb-0 text">
-                {areas.data.map((area) => area?.attributes?.name).join(", ")}
+                {[
+                  ...(counties?.map((county) => county?.attributes?.name) ||
+                    []),
+                  ...(areas?.map((area) => area?.attributes?.name) || []),
+                ].join(", ")}
               </p>
             </div>
           </div>
