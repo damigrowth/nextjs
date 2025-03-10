@@ -5,6 +5,7 @@ import {
   getReviewsByService,
   getServiceById,
   getServiceBySlug,
+  getServicesById,
 } from "@/lib/service/service";
 import ServiceBreadcrumb from "@/components/ui/breadcrumbs/service/ServiceBreadcrumb";
 import { getData } from "@/lib/client/operations";
@@ -23,21 +24,17 @@ export const dynamicParams = true;
 // Dynamic SEO
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-
   const parts = slug.split("-");
   const serviceId = parts[parts.length - 1];
-
   const data = {
-    type: "service",
+    type: "services",
     params: { id: serviceId },
     titleTemplate: "%title% από %displayName%",
     descriptionTemplate: "%category% - %description%",
     size: 100,
     customUrl: `/s`,
   };
-
   const { meta } = await Meta(data);
-
   return meta;
 }
 
@@ -48,7 +45,7 @@ export default async function page({ params, searchParams }) {
   const parts = slug.split("-");
   const paramsServiceId = parts[parts.length - 1];
 
-  const service = await getServiceById(paramsServiceId);
+  const service = await getServicesById(paramsServiceId);
 
   if (!service || service?.status?.data?.attributes?.type !== "Active") {
     redirect("/not-found");

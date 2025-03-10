@@ -7,7 +7,7 @@ import { FREELANCERS_ARCHIVE_SEO } from "@/lib/graphql/queries/main/taxonomies/f
 import { SERVICES_ARCHIVE_SEO } from "@/lib/graphql/queries/main/taxonomies/service";
 
 const ENTITY_QUERIES = {
-  service: SERVICE_PAGE_SEO,
+  services: SERVICE_PAGE_SEO,
   freelancer: FREELANCER_PAGE_SEO,
   category: SERVICES_ARCHIVE_SEO,
   subcategory: SERVICES_ARCHIVE_SEO,
@@ -24,11 +24,7 @@ export async function fetchEntity(type, params) {
 
   let entity = null;
 
-  if (type === "service") {
-    entity = data?.[type]?.data?.attributes;
-  } else {
-    entity = data?.[type]?.data?.[0]?.attributes;
-  }
+  entity = data?.[type]?.data?.[0]?.attributes;
 
   return { entity };
 }

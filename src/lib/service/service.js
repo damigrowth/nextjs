@@ -6,6 +6,7 @@ import {
 import {
   SERVICE_BY_ID,
   SERVICE_BY_SLUG,
+  SERVICES_BY_ID,
 } from "../graphql/queries/main/service";
 
 export async function getServiceById(id) {
@@ -17,7 +18,21 @@ export async function getServiceById(id) {
       return null;
     }
   } catch (error) {
-    console.error("Error fetching freelancer by slug:", error);
+    console.error("Error fetching service by id:", error);
+    return null;
+  }
+}
+
+export async function getServicesById(id) {
+  try {
+    const { services } = await getData(SERVICES_BY_ID, { id });
+    if (services && services?.data?.[0]?.id) {
+      return { id: services?.data?.[0]?.id, ...services.data[0].attributes };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching services by id:", error);
     return null;
   }
 }
@@ -38,7 +53,7 @@ export async function getServiceBySlug(slug) {
 
     return { service, serviceId };
   } catch (error) {
-    console.error("Error fetching freelancer by slug:", error);
+    console.error("Error fetching service by slug:", error);
     return null;
   }
 }
