@@ -19,7 +19,7 @@ import {
   SUBCATEGORIES_SEARCH,
   SUBDIVISIONS_SEARCH,
 } from "@/lib/graphql/queries/main/taxonomies/service";
-import { TAGS_SEARCH_BY_CATEGORY } from "@/lib/graphql/queries/main/taxonomies/service/tag";
+import { TAGS_SEARCH_COMPLETE } from "@/lib/graphql/queries/main/taxonomies/service/tag";
 
 export default function EditServiceForm({ service }) {
   const initialState = {
@@ -151,7 +151,7 @@ export default function EditServiceForm({ service }) {
   );
 
   const handleTagsSearch = useCallback(async (searchTerm, page = 1) => {
-    const query = normalizeQuery(TAGS_SEARCH_BY_CATEGORY);
+    const query = normalizeQuery(TAGS_SEARCH_COMPLETE);
     const data = await searchData({
       query,
       searchTerm,

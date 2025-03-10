@@ -61,7 +61,7 @@ const TAGS_SEARCH_SIMPLE = gql`
   ${TAG}
 `;
 
-const TAGS_SEARCH_BY_CATEGORY = gql`
+const TAGS_SEARCH_COMPLETE = gql`
   query TagsSearchByCategory(
     $label: String
     $tagsPage: Int
@@ -84,4 +84,4 @@ const TAGS_SEARCH_BY_CATEGORY = gql`
   ${PAGINATION}
 `;
 
-export { TAGS_SEARCH, TAGS_SEARCH_SIMPLE, TAGS_SEARCH_BY_CATEGORY };
+export { TAGS_SEARCH, TAGS_SEARCH_SIMPLE, TAGS_SEARCH_COMPLETE };
