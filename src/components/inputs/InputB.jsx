@@ -43,6 +43,8 @@ export default function InputB({
     // For number inputs, if empty or NaN, set to min
     if (type === "number" && (formattedValue === "" || isNaN(formattedValue))) {
       onChange(min !== undefined ? Number(min) : 0);
+    } else if (type === "tel" && formattedValue === "") {
+      onChange(""); // Allow empty string for tel input
     } else {
       onChange(formattedValue);
     }

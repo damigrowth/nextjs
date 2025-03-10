@@ -34,7 +34,7 @@ export const formatInput = ({
 }) => {
   let formattedValue = value;
 
-  if (type === "number") {
+  if (type === "number" || type === "tel") {
     formattedValue = keepOnlyNumbers(formattedValue);
   }
 
