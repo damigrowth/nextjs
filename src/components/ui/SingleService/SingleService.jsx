@@ -133,7 +133,7 @@ export default async function SingleService({
                 />
 
                 <Info
-                  visibility={visibility?.data?.attributes?.address}
+                  visibility={visibility?.address}
                   coverage={coverage}
                   category={subdivision.data?.attributes}
                   subcategory={subcategory.data?.attributes}
