@@ -2,7 +2,8 @@ import React from "react";
 import TooltipTop from "../ui/TooltipTop";
 
 export default function VerifiedBadge({ verified }) {
-  if (verified === null || verified === false) return null;
+  if (verified === undefined || verified === null || verified === false)
+    return null;
   return (
     <div id="verified">
       <p className="mb-0">

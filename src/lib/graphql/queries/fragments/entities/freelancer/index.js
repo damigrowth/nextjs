@@ -19,6 +19,7 @@ const FREELANCER_SMALL = gql`
         rating
         reviews_total
         topLevel
+        verified
         image {
           ...SingleImage
         }
