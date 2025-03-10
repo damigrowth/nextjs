@@ -167,13 +167,13 @@ const useAddonsStore = (set, get) => ({
     })),
   saveEditingAddon: () =>
     set((state) => {
-      const { editingAddon, editingInput } = state;
+      const { editingAddon, addonEditingInput } = state;
 
       // Make a copy of the addons array
       const updatedAddons = [...state.addons];
 
       // Update the addon at the editing index with the edited values
-      updatedAddons[editingInput] = editingAddon;
+      updatedAddons[addonEditingInput] = editingAddon;
 
       // Validation checks
       if (editingAddon.title.length === 0) {
