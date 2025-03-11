@@ -207,29 +207,31 @@ export async function updatePresentationInfo(prevState, formData) {
   // Prepare the payload
   const payload = {};
 
-  // Add website if changed
-  if (changedFields.website) {
-    payload.website = changedFields.website;
+  // Add website if changed (following pattern from updateBasicInfo)
+  if (validationResult.data.website !== undefined) {
+    payload.website = validationResult.data.website;
   }
 
-  // Add socials if changed
-  if (changedFields.socials) {
-    payload.socials = Object.fromEntries(
-      Object.entries(changedFields.socials)
-        .filter(([_, socialData]) => socialData.url?.trim())
-        .map(([platform, socialData]) => [
-          platform,
-          { url: socialData.url.trim() },
-        ])
+  // Add visibility if changed (direct assignment like other server actions)
+  if (validationResult.data.visibility) {
+    payload.visibility = validationResult.data.visibility;
+  }
+
+  // Add socials if changed (following pattern from other fields)
+  if (validationResult.data.socials) {
+    // Create clean socials object with only URL property
+    payload.socials = {};
+
+    Object.entries(validationResult.data.socials).forEach(
+      ([platform, data]) => {
+        if (data && data.url) {
+          payload.socials[platform] = { url: data.url.trim() };
+        }
+      }
     );
   }
 
-  // Add visibility if changed
-  if (changedFields.visibility) {
-    payload.visibility = changedFields.visibility;
-  }
-
-  // Handle media update
+  // Handle media update (keep as is since this is a unique case)
   const remainingMediaIds = JSON.parse(formData.get("remaining-media") || "[]");
   const deletedMediaIds = JSON.parse(formData.get("deleted-media") || "[]");
   const files = formData.getAll("media-files");
@@ -241,7 +243,6 @@ export async function updatePresentationInfo(prevState, formData) {
     namePrefix: "portfolio",
   };
 
-  // Only handle media if there are changes
   if (files.length > 0 || deletedMediaIds.length > 0) {
     const finalMediaIds = await handleMediaUpdate({
       remainingMediaIds,
@@ -253,7 +254,7 @@ export async function updatePresentationInfo(prevState, formData) {
     payload.portfolio = finalMediaIds;
   }
 
-  // Remove empty values
+  // Clean empty objects (following pattern from other server actions)
   Object.keys(payload).forEach((key) => {
     if (
       payload[key] === undefined ||

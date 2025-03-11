@@ -264,72 +264,136 @@ export const presentationSchema = z.object({
     .nullable(),
   socials: z.object({
     facebook: z
-      .string()
-      .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο Facebook")
-      .regex(
-        /^https?:\/\/(www\.)?facebook\.com\/.*$/,
-        "Μη έγκυρος σύνδεσμος Facebook"
-      )
+      .union([
+        z.null(),
+        z.object({
+          url: z
+            .string()
+            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο Facebook")
+            .regex(
+              /^https?:\/\/(www\.)?facebook\.com\/.*$/,
+              "Μη έγκυρος σύνδεσμος Facebook"
+            )
+            .optional()
+            .nullable(),
+        }),
+      ])
       .optional()
       .nullable(),
     linkedin: z
-      .string()
-      .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο LinkedIn")
-      .regex(
-        /^https?:\/\/(www\.)?linkedin\.com\/.*$/,
-        "Μη έγκυρος σύνδεσμος LinkedIn"
-      )
+      .union([
+        z.null(),
+        z.object({
+          url: z
+            .string()
+            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο LinkedIn")
+            .regex(
+              /^https?:\/\/(www\.)?linkedin\.com\/.*$/,
+              "Μη έγκυρος σύνδεσμος LinkedIn"
+            )
+            .optional()
+            .nullable(),
+        }),
+      ])
       .optional()
       .nullable(),
     x: z
-      .string()
-      .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμος X")
-      .regex(/^https?:\/\/(www\.)?x\.com\/.*$/, "Μη έγκυρος σύνδεσμος X")
+      .union([
+        z.null(),
+        z.object({
+          url: z
+            .string()
+            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο X")
+            .regex(/^https?:\/\/(www\.)?x\.com\/.*$/, "Μη έγκυρος σύνδεσμος X")
+            .optional()
+            .nullable(),
+        }),
+      ])
       .optional()
       .nullable(),
     youtube: z
-      .string()
-      .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο YouTube")
-      .regex(
-        /^https?:\/\/(www\.)?youtube\.com\/.*$/,
-        "Μη έγκυρος σύνδεσμος YouTube"
-      )
+      .union([
+        z.null(),
+        z.object({
+          url: z
+            .string()
+            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο YouTube")
+            .regex(
+              /^https?:\/\/(www\.)?youtube\.com\/.*$/,
+              "Μη έγκυρος σύνδεσμος YouTube"
+            )
+            .optional()
+            .nullable(),
+        }),
+      ])
       .optional()
       .nullable(),
     github: z
-      .string()
-      .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο GitHub")
-      .regex(
-        /^https?:\/\/(www\.)?github\.com\/.*$/,
-        "Μη έγκυρος σύνδεσμος GitHub"
-      )
+      .union([
+        z.null(),
+        z.object({
+          url: z
+            .string()
+            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο GitHub")
+            .regex(
+              /^https?:\/\/(www\.)?github\.com\/.*$/,
+              "Μη έγκυρος σύνδεσμος GitHub"
+            )
+            .optional()
+            .nullable(),
+        }),
+      ])
       .optional()
       .nullable(),
     instagram: z
-      .string()
-      .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο Instagram")
-      .regex(
-        /^https?:\/\/(www\.)?instagram\.com\/.*$/,
-        "Μη έγκυρος σύνδεσμος Instagram"
-      )
+      .union([
+        z.null(),
+        z.object({
+          url: z
+            .string()
+            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο Instagram")
+            .regex(
+              /^https?:\/\/(www\.)?instagram\.com\/.*$/,
+              "Μη έγκυρος σύνδεσμος Instagram"
+            )
+            .optional()
+            .nullable(),
+        }),
+      ])
       .optional()
       .nullable(),
     behance: z
-      .string()
-      .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο Behance")
-      .regex(
-        /^https?:\/\/(www\.)?behance\.net\/.*$/,
-        "Μη έγκυρος σύνδεσμος Behance"
-      )
+      .union([
+        z.null(),
+        z.object({
+          url: z
+            .string()
+            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο Behance")
+            .regex(
+              /^https?:\/\/(www\.)?behance\.net\/.*$/,
+              "Μη έγκυρος σύνδεσμος Behance"
+            )
+            .optional()
+            .nullable(),
+        }),
+      ])
       .optional()
       .nullable(),
     dribbble: z
-      .string()
-      .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο Dribbble")
-      .regex(
-        /^https?:\/\/(www\.)?dribbble\.com\/.*$/,
-        "Μη έγκυρος σύνδεσμος Dribbble"
-      )
+      .union([
+        z.null(),
+        z.object({
+          url: z
+            .string()
+            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο Dribbble")
+            .regex(
+              /^https?:\/\/(www\.)?dribbble\.com\/.*$/,
+              "Μη έγκυρος σύνδεσμος Dribbble"
+            )
+            .optional()
+            .nullable(),
+        }),
+      ])
       .optional()
       .nullable(),
   }),
