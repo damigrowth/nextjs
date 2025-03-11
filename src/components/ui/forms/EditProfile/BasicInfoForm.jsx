@@ -169,10 +169,10 @@ export default function BasicInfoForm({ freelancer, type }) {
         searchTermType: "label",
         page,
         additionalVariables: {
-          // type: type?.attributes?.slug || "", // Access slug from type prop
+          type: type || "",
           categorySlug: category.data?.attributes?.slug || "",
-          categoriesPage: page,
-          categoriesPageSize: 10,
+          subcategoriesPage: page,
+          subcategoriesPageSize: 10,
         },
       });
 
@@ -306,6 +306,8 @@ export default function BasicInfoForm({ freelancer, type }) {
     })) || [];
 
   const handleSubmit = async (formData) => {
+    const currentCoverage = { ...coverage };
+
     formData.append("id", freelancer.id);
 
     // Handle image separately if it exists in changes
@@ -317,8 +319,30 @@ export default function BasicInfoForm({ freelancer, type }) {
       formData.append("changes", JSON.stringify(changes));
     }
 
-    return formAction(formData);
+    // Submit the form
+    const result = await formAction(formData);
+
+    // If there are errors, make sure coverage state stays the same
+    if (result?.errors && Object.keys(result.errors).length > 0) {
+      useEditProfileStore.setState((state) => ({
+        ...state,
+        coverage: currentCoverage,
+      }));
+    }
+
+    return result;
   };
+
+  useEffect(() => {
+    // This effect will run when formState changes (like when errors occur)
+    if (formState?.errors && Object.keys(formState.errors).length > 0) {
+      // Preserve the current coverage state during errors
+      useEditProfileStore.setState((state) => ({
+        ...state,
+        coverage: { ...coverage }, // Just make a shallow copy of the current coverage
+      }));
+    }
+  }, [formState?.errors]);
 
   return (
     <form action={handleSubmit}>
