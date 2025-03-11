@@ -25,7 +25,7 @@ export default function NewAddonInputs({ editMode = false }) {
                   type="text"
                   id="addon-title"
                   name="addon-title"
-                  maxLength={40}
+                  maxLength={20}
                   value={newAddon.title}
                   onChange={(formattedValue) =>
                     setNewAddon("title", formattedValue)

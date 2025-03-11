@@ -7152,6 +7152,7 @@ textarea:focus-visible {
 }
 .accordion-style1 .accordion-body {
   background-color: #f1fcfa;
+  word-wrap: anywhere;
   color: var(--headings-color);
   font-family: sans-serif;
   font-weight: 400;
