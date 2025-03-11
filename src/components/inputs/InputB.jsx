@@ -32,6 +32,8 @@ export default function InputB({
     const formattedValue = formatInput({
       value: event.target.value,
       type,
+      min,
+      max,
       maxLength,
       formatNumbers,
       formatSpaces,
@@ -40,14 +42,7 @@ export default function InputB({
       lowerCase,
     });
 
-    // For number inputs, if empty or NaN, set to min
-    if (type === "number" && (formattedValue === "" || isNaN(formattedValue))) {
-      onChange(min !== undefined ? Number(min) : 0);
-    } else if (type === "tel" && formattedValue === "") {
-      onChange(""); // Allow empty string for tel input
-    } else {
-      onChange(formattedValue);
-    }
+    onChange(formattedValue);
   };
 
   return (

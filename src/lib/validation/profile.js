@@ -42,8 +42,7 @@ const imageSchema = z
         resolve(false);
       };
     });
-  }, `Οι ελάχιστες διαστάσεις εικόνας είναι ${MIN_WIDTH}x${MIN_HEIGHT} pixels`)
-  .optional();
+  }, `Οι ελάχιστες διαστάσεις εικόνας είναι ${MIN_WIDTH}x${MIN_HEIGHT} pixels`);
 
 export const basicInfoSchema = z.object({
   image: imageSchema,
@@ -53,41 +52,80 @@ export const basicInfoSchema = z.object({
     .max(
       120,
       "Η σύντομη περιγραφή δεν μπορεί να υπερβαίνει τους 120 χαρακτήρες"
-    ),
+    )
+    .optional()
+    .nullable(),
   description: z
     .string()
     .min(80, "Η περιγραφή πρέπει να έχει τουλάχιστον 80 χαρακτήρες")
-    .max(5000, "Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες"),
-  category: z.object(
-    {
-      data: z.object({
-        id: z.string(),
-        attributes: z.object({
-          slug: z.string(),
-        }),
-      }),
-    },
-    { required_error: "Η κατηγορία είναι υποχρεωτική" }
-  ),
-  subcategory: z
-    .object({
-      data: z
-        .object({
-          id: z.string(),
-        })
-        .nullable(),
-    })
-    .optional(),
-  skills: z.object({
-    data: z.array(
+    .max(5000, "Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες")
+    .optional()
+    .nullable(),
+  category: z
+    .union([
+      z.null(),
       z.object({
-        id: z.string(),
-        attributes: z.object({
-          slug: z.string(),
-        }),
-      })
-    ),
-  }),
+        data: z.union([
+          z.null(),
+          z.object({
+            id: z.string(),
+            attributes: z.object({
+              slug: z.string(),
+            }),
+          }),
+        ]),
+      }),
+    ])
+    .superRefine((val, ctx) => {
+      // Check if it's null or doesn't have the right structure
+      if (!val || !val.data || !val.data.id || !val.data.attributes?.slug) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Η κατηγορία είναι υποχρεωτική",
+          path: ["data"],
+        });
+        return false;
+      }
+      return true;
+    }),
+
+  subcategory: z
+    .union([
+      z.null(),
+      z.object({
+        data: z.union([
+          z.null(),
+          z.object({
+            id: z.string(),
+          }),
+        ]),
+      }),
+    ])
+    .superRefine((val, ctx) => {
+      // Check if it's null or doesn't have the right structure
+      if (!val || !val.data || !val.data.id) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Η υποκατηγορία είναι υποχρεωτική",
+          path: ["data"],
+        });
+        return false;
+      }
+      return true;
+    }),
+  skills: z
+    .object({
+      data: z.array(
+        z.object({
+          id: z.string(),
+          attributes: z.object({
+            slug: z.string(),
+          }),
+        })
+      ),
+    })
+    .optional()
+    .nullable(),
   specialization: z
     .object({
       data: z
@@ -99,18 +137,23 @@ export const basicInfoSchema = z.object({
         })
         .nullable(),
     })
-    .optional(),
+    .optional()
+    .nullable(),
   rate: z
     .number()
     .min(10, "Η ελάχιστη χρέωση είναι 10€")
-    .max(50000, "Η μέγιστη χρέωση είναι 50.000€"),
+    .max(50000, "Η μέγιστη χρέωση είναι 50.000€")
+    .optional()
+    .nullable(),
   commencement: z
     .number()
     .min(1900, "Το έτος έναρξης πρέπει να είναι μετά το 1900")
     .max(
       new Date().getFullYear(),
       "Το έτος έναρξης δεν μπορεί να είναι μελλοντικό"
-    ),
+    )
+    .optional()
+    .nullable(),
   coverage: z
     .object({
       online: z.boolean(),
@@ -163,22 +206,54 @@ export const basicInfoSchema = z.object({
         })
         .optional(),
     })
-    .refine(
-      (data) => data.online || data.onbase || data.onsite,
-      "Πρέπει να επιλέξετε τουλάχιστον έναν τρόπο κάλυψης"
-    )
-    .refine((data) => {
+    .superRefine((data, ctx) => {
+      // At least one coverage type must be selected
+      if (!data.online && !data.onbase && !data.onsite) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Πρέπει να επιλέξετε τουλάχιστον έναν τρόπο κάλυψης",
+          path: [],
+        });
+      }
+
+      // If onbase is true, validate required fields
       if (data.onbase) {
-        return data.address && data.zipcode.data;
+        if (!data.address) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Η διεύθυνση είναι υποχρεωτική για κάλυψη στην έδρα σας",
+            path: ["address"],
+          });
+        }
+
+        if (!data.zipcode?.data?.id) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Ο Τ.Κ. είναι υποχρεωτικός για κάλυψη στην έδρα σας",
+            path: ["zipcode"],
+          });
+        }
       }
-      return true;
-    }, "Για την κάλυψη στην έδρα σας απαιτείται διεύθυνση και Τ.Κ.")
-    .refine((data) => {
+
+      // If onsite is true, validate either counties or areas are populated
       if (data.onsite) {
-        return data.counties.data.length > 0;
+        const hasCounties =
+          Array.isArray(data.counties?.data) && data.counties.data.length > 0;
+        const hasAreas =
+          Array.isArray(data.areas?.data) && data.areas.data.length > 0;
+
+        if (!hasCounties && !hasAreas) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              "Για την κάλυψη στο χώρο του πελάτη απαιτείται τουλάχιστον ένας νομός ή μια περιοχή",
+            path: ["counties"],
+          });
+        }
       }
+
       return true;
-    }, "Για την κάλυψη στο χώρο του πελάτη απαιτείται τουλάχιστον ένας νομός"),
+    }),
 });
 
 export const presentationSchema = z.object({
@@ -312,11 +387,14 @@ export const billingSchemaOptional = z.object({
   receipt: z.boolean(),
   invoice: z.boolean(),
   afm: z
-    .string()
-    .min(1, "Το ΑΦΜ πρέπει να έχει τουλάχιστον 1 ψηφίο")
-    .max(10, "Το ΑΦΜ δεν μπορεί να υπερβαίνει τα 10 ψηφία")
-    .optional()
-    .nullable(),
+    .number()
+    .refine((val) => val !== null && val.toString().length === 9, {
+      message: "Το ΑΦΜ πρέπει να έχει ακριβώς 9 ψηφία",
+    })
+    .nullable()
+    .refine((val) => val !== null, {
+      message: "Το ΑΦΜ είναι υποχρεωτικό",
+    }),
   doy: z.string().min(2, "Το ΔΟΥ είναι υποχρεωτικό").optional().nullable(),
   brandName: z
     .string()
@@ -339,8 +417,10 @@ export const billingSchema = z.object({
   receipt: z.boolean(),
   invoice: z.boolean(),
   afm: z
-    .string()
-    .min(1, "Το ΑΦΜ είναι υποχρεωτικό")
+    .number()
+    .refine((val) => val !== null && val.toString().length === 9, {
+      message: "Το ΑΦΜ πρέπει να έχει ακριβώς 9 ψηφία",
+    })
     .nullable()
     .refine((val) => val !== null, {
       message: "Το ΑΦΜ είναι υποχρεωτικό",

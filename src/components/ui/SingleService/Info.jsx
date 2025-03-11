@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function Info({
-  visibility,
+  // visibility,
   time,
   category,
   subcategory,
@@ -18,7 +18,7 @@ export default function Info({
     subscription_type,
   } = type;
 
-  const address = visibility && coverage?.address;
+  const address = coverage?.address;
   const county = coverage?.county?.data?.attributes?.name;
   const counties = coverage?.counties?.data;
   const area = coverage?.area?.data?.attributes?.name;

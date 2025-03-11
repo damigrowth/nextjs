@@ -25,7 +25,7 @@ export default async function FreelancerGrid({
       {freelancers.length > 0 ? (
         freelancers.map(
           (freelancer, i) =>
-            freelancer?.username && (
+            freelancer?.image?.data && (
               <div key={i} className="col-sm-6 col-xl-4">
                 <FreelancerCard freelancer={freelancer} fid={fid} linkedName />
               </div>

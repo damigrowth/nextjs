@@ -31,11 +31,25 @@ export const formatInput = ({
   lowerCase,
   type,
   value,
+  min,
+  max,
+  maxLength,
+  minLength,
 }) => {
   let formattedValue = value;
 
   if (type === "number" || type === "tel") {
     formattedValue = keepOnlyNumbers(formattedValue);
+
+    // Enforce maxLength for number and tel inputs
+    if (maxLength && formattedValue.length > maxLength) {
+      formattedValue = formattedValue.substring(0, maxLength);
+    }
+
+    // For number inputs, convert to numeric type after length enforcement
+    if (type === "number" && formattedValue !== "") {
+      formattedValue = parseFloat(formattedValue);
+    }
   }
 
   // Apply number formatting only if formatNumbers is true
@@ -57,10 +71,6 @@ export const formatInput = ({
   // Apply lowercase restriction only if lowerCase is true
   if (lowerCase) {
     formattedValue = restrictCapitalLetters(formattedValue);
-  }
-  // Convert value to number only if type is "number"
-  if (type === "number") {
-    formattedValue = parseFloat(formattedValue);
   }
 
   return formattedValue;

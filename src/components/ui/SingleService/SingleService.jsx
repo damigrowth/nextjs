@@ -20,6 +20,7 @@ import { redirect } from "next/navigation";
 
 export default async function SingleService({
   slug,
+  fid,
   serviceId,
   service,
   reviews,
@@ -133,7 +134,7 @@ export default async function SingleService({
                 />
 
                 <Info
-                  visibility={visibility?.address}
+                  // visibility={visibility?.address}
                   coverage={coverage}
                   category={subdivision.data?.attributes}
                   subcategory={subcategory.data?.attributes}
@@ -178,11 +179,13 @@ export default async function SingleService({
                   ratingStars={ratingStars}
                 />
                 <Protected message="Κάνε σύνδεση για να αξιολογήσεις την υπηρεσία.">
-                  <AddModelReviewForm
-                    type="service"
-                    serviceId={serviceId}
-                    freelancerId={freelancerId}
-                  />
+                  {fid !== freelancerId && (
+                    <AddModelReviewForm
+                      type="service"
+                      serviceId={serviceId}
+                      freelancerId={freelancerId}
+                    />
+                  )}
                 </Protected>
               </div>
             </div>
@@ -214,7 +217,7 @@ export default async function SingleService({
               rating={freelancerRating}
               totalReviews={freelancerReviewsTotal}
               socials={socials}
-              email={visibility?.data?.attributes?.remail && email}
+              email={visibility?.data?.attributes?.email && email}
               phone={visibility?.data?.attributes?.phone && phone}
               website={website}
               type={freelancerType}

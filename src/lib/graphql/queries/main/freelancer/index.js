@@ -55,7 +55,14 @@ const FREELANCER_BY_ID = gql`
 const FREELANCER_BY_USERNAME = gql`
   query GetFreelancer($username: String!) {
     freelancers(
-      filters: { username: { eq: $username }, type: { slug: { ne: "user" } } }
+      filters: {
+        username: { eq: $username }
+        email: { ne: "" }
+        displayName: { ne: "" }
+        type: { slug: { ne: "user" } }
+        category: { id: { ne: null } }
+        subcategory: { id: { ne: null } }
+      }
     ) {
       data {
         id
@@ -119,6 +126,9 @@ const FREELANCERS_ARCHIVE = gql`
     freelancers(
       filters: {
         type: { and: [{ slug: { eq: $type } }, { slug: { ne: "user" } }] }
+        email: { ne: "" }
+        username: { ne: "" }
+        displayName: { ne: "" }
         rate: { gte: $min, lte: $max }
         payment_methods: { id: { in: $paymentMethods } }
         contactTypes: { id: { in: $contactTypes } }
@@ -129,9 +139,9 @@ const FREELANCERS_ARCHIVE = gql`
             { areas: { county: { id: { eq: $coverageCounty } } } }
           ]
         }
-        category: { slug: { eq: $cat } }
+        category: { id: { ne: null }, slug: { eq: $cat } }
         skills: { slug: { in: $skills } }
-        subcategory: { slug: { eq: $sub } }
+        subcategory: { id: { ne: null }, slug: { eq: $sub } }
         yearsOfExperience: { gte: $experience }
         topLevel: { eq: $top }
         verified: { eq: $verified }
@@ -159,7 +169,16 @@ const FEATURED_FREELANCERS = gql`
     featuredEntity {
       data {
         attributes {
-          freelancers(filters: { type: { slug: { ne: "user" } } }) {
+          freelancers(
+            filters: {
+              type: { slug: { ne: "user" } }
+              email: { ne: "" }
+              username: { ne: "" }
+              displayName: { ne: "" }
+              category: { id: { ne: null } }
+              subcategory: { id: { ne: null } }
+            }
+          ) {
             data {
               id
               attributes {

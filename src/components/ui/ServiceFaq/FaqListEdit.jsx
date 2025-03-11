@@ -29,7 +29,7 @@ export default function FaqListEdit({ id, editMode = false }) {
                 type="text"
                 id="editing-faq-question"
                 name="editing-faq-question"
-                maxLength={20}
+                maxLength={80}
                 value={editingFaq.question}
                 onChange={(formattedValue) =>
                   setEditingFaq("question", formattedValue)
@@ -47,7 +47,7 @@ export default function FaqListEdit({ id, editMode = false }) {
                 type="text"
                 id="editing-faq-answer"
                 name="editing-faq-answer"
-                maxLength={20}
+                maxLength={300}
                 value={editingFaq.answer}
                 onChange={(formattedValue) =>
                   setEditingFaq("answer", formattedValue)

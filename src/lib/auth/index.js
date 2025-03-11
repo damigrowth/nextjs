@@ -25,7 +25,7 @@ export async function register(prevState, formData) {
   if (!consent) {
     return {
       errors: {
-        consent: ["Πρέπει να αποδεχτείτε τους όρους και τις προϋποθέσεις"],
+        consent: ["Πρέπει να αποδεχθείς τους Όρους Χρήσης"],
       },
     };
   }
