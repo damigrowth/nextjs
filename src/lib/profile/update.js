@@ -311,7 +311,6 @@ export async function updateAdditionalInfo(prevState, formData) {
     "contactTypes",
     "payment_methods",
     "settlement_methods",
-    "minBudget",
     "industries",
   ].forEach((field) => {
     if (changedFields[field]) {
@@ -320,6 +319,12 @@ export async function updateAdditionalInfo(prevState, formData) {
         : [];
     }
   });
+
+  // Handle minBudget
+  if (changedFields.minBudget) {
+    // Extract the ID directly from the nested structure
+    changedFields.minBudget = changedFields.minBudget.data?.id || null;
+  }
 
   // Handle size field transformation
   if (changedFields.size) {
@@ -357,6 +362,11 @@ export async function updateAdditionalInfo(prevState, formData) {
   // Prepare the payload for the API
   const payload = {};
 
+  // Handle minBudget field explicitly
+  if (validationResult.data.minBudget !== undefined) {
+    payload.minBudget = validationResult.data.minBudget;
+  }
+
   // Handle terms field
   if (validationResult.data.terms !== undefined) {
     payload.terms = validationResult.data.terms;
@@ -364,7 +374,12 @@ export async function updateAdditionalInfo(prevState, formData) {
 
   // Handle size field
   if (validationResult.data.size !== undefined) {
-    payload.size = validationResult.data.size.data.id;
+    if (validationResult.data.size.data) {
+      payload.size = validationResult.data.size.data.id;
+    } else {
+      // When size is cleared, set to null in the payload
+      payload.size = null;
+    }
   }
 
   // Handle array fields
@@ -372,7 +387,6 @@ export async function updateAdditionalInfo(prevState, formData) {
     "contactTypes",
     "payment_methods",
     "settlement_methods",
-    "minBudget",
     "industries",
   ].forEach((field) => {
     if (validationResult.data[field] !== undefined) {

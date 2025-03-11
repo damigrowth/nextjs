@@ -350,37 +350,26 @@ export const additionalInfoSchema = z.object({
         })
         .nullable(),
     })
-    .optional(),
-  terms: z
-    .string()
-    .min(80, "Οι όροι συνεργασίας πρέπει να είναι τουλάχιστον 80 χαρακτήρες")
-    .max(
-      5000,
-      "Οι όροι συνεργασίας δεν μπορούν να υπερβαίνουν τους 5000 χαρακτήρες"
-    )
     .optional()
     .nullable(),
-  minBudget: z.object(z.string()).optional().nullable(),
+  terms: z
+    .string()
+    // .min(80, "Οι όροι συνεργασίας πρέπει να είναι τουλάχιστον 80 χαρακτήρες")
+    // .max(
+    //   5000,
+    //   "Οι όροι συνεργασίας δεν μπορούν να υπερβαίνουν τους 5000 χαρακτήρες"
+    // )
+    .optional()
+    .nullable(),
+  minBudget: z.string().optional().nullable(),
   industries: z
     .array(z.string())
     .max(10, "Μπορείτε να επιλέξετε έως 3 κλάδους")
     .optional()
     .nullable(),
-  contactTypes: z
-    .array(z.string())
-    .min(1, "Πρέπει να επιλέξετε τουλάχιστον έναν τρόπο επικοινωνίας")
-    .optional()
-    .nullable(),
-  payment_methods: z
-    .array(z.string())
-    .min(1, "Πρέπει να επιλέξετε τουλάχιστον έναν τρόπο πληρωμής")
-    .optional()
-    .nullable(),
-  settlement_methods: z
-    .array(z.string())
-    .min(1, "Πρέπει να επιλέξετε τουλάχιστον μία μέθοδο εξόφλησης")
-    .optional()
-    .nullable(),
+  contactTypes: z.array(z.string()).optional().nullable(),
+  payment_methods: z.array(z.string()).optional().nullable(),
+  settlement_methods: z.array(z.string()).optional().nullable(),
 });
 
 export const billingSchemaOptional = z.object({

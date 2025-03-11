@@ -263,7 +263,7 @@ export default function AdditionalInfoForm({ freelancer, type }) {
         </div>
         <div className="row mb10">
           {type === "company" && (
-            <div className="col-md-2">
+            <div className="col-md-2 mb20">
               <SearchableSelect
                 name="size"
                 label="Αριθμός Εργαζομένων"
