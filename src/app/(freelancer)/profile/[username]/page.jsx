@@ -44,7 +44,7 @@ export default async function page({ params, searchParams }) {
 
   const { freelancer } = await getFreelancerByUsername(username);
 
-  if (!freelancer) {
+  if (!freelancer || freelancer.image.data === null) {
     redirect("/not-found");
   } else {
     const freelancerId = freelancer.id;

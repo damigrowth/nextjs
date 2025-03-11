@@ -64,7 +64,9 @@ export default async function page() {
   const featuredServices =
     featuredServicesData?.data?.attributes?.services?.data;
   const featuredFreelancers =
-    featuredFreelancersData?.data?.attributes?.freelancers?.data;
+    featuredFreelancersData?.data?.attributes?.freelancers?.data.filter((f) => {
+      return f.attributes.image.data !== null;
+    });
 
   return (
     <>

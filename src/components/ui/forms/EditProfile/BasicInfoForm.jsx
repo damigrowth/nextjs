@@ -362,7 +362,7 @@ export default function BasicInfoForm({ freelancer, type }) {
         <div className="row mb20">
           <div className="col-md-3">
             <SearchableSelect
-              name="freelancerCategories"
+              name="category"
               label="Κατηγορία"
               labelPlural="κατηγορίες"
               value={category.data}
@@ -381,7 +381,7 @@ export default function BasicInfoForm({ freelancer, type }) {
           </div>
           <div className="col-md-3">
             <SearchableSelect
-              name="freelancerSubcategories"
+              name="subcategory"
               label="Υποκατηγορία"
               labelPlural="υποκατηγορίες"
               value={subcategory.data}

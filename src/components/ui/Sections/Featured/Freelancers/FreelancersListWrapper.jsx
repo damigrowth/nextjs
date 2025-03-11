@@ -44,7 +44,7 @@ export default function FreelancersListWrapper({
           }}
           modules={[Navigation, Pagination]}
           className="mySwiper"
-          loop={loop}
+          loop={loop && itemCount > slidesPerView[1200]}
           pagination={{
             el: `.${paginationClass}`,
             clickable: true,
