@@ -148,77 +148,42 @@ const useEditProfileStore = create((set) => ({
   switchCoverageMode: (mode, freelancerCoverage) =>
     set((state) => {
       const newValue = !state.coverage[mode];
+      const newCoverage = { ...state.coverage };
 
-      // Online mode logic
-      if (mode === "online") {
-        if (newValue) {
-          return {
-            coverage: {
-              ...initialCoverage,
-              online: true,
-            },
-          };
-        } else {
-          return {
-            coverage: {
-              ...state.coverage,
-              online: false,
-            },
-          };
+      // Toggle the selected mode without affecting others
+      newCoverage[mode] = newValue;
+
+      // Initialize fields for the specific mode if it's being enabled
+      if (newValue) {
+        if (mode === "onbase") {
+          // Set onbase-specific fields from freelancerCoverage or keep the current ones
+          newCoverage.address =
+            freelancerCoverage.address || newCoverage.address;
+          newCoverage.zipcode =
+            freelancerCoverage.zipcode || newCoverage.zipcode;
+          newCoverage.county = freelancerCoverage.county || newCoverage.county;
+          newCoverage.area = freelancerCoverage.area || newCoverage.area;
+        } else if (mode === "onsite") {
+          // Set onsite-specific fields from freelancerCoverage or keep the current ones
+          newCoverage.areas = freelancerCoverage.areas || newCoverage.areas;
+          newCoverage.counties =
+            freelancerCoverage.counties || newCoverage.counties;
+        }
+      }
+      // Reset fields for the specific mode if it's being disabled
+      else {
+        if (mode === "onbase") {
+          newCoverage.address = initialCoverage.address;
+          newCoverage.area = initialCoverage.area;
+          newCoverage.county = initialCoverage.county;
+          newCoverage.zipcode = initialCoverage.zipcode;
+        } else if (mode === "onsite") {
+          newCoverage.areas = initialCoverage.areas;
+          newCoverage.counties = initialCoverage.counties;
         }
       }
 
-      // Onbase logic
-      if (mode === "onbase") {
-        if (newValue) {
-          return {
-            coverage: {
-              ...state.coverage,
-              online: false,
-              onbase: true,
-              address: freelancerCoverage.address,
-              zipcode: freelancerCoverage.zipcode,
-              county: freelancerCoverage.county,
-              area: freelancerCoverage.area,
-            },
-          };
-        } else {
-          return {
-            coverage: {
-              ...state.coverage,
-              onbase: false,
-              address: initialCoverage.address,
-              area: initialCoverage.area,
-              county: initialCoverage.county,
-              zipcode: initialCoverage.zipcode,
-            },
-          };
-        }
-      }
-
-      // Onsite logic
-      if (mode === "onsite") {
-        if (newValue) {
-          return {
-            coverage: {
-              ...state.coverage,
-              online: false,
-              onsite: true,
-              areas: freelancerCoverage.areas,
-              counties: freelancerCoverage.counties,
-            },
-          };
-        } else {
-          return {
-            coverage: {
-              ...state.coverage,
-              onsite: false,
-              areas: initialCoverage.areas,
-              counties: initialCoverage.counties,
-            },
-          };
-        }
-      }
+      return { coverage: newCoverage };
     }),
 
   type: { data: null },
