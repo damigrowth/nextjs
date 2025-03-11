@@ -90,6 +90,7 @@ export default async function page({ params, searchParams }) {
           />
           <SingleService
             slug={slug}
+            fid={fid}
             serviceId={serviceId}
             service={service}
             reviews={reviews}

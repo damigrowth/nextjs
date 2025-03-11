@@ -20,6 +20,7 @@ import { redirect } from "next/navigation";
 
 export default async function SingleService({
   slug,
+  fid,
   serviceId,
   service,
   reviews,
@@ -178,11 +179,13 @@ export default async function SingleService({
                   ratingStars={ratingStars}
                 />
                 <Protected message="Κάνε σύνδεση για να αξιολογήσεις την υπηρεσία.">
-                  <AddModelReviewForm
-                    type="service"
-                    serviceId={serviceId}
-                    freelancerId={freelancerId}
-                  />
+                  {fid !== freelancerId && (
+                    <AddModelReviewForm
+                      type="service"
+                      serviceId={serviceId}
+                      freelancerId={freelancerId}
+                    />
+                  )}
                 </Protected>
               </div>
             </div>

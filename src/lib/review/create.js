@@ -20,11 +20,7 @@ const reviewSchema = z
     service: z.object({
       id: z.string().optional(),
     }),
-    comment: z
-      .string()
-      .min(1, "Η αξιολόγηση είναι υποχρεωτική")
-      .min(25, "Η αξιολόγηση είναι μικρή")
-      .max(350, "Η μέγιστη αξιολόγηση είναι 350 χαρακτήρες"),
+    comment: z.string().optional().nullable(),
   })
   .superRefine((data, ctx) => {
     // Only require service for freelancer type reviews

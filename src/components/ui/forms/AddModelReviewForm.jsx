@@ -69,7 +69,7 @@ export default function AddModelReviewForm({ type, serviceId, freelancerId }) {
   const hasChanges =
     formData.rating !== initialFormData.rating ||
     formData.comment !== initialFormData.comment ||
-    formData.service.id !== "";
+    (type !== "service" && formData.service.id !== "");
 
   const handleServices = useCallback(async (searchTerm, page = 1) => {
     const query = normalizeQuery(SERVICES_BY_FREELANCER_FOR_REVIEWS);
