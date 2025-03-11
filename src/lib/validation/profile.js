@@ -312,11 +312,14 @@ export const billingSchemaOptional = z.object({
   receipt: z.boolean(),
   invoice: z.boolean(),
   afm: z
-    .string()
-    .min(1, "Το ΑΦΜ πρέπει να έχει τουλάχιστον 1 ψηφίο")
-    .max(10, "Το ΑΦΜ δεν μπορεί να υπερβαίνει τα 10 ψηφία")
-    .optional()
-    .nullable(),
+    .number()
+    .refine((val) => val !== null && val.toString().length === 9, {
+      message: "Το ΑΦΜ πρέπει να έχει ακριβώς 9 ψηφία",
+    })
+    .nullable()
+    .refine((val) => val !== null, {
+      message: "Το ΑΦΜ είναι υποχρεωτικό",
+    }),
   doy: z.string().min(2, "Το ΔΟΥ είναι υποχρεωτικό").optional().nullable(),
   brandName: z
     .string()
@@ -339,8 +342,10 @@ export const billingSchema = z.object({
   receipt: z.boolean(),
   invoice: z.boolean(),
   afm: z
-    .string()
-    .min(1, "Το ΑΦΜ είναι υποχρεωτικό")
+    .number()
+    .refine((val) => val !== null && val.toString().length === 9, {
+      message: "Το ΑΦΜ πρέπει να έχει ακριβώς 9 ψηφία",
+    })
     .nullable()
     .refine((val) => val !== null, {
       message: "Το ΑΦΜ είναι υποχρεωτικό",
