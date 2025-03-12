@@ -4,6 +4,7 @@ import useCreateServiceStore from "@/store/service/create/createServiceStore";
 import useEditServiceStore from "@/store/service/edit/editServiceStore";
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
+import imageCompression from "browser-image-compression";
 
 export default function ServiceGallery({
   isPending,
@@ -98,9 +99,17 @@ export default function ServiceGallery({
     return "unknown";
   };
 
-  const handleDropMedia = (files) => {
+  const handleDropMedia = async (files) => {
     const newFiles = [];
     let newTotalSize = totalSize;
+
+    // Compression config
+    const compressionOptions = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+      fileType: "image/jpeg", // Explicitly set output type
+    };
 
     // Count existing media types
     const videoCount = media.filter((item) => {
@@ -120,39 +129,77 @@ export default function ServiceGallery({
     }).length;
 
     for (const file of files) {
-      const mediaType = getMediaType(file.type);
+      try {
+        let processedFile = file;
+        let finalFileType = file.type;
 
-      if (
-        mediaType === "video" &&
-        videoCount +
-          newFiles.filter((item) => getMediaType(item.file.type) === "video")
-            .length >=
-          3
-      ) {
-        setError("Μέγιστος αριθμός βίντεο: 3");
-        continue;
+        // Only compress image files
+        if (file.type.startsWith("image/")) {
+          // Compress image
+          const compressedBlob = await imageCompression(
+            file,
+            compressionOptions
+          );
+
+          // Convert blob back to File with original name and type
+          processedFile = new File([compressedBlob], file.name, {
+            type: "image/jpeg", // Force JPEG output
+            lastModified: Date.now(),
+          });
+
+          // Update final type
+          finalFileType = "image/jpeg";
+        }
+
+        const mediaType = getMediaType(finalFileType);
+
+        // Type validation
+        if (!["image", "video", "audio"].includes(mediaType)) {
+          setError("Μη υποστηριζόμενος τύπος αρχείου");
+          continue;
+        }
+
+        // Rest of validation logic...
+        if (
+          mediaType === "video" &&
+          videoCount +
+            newFiles.filter((item) => getMediaType(item.file.type) === "video")
+              .length >=
+            3
+        ) {
+          setError("Μέγιστος αριθμός βίντεο: 3");
+          continue;
+        }
+
+        if (
+          mediaType === "audio" &&
+          audioCount +
+            newFiles.filter((item) => getMediaType(item.file.type) === "audio")
+              .length >=
+            3
+        ) {
+          setError("Μέγιστος αριθμός ήχων: 3");
+          continue;
+        }
+
+        const fileSize = processedFile.size / (1024 * 1024);
+
+        if (newTotalSize + fileSize > 15) {
+          setError("Το συνολικό μέγεθος των αρχείων υπερβαίνει τα 15MB");
+          break;
+        }
+
+        const blob = URL.createObjectURL(processedFile);
+        newFiles.push({
+          file: processedFile,
+          url: blob,
+          originalType: file.type, // Keep original type for reference
+        });
+        newTotalSize += fileSize;
+      } catch (error) {
+        console.error("Error processing file:", error);
+        setError("Σφάλμα επεξεργασίας αρχείου");
       }
-
-      if (
-        mediaType === "audio" &&
-        audioCount +
-          newFiles.filter((item) => getMediaType(item.file.type) === "audio")
-            .length >=
-          3
-      ) {
-        setError("Μέγιστος αριθμός ήχων: 3");
-        continue;
-      }
-
-      const fileSize = file.size / (1024 * 1024);
-      if (newTotalSize + fileSize > 15) {
-        setError("Το συνολικό μέγεθος των αρχείων υπερβαίνει τα 15MB");
-        break;
-      }
-
-      const blob = URL.createObjectURL(file);
-      newFiles.push({ file, url: blob });
-      newTotalSize += fileSize;
     }
 
     if (newFiles.length > 0) {
@@ -284,7 +331,10 @@ export default function ServiceGallery({
 
     // For new uploads
     if (item.file instanceof File) {
-      const mediaType = getMediaType(item.file.type);
+      // Use originalType if available
+      const mediaType = item.originalType
+        ? getMediaType(item.originalType)
+        : getMediaType(item.file.type);
 
       switch (mediaType) {
         case "image":
