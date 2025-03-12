@@ -24,13 +24,7 @@ export async function uploadMedia(files, options = {}) {
   });
 
   try {
-    console.log("Starting upload with options:", JSON.stringify(options));
-    console.log(
-      "File details:",
-      files.map((f) => ({ name: f.name, size: f.size, type: f.type }))
-    );
     const response = await postMedia("upload", formData);
-    console.log("Upload response:", JSON.stringify(response));
 
     if (!response) {
       console.error("Upload failed: No response received");
