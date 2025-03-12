@@ -46,7 +46,8 @@ const SocialsInputs = ({ data = {}, username, onChange, errors }) => {
   };
 
   const handleInputChange = (platform, url) => {
-    onChange(platform, url.trim());
+    const newUrl = url.trim() === "" ? null : url.trim(); // Convert empty strings to null
+    onChange(platform, newUrl);
   };
 
   return (
@@ -58,11 +59,13 @@ const SocialsInputs = ({ data = {}, username, onChange, errors }) => {
             id={platform}
             name={platform}
             type="url"
-            value={data[platform]?.url || ""}
+            value={data?.[platform]?.url || ""}
             onChange={(value) => handleInputChange(platform, value)}
             placeholder={`${config.placeholder}username`}
             className="form-control"
-            errors={errors?.[platform]}
+            errors={
+              errors && { field: platform, message: errors[platform]?.message }
+            }
             icon={`fab fa-${config.icon}`}
           />
         </div>
