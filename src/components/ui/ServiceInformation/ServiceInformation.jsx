@@ -419,8 +419,8 @@ export default function ServiceInformation() {
                   type="number"
                   min={10}
                   max={50000}
-                  defaultValue={info.price}
-                  value={info.price}
+                  defaultValue={info.price || 0}
+                  value={info.price || 0}
                   onChange={(formattedValue) =>
                     setInfo("price", formattedValue)
                   }
@@ -428,7 +428,6 @@ export default function ServiceInformation() {
                   errors={errors}
                   disabled={!info.fixed}
                   append="€"
-                  formatSymbols
                 />
               </div>
             </div>
@@ -442,14 +441,13 @@ export default function ServiceInformation() {
                     type="number"
                     min={1}
                     append={info.time > 1 ? "Μέρες" : "Μέρα"}
-                    defaultValue={info.time}
-                    value={info.time}
+                    defaultValue={info.time || 1}
+                    value={info.time || 1}
                     onChange={(formattedValue) =>
                       setInfo("time", formattedValue)
                     }
                     className="form-control input-group"
                     errors={errors}
-                    formatSymbols
                   />
                 </div>
               </div>
