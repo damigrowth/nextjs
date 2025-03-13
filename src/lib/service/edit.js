@@ -9,40 +9,74 @@ import { revalidatePath } from "next/cache";
 import { createTags } from "../tags";
 import { z } from "zod";
 
-// Define the service edit validation schema with more flexibility
+// Custom validator function to check if taxonomy fields have valid IDs
+const hasValidId = (field) => {
+  if (!field) return false;
+  if (field.id === 0 || field.id === "0") return false;
+  return true;
+};
+
+// Define the service edit validation schema with proper error messages
 const SERVICE_EDIT_SCHEMA = z.object({
-  title: z.string().min(1).max(80).optional(),
-  description: z.string().min(80).max(5000).optional(),
-  price: z.number().min(10).max(50000).optional(),
+  title: z
+    .string()
+    .min(1, "Ο τίτλος είναι απαραίτητος")
+    .max(80, "Ο τίτλος δεν μπορεί να υπερβαίνει τους 80 χαρακτήρες")
+    .optional(),
+  description: z
+    .string()
+    .min(80, "Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες")
+    .max(5000, "Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες")
+    .optional(),
+  price: z
+    .number()
+    .min(10, "Η ελάχιστη τιμή είναι 10€")
+    .max(50000, "Η μέγιστη τιμή είναι 50000€")
+    .optional(),
   status: z.string().optional(),
-  // Make category, subcategory, and subdivision more flexible
-  category: z
-    .union([
-      z.object({
+
+  // Make category required with proper validation
+  category: z.union([
+    z
+      .object({
         id: z.union([z.string(), z.number()]),
         label: z.string().optional(),
+      })
+      .refine(hasValidId, {
+        message: "Η κατηγορία είναι υποχρεωτική",
+        path: ["id"],
       }),
-      z.null(),
-    ])
-    .optional(),
-  subcategory: z
-    .union([
-      z.object({
+    z.null(),
+  ]),
+
+  // Make subcategory required with proper validation
+  subcategory: z.union([
+    z
+      .object({
         id: z.union([z.string(), z.number()]),
         label: z.string().optional(),
+      })
+      .refine(hasValidId, {
+        message: "Η υποκατηγορία είναι υποχρεωτική",
+        path: ["id"],
       }),
-      z.null(),
-    ])
-    .optional(),
-  subdivision: z
-    .union([
-      z.object({
+    z.null(),
+  ]),
+
+  // Make subdivision required with proper validation
+  subdivision: z.union([
+    z
+      .object({
         id: z.union([z.string(), z.number()]),
         label: z.string().optional(),
+      })
+      .refine(hasValidId, {
+        message: "Το αντικείμενο είναι υποχρεωτικό",
+        path: ["id"],
       }),
-      z.null(),
-    ])
-    .optional(),
+    z.null(),
+  ]),
+
   // Make tags more flexible
   tags: z
     .array(
@@ -56,26 +90,42 @@ const SERVICE_EDIT_SCHEMA = z.object({
       })
     )
     .optional(),
+
   // Add validation for addons
   addons: z
     .array(
       z.object({
-        title: z.string().min(5),
-        description: z.string().min(10),
-        price: z.number().min(5).max(10000),
+        title: z
+          .string()
+          .min(5, "Ο τίτλος πρόσθετου πρέπει να έχει τουλάχιστον 5 χαρακτήρες"),
+        description: z
+          .string()
+          .min(
+            10,
+            "Η περιγραφή πρόσθετου πρέπει να έχει τουλάχιστον 10 χαρακτήρες"
+          ),
+        price: z
+          .number()
+          .min(5, "Η ελάχιστη τιμή είναι 5€")
+          .max(10000, "Η μέγιστη τιμή είναι 10000€"),
       })
     )
-    .max(3)
+    .max(3, "Μέγιστος αριθμός πρόσθετων: 3")
     .optional(),
+
   // Add validation for FAQ
   faq: z
     .array(
       z.object({
-        question: z.string().min(10),
-        answer: z.string().min(2),
+        question: z
+          .string()
+          .min(10, "Η ερώτηση πρέπει να έχει τουλάχιστον 10 χαρακτήρες"),
+        answer: z
+          .string()
+          .min(2, "Η απάντηση πρέπει να έχει τουλάχιστον 2 χαρακτήρες"),
       })
     )
-    .max(5)
+    .max(5, "Μέγιστος αριθμός ερωτήσεων: 5")
     .optional(),
 });
 
@@ -83,6 +133,25 @@ export async function editService(prevState, formData) {
   try {
     const changedFields = JSON.parse(formData.get("changes"));
     const serviceId = formData.get("service-id");
+
+    // Special case: check if subcategory is being updated but subdivision is missing or null
+    if (
+      changedFields.subcategory &&
+      changedFields.subcategory.id &&
+      (!changedFields.subdivision || changedFields.subdivision === null)
+    ) {
+      console.log("Subcategory changed but subdivision is missing or null");
+      return {
+        ...prevState,
+        message: "Σφάλμα επικύρωσης",
+        errors: {
+          field: "subdivision",
+          message:
+            "Όταν αλλάζετε υποκατηγορία, πρέπει να επιλέξετε αντικείμενο",
+        },
+        data: null,
+      };
+    }
 
     // Create a partial schema based on changed fields
     const partialSchema = z.object(
@@ -99,23 +168,39 @@ export async function editService(prevState, formData) {
     const validationResult = partialSchema.safeParse(changedFields);
 
     if (!validationResult.success) {
-      const fieldErrors = {};
+      console.log("Validation errors:", validationResult.error.format());
 
-      Object.entries(validationResult.error.flatten().fieldErrors).forEach(
-        ([field, messages]) => {
-          if (messages && messages.length > 0) {
+      const fieldErrors = {};
+      const formattedErrors = validationResult.error.format();
+
+      Object.entries(formattedErrors).forEach(([field, error]) => {
+        if (field !== "_errors") {
+          // Handle nested errors like category.id
+          if (error.id?.[0]) {
             fieldErrors[field] = {
               field,
-              message: messages[0],
+              message: error.id[0],
+            };
+          } else if (error._errors?.[0]) {
+            // Handle top-level errors
+            fieldErrors[field] = {
+              field,
+              message: error._errors[0],
             };
           }
         }
-      );
+      });
 
       return {
         ...prevState,
-        message: "Validation errors",
-        errors: fieldErrors,
+        message: "Σφάλμα επικύρωσης",
+        errors:
+          Object.keys(fieldErrors).length > 0
+            ? fieldErrors
+            : {
+                field: "validation",
+                message: "Υπάρχουν σφάλματα στη φόρμα",
+              },
         data: null,
       };
     }
@@ -190,7 +275,6 @@ export async function editService(prevState, formData) {
 
     // Check if any media-related fields exist in the form data
     if (hasMediaFiles || hasRemainingMedia || hasDeletedMedia) {
-
       const remainingMediaIds = JSON.parse(
         formData.get("remaining-media") || "[]"
       );
@@ -212,7 +296,6 @@ export async function editService(prevState, formData) {
           files,
           options: mediaOptions,
         });
-
       } catch (error) {
         console.error("Media update error:", error);
         return {
@@ -235,11 +318,89 @@ export async function editService(prevState, formData) {
     if (description !== undefined) payload.data.description = description;
     if (price !== undefined) payload.data.price = price;
     if (status !== undefined) payload.data.status = status === "Active" ? 1 : 2;
-    if (category !== undefined) payload.data.category = category?.id || null;
-    if (subcategory !== undefined)
-      payload.data.subcategory = subcategory?.id || null;
-    if (subdivision !== undefined)
-      payload.data.subdivision = subdivision?.id || null;
+
+    // Handle taxonomy fields carefully - they're required in the database
+    if (category !== undefined) {
+      if (category && category.id && category.id !== 0 && category.id !== "0") {
+        payload.data.category = category.id;
+      } else {
+        // Cannot set to null - required field
+        // If the user tried to set category to null/invalid, return error
+        if (
+          changedFields.category === null ||
+          (category &&
+            (!category.id || category.id === 0 || category.id === "0"))
+        ) {
+          return {
+            ...prevState,
+            message: "Σφάλμα επικύρωσης",
+            errors: {
+              field: "category",
+              message: "Η κατηγορία είναι υποχρεωτική",
+            },
+            data: null,
+          };
+        }
+      }
+    }
+
+    if (subcategory !== undefined) {
+      if (
+        subcategory &&
+        subcategory.id &&
+        subcategory.id !== 0 &&
+        subcategory.id !== "0"
+      ) {
+        payload.data.subcategory = subcategory.id;
+      } else {
+        // Cannot set to null - required field
+        // If the user tried to set subcategory to null/invalid, return error
+        if (
+          changedFields.subcategory === null ||
+          (subcategory &&
+            (!subcategory.id || subcategory.id === 0 || subcategory.id === "0"))
+        ) {
+          return {
+            ...prevState,
+            message: "Σφάλμα επικύρωσης",
+            errors: {
+              field: "subcategory",
+              message: "Η υποκατηγορία είναι υποχρεωτική",
+            },
+            data: null,
+          };
+        }
+      }
+    }
+
+    if (subdivision !== undefined) {
+      if (
+        subdivision &&
+        subdivision.id &&
+        subdivision.id !== 0 &&
+        subdivision.id !== "0"
+      ) {
+        payload.data.subdivision = subdivision.id;
+      } else {
+        // Cannot set to null - required field
+        // If the user tried to set subdivision to null/invalid, return error
+        if (
+          changedFields.subdivision === null ||
+          (subdivision &&
+            (!subdivision.id || subdivision.id === 0 || subdivision.id === "0"))
+        ) {
+          return {
+            ...prevState,
+            message: "Σφάλμα επικύρωσης",
+            errors: {
+              field: "subdivision",
+              message: "Το αντικείμενο είναι υποχρεωτικό",
+            },
+            data: null,
+          };
+        }
+      }
+    }
 
     // Include tag IDs for the API
     if (allTagIds !== undefined && allTagIds.length > 0) {

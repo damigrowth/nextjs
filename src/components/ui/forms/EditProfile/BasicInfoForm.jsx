@@ -635,11 +635,10 @@ export default function BasicInfoForm({ freelancer, type }) {
               type="number"
               min={10}
               max={50000}
-              value={rate}
+              value={rate || ""}
               onChange={setRate}
               className="form-control input-group"
               append="€"
-              formatSymbols
               errors={formState?.errors?.rate}
             />
           </div>
@@ -651,10 +650,9 @@ export default function BasicInfoForm({ freelancer, type }) {
               type="number"
               min={1900}
               max={2025}
-              value={commencement}
+              value={commencement || ""}
               onChange={setCommencement}
               className="form-control input-group"
-              formatSymbols
               errors={formState?.errors?.commencement}
             />
           </div>

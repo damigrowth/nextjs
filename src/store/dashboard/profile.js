@@ -65,7 +65,7 @@ const useEditProfileStore = create((set) => ({
   rate: 0,
   setRate: (value) => set(() => ({ rate: value })),
 
-  commencement: new Date().getFullYear(),
+  commencement: 0,
   setCommencement: (value) => set(() => ({ commencement: value })),
 
   yearsOfExperience: 0,
@@ -240,7 +240,7 @@ const useEditProfileStore = create((set) => ({
       website: freelancer.website || "",
       tagline: freelancer.tagline || "",
       rate: freelancer.rate || 0,
-      commencement: freelancer.commencement || new Date().getFullYear(),
+      commencement: freelancer.commencement || 0,
       yearsOfExperience: freelancer.yearsOfExperience || 0,
       description: freelancer.description || "",
       rating: freelancer.rating || 0,
@@ -307,7 +307,7 @@ const useEditProfileStore = create((set) => ({
       website: "",
       tagline: "",
       rate: 0,
-      commencement: new Date().getFullYear(),
+      commencement: 0,
       yearsOfExperience: 0,
       description: "",
       rating: 0,
