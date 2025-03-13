@@ -261,7 +261,8 @@ export const presentationSchema = z.object({
     .string()
     .url("Παρακαλώ εισάγετε έναν έγκυρο ιστότοπο")
     .optional()
-    .nullable(),
+    .nullable()
+    .or(z.literal("")),
   socials: z.object({
     facebook: z
       .union([
@@ -275,7 +276,8 @@ export const presentationSchema = z.object({
               "Μη έγκυρος σύνδεσμος Facebook"
             )
             .optional()
-            .nullable(),
+            .nullable()
+            .or(z.literal("")),
         }),
       ])
       .optional()
@@ -292,7 +294,8 @@ export const presentationSchema = z.object({
               "Μη έγκυρος σύνδεσμος LinkedIn"
             )
             .optional()
-            .nullable(),
+            .nullable()
+            .or(z.literal("")),
         }),
       ])
       .optional()
@@ -306,7 +309,8 @@ export const presentationSchema = z.object({
             .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο X")
             .regex(/^https?:\/\/(www\.)?x\.com\/.*$/, "Μη έγκυρος σύνδεσμος X")
             .optional()
-            .nullable(),
+            .nullable()
+            .or(z.literal("")),
         }),
       ])
       .optional()
@@ -323,7 +327,8 @@ export const presentationSchema = z.object({
               "Μη έγκυρος σύνδεσμος YouTube"
             )
             .optional()
-            .nullable(),
+            .nullable()
+            .or(z.literal("")),
         }),
       ])
       .optional()
@@ -340,7 +345,8 @@ export const presentationSchema = z.object({
               "Μη έγκυρος σύνδεσμος GitHub"
             )
             .optional()
-            .nullable(),
+            .nullable()
+            .or(z.literal("")),
         }),
       ])
       .optional()
@@ -357,7 +363,8 @@ export const presentationSchema = z.object({
               "Μη έγκυρος σύνδεσμος Instagram"
             )
             .optional()
-            .nullable(),
+            .nullable()
+            .or(z.literal("")),
         }),
       ])
       .optional()
@@ -374,7 +381,8 @@ export const presentationSchema = z.object({
               "Μη έγκυρος σύνδεσμος Behance"
             )
             .optional()
-            .nullable(),
+            .nullable()
+            .or(z.literal("")),
         }),
       ])
       .optional()
@@ -391,7 +399,8 @@ export const presentationSchema = z.object({
               "Μη έγκυρος σύνδεσμος Dribbble"
             )
             .optional()
-            .nullable(),
+            .nullable()
+            .or(z.literal("")),
         }),
       ])
       .optional()

@@ -38,6 +38,28 @@ const useEditServiceStore = create((set, get) => ({
 
   // Initialize with service data
   initializeWithService: (service) => {
+    // Create normalized structures for taxonomy data
+    const normalizeCategory = (data) => {
+      if (!data) return { id: 0, label: "" };
+      return {
+        id: data.id,
+        label: data.attributes?.label || "",
+        data,
+      };
+    };
+
+    const normalizeTags = (tags) => {
+      if (!tags || !tags.data) return [];
+      return tags.data.map((tag) => ({
+        id: tag.id,
+        label: tag.attributes?.label || "",
+        data: tag,
+        attributes: tag.attributes || null,
+        value: tag.id,
+        isNewTerm: false,
+      }));
+    };
+
     set({
       serviceId: service.id,
       status: service.status.data.attributes.type,
@@ -46,20 +68,20 @@ const useEditServiceStore = create((set, get) => ({
         title: service.title,
         description: service.description,
         price: service.price,
-        category: service.category.data,
-        subcategory: service.subcategory.data,
-        subdivision: service.subdivision.data,
-        tags: service.tags?.data || [],
+        category: normalizeCategory(service.category.data),
+        subcategory: normalizeCategory(service.subcategory.data),
+        subdivision: normalizeCategory(service.subdivision.data),
+        tags: normalizeTags(service.tags),
       },
       initialValues: {
         title: service.title,
         description: service.description,
         price: service.price,
         status: service.status.data.attributes.type,
-        category: service.category.data,
-        subcategory: service.subcategory.data,
-        subdivision: service.subdivision.data,
-        tags: service.tags?.data || [],
+        category: normalizeCategory(service.category.data),
+        subcategory: normalizeCategory(service.subcategory.data),
+        subdivision: normalizeCategory(service.subdivision.data),
+        tags: normalizeTags(service.tags),
       },
     });
 
@@ -112,19 +134,55 @@ const useEditServiceStore = create((set, get) => ({
     const state = get();
     const initialValues = state.initialValues;
 
-    return (
-      state.status !== initialValues.status ||
+    // Compare status with the original status
+    const statusChanged = state.status !== initialValues.status;
+
+    // Compare basic fields
+    const basicFieldsChanged =
       state.info.title !== initialValues.title ||
       state.info.description !== initialValues.description ||
-      state.info.price !== initialValues.price ||
-      state.info.category?.id !== initialValues.category?.id ||
-      state.info.subcategory?.id !== initialValues.subcategory?.id ||
-      state.info.subdivision?.id !== initialValues.subdivision?.id ||
-      JSON.stringify(state.info.tags) !== JSON.stringify(initialValues.tags) ||
-      JSON.stringify(state.addons) !== JSON.stringify(initialValues.addons) ||
-      JSON.stringify(state.faq) !== JSON.stringify(initialValues.faq) ||
+      state.info.price !== initialValues.price;
+
+    // Compare taxonomy IDs
+    const categoryId = state.info.category?.id?.toString();
+    const initialCategoryId = initialValues.category?.id?.toString();
+    const categoryChanged = categoryId !== initialCategoryId;
+
+    const subcategoryId = state.info.subcategory?.id?.toString();
+    const initialSubcategoryId = initialValues.subcategory?.id?.toString();
+    const subcategoryChanged = subcategoryId !== initialSubcategoryId;
+
+    const subdivisionId = state.info.subdivision?.id?.toString();
+    const initialSubdivisionId = initialValues.subdivision?.id?.toString();
+    const subdivisionChanged = subdivisionId !== initialSubdivisionId;
+
+    // Compare tags by ID
+    const currentTagIds = state.info.tags.map((tag) => tag.id).sort();
+    const initialTagIds = initialValues.tags.map((tag) => tag.id).sort();
+    const tagsChanged =
+      JSON.stringify(currentTagIds) !== JSON.stringify(initialTagIds);
+
+    // Compare addons and FAQ
+    const addonsChanged =
+      JSON.stringify(state.addons) !== JSON.stringify(initialValues.addons);
+    const faqChanged =
+      JSON.stringify(state.faq) !== JSON.stringify(initialValues.faq);
+
+    // Check media changes
+    const mediaChanged =
       state.media.some((item) => item.file instanceof File) ||
-      state.deletedMediaIds.length > 0
+      state.deletedMediaIds.length > 0;
+
+    return (
+      statusChanged ||
+      basicFieldsChanged ||
+      categoryChanged ||
+      subcategoryChanged ||
+      subdivisionChanged ||
+      tagsChanged ||
+      addonsChanged ||
+      faqChanged ||
+      mediaChanged
     );
   },
 }));

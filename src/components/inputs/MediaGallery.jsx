@@ -74,10 +74,10 @@ export default function MediaGallery({
   // Initialize media from props - only runs once
   useEffect(() => {
     if (!isInitialized.current && initialMedia?.length > 0) {
-      // Ensure all media items have consistent structure
       const formattedMedia = initialMedia.map(formatMediaItem).filter(Boolean);
       setMedia(formattedMedia);
       isInitialized.current = true;
+      
     }
   }, [initialMedia, formatMediaItem]);
 
@@ -145,17 +145,41 @@ export default function MediaGallery({
     calculateSize();
   }, [media]);
 
-  // Update parent component when media changes - BUT ONLY AFTER USER ACTIONS
+  // Update parent component when media changes
   useEffect(() => {
     // Skip if not fully initialized yet
     if (!isInitialized.current) return;
 
-    // Only notify parent when changes were made by user actions
-    if (userActionPerformed.current && onUpdate) {
-      onUpdate(media, deletedMediaIds);
-      // Reset the flag after notifying
-      userActionPerformed.current = false;
+    // Don't notify during first render or if user hasn't performed actions
+    if (!userActionPerformed.current || !onUpdate) return;
+
+    // Always notify parent when there are deleted IDs, even if media is empty
+    const hasDeletedItems = deletedMediaIds.length > 0;
+
+    // Skip notifications ONLY if there's no media AND no deleted IDs AND user hasn't performed actions
+    if (media.length === 0 && !hasDeletedItems) {
+      
+      // If we're transitioning to empty state (meaning a deletion just happened), we should still notify
+      // This is handled by the userActionPerformed flag which should be true if user deleted the last item
     }
+
+    // Create stable copies of data to avoid reference issues
+    const stableMedia = [...media];
+    const stableDeletedIds = [...deletedMediaIds];
+
+    
+
+    // Use requestAnimationFrame to ensure we're not in the middle of a React render cycle
+    // This helps break potential infinite loops
+    const updateId = requestAnimationFrame(() => {
+      
+      onUpdate(stableMedia, stableDeletedIds);
+    });
+
+    // Clean up the animation frame if component unmounts or dependencies change
+    return () => {
+      cancelAnimationFrame(updateId);
+    };
   }, [media, deletedMediaIds, onUpdate]);
 
   const clearError = useCallback(() => {
@@ -180,9 +204,17 @@ export default function MediaGallery({
 
   const handleDropMedia = useCallback(
     (files) => {
+      // Ensure we have actual file objects
+      if (!files || !files.length) {
+        
+        return;
+      }
+
       // Flag that this is a user action
       userActionPerformed.current = true;
+      
 
+      // Process files
       const newFiles = [];
       let newTotalSize = totalSize;
 
@@ -240,22 +272,46 @@ export default function MediaGallery({
       }
 
       if (newFiles.length > 0) {
-        setMedia((prevMedia) => [
-          ...prevMedia,
-          ...newFiles.filter(
-            (item) =>
-              !prevMedia.some(
-                (f) =>
-                  f?.file instanceof File &&
-                  item?.file instanceof File &&
-                  f.file.name === item.file.name
-              )
-          ),
-        ]);
+        setMedia((prevMedia) => {
+          const updatedMedia = [
+            ...prevMedia,
+            ...newFiles.filter(
+              (item) =>
+                !prevMedia.some(
+                  (f) =>
+                    f?.file instanceof File &&
+                    item?.file instanceof File &&
+                    f.file.name === item.file.name
+                )
+            ),
+          ];
+
+          // Immediately notify parent after state update
+          // This ensures changes are detected properly
+          setTimeout(() => {
+            if (onUpdate && userActionPerformed.current) {
+              
+              onUpdate(updatedMedia, deletedMediaIds);
+            }
+          }, 0);
+
+          return updatedMedia;
+        });
+
         setTotalSize(newTotalSize);
       }
     },
-    [media, totalSize, getMediaType, maxVideos, maxAudio, maxSize, labels]
+    [
+      media,
+      totalSize,
+      getMediaType,
+      maxVideos,
+      maxAudio,
+      maxSize,
+      labels,
+      deletedMediaIds,
+      onUpdate,
+    ]
   );
 
   // Default save implementation if no onSave is provided
@@ -324,38 +380,85 @@ export default function MediaGallery({
     (item) => {
       // Flag that this is a user action
       userActionPerformed.current = true;
+      
 
-      // Call the onDelete callback if provided
-      if (onDelete) {
-        onDelete(item);
-      }
+      // First, prepare the updated media array and deletedIds
+      let updatedMedia = [...media];
+      let updatedDeletedIds = [...deletedMediaIds];
+      let hasActualChanges = false;
 
       if (item?.file?.attributes) {
         // For existing Strapi media, use the ID
         const id = item.file.id;
+        
 
-        // Only add to deletedMediaIds if it's a numeric ID (Strapi convention)
+        // Only add to deletedMediaIds if it's a valid ID
         if (id && (typeof id === "string" || typeof id === "number")) {
-          setDeletedMediaIds((prev) => [...prev, id.toString()]);
+          // Convert to string for consistency
+          const idString = id.toString();
+
+          // Check if this ID is already in the deletedMediaIds array
+          if (!updatedDeletedIds.includes(idString)) {
+            
+            updatedDeletedIds = [...updatedDeletedIds, idString];
+            hasActualChanges = true;
+          }
         }
 
         // Remove from media array
-        setMedia((prev) => prev.filter((m) => m?.file?.id !== id));
+        const mediaLengthBefore = updatedMedia.length;
+        updatedMedia = updatedMedia.filter((m) => m?.file?.id !== id);
+
+        if (mediaLengthBefore !== updatedMedia.length) {
+          
+          hasActualChanges = true;
+        }
       } else if (item?.file instanceof File) {
         // For new uploads, use the filename
-        setMedia((prev) =>
-          prev.filter(
-            (m) => !(m?.file instanceof File && m.file.name === item.file.name)
-          )
+        const mediaLengthBefore = updatedMedia.length;
+        updatedMedia = updatedMedia.filter(
+          (m) => !(m?.file instanceof File && m.file.name === item.file.name)
         );
+
+        if (mediaLengthBefore !== updatedMedia.length) {
+          
+          hasActualChanges = true;
+        }
 
         // Revoke blob URL if it exists
         if (item?.url?.startsWith("blob:")) {
           URL.revokeObjectURL(item.url);
         }
       }
+
+      // Only update state if there were actual changes
+      if (hasActualChanges) {
+        
+        
+        
+
+        // Update the state with the new values
+        setMedia(updatedMedia);
+        setDeletedMediaIds(updatedDeletedIds);
+
+        // Call the onDelete callback if provided
+        if (onDelete) {
+          onDelete(item);
+        }
+
+        // Notify parent of the updates - do this after state updates
+        // with a small delay to ensure proper state synchronization
+        setTimeout(() => {
+          if (onUpdate) {
+            
+            onUpdate(updatedMedia, updatedDeletedIds);
+          }
+        }, 0);
+      } else {
+        
+      }
     },
-    [onDelete]
+    [media, deletedMediaIds, onDelete, onUpdate]
   );
 
   const renderMediaPreview = useCallback(
@@ -533,6 +636,22 @@ export default function MediaGallery({
     [getMediaType, labels]
   );
 
+  // Reset userActionPerformed flag when the parent component signals
+  useEffect(() => {
+    const resetUserAction = () => {
+      
+      userActionPerformed.current = false;
+    };
+
+    // Listen for reset events
+    document.addEventListener("media-gallery-reset", resetUserAction);
+
+    // Clean up
+    return () => {
+      document.removeEventListener("media-gallery-reset", resetUserAction);
+    };
+  }, []);
+
   return (
     <>
       <div
@@ -561,7 +680,14 @@ export default function MediaGallery({
             accept="image/*,video/*,audio/*"
             placeholder={labels.selectFiles}
             multiple
-            onChange={(e) => handleDropMedia(Array.from(e.target.files))}
+            onChange={(e) => {
+              const fileList = e.target.files;
+              if (fileList && fileList.length > 0) {
+                const filesArray = Array.from(fileList);
+                
+                handleDropMedia(filesArray);
+              }
+            }}
             className="dropzone"
           />
 

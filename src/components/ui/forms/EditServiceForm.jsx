@@ -33,7 +33,6 @@ export default function EditServiceForm({ service }) {
     initialState
   );
 
-  // Status state
   const {
     info,
     setInfo,
@@ -48,12 +47,10 @@ export default function EditServiceForm({ service }) {
     initializeWithService,
   } = useEditServiceStore();
 
-  // Initialize store with service data on component mount
   useEffect(() => {
     initializeWithService(service);
   }, [service]);
 
-  // State for taxonomy search params and results
   const [taxonomyParams, setTaxonomyParams] = useState({
     categoryTerm: "",
     subcategoryTerm: "",
@@ -68,7 +65,6 @@ export default function EditServiceForm({ service }) {
     tags: false,
   });
 
-  // Handler functions for taxonomy search
   const handleCategorySearch = useCallback(async (searchTerm, page = 1) => {
     const query = normalizeQuery(CATEGORIES_SEARCH);
     const data = await searchData({
@@ -189,17 +185,18 @@ export default function EditServiceForm({ service }) {
     const formattedTags = selected
       ? selected.map((tag) => ({
           id: tag.id,
-          label: tag.data?.attributes?.label || "",
+          value: tag.id,
+          label: tag.data?.attributes?.label || tag.label || "",
           isNewTerm: tag.isNewTerm || false,
           data: tag.data || null,
-          attributes: tag.attributes || null,
+          attributes: tag.attributes || tag.data?.attributes || null,
         }))
       : [];
 
+    console.log("Selected and formatted tags:", formattedTags);
     setInfo("tags", formattedTags);
   };
 
-  // Selection handlers for taxonomy fields
   const handleCategorySelect = useCallback(
     (selected) => {
       setInfo("category", {
@@ -207,7 +204,6 @@ export default function EditServiceForm({ service }) {
         label: selected ? selected.attributes.label : "",
       });
 
-      // Reset dependent fields
       setInfo("subcategory", { id: 0, label: "" });
       setInfo("subdivision", { id: 0, label: "" });
       setTaxonomyParams((prev) => ({
@@ -226,7 +222,6 @@ export default function EditServiceForm({ service }) {
         label: selected ? selected.attributes.label : "",
       });
 
-      // Reset subdivision when subcategory changes
       setInfo("subdivision", { id: 0, label: "" });
       setTaxonomyParams((prev) => ({
         ...prev,
@@ -246,74 +241,165 @@ export default function EditServiceForm({ service }) {
     [setInfo]
   );
 
-  // Format selected values for SearchableSelect components
+  const getChangedFields = () => {
+    const changes = {};
 
-  const handleSubmit = async (formData) => {
-    if (!hasChanges()) return;
-
-    // Validate all sections using store functions
-    saveInfo();
-    saveAddons();
-    saveFaq();
-    saveGallery();
-
-    // Check if there are any validation errors
-    if (errors.active) return;
-
-    // Get current values from store
-    const { info, addons, faq, media, deletedMediaIds } =
-      useEditServiceStore.getState();
-
-    // Prepare form data
-    formData.append("service-id", service.id);
-    formData.append("service-title", info.title);
-    formData.append("service-description", info.description);
-    formData.append("service-price", info.price);
-    formData.append("status", status);
-    formData.append("addons", JSON.stringify(addons));
-    formData.append("faq", JSON.stringify(faq));
-
-    // Add taxonomy data
-    formData.append("service-category", info.category.id);
-    formData.append("service-subcategory", info.subcategory.id);
-    formData.append("service-subdivision", info.subdivision.id);
-
-    formData.append("service-tags", JSON.stringify(info.tags));
-
-    // Handle media
-    const remainingMediaIds = media
-      .filter((item) => item.file.attributes)
-      .map((item) => item.file.id);
-
-    // Get new valid files
-    const allNewFiles = media
-      .filter((item) => item.file instanceof File)
-      .map((item) => item.file);
-
-    const validNewFiles = allNewFiles.filter(
-      (file) => file.size > 0 && file.name !== "undefined"
-    );
-
-    // Remove duplicates
-    const uniqueFileNames = [
-      ...new Set(validNewFiles.map((file) => file.name)),
-    ];
-
-    const uniqueFiles = uniqueFileNames.map((name) =>
-      validNewFiles.find((file) => file.name === name)
-    );
-
-    // Add to formData
-    formData.append("remaining-media", JSON.stringify(remainingMediaIds));
-    formData.append("deleted-media", JSON.stringify(deletedMediaIds));
-
-    if (uniqueFiles.length > 0) {
-      uniqueFiles.forEach((file) => {
-        formData.append("media-files", file);
-      });
+    if (info.title !== service.title) {
+      changes.title = info.title;
+    }
+    if (info.description !== service.description) {
+      changes.description = info.description;
+    }
+    if (info.price !== service.price) {
+      changes.price = info.price;
+    }
+    if (status !== service.status.data.attributes.type) {
+      changes.status = status;
     }
 
-    // Submit if validation passed
+    // Compare category IDs properly
+    const categoryId = info.category?.id?.toString();
+    const originalCategoryId = service.category?.data?.id?.toString();
+    if (categoryId !== originalCategoryId) {
+      changes.category = info.category
+        ? {
+            id: info.category.id,
+            label: info.category.label || "",
+          }
+        : null;
+    }
+
+    // Compare subcategory IDs properly
+    const subcategoryId = info.subcategory?.id?.toString();
+    const originalSubcategoryId = service.subcategory?.data?.id?.toString();
+    if (subcategoryId !== originalSubcategoryId) {
+      changes.subcategory = info.subcategory
+        ? {
+            id: info.subcategory.id,
+            label: info.subcategory.label || "",
+          }
+        : null;
+    }
+
+    // Compare subdivision IDs properly
+    const subdivisionId = info.subdivision?.id?.toString();
+    const originalSubdivisionId = service.subdivision?.data?.id?.toString();
+    if (subdivisionId !== originalSubdivisionId) {
+      changes.subdivision = info.subdivision
+        ? {
+            id: info.subdivision.id,
+            label: info.subdivision.label || "",
+          }
+        : null;
+    }
+
+    // Compare tags more accurately - by checking IDs
+    const currentTagIds = info.tags.map((tag) => tag.id).sort();
+    const originalTagIds = (service.tags?.data || [])
+      .map((tag) => tag.id)
+      .sort();
+    const tagsChanged =
+      JSON.stringify(currentTagIds) !== JSON.stringify(originalTagIds);
+
+    if (tagsChanged) {
+      // Enhanced tag format with more complete data
+      changes.tags = info.tags.map((tag) => ({
+        id: tag.id,
+        label: tag.label || tag.data?.attributes?.label || "",
+        isNewTerm: tag.isNewTerm || false,
+        // Include additional data to ensure labels are preserved
+        data: tag.data || null,
+        attributes: tag.attributes || tag.data?.attributes || null,
+      }));
+    }
+
+    // Get current addons and faq from store
+    const { addons, faq, initialValues } = useEditServiceStore.getState();
+
+    // Check for addon changes
+    const addonsChanged =
+      JSON.stringify(addons) !== JSON.stringify(initialValues.addons);
+    if (addonsChanged) {
+      changes.addons = addons;
+    }
+
+    // Check for FAQ changes
+    const faqChanged =
+      JSON.stringify(faq) !== JSON.stringify(initialValues.faq);
+    if (faqChanged) {
+      changes.faq = faq;
+    }
+
+    return changes;
+  };
+
+  const handleSubmit = async () => {
+    const changedFields = getChangedFields();
+    const { media, deletedMediaIds } = useEditServiceStore.getState();
+
+    // Check if media has changed
+    const mediaChanged =
+      media.some((item) => item.file instanceof File) ||
+      deletedMediaIds.length > 0;
+
+    // If no fields changed and media didn't change, don't submit
+    if (!Object.keys(changedFields).length && !mediaChanged) {
+      console.log("No changes detected, skipping submission");
+      return;
+    }
+
+
+    const formData = new FormData();
+    formData.append("service-id", service.id);
+    formData.append("changes", JSON.stringify(changedFields));
+
+    // Always include media information in the form data if there's a change
+    if (mediaChanged) {
+      const remainingMediaIds = media
+        .filter((item) => item.file.attributes)
+        .map((item) => item.file.id);
+
+      const allNewFiles = media
+        .filter((item) => item.file instanceof File)
+        .map((item) => item.file);
+
+      const validNewFiles = allNewFiles.filter(
+        (file) => file.size > 0 && file.name !== "undefined"
+      );
+
+      const uniqueFileNames = [
+        ...new Set(validNewFiles.map((file) => file.name)),
+      ];
+
+      const uniqueFiles = uniqueFileNames.map((name) =>
+        validNewFiles.find((file) => file.name === name)
+      );
+
+      console.log("Remaining media IDs:", remainingMediaIds);
+      console.log("Valid new files:", validNewFiles);
+      console.log("Unique files:", uniqueFiles);
+
+      formData.append("remaining-media", JSON.stringify(remainingMediaIds));
+      formData.append("deleted-media", JSON.stringify(deletedMediaIds));
+
+      // Make sure we properly append each file
+      if (uniqueFiles.length > 0) {
+        console.log("Adding files to form data");
+        uniqueFiles.forEach((file) => {
+          if (file) {
+            formData.append("media-files", file);
+            console.log("Added file:", file.name);
+          }
+        });
+      }
+    }
+
+    // Debug log the form data
+    for (let [key, value] of formData.entries()) {
+      console.log(`Form data: ${key} = `, value);
+    }
+
+    // Make the form action call
     formAction(formData);
   };
 
@@ -355,8 +441,6 @@ export default function EditServiceForm({ service }) {
               />
             </div>
           </div>
-
-          {/* New taxonomy fields section */}
           <div className="row">
             <div className="col-sm-4">
               <div className="mb20">
@@ -451,8 +535,6 @@ export default function EditServiceForm({ service }) {
               />
             </div>
           </div>
-          {/* End of new taxonomy fields section */}
-
           <div className="row">
             <div className="col-sm-2">
               <div className="mb20">
@@ -510,7 +592,6 @@ export default function EditServiceForm({ service }) {
             type={formState?.errors ? "error" : "success"}
             message={formState?.message}
           />
-
           <SaveButton
             defaultText="Ενημέρωση Υπηρεσίας"
             loadingText="Ενημέρωση Υπηρεσίας..."

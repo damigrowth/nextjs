@@ -168,135 +168,184 @@ export async function updateBasicInfo(prevState, formData) {
 }
 
 export async function updatePresentationInfo(prevState, formData) {
-  const changedFields = JSON.parse(formData.get("changes") || "{}");
-  const id = formData.get("id");
+  try {
+    const changedFields = JSON.parse(formData.get("changes") || "{}");
+    const id = formData.get("id");
 
-  // Validate changed fields using the existing presentation schema
-  const partialSchema = z.object(
-    Object.keys(changedFields).reduce((acc, field) => {
-      acc[field] = presentationSchema.shape[field];
-      return acc;
-    }, {})
-  );
+    console.log("Presentation update - Changed fields:", changedFields);
 
-  // Validate only changed fields
-  const validationResult = partialSchema.safeParse(changedFields);
+    // Create a partial schema based on changed fields
+    const partialSchema = z.object(
+      Object.keys(changedFields).reduce((acc, field) => {
+        acc[field] = presentationSchema.shape[field];
+        return acc;
+      }, {})
+    );
 
-  if (!validationResult.success) {
-    // Transform Zod errors to match InputB's expected format
-    const fieldErrors = {};
+    // Validate only the changed fields
+    const validationResult = partialSchema.safeParse(changedFields);
 
-    Object.entries(validationResult.error.flatten().fieldErrors).forEach(
-      ([field, messages]) => {
-        if (messages && messages.length > 0) {
-          fieldErrors[field] = {
-            field,
-            message: messages[0],
+    if (!validationResult.success) {
+      // Transform Zod errors to match InputB's expected format
+      const fieldErrors = {};
+      validationResult.error.errors.forEach((error) => {
+        const path = error.path;
+        let current = fieldErrors;
+        for (let i = 0; i < path.length; i++) {
+          const part = path[i];
+          if (i === path.length - 1) {
+            current[part] = { message: error.message };
+          } else {
+            current[part] = current[part] || {};
+            current = current[part];
+          }
+        }
+      });
+
+      return {
+        data: null,
+        errors: fieldErrors,
+        message: null,
+      };
+    }
+
+    // Prepare the payload - only include fields that have been validated
+    const payload = {};
+
+    // Add website if changed
+    if (validationResult.data.website !== undefined) {
+      payload.website = validationResult.data.website;
+    }
+
+    // Add visibility if changed
+    if (validationResult.data.visibility) {
+      payload.visibility = validationResult.data.visibility;
+    }
+
+    // Add socials if changed
+    if (validationResult.data.socials) {
+      // Create clean socials object with only URL property
+      payload.socials = {};
+
+      Object.entries(validationResult.data.socials).forEach(
+        ([platform, data]) => {
+          if (data && data.url !== undefined) {
+            // Check for undefined, not truthiness
+            const trimmedUrl =
+              data.url === "" || data.url === null ? null : data.url.trim();
+
+            // Only include if the URL is not null or if we're explicitly setting it to null
+            payload.socials[platform] = { url: trimmedUrl };
+          }
+        }
+      );
+    }
+
+    // Handle media update
+    const remainingMediaIds = JSON.parse(
+      formData.get("remaining-media") || "[]"
+    );
+    const deletedMediaIds = JSON.parse(formData.get("deleted-media") || "[]");
+    const files = formData.getAll("media-files");
+    const allMediaDeleted = formData.get("all-media-deleted") === "true";
+
+    // Check if there are actual media changes to process
+    const hasNewFiles = files.length > 0;
+    const hasDeletedFiles = deletedMediaIds.length > 0;
+    const hasMediaChanges = hasNewFiles || hasDeletedFiles || allMediaDeleted;
+
+    if (hasMediaChanges) {
+      // Special case - if all media is deleted, explicitly set an empty portfolio
+      if (allMediaDeleted && remainingMediaIds.length === 0 && !hasNewFiles) {
+        payload.portfolio = [];
+      } else {
+        const mediaOptions = {
+          refId: id,
+          ref: "api::freelancer.freelancer",
+          field: "portfolio",
+          namePrefix: "portfolio",
+        };
+
+        try {
+          const finalMediaIds = await handleMediaUpdate({
+            remainingMediaIds,
+            files,
+            options: mediaOptions,
+            deletedMediaIds,
+          });
+
+          // Always set the portfolio in payload when there are media changes
+          payload.portfolio = finalMediaIds;
+        } catch (error) {
+          return {
+            data: null,
+            errors: {
+              submit: `Error processing media files: ${
+                error.message || "Unknown error"
+              }`,
+            },
+            message: null,
           };
         }
       }
-    );
+    }
 
-    return {
-      data: null,
-      errors: fieldErrors,
-      message: null,
-    };
-  }
-
-  // Prepare the payload
-  const payload = {};
-
-  // Add website if changed (following pattern from updateBasicInfo)
-  if (validationResult.data.website !== undefined) {
-    payload.website = validationResult.data.website;
-  }
-
-  // Add visibility if changed (direct assignment like other server actions)
-  if (validationResult.data.visibility) {
-    payload.visibility = validationResult.data.visibility;
-  }
-
-  // Add socials if changed (following pattern from other fields)
-  if (validationResult.data.socials) {
-    // Create clean socials object with only URL property
-    payload.socials = {};
-
-    Object.entries(validationResult.data.socials).forEach(
-      ([platform, data]) => {
-        if (data && data.url) {
-          payload.socials[platform] = { url: data.url.trim() };
-        }
+    // Clean empty objects from the payload, but DON'T clean empty arrays
+    // when they represent intentionally empty collections like portfolio
+    Object.keys(payload).forEach((key) => {
+      if (
+        payload[key] === undefined ||
+        payload[key] === null ||
+        (typeof payload[key] === "object" &&
+          !Array.isArray(payload[key]) &&
+          Object.keys(payload[key]).length === 0)
+      ) {
+        delete payload[key];
       }
-    );
-  }
-
-  // Handle media update (keep as is since this is a unique case)
-  const remainingMediaIds = JSON.parse(formData.get("remaining-media") || "[]");
-  const deletedMediaIds = JSON.parse(formData.get("deleted-media") || "[]");
-  const files = formData.getAll("media-files");
-
-  const mediaOptions = {
-    refId: id,
-    ref: "api::freelancer.freelancer",
-    field: "portfolio",
-    namePrefix: "portfolio",
-  };
-
-  if (files.length > 0 || deletedMediaIds.length > 0) {
-    const finalMediaIds = await handleMediaUpdate({
-      remainingMediaIds,
-      files,
-      options: mediaOptions,
-      deletedMediaIds,
     });
 
-    payload.portfolio = finalMediaIds;
-  }
-
-  // Clean empty objects (following pattern from other server actions)
-  Object.keys(payload).forEach((key) => {
-    if (
-      payload[key] === undefined ||
-      payload[key] === null ||
-      (Array.isArray(payload[key]) && payload[key].length === 0) ||
-      (typeof payload[key] === "object" &&
-        Object.keys(payload[key]).length === 0)
-    ) {
-      delete payload[key];
+    // Only proceed if there are changes
+    if (Object.keys(payload).length === 0) {
+      return {
+        data: null,
+        errors: null,
+        message: "Δεν υπάρχουν αλλαγές για αποθήκευση",
+      };
     }
-  });
 
-  // Only proceed if there are changes
-  if (Object.keys(payload).length === 0) {
+    // Execute GraphQL mutation
+    const { data: gqlData, error } = await postData(UPDATE_FREELANCER, {
+      id,
+      data: payload,
+    });
+
+    if (error) {
+      console.error("GraphQL error:", error);
+      return {
+        data: null,
+        errors: { submit: error.message || "Error updating profile" },
+        message: null,
+      };
+    }
+
+    // Revalidate path to update the UI
+    revalidatePath("/dashboard/profile");
+
     return {
-      data: null,
+      data: gqlData?.updateFreelancer?.data,
       errors: null,
-      message: "Δεν υπάρχουν αλλαγές για αποθήκευση",
+      message: "Τα στοιχεία ενημερώθηκαν με επιτυχία",
     };
-  }
-
-  // Execute GraphQL mutation
-  const { data: gqlData, error } = await postData(UPDATE_FREELANCER, {
-    id,
-    data: payload,
-  });
-
-  if (error) {
+  } catch (error) {
+    console.error("Unexpected error in updatePresentationInfo:", error);
     return {
       data: null,
-      errors: { submit: error.message },
+      errors: {
+        submit: `Unexpected error: ${error.message || "Unknown error"}`,
+      },
       message: null,
     };
   }
-
-  revalidatePath("/dashboard/profile");
-
-  return {
-    data: gqlData?.updateFreelancer?.data,
-    errors: null,
-    message: "Τα στοιχεία ενημερώθηκαν με επιτυχία",
-  };
 }
 
 export async function updateAdditionalInfo(prevState, formData) {

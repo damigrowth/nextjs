@@ -14,14 +14,14 @@ const initialCoverage = {
 };
 
 const initialSocials = {
-  facebook: { url: "" },
-  linkedin: { url: "" },
-  x: { url: "" },
-  youtube: { url: "" },
-  github: { url: "" },
-  instagram: { url: "" },
-  behance: { url: "" },
-  dribbble: { url: "" },
+  facebook: { url: null },
+  linkedin: { url: null },
+  x: { url: null },
+  youtube: { url: null },
+  github: { url: null },
+  instagram: { url: null },
+  behance: { url: null },
+  dribbble: { url: null },
 };
 
 const useEditProfileStore = create((set) => ({
@@ -108,7 +108,7 @@ const useEditProfileStore = create((set) => ({
   setImage: (value) => set(() => ({ image: value })),
 
   // Socials
-  socials: initialSocials,
+  socials: null,
   setSocial: (platform, url) =>
     set((state) => ({
       socials: {
@@ -319,7 +319,7 @@ const useEditProfileStore = create((set) => ({
       rating_stars_5: null,
       visibility: { phone: false, email: false, address: false },
       image: { data: null },
-      socials: {},
+      socials: initialSocials,
       terms: "",
       portfolio: { data: [] },
       services: { data: [] },
