@@ -40,7 +40,7 @@ const useEditServiceStore = create((set, get) => ({
   initializeWithService: (service) => {
     // Create normalized structures for taxonomy data
     const normalizeCategory = (data) => {
-      if (!data) return { id: 0, label: "" };
+      if (!data || !data.id) return { id: 0, label: "" };
       return {
         id: data.id,
         label: data.attributes?.label || "",

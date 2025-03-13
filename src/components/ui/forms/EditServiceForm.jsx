@@ -193,7 +193,7 @@ export default function EditServiceForm({ service }) {
         }))
       : [];
 
-    console.log("Selected and formatted tags:", formattedTags);
+    
     setInfo("tags", formattedTags);
   };
 
@@ -257,40 +257,49 @@ export default function EditServiceForm({ service }) {
       changes.status = status;
     }
 
-    // Compare category IDs properly
+    // Compare category IDs properly - ensure changes are detected
     const categoryId = info.category?.id?.toString();
     const originalCategoryId = service.category?.data?.id?.toString();
+
+    // Log what's happening with the category comparison for debugging
+    
+
     if (categoryId !== originalCategoryId) {
-      changes.category = info.category
-        ? {
-            id: info.category.id,
-            label: info.category.label || "",
-          }
-        : null;
+      changes.category =
+        info.category && info.category.id && info.category.id !== "0"
+          ? {
+              id: info.category.id,
+              label: info.category.label || "",
+            }
+          : null;
     }
 
     // Compare subcategory IDs properly
     const subcategoryId = info.subcategory?.id?.toString();
     const originalSubcategoryId = service.subcategory?.data?.id?.toString();
+
     if (subcategoryId !== originalSubcategoryId) {
-      changes.subcategory = info.subcategory
-        ? {
-            id: info.subcategory.id,
-            label: info.subcategory.label || "",
-          }
-        : null;
+      changes.subcategory =
+        info.subcategory && info.subcategory.id && info.subcategory.id !== "0"
+          ? {
+              id: info.subcategory.id,
+              label: info.subcategory.label || "",
+            }
+          : null;
     }
 
     // Compare subdivision IDs properly
     const subdivisionId = info.subdivision?.id?.toString();
     const originalSubdivisionId = service.subdivision?.data?.id?.toString();
+
     if (subdivisionId !== originalSubdivisionId) {
-      changes.subdivision = info.subdivision
-        ? {
-            id: info.subdivision.id,
-            label: info.subdivision.label || "",
-          }
-        : null;
+      changes.subdivision =
+        info.subdivision && info.subdivision.id && info.subdivision.id !== "0"
+          ? {
+              id: info.subdivision.id,
+              label: info.subdivision.label || "",
+            }
+          : null;
     }
 
     // Compare tags more accurately - by checking IDs
@@ -342,12 +351,17 @@ export default function EditServiceForm({ service }) {
       media.some((item) => item.file instanceof File) ||
       deletedMediaIds.length > 0;
 
+    
+    
+    
+
     // If no fields changed and media didn't change, don't submit
     if (!Object.keys(changedFields).length && !mediaChanged) {
-      console.log("No changes detected, skipping submission");
+      
       return;
     }
 
+    
 
     const formData = new FormData();
     formData.append("service-id", service.id);
@@ -375,20 +389,20 @@ export default function EditServiceForm({ service }) {
         validNewFiles.find((file) => file.name === name)
       );
 
-      console.log("Remaining media IDs:", remainingMediaIds);
-      console.log("Valid new files:", validNewFiles);
-      console.log("Unique files:", uniqueFiles);
+      
+      
+      
 
       formData.append("remaining-media", JSON.stringify(remainingMediaIds));
       formData.append("deleted-media", JSON.stringify(deletedMediaIds));
 
       // Make sure we properly append each file
       if (uniqueFiles.length > 0) {
-        console.log("Adding files to form data");
+        
         uniqueFiles.forEach((file) => {
           if (file) {
             formData.append("media-files", file);
-            console.log("Added file:", file.name);
+            
           }
         });
       }
@@ -396,12 +410,14 @@ export default function EditServiceForm({ service }) {
 
     // Debug log the form data
     for (let [key, value] of formData.entries()) {
-      console.log(`Form data: ${key} = `, value);
+      
     }
 
     // Make the form action call
     formAction(formData);
   };
+
+  
 
   return (
     <form action={handleSubmit}>
@@ -411,14 +427,14 @@ export default function EditServiceForm({ service }) {
             <div className="mb10">
               <InputB
                 label="Τίτλος"
-                id="service-title"
-                name="service-title"
+                id="title"
+                name="title"
                 type="text"
                 maxLength={80}
                 value={info.title}
                 onChange={(formattedValue) => setInfo("title", formattedValue)}
                 className="form-control input-group"
-                errors={errors}
+                errors={formState?.errors}
                 formatSymbols
                 capitalize
               />
@@ -427,13 +443,13 @@ export default function EditServiceForm({ service }) {
           <div className="row">
             <div className="mb10">
               <TextArea
-                id="service-description"
-                name="service-description"
+                id="description"
+                name="description"
                 label="Περιγραφή"
                 minLength={80}
                 maxLength={5000}
                 counter
-                errors={errors}
+                errors={formState?.errors}
                 value={info.description}
                 onChange={(formattedValue) =>
                   setInfo("description", formattedValue)
@@ -445,7 +461,7 @@ export default function EditServiceForm({ service }) {
             <div className="col-sm-4">
               <div className="mb20">
                 <SearchableSelect
-                  name="service-category"
+                  name="category"
                   label="Κατηγορία"
                   labelPlural="κατηγορίες"
                   value={info.category}
@@ -459,14 +475,14 @@ export default function EditServiceForm({ service }) {
                   isClearable={true}
                   formatSymbols
                   capitalize
-                  errors={errors?.field === "category" ? errors : null}
+                  errors={formState?.errors}
                 />
               </div>
             </div>
             <div className="col-sm-4">
               <div className="mb20">
                 <SearchableSelect
-                  name="service-subcategory"
+                  name="subcategory"
                   label="Υποκατηγορία"
                   labelPlural="υποκατηγορίες"
                   value={info.subcategory}
@@ -480,7 +496,7 @@ export default function EditServiceForm({ service }) {
                   isClearable={true}
                   formatSymbols
                   capitalize
-                  errors={errors?.field === "subcategory" ? errors : null}
+                  errors={formState?.errors}
                   isDisabled={!info?.category?.id}
                   resetDependency={info?.category?.id}
                 />
@@ -489,7 +505,7 @@ export default function EditServiceForm({ service }) {
             <div className="col-sm-4">
               <div className="mb20">
                 <SearchableSelect
-                  name="service-subdivision"
+                  name="subdivision"
                   label="Αντικείμενο"
                   labelPlural="αντικείμενα"
                   value={info.subdivision}
@@ -503,7 +519,7 @@ export default function EditServiceForm({ service }) {
                   isClearable={true}
                   formatSymbols
                   capitalize
-                  errors={errors?.field === "subdivision" ? errors : null}
+                  errors={formState?.errors}
                   isDisabled={!info?.subcategory?.id}
                   resetDependency={info?.subcategory?.id}
                 />
@@ -513,7 +529,7 @@ export default function EditServiceForm({ service }) {
           <div className="row">
             <div className="mb20">
               <SearchableSelect
-                name="service-tags"
+                name="tags"
                 label="Tags"
                 labelPlural="tags"
                 value={selectedTagsValue}
@@ -554,20 +570,19 @@ export default function EditServiceForm({ service }) {
             <div className="col-sm-2">
               <div className="mb20">
                 <InputB
-                  id="service-price"
-                  name="service-price"
+                  id="price"
+                  name="price"
                   label="Αμοιβή"
                   type="number"
                   min={10}
                   max={50000}
-                  value={info.price}
+                  value={info.price || 0}
                   onChange={(formattedValue) =>
                     setInfo("price", formattedValue)
                   }
                   className="form-control input-group"
-                  errors={errors}
+                  errors={formState?.errors}
                   append="€"
-                  formatSymbols
                 />
               </div>
             </div>
