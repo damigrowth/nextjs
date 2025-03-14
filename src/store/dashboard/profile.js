@@ -1,17 +1,28 @@
 import { data } from "@/data/pages/about";
 import { create } from "zustand";
 
-const initialCoverage = {
-  online: false,
-  onsite: false,
-  onbase: false,
-  address: "",
-  county: { data: null },
-  area: { data: null },
-  zipcode: { data: null },
-  counties: { data: [] },
-  areas: { data: [] },
+// Initialize coverage in a way that handles null values gracefully
+const getInitialCoverage = () => {
+  try {
+    return {
+      online: false,
+      onsite: false,
+      onbase: false,
+      address: "",
+      county: { data: null },
+      area: { data: null },
+      zipcode: { data: null },
+      counties: { data: [] },
+      areas: { data: [] },
+    };
+  } catch (error) {
+    console.error("Error initializing coverage:", error);
+    return null;
+  }
 };
+
+// Use the function to initialize coverage safely
+const initialCoverage = getInitialCoverage();
 
 const initialSocials = {
   facebook: { url: null },
@@ -137,16 +148,38 @@ const useEditProfileStore = create((set) => ({
 
   coverage: initialCoverage,
   setCoverage: (field, value) =>
-    set((state) => ({
-      coverage: {
-        ...state.coverage,
-        [field]: value,
-      },
-    })),
+    set((state) => {
+      // If coverage is null, initialize it first
+      if (state.coverage === null) {
+        return {
+          coverage: {
+            ...initialCoverage,
+            [field]: value,
+          },
+        };
+      }
+
+      return {
+        coverage: {
+          ...state.coverage,
+          [field]: value,
+        },
+      };
+    }),
 
   // Single method to handle all coverage mode switches
   switchCoverageMode: (mode, freelancerCoverage) =>
     set((state) => {
+      // If coverage is null, initialize it first
+      if (state.coverage === null) {
+        return {
+          coverage: {
+            ...initialCoverage,
+            [mode]: true,
+          },
+        };
+      }
+
       const newValue = !state.coverage[mode];
       const newCoverage = { ...state.coverage };
 
@@ -158,16 +191,24 @@ const useEditProfileStore = create((set) => ({
         if (mode === "onbase") {
           // Set onbase-specific fields from freelancerCoverage or keep the current ones
           newCoverage.address =
-            freelancerCoverage.address || newCoverage.address;
+            (freelancerCoverage && freelancerCoverage.address) ||
+            newCoverage.address;
           newCoverage.zipcode =
-            freelancerCoverage.zipcode || newCoverage.zipcode;
-          newCoverage.county = freelancerCoverage.county || newCoverage.county;
-          newCoverage.area = freelancerCoverage.area || newCoverage.area;
+            (freelancerCoverage && freelancerCoverage.zipcode) ||
+            newCoverage.zipcode;
+          newCoverage.county =
+            (freelancerCoverage && freelancerCoverage.county) ||
+            newCoverage.county;
+          newCoverage.area =
+            (freelancerCoverage && freelancerCoverage.area) || newCoverage.area;
         } else if (mode === "onsite") {
           // Set onsite-specific fields from freelancerCoverage or keep the current ones
-          newCoverage.areas = freelancerCoverage.areas || newCoverage.areas;
+          newCoverage.areas =
+            (freelancerCoverage && freelancerCoverage.areas) ||
+            newCoverage.areas;
           newCoverage.counties =
-            freelancerCoverage.counties || newCoverage.counties;
+            (freelancerCoverage && freelancerCoverage.counties) ||
+            newCoverage.counties;
         }
       }
       // Reset fields for the specific mode if it's being disabled
@@ -262,17 +303,10 @@ const useEditProfileStore = create((set) => ({
       services: freelancer.services || { data: [] },
       skills: freelancer.skills || { data: [] },
       specialization: freelancer.specialization || { data: null },
-      coverage: freelancer.coverage || {
-        online: false,
-        onsite: false,
-        onbase: false,
-        address: "",
-        county: { data: null },
-        area: { data: null },
-        zipcode: { data: null },
-        counties: { data: [] },
-        areas: { data: [] },
-      },
+      coverage:
+        freelancer.coverage === null
+          ? null
+          : freelancer.coverage || initialCoverage,
       type: freelancer.type || { data: null },
       category: freelancer.category || { data: null },
       subcategory: freelancer.subcategory || { data: null },
@@ -325,14 +359,7 @@ const useEditProfileStore = create((set) => ({
       services: { data: [] },
       skills: { data: [] },
       specialization: { data: null },
-      coverage: {
-        online: false,
-        onsite: false,
-        onbase: false,
-        address: "",
-        county: { data: null },
-        areas: { data: [] },
-      },
+      coverage: initialCoverage,
       type: { data: null },
       category: { data: null },
       subcategory: { data: null },

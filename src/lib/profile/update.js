@@ -76,95 +76,174 @@ export async function updateAccountInfo(prevState, formData) {
 }
 
 export async function updateBasicInfo(prevState, formData) {
-  const changedFields = JSON.parse(formData.get("changes"));
-  const file = formData.get("image");
+  try {
+    const changedFields = JSON.parse(formData.get("changes"));
+    const hasExistingImage = formData.get("hasExistingImage") === "true";
+    const file = formData.get("image");
+    const id = formData.get("id");
 
-  // Validate changed fields
-  const partialSchema = z.object(
-    Object.keys(changedFields).reduce((acc, field) => {
-      acc[field] = basicInfoSchema.shape[field];
-      return acc;
-    }, {})
-  );
+    // Create a collection of data to validate
+    const dataToValidate = { ...changedFields };
 
-  const validationResult = partialSchema.safeParse(changedFields);
+    // Handle file upload separately with more explicit logic
+    if (file && file instanceof File && file.size > 0) {
+      // If a new file is uploaded, include it in validation
+      dataToValidate.image = file;
+    } else if (hasExistingImage) {
+      // If there's an existing image but no new file,
+      // we should keep the existing image and remove from validation
+      delete dataToValidate.image;
+    } else if (changedFields.image?.data) {
+      // If we have image data in changedFields, keep it
+      // This handles the case where an image is selected from existing media
+      dataToValidate.image = changedFields.image;
+    } else if (!hasExistingImage) {
+      // If no existing image and no new file, validation should catch this
+      dataToValidate.image = null;
+    }
 
-  if (!validationResult.success) {
+    // Create a partial schema based on changed fields
+    const partialSchema = z.object(
+      Object.keys(dataToValidate).reduce((acc, field) => {
+        if (basicInfoSchema.shape[field]) {
+          acc[field] = basicInfoSchema.shape[field];
+        }
+        return acc;
+      }, {})
+    );
+
+    // Validate only changed fields
+    const validationResult = partialSchema.safeParse(dataToValidate);
+
+    if (!validationResult.success) {
+      // Transform Zod errors to match the exact format requested
+      const fieldErrors = {};
+
+      Object.entries(validationResult.error.flatten().fieldErrors).forEach(
+        ([field, messages]) => {
+          if (messages && messages.length > 0) {
+            fieldErrors[field] = {
+              field,
+              message: messages[0],
+            };
+          }
+        }
+      );
+
+      return {
+        data: null,
+        errors: fieldErrors,
+        message: null,
+      };
+    }
+
+    // Prepare the payload for API
+    const payload = {};
+
+    // Handle simple fields
+    if (validationResult.data.tagline !== undefined)
+      payload.tagline = validationResult.data.tagline;
+    if (validationResult.data.description !== undefined)
+      payload.description = validationResult.data.description;
+    if (validationResult.data.rate !== undefined)
+      payload.rate = validationResult.data.rate;
+    if (validationResult.data.commencement !== undefined)
+      payload.commencement = validationResult.data.commencement;
+
+    // Handle image upload if it exists and is a file
+    if (file && file instanceof File && file.size > 0) {
+      const uploadedIds = await uploadMedia([file]);
+      if (uploadedIds?.length > 0) {
+        payload.image = uploadedIds[0];
+      }
+    } else if (validationResult.data.image?.data?.id) {
+      // If we have an image ID in the validation result, use it
+      payload.image = validationResult.data.image.data.id;
+    } else if (!hasExistingImage && !file) {
+      // This case should not reach here if validation worked correctly
+      return {
+        data: null,
+        errors: {
+          image: {
+            field: "image",
+            message: "Η εικόνα προφίλ είναι υποχρεωτική",
+          },
+        },
+        message: null,
+      };
+    }
+    // Handle nested IDs
+    if (validationResult.data.category?.data?.id)
+      payload.category = validationResult.data.category.data.id;
+    if (validationResult.data.subcategory?.data?.id)
+      payload.subcategory = validationResult.data.subcategory.data.id;
+    if (validationResult.data.skills?.data) {
+      payload.skills = validationResult.data.skills.data.map(
+        (skill) => skill.id
+      );
+    }
+    if (validationResult.data.specialization?.data?.id) {
+      payload.specialization = validationResult.data.specialization.data.id;
+    } else if (validationResult.data.specialization?.data === null) {
+      payload.specialization = null;
+    }
+
+    // Handle coverage
+    if (validationResult.data.coverage) {
+      payload.coverage = {
+        online: validationResult.data.coverage.online,
+        onbase: validationResult.data.coverage.onbase,
+        onsite: validationResult.data.coverage.onsite,
+        address: validationResult.data.coverage.address,
+        zipcode: validationResult.data.coverage.zipcode?.data?.id,
+        area: validationResult.data.coverage.area?.data?.id,
+        county: validationResult.data.coverage.county?.data?.id,
+        counties:
+          validationResult.data.coverage.counties?.data?.map((el) => el.id) ||
+          [],
+        areas:
+          validationResult.data.coverage.areas?.data?.map((el) => el.id) || [],
+      };
+    }
+
+    // Make the API call
+    const { data, error } = await postData(UPDATE_FREELANCER, {
+      id,
+      data: payload,
+    });
+
+    if (error) {
+      return {
+        data: null,
+        errors: {
+          submit: {
+            field: "submit",
+            message: error,
+          },
+        },
+        message: null,
+      };
+    }
+
+    revalidatePath("/dashboard/profile");
+    return {
+      data: data.updateFreelancer.data,
+      errors: null,
+      message: "Τα στοιχεία ενημερώθηκαν με επιτυχία",
+    };
+  } catch (error) {
+    console.error("Error in updateBasicInfo:", error);
     return {
       data: null,
-      errors: Object.fromEntries(
-        Object.entries(validationResult.error.flatten().fieldErrors)
-          .filter(([_, messages]) => messages?.length > 0)
-          .map(([field, messages]) => [field, { field, message: messages[0] }])
-      ),
+      errors: {
+        submit: {
+          field: "submit",
+          message: "Προέκυψε ένα σφάλμα. Παρακαλώ δοκιμάστε ξανά.",
+        },
+      },
       message: null,
     };
   }
-
-  // Format the payload
-  const payload = {};
-
-  // Handle image upload if it exists in the valid data
-  if (file) {
-    const uploadedIds = await uploadMedia([file]);
-    if (uploadedIds?.length > 0) {
-      payload.image = uploadedIds[0];
-    }
-  }
-
-  // Handle simple fields
-  if (validationResult.data.tagline)
-    payload.tagline = validationResult.data.tagline;
-  if (validationResult.data.description)
-    payload.description = validationResult.data.description;
-  if (validationResult.data.rate) payload.rate = validationResult.data.rate;
-  if (validationResult.data.commencement)
-    payload.commencement = validationResult.data.commencement;
-
-  // Handle nested IDs
-  if (validationResult.data.category?.data?.id)
-    payload.category = validationResult.data.category.data.id;
-  if (validationResult.data.subcategory?.data?.id)
-    payload.subcategory = validationResult.data.subcategory.data.id;
-  if (validationResult.data.skills?.data) {
-    payload.skills = validationResult.data.skills.data.map((skill) => skill.id);
-  }
-  if (validationResult.data.specialization?.data?.id) {
-    payload.specialization = validationResult.data.specialization.data.id;
-  }
-
-  // Handle coverage
-  if (validationResult.data.coverage) {
-    payload.coverage = {
-      online: validationResult.data.coverage.online,
-      onbase: validationResult.data.coverage.onbase,
-      onsite: validationResult.data.coverage.onsite,
-      address: validationResult.data.coverage.address,
-      zipcode: validationResult.data.coverage.zipcode?.data?.id,
-      area: validationResult.data.coverage.area?.data?.id,
-      county: validationResult.data.coverage.county?.data?.id,
-      counties:
-        validationResult.data.coverage.counties?.data?.map((el) => el.id) || [],
-      areas:
-        validationResult.data.coverage.areas?.data?.map((el) => el.id) || [],
-    };
-  }
-
-  const { data, error } = await postData(UPDATE_FREELANCER, {
-    id: formData.get("id"),
-    data: payload,
-  });
-
-  if (error) {
-    return { data: null, errors: { submit: error }, message: null };
-  }
-
-  revalidatePath("/dashboard/profile");
-  return {
-    data: data.updateFreelancer.data,
-    errors: null,
-    message: "Τα στοιχεία ενημερώθηκαν με επιτυχία",
-  };
 }
 
 export async function updatePresentationInfo(prevState, formData) {

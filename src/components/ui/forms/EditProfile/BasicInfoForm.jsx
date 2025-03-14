@@ -26,6 +26,19 @@ import { useFormChanges } from "@/hook/useFormChanges";
 import { FREELANCER_PROFILE_SKILLS } from "@/lib/graphql/queries/main/taxonomies/freelancer/skill";
 
 export default function BasicInfoForm({ freelancer, type }) {
+  // Create a default coverage object to use when coverage is null
+  const defaultCoverage = {
+    online: false,
+    onbase: false,
+    onsite: false,
+    address: "",
+    area: { data: null },
+    county: { data: null },
+    zipcode: { data: null },
+    counties: { data: [] },
+    areas: { data: [] },
+  };
+
   const {
     image,
     setImage,
@@ -69,8 +82,8 @@ export default function BasicInfoForm({ freelancer, type }) {
     subcategory: freelancer.subcategory,
     skills: freelancer.skills,
     specialization: freelancer.specialization,
-    rate: Number(freelancer.rate),
-    commencement: Number(freelancer.commencement),
+    rate: Number(freelancer.rate) || 0,
+    commencement: Number(freelancer.commencement) || 0,
     coverage: freelancer.coverage,
   };
 
@@ -82,8 +95,8 @@ export default function BasicInfoForm({ freelancer, type }) {
     subcategory,
     skills,
     specialization,
-    rate: Number(rate),
-    commencement: Number(commencement),
+    rate: Number(rate) || 0,
+    commencement: Number(commencement) || 0,
     coverage,
   };
 
@@ -122,7 +135,8 @@ export default function BasicInfoForm({ freelancer, type }) {
 
   const handleOnsiteAreas = useCallback(
     async (searchTerm, page = 1) => {
-      const countyIds = coverage.counties.data.map((c) => c.id);
+      // Use optional chaining and provide a default empty array
+      const countyIds = coverage?.counties?.data?.map((c) => c.id) || [];
 
       const query = normalizeQuery(ONSITE_AREAS);
       const data = await searchData({
@@ -138,7 +152,7 @@ export default function BasicInfoForm({ freelancer, type }) {
 
       return data;
     },
-    [coverage.counties.data]
+    [coverage?.counties?.data]
   );
 
   const handleFreelancerCategories = useCallback(
@@ -202,15 +216,45 @@ export default function BasicInfoForm({ freelancer, type }) {
   );
 
   const handleOnlineSwitch = () => {
-    switchCoverageMode("online", freelancer.coverage);
+    // Initialize coverage if it's null before switching
+    if (coverage === null) {
+      useEditProfileStore.setState((state) => ({
+        ...state,
+        coverage: defaultCoverage,
+      }));
+      // After initializing, call switchCoverageMode
+      setTimeout(() => switchCoverageMode("online", freelancer.coverage), 0);
+    } else {
+      switchCoverageMode("online", freelancer.coverage);
+    }
   };
 
   const handleOnbaseSwitch = () => {
-    switchCoverageMode("onbase", freelancer.coverage);
+    // Initialize coverage if it's null before switching
+    if (coverage === null) {
+      useEditProfileStore.setState((state) => ({
+        ...state,
+        coverage: defaultCoverage,
+      }));
+      // After initializing, call switchCoverageMode
+      setTimeout(() => switchCoverageMode("onbase", freelancer.coverage), 0);
+    } else {
+      switchCoverageMode("onbase", freelancer.coverage);
+    }
   };
 
   const handleOnsiteSwitch = () => {
-    switchCoverageMode("onsite", freelancer.coverage);
+    // Initialize coverage if it's null before switching
+    if (coverage === null) {
+      useEditProfileStore.setState((state) => ({
+        ...state,
+        coverage: defaultCoverage,
+      }));
+      // After initializing, call switchCoverageMode
+      setTimeout(() => switchCoverageMode("onsite", freelancer.coverage), 0);
+    } else {
+      switchCoverageMode("onsite", freelancer.coverage);
+    }
   };
 
   // Handle category change
@@ -283,7 +327,8 @@ export default function BasicInfoForm({ freelancer, type }) {
   const handleCountiesSelect = (selected) => {
     const newCountyIds = selected ? selected.map((c) => c.id) : [];
 
-    const currentAreas = coverage.areas.data || [];
+    // Use optional chaining for safely accessing coverage.areas.data
+    const currentAreas = coverage?.areas?.data || [];
 
     const updatedAreas = currentAreas.filter((area) => {
       const countyData = area.data?.attributes?.county?.data;
@@ -306,7 +351,18 @@ export default function BasicInfoForm({ freelancer, type }) {
     })) || [];
 
   const handleSubmit = async (formData) => {
-    const currentCoverage = { ...coverage };
+    // Only proceed if there are actual changes
+    if (!hasChanges) {
+      return {
+        data: null,
+        errors: { submit: "Δεν υπάρχουν αλλαγές για αποθήκευση" },
+        message: null,
+      };
+    }
+
+    const hasExistingImage = Boolean(originalValues.image.data);
+
+    formData.append("hasExistingImage", hasExistingImage);
 
     formData.append("id", freelancer.id);
 
@@ -321,14 +377,6 @@ export default function BasicInfoForm({ freelancer, type }) {
 
     // Submit the form
     const result = await formAction(formData);
-
-    // If there are errors, make sure coverage state stays the same
-    if (result?.errors && Object.keys(result.errors).length > 0) {
-      useEditProfileStore.setState((state) => ({
-        ...state,
-        coverage: currentCoverage,
-      }));
-    }
 
     return result;
   };
@@ -352,6 +400,7 @@ export default function BasicInfoForm({ freelancer, type }) {
         </div>
         <label className="form-label fw500 dark-color">Εικόνα Προφιλ</label>
         <ProfileImageInput
+          name="image"
           image={image?.data?.attributes?.formats?.thumbnail?.url}
           onChange={setImage}
           errors={formState?.errors?.image}
@@ -435,7 +484,7 @@ export default function BasicInfoForm({ freelancer, type }) {
               <SwitchB
                 label="Online"
                 name="online"
-                initialValue={coverage.online}
+                initialValue={coverage?.online || false}
                 onChange={handleOnlineSwitch}
               />
             </div>
@@ -443,7 +492,7 @@ export default function BasicInfoForm({ freelancer, type }) {
               <SwitchB
                 label="Στην έδρα μου"
                 name="onbase"
-                initialValue={coverage.onbase}
+                initialValue={coverage?.onbase || false}
                 onChange={handleOnbaseSwitch}
               />
             </div>
@@ -451,7 +500,7 @@ export default function BasicInfoForm({ freelancer, type }) {
               <SwitchB
                 label="Στον χώρο του πελάτη"
                 name="onsite"
-                initialValue={coverage.onsite}
+                initialValue={coverage?.onsite || false}
                 onChange={handleOnsiteSwitch}
               />
             </div>
@@ -463,7 +512,7 @@ export default function BasicInfoForm({ freelancer, type }) {
               </div>
             ) : null}
           </div>
-          {coverage.onbase && (
+          {coverage?.onbase && (
             <div className="row mb10">
               <div className="col-md-3">
                 <InputB
@@ -471,7 +520,7 @@ export default function BasicInfoForm({ freelancer, type }) {
                   id="address"
                   name="address"
                   type="text"
-                  value={coverage.address || ""}
+                  value={coverage?.address || ""}
                   onChange={(value) => setCoverage("address", value)}
                   className="form-control input-group"
                   errors={formState?.errors?.address}
@@ -482,7 +531,7 @@ export default function BasicInfoForm({ freelancer, type }) {
                   name="zipcode"
                   label="Τ.Κ"
                   labelPlural="Τ.Κ"
-                  value={coverage.zipcode.data}
+                  value={coverage?.zipcode?.data}
                   nameParam="name"
                   pageParam="coverageZipcodePage"
                   pageSizeParam="coverageZipcodePageSize"
@@ -510,7 +559,7 @@ export default function BasicInfoForm({ freelancer, type }) {
                 <SearchableSelect
                   name="area"
                   label="Περιοχή"
-                  value={coverage.area.data}
+                  value={coverage?.area?.data}
                   isDisabled={true}
                   formatSymbols
                   capitalize
@@ -521,7 +570,7 @@ export default function BasicInfoForm({ freelancer, type }) {
                 <SearchableSelect
                   name="county"
                   label="Νομός"
-                  value={coverage.county.data}
+                  value={coverage?.county?.data}
                   isMulti={false}
                   isClearable={true}
                   isDisabled={true}
@@ -532,14 +581,14 @@ export default function BasicInfoForm({ freelancer, type }) {
               </div>
             </div>
           )}
-          {coverage.onsite && (
+          {coverage?.onsite && (
             <div className="row mb10">
               <div className="col-md-3">
                 <SearchableSelect
                   name="counties"
                   label="Νομοί"
                   labelPlural="νομοί"
-                  value={coverage.counties.data}
+                  value={coverage?.counties?.data}
                   nameParam="name"
                   pageParam="coverageCountiesPage"
                   pageSizeParam="coverageCountiesPageSize"
@@ -558,7 +607,7 @@ export default function BasicInfoForm({ freelancer, type }) {
                   name="areas"
                   label="Περιοχές"
                   labelPlural="περιοχές"
-                  value={coverage.areas.data}
+                  value={coverage?.areas?.data}
                   nameParam="areaTerm"
                   pageParam="coverageAreasPage"
                   pageSizeParam="coverageAreasPageSize"
@@ -573,7 +622,9 @@ export default function BasicInfoForm({ freelancer, type }) {
                   isClearable={true}
                   formatSymbols
                   capitalize
-                  key={coverage.counties.data.map((c) => c.id).join("-")}
+                  key={(coverage?.counties?.data || [])
+                    .map((c) => c.id)
+                    .join("-")}
                   errors={formState?.errors?.areas}
                 />
               </div>

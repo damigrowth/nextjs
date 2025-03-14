@@ -3,7 +3,7 @@
 export default function SaveButton({
   hidden = false,
   isPending = false,
-  hasChanges = true,
+  hasChanges = false,
   loadingText = "Ενημέρωση Στοιχείων...",
   defaultText = "Ενημέρωση Στοιχείων",
   icon = "fa-solid fa-floppy-disk",
