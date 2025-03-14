@@ -5,7 +5,7 @@ export default function Industries({ industries }) {
     return;
   }
   return (
-    <div className="list1 mt60">
+    <div className="list1 mt50 mb50">
       <h6 className="fw500">Κύριοι Κλάδοι Πελατών</h6>
       <ul className="tags mt20">
         {industries.map((industry, i) => (
