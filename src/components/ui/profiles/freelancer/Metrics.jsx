@@ -1,4 +1,3 @@
-import { getYearsOfExperience } from "@/utils/getYearsOfExperience";
 import React from "react";
 
 export default function Metrics({
@@ -7,9 +6,6 @@ export default function Metrics({
   commencement,
   yearsOfExperience,
 }) {
-  // DONE IN THE BACKEND
-  // const yearsOfExperience = getYearsOfExperience(commencement);
-
   return (
     <div className="row">
       {subcategory && (
@@ -24,18 +20,20 @@ export default function Metrics({
           </div>
         </div>
       )}
-
-      <div className="col-sm-6 col-xl-3">
-        <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
-          <div className="icon flex-shrink-0">
-            <span className="flaticon-page" />
-          </div>
-          <div className="details">
-            <h5 className="title fw600">Υπηρεσίες</h5>
-            <p className="mb-0 text">{servicesTotal}</p>
+      {servicesTotal && (
+        <div className="col-sm-6 col-xl-3">
+          <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
+            <div className="icon flex-shrink-0">
+              <span className="flaticon-page" />
+            </div>
+            <div className="details">
+              <h5 className="title fw600">Υπηρεσίες</h5>
+              <p className="mb-0 text">{servicesTotal}</p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
       {commencement && (
         <div className="col-sm-6 col-xl-3">
           <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
