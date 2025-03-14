@@ -7,18 +7,6 @@ export default function Features({
   payment_methods,
   settlement_methods,
 }) {
-  const sizeNumber = Number(size?.slug);
-
-  // // Function to find the smallest budget
-  // const getSmallestBudget = (budgets) => {
-  //   if (!budgets || budgets.length === 0) return null;
-  //   return budgets.reduce((min, budget) =>
-  //     budget.attributes.value < min.attributes.value ? budget : min
-  //   );
-  // };
-
-  // const smallestBudget = getSmallestBudget(minBudget);
-
   return (
     <>
       <div className="row mt60">
@@ -78,7 +66,7 @@ export default function Features({
           </div>
         )}
 
-        {sizeNumber > 1 && (
+        {size?.label && (
           <div className="col-sm-6 col-xl-4">
             <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
               <div className="icon flex-shrink-0">
@@ -86,7 +74,7 @@ export default function Features({
               </div>
               <div className="details">
                 <h5 className="title">Αριθμός Εργαζομένων</h5>
-                <p className="mb-0 text">{size?.label}</p>
+                <p className="mb-0 text">{size.label}</p>
               </div>
             </div>
           </div>

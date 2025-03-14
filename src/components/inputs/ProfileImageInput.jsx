@@ -3,13 +3,13 @@
 import Image from "next/image";
 import React, { useState, useEffect, useCallback } from "react";
 
-export default function ProfileImageInput({ image, onChange, errors }) {
-  const [error, setError] = useState("");
+export default function ProfileImageInput({ image, name, onChange, errors }) {
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [error, setError] = useState(null);
 
   // Clear error after 3 seconds
   const clearError = useCallback(() => {
-    setError("");
+    setError(null);
   }, []);
 
   useEffect(() => {
@@ -60,15 +60,6 @@ export default function ProfileImageInput({ image, onChange, errors }) {
     }
   };
 
-  const handleDelete = () => {
-    if (previewUrl?.startsWith("blob:")) {
-      URL.revokeObjectURL(previewUrl);
-    }
-    setPreviewUrl(null);
-    setError("");
-    onChange(null);
-  };
-
   // Get image source - either the preview URL, passed URL, or default
   const getImageSource = () => {
     if (previewUrl) {
@@ -84,8 +75,8 @@ export default function ProfileImageInput({ image, onChange, errors }) {
   const hasImage = Boolean(image || previewUrl);
 
   return (
-    <div className="col-xl-7">
-      <div className="profile-box d-sm-flex align-items-center mb30">
+    <div className="col-xl-7 mb20">
+      <div className="profile-box d-sm-flex align-items-center mb10">
         <div className="profile-img mb20-sm">
           <Image
             height={142}
@@ -103,14 +94,9 @@ export default function ProfileImageInput({ image, onChange, errors }) {
         <div className="profile-content ml20 ml0-xs">
           <div className="d-flex flex-column">
             <div className="d-flex align-items-center">
-              {/* <a
-                className="tag-delt text-thm2 cursor-pointer"
-                onClick={handleDelete}
-              >
-                <span className="flaticon-delete text-thm2" />
-              </a> */}
               <label className="mb0">
                 <input
+                  name={name}
                   type="file"
                   accept=".png, .jpg, .jpeg"
                   className="d-none"
@@ -122,11 +108,6 @@ export default function ProfileImageInput({ image, onChange, errors }) {
                 </a>
               </label>
             </div>
-            {(error || errors) && (
-              <p className="text-danger fs-14 ml10 mb0 mt-1">
-                {error || errors}
-              </p>
-            )}
           </div>
           <p className="text fz13 mb-0 mt-2">
             Μέγιστο μέγεθος αρχείου: 1MB, Ελάχιστες διαστάσεις: 80x80.
@@ -134,6 +115,11 @@ export default function ProfileImageInput({ image, onChange, errors }) {
           </p>
         </div>
       </div>
+      {errors?.field === name || error ? (
+        <div>
+          <p className="text-danger mb0 pb0">{errors?.message || error}</p>
+        </div>
+      ) : null}
     </div>
   );
 }

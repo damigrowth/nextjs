@@ -1,6 +1,23 @@
 import equal from "fast-deep-equal";
 
-const normalizeValue = (value) => {
+const normalizeValue = (value, key) => {
+  // Special handling for coverage object
+  if (key === "coverage") {
+    // If coverage is null, return null
+    if (value === null) return null;
+
+    // Check if the coverage object is effectively empty
+    const hasOnlineEnabled = !!value.online;
+    const hasOnbaseEnabled = !!value.onbase;
+    const hasOnsiteEnabled = !!value.onsite;
+    const hasAddress = value.address && value.address.trim() !== "";
+    const hasData =
+      hasOnlineEnabled || hasOnbaseEnabled || hasOnsiteEnabled || hasAddress;
+
+    // If coverage is effectively empty, treat it as null for comparison
+    if (!hasData) return null;
+  }
+
   // Handle null or undefined
   if (value === null || value === undefined) return null;
 
@@ -33,7 +50,7 @@ const normalizeValue = (value) => {
             if (Object.keys(item).length > 0) {
               const normalizedItem = {};
               Object.entries(item).forEach(([key, val]) => {
-                const normalizedVal = normalizeValue(val);
+                const normalizedVal = normalizeValue(val, key);
                 if (normalizedVal !== null) {
                   normalizedItem[key] = normalizedVal;
                 }
@@ -73,11 +90,11 @@ const normalizeValue = (value) => {
     // Deep object traversal
     if (Object.keys(value).length > 0) {
       const normalizedObj = {};
-      Object.entries(value).forEach(([key, val]) => {
-        const normalizedVal = normalizeValue(val);
+      Object.entries(value).forEach(([subKey, val]) => {
+        const normalizedVal = normalizeValue(val, subKey);
         // Only add non-null values
         if (normalizedVal !== null) {
-          normalizedObj[key] = normalizedVal;
+          normalizedObj[subKey] = normalizedVal;
         }
       });
       return Object.keys(normalizedObj).length > 0 ? normalizedObj : null;
@@ -103,8 +120,8 @@ export const useFormChanges = (currentState, originalState) => {
 
   const changes = Object.fromEntries(
     Object.entries(currentState).filter(([key, value]) => {
-      const normalizedCurrent = normalizeValue(value);
-      const normalizedOriginal = normalizeValue(originalState[key]);
+      const normalizedCurrent = normalizeValue(value, key);
+      const normalizedOriginal = normalizeValue(originalState[key], key);
 
       // Deep comparison using fast-deep-equal
       return !equal(normalizedCurrent, normalizedOriginal);

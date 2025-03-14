@@ -18,31 +18,55 @@ const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 const MIN_WIDTH = 80;
 const MIN_HEIGHT = 80;
 
+// A schema that validates either a File object or an existing image object
 const imageSchema = z
-  .any()
-  .refine(
-    (file) => !file || file.size <= MAX_FILE_SIZE,
-    "Το μέγεθος του αρχείου πρέπει να είναι μικρότερο από 1MB"
-  )
-  .refine(
-    (file) => !file || ACCEPTED_IMAGE_TYPES.includes(file.type),
-    "Επιτρέπονται μόνο αρχεία .jpg και .png"
-  )
-  .refine((file) => {
-    if (!file) return true;
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.src = URL.createObjectURL(file);
-      img.onload = () => {
-        URL.revokeObjectURL(img.src);
-        resolve(img.width >= MIN_WIDTH && img.height >= MIN_HEIGHT);
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(img.src);
-        resolve(false);
-      };
-    });
-  }, `Οι ελάχιστες διαστάσεις εικόνας είναι ${MIN_WIDTH}x${MIN_HEIGHT} pixels`);
+  .union([
+    // Case 1: Existing valid image (from URL or backend response)
+    z.object({
+      data: z.object({
+        id: z.string(),
+        attributes: z.object({
+          url: z.string().url(),
+          formats: z
+            .object({
+              thumbnail: z
+                .object({
+                  url: z.string().url(),
+                })
+                .optional(),
+            })
+            .optional(),
+        }),
+      }),
+    }),
+
+    // Case 2: New file upload
+    z
+      .instanceof(File)
+      .refine(
+        (file) => file.size <= MAX_FILE_SIZE,
+        "Το μέγεθος του αρχείου πρέπει να είναι μικρότερο από 1MB"
+      )
+      .refine(
+        (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
+        "Επιτρέπονται μόνο αρχεία .jpg και .png"
+      )
+      .optional(),
+
+    // Case 3: Empty/undefined (allowed only if existing image exists)
+    z.undefined().or(z.null()).optional(),
+  ])
+  .superRefine((val, ctx) => {
+    // Only require validation if there's no existing image
+    if (!val?.data?.attributes?.url) {
+      if (!(val instanceof File)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Η εικόνα προφίλ είναι υποχρεωτική",
+        });
+      }
+    }
+  });
 
 export const basicInfoSchema = z.object({
   image: imageSchema,
