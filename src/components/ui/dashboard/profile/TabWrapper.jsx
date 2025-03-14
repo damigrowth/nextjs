@@ -16,17 +16,30 @@ export default function TabWrapper({ children, freelancer }) {
 
   // New activation logic
   useEffect(() => {
+    const isTypeUser = freelancer.type?.data?.attributes?.slug === "user";
+
     const requiredFieldsFilled = () => {
-      return Boolean(
-        freelancer.displayName &&
-          freelancer.phone &&
-          freelancer.email &&
-          freelancer.coverage &&
-          (freelancer.coverage.online ||
-            freelancer.coverage.onbase ||
-            freelancer.coverage.onsite) &&
-          freelancer.image?.data?.id
-      );
+      if (isTypeUser) {
+        return Boolean(
+          freelancer.displayName &&
+            freelancer.phone &&
+            freelancer.email &&
+            freelancer.image?.data?.id
+        );
+      } else {
+        return Boolean(
+          freelancer.displayName &&
+            freelancer.phone &&
+            freelancer.email &&
+            freelancer.coverage &&
+            (freelancer.coverage.online ||
+              freelancer.coverage.onbase ||
+              freelancer.coverage.onsite) &&
+            freelancer.category?.data?.id &&
+            freelancer.subcategory?.data?.id &&
+            freelancer.image?.data?.id
+        );
+      }
     };
 
     const shouldActivate =
@@ -60,6 +73,8 @@ export default function TabWrapper({ children, freelancer }) {
     freelancer.coverage?.online,
     freelancer.coverage?.onbase,
     freelancer.coverage?.onsite,
+    freelancer.category?.data?.id,
+    freelancer.subcategory?.data?.id,
     freelancer.image?.data?.id,
   ]);
 
