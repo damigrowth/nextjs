@@ -105,7 +105,7 @@ export async function updateBasicInfo(prevState, formData) {
     const dataToValidate = { ...changedFields };
 
     // Handle file upload separately with more explicit logic
-    if (file && file instanceof File && file.size > 0) {
+    if (file && file.size > 0) {
       // If a new file is uploaded, include it in validation
       dataToValidate.image = file;
     } else if (hasExistingImage) {
