@@ -59,6 +59,7 @@ const FREELANCER_BY_USERNAME = gql`
         username: { eq: $username }
         email: { ne: "" }
         displayName: { ne: "" }
+        status: { id: { eq: 1 } }
         type: { slug: { ne: "user" } }
         category: { id: { ne: null } }
         subcategory: { id: { ne: null } }
@@ -130,6 +131,7 @@ const FREELANCERS_ARCHIVE = gql`
         username: { ne: "" }
         displayName: { ne: "" }
         rate: { gte: $min, lte: $max }
+        status: { id: { eq: 1 } }
         payment_methods: { id: { in: $paymentMethods } }
         contactTypes: { id: { in: $contactTypes } }
         coverage: {
@@ -175,6 +177,7 @@ const FEATURED_FREELANCERS = gql`
               email: { ne: "" }
               username: { ne: "" }
               displayName: { ne: "" }
+              status: { id: { eq: 1 } }
               category: { id: { ne: null } }
               subcategory: { id: { ne: null } }
             }
