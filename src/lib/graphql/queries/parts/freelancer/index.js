@@ -52,6 +52,11 @@ const FREELANCER_PARTIAL_MAIN = gql`
 
 const FREELANCER_PARTIAL_RELATIONS = gql`
   fragment FreelancerPartialRelations on Freelancer {
+    status {
+      data {
+        id
+      }
+    }
     image {
       ...SingleImage
     }
@@ -147,6 +152,11 @@ const FREELANCER_MAIN = gql`
 
 const FREELANCER_RELATIONS = gql`
   fragment FreelancerRelations on Freelancer {
+    status {
+      data {
+        id
+      }
+    }
     image {
       ...SingleImage
     }
@@ -297,6 +307,11 @@ const FREELANCER_RELATIONS = gql`
 // New fragment without user field
 const FREELANCER_RELATIONS_WITHOUT_USER = gql`
   fragment FreelancerRelationsWithoutUser on Freelancer {
+    status {
+      data {
+        id
+      }
+    }
     image {
       ...SingleImage
     }

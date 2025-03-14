@@ -15,6 +15,25 @@ import {
 import { uploadMedia } from "../uploads/upload";
 import { handleMediaUpdate } from "../uploads/update";
 
+export async function updateFreelancerStatus(id) {
+  try {
+    const { data, error } = await postData(UPDATE_FREELANCER, {
+      id,
+      data: {
+        status: 1,
+      },
+    });
+
+    if (error) throw error;
+
+    revalidatePath("/dashboard/profile");
+    return data;
+  } catch (error) {
+    console.error("Status update failed:", error);
+    throw error;
+  }
+}
+
 export async function updateAccountInfo(prevState, formData) {
   const changedFields = JSON.parse(formData.get("changes"));
 

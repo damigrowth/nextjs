@@ -23,14 +23,11 @@ export default async function FreelancerGrid({
         taxonomies={taxonomies}
       />
       {freelancers.length > 0 ? (
-        freelancers.map(
-          (freelancer, i) =>
-            freelancer?.image?.data && (
-              <div key={i} className="col-sm-6 col-xl-4">
-                <FreelancerCard freelancer={freelancer} fid={fid} linkedName />
-              </div>
-            )
-        )
+        freelancers.map((freelancer, i) => (
+          <div key={i} className="col-sm-6 col-xl-4">
+            <FreelancerCard freelancer={freelancer} fid={fid} linkedName />
+          </div>
+        ))
       ) : (
         <div>
           Δεν βρέθηκαν {type === "company" ? "επιχειρήσεις" : "επαγγελματίες"}
