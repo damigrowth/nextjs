@@ -207,7 +207,7 @@ export default function PresentationForm({ freelancer }) {
 
     // Create hashable representations of media items
     const getMediaHash = (item) => {
-      if (item.file instanceof File) {
+      if (typeof window !== "undefined" && item.file instanceof File) {
         return `file_${item.file.name}_${item.file.size}`;
       } else if (
         item.file &&
@@ -297,9 +297,9 @@ export default function PresentationForm({ freelancer }) {
     // Always check for media changes, not just based on hasChanges flag
     // This ensures we properly handle deletes even if other form fields changed
     const hasMediaDeletions = mediaState.deletedMediaIds.length > 0;
-    const hasNewUploads = mediaState.media.some(
-      (item) => item.file instanceof File
-    );
+    const hasNewUploads =
+      typeof window !== "undefined" &&
+      mediaState.media.some((item) => item.file instanceof File);
 
     // Special case: all media has been deleted
     const allMediaDeleted =
