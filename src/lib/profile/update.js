@@ -170,7 +170,7 @@ export async function updateBasicInfo(prevState, formData) {
       payload.commencement = validationResult.data.commencement;
 
     // Handle image upload if it exists and is a file
-    if (file && file instanceof File && file.size > 0) {
+    if (file && file.size > 0) {
       const uploadedIds = await uploadMedia([file]);
       if (uploadedIds?.length > 0) {
         payload.image = uploadedIds[0];
@@ -269,8 +269,6 @@ export async function updatePresentationInfo(prevState, formData) {
   try {
     const changedFields = JSON.parse(formData.get("changes") || "{}");
     const id = formData.get("id");
-
-    console.log("Presentation update - Changed fields:", changedFields);
 
     // Create a partial schema based on changed fields
     const partialSchema = z.object(
