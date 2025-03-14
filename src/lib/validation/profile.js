@@ -21,7 +21,7 @@ const MIN_HEIGHT = 80;
 // A schema that validates either a File object or an existing image object
 const imageSchema = z
   .union([
-    // Case 1: Existing valid image (from URL or backend response)
+    // Case 1: Existing valid image
     z.object({
       data: z.object({
         id: z.string(),
@@ -40,9 +40,14 @@ const imageSchema = z
       }),
     }),
 
-    // Case 2: New file upload
+    // Case 2: New file upload (modified to work in Node.js)
     z
-      .instanceof(File)
+      .object({
+        name: z.string(),
+        size: z.number(),
+        type: z.string(),
+        lastModified: z.number(),
+      })
       .refine(
         (file) => file.size <= MAX_FILE_SIZE,
         "Το μέγεθος του αρχείου πρέπει να είναι μικρότερο από 1MB"
@@ -53,18 +58,20 @@ const imageSchema = z
       )
       .optional(),
 
-    // Case 3: Empty/undefined (allowed only if existing image exists)
+    // Case 3: Empty/undefined
     z.undefined().or(z.null()).optional(),
   ])
   .superRefine((val, ctx) => {
-    // Only require validation if there's no existing image
-    if (!val?.data?.attributes?.url) {
-      if (!(val instanceof File)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Η εικόνα προφίλ είναι υποχρεωτική",
-        });
-      }
+    // Check if we have either existing image or valid file object
+    const hasValidImage =
+      val?.data?.attributes?.url ||
+      (val?.name && val?.size && val?.type && val?.lastModified);
+
+    if (!hasValidImage) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Η εικόνα προφίλ είναι υποχρεωτική",
+      });
     }
   });
 
