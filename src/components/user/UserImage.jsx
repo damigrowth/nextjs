@@ -43,6 +43,7 @@ export default function UserImage({
             className="rounded-circle"
             src={image}
             alt={alt || "profile-image"}
+            style={{ objectFit: "cover" }}
           />
         ) : (
           <InitialsImage

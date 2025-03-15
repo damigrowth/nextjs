@@ -466,7 +466,7 @@ a {
 }
 
 .no-rotate i {
-  transform: rotate(0deg);
+  transform: rotate(0deg) !important;
 }
 
 .btn-dark-disabled {
