@@ -13,7 +13,7 @@ import {
   presentationSchema,
 } from "../validation/profile";
 import { uploadMedia } from "../uploads/upload";
-import { handleMediaUpdate } from "../uploads/update";
+// We no longer need handleMediaUpdate as files are uploaded client-side
 
 export async function updateFreelancerStatus(id) {
   try {
@@ -482,47 +482,21 @@ export async function updatePresentationInfo(prevState, formData) {
       formData.get("remaining-media") || "[]"
     );
     const deletedMediaIds = JSON.parse(formData.get("deleted-media") || "[]");
-    const files = formData.getAll("media-files");
     const allMediaDeleted = formData.get("all-media-deleted") === "true";
 
     // Check if there are actual media changes to process
-    const hasNewFiles = files.length > 0;
     const hasDeletedFiles = deletedMediaIds.length > 0;
-    const hasMediaChanges = hasNewFiles || hasDeletedFiles || allMediaDeleted;
+    const hasMediaChanges =
+      hasDeletedFiles || allMediaDeleted || remainingMediaIds.length > 0;
 
     if (hasMediaChanges) {
       // Special case - if all media is deleted, explicitly set an empty portfolio
-      if (allMediaDeleted && remainingMediaIds.length === 0 && !hasNewFiles) {
+      if (allMediaDeleted && remainingMediaIds.length === 0) {
         payload.portfolio = [];
       } else {
-        const mediaOptions = {
-          refId: id,
-          ref: "api::freelancer.freelancer",
-          field: "portfolio",
-          namePrefix: "portfolio",
-        };
-
-        try {
-          const finalMediaIds = await handleMediaUpdate({
-            remainingMediaIds,
-            files,
-            options: mediaOptions,
-            deletedMediaIds,
-          });
-
-          // Always set the portfolio in payload when there are media changes
-          payload.portfolio = finalMediaIds;
-        } catch (error) {
-          return {
-            data: null,
-            errors: {
-              submit: `Error processing media files: ${
-                error.message || "Unknown error"
-              }`,
-            },
-            message: null,
-          };
-        }
+        // Simply use the remaining media IDs directly
+        // No need for file uploads since they're already handled on client side
+        payload.portfolio = remainingMediaIds;
       }
     }
 
