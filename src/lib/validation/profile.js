@@ -243,13 +243,13 @@ export const basicInfoSchema = z.object({
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Πρέπει να επιλέξετε τουλάχιστον έναν τρόπο κάλυψης",
-          path: [],
+          path: [], // Setting empty path to make sure it shows as a general error
         });
       }
 
       // If onbase is true, validate required fields
       if (data.onbase) {
-        if (!data.address) {
+        if (!data.address || data.address.trim() === "") {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Η διεύθυνση είναι υποχρεωτική για κάλυψη στην έδρα σας",

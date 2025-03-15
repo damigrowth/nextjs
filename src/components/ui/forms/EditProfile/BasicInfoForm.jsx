@@ -75,7 +75,7 @@ export default function BasicInfoForm({ freelancer, type }) {
   );
 
   const originalValues = {
-    image: freelancer.image,
+    image: freelancer.image || { data: null },
     tagline: freelancer.tagline,
     description: freelancer.description,
     category: freelancer.category,
@@ -360,15 +360,35 @@ export default function BasicInfoForm({ freelancer, type }) {
       };
     }
 
-    const hasExistingImage = Boolean(originalValues.image.data);
-
+    // Check if the image exists in the original values
+    const hasExistingImage = Boolean(originalValues.image?.data);
     formData.append("hasExistingImage", hasExistingImage);
-
     formData.append("id", freelancer.id);
+
+    // Send the current state of all form fields - ensure it's JSON serializable
+    const serializedValues = {
+      ...currentValues,
+      image:
+        currentValues.image && currentValues.image.data
+          ? {
+              data: {
+                id: currentValues.image.data.id,
+                attributes: currentValues.image.data.attributes,
+              },
+            }
+          : { data: null },
+    };
+
+    formData.append("currentFormState", JSON.stringify(serializedValues));
 
     // Handle image separately if it exists in changes
     if (changes.image) {
-      formData.append("image", changes.image);
+      // If the image is a File object (new upload), append it directly
+      if (changes.image instanceof File) {
+        formData.append("image", changes.image);
+      }
+
+      // Remove image from the changes object for JSON serialization
       const { image, ...restChanges } = changes;
       formData.append("changes", JSON.stringify(restChanges));
     } else {
@@ -377,7 +397,6 @@ export default function BasicInfoForm({ freelancer, type }) {
 
     // Submit the form
     const result = await formAction(formData);
-
     return result;
   };
 
@@ -401,8 +420,18 @@ export default function BasicInfoForm({ freelancer, type }) {
         <label className="form-label fw500 dark-color">Εικόνα Προφιλ</label>
         <ProfileImageInput
           name="image"
-          image={image?.data?.attributes?.formats?.thumbnail?.url}
-          onChange={setImage}
+          image={
+            image?.data?.attributes?.formats?.thumbnail?.url ||
+            image?.data?.attributes?.url
+          }
+          onChange={(newImage) => {
+            // Make sure we're setting the image correctly for both File objects and API data
+            if (newImage instanceof File) {
+              setImage(newImage);
+            } else {
+              setImage({ data: newImage?.data || null });
+            }
+          }}
           errors={formState?.errors?.image}
         />
 
