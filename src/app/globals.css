@@ -495,6 +495,7 @@ a {
 }
 
 .dropzone-container {
+  position: relative;
   width: 100%;
   text-align: center;
   padding: 40px 20px;
@@ -513,10 +514,6 @@ a {
   top: 0;
   left: 0;
   opacity: 0;
-}
-
-.dropzone-container {
-  position: relative;
 }
 
 .dropzone-info p {
@@ -1279,11 +1276,11 @@ a {
   pointer-events: none;
   filter: grayscale(100%);
   opacity: 0.9;
-  transition: all 0.3s ease;
-  animation: pulse 2s infinite;
+  transition: grayscale 0.3s ease;
+  animation: disabled-pulse 2s infinite;
 }
 
-@keyframes pulse {
+@keyframes disabled-pulse {
   0%,
   100% {
     opacity: 0.9;
