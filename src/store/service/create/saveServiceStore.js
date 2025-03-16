@@ -16,7 +16,7 @@ const useSaveServiceStore = (set) => ({
     packages: false,
     addons: true,
     faq: true,
-    gallery: false,
+    gallery: true,
   },
   saved: {
     type: false,

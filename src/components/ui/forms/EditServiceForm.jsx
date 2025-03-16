@@ -9,6 +9,7 @@ import React, {
   useCallback,
   startTransition,
 } from "react";
+import { flushSync } from "react-dom";
 import SwitchB from "../Archives/Inputs/SwitchB";
 import ServiceGallery from "../AddService/ServiceGallery";
 import ServiceFaq from "../ServiceFaq/ServiceFaq";
@@ -350,8 +351,10 @@ export default function EditServiceForm({ service, jwt }) {
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    // Force immediate state update
+    flushSync(() => {
+      setIsSubmitting(true);
+    });
 
     const changedFields = getChangedFields();
     const { media, deletedMediaIds } = useEditServiceStore.getState();

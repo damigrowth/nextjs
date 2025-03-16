@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useActionState, useState, useEffect } from "react";
+import React, {
+  useActionState,
+  useState,
+  useEffect,
+  startTransition,
+} from "react";
+import { flushSync } from "react-dom";
 import ServiceGallery from "../AddService/ServiceGallery";
 import { createService } from "@/lib/service/create";
 import ServiceFaq from "../ServiceFaq/ServiceFaq";
@@ -13,8 +19,9 @@ import ServiceType from "../AddService/ServiceType";
 import { NavigationButtons } from "../buttons/NavigationButtons";
 import Alert from "../alerts/Alert";
 import SaveButton from "../buttons/SaveButton";
+import { uploadData } from "@/lib/uploads/upload";
 
-export default function AddServiceForm({ coverage }) {
+export default function AddServiceForm({ coverage, jwt }) {
   const {
     service,
     saved,
@@ -49,6 +56,8 @@ export default function AddServiceForm({ coverage }) {
     createService,
     initialState
   );
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const serviceId = formState?.data?.id;
   const serviceTitle = formState?.data?.attributes?.title;
@@ -197,6 +206,43 @@ export default function AddServiceForm({ coverage }) {
     }
   };
 
+  const handleSubmit = async (formData) => {
+    const { media } = useCreateServiceStore.getState();
+
+    // Force immediate state update
+    flushSync(() => {
+      setIsSubmitting(true);
+    });
+
+    let newMedia = [];
+
+    // Upload media files if any
+    if (media.length > 0) {
+      const newFiles = media
+        .filter((item) => item.file instanceof File)
+        .map((item) => item.file);
+
+      if (newFiles.length > 0) {
+        const mediaOptions = {
+          ref: "api::service.service",
+          field: "media",
+        };
+        newMedia = await uploadData(newFiles, mediaOptions, jwt);
+
+        formData.append("media-ids", JSON.stringify(newMedia));
+      }
+    }
+
+    // Call the server action
+    startTransition(() => {
+      formAction(formData);
+    });
+
+    // Ensure state update is processed
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    setIsSubmitting(false);
+  };
+
   const showPreviousButton = () => {
     // Show previous button if there's a previous step or if we're in the type step with typeStep > 0
     return steps[step].previous || (step === "type" && typeStep > 0);
@@ -207,7 +253,7 @@ export default function AddServiceForm({ coverage }) {
   };
 
   return (
-    <form action={formAction}>
+    <form action={handleSubmit}>
       <div className="row">
         <div className="col-lg-9">
           <div className="dashboard_title_area">
@@ -243,7 +289,9 @@ export default function AddServiceForm({ coverage }) {
             {step === "packages" && <ServicePackages />}
             {step === "addons" && <ServiceAddons />}
             {step === "faq" && <ServiceFaq />}
-            {step === "gallery" && <ServiceGallery isPending={isPending} />}
+            {step === "gallery" && (
+              <ServiceGallery isPending={isSubmitting || isPending} />
+            )}
 
             {/* Display any errors */}
             {errors && errors.active && (
@@ -270,12 +318,13 @@ export default function AddServiceForm({ coverage }) {
             />
 
             <SaveButton
-              isPending={isPending}
+              isPending={isSubmitting || isPending}
               defaultText="Δημοσίευση Υπηρεσίας"
               loadingText="Δημοσίευση Υπηρεσίας..."
               emoji="🚀"
               icon={null}
               orientation="center"
+              hasChanges={true}
               hidden={
                 step !== "gallery" ||
                 saved.type === false ||
