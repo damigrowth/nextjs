@@ -2,7 +2,14 @@
 
 import InputB from "@/components/inputs/InputB";
 import TextArea from "@/components/inputs/TextArea";
-import React, { useEffect, useActionState, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useActionState,
+  useState,
+  useCallback,
+  startTransition,
+} from "react";
+import { flushSync } from "react-dom";
 import SwitchB from "../Archives/Inputs/SwitchB";
 import ServiceGallery from "../AddService/ServiceGallery";
 import ServiceFaq from "../ServiceFaq/ServiceFaq";
@@ -14,6 +21,7 @@ import Alert from "../alerts/Alert";
 import SearchableSelect from "../Archives/Inputs/SearchableSelect";
 import { normalizeQuery } from "@/utils/queries";
 import { searchData } from "@/lib/client/operations";
+import { uploadData } from "@/lib/uploads/upload";
 import {
   CATEGORIES_SEARCH,
   SUBCATEGORIES_SEARCH,
@@ -21,7 +29,7 @@ import {
 } from "@/lib/graphql/queries/main/taxonomies/service";
 import { TAGS_SEARCH_COMPLETE } from "@/lib/graphql/queries/main/taxonomies/service/tag";
 
-export default function EditServiceForm({ service }) {
+export default function EditServiceForm({ service, jwt }) {
   const initialState = {
     data: null,
     errors: {},
@@ -32,6 +40,8 @@ export default function EditServiceForm({ service }) {
     editService,
     initialState
   );
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     info,
@@ -193,7 +203,6 @@ export default function EditServiceForm({ service }) {
         }))
       : [];
 
-    
     setInfo("tags", formattedTags);
   };
 
@@ -262,7 +271,6 @@ export default function EditServiceForm({ service }) {
     const originalCategoryId = service.category?.data?.id?.toString();
 
     // Log what's happening with the category comparison for debugging
-    
 
     if (categoryId !== originalCategoryId) {
       changes.category =
@@ -343,6 +351,11 @@ export default function EditServiceForm({ service }) {
   };
 
   const handleSubmit = async () => {
+    // Force immediate state update
+    flushSync(() => {
+      setIsSubmitting(true);
+    });
+
     const changedFields = getChangedFields();
     const { media, deletedMediaIds } = useEditServiceStore.getState();
 
@@ -351,73 +364,60 @@ export default function EditServiceForm({ service }) {
       media.some((item) => item.file instanceof File) ||
       deletedMediaIds.length > 0;
 
-    
-    
-    
-
     // If no fields changed and media didn't change, don't submit
     if (!Object.keys(changedFields).length && !mediaChanged) {
-      
+      setIsSubmitting(false);
       return;
     }
-
-    
 
     const formData = new FormData();
     formData.append("service-id", service.id);
     formData.append("changes", JSON.stringify(changedFields));
 
-    // Always include media information in the form data if there's a change
+    // Handle media changes
     if (mediaChanged) {
+      // Get existing media IDs
       const remainingMediaIds = media
-        .filter((item) => item.file.attributes)
+        .filter((item) => item.file?.id)
         .map((item) => item.file.id);
 
-      const allNewFiles = media
+      // Get new files to upload
+      const newFiles = media
         .filter((item) => item.file instanceof File)
         .map((item) => item.file);
 
-      const validNewFiles = allNewFiles.filter(
-        (file) => file.size > 0 && file.name !== "undefined"
-      );
+      // Upload new files client-side
+      let newMediaIds = [];
+      if (newFiles.length > 0) {
+        const mediaOptions = {
+          refId: service.id,
+          ref: "api::service.service",
+          field: "media",
+        };
+        newMediaIds = await uploadData(newFiles, mediaOptions, jwt);
+      }
 
-      const uniqueFileNames = [
-        ...new Set(validNewFiles.map((file) => file.name)),
-      ];
+      // Combine existing and new media IDs
+      const allMediaIds = [...remainingMediaIds, ...newMediaIds];
 
-      const uniqueFiles = uniqueFileNames.map((name) =>
-        validNewFiles.find((file) => file.name === name)
-      );
-
-      
-      
-      
-
-      formData.append("remaining-media", JSON.stringify(remainingMediaIds));
+      // Add media info to form data
+      formData.append("remaining-media", JSON.stringify(allMediaIds));
       formData.append("deleted-media", JSON.stringify(deletedMediaIds));
 
-      // Make sure we properly append each file
-      if (uniqueFiles.length > 0) {
-        
-        uniqueFiles.forEach((file) => {
-          if (file) {
-            formData.append("media-files", file);
-            
-          }
-        });
+      // Special case: all media deleted
+      if (media.length === 0 && deletedMediaIds.length > 0) {
+        formData.append("all-media-deleted", "true");
       }
     }
 
-    // Debug log the form data
-    for (let [key, value] of formData.entries()) {
-      
-    }
+    // Call the server action with only the IDs, not the files
+    startTransition(() => {
+      formAction(formData);
+    });
 
-    // Make the form action call
-    formAction(formData);
+    setIsSubmitting(false);
+    await new Promise((resolve) => setTimeout(resolve, 0));
   };
-
-  
 
   return (
     <form action={handleSubmit}>
@@ -599,7 +599,11 @@ export default function EditServiceForm({ service }) {
           </div>
           <div>
             <label className="form-label fw500 dark-color">Πολυμέσα</label>
-            <ServiceGallery custom={true} editMode={true} />
+            <ServiceGallery
+              isPending={isSubmitting || isPending}
+              custom={true}
+              editMode={true}
+            />
           </div>
         </div>
         <div className="d-flex flex-lg-column align-items-lg-center">
@@ -610,7 +614,7 @@ export default function EditServiceForm({ service }) {
           <SaveButton
             defaultText="Ενημέρωση Υπηρεσίας"
             loadingText="Ενημέρωση Υπηρεσίας..."
-            isPending={isPending}
+            isPending={isSubmitting || isPending}
             hasChanges={hasChanges()}
           />
         </div>

@@ -1,7 +1,7 @@
 import AddServiceForm from "@/components/ui/forms/AddServiceForm";
 import DashboardNavigation from "../dashboard/header/DashboardNavigation";
 
-export default async function AddServiceInfo({ coverage }) {
+export default async function AddServiceInfo({ coverage, jwt }) {
   return (
     <>
       <div className="dashboard__content dashboard-bg">
@@ -10,7 +10,7 @@ export default async function AddServiceInfo({ coverage }) {
             <DashboardNavigation />
           </div>
           <div className="col-lg-12">
-            <AddServiceForm coverage={coverage} />
+            <AddServiceForm coverage={coverage} jwt={jwt} />
           </div>
         </div>
       </div>

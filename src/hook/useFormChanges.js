@@ -24,8 +24,8 @@ const normalizeValue = (value, key) => {
   // Convert numbers to strings for consistent comparison
   if (typeof value === "number") return String(value);
 
-  // Handle File objects
-  if (value instanceof File) {
+  // Handle File objects (only in browser environment)
+  if (value?.name || (typeof window !== "undefined" && value instanceof File)) {
     return {
       name: value.name,
       size: value.size,
@@ -42,7 +42,7 @@ const normalizeValue = (value, key) => {
           // For objects with nested structures
           if (typeof item === "object") {
             // Special handling for file-like objects
-            if (item.file instanceof File) {
+            if (typeof window !== "undefined" && item.file instanceof File) {
               return normalizeValue(item.file);
             }
 

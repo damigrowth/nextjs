@@ -288,10 +288,6 @@ export default function PresentationForm({ freelancer, jwt }) {
       return;
     }
 
-    try {
-      setIsSubmitting(true);
-    } catch (error) {}
-
     // Handle new file uploads first
     const newFiles = mediaState.media
       .filter((item) => item.file && item.file instanceof File)

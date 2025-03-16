@@ -3,7 +3,6 @@
 import { postData } from "../client/operations";
 import { getFreelancerId } from "../users/freelancer";
 import { POST_SERVICE } from "../graphql/mutations";
-import { uploadMedia } from "../uploads/upload";
 import { createTags } from "../tags";
 
 // Create service
@@ -50,19 +49,8 @@ export async function createService(prevState, formData) {
       allTagIds = [...existingTags, ...result.data.map((tag) => tag.id)];
     }
 
-    // UPLOAD MEDIA
-    // GET MEDIA IDS
-    const files = formData.getAll("media-files");
-    const firstFileSize = files[0].size;
-    let uploadedMedia = [];
-
-    if (firstFileSize > 0) {
-      uploadedMedia = await uploadMedia(files);
-    }
-
-    // console.log("FILES", files);
-    // console.log("SIZE", firstFileSize);
-    // console.log("UPLOADED MEDIA", uploadedMedia);
+    // GET MEDIA IDS FROM CLIENT-SIDE UPLOAD
+    const mediaIds = JSON.parse(formData.get("media-ids") || "[]");
 
     // GET FREELANCER ID
     const fid = await getFreelancerId();
@@ -85,7 +73,7 @@ export async function createService(prevState, formData) {
         status: 2,
         addons: service.addons,
         faq: service.faq,
-        media: uploadedMedia,
+        media: mediaIds,
       },
     };
 
