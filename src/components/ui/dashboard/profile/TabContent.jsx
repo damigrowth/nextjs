@@ -8,9 +8,12 @@ import Tab from "./Tab";
 import TabNavigation from "./TabNavigation";
 import TabWrapper from "./TabWrapper";
 import { redirect } from "next/navigation";
+import { getToken } from "@/lib/auth/token";
 
 export async function TabContent() {
   const freelancer = await getFreelancer();
+
+  const jwt = await getToken();
 
   if (!freelancer) {
     // Redirect function directly
@@ -36,7 +39,7 @@ export async function TabContent() {
     {
       index: 2,
       label: "Παρουσίαση",
-      content: <PresentationForm freelancer={freelancer} />,
+      content: <PresentationForm freelancer={freelancer} jwt={jwt} />,
       showForUser: false,
     },
     {

@@ -13,7 +13,7 @@ import {
   presentationSchema,
 } from "../validation/profile";
 import { uploadMedia } from "../uploads/upload";
-import { handleMediaUpdate } from "../uploads/update";
+// We no longer need handleMediaUpdate as files are uploaded client-side
 
 export async function updateFreelancerStatus(id) {
   try {
@@ -100,132 +100,276 @@ export async function updateBasicInfo(prevState, formData) {
     const hasExistingImage = formData.get("hasExistingImage") === "true";
     const file = formData.get("image");
     const id = formData.get("id");
-
-    // Create a collection of data to validate
-    const dataToValidate = { ...changedFields };
-
-    // Handle file upload separately with more explicit logic
-    if (file && file.size > 0) {
-      // If a new file is uploaded, include it in validation
-      dataToValidate.image = file;
-    } else if (hasExistingImage) {
-      // If there's an existing image but no new file,
-      // we should keep the existing image and remove from validation
-      delete dataToValidate.image;
-    } else if (changedFields.image?.data) {
-      // If we have image data in changedFields, keep it
-      // This handles the case where an image is selected from existing media
-      dataToValidate.image = changedFields.image;
-    } else if (!hasExistingImage) {
-      // If no existing image and no new file, validation should catch this
-      dataToValidate.image = null;
-    }
-
-    // Create a partial schema based on changed fields
-    const partialSchema = z.object(
-      Object.keys(dataToValidate).reduce((acc, field) => {
-        if (basicInfoSchema.shape[field]) {
-          acc[field] = basicInfoSchema.shape[field];
-        }
-        return acc;
-      }, {})
+    const currentFormState = JSON.parse(
+      formData.get("currentFormState") || "{}"
     );
 
-    // Validate only changed fields
-    const validationResult = partialSchema.safeParse(dataToValidate);
+    // Ensure currentFormState.coverage is not null to avoid validation issues
+    if (currentFormState.coverage === null) {
+      currentFormState.coverage = {
+        online: false,
+        onbase: false,
+        onsite: false,
+      };
+    }
+
+    // 1. Determine current validity of required fields
+    const currentValidity = {
+      category: !!currentFormState.category?.data?.id,
+      subcategory: !!currentFormState.subcategory?.data?.id,
+      image: hasExistingImage,
+      coverage: basicInfoSchema.shape.coverage.safeParse(
+        currentFormState.coverage
+      ).success,
+    };
+
+    // 2. Prepare validation schema with conditional requirements
+    const validationSchema = z
+      .object({
+        category: basicInfoSchema.shape.category.optional(),
+        subcategory: basicInfoSchema.shape.subcategory.optional(),
+        image: basicInfoSchema.shape.image.optional(),
+        coverage: basicInfoSchema.shape.coverage.optional(),
+      })
+      .superRefine((val, ctx) => {
+        // Category check
+        if (!currentValidity.category && !val.category?.data?.id) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Η κατηγορία είναι υποχρεωτική",
+            path: ["category"],
+          });
+        }
+
+        // Subcategory check
+        if (!currentValidity.subcategory && !val.subcategory?.data?.id) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Η υποκατηγορία είναι υποχρεωτική",
+            path: ["subcategory"],
+          });
+        }
+
+        // Image check - Only validate if no existing image and no file in formData
+        if (!currentValidity.image) {
+          // We need to check if there's an image in the validation data
+          // or if a file was uploaded directly via formData
+          const hasImageData = !!val.image?.data?.id;
+          const hasFileInFormData =
+            file && file instanceof File && file.size > 0;
+
+          if (!hasImageData && !hasFileInFormData) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Η εικόνα προφίλ είναι υποχρεωτική",
+              path: ["image"],
+            });
+          }
+        }
+
+        // Coverage check - always validate that at least one is selected
+        // regardless of current validity
+        const coverage = val.coverage || {};
+        if (!coverage.online && !coverage.onbase && !coverage.onsite) {
+          // Check if the currentFormState has at least one coverage type
+          const hasCoverageInCurrentState =
+            currentFormState.coverage?.online === true ||
+            currentFormState.coverage?.onbase === true ||
+            currentFormState.coverage?.onsite === true;
+
+          // Only add the error if neither the changed values nor current state has coverage
+          if (!hasCoverageInCurrentState) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Πρέπει να επιλέξετε τουλάχιστον έναν τρόπο κάλυψης",
+              path: ["coverage"],
+            });
+          }
+        }
+      });
+
+    // 3. Validate only the changed fields
+    const validationResult = validationSchema.safeParse(changedFields);
 
     if (!validationResult.success) {
-      // Transform Zod errors to match the exact format requested
       const fieldErrors = {};
-
       Object.entries(validationResult.error.flatten().fieldErrors).forEach(
         ([field, messages]) => {
-          if (messages && messages.length > 0) {
-            fieldErrors[field] = {
-              field,
-              message: messages[0],
-            };
+          if (messages?.length > 0) {
+            fieldErrors[field] = { field, message: messages[0] };
           }
         }
       );
-
-      return {
-        data: null,
-        errors: fieldErrors,
-        message: null,
-      };
+      return { data: null, errors: fieldErrors, message: null };
     }
 
-    // Prepare the payload for API
-    const payload = {};
+    // 4. Prepare payload with merged data
+    const payload = {
+      // Use existing valid data or new validated data
+      category: currentValidity.category
+        ? currentFormState.category.data.id
+        : validationResult.data.category.data.id,
 
-    // Handle simple fields
-    if (validationResult.data.tagline !== undefined)
-      payload.tagline = validationResult.data.tagline;
-    if (validationResult.data.description !== undefined)
-      payload.description = validationResult.data.description;
-    if (validationResult.data.rate !== undefined)
-      payload.rate = validationResult.data.rate;
-    if (validationResult.data.commencement !== undefined)
-      payload.commencement = validationResult.data.commencement;
+      subcategory: currentValidity.subcategory
+        ? currentFormState.subcategory.data.id
+        : validationResult.data.subcategory.data.id,
+    };
 
-    // Handle image upload if it exists and is a file
-    if (file && file.size > 0) {
-      const uploadedIds = await uploadMedia([file]);
-      if (uploadedIds?.length > 0) {
-        payload.image = uploadedIds[0];
-      }
-    } else if (validationResult.data.image?.data?.id) {
-      // If we have an image ID in the validation result, use it
-      payload.image = validationResult.data.image.data.id;
-    } else if (!hasExistingImage && !file) {
-      // This case should not reach here if validation worked correctly
-      return {
-        data: null,
-        errors: {
-          image: {
-            field: "image",
-            message: "Η εικόνα προφίλ είναι υποχρεωτική",
+    // 5. Handle image upload
+    if (!currentValidity.image) {
+      // Check if there's a file in the formData
+      const hasUploadedFile = file && file instanceof File && file.size > 0;
+
+      if (hasUploadedFile) {
+        // Process the new file upload
+        const uploadedIds = await uploadMedia([file]);
+        payload.image = uploadedIds?.[0];
+      } else if (validationResult.data.image?.data?.id) {
+        // Use image ID from validation result
+        payload.image = validationResult.data.image.data.id;
+      } else {
+        // No existing image and no new image provided
+        return {
+          data: null,
+          errors: {
+            image: {
+              field: "image",
+              message: "Η εικόνα προφίλ είναι υποχρεωτική",
+            },
           },
-        },
-        message: null,
-      };
+          message: null,
+        };
+      }
     }
-    // Handle nested IDs
-    if (validationResult.data.category?.data?.id)
-      payload.category = validationResult.data.category.data.id;
-    if (validationResult.data.subcategory?.data?.id)
-      payload.subcategory = validationResult.data.subcategory.data.id;
+
+    // 6. Handle coverage data structure
+    if (validationResult.data.coverage || currentFormState.coverage) {
+      const coverageData =
+        validationResult.data.coverage || currentFormState.coverage;
+
+      // Check if at least one coverage type is selected
+      const hasAnyCoverage =
+        coverageData.online === true ||
+        coverageData.onbase === true ||
+        coverageData.onsite === true;
+
+      if (!hasAnyCoverage) {
+        return {
+          data: null,
+          errors: {
+            coverage: {
+              field: "coverage",
+              message: "Πρέπει να επιλέξετε τουλάχιστον έναν τρόπο κάλυψης",
+            },
+          },
+          message: null,
+        };
+      }
+
+      const errors = {};
+
+      // Additional validation for onbase mode
+      if (coverageData.onbase === true) {
+        // Validate address is provided
+        if (!coverageData.address || coverageData.address.trim() === "") {
+          errors.address = {
+            field: "address",
+            message: "Η διεύθυνση είναι υποχρεωτική για κάλυψη στην έδρα σας",
+          };
+        }
+
+        // Validate zipcode is provided
+        if (!coverageData.zipcode?.data?.id) {
+          errors.zipcode = {
+            field: "zipcode",
+            message: "Ο Τ.Κ. είναι υποχρεωτικός για κάλυψη στην έδρα σας",
+          };
+        }
+      }
+
+      // Additional validation for onsite mode
+      if (coverageData.onsite === true) {
+        const hasCounties =
+          Array.isArray(coverageData.counties?.data) &&
+          coverageData.counties.data.length > 0;
+
+        const hasAreas =
+          Array.isArray(coverageData.areas?.data) &&
+          coverageData.areas.data.length > 0;
+
+        if (!hasCounties && !hasAreas) {
+          errors.counties = {
+            field: "counties",
+            message:
+              "Για την κάλυψη στο χώρο του πελάτη απαιτείται τουλάχιστον ένας νομός ή μια περιοχή",
+          };
+        }
+      }
+
+      // Return errors if any found
+      if (Object.keys(errors).length > 0) {
+        return {
+          data: null,
+          errors,
+          message: null,
+        };
+      }
+
+      payload.coverage = {
+        online: coverageData.online,
+        onbase: coverageData.onbase,
+        onsite: coverageData.onsite,
+        address: coverageData.address,
+        zipcode: coverageData.zipcode?.data?.id,
+        area: coverageData.area?.data?.id,
+        county: coverageData.county?.data?.id,
+        counties: coverageData.counties?.data?.map((c) => c.id) || [],
+        areas: coverageData.areas?.data?.map((a) => a.id) || [],
+      };
+
+      // Remove undefined values
+      payload.coverage = Object.fromEntries(
+        Object.entries(payload.coverage).filter(([_, v]) => v !== undefined)
+      );
+    }
+
+    // 7. Handle other fields
+    const optionalFields = [
+      "tagline",
+      "description",
+      "rate",
+      "commencement",
+      "skills",
+      "specialization",
+    ];
+    optionalFields.forEach((field) => {
+      if (validationResult.data[field] !== undefined) {
+        payload[field] = validationResult.data[field];
+      }
+    });
+
+    // 8. Process nested fields
     if (validationResult.data.skills?.data) {
       payload.skills = validationResult.data.skills.data.map(
         (skill) => skill.id
       );
+    } else if (currentFormState.skills?.data) {
+      // Use existing skills if not in changed fields
+      payload.skills = currentFormState.skills.data.map((skill) => skill.id);
     }
+
+    // Handle specialization correctly
     if (validationResult.data.specialization?.data?.id) {
       payload.specialization = validationResult.data.specialization.data.id;
-    } else if (validationResult.data.specialization?.data === null) {
+    } else if (currentFormState.specialization?.data?.id) {
+      // Use existing specialization if not in changed fields
+      payload.specialization = currentFormState.specialization.data.id;
+    } else {
+      // Explicitly set to null if not selected
       payload.specialization = null;
     }
 
-    // Handle coverage
-    if (validationResult.data.coverage) {
-      payload.coverage = {
-        online: validationResult.data.coverage.online,
-        onbase: validationResult.data.coverage.onbase,
-        onsite: validationResult.data.coverage.onsite,
-        address: validationResult.data.coverage.address,
-        zipcode: validationResult.data.coverage.zipcode?.data?.id,
-        area: validationResult.data.coverage.area?.data?.id,
-        county: validationResult.data.coverage.county?.data?.id,
-        counties:
-          validationResult.data.coverage.counties?.data?.map((el) => el.id) ||
-          [],
-        areas:
-          validationResult.data.coverage.areas?.data?.map((el) => el.id) || [],
-      };
-    }
-
-    // Make the API call
+    // 9. API call
     const { data, error } = await postData(UPDATE_FREELANCER, {
       id,
       data: payload,
@@ -234,16 +378,12 @@ export async function updateBasicInfo(prevState, formData) {
     if (error) {
       return {
         data: null,
-        errors: {
-          submit: {
-            field: "submit",
-            message: error,
-          },
-        },
+        errors: { submit: { field: "submit", message: error } },
         message: null,
       };
     }
 
+    // 10. Revalidation and return
     revalidatePath("/dashboard/profile");
     return {
       data: data.updateFreelancer.data,
@@ -342,47 +482,21 @@ export async function updatePresentationInfo(prevState, formData) {
       formData.get("remaining-media") || "[]"
     );
     const deletedMediaIds = JSON.parse(formData.get("deleted-media") || "[]");
-    const files = formData.getAll("media-files");
     const allMediaDeleted = formData.get("all-media-deleted") === "true";
 
     // Check if there are actual media changes to process
-    const hasNewFiles = files.length > 0;
     const hasDeletedFiles = deletedMediaIds.length > 0;
-    const hasMediaChanges = hasNewFiles || hasDeletedFiles || allMediaDeleted;
+    const hasMediaChanges =
+      hasDeletedFiles || allMediaDeleted || remainingMediaIds.length > 0;
 
     if (hasMediaChanges) {
       // Special case - if all media is deleted, explicitly set an empty portfolio
-      if (allMediaDeleted && remainingMediaIds.length === 0 && !hasNewFiles) {
+      if (allMediaDeleted && remainingMediaIds.length === 0) {
         payload.portfolio = [];
       } else {
-        const mediaOptions = {
-          refId: id,
-          ref: "api::freelancer.freelancer",
-          field: "portfolio",
-          namePrefix: "portfolio",
-        };
-
-        try {
-          const finalMediaIds = await handleMediaUpdate({
-            remainingMediaIds,
-            files,
-            options: mediaOptions,
-            deletedMediaIds,
-          });
-
-          // Always set the portfolio in payload when there are media changes
-          payload.portfolio = finalMediaIds;
-        } catch (error) {
-          return {
-            data: null,
-            errors: {
-              submit: `Error processing media files: ${
-                error.message || "Unknown error"
-              }`,
-            },
-            message: null,
-          };
-        }
+        // Simply use the remaining media IDs directly
+        // No need for file uploads since they're already handled on client side
+        payload.portfolio = remainingMediaIds;
       }
     }
 

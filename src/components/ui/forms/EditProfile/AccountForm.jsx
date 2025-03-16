@@ -89,7 +89,7 @@ export default function AccountForm({ freelancer }) {
                 name="phone"
                 type="tel"
                 maxLength={10}
-                value={phone || 0}
+                value={phone || ""}
                 onChange={setPhone}
                 className="form-control input-group"
                 errors={formState?.errors?.phone}

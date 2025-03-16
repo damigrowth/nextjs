@@ -469,7 +469,7 @@ export default function SearchableSelect({
       />
       {errors?.field === name && (
         <div className="mt-1">
-          <p className="text-error text-sm">{errors.message}</p>
+          <p className="text-danger text-sm">{errors.message}</p>
         </div>
       )}
     </fieldset>

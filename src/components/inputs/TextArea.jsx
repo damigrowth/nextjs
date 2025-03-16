@@ -96,7 +96,7 @@ export default function TextArea({
         </div>
         {(fieldError || nameError) && (
           <div>
-            <p className="text-danger">{fieldError || nameError}</p>
+            <p className="text-danger text-sm">{fieldError || nameError}</p>
           </div>
         )}
       </div>

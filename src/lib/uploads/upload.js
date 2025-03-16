@@ -1,7 +1,10 @@
-import { faker } from "@faker-js/faker";
 import { UPLOAD } from "../graphql/mutations";
-import { postData } from "../client/operations";
 import { postMedia } from "../api";
+import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
+import {
+  ApolloClient,
+  InMemoryCache,
+} from "@apollo/experimental-nextjs-app-support";
 
 // Upload media to Strapi
 export async function uploadMedia(files, options = {}) {
@@ -44,4 +47,38 @@ export async function uploadMedia(files, options = {}) {
     // Re-throw with more context
     throw new Error(`Media upload failed: ${error.message}`);
   }
+}
+
+export async function uploadData(files, options, jwt) {
+  if (!files?.length) return [];
+
+  const uploadClient = new ApolloClient({
+    cache: new InMemoryCache(),
+    link: createUploadLink({
+      uri: "https://api.doulitsa.gr/graphql",
+      headers: {
+        Authorization: jwt ? `Bearer ${jwt}` : "",
+      },
+    }),
+  });
+
+  const mediaIds = [];
+
+  for (const file of files) {
+    const { data } = await uploadClient.mutate({
+      mutation: UPLOAD,
+      variables: {
+        file,
+        refId: options.refId,
+        ref: options.ref,
+        field: options.field,
+      },
+    });
+
+    if (data?.upload?.data?.id) {
+      mediaIds.push(data.upload.data.id);
+    }
+  }
+
+  return mediaIds;
 }

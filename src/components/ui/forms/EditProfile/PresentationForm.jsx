@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { startTransition, useActionState, useRef } from "react";
 import { updatePresentationInfo } from "@/lib/profile/update";
 import SaveButton from "../../buttons/SaveButton";
 import SocialsInputs from "./SocialsInputs";
@@ -11,8 +11,9 @@ import { useState, useEffect } from "react";
 import useEditProfileStore from "@/store/dashboard/profile";
 import MediaGallery from "@/components/inputs/MediaGallery";
 import { useFormChanges } from "@/hook/useFormChanges";
+import { uploadData } from "@/lib/uploads/upload";
 
-export default function PresentationForm({ freelancer }) {
+export default function PresentationForm({ freelancer, jwt }) {
   const { website, setWebsite, visibility, setVisibility, socials, setSocial } =
     useEditProfileStore();
 
@@ -29,6 +30,8 @@ export default function PresentationForm({ freelancer }) {
     updatePresentationInfo,
     initialState
   );
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Setup original values for change detection
   const originalValues = {
@@ -276,10 +279,54 @@ export default function PresentationForm({ freelancer }) {
 
   // Handle form submission
   const handleSubmit = async (formData) => {
+    // Set local loading state to true immediately with a short delay as promise
+    setIsSubmitting(true);
+    await new Promise((resolve) => setTimeout(resolve, 0));
     // Only proceed if there are changes
     if (!hasChanges()) {
+      setIsSubmitting(false);
       return;
     }
+
+    try {
+      setIsSubmitting(true);
+    } catch (error) {}
+
+    // Handle new file uploads first
+    const newFiles = mediaState.media
+      .filter((item) => item.file && item.file instanceof File)
+      .map((item) => item.file);
+
+    let newMediaIds = [];
+
+    // If we have new files, upload them directly via GraphQL
+    if (newFiles.length > 0) {
+      const mediaOptions = {
+        refId: freelancer.id,
+        ref: "api::freelancer.freelancer",
+        field: "portfolio",
+      };
+
+      // Upload files using the uploadMedia function
+      newMediaIds = await uploadData(newFiles, mediaOptions, jwt);
+
+      // Handle case where upload fails but no error is thrown
+      if (!newMediaIds.length && newFiles.length > 0) {
+        setIsSubmitting(false);
+        throw new Error("Failed to upload media files");
+      }
+    }
+
+    // Prepare remaining media IDs (existing media that wasn't deleted)
+    const remainingMediaIds = mediaState.media
+      .filter(
+        (item) =>
+          item.file && typeof item.file === "object" && "id" in item.file
+      )
+      .map((item) => item.file.id);
+
+    // Combine existing and new media IDs
+    const allMediaIds = [...remainingMediaIds, ...newMediaIds];
 
     // Add the freelancer ID
     formData.append("id", freelancer.id);
@@ -294,48 +341,20 @@ export default function PresentationForm({ freelancer }) {
 
     formData.append("changes", JSON.stringify(formChanges));
 
-    // Always check for media changes, not just based on hasChanges flag
-    // This ensures we properly handle deletes even if other form fields changed
+    // Handle media information
     const hasMediaDeletions = mediaState.deletedMediaIds.length > 0;
-    const hasNewUploads =
-      typeof window !== "undefined" &&
-      mediaState.media.some((item) => item.file instanceof File);
-
-    // Special case: all media has been deleted
     const allMediaDeleted =
       mediaState.media.length === 0 && originalMediaLength.current > 0;
 
-    if (
-      mediaState.hasChanges ||
-      hasMediaDeletions ||
-      hasNewUploads ||
-      allMediaDeleted
-    ) {
-      // Handle new files
-      const newFiles = mediaState.media
-        .filter((item) => item.file && item.file instanceof File)
-        .map((item) => item.file);
-
-      newFiles.forEach((file) => {
-        formData.append("media-files", file);
-      });
-
-      // Handle remaining media IDs - files that already existed and weren't deleted
-      const remainingMediaIds = mediaState.media
-        .filter(
-          (item) =>
-            item.file && typeof item.file === "object" && "id" in item.file
-        )
-        .map((item) => item.file.id);
-
-      // Always provide these arrays, even if they're empty
-      formData.append("remaining-media", JSON.stringify(remainingMediaIds));
+    if (mediaState.hasChanges || hasMediaDeletions || allMediaDeleted) {
+      // Instead of appending files, just append the IDs
+      formData.append("remaining-media", JSON.stringify(allMediaIds));
       formData.append(
         "deleted-media",
         JSON.stringify(mediaState.deletedMediaIds)
       );
 
-      // For the special case where all media is deleted, ensure we're setting an empty array
+      // For the special case where all media is deleted
       if (allMediaDeleted) {
         formData.append("all-media-deleted", "true");
       }
@@ -344,7 +363,14 @@ export default function PresentationForm({ freelancer }) {
     // Reset hasProcessedSuccess flag before submission
     hasProcessedSuccess.current = false;
 
-    return formAction(formData);
+    // Call the server action with only the IDs, not the files
+    startTransition(() => {
+      formAction(formData);
+    });
+
+    // Set local loading state to false immediately with a short delay as promise
+    setIsSubmitting(false);
+    await new Promise((resolve) => setTimeout(resolve, 0));
   };
 
   return (
@@ -412,7 +438,7 @@ export default function PresentationForm({ freelancer }) {
           initialMedia={freelancer.portfolio?.data || []}
           onUpdate={handleMediaUpdate}
           onSave={handleMediaSave}
-          isPending={isPending}
+          isPending={isSubmitting || isPending}
           custom={true}
           maxSize={15}
           maxVideos={3}
@@ -434,7 +460,7 @@ export default function PresentationForm({ freelancer }) {
         <SaveButton
           variant="primary"
           orientation="end"
-          isPending={isPending}
+          isPending={isSubmitting || isPending}
           hasChanges={hasChanges()}
         />
       </div>
