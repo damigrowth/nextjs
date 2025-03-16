@@ -1,6 +1,7 @@
 import { DashboardHeader } from "@/components/ui/dashboard/DashboardHeader";
 import CancelServiceForm from "@/components/ui/forms/CancelServiceForm";
 import EditServiceForm from "@/components/ui/forms/EditServiceForm";
+import { getToken } from "@/lib/auth/token";
 import { getData } from "@/lib/client/operations";
 import { SERVICE_BY_ID } from "@/lib/graphql/queries/main/service";
 
@@ -68,11 +69,14 @@ export default async function ServiceEditPage({ params }) {
     );
   }
 
+  const jwt = await getToken();
+
   // If all checks pass, render the form
   return (
     <Wrapper>
       <EditServiceForm
         service={{ id: service.data.id, ...service.data.attributes }}
+        jwt={jwt}
       />
       <CancelServiceForm />
     </Wrapper>

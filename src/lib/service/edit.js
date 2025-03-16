@@ -267,45 +267,10 @@ export async function editService(prevState, formData) {
       ];
     }
 
-    // Handle media
-    let finalMediaIds = undefined;
-    const hasMediaFiles = formData.has("media-files");
-    const hasRemainingMedia = formData.has("remaining-media");
-    const hasDeletedMedia = formData.has("deleted-media");
-
-    // Check if any media-related fields exist in the form data
-    if (hasMediaFiles || hasRemainingMedia || hasDeletedMedia) {
-      const remainingMediaIds = JSON.parse(
-        formData.get("remaining-media") || "[]"
-      );
-      const files = formData.getAll("media-files");
-      const deletedIds = JSON.parse(formData.get("deleted-media") || "[]");
-
-      // Prepare media options
-      const mediaOptions = {
-        refId: serviceId,
-        ref: "api::service.service",
-        field: "media",
-        namePrefix: "service",
-      };
-
-      try {
-        // Handle media update with deduplication
-        finalMediaIds = await handleMediaUpdate({
-          remainingMediaIds,
-          files,
-          options: mediaOptions,
-        });
-      } catch (error) {
-        console.error("Media update error:", error);
-        return {
-          ...prevState,
-          message: "Error updating media: " + error.message,
-          errors: { media: error.message },
-          data: null,
-        };
-      }
-    }
+    // Get media IDs from client
+    const finalMediaIds = formData.has("remaining-media")
+      ? JSON.parse(formData.get("remaining-media") || "[]")
+      : undefined;
 
     // Prepare update payload with only changed fields
     const payload = {
