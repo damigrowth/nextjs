@@ -33,7 +33,7 @@ export async function TabContent() {
     {
       index: 1,
       label: "Βασικά Στοιχεία",
-      content: <BasicInfoForm freelancer={freelancer} type={type} />,
+      content: <BasicInfoForm freelancer={freelancer} type={type} jwt={jwt} />,
       showForUser: false,
     },
     {
