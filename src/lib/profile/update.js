@@ -346,154 +346,162 @@ export async function updateBasicInfo(prevState, formData) {
 
 export async function updatePresentationInfo(prevState, formData) {
   try {
-    const changedFields = JSON.parse(formData.get("changes") || "{}");
     const id = formData.get("id");
+    const changesJson = formData.get("changes");
+    const changes = changesJson ? JSON.parse(changesJson) : {};
+    const validateOnly = formData.get("validateOnly") === "true";
 
-    // Create a partial schema based on changed fields
-    const partialSchema = z.object(
-      Object.keys(changedFields).reduce((acc, field) => {
-        acc[field] = presentationSchema.shape[field];
-        return acc;
-      }, {})
-    );
+    // Handle explicit error (e.g., from file upload failure)
+    if (formData.get("error")) {
+      const error = JSON.parse(formData.get("error"));
+      return {
+        data: null,
+        errors: {
+          submit: {
+            message: error.message || "Error uploading files",
+          },
+        },
+        message: null,
+      };
+    }
 
-    // Validate only the changed fields
-    const validationResult = partialSchema.safeParse(changedFields);
+    // Collect validation errors
+    const errors = {};
 
-    if (!validationResult.success) {
-      // Transform Zod errors to match InputB's expected format
-      const fieldErrors = {};
-      validationResult.error.errors.forEach((error) => {
-        const path = error.path;
-        let current = fieldErrors;
-        for (let i = 0; i < path.length; i++) {
-          const part = path[i];
-          if (i === path.length - 1) {
-            current[part] = { message: error.message };
-          } else {
-            current[part] = current[part] || {};
-            current = current[part];
+    // Validate website format if changed
+    if (changes.website !== undefined) {
+      // Simple URL validation
+      if (changes.website && !isValidUrl(changes.website)) {
+        errors.website = {
+          message: "Παρακαλώ εισάγετε έγκυρη διεύθυνση ιστοσελίδας",
+        };
+      }
+    }
+
+    // Validate social media URLs if changed
+    if (changes.socials) {
+      const socialErrors = {};
+
+      // Check each platform that has a URL
+      Object.entries(changes.socials).forEach(([platform, data]) => {
+        if (data && data.url) {
+          // Skip empty URLs
+          if (data.url.trim() === "") {
+            return;
           }
+
+          // Validate URL format
+          if (!isValidUrl(data.url)) {
+            socialErrors[platform] = {
+              message: "Παρακαλώ εισάγετε έγκυρη διεύθυνση URL",
+            };
+          }
+
+          // Additional platform-specific validation could be added here
+          // For example, checking if the URL matches the expected pattern for each platform
         }
       });
 
+      // Add social errors if any were found
+      if (Object.keys(socialErrors).length > 0) {
+        errors.socials = socialErrors;
+      }
+    }
+
+    // For validation-only requests, check media state if provided
+    if (validateOnly && formData.get("mediaState")) {
+      const mediaState = JSON.parse(formData.get("mediaState"));
+
+      // Add any media-specific validation here if needed
+      // For example, check if the maximum number of files would be exceeded
+    }
+
+    // If there are validation errors, return them
+    if (Object.keys(errors).length > 0) {
       return {
         data: null,
-        errors: fieldErrors,
+        errors,
         message: null,
       };
     }
 
-    // Prepare the payload - only include fields that have been validated
-    const payload = {};
-
-    // Add website if changed
-    if (validationResult.data.website !== undefined) {
-      payload.website = validationResult.data.website;
-    }
-
-    // Add visibility if changed
-    if (validationResult.data.visibility) {
-      payload.visibility = validationResult.data.visibility;
-    }
-
-    // Add socials if changed
-    if (validationResult.data.socials) {
-      // Create clean socials object with only URL property
-      payload.socials = {};
-
-      Object.entries(validationResult.data.socials).forEach(
-        ([platform, data]) => {
-          if (data && data.url !== undefined) {
-            // Check for undefined, not truthiness
-            const trimmedUrl =
-              data.url === "" || data.url === null ? null : data.url.trim();
-
-            // Only include if the URL is not null or if we're explicitly setting it to null
-            payload.socials[platform] = { url: trimmedUrl };
-          }
-        }
-      );
-    }
-
-    // Handle media update
-    const remainingMediaIds = JSON.parse(
-      formData.get("remaining-media") || "[]"
-    );
-    const deletedMediaIds = JSON.parse(formData.get("deleted-media") || "[]");
-    const allMediaDeleted = formData.get("all-media-deleted") === "true";
-
-    // Check if there are actual media changes to process
-    const hasDeletedFiles = deletedMediaIds.length > 0;
-    const hasMediaChanges =
-      hasDeletedFiles || allMediaDeleted || remainingMediaIds.length > 0;
-
-    if (hasMediaChanges) {
-      // Special case - if all media is deleted, explicitly set an empty portfolio
-      if (allMediaDeleted && remainingMediaIds.length === 0) {
-        payload.portfolio = [];
-      } else {
-        // Simply use the remaining media IDs directly
-        // No need for file uploads since they're already handled on client side
-        payload.portfolio = remainingMediaIds;
-      }
-    }
-
-    // Clean empty objects from the payload, but DON'T clean empty arrays
-    // when they represent intentionally empty collections like portfolio
-    Object.keys(payload).forEach((key) => {
-      if (
-        payload[key] === undefined ||
-        payload[key] === null ||
-        (typeof payload[key] === "object" &&
-          !Array.isArray(payload[key]) &&
-          Object.keys(payload[key]).length === 0)
-      ) {
-        delete payload[key];
-      }
-    });
-
-    // Only proceed if there are changes
-    if (Object.keys(payload).length === 0) {
+    // If validation only, return success without making API calls
+    if (validateOnly) {
       return {
         data: null,
-        errors: null,
-        message: "Δεν υπάρχουν αλλαγές για αποθήκευση",
+        errors: {},
+        message: "Validation passed",
       };
     }
 
-    // Execute GraphQL mutation
-    const { data: gqlData, error } = await postData(UPDATE_FREELANCER, {
+    // Process media updates if needed
+    const remainingMedia = formData.get("remaining-media");
+    const deletedMedia = formData.get("deleted-media");
+    const allMediaDeleted = formData.get("all-media-deleted") === "true";
+
+    // Add media changes to the payload if provided
+    if (remainingMedia || deletedMedia || allMediaDeleted) {
+      // If all media was deleted
+      if (allMediaDeleted) {
+        changes.portfolio = [];
+      }
+      // If we have remaining media IDs
+      else if (remainingMedia) {
+        changes.portfolio = JSON.parse(remainingMedia);
+      }
+    }
+
+    // Make the API call to update the freelancer presentation info
+    const { data, error } = await postData(UPDATE_FREELANCER, {
       id,
-      data: payload,
+      data: changes,
     });
 
     if (error) {
-      console.error("GraphQL error:", error);
       return {
         data: null,
-        errors: { submit: error.message || "Error updating profile" },
+        errors: {
+          submit: {
+            message: error.message || "Error during update",
+          },
+        },
         message: null,
       };
     }
 
-    // Revalidate path to update the UI
+    // Success - revalidate the path to refresh data
     revalidatePath("/dashboard/profile");
-
     return {
-      data: gqlData?.updateFreelancer?.data,
+      data,
       errors: null,
       message: "Τα στοιχεία ενημερώθηκαν με επιτυχία",
     };
   } catch (error) {
-    console.error("Unexpected error in updatePresentationInfo:", error);
+    console.error("Update failed:", error);
     return {
       data: null,
       errors: {
-        submit: `Unexpected error: ${error.message || "Unknown error"}`,
+        submit: {
+          message: error.message || "Προέκυψε σφάλμα κατά την ενημέρωση",
+        },
       },
       message: null,
     };
+  }
+}
+
+// Helper function to validate URLs
+function isValidUrl(string) {
+  try {
+    // Allow empty values
+    if (!string) return true;
+
+    // Try to create a URL object
+    const url = new URL(string);
+    // Valid if protocol is http or https
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch (_) {
+    return false;
   }
 }
 

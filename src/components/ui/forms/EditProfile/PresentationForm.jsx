@@ -278,95 +278,168 @@ export default function PresentationForm({ freelancer, jwt }) {
   };
 
   // Handle form submission
+  // Updated handleSubmit function for PresentationForm
   const handleSubmit = async (formData) => {
-    // Set local loading state to true immediately with a short delay as promise
+    // Set loading state
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 0));
+
     // Only proceed if there are changes
     if (!hasChanges()) {
       setIsSubmitting(false);
       return;
     }
 
-    // Handle new file uploads first
-    const newFiles = mediaState.media
-      .filter((item) => item.file && item.file instanceof File)
-      .map((item) => item.file);
+    try {
+      // Step 1: Validate the form first
+      const validationFormData = new FormData();
+      validationFormData.append("id", freelancer.id);
+      validationFormData.append("validateOnly", "true");
 
-    let newMediaIds = [];
+      // Create validation state to check before proceeding
+      const formChangesToValidate = {};
+      if (changes.website !== undefined)
+        formChangesToValidate.website = changes.website;
+      if (changes.visibility)
+        formChangesToValidate.visibility = changes.visibility;
+      if (changes.socials) formChangesToValidate.socials = changes.socials;
 
-    // If we have new files, upload them directly via GraphQL
-    if (newFiles.length > 0) {
-      const mediaOptions = {
-        refId: freelancer.id,
-        ref: "api::freelancer.freelancer",
-        field: "portfolio",
+      // Add media validation state
+      const mediaValidationState = {
+        hasNewMedia: mediaState.media.some((item) => item.file instanceof File),
+        hasDeletedMedia: mediaState.deletedMediaIds.length > 0,
+        mediaCount: mediaState.media.length,
       };
 
-      // Upload files using the uploadMedia function
-      newMediaIds = await uploadData(newFiles, mediaOptions, jwt);
-
-      // Handle case where upload fails but no error is thrown
-      if (!newMediaIds.length && newFiles.length > 0) {
-        setIsSubmitting(false);
-        throw new Error("Failed to upload media files");
-      }
-    }
-
-    // Prepare remaining media IDs (existing media that wasn't deleted)
-    const remainingMediaIds = mediaState.media
-      .filter(
-        (item) =>
-          item.file && typeof item.file === "object" && "id" in item.file
-      )
-      .map((item) => item.file.id);
-
-    // Combine existing and new media IDs
-    const allMediaIds = [...remainingMediaIds, ...newMediaIds];
-
-    // Add the freelancer ID
-    formData.append("id", freelancer.id);
-
-    // Only include fields that have actually changed
-    const formChanges = {};
-
-    // Only add changed form fields to the formChanges object
-    if (changes.website !== undefined) formChanges.website = changes.website;
-    if (changes.visibility) formChanges.visibility = changes.visibility;
-    if (changes.socials) formChanges.socials = changes.socials;
-
-    formData.append("changes", JSON.stringify(formChanges));
-
-    // Handle media information
-    const hasMediaDeletions = mediaState.deletedMediaIds.length > 0;
-    const allMediaDeleted =
-      mediaState.media.length === 0 && originalMediaLength.current > 0;
-
-    if (mediaState.hasChanges || hasMediaDeletions || allMediaDeleted) {
-      // Instead of appending files, just append the IDs
-      formData.append("remaining-media", JSON.stringify(allMediaIds));
-      formData.append(
-        "deleted-media",
-        JSON.stringify(mediaState.deletedMediaIds)
+      validationFormData.append(
+        "changes",
+        JSON.stringify(formChangesToValidate)
+      );
+      validationFormData.append(
+        "mediaState",
+        JSON.stringify(mediaValidationState)
       );
 
-      // For the special case where all media is deleted
-      if (allMediaDeleted) {
-        formData.append("all-media-deleted", "true");
+      // Call server action WITH await to ensure validation completes
+      const validationResult = await formAction(validationFormData);
+
+      // Check validation result
+      if (
+        validationResult?.errors &&
+        Object.keys(validationResult.errors).length > 0
+      ) {
+        console.log("Validation failed:", validationResult.errors);
+        setIsSubmitting(false);
+        return; // Stop the submission if validation fails
       }
+
+      // Step 2: If validation passed, handle file uploads
+      let newMediaIds = [];
+      const newFiles = mediaState.media
+        .filter((item) => item.file && item.file instanceof File)
+        .map((item) => item.file);
+
+      // If we have new files, upload them
+      if (newFiles.length > 0) {
+        const mediaOptions = {
+          refId: freelancer.id,
+          ref: "api::freelancer.freelancer",
+          field: "portfolio",
+        };
+
+        try {
+          // Upload files using the uploadData function
+          newMediaIds = await uploadData(newFiles, mediaOptions, jwt);
+
+          // Handle case where upload fails but no error is thrown
+          if (!newMediaIds.length && newFiles.length > 0) {
+            throw new Error("Failed to upload media files");
+          }
+        } catch (error) {
+          // Handle upload error
+          setIsSubmitting(false);
+
+          // Create error form data
+          const errorFormData = new FormData();
+          errorFormData.append("id", freelancer.id);
+          errorFormData.append(
+            "error",
+            JSON.stringify({
+              message: "Σφάλμα κατά την μεταφόρτωση των αρχείων",
+            })
+          );
+
+          // Submit error
+          await formAction(errorFormData);
+          return;
+        }
+      }
+
+      // Step 3: Prepare final submission
+      const finalFormData = new FormData();
+      finalFormData.append("id", freelancer.id);
+
+      // Only include fields that have actually changed
+      const formChanges = {};
+      if (changes.website !== undefined) formChanges.website = changes.website;
+      if (changes.visibility) formChanges.visibility = changes.visibility;
+      if (changes.socials) formChanges.socials = changes.socials;
+
+      finalFormData.append("changes", JSON.stringify(formChanges));
+
+      // Prepare remaining media IDs (existing media that wasn't deleted)
+      const remainingMediaIds = mediaState.media
+        .filter(
+          (item) =>
+            item.file && typeof item.file === "object" && "id" in item.file
+        )
+        .map((item) => item.file.id);
+
+      // Combine existing and new media IDs
+      const allMediaIds = [...remainingMediaIds, ...newMediaIds];
+
+      // Handle media information
+      const hasMediaDeletions = mediaState.deletedMediaIds.length > 0;
+      const allMediaDeleted =
+        mediaState.media.length === 0 && originalMediaLength.current > 0;
+
+      if (mediaState.hasChanges || hasMediaDeletions || allMediaDeleted) {
+        // Instead of appending files, just append the IDs
+        finalFormData.append("remaining-media", JSON.stringify(allMediaIds));
+        finalFormData.append(
+          "deleted-media",
+          JSON.stringify(mediaState.deletedMediaIds)
+        );
+
+        // For the special case where all media is deleted
+        if (allMediaDeleted) {
+          finalFormData.append("all-media-deleted", "true");
+        }
+      }
+
+      // Reset hasProcessedSuccess flag before submission
+      hasProcessedSuccess.current = false;
+
+      // Call the server action with transition for UI updates
+      startTransition(() => {
+        formAction(finalFormData);
+      });
+    } catch (error) {
+      console.error("Submission error:", error);
+
+      // Create error form data
+      const errorFormData = new FormData();
+      errorFormData.append("id", freelancer.id);
+      errorFormData.append(
+        "error",
+        JSON.stringify({
+          message: "Προέκυψε σφάλμα κατά την υποβολή",
+        })
+      );
+
+      formAction(errorFormData);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // Reset hasProcessedSuccess flag before submission
-    hasProcessedSuccess.current = false;
-
-    // Call the server action with only the IDs, not the files
-    startTransition(() => {
-      formAction(formData);
-    });
-
-    // Set local loading state to false immediately with a short delay as promise
-    setIsSubmitting(false);
-    await new Promise((resolve) => setTimeout(resolve, 0));
   };
 
   return (
