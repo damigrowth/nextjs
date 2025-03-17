@@ -1,6 +1,11 @@
 "use client";
 
-import React, { useCallback, useEffect } from "react";
+import React, {
+  startTransition,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import InputB from "@/components/inputs/InputB";
 import TextArea from "@/components/inputs/TextArea";
 import ProfileImageInput from "@/components/inputs/ProfileImageInput";
@@ -24,8 +29,9 @@ import Alert from "../../alerts/Alert";
 import SwitchB from "../../Archives/Inputs/SwitchB";
 import { useFormChanges } from "@/hook/useFormChanges";
 import { FREELANCER_PROFILE_SKILLS } from "@/lib/graphql/queries/main/taxonomies/freelancer/skill";
+import { uploadData } from "@/lib/uploads/upload";
 
-export default function BasicInfoForm({ freelancer, type }) {
+export default function BasicInfoForm({ freelancer, type, jwt }) {
   // Create a default coverage object to use when coverage is null
   const defaultCoverage = {
     online: false,
@@ -73,6 +79,8 @@ export default function BasicInfoForm({ freelancer, type }) {
     updateBasicInfo,
     initialState
   );
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const originalValues = {
     image: freelancer.image || { data: null },
@@ -350,54 +358,133 @@ export default function BasicInfoForm({ freelancer, type }) {
       label: skill.attributes?.label || skill.attributes?.name,
     })) || [];
 
+  // Updated handleSubmit function for BasicInfoForm
   const handleSubmit = async (formData) => {
+    setIsSubmitting(true);
+
     // Only proceed if there are actual changes
     if (!hasChanges) {
-      return {
-        data: null,
-        errors: { submit: "Δεν υπάρχουν αλλαγές για αποθήκευση" },
-        message: null,
-      };
+      setIsSubmitting(false);
+      return;
     }
 
-    // Check if the image exists in the original values
-    const hasExistingImage = Boolean(originalValues.image?.data);
-    formData.append("hasExistingImage", hasExistingImage);
-    formData.append("id", freelancer.id);
+    try {
+      // Step 1: Validate the form first with await to ensure validation completes
+      const validationFormData = new FormData();
+      validationFormData.append("id", freelancer.id);
+      validationFormData.append("validateOnly", "true");
 
-    // Send the current state of all form fields - ensure it's JSON serializable
-    const serializedValues = {
-      ...currentValues,
-      image:
-        currentValues.image && currentValues.image.data
-          ? {
-              data: {
-                id: currentValues.image.data.id,
-                attributes: currentValues.image.data.attributes,
-              },
-            }
-          : { data: null },
-    };
+      // Create validation state with placeholder for new image
+      const formStateForValidation = {
+        ...currentValues,
+        image:
+          image instanceof File ? { isNewFile: true } : currentValues.image,
+      };
 
-    formData.append("currentFormState", JSON.stringify(serializedValues));
+      validationFormData.append(
+        "currentFormState",
+        JSON.stringify(formStateForValidation)
+      );
+      validationFormData.append("changes", JSON.stringify(changes));
 
-    // Handle image separately if it exists in changes
-    if (changes.image) {
-      // If the image is a File object (new upload), append it directly
-      if (changes.image instanceof File) {
-        formData.append("image", changes.image);
+      // Call server action WITH await to ensure validation completes
+      const validationResult = await formAction(validationFormData);
+
+      // Check validation result
+      if (
+        validationResult?.errors &&
+        Object.keys(validationResult.errors).length > 0
+      ) {
+        
+        setIsSubmitting(false);
+        return; // Stop the submission if validation fails
       }
 
-      // Remove image from the changes object for JSON serialization
-      const { image, ...restChanges } = changes;
-      formData.append("changes", JSON.stringify(restChanges));
-    } else {
-      formData.append("changes", JSON.stringify(changes));
-    }
+      // Step 2: Only if validation passed and we have a new image, upload it
+      let uploadedImageId = null;
+      if (image instanceof File) {
+        try {
+          const mediaOptions = {
+            refId: freelancer.id,
+            ref: "api::freelancer.freelancer",
+            field: "image",
+          };
+          // This is a client-side operation, so we use await
+          const uploadedIds = await uploadData([image], mediaOptions, jwt);
+          uploadedImageId = uploadedIds[0];
 
-    // Submit the form
-    const result = await formAction(formData);
-    return result;
+          if (!uploadedImageId) {
+            throw new Error("Image upload failed");
+          }
+        } catch (error) {
+          // Handle image upload error
+          setIsSubmitting(false);
+
+          // Create error form data
+          const errorFormData = new FormData();
+          errorFormData.append("id", freelancer.id);
+          errorFormData.append(
+            "error",
+            JSON.stringify({
+              message: "Σφάλμα κατά την μεταφόρτωση της εικόνας",
+            })
+          );
+
+          // Submit error WITH await
+          await formAction(errorFormData);
+          return;
+        }
+      }
+
+      // Step 3: Final submission with all data including uploaded image
+      const finalFormData = new FormData();
+      finalFormData.append("id", freelancer.id);
+
+      // Prepare the final state with uploaded image ID
+      const serializedValues = {
+        ...currentValues,
+        // Only include image data if we have a valid ID
+        image: uploadedImageId
+          ? { data: { id: uploadedImageId } }
+          : currentValues.image?.data?.id
+          ? currentValues.image // Keep existing image if it has an ID
+          : null, // Otherwise set to null, not empty object
+      };
+
+      // Make sure we're not sending empty objects
+      if (
+        serializedValues.image &&
+        (!serializedValues.image.data || !serializedValues.image.data.id)
+      ) {
+        serializedValues.image = null;
+      }
+
+      finalFormData.append(
+        "currentFormState",
+        JSON.stringify(serializedValues)
+      );
+      finalFormData.append("changes", JSON.stringify(changes));
+
+      // Submit the final form data with transition for UI updates
+      startTransition(() => {
+        formAction(finalFormData);
+      });
+    } catch (error) {
+      console.error("Submission error:", error);
+      // Handle any unexpected errors
+      const errorFormData = new FormData();
+      errorFormData.append("id", freelancer.id);
+      errorFormData.append(
+        "error",
+        JSON.stringify({
+          message: "Unexpected error during submission",
+        })
+      );
+
+      formAction(errorFormData);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -410,6 +497,8 @@ export default function BasicInfoForm({ freelancer, type }) {
       }));
     }
   }, [formState?.errors]);
+
+  
 
   return (
     <form action={handleSubmit}>
@@ -753,7 +842,7 @@ export default function BasicInfoForm({ freelancer, type }) {
         <SaveButton
           variant="primary"
           orientation="end"
-          isPending={isPending}
+          isPending={isSubmitting || isPending}
           hasChanges={hasChanges}
         />
       </div>

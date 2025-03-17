@@ -75,216 +75,107 @@ const imageSchema = z
     }
   });
 
+// 3. Zod validation schema
+export const coverageSchema = z
+  .object({
+    online: z.boolean(),
+    onbase: z.boolean(),
+    onsite: z.boolean(),
+    address: z.string().nullable(),
+    area: z.object({ data: z.any().nullable() }).nullable(),
+    county: z.object({ data: z.any().nullable() }).nullable(),
+    zipcode: z.object({ data: z.any().nullable() }).nullable(),
+    counties: z.object({ data: z.array(z.any()).nullable() }).nullable(),
+    areas: z.object({ data: z.array(z.any()).nullable() }).nullable(),
+  })
+  .superRefine((cov, ctx) => {
+    // At least one coverage type must be selected
+    if (!cov.online && !cov.onbase && !cov.onsite) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Πρέπει να επιλέξετε τουλάχιστον έναν τρόπο κάλυψης",
+        path: ["coverage"],
+      });
+    }
+
+    // Validate onbase requirements
+    if (cov.onbase) {
+      if (!cov.address?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Η διεύθυνση είναι υποχρεωτική για κάλυψη στην έδρα σας",
+          path: ["address"],
+        });
+      }
+
+      if (!cov.zipcode?.data?.id) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Ο Τ.Κ. είναι υποχρεωτικός για κάλυψη στην έδρα σας",
+          path: ["zipcode"],
+        });
+      }
+
+      if (!cov.county?.data?.id) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Ο νομός είναι υποχρεωτικός για κάλυψη στην έδρα σας",
+          path: ["county"],
+        });
+      }
+
+      if (!cov.area?.data?.id) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Η περιοχή είναι υποχρεωτική για κάλυψη στην έδρα σας",
+          path: ["area"],
+        });
+      }
+    }
+
+    // Validate onsite requirements
+    if (cov.onsite) {
+      if (!cov.counties?.data?.length && !cov.areas?.data?.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Απαιτείται τουλάχιστον ένας νομός ή μια περιοχή για κάλυψη στον χώρο του πελάτη",
+          path: ["counties"],
+        });
+      }
+    }
+  });
+
+export const baseSchema = z.object({
+  category: z.object({
+    data: z.object({ id: z.string() }),
+  }),
+  subcategory: z.object({
+    data: z.object({ id: z.string() }),
+  }),
+  coverage: coverageSchema,
+});
+
 export const basicInfoSchema = z.object({
-  image: imageSchema,
-  tagline: z
-    .string()
-    .min(5, "Η σύντομη περιγραφή πρέπει να έχει τουλάχιστον 5 χαρακτήρες")
-    .max(
-      120,
-      "Η σύντομη περιγραφή δεν μπορεί να υπερβαίνει τους 120 χαρακτήρες"
-    )
-    .optional()
-    .nullable(),
-  description: z
-    .string()
-    .min(80, "Η περιγραφή πρέπει να έχει τουλάχιστον 80 χαρακτήρες")
-    .max(5000, "Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες")
-    .optional()
-    .nullable(),
-  category: z
-    .union([
-      z.null(),
-      z.object({
-        data: z.union([
-          z.null(),
-          z.object({
-            id: z.string(),
-            attributes: z.object({
-              slug: z.string(),
-            }),
-          }),
-        ]),
-      }),
-    ])
-    .superRefine((val, ctx) => {
-      // Check if it's null or doesn't have the right structure
-      if (!val || !val.data || !val.data.id || !val.data.attributes?.slug) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Η κατηγορία είναι υποχρεωτική",
-          path: ["data"],
-        });
-        return false;
-      }
-      return true;
+  image: imageSchema.optional(),
+  category: z.object({
+    data: z.object({
+      id: z.string(),
+      attributes: z.object({ slug: z.string() }),
     }),
-
-  subcategory: z
-    .union([
-      z.null(),
-      z.object({
-        data: z.union([
-          z.null(),
-          z.object({
-            id: z.string(),
-          }),
-        ]),
-      }),
-    ])
-    .superRefine((val, ctx) => {
-      // Check if it's null or doesn't have the right structure
-      if (!val || !val.data || !val.data.id) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Η υποκατηγορία είναι υποχρεωτική",
-          path: ["data"],
-        });
-        return false;
-      }
-      return true;
+  }),
+  subcategory: z.object({
+    data: z.object({
+      id: z.string(),
+      attributes: z.object({ slug: z.string() }),
     }),
-  skills: z
-    .object({
-      data: z.array(
-        z.object({
-          id: z.string(),
-          attributes: z.object({
-            slug: z.string(),
-          }),
-        })
-      ),
-    })
-    .optional()
-    .nullable(),
-  specialization: z
-    .object({
-      data: z
-        .object({
-          id: z.string(),
-          attributes: z.object({
-            slug: z.string(),
-          }),
-        })
-        .nullable(),
-    })
-    .optional()
-    .nullable(),
-  rate: z
-    .number()
-    .min(10, "Η ελάχιστη χρέωση είναι 10€")
-    .max(50000, "Η μέγιστη χρέωση είναι 50.000€")
-    .optional()
-    .nullable(),
-  commencement: z
-    .number()
-    .min(1900, "Το έτος έναρξης πρέπει να είναι μετά το 1900")
-    .max(
-      new Date().getFullYear(),
-      "Το έτος έναρξης δεν μπορεί να είναι μελλοντικό"
-    )
-    .optional()
-    .nullable(),
-  coverage: z
-    .object({
-      online: z.boolean(),
-      onbase: z.boolean(),
-      onsite: z.boolean(),
-      address: z.string().optional().nullable(),
-      zipcode: z
-        .object({
-          data: z
-            .object({
-              id: z.string(),
-            })
-            .nullable(),
-        })
-        .optional(),
-      area: z
-        .object({
-          data: z
-            .object({
-              id: z.string(),
-            })
-            .nullable(),
-        })
-        .optional(),
-      county: z
-        .object({
-          data: z
-            .object({
-              id: z.string(),
-            })
-            .nullable(),
-        })
-        .optional(),
-      counties: z
-        .object({
-          data: z.array(
-            z.object({
-              id: z.string(),
-            })
-          ),
-        })
-        .optional(),
-      areas: z
-        .object({
-          data: z.array(
-            z.object({
-              id: z.string(),
-            })
-          ),
-        })
-        .optional(),
-    })
-    .superRefine((data, ctx) => {
-      // At least one coverage type must be selected
-      if (!data.online && !data.onbase && !data.onsite) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Πρέπει να επιλέξετε τουλάχιστον έναν τρόπο κάλυψης",
-          path: [], // Setting empty path to make sure it shows as a general error
-        });
-      }
-
-      // If onbase is true, validate required fields
-      if (data.onbase) {
-        if (!data.address || data.address.trim() === "") {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Η διεύθυνση είναι υποχρεωτική για κάλυψη στην έδρα σας",
-            path: ["address"],
-          });
-        }
-
-        if (!data.zipcode?.data?.id) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Ο Τ.Κ. είναι υποχρεωτικός για κάλυψη στην έδρα σας",
-            path: ["zipcode"],
-          });
-        }
-      }
-
-      // If onsite is true, validate either counties or areas are populated
-      if (data.onsite) {
-        const hasCounties =
-          Array.isArray(data.counties?.data) && data.counties.data.length > 0;
-        const hasAreas =
-          Array.isArray(data.areas?.data) && data.areas.data.length > 0;
-
-        if (!hasCounties && !hasAreas) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message:
-              "Για την κάλυψη στο χώρο του πελάτη απαιτείται τουλάχιστον ένας νομός ή μια περιοχή",
-            path: ["counties"],
-          });
-        }
-      }
-
-      return true;
-    }),
+  }),
+  coverage: coverageSchema, // Defined above
+  // Optional fields
+  tagline: z.string().min(5).max(120).optional(),
+  description: z.string().min(80).max(5000).optional(),
+  rate: z.number().min(10).max(50000).optional(),
+  commencement: z.number().min(1900).max(new Date().getFullYear()).optional(),
 });
 
 export const presentationSchema = z.object({
