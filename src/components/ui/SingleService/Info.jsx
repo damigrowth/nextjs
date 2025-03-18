@@ -113,11 +113,11 @@ export default function Info({
             <div className="details">
               <h5 className="title">Περιοχές Εξυπηρέτησης</h5>
               <p className="mb-0 text">
-                {[
-                  ...(counties?.map((county) => county?.attributes?.name) ||
-                    []),
-                  ...(areas?.map((area) => area?.attributes?.name) || []),
-                ].join(", ")}
+                {counties?.length > 0 &&
+                  counties.map((county) => county?.attributes?.name).join(", ")}
+                {counties?.length > 0 && areas?.length > 0 && " - "}
+                {areas?.length > 0 &&
+                  areas.map((area) => area?.attributes?.name).join(", ")}
               </p>
             </div>
           </div>
