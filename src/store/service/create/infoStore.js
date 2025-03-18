@@ -26,6 +26,8 @@ const initialErrorsState = {
 
 const useInfoStore = (set, get) => ({
   info: initialInfoState,
+  showPrice: true,
+  setShowPrice: (value) => set({ showPrice: value }),
   errors: initialErrorsState,
   setInfo: (key, payload) =>
     set((state) => ({

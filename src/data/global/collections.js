@@ -49,8 +49,8 @@ export const paymentMethodsOptions = [
   },
   {
     id: "6",
-    label: "Revoulut",
-    slug: "revoulut",
+    label: "Revolut",
+    slug: "revolut",
   },
   {
     id: "11",

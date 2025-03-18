@@ -30,6 +30,7 @@ export default function AddServiceForm({ coverage, jwt }) {
     steps,
     setStep,
     info,
+    showPrice,
     media,
     goBack,
     typeStep,
@@ -95,7 +96,10 @@ export default function AddServiceForm({ coverage, jwt }) {
           info.category.id === 0 ||
           info.subcategory.id === 0 ||
           info.subdivision.id === 0 ||
-          (info.fixed && (info.price < 10 || info.price > 50000))
+          (showPrice &&
+            info.fixed &&
+            (info.price < 10 || info.price > 50000)) ||
+          (!showPrice && info.fixed && info.price !== 0)
         );
 
       case "packages":

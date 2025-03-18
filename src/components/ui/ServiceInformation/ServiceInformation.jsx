@@ -14,10 +14,18 @@ import { TAGS_SEARCH_COMPLETE } from "@/lib/graphql/queries/main/taxonomies/serv
 import SearchableSelect from "../Archives/Inputs/SearchableSelect";
 import { normalizeQuery } from "@/utils/queries";
 import { searchData } from "@/lib/client/operations";
+import SwitchB from "../Archives/Inputs/SwitchB";
 
 export default function ServiceInformation() {
-  const { info, setInfo, errors, handleStepsTypeChange, type } =
-    useCreateServiceStore();
+  const {
+    info,
+    setInfo,
+    showPrice,
+    setShowPrice,
+    errors,
+    handleStepsTypeChange,
+    type,
+  } = useCreateServiceStore();
 
   const [taxonomyParams, setTaxonomyParams] = useState({
     categoryTerm: "",
@@ -273,6 +281,19 @@ export default function ServiceInformation() {
         }
       : { data: null };
 
+  const handleHidePriceToggle = (checked) => {
+    // If checked, hide price (showPrice = false)
+    // If unchecked, show price (showPrice = true)
+    setShowPrice(!checked);
+
+    // If hiding price (checked = true), set price to 0
+    if (checked) {
+      setInfo("price", 0);
+    } else {
+      setInfo("price", 10);
+    }
+  };
+
   return (
     <div>
       <div className="ps-widget bdrs4 p30 mb30 position-relative">
@@ -417,16 +438,16 @@ export default function ServiceInformation() {
                   name="service-price"
                   label="Αμοιβή"
                   type="number"
-                  min={10}
+                  min={!showPrice ? 0 : 10}
                   max={50000}
-                  defaultValue={info.price || 0}
-                  value={info.price || 0}
+                  defaultValue={!showPrice ? 0 : info.price || 0}
+                  value={!showPrice ? 0 : info.price || 0}
                   onChange={(formattedValue) =>
                     setInfo("price", formattedValue)
                   }
                   className="form-control input-group"
                   errors={errors}
-                  disabled={!info.fixed}
+                  disabled={!showPrice || !info.fixed}
                   append="€"
                 />
               </div>
@@ -472,6 +493,15 @@ export default function ServiceInformation() {
                 </div>
               </div>
             )}
+
+            <div className="mb20">
+              <SwitchB
+                label="Δεν θέλω να εμφανίζεται τιμή στην υπηρεσία"
+                name="hide-price"
+                initialValue={!showPrice}
+                onChange={handleHidePriceToggle}
+              />
+            </div>
           </div>
         </div>
         {/* Remove the save button - saving will be handled by the Next button */}

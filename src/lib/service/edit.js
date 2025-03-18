@@ -30,8 +30,9 @@ const SERVICE_EDIT_SCHEMA = z.object({
     .optional(),
   price: z
     .number()
-    .min(10, "Η ελάχιστη τιμή είναι 10€")
-    .max(50000, "Η μέγιστη τιμή είναι 50000€")
+    .refine((val) => val === 0 || val >= 10, {
+      message: "Η τιμή πρέπει να είναι 0 ή τουλάχιστον 10€",
+    })
     .optional(),
   status: z.string().optional(),
 
@@ -170,37 +171,41 @@ export async function editService(prevState, formData) {
     if (!validationResult.success) {
       console.log("Validation errors:", validationResult.error.format());
 
-      const fieldErrors = {};
       const formattedErrors = validationResult.error.format();
 
-      Object.entries(formattedErrors).forEach(([field, error]) => {
-        if (field !== "_errors") {
-          // Handle nested errors like category.id
-          if (error.id?.[0]) {
-            fieldErrors[field] = {
-              field,
-              message: error.id[0],
-            };
-          } else if (error._errors?.[0]) {
-            // Handle top-level errors
-            fieldErrors[field] = {
-              field,
-              message: error._errors[0],
-            };
-          }
-        }
-      });
+      // Find the first field with an error
+      const firstErrorField = Object.keys(formattedErrors).find(
+        (field) =>
+          field !== "_errors" &&
+          (formattedErrors[field]._errors?.length > 0 ||
+            formattedErrors[field].id?.[0])
+      );
+
+      if (firstErrorField) {
+        // Get the error message
+        const errorMessage =
+          formattedErrors[firstErrorField].id?.[0] ||
+          formattedErrors[firstErrorField]._errors[0];
+
+        // Return in the expected format
+        return {
+          ...prevState,
+          message: "Σφάλμα επικύρωσης",
+          errors: {
+            field: firstErrorField,
+            message: errorMessage,
+          },
+          data: null,
+        };
+      }
 
       return {
         ...prevState,
         message: "Σφάλμα επικύρωσης",
-        errors:
-          Object.keys(fieldErrors).length > 0
-            ? fieldErrors
-            : {
-                field: "validation",
-                message: "Υπάρχουν σφάλματα στη φόρμα",
-              },
+        errors: {
+          field: "validation",
+          message: "Υπάρχουν σφάλματα στη φόρμα",
+        },
         data: null,
       };
     }
