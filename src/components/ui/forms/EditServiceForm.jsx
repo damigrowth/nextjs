@@ -51,6 +51,8 @@ export default function EditServiceForm({ service, jwt }) {
     errors,
     hasChanges,
     saveInfo,
+    showPrice,
+    setShowPrice,
     saveAddons,
     saveFaq,
     saveGallery,
@@ -419,6 +421,19 @@ export default function EditServiceForm({ service, jwt }) {
     await new Promise((resolve) => setTimeout(resolve, 0));
   };
 
+  const handleHidePriceToggle = (checked) => {
+    // If checked, hide price (showPrice = false)
+    // If unchecked, show price (showPrice = true)
+    setShowPrice(!checked);
+
+    // If hiding price (checked = true), set price to 0
+    if (checked) {
+      setInfo("price", 0);
+    } else {
+      setInfo("price", 10);
+    }
+  };
+
   return (
     <form action={handleSubmit}>
       <div className="ps-widget bdrs4 mb30 position-relative">
@@ -430,6 +445,7 @@ export default function EditServiceForm({ service, jwt }) {
                 id="title"
                 name="title"
                 type="text"
+                minLength={10}
                 maxLength={80}
                 value={info.title}
                 onChange={(formattedValue) => setInfo("title", formattedValue)}
@@ -544,7 +560,7 @@ export default function EditServiceForm({ service, jwt }) {
                 isClearable={true}
                 formatSymbols
                 capitalize
-                errors={errors?.field === "tags" ? errors : null}
+                errors={formState?.errors}
                 allowNewTerms={true}
                 newTermValue="new"
                 showOptionsOnType={true}
@@ -574,28 +590,51 @@ export default function EditServiceForm({ service, jwt }) {
                   name="price"
                   label="Αμοιβή"
                   type="number"
-                  min={10}
+                  min={!showPrice ? 0 : 10}
                   max={50000}
-                  value={info.price || 0}
+                  value={!showPrice ? 0 : info.price || 0}
                   onChange={(formattedValue) =>
                     setInfo("price", formattedValue)
                   }
                   className="form-control input-group"
                   errors={formState?.errors}
+                  disabled={!showPrice || !info.fixed}
                   append="€"
                 />
               </div>
+            </div>
+            <div className="mb10">
+              <SwitchB
+                label="Δεν θέλω να εμφανίζεται τιμή στην υπηρεσία"
+                name="hide-price"
+                initialValue={!showPrice}
+                onChange={handleHidePriceToggle}
+              />
             </div>
           </div>
           <div className="mb30">
             <label className="form-label fw500 dark-color">Πρόσθετα</label>
             <ServiceAddons custom={true} editMode={true} />
+            {formState?.errors?.field === "addons" && (
+              <div>
+                <p className="text-danger mb0 pb0">
+                  {formState?.errors?.message}
+                </p>
+              </div>
+            )}
           </div>
           <div className="mb30">
             <label className="form-label fw500 dark-color">
               Συχνές Ερωτήσεις
             </label>
             <ServiceFaq custom={true} editMode={true} />
+            {formState?.errors?.field === "faq" && (
+              <div>
+                <p className="text-danger mb0 pb0">
+                  {formState?.errors?.message}
+                </p>
+              </div>
+            )}
           </div>
           <div>
             <label className="form-label fw500 dark-color">Πολυμέσα</label>

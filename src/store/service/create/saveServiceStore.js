@@ -71,6 +71,8 @@ const useSaveServiceStore = (set) => ({
         fixed,
       } = state.info;
 
+      const showPrice = state.showPrice;
+
       const { oneoff } = state.type;
 
       // Check if the title is over 1 characters
@@ -118,16 +120,18 @@ const useSaveServiceStore = (set) => ({
       }
 
       if (fixed === true) {
-        // Check if the price is bellow 10€
-        if (price < 10) {
-          return {
-            errors: {
-              field: "service-price",
-              active: true,
-              message: "Η αμοιβή είναι μικρότερη από 10€",
-            },
-          };
+        if (showPrice) {
+          if (price < 10) {
+            return {
+              errors: {
+                field: "service-price",
+                active: true,
+                message: "Η αμοιβή είναι μικρότερη από 10€",
+              },
+            };
+          }
         }
+        // Check if the price is bellow 10€
 
         // Check if the price is above 50000€
         if (price > 50000) {

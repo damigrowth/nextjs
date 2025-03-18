@@ -23,6 +23,8 @@ const initialErrorsState = {
 const useEditInfoStore = (set) => ({
   info: initialInfoState,
   errors: initialErrorsState,
+  showPrice: true,
+  setShowPrice: (value) => set({ showPrice: value }),
   setInfo: (key, payload) =>
     set((state) => ({
       info: {
