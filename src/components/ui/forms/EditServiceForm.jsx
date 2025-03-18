@@ -592,7 +592,7 @@ export default function EditServiceForm({ service, jwt }) {
                   type="number"
                   min={!showPrice ? 0 : 10}
                   max={50000}
-                  value={!showPrice ? 0 : info.price || 0}
+                  value={!showPrice ? 0 : info.price || 10}
                   onChange={(formattedValue) =>
                     setInfo("price", formattedValue)
                   }

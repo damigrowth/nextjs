@@ -218,33 +218,61 @@ export default function AddServiceForm({ coverage, jwt }) {
       setIsSubmitting(true);
     });
 
-    let newMedia = [];
+    try {
+      // Upload media files if any
+      let newMediaIds = [];
+      if (media.length > 0) {
+        // Extract all files that need to be uploaded
+        const newFiles = media
+          .filter((item) => item.file instanceof File)
+          .map((item) => item.file);
 
-    // Upload media files if any
-    if (media.length > 0) {
-      const newFiles = media
-        .filter((item) => item.file instanceof File)
-        .map((item) => item.file);
+        if (newFiles.length > 0) {
+          const mediaOptions = {
+            ref: "api::service.service",
+            field: "media",
+          };
 
-      if (newFiles.length > 0) {
-        const mediaOptions = {
-          ref: "api::service.service",
-          field: "media",
-        };
-        newMedia = await uploadData(newFiles, mediaOptions, jwt);
+          // Try to upload the files and get their IDs
+          newMediaIds = await uploadData(newFiles, mediaOptions, jwt);
 
-        formData.append("media-ids", JSON.stringify(newMedia));
+          // If we have files but no IDs returned, there was an upload error
+          if (newMediaIds.length === 0 && newFiles.length > 0) {
+            throw new Error("Failed to upload media files");
+          }
+
+          // Add media IDs to form data as JSON string
+          formData.append("media-ids", JSON.stringify(newMediaIds));
+        } else {
+          // No files to upload, set empty array
+          formData.append("media-ids", "[]");
+        }
+      } else {
+        // No media at all, set empty array
+        formData.append("media-ids", "[]");
       }
+
+      // Call the server action
+      startTransition(() => {
+        formAction(formData);
+      });
+    } catch (error) {
+      console.error("Error during form submission:", error);
+      // Update form state with error
+      useCreateServiceStore.setState((state) => ({
+        ...state,
+        errors: {
+          active: true,
+          field: "media",
+          message:
+            error.message ||
+            "Σφάλμα κατά την μεταφόρτωση των αρχείων. Παρακαλώ προσπαθήστε ξανά.",
+        },
+      }));
+    } finally {
+      // Always ensure we clear the submitting state
+      setIsSubmitting(false);
     }
-
-    // Call the server action
-    startTransition(() => {
-      formAction(formData);
-    });
-
-    // Ensure state update is processed
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    setIsSubmitting(false);
   };
 
   const showPreviousButton = () => {
