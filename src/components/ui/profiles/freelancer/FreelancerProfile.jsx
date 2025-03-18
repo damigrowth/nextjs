@@ -186,8 +186,8 @@ export default function FreelancerProfile({
               coverage={coverage}
               commencement={commencement}
               website={website}
-              phone={visibility?.data?.attributes?.phone && phone}
-              email={visibility?.data?.attributes?.email && email}
+              phone={visibility?.phone && phone}
+              email={visibility?.email && email}
             />
             <Skills
               skills={skills?.data}
