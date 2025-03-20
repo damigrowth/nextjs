@@ -11,7 +11,7 @@ export default function FeaturedServices({ categories, services, fid }) {
             <div className="main-title mb30-lg">
               <h2 className="title">Δημοφιλείς Υπηρεσίες</h2>
               <p className="paragraph">
-                Δείτε τις υπηρεσίες με τη μεγαλύτερη ζήτηση
+                Δες τις υπηρεσίες με τη μεγαλύτερη ζήτηση
               </p>
             </div>
           </div>

@@ -12,9 +12,9 @@ export default function ServiceDetailComment1() {
   return (
     <>
       <div className="bsp_reveiw_wrt mb20">
-        <h6 className="fz17">Πρόσθεσε Αξιολόγησης</h6>
+        <h6 className="fz17">Προσθήκη Αξιολόγησης</h6>
         <p className="text">
-          Το email σας δεν θα δημοσιευτεί, μόνο το όνομα και το επίθετο.
+          Δεν θα δημοσιευθεί το email σας, μόνο το username.
         </p>
         <h6>Βαθμολογία</h6>
         <ReactStars

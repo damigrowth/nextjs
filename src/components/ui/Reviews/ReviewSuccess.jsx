@@ -8,7 +8,7 @@ export default function ReviewSuccess({ id }) {
           <i className="flaticon-success vam fz40 text-white " />
         </div>
         <h3 className="list-title text-center">
-          Επιτυχής αποστολή αξιολόγησης!
+          Επιτυχής υποβολή αξιολόγησης!
         </h3>
         <p className="text-center">
           Ευχαριστούμε για την αξιολόγηση σας με κωδικό <strong>#{id}</strong>.{" "}

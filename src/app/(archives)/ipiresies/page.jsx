@@ -21,7 +21,7 @@ export async function generateMetadata() {
   const { meta } = await Meta({
     titleTemplate: "Υπηρεσίες | Doulitsa",
     descriptionTemplate:
-      "Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας.",
+      "Ανακάλυψε τις υπηρεσίες που θα καλύψουν τις ανάγκες σου.",
     size: 150,
     url: "/ipiresies",
   });
@@ -126,7 +126,7 @@ export default async function page({ searchParams }) {
       <Breadcrumb parentPathLabel="Υπηρεσίες" parentPathLink="ipiresies" />
       <Banner
         heading="Όλες οι Υπηρεσίες"
-        description="Ανακαλύψτε τις υπηρεσίες που χρειάζεστε απο τους επαγγελματίες μας."
+        description="Ανακάλυψε τις καλύτερες υπηρεσίες για οποιαδήποτε ανάγκη, από τους καλύτερους επαγγελματίες."
       />
       <ServicesArchive
         searchParams={allSearchParams}

@@ -266,7 +266,7 @@ export default function AddServiceForm({ coverage, jwt }) {
           field: "media",
           message:
             error.message ||
-            "Σφάλμα κατά την μεταφόρτωση των αρχείων. Παρακαλώ προσπαθήστε ξανά.",
+            "Σφάλμα κατά την μεταφόρτωση των αρχείων. Προσπαθήστε ξανά.",
         },
       }));
     } finally {
@@ -293,8 +293,7 @@ export default function AddServiceForm({ coverage, jwt }) {
               <>
                 <h2>Δημιουργία Υπηρεσίας</h2>
                 <p className="text">
-                  Με αυτή την φόρμα μπορείτε να προσθέσετε καινούργιες
-                  υπηρεσίες.
+                  Με αυτήν τη φόρμα μπορείτε να προσθέσετε νέες υπηρεσίες.
                 </p>
               </>
             )}

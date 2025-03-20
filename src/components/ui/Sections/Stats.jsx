@@ -12,7 +12,7 @@ export default function Stats() {
               data-wow-delay="100ms"
             >
               <div className="main-title">
-                <h2 className="title">Βρείτε αξιόλογους επαγγελματίες</h2>
+                <h2 className="title">Βρες τους πιο αξιόλογους επαγγελματίες</h2>
                 <p className="paragraph">
                   Η Doulitsa επιβραβεύει και ξεχωρίζει τους καλύτερους
                   επαγγελματίες, γιατί θέλουμε να μένουν όλοι ικανοποιημένοι.

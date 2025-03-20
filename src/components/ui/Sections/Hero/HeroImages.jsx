@@ -7,20 +7,6 @@ export default function HeroImages() {
     <div className="home12-hero-img">
       <div className="position-relative">
         <Image
-          width={196}
-          height={129}
-          className="img-1 bounce-x"
-          src="/images/team/home12-img-1.png"
-          alt=" image "
-        />
-        <Image
-          width={114}
-          height={114}
-          className="img-2 bounce-y"
-          src="/images/team/home12-img-2.png"
-          alt=" image "
-        />
-        <Image
           width={90}
           height={90}
           style={{ height: "fit-content" }}

@@ -478,7 +478,7 @@ export default function PresentationForm({ freelancer, jwt }) {
           </div>
         </div>
 
-        <div className="mb10 col-md-3">
+        <div className="mb40 mt40 col-md-3">
           <InputB
             label="Ιστότοπος"
             id="website"

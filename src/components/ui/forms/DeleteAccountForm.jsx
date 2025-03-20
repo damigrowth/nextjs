@@ -81,7 +81,7 @@ export default function DeleteAccountForm({ username }) {
           <>
             Η διαγραφή του λογαριασμού είναι{" "}
             <strong>μη αναστρέψιμη ενέργεια.</strong> <br />
-            Παρακαλώ πληκτρολογήστε το username σας ({username}) για
+            Πληκτρολογήστε το username σας ({username}) για
             επιβεβαίωση:
           </>
         }

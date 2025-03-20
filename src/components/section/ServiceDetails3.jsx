@@ -24,7 +24,7 @@ export default async function ServiceDetail3({
   if (!service) {
     return (
       <div>
-        <p>Παρακαλώ περιμένετε...</p>
+        <p>Περιμένετε...</p>
       </div>
     );
   }

@@ -123,7 +123,7 @@ export default function SaveForm({
           onClick={handleSave}
           disabled={isLoading}
           className="listing-fav fz12 btn relative"
-          style={{ zIndex: 100 }}
+          style={{ zIndex: 5 }}
         >
           <span
             className={`flaticon-delete ${isLoading ? "opacity-75" : ""}`}
@@ -144,7 +144,7 @@ export default function SaveForm({
             ? `listing-fav fz12 btn ${displaySaved ? "ui-fav-active" : ""}`
             : "btn-none"
         } ${className} ${isLoading ? "opacity-50 pe-none" : ""}`}
-        style={{ zIndex: 100 }}
+        style={{ zIndex: 5 }}
       >
         {renderContent()}
       </button>

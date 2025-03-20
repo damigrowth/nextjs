@@ -27,7 +27,7 @@ export default function DashboardFooter() {
               <Socials />
             </div>
             <div className="contact-info">
-              <p className="mb-2 text-white">Έχετε ερωτήσεις?</p>
+              <p className="mb-2 text-white">Ερωτήσεις?</p>
               <h5 className="info-mail">
                 <a className="text-white" href="mailto:contact@doulitsa.gr">
                   contact@doulitsa.gr

@@ -198,7 +198,7 @@ export async function login(prevState, formData) {
   } else {
     return {
       errors: {},
-      message: response.error || "Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά.",
+      message: response.error || "Κάτι πήγε στραβά. Δοκιμάστε ξανά.",
     };
   }
 }
@@ -232,7 +232,7 @@ export async function forgotPassword(prevState, formData) {
     console.error(error);
     return {
       errors: {},
-      message: "Προέκυψε σφάλμα. Παρακαλώ δοκιμάστε ξανά αργότερα.",
+      message: "Προέκυψε σφάλμα. Δοκιμάστε ξανά αργότερα.",
     };
   }
 }
@@ -252,7 +252,7 @@ export async function resetPassword(prevState, formData) {
     return {
       success: false,
       message:
-        "Ο σύνδεσμος επαναφοράς έχει λήξει. Παρακαλώ χρησιμοποιήστε νέο σύνδεσμο επαναφοράς κωδικού.",
+        "Ο σύνδεσμος επαναφοράς έχει λήξει. Χρησιμοποιήστε νέο σύνδεσμο επαναφοράς κωδικού.",
     };
   }
 

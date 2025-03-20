@@ -9,7 +9,7 @@ export default function Metrics({
   return (
     <div className="row">
       {subcategory && (
-        <div className="col-sm-6 col-xl-3">
+        <div className="col-sm-12 col-xl-6">
           <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
             <div className="icon flex-shrink-0">
               <span className="flaticon-category" />

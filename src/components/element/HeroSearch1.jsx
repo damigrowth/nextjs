@@ -35,7 +35,7 @@ export default function HeroSearch1() {
             className="form-control"
             type="text"
             name="search"
-            placeholder="Τι υπηρεσία ψάχνετε;"
+            placeholder="Τι υπηρεσία ψάχνεις;"
             onFocus={focusDropdown}
             onBlur={blurDropdown}
             value={getSelectedResult}

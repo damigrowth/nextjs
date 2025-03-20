@@ -8,6 +8,7 @@ const SwitchB = memo(function SwitchB({
   onChange,
   activeText,
   inactiveText,
+  id = "flexSwitchCheckDefault",
 }) {
   const handleChange = (e) => {
     if (onChange) {
@@ -21,7 +22,7 @@ const SwitchB = memo(function SwitchB({
       <div className="switch-style1">
         <label
           className="form-label fw500 dark-color"
-          htmlFor="flexSwitchCheckDefault"
+          htmlFor={id}
         >
           {label}
         </label>
@@ -29,13 +30,13 @@ const SwitchB = memo(function SwitchB({
           <input
             className="form-check-input mt-0"
             type="checkbox"
-            id="flexSwitchCheckDefault"
+            id={id}
             checked={initialValue}
             onChange={handleChange}
           />
           <label
             className="form-check-label mt-0"
-            htmlFor="flexSwitchCheckDefault"
+            htmlFor={id}
           >
             {initialValue ? activeText : inactiveText}
           </label>
@@ -46,3 +47,4 @@ const SwitchB = memo(function SwitchB({
 });
 
 export default SwitchB;
+

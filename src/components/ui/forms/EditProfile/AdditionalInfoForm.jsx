@@ -261,7 +261,7 @@ export default function AdditionalInfoForm({ freelancer, type }) {
             />
           </div>
         </div>
-        <div className="row mb10">
+        <div className="boxede row mb40 mt40">
           {type === "company" && (
             <div className="col-md-2 mb20">
               <SearchableSelect

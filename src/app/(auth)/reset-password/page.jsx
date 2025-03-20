@@ -18,7 +18,7 @@ export default function page({ searchParams }) {
         </div>
         <div className="row wow fadeInRight" data-wow-delay="300ms">
           <div className="col-xl-6 mx-auto">
-            <div className="log-reg-form search-modal form-style1 bgc-white p50 p30-sm default-box-shadow1 bdrs12">
+            <div className="log-reg-form search-modal searchbrd form-style1 bgc-white p50 p30-sm default-box-shadow1 bdrs12">
               <ResetPasswordForm resetCode={resetCode} />
             </div>
           </div>

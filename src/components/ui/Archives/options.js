@@ -5,7 +5,7 @@ export const serviceSortOptions = [
   },
   {
     value: "publishedAt:asc",
-    label: "Πιο παλιές",
+    label: "Παλαιότερες",
   },
   {
     value: "price:asc",

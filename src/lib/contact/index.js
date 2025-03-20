@@ -65,7 +65,7 @@ export async function submitContactForm(prevState, formData) {
   if (!isCaptchaValid) {
     return {
       success: false,
-      message: "Η επαλήθευση reCAPTCHA απέτυχε. Παρακαλώ δοκιμάστε ξανά.",
+      message: "Η επαλήθευση reCAPTCHA απέτυχε. Δοκιμάστε ξανά.",
     };
   }
 
@@ -81,7 +81,7 @@ export async function submitContactForm(prevState, formData) {
     if (!data?.data?.createEmail?.data?.id) {
       return {
         success: false,
-        message: "Αποτυχία αποστολής μηνύματος. Παρακαλώ δοκιμάστε ξανά.",
+        message: "Αποτυχία αποστολής μηνύματος. Δοκιμάστε ξανά.",
       };
     } else {
       return { success: true, message: "Επιτυχία αποστολής μηνύματος!" };
@@ -90,7 +90,7 @@ export async function submitContactForm(prevState, formData) {
     console.error("Σφάλμα κατά την υποβολή της φόρμας επικοινωνίας:", error);
     return {
       success: false,
-      message: "Προέκυψε ένα σφάλμα. Παρακαλώ δοκιμάστε ξανά αργότερα.",
+      message: "Προέκυψε ένα σφάλμα. Δοκιμάστε ξανά.",
     };
   }
 }

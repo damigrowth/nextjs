@@ -20,7 +20,7 @@ export default function AuthTypeOptions() {
           type="button"
           onClick={() => setAuthType(1)}
         >
-          Εγγραφή χρήστη
+          Εγγραφή ως Απλό Προφίλ
         </button>
         <button
           className="ud-btn btn-thm2 add-joining mr10-lg"

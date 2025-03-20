@@ -16,7 +16,7 @@ const ReviewsHeader = () => (
     <div className="col-lg-12">
       <div className="dashboard_title_area">
         <h2>Αξιολογήσεις</h2>
-        <p>Δείτε τις αξιολογήσεις που έχετε λάβει και δώσει</p>
+        <p>Δες τις αξιολογήσεις που έχεις ανταλλάξει.</p>
       </div>
     </div>
   </div>

@@ -11,7 +11,7 @@ export default function PopularSearches({ subcategories }) {
           <Link
             href={`/ipiresies/${sub.slug}`}
             key={i}
-            className="bdrs60 mb-md-0 "
+            className="bdrs60 mb-md-0 searchbrd"
           >
             {sub.label}
           </Link>

@@ -5,7 +5,7 @@ export default function ExtraService() {
     <>
       <div className="ps-widget bdrs12 p30 mb30 overflow-hidden position-relative">
         <div className="bdrb1 ">
-          <h3 className="list-title">Πρόσθετα</h3>
+          <h3 className="list-title">Πρόσθετες Υπηρεσίες</h3>
         </div>
         <div className="col-xl-8">
           <ServiceDetailExtra1 />

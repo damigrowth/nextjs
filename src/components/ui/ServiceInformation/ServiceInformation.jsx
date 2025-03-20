@@ -304,7 +304,7 @@ export default function ServiceInformation() {
           <div className="row">
             <div className="mb10">
               <InputB
-                label="Τίτλος"
+                label="Τίτλος*"
                 id="service-title"
                 name="service-title"
                 type="text"
@@ -323,7 +323,7 @@ export default function ServiceInformation() {
               <TextArea
                 id="service-description"
                 name="service-description"
-                label="Περιγραφή"
+                label="Περιγραφή* (τουλάχιστον 80 χαρακτήρες)"
                 minLength={80}
                 maxLength={5000}
                 counter
@@ -341,7 +341,7 @@ export default function ServiceInformation() {
               <div className="mb20">
                 <SearchableSelect
                   name="service-category"
-                  label="Κατηγορία"
+                  label="Κατηγορία*"
                   labelPlural="κατηγορίες"
                   value={categoryValue.data}
                   nameParam="label"
@@ -362,7 +362,7 @@ export default function ServiceInformation() {
               <div className="mb20">
                 <SearchableSelect
                   name="service-subcategory"
-                  label="Υποκατηγορία"
+                  label="Υποκατηγορία*"
                   labelPlural="υποκατηγορίες"
                   value={subcategoryValue.data}
                   nameParam="label"
@@ -385,7 +385,7 @@ export default function ServiceInformation() {
               <div className="mb20">
                 <SearchableSelect
                   name="service-subdivision"
-                  label="Αντικείμενο"
+                  label="Αντικείμενο*"
                   labelPlural="αντικείμενα"
                   value={subdivisionValue.data}
                   nameParam="label"
@@ -409,7 +409,7 @@ export default function ServiceInformation() {
             <div className="mb20">
               <SearchableSelect
                 name="service-tags"
-                label="Tags"
+                label="Tags/Χαρακτηριστικά"
                 labelPlural="tags"
                 value={selectedTagsValue}
                 nameParam="label"
@@ -430,7 +430,7 @@ export default function ServiceInformation() {
               />
             </div>
           </div>
-          <div className="row">
+          <div className="row mb30">
             <div className="col-sm-2">
               <div className="mb20">
                 <InputB
@@ -452,6 +452,15 @@ export default function ServiceInformation() {
                 />
               </div>
             </div>
+            <div className="col-sm-2">
+              <SwitchB
+                label={<span className="fontless">Χωρίς εμφάνιση τιμής</span>}
+                name="hide-price"
+                initialValue={!showPrice}
+                onChange={handleHidePriceToggle}
+              />
+            </div>
+           </div>
             {type.online && type.oneoff && (
               <div className="col-sm-2">
                 <div className="mb20 fw400">
@@ -474,7 +483,7 @@ export default function ServiceInformation() {
               </div>
             )}
             {type.online && type.subscription && (
-              <div className="col-sm-2">
+              <div className="col-sm-3">
                 <div className="mb20 ">
                   <SearchableSelect
                     name="subscription-type"
@@ -493,17 +502,7 @@ export default function ServiceInformation() {
                 </div>
               </div>
             )}
-
-            <div className="mb20">
-              <SwitchB
-                label="Δεν θέλω να εμφανίζεται τιμή στην υπηρεσία"
-                name="hide-price"
-                initialValue={!showPrice}
-                onChange={handleHidePriceToggle}
-              />
-            </div>
           </div>
-        </div>
         {/* Remove the save button - saving will be handled by the Next button */}
       </div>
     </div>

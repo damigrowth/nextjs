@@ -106,7 +106,7 @@ export default function AddModelReviewForm({ type, serviceId, freelancerId }) {
       ) : (
         <div className="bsp_reveiw_wrt mb20">
           <form action={handleSubmit} className="comments_form mt30 mb30-md">
-            <h6 className="fz17">Πρόσθεσε Αξιολόγηση</h6>
+            <h6 className="fz17">Προσθήκη	 Αξιολόγησης</h6>
             {type === "freelancer" && (
               <>
                 <p className="text">
@@ -211,7 +211,7 @@ export default function AddModelReviewForm({ type, serviceId, freelancerId }) {
               <SaveButton
                 isPending={isPending}
                 icon="fa-solid fa-paper-plane"
-                defaultText="Αποστολή Αξιολόγησης"
+                defaultText="Δημοσίευση Αξιολόγησης"
                 hasChanges={hasChanges}
               />
             </div>

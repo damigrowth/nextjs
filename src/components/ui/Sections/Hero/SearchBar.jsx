@@ -4,7 +4,7 @@ import SearchButton from "./SearchButton";
 
 export default function SearchBar({ categories }) {
   return (
-    <div className="advance-search-tab bgc-white p10 bdrs4-sm bdrs60 banner-btn position-relative zi1 animate-up-3 mt30">
+    <div className="advance-search-tab bgc-white p10 bdrs4-sm bdrs60 searchbrd banner-btn position-relative zi1 animate-up-3 mt30">
       <div className="row">
         <div className="col-md-5 col-lg-6 col-xl-6">
           <div className="advance-search-field mb10-sm">

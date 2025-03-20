@@ -14,14 +14,14 @@ export default async function page({ searchParams }) {
             <div className="main-title text-center">
               <h2 className="title">Επιβεβαίωση της διεύθυνσής σας email</h2>
               <p className="paragraph">
-                Παρακαλώ περιμένετε όσο επιβεβαιώνουμε το email σας...
+                Περιμένετε όσο επιβεβαιώνουμε το email σας...
               </p>
             </div>
           </div>
         </div>
         <div className="row wow fadeInRight" data-wow-delay="300ms">
           <div className="col-xl-6 mx-auto">
-            <div className="log-reg-form search-modal form-style1 bgc-white p50 p30-sm default-box-shadow1 bdrs12">
+            <div className="log-reg-form search-modal searchbrd form-style1 bgc-white p50 p30-sm default-box-shadow1 bdrs12">
               <EmailConfirmationForm confirmationCode={confirmationCode} />
             </div>
           </div>

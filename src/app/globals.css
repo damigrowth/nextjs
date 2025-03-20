@@ -757,6 +757,7 @@ a {
 
 .contact-meta-info.right {
   text-align: right;
+  min-width: 110px;
 }
 
 .inline-divider {
@@ -1144,6 +1145,7 @@ a {
   font-style: normal;
   line-height: 15px;
   white-space: nowrap;
+  border: 1px solid #6c757d;
 }
 
 .taxonomies-archive {

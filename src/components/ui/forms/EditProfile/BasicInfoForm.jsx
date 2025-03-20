@@ -503,10 +503,10 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
   return (
     <form action={handleSubmit}>
       <div className="form-style1">
-        <div className="bdrb1 pb15 mb25">
+        <div className="bdrb1 pb15 mb40">
           <h5 className="list-title heading">Βασικά Στοιχεία</h5>
         </div>
-        <label className="form-label fw500 dark-color">Εικόνα Προφιλ</label>
+        <label className="form-label fw500 dark-color">Εικόνα Προφιλ*</label>
         <ProfileImageInput
           name="image"
           image={
@@ -524,7 +524,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           errors={formState?.errors?.image}
         />
 
-        <div className="mb10 col-md-6">
+        <div className="mb20 mt20 col-md-6">
           <InputB
             label="Σύντομη Περιγραφή"
             id="tagline"
@@ -537,7 +537,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           />
         </div>
 
-        <div className="mb10">
+        <div className="mb20 mt20">
           <TextArea
             id="description"
             name="description"
@@ -550,11 +550,11 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
             errors={formState?.errors?.description}
           />
         </div>
-        <div className="row mb20">
+        <div className="row mb40">
           <div className="col-md-3">
             <SearchableSelect
               name="category"
-              label="Κατηγορία"
+              label="Κατηγορία*"
               labelPlural="κατηγορίες"
               value={category.data}
               nameParam="label"
@@ -573,7 +573,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           <div className="col-md-3">
             <SearchableSelect
               name="subcategory"
-              label="Υποκατηγορία"
+              label="Υποκατηγορία*"
               labelPlural="υποκατηγορίες"
               value={subcategory.data}
               nameParam="label"
@@ -592,11 +592,11 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
             />
           </div>
         </div>
-        <div>
-          <label className="form-label fw700 dark-color mb10">Κάλυψη</label>
+        <div className="boxede">
+          <label className="form-label fw700 dark-color mb10">Τρόποι παροχής των Υπηρεσιών*</label>
           <div className="row ">
             <label className="form-label dark-color mb10">
-              Προσφέρω τις υπηρεσίες μου
+              Προσφέρω τις υπηρεσίες:
             </label>
             <div className="col-md-2">
               <SwitchB
@@ -608,13 +608,13 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
             </div>
             <div className="col-md-2">
               <SwitchB
-                label="Στην έδρα μου"
+                label="Στον χώρο μου"
                 name="onbase"
                 initialValue={coverage?.onbase || false}
                 onChange={handleOnbaseSwitch}
               />
             </div>
-            <div className="col-md-2">
+            <div className="col-md-4">
               <SwitchB
                 label="Στον χώρο του πελάτη"
                 name="onsite"
@@ -631,7 +631,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
             ) : null}
           </div>
           {coverage?.onbase && (
-            <div className="row mb10">
+            <div className="row mb20 mt20">
               <div className="col-md-3">
                 <InputB
                   label="Διεύθυνση"
@@ -700,8 +700,8 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
             </div>
           )}
           {coverage?.onsite && (
-            <div className="row mb10">
-              <div className="col-md-3">
+            <div className="row mb20">
+              <div className="col-md-6">
                 <SearchableSelect
                   name="counties"
                   label="Νομοί"
@@ -720,7 +720,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                   errors={formState?.errors?.counties}
                 />
               </div>
-              <div className="col-md-3">
+              <div className="col-md-6">
                 <SearchableSelect
                   name="areas"
                   label="Περιοχές"
@@ -749,8 +749,8 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
             </div>
           )}
         </div>
-        <div className="row mb10">
-          <div className="col-md-12">
+        <div className="row mb20 mt20">
+          <div className="col-md-6">
             <SearchableSelect
               name="skills"
               label="Δεξιότητες"
@@ -773,8 +773,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
               showOptionsOnType={true}
             />
           </div>
-        </div>
-        <div className="col-md-3 mb20">
+          <div className="col-md-3">
           <SearchableSelect
             name="specialization"
             label="Εξειδίκευση"
@@ -793,9 +792,24 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
             }
           />
         </div>
+        </div>
+      
 
-        <label className="form-label fw700 dark-color mb10">Υπηρεσία</label>
         <div className="row">
+          <div className="mb10 col-sm-3">
+            <InputB
+              label="Έτος έναρξης δραστηριότητας"
+              id="commencement"
+              name="commencement"
+              type="number"
+              min={1900}
+              max={2025}
+              value={commencement || ""}
+              onChange={setCommencement}
+              className="form-control input-group"
+              errors={formState?.errors?.commencement}
+            />
+          </div>
           <div className="mb10 col-sm-2">
             <InputB
               label="Εργατοώρα"
@@ -809,20 +823,6 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
               className="form-control input-group"
               append="€"
               errors={formState?.errors?.rate}
-            />
-          </div>
-          <div className="mb10 col-sm-3">
-            <InputB
-              label="Έτος έναρξης δραστηριότητας"
-              id="commencement"
-              name="commencement"
-              type="number"
-              min={1900}
-              max={2025}
-              value={commencement || ""}
-              onChange={setCommencement}
-              className="form-control input-group"
-              errors={formState?.errors?.commencement}
             />
           </div>
         </div>
