@@ -18,7 +18,7 @@ export async function generateMetadata() {
   const { meta } = await Meta({
     titleTemplate: "Κατηγορίες | Doulitsa",
     descriptionTemplate:
-      "Ανακαλύψτε τις κατηγορίες υπηρεσιών που χρειάζεστε απο τους επαγγελματίες μας.",
+      "Ανακάλυψε τις κατηγορίες υπηρεσιών που χρειάζεσαι απο τους επαγγελματίες μας.",
     size: 150,
     url: "/categories",
   });
@@ -39,7 +39,7 @@ export default async function page() {
       <Breadcrumb parentPathLabel="Κατηγορίες" parentPathLink="categories" />
       <Banner
         heading="Όλες οι Κατηγορίες"
-        description="Ανακαλύψτε τις κατηγορίες υπηρεσιών που χρειάζεστε απο τους επαγγελματίες μας."
+        description="Ανακάλυψε όλες τις υπηρεσίες για κάθε ανάγκη από τους καλύτερους επαγγελματίες."
       />
       <TaxonomiesArchive archive={archive} />
     </>

@@ -19,7 +19,7 @@ export default async function ServicesTableDashboard({ fid, page, pageSize }) {
   if (!services?.data?.length) {
     return (
       <div className="text-center p-4">
-        <p>Δεν βρέθηκαν υπηρεσίες</p>
+        <p>Δεν βρέθηκαν ενεργές υπηρεσίες</p>
         <p className="mt-2 text-muted">
           Προσθέστε την πρώτη σας υπηρεσία πατώντας το κουμπί "Προσθήκη
           Υπηρεσίας"

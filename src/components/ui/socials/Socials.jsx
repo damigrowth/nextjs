@@ -27,7 +27,7 @@ export default function Socials({ socials = {}, email, phone, website }) {
   ].filter(Boolean); // Filter out any null entries
 
   return (
-    <div className="social-style1 light-style2 socials-list">
+    <div className="social-style1 pt20 pb30 light-style2 socials-list">
       {socialsData.map((social, index) =>
         social.data ? (
           <a

@@ -438,7 +438,7 @@ export default function EditServiceForm({ service, jwt }) {
     <form action={handleSubmit}>
       <div className="ps-widget bdrs4 mb30 position-relative">
         <div className="form-style1">
-          <div className="row">
+          <div className="row mb30">
             <div className="mb10">
               <InputB
                 label="Τίτλος"
@@ -456,12 +456,12 @@ export default function EditServiceForm({ service, jwt }) {
               />
             </div>
           </div>
-          <div className="row">
+          <div className="row mb30">
             <div className="mb10">
               <TextArea
                 id="description"
                 name="description"
-                label="Περιγραφή"
+                label="Περιγραφή (τουλάχιστον 80 χαρακτήρες)"
                 minLength={80}
                 maxLength={5000}
                 counter
@@ -473,7 +473,7 @@ export default function EditServiceForm({ service, jwt }) {
               />
             </div>
           </div>
-          <div className="row">
+          <div className="row mb30">
             <div className="col-sm-4">
               <div className="mb20">
                 <SearchableSelect
@@ -542,11 +542,11 @@ export default function EditServiceForm({ service, jwt }) {
               </div>
             </div>
           </div>
-          <div className="row">
+          <div className="row mb30">
             <div className="mb20">
               <SearchableSelect
                 name="tags"
-                label="Tags"
+                label="Tags/Χαρακτηριστικά"
                 labelPlural="tags"
                 value={selectedTagsValue}
                 nameParam="label"
@@ -567,22 +567,25 @@ export default function EditServiceForm({ service, jwt }) {
               />
             </div>
           </div>
-          <div className="row">
+          <div className="row mb30">
             <div className="col-sm-2">
               <div className="mb20">
-                <SwitchB
-                  label="Κατάσταση"
-                  initialValue={status === "Active"}
-                  activeText="Ενεργή"
-                  inactiveText="Σε Παύση"
-                  onChange={(isActive) => {
-                    setStatus(isActive ? "Active" : "Paused");
-                  }}
-                />
+                <div className="status-switch-container">
+                  <SwitchB
+                    id="status-switch"
+                    label="Κατάσταση"
+                    initialValue={status === "Active"}
+                    activeText="Ενεργή"
+                    inactiveText="Σε Παύση"
+                    onChange={(isActive) => {
+                      setStatus(isActive ? "Active" : "Paused");
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>
-          <div className="row">
+          <div className="row mb30">
             <div className="col-sm-2">
               <div className="mb20">
                 <InputB
@@ -602,18 +605,27 @@ export default function EditServiceForm({ service, jwt }) {
                   append="€"
                 />
               </div>
-            </div>
-            <div className="mb10">
-              <SwitchB
-                label="Δεν θέλω να εμφανίζεται τιμή στην υπηρεσία"
-                name="hide-price"
-                initialValue={!showPrice}
-                onChange={handleHidePriceToggle}
-              />
+
+              <div className="mb10">
+              <div className="price-switch-container">
+                <SwitchB
+                  id="hide-price-switch"
+                  label={<span className="fontless" onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.nativeEvent.stopImmediatePropagation();
+                    handleHidePriceToggle(!showPrice);
+                  }}>Χωρίς εμφάνιση τιμής</span>}
+                  name="hide-price"
+                  initialValue={!showPrice}
+                  onChange={handleHidePriceToggle}
+                />
+              </div>
+             </div> 
             </div>
           </div>
           <div className="mb30">
-            <label className="form-label fw500 dark-color">Πρόσθετα</label>
+            <label className="form-label fw500 dark-color">Πρόσθετες Υπηρεσίες</label>
             <ServiceAddons custom={true} editMode={true} />
             {formState?.errors?.field === "addons" && (
               <div>
@@ -626,7 +638,7 @@ export default function EditServiceForm({ service, jwt }) {
           <div className="mb30">
             <label className="form-label fw500 dark-color">
               Συχνές Ερωτήσεις
-            </label>
+            </label> 
             <ServiceFaq custom={true} editMode={true} />
             {formState?.errors?.field === "faq" && (
               <div>

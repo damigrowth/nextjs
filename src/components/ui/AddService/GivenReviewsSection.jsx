@@ -32,9 +32,9 @@ export async function GivenReviewsSection({ searchParamsData }) {
             <div className="packages_table table-responsive">
               {reviewsGiven?.data?.length === 0 ? (
                 <div className="text-center p-4">
-                  <p>Δεν έχετε δώσει αξιολογήσεις ακόμα</p>
+                  <p>Δεν έχεις κάνει αξιολογήσεις ακόμα</p>
                   <p className="mt-2 text-muted">
-                    Μπορείτε να αξιολογήσετε τις υπηρεσίες που έχετε λάβει
+                    Μπορείς να αξιολογήσεις τις υπηρεσίες που έχεις λάβει
                   </p>
                 </div>
               ) : (

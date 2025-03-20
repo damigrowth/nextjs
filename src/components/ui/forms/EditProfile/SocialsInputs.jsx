@@ -8,6 +8,11 @@ const SocialsInputs = ({ data = {}, username, onChange, errors }) => {
       icon: "facebook-f",
       placeholder: "https://facebook.com/",
     },
+    instagram: {
+      label: "Instagram",
+      icon: "instagram",
+      placeholder: "https://instagram.com/",
+    },
     linkedin: {
       label: "LinkedIn",
       icon: "linkedin-in",
@@ -28,11 +33,7 @@ const SocialsInputs = ({ data = {}, username, onChange, errors }) => {
       icon: "github",
       placeholder: "https://github.com/",
     },
-    instagram: {
-      label: "Instagram",
-      icon: "instagram",
-      placeholder: "https://instagram.com/",
-    },
+
     behance: {
       label: "Behance",
       icon: "behance",

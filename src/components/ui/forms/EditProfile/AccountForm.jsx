@@ -50,7 +50,7 @@ export default function AccountForm({ freelancer }) {
           <div className="row">
             <div className="mb10 col-md-3">
               <InputB
-                label="Email"
+                label="Email*"
                 id="email"
                 name="email"
                 type="email"
@@ -61,7 +61,7 @@ export default function AccountForm({ freelancer }) {
             </div>
             <div className="mb10 col-md-3">
               <InputB
-                label="Username"
+                label="Username*"
                 id="username"
                 name="username"
                 type="text"
@@ -72,7 +72,7 @@ export default function AccountForm({ freelancer }) {
             </div>
             <div className="mb10 col-md-3">
               <InputB
-                label="Όνομα προβολής"
+                label="Όνομα προβολής*"
                 id="displayName"
                 name="displayName"
                 type="text"

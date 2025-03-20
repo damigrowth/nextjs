@@ -97,7 +97,7 @@ export async function createReview(prevState, formData) {
     console.error(error);
     return {
       errors: {
-        submit: "Σφάλμα διακομιστή. Παρακαλώ προσπαθήστε ξανά αργότερα.",
+        submit: "Σφάλμα διακομιστή. Προσπαθήστε ξανά αργότερα.",
       },
       message: null,
       data: null,

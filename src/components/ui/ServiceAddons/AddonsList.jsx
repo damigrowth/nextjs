@@ -28,27 +28,29 @@ export default function AddonsList({ custom, editMode = false }) {
           <col style={{ width: "20%" }} />
           <col style={{ width: "15%" }} />
         </colgroup>
-        <thead className="t-head">
-          <tr>
-            <th className="col pl30" scope="col">
-              <span>Πρόσθετο</span>
-            </th>
-            <th className="col pl30" scope="col">
-              <span>Τιμή</span>
-            </th>
-          </tr>
-        </thead>
         {addons.length ? (
-          <tbody className="t-body">
-            {addons.map((addon, id) => (
-              <AddonListItem
-                addon={addon}
-                id={id}
-                key={id}
-                editMode={editMode}
-              />
-            ))}
-          </tbody>
+          <>
+            <thead className="t-head">
+              <tr>
+                <th className="col pl30" scope="col">
+                  <span>Πρόσθετο</span>
+                </th>
+                <th className="col pl30" scope="col">
+                  <span>Τιμή</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="t-body">
+              {addons.map((addon, id) => (
+                <AddonListItem
+                  addon={addon}
+                  id={id}
+                  key={id}
+                  editMode={editMode}
+                />
+              ))}
+            </tbody>
+          </>
         ) : null}
       </table>
     </div>

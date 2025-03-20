@@ -19,7 +19,7 @@ export default function Info({
 
   return (
     <>
-      <div className="price-widget pt25 bdrs8">
+      <div className="price-widget pt25 bdrs8 prowidget">
         {rate && (
           <h3 className="widget-title mb30">
             {}

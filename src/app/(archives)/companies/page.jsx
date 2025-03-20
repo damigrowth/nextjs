@@ -132,8 +132,8 @@ export default async function page({ params, searchParams }) {
         plural
       />
       <Banner
-        heading="Βρείτε Επιχειρήσεις"
-        description="Ανακαλύψτε και προσλάβετε τις καλύτερες επιχειρήσεις"
+        heading="Ανακάλυψε Επιχειρήσεις"
+        description="Εντόπισε την επιχείρηση που χρειάζεσαι. Βρες τις καλύτερες επιχειρήσεις"
       />
       <FreelancersArchive
         taxonomies={taxonomies}

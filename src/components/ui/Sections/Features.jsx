@@ -3,12 +3,12 @@ import { featuresData } from "../data";
 
 export default function Features() {
   return (
-    <section className="our-features pb90 pb30-md pt-0">
+    <section className="our-features pb40 pb30-md pt40 mb50 bgorange">
       <div className="container wow fadeInUp">
         <div className="row">
           <div className="col-lg-12">
             <div className="main-title text-center">
-              <h2>Ψάχνετε κάποια υπηρεσία;</h2>
+              <h2>Ψάχνεις κάποια υπηρεσία;</h2>
               <h3 className="heading-p">
                 Βρες Επαγγελματίες και Υπηρεσίες που Ταιριάζουν στις Ανάγκες
                 σου.
@@ -23,7 +23,7 @@ export default function Features() {
                 <div className="icon before-none">
                   <span className={feature.iconClass}></span>
                 </div>
-                <div className="details">
+                <div className="details textpad">
                   <h4 className="title mt10 mb-3">{feature.title}</h4>
                   <p
                     className="text"

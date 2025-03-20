@@ -32,7 +32,7 @@ export async function ReceivedReviewsSection({ searchParamsData }) {
             <div className="packages_table table-responsive">
               {reviewsReceived?.data?.length === 0 ? (
                 <div className="text-center p-4">
-                  <p>Δεν έχετε λάβει αξιολογήσεις ακόμα</p>
+                  <p>Δεν έχεις λάβει αξιολογήσεις ακόμα</p>
                 </div>
               ) : (
                 <div className="navtab-style1">

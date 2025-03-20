@@ -36,7 +36,7 @@ export default function AllTaxonomies({
   ];
 
   return (
-    <section className="pb90 pb30-md pt110">
+    <section className="pb90 pb30-md pt110 bgorange">
       <div className="container">
         <div className="row align-items-md-center">
           <div className="col-lg-12">

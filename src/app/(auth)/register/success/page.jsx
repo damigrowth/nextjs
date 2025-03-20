@@ -4,7 +4,7 @@ export default function page() {
       <div className="container">
         <div className="row wow fadeInRight" data-wow-delay="300ms">
           <div className="col-xl-6 mx-auto">
-            <div className="log-reg-form search-modal form-style1 bgc-white p50 p30-sm default-box-shadow1 bdrs12 text-center">
+            <div className="log-reg-form search-modal searchbrd form-style1 bgc-white p50 p30-sm default-box-shadow1 bdrs12 text-center">
               <h2 className="title">Σχεδόν Έτοιμοι! </h2>
               <p className="fz20">
                 Έλεγξε το email σου για να επιβεβαιώσεις την εγγραφή του

@@ -168,14 +168,14 @@ export async function updateBasicInfo(prevState, formData) {
       if (!validationState.coverage.address?.trim()) {
         errors.address = {
           field: "address",
-          message: "Η διεύθυνση είναι υποχρεωτική για κάλυψη στην έδρα σας",
+          message: "Η διεύθυνση είναι υποχρεωτική για κάλυψη στον χώρο σας",
         };
       }
 
       if (!validationState.coverage.zipcode?.data?.id) {
         errors.zipcode = {
           field: "zipcode",
-          message: "Ο Τ.Κ. είναι υποχρεωτικός για κάλυψη στην έδρα σας",
+          message: "Ο Τ.Κ. είναι υποχρεωτικός για κάλυψη στον χώρο σας",
         };
       }
     }
@@ -373,7 +373,7 @@ export async function updatePresentationInfo(prevState, formData) {
       // Simple URL validation
       if (changes.website && !isValidUrl(changes.website)) {
         errors.website = {
-          message: "Παρακαλώ εισάγετε έγκυρη διεύθυνση ιστοσελίδας",
+          message: "Εισάγετε έγκυρη διεύθυνση ιστοσελίδας",
         };
       }
     }
@@ -393,7 +393,7 @@ export async function updatePresentationInfo(prevState, formData) {
           // Validate URL format
           if (!isValidUrl(data.url)) {
             socialErrors[platform] = {
-              message: "Παρακαλώ εισάγετε έγκυρη διεύθυνση URL",
+              message: "Εισάγετε μία έγκυρη διεύθυνση URL",
             };
           }
 

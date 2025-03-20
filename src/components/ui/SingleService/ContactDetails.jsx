@@ -71,11 +71,11 @@ export default function ContactDetails({
           <div className="fl-meta d-flex align-items-center justify-content-between">
             <div className="contact-meta-info left">
               {type?.data && (
-                <span className="fz14 fw400">{type.data.attributes.label}</span>
+                <span className="fz14 fw500" style={{ color: '#6c757d' }}>{type.data.attributes.label}</span>
               )}
               <br />
               {category?.data && (
-                <span className="fz14 fw400">
+                <span className="fz14 fw500">
                   {category.data.attributes.label}
                 </span>
               )}

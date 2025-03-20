@@ -6,7 +6,7 @@ export const registerSchema = {
     username: z.string().min(4, "Το username είναι πολύ μικρό").max(25),
     password: z.string().min(6, "Ο κωδικός είναι πολύ μικρός").max(50),
     consent: z.boolean().refine((val) => val === true, {
-      message: "Παρακαλώ αποδεχτείτε τους όρους χρήσης",
+      message: "Πρέπει να αποδεχτείτε τους όρους χρήσης",
     }),
   },
   professional: {
@@ -15,7 +15,7 @@ export const registerSchema = {
       .min(3, "Το όνομα εμφάνισης είναι πολύ μικρό")
       .max(25),
     role: z.number().refine((val) => !isNaN(val) && val > 0, {
-      message: "Παρακαλώ επιλέξτε τύπο λογαριασμού",
+      message: "Επιλέξτε τύπο λογαριασμού",
     }),
   },
 };

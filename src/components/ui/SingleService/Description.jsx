@@ -24,8 +24,8 @@ export default function Description({
         </div>
         {/* <BlocksRenderer content={service.description} /> */}
         {tags.length > 0 && (
-          <div className="list1">
-            <h6 className="fw500">Χαρακτηριστικά</h6>
+          <div className="list1 pt20 pb20">
+            <h6 style={{ color: '#6c757d', fontWeight: 600 }}>Χαρακτηριστικά</h6>
             <ul className="tags">
               {tags.map((tag, i) => (
                 <li key={i}>

@@ -17,20 +17,11 @@ export default function ServiceSecondaryType({ coverage }) {
       {type.online && (
         <div className="pt20">
           <h4 className="list-title pb10">
-            Προσφέρετε τη συγκεκριμένη υπηρεσία, <br /> με τη μορφή συνδρομής ή
-            θα εκτελεστεί για μια φορά;
+            Προσφέρετε την συγκεκριμένη απομακρυσμένη υπηρεσία, <br /> με τη μορφή συνδρομής ή
+         μπορεί να εκτελείται για μια φορά (one-off) χωρίς απαραίτητα να επαναλαμβάνεται;
           </h4>
           <div className="mb20-lg mt20 mb30">
-            <button
-              className={`ud-btn btn-thm2 add-joining mr10-lg mr20 ${
-                type.oneoff ? "active" : ""
-              }`}
-              type="button"
-              onClick={() => handleTypeChange("oneoff")}
-            >
-              One-off
-            </button>
-            <button
+          <button
               className={`ud-btn btn-thm2 add-joining ${
                 type.subscription ? "active" : ""
               }`}
@@ -39,6 +30,16 @@ export default function ServiceSecondaryType({ coverage }) {
             >
               Συνδρομή
             </button>
+            <button
+              className={`ud-btn btn-thm2 add-joining mr10-lg mr20 ${
+                type.oneoff ? "active" : ""
+              }`}
+              type="button"
+              onClick={() => handleTypeChange("oneoff")}
+            >
+              Μια φορά (one-off)
+            </button>
+          
           </div>
         </div>
       )}
@@ -58,7 +59,7 @@ export default function ServiceSecondaryType({ coverage }) {
               onClick={() => handleTypeChange("onbase")}
               disabled={!coverage.onbase}
             >
-              Στην έδρα μου
+              Στον χώρο μου
             </button>
             <button
               className={`ud-btn btn-thm2 add-joining ${
@@ -74,13 +75,13 @@ export default function ServiceSecondaryType({ coverage }) {
           {!coverage.onbase && (
             <Alert
               type="info"
-              message={`Δεν μπορείτε να επιλέξετε "Στην έδρα μου" γιατί δεν έχετε συμπληρώσει την Περιοχή και την Διεύθυνση στο προφίλ σας.`}
+              message={`Δεν μπορείτε να επιλέξετε "Στον χώρο μου" γιατί δεν έχετε συμπληρώσει το αντίστοιχο πεδίο στη Διαχείριση Προφίλ.`}
             />
           )}
           {!coverage.onsite && (
             <Alert
               type="info"
-              message={`Δεν μπορείτε να επιλέξετε "Στον χώρο του πελάτη" γιατί δεν έχετε συμπληρώσει τις Περιοχές Εξυπηρέτησης στο προφίλ σας.`}
+              message={`Δεν μπορείτε να επιλέξετε "Στον χώρο του πελάτη" γιατί δεν έχετε συμπληρώσει το αντίστοιχο πεδίο στη Διαχείριση Προφίλ.`}
             />
           )}
         </div>

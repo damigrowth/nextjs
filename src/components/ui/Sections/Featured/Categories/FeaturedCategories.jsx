@@ -20,7 +20,7 @@ export default async function FeaturedCategories({ categories }) {
           <div className="col-lg-9">
             <div className="main-title2">
               <h2 className="title">Κατηγορίες</h2>
-              <p className="paragraph">Ανακαλύψτε 100+ κατηγορίες υπηρεσιών.</p>
+              <p className="paragraph">Ανακάλυψε 100+ κατηγορίες υπηρεσιών.</p>
             </div>
           </div>
           <div className="col-lg-3">

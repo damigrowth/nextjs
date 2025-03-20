@@ -103,7 +103,7 @@ export const coverageSchema = z
       if (!cov.address?.trim()) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Η διεύθυνση είναι υποχρεωτική για κάλυψη στην έδρα σας",
+          message: "Η διεύθυνση είναι υποχρεωτική για κάλυψη στον χώρο σας",
           path: ["address"],
         });
       }
@@ -111,7 +111,7 @@ export const coverageSchema = z
       if (!cov.zipcode?.data?.id) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Ο Τ.Κ. είναι υποχρεωτικός για κάλυψη στην έδρα σας",
+          message: "Ο Τ.Κ. είναι υποχρεωτικός για κάλυψη στον χώρο σας",
           path: ["zipcode"],
         });
       }
@@ -119,7 +119,7 @@ export const coverageSchema = z
       if (!cov.county?.data?.id) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Ο νομός είναι υποχρεωτικός για κάλυψη στην έδρα σας",
+          message: "Ο νομός είναι υποχρεωτικός για κάλυψη στον χώρο σας",
           path: ["county"],
         });
       }
@@ -127,7 +127,7 @@ export const coverageSchema = z
       if (!cov.area?.data?.id) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Η περιοχή είναι υποχρεωτική για κάλυψη στην έδρα σας",
+          message: "Η περιοχή είναι υποχρεωτική για κάλυψη στον χώρο σας",
           path: ["area"],
         });
       }
@@ -181,7 +181,7 @@ export const basicInfoSchema = z.object({
 export const presentationSchema = z.object({
   website: z
     .string()
-    .url("Παρακαλώ εισάγετε έναν έγκυρο ιστότοπο")
+    .url("Εισάγετε έναν έγκυρο ιστότοπο")
     .optional()
     .nullable()
     .or(z.literal("")),
@@ -192,7 +192,7 @@ export const presentationSchema = z.object({
         z.object({
           url: z
             .string()
-            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο Facebook")
+            .url("Εισάγετε έναν έγκυρο σύνδεσμο Facebook")
             .regex(
               /^https?:\/\/(www\.)?facebook\.com\/.*$/,
               "Μη έγκυρος σύνδεσμος Facebook"
@@ -210,7 +210,7 @@ export const presentationSchema = z.object({
         z.object({
           url: z
             .string()
-            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο LinkedIn")
+            .url("Εισάγετε έναν έγκυρο σύνδεσμο LinkedIn")
             .regex(
               /^https?:\/\/(www\.)?linkedin\.com\/.*$/,
               "Μη έγκυρος σύνδεσμος LinkedIn"
@@ -228,7 +228,7 @@ export const presentationSchema = z.object({
         z.object({
           url: z
             .string()
-            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο X")
+            .url("Εισάγετε έναν έγκυρο σύνδεσμο X")
             .regex(/^https?:\/\/(www\.)?x\.com\/.*$/, "Μη έγκυρος σύνδεσμος X")
             .optional()
             .nullable()
@@ -243,7 +243,7 @@ export const presentationSchema = z.object({
         z.object({
           url: z
             .string()
-            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο YouTube")
+            .url("Εισάγετε έναν έγκυρο σύνδεσμο YouTube")
             .regex(
               /^https?:\/\/(www\.)?youtube\.com\/.*$/,
               "Μη έγκυρος σύνδεσμος YouTube"
@@ -261,7 +261,7 @@ export const presentationSchema = z.object({
         z.object({
           url: z
             .string()
-            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο GitHub")
+            .url("Εισάγετε έναν έγκυρο σύνδεσμο GitHub")
             .regex(
               /^https?:\/\/(www\.)?github\.com\/.*$/,
               "Μη έγκυρος σύνδεσμος GitHub"
@@ -279,7 +279,7 @@ export const presentationSchema = z.object({
         z.object({
           url: z
             .string()
-            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο Instagram")
+            .url("Εισάγετε έναν έγκυρο σύνδεσμο Instagram")
             .regex(
               /^https?:\/\/(www\.)?instagram\.com\/.*$/,
               "Μη έγκυρος σύνδεσμος Instagram"
@@ -297,7 +297,7 @@ export const presentationSchema = z.object({
         z.object({
           url: z
             .string()
-            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο Behance")
+            .url("Εισάγετε έναν έγκυρο σύνδεσμο Behance")
             .regex(
               /^https?:\/\/(www\.)?behance\.net\/.*$/,
               "Μη έγκυρος σύνδεσμος Behance"
@@ -315,7 +315,7 @@ export const presentationSchema = z.object({
         z.object({
           url: z
             .string()
-            .url("Παρακαλώ εισάγετε έναν έγκυρο σύνδεσμο Dribbble")
+            .url("Εισάγετε έναν έγκυρο σύνδεσμο Dribbble")
             .regex(
               /^https?:\/\/(www\.)?dribbble\.com\/.*$/,
               "Μη έγκυρος σύνδεσμος Dribbble"

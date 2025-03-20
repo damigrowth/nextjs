@@ -95,7 +95,7 @@ export default async function Footer() {
                 <div className="row mb-4 mb-lg-5">
                   <div className="col-auto">
                     <div className="contact-info">
-                      <p className="mb-2 text-white">Έχετε ερωτήσεις?</p>
+                      <p className="mb-2 text-white">Ερωτήσεις?</p>
                       <h5 className="info-mail ">
                         <a
                           className="text-white"

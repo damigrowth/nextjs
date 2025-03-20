@@ -13,11 +13,11 @@ const Wrapper = ({ children, title = "Επεξεργασία Υπηρεσίας"
   <div className="dashboard__content dashboard-bg">
     <DashboardHeader
       title={title}
-      buttonText="Διαχείρηση Υπηρεσιών"
+      buttonText="Διαχείριση Υπηρεσιών"
       buttonHref="/dashboard/services"
       showButton={true}
     />
-    <div className="col-lg-12 bgc-white bdrs4 p30 mb30 dashboard-bg">
+    <div className="col-lg-12 bgc-white bdrs4 p30 mb30 bgorange">
       {children}
     </div>
   </div>
@@ -46,7 +46,7 @@ export default async function ServiceEditPage({ params }) {
         <div className="alert alert-danger">
           <strong>
             Κάτι πήγε στραβά!
-            <br /> Παρακαλώ ελέγξτε:
+            <br /> Ελέγξτε:
           </strong>
           <ul className="mt-2">
             <li>- Τη σύνδεσή σας στο διαδίκτυο</li>
