@@ -11,7 +11,7 @@ export default async function FeaturedCategories({ categories }) {
   }));
 
   return (
-    <section className="pb40-md pb90">
+    <section className="pb40-md pt20 pb90">
       <div className="container">
         <div
           className="row align-items-center wow fadeInUp"
