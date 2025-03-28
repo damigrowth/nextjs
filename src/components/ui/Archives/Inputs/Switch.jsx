@@ -3,7 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 
-export default function Switch({ paramName, label }) {
+export default function Switch({ paramName, label, noHeader, id }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -38,28 +38,40 @@ export default function Switch({ paramName, label }) {
     });
   };
 
+  const switchContent = (
+    <div className="switch-style1">
+      <div className="form-check form-switch mb10">
+        <input
+          className="form-check-input mt-0"
+          type="checkbox"
+          id={id || `switch-${paramName}`}
+          checked={isToggled}
+          onChange={handleSwitchChange}
+        />
+        <label
+          className="form-check-label mt-0"
+          htmlFor={id || `switch-${paramName}`}
+        >
+          {label}
+        </label>
+      </div>
+    </div>
+  );
+
+  if (noHeader) {
+    return (
+      <div data-pending={isPending ? "" : undefined}>
+        {switchContent}
+      </div>
+    );
+  }
+
   return (
     <div
       data-pending={isPending ? "" : undefined}
       className="card-body card-body px-0 pt-0"
     >
-      <div className="switch-style1">
-        <div className="form-check form-switch mb20">
-          <input
-            className="form-check-input mt-0"
-            type="checkbox"
-            id="flexSwitchCheckDefault"
-            checked={isToggled}
-            onChange={handleSwitchChange}
-          />
-          <label
-            className="form-check-label mt-0"
-            htmlFor="flexSwitchCheckDefault"
-          >
-            {label}
-          </label>
-        </div>
-      </div>
+      {switchContent}
     </div>
   );
 }

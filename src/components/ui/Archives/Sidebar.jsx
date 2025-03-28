@@ -16,7 +16,15 @@ export default function Sidebar({ filters, searchParams }) {
 
           const hasChildPath = filter.childPath !== undefined;
 
-          const isCollapsed = index !== 0 && !hasParams && !hasChildPath;
+          const isCollapsed = index !== 0 && !hasParams && !hasChildPath && !filter.noCollapse;
+
+          if (filter.noCollapse) {
+            return (
+              <div className="card mb20 pb10 mt-0" key={index}>
+                {filter.component}
+              </div>
+            );
+          }
 
           return (
             <div className="card mb20 pb10 mt-0" key={index}>

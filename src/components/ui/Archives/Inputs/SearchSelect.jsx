@@ -288,7 +288,11 @@ export default function SearchSelect({
             styles={customStyles}
             placeholder={rootLabel}
             onMenuScrollToBottom={loadMore}
-            closeMenuOnSelect={false}
+            onMenuClose={() => {
+              if (selectedOptions.length > 0) {
+                multiSelectHandler(selectedOptions);
+              }
+            }}
             components={{
               LoadingIndicator: () => (
                 <RotatingLines

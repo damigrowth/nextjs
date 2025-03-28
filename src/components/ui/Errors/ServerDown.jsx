@@ -41,7 +41,7 @@ export default function ServerDown() {
                   50<span className="text-thm">3</span>
                 </div>
                 <div className="h2 error_title">
-                  Ουυπς! Σφάλμα, υπό κατασκευή.
+                  Ουπς! Σφάλμα, υπό κατασκευή.
                 </div>
                 <p className="text fz15 mb20">
                   Η σελίδα που αναζητάτε δεν είναι διαθέσιμη. Προσπαθήστε να

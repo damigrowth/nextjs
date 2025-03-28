@@ -5,14 +5,14 @@ import ReactSlider from "react-slider";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { debounce } from "lodash";
 
-export default function RangeSlider({ iniMin, iniMax }) {
+export default function RangeSlider({ iniMin, iniMax, type = "price" }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
 
   // Initialize state from search parameters or use default values
-  const getInitialMin = () => parseInt(searchParams.get("min")) || iniMin;
-  const getInitialMax = () => parseInt(searchParams.get("max")) || iniMax;
+  const getInitialMin = () => parseInt(searchParams.get(type === "price" ? "min" : "hourly_min")) || iniMin;
+  const getInitialMax = () => parseInt(searchParams.get(type === "price" ? "max" : "hourly_max")) || iniMax;
 
   const [min, setMin] = useState(getInitialMin);
   const [max, setMax] = useState(getInitialMax);
@@ -27,8 +27,8 @@ export default function RangeSlider({ iniMin, iniMax }) {
   // Helper function to update URL search parameters
   const updateSearchParams = (newMin, newMax) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set("min", newMin);
-    params.set("max", newMax);
+    params.set(type === "price" ? "min" : "hourly_min", newMin);
+    params.set(type === "price" ? "max" : "hourly_max", newMax);
     params.set("page", 1);
 
     startTransition(() => {
@@ -40,27 +40,43 @@ export default function RangeSlider({ iniMin, iniMax }) {
   const debouncedUpdateSearchParams = debounce(updateSearchParams, 300);
 
   // Function to handle slider changes
-  const handleSliderChange = (values) => {
-    const [newMin, newMax] = values;
+  const handleSliderChange = (value, index) => {
+    const [newMin, newMax] = value;
     setMin(newMin);
     setMax(newMax);
   };
 
   // Function to handle after slider change
-  const handleAfterChange = (values) => {
-    const [newMin, newMax] = values;
-    debouncedUpdateSearchParams(newMin, newMax);
+  const handleAfterChange = (value) => {
+    const [newMin, newMax] = value;
+    // If max is 1000 for price or 100 for hourly, set it to show all values above
+    const finalMax = type === "price" 
+      ? (newMax === 1000 ? 100000 : newMax)
+      : (newMax === 100 ? 10000 : newMax);
+    debouncedUpdateSearchParams(newMin, finalMax);
   };
 
   const handleSlider = (e, type) => {
-    const value = parseInt(e.target.value, 10);
-
+    const value = parseInt(e.target.value);
     if (type === "min") {
       setMin(value);
       debouncedUpdateSearchParams(value, max);
     } else {
+      // If max is 1000 for price or 100 for hourly, set it to show all values above
+      const finalMax = this.type === "price"
+        ? (value === 1000 ? 100000 : value)
+        : (value === 100 ? 10000 : value);
       setMax(value);
-      debouncedUpdateSearchParams(min, value);
+      debouncedUpdateSearchParams(min, finalMax);
+    }
+  };
+
+  // Function to format the display value
+  const formatDisplayValue = (value) => {
+    if (type === "price") {
+      return value === 100000 ? "1000+" : value;
+    } else {
+      return value === 10000 ? "100+" : value;
     }
   };
 
@@ -89,7 +105,7 @@ export default function RangeSlider({ iniMin, iniMax }) {
               <input
                 type="number"
                 className="amount w-100"
-                placeholder={`${iniMin}€`}
+                placeholder={`${iniMin}${type === "price" ? "€" : "€/ώρα"}`}
                 min={iniMin}
                 max={max}
                 value={min}
@@ -97,13 +113,22 @@ export default function RangeSlider({ iniMin, iniMax }) {
               />
               <span className="fa-sharp fa-solid fa-minus mx-1 dark-color" />
               <input
-                type="number"
+                type="text"
                 className="amount2 w-100"
-                placeholder={`${iniMax}€`}
+                placeholder={`${iniMax}${type === "price" ? "€" : "€/ώρα"}`}
                 min={min}
                 max={iniMax}
-                value={max}
-                onChange={(e) => handleSlider(e, "max")}
+                value={formatDisplayValue(max)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (type === "price" && value === "1000+") {
+                    handleSlider({ target: { value: "1000" } }, "max");
+                  } else if (type === "hourly" && value === "100+") {
+                    handleSlider({ target: { value: "100" } }, "max");
+                  } else {
+                    handleSlider({ target: { value } }, "max");
+                  }
+                }}
               />
             </div>
           </div>

@@ -8,6 +8,7 @@ import {
   FREELANCER_CATEGORIES,
   FREELANCER_CATEGORIES_SEARCH_FILTERED,
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import { SKILLS_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer/skill";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 
 export const dynamic = "force-dynamic";
@@ -52,6 +53,10 @@ export default async function page({ params, searchParams }) {
     cat_s,
     cat_p,
     cat_ps,
+    skills,
+    skills_s,
+    skills_p,
+    skills_ps,
     exp,
     top,
     ver,
@@ -83,12 +88,16 @@ export default async function page({ params, searchParams }) {
     coverageCountyPageSize: addFilter(covc_ps, parseInt(covc_ps, 10)),
     categoriesPage: addFilter(cat_p, parseInt(cat_p, 10)),
     categoriesPageSize: addFilter(cat_ps, parseInt(cat_ps, 10)),
+    skillsPage: addFilter(skills_p, parseInt(skills_p, 10)) || 1,
+    skillsPageSize: addFilter(skills_ps, parseInt(skills_ps, 10)) || 10,
+    skills: skills?.split(",").filter(Boolean),
     page: !page || parseInt(page, 10) < 1 ? 1 : parseInt(page, 10),
     sort: sort ? sort : "publishedAt:desc",
   };
 
   let categorySearch = cat_s ? cat_s : undefined;
   let coverageCountySearch = covc_s ? covc_s : undefined;
+  let skillsSearch = skills_s ? skills_s : undefined;
 
   const { categoriesSearch } = await getData(
     FREELANCER_CATEGORIES_SEARCH_FILTERED,
@@ -104,6 +113,18 @@ export default async function page({ params, searchParams }) {
     coverageCountyPage: paramsFilters.coverageCountyPage,
     coverageCountyPageSize: paramsFilters.coverageCountyPageSize,
   });
+
+  const { skillsBySearch, skillsBySlug } = await getData(
+    SKILLS_SEARCH,
+    {
+      label: skillsSearch,
+      category: category,
+      skillsPage: paramsFilters.skillsPage,
+      skillsPageSize: paramsFilters.skillsPageSize,
+      slugs: paramsFilters.skills,
+    },
+    "skills"
+  );
 
   const selectData = {
     option: ["cat", "covc"],
@@ -121,6 +142,24 @@ export default async function page({ params, searchParams }) {
       `${taxonomies.current ? taxonomies.current : "Όλες οι κατηγορίες"}`,
       "Όλες οι περιοχές",
     ],
+  };
+
+  const multiSelectData = {
+    option: "skills",
+    search: "skills_s",
+    page: "skills_p",
+    pageSize: "skills_ps",
+    rootLabel: "Όλες οι δεξιότητες",
+    defaultLabel: "Όλες οι δεξιότητες",
+    // Combine both results and remove duplicates by slug
+    options: [
+      ...new Map(
+        [...(skillsBySearch?.data || []), ...(skillsBySlug?.data || [])].map(
+          (item) => [item.attributes.slug, item]
+        )
+      ).values(),
+    ],
+    pagination: skillsBySearch?.meta?.pagination,
   };
 
   return (
@@ -142,6 +181,7 @@ export default async function page({ params, searchParams }) {
         searchParams={allSearchParams}
         paramsFilters={paramsFilters}
         selectData={selectData}
+        multiSelectData={multiSelectData}
         childPath
       />
     </>

@@ -13,14 +13,14 @@ export default function Socials({ socials = {}, email, phone, website }) {
   } = socials || {};
 
   const socialsData = [
-    { icon: "fa-facebook-f", data: facebook },
-    { icon: "fa-linkedin-in", data: linkedin },
-    { icon: "fa-twitter", data: x },
-    { icon: "fa-youtube", data: youtube },
-    { icon: "fa-github", data: github },
-    { icon: "fa-instagram", data: instagram },
-    { icon: "fa-behance", data: behance },
-    { icon: "fa-dribbble", data: dribbble },
+    facebook?.url && { icon: "fa-facebook-f", data: facebook },
+    linkedin?.url && { icon: "fa-linkedin-in", data: linkedin },
+    x?.url && { icon: "fa-x", data: x },
+    youtube?.url && { icon: "fa-youtube", data: youtube },
+    github?.url && { icon: "fa-github", data: github },
+    instagram?.url && { icon: "fa-instagram", data: instagram },
+    behance?.url && { icon: "fa-behance", data: behance },
+    dribbble?.url && { icon: "fa-dribbble", data: dribbble },
     email && { icon: "flaticon-mail", data: { url: `mailto:${email}` } },
     phone && { icon: "flaticon-call", data: { url: `tel:${phone}` } },
     website && { icon: "flaticon-website", data: { url: website } },

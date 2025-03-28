@@ -12,11 +12,9 @@ import { getToken } from "@/lib/auth/token";
 
 export async function TabContent() {
   const freelancer = await getFreelancer();
-
   const jwt = await getToken();
 
   if (!freelancer) {
-    // Redirect function directly
     redirect("/login");
   }
 
@@ -38,14 +36,14 @@ export async function TabContent() {
     },
     {
       index: 2,
-      label: "Παρουσίαση",
-      content: <PresentationForm freelancer={freelancer} jwt={jwt} />,
+      label: "Πρόσθετα Στοιχεία",
+      content: <AdditionalInfoForm freelancer={freelancer} type={type} />,
       showForUser: false,
     },
     {
       index: 3,
-      label: "Πρόσθετα Στοιχεία",
-      content: <AdditionalInfoForm freelancer={freelancer} type={type} />,
+      label: "Παρουσίαση",
+      content: <PresentationForm freelancer={freelancer} jwt={jwt} />,
       showForUser: false,
     },
     {

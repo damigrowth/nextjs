@@ -73,11 +73,13 @@ export default function InputB({
         />
         {append && <span className="input-group-text">{append}</span>}
       </div>
-      {errors?.field === name ? (
+      {errors && (
         <div>
-          <p className="text-danger mb0 pb0">{errors.message}</p>
+          <p className="text-danger mb0 pb0">
+            {typeof errors === 'string' ? errors : errors.message}
+          </p>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
