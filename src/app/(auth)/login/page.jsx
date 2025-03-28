@@ -1,5 +1,18 @@
 import Link from "next/link";
 import LoginForm from "@/components/ui/forms/LoginForm";
+import { Meta } from "@/utils/Seo/Meta/Meta";
+
+// Static SEO
+export async function generateMetadata() {
+  const { meta } = await Meta({
+    titleTemplate: "Είσοδος - Doulitsa",
+    descriptionTemplate: "Συνδέσου στον λογαριασμό σου για να αποκτήσεις πρόσβαση στις υπηρεσίες της Doulitsa.",
+    size: 160,
+    url: "/login",
+  });
+
+  return meta;
+}
 
 export default async function page() {
   const isUnderMaintenance = false;

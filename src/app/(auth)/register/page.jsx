@@ -2,6 +2,19 @@ import AuthTypeOptions from "@/components/ui/forms/AuthTypeOptions";
 import Link from "next/link";
 import RegisterForm from "@/components/ui/forms/RegisterForm";
 import RegisterHeading from "@/components/ui/forms/RegisterHeading";
+import { Meta } from "@/utils/Seo/Meta/Meta";
+
+// Static SEO
+export async function generateMetadata() {
+  const { meta } = await Meta({
+    titleTemplate: "Εγγραφή - Doulitsa",
+    descriptionTemplate: "Δημιούργησε τον λογαριασμό σου στην Doulitsa και ξεκίνησε να προσφέρεις ή να αναζητάς υπηρεσίες.",
+    size: 160,
+    url: "/register",
+  });
+
+  return meta;
+}
 
 export default function page() {
   return (

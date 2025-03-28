@@ -551,7 +551,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           />
         </div>
         <div className="row mb40">
-          <div className="col-md-3">
+          <div className="col-md-4">
             <SearchableSelect
               name="category"
               label="Κατηγορία*"
@@ -570,7 +570,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
               errors={formState?.errors?.category}
             />
           </div>
-          <div className="col-md-3">
+          <div className="col-md-4">
             <SearchableSelect
               name="subcategory"
               label="Υποκατηγορία*"

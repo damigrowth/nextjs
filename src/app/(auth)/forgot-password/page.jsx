@@ -1,5 +1,18 @@
 import ForgotPasswordForm from "@/components/ui/forms/ForgotPasswordForm";
 import React from "react";
+import { Meta } from "@/utils/Seo/Meta/Meta";
+
+// Static SEO
+export async function generateMetadata() {
+  const { meta } = await Meta({
+    titleTemplate: "Ξέχασες τον κωδικό σου - Doulitsa",
+    descriptionTemplate: "Ανακτήστε τον κωδικό πρόσβασης του λογαριασμού σας στην Doulitsa με λίγα απλά βήματα.",
+    size: 160,
+    url: "/forgot-password",
+  });
+
+  return meta;
+}
 
 export default function page() {
   return (

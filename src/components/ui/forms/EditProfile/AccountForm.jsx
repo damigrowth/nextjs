@@ -88,7 +88,8 @@ export default function AccountForm({ freelancer }) {
                 id="phone"
                 name="phone"
                 type="tel"
-                maxLength={10}
+                pattern="[0-9]*"
+                inputMode="numeric"
                 value={phone || ""}
                 onChange={setPhone}
                 className="form-control input-group"
