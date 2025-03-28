@@ -42,39 +42,40 @@ export default function FreelancersArchive({
 
   const filters = [
     {
+      heading: "Πιστοποιημένα Προφίλ",
+      params: ["ver"],
+      component: <Verified />,
+      noCollapse: true
+    },
+    {
       heading: "Κατηγορία",
       params: ["cat"],
       childPath,
       component: <Category selectData={selectData} />,
     },
-    {
-      heading: "Δεξιότητες",
-      params: ["skills"],
-      component: <Skills selectData={multiSelectData} />,
-    },
-    { heading: "Εργατοώρα", params: ["min", "max"], component: <Rate /> },
-    {
-      heading: "Τρόποι Πληρωμής",
-      params: ["pay_m"],
-      component: <PaymentMethods />,
-    },
-    {
-      heading: "Τρόποι Επικοινωνίας",
-      params: ["con_t"],
-      component: <ContactTypes />,
-    },
+    /* { heading: "Εργατοώρα", params: ["min", "max"], component: <Rate /> }, */
     {
       heading: "Περιοχές Εξυπηρέτησης",
       params: ["cov_o", "cov_c"],
       component: <Coverage selectData={selectData} />,
     },
-    { heading: "Εμπειρία σε έτη", params: ["exp"], component: <Experience /> },
     {
-      heading: "Πιστοποιημένο προφίλ",
-      params: ["ver"],
-      component: <Verified />,
+      heading: "Τρόποι Πληρωμής",
+      params: ["pay_m"],
+      component: <PaymentMethods />,
     },
-    { heading: "Top", params: ["top"], component: <Top /> },
+    /* {
+      heading: "Τρόποι Επικοινωνίας",
+      params: ["con_t"],
+      component: <ContactTypes />,
+    }, */
+    /* { heading: "Εμπειρία σε έτη", params: ["exp"], component: <Experience /> }, */
+    /* { heading: "Top", params: ["top"], component: <Top /> }, */
+    {
+      heading: "Δεξιότητες",
+      params: ["skills"],
+      component: <Skills selectData={multiSelectData} />,
+    },
   ];
 
   return (

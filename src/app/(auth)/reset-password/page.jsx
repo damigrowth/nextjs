@@ -1,4 +1,17 @@
 import ResetPasswordForm from "@/components/ui/forms/ResetPasswordForm";
+import { Meta } from "@/utils/Seo/Meta/Meta";
+
+// Static SEO
+export async function generateMetadata() {
+  const { meta } = await Meta({
+    titleTemplate: "Επαναφορά κωδικού - Doulitsa",
+    descriptionTemplate: "Ορίστε τον νέο κωδικό πρόσβασης για τον λογαριασμό σας στην Doulitsa.",
+    size: 160,
+    url: "/reset-password",
+  });
+
+  return meta;
+}
 
 export default function page({ searchParams }) {
   const resetCode = searchParams?.code || "";

@@ -13419,6 +13419,10 @@ section.pb40-md.pb90 > div > div.row.d-block.d-lg-none > div > div.row {
   border-radius: 6px;
 }
 
+.searchaki {
+  max-width: 550px;
+}
+
 .fontless {
   font-weight: 500;
 }

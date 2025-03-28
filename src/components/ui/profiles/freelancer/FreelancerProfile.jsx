@@ -116,7 +116,7 @@ export default function FreelancerProfile({
               yearsOfExperience={yearsOfExperience}
             />
             <div className="service-about">
-              <Description heading="Περιγραφή" text={description} />
+              <Description heading="Σχετικά" text={description} />
               <Features
                 minBudget={minBudget?.data}
                 size={size?.data?.attributes}

@@ -35,6 +35,13 @@ export default function ServicesArchive({
   );
 
   const filters = [
+    { heading: "Τιμή", params: ["min", "max"], component: <Price /> },
+    {
+      heading: "Πιστοποιημένα Προφίλ",
+      params: ["ver"],
+      component: <Verified />,
+      noCollapse: true
+    },
     {
       heading: "Κατηγορία",
       params: ["cat"],
@@ -46,13 +53,7 @@ export default function ServicesArchive({
       params: ["tags"],
       component: <Tags selectData={multiSelectData} />,
     },
-    { heading: "Τιμή", params: ["min", "max"], component: <Price /> },
-    { heading: "Χρόνος παράδοσης", params: ["time"], component: <Time /> },
-    {
-      heading: "Πιστοποιημένο προφίλ",
-      params: ["ver"],
-      component: <Verified />,
-    },
+    /* { heading: "Χρόνος παράδοσης", params: ["time"], component: <Time /> }, */
   ];
 
   return (

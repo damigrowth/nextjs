@@ -7,8 +7,8 @@ export const accountSchema = z.object({
     .max(50, "Το όνομα προβολής δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες"),
   phone: z
     .number()
-    .min(1000000000, "Ο αριθμός τηλεφώνου πρέπει να έχει ακριβώς 10 ψηφία")
-    .max(9999999999, "Ο αριθμός τηλεφώνου πρέπει να έχει ακριβώς 10 ψηφία")
+    .min(1000000000, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")
+    .max(999999999999, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")
     .optional()
     .nullable(),
 });
@@ -172,8 +172,8 @@ export const basicInfoSchema = z.object({
   }),
   coverage: coverageSchema, // Defined above
   // Optional fields
-  tagline: z.string().min(5).max(120).optional(),
-  description: z.string().min(80).max(5000).optional(),
+  tagline: z.string().max(120).optional().nullable().or(z.literal("")),
+  description: z.string().min(80).max(5000).optional().nullable().or(z.literal("")),
   rate: z.number().min(10).max(50000).optional(),
   commencement: z.number().min(1900).max(new Date().getFullYear()).optional(),
 });

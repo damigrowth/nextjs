@@ -132,6 +132,15 @@ export async function updateBasicInfo(prevState, formData) {
       };
     }
 
+    // Handle empty tagline
+    if (changedFields.tagline === "") {
+      validationState.tagline = "";
+      // Remove any existing tagline errors
+      if (errors.tagline) {
+        delete errors.tagline;
+      }
+    }
+
     // Create an errors object to collect all validation errors
     const errors = {};
 

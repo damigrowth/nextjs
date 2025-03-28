@@ -14,16 +14,22 @@ export default function EmailConfirmationForm({ confirmationCode }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (confirmationCode) {
+    if (confirmationCode && typeof confirmationCode === 'string') {
       const submitForm = () => {
         const formData = new FormData();
-        formData.set("code", confirmationCode);
+        formData.set("code", confirmationCode.toString());
         formAction(formData);
       };
 
       // Use startTransition to wrap the action dispatch
       React.startTransition(() => {
         submitForm();
+      });
+    } else {
+      // Αν το confirmation code δεν είναι έγκυρο, εμφάνισε μήνυμα σφάλματος
+      formAction({
+        success: false,
+        message: "Μη έγκυρος κωδικός επιβεβαίωσης. Παρακαλώ δοκιμάστε ξανά ή επικοινωνήστε μαζί μας."
       });
     }
   }, [confirmationCode, formAction]);
@@ -71,9 +77,15 @@ export default function EmailConfirmationForm({ confirmationCode }) {
           <i className="fa fa-exclamation-circle fa-3x"></i>
         </div>
         <p className="text-danger">{state.message}</p>
-        <Link href="/login" className="btn btn-primary mt-3">
+        <Link href="/login" className="ud-btn btn-thm default-box-shadow2">
           Σύνδεση
         </Link>
+        <p className="mt-3 text-muted">
+          Εάν υπάρχει οποιοδήποτε πρόβλημα επικοινώνησε μαζί μας στο{" "}
+          <a href="mailto:contact@doulitsa.gr" className="text-thm">
+            contact@doulitsa.gr
+          </a>
+        </p>
       </div>
     );
   }

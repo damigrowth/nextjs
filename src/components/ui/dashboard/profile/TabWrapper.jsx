@@ -22,14 +22,12 @@ export default function TabWrapper({ children, freelancer }) {
       if (isTypeUser) {
         return Boolean(
           freelancer.displayName &&
-            freelancer.phone &&
             freelancer.email &&
             freelancer.image?.data?.id
         );
       } else {
         return Boolean(
           freelancer.displayName &&
-            freelancer.phone &&
             freelancer.email &&
             freelancer.coverage &&
             (freelancer.coverage.online ||
@@ -68,7 +66,6 @@ export default function TabWrapper({ children, freelancer }) {
     freelancer.id,
     freelancer.status?.data?.id,
     freelancer.displayName,
-    freelancer.phone,
     freelancer.email,
     freelancer.coverage?.online,
     freelancer.coverage?.onbase,

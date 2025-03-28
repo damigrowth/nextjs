@@ -1,6 +1,19 @@
 import EmailConfirmationForm from "@/components/ui/forms/EmailConfirmationForm";
 import { getToken } from "@/lib/auth/token";
 import { getUser } from "@/lib/auth/user";
+import { Meta } from "@/utils/Seo/Meta/Meta";
+
+// Static SEO
+export async function generateMetadata() {
+  const { meta } = await Meta({
+    titleTemplate: "Επιβεβαίωση Email - Doulitsa",
+    descriptionTemplate: "Επιβεβαιώστε τη διεύθυνση email σας για να ολοκληρώσετε την εγγραφή σας στην Doulitsa.",
+    size: 160,
+    url: "/email-confirmation",
+  });
+
+  return meta;
+}
 
 export default async function page({ searchParams }) {
   const params = await searchParams;

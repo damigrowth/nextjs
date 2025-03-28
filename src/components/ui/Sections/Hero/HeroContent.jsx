@@ -1,5 +1,6 @@
 import SearchBar from "./SearchBar";
 import PopularSearches from "./PopularSearches";
+import Link from "next/link";
 
 export default function HeroContent({ categories }) {
   let subcategories = [];
@@ -21,15 +22,17 @@ export default function HeroContent({ categories }) {
   return (
     <div className="home12-hero-content">
       <span className="d-inline-block tag animate-up-1 mb15 fit">
-        Κατάλογος Υπηρεσιών
+        <Link href="/categories" className="text-decoration-none text-white hover:text-white">
+          Κατάλογος Υπηρεσιών
+        </Link>
       </span>
       <h1 className="animate-up-1 mb25">
-        Οι καλύτεροι επαγγελματίες
+        Οι καλύτερες Υπηρεσίες
         <br />
         στην οθόνη σου.
       </h1>
       <h2 className="heading-p animate-up-2">
-        Ανακάλυψε Υπηρεσίες από τους Καλύτερους Επαγγελματίες.
+        Άμεση αναζήτηση υπηρεσιών από Επαγγελματίες και Επιχειρήσεις.
       </h2>
       <SearchBar categories={categories} subcategories={subcategories} />
       <PopularSearches subcategories={subcategories} />

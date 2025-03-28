@@ -506,6 +506,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
         <div className="bdrb1 pb15 mb40">
           <h5 className="list-title heading">Βασικά Στοιχεία</h5>
         </div>
+        <p className="text-muted mb10">Τα πεδία με αστερίσκο (*) είναι υποχρεωτικά.</p>
         <label className="form-label fw500 dark-color">Εικόνα Προφιλ*</label>
         <ProfileImageInput
           name="image"
@@ -526,14 +527,14 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
 
         <div className="mb20 mt20 col-md-6">
           <InputB
-            label="Σύντομη Περιγραφή"
+            label="Σύντομη Περιγραφή*"
             id="tagline"
             name="tagline"
             type="text"
             value={tagline}
             onChange={setTagline}
             className="form-control input-group"
-            errors={formState?.errors?.tagline}
+            errors={formState?.errors?.tagline?.message || null}
           />
         </div>
 
@@ -541,7 +542,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           <TextArea
             id="description"
             name="description"
-            label="Περιγραφή"
+            label="Κείμενο (Σχετικά)"
             minLength={80}
             maxLength={5000}
             counter
@@ -551,7 +552,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           />
         </div>
         <div className="row mb40">
-          <div className="col-md-3">
+          <div className="col-md-4">
             <SearchableSelect
               name="category"
               label="Κατηγορία*"
@@ -570,7 +571,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
               errors={formState?.errors?.category}
             />
           </div>
-          <div className="col-md-3">
+          <div className="col-md-4">
             <SearchableSelect
               name="subcategory"
               label="Υποκατηγορία*"
@@ -749,7 +750,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
             </div>
           )}
         </div>
-        <div className="row mb20 mt20">
+        <div className="row mb40 mt40">
           <div className="col-md-6">
             <SearchableSelect
               name="skills"

@@ -30,7 +30,7 @@ export default function ErrorBoundary({ error }) {
                 <div className="erro_code">
                   50<span className="text-thm">0</span>
                 </div>
-                <div className="h2 error_title">Ουυπς! Υπο κατασκευή.</div>
+                <div className="h2 error_title">Ουπς! Υπο κατασκευή.</div>
                 <p className="text fz15 mb20">
                   Η σελίδα που αναζητάτε δεν είναι διαθέσιμη. Προσπαθήστε να
                   ψάξετε ξανά ή χρησιμοποιήστε το κουμπί πίσω στην αρχική{" "}

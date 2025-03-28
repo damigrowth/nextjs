@@ -29,7 +29,7 @@ export default function PageNotFound() {
                   40<span className="text-thm">4</span>
                 </div>
                 <div className="h2 error_title">
-                  Ουυπς! Η σελίδα που ψάχνεις δεν υπάρχει.
+                  Ουπς! Η σελίδα που ψάχνεις δεν υπάρχει.
                 </div>
                 <p className="text fz15 mb20">
                   Η σελίδα δεν είναι διαθέσιμη. Προσπάθησε να

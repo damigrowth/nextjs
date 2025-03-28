@@ -25,10 +25,13 @@ export default function AccountForm({ freelancer }) {
   const { email, username, displayName, phone, setDisplayName, setPhone } =
     useEditProfileStore();
 
-  const currentValues = { displayName, phone: Number(phone) };
+  const currentValues = { 
+    displayName, 
+    phone: phone ? Number(phone) : null 
+  };
   const originalValues = {
     displayName: freelancer.displayName,
-    phone: Number(freelancer.phone),
+    phone: freelancer.phone ? Number(freelancer.phone) : null,
   };
 
   // // Use custom hook to track changes
@@ -88,7 +91,8 @@ export default function AccountForm({ freelancer }) {
                 id="phone"
                 name="phone"
                 type="tel"
-                maxLength={10}
+                pattern="[0-9]*"
+                inputMode="numeric"
                 value={phone || ""}
                 onChange={setPhone}
                 className="form-control input-group"
