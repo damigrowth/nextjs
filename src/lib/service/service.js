@@ -2,6 +2,7 @@ import { getData } from "../client/operations";
 import {
   ALL_REVIEWS_RATINGS_BY_SERVICE,
   REVIEWS_BY_SERVICE,
+  OTHER_SERVICES_REVIEWS,
 } from "../graphql/queries/main/reviews";
 import {
   SERVICE_BY_ID,
@@ -101,6 +102,27 @@ export async function getAllReviewsRatingsByService(serviceId, pageSize) {
     return { allReviewsRatings };
   } catch (error) {
     console.error("Error fetching service reviews:", error);
+    return [];
+  }
+}
+
+export async function getOtherServicesReviews(serviceId, freelancerId, pageSize = 5) {
+  try {
+    let otherServicesReviews = [];
+
+    const res = await getData(OTHER_SERVICES_REVIEWS, {
+      serviceId,
+      freelancerId,
+      pageSize,
+    });
+
+    if (res?.reviews?.data?.length > 0) {
+      otherServicesReviews = res.reviews.data;
+    }
+
+    return otherServicesReviews;
+  } catch (error) {
+    console.error("Error fetching other services reviews:", error);
     return [];
   }
 }

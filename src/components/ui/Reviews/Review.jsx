@@ -67,7 +67,7 @@ export default async function Review({
               <span className="ml5 fz14 fw600">{formatRating(rating)}</span>
             </div>
             <span className="inline-divider"></span>
-            <span className="fz14">{formattedDate}</span>
+            <span className="review-date">{formattedDate}</span>
           </div>
         </div>
       </div>

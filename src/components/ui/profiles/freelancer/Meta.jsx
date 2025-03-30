@@ -62,7 +62,7 @@ export default function Meta({
                 </div>
                 <h2 className="heading-p mb-0">{tagline}</h2>
                 {totalReviews > 0 && (
-                  <Rating totalReviews={totalReviews} rating={rating} />
+                  <Rating totalReviews={totalReviews} rating={rating} clickable={true} />
                 )}
                 {coverage.onbase &&
                   coverage?.address &&

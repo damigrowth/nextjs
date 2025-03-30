@@ -17,6 +17,7 @@ import ServiceSchema from "@/utils/Seo/Schema/ServiceSchema";
 import Protected from "@/components/auth/Protected";
 import { getUserId } from "@/lib/auth/user";
 import { redirect } from "next/navigation";
+import { getOtherServicesReviews } from "@/lib/service/service";
 
 export default async function SingleService({
   slug,
@@ -102,6 +103,12 @@ export default async function SingleService({
     rating_stars_5,
   ];
 
+  // Get reviews from other services
+  const otherServicesReviews = await getOtherServicesReviews(
+    serviceId,
+    freelancerId
+  );
+
   return (
     <section className="pt10 pb90 pb30-md bg-orange">
       <ServiceSchema
@@ -177,6 +184,7 @@ export default async function SingleService({
                   reviewsMeta={reviewsMeta}
                   reviewsPage={reviewsPage}
                   ratingStars={ratingStars}
+                  otherServicesReviews={otherServicesReviews}
                 />
                 <Protected message="Κάνε σύνδεση για να αξιολογήσεις την υπηρεσία.">
                   {fid !== freelancerId && (

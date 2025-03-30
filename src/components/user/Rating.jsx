@@ -1,9 +1,10 @@
 import { formatRating } from "@/utils/formatRating";
 import React from "react";
+import Link from "next/link";
 
-export default function Rating({ totalReviews, rating }) {
-  return totalReviews === 0 || totalReviews === null ? null : (
-    <p className="mb-0 fz14 ">
+export default function Rating({ totalReviews, rating, clickable = false }) {
+  const ratingContent = (
+    <p className={`mb-0 fz14 ${clickable ? 'cursor-pointer' : ''}`}>
       <i
         className="fas fa-star vam review-color"
         style={{ fontSize: 17, marginBottom: "2px" }}
@@ -16,4 +17,16 @@ export default function Rating({ totalReviews, rating }) {
       </span>
     </p>
   );
+
+  if (totalReviews === 0 || totalReviews === null) return null;
+
+  if (clickable) {
+    return (
+      <Link href="#reviews-section" className="text-decoration-none">
+        {ratingContent}
+      </Link>
+    );
+  }
+
+  return ratingContent;
 }

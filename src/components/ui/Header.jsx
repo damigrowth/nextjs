@@ -50,7 +50,7 @@ export default function Header({ user, header }) {
                 <div className="d-flex align-items-center">
                   {!user && (
                     <Link className="mx15-xl mx30" href="/register">
-                      <span className="d-none d-xl-inline-block">
+                      <span className="hide-below-1400">
                         Καταχώριση Επαγγελματία
                       </span>
                     </Link>

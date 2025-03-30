@@ -64,7 +64,7 @@ Tag:  bidding, fiverr, freelance marketplace, freelancers, freelancing, gigs, hi
   --container-width: 1460px;
   --divder-space: 200px;
   --headings-color: #222222;
-  --body-text-color: #6b7177;
+  --body-text-color: #212529;
 }
 
 /* Typography Styles */
@@ -1452,7 +1452,6 @@ li {
   height: 16px;
   position: absolute;
   right: 10px;
-  text-align: center;
   top: 33px;
   width: 16px;
 }
@@ -3316,6 +3315,12 @@ background-image: linear-gradient(0deg, #ffffff 0%, #ffe9b2 100%);
 @media screen and (max-width: 300px) {
   .hero-home12 {
     padding-top: 6rem;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .hero-home12 {
+    height: 580px;
   }
 }
 
@@ -5249,12 +5254,13 @@ section {
   color: var(--headings-color);
   font-family: sans-serif;
   font-weight: 700;
-  line-height: 289px;
-  font-size: 200px;
+  line-height: 100px;
+  font-size: 100px;
 }
 @media (max-width: 575.98px) {
   .error_page_content .erro_code {
-    font-size: 150px;
+    font-size: 80px;
+    margin-top: 40px;
   }
 }
 
@@ -6990,7 +6996,6 @@ textarea:focus-visible {
   line-height: 45px;
   position: absolute;
   right: 20px;
-  text-align: center;
   top: 20px;
   width: 36px;
   -webkit-transition: all 0.4s ease;
@@ -7175,10 +7180,6 @@ textarea:focus-visible {
 }
 .accordion-style1.faq-page .accordion-body {
   max-width: initial;
-}
-.accordion-style1.style2 .accordion-item {
-  border: none;
-  padding: 0;
 }
 .accordion-style1.style2 .accordion-item.active {
   box-shadow: none;
@@ -8775,9 +8776,6 @@ header.nav-homepage-style.at-home5.stricky.stricky-fixed
   a.list-item:before {
   background-color: #222222;
 }
-header.nav-homepage-style.at-home17.stricky.stricky-fixed .home18-sign-btn {
-  border: 1px solid #e9e9e9;
-}
 header.nav-homepage-style.at-home18 {
   margin-top: 10px;
 }
@@ -9574,9 +9572,6 @@ li.mm-listitem:focus {
   border-radius: 4px;
   border: 1px solid #e9e9e9;
   color: #5bbb7b;
-}
-.navpill-style2.at-home9 .nav-item {
-  margin-right: 0;
 }
 .navpill-style2.at-home9 .nav-link.active,
 .navpill-style2.at-home9 .nav-link:hover {
@@ -11168,6 +11163,16 @@ input:focus-visible {
 @media (max-width: 579px) {
   .vam_nav_style.owl-theme .owl-nav button.owl-next {
     right: -10px;
+  }
+}
+
+/* Mobile Switch Label Styles */
+@media (max-width: 991px) {
+  .switch-style1 .form-check-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--headings-color);
+    cursor: pointer;
   }
 }
 .vam_nav_style.owl-theme .owl-nav button.owl-prev,
@@ -13442,6 +13447,16 @@ section.pb40-md.pb90 > div > div.row.d-block.d-lg-none > div > div.row {
 .butgreen {
   background-color: #198754;
 }
+
+.hide-below-1400 {
+  display: none;
+}
+
+@media (min-width: 1400px) {
+  .hide-below-1400 {
+    display: inline-block;
+  }
+} 
 
 @media (min-width: 1200px) {
 

@@ -49,8 +49,8 @@ export default function ReviewStats({
       <div className="total_review mb30 mt45">
         <h4>
           {reviews_total > 1
-            ? reviews_total + " " + "Αξιολογήσεις"
-            : reviews_total + " " + "Αξιολόγηση"}{" "}
+            ? reviews_total + " " + "Αξιολογήσεις της υπηρεσίας"
+            : reviews_total + " " + "Αξιολόγηση της υπηρεσίας"}{" "}
         </h4>
       </div>
       <div className="d-md-flex align-items-center mb30">

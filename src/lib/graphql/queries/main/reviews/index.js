@@ -81,6 +81,31 @@ const REVIEWS_BY_SERVICE = gql`
   ${PAGINATION}
 `;
 
+const OTHER_SERVICES_REVIEWS = gql`
+  query otherServicesReviews($serviceId: ID!, $freelancerId: ID!, $pageSize: Int) {
+    reviews(
+      sort: "publishedAt:desc"
+      filters: { 
+        and: [
+          { service: { freelancer: { id: { eq: $freelancerId } } } }
+          { service: { id: { ne: $serviceId } } }
+        ]
+      }
+      pagination: { pageSize: $pageSize }
+    ) {
+      data {
+        id
+        attributes {
+          ...ReviewMain
+          ...ReviewRelations
+        }
+      }
+    }
+  }
+  ${REVIEW_MAIN}
+  ${REVIEW_RELATIONS}
+`;
+
 const ALL_REVIEWS_RATINGS_BY_SERVICE = gql`
   query allReviewsRatingsByService($id: ID!, $pageSize: Int) {
     reviews(
@@ -102,5 +127,6 @@ export {
   REVIEWS_BY_FREELANCER,
   ALL_REVIEWS_RATINGS_BY_FREELANCER,
   REVIEWS_BY_SERVICE,
+  OTHER_SERVICES_REVIEWS,
   ALL_REVIEWS_RATINGS_BY_SERVICE,
 };

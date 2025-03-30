@@ -6,6 +6,7 @@ import { getData } from "@/lib/client/operations";
 import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
 import {
   FREELANCER_CATEGORIES,
+  FREELANCER_TAXONOMIES_BY_SLUG,
   FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import { SKILLS_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer/skill";
@@ -33,9 +34,16 @@ export default async function page({ params, searchParams }) {
 
   const { categories } = await getData(FREELANCER_CATEGORIES);
 
+  const { categoryBySlug } = await getData(FREELANCER_TAXONOMIES_BY_SLUG, {
+    category,
+    type: "company",
+  });
+
+  const currCategory = categoryBySlug?.data[0]?.attributes;
+
   const taxonomies = {
-    current: null,
-    category: null,
+    current: currCategory?.label,
+    category: currCategory,
     subcategory: null,
   };
 
@@ -79,7 +87,6 @@ export default async function page({ params, searchParams }) {
     paymentMethods: addFilter(pay_m && pay_m.length > 0, toIntArray(pay_m)),
     contactTypes: addFilter(con_t && con_t.length > 0, toIntArray(con_t)),
     cat: category,
-    sub: subcategory,
     experience: addFilter(exp, parseInt(exp, 10)),
     top: addFilter(top === "", true),
     verified: addFilter(ver === "", true),

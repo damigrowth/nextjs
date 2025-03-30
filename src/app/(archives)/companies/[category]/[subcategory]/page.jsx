@@ -40,16 +40,14 @@ export default async function page({ params, searchParams }) {
 
   const { categories } = await getData(FREELANCER_CATEGORIES);
 
-  const { categoryBySlug } = await getData(FREELANCER_TAXONOMIES_BY_SLUG, {
-    category,
-    type: "company",
-  });
-
-  const { subcategoryBySlug } = await getData(FREELANCER_TAXONOMIES_BY_SLUG, {
-    category,
-    subcategory,
-    type: "company",
-  });
+  const { categoryBySlug, subcategoryBySlug } = await getData(
+    FREELANCER_TAXONOMIES_BY_SLUG,
+    {
+      category,
+      subcategory,
+      type: "company",
+    }
+  );
 
   const currCategory = categoryBySlug?.data[0]?.attributes;
   const currSubcategory = subcategoryBySlug?.data[0]?.attributes;

@@ -23,8 +23,8 @@ export default function ServerDown() {
               <div className="animate_content text-center text-xl-start">
                 <div className="animate_thumb">
                   <Image
-                    height={500}
-                    width={500}
+                    height={300}
+                    width={300}
                     className="w-100"
                     src="/images/icon/error-page-img.svg"
                     alt="error-page-img"
