@@ -4,7 +4,7 @@ import { useState } from "react";
 import ReactStars from "react-stars";
 
 export default function ServiceDetailComment1() {
-  const [rating, setRating] = useState(1);
+  const [rating, setRating] = useState(5);
 
   const handleRatingChange = (value) => {
     setRating(value);
