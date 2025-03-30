@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Input from "@/components/inputs/Input";
 import { login } from "@/lib/auth";
 import Link from "next/link";
