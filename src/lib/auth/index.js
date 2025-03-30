@@ -21,6 +21,7 @@ export async function register(prevState, formData) {
   const type = Number(formData.get("type"));
   const role = Number(formData.get("role"));
   const consent = formData.get("consent");
+  const username = formData.get("username");
 
   if (!consent) {
     return {
@@ -32,13 +33,13 @@ export async function register(prevState, formData) {
 
   const userData = {
     email: formData.get("email"),
-    username: formData.get("username"),
+    username: username,
     password: formData.get("password"),
     consent: true,
     registrationData: {
       type,
       role,
-      displayName: type === 2 ? formData.get("displayName") : userData.username,
+      displayName: type === 2 ? formData.get("displayName") : username,
       consent: true,
     }
   };
