@@ -177,7 +177,11 @@ export async function login(prevState, formData) {
   if (response?.data?.login?.jwt) {
     // Check if user is confirmed
     if (!response.data.login.user.confirmed) {
-      redirect("/register/success");
+      return {
+        success: false,
+        message: "Παρακαλώ επιβεβαιώστε το email σας πριν δοκιμάσετε να συνδεθείτε.",
+        redirect: "/register/success"
+      };
     }
 
     await setToken(response.data.login.jwt);
