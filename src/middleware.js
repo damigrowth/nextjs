@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getTokenFromRequest } from "./lib/auth/token";
-import { getFreelancerId } from "./lib/users/freelancer";
-import { getUser } from "./lib/users/user";
+import { getUser } from "@/lib/auth/user";
+import { getFreelancerId } from "@/lib/users/freelancer";
 
 export async function middleware(request) {
   const currentPath = request.nextUrl.pathname;
