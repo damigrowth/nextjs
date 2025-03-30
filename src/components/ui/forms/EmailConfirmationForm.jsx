@@ -1,53 +1,40 @@
 "use client";
 
-import { useState } from "react";
-import { useFormState } from "react-dom";
 import { completeRegistration } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { postData } from "@/lib/client/operations";
-import { RESEND_CONFIRMATION } from "@/lib/graphql/mutations";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useActionState, useEffect } from "react";
 
-export default function EmailConfirmationForm() {
-  const [state, formAction] = useFormState(completeRegistration, null);
-  const [email, setEmail] = useState("");
-  const [resendStatus, setResendStatus] = useState(null);
+export default function EmailConfirmationForm({ confirmationCode }) {
+  const [state, formAction, isPending] = useActionState(completeRegistration, {
+    success: false,
+    message: "",
+  });
 
   const router = useRouter();
 
-  const handleResend = async () => {
-    if (!email) {
-      setResendStatus({
-        success: false,
-        message: "Παρακαλώ εισάγετε το email σας",
-      });
-      return;
-    }
+  useEffect(() => {
+    if (confirmationCode && typeof confirmationCode === 'string') {
+      const submitForm = () => {
+        const formData = new FormData();
+        formData.set("code", confirmationCode.toString());
+        formAction(formData);
+      };
 
-    try {
-      const result = await postData(RESEND_CONFIRMATION, { email });
-      if (result?.data?.resendEmailConfirmation?.ok) {
-        setResendStatus({
-          success: true,
-          message: "Το email επιβεβαίωσης έχει σταλεί ξανά",
-        });
-      } else {
-        setResendStatus({
-          success: false,
-          message: "Κάτι πήγε στραβά. Δοκιμάστε ξανά.",
-        });
-      }
-    } catch (error) {
-      setResendStatus({
+      // Use startTransition to wrap the action dispatch
+      React.startTransition(() => {
+        submitForm();
+      });
+    } else {
+      // Αν το confirmation code δεν είναι έγκυρο, εμφάνισε μήνυμα σφάλματος
+      formAction({
         success: false,
-        message: "Κάτι πήγε στραβά. Δοκιμάστε ξανά.",
+        message: "Μη έγκυρος κωδικός επιβεβαίωσης. Παρακαλώ δοκιμάστε ξανά ή επικοινωνήστε μαζί μας."
       });
     }
-  };
+  }, [confirmationCode, formAction]);
 
+  // Handle redirect after successful confirmation
   useEffect(() => {
     if (state?.success && state?.redirect) {
       const timer = setTimeout(() => {
@@ -58,6 +45,17 @@ export default function EmailConfirmationForm() {
       return () => clearTimeout(timer);
     }
   }, [state, router]);
+
+  if (isPending) {
+    return (
+      <div className="text-center">
+        <div className="spinner-border text-thm mb-3" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <p className="text-muted">Ταυτοποίηση σε εξέλιξη...</p>
+      </div>
+    );
+  }
 
   if (state?.success) {
     return (
@@ -92,70 +90,5 @@ export default function EmailConfirmationForm() {
     );
   }
 
-  return (
-    <div className="w-full max-w-md mx-auto p-6">
-      <h2 className="text-2xl font-bold text-center mb-6">
-        Επιβεβαίωση Email
-      </h2>
-
-      <form action={formAction} className="space-y-4">
-        <div>
-          <Input
-            type="text"
-            name="code"
-            placeholder="Εισάγετε τον κωδικό επιβεβαίωσης"
-            required
-            className="w-full"
-          />
-        </div>
-
-        {state?.success === false && (
-          <div className="text-red-500 text-sm">{state.message}</div>
-        )}
-
-        <Button type="submit" className="w-full">
-          Επιβεβαίωση
-        </Button>
-      </form>
-
-      {state?.success === false && (
-        <div className="mt-6 space-y-4">
-          <p className="text-muted">
-            Εάν υπάρχει οποιοδήποτε πρόβλημα επικοινώνησε μαζί μας στο{" "}
-            <a href="mailto:contact@doulitsa.gr" className="text-thm">
-              contact@doulitsa.gr
-            </a>
-          </p>
-
-          <div className="space-y-2">
-            <Input
-              type="email"
-              placeholder="Εισάγετε το email σας"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full"
-            />
-            <Button
-              type="button"
-              onClick={handleResend}
-              className="w-full"
-              variant="outline"
-            >
-              Αποστολή νέου κωδικού επιβεβαίωσης
-            </Button>
-          </div>
-
-          {resendStatus && (
-            <div
-              className={`text-sm ${
-                resendStatus.success ? "text-green-500" : "text-red-500"
-              }`}
-            >
-              {resendStatus.message}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
+  return null;
 }
