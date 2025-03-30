@@ -21,7 +21,7 @@ export async function register(prevState, formData) {
   const type = Number(formData.get("type"));
   const role = Number(formData.get("role"));
   const consent = formData.get("consent");
-  const username = formData.get("username");
+  const displayName = formData.get("username");
 
   if (!consent) {
     return {
@@ -33,15 +33,8 @@ export async function register(prevState, formData) {
 
   const userData = {
     email: formData.get("email"),
-    username: username,
+    username: formData.get("username"),
     password: formData.get("password"),
-    consent: true,
-    registrationData: {
-      type,
-      role,
-      displayName: type === 2 ? formData.get("displayName") : username,
-      consent: true,
-    }
   };
 
   const result = await postData(REGISTER_USER, {
@@ -98,9 +91,6 @@ export async function completeRegistration(prevState, formData) {
           email: user.email,
           displayName: user.username,
           type: "3",
-          // coverage: {
-          //   online: true,
-          // },
           publishedAt: new Date().toISOString(),
         },
       },
@@ -134,9 +124,6 @@ export async function completeRegistration(prevState, formData) {
           email: user.email,
           displayName: displayName,
           type: freelancerType.toString(),
-          // coverage: {
-          //   online: true,
-          // },
           publishedAt: new Date().toISOString(),
         },
       },
