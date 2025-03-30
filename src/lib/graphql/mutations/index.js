@@ -334,6 +334,7 @@ const EMAIL_CONFIRMATION = gql`
         role {
           id
         }
+        registrationData
       }
     }
   }

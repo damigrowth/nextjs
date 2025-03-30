@@ -34,7 +34,7 @@ export async function register(prevState, formData) {
   const userData = {
     email: formData.get("email"),
     username: formData.get("username"),
-    password: formData.get("password"),
+    password: formData.get("password")
   };
 
   const result = await postData(REGISTER_USER, {
@@ -107,7 +107,7 @@ export async function completeRegistration(prevState, formData) {
         freelancer: freelancerId,
         username: user.username,
         displayName: user.username,
-        consent: consent,
+        consent: true,
       },
       jwt
     );
@@ -140,7 +140,7 @@ export async function completeRegistration(prevState, formData) {
         freelancer: freelancerId,
         username: user.username,
         displayName: displayName,
-        consent: consent,
+        consent: true,
       },
       jwt
     );
