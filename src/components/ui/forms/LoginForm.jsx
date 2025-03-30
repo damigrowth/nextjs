@@ -4,6 +4,7 @@ import Input from "@/components/inputs/Input";
 import { login } from "@/lib/auth";
 import Link from "next/link";
 import { useActionState } from "react";
+import { useRouter } from "next/navigation";
 
 const LoginForm = () => {
   const initialState = {
@@ -12,6 +13,14 @@ const LoginForm = () => {
   };
 
   const [state, formAction, isPending] = useActionState(login, initialState);
+  const router = useRouter();
+
+  // Handle redirect after form submission
+  React.useEffect(() => {
+    if (state?.redirect) {
+      router.push(state.redirect);
+    }
+  }, [state, router]);
 
   return (
     <form action={formAction}>

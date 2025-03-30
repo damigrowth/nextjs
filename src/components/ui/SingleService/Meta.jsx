@@ -31,7 +31,7 @@ export default function Meta({
             path={`/profile/${username}`}
           />
           <Badges verified={verified} topLevel={topLevel} />
-          <Rating totalReviews={totalReviews} rating={rating} />
+          <Rating totalReviews={totalReviews} rating={rating} clickable={true} />
         </div>
       </div>
     </div>

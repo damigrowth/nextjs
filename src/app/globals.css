@@ -12,8 +12,14 @@
 @import "./../../public/css/dashbord_navitaion.css";
 @import "./../../public/css/responsive.css";
 
+html {
+  scroll-behavior: smooth;
+}
+
 a {
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 
 /* slider arrow start*/
@@ -1622,4 +1628,22 @@ a {
 
 .dashboard__content form .ff-heading {
   font-weight: bold;
+}
+
+/* Hover effect for clickable rating */
+a[href="#reviews-section"] {
+  transition: opacity 0.2s ease-in-out;
+}
+
+a[href="#reviews-section"]:hover {
+  opacity: 0.8;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.review-date {
+  color: #a5a5a5;
+  font-size: 12px;
 }

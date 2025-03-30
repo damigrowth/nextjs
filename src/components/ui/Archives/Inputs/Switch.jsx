@@ -60,7 +60,7 @@ export default function Switch({ paramName, label, noHeader, id }) {
 
   if (noHeader) {
     return (
-      <div data-pending={isPending ? "" : undefined}>
+      <div data-pending={isPending ? "" : undefined} className="px-0 pt-0">
         {switchContent}
       </div>
     );

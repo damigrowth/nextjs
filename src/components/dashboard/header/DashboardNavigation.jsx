@@ -1,10 +1,10 @@
 "use client";
-import { dashboardNavigation } from "@/data/dashboard";
+import { hasAccessMainNav, noAccessMainNav, hasAccessServicesNav, hasAccessAccountNav, noAccessAccountNav } from "@/data/dashboard";
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 
-export default function DashboardNavigation() {
+export default function DashboardNavigation({ hasAccess }) {
   const [isActive, setActive] = useState(false);
   const path = usePathname();
 
@@ -28,6 +28,9 @@ export default function DashboardNavigation() {
     return <Link href={item.path}>{commonContent}</Link>;
   };
 
+  const mainNav = hasAccess ? hasAccessMainNav : noAccessMainNav;
+  const accountNav = hasAccess ? hasAccessAccountNav : noAccessAccountNav;
+
   return (
     <>
       <div className="dashboard_navigationbar d-block d-lg-none">
@@ -36,7 +39,7 @@ export default function DashboardNavigation() {
             <i className="fa fa-bars pr10" /> Διαχείριση
           </button>
           <ul className={`dropdown-content ${isActive ? "show" : ""}`}>
-            {dashboardNavigation.slice(0, 8).map((item, i) => (
+            {mainNav.map((item, i) => (
               <li
                 className={
                   path === item.path ? "mobile-dasboard-menu-active" : ""
@@ -48,7 +51,7 @@ export default function DashboardNavigation() {
               </li>
             ))}
 
-            {dashboardNavigation.slice(8, 13).map((item, i) => (
+            {hasAccess && hasAccessServicesNav.map((item, i) => (
               <li
                 className={
                   path === item.path ? "mobile-dasboard-menu-active" : ""
@@ -60,7 +63,7 @@ export default function DashboardNavigation() {
               </li>
             ))}
 
-            {dashboardNavigation.slice(13, 15).map((item, i) => (
+            {accountNav.map((item, i) => (
               <li
                 className={
                   path === item.path ? "mobile-dasboard-menu-active" : ""

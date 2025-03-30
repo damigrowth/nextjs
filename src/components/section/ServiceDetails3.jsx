@@ -14,6 +14,7 @@ import Gallery from "../ui/SingleService/FeaturedFiles";
 import Description from "../ui/SingleService/Description";
 import Faq from "../ui/SingleService/Faq";
 import Reviews from "../ui/SingleService/Reviews";
+import { getOtherServicesReviews } from "@/lib/service/service";
 
 export default async function ServiceDetail3({
   serviceId,
@@ -40,6 +41,12 @@ export default async function ServiceDetail3({
     ratingServicesCount =
       ratingServicesCountData?.data?.attributes?.services?.data?.length;
   }
+
+  // Get reviews from other services
+  const otherServicesReviews = await getOtherServicesReviews(
+    serviceId,
+    service.freelancer.data.id
+  );
 
   // console.log("SERVICE-DETAIL=>>", reviews);
 
@@ -155,6 +162,7 @@ export default async function ServiceDetail3({
                       serviceRating={service.rating}
                       serviceRatingGlobal={service.rating_global.data}
                       ratingServicesCount={ratingServicesCount}
+                      otherServicesReviews={otherServicesReviews}
                     />
                   )}
                   <AddServiceReviewForm serviceId={serviceId} />

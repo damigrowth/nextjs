@@ -62,7 +62,7 @@ export default function DeleteAccountForm({ username }) {
     <>
       <button
         type="button"
-        className="btn-none"
+        className="btn-none mt100"
         data-bs-toggle="modal"
         data-bs-target="#deleteAccountModal"
       >

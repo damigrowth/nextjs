@@ -35,25 +35,16 @@ export async function register(prevState, formData) {
     username: formData.get("username"),
     password: formData.get("password"),
     consent: true,
-  };
-
-  // Store registration data in cookies
-  (await cookies()).set(
-    "registration_data",
-    JSON.stringify({
+    registrationData: {
       type,
       role,
       displayName: type === 2 ? formData.get("displayName") : userData.username,
       consent: true,
-    })
-  );
+    }
+  };
 
   const result = await postData(REGISTER_USER, {
-    input: {
-      email: userData.email,
-      username: userData.username,
-      password: userData.password,
-    },
+    input: userData,
   });
 
   if (result.error) {
@@ -82,9 +73,15 @@ export async function completeRegistration(prevState, formData) {
   const { jwt, user } = confirmationResult.data.emailConfirmation;
   const userId = user.id;
 
-  const cookieData = (await cookies()).get("registration_data")?.value;
-  // Get stored registration data
-  const registrationData = JSON.parse(cookieData || "{}");
+  // Get registration data from user metadata
+  const registrationData = user.registrationData;
+
+  if (!registrationData) {
+    return {
+      success: false,
+      message: "Δεν βρέθηκαν τα στοιχεία εγγραφής. Παρακαλώ δοκιμάστε ξανά.",
+    };
+  }
 
   const { type, role, displayName, consent } = registrationData;
 
@@ -161,9 +158,6 @@ export async function completeRegistration(prevState, formData) {
     );
   }
 
-  // Clean up stored data
-  (await cookies()).delete("registration_data");
-
   await setToken(jwt);
   return {
     success: true,
@@ -193,6 +187,11 @@ export async function login(prevState, formData) {
   });
 
   if (response?.data?.login?.jwt) {
+    // Check if user is confirmed
+    if (!response.data.login.user.confirmed) {
+      redirect("/register/success");
+    }
+
     await setToken(response.data.login.jwt);
     redirect("/dashboard/profile");
   } else {
