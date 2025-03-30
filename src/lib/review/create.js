@@ -28,7 +28,7 @@ const reviewSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          "Πρέπει να επιλέξετε Υπηρεσία για να υποβάλετε την αξιολόγηση.",
+          "Πρέπει να επιλέξετε υπηρεσία για να υποβάλετε την αξιολόγηση.",
         path: ["service"],
       });
     }

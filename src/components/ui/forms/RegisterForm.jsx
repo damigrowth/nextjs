@@ -95,6 +95,8 @@ const RegisterForm = () => {
               disabled={isPending}
               errorId="displayName-error"
               formatSymbols
+              formatNumbers
+              capitalize
             />
           </div>
         </>
