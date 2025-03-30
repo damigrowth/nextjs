@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getTokenFromRequest } from "./lib/auth/token";
-import { getUser } from "@/lib/auth/user";
-import { getFreelancerId } from "@/lib/users/freelancer";
+import { getFreelancerId } from "./lib/users/freelancer";
 
 export async function middleware(request) {
   const currentPath = request.nextUrl.pathname;
@@ -11,10 +10,8 @@ export async function middleware(request) {
   const isUnderMaintenance = false;
 
   const token = getTokenFromRequest(request);
-  const user = await getUser();
-  const isConfirmed = user?.confirmed;
   const freelancer = await getFreelancerId();
-  const authenticated = Boolean(token && freelancer && isConfirmed);
+  const authenticated = Boolean(token && freelancer);
 
   const maintenancePublicPaths = [
     "/maintenance",

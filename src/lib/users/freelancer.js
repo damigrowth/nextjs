@@ -14,8 +14,9 @@ import { FEATURED_SERVICES_BY_FREELANCER } from "../graphql/queries/main/service
 export async function getFreelancerId() {
   const user = await getUser();
   if (!user) return null;
-  if (!user.freelancer?.data) return null;
-  return user.freelancer.data.id;
+  const freelancerId = user.freelancer.data.id;
+  const id = freelancerId ? freelancerId : null;
+  return id;
 }
 
 export async function getFreelancer() {

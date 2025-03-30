@@ -136,14 +136,8 @@ const UPLOAD = gql`
 
 const LOGIN_USER = gql`
   mutation Login($identifier: String!, $password: String!) {
-    login(identifier: $identifier, password: $password) {
+    login(input: { identifier: $identifier, password: $password }) {
       jwt
-      user {
-        id
-        username
-        email
-        confirmed
-      }
     }
   }
 `;
@@ -334,7 +328,6 @@ const EMAIL_CONFIRMATION = gql`
         role {
           id
         }
-        registrationData
       }
     }
   }
@@ -345,14 +338,6 @@ const DELETE_ACCOUNT = gql`
     deleteAccount(username: $username) {
       success
       message
-    }
-  }
-`;
-
-const RESEND_CONFIRMATION = gql`
-  mutation ResendConfirmation($email: String!) {
-    resendEmailConfirmation(email: $email) {
-      ok
     }
   }
 `;
@@ -383,5 +368,4 @@ export {
   CREATE_TAG,
   EMAIL_CONFIRMATION,
   DELETE_ACCOUNT,
-  RESEND_CONFIRMATION,
 };

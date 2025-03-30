@@ -172,7 +172,7 @@ export const basicInfoSchema = z.object({
   }),
   coverage: coverageSchema, // Defined above
   // Optional fields
-  tagline: z.string().max(120).optional().nullable().or(z.literal("")),
+  tagline: z.string().min(5).max(120).optional().nullable().or(z.literal("")),
   description: z.string().min(80).max(5000).optional().nullable().or(z.literal("")),
   rate: z.number().min(10).max(50000).optional(),
   commencement: z.number().min(1900).max(new Date().getFullYear()).optional(),

@@ -13455,6 +13455,8 @@ section.pb40-md.pb90 > div > div.row.d-block.d-lg-none > div > div.row {
 @media (min-width: 1400px) {
   .hide-below-1400 {
     display: inline-block;
+    color: #1f4b3f;
+    padding-bottom: 10px;
   }
 } 
 
