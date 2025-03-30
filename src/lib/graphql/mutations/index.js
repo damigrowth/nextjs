@@ -136,7 +136,7 @@ const UPLOAD = gql`
 
 const LOGIN_USER = gql`
   mutation Login($identifier: String!, $password: String!) {
-    login(input: { identifier: $identifier, password: $password }) {
+    login(identifier: $identifier, password: $password) {
       jwt
       user {
         id
@@ -349,6 +349,14 @@ const DELETE_ACCOUNT = gql`
   }
 `;
 
+const RESEND_CONFIRMATION = gql`
+  mutation ResendConfirmation($email: String!) {
+    resendEmailConfirmation(email: $email) {
+      ok
+    }
+  }
+`;
+
 export {
   POST_REVIEW,
   POST_SERVICE,
@@ -375,4 +383,5 @@ export {
   CREATE_TAG,
   EMAIL_CONFIRMATION,
   DELETE_ACCOUNT,
+  RESEND_CONFIRMATION,
 };
