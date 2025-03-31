@@ -83,14 +83,19 @@ export async function completeRegistration(prevState, formData) {
   const userId = user.id;
 
   const cookieData = (await cookies()).get("registration_data")?.value;
-  // Get stored registration data
-  const registrationData = JSON.parse(cookieData || "{}");
+  // Get stored registration data with default values
+  const registrationData = cookieData ? JSON.parse(cookieData) : {
+    type: 3,
+    role: 1,
+    displayName: user.username,
+    consent: true
+  };
 
   const { type, role, displayName, consent } = registrationData;
 
   // Create freelancer profile based on type
   if (type === 1) {
-    // Regural User type
+    // Regular User type
     const freelancer = await postData(
       CREATE_FREELANCER,
       {
@@ -100,9 +105,6 @@ export async function completeRegistration(prevState, formData) {
           email: user.email,
           displayName: user.username,
           type: "3",
-          // coverage: {
-          //   online: true,
-          // },
           publishedAt: new Date().toISOString(),
         },
       },
@@ -136,9 +138,6 @@ export async function completeRegistration(prevState, formData) {
           email: user.email,
           displayName: displayName,
           type: freelancerType.toString(),
-          // coverage: {
-          //   online: true,
-          // },
           publishedAt: new Date().toISOString(),
         },
       },
