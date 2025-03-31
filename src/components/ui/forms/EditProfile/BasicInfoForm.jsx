@@ -620,6 +620,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                 name="online"
                 initialValue={coverage?.online || false}
                 onChange={handleOnlineSwitch}
+                id="online-switch"
               />
             </div>
             <div className="col-md-2">
@@ -628,6 +629,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                 name="onbase"
                 initialValue={coverage?.onbase || false}
                 onChange={handleOnbaseSwitch}
+                id="onbase-switch"
               />
             </div>
             <div className="col-md-4">
@@ -636,6 +638,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                 name="onsite"
                 initialValue={coverage?.onsite || false}
                 onChange={handleOnsiteSwitch}
+                id="onsite-switch"
               />
             </div>
             {formState?.errors?.coverage ? (
@@ -663,8 +666,8 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
               <div className="col-md-3">
                 <SearchableSelect
                   name="zipcode"
-                  label="Τ.Κ"
-                  labelPlural="Τ.Κ"
+                  label="Τ.Κ."
+                  labelPlural="Τ.Κ."
                   value={coverage?.zipcode?.data}
                   nameParam="name"
                   pageParam="coverageZipcodePage"
