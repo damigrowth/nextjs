@@ -12389,7 +12389,7 @@ input:focus-visible {
 .table-style2 .table .t-head th {
   color: var(--headings-color);
   font-family: sans-serif;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 15px;
   line-height: 22px;
   padding-bottom: 30px;
