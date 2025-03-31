@@ -503,11 +503,26 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
   return (
     <form action={handleSubmit}>
       <div className="form-style1">
-        <div className="bdrb1 pb15 mb40">
+        <div className="bdrb1 pb15 mb10">
           <h5 className="list-title heading">Βασικά Στοιχεία</h5>
         </div>
-        <p className="text-muted mb10">Τα πεδία με αστερίσκο (*) είναι υποχρεωτικά.</p>
-        <label className="form-label fw500 dark-color">Εικόνα Προφιλ*</label>
+
+        <p className="text-muted mb0">Για τη δημόσια προβολή του προφίλ θα πρέπει να υπάρχουν:</p>
+        <div className="text-muted mb30">
+          <div className="d-flex align-items-center mb2">
+            <span className="me-2" style={{ color: '#6c757d' }}>•</span>
+            <span>Εικόνα Προφίλ</span>
+          </div>
+          <div className="d-flex align-items-center mb2">
+            <span className="me-2" style={{ color: '#6c757d' }}>•</span>
+            <span>Κατηγορία/Υποκατηγορία</span>
+          </div>
+          <div className="d-flex align-items-center">
+            <span className="me-2" style={{ color: '#6c757d' }}>•</span>
+            <span>Τρόποι παροχής των Υπηρεσιών</span>
+          </div>
+        </div>
+        <label className="form-label fw500 dark-color">Εικόνα Προφίλ*</label>
         <ProfileImageInput
           name="image"
           image={
@@ -527,7 +542,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
 
         <div className="mb20 mt20 col-md-6">
           <InputB
-            label="Σύντομη Περιγραφή*"
+            label="Σύντομη Περιγραφή"
             id="tagline"
             name="tagline"
             type="text"

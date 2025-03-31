@@ -48,7 +48,7 @@ export default async function DashboardInfo() {
       <div className="dashboard__content hover-bgc-color">
         <div className="row pb40">
           <div className="col-lg-12">
-            <DashboardNavigation hasAccess={hasAccess} />
+            <DashboardNavigation />
           </div>
           <div className="col-lg-12">
             <div className="dashboard_title_area">
@@ -172,15 +172,15 @@ export default async function DashboardInfo() {
             </strong>. <br/>Ακόμα, μπορείς να αποθηκεύσεις τις Αγαπημένες σου υπηρεσίες και τα προφίλ. <br/>Εάν έχεις έρθει σε επικοινωνία με κάποιον επαγγελματία, μη διστάσεις να υποβάλεις μια αξιολόγηση. <br/>Θα βοηθήσεις έτσι, και άλλους χρήστες να βρουν αυτό που ψάχνουν!
           
             <div className="d-flex pb30 gap-3 mt-4 flex-wrap">
-          <Link href="/ipiresies" className="ud-btn btn-thm w-100 w-md-auto">
+          <Link href="/ipiresies" className="ud-btn btn-thm2 mb25 me-4">
             Όλες οι Υπηρεσίες
             <i className="fal fa-arrow-right-long" />
           </Link>
-          <Link href="/pros" className="ud-btn btn-thm w-100 w-md-auto">
+          <Link href="/pros" className="ud-btn btn-thm2 mb25 me-4">
             Επαγγελματίες
             <i className="fal fa-arrow-right-long" />
           </Link>
-          <Link href="/companies" className="ud-btn btn-thm w-100 w-md-auto">
+          <Link href="/companies" className="ud-btn btn-thm2 mb25 me-4">
             Επιχειρήσεις
             <i className="fal fa-arrow-right-long" />
           </Link>

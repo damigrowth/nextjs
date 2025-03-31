@@ -44,7 +44,7 @@ export const dashboardNavigation = [
   },
   {
     id: 8,
-    name: "Διαχείριση Προφιλ",
+    name: "Διαχείριση Προφίλ",
     icon: "flaticon-photo",
     path: "/dashboard/profile",
   },
@@ -115,7 +115,7 @@ export const hasAccessServicesNav = [
 export const hasAccessAccountNav = [
   {
     id: 0,
-    name: "Διαχείριση Προφιλ",
+    name: "Διαχείριση Προφίλ",
     icon: "flaticon-photo",
     path: "/dashboard/profile",
   },
@@ -222,7 +222,7 @@ export const noAccessMainNav = [
 export const noAccessAccountNav = [
   {
     id: 0,
-    name: "Διαχείριση Προφιλ",
+    name: "Διαχείριση Προφίλ",
     icon: "flaticon-photo",
     path: "/dashboard/profile",
   },
@@ -255,7 +255,7 @@ export const noAccessUserMenuNav = [
   },
   {
     id: 0,
-    name: "Διαχείριση Προφιλ",
+    name: "Διαχείριση Προφίλ",
     icon: "flaticon-photo",
     path: "/dashboard/profile",
   },

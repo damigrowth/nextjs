@@ -26,7 +26,8 @@ export default function SidebarModal({ filters, searchParams }) {
 
                   const hasChildPath = filter.childPath !== undefined;
 
-                  const isCollapsed = index !== 0 && !hasParams && !hasChildPath && !filter.noCollapse;
+                  // Στο mobile, όλα τα φίλτρα είναι μαζεμένα by default, εκτός από αυτά που έχουν noCollapse=true
+                  const isCollapsed = !filter.noCollapse;
 
                   if (filter.noCollapse) {
                     return (
@@ -66,7 +67,9 @@ export default function SidebarModal({ filters, searchParams }) {
                   );
                 })}
               </div>
-              <ClearButton />
+              <div className="mt-4 mb-3 mobile-filter-clear-btn">
+                <ClearButton alwaysShow={true} />
+              </div>
             </div>
           </div>
         </div>

@@ -32,7 +32,8 @@ export default async function FeaturedServiceCard({
   const fallbackImage = "/images/fallback/service.png";
 
   if (media.data.length > 0) {
-    image = getBestDimensions(media.data[0].attributes.formats).url;
+    const formatResult = getBestDimensions(media.data[0].attributes.formats);
+    image = formatResult && formatResult.url ? formatResult.url : fallbackImage;
   } else {
     image = fallbackImage;
   }
