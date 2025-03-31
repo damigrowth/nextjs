@@ -21,6 +21,7 @@ export async function register(prevState, formData) {
   const type = Number(formData.get("type"));
   const role = Number(formData.get("role"));
   const consent = formData.get("consent");
+  const displayName = type === 2 ? formData.get("displayName") : undefined;
 
   if (!consent) {
     return {
@@ -30,34 +31,38 @@ export async function register(prevState, formData) {
     };
   }
 
+  // Περνάμε τα επιπλέον πεδία στο Strapi
   const userData = {
     email: formData.get("email"),
     username: formData.get("username"),
     password: formData.get("password"),
-    consent: true,
+    pendingType: type,
+    pendingRole: role,
+    pendingDisplayName: displayName || formData.get("username"),
   };
 
-  // Store registration data in cookies
-  (await cookies()).set(
-    "registration_data",
-    JSON.stringify({
-      type,
-      role,
-      displayName: type === 2 ? formData.get("displayName") : userData.username,
-      consent: true,
-    })
-  );
-
   const result = await postData(REGISTER_USER, {
-    input: {
-      email: userData.email,
-      username: userData.username,
-      password: userData.password,
-    },
+    input: userData,
   });
 
   if (result.error) {
     return { message: result.error };
+  }
+
+  // Αποθηκεύουμε παράλληλα και στα cookies για συμβατότητα
+  try {
+    (await cookies()).set(
+      "registration_data",
+      JSON.stringify({
+        type,
+        role,
+        displayName: type === 2 ? displayName : userData.username,
+        consent: true,
+      })
+    );
+  } catch (e) {
+    console.error("Error storing cookies:", e);
+    // Συνεχίζουμε κανονικά ακόμα κι αν αποτύχει η αποθήκευση cookies
   }
 
   redirect("/register/success");
@@ -81,105 +86,121 @@ export async function completeRegistration(prevState, formData) {
 
   const { jwt, user } = confirmationResult.data.emailConfirmation;
   const userId = user.id;
-  
-  // Προσπάθησε να ανακτήσεις τα δεδομένα από cookies (για συμβατότητα με παλιούς browsers)
-  let registrationData = {};
-  try {
-    const cookieData = (await cookies()).get("registration_data")?.value;
-    if (cookieData) {
-      registrationData = JSON.parse(cookieData || "{}");
+
+  // Χρησιμοποιούμε τα πεδία από το Strapi (pendingType, pendingRole, pendingDisplayName)
+  let type = user.pendingType ? Number(user.pendingType) : 1;
+  let role = user.pendingRole ? Number(user.pendingRole) : 1;
+  let displayName = user.pendingDisplayName || user.username;
+  let consent = true;
+
+  // Αν δεν βρέθηκαν δεδομένα από το Strapi, προσπαθούμε να διαβάσουμε από cookies για συμβατότητα
+  if (!user.pendingType) {
+    try {
+      const cookieData = (await cookies()).get("registration_data")?.value;
+      if (cookieData) {
+        const registrationData = JSON.parse(cookieData);
+        type = registrationData.type || type;
+        role = registrationData.role || role;
+        displayName = registrationData.displayName || displayName;
+        consent = registrationData.consent || consent;
+      }
+    } catch (e) {
+      console.error("Error reading cookies:", e);
     }
-  } catch (e) {
-    // Σε περίπτωση που δεν υπάρχουν cookies, συνεχίζουμε με τις πληροφορίες από το API
-    console.error("Error reading cookies:", e);
   }
 
-  // Χρησιμοποίησε δεδομένα από cookies αν υπάρχουν, διαφορετικά χρησιμοποίησε τα δεδομένα από το API
-  const userType = registrationData.type || (user.type ? Number(user.type) : 1);
-  const userRole = registrationData.role || (user.role?.id ? Number(user.role.id) : 1);
-  const displayName = registrationData.displayName || user.displayName || user.username;
-  const userConsent = registrationData.consent || user.consent || true;
-  
-  // Create freelancer profile based on type
-  if (userType === 1) {
-    // Regular User type
-    const freelancer = await postData(
-      CREATE_FREELANCER,
-      {
-        data: {
-          user: userId,
-          username: user.username,
-          email: user.email,
-          displayName: user.username,
-          type: "3",
-          publishedAt: new Date().toISOString(),
-        },
-      },
-      jwt
-    );
-
-    const freelancerId = freelancer.data?.createFreelancer?.data?.id;
-
-    await postData(
-      UPDATE_USER,
-      {
-        id: userId,
-        roleId: "1",
-        freelancer: freelancerId,
-        username: user.username,
-        displayName: user.username,
-        consent: userConsent,
-      },
-      jwt
-    );
-  } else {
-    // Freelancer User type
-    const freelancerType = userRole === 4 ? 1 : 2;
-
-    const freelancer = await postData(
-      CREATE_FREELANCER,
-      {
-        data: {
-          user: userId,
-          username: user.username,
-          email: user.email,
-          displayName: displayName,
-          type: freelancerType.toString(),
-          publishedAt: new Date().toISOString(),
-        },
-      },
-      jwt
-    );
-
-    const freelancerId = freelancer.data?.createFreelancer?.data?.id;
-
-    await postData(
-      UPDATE_USER,
-      {
-        id: userId,
-        roleId: userRole.toString(),
-        freelancer: freelancerId,
-        username: user.username,
-        displayName: displayName,
-        consent: userConsent,
-      },
-      jwt
-    );
-  }
-
-  // Προσπάθησε να καθαρίσεις τα cookies (για συμβατότητα)
   try {
-    (await cookies()).delete("registration_data");
-  } catch (e) {
-    // Αγνόησε τυχόν σφάλματα cookies
-  }
+    // Δημιουργία προφίλ freelancer με βάση τον τύπο χρήστη
+    let freelancerType;
+    let roleId;
 
-  await setToken(jwt);
-  return {
-    success: true,
-    message: `Καλώς ήρθες ${user.username}!`,
-    redirect: true,
-  };
+    if (type === 1) {
+      // Απλός χρήστης (User)
+      freelancerType = "3"; // Type 3: Χρήστης
+      roleId = "1";         // Role 1: User
+    } else if (type === 2) {
+      if (role === 4) {
+        // Επαγγελματίας (Freelancer)
+        freelancerType = "1"; // Type 1: Επαγγελματίας
+        roleId = "4";         // Role 4: Freelancer
+      } else if (role === 5) {
+        // Επιχείρηση (Company)
+        freelancerType = "2"; // Type 2: Επιχείρηση
+        roleId = "5";         // Role 5: Company
+      } else {
+        // Εάν δεν έχει οριστεί ρόλος, χρησιμοποιούμε προεπιλογή για Επαγγελματία
+        freelancerType = "1"; // Type 1: Επαγγελματίας
+        roleId = "4";         // Role 4: Freelancer
+      }
+    } else {
+      // Αν δεν υπάρχει έγκυρο type, χρησιμοποιούμε προεπιλογή απλού χρήστη
+      freelancerType = "3"; // Type 3: Χρήστης
+      roleId = "1";         // Role 1: User
+    }
+
+    // Δημιουργία του freelancer προφίλ
+    const freelancer = await postData(
+      CREATE_FREELANCER,
+      {
+        data: {
+          user: userId,
+          username: user.username,
+          email: user.email,
+          displayName: type === 2 ? displayName : user.username,
+          type: freelancerType,
+          publishedAt: new Date().toISOString(),
+        },
+      },
+      jwt
+    );
+
+    if (!freelancer.data?.createFreelancer?.data?.id) {
+      throw new Error("Αποτυχία δημιουργίας προφίλ");
+    }
+
+    const freelancerId = freelancer.data.createFreelancer.data.id;
+
+    // Ενημέρωση του χρήστη με τον ρόλο και το προφίλ freelancer
+    await postData(
+      UPDATE_USER,
+      {
+        id: userId,
+        roleId: roleId,
+        freelancer: freelancerId,
+        username: user.username,
+        displayName: type === 2 ? displayName : user.username,
+        consent: consent,
+        // Καθαρισμός των pending πεδίων
+        pendingType: null,
+        pendingRole: null, 
+        pendingDisplayName: null,
+        confirmed: true, // Σημειώνουμε ότι ο χρήστης έχει επιβεβαιωθεί
+      },
+      jwt
+    );
+
+    // Καθαρισμός cookies (δεν είναι πλέον κρίσιμο)
+    try {
+      (await cookies()).delete("registration_data");
+    } catch (e) {
+      // Αγνοούμε σφάλματα cookies
+    }
+
+    // Αποθήκευση του JWT token
+    await setToken(jwt);
+    
+    return {
+      success: true,
+      message: `Καλώς ήρθες ${user.username}!`,
+      redirect: true,
+    };
+  } catch (error) {
+    console.error("Σφάλμα ολοκλήρωσης εγγραφής:", error);
+    return {
+      success: false,
+      message: "Προέκυψε σφάλμα κατά την ολοκλήρωση της εγγραφής. Παρακαλώ δοκιμάστε ξανά ή επικοινωνήστε με την υποστήριξη.",
+    };
+  }
 }
 
 export async function login(prevState, formData) {
