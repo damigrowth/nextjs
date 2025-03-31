@@ -1475,6 +1475,82 @@ a {
   margin-left: 30px;
 }
 
+/* Κλάση για το overlay στα mobile φίλτρα */
+.body-overlay-mobile-desktop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1031;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.body-overlay-mobile-desktop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Βελτιώσεις για τα φίλτρα στα mobile */
+@media (max-width: 768px) {
+  .lefttside-hidden-bar {
+    z-index: 1032;
+    width: 85%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .hsidebar-header {
+    flex-shrink: 0;
+  }
+  
+  .hsidebar-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .widget-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sidebar-accordion {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sidebar-close-icon {
+    display: block;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .mobile-filter-clear-btn {
+    margin-top: auto !important;
+    padding: 15px 0;
+    background-color: #fff;
+    box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+    flex-shrink: 0;
+  }
+  
+  .mobile-filter-clear-btn .ui-clear-btn {
+    transition: all 0.3s ease;
+  }
+}
+
 @media (max-width: 1024px) {
   .dashboard-navmenu {
     display: none;

@@ -1,17 +1,52 @@
 "use client";
-import { hasAccessMainNav, noAccessMainNav, hasAccessServicesNav, hasAccessAccountNav, noAccessAccountNav } from "@/data/dashboard";
+import { hasAccessMainNav, noAccessMainNav, hasAccessServicesNav, hasAccessAccountNav, noAccessAccountNav, hasAccessUserMenuNav, noAccessUserMenuNav } from "@/data/dashboard";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { getAccess, getUser } from "@/lib/auth/user";
 
 export default function DashboardNavigation({ hasAccess }) {
   const [isActive, setActive] = useState(false);
+  const [menuItems, setMenuItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const path = usePathname();
+
+  useEffect(() => {
+    async function loadMenuItems() {
+      try {
+        // Αν δεν παρέχεται η παράμετρος hasAccess από το parent component,
+        // τότε θα την αποκτήσουμε εδώ όπως στο UserMenu
+        let userHasAccess = hasAccess;
+        
+        if (userHasAccess === undefined) {
+          userHasAccess = await getAccess(["freelancer", "company"]);
+        }
+
+        // Συλλέγουμε όλα τα στοιχεία μενού σε ένα ενιαίο πίνακα
+        const mainItems = userHasAccess ? hasAccessMainNav : noAccessMainNav;
+        const serviceItems = userHasAccess ? hasAccessServicesNav : [];
+        const accountItems = userHasAccess ? hasAccessAccountNav : noAccessAccountNav;
+        
+        // Συνδυάζουμε τα στοιχεία μενού σε έναν ενιαίο πίνακα για mobile χρήση
+        // ακριβώς όπως κάνει το UserMenu
+        setMenuItems([
+          ...mainItems,
+          ...(userHasAccess ? serviceItems : []),
+          ...accountItems
+        ]);
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Σφάλμα κατά τη φόρτωση στοιχείων μενού:", error);
+        setIsLoading(false);
+      }
+    }
+
+    loadMenuItems();
+  }, [hasAccess]);
 
   const renderNavItem = (item) => {
     // Common class names
-    const isActiveClass =
-      path === item.path ? "mobile-dasboard-menu-active" : "";
     const commonContent = (
       <>
         <i className={`${item.icon} mr10`} />
@@ -28,8 +63,9 @@ export default function DashboardNavigation({ hasAccess }) {
     return <Link href={item.path}>{commonContent}</Link>;
   };
 
-  const mainNav = hasAccess ? hasAccessMainNav : noAccessMainNav;
-  const accountNav = hasAccess ? hasAccessAccountNav : noAccessAccountNav;
+  if (isLoading) {
+    return <div className="dashboard_navigationbar d-block d-lg-none">Φόρτωση...</div>;
+  }
 
   return (
     <>
@@ -39,31 +75,7 @@ export default function DashboardNavigation({ hasAccess }) {
             <i className="fa fa-bars pr10" /> Διαχείριση
           </button>
           <ul className={`dropdown-content ${isActive ? "show" : ""}`}>
-            {mainNav.map((item, i) => (
-              <li
-                className={
-                  path === item.path ? "mobile-dasboard-menu-active" : ""
-                }
-                onClick={() => setActive(false)}
-                key={i}
-              >
-                {renderNavItem(item)}
-              </li>
-            ))}
-
-            {hasAccess && hasAccessServicesNav.map((item, i) => (
-              <li
-                className={
-                  path === item.path ? "mobile-dasboard-menu-active" : ""
-                }
-                onClick={() => setActive(false)}
-                key={i}
-              >
-                {renderNavItem(item)}
-              </li>
-            ))}
-
-            {accountNav.map((item, i) => (
+            {menuItems.map((item, i) => (
               <li
                 className={
                   path === item.path ? "mobile-dasboard-menu-active" : ""

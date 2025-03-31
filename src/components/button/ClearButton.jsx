@@ -2,8 +2,23 @@
 
 import listingStore from "@/store/listingStore";
 import priceStore from "@/store/priceStore";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function ClearButton() {
+export default function ClearButton({ alwaysShow = false }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [hasArchiveFilters, setHasArchiveFilters] = useState(false);
+
+  useEffect(() => {
+    // Έλεγχος αν υπάρχουν παράμετροι φίλτρων archive
+    const hasFilters = Array.from(searchParams.keys()).some(
+      key => ["min", "max", "time", "cat", "tags", "ver", "sort"].includes(key)
+    );
+    setHasArchiveFilters(hasFilters);
+  }, [searchParams]);
+
   // set handlers
   const setDeliveryTime = listingStore((state) => state.setDeliveryTime);
   const setLevel = listingStore((state) => state.setLevel);
@@ -36,6 +51,7 @@ export default function ClearButton() {
 
   // clear handler
   const clearHandler = () => {
+    // Καθαρισμός των store filters
     setDeliveryTime("");
     setLevel([]);
     setLocation([]);
@@ -49,29 +65,39 @@ export default function ClearButton() {
     setEnglishLevel([]);
     setJobType([]);
     setNoOfEmployee([]);
+
+    // Καθαρισμός των URL parameters για τις archive σελίδες
+    if (pathname.includes('ipiresies') || pathname.includes('companies') || pathname.includes('pros')) {
+      // Κράτησε μόνο το page=1 παράμετρο
+      router.push(`${pathname}?page=1`, { scroll: false });
+    }
   };
+
+  // Έλεγχος εάν υπάρχουν ενεργά φίλτρα για την εμφάνιση του κουμπιού
+  const hasActiveFilters = getDeliveryTime !== "" ||
+    getLevel?.length !== 0 ||
+    getLocation?.length !== 0 ||
+    getSearch !== "" ||
+    getBestSeller !== "best-seller" ||
+    getDesginTool?.length !== 0 ||
+    getSpeak?.length !== 0 ||
+    getPriceRange.min !== 0 ||
+    getPriceRange.max !== 100000 ||
+    getCategory?.length !== 0 ||
+    getProjectType?.length !== 0 ||
+    getEnglishLevel?.length !== 0 ||
+    getJobType?.length !== 0 ||
+    getNoOfEmployee?.length !== 0 ||
+    hasArchiveFilters;
 
   return (
     <>
-      {getDeliveryTime !== "" ||
-      getLevel?.length !== 0 ||
-      getLocation?.length !== 0 ||
-      getSearch !== "" ||
-      getBestSeller !== "best-seller" ||
-      getDesginTool?.length !== 0 ||
-      getSpeak?.length !== 0 ||
-      getPriceRange.min !== 0 ||
-      getPriceRange.max !== 100000 ||
-      getCategory?.length !== 0 ||
-      getProjectType?.length !== 0 ||
-      getEnglishLevel?.length !== 0 ||
-      getJobType?.length !== 0 ||
-      getNoOfEmployee?.length !== 0 ? (
+      {(alwaysShow || hasActiveFilters) ? (
         <button
           onClick={clearHandler}
           className="ud-btn btn-thm ui-clear-btn w-100"
         >
-          Clear
+          Καθαρισμός φίλτρων
           <i className="fal fa-arrow-right-long"></i>
         </button>
       ) : (

@@ -50,7 +50,14 @@ export default function ServiceCardFiles({
                       width: width ? `${width}px` : "300px",
                       height: height ? `${height}px` : "200px",
                     }}
-                    src={getBestDimensions(formats).url || fallbackImage}
+                    src={
+                      (() => {
+                        const formatResult = getBestDimensions(formats);
+                        return formatResult && formatResult.url
+                          ? formatResult.url
+                          : fallbackImage;
+                      })()
+                    }
                     alt="service-thumbnail"
                   />
                 ) : (

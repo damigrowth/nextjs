@@ -71,9 +71,9 @@ export default function EmailConfirmationForm({ confirmationCode }) {
           <i className="fa fa-exclamation-circle fa-3x"></i>
         </div>
         <p className="text-danger">{state.message}</p>
-        <Link href="/login" className="btn btn-primary mt-3">
-          Σύνδεση
-        </Link>
+        <p className="mt-3">
+          Εάν υπάρχει πρόβλημα επικοινωνήστε μαζί μας στο contact@doulitsa.gr και θα σας βοηθήσουμε άμεσα.
+        </p>
       </div>
     );
   }

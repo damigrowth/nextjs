@@ -30,7 +30,14 @@ export default function ServiceCardFile({ file, path, width, height }) {
               height={height || 245}
               width={width || 329}
               className="w-100 h-100 object-fit-cover"
-              src={getBestDimensions(file.formats).url}
+              src={
+                (() => {
+                  const formatResult = getBestDimensions(file.formats);
+                  return formatResult && formatResult.url
+                    ? formatResult.url
+                    : fallbackImage;
+                })()
+              }
               alt="service-thumbnail"
             />
           ) : (

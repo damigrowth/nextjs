@@ -154,11 +154,18 @@ export default function SearchSelect({
           .filter((item) => item.value !== "" && item.value !== "default")
           .map((item) => item.value)
           .join(",");
-        // Using encodeURI instead of the default URL encoding
-        params.set(paramOptionName, values);
+        
+        if (values.length === 0) {
+          // Εάν τελικά δεν υπάρχουν έγκυρες τιμές, διαγράφουμε το parameter
+          params.delete(paramOptionName);
+        } else {
+          // Χρήση encodeURI αντί για το προεπιλεγμένο URL encoding
+          params.set(paramOptionName, values);
+        }
       }
+      
       params.set(paramPageName, "1");
-      // Construct the URL manually to preserve commas
+      // Κατασκευή του URL χειροκίνητα για να διατηρηθούν τα κόμματα
       const queryString = params.toString().replace(/%2C/g, ",");
       router.push(`${pathname}?${queryString}`, { scroll: false });
     });
@@ -289,6 +296,11 @@ export default function SearchSelect({
             placeholder={rootLabel}
             onMenuScrollToBottom={loadMore}
             onMenuClose={() => {
+              if (selectedOptions.length > 0) {
+                multiSelectHandler(selectedOptions);
+              }
+            }}
+            onBlur={() => {
               if (selectedOptions.length > 0) {
                 multiSelectHandler(selectedOptions);
               }

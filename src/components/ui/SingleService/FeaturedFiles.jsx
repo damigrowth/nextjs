@@ -50,9 +50,25 @@ export default function FeaturedFiles({ files, title, border }) {
               >
                 {galleryFiles.map(({ formats, url }, i) => {
                   if (formats) {
-                    const imageWidth = getBestDimensions(formats).width;
-                    const imageHeight = getBestDimensions(formats).height;
-                    const imageUrl = getBestDimensions(formats).url;
+                    const formatResult = getBestDimensions(formats);
+                    
+                    if (!formatResult) {
+                      return (
+                        <SwiperSlide key={i}>
+                          <Image
+                            src="/images/fallback/service.png"
+                            alt={`gallery-image-${i}`}
+                            width={800}
+                            height={600}
+                            className="big-slide-image"
+                          />
+                        </SwiperSlide>
+                      );
+                    }
+                    
+                    const imageWidth = formatResult.width;
+                    const imageHeight = formatResult.height;
+                    const imageUrl = formatResult.url;
 
                     return (
                       <SwiperSlide key={i}>
