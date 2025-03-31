@@ -16,7 +16,7 @@ export default function AuthTypeOptions() {
     return (
       <div className="mb20-lg mb30">
         <button
-          className="ud-btn btn-thm2 add-joining mr20"
+          className="ud-btn btn-thm2 add-joining mr20 mb25"
           type="button"
           onClick={() => setAuthType(1)}
         >
