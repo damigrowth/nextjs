@@ -81,44 +81,97 @@ export async function completeRegistration(prevState, formData) {
 
   const { jwt, user } = confirmationResult.data.emailConfirmation;
   const userId = user.id;
+  
+  // Προσπάθησε να ανακτήσεις τα δεδομένα από cookies (για συμβατότητα με παλιούς browsers)
+  let registrationData = {};
+  try {
+    const cookieData = (await cookies()).get("registration_data")?.value;
+    if (cookieData) {
+      registrationData = JSON.parse(cookieData || "{}");
+    }
+  } catch (e) {
+    // Σε περίπτωση που δεν υπάρχουν cookies, συνεχίζουμε με τις πληροφορίες από το API
+    console.error("Error reading cookies:", e);
+  }
 
-  // Δημιουργία προφίλ απλού χρήστη (Freelancer τύπου 3)
-  const freelancer = await postData(
-    CREATE_FREELANCER,
-    {
-      data: {
-        user: userId,
-        username: user.username,
-        email: user.email,
-        displayName: user.username,
-        type: "3",
-        publishedAt: new Date().toISOString(),
+  // Χρησιμοποίησε δεδομένα από cookies αν υπάρχουν, διαφορετικά χρησιμοποίησε τα δεδομένα από το API
+  const userType = registrationData.type || (user.type ? Number(user.type) : 1);
+  const userRole = registrationData.role || (user.role?.id ? Number(user.role.id) : 1);
+  const displayName = registrationData.displayName || user.displayName || user.username;
+  const userConsent = registrationData.consent || user.consent || true;
+  
+  // Create freelancer profile based on type
+  if (userType === 1) {
+    // Regular User type
+    const freelancer = await postData(
+      CREATE_FREELANCER,
+      {
+        data: {
+          user: userId,
+          username: user.username,
+          email: user.email,
+          displayName: user.username,
+          type: "3",
+          publishedAt: new Date().toISOString(),
+        },
       },
-    },
-    jwt
-  );
+      jwt
+    );
 
-  const freelancerId = freelancer.data?.createFreelancer?.data?.id;
+    const freelancerId = freelancer.data?.createFreelancer?.data?.id;
 
-  // Ενημέρωση του χρήστη με το προφίλ freelancer
-  await postData(
-    UPDATE_USER,
-    {
-      id: userId,
-      roleId: "1", // Βασικός ρόλος χρήστη
-      freelancer: freelancerId,
-      username: user.username,
-      displayName: user.username,
-      consent: true,
-    },
-    jwt
-  );
+    await postData(
+      UPDATE_USER,
+      {
+        id: userId,
+        roleId: "1",
+        freelancer: freelancerId,
+        username: user.username,
+        displayName: user.username,
+        consent: userConsent,
+      },
+      jwt
+    );
+  } else {
+    // Freelancer User type
+    const freelancerType = userRole === 4 ? 1 : 2;
 
-  // Καθαρισμός των cookies (για συμβατότητα)
+    const freelancer = await postData(
+      CREATE_FREELANCER,
+      {
+        data: {
+          user: userId,
+          username: user.username,
+          email: user.email,
+          displayName: displayName,
+          type: freelancerType.toString(),
+          publishedAt: new Date().toISOString(),
+        },
+      },
+      jwt
+    );
+
+    const freelancerId = freelancer.data?.createFreelancer?.data?.id;
+
+    await postData(
+      UPDATE_USER,
+      {
+        id: userId,
+        roleId: userRole.toString(),
+        freelancer: freelancerId,
+        username: user.username,
+        displayName: displayName,
+        consent: userConsent,
+      },
+      jwt
+    );
+  }
+
+  // Προσπάθησε να καθαρίσεις τα cookies (για συμβατότητα)
   try {
     (await cookies()).delete("registration_data");
   } catch (e) {
-    // Αγνόηση σφαλμάτων cookies
+    // Αγνόησε τυχόν σφάλματα cookies
   }
 
   await setToken(jwt);

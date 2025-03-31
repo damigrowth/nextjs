@@ -325,9 +325,14 @@ const EMAIL_CONFIRMATION = gql`
         id
         email
         username
+        displayName
         role {
           id
+          name
+          type
         }
+        type
+        consent
       }
     }
   }
