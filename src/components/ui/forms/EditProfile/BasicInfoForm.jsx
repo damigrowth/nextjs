@@ -519,7 +519,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           </div>
           <div className="d-flex align-items-center">
             <span className="me-2" style={{ color: '#6c757d' }}>•</span>
-            <span>Τρόποι παροχής των Υπηρεσιών</span>
+            <span>Τρόποι παροχής των Υπηρεσιών (τουλάχιστον μία επιλογή)</span>
           </div>
         </div>
         <label className="form-label fw500 dark-color">Εικόνα Προφίλ*</label>

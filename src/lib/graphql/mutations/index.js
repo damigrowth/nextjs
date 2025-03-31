@@ -150,9 +150,6 @@ const REGISTER_USER = gql`
         id
         username
         email
-        pendingType
-        pendingRole
-        pendingDisplayName
       }
     }
   }
@@ -328,9 +325,6 @@ const EMAIL_CONFIRMATION = gql`
         id
         email
         username
-        pendingType
-        pendingRole
-        pendingDisplayName
         role {
           id
         }
