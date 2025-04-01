@@ -139,7 +139,6 @@ export default function FeaturedFiles({ files, title, border }) {
           </Swiper>
         )}
       </div>
-      {border && <hr className="opacity-100 mb60 mt60" />}
     </>
   );
 }

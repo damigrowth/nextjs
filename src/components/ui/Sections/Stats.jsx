@@ -4,7 +4,7 @@ import Counter from "../Counters/Counter";
 export default function Stats() {
   return (
     <>
-      <section className="bgc-thm3">
+      <section className="bggreenorange">
         <div className="container">
           <div className="row align-items-md-center">
             <div

@@ -4,14 +4,14 @@ import ServicesList from "./ServicesList";
 
 export default function FeaturedServices({ categories, services, fid }) {
   return (
-    <section className={`pt-0 pb100`}>
+    <section className={`pt-0 pb100 pt100 bgorange`}>
       <div className="container">
         <div className="row align-items-center wow fadeInUp">
           <div className="col-xl-3">
             <div className="main-title mb30-lg">
               <h2 className="title">Δημοφιλείς Υπηρεσίες</h2>
               <p className="paragraph">
-                Δες τις υπηρεσίες με τη μεγαλύτερη ζήτηση
+                Οι υπηρεσίες με τη μεγαλύτερη ζήτηση.
               </p>
             </div>
           </div>

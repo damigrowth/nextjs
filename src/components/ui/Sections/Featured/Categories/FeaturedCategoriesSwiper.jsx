@@ -45,7 +45,7 @@ export default function FeaturedCategoriesSwiper({ categories }) {
               {categories.map((item, index) => (
                 <SwiperSlide key={index}>
                   <div className="item">
-                    <div className="iconbox-style1 bdr1">
+                    <div className="iconbox-style1 bdr1 default-box-shadow3">
                       <Link href={`/categories/${item.attributes.slug}`}>
                         <div className="icon">
                           <span className={item.attributes.icon}></span>

@@ -84,4 +84,143 @@ const TAGS_SEARCH_COMPLETE = gql`
   ${PAGINATION}
 `;
 
-export { TAGS_SEARCH, TAGS_SEARCH_SIMPLE, TAGS_SEARCH_COMPLETE };
+const TAGS_FOR_FILTERED_SERVICES = gql`
+  query TagsForFilteredServices(
+    $search: String
+    $min: Int
+    $max: Int
+    $time: Int
+    $verified: Boolean
+    $tagsPage: Int
+    $tagsPageSize: Int
+    $label: String
+    $slugs: [String!]
+  ) {
+    tagsForFilteredResults: tags(
+      filters: {
+        label: { containsi: $label }
+        services: {
+          and: [
+            {
+              or: [
+                { title_normalized: { containsi: $search } }
+                { description_normalized: { containsi: $search } }
+                { category: { label_normalized: { containsi: $search } } }
+                { subcategory: { label_normalized: { containsi: $search } } }
+                { subdivision: { label_normalized: { containsi: $search } } }
+                { tags: { label_normalized: { containsi: $search } } }
+              ]
+            },
+            { price: { gte: $min, lte: $max } },
+            { time: { lte: $time } },
+            { freelancer: { id: { notNull: true } } },
+            { status: { type: { eq: "Active" } } },
+            { freelancer: { verified: { eq: $verified } } }
+          ]
+        }
+      }
+      pagination: { page: $tagsPage, pageSize: $tagsPageSize }
+      sort: "label:asc"
+    ) {
+      data {
+        ...Tag
+      }
+      meta {
+        ...Pagination
+      }
+    }
+    tagsBySlug: tags(
+      filters: {
+        slug: { in: $slugs }
+        services: { id: { not: { null: true } } }
+      }
+    ) {
+      data {
+        ...Tag
+      }
+    }
+  }
+  ${PAGINATION}
+  ${TAG}
+`;
+
+const TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY = gql`
+  query TagsForFilteredServicesWithCategory(
+    $search: String
+    $min: Int
+    $max: Int
+    $time: Int
+    $cat: String!
+    $verified: Boolean
+    $tagsPage: Int
+    $tagsPageSize: Int
+    $label: String
+    $slugs: [String!]
+  ) {
+    tagsForFilteredResults: tags(
+      filters: {
+        label: { containsi: $label }
+        services: {
+          and: [
+            {
+              or: [
+                { title_normalized: { containsi: $search } }
+                { description_normalized: { containsi: $search } }
+                { category: { label_normalized: { containsi: $search } } }
+                { subcategory: { label_normalized: { containsi: $search } } }
+                { subdivision: { label_normalized: { containsi: $search } } }
+                { tags: { label_normalized: { containsi: $search } } }
+              ]
+            },
+            { price: { gte: $min, lte: $max } },
+            { time: { lte: $time } },
+            { freelancer: { id: { notNull: true } } },
+            { status: { type: { eq: "Active" } } },
+            { freelancer: { verified: { eq: $verified } } },
+            {
+              or: [
+                { category: { slug: { eq: $cat } } },
+                { subcategory: { slug: { eq: $cat } } },
+                { subdivision: { slug: { eq: $cat } } }
+              ]
+            }
+          ]
+        }
+      }
+      pagination: { page: $tagsPage, pageSize: $tagsPageSize }
+      sort: "label:asc"
+    ) {
+      data {
+        ...Tag
+      }
+      meta {
+        ...Pagination
+      }
+    }
+    tagsBySlug: tags(
+      filters: {
+        slug: { in: $slugs }
+        services: {
+          and: [
+            { id: { notNull: true } },
+            {
+              or: [
+                { category: { slug: { eq: $cat } } },
+                { subcategory: { slug: { eq: $cat } } },
+                { subdivision: { slug: { eq: $cat } } }
+              ]
+            }
+          ]
+        }
+      }
+    ) {
+      data {
+        ...Tag
+      }
+    }
+  }
+  ${PAGINATION}
+  ${TAG}
+`;
+
+export { TAGS_SEARCH, TAGS_SEARCH_SIMPLE, TAGS_SEARCH_COMPLETE, TAGS_FOR_FILTERED_SERVICES, TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY };

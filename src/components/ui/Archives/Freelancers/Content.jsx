@@ -4,10 +4,15 @@ import FreelancerGrid from "./FreelancerGrid";
 import Pagination from "../Pagination";
 import { freelancerSortOptions } from "../options";
 import { getData } from "@/lib/client/operations";
-import { FREELANCERS_ARCHIVE } from "@/lib/graphql/queries/main/freelancer";
+import { FREELANCERS_ARCHIVE, FREELANCERS_ARCHIVE_WITH_SKILLS } from "@/lib/graphql/queries/main/freelancer";
 
 export default async function Content({ paramsFilters, taxonomies }) {
-  const { freelancers } = await getData(FREELANCERS_ARCHIVE, paramsFilters);
+  // Επιλογή του κατάλληλου query ανάλογα με το αν έχουν επιλεγεί skills
+  const query = paramsFilters.skills && paramsFilters.skills.length > 0
+    ? FREELANCERS_ARCHIVE_WITH_SKILLS
+    : FREELANCERS_ARCHIVE;
+
+  const { freelancers } = await getData(query, paramsFilters);
 
   return (
     <>

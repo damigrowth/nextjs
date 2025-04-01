@@ -8,8 +8,12 @@ import {
   FREELANCER_CATEGORIES,
   FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
   FREELANCER_TAXONOMIES_BY_SLUG,
+  FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import { SKILLS_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer/skill";
+import { 
+  SKILLS_SEARCH, 
+  SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY 
+} from "@/lib/graphql/queries/main/taxonomies/freelancer/skill";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 
 export const dynamic = "force-dynamic";
@@ -114,6 +118,25 @@ export default async function page({ params, searchParams }) {
   let coverageCountySearch = covc_s ? covc_s : undefined;
   let skillsSearch = skills_s ? skills_s : undefined;
 
+  // Fetch subcategories based on filtered freelancers
+  const { subcategoriesForFilteredResults } = await getData(FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS, {
+    min: paramsFilters.min,
+    max: paramsFilters.max,
+    paymentMethods: paramsFilters.paymentMethods,
+    contactTypes: paramsFilters.contactTypes,
+    coverageOnline: paramsFilters.coverageOnline,
+    coverageCounty: paramsFilters.coverageCounty,
+    type: paramsFilters.type,
+    categorySlug: category,
+    skills: paramsFilters.skills,
+    experience: paramsFilters.experience,
+    top: paramsFilters.top,
+    verified: paramsFilters.verified,
+    subcategoriesPage: paramsFilters.subcategoriesPage,
+    subcategoriesPageSize: paramsFilters.subcategoriesPageSize,
+  });
+
+  // Fallback to old query for search functionality only
   const { subcategoriesSearch } = await getData(
     FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
     {
@@ -131,17 +154,34 @@ export default async function page({ params, searchParams }) {
     coverageCountyPageSize: paramsFilters.coverageCountyPageSize,
   });
 
-  const { skillsBySearch, skillsBySlug } = await getData(
-    SKILLS_SEARCH,
-    {
+  // Fetch skills based on filtered freelancers with category filter
+  const { skillsForFilteredResults, skillsBySlug } = await getData(SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY, {
+    min: paramsFilters.min,
+    max: paramsFilters.max,
+    paymentMethods: paramsFilters.paymentMethods,
+    contactTypes: paramsFilters.contactTypes,
+    coverageOnline: paramsFilters.coverageOnline,
+    coverageCounty: paramsFilters.coverageCounty,
+    type: paramsFilters.type,
+    cat: category,
+    experience: paramsFilters.experience,
+    top: paramsFilters.top,
+    verified: paramsFilters.verified,
+    label: skillsSearch || "",
+    skillsPage: paramsFilters.skillsPage,
+    skillsPageSize: paramsFilters.skillsPageSize,
+    slugs: paramsFilters.skills || [],
+  }, "skills");
+
+  // Fallback to old query for search functionality only
+  const { skillsBySearch: oldSkillsBySearch } = skillsSearch ? 
+    await getData(SKILLS_SEARCH, {
       label: skillsSearch,
       category: category,
       skillsPage: paramsFilters.skillsPage,
       skillsPageSize: paramsFilters.skillsPageSize,
       slugs: paramsFilters.skills,
-    },
-    "skills"
-  );
+    }, "skills") : { skillsBySearch: { data: [], meta: { pagination: {} } } };
 
   const selectData = {
     option: ["subc", "covc"],
@@ -149,14 +189,17 @@ export default async function page({ params, searchParams }) {
     page: ["subc_p", "covc_p"],
     pageSize: ["subc_ps", "covc_ps"],
     disabled: "cov_o",
-    options: [subcategoriesSearch?.data, counties?.data],
+    options: [
+      subcategorySearch ? subcategoriesSearch?.data : subcategoriesForFilteredResults?.data, 
+      counties?.data
+    ],
     pagination: [
-      subcategoriesSearch?.meta?.pagination,
+      subcategorySearch ? subcategoriesSearch?.meta?.pagination : subcategoriesForFilteredResults?.meta?.pagination,
       counties?.meta?.pagination,
     ],
     rootLabel: ["Όλες οι κατηγορίες", "Όλες οι περιοχές"],
     defaultLabel: [
-      `${taxonomies.current ? taxonomies.current : "Όλες οι κατηγορίες"}`,
+      "Όλες οι κατηγορίες",
       "Όλες οι περιοχές",
     ],
   };
@@ -171,12 +214,15 @@ export default async function page({ params, searchParams }) {
     // Combine both results and remove duplicates by slug
     options: [
       ...new Map(
-        [...(skillsBySearch?.data || []), ...(skillsBySlug?.data || [])].map(
+        [
+          ...(skillsSearch ? oldSkillsBySearch?.data || [] : skillsForFilteredResults?.data || []), 
+          ...(skillsBySlug?.data || [])
+        ].map(
           (item) => [item.attributes.slug, item]
         )
       ).values(),
     ],
-    pagination: skillsBySearch?.meta?.pagination,
+    pagination: skillsSearch ? oldSkillsBySearch?.meta?.pagination : skillsForFilteredResults?.meta?.pagination,
   };
 
   // inspect(freelancerCategories);
@@ -197,7 +243,7 @@ export default async function page({ params, searchParams }) {
       />
       <FreelancersArchive
         taxonomies={taxonomies}
-        categories={subcategoriesSearch?.data}
+        categories={subcategorySearch ? subcategoriesSearch?.data : subcategoriesForFilteredResults?.data}
         counties={counties?.data}
         searchParams={allSearchParams}
         paramsFilters={paramsFilters}

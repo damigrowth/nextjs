@@ -125,7 +125,7 @@ export default async function SingleService({
         <div className="row wrap service-wrapper">
           <div className="col-lg-8">
             <div className="column">
-              <div className="row  px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
+              <div className="row px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
                 <Meta
                   title={title}
                   firstName={firstName}
@@ -173,18 +173,58 @@ export default async function SingleService({
                 {addons?.length > 0 && (
                   <Addons addons={addons} price={price} username={username} />
                 )}
+
+                {/* Mobile Sidebar Content */}
+                <div className="d-lg-none">
+                  <div className="blog-sidebar column">
+                    {fixed ? (
+                      <OrderFixed price={price} addons={addons} username={username} />
+                    ) : (
+                      <OrderPackages
+                        packages={packages}
+                        addons={addons}
+                        serviceId={serviceId}
+                        freelancerId={freelancerId}
+                        userId={userId}
+                        username={username}
+                      />
+                    )}
+                    <ContactDetails
+                      firstName={firstName}
+                      lastName={lastName}
+                      displayName={displayName}
+                      username={username}
+                      tagline={tagline}
+                      topLevel={topLevel}
+                      verified={verified}
+                      base={base}
+                      rate={rate}
+                      image={image?.data?.attributes?.formats?.thumbnail?.url}
+                      rating={freelancerRating}
+                      totalReviews={freelancerReviewsTotal}
+                      socials={socials}
+                      email={visibility?.data?.attributes?.email && email}
+                      phone={visibility?.data?.attributes?.phone && phone}
+                      website={website}
+                      type={freelancerType}
+                      category={freelancerSubcategory}
+                      commencement={commencement}
+                    />
+                  </div>
+                </div>
+
                 {faq?.length > 0 && <Faq faq={faq} />}
                 <Terms heading="Όροι Συνεργασίας" text={terms} />
-                {/* <hr className="opacity-100 mb15" /> */}
                 <Reviews
                   reviews={reviews}
-                  rating={rating}
-                  reviews_total={reviews_total}
+                  rating={freelancerRating}
+                  reviews_total={freelancerReviewsTotal}
                   rating_global={rating_global.data}
                   reviewsMeta={reviewsMeta}
                   reviewsPage={reviewsPage}
                   ratingStars={ratingStars}
                   otherServicesReviews={otherServicesReviews}
+                  isServicePage={true}
                 />
                 <Protected message="Κάνε σύνδεση για να αξιολογήσεις την υπηρεσία.">
                   {fid !== freelancerId && (

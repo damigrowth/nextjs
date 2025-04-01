@@ -7,8 +7,12 @@ import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
 import {
   FREELANCER_CATEGORIES,
   FREELANCER_CATEGORIES_SEARCH_FILTERED,
+  FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import { SKILLS_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer/skill";
+import {
+  SKILLS_SEARCH,
+  SKILLS_FOR_FILTERED_FREELANCERS
+} from "@/lib/graphql/queries/main/taxonomies/freelancer/skill";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 
 export const dynamic = "force-dynamic";
@@ -78,7 +82,7 @@ export default async function page({ params, searchParams }) {
     max: addFilter(max, parseInt(max, 10)),
     paymentMethods: addFilter(pay_m && pay_m.length > 0, toIntArray(pay_m)),
     contactTypes: addFilter(con_t && con_t.length > 0, toIntArray(con_t)),
-    cat: category,
+    cat: addFilter(cat, cat),
     experience: addFilter(exp, parseInt(exp, 10)),
     top: addFilter(top === "", true),
     verified: addFilter(ver === "", true),
@@ -99,14 +103,29 @@ export default async function page({ params, searchParams }) {
   let coverageCountySearch = covc_s ? covc_s : undefined;
   let skillsSearch = skills_s ? skills_s : undefined;
 
-  const { categoriesSearch } = await getData(
-    FREELANCER_CATEGORIES_SEARCH_FILTERED,
-    {
-      searchTerm: categorySearch,
-      categoriesPage: paramsFilters.categoriesPage,
-      categoriesPageSize: paramsFilters.categoriesPageSize,
-    }
-  );
+  // Fetch categories based on filtered freelancers
+  const { categoriesForFilteredResults } = await getData(FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS, {
+    min: paramsFilters.min,
+    max: paramsFilters.max,
+    paymentMethods: paramsFilters.paymentMethods,
+    contactTypes: paramsFilters.contactTypes,
+    coverageOnline: paramsFilters.coverageOnline,
+    coverageCounty: paramsFilters.coverageCounty,
+    type: paramsFilters.type,
+    skills: paramsFilters.skills,
+    experience: paramsFilters.experience,
+    top: paramsFilters.top,
+    verified: paramsFilters.verified,
+    categoriesPage: paramsFilters.categoriesPage,
+    categoriesPageSize: paramsFilters.categoriesPageSize,
+  });
+
+  // Fallback to old query for search functionality only
+  const { categoriesSearch } = await getData(FREELANCER_CATEGORIES_SEARCH_FILTERED, {
+    searchTerm: categorySearch,
+    categoriesPage: paramsFilters.categoriesPage,
+    categoriesPageSize: paramsFilters.categoriesPageSize,
+  });
 
   const { counties } = await getData(COUNTIES_SEARCH, {
     name: coverageCountySearch,
@@ -114,17 +133,36 @@ export default async function page({ params, searchParams }) {
     coverageCountyPageSize: paramsFilters.coverageCountyPageSize,
   });
 
-  const { skillsBySearch, skillsBySlug } = await getData(
-    SKILLS_SEARCH,
+  // Fetch skills based on filtered freelancers
+  const { skillsForFilteredResults, skillsBySlug } = await getData(
+    SKILLS_FOR_FILTERED_FREELANCERS,
     {
-      label: skillsSearch,
-      category: category,
+      min: paramsFilters.min,
+      max: paramsFilters.max,
+      paymentMethods: paramsFilters.paymentMethods,
+      contactTypes: paramsFilters.contactTypes,
+      coverageOnline: paramsFilters.coverageOnline,
+      coverageCounty: paramsFilters.coverageCounty,
+      type: paramsFilters.type,
+      experience: paramsFilters.experience,
+      top: paramsFilters.top,
+      verified: paramsFilters.verified,
+      label: skillsSearch || "",
       skillsPage: paramsFilters.skillsPage,
       skillsPageSize: paramsFilters.skillsPageSize,
-      slugs: paramsFilters.skills,
+      slugs: paramsFilters.skills || [],
     },
     "skills"
   );
+
+  // Fallback to old query for search functionality only
+  const { skillsBySearch: oldSkillsBySearch } = skillsSearch ? 
+    await getData(SKILLS_SEARCH, {
+      label: skillsSearch,
+      skillsPage: paramsFilters.skillsPage,
+      skillsPageSize: paramsFilters.skillsPageSize,
+      slugs: paramsFilters.skills,
+    }, "skills") : { skillsBySearch: { data: [], meta: { pagination: {} } } };
 
   const selectData = {
     option: ["cat", "covc"],
@@ -132,14 +170,17 @@ export default async function page({ params, searchParams }) {
     page: ["cat_p", "covc_p"],
     pageSize: ["cat_ps", "covc_ps"],
     disabled: "cov_o",
-    options: [categoriesSearch?.data, counties?.data],
+    options: [
+      categorySearch ? categoriesSearch?.data : categoriesForFilteredResults?.data, 
+      counties?.data
+    ],
     pagination: [
-      categoriesSearch?.meta?.pagination,
-      counties?.meta?.pagination,
+      categorySearch ? categoriesSearch?.meta?.pagination : categoriesForFilteredResults?.meta?.pagination,
+      counties?.meta?.pagination
     ],
     rootLabel: ["Όλες οι κατηγορίες", "Όλες οι περιοχές"],
     defaultLabel: [
-      `${taxonomies.current ? taxonomies.current : "Όλες οι κατηγορίες"}`,
+      "Όλες οι κατηγορίες",
       "Όλες οι περιοχές",
     ],
   };
@@ -154,12 +195,15 @@ export default async function page({ params, searchParams }) {
     // Combine both results and remove duplicates by slug
     options: [
       ...new Map(
-        [...(skillsBySearch?.data || []), ...(skillsBySlug?.data || [])].map(
+        [
+          ...(skillsSearch ? oldSkillsBySearch?.data || [] : skillsForFilteredResults?.data || []), 
+          ...(skillsBySlug?.data || [])
+        ].map(
           (item) => [item.attributes.slug, item]
         )
       ).values(),
     ],
-    pagination: skillsBySearch?.meta?.pagination,
+    pagination: skillsSearch ? oldSkillsBySearch?.meta?.pagination : skillsForFilteredResults?.meta?.pagination,
   };
 
   return (
@@ -168,15 +212,14 @@ export default async function page({ params, searchParams }) {
       <Breadcrumb
         parentPathLabel="Επιχειρήσεις"
         parentPathLink="companies"
-        plural
       />
       <Banner
-        heading="Ανακάλυψε Επιχειρήσεις"
-        description="Εντόπισε την επιχείρηση που χρειάζεσαι. Βρες τις καλύτερες επιχειρήσεις"
+        heading="Όλες οι Επιχειρήσεις"
+        description="Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές."
       />
       <FreelancersArchive
         taxonomies={taxonomies}
-        categories={categoriesSearch?.data}
+        categories={categorySearch ? categoriesSearch?.data : categoriesForFilteredResults?.data}
         counties={counties?.data}
         searchParams={allSearchParams}
         paramsFilters={paramsFilters}

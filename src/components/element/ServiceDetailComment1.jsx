@@ -11,7 +11,7 @@ export default function ServiceDetailComment1() {
   };
   return (
     <>
-      <div className="bsp_reveiw_wrt mb20">
+      <div className="bsp_reveiw_wrt p30 mt40 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
         <h6 className="fz17">Προσθήκη Αξιολόγησης</h6>
         <p className="text">
           Δεν θα δημοσιευθεί το email σας, μόνο το username.

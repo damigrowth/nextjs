@@ -7,7 +7,7 @@ export default function Socials() {
         href="https://www.linkedin.com/company/doulitsa"
         className="fz18 text-white"
         target="_blank"
-        rel="noopener noreferrer"
+        rel="noopener"
       >
         <i className="fab fa-linkedin-in list-inline-item" />
       </a>

@@ -4,11 +4,16 @@ import { serviceSortOptions } from "../options";
 import Pagination from "../Pagination";
 import { getData } from "@/lib/client/operations";
 import ServiceGrid from "./ServiceGrid";
-import { SERVICES_ARCHIVE } from "@/lib/graphql/queries/main/service";
+import { SERVICES_ARCHIVE, SERVICES_ARCHIVE_WITH_TAGS } from "@/lib/graphql/queries/main/service";
 import { getFreelancerId } from "@/lib/users/freelancer";
 
 export default async function Content({ paramsFilters, taxonomies }) {
-  const { services } = await getData(SERVICES_ARCHIVE, paramsFilters);
+  // Επιλογή του κατάλληλου query ανάλογα με το αν έχουν επιλεγεί tags
+  const query = paramsFilters.tags && paramsFilters.tags.length > 0 
+    ? SERVICES_ARCHIVE_WITH_TAGS 
+    : SERVICES_ARCHIVE;
+
+  const { services } = await getData(query, paramsFilters);
 
   const fid = await getFreelancerId();
 

@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 
 export default function Info({
   rate,
@@ -11,11 +13,32 @@ export default function Info({
 }) {
   // console.log(coverage);
   const formattedWebsite = website ? website.replace(/^https?:\/\//, "") : null;
+  const [showPhone, setShowPhone] = useState(false);
+  const [showEmail, setShowEmail] = useState(false);
 
   const covers = [];
   if (coverage?.online) covers.push("Online");
   if (coverage?.onbase) covers.push("Στην έδρα");
   if (coverage?.onsite) covers.push("Στον χώρο σας");
+  
+  // Συνάρτηση για tracking των κλικ στο Google Analytics
+  const trackContactReveal = (contactType) => {
+    // Έλεγχος αν το window και το gtag υπάρχουν (client-side)
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'reveal_contact', {
+        'event_category': 'Contact',
+        'event_label': contactType,
+        'value': 1
+      });
+    }
+    
+    // Ενημερώνουμε το state ανάλογα με τον τύπο επικοινωνίας
+    if (contactType === 'phone') {
+      setShowPhone(true);
+    } else if (contactType === 'email') {
+      setShowEmail(true);
+    }
+  };
 
   return (
     <>
@@ -67,7 +90,7 @@ export default function Info({
                 <i className="flaticon-website text-thm2 pe-2 vam" />
                 <span className="list-item-title">Ιστοσελίδα</span>
               </span>
-              <a href={website} target="_blank" rel="noopener noreferrer">
+              <a href={website} target="_blank" rel="noopener">
                 {formattedWebsite}
               </a>
             </div>
@@ -78,7 +101,19 @@ export default function Info({
                 <i className="flaticon-call text-thm2 pe-2 vam" />
                 <span className="list-item-title">Τηλέφωνο</span>
               </span>
-              <a href={`tel:${phone}`}>{phone}</a>
+              {showPhone ? (
+                <a href={`tel:${phone}`}>{phone}</a>
+              ) : (
+                <button 
+                  onClick={() => trackContactReveal('phone')} 
+                  style={{ color: "#198754", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                  id="show-phone-btn"
+                >
+                  Προβολή
+                </button>
+              )}
+              {/* Κρυφό link για SEO */}
+              <a href={`tel:${phone}`} style={{ display: 'none' }}>{phone}</a>
             </div>
           )}
           {email && (
@@ -87,7 +122,19 @@ export default function Info({
                 <i className="flaticon-mail text-thm2 pe-2 vam" />
                 <span className="list-item-title">Email</span>
               </span>
-              <a href={`mailto:${email}`}>{email}</a>
+              {showEmail ? (
+                <a href={`mailto:${email}`}>{email}</a>
+              ) : (
+                <button 
+                  onClick={() => trackContactReveal('email')} 
+                  style={{ color: "#198754", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                  id="show-email-btn"
+                >
+                  Προβολή
+                </button>
+              )}
+              {/* Κρυφό link για SEO */}
+              <a href={`mailto:${email}`} style={{ display: 'none' }}>{email}</a>
             </div>
           )}
         </div>

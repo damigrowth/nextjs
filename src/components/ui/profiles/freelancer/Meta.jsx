@@ -60,7 +60,7 @@ export default function Meta({
                   <h1 className="heading-h5 title m0 p0 pr5">{displayName}</h1>
                   <VerifiedBadge verified={verified} />
                 </div>
-                <h2 className="heading-p mb-0">{tagline}</h2>
+                <h2 className="heading-p mb-0 taglinec">{tagline}</h2>
                 {totalReviews > 0 && (
                   <Rating totalReviews={totalReviews} rating={rating} clickable={true} />
                 )}

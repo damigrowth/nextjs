@@ -104,7 +104,7 @@ export default function AddModelReviewForm({ type, serviceId, freelancerId }) {
       {reviewId ? (
         <ReviewSuccess id={reviewId} />
       ) : (
-        <div className="bsp_reveiw_wrt mb20">
+        <div className="bsp_reveiw_wrt p30 mt40 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
           <form action={handleSubmit} className="comments_form mt30 mb30-md">
             <h6 className="fz17">Προσθήκη	 Αξιολόγησης</h6>
             {type === "freelancer" && (

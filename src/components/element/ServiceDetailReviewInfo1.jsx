@@ -113,7 +113,7 @@ export default function ServiceDetailReviewInfo1({
                 <h4>{reviews.length} Αξιολογήσεις</h4>
               </div>
               <div className="d-md-flex align-items-center mb30">
-                <div className="total-review-box d-flex align-items-center text-center mb30-sm">
+                <div className="total-review-box-service d-flex align-items-center text-center mb30-sm">
                   <ReviewStatsForm
                     reviews={reviews}
                     ratings={ratings}
