@@ -11,7 +11,7 @@ export default function ReviewStatsService({
       <div className="total_review mb30 mt45">
         <h4>
           {reviews_total > 1
-            ? reviews_total + " " + "Αξιολογήσεις"
+            ? reviews_total + " " + "Συνολικές Αξιολογήσεις"
             : reviews_total + " " + "Αξιολόγηση"}{" "}
         </h4>
       </div>

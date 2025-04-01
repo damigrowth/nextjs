@@ -1444,12 +1444,6 @@ a {
   opacity: 0.5;
 }
 
-@media (max-width: 992px) {
-  .nav-pills {
-    width: 80%;
-    float: right;
-  }
-}
 @media (max-width: 767px) {
   .heading-h2 {
     font-size: 1.3em;

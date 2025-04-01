@@ -3,13 +3,13 @@ import { featuresData } from "../data";
 
 export default function Features() {
   return (
-    <section className="our-features pb40 pb30-md pt40 mb50 bgorange">
+    <section className="our-features pb40 pb30-md pt40 bgc-dark">
       <div className="container wow fadeInUp">
         <div className="row">
           <div className="col-lg-12">
             <div className="main-title text-center">
-              <h2>Ψάχνεις κάποια υπηρεσία;</h2>
-              <h3 className="heading-p">
+              <h2 style={{ color: "#5bbb7b" }}>Ψάχνεις κάποια υπηρεσία;</h2>
+              <h3 className="heading-p" style={{ color: "#ffffff" }}>
                 Βρες Επαγγελματίες και Υπηρεσίες που Ταιριάζουν στις Ανάγκες
                 σου.
               </h3>
@@ -24,9 +24,9 @@ export default function Features() {
                   <span className={feature.iconClass}></span>
                 </div>
                 <div className="details textpad">
-                  <h4 className="title mt10 mb-3">{feature.title}</h4>
+                  <h4 className="title mt10 mb-3" style={{ color: "#5bbb7b" }}>{feature.title}</h4>
                   <p
-                    className="text"
+                    style={{ color: "#ffffff" }}
                     dangerouslySetInnerHTML={{ __html: feature.description }}
                   ></p>
                 </div>

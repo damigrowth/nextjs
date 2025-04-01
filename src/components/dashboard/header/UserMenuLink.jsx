@@ -15,7 +15,7 @@ export default function UserMenuLink({ item }) {
       }`}
       href={item.path}
       target={isProfile ? "_blank" : undefined}
-      rel={isProfile ? "noopener noreferrer" : undefined}
+      rel={isProfile ? "noopener" : undefined}
     >
       <i className={`${item.icon} mr10`} />
       <span>{item.name}</span>

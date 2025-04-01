@@ -41,7 +41,7 @@ export default function Socials({ socials = {}, email, phone, website }) {
             }
             rel={
               social.data.url && social.data.url.startsWith("http")
-                ? "noopener noreferrer"
+                ? "noopener"
                 : undefined
             }
           >

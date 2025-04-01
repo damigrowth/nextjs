@@ -19,7 +19,7 @@ export default function FeaturedFreelancers({
           <div className="row align-items-center wow fadeInUp">
             <div className="col-lg-9">
               <div className="main-title">
-                <h2 className="title text-white">
+                <h2 className="title " style={{ color: "#5bbb7b" }}>
                   Πιο Δημοφιλείς Επαγγελματίες
                 </h2>
                 <p className="paragraph text-white">
