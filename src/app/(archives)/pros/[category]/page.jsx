@@ -8,6 +8,7 @@ import {
   FREELANCER_CATEGORIES,
   FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
   FREELANCER_TAXONOMIES_BY_SLUG,
+  FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import { 
   SKILLS_SEARCH, 
@@ -117,6 +118,25 @@ export default async function page({ params, searchParams }) {
   let coverageCountySearch = covc_s ? covc_s : undefined;
   let skillsSearch = skills_s ? skills_s : undefined;
 
+  // Fetch subcategories based on filtered freelancers
+  const { subcategoriesForFilteredResults } = await getData(FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS, {
+    min: paramsFilters.min,
+    max: paramsFilters.max,
+    paymentMethods: paramsFilters.paymentMethods,
+    contactTypes: paramsFilters.contactTypes,
+    coverageOnline: paramsFilters.coverageOnline,
+    coverageCounty: paramsFilters.coverageCounty,
+    type: paramsFilters.type,
+    categorySlug: category,
+    skills: paramsFilters.skills,
+    experience: paramsFilters.experience,
+    top: paramsFilters.top,
+    verified: paramsFilters.verified,
+    subcategoriesPage: paramsFilters.subcategoriesPage,
+    subcategoriesPageSize: paramsFilters.subcategoriesPageSize,
+  });
+
+  // Fallback to old query for search functionality only
   const { subcategoriesSearch } = await getData(
     FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
     {
@@ -169,14 +189,17 @@ export default async function page({ params, searchParams }) {
     page: ["subc_p", "covc_p"],
     pageSize: ["subc_ps", "covc_ps"],
     disabled: "cov_o",
-    options: [subcategoriesSearch?.data, counties?.data],
+    options: [
+      subcategorySearch ? subcategoriesSearch?.data : subcategoriesForFilteredResults?.data, 
+      counties?.data
+    ],
     pagination: [
-      subcategoriesSearch?.meta?.pagination,
+      subcategorySearch ? subcategoriesSearch?.meta?.pagination : subcategoriesForFilteredResults?.meta?.pagination,
       counties?.meta?.pagination,
     ],
     rootLabel: ["Όλες οι κατηγορίες", "Όλες οι περιοχές"],
     defaultLabel: [
-      `${taxonomies.current ? taxonomies.current : "Όλες οι κατηγορίες"}`,
+      "Όλες οι κατηγορίες",
       "Όλες οι περιοχές",
     ],
   };
@@ -220,7 +243,7 @@ export default async function page({ params, searchParams }) {
       />
       <FreelancersArchive
         taxonomies={taxonomies}
-        categories={subcategoriesSearch?.data}
+        categories={subcategorySearch ? subcategoriesSearch?.data : subcategoriesForFilteredResults?.data}
         counties={counties?.data}
         searchParams={allSearchParams}
         paramsFilters={paramsFilters}

@@ -326,6 +326,138 @@ const FREELANCER_PROFILE_SUBCATEGORIES = gql`
   ${PAGINATION}
 `;
 
+const FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS = gql`
+  query FreelancerCategoriesForFilteredFreelancers(
+    $min: Int
+    $max: Int
+    $paymentMethods: [ID]
+    $contactTypes: [ID]
+    $coverageOnline: Boolean
+    $coverageCounty: ID
+    $type: String
+    $skills: [String]
+    $experience: Int
+    $top: Boolean
+    $verified: Boolean
+    $categoriesPage: Int
+    $categoriesPageSize: Int
+  ) {
+    categoriesForFilteredResults: freelancerCategories(
+      filters: {
+        and: [
+          {
+            freelancers: {
+              and: [
+                { type: { and: [{ slug: { eq: $type } }, { slug: { ne: "user" } }] } }
+                { email: { ne: "" } }
+                { username: { ne: "" } }
+                { displayName: { ne: "" } }
+                { rate: { gte: $min, lte: $max } }
+                { status: { id: { eq: 1 } } }
+                { payment_methods: { id: { in: $paymentMethods } } }
+                { contactTypes: { id: { in: $contactTypes } } }
+                { coverage: {
+                  online: { eq: $coverageOnline }
+                  or: [
+                    { county: { id: { eq: $coverageCounty } } }
+                    { areas: { county: { id: { eq: $coverageCounty } } } }
+                  ]
+                } }
+                { skills: { slug: { in: $skills } } }
+                { yearsOfExperience: { gte: $experience } }
+                { topLevel: { eq: $top } }
+                { verified: { eq: $verified } }
+              ]
+            }
+          }
+        ]
+      }
+      pagination: { page: $categoriesPage, pageSize: $categoriesPageSize }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          plural
+          slug
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+`;
+
+const FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS = gql`
+  query FreelancerSubcategoriesForFilteredFreelancers(
+    $min: Int
+    $max: Int
+    $paymentMethods: [ID]
+    $contactTypes: [ID]
+    $coverageOnline: Boolean
+    $coverageCounty: ID
+    $type: String
+    $categorySlug: String!
+    $skills: [String]
+    $experience: Int
+    $top: Boolean
+    $verified: Boolean
+    $subcategoriesPage: Int
+    $subcategoriesPageSize: Int
+  ) {
+    subcategoriesForFilteredResults: freelancerSubcategories(
+      filters: {
+        and: [
+          { type: { slug: { eq: $type } } }
+          { category: { slug: { eq: $categorySlug } } }
+          {
+            freelancers: {
+              and: [
+                { type: { and: [{ slug: { eq: $type } }, { slug: { ne: "user" } }] } }
+                { email: { ne: "" } }
+                { username: { ne: "" } }
+                { displayName: { ne: "" } }
+                { rate: { gte: $min, lte: $max } }
+                { status: { id: { eq: 1 } } }
+                { payment_methods: { id: { in: $paymentMethods } } }
+                { contactTypes: { id: { in: $contactTypes } } }
+                { coverage: {
+                  online: { eq: $coverageOnline }
+                  or: [
+                    { county: { id: { eq: $coverageCounty } } }
+                    { areas: { county: { id: { eq: $coverageCounty } } } }
+                  ]
+                } }
+                { category: { slug: { eq: $categorySlug } } }
+                { skills: { slug: { in: $skills } } }
+                { yearsOfExperience: { gte: $experience } }
+                { topLevel: { eq: $top } }
+                { verified: { eq: $verified } }
+              ]
+            }
+          }
+        ]
+      }
+      pagination: { page: $subcategoriesPage, pageSize: $subcategoriesPageSize }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          plural
+          slug
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+`;
+
 export {
   FREELANCER_CATEGORIES,
   FREELANCER_CATEGORIES_SEARCH,
@@ -338,4 +470,6 @@ export {
   FREELANCERS_ARCHIVE_ALL,
   FREELANCER_PROFILE_CATEGORIES,
   FREELANCER_PROFILE_SUBCATEGORIES,
+  FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS,
+  FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS,
 };

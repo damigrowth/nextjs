@@ -6,12 +6,12 @@ import { getData } from "@/lib/client/operations";
 import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
 import {
   FREELANCER_CATEGORIES,
-  FREELANCER_CATEGORIES_SEARCH,
   FREELANCER_CATEGORIES_SEARCH_FILTERED,
+  FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import { 
-  SKILLS_SEARCH, 
-  SKILLS_FOR_FILTERED_FREELANCERS 
+import {
+  SKILLS_SEARCH,
+  SKILLS_FOR_FILTERED_FREELANCERS
 } from "@/lib/graphql/queries/main/taxonomies/freelancer/skill";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 
@@ -104,19 +104,21 @@ export default async function page({ params, searchParams }) {
   let coverageCountySearch = covc_s ? covc_s : undefined;
   let skillsSearch = skills_s ? skills_s : undefined;
 
-  const { categoriesSearch } = await getData(
-    FREELANCER_CATEGORIES_SEARCH_FILTERED,
-    {
-      searchTerm: categorySearch,
-      categoriesPage: paramsFilters.categoriesPage,
-      categoriesPageSize: paramsFilters.categoriesPageSize,
-    }
-  );
-
-  const { counties } = await getData(COUNTIES_SEARCH, {
-    name: coverageCountySearch,
-    coverageCountyPage: paramsFilters.coverageCountyPage,
-    coverageCountyPageSize: paramsFilters.coverageCountyPageSize,
+  // Fetch categories based on filtered freelancers
+  const { categoriesForFilteredResults } = await getData(FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS, {
+    min: paramsFilters.min,
+    max: paramsFilters.max,
+    paymentMethods: paramsFilters.paymentMethods,
+    contactTypes: paramsFilters.contactTypes,
+    coverageOnline: paramsFilters.coverageOnline,
+    coverageCounty: paramsFilters.coverageCounty,
+    type: paramsFilters.type,
+    skills: paramsFilters.skills,
+    experience: paramsFilters.experience,
+    top: paramsFilters.top,
+    verified: paramsFilters.verified,
+    categoriesPage: paramsFilters.categoriesPage,
+    categoriesPageSize: paramsFilters.categoriesPageSize,
   });
 
   // Fetch skills based on filtered freelancers (without category filter)
@@ -138,14 +140,17 @@ export default async function page({ params, searchParams }) {
   }, "skills");
 
   // Fallback to old query for search functionality only
-  const { skillsBySearch: oldSkillsBySearch } = skillsSearch ? 
-    await getData(SKILLS_SEARCH, {
-      label: skillsSearch,
-      category: category,
-      skillsPage: paramsFilters.skillsPage,
-      skillsPageSize: paramsFilters.skillsPageSize,
-      slugs: paramsFilters.skills,
-    }, "skills") : { skillsBySearch: { data: [], meta: { pagination: {} } } };
+  const { categoriesSearch } = await getData(FREELANCER_CATEGORIES_SEARCH_FILTERED, {
+    searchTerm: categorySearch,
+    categoriesPage: paramsFilters.categoriesPage,
+    categoriesPageSize: paramsFilters.categoriesPageSize,
+  });
+
+  const { counties } = await getData(COUNTIES_SEARCH, {
+    name: coverageCountySearch,
+    coverageCountyPage: paramsFilters.coverageCountyPage,
+    coverageCountyPageSize: paramsFilters.coverageCountyPageSize,
+  });
 
   const selectData = {
     option: ["cat", "covc"],
@@ -153,14 +158,17 @@ export default async function page({ params, searchParams }) {
     page: ["cat_p", "covc_p"],
     pageSize: ["cat_ps", "covc_ps"],
     disabled: "cov_o",
-    options: [categoriesSearch?.data, counties?.data],
+    options: [
+      categorySearch ? categoriesSearch?.data : categoriesForFilteredResults?.data, 
+      counties?.data
+    ],
     pagination: [
-      categoriesSearch?.meta?.pagination,
-      counties?.meta?.pagination,
+      categorySearch ? categoriesSearch?.meta?.pagination : categoriesForFilteredResults?.meta?.pagination,
+      counties?.meta?.pagination
     ],
     rootLabel: ["Όλες οι κατηγορίες", "Όλες οι περιοχές"],
     defaultLabel: [
-      `${taxonomies.current ? taxonomies.current : "Όλες οι κατηγορίες"}`,
+      "Όλες οι κατηγορίες",
       "Όλες οι περιοχές",
     ],
   };
@@ -192,16 +200,15 @@ export default async function page({ params, searchParams }) {
       <Breadcrumb
         parentPathLabel="Επαγγελματίες"
         parentPathLink="pros"
-        plural
       />
       <Banner
-        heading="Βρες Επαγγελματίες"
-        description="Ανακάλυψε και επικοινώνησε με τους καλύτερους επαγγελματίες για οποιαδήποτε ανάγκη."
+        heading="Όλοι οι Επαγγελματίες"
+        description="Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές."
       />
       <FreelancersArchive
         taxonomies={taxonomies}
-        categories={categoriesSearch?.data}
-        counties={counties}
+        categories={categorySearch ? categoriesSearch?.data : categoriesForFilteredResults?.data}
+        counties={counties?.data}
         searchParams={allSearchParams}
         paramsFilters={paramsFilters}
         selectData={selectData}
