@@ -20,7 +20,7 @@ export default function SortOptions({ sortOptions }) {
   };
 
   return (
-    <div className="pcs_dropdown dark-color pr10 pr0-xs text-center d-flex justify-content-center align-items-center">
+    <div className="pcs_dropdown taxfilters dark-color pr10 pr0-xs text-center d-flex justify-content-center align-items-center">
       <span>Ταξινόμηση κατά</span>
       <div className="dropdown bootstrap-select show-tick">
         <button

@@ -263,7 +263,7 @@ export default function AdditionalInfoForm({ freelancer, type }) {
         </div>
         <div className="boxede row mb40 mt40">
           {type === "company" && (
-            <div className="col-md-2 mb20">
+            <div className="col-md-3 mb20">
               <SearchableSelect
                 name="size"
                 label="Αριθμός Εργαζομένων"
@@ -281,8 +281,8 @@ export default function AdditionalInfoForm({ freelancer, type }) {
           <div className="col-md-4">
             <SearchableSelect
               name="minBudget"
-              label="Ελάχιστο Budget"
-              labelPlural="ελάχιστα budget"
+              label="Ελάχιστο Budget Εργασίας"
+              labelPlural="ελάχιστο budget"
               value={minBudget.data}
               staticOptions={budgetOptions}
               onSelect={handleMinBudgetSelect}

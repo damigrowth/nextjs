@@ -9,7 +9,7 @@ export default function Features({
 }) {
   return (
     <>
-      <div className="row mt60">
+      <div className="row mt60 px10">
         {contactTypes.length > 0 && (
           <div className="col-sm-6 col-xl-4">
             <div className="iconbox-style1 contact-style d-flex align-items-start mb30">

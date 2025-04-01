@@ -250,7 +250,9 @@ export default function SearchSelect({
   };
 
   const selectLinkHandler = (item) => {
-    setSelectedLink(item);
+    startTransition(() => {
+      setSelectedLink(item);
+    });
   };
 
   // Styles for react-select

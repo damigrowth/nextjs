@@ -6,11 +6,12 @@ import {
   CATEGORIES,
   TAXONOMIES_BY_SLUG,
   SUBDIVISIONS_SEARCH_FILTERED,
+  SUBDIVISIONS_FOR_FILTERED_SERVICES,
 } from "@/lib/graphql/queries/main/taxonomies/service";
 import Tabs from "@/components/ui/Archives/Tabs";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
-import { TAGS_SEARCH } from "@/lib/graphql/queries/main/taxonomies/service/tag";
+import { TAGS_SEARCH, TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY } from "@/lib/graphql/queries/main/taxonomies/service/tag";
 import { normalizeTerm } from "@/utils/normalizeTerm";
 
 export const dynamic = "force-dynamic";
@@ -97,6 +98,20 @@ export default async function page({ params, searchParams }) {
   let categorySearch = cat_s ? cat_s : undefined;
   let tagsSearch = tags_s ? tags_s : undefined;
 
+  // Fetch subdivisions based on filtered services
+  const { subdivisionsForFilteredResults } = await getData(SUBDIVISIONS_FOR_FILTERED_SERVICES, {
+    search: paramsFilters.search,
+    min: paramsFilters.min,
+    max: paramsFilters.max,
+    time: paramsFilters.time,
+    subcategorySlug: subcategory,
+    tags: paramsFilters.tags,
+    verified: paramsFilters.verified,
+    subdivisionPage: paramsFilters.subdivisionPage,
+    subdivisionPageSize: paramsFilters.subdivisionPageSize,
+  });
+
+  // Fallback to old query for search functionality only
   const { subdivisionsSearch } = await getData(SUBDIVISIONS_SEARCH_FILTERED, {
     subcategorySlug: subcategory,
     searchTerm: categorySearch,
@@ -104,24 +119,37 @@ export default async function page({ params, searchParams }) {
     subdivisionPageSize: paramsFilters.subdivisionPageSize,
   });
 
-  const { tagsBySearch, tagsBySlug } = await getData(
-    TAGS_SEARCH,
-    {
+  // Fetch tags based on filtered services with category filter
+  const { tagsForFilteredResults, tagsBySlug } = await getData(TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY, {
+    search: paramsFilters.search,
+    min: paramsFilters.min,
+    max: paramsFilters.max,
+    time: paramsFilters.time,
+    cat: subcategory,
+    verified: paramsFilters.verified,
+    tagsPage: paramsFilters.tagsPage,
+    tagsPageSize: paramsFilters.tagsPageSize,
+    label: tagsSearch || "",
+    slugs: paramsFilters.tags || [],
+  }, "tags");
+
+  // Fallback to old query for search functionality only
+  const { tagsBySearch: oldTagsBySearch } = tagsSearch ? 
+    await getData(TAGS_SEARCH, {
       label: tagsSearch,
       tagsPage: paramsFilters.tagsPage,
       tagsPageSize: paramsFilters.tagsPageSize,
       slugs: paramsFilters.tags,
-    },
-    "tags"
-  );
+    }, "tags") : { tagsBySearch: { data: [], meta: { pagination: {} } } };
 
   const selectData = {
     option: "cat",
     search: "cat_s",
     page: "subd_p",
     pageSize: "subd_ps",
-    options: subdivisionsSearch?.data,
-    pagination: subdivisionsSearch?.meta?.pagination,
+    // Use filtered results if available, otherwise use search results
+    options: categorySearch ? subdivisionsSearch?.data : subdivisionsForFilteredResults?.data,
+    pagination: categorySearch ? subdivisionsSearch?.meta?.pagination : subdivisionsForFilteredResults?.meta?.pagination,
     rootLabel: "Όλες οι κατηγορίες",
     defaultLabel: `${
       taxonomies.current ? taxonomies.current : "Όλες οι κατηγορίες"
@@ -138,12 +166,15 @@ export default async function page({ params, searchParams }) {
     // Combine both results and remove duplicates by slug
     options: [
       ...new Map(
-        [...(tagsBySearch?.data || []), ...(tagsBySlug?.data || [])].map(
+        [
+          ...(tagsSearch ? oldTagsBySearch?.data || [] : tagsForFilteredResults?.data || []), 
+          ...(tagsBySlug?.data || [])
+        ].map(
           (item) => [item.attributes.slug, item]
         )
       ).values(),
     ],
-    pagination: tagsBySearch?.meta?.pagination,
+    pagination: tagsSearch ? oldTagsBySearch?.meta?.pagination : tagsForFilteredResults?.meta?.pagination,
   };
 
   return (

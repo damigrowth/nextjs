@@ -500,6 +500,118 @@ const SERVICES_ARCHIVE_ALL = gql`
   }
 `;
 
+const CATEGORIES_FOR_FILTERED_SERVICES = gql`
+  query CategoriesForFilteredServices(
+    $search: String
+    $min: Int
+    $max: Int
+    $time: Int
+    $tags: [String]
+    $verified: Boolean
+    $subcategoryPage: Int
+    $subcategoryPageSize: Int
+  ) {
+    subcategoriesForFilteredResults: subcategories(
+      filters: {
+        and: [
+          {
+            services: {
+              and: [
+                {
+                  or: [
+                    { title_normalized: { containsi: $search } }
+                    { description_normalized: { containsi: $search } }
+                    { category: { label_normalized: { containsi: $search } } }
+                    { subcategory: { label_normalized: { containsi: $search } } }
+                    { subdivision: { label_normalized: { containsi: $search } } }
+                    { tags: { label_normalized: { containsi: $search } } }
+                  ]
+                },
+                { price: { gte: $min, lte: $max } },
+                { time: { lte: $time } },
+                { freelancer: { id: { notNull: true } } },
+                { status: { type: { eq: "Active" } } },
+                { tags: { slug: { in: $tags } } },
+                { freelancer: { verified: { eq: $verified } } }
+              ]
+            }
+          }
+        ]
+      }
+      pagination: { page: $subcategoryPage, pageSize: $subcategoryPageSize }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+`;
+
+const SUBDIVISIONS_FOR_FILTERED_SERVICES = gql`
+  query SubdivisionsForFilteredServices(
+    $search: String
+    $min: Int
+    $max: Int
+    $time: Int
+    $subcategorySlug: String
+    $tags: [String]
+    $verified: Boolean
+    $subdivisionPage: Int
+    $subdivisionPageSize: Int
+  ) {
+    subdivisionsForFilteredResults: subdivisions(
+      filters: {
+        and: [
+          { subcategory: { slug: { eq: $subcategorySlug } } },
+          {
+            services: {
+              and: [
+                {
+                  or: [
+                    { title_normalized: { containsi: $search } }
+                    { description_normalized: { containsi: $search } }
+                    { category: { label_normalized: { containsi: $search } } }
+                    { subcategory: { label_normalized: { containsi: $search } } }
+                    { subdivision: { label_normalized: { containsi: $search } } }
+                    { tags: { label_normalized: { containsi: $search } } }
+                  ]
+                },
+                { price: { gte: $min, lte: $max } },
+                { time: { lte: $time } },
+                { freelancer: { id: { notNull: true } } },
+                { status: { type: { eq: "Active" } } },
+                { tags: { slug: { in: $tags } } },
+                { freelancer: { verified: { eq: $verified } } }
+              ]
+            }
+          }
+        ]
+      }
+      pagination: { page: $subdivisionPage, pageSize: $subdivisionPageSize }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+`;
+
 export {
   CATEGORIES,
   SUBCATEGORIES,
@@ -515,4 +627,6 @@ export {
   SUBCATEGORIES_SEARCH_FILTERED,
   SUBDIVISIONS_SEARCH_FILTERED,
   SERVICES_ARCHIVE_ALL,
+  CATEGORIES_FOR_FILTERED_SERVICES,
+  SUBDIVISIONS_FOR_FILTERED_SERVICES,
 };

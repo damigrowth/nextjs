@@ -9,7 +9,7 @@ export default function Faq({ faq }) {
     setActiveItem(index === activeItem ? null : index);
   };
   return (
-    <div className="px30 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
+    <div className="px30 mt40 bdr1 pt30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
       <h4>Συχνές Ερωτήσεις</h4>
       <div className="accordion-style1 faq-page mb-4 mb-lg-5 mt30">
         <div className="accordion" id="accordion">

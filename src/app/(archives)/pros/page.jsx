@@ -9,7 +9,10 @@ import {
   FREELANCER_CATEGORIES_SEARCH,
   FREELANCER_CATEGORIES_SEARCH_FILTERED,
 } from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import { SKILLS_SEARCH } from "@/lib/graphql/queries/main/taxonomies/freelancer/skill";
+import { 
+  SKILLS_SEARCH, 
+  SKILLS_FOR_FILTERED_FREELANCERS 
+} from "@/lib/graphql/queries/main/taxonomies/freelancer/skill";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 
 export const dynamic = "force-dynamic";
@@ -116,17 +119,33 @@ export default async function page({ params, searchParams }) {
     coverageCountyPageSize: paramsFilters.coverageCountyPageSize,
   });
 
-  const { skillsBySearch, skillsBySlug } = await getData(
-    SKILLS_SEARCH,
-    {
+  // Fetch skills based on filtered freelancers (without category filter)
+  const { skillsForFilteredResults, skillsBySlug } = await getData(SKILLS_FOR_FILTERED_FREELANCERS, {
+    min: paramsFilters.min,
+    max: paramsFilters.max,
+    paymentMethods: paramsFilters.paymentMethods,
+    contactTypes: paramsFilters.contactTypes,
+    coverageOnline: paramsFilters.coverageOnline,
+    coverageCounty: paramsFilters.coverageCounty,
+    type: paramsFilters.type,
+    experience: paramsFilters.experience,
+    top: paramsFilters.top,
+    verified: paramsFilters.verified,
+    label: skillsSearch || "",
+    skillsPage: paramsFilters.skillsPage,
+    skillsPageSize: paramsFilters.skillsPageSize,
+    slugs: paramsFilters.skills || [],
+  }, "skills");
+
+  // Fallback to old query for search functionality only
+  const { skillsBySearch: oldSkillsBySearch } = skillsSearch ? 
+    await getData(SKILLS_SEARCH, {
       label: skillsSearch,
       category: category,
       skillsPage: paramsFilters.skillsPage,
       skillsPageSize: paramsFilters.skillsPageSize,
       slugs: paramsFilters.skills,
-    },
-    "skills"
-  );
+    }, "skills") : { skillsBySearch: { data: [], meta: { pagination: {} } } };
 
   const selectData = {
     option: ["cat", "covc"],
@@ -156,12 +175,15 @@ export default async function page({ params, searchParams }) {
     // Combine both results and remove duplicates by slug
     options: [
       ...new Map(
-        [...(skillsBySearch?.data || []), ...(skillsBySlug?.data || [])].map(
+        [
+          ...(skillsSearch ? oldSkillsBySearch?.data || [] : skillsForFilteredResults?.data || []), 
+          ...(skillsBySlug?.data || [])
+        ].map(
           (item) => [item.attributes.slug, item]
         )
       ).values(),
     ],
-    pagination: skillsBySearch?.meta?.pagination,
+    pagination: skillsSearch ? oldSkillsBySearch?.meta?.pagination : skillsForFilteredResults?.meta?.pagination,
   };
 
   return (

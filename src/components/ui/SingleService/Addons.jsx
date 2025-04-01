@@ -23,7 +23,7 @@ export default function Addons({ addons, small, price, username }) {
   return (
     <div
       className={`pb-0 bg-white bdrs12 wow fadeInUp default-box-shadow1 ${
-        !small ? "px30 pt30" : ""
+        !small ? "px30 pt30 noshowmobile" : ""
       }`}
     >
       {!small && <div className="addons-total-price">{price}€</div>}

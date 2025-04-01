@@ -333,6 +333,7 @@ a {
 .ui-fav-active {
   background-color: #5bbb7b !important;
   color: #fff !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* hero search list active */
@@ -1413,6 +1414,7 @@ a {
   border-color: transparent;
   background-color: #fff;
   border: 1px solid #e6e6e6;
+  transition: all 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
 
 .save-button-form button:hover {

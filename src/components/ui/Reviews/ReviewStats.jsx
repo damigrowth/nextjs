@@ -8,6 +8,7 @@ export default function ReviewStats({
   reviews_total,
   rating_global,
   ratingStars,
+  isServicePage = false,
 }) {
   const stars = [
     {
@@ -49,14 +50,16 @@ export default function ReviewStats({
       <div className="total_review mb30 mt45">
         <h4>
           {reviews_total > 1
-            ? reviews_total + " " + "Αξιολογήσεις της υπηρεσίας"
-            : reviews_total + " " + "Αξιολόγηση της υπηρεσίας"}{" "}
+            ? reviews_total + " " + "Αξιολογήσεις"
+            : reviews_total + " " + "Αξιολόγηση"}{" "}
         </h4>
       </div>
       <div className="d-md-flex align-items-center mb30">
-        <div className="total-review-box d-flex align-items-center text-center mb30-sm">
+        <div className={`d-flex align-items-center text-center mb30-sm ${isServicePage ? 'total-review-box-service' : 'total-review-box'}`}>
           <div className="wrapper mx-auto">
-            <div className="t-review mb15">{formatRating(rating)}</div>
+            <div className="t-review mb15">
+              {formatRating(rating)} <i className="fas fa-star vam review-color" style={{ paddingBottom: "0.3em", fontSize: isServicePage ? "36px" : "48px" }}></i>
+            </div>
             <h5>
               {rating_global?.attributes && rating_global.attributes.label}
             </h5>
@@ -65,13 +68,15 @@ export default function ReviewStats({
       </p> */}
           </div>
         </div>
-        <div className="wrapper ml60 ml0-sm">
-          {reviewStatsData.map((stat, i) => (
-            <div key={i}>
-              <ReviewStatsLine data={stat} />
-            </div>
-          ))}
-        </div>
+        {!isServicePage && (
+          <div className="wrapper ml60 ml0-sm">
+            {reviewStatsData.map((stat, i) => (
+              <div key={i}>
+                <ReviewStatsLine data={stat} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

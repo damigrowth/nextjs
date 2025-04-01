@@ -116,6 +116,66 @@ const FREELANCERS_ARCHIVE = gql`
     $coverageCounty: ID
     $type: String
     $cat: String
+    $sub: String
+    $experience: Int
+    $top: Boolean
+    $verified: Boolean
+    $sort: [String]
+    $page: Int
+  ) {
+    freelancers(
+      filters: {
+        and: [
+          { type: { and: [{ slug: { eq: $type } }, { slug: { ne: "user" } }] } }
+          { email: { ne: "" } }
+          { username: { ne: "" } }
+          { displayName: { ne: "" } }
+          { rate: { gte: $min, lte: $max } }
+          { status: { id: { eq: 1 } } }
+          { payment_methods: { id: { in: $paymentMethods } } }
+          { contactTypes: { id: { in: $contactTypes } } }
+          { coverage: {
+            online: { eq: $coverageOnline }
+            or: [
+              { county: { id: { eq: $coverageCounty } } }
+              { areas: { county: { id: { eq: $coverageCounty } } } }
+            ]
+          } }
+          { category: { id: { ne: null }, slug: { eq: $cat } } }
+          { subcategory: { id: { ne: null }, slug: { eq: $sub } } }
+          { yearsOfExperience: { gte: $experience } }
+          { topLevel: { eq: $top } }
+          { verified: { eq: $verified } }
+        ]
+      }
+      sort: $sort
+      pagination: { page: $page, pageSize: 20 }
+    ) {
+      data {
+        id
+        attributes {
+          ...FreelancerReference
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+  ${FREELANCER_REFERENCE}
+`;
+
+const FREELANCERS_ARCHIVE_WITH_SKILLS = gql`
+  query FreelancersArchiveWithSkills(
+    $min: Int
+    $max: Int
+    $paymentMethods: [ID]
+    $contactTypes: [ID]
+    $coverageOnline: Boolean
+    $coverageCounty: ID
+    $type: String
+    $cat: String
     $skills: [String]
     $sub: String
     $experience: Int
@@ -240,6 +300,7 @@ export {
   FREELANCER_PAGE_SEO,
   COUNT_FREELANCERS_BY_RATING,
   FREELANCERS_ARCHIVE,
+  FREELANCERS_ARCHIVE_WITH_SKILLS,
   FEATURED_FREELANCERS,
   FREELANCERS_ALL,
 };

@@ -148,9 +148,66 @@ const FEATURED_SERVICES = gql`
   ${FEATURED_SERVICE}
 `;
 
-// TODO: Add $search for tags
+// Το αρχικό query χωρίς tag φιλτράρισμα
 const SERVICES_ARCHIVE = gql`
   query ServicesArchive(
+    $search: String
+    $min: Int
+    $max: Int
+    $time: Int
+    $cat: String
+    $verified: Boolean
+    $page: Int
+    $sort: [String]
+  ) {
+    services(
+      filters: {
+        or: [
+          { title_normalized: { containsi: $search } }
+          { description_normalized: { containsi: $search } }
+          { category: { label_normalized: { containsi: $search } } }
+          { subcategory: { label_normalized: { containsi: $search } } }
+          { subdivision: { label_normalized: { containsi: $search } } }
+          { tags: { label_normalized: { containsi: $search } } }
+        ]
+        and: [
+          { price: { gte: $min, lte: $max } }
+          { time: { lte: $time } }
+          { freelancer: { id: { notNull: true } } }
+          { status: { type: { eq: "Active" } } }
+          {
+            or: [
+              { category: { slug: { eq: $cat } } }
+              { subcategory: { slug: { eq: $cat } } }
+              { subdivision: { slug: { eq: $cat } } }
+            ]
+          }
+          { freelancer: { verified: { eq: $verified } } }
+        ]
+      }
+      sort: $sort
+      pagination: { page: $page, pageSize: 20 }
+    ) {
+      data {
+        id
+        attributes {
+          ...ServicePartialMain
+          ...ServicePartialRelations
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${SERVICE_PARTIAL_MAIN}
+  ${SERVICE_PARTIAL_RELATIONS}
+  ${PAGINATION}
+`;
+
+// Νέο query με tag φιλτράρισμα
+const SERVICES_ARCHIVE_WITH_TAGS = gql`
+  query ServicesArchiveWithTags(
     $search: String
     $min: Int
     $max: Int
@@ -181,9 +238,9 @@ const SERVICES_ARCHIVE = gql`
               { category: { slug: { eq: $cat } } }
               { subcategory: { slug: { eq: $cat } } }
               { subdivision: { slug: { eq: $cat } } }
-              { tags: { slug: { in: $tags } } }
             ]
           }
+          { tags: { slug: { in: $tags } } }
           { freelancer: { verified: { eq: $verified } } }
         ]
       }
@@ -340,6 +397,7 @@ export {
   SERVICE_UID,
   FEATURED_SERVICES,
   SERVICES_ARCHIVE,
+  SERVICES_ARCHIVE_WITH_TAGS,
   SERVICES_BY_CATEGORY,
   SERVICES_ALL,
   SERVICES_BY_FREELANCER,

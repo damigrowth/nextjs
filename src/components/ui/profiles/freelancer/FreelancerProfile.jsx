@@ -125,6 +125,25 @@ export default function FreelancerProfile({
                 settlement_methods={settlement_methods?.data}
               />
               <Industries industries={industries?.data} />
+
+              {/* Mobile Sidebar Content */}
+              <div className="d-lg-none">
+                <div className="blog-sidebar column">
+                  <Info
+                    rate={rate}
+                    coverage={coverage}
+                    commencement={commencement}
+                    website={website}
+                    phone={visibility?.phone && phone}
+                    email={visibility?.email && email}
+                  />
+                  <Skills
+                    skills={skills?.data}
+                    specialization={specialization?.data}
+                  />
+                </div>
+              </div>
+
               <FeaturedServices
                 services={services}
                 meta={servicesMeta}

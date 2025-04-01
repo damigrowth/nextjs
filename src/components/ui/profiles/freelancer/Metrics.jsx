@@ -7,7 +7,7 @@ export default function Metrics({
   yearsOfExperience,
 }) {
   return (
-    <div className="row">
+    <div className="row px20">
       {subcategory && (
         <div className="col-sm-12 col-xl-6">
           <div className="iconbox-style1 contact-style d-flex align-items-start mb30">
