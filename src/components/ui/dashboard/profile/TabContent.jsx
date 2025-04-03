@@ -25,7 +25,7 @@ export async function TabContent() {
     {
       index: 0,
       label: "Λογαριασμός",
-      content: <AccountForm freelancer={freelancer} />,
+      content: <AccountForm freelancer={freelancer} type={type} jwt={jwt} />,
       showForUser: true,
     },
     {
