@@ -1,12 +1,7 @@
-import { freelancer1 } from "@/data/product";
 import React from "react";
 import Meta from "./Meta";
 import Metrics from "./Metrics";
 import Description from "./Terms";
-import Education from "./Education";
-import Experience from "./Experience";
-import Certificates from "./Certificates";
-import Featured from "./Featured";
 import StickySidebar from "@/components/ui/sticky/StickySidebar";
 import Info from "./Info";
 import Skills from "./Skills";
@@ -40,6 +35,8 @@ export default function FreelancerProfile({
     verified,
     email,
     phone,
+    viber,
+    whatsapp,
     tagline,
     visibility,
     coverage,
@@ -135,6 +132,8 @@ export default function FreelancerProfile({
                     commencement={commencement}
                     website={website}
                     phone={visibility?.phone && phone}
+                    viber={viber}
+                    whatsapp={whatsapp}
                     email={visibility?.email && email}
                   />
                   <Skills
@@ -207,6 +206,8 @@ export default function FreelancerProfile({
               website={website}
               phone={visibility?.phone && phone}
               email={visibility?.email && email}
+              viber={viber}
+              whatsapp={whatsapp}
             />
             <Skills
               skills={skills?.data}

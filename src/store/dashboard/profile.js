@@ -61,6 +61,12 @@ const useEditProfileStore = create((set) => ({
   phone: undefined,
   setPhone: (value) => set(() => ({ phone: value })),
 
+  viber: null,
+  setViber: (value) => set(() => ({ viber: value })),
+
+  whatsapp: null,
+  setWhatsapp: (value) => set(() => ({ whatsapp: value })),
+
   verified: false,
   setVerified: (value) => set(() => ({ verified: value })),
 
@@ -276,6 +282,8 @@ const useEditProfileStore = create((set) => ({
       displayName: freelancer.displayName || "",
       email: freelancer.email || "",
       phone: freelancer.phone || null,
+      viber: freelancer.viber || null, // Add viber
+      whatsapp: freelancer.whatsapp || null, // Add whatsapp
       verified: freelancer.verified || false,
       address: freelancer?.coverage?.address || "", // Setting it from the coverage address
       website: freelancer.website || "",
@@ -336,6 +344,8 @@ const useEditProfileStore = create((set) => ({
       displayName: "",
       email: "",
       phone: null,
+      viber: null, // Reset viber
+      whatsapp: null, // Reset whatsapp
       verified: false,
       address: "",
       website: "",

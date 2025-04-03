@@ -9,9 +9,10 @@ export default function Info({
   commencement,
   website,
   phone,
+  viber,
+  whatsapp,
   email,
 }) {
-  // console.log(coverage);
   const formattedWebsite = website ? website.replace(/^https?:\/\//, "") : null;
   const [showPhone, setShowPhone] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
@@ -20,22 +21,22 @@ export default function Info({
   if (coverage?.online) covers.push("Online");
   if (coverage?.onbase) covers.push("Στην έδρα");
   if (coverage?.onsite) covers.push("Στον χώρο σας");
-  
+
   // Συνάρτηση για tracking των κλικ στο Google Analytics
   const trackContactReveal = (contactType) => {
     // Έλεγχος αν το window και το gtag υπάρχουν (client-side)
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'reveal_contact', {
-        'event_category': 'Contact',
-        'event_label': contactType,
-        'value': 1
+    if (typeof window !== "undefined" && window.gtag) {
+      window.gtag("event", "reveal_contact", {
+        event_category: "Contact",
+        event_label: contactType,
+        value: 1,
       });
     }
-    
+
     // Ενημερώνουμε το state ανάλογα με τον τύπο επικοινωνίας
-    if (contactType === 'phone') {
+    if (contactType === "phone") {
       setShowPhone(true);
-    } else if (contactType === 'email') {
+    } else if (contactType === "email") {
       setShowEmail(true);
     }
   };
@@ -45,7 +46,6 @@ export default function Info({
       <div className="price-widget pt25 bdrs8 prowidget">
         {rate && (
           <h3 className="widget-title mb30">
-            {}
             {rate}€<small className="fz15 fw500"> / εργατοώρα</small>
           </h3>
         )}
@@ -101,19 +101,68 @@ export default function Info({
                 <i className="flaticon-call text-thm2 pe-2 vam" />
                 <span className="list-item-title">Τηλέφωνο</span>
               </span>
-              {showPhone ? (
-                <a href={`tel:${phone}`}>{phone}</a>
-              ) : (
-                <button 
-                  onClick={() => trackContactReveal('phone')} 
-                  style={{ color: "#198754", background: "none", border: "none", cursor: "pointer", padding: 0 }}
-                  id="show-phone-btn"
-                >
-                  Προβολή
-                </button>
-              )}
+              {/* Phone number display */}
+              <div className="d-flex align-items-center">
+                {/* Viber Icon (Moved Before Number) */}
+                {viber && showPhone && (
+                  <a
+                    href={`tel:${String(viber)}`} // Ensure viber is string
+                    className="me-2" // Changed margin to me-2
+                    title={`Viber: ${viber}`}
+                  >
+                    <i
+                      className="fab fa-viber"
+                      style={{
+                        color: "#665CAC",
+                        fontSize: "1.3em",
+                      }} /* Increased size */
+                    ></i>
+                  </a>
+                )}
+                {/* Whatsapp Icon (Moved Before Number) */}
+                {whatsapp && showPhone && (
+                  <a
+                    href={`https://wa.me/${String(whatsapp).replace(
+                      /\D/g,
+                      ""
+                    )}`} // Ensure whatsapp is string
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="me-2" // Changed margin to me-2
+                    title={`Whatsapp: ${whatsapp}`}
+                  >
+                    <i
+                      className="fab fa-whatsapp"
+                      style={{
+                        color: "#25D366",
+                        fontSize: "1.45em",
+                      }} /* Increased size */
+                    ></i>
+                  </a>
+                )}
+                {/* Phone Number / Reveal Button */}
+                {showPhone ? (
+                  <a href={`tel:${phone}`}>{phone}</a>
+                ) : (
+                  <button
+                    onClick={() => trackContactReveal("phone")}
+                    style={{
+                      color: "#198754",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 0,
+                    }}
+                    id="show-phone-btn"
+                  >
+                    Προβολή
+                  </button>
+                )}
+              </div>
               {/* Κρυφό link για SEO */}
-              <a href={`tel:${phone}`} style={{ display: 'none' }}>{phone}</a>
+              <a href={`tel:${phone}`} style={{ display: "none" }}>
+                {phone}
+              </a>
             </div>
           )}
           {email && (
@@ -125,16 +174,24 @@ export default function Info({
               {showEmail ? (
                 <a href={`mailto:${email}`}>{email}</a>
               ) : (
-                <button 
-                  onClick={() => trackContactReveal('email')} 
-                  style={{ color: "#198754", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                <button
+                  onClick={() => trackContactReveal("email")}
+                  style={{
+                    color: "#198754",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                  }}
                   id="show-email-btn"
                 >
                   Προβολή
                 </button>
               )}
               {/* Κρυφό link για SEO */}
-              <a href={`mailto:${email}`} style={{ display: 'none' }}>{email}</a>
+              <a href={`mailto:${email}`} style={{ display: "none" }}>
+                {email}
+              </a>
             </div>
           )}
         </div>

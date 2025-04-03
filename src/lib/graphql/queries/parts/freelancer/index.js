@@ -38,6 +38,8 @@ const FREELANCER_PARTIAL_MAIN = gql`
     displayName
     email
     phone
+    viber
+    whatsapp
     verified
     tagline
     rate
@@ -130,6 +132,8 @@ const FREELANCER_MAIN = gql`
     displayName
     email
     phone
+    viber
+    whatsapp
     verified
     website
     tagline
