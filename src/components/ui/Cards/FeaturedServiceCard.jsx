@@ -6,6 +6,7 @@ import Link from "next/link";
 import React from "react";
 import SaveFrom from "../forms/SaveForm";
 import { getSavedStatus } from "@/lib/save";
+import VideoPreview from "./VideoPreview"; // Import VideoPreview
 
 export default async function FeaturedServiceCard({
   service,
@@ -28,29 +29,59 @@ export default async function FeaturedServiceCard({
     reviews_total,
   } = freelancerData;
 
-  let image = null;
   const fallbackImage = "/images/fallback/service.png";
+  const firstMediaItem = media.data.length > 0 ? media.data[0] : null;
+  const firstMediaAttributes = firstMediaItem?.attributes;
 
-  if (media.data.length > 0) {
-    const formatResult = getBestDimensions(media.data[0].attributes.formats);
-    image = formatResult && formatResult.url ? formatResult.url : fallbackImage;
+  let mediaContent;
+
+  if (firstMediaAttributes?.formats) {
+    // It's an image
+    const formatResult = getBestDimensions(firstMediaAttributes.formats);
+    const imageUrl = formatResult?.url || fallbackImage;
+    mediaContent = (
+      <Link href={`/s/${slug}`}>
+        <Image
+          height={247}
+          width={331}
+          className="w-100"
+          src={imageUrl}
+          alt={`featured-service-${title}-freelancer-${username}`}
+          style={{ objectFit: "cover", height: "247px" }} // Ensure consistent height
+        />
+      </Link>
+    );
+  } else if (firstMediaAttributes?.mime?.startsWith("video/")) {
+    // It's a video
+    mediaContent = (
+      <div style={{ width: "331px", height: "247px" }}>
+        {" "}
+        {/* Container with dimensions */}
+        <VideoPreview
+          previewUrl={firstMediaAttributes.previewUrl}
+          videoUrl={firstMediaAttributes.url}
+          mime={firstMediaAttributes.mime}
+        />
+      </div>
+    );
   } else {
-    image = fallbackImage;
+    // Fallback (no media or unknown type) - Render fallback image without link
+    mediaContent = (
+      <Image
+        height={247}
+        width={331}
+        className="w-100"
+        src={fallbackImage}
+        alt={`featured-service-${title}-freelancer-${username}`}
+        style={{ objectFit: "cover", height: "247px" }}
+      />
+    );
   }
 
   return (
     <div className="listing-style1 bdrs16">
       <div className="list-thumb">
-        <Link href={`/s/${slug}`}>
-          <Image
-            height={247}
-            width={331}
-            className="w-100"
-            src={image}
-            alt={`featured-service-${title}-freelancer-${freelancer?.data?.attributes?.username}`}
-            style={{ objectFit: "cover" }}
-          />
-        </Link>
+        {mediaContent} {/* Render the determined media content */}
         {fid && (
           <SaveFrom
             type="service"
