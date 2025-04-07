@@ -1,6 +1,6 @@
 "use server";
 
-import { inspect } from "@/utils/inspect";
+// import { inspect } from "@/utils/inspect";
 import { getClient } from ".";
 import {
   STRAPI_GRAPHQL,
@@ -100,9 +100,14 @@ export const getData = cache(
       const response = await fetchWithRetry(STRAPI_GRAPHQL, options);
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("GraphQL error:", inspect(errorData.errors));
-        throw new Error(`Request failed with status ${response.status}`);
+        const clonedResponse = response.clone();
+        const errorData = await clonedResponse.json();
+        console.log("GraphQL error:", errorData?.errors);
+        console.log("GraphQL response status:", response?.status);
+
+        console.log("GraphQL response:", response);
+
+        // throw new Error(`Request failed with status ${response.status}`);
       }
 
       const jsonResponse = await response.json();

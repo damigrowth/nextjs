@@ -1,32 +1,37 @@
 "use client";
 
-import { completeRegistration } from "@/lib/auth";
+import { confirmTokenAction } from "@/lib/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useActionState, useEffect } from "react";
+import React, { useActionState, useEffect, useRef } from "react";
 
-export default function EmailConfirmationForm({ confirmationCode }) {
-  const [state, formAction, isPending] = useActionState(completeRegistration, {
+export default function EmailConfirmationForm({ confirmationToken }) {
+  const [state, formAction, isPending] = useActionState(confirmTokenAction, {
     success: false,
     message: "",
+    redirect: false,
   });
 
   const router = useRouter();
+  // Use a ref to track if we've already submitted the token
+  const hasSubmittedToken = useRef(false);
 
   useEffect(() => {
-    if (confirmationCode) {
-      const submitForm = () => {
-        const formData = new FormData();
-        formData.set("code", confirmationCode);
-        formAction(formData);
+    // Only submit token if it exists and hasn't been submitted yet
+    if (confirmationToken && !hasSubmittedToken.current) {
+      // Mark as submitted immediately to prevent double submission
+      hasSubmittedToken.current = true;
+
+      const submitToken = () => {
+        formAction(confirmationToken);
       };
 
       // Use startTransition to wrap the action dispatch
       React.startTransition(() => {
-        submitForm();
+        submitToken();
       });
     }
-  }, [confirmationCode, formAction]);
+  }, [confirmationToken, formAction]); // Keep dependencies minimal
 
   // Handle redirect after successful confirmation
   useEffect(() => {
@@ -64,7 +69,7 @@ export default function EmailConfirmationForm({ confirmationCode }) {
     );
   }
 
-  if (state?.message) {
+  if (state?.message && !state?.success) {
     return (
       <div className="text-center">
         <div className="text-danger mb-3">
@@ -72,11 +77,19 @@ export default function EmailConfirmationForm({ confirmationCode }) {
         </div>
         <p className="text-danger">{state.message}</p>
         <p className="mt-3">
-          Εάν υπάρχει πρόβλημα επικοινωνήστε μαζί μας στο contact@doulitsa.gr και θα σας βοηθήσουμε άμεσα.
+          Εάν υπάρχει πρόβλημα επικοινωνήστε μαζί μας στο contact@doulitsa.gr
+          και θα σας βοηθήσουμε άμεσα.
         </p>
       </div>
     );
   }
 
-  return null;
+  return (
+    <div className="text-center">
+      <div className="spinner-border text-thm mb-3" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+      <p className="text-muted">Προετοιμασία επιβεβαίωσης...</p>
+    </div>
+  );
 }
