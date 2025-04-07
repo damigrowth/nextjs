@@ -21,6 +21,12 @@ export default function FeaturedFile({ file, formats }) {
     image = null;
   }
 
+  // If the file is audio, render nothing
+  if (fileAttributes.mime?.startsWith("audio/")) {
+    return null;
+  }
+
+  // Otherwise, render the image or video player
   return (
     <>
       <div className="scrollbalance-inner">

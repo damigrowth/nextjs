@@ -16,8 +16,9 @@ export default function ServiceSlideCardMedia({ media, path }) {
   const [showSwiper, setShowSwiper] = useState(false);
   const fallbackImage = "/images/fallback/service.png"; // Define fallback
 
-  const mediaUrls = media.data.map((img) =>
-    getBestDimensions(img.attributes.formats)
+  // Re-introduce filtering to exclude audio files
+  const displayMedia = media.data.filter(
+    (item) => !item.attributes.mime?.startsWith("audio/")
   );
 
   useEffect(() => {

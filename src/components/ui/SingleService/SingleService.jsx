@@ -13,6 +13,7 @@ import FeaturedFiles from "./FeaturedFiles";
 import Reviews from "../Reviews/Reviews";
 import Terms from "./Terms";
 import FeaturedFile from "./FeaturedFile";
+import ServiceAudioFiles from "./ServiceAudioFiles"; // Import the new component
 import ServiceSchema from "@/utils/Seo/Schema/ServiceSchema";
 import Protected from "@/components/auth/Protected";
 import { getUserId } from "@/lib/auth/user";
@@ -56,6 +57,11 @@ export default async function SingleService({
     type,
     freelancer,
   } = service;
+
+  // Filter out audio files
+  const audioFiles = media?.data
+    ?.filter((file) => file.attributes.mime?.startsWith("audio/"))
+    .map((file) => file.attributes); // Map to attributes for the component
 
   if (!freelancer?.data?.id) {
     redirect("/not-found");
@@ -157,6 +163,9 @@ export default async function SingleService({
                   payment_methods={payment_methods}
                   settlement_methods={settlement_methods}
                 />
+
+                <ServiceAudioFiles audioFiles={audioFiles} />
+
                 {media.data.length > 0 && (
                   <>
                     {media.data.length > 1 ? (
@@ -178,7 +187,11 @@ export default async function SingleService({
                 <div className="d-lg-none">
                   <div className="blog-sidebar column">
                     {fixed ? (
-                      <OrderFixed price={price} addons={addons} username={username} />
+                      <OrderFixed
+                        price={price}
+                        addons={addons}
+                        username={username}
+                      />
                     ) : (
                       <OrderPackages
                         packages={packages}

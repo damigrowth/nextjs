@@ -22,7 +22,10 @@ export default function FeaturedFiles({ files, title, border }) {
     setShowSwiper(true);
   }, []);
 
-  const galleryFiles = files.map((image) => image.attributes);
+  // Filter out audio files before mapping to attributes
+  const galleryFiles = files
+    .filter((file) => !file.attributes.mime?.startsWith("audio/"))
+    .map((file) => file.attributes);
 
   return (
     <>
