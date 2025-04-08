@@ -12,13 +12,6 @@ export default function ProfileImageInput({ image, name, onChange, errors }) {
     setError(null);
   }, []);
 
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(clearError, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [error, clearError]);
-
   // Clean up blob URL when component unmounts or when previewUrl changes
   useEffect(() => {
     return () => {
