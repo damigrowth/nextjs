@@ -20,6 +20,16 @@ const MULTIPLE_FILES = gql`
         formats
         size
         url
+        mime
+        alternativeText
+        caption
+        width
+        height
+        hash
+        ext
+        previewUrl
+        provider
+        provider_metadata
       }
     }
   }

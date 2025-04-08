@@ -46,9 +46,10 @@ export default async function FeaturedServiceSliderCard({
           />
           <div className="listing-thumbIn-slider position-relative navi_pagi_bottom_center slider-1-grid">
             <div className="item">
-              <Link href={`/s/${slug}`}>
-                <FeaturedServiceSlideCardMedia media={media} />
-              </Link>
+              <FeaturedServiceSlideCardMedia
+                media={media}
+                path={`/s/${slug}`}
+              />
             </div>
           </div>
         </div>

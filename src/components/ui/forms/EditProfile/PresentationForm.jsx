@@ -14,8 +14,18 @@ import { useFormChanges } from "@/hook/useFormChanges";
 import { uploadData } from "@/lib/uploads/upload";
 
 export default function PresentationForm({ freelancer, jwt }) {
-  const { website, setWebsite, visibility, setVisibility, socials, setSocial } =
-    useEditProfileStore();
+  const {
+    website,
+    setWebsite,
+    visibility,
+    setVisibility,
+    socials,
+    setSocial,
+    viber, // Import viber
+    setViber, // Import setViber
+    whatsapp, // Import whatsapp
+    setWhatsapp, // Import setWhatsapp
+  } = useEditProfileStore();
 
   const initialState = {
     data: null,
@@ -51,6 +61,8 @@ export default function PresentationForm({ freelancer, jwt }) {
       behance: null,
       dribbble: null,
     },
+    viber: freelancer.viber || null, // Add viber
+    whatsapp: freelancer.whatsapp || null, // Add whatsapp
   };
 
   // Setup current values for change detection
@@ -58,6 +70,8 @@ export default function PresentationForm({ freelancer, jwt }) {
     website,
     visibility,
     socials,
+    viber, // Add viber
+    whatsapp, // Add whatsapp
   };
 
   // Use the useFormChanges hook for form field changes
@@ -302,6 +316,10 @@ export default function PresentationForm({ freelancer, jwt }) {
       if (changes.visibility)
         formChangesToValidate.visibility = changes.visibility;
       if (changes.socials) formChangesToValidate.socials = changes.socials;
+      if (changes.viber !== undefined)
+        formChangesToValidate.viber = changes.viber; // Add viber
+      if (changes.whatsapp !== undefined)
+        formChangesToValidate.whatsapp = changes.whatsapp; // Add whatsapp
 
       // Add media validation state
       const mediaValidationState = {
@@ -383,6 +401,9 @@ export default function PresentationForm({ freelancer, jwt }) {
       if (changes.website !== undefined) formChanges.website = changes.website;
       if (changes.visibility) formChanges.visibility = changes.visibility;
       if (changes.socials) formChanges.socials = changes.socials;
+      if (changes.viber !== undefined) formChanges.viber = changes.viber; // Add viber
+      if (changes.whatsapp !== undefined)
+        formChanges.whatsapp = changes.whatsapp; // Add whatsapp
 
       finalFormData.append("changes", JSON.stringify(formChanges));
 
@@ -478,19 +499,51 @@ export default function PresentationForm({ freelancer, jwt }) {
           </div>
         </div>
 
-        <div className="mb40 mt40 col-md-3">
-          <InputB
-            label="Ιστότοπος"
-            id="website"
-            name="website"
-            type="url"
-            placeholder="https://selida.gr"
-            value={website}
-            onChange={setWebsite}
-            className="form-control input-group"
-            errors={formState?.errors?.website}
-          />
+        {/* Combine Website, Viber, Whatsapp into one row */}
+        <div className="row mb40 mt40">
+          <div className="col-md-3">
+            <InputB
+              label="Ιστότοπος"
+              id="website"
+              name="website"
+              type="url"
+              placeholder="https://selida.gr"
+              value={website}
+              onChange={setWebsite}
+              className="form-control input-group"
+              errors={formState?.errors?.website}
+            />
+          </div>
+          <div className="col-md-3">
+            <InputB
+              label="Viber"
+              id="viber"
+              name="viber"
+              type="tel"
+              pattern="[0-9]*"
+              inputMode="numeric"
+              value={viber || ""}
+              onChange={setViber}
+              className="form-control input-group"
+              errors={formState?.errors?.viber}
+            />
+          </div>
+          <div className="col-md-3">
+            <InputB
+              label="Whatsapp"
+              id="whatsapp"
+              name="whatsapp"
+              type="tel"
+              pattern="[0-9]*"
+              inputMode="numeric"
+              value={whatsapp || ""}
+              onChange={setWhatsapp}
+              className="form-control input-group"
+              errors={formState?.errors?.whatsapp}
+            />
+          </div>
         </div>
+        {/* End combined row */}
 
         <label className="form-label fw700 dark-color">Κοινωνικά Δίκτυα</label>
         <SocialsInputs

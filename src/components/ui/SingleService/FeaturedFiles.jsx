@@ -9,8 +9,10 @@ import "swiper/css/thumbs";
 import { FreeMode, Navigation, Thumbs } from "swiper";
 import Image from "next/image";
 import { getBestDimensions } from "@/utils/imageDimensions";
-import { MediaPlayer } from "../media/MediaPlayer";
+// MediaPlayer might not be needed anymore if VideoPreview handles all non-image cases
+// import { MediaPlayer } from "../media/MediaPlayer";
 import { MediaThumb } from "../media/MediaThumb";
+import VideoPreview from "../Cards/VideoPreview"; // Import VideoPreview
 
 export default function FeaturedFiles({ files, title, border }) {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
@@ -20,7 +22,10 @@ export default function FeaturedFiles({ files, title, border }) {
     setShowSwiper(true);
   }, []);
 
-  const galleryFiles = files.map((image) => image.attributes);
+  // Filter out audio files before mapping to attributes
+  const galleryFiles = files
+    .filter((file) => !file.attributes.mime?.startsWith("audio/"))
+    .map((file) => file.attributes);
 
   return (
     <>
@@ -48,10 +53,12 @@ export default function FeaturedFiles({ files, title, border }) {
                 modules={[FreeMode, Navigation, Thumbs]}
                 className="mySwiper2"
               >
-                {galleryFiles.map(({ formats, url }, i) => {
-                  if (formats) {
-                    const formatResult = getBestDimensions(formats);
-                    
+                {galleryFiles.map((file, i) => {
+                  // Map over the full file object
+                  if (file.formats) {
+                    // Check for image formats
+                    const formatResult = getBestDimensions(file.formats);
+
                     if (!formatResult) {
                       return (
                         <SwiperSlide key={i}>
@@ -65,7 +72,8 @@ export default function FeaturedFiles({ files, title, border }) {
                         </SwiperSlide>
                       );
                     }
-                    
+
+                    // Image rendering logic (remains the same)
                     const imageWidth = formatResult.width;
                     const imageHeight = formatResult.height;
                     const imageUrl = formatResult.url;
@@ -81,12 +89,24 @@ export default function FeaturedFiles({ files, title, border }) {
                         />
                       </SwiperSlide>
                     );
-                  } else {
+                  } else if (file.mime?.startsWith("video/")) {
+                    // Check if it's video
                     return (
                       <SwiperSlide key={i}>
-                        <MediaPlayer url={url} />
+                        {/* Render VideoPreview for video files */}
+                        <div className="w-100 h-100 d-flex align-items-center justify-content-center">
+                          <VideoPreview
+                            previewUrl={file.previewUrl} // Access properties from file
+                            videoUrl={file.url} // Access properties from file
+                            mime={file.mime} // Access properties from file
+                          />
+                        </div>
                       </SwiperSlide>
                     );
+                  } else {
+                    // Fallback for non-image, non-video (already filtered audio)
+                    // Render nothing or a placeholder image
+                    return null; // Or potentially a fallback image slide
                   }
                 })}
               </Swiper>
@@ -110,14 +130,18 @@ export default function FeaturedFiles({ files, title, border }) {
             modules={[FreeMode, Navigation, Thumbs]}
             className="mySwiper ui-service-gig-slder-bottom mb60 "
           >
-            {galleryFiles.map(({ formats, url }, i) => {
-              if (formats) {
+            {galleryFiles.map((file, i) => {
+              // Map over full file object for thumbnails too
+              if (file.formats) {
+                // Check for image formats
                 const imageWidth =
-                  formats?.small?.width || formats.thumbnail.width;
+                  file.formats?.small?.width || file.formats.thumbnail.width;
                 const imageHeight =
-                  formats?.small?.height || formats.thumbnail.height;
-                const imageUrl = formats?.small?.url || formats.thumbnail.url;
+                  file.formats?.small?.height || file.formats.thumbnail.height;
+                const imageUrl =
+                  file.formats?.small?.url || file.formats.thumbnail.url;
 
+                // Image thumbnail rendering (remains the same)
                 return (
                   <SwiperSlide key={i}>
                     <Image
@@ -128,12 +152,21 @@ export default function FeaturedFiles({ files, title, border }) {
                     />
                   </SwiperSlide>
                 );
-              } else {
+              } else if (file.mime?.startsWith("video/")) {
+                // Check for video
                 return (
                   <SwiperSlide key={i}>
-                    <MediaThumb url={url} />
+                    {/* Pass previewUrl and mime to MediaThumb */}
+                    <MediaThumb
+                      url={file.url}
+                      mime={file.mime}
+                      previewUrl={file.previewUrl} // Pass previewUrl
+                    />
                   </SwiperSlide>
                 );
+              } else {
+                // Fallback for non-image, non-video in thumbnails
+                return null;
               }
             })}
           </Swiper>

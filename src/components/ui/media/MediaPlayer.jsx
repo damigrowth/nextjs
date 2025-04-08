@@ -12,12 +12,8 @@ export const MediaPlayer = ({ url }) => {
         </video>
       );
     case "audio":
-      return (
-        <audio controls preload="none" style={{ width: "80%" }}>
-          <source src={url} type={`audio/${url.split(".").pop()}`} />
-          Your browser does not support the audio tag.
-        </audio>
-      );
+      // Return null for audio files to prevent rendering
+      return null;
     case "unknown":
       return (
         <div className="p-4 bg-red-100 text-red-600">

@@ -8,12 +8,17 @@ import "swiper/css/pagination";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { getBestDimensions } from "@/utils/imageDimensions";
+import VideoPreview from "./VideoPreview"; // Import VideoPreview
+import Link from "next/link"; // Import Link
 
-export default function ServiceSlideCardMedia({ media }) {
+export default function ServiceSlideCardMedia({ media, path }) {
+  // Add path prop
   const [showSwiper, setShowSwiper] = useState(false);
+  const fallbackImage = "/images/fallback/service.png"; // Define fallback
 
-  const mediaUrls = media.data.map((img) =>
-    getBestDimensions(img.attributes.formats)
+  // Re-introduce filtering to exclude audio files
+  const displayMedia = media.data.filter(
+    (item) => !item.attributes.mime?.startsWith("audio/")
   );
 
   useEffect(() => {
@@ -36,18 +41,56 @@ export default function ServiceSlideCardMedia({ media }) {
             clickable: true,
           }}
         >
-          {mediaUrls.map((el, index) => (
-            <SwiperSlide key={index}>
-              <Image
-                height={247}
-                width={331}
-                className="w-100 object-fit-cover"
-                src={el?.url || "/images/fallback/service.png"}
-                alt="thumbnail"
-                style={{ objectFit: "cover" }}
-              />
-            </SwiperSlide>
-          ))}
+          {displayMedia.map((file, index) => {
+            const attributes = file.attributes;
+            let slideContent;
+
+            if (attributes.formats) {
+              // It's an image - Wrap with Link
+              const formatResult = getBestDimensions(attributes.formats);
+              slideContent = (
+                <Link href={path || "#"}>
+                  {" "}
+                  {/* Add Link wrapper, provide fallback href */}
+                  <Image
+                    height={247}
+                    width={331}
+                    className="w-100 object-fit-cover"
+                    src={formatResult?.url || fallbackImage}
+                    alt="thumbnail"
+                    style={{ objectFit: "cover", height: "247px" }} // Ensure consistent height
+                  />
+                </Link>
+              );
+            } else if (attributes.mime?.startsWith("video/")) {
+              // Only check for video now
+              // It's a video
+              slideContent = (
+                <div style={{ width: "331px", height: "247px" }}>
+                  {/* Container with dimensions */}
+                  <VideoPreview
+                    previewUrl={attributes.previewUrl}
+                    videoUrl={attributes.url}
+                    mime={attributes.mime}
+                  />
+                </div>
+              );
+            } else {
+              // Fallback for other types
+              slideContent = (
+                <Image
+                  height={247}
+                  width={331}
+                  className="w-100 object-fit-cover"
+                  src={fallbackImage}
+                  alt="thumbnail"
+                  style={{ objectFit: "cover", height: "247px" }}
+                />
+              );
+            }
+
+            return <SwiperSlide key={index}>{slideContent}</SwiperSlide>;
+          })}
           <div className="swiper__parent">
             <div className="row justify-content-center">
               <div className="col-auto">

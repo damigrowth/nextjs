@@ -3,13 +3,15 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import {
-  REGISTER_USER,
+  // REGISTER_USER, // Keep commented or remove if not used elsewhere
+  START_REGISTRATION, // Import the new mutation
+  COMPLETE_REGISTRATION, // Import the new mutation
   UPDATE_USER,
   CREATE_FREELANCER,
   FORGOT_PASSWORD,
   RESET_PASSWORD,
   LOGIN_USER,
-  EMAIL_CONFIRMATION,
+  EMAIL_CONFIRMATION, // Keep for completeRegistration for now
 } from "../graphql/mutations";
 import { postData } from "../client/operations";
 import { loginSchema, registerSchema } from "../validation/auth";
@@ -19,7 +21,11 @@ import { cookies } from "next/headers";
 
 export async function register(prevState, formData) {
   const type = Number(formData.get("type"));
-  const role = Number(formData.get("role"));
+  const role = formData.get("role") ? Number(formData.get("role")) : null; // Handle null role
+  const displayName = formData.get("displayName");
+  const email = formData.get("email");
+  const username = formData.get("username");
+  const password = formData.get("password");
   const consent = formData.get("consent");
 
   if (!consent) {
@@ -27,149 +33,157 @@ export async function register(prevState, formData) {
       errors: {
         consent: ["Πρέπει να αποδεχθείς τους Όρους Χρήσης"],
       },
+      message: null, // Ensure consistent return structure
     };
   }
 
-  const userData = {
-    email: formData.get("email"),
-    username: formData.get("username"),
-    password: formData.get("password"),
-    consent: true,
-  };
+  // Remove the cookie storage logic
+  // (await cookies()).set(...) - DELETED
 
-  // Store registration data in cookies
-  (await cookies()).set(
-    "registration_data",
-    JSON.stringify({
-      type,
-      role,
-      displayName: type === 2 ? formData.get("displayName") : userData.username,
-      consent: true,
-    })
-  );
-
-  const result = await postData(REGISTER_USER, {
+  // Call the new START_REGISTRATION mutation
+  const result = await postData(START_REGISTRATION, {
     input: {
-      email: userData.email,
-      username: userData.username,
-      password: userData.password,
+      email: email,
+      username: username,
+      password: password,
+      type: type,
+      // Only include role and displayName if type is 2 (Professional)
+      ...(type === 2 && { role: role, displayName: displayName }),
     },
   });
 
+  // Handle potential GraphQL errors returned by postData
   if (result.error) {
-    return { message: result.error };
+    console.error("GraphQL Error in register action:", result.error);
+    return { errors: {}, message: result.error }; // Return error message
+  }
+
+  // Handle application-level errors returned in the mutation payload
+  if (!result?.data?.startRegistration?.success) {
+    console.error(
+      "StartRegistration failed:",
+      result?.data?.startRegistration?.message
+    );
+    return {
+      errors: {},
+      message:
+        result?.data?.startRegistration?.message ||
+        "Η εγγραφή απέτυχε. Παρακαλώ δοκιμάστε ξανά.",
+    };
   }
 
   redirect("/register/success");
 }
 
-// Complete registration action
-export async function completeRegistration(prevState, formData) {
-  const code = formData.get("code");
+// // Complete registration action (OLD - Cookie/Code based)
+// export async function completeRegistration(prevState, formData) {
+//   const code = formData.get("code");
 
-  // First verify email with Strapi
-  const confirmationResult = await postData(EMAIL_CONFIRMATION, {
-    code,
-  });
+//   // First verify email with Strapi
+//   const confirmationResult = await postData(EMAIL_CONFIRMATION, {
+//     code,
+//   });
 
-  if (!confirmationResult?.data?.emailConfirmation?.jwt) {
-    return {
-      success: false,
-      message: "Σφάλμα ταυτοποίησης, ο σύνδεσμος έχει λήξει.",
-    };
-  }
+//   if (!confirmationResult?.data?.emailConfirmation?.jwt) {
+//     return {
+//       success: false,
+//       message: "Σφάλμα ταυτοποίησης, ο σύνδεσμος έχει λήξει.",
+//     };
+//   }
 
-  const { jwt, user } = confirmationResult.data.emailConfirmation;
-  const userId = user.id;
+//   const { jwt, user } = confirmationResult.data.emailConfirmation;
+//   const userId = user.id;
 
-  const cookieData = (await cookies()).get("registration_data")?.value;
-  // Get stored registration data with default values
-  const registrationData = cookieData ? JSON.parse(cookieData) : {
-    type: 3,
-    role: 1,
-    displayName: user.username,
-    consent: true
-  };
+//   const cookieData = (await cookies()).get("registration_data")?.value;
+//   // Get stored registration data with default values
+//   const registrationData = cookieData
+//     ? JSON.parse(cookieData)
+//     : {
+//         type: 3,
+//         role: 1,
+//         displayName: user.username,
+//         consent: true,
+//       };
 
-  const { type, role, displayName, consent } = registrationData;
+//   const { type, role, displayName, consent } = registrationData;
 
-  // Create freelancer profile based on type
-  if (type === 1) {
-    // Regular User type
-    const freelancer = await postData(
-      CREATE_FREELANCER,
-      {
-        data: {
-          user: userId,
-          username: user.username,
-          email: user.email,
-          displayName: user.username,
-          type: "3",
-          publishedAt: new Date().toISOString(),
-        },
-      },
-      jwt
-    );
+//   // Create freelancer profile based on type
+//   if (type === 1) {
+//     // Regular User type
+//     const freelancer = await postData(
+//       CREATE_FREELANCER,
+//       {
+//         data: {
+//           user: userId,
+//           username: user.username,
+//           email: user.email,
+//           displayName: user.username,
+//           type: "3",
+//           publishedAt: new Date().toISOString(),
+//         },
+//       },
+//       jwt
+//     );
 
-    const freelancerId = freelancer.data?.createFreelancer?.data?.id;
+//     const freelancerId = freelancer.data?.createFreelancer?.data?.id;
 
-    await postData(
-      UPDATE_USER,
-      {
-        id: userId,
-        roleId: "1",
-        freelancer: freelancerId,
-        username: user.username,
-        displayName: user.username,
-        consent: consent,
-      },
-      jwt
-    );
-  } else {
-    // Freelancer User type
-    const freelancerType = role === 4 ? 1 : 2;
+//     await postData(
+//       UPDATE_USER,
+//       {
+//         id: userId,
+//         roleId: "1",
+//         freelancer: freelancerId,
+//         username: user.username,
+//         displayName: user.username,
+//         consent: consent,
+//       },
+//       jwt
+//     );
+//   } else {
+//     // Freelancer User type
+//     const freelancerType = role === 4 ? 1 : 2;
 
-    const freelancer = await postData(
-      CREATE_FREELANCER,
-      {
-        data: {
-          user: userId,
-          username: user.username,
-          email: user.email,
-          displayName: displayName,
-          type: freelancerType.toString(),
-          publishedAt: new Date().toISOString(),
-        },
-      },
-      jwt
-    );
+//     const freelancer = await postData(
+//       CREATE_FREELANCER,
+//       {
+//         data: {
+//           user: userId,
+//           username: user.username,
+//           email: user.email,
+//           displayName: displayName,
+//           type: freelancerType.toString(),
+//           publishedAt: new Date().toISOString(),
+//         },
+//       },
+//       jwt
+//     );
 
-    const freelancerId = freelancer.data?.createFreelancer?.data?.id;
+//     const freelancerId = freelancer.data?.createFreelancer?.data?.id;
 
-    await postData(
-      UPDATE_USER,
-      {
-        id: userId,
-        roleId: role.toString(),
-        freelancer: freelancerId,
-        username: user.username,
-        displayName: displayName,
-        consent: consent,
-      },
-      jwt
-    );
-  }
+//     await postData(
+//       UPDATE_USER,
+//       {
+//         id: userId,
+//         roleId: role.toString(),
+//         freelancer: freelancerId,
+//         username: user.username,
+//         displayName: displayName,
+//         consent: consent,
+//       },
+//       jwt
+//     );
+//   }
 
-  // Clean up stored data
-  (await cookies()).delete("registration_data");
+//   // Clean up stored data
+//   (await cookies()).delete("registration_data");
 
-  await setToken(jwt);
-  return {
-    success: true,
-    message: `Καλώς ήρθες ${user.username}!`,
-    redirect: true,
-  };
-}
+//   await setToken(jwt);
+//   return {
+//     success: true,
+//     message: `Καλώς ήρθες ${user.username}!`,
+//     redirect: true, // Keep redirect flag for client-side handling
+//   };
+// }
 
 export async function login(prevState, formData) {
   const validatedFields = loginSchema.safeParse({
@@ -234,6 +248,59 @@ export async function forgotPassword(prevState, formData) {
       message: "Προέκυψε σφάλμα. Δοκιμάστε ξανά αργότερα.",
     };
   }
+}
+
+// New action to handle token-based confirmation
+export async function confirmTokenAction(prevState, token) {
+  if (!token) {
+    return {
+      success: false,
+      message: "Missing confirmation token.",
+      redirect: false,
+    };
+  }
+
+  // Call the COMPLETE_REGISTRATION mutation
+  const result = await postData(COMPLETE_REGISTRATION, {
+    input: {
+      token: token,
+    },
+  });
+
+  // Handle potential GraphQL errors
+  if (result.error) {
+    console.error("GraphQL Error in confirmTokenAction:", result.error);
+    return { success: false, message: result.error, redirect: false };
+  }
+
+  // Handle application-level errors from the mutation payload
+  if (!result?.data?.completeRegistration?.success) {
+    console.error(
+      "CompleteRegistration failed:",
+      result?.data?.completeRegistration?.message
+    );
+    return {
+      success: false,
+      message:
+        result?.data?.completeRegistration?.message || "Η επιβεβαίωση απέτυχε.",
+      redirect: false,
+    };
+  }
+
+  // --- Success ---
+  const { jwt } = result.data.completeRegistration;
+
+  if (jwt) {
+    // Set the authentication token
+    await setToken(jwt);
+  }
+
+  // Return success state - redirect will be handled client-side based on state.redirect
+  return {
+    success: true,
+    message: `Επιτυχία εγγραφής!`, // Use optional chaining
+    redirect: true,
+  };
 }
 
 export async function resetPassword(prevState, formData) {

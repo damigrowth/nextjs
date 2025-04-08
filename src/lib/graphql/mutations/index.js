@@ -342,6 +342,31 @@ const DELETE_ACCOUNT = gql`
   }
 `;
 
+// ========================================
+// NEW CUSTOM REGISTRATION MUTATIONS
+// ========================================
+
+const START_REGISTRATION = gql`
+  # Mutation to start the custom registration process
+  mutation StartRegistration($input: StartRegistrationInput!) {
+    startRegistration(input: $input) {
+      success
+      message
+    }
+  }
+`;
+
+const COMPLETE_REGISTRATION = gql`
+  # Mutation to complete the custom registration process using a token
+  mutation CompleteRegistration($input: CompleteRegistrationInput!) {
+    completeRegistration(input: $input) {
+      success
+      jwt
+      message
+    }
+  }
+`;
+
 export {
   POST_REVIEW,
   POST_SERVICE,
@@ -368,4 +393,6 @@ export {
   CREATE_TAG,
   EMAIL_CONFIRMATION,
   DELETE_ACCOUNT,
+  START_REGISTRATION,
+  COMPLETE_REGISTRATION,
 };
