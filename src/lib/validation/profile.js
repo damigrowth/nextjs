@@ -13,7 +13,7 @@ export const accountSchema = z.object({
     .nullable(),
 });
 
-const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 const MIN_WIDTH = 80;
 const MIN_HEIGHT = 80;
@@ -50,7 +50,7 @@ const imageSchema = z
       })
       .refine(
         (file) => file.size <= MAX_FILE_SIZE,
-        "Το μέγεθος του αρχείου πρέπει να είναι μικρότερο από 1MB"
+        "Το μέγεθος του αρχείου πρέπει να είναι μικρότερο από 3MB"
       )
       .refine(
         (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),

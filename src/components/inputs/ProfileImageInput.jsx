@@ -31,10 +31,10 @@ export default function ProfileImageInput({ image, name, onChange, errors }) {
   const handleImageChange = (event) => {
     const file = event.target.files?.[0];
     if (file) {
-      // File size validation (1MB limit)
+      // File size validation (3MB limit)
       const fileSize = file.size / (1024 * 1024);
-      if (fileSize > 1) {
-        setError("Το μέγεθος του αρχείου πρέπει να είναι μικρότερο από 1MB");
+      if (fileSize > 3) {
+        setError("Το μέγεθος του αρχείου πρέπει να είναι μικρότερο από 3MB");
         return;
       }
 
@@ -110,7 +110,7 @@ export default function ProfileImageInput({ image, name, onChange, errors }) {
             </div>
           </div>
           <p className="text fz13 mb-0 mt-2">
-            Μέγιστο μέγεθος αρχείου: 1MB, Ελάχιστες διαστάσεις: 80x80.
+            Μέγιστο μέγεθος αρχείου: 3MB, Ελάχιστες διαστάσεις: 80x80.
             Επιτρεπόμενοι τύποι αρχείων: .jpg & .png
           </p>
         </div>
