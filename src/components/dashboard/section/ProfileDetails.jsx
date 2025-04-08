@@ -113,8 +113,8 @@ export default function ProfileDetails() {
                 </label>
               </div>
               <p className="text mb-0">
-                Max file size is 1MB, Minimum dimension: 330x300 And Suitable
-                files are .jpg &amp; .png
+                Max file size is 3MB, Minimum dimension: 330x300 And Suitable
+                files are .jpg & .png
               </p>
             </div>
           </div>
