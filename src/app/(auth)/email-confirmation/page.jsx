@@ -7,7 +7,8 @@ import { Meta } from "@/utils/Seo/Meta/Meta";
 export async function generateMetadata() {
   const { meta } = await Meta({
     titleTemplate: "Επιβεβαίωση Email - Doulitsa",
-    descriptionTemplate: "Επιβεβαιώστε τη διεύθυνση email σας για να ολοκληρώσετε την εγγραφή σας στην Doulitsa.",
+    descriptionTemplate:
+      "Επιβεβαιώστε τη διεύθυνση email σας για να ολοκληρώσετε την εγγραφή σας στην Doulitsa.",
     size: 160,
     url: "/email-confirmation",
   });
@@ -16,8 +17,7 @@ export async function generateMetadata() {
 }
 
 export default async function page({ searchParams }) {
-  const params = await searchParams;
-  const confirmationCode = params?.code || "";
+  const { token } = await searchParams;
 
   return (
     <section className="our-register">
@@ -35,7 +35,8 @@ export default async function page({ searchParams }) {
         <div className="row wow fadeInRight" data-wow-delay="300ms">
           <div className="col-xl-6 mx-auto">
             <div className="log-reg-form search-modal searchbrd form-style1 bgc-white p50 p30-sm default-box-shadow1 bdrs12">
-              <EmailConfirmationForm confirmationCode={confirmationCode} />
+              {/* Pass confirmationToken to the form component */}
+              <EmailConfirmationForm confirmationToken={token} />
             </div>
           </div>
         </div>
