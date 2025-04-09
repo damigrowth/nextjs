@@ -252,7 +252,10 @@ export async function forgotPassword(prevState, formData) {
 
 // New action to handle token-based confirmation
 export async function confirmTokenAction(prevState, token) {
+  console.log("[confirmTokenAction] Action started."); // Log entry
+
   if (!token) {
+    console.error("[confirmTokenAction] Error: Missing confirmation token.");
     return {
       success: false,
       message: "Missing confirmation token.",
@@ -260,47 +263,77 @@ export async function confirmTokenAction(prevState, token) {
     };
   }
 
-  // Call the COMPLETE_REGISTRATION mutation
-  const result = await postData(COMPLETE_REGISTRATION, {
-    input: {
-      token: token,
-    },
-  });
+  console.log(`[confirmTokenAction] Received token: ${token}`); // Log token
 
-  // Handle potential GraphQL errors
-  if (result.error) {
-    console.error("GraphQL Error in confirmTokenAction:", result.error);
-    return { success: false, message: result.error, redirect: false };
-  }
+  try {
+    console.log(
+      "[confirmTokenAction] Calling COMPLETE_REGISTRATION mutation..."
+    ); // Log before postData
+    // Call the COMPLETE_REGISTRATION mutation
+    const result = await postData(COMPLETE_REGISTRATION, {
+      input: {
+        token: token,
+      },
+    });
+    console.log(
+      "[confirmTokenAction] COMPLETE_REGISTRATION result:",
+      JSON.stringify(result, null, 2)
+    ); // Log result
 
-  // Handle application-level errors from the mutation payload
-  if (!result?.data?.completeRegistration?.success) {
-    console.error(
-      "CompleteRegistration failed:",
-      result?.data?.completeRegistration?.message
-    );
+    // Handle potential GraphQL errors
+    if (result.error) {
+      console.error("[confirmTokenAction] GraphQL Error:", result.error);
+      return { success: false, message: result.error, redirect: false };
+    }
+
+    // Handle application-level errors from the mutation payload
+    if (!result?.data?.completeRegistration?.success) {
+      const errorMessage =
+        result?.data?.completeRegistration?.message || "Η επιβεβαίωση απέτυχε.";
+      console.error(
+        "[confirmTokenAction] CompleteRegistration failed:",
+        errorMessage
+      );
+      return {
+        success: false,
+        message: errorMessage,
+        redirect: false,
+      };
+    }
+
+    // --- Success ---
+    const { jwt } = result.data.completeRegistration;
+    console.log("[confirmTokenAction] Registration successful."); // Log success
+
+    if (jwt) {
+      console.log("[confirmTokenAction] Setting token..."); // Log before setToken
+      // Set the authentication token
+      await setToken(jwt);
+      console.log("[confirmTokenAction] Token set successfully."); // Log after setToken
+    } else {
+      console.warn(
+        "[confirmTokenAction] No JWT returned on successful registration."
+      );
+    }
+
+    const finalState = {
+      success: true,
+      message: `Επιτυχία εγγραφής!`, // Use optional chaining
+      redirect: true,
+    };
+    console.log(
+      "[confirmTokenAction] Returning success state:",
+      JSON.stringify(finalState, null, 2)
+    ); // Log final state
+    return finalState;
+  } catch (error) {
+    console.error("[confirmTokenAction] Unhandled exception:", error); // Log any unexpected errors
     return {
       success: false,
-      message:
-        result?.data?.completeRegistration?.message || "Η επιβεβαίωση απέτυχε.",
+      message: "An unexpected error occurred during confirmation.", // Generic message for unhandled errors
       redirect: false,
     };
   }
-
-  // --- Success ---
-  const { jwt } = result.data.completeRegistration;
-
-  if (jwt) {
-    // Set the authentication token
-    await setToken(jwt);
-  }
-
-  // Return success state - redirect will be handled client-side based on state.redirect
-  return {
-    success: true,
-    message: `Επιτυχία εγγραφής!`, // Use optional chaining
-    redirect: true,
-  };
 }
 
 export async function resetPassword(prevState, formData) {
