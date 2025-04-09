@@ -2,14 +2,22 @@
 
 import React from "react";
 
-export default function ServiceAudioFiles({ audioFiles }) {
+export default function ServiceAudioFiles({ audioFiles, hideContainer }) {
   if (!audioFiles || audioFiles.length === 0) {
     return null; // Don't render anything if there are no audio files
   }
 
   return (
-    <div className="px30 bdr1 pt30 pb30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1">
-      <h4 className="mb20">Αρχεία Ήχου</h4>
+    <div
+      className={
+        hideContainer
+          ? ""
+          : "px30 bdr1 pt30 pb30 pb-0 mb30 bg-white bdrs12 wow fadeInUp default-box-shadow1"
+      }
+    >
+      <h4 className={`mb20 ${hideContainer ? "fz15 fw700 mt30" : ""}`}>
+        Αρχεία Ήχου
+      </h4>
       {audioFiles.map((file) => (
         <div key={file.id || file.url} className="audio-player-wrapper mb10">
           <p className="mb10">{file.name || "Audio File"}</p>{" "}

@@ -15,6 +15,7 @@ import Terms from "./Terms";
 import FreelancerSchema from "@/utils/Seo/Schema/FreelancerSchema";
 import Protected from "@/components/auth/Protected";
 import FeaturedFile from "../../SingleService/FeaturedFile";
+import ServiceAudioFiles from "../../SingleService/ServiceAudioFiles";
 
 export default function FreelancerProfile({
   freelancer,
@@ -77,6 +78,11 @@ export default function FreelancerProfile({
     rating_stars_4,
     rating_stars_5,
   ];
+
+  // Filter out audio files
+  const audioFiles = portfolio?.data
+    ?.filter((file) => file.attributes.mime?.startsWith("audio/"))
+    .map((file) => file.attributes); // Map to attributes for the component
 
   return (
     <section className="pt10 pb90 pb30-md">
@@ -148,14 +154,15 @@ export default function FreelancerProfile({
                 meta={servicesMeta}
                 servicesPage={servicesPage}
               />
+
+              <h4>Δείγμα Εργασιών</h4>
+
+              <ServiceAudioFiles audioFiles={audioFiles} hideContainer />
+
               {portfolio.data.length > 0 && (
                 <>
                   {portfolio.data.length > 1 ? (
-                    <FeaturedFiles
-                      files={portfolio.data}
-                      title="Δείγμα Εργασιών"
-                      border
-                    />
+                    <FeaturedFiles files={portfolio.data} border />
                   ) : (
                     <FeaturedFile
                       file={portfolio?.data[0]}
