@@ -401,9 +401,13 @@ export default function PresentationForm({ freelancer, jwt }) {
       if (changes.website !== undefined) formChanges.website = changes.website;
       if (changes.visibility) formChanges.visibility = changes.visibility;
       if (changes.socials) formChanges.socials = changes.socials;
-      if (changes.viber !== undefined) formChanges.viber = changes.viber; // Add viber
-      if (changes.whatsapp !== undefined)
-        formChanges.whatsapp = changes.whatsapp; // Add whatsapp
+      if (changes.viber !== undefined) {
+        formChanges.viber = changes.viber === "" ? null : changes.viber;
+      }
+      if (changes.whatsapp !== undefined) {
+        formChanges.whatsapp =
+          changes.whatsapp === "" ? null : changes.whatsapp;
+      }
 
       finalFormData.append("changes", JSON.stringify(formChanges));
 
