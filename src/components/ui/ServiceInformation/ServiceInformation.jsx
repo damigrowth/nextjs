@@ -440,8 +440,8 @@ export default function ServiceInformation() {
                   type="number"
                   min={!showPrice ? 0 : 10}
                   max={50000}
-                  defaultValue={!showPrice ? 0 : info.price || 0}
-                  value={!showPrice ? 0 : info.price || 0}
+                  // Use state value directly, handle default/min on blur in InputB
+                  value={!showPrice ? 0 : info.price}
                   onChange={(formattedValue) =>
                     setInfo("price", formattedValue)
                   }
@@ -460,49 +460,45 @@ export default function ServiceInformation() {
                 onChange={handleHidePriceToggle}
               />
             </div>
-           </div>
-            {type.online && type.oneoff && (
-              <div className="col-sm-2">
-                <div className="mb20 fw400">
-                  <InputB
-                    id="service-time"
-                    name="service-time"
-                    label="Χρόνος Παράδοσης"
-                    type="number"
-                    min={1}
-                    append={info.time > 1 ? "Μέρες" : "Μέρα"}
-                    defaultValue={info.time || 1}
-                    value={info.time || 1}
-                    onChange={(formattedValue) =>
-                      setInfo("time", formattedValue)
-                    }
-                    className="form-control input-group"
-                    errors={errors}
-                  />
-                </div>
-              </div>
-            )}
-            {type.online && type.subscription && (
-              <div className="col-sm-3">
-                <div className="mb20 ">
-                  <SearchableSelect
-                    name="subscription-type"
-                    label="Τύπος Συνδρομής"
-                    labelPlural="τύποι συνδρομής"
-                    staticOptions={subscriptionTypeOptions}
-                    value={selectedSubscriptionType}
-                    onSelect={handleSubscriptionTypeSelect}
-                    isMulti={false}
-                    isClearable={false}
-                    isSearchable={false}
-                    errors={
-                      errors?.field === "subscription_type" ? errors : null
-                    }
-                  />
-                </div>
-              </div>
-            )}
           </div>
+          {type.online && type.oneoff && (
+            <div className="col-sm-2">
+              <div className="mb20 fw400">
+                <InputB
+                  id="service-time"
+                  name="service-time"
+                  label="Χρόνος Παράδοσης"
+                  type="number"
+                  min={1}
+                  append={info.time > 1 ? "Μέρες" : "Μέρα"}
+                  // Use state value directly, handle default/min on blur in InputB
+                  value={info.time}
+                  onChange={(formattedValue) => setInfo("time", formattedValue)}
+                  className="form-control input-group"
+                  errors={errors}
+                />
+              </div>
+            </div>
+          )}
+          {type.online && type.subscription && (
+            <div className="col-sm-3">
+              <div className="mb20 ">
+                <SearchableSelect
+                  name="subscription-type"
+                  label="Τύπος Συνδρομής"
+                  labelPlural="τύποι συνδρομής"
+                  staticOptions={subscriptionTypeOptions}
+                  value={selectedSubscriptionType}
+                  onSelect={handleSubscriptionTypeSelect}
+                  isMulti={false}
+                  isClearable={false}
+                  isSearchable={false}
+                  errors={errors?.field === "subscription_type" ? errors : null}
+                />
+              </div>
+            </div>
+          )}
+        </div>
         {/* Remove the save button - saving will be handled by the Next button */}
       </div>
     </div>

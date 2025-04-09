@@ -46,9 +46,14 @@ export const formatInput = ({
       formattedValue = formattedValue.substring(0, maxLength);
     }
 
-    // For number inputs, convert to numeric type after length enforcement
+    // For number inputs, keep as string if empty, otherwise parse
+    // This allows the InputB component to handle empty state correctly on change/blur
     if (type === "number" && formattedValue !== "") {
-      formattedValue = parseFloat(formattedValue);
+      // We don't parseFloat here anymore, InputB's onBlur will handle final numeric conversion/validation
+      // formattedValue = parseFloat(formattedValue); // Removed parseFloat here
+    } else if (type === "number" && formattedValue === "") {
+      // Explicitly return empty string if formatting resulted in empty
+      return "";
     }
   }
 
