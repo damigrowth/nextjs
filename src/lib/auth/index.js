@@ -19,9 +19,18 @@ import { removeToken, setToken } from "./token";
 import { inspect } from "@/utils/inspect";
 import { cookies } from "next/headers";
 
+/**
+ * Server action to handle the first step of user registration (startRegistration).
+ * Sends user details (email, username, password, type, role, displayName) to the backend
+ * via the START_REGISTRATION mutation. Redirects to /register/success on success.
+ *
+ * @param {object} prevState - The previous state from useActionState (not used here but required by the hook).
+ * @param {FormData} formData - The form data containing registration details.
+ * @returns {Promise<{ errors: object, message: string | null } | void>} Returns an error object or redirects.
+ */
 export async function register(prevState, formData) {
   const type = Number(formData.get("type"));
-  const role = formData.get("role") ? Number(formData.get("role")) : null; // Handle null role
+  const role = formData.get("role") ? Number(formData.get("role")) : null;
   const displayName = formData.get("displayName");
   const email = formData.get("email");
   const username = formData.get("username");
@@ -33,32 +42,28 @@ export async function register(prevState, formData) {
       errors: {
         consent: ["Πρέπει να αποδεχθείς τους Όρους Χρήσης"],
       },
-      message: null, // Ensure consistent return structure
+      message: null,
     };
   }
 
-  // Remove the cookie storage logic
-  // (await cookies()).set(...) - DELETED
-
-  // Call the new START_REGISTRATION mutation
+  // Call the START_REGISTRATION mutation
   const result = await postData(START_REGISTRATION, {
     input: {
       email: email,
       username: username,
       password: password,
       type: type,
-      // Only include role and displayName if type is 2 (Professional)
-      ...(type === 2 && { role: role, displayName: displayName }),
+      ...(type === 2 && { role: role, displayName: displayName }), // Only include role and displayName if type is 2 (Professional)
     },
   });
 
-  // Handle potential GraphQL errors returned by postData
+  // Handle potential GraphQL errors
   if (result.error) {
     console.error("GraphQL Error in register action:", result.error);
-    return { errors: {}, message: result.error }; // Return error message
+    return { errors: {}, message: result.error };
   }
 
-  // Handle application-level errors returned in the mutation payload
+  // Handle application-level errors from the mutation
   if (!result?.data?.startRegistration?.success) {
     console.error(
       "StartRegistration failed:",
@@ -75,116 +80,18 @@ export async function register(prevState, formData) {
   redirect("/register/success");
 }
 
-// // Complete registration action (OLD - Cookie/Code based)
-// export async function completeRegistration(prevState, formData) {
-//   const code = formData.get("code");
+// Note: The old completeRegistration function using cookies/code is commented out
+// and kept for historical reference if needed. It's replaced by confirmTokenAction.
 
-//   // First verify email with Strapi
-//   const confirmationResult = await postData(EMAIL_CONFIRMATION, {
-//     code,
-//   });
-
-//   if (!confirmationResult?.data?.emailConfirmation?.jwt) {
-//     return {
-//       success: false,
-//       message: "Σφάλμα ταυτοποίησης, ο σύνδεσμος έχει λήξει.",
-//     };
-//   }
-
-//   const { jwt, user } = confirmationResult.data.emailConfirmation;
-//   const userId = user.id;
-
-//   const cookieData = (await cookies()).get("registration_data")?.value;
-//   // Get stored registration data with default values
-//   const registrationData = cookieData
-//     ? JSON.parse(cookieData)
-//     : {
-//         type: 3,
-//         role: 1,
-//         displayName: user.username,
-//         consent: true,
-//       };
-
-//   const { type, role, displayName, consent } = registrationData;
-
-//   // Create freelancer profile based on type
-//   if (type === 1) {
-//     // Regular User type
-//     const freelancer = await postData(
-//       CREATE_FREELANCER,
-//       {
-//         data: {
-//           user: userId,
-//           username: user.username,
-//           email: user.email,
-//           displayName: user.username,
-//           type: "3",
-//           publishedAt: new Date().toISOString(),
-//         },
-//       },
-//       jwt
-//     );
-
-//     const freelancerId = freelancer.data?.createFreelancer?.data?.id;
-
-//     await postData(
-//       UPDATE_USER,
-//       {
-//         id: userId,
-//         roleId: "1",
-//         freelancer: freelancerId,
-//         username: user.username,
-//         displayName: user.username,
-//         consent: consent,
-//       },
-//       jwt
-//     );
-//   } else {
-//     // Freelancer User type
-//     const freelancerType = role === 4 ? 1 : 2;
-
-//     const freelancer = await postData(
-//       CREATE_FREELANCER,
-//       {
-//         data: {
-//           user: userId,
-//           username: user.username,
-//           email: user.email,
-//           displayName: displayName,
-//           type: freelancerType.toString(),
-//           publishedAt: new Date().toISOString(),
-//         },
-//       },
-//       jwt
-//     );
-
-//     const freelancerId = freelancer.data?.createFreelancer?.data?.id;
-
-//     await postData(
-//       UPDATE_USER,
-//       {
-//         id: userId,
-//         roleId: role.toString(),
-//         freelancer: freelancerId,
-//         username: user.username,
-//         displayName: displayName,
-//         consent: consent,
-//       },
-//       jwt
-//     );
-//   }
-
-//   // Clean up stored data
-//   (await cookies()).delete("registration_data");
-
-//   await setToken(jwt);
-//   return {
-//     success: true,
-//     message: `Καλώς ήρθες ${user.username}!`,
-//     redirect: true, // Keep redirect flag for client-side handling
-//   };
-// }
-
+/**
+ * Server action to handle user login.
+ * Validates identifier and password using loginSchema.
+ * Calls the LOGIN_USER mutation. Sets the JWT token on success and redirects to the dashboard.
+ *
+ * @param {object} prevState - The previous state from useActionState.
+ * @param {FormData} formData - The form data containing login credentials.
+ * @returns {Promise<{ errors: object, message: string } | void>} Returns an error object or redirects.
+ */
 export async function login(prevState, formData) {
   const validatedFields = loginSchema.safeParse({
     identifier: formData.get("identifier"),
@@ -216,11 +123,25 @@ export async function login(prevState, formData) {
   }
 }
 
+/**
+ * Server action to handle user logout.
+ * Removes the JWT token and redirects to the login page.
+ *
+ * @returns {Promise<void>} Redirects the user.
+ */
 export async function logout() {
   await removeToken();
   redirect("/login");
 }
 
+/**
+ * Server action to handle the "forgot password" request.
+ * Sends the user's email to the backend via the FORGOT_PASSWORD mutation.
+ *
+ * @param {object} prevState - The previous state from useActionState.
+ * @param {FormData} formData - The form data containing the user's email.
+ * @returns {Promise<{ success?: boolean, errors?: object, message: string }>} Returns a state object indicating success or failure.
+ */
 export async function forgotPassword(prevState, formData) {
   try {
     const email = formData.get("email");
@@ -250,12 +171,17 @@ export async function forgotPassword(prevState, formData) {
   }
 }
 
-// New action to handle token-based confirmation
+/**
+ * Server action to complete user registration by confirming an email token.
+ * Calls the COMPLETE_REGISTRATION mutation with the provided token.
+ * Sets the JWT token on success.
+ *
+ * @param {object} prevState - The previous state from useActionState.
+ * @param {string} token - The email confirmation token from the URL.
+ * @returns {Promise<{ success: boolean, message: string, redirect: boolean }>} Returns a state object indicating success or failure, and if a redirect should occur.
+ */
 export async function confirmTokenAction(prevState, token) {
-  console.log("[confirmTokenAction] Action started."); // Log entry
-
   if (!token) {
-    console.error("[confirmTokenAction] Error: Missing confirmation token.");
     return {
       success: false,
       message: "Missing confirmation token.",
@@ -263,37 +189,23 @@ export async function confirmTokenAction(prevState, token) {
     };
   }
 
-  console.log(`[confirmTokenAction] Received token: ${token}`); // Log token
-
   try {
-    console.log(
-      "[confirmTokenAction] Calling COMPLETE_REGISTRATION mutation..."
-    ); // Log before postData
     // Call the COMPLETE_REGISTRATION mutation
     const result = await postData(COMPLETE_REGISTRATION, {
       input: {
         token: token,
       },
     });
-    console.log(
-      "[confirmTokenAction] COMPLETE_REGISTRATION result:",
-      JSON.stringify(result, null, 2)
-    ); // Log result
 
     // Handle potential GraphQL errors
     if (result.error) {
-      console.error("[confirmTokenAction] GraphQL Error:", result.error);
       return { success: false, message: result.error, redirect: false };
     }
 
-    // Handle application-level errors from the mutation payload
+    // Handle application-level errors from the mutation
     if (!result?.data?.completeRegistration?.success) {
       const errorMessage =
         result?.data?.completeRegistration?.message || "Η επιβεβαίωση απέτυχε.";
-      console.error(
-        "[confirmTokenAction] CompleteRegistration failed:",
-        errorMessage
-      );
       return {
         success: false,
         message: errorMessage,
@@ -301,33 +213,22 @@ export async function confirmTokenAction(prevState, token) {
       };
     }
 
-    // --- Success ---
+    // Success case
     const { jwt } = result.data.completeRegistration;
-    console.log("[confirmTokenAction] Registration successful."); // Log success
 
     if (jwt) {
-      console.log("[confirmTokenAction] Setting token..."); // Log before setToken
-      // Set the authentication token
-      await setToken(jwt);
-      console.log("[confirmTokenAction] Token set successfully."); // Log after setToken
-    } else {
-      console.warn(
-        "[confirmTokenAction] No JWT returned on successful registration."
-      );
+      await setToken(jwt); // Set the authentication token
     }
 
     const finalState = {
       success: true,
-      message: `Επιτυχία εγγραφής!`, // Use optional chaining
+      message: `Επιτυχία εγγραφής!`,
       redirect: true,
     };
-    console.log(
-      "[confirmTokenAction] Returning success state:",
-      JSON.stringify(finalState, null, 2)
-    ); // Log final state
     return finalState;
   } catch (error) {
-    console.error("[confirmTokenAction] Unhandled exception:", error); // Log any unexpected errors
+    // Catch unexpected errors during the process
+    console.error("Unexpected error in confirmTokenAction:", error);
     return {
       success: false,
       message: "An unexpected error occurred during confirmation.", // Generic message for unhandled errors
@@ -336,6 +237,15 @@ export async function confirmTokenAction(prevState, token) {
   }
 }
 
+/**
+ * Server action to handle resetting the user's password using a reset code.
+ * Calls the RESET_PASSWORD mutation with the new password and reset code.
+ * Logs the user out if successful.
+ *
+ * @param {object} prevState - The previous state from useActionState.
+ * @param {FormData} formData - The form data containing the new password, confirmation, and reset code.
+ * @returns {Promise<{ success: boolean, message: string }>} Returns a state object indicating success or failure.
+ */
 export async function resetPassword(prevState, formData) {
   const password = formData.get("password");
   const passwordConfirmation = formData.get("passwordConfirmation");
