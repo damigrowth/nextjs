@@ -14,6 +14,8 @@ export default async function UserMenu({ isMobile }) {
     const allNav = hasAccess ? hasAccessUserMenuNav : noAccessUserMenuNav;
     const userProfilePath = `/profile/${user.username}`;
 
+    const freelancer = user?.freelancer?.data?.attributes;
+
     // Modify the nav items to use dynamic profile path or filter out profile for non-access users
     const modifiedNav = allNav
       .map((item) => {
@@ -29,16 +31,16 @@ export default async function UserMenu({ isMobile }) {
         <div className="dropdown">
           <div className="btn" data-bs-toggle="dropdown">
             <UserImage
-              firstName={user.firstName}
-              lastName={user.lastName}
-              displayName={user.displayName}
+              firstName={freelancer.firstName}
+              lastName={freelancer.lastName}
+              displayName={freelancer.displayName}
               hideDisplayName
               image={
-                user?.freelancer?.data?.attributes?.image?.data?.attributes
-                  ?.formats?.thumbnail?.url
+                freelancer?.image?.data?.attributes?.formats?.thumbnail?.url
               }
               alt={
-                user?.image?.formats?.thumbnail?.provider_metadata?.public_id
+                freelancer?.image?.data?.attributes?.formats?.thumbnail
+                  ?.provider_metadata?.public_id
               }
               width={40}
               height={40}
