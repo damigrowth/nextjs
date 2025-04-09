@@ -1,19 +1,51 @@
 "use client";
 
-import { startTransition, useActionState, useRef } from "react";
+import {
+  startTransition,
+  useActionState,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
 import { updatePresentationInfo } from "@/lib/profile/update";
 import SaveButton from "../../buttons/SaveButton";
 import SocialsInputs from "./SocialsInputs";
 import InputB from "@/components/inputs/InputB";
 import SwitchB from "../../Archives/Inputs/SwitchB";
 import Alert from "../../alerts/Alert";
-import { useState, useEffect } from "react";
 import useEditProfileStore from "@/store/dashboard/profile";
 import MediaGallery from "@/components/inputs/MediaGallery";
 import { useFormChanges } from "@/hook/useFormChanges";
 import { uploadData } from "@/lib/uploads/upload";
 
+/**
+ * @typedef {import('@/lib/types').Freelancer} Freelancer
+ * @typedef {import('@/lib/types').StrapiMedia} StrapiMedia
+ * @typedef {import('@/lib/types').StrapiMediaItem} StrapiMediaItem
+ */
+
+/**
+ * @typedef {object} MediaState
+ * @property {StrapiMediaItem[]} media - Current list of media items (existing and new).
+ * @property {number[]} deletedMediaIds - IDs of media items marked for deletion.
+ * @property {boolean} hasChanges - Flag indicating if media state has changed from original.
+ * @property {number[]} initialMediaIds - IDs of the media items initially loaded.
+ */
+
+/**
+ * Renders the presentation form for editing freelancer profile details.
+ * Includes fields for visibility settings, website, Viber, WhatsApp, social media links, and portfolio media gallery.
+ * Handles form state, validation, media uploads, and submission via a server action.
+ *
+ * @param {object} props - The component props.
+ * @param {Freelancer} props.freelancer - The freelancer data object.
+ * @param {string} props.jwt - The JWT token for authenticated requests.
+ * @returns {JSX.Element} The PresentationForm component.
+ */
 export default function PresentationForm({ freelancer, jwt }) {
+  /**
+   * Zustand store state and setters for presentation form fields.
+   */
   const {
     website,
     setWebsite,
@@ -21,29 +53,47 @@ export default function PresentationForm({ freelancer, jwt }) {
     setVisibility,
     socials,
     setSocial,
-    viber, // Import viber
-    setViber, // Import setViber
-    whatsapp, // Import whatsapp
-    setWhatsapp, // Import setWhatsapp
+    viber,
+    setViber,
+    whatsapp,
+    setWhatsapp,
   } = useEditProfileStore();
 
+  /**
+   * Initial state for the server action response.
+   * @type {{ data: any, errors: object, message: string | null }}
+   */
   const initialState = {
     data: null,
     errors: {},
     message: null,
   };
 
-  // Track if we've processed a successful form submission to avoid loops
+  /**
+   * Ref to track if a successful form submission has been processed to prevent loops.
+   * @type {React.MutableRefObject<boolean>}
+   */
   const hasProcessedSuccess = useRef(false);
 
+  /**
+   * State hook for managing server action state (response, errors, pending status).
+   * @type {[typeof initialState, (formData: FormData) => Promise<typeof initialState>, boolean]}
+   */
   const [formState, formAction, isPending] = useActionState(
     updatePresentationInfo,
     initialState
   );
 
+  /**
+   * Local state to track the submission process initiated by the user.
+   * @type {[boolean, React.Dispatch<React.SetStateAction<boolean>>]}
+   */
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Setup original values for change detection
+  /**
+   * Original values of the form fields loaded from the freelancer data.
+   * Used by `useFormChanges` hook for change detection.
+   */
   const originalValues = {
     website: freelancer.website || "",
     visibility: freelancer.visibility || {
@@ -61,29 +111,41 @@ export default function PresentationForm({ freelancer, jwt }) {
       behance: null,
       dribbble: null,
     },
-    viber: freelancer.viber || null, // Add viber
-    whatsapp: freelancer.whatsapp || null, // Add whatsapp
+    viber: freelancer.viber || null,
+    whatsapp: freelancer.whatsapp || null,
   };
 
-  // Setup current values for change detection
+  /**
+   * Current values of the form fields from the Zustand store.
+   * Used by `useFormChanges` hook for change detection.
+   */
   const currentValues = {
     website,
     visibility,
     socials,
-    viber, // Add viber
-    whatsapp, // Add whatsapp
+    viber,
+    whatsapp,
   };
 
-  // Use the useFormChanges hook for form field changes
+  /**
+   * Custom hook to detect changes in form fields compared to original values.
+   * @type {{ changes: object, hasChanges: boolean }}
+   */
   const { changes, hasChanges: formFieldsChanged } = useFormChanges(
     currentValues,
     originalValues
   );
 
-  // Track original media length for comparison
+  /**
+   * Ref to store the original number of media items.
+   * @type {React.MutableRefObject<number>}
+   */
   const originalMediaLength = useRef(freelancer.portfolio?.data?.length || 0);
 
-  // Media changes state
+  /**
+   * Local state to manage the media gallery items, deletions, and change status.
+   * @type {[MediaState, React.Dispatch<React.SetStateAction<MediaState>>]}
+   */
   const [mediaState, setMediaState] = useState({
     media: freelancer.portfolio?.data || [],
     deletedMediaIds: [],
@@ -93,7 +155,10 @@ export default function PresentationForm({ freelancer, jwt }) {
       .filter(Boolean),
   });
 
-  // Process social media errors for easier display
+  /**
+   * Processes social media errors from the form state for easier display in SocialsInputs.
+   * @returns {object} An object mapping social platforms to their specific error messages.
+   */
   const getSocialErrors = () => {
     const errors = {};
     if (formState?.errors?.socials) {
@@ -108,38 +173,38 @@ export default function PresentationForm({ freelancer, jwt }) {
     return errors;
   };
 
+  /**
+   * Processed social media errors.
+   */
   const socialErrors = getSocialErrors();
 
-  // Reset form state when component mounts or unmounts
+  /**
+   * Effect to reset the success processing flag when the component unmounts.
+   */
   useEffect(() => {
-    // Reset processing flag when component unmounts
     return () => {
       hasProcessedSuccess.current = false;
     };
   }, []);
 
-  // Reset media changes flag after successful submission - using a different approach
+  /**
+   * Effect to handle resetting the media state after a successful form submission.
+   * Dispatches a custom event to reset MediaGallery state and updates local media state.
+   * Uses `setTimeout` to avoid potential render loops.
+   */
   useEffect(() => {
-    // Only run this if we have a success message and no errors
     const isSuccess = formState?.message && !formState?.errors;
 
-    // Only process a success once to avoid loops
     if (isSuccess && !hasProcessedSuccess.current) {
-      // Mark that we've processed this success
       hasProcessedSuccess.current = true;
 
-      // Reset the MediaGallery user action flag first
       if (typeof window !== "undefined") {
         document.dispatchEvent(new CustomEvent("media-gallery-reset"));
 
-        // Use setTimeout to break potential render cycles
         setTimeout(() => {
-          // Get the updated media from portfolio after server response
           const updatedMedia = freelancer.portfolio?.data || [];
 
-          // Update state after userActionPerformed is reset
           setMediaState((prev) => {
-            // Compare if the media actually changed to avoid unnecessary updates
             if (
               compareMediaArrays(prev.media, updatedMedia) &&
               prev.deletedMediaIds.length === 0 &&
@@ -158,57 +223,49 @@ export default function PresentationForm({ freelancer, jwt }) {
             };
           });
 
-          // Update the original length reference
           originalMediaLength.current = updatedMedia.length;
-        }, 20); // A slightly longer delay to ensure the reset event has been processed
+        }, 20);
       }
     } else if (!isSuccess) {
-      // Reset our tracker if form state is not a success
       hasProcessedSuccess.current = false;
     }
-  }, [formState]);
+  }, [formState, freelancer.portfolio?.data]); // Added freelancer.portfolio?.data dependency
 
-  // Handle media changes through the proper update function
+  /**
+   * Updates the media state based on changes from the MediaGallery component.
+   * Calculates if the media state has changed compared to the original state.
+   * @param {StrapiMediaItem[]} media - The updated list of media items.
+   * @param {number[]} deletedIds - The list of IDs marked for deletion in this update.
+   */
   const handleMediaUpdate = (media, deletedIds) => {
-    // Ensure we're only updating state when necessary
     setMediaState((prev) => {
-      // Combine previous and new deleted IDs without duplicates
       const combinedDeletedIds = Array.from(
         new Set([...prev.deletedMediaIds, ...deletedIds])
       );
 
-      // Debug deleted IDs handling
-
-      // Deep compare media arrays to detect real changes
       const mediaContentChanged = !compareMediaArrays(prev.media, media);
-      // Deep compare deleted IDs arrays
       const deletedIdsContentChanged = !arraysEqual(
         prev.deletedMediaIds,
         combinedDeletedIds
       );
 
-      // Skip update if nothing has actually changed
       if (!mediaContentChanged && !deletedIdsContentChanged) {
         return prev;
       }
 
-      // Check if there are new files or deleted files
       const hasNewFiles = media.some((item) => item.file instanceof File);
       const hasDeletedFiles = combinedDeletedIds.length > 0;
       const hasLengthChanged = media.length !== originalMediaLength.current;
 
-      // Check if we've returned to the original state
       const isInitialState =
         media.length === 0 &&
         originalMediaLength.current === 0 &&
         !hasDeletedFiles;
 
-      // Calculate the new hasChanges value
       const newHasChanges = isInitialState
         ? false
         : hasNewFiles || hasDeletedFiles || hasLengthChanged;
 
-      // Return new state with the updated values
       return {
         ...prev,
         media,
@@ -218,11 +275,16 @@ export default function PresentationForm({ freelancer, jwt }) {
     });
   };
 
-  // Helper function to compare media arrays
+  /**
+   * Compares two arrays of media items for equality based on content.
+   * Handles both existing Strapi media objects (by ID) and new File objects (by name/size).
+   * @param {StrapiMediaItem[]} arr1 - The first media array.
+   * @param {StrapiMediaItem[]} arr2 - The second media array.
+   * @returns {boolean} True if the arrays contain the same media items, false otherwise.
+   */
   const compareMediaArrays = (arr1, arr2) => {
     if (arr1.length !== arr2.length) return false;
 
-    // Create hashable representations of media items
     const getMediaHash = (item) => {
       if (typeof window !== "undefined" && item.file instanceof File) {
         return `file_${item.file.name}_${item.file.size}`;
@@ -236,15 +298,18 @@ export default function PresentationForm({ freelancer, jwt }) {
       return JSON.stringify(item);
     };
 
-    // Convert arrays to hashable strings for comparison
     const set1 = new Set(arr1.map(getMediaHash));
     const set2 = new Set(arr2.map(getMediaHash));
 
-    // Check if all items in set2 are in set1
     return arr2.every((item) => set1.has(getMediaHash(item)));
   };
 
-  // Helper function to compare arrays of primitives
+  /**
+   * Compares two arrays of primitive values (e.g., numbers) for equality.
+   * @param {Array<number|string>} a - The first array.
+   * @param {Array<number|string>} b - The second array.
+   * @returns {boolean} True if the arrays contain the same elements, false otherwise.
+   */
   const arraysEqual = (a, b) => {
     if (a.length !== b.length) return false;
     const sortedA = [...a].sort();
@@ -252,64 +317,61 @@ export default function PresentationForm({ freelancer, jwt }) {
     return sortedA.every((val, idx) => val === sortedB[idx]);
   };
 
-  // Handle media save - implemented to set changes flag
+  /**
+   * Callback passed to MediaGallery's onSave prop. Updates media state.
+   * @param {StrapiMediaItem[]} media - The current media items in the gallery.
+   * @param {number[]} deletedIds - IDs marked for deletion.
+   * @returns {Promise<boolean>} Always returns true to indicate success to MediaGallery.
+   */
   const handleMediaSave = async (media, deletedIds) => {
     handleMediaUpdate(media, deletedIds);
-    return true; // Indicate successful operation to MediaGallery component
+    return true;
   };
 
-  // Combine form field changes with media changes
+  /**
+   * Determines if there are any changes in the form fields or the media gallery.
+   * @returns {boolean} True if there are changes, false otherwise.
+   */
   const hasChanges = () => {
     const formHasChanges = formFieldsChanged;
-
-    // Check if media has changes
     const mediaHasChanges = mediaState.hasChanges;
-
-    // Explicitly check for deleted media as an indication of changes
     const hasDeletedMedia = mediaState.deletedMediaIds.length > 0;
-
-    // Check if we're at the initial state (no files when there were none originally)
     const hasReturnedToInitialState =
       mediaState.media.length === 0 &&
       originalMediaLength.current === 0 &&
       mediaState.deletedMediaIds.length === 0;
-
-    // Check if all media has been deleted (special case)
     const allMediaDeleted =
       mediaState.media.length === 0 && originalMediaLength.current > 0;
 
-    // If we've returned to the initial state, we don't have changes
     if (hasReturnedToInitialState) {
       return formHasChanges;
     }
-
-    // If all media has been deleted, this is definitely a change
     if (allMediaDeleted) {
       return true;
     }
-
     return formHasChanges || mediaHasChanges || hasDeletedMedia;
   };
 
-  // Handle form submission
-  // Updated handleSubmit function for PresentationForm
+  /**
+   * Handles the form submission process.
+   * Performs validation, uploads new media files, and calls the server action to update data.
+   * Converts empty strings for website, viber, and whatsapp to null.
+   * @param {FormData} formData - The form data (not directly used, values taken from state/changes).
+   */
   const handleSubmit = async (formData) => {
-    // Set loading state
     setIsSubmitting(true);
 
-    // Only proceed if there are changes
     if (!hasChanges()) {
       setIsSubmitting(false);
       return;
     }
 
     try {
-      // Step 1: Validate the form first
+      // Step 1: Validate form changes
       const validationFormData = new FormData();
       validationFormData.append("id", freelancer.id);
       validationFormData.append("validateOnly", "true");
 
-      // Create validation state to check before proceeding
       const formChangesToValidate = {};
       if (changes.website !== undefined)
         formChangesToValidate.website = changes.website;
@@ -317,11 +379,10 @@ export default function PresentationForm({ freelancer, jwt }) {
         formChangesToValidate.visibility = changes.visibility;
       if (changes.socials) formChangesToValidate.socials = changes.socials;
       if (changes.viber !== undefined)
-        formChangesToValidate.viber = changes.viber; // Add viber
+        formChangesToValidate.viber = changes.viber;
       if (changes.whatsapp !== undefined)
-        formChangesToValidate.whatsapp = changes.whatsapp; // Add whatsapp
+        formChangesToValidate.whatsapp = changes.whatsapp;
 
-      // Add media validation state
       const mediaValidationState = {
         hasNewMedia: mediaState.media.some((item) => item.file instanceof File),
         hasDeletedMedia: mediaState.deletedMediaIds.length > 0,
@@ -337,26 +398,22 @@ export default function PresentationForm({ freelancer, jwt }) {
         JSON.stringify(mediaValidationState)
       );
 
-      // Call server action WITH await to ensure validation completes
       const validationResult = await formAction(validationFormData);
 
-      // Check validation result
       if (
         validationResult?.errors &&
         Object.keys(validationResult.errors).length > 0
       ) {
-        console.log("Validation failed:", validationResult.errors);
         setIsSubmitting(false);
-        return; // Stop the submission if validation fails
+        return;
       }
 
-      // Step 2: If validation passed, handle file uploads
+      // Step 2: Upload new media files
       let newMediaIds = [];
       const newFiles = mediaState.media
         .filter((item) => item.file && item.file instanceof File)
         .map((item) => item.file);
 
-      // If we have new files, upload them
       if (newFiles.length > 0) {
         const mediaOptions = {
           refId: freelancer.id,
@@ -365,18 +422,12 @@ export default function PresentationForm({ freelancer, jwt }) {
         };
 
         try {
-          // Upload files using the uploadData function
           newMediaIds = await uploadData(newFiles, mediaOptions, jwt);
-
-          // Handle case where upload fails but no error is thrown
           if (!newMediaIds.length && newFiles.length > 0) {
             throw new Error("Failed to upload media files");
           }
         } catch (error) {
-          // Handle upload error
           setIsSubmitting(false);
-
-          // Create error form data
           const errorFormData = new FormData();
           errorFormData.append("id", freelancer.id);
           errorFormData.append(
@@ -385,29 +436,35 @@ export default function PresentationForm({ freelancer, jwt }) {
               message: "Σφάλμα κατά την μεταφόρτωση των αρχείων",
             })
           );
-
-          // Submit error
           await formAction(errorFormData);
           return;
         }
       }
 
-      // Step 3: Prepare final submission
+      // Step 3: Prepare final submission data
       const finalFormData = new FormData();
       finalFormData.append("id", freelancer.id);
 
-      // Only include fields that have actually changed
       const formChanges = {};
-      if (changes.website !== undefined) formChanges.website = changes.website;
-      if (changes.visibility) formChanges.visibility = changes.visibility;
-      if (changes.socials) formChanges.socials = changes.socials;
-      if (changes.viber !== undefined) formChanges.viber = changes.viber; // Add viber
-      if (changes.whatsapp !== undefined)
-        formChanges.whatsapp = changes.whatsapp; // Add whatsapp
+      if (changes.website !== undefined) {
+        formChanges.website = changes.website === "" ? null : changes.website;
+      }
+      if (changes.visibility) {
+        formChanges.visibility = changes.visibility;
+      }
+      if (changes.socials) {
+        formChanges.socials = changes.socials;
+      }
+      if (changes.viber !== undefined) {
+        formChanges.viber = changes.viber === "" ? null : changes.viber;
+      }
+      if (changes.whatsapp !== undefined) {
+        formChanges.whatsapp =
+          changes.whatsapp === "" ? null : changes.whatsapp;
+      }
 
       finalFormData.append("changes", JSON.stringify(formChanges));
 
-      // Prepare remaining media IDs (existing media that wasn't deleted)
       const remainingMediaIds = mediaState.media
         .filter(
           (item) =>
@@ -415,39 +472,29 @@ export default function PresentationForm({ freelancer, jwt }) {
         )
         .map((item) => item.file.id);
 
-      // Combine existing and new media IDs
       const allMediaIds = [...remainingMediaIds, ...newMediaIds];
-
-      // Handle media information
       const hasMediaDeletions = mediaState.deletedMediaIds.length > 0;
       const allMediaDeleted =
         mediaState.media.length === 0 && originalMediaLength.current > 0;
 
       if (mediaState.hasChanges || hasMediaDeletions || allMediaDeleted) {
-        // Instead of appending files, just append the IDs
         finalFormData.append("remaining-media", JSON.stringify(allMediaIds));
         finalFormData.append(
           "deleted-media",
           JSON.stringify(mediaState.deletedMediaIds)
         );
-
-        // For the special case where all media is deleted
         if (allMediaDeleted) {
           finalFormData.append("all-media-deleted", "true");
         }
       }
 
-      // Reset hasProcessedSuccess flag before submission
       hasProcessedSuccess.current = false;
 
-      // Call the server action with transition for UI updates
+      // Step 4: Call server action
       startTransition(() => {
         formAction(finalFormData);
       });
     } catch (error) {
-      console.error("Submission error:", error);
-
-      // Create error form data
       const errorFormData = new FormData();
       errorFormData.append("id", freelancer.id);
       errorFormData.append(
@@ -456,7 +503,6 @@ export default function PresentationForm({ freelancer, jwt }) {
           message: "Προέκυψε σφάλμα κατά την υποβολή",
         })
       );
-
       formAction(errorFormData);
     } finally {
       setIsSubmitting(false);
@@ -499,7 +545,6 @@ export default function PresentationForm({ freelancer, jwt }) {
           </div>
         </div>
 
-        {/* Combine Website, Viber, Whatsapp into one row */}
         <div className="row mb40 mt40">
           <div className="col-md-3">
             <InputB
@@ -543,7 +588,6 @@ export default function PresentationForm({ freelancer, jwt }) {
             />
           </div>
         </div>
-        {/* End combined row */}
 
         <label className="form-label fw700 dark-color">Κοινωνικά Δίκτυα</label>
         <SocialsInputs

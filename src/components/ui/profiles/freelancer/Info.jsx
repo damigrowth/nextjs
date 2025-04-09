@@ -3,6 +3,29 @@
 import Link from "next/link";
 import React, { useState } from "react";
 
+/**
+ * Renders the information widget for a freelancer's profile.
+ * Displays rate, location, service coverage, commencement year, website,
+ * and contact details (phone, Viber, WhatsApp, email) with reveal functionality.
+ *
+ * @param {object} props - The component props.
+ * @param {number} [props.rate] - The freelancer's hourly rate.
+ * @param {object} [props.coverage] - Object detailing service coverage areas.
+ * @param {boolean} [props.coverage.online] - Whether the freelancer offers online services.
+ * @param {boolean} [props.coverage.onbase] - Whether the freelancer offers services at their location.
+ * @param {boolean} [props.coverage.onsite] - Whether the freelancer offers services at the client's location.
+ * @param {object} [props.coverage.county] - Strapi relation object for the county.
+ * @param {object} [props.coverage.county.data] - Data object for the county.
+ * @param {object} [props.coverage.county.data.attributes] - Attributes of the county.
+ * @param {string} [props.coverage.county.data.attributes.name] - Name of the county.
+ * @param {number} [props.commencement] - The year the freelancer started their business.
+ * @param {string} [props.website] - The freelancer's website URL.
+ * @param {string} [props.phone] - The freelancer's primary phone number.
+ * @param {string} [props.viber] - The freelancer's Viber phone number.
+ * @param {string} [props.whatsapp] - The freelancer's WhatsApp phone number.
+ * @param {string} [props.email] - The freelancer's email address.
+ * @returns {JSX.Element} The Info component.
+ */
 export default function Info({
   rate,
   coverage,
@@ -13,18 +36,39 @@ export default function Info({
   whatsapp,
   email,
 }) {
+  /**
+   * Formats the website URL by removing the protocol (http:// or https://).
+   * @type {string | null}
+   */
   const formattedWebsite = website ? website.replace(/^https?:\/\//, "") : null;
+
+  /**
+   * State to control the visibility of the phone number.
+   * @type {[boolean, React.Dispatch<React.SetStateAction<boolean>>]}
+   */
   const [showPhone, setShowPhone] = useState(false);
+
+  /**
+   * State to control the visibility of the email address.
+   * @type {[boolean, React.Dispatch<React.SetStateAction<boolean>>]}
+   */
   const [showEmail, setShowEmail] = useState(false);
 
+  /**
+   * Array of strings describing the service coverage types based on the coverage prop.
+   * @type {string[]}
+   */
   const covers = [];
   if (coverage?.online) covers.push("Online");
   if (coverage?.onbase) covers.push("Στην έδρα");
   if (coverage?.onsite) covers.push("Στον χώρο σας");
 
-  // Συνάρτηση για tracking των κλικ στο Google Analytics
+  /**
+   * Tracks the revealing of contact information (phone or email) using Google Analytics gtag.
+   * Also updates the corresponding state (showPhone or showEmail) to true.
+   * @param {'phone' | 'email'} contactType - The type of contact information being revealed.
+   */
   const trackContactReveal = (contactType) => {
-    // Έλεγχος αν το window και το gtag υπάρχουν (client-side)
     if (typeof window !== "undefined" && window.gtag) {
       window.gtag("event", "reveal_contact", {
         event_category: "Contact",
@@ -33,7 +77,6 @@ export default function Info({
       });
     }
 
-    // Ενημερώνουμε το state ανάλογα με τον τύπο επικοινωνίας
     if (contactType === "phone") {
       setShowPhone(true);
     } else if (contactType === "email") {
@@ -60,7 +103,7 @@ export default function Info({
               <span>{coverage?.county?.data?.attributes?.name}</span>
             </div>
           )}
-          {covers && (
+          {covers.length > 0 && (
             <div className="list-item d-flex align-items-center justify-content-between bdrb1 pb-3">
               <span className="text">
                 <i className="flaticon-customer-service text-thm2 pe-2 vam" />
@@ -101,34 +144,35 @@ export default function Info({
                 <i className="flaticon-call text-thm2 pe-2 vam" />
                 <span className="list-item-title">Τηλέφωνο</span>
               </span>
-              {/* Phone number display */}
               <div className="d-flex align-items-center">
-                {/* Viber Icon (Moved Before Number) */}
-                {viber && showPhone && (
+                {viber && (
                   <a
-                    href={`tel:${String(viber)}`} // Ensure viber is string
-                    className="me-2" // Changed margin to me-2
+                    href={`viber://chat/?number=%2B30${String(viber).replace(
+                      /\D/g,
+                      ""
+                    )}`}
+                    className="me-2"
                     title={`Viber: ${viber}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     <i
                       className="fab fa-viber"
                       style={{
                         color: "#665CAC",
                         fontSize: "1.3em",
-                      }} /* Increased size */
+                      }}
                     ></i>
                   </a>
                 )}
-                {/* Whatsapp Icon (Moved Before Number) */}
-                {whatsapp && showPhone && (
+                {whatsapp && (
                   <a
-                    href={`https://wa.me/${String(whatsapp).replace(
-                      /\D/g,
-                      ""
-                    )}`} // Ensure whatsapp is string
+                    href={`whatsapp://send?phone=%2B30${String(
+                      whatsapp
+                    ).replace(/\D/g, "")}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="me-2" // Changed margin to me-2
+                    className="me-2"
                     title={`Whatsapp: ${whatsapp}`}
                   >
                     <i
@@ -136,11 +180,10 @@ export default function Info({
                       style={{
                         color: "#25D366",
                         fontSize: "1.45em",
-                      }} /* Increased size */
+                      }}
                     ></i>
                   </a>
                 )}
-                {/* Phone Number / Reveal Button */}
                 {showPhone ? (
                   <a href={`tel:${phone}`}>{phone}</a>
                 ) : (
@@ -159,7 +202,6 @@ export default function Info({
                   </button>
                 )}
               </div>
-              {/* Κρυφό link για SEO */}
               <a href={`tel:${phone}`} style={{ display: "none" }}>
                 {phone}
               </a>
@@ -188,7 +230,6 @@ export default function Info({
                   Προβολή
                 </button>
               )}
-              {/* Κρυφό link για SEO */}
               <a href={`mailto:${email}`} style={{ display: "none" }}>
                 {email}
               </a>
