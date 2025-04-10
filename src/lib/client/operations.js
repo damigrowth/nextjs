@@ -125,6 +125,62 @@ export const getData = cache(
   }
 );
 
+// Version of getData specifically for public data (e.g., sitemaps) that avoids token/cookie usage
+export const getPublicData = cache(
+  async (query, variables, cacheKey = "NO_CACHE", extraTags = []) => {
+    validateEnvVars();
+    // No getToken() call here
+
+    const queryString = normalizeQuery(query);
+    const cacheConfig = CACHE_CONFIG[cacheKey] || {};
+    const { key, ttl } = cacheConfig;
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // No Authorization header
+        ...(key ? { "Cache-Control": `max-age=${ttl}, s-maxage=${ttl}` } : {}),
+      },
+      body: JSON.stringify({
+        query: queryString,
+        variables,
+      }),
+      ...(key && {
+        next: {
+          revalidate: ttl || 0,
+          tags: ["graphql", key, ...extraTags].filter(Boolean),
+        },
+      }),
+    };
+
+    try {
+      const response = await fetchWithRetry(STRAPI_GRAPHQL, options);
+
+      if (!response.ok) {
+        const clonedResponse = response.clone();
+        const errorData = await clonedResponse.json();
+        console.error("Public GraphQL error:", errorData?.errors);
+        console.error("Public GraphQL response status:", response?.status);
+        // Consider throwing a more specific error or returning null/empty data
+        return null; // Or handle error appropriately for sitemaps
+      }
+
+      const jsonResponse = await response.json();
+      // Basic error check for GraphQL-level errors
+      if (jsonResponse.errors) {
+        console.error("Public GraphQL response errors:", jsonResponse.errors);
+        return null; // Or handle error appropriately
+      }
+      return jsonResponse.data;
+    } catch (error) {
+      console.error("Public data fetch server error:", error);
+      // Consider throwing a more specific error or returning null/empty data
+      return null; // Or handle error appropriately
+    }
+  }
+);
+
 // Generic GraphQL mutation function
 export const postData = async (mutation, variables, jwt) => {
   const token = (await getToken()) || jwt;

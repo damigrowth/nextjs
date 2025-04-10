@@ -289,7 +289,10 @@ const SERVICES_BY_CATEGORY = gql`
 
 const SERVICES_ALL = gql`
   query ServicesAll {
-    allServices: services(pagination: { page: 1, pageSize: 1000 }) {
+    allServices: services(
+      filters: { status: { type: { eq: "Active" } } }
+      pagination: { page: 1, pageSize: 1000 }
+    ) {
       data {
         attributes {
           slug
