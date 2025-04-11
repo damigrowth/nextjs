@@ -478,7 +478,13 @@ const SUBDIVISIONS_SEARCH_FILTERED = gql`
 const SERVICES_ARCHIVE_ALL = gql`
   query ServicesArchiveAll {
     allServicesArchive: subcategories(
-      filters: { and: [{ services: { id: { not: { null: true } } } }] }
+      filters: {
+        services: {
+          id: { ne: null }
+          status: { type: { eq: "Active" } }
+          freelancer: { id: { ne: null } }
+        }
+      }
       pagination: { page: 1, pageSize: 1000 }
       sort: "label:asc"
     ) {
@@ -486,7 +492,15 @@ const SERVICES_ARCHIVE_ALL = gql`
         attributes {
           label
           slug
-          subdivisions {
+          subdivisions(
+            filters: {
+              services: {
+                id: { ne: null }
+                status: { type: { eq: "Active" } }
+                freelancer: { id: { ne: null } }
+              }
+            }
+          ) {
             data {
               attributes {
                 label
@@ -522,16 +536,20 @@ const CATEGORIES_FOR_FILTERED_SERVICES = gql`
                     { title_normalized: { containsi: $search } }
                     { description_normalized: { containsi: $search } }
                     { category: { label_normalized: { containsi: $search } } }
-                    { subcategory: { label_normalized: { containsi: $search } } }
-                    { subdivision: { label_normalized: { containsi: $search } } }
+                    {
+                      subcategory: { label_normalized: { containsi: $search } }
+                    }
+                    {
+                      subdivision: { label_normalized: { containsi: $search } }
+                    }
                     { tags: { label_normalized: { containsi: $search } } }
                   ]
-                },
-                { price: { gte: $min, lte: $max } },
-                { time: { lte: $time } },
-                { freelancer: { id: { notNull: true } } },
-                { status: { type: { eq: "Active" } } },
-                { tags: { slug: { in: $tags } } },
+                }
+                { price: { gte: $min, lte: $max } }
+                { time: { lte: $time } }
+                { freelancer: { id: { notNull: true } } }
+                { status: { type: { eq: "Active" } } }
+                { tags: { slug: { in: $tags } } }
                 { freelancer: { verified: { eq: $verified } } }
               ]
             }
@@ -570,7 +588,7 @@ const SUBDIVISIONS_FOR_FILTERED_SERVICES = gql`
     subdivisionsForFilteredResults: subdivisions(
       filters: {
         and: [
-          { subcategory: { slug: { eq: $subcategorySlug } } },
+          { subcategory: { slug: { eq: $subcategorySlug } } }
           {
             services: {
               and: [
@@ -579,16 +597,20 @@ const SUBDIVISIONS_FOR_FILTERED_SERVICES = gql`
                     { title_normalized: { containsi: $search } }
                     { description_normalized: { containsi: $search } }
                     { category: { label_normalized: { containsi: $search } } }
-                    { subcategory: { label_normalized: { containsi: $search } } }
-                    { subdivision: { label_normalized: { containsi: $search } } }
+                    {
+                      subcategory: { label_normalized: { containsi: $search } }
+                    }
+                    {
+                      subdivision: { label_normalized: { containsi: $search } }
+                    }
                     { tags: { label_normalized: { containsi: $search } } }
                   ]
-                },
-                { price: { gte: $min, lte: $max } },
-                { time: { lte: $time } },
-                { freelancer: { id: { notNull: true } } },
-                { status: { type: { eq: "Active" } } },
-                { tags: { slug: { in: $tags } } },
+                }
+                { price: { gte: $min, lte: $max } }
+                { time: { lte: $time } }
+                { freelancer: { id: { notNull: true } } }
+                { status: { type: { eq: "Active" } } }
+                { tags: { slug: { in: $tags } } }
                 { freelancer: { verified: { eq: $verified } } }
               ]
             }

@@ -290,7 +290,11 @@ const SERVICES_BY_CATEGORY = gql`
 const SERVICES_ALL = gql`
   query ServicesAll {
     allServices: services(
-      filters: { status: { type: { eq: "Active" } } }
+      filters: {
+        id: { ne: null }
+        status: { type: { eq: "Active" } }
+        freelancer: { id: { ne: null } }
+      }
       pagination: { page: 1, pageSize: 1000 }
     ) {
       data {

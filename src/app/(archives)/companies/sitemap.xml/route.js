@@ -1,7 +1,7 @@
 // Route Handler for /companies/sitemap.xml (Companies Archive)
-import { getPublicData } from "@/lib/client/operations"; // Changed import
-import { CATEGORIES_ALL } from "@/lib/graphql/queries/main/taxonomies";
-import { FREELANCERS_ARCHIVE_ALL } from "@/lib/graphql/queries/main/taxonomies/freelancer"; // Using the same query, filtered by type
+import { getPublicData } from "@/lib/client/operations";
+// Import the new COMPANIES_ALL query
+import { COMPANIES_ALL } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import { generateSitemapXml } from "@/utils/sitemapUtils";
 
 export async function GET() {
@@ -9,34 +9,39 @@ export async function GET() {
   let allUrls = [];
 
   try {
-    // Fetch categories for category slugs using getPublicData
-    const categoryData = await getPublicData(CATEGORIES_ALL);
-    // Fetch freelancer archive data specifically for type 'company' using getPublicData
-    const companiesArchiveData = await getPublicData(FREELANCERS_ARCHIVE_ALL, {
-      type: "company",
-    });
+    // Fetch categories with nested subcategories using the COMPANIES_ALL query
+    const sitemapData = await getPublicData(COMPANIES_ALL);
 
     // Handle potential null responses
-    const categories = categoryData?.allCategories?.data || [];
-    const companiesArchive =
-      companiesArchiveData?.allFreelancersArchive?.data || [];
+    // Note: The query returns 'freelancerCategories' even though we filter for company subcategories
+    const categoriesWithSubcategories =
+      sitemapData?.freelancerCategories?.data || [];
 
-    // URLs for category archive pages (/companies/[category])
-    const companiesCategoryUrls = categories.map((item) => ({
-      url: `${baseUrl}/companies/${item.attributes.slug}`,
-      lastModified: new Date(item.attributes.updatedAt || Date.now()),
-    }));
+    // Process the nested data to generate URLs
+    categoriesWithSubcategories.forEach((category) => {
+      const categoryAttr = category.attributes;
+      if (!categoryAttr?.slug) return; // Skip if category slug is missing
 
-    // URLs for subcategory archive pages (/companies/[category]/[subcategory])
-    const companiesSubcategoryUrls = companiesArchive
-      .map((item) => ({
-        // Ensure category data exists before accessing slug
-        url: `${baseUrl}/companies/${item.attributes.category?.data?.attributes?.slug}/${item.attributes.slug}`,
-        lastModified: new Date(item.attributes.updatedAt || Date.now()),
-      }))
-      .filter((item) => item.url.includes("/companies/undefined/") === false); // Filter out URLs with missing category slugs
+      // Add category URL (only if it has relevant company subcategories)
+      const subcategories = categoryAttr.subcategories?.data || [];
+      if (subcategories.length > 0) {
+        allUrls.push({
+          url: `${baseUrl}/companies/${categoryAttr.slug}`,
+          lastModified: new Date(categoryAttr.updatedAt || Date.now()),
+        });
+      }
 
-    allUrls = [...companiesCategoryUrls, ...companiesSubcategoryUrls];
+      // Add subcategory URLs (these are already filtered for type: "company" in the query)
+      subcategories.forEach((subcategory) => {
+        const subcategoryAttr = subcategory.attributes;
+        if (!subcategoryAttr?.slug) return; // Skip if subcategory slug is missing
+
+        allUrls.push({
+          url: `${baseUrl}/companies/${categoryAttr.slug}/${subcategoryAttr.slug}`,
+          lastModified: new Date(subcategoryAttr.updatedAt || Date.now()),
+        });
+      });
+    });
   } catch (error) {
     console.error("Error fetching companies archive for sitemap:", error);
     // Optionally return an empty sitemap or an error response
