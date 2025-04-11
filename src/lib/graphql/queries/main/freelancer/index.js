@@ -134,13 +134,15 @@ const FREELANCERS_ARCHIVE = gql`
           { status: { id: { eq: 1 } } }
           { payment_methods: { id: { in: $paymentMethods } } }
           { contactTypes: { id: { in: $contactTypes } } }
-          { coverage: {
-            online: { eq: $coverageOnline }
-            or: [
-              { county: { id: { eq: $coverageCounty } } }
-              { areas: { county: { id: { eq: $coverageCounty } } } }
-            ]
-          } }
+          {
+            coverage: {
+              online: { eq: $coverageOnline }
+              or: [
+                { county: { id: { eq: $coverageCounty } } }
+                { areas: { county: { id: { eq: $coverageCounty } } } }
+              ]
+            }
+          }
           { category: { id: { ne: null }, slug: { eq: $cat } } }
           { subcategory: { id: { ne: null }, slug: { eq: $sub } } }
           { yearsOfExperience: { gte: $experience } }
@@ -195,13 +197,15 @@ const FREELANCERS_ARCHIVE_WITH_SKILLS = gql`
           { status: { id: { eq: 1 } } }
           { payment_methods: { id: { in: $paymentMethods } } }
           { contactTypes: { id: { in: $contactTypes } } }
-          { coverage: {
-            online: { eq: $coverageOnline }
-            or: [
-              { county: { id: { eq: $coverageCounty } } }
-              { areas: { county: { id: { eq: $coverageCounty } } } }
-            ]
-          } }
+          {
+            coverage: {
+              online: { eq: $coverageOnline }
+              or: [
+                { county: { id: { eq: $coverageCounty } } }
+                { areas: { county: { id: { eq: $coverageCounty } } } }
+              ]
+            }
+          }
           { category: { id: { ne: null }, slug: { eq: $cat } } }
           { skills: { slug: { in: $skills } } }
           { subcategory: { id: { ne: null }, slug: { eq: $sub } } }

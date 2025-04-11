@@ -1,7 +1,7 @@
 // Route Handler for /pros/sitemap.xml (Pros Archive)
-import { getPublicData } from "@/lib/client/operations"; // Changed import
-import { CATEGORIES_ALL } from "@/lib/graphql/queries/main/taxonomies";
-import { FREELANCERS_ARCHIVE_ALL } from "@/lib/graphql/queries/main/taxonomies/freelancer";
+import { getPublicData } from "@/lib/client/operations";
+// Import the renamed query PROS_ALL
+import { PROS_ALL } from "@/lib/graphql/queries/main/taxonomies/freelancer";
 import { generateSitemapXml } from "@/utils/sitemapUtils";
 
 export async function GET() {
@@ -9,33 +9,36 @@ export async function GET() {
   let allUrls = [];
 
   try {
-    // Fetch categories for category slugs using getPublicData
-    const categoryData = await getPublicData(CATEGORIES_ALL);
-    // Fetch freelancer archive data specifically for type 'freelancer' using getPublicData
-    const prosArchiveData = await getPublicData(FREELANCERS_ARCHIVE_ALL, {
-      type: "freelancer",
-    });
+    // Fetch categories with nested subcategories using the renamed query PROS_ALL
+    const sitemapData = await getPublicData(PROS_ALL);
 
     // Handle potential null responses
-    const categories = categoryData?.allCategories?.data || [];
-    const prosArchive = prosArchiveData?.allFreelancersArchive?.data || [];
+    const categoriesWithSubcategories =
+      sitemapData?.freelancerCategories?.data || [];
 
-    // URLs for category archive pages (/pros/[category])
-    const prosCategoryUrls = categories.map((item) => ({
-      url: `${baseUrl}/pros/${item.attributes.slug}`,
-      lastModified: new Date(item.attributes.updatedAt || Date.now()),
-    }));
+    // Process the nested data to generate URLs
+    categoriesWithSubcategories.forEach((category) => {
+      const categoryAttr = category.attributes;
+      if (!categoryAttr?.slug) return; // Skip if category slug is missing
 
-    // URLs for subcategory archive pages (/pros/[category]/[subcategory])
-    const prosSubcategoryUrls = prosArchive
-      .map((item) => ({
-        // Ensure category data exists before accessing slug
-        url: `${baseUrl}/pros/${item.attributes.category?.data?.attributes?.slug}/${item.attributes.slug}`,
-        lastModified: new Date(item.attributes.updatedAt || Date.now()),
-      }))
-      .filter((item) => item.url.includes("/pros/undefined/") === false); // Filter out URLs with missing category slugs
+      // Add category URL
+      allUrls.push({
+        url: `${baseUrl}/pros/${categoryAttr.slug}`,
+        lastModified: new Date(categoryAttr.updatedAt || Date.now()),
+      });
 
-    allUrls = [...prosCategoryUrls, ...prosSubcategoryUrls];
+      // Add subcategory URLs
+      const subcategories = categoryAttr.subcategories?.data || [];
+      subcategories.forEach((subcategory) => {
+        const subcategoryAttr = subcategory.attributes;
+        if (!subcategoryAttr?.slug) return; // Skip if subcategory slug is missing
+
+        allUrls.push({
+          url: `${baseUrl}/pros/${categoryAttr.slug}/${subcategoryAttr.slug}`,
+          lastModified: new Date(subcategoryAttr.updatedAt || Date.now()),
+        });
+      });
+    });
   } catch (error) {
     console.error("Error fetching pros archive for sitemap:", error);
     // Optionally return an empty sitemap or an error response
