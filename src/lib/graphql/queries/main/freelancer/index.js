@@ -282,7 +282,16 @@ const FEATURED_FREELANCERS = gql`
 
 const FREELANCERS_ALL = gql`
   query FreelancersAll {
-    allFreelancers: freelancers(pagination: { page: 1, pageSize: 1000 }) {
+    allFreelancers: freelancers(
+      filters: {
+        type: { slug: { ne: "user" } }
+        email: { ne: "" }
+        username: { ne: "" }
+        displayName: { ne: "" }
+        status: { id: { eq: 1 } }
+      }
+      pagination: { page: 1, pageSize: 1000 }
+    ) {
       data {
         attributes {
           username
