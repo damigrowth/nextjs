@@ -67,17 +67,112 @@ const FEATURED_CATEGORIES = gql`
   query FeaturedCategories {
     featuredEntity {
       data {
+        id
         attributes {
-          categories {
+          categories(
+            filters: {
+              services: {
+                id: { ne: null }
+                status: { type: { eq: "Active" } }
+                freelancer: { id: { ne: null } }
+              }
+            }
+          ) {
             data {
-              ...CategoryFull
+              id
+              attributes {
+                label
+                slug
+                description
+                icon
+                image {
+                  data {
+                    id
+                    attributes {
+                      formats
+                    }
+                  }
+                }
+                subcategories(
+                  filters: {
+                    services: {
+                      id: { ne: null }
+                      status: { type: { eq: "Active" } }
+                      freelancer: { id: { ne: null } }
+                    }
+                  }
+                ) {
+                  data {
+                    id
+                    attributes {
+                      label
+                      slug
+                      category {
+                        data {
+                          id
+                          attributes {
+                            label
+                            slug
+                            icon
+                          }
+                        }
+                      }
+                      subdivisions(
+                        filters: {
+                          services: {
+                            id: { ne: null }
+                            status: { type: { eq: "Active" } }
+                            freelancer: { id: { ne: null } }
+                          }
+                        }
+                      ) {
+                        data {
+                          id
+                          attributes {
+                            label
+                            slug
+                            subcategory {
+                              data {
+                                id
+                                attributes {
+                                  label
+                                  slug
+                                  category {
+                                    data {
+                                      id
+                                      attributes {
+                                        label
+                                        slug
+                                        icon
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                            category {
+                              data {
+                                id
+                                attributes {
+                                  label
+                                  slug
+                                  icon
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
       }
     }
   }
-  ${CATEGORY_FULL}
 `;
 
 const CATEGORIES_ALL = gql`
