@@ -7,15 +7,14 @@ import {
   ApolloClient,
   SSRMultipartLink,
 } from "@apollo/experimental-nextjs-app-support";
-import { STRAPI_GRAPHQL, STRAPI_TOKEN } from "../strapi";
 
 function makeClient() {
   const httpLink = new HttpLink({
     uri: "/api/graphql",
-    // headers: {
-    //   Authorization: `Bearer ${STRAPI_TOKEN}`,
-    // },
-    // fetchOptions: { cache: "no-store" },
+    credentials: "include", // This ensures cookies are sent with requests
+    fetchOptions: {
+      cache: "no-store",
+    },
   });
 
   return new ApolloClient({
