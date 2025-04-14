@@ -568,7 +568,7 @@ export default function EditServiceForm({ service, jwt }) {
             </div>
           </div>
           <div className="row mb30">
-            <div className="col-sm-2">
+            <div className="col-sm-6">
               <div className="mb20">
                 <div className="status-switch-container">
                   <SwitchB
@@ -586,7 +586,7 @@ export default function EditServiceForm({ service, jwt }) {
             </div>
           </div>
           <div className="row mb30">
-            <div className="col-sm-3">
+            <div className="col-sm-6">
               <div className="mb20">
                 <InputB
                   id="price"
@@ -599,7 +599,7 @@ export default function EditServiceForm({ service, jwt }) {
                   onChange={(formattedValue) =>
                     setInfo("price", formattedValue)
                   }
-                  className="form-control input-group"
+                  className="form-control input-group noumera"
                   errors={formState?.errors}
                   disabled={!showPrice || !info.fixed}
                   append="€"
@@ -610,14 +610,11 @@ export default function EditServiceForm({ service, jwt }) {
                 <div className="price-switch-container d-flex align-items-center">
                   <SwitchB
                     id="hide-price-switch"
-                    label=""
+                    label={<span className="fontless">Χωρίς εμφάνιση τιμής</span>}
                     name="hide-price"
                     initialValue={!showPrice}
                     onChange={handleHidePriceToggle}
                   />
-                  <span className="fw400 pt5">
-                    Χωρίς εμφάνιση τιμής
-                  </span>
                 </div>
               </div>
             </div>

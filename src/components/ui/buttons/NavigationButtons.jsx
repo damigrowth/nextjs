@@ -5,10 +5,17 @@ import React from "react";
 export function PreviousButton({ onClick, show, disabled }) {
   if (!show) return null;
 
+  const handleClick = (e) => {
+    if (onClick) {
+      onClick(e);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={handleClick}
       className="ud-btn btn-white bdrs4 d-flex align-items-center gap-2 default-box-shadow p3"
       disabled={disabled}
     >
@@ -21,11 +28,18 @@ export function PreviousButton({ onClick, show, disabled }) {
 export function NextButton({ onClick, show, disabled, isDisabled, isPending }) {
   if (!show) return null;
 
+  const handleClick = (e) => {
+    if (onClick) {
+      onClick(e);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <button
       type="button"
       disabled={disabled || isPending}
-      onClick={onClick}
+      onClick={handleClick}
       className={`ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3 ${
         isDisabled ? "btn-dark-disabled" : ""
       }`}
@@ -51,15 +65,15 @@ export function NavigationButtons({
   isPending,
 }) {
   return (
-    <div className="row justify-content-between pt10">
-      <div className="fit text-start">
+    <div className="row align-items-center justify-content-between pt10">
+      <div className="col-auto">
         <PreviousButton
           onClick={onPreviousClick}
           show={showPrevious}
           disabled={isPending}
         />
       </div>
-      <div className="fit text-end d-flex justify-content-end align-items-center">
+      <div className="col-auto">
         <NextButton
           onClick={onNextClick}
           show={showNext}

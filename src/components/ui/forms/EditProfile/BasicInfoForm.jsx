@@ -512,7 +512,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
         <div className="text-muted mb30">
           <div className="d-flex align-items-center mb2">
             <span className="me-2" style={{ color: '#6c757d' }}>•</span>
-            <span>Εικόνα Προφίλ</span>
+            <span>Εικόνα Προφίλ (Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο)</span>
           </div>
           <div className="d-flex align-items-center mb2">
             <span className="me-2" style={{ color: '#6c757d' }}>•</span>
@@ -833,7 +833,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           </div>
           <div className="mb10 col-sm-2">
             <InputB
-              label="Εργατοώρα"
+              label="Μέση Αμοιβή / ώρα"
               id="rate"
               name="rate"
               type="number"

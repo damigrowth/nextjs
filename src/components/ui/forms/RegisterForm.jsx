@@ -97,7 +97,7 @@ const RegisterForm = () => {
           <div className="mb25">
             <Input
               state={state}
-              label="Επωνυμία / Όνομα εμφάνισης"
+              label="Επωνυμία / Όνομα προβολής"
               type="text"
               id="displayName"
               name="displayName"

@@ -55,7 +55,7 @@ export default function ManageServiceCard1({ service }) {
           </div>
         </th>
         <td className="align-top">
-          <span className="fz15 fw400">
+          <span className="fz15 fw400" style={{ color: '#6c757d' }}>
             {`${
               service.attributes?.category?.data
                 ? service.attributes.category.data.attributes.label + " - "

@@ -24,7 +24,7 @@ export default function ClearBtn() {
       onClick={clearHandler}
       className="ud-btn btn-thm ui-clear-btn w-100"
     >
-      Καθαρισμός
+      Καθαρισμός φίλτρων
       {isPending ? (
         <div className="spinner-border spinner-border-sm ml10" role="status">
           <span className="sr-only"></span>

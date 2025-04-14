@@ -430,8 +430,8 @@ export default function ServiceInformation() {
               />
             </div>
           </div>
-          <div className="row mb30">
-            <div className="col-sm-2">
+          <div className="row">
+            <div className="col-sm-6">
               <div className="mb20">
                 <InputB
                   id="service-price"
@@ -445,14 +445,16 @@ export default function ServiceInformation() {
                   onChange={(formattedValue) =>
                     setInfo("price", formattedValue)
                   }
-                  className="form-control input-group"
+                  className="form-control input-group noumera"
                   errors={errors}
                   disabled={!showPrice || !info.fixed}
                   append="€"
                 />
               </div>
             </div>
-            <div className="col-sm-2">
+          </div>
+          <div className="row mb30">
+            <div className="col-sm-6">
               <SwitchB
                 label={<span className="fontless">Χωρίς εμφάνιση τιμής</span>}
                 name="hide-price"
@@ -462,7 +464,7 @@ export default function ServiceInformation() {
             </div>
           </div>
           {type.online && type.oneoff && (
-            <div className="col-sm-2">
+            <div className="col-sm-6">
               <div className="mb20 fw400">
                 <InputB
                   id="service-time"
@@ -474,14 +476,14 @@ export default function ServiceInformation() {
                   // Use state value directly, handle default/min on blur in InputB
                   value={info.time}
                   onChange={(formattedValue) => setInfo("time", formattedValue)}
-                  className="form-control input-group"
+                  className="form-control input-group noumera"
                   errors={errors}
                 />
               </div>
             </div>
           )}
           {type.online && type.subscription && (
-            <div className="col-sm-3">
+            <div className="col-sm-6">
               <div className="mb20 ">
                 <SearchableSelect
                   name="subscription-type"
