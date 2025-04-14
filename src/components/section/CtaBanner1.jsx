@@ -23,9 +23,8 @@ export default function CtaBanner1() {
                 <div className="mb30">
                   <div className="main-title">
                     <h2 className="title">
-                      A whole world of freelance{" "}
-                      <br className="d-none d-xl-block" /> talent at your
-                      fingertips
+                    Έτοιμοι{" "}
+                      <br className="d-none d-xl-block" /> για νέες συνεργασίες;
                     </h2>
                   </div>
                 </div>
@@ -33,32 +32,26 @@ export default function CtaBanner1() {
                   <div className="list-one d-flex align-items-start mb30">
                     <span className="list-icon flex-shrink-0 flaticon-badge" />
                     <div className="list-content flex-grow-1 ml20">
-                      <h4 className="mb-1">Proof of quality</h4>
+                      <h4 className="mb-1">Εμφανίσου στους κορυφαίους</h4>
                       <p className="text mb-0 fz15">
-                        Check any pro’s work samples, client reviews, and
-                        identity <br className="d-none d-lg-block" />{" "}
-                        verification.
-                      </p>
+                      Συμπλήρωσε το επαγγελματικό προφίλ και τις υπηρεσίες που προσφέρεις και εμφανίσου ανάμεσα στα κορυφαία επαγγελματικά προφίλ.</p>
                     </div>
                   </div>
                   <div className="list-one d-flex align-items-start mb30">
-                    <span className="list-icon flex-shrink-0 flaticon-money" />
+                    <span className="list-icon flex-shrink-0 flaticon-wallet" />
                     <div className="list-content flex-grow-1 ml20">
-                      <h4 className="mb-1">No cost until you hire</h4>
+                      <h4 className="mb-1">Χωρίς κρυφά κόστη</h4>
                       <p className="text mb-0 fz15">
-                        Interview potential fits for your job, negotiate rates,
-                        and only pay <br className="d-none d-lg-block" /> for
-                        work you approve.
+                        Δεν κρατάμε καμία προμήθεια και δεν έχουμε καμία χρέωση για να εμφανίσεις το επαγγελματικό προφίλ και τις υπηρεσίες που προσφέρεις.
                       </p>
                     </div>
                   </div>
                   <div className="list-one d-flex align-items-start mb30">
                     <span className="list-icon flex-shrink-0 flaticon-security" />
                     <div className="list-content flex-grow-1 ml20">
-                      <h4 className="mb-1">Safe and secure</h4>
+                      <h4 className="mb-1">Ασφάλεια και Πιστοποίηση</h4>
                       <p className="text mb-0 fz15">
-                        Focus on your work knowing we help protect your data and
-                        privacy. We’re here with 24/7 support if you need it.
+                      Θεωρούμε την ασφάλεια ως τον πιο σημαντικό παράγοντα, για αυτό προτείνουμε την πιστοποίηση του επαγγελματικού προφίλ σας.
                       </p>
                     </div>
                   </div>

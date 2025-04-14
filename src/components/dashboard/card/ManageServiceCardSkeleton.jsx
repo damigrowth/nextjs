@@ -5,7 +5,7 @@ export default function ManageServiceCardSkeleton() {
   return (
     <tr>
       <th className="dashboard-img-service" scope="row">
-        <div className="listing-style1 list-style d-block d-xl-flex align-items-start border-0 mb-0">
+        <div className="listing-style1 list-style d-block d-xl-flex align-items-start border-0 mb-0 shadow-none">
           <div className="list-thumb flex-shrink-0 bdrs4 mb10-lg">
             <Skeleton count={1} height={91} width={122} />
           </div>

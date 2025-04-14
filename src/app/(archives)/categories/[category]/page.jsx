@@ -3,7 +3,7 @@ import { getData } from "@/lib/client/operations";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 import {
   CATEGORIES,
-  TAXONOMIES_ARCHIVE,
+  TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES,
 } from "@/lib/graphql/queries/main/taxonomies/service";
 import Tabs from "@/components/ui/Archives/Tabs";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
@@ -37,11 +37,18 @@ export default async function page({ params }) {
 
   const { categories } = await getData(CATEGORIES);
 
-  const { archive } = await getData(TAXONOMIES_ARCHIVE, {
+  const { category: categoryData, subcategories, subdivisions } = await getData(TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES, {
     category,
   });
 
-  const archiveCategory = archive?.category;
+  // Δημιουργία του archive αντικειμένου για το TaxonomiesArchive component
+  const archive = {
+    category: categoryData?.data?.[0]?.attributes,
+    subcategories,
+    subdivisions
+  };
+
+  const archiveCategory = archive.category;
 
   return (
     <>

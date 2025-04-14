@@ -28,7 +28,7 @@ const consentOptions = [
 ];
 
 const RegisterForm = () => {
-  const { type, role, roles, setAuthRole, consent, setConsent } = authStore();
+  const { type, role, roles, setAuthRole, consent, setConsent, setAuthType } = authStore();
   const formRef = useRef(null);
 
   const [state, formAction, isPending] = useActionState(register, {
@@ -36,6 +36,15 @@ const RegisterForm = () => {
     message: null,
     role: null,
   });
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash === '#user') {
+      setAuthType(1);
+    } else if (hash === '#pro') {
+      setAuthType(2);
+    }
+  }, []);
 
   // Handle Submit - role wasn't working right
   const handleSubmit = async (formData) => {
@@ -88,13 +97,12 @@ const RegisterForm = () => {
           <div className="mb25">
             <Input
               state={state}
-              label="Επωνυμία / Όνομα εμφάνισης"
+              label="Επωνυμία / Όνομα προβολής"
               type="text"
               id="displayName"
               name="displayName"
               disabled={isPending}
               errorId="displayName-error"
-              formatSymbols
               capitalize
             />
           </div>

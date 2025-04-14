@@ -122,7 +122,7 @@ export default async function DashboardInfo() {
               <div className="col-md-6 col-xxl-4">
                 <div className="ps-widget bgc-white bdrs4 p30 mb30 overflow-hidden position-relative">
                   <div className="d-flex justify-content-between bdrb1 pb15 mb30">
-                    <h5 className="title">Γρήγορες Ενέργειες</h5>
+                    <h5 className="title">Συντομεύσεις</h5>
                   </div>
                   <div className="d-grid gap-3">
                     <Link href="/dashboard/profile" className="ud-btn btn-thm2 mb25 me-4">

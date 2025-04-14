@@ -8,10 +8,9 @@ export default function AllTimeSelling() {
               <span className="flaticon-cv" />
             </div>
             <div className="details">
-              <h4 className="title mt10 mb-3">Post a job</h4>
+              <h4 className="title mt10 mb-3">Δημιούργησε Επαγγελματικό Προφίλ</h4>
               <p className="text">
-                It’s free and easy to post a job. Simply fill{" "}
-                <br className="d-none d-xxl-block" /> in a title, description.
+               Κάνε Εγγραφή ως Επαγγελματικό Προφίλ και δημιούργησε το προφίλ σου. Είναι Δωρεάν!
               </p>
             </div>
           </div>
@@ -22,10 +21,9 @@ export default function AllTimeSelling() {
               <span className="flaticon-web-design" />
             </div>
             <div className="details">
-              <h4 className="title mt10 mb-3">Choose freelancers</h4>
+              <h4 className="title mt10 mb-3">Κάνε Ανάρτηση Υπηρεσιών</h4>
               <p className="text">
-                It’s free and easy to post a job. Simply fill{" "}
-                <br className="d-none d-xxl-block" /> in a title, description.
+              Συμπλήρωσε τις Υπηρεσίες που προσφέρεις ώστε να σε βρίσκουν οι Χρήστες.
               </p>
             </div>
           </div>
@@ -36,10 +34,9 @@ export default function AllTimeSelling() {
               <span className="flaticon-secure" />
             </div>
             <div className="details">
-              <h4 className="title mt10 mb-3">Pay safely</h4>
+              <h4 className="title mt10 mb-3">Γίνε Πιστοποιημένος</h4>
               <p className="text">
-                It’s free and easy to post a job. Simply fill{" "}
-                <br className="d-none d-xxl-block" /> in a title, description.
+              Μπορείς να πιστοποιηθείς ως Επαγγελματίας ή Επιχείρηση και να αποκτήσεις μεγαλύτερη αξιοπιστία.
               </p>
             </div>
           </div>
@@ -50,10 +47,9 @@ export default function AllTimeSelling() {
               <span className="flaticon-customer-service" />
             </div>
             <div className="details">
-              <h4 className="title mt10 mb-3">We’re here to help</h4>
+              <h4 className="title mt10 mb-3">Είμαστε εδώ για να σε βοηθήσουμε</h4>
               <p className="text">
-                It’s free and easy to post a job. Simply fill{" "}
-                <br className="d-none d-xxl-block" /> in a title, description.
+              Για ο,τι χρειαστείς, επικοινώνησε μαζί μας. Θα κάνουμε ο,τι μπορούμε για να βοηθήσουμε.
               </p>
             </div>
           </div>

@@ -1,9 +1,10 @@
 export const firstColumnLinks = [
   { attributes: { title: "Πλατφόρμα", slug: "about" } },
+  { attributes: { title: "Για Επαγγελματίες", slug: "for-pros" } },
   { attributes: { title: "Συχνές Ερωτήσεις", slug: "faq" } },
-  { attributes: { title: "Επικοινωνία", slug: "contact" } },
   { attributes: { title: "Πολιτική Απορρήτου", slug: "privacy" } },
   { attributes: { title: "Όροι Χρήσης", slug: "terms" } },
+  { attributes: { title: "Επικοινωνία", slug: "contact" } },
 ];
 
 export const secondColumnLinks = [

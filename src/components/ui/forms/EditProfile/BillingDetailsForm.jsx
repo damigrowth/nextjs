@@ -92,7 +92,7 @@ export default function BillingDetailsForm({ freelancer }) {
                   id="afm"
                   name="afm"
                   type="number"
-                  value={billing_details?.afm || 0}
+                  value={billing_details?.afm || ''}
                   onChange={(value) =>
                     setBillingDetails({
                       ...billing_details,

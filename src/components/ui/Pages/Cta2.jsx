@@ -23,7 +23,7 @@ export default function Cta2({ data }) {
         <div className="row wow fadeInDown" data-wow-delay="400ms">
           {data.boxes.map((box, index) => (
             <div key={index} className="col-sm-6 col-lg-4 col-xl-3">
-              <div className="iconbox-style9 default-box-shadow1 bgc-white p40 bdrs12 position-relative mb30">
+              <div className="iconbox-style9 default-box-shadow1 bgc-white p20 bdrs12 position-relative mb30">
                 <span className={`icon fz40 ${box.icon}`} />
                 <h4 className="iconbox-title mt20">{box.title}</h4>
                 <p className="text mb-0">
