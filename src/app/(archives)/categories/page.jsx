@@ -5,7 +5,7 @@ import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import Banner from "@/components/ui/Archives/Banner";
 import {
   CATEGORIES,
-  TAXONOMIES_ARCHIVE,
+  ALL_TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES,
 } from "@/lib/graphql/queries/main/taxonomies/service";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 import TaxonomiesArchive from "@/components/ui/Archives/Taxonomies/TaxonomiesArchive";
@@ -29,9 +29,13 @@ export async function generateMetadata() {
 export default async function page() {
   const { categories } = await getData(CATEGORIES);
 
-  const { archive } = await getData(TAXONOMIES_ARCHIVE, {
-    category: "",
-  });
+  const { categories: archiveCategories, subcategories, subdivisions } = await getData(ALL_TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES);
+
+  // Δημιουργία του archive αντικειμένου για το TaxonomiesArchive component
+  const archive = {
+    subcategories,
+    subdivisions
+  };
 
   return (
     <>

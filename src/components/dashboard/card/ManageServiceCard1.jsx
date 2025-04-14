@@ -18,7 +18,7 @@ export default function ManageServiceCard1({ service }) {
     <>
       <tr>
         <th className="dashboard-img-service" scope="row">
-          <div className="listing-style1 list-style d-block d-xl-flex align-items-start border-0 mb-0">
+          <div className="listing-style1 list-style d-block d-xl-flex align-items-start border-0 mb-0 shadow-none">
             <div className="list-thumb flex-shrink-0 bdrs4 mb10-lg">
               {media.length > 1 ? (
                 <ServiceCardFiles
@@ -74,7 +74,7 @@ export default function ManageServiceCard1({ service }) {
           </span>
         </td>
         <td className="align-top">
-          <span className="fz14 fw400">{status}</span>
+          <span className="fz14 fw400" style={{ color: '#198754' }}>{status}</span>
         </td>
         <td className="align-top">
           <div className="d-flex justify-content-end">

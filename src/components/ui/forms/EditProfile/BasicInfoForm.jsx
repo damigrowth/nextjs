@@ -67,6 +67,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
     switchCoverageMode,
     specialization,
     setSpecialization,
+    displayName,
   } = useEditProfileStore();
 
   const initialState = {
@@ -538,6 +539,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
             }
           }}
           errors={formState?.errors?.image}
+          displayName={displayName}
         />
 
         <div className="mb20 mt20 col-md-6">

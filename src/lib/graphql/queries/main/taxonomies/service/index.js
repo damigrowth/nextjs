@@ -233,6 +233,297 @@ const TAXONOMIES_ARCHIVE = gql`
   ${SINGLE_IMAGE}
 `;
 
+const TAXONOMIES_ARCHIVE_FILTERED = gql`
+  query TaxonomiesArchiveFiltered($category: String!) {
+    archive: topServiceTaxonomiesByCategory(category: $category, limit: 10) {
+      category {
+        label
+        slug
+        description
+        image {
+          ...SingleImage
+        }
+      }
+      subcategories(
+        filters: {
+          services: {
+            id: { ne: null }
+            status: { type: { eq: "Active" } }
+            freelancer: { id: { ne: null } }
+          }
+        }
+      ) {
+        label
+        slug
+        image {
+          ...SingleImage
+        }
+        category {
+          data {
+            attributes {
+              slug
+            }
+          }
+        }
+        subdivisions(
+          filters: {
+            services: {
+              id: { ne: null }
+              status: { type: { eq: "Active" } }
+              freelancer: { id: { ne: null } }
+            }
+          }
+        ) {
+          data {
+            attributes {
+              label
+              slug
+            }
+          }
+        }
+      }
+      subdivisions(
+        filters: {
+          services: {
+            id: { ne: null }
+            status: { type: { eq: "Active" } }
+            freelancer: { id: { ne: null } }
+          }
+        }
+      ) {
+        label
+        slug
+        category {
+          data {
+            attributes {
+              slug
+            }
+          }
+        }
+        subcategory {
+          data {
+            attributes {
+              slug
+            }
+          }
+        }
+      }
+    }
+  }
+  ${SINGLE_IMAGE}
+`;
+
+const TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES = gql`
+  query TaxonomiesArchiveWithActiveServices($category: String!) {
+    category: categories(
+      filters: { slug: { eq: $category } }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+          description
+          image {
+            ...SingleImage
+          }
+        }
+      }
+    }
+    subcategories: subcategories(
+      filters: {
+        and: [
+          { 
+            category: { 
+              slug: { 
+                eq: $category 
+              } 
+            } 
+          },
+          {
+            services: {
+              id: { ne: null }
+              status: { type: { eq: "Active" } }
+              freelancer: { id: { ne: null } }
+            }
+          }
+        ]
+      }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+          image {
+            ...SingleImage
+          }
+          category {
+            data {
+              attributes {
+                slug
+              }
+            }
+          }
+          subdivisions(
+            filters: {
+              services: {
+                id: { ne: null }
+                status: { type: { eq: "Active" } }
+                freelancer: { id: { ne: null } }
+              }
+            }
+          ) {
+            data {
+              attributes {
+                label
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+    subdivisions: subdivisions(
+      filters: {
+        and: [
+          { 
+            category: { 
+              slug: { 
+                eq: $category 
+              } 
+            } 
+          },
+          {
+            services: {
+              id: { ne: null }
+              status: { type: { eq: "Active" } }
+              freelancer: { id: { ne: null } }
+            }
+          }
+        ]
+      }
+      sort: "label:asc"
+      pagination: { limit: 10 }
+    ) {
+      data {
+        attributes {
+          label
+          slug
+          category {
+            data {
+              attributes {
+                slug
+              }
+            }
+          }
+          subcategory {
+            data {
+              attributes {
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  ${SINGLE_IMAGE}
+`;
+
+const ALL_TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES = gql`
+  query AllTaxonomiesArchiveWithActiveServices {
+    categories: categories(sort: "label:asc") {
+      data {
+        attributes {
+          label
+          slug
+          description
+          image {
+            ...SingleImage
+          }
+        }
+      }
+    }
+    subcategories: subcategories(
+      filters: {
+        services: {
+          id: { ne: null }
+          status: { type: { eq: "Active" } }
+          freelancer: { id: { ne: null } }
+        }
+      }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          slug
+          image {
+            ...SingleImage
+          }
+          category {
+            data {
+              attributes {
+                slug
+              }
+            }
+          }
+          subdivisions(
+            filters: {
+              services: {
+                id: { ne: null }
+                status: { type: { eq: "Active" } }
+                freelancer: { id: { ne: null } }
+              }
+            }
+          ) {
+            data {
+              attributes {
+                label
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+    subdivisions: subdivisions(
+      filters: {
+        services: {
+          id: { ne: null }
+          status: { type: { eq: "Active" } }
+          freelancer: { id: { ne: null } }
+        }
+      }
+      sort: "label:asc"
+      pagination: { limit: 10 }
+    ) {
+      data {
+        attributes {
+          label
+          slug
+          category {
+            data {
+              attributes {
+                slug
+              }
+            }
+          }
+          subcategory {
+            data {
+              attributes {
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  ${SINGLE_IMAGE}
+`;
+
 const HOME_SEARCH = gql`
   query HomeSearch($searchTerm: String, $categorySlug: String) {
     subcategories(
@@ -641,6 +932,9 @@ export {
   SERVICES_ARCHIVE_SEO,
   SERVICE_TAXONOMIES,
   TAXONOMIES_ARCHIVE,
+  TAXONOMIES_ARCHIVE_FILTERED,
+  TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES,
+  ALL_TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES,
   HOME_SEARCH,
   TAXONOMIES_SEARCH,
   CATEGORIES_SEARCH,

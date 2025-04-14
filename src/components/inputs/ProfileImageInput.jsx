@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import React, { useState, useEffect, useCallback } from "react";
+import InitialsImage from "@/components/user/InitialsImage";
 
-export default function ProfileImageInput({ image, name, onChange, errors }) {
+export default function ProfileImageInput({ image, name, onChange, errors, displayName }) {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [error, setError] = useState(null);
 
@@ -53,6 +54,13 @@ export default function ProfileImageInput({ image, name, onChange, errors }) {
     }
   };
 
+  const handleImageClick = () => {
+    const fileInput = document.querySelector(`input[name="${name}"]`);
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+
   // Get image source - either the preview URL, passed URL, or default
   const getImageSource = () => {
     if (previewUrl) {
@@ -61,7 +69,7 @@ export default function ProfileImageInput({ image, name, onChange, errors }) {
     if (image) {
       return image;
     }
-    return "/images/team/fl-1.png";
+    return null;
   };
 
   // Determine if there's a current image
@@ -70,19 +78,27 @@ export default function ProfileImageInput({ image, name, onChange, errors }) {
   return (
     <div className="col-xl-7 mb20">
       <div className="profile-box d-sm-flex align-items-center mb10">
-        <div className="profile-img mb20-sm">
-          <Image
-            height={142}
-            width={142}
-            className="rounded-circle wa-xs"
-            src={getImageSource()}
-            style={{
-              height: "71px",
-              width: "71px",
-              objectFit: "cover",
-            }}
-            alt="Εικόνα προφίλ"
-          />
+        <div className="profile-img mb20-sm cursor-pointer" onClick={handleImageClick}>
+          {getImageSource() ? (
+            <Image
+              height={142}
+              width={142}
+              className="rounded-circle wa-xs"
+              src={getImageSource()}
+              style={{
+                height: "71px",
+                width: "71px",
+                objectFit: "cover",
+              }}
+              alt="Εικόνα προφίλ"
+            />
+          ) : (
+            <InitialsImage
+              displayName={displayName}
+              width="71px"
+              height="71px"
+            />
+          )}
         </div>
         <div className="profile-content ml20 ml0-xs">
           <div className="d-flex flex-column">
@@ -102,7 +118,7 @@ export default function ProfileImageInput({ image, name, onChange, errors }) {
               </label>
             </div>
           </div>
-          <p className="text fz13 mb-0 mt-2">
+          <p className="text fz13 mb-0 mt-2" style={{ maxWidth: '400px' }}>
             Μέγιστο μέγεθος αρχείου: 3MB, Ελάχιστες διαστάσεις: 80x80.
             Επιτρεπόμενοι τύποι αρχείων: .jpg & .png
           </p>

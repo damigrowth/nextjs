@@ -155,7 +155,9 @@ export default function FreelancerProfile({
                 servicesPage={servicesPage}
               />
 
-              <h4>Δείγμα Εργασιών</h4>
+              {(audioFiles?.length > 0 || portfolio?.data?.length > 0) && (
+                <h4>Δείγμα Εργασιών</h4>
+              )}
 
               <ServiceAudioFiles audioFiles={audioFiles} hideContainer />
 

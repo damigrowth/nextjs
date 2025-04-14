@@ -22,7 +22,7 @@ export default function MediaGallery({
     maxSizeText: "Το μέγιστο επιτρεπτό μέγεθος αρχείων είναι",
     currentSize: "Τρέχον μέγεθος:",
     maxVideosText: "Μέχρι",
-    videosOrAudio: "βίντεο η ήχους",
+    videosOrAudio: "αρχεία βίντεο / ήχου",
     saving: "Αποθήκευση...",
     save: "Αποθήκευση",
     maxVideosError: "Μέγιστος αριθμός βίντεο:",
