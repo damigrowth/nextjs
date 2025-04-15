@@ -569,7 +569,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           />
         </div>
         <div className="row mb40">
-          <div className="col-md-4">
+          <div className="col-md-4 pb-4">
             <SearchableSelect
               name="category"
               label="Κατηγορία*"
@@ -653,7 +653,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           </div>
           {coverage?.onbase && (
             <div className="row mb20 mt20">
-              <div className="col-md-3">
+              <div className="col-md-3 pb-2">
                 <InputB
                   label="Διεύθυνση"
                   id="address"
@@ -665,7 +665,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                   errors={formState?.errors?.address}
                 />
               </div>
-              <div className="col-md-3">
+              <div className="col-md-3 pb-2">
                 <SearchableSelect
                   name="zipcode"
                   label="Τ.Κ."
@@ -694,7 +694,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                   errors={formState?.errors?.zipcode}
                 />
               </div>
-              <div className="col-md-3">
+              <div className="col-md-3 pb-2">
                 <SearchableSelect
                   name="area"
                   label="Περιοχή"
@@ -703,9 +703,12 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                   formatSymbols
                   capitalize
                   errors={formState?.errors?.area}
+                  customStyles={{
+                    indicatorsContainer: () => ({ display: 'none' })
+                  }}
                 />
               </div>
-              <div className="col-md-3">
+              <div className="col-md-3 pb-2">
                 <SearchableSelect
                   name="county"
                   label="Νομός"
@@ -716,13 +719,16 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                   formatSymbols
                   capitalize
                   errors={formState?.errors?.county}
+                  customStyles={{
+                    indicatorsContainer: () => ({ display: 'none' })
+                  }}
                 />
               </div>
             </div>
           )}
           {coverage?.onsite && (
             <div className="row mb20">
-              <div className="col-md-6">
+              <div className="col-md-6 pb-4">
                 <SearchableSelect
                   name="counties"
                   label="Νομοί"
@@ -771,7 +777,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           )}
         </div>
         <div className="row mb40 mt40">
-          <div className="col-md-6">
+          <div className="col-md-6 pb-4">
             <SearchableSelect
               name="skills"
               label="Δεξιότητες"

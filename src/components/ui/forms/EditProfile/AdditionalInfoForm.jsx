@@ -230,7 +230,7 @@ export default function AdditionalInfoForm({ freelancer, type }) {
         </div>
 
         <div className="row mb20">
-          <div className="col-md-4">
+          <div className="col-md-4 pb-4">
             <CheckSelect
               options={contactTypesOptions}
               selectedValues={contactTypes}
@@ -240,7 +240,7 @@ export default function AdditionalInfoForm({ freelancer, type }) {
               error={formState?.errors?.contactTypes?.message}
             />
           </div>
-          <div className="col-md-4">
+          <div className="col-md-4 pb-4">
             <CheckSelect
               options={paymentMethodsOptions}
               selectedValues={payment_methods}
@@ -250,7 +250,7 @@ export default function AdditionalInfoForm({ freelancer, type }) {
               error={formState?.errors?.payment_methods?.message}
             />
           </div>
-          <div className="col-md-4">
+          <div className="col-md-4 pb-4">
             <CheckSelect
               options={settlementMethodsOptions}
               selectedValues={settlement_methods}
@@ -278,7 +278,7 @@ export default function AdditionalInfoForm({ freelancer, type }) {
             </div>
           )}
 
-          <div className="col-md-4">
+          <div className="col-md-4 pb-4">
             <SearchableSelect
               name="minBudget"
               label="Ελάχιστο Budget Εργασίας"
