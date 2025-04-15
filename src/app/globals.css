@@ -554,6 +554,21 @@ a {
   cursor: text;
 }
 
+/* Διόρθωση για focused πεδία */
+.select-input:focus-within .select__control {
+  border: 2px solid #1f4b3f !important;
+  box-shadow: none !important;
+}
+
+.select-input .select__control--is-focused {
+  border: 2px solid #1f4b3f !important;
+  box-shadow: none !important;
+}
+
+.select-input .select__control:hover {
+  border: 2px solid #1f4b3f !important;
+}
+
 .select-input:focus .select__control {
   border: 2px solid #1f4b3f;
   color: var(--headings-color);
@@ -1722,4 +1737,8 @@ a[href="#reviews-section"]:hover {
 .review-date {
   color: #a5a5a5;
   font-size: 12px;
+}
+
+.hero-home12 {
+  isolation: isolate;
 }

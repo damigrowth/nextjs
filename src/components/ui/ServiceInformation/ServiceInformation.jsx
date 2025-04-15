@@ -337,7 +337,7 @@ export default function ServiceInformation() {
             </div>
           </div>
           <div className="row">
-            <div className="col-sm-4">
+            <div className="col-sm-4 pb-4">
               <div className="mb20">
                 <SearchableSelect
                   name="service-category"
