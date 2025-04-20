@@ -367,6 +367,47 @@ const COMPLETE_REGISTRATION = gql`
   }
 `;
 
+const CREATE_CHAT = gql`
+  mutation CreateChat($input: ChatInput!) {
+    createChat(data: $input) {
+      data {
+        id
+        attributes {
+          name
+          createdAt
+        }
+      }
+    }
+  }
+`;
+
+const CREATE_MESSAGE = gql`
+  mutation CreateMessage($input: MessageInput!) {
+    createMessage(data: $input) {
+      data {
+        id
+        attributes {
+          content
+          createdAt
+        }
+      }
+    }
+  }
+`;
+
+const UPDATE_CHAT = gql`
+  mutation UpdateChat($id: ID!, $data: ChatInput!) {
+    updateChat(id: $id, data: $data) {
+      data {
+        id
+        attributes {
+          updatedAt
+        }
+      }
+    }
+  }
+`;
+
 export {
   POST_REVIEW,
   POST_SERVICE,
@@ -395,4 +436,7 @@ export {
   DELETE_ACCOUNT,
   START_REGISTRATION,
   COMPLETE_REGISTRATION,
+  CREATE_CHAT,
+  UPDATE_CHAT,
+  CREATE_MESSAGE,
 };

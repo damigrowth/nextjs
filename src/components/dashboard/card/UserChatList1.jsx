@@ -14,6 +14,14 @@ export default function UserChatList1({ data, currentFreelancerId }) {
         }`.trim()
       : data.name);
 
+  // Truncate message text to a reasonable length
+  const truncateMessage = (text, maxLength = 40) => {
+    if (!text) return "No messages yet";
+    return text.length > maxLength
+      ? `${text.substring(0, maxLength)}...`
+      : text;
+  };
+
   return (
     <div className="d-flex align-items-center position-relative">
       <div className="mr10">
@@ -37,7 +45,7 @@ export default function UserChatList1({ data, currentFreelancerId }) {
               data.unreadCount > 0 ? "fw600" : ""
             }`}
           >
-            {data.lastMessage?.content || "No messages yet"}
+            {truncateMessage(data.lastMessage?.content)}
           </p>
         </div>
         <div className="iul_notific ms-auto text-end">

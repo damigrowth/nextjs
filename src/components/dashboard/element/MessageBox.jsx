@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { timeAgo, formatMessageTime, getDatePart } from "@/utils/timeAgo";
 import UserImage from "@/components/user/UserImage";
+import ChatMessagesSkeleton from "@/components/ui/Skeletons/ChatMessagesSkeleton";
 
 export default function MessageBox({
   selectedChat,
@@ -112,7 +113,11 @@ export default function MessageBox({
       }
 
       setShouldScrollToBottom(true);
-      focusMessageInput();
+
+      // Use a small delay to ensure the input is focused after state updates
+      setTimeout(() => {
+        focusMessageInput();
+      }, 10);
     } catch (error) {
       setSendError(`Error: ${error.message || "Failed to send"}`);
       setNewMessage(messageContent); // Restore message text
@@ -197,12 +202,7 @@ export default function MessageBox({
         }}
       >
         {isLoading ? (
-          <div className="text-center p-5">
-            <div className="spinner-border text-thm2" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
-            <p className="mt-2">Loading messages...</p>
-          </div>
+          <ChatMessagesSkeleton />
         ) : !selectedChat ? (
           <p className="text-center p-5">
             Select a conversation to start messaging.
@@ -308,7 +308,7 @@ export default function MessageBox({
                                 : "Failed"
                               : timeAgoText}
                           </small>{" "}
-                          {authorDisplayName}{" "}
+                          Me{" "}
                         </>
                       ) : (
                         <>
