@@ -2,6 +2,14 @@
 
 import StartChatForm from "../ui/forms/StartChatForm";
 
+/**
+ * Modal component that contains the form for starting a new chat with a freelancer
+ * @param {Object} props - Component props
+ * @param {string|number} props.fid - ID of the current user
+ * @param {string|number} props.freelancerId - ID of the target freelancer to chat with
+ * @param {string} props.displayName - Display name of the target freelancer
+ * @returns {JSX.Element} Modal containing a chat form
+ */
 export default function StartChatModal({ fid, freelancerId, displayName }) {
   return (
     <div
@@ -17,7 +25,7 @@ export default function StartChatModal({ fid, freelancerId, displayName }) {
             type="button"
             className="btn-close position-absolute no-rotate btn-raw"
             data-bs-dismiss="modal"
-            aria-label="Close"
+            aria-label="Κλείσιμο"
             style={{ top: "10px", right: "10px", zIndex: "9" }}
           />
 

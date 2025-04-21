@@ -5,6 +5,22 @@ import { getToken } from "../auth/token";
 import { getData, postData } from "../client/operations";
 import { CREATE_CHAT, CREATE_MESSAGE, UPDATE_CHAT } from "../graphql/mutations";
 
+/**
+ * Server action that initializes a chat between users
+ * This function either finds an existing chat or creates a new one,
+ * then adds the initial message
+ *
+ * @param {Object} prevState - Previous form state (from useActionState)
+ * @param {Object} formData - Data for the chat and initial message
+ * @param {Object} formData.chat - Chat information
+ * @param {string} formData.chat.name - Chat name
+ * @param {Array<string|number>} formData.chat.participants - Array of participant IDs
+ * @param {string|number} formData.chat.creator - ID of user creating the chat
+ * @param {Object} formData.message - Initial message information
+ * @param {string} formData.message.content - Message content
+ * @param {string|number} formData.message.author - Message author ID
+ * @returns {Object} Result containing success status, message and chat ID if successful
+ */
 export async function initializeChat(prevState, formData) {
   try {
     const chat = formData?.chat;
@@ -12,7 +28,7 @@ export async function initializeChat(prevState, formData) {
 
     if (!chat?.participants || !message?.content || !message?.author) {
       return {
-        message: "Missing required information",
+        message: "Λείπουν απαραίτητες πληροφορίες",
         error: true,
         success: false,
       };
@@ -21,7 +37,7 @@ export async function initializeChat(prevState, formData) {
     const jwt = await getToken();
     if (!jwt) {
       return {
-        message: "Authentication required",
+        message: "Απαιτείται σύνδεση",
         error: true,
         success: false,
       };
@@ -31,7 +47,8 @@ export async function initializeChat(prevState, formData) {
     const existingChat = await getData(
       CHECK_EXISTING_CHAT,
       {
-        participants: chat.participants,
+        participant1: chat.participants[0],
+        participant2: chat.participants[1],
       },
       jwt
     );
@@ -49,41 +66,42 @@ export async function initializeChat(prevState, formData) {
           participantId.toString() === creatorId ? 0 : 1;
       });
 
-      const newChat = await postData(
-        CREATE_CHAT,
-        {
-          input: {
-            name: chat.name,
-            participants: chat.participants,
-            creator: chat.creator,
-            unreadCountMap,
-            isGroup: chat.participants.length > 2,
-            publishedAt: new Date().toISOString(),
-          },
+      const chatInput = {
+        input: {
+          name: chat.name,
+          participants: chat.participants,
+          creator: chat.creator,
+          unreadCountMap,
+          isGroup: chat.participants.length > 2,
+          publishedAt: new Date().toISOString(),
         },
-        jwt
-      );
+      };
 
-      if (newChat?.error) throw new Error(newChat.error);
+      const newChat = await postData(CREATE_CHAT, chatInput, jwt);
+
+      if (newChat?.error) {
+        throw new Error(newChat.error);
+      }
+
       chatId = newChat.data.createChat.data.id;
     }
 
     // Create message
-    const newMessage = await postData(
-      CREATE_MESSAGE,
-      {
-        input: {
-          content: message.content,
-          chat: chatId,
-          author: message.author,
-          readBy: [message.author],
-          publishedAt: new Date().toISOString(),
-        },
+    const messageInput = {
+      input: {
+        content: message.content,
+        chat: chatId,
+        author: message.author,
+        readBy: [message.author],
+        publishedAt: new Date().toISOString(),
       },
-      jwt
-    );
+    };
 
-    if (newMessage?.error) throw new Error(newMessage.error);
+    const newMessage = await postData(CREATE_MESSAGE, messageInput, jwt);
+
+    if (newMessage?.error) {
+      throw new Error(newMessage.error);
+    }
 
     // Update chat's lastMessage
     await postData(
@@ -92,22 +110,20 @@ export async function initializeChat(prevState, formData) {
         id: chatId,
         data: {
           lastMessage: newMessage.data.createMessage.data.id,
-          updatedAt: new Date().toISOString(),
         },
       },
       jwt
     );
 
     return {
-      message: "Chat started successfully!",
+      message: "Η συνομιλία ξεκίνησε με επιτυχία!",
       error: false,
       success: true,
       chatId,
     };
   } catch (error) {
-    console.error("Error initializing chat:", error);
     return {
-      message: error.message || "Failed to start chat",
+      message: error.message || "Αποτυχία έναρξης συνομιλίας",
       error: true,
       success: false,
     };

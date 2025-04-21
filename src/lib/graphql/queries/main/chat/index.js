@@ -116,8 +116,15 @@ export const GET_CHAT_MESSAGES = gql`
 `;
 
 export const CHECK_EXISTING_CHAT = gql`
-  query CheckExistingChat($participants: [ID]!) {
-    chats(filters: { participants: { id: { in: $participants } } }) {
+  query CheckExistingChat($participant1: ID!, $participant2: ID) {
+    chats(
+      filters: {
+        and: [
+          { participants: { id: { eq: $participant1 } } }
+          { participants: { id: { eq: $participant2 } } }
+        ]
+      }
+    ) {
       data {
         id
         attributes {
