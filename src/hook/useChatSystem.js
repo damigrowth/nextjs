@@ -6,6 +6,13 @@ import { io } from "socket.io-client";
 import { useLazyQuery } from "@apollo/client";
 import { GET_CHAT_MESSAGES } from "@/lib/graphql/queries/main/message";
 
+/**
+ * Real-time chat system hook that handles WebSocket connections and chat functionality
+ * @param {Object} params - Hook parameters
+ * @param {Array} [params.initialChatList=[]] - Initial list of chats to display
+ * @param {string|number} params.currentFreelancerId - ID of the current freelancer/user
+ * @returns {Object} Chat system state and functions
+ */
 export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -15,23 +22,37 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [error, setError] = useState(null);
 
+  const connectionAttemptsRef = useRef(0);
+
   const [loadMessages] = useLazyQuery(GET_CHAT_MESSAGES, {
     fetchPolicy: "network-only",
   });
 
-  // Socket connection
+  /**
+   * Set up the WebSocket connection to the chat server
+   */
   useEffect(() => {
-    if (!currentFreelancerId) return;
+    if (!currentFreelancerId) {
+      return;
+    }
 
-    const newSocket = io(
-      process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337",
-      {
-        query: { freelancerId: currentFreelancerId },
-        reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
-      }
-    );
+    const serverUrl =
+      process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+
+    connectionAttemptsRef.current++;
+
+    const newSocket = io(serverUrl, {
+      query: { freelancerId: currentFreelancerId },
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      timeout: 10000,
+    });
+
+    newSocket.on("connect_error", () => {});
+    newSocket.on("connect_timeout", () => {});
+    newSocket.io.on("reconnect_attempt", () => {});
+    newSocket.io.on("reconnect", () => {});
 
     setSocket(newSocket);
 
@@ -40,9 +61,13 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
     };
   }, [currentFreelancerId]);
 
-  // Socket event handlers
+  /**
+   * Set up WebSocket event handlers for chat functionality
+   */
   useEffect(() => {
-    if (!socket) return;
+    if (!socket) {
+      return;
+    }
 
     const handleConnect = () => {
       setIsConnected(true);
@@ -56,30 +81,29 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
     };
 
     const handleNewMessage = (message) => {
-      if (!message || !message.id) return;
+      if (!message || !message.id) {
+        return;
+      }
 
       const currentUserIdStr = currentFreelancerId?.toString();
       const messageAuthorId = message.author?.id?.toString();
 
-      // Update messages if in current chat
       if (
         selectedChat &&
         message.chatId.toString() === selectedChat.id.toString()
       ) {
         setMessages((prev) => {
-          // Look for an optimistic message to replace
           const updatedMessages = prev.map((msg) => {
             if (
               msg.id.toString().startsWith("temp-") &&
               msg.content === message.content &&
               msg.author?.id?.toString() === messageAuthorId
             ) {
-              return message; // Replace optimistic message with real one
+              return message;
             }
             return msg;
           });
 
-          // If we didn't find an optimistic message to replace, check for duplicates
           const messageExists = updatedMessages.some(
             (m) => m.id.toString() === message.id.toString()
           );
@@ -87,22 +111,26 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
             return updatedMessages;
           }
 
-          // Add the new message
           return [...updatedMessages, message];
         });
       }
 
-      // Update chat list
-      setChatList((prev) =>
-        prev
+      setChatList((prev) => {
+        const chatExists = prev.some(
+          (chat) => chat.id.toString() === message.chatId.toString()
+        );
+
+        if (!chatExists) {
+          return prev;
+        }
+
+        const updated = prev
           .map((chat) => {
             if (chat.id.toString() === message.chatId.toString()) {
               const isAuthor = messageAuthorId === currentUserIdStr;
               const isCurrentChat =
                 chat.id.toString() === selectedChat?.id?.toString();
 
-              // If this is the current chat and we're the author, set unread to 0
-              // If this is not the current chat and we're not the author, increment unread
               const newUnreadCount =
                 isAuthor || isCurrentChat ? 0 : (chat.unreadCount || 0) + 1;
 
@@ -116,8 +144,10 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
             }
             return chat;
           })
-          .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-      );
+          .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+        return updated;
+      });
     };
 
     const handleChatUpdated = ({
@@ -126,8 +156,8 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
       hasNewMessage,
       lastMessage,
     }) => {
-      setChatList((prev) =>
-        prev.map((chat) => {
+      setChatList((prev) => {
+        const updatedList = prev.map((chat) => {
           if (chat.id.toString() === chatId.toString()) {
             return {
               ...chat,
@@ -137,31 +167,81 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
             };
           }
           return chat;
-        })
+        });
+
+        return updatedList;
+      });
+    };
+
+    const handleNewChat = (chatData) => {
+      const isUserInChat = chatData.participants.some(
+        (p) => p.id.toString() === currentFreelancerId.toString()
       );
+
+      if (!isUserInChat) {
+        return;
+      }
+
+      setChatList((prevList) => {
+        const exists = prevList.some(
+          (chat) => chat.id.toString() === chatData.id.toString()
+        );
+
+        if (exists) {
+          return prevList;
+        }
+
+        const newChat = {
+          id: chatData.id,
+          name: chatData.name,
+          isGroup: chatData.isGroup,
+          updatedAt: chatData.updatedAt,
+          unreadCountMap: chatData.unreadCountMap,
+          lastMessage: chatData.lastMessage,
+          participants: chatData.participants,
+          hasNewMessage: chatData.unreadCountMap?.[currentFreelancerId] > 0,
+          unreadCount: chatData.unreadCountMap?.[currentFreelancerId] || 0,
+        };
+
+        const updatedList = [newChat, ...prevList].sort(
+          (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+        );
+
+        return updatedList;
+      });
     };
 
     socket.on("connect", handleConnect);
     socket.on("disconnect", handleDisconnect);
     socket.on("new_message", handleNewMessage);
     socket.on("chat_updated", handleChatUpdated);
+    socket.on("new_chat", handleNewChat);
+
+    if (socket.connected) {
+      handleConnect();
+    }
 
     return () => {
       socket.off("connect", handleConnect);
       socket.off("disconnect", handleDisconnect);
       socket.off("new_message", handleNewMessage);
       socket.off("chat_updated", handleChatUpdated);
+      socket.off("new_chat", handleNewChat);
     };
   }, [socket, selectedChat, currentFreelancerId]);
 
+  /**
+   * Marks a chat as read for the current user
+   * @param {string|number} chatId - ID of the chat to mark as read
+   */
   const markChatAsRead = useCallback(
     (chatId) => {
-      if (!socket || !socket.connected || !chatId) return;
+      if (!socket || !socket.connected || !chatId) {
+        return;
+      }
 
-      // Emit socket event to mark chat as read
       socket.emit("mark_chat_read", { chat_id: chatId });
 
-      // Update local state immediately for better UX
       setChatList((prev) =>
         prev.map((c) =>
           c.id.toString() === chatId.toString()
@@ -173,21 +253,28 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
     [socket]
   );
 
-  // Select chat
+  /**
+   * Selects a chat and loads its messages
+   * @param {Object} chat - Chat object to select
+   */
   const selectChat = useCallback(
     async (chat) => {
-      if (!chat || chat.id === selectedChat?.id) return;
+      if (!chat) {
+        return;
+      }
+
+      if (chat.id === selectedChat?.id) {
+        return;
+      }
 
       setSelectedChat(chat);
       setIsLoadingMessages(true);
 
       try {
-        // Join chat room
         if (socket?.connected) {
           socket.emit("join_chat", chat.id);
         }
 
-        // Load messages
         const result = await loadMessages({
           variables: { chatId: chat.id },
         });
@@ -218,9 +305,10 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
           }));
 
           setMessages(transformedMessages);
+        } else {
+          setMessages([]);
         }
 
-        // Mark chat as read immediately when selecting it
         markChatAsRead(chat.id);
       } catch (err) {
         setError(err.message);
@@ -231,7 +319,11 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
     [socket, selectedChat, loadMessages, markChatAsRead]
   );
 
-  // Send message
+  /**
+   * Sends a message to the currently selected chat
+   * @param {string} content - Message content to send
+   * @returns {Promise<Object>} Promise resolving to success status
+   */
   const sendMessage = useCallback(
     (content) => {
       if (!socket || !selectedChat || !content.trim()) {
@@ -245,12 +337,10 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
           authorId: currentFreelancerId,
         };
 
-        // Find current user's data from selected chat participants
         const currentUser = selectedChat.participants?.find(
           (p) => p.id.toString() === currentFreelancerId.toString()
         );
 
-        // Optimistic update with unique ID and proper author data
         const optimisticId = `temp-${Date.now()}-${Math.random()
           .toString(36)
           .substr(2, 9)}`;
@@ -291,7 +381,6 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
             );
             resolve({ success: false, error: response.error });
           } else if (response?.success && response?.message) {
-            // The real message will be added via socket event
             resolve({ success: true });
           }
         });

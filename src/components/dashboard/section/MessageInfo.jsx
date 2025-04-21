@@ -1,11 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import DashboardNavigation from "../header/DashboardNavigation";
 import UserChatList1 from "../card/UserChatList1";
 import MessageBox from "../element/MessageBox";
 import { useChatSystem } from "@/hook/useChatSystem";
 
+/**
+ * MessageInfo component that displays the chat interface with chat list and messages
+ * @param {Object} props - Component props
+ * @param {Array} props.initialChatList - Initial list of chats to display
+ * @param {string|null} props.chatListError - Error message if chat list failed to load
+ * @param {string|number} props.currentFreelancerId - ID of the current freelancer/user
+ * @returns {JSX.Element} Rendered message interface with chat sidebar and message area
+ */
 export default function MessageInfo({
   initialChatList,
   chatListError: initialChatListError,
@@ -26,23 +34,37 @@ export default function MessageInfo({
     currentFreelancerId,
   });
 
-  // Handle URL-based chat selection
+  // Track if we've handled the URL chat parameter
+  const [hasProcessedUrlChat, setHasProcessedUrlChat] = useState(false);
+
+  /**
+   * Handles URL-based chat selection when component loads or chat list changes
+   */
   useEffect(() => {
+    if (hasProcessedUrlChat) {
+      return;
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const chatIdFromUrl = urlParams.get("chat");
 
     if (chatIdFromUrl && chatList.length > 0) {
+      // Ensure we're comparing strings
       const targetChat = chatList.find(
-        (chat) => chat.id.toString() === chatIdFromUrl
+        (chat) => chat.id.toString() === chatIdFromUrl.toString()
       );
 
       if (targetChat) {
         selectChat(targetChat);
-        // Clean up URL
-        window.history.replaceState({}, "", window.location.pathname);
+        setHasProcessedUrlChat(true);
+
+        // Clean up URL after a short delay to ensure chat is selected
+        setTimeout(() => {
+          window.history.replaceState({}, "", window.location.pathname);
+        }, 500);
       }
     }
-  }, [chatList, selectChat]);
+  }, [chatList, selectChat, hasProcessedUrlChat]);
 
   return (
     <div className="dashboard__content hover-bgc-color">
@@ -53,6 +75,10 @@ export default function MessageInfo({
         <div className="col-lg-12">
           <div className="dashboard_title_area">
             <h2>Μηνύματα</h2>
+            {/* <small className="text-muted">
+              Σύνδεση: {isConnected ? "✅" : "❌"} | Συνομιλίες:{" "}
+              {chatList.length}
+            </small> */}
           </div>
         </div>
       </div>
@@ -64,7 +90,7 @@ export default function MessageInfo({
               <div className="chat-member-list pr20">
                 {initialChatListError || error ? (
                   <p className="text-danger p-3">
-                    Error: {initialChatListError || error}
+                    Σφάλμα: {initialChatListError || error}
                   </p>
                 ) : chatList.length > 0 ? (
                   chatList.map((chat) => (
@@ -73,7 +99,9 @@ export default function MessageInfo({
                       className={`list-item pt5 ${
                         selectedChat?.id === chat.id ? "active" : ""
                       }`}
-                      onClick={() => selectChat(chat)}
+                      onClick={() => {
+                        selectChat(chat);
+                      }}
                       style={{ cursor: "pointer" }}
                     >
                       <UserChatList1
@@ -83,7 +111,7 @@ export default function MessageInfo({
                     </div>
                   ))
                 ) : (
-                  <p className="p-3">No chats found.</p>
+                  <p className="p-3">Δεν βρέθηκαν συνομιλίες.</p>
                 )}
               </div>
             </div>

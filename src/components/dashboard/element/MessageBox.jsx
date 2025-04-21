@@ -3,6 +3,18 @@ import { timeAgo, formatMessageTime, getDatePart } from "@/utils/timeAgo";
 import UserImage from "@/components/user/UserImage";
 import ChatMessagesSkeleton from "@/components/ui/Skeletons/ChatMessagesSkeleton";
 
+/**
+ * MessageBox component that displays chat messages and message input
+ * @param {Object} props - Component props
+ * @param {Object|null} props.selectedChat - Currently selected chat
+ * @param {Array} props.messages - List of messages in the chat
+ * @param {boolean} props.isConnected - Whether the socket connection is active
+ * @param {string|number} props.currentUserId - ID of the current user
+ * @param {boolean} props.isLoading - Whether messages are currently loading
+ * @param {Function} props.onSendMessage - Callback to send a message
+ * @param {Function} props.markChatAsRead - Callback to mark a chat as read
+ * @returns {JSX.Element} Rendered message box component
+ */
 export default function MessageBox({
   selectedChat,
   messages,
@@ -22,7 +34,9 @@ export default function MessageBox({
   const chatContainerRef = useRef(null);
   const wasEnterKeySend = useRef(false);
 
-  // Scroll to bottom function
+  /**
+   * Scrolls the chat container to the bottom
+   */
   const scrollChatToBottom = () => {
     if (chatContainerRef.current) {
       const container = chatContainerRef.current;
@@ -30,7 +44,9 @@ export default function MessageBox({
     }
   };
 
-  // Focus input function
+  /**
+   * Focuses the message input field
+   */
   const focusMessageInput = () => {
     if (messageInputRef.current) {
       messageInputRef.current.focus();
@@ -42,14 +58,18 @@ export default function MessageBox({
     }
   };
 
-  // Scroll to bottom when messages change
+  /**
+   * Scrolls to bottom when messages change if shouldScrollToBottom is true
+   */
   useEffect(() => {
     if (shouldScrollToBottom) {
       setTimeout(scrollChatToBottom, 100);
     }
   }, [messages, shouldScrollToBottom]);
 
-  // Focus input when chat changes
+  /**
+   * Focuses input and scrolls to bottom when chat changes
+   */
   useEffect(() => {
     if (selectedChat) {
       setShouldScrollToBottom(true);
@@ -57,7 +77,9 @@ export default function MessageBox({
     }
   }, [selectedChat]);
 
-  // Focus input after messages load
+  /**
+   * Focuses input after messages load
+   */
   useEffect(() => {
     if (!isLoading && messages.length > 0) {
       setShouldScrollToBottom(true);
@@ -65,7 +87,9 @@ export default function MessageBox({
     }
   }, [isLoading, messages.length]);
 
-  // Set up scroll detection
+  /**
+   * Sets up scroll detection to determine if we should auto-scroll
+   */
   useEffect(() => {
     const handleScroll = () => {
       if (chatContainerRef.current) {
@@ -85,7 +109,10 @@ export default function MessageBox({
     }
   }, []);
 
-  // Handle message submission
+  /**
+   * Handles sending a new message
+   * @param {Event} e - Form submit event
+   */
   const handleSendMessage = async (e) => {
     e.preventDefault();
 
@@ -126,7 +153,10 @@ export default function MessageBox({
     }
   };
 
-  // Handle Enter key press
+  /**
+   * Handles Enter key press to send messages
+   * @param {KeyboardEvent} e - Keyboard event
+   */
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -144,7 +174,7 @@ export default function MessageBox({
     (p) => p.id.toString() !== currentUserId.toString()
   );
 
-  const chatName = selectedChat?.name || "Select a Conversation";
+  const chatName = selectedChat?.name || "Επιλογή Συνομιλίας";
   const displayName =
     otherParticipant?.displayName ||
     (otherParticipant
@@ -154,6 +184,9 @@ export default function MessageBox({
       : chatName);
   const chatStatus = isConnected ? "Active" : "Disconnected";
 
+  /**
+   * Marks chat as read when input is focused
+   */
   const handleInputFocus = () => {
     if (selectedChat && isConnected) {
       markChatAsRead(selectedChat.id);
@@ -184,7 +217,8 @@ export default function MessageBox({
             <div className="authors">
               <h6 className="name mb-0">{displayName}</h6>
               <p className="preview">
-                {chatStatus} {isSending && "• Sending..."}
+                {/* {chatStatus === "Active" ? "Ενεργός" : "Αποσυνδεδημένος"}{" "} */}
+                {isSending && "• Αποστολή..."}
               </p>
             </div>
           </div>
@@ -205,11 +239,11 @@ export default function MessageBox({
           <ChatMessagesSkeleton />
         ) : !selectedChat ? (
           <p className="text-center p-5">
-            Select a conversation to start messaging.
+            Επιλέξτε μια συνομιλία για να ξεκινήσετε.
           </p>
         ) : messages.length === 0 ? (
           <p className="text-center p-5">
-            No messages in this conversation yet.
+            Δεν υπάρχουν μηνύματα σε αυτή τη συνομιλία ακόμα.
           </p>
         ) : (
           <ul className="chatting_content">
@@ -228,7 +262,7 @@ export default function MessageBox({
               const authorName =
                 msg.author?.displayName ||
                 msg.author?.username ||
-                "Unknown User";
+                "Άγνωστος Χρήστης";
               const isOptimistic = msg.id.toString().startsWith("temp-");
               const hasError = msg.status === "error";
 
@@ -302,13 +336,13 @@ export default function MessageBox({
                           <small className="mr10">
                             {isOptimistic
                               ? msg.status === "sending"
-                                ? "Sending..."
+                                ? "Αποστολή..."
                                 : msg.status === "pending"
-                                ? "Pending..."
-                                : "Failed"
+                                ? "Εκκρεμεί..."
+                                : "Απέτυχε"
                               : timeAgoText}
                           </small>{" "}
-                          Me{" "}
+                          Εγώ{" "}
                         </>
                       ) : (
                         <>
@@ -339,7 +373,7 @@ export default function MessageBox({
                     {msg.content}
                     {hasError && (
                       <small className="d-block mt-1 text-danger">
-                        Error: {msg.error || "Failed to send"}
+                        Σφάλμα: {msg.error || "Αποτυχία αποστολής"}
                       </small>
                     )}
                   </p>
@@ -353,7 +387,13 @@ export default function MessageBox({
 
       {sendError && (
         <div className="alert alert-danger mx-3 mb-0 mt-2 py-2">
-          {sendError}
+          {sendError.includes("Cannot send")
+            ? "Δεν είναι δυνατή η αποστολή κενού μηνύματος"
+            : sendError.includes("disconnected")
+            ? "Δεν είναι δυνατή η αποστολή: Είστε αποσυνδεδεμένοι"
+            : sendError.includes("Failed")
+            ? "Αποτυχία αποστολής μηνύματος"
+            : sendError}
         </div>
       )}
 
@@ -370,7 +410,9 @@ export default function MessageBox({
                 className="form-control"
                 type="text"
                 placeholder={
-                  isConnected ? "Type a message" : "Reconnecting... Please wait"
+                  isConnected
+                    ? "Γράψτε ένα μήνυμα"
+                    : "Επανασύνδεση... Παρακαλώ περιμένετε"
                 }
                 value={newMessage}
                 onChange={(e) => {
@@ -390,7 +432,7 @@ export default function MessageBox({
               >
                 {isSending ? (
                   <>
-                    Send
+                    Αποστολή
                     <span
                       className="spinner-border spinner-border-sm ms-2"
                       role="status"
@@ -399,7 +441,7 @@ export default function MessageBox({
                   </>
                 ) : (
                   <>
-                    Send
+                    Αποστολή
                     <i className="fal fa-arrow-right-long ms-2" />
                   </>
                 )}
@@ -407,7 +449,7 @@ export default function MessageBox({
             </form>
           ) : (
             <p className="text-center p-3 text-muted">
-              Select a conversation to send a message.
+              Επιλέξτε μια συνομιλία για να στείλετε μήνυμα.
             </p>
           )}
         </div>

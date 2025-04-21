@@ -7,6 +7,10 @@ export const metadata = {
   title: "Μηνύματα | Doulitsa",
 };
 
+/**
+ * Messages page component that fetches initial chat data for the current freelancer
+ * @returns {JSX.Element} Rendered message interface with chat data
+ */
 export default async function MessagesPage() {
   const fid = await getFreelancerId();
   let initialChatList = [];
@@ -14,7 +18,7 @@ export default async function MessagesPage() {
 
   try {
     if (!fid) {
-      chatListError = "Freelancer profile not found";
+      chatListError = "Δεν βρέθηκε προφίλ freelancer";
     } else {
       const data = await getData(
         GET_FREELANCER_CHATS,
@@ -39,7 +43,7 @@ export default async function MessagesPage() {
       }
     }
   } catch (error) {
-    chatListError = error.message || "Failed to load page data";
+    chatListError = error.message || "Αποτυχία φόρτωσης δεδομένων σελίδας";
   }
 
   return (
