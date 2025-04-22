@@ -63,6 +63,68 @@ const ALL_TOP_TAXONOMIES = gql`
   }
 `;
 
+const ALL_ACTIVE_TOP_TAXONOMIES = gql`
+  query AllActiveTopTaxonomies {
+    topFreelancerSubcategories: freelancerSubcategories(
+      filters: {
+        freelancers: { 
+          id: { ne: null },
+          status: { type: { eq: "Active" } }
+        }
+      }
+      sort: "label:asc"
+      pagination: { limit: 100 }
+    ) {
+      data {
+        attributes {
+          plural
+          label
+          slug
+          type {
+            data {
+              attributes {
+                slug
+              }
+            }
+          }
+          category {
+            data {
+              attributes {
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+    topServiceSubcategories: subcategories(
+      filters: {
+        services: {
+          id: { ne: null }
+          status: { type: { eq: "Active" } }
+          freelancer: { id: { ne: null } }
+        }
+      }
+      sort: "label:asc"
+      pagination: { limit: 100 }
+    ) {
+      data {
+        attributes {
+          label
+          slug
+          category {
+            data {
+              attributes {
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 const FEATURED_CATEGORIES = gql`
   query FeaturedCategories {
     featuredEntity {
@@ -193,4 +255,5 @@ export {
   FEATURED_CATEGORIES,
   CATEGORIES_ALL,
   ALL_TOP_TAXONOMIES,
+  ALL_ACTIVE_TOP_TAXONOMIES,
 };

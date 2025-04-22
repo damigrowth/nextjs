@@ -6,10 +6,9 @@ export default function OurFaq1() {
           <div className="row wow fadeInUp">
             <div className="col-lg-6 m-auto">
               <div className="main-title text-center">
-                <h2 className="title">Frequently Asked Questions</h2>
+                <h2 className="title">Συχνές Ερωτήσεις</h2>
                 <p className="paragraph mt10">
-                  Lorem ipsum dolor sit amet, consectetur.
-                </p>
+                Αν έχεις περισσότερες ερωτήσεις πήγαινε στη σελίδα <a href="/faq" className="text-decoration-underline">FAQ</a>.</p>
               </div>
             </div>
           </div>
@@ -28,7 +27,7 @@ export default function OurFaq1() {
                           aria-expanded="true"
                           aria-controls="collapseOne"
                         >
-                          What methods of payments are supported?
+                          Πώς μπορώ να εμφανίσω το προφίλ μου στην Doulitsa;
                         </button>
                       </h2>
                       <div
@@ -38,10 +37,8 @@ export default function OurFaq1() {
                         data-parent="#accordionExample"
                       >
                         <div className="accordion-body">
-                          Cras vitae ac nunc orci. Purus amet tortor non at
-                          phasellus ultricies hendrerit. Eget a, sit morbi nunc
-                          sit id massa. Metus, scelerisque volutpat nec sit vel
-                          donec. Sagittis, id volutpat erat vel.
+                        Για να εγγραφείς ως επαγγελματίας και να προσφέρεις τις υπηρεσίες σου, ακολούθησε τις οδηγίες στη σελίδα 'Εγγραφή' αφού επιλέξεις "Επαγγελματικό Προφίλ". Θα είμαστε σε επικοινωνία για να σε βοηθήσουμε σε ό,τι χρειαστείς.
+
                         </div>
                       </div>
                     </div>
@@ -55,7 +52,7 @@ export default function OurFaq1() {
                           aria-expanded="false"
                           aria-controls="collapseTwo"
                         >
-                          Can I cancel at anytime?
+                          Υπάρχει χρέωση για την επικοινωνία με τους χρήστες;
                         </button>
                       </h2>
                       <div
@@ -65,10 +62,8 @@ export default function OurFaq1() {
                         data-parent="#accordionExample"
                       >
                         <div className="accordion-body">
-                          Cras vitae ac nunc orci. Purus amet tortor non at
-                          phasellus ultricies hendrerit. Eget a, sit morbi nunc
-                          sit id massa. Metus, scelerisque volutpat nec sit vel
-                          donec. Sagittis, id volutpat erat vel.
+                        Όχι, η επικοινωνία μέσω της πλατφόρμας είναι δωρεάν και οι πληροφορίες είναι ελεύθερες. Οι οικονομικές λεπτομέρειες της συνεργασίας σας καθορίζονται από εσάς και κανονίζονται απευθείας με τον υποψήφιο πελάτη κατόπιν της επικοινωνίας σας.
+
                         </div>
                       </div>
                     </div>
@@ -82,7 +77,7 @@ export default function OurFaq1() {
                           aria-expanded="false"
                           aria-controls="collapseThree"
                         >
-                          How do I get a receipt for my purchase?
+                          Πώς μπορώ να διασφαλίσω την εγκυρότητα του προφίλ μου;
                         </button>
                       </h2>
                       <div
@@ -92,10 +87,8 @@ export default function OurFaq1() {
                         data-parent="#accordionExample"
                       >
                         <div className="accordion-body">
-                          Cras vitae ac nunc orci. Purus amet tortor non at
-                          phasellus ultricies hendrerit. Eget a, sit morbi nunc
-                          sit id massa. Metus, scelerisque volutpat nec sit vel
-                          donec. Sagittis, id volutpat erat vel.
+                        Εάν θέλεις να αποκτήσεις το σήμα 'Πιστοποιημένος', θα πρέπει να δηλώσεις τον ΑΦΜ σου και τα στοιχεία σου για να επιβεβαιώσουμε ότι έχεις ενεργή επιχείρηση. Το σήμα αυτό παρέχει στους πελάτες περισσότερη ασφάλεια για την επαγγελματική σου αξιοπιστία.
+
                         </div>
                       </div>
                     </div>
@@ -109,7 +102,7 @@ export default function OurFaq1() {
                           aria-expanded="false"
                           aria-controls="collapseFour"
                         >
-                          Which license do I need?
+                          Πώς μπορώ να υποβάλω σχόλια ή προτάσεις για τη βελτίωση της πλατφόρμας;
                         </button>
                       </h2>
                       <div
@@ -119,10 +112,8 @@ export default function OurFaq1() {
                         data-parent="#accordionExample"
                       >
                         <div className="accordion-body">
-                          Cras vitae ac nunc orci. Purus amet tortor non at
-                          phasellus ultricies hendrerit. Eget a, sit morbi nunc
-                          sit id massa. Metus, scelerisque volutpat nec sit vel
-                          donec. Sagittis, id volutpat erat vel.
+                        Εκτιμούμε τις προτάσεις και τα σχόλιά σου! Μπορείς να μας τα στείλεις μέσω email, και η ομάδα μας θα τα λάβει υπόψη για τη συνεχή βελτίωση της Doulitsa.
+
                         </div>
                       </div>
                     </div>
@@ -136,7 +127,7 @@ export default function OurFaq1() {
                           aria-expanded="false"
                           aria-controls="collapseFive"
                         >
-                          How do I get access to a theme I purchased?
+                         Τι να κάνω αν χρειάζομαι τεχνική υποστήριξη με τον λογαριασμό μου;
                         </button>
                       </h2>
                       <div
@@ -146,10 +137,8 @@ export default function OurFaq1() {
                         data-parent="#accordionExample"
                       >
                         <div className="accordion-body">
-                          Cras vitae ac nunc orci. Purus amet tortor non at
-                          phasellus ultricies hendrerit. Eget a, sit morbi nunc
-                          sit id massa. Metus, scelerisque volutpat nec sit vel
-                          donec. Sagittis, id volutpat erat vel.
+                        Αν αντιμετωπίζεις οποιοδήποτε τεχνικό πρόβλημα, μπορείς να επικοινωνήσεις με την ομάδα υποστήριξής μας μέσω email. Θα κάνουμε το καλύτερο δυνατό για να σε βοηθήσουμε άμεσα.
+
                         </div>
                       </div>
                     </div>

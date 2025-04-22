@@ -221,6 +221,7 @@ export default function AccountForm({ freelancer, type, jwt }) {
                   image?.data?.attributes?.formats?.thumbnail?.url ||
                   image?.data?.attributes?.url
                 }
+                displayName={displayName}
                 onChange={(newImage) => {
                   // Make sure we're setting the image correctly for both File objects and API data
                   if (newImage instanceof File) {

@@ -21,8 +21,7 @@ export default function page() {
             <div className="log-reg-form search-modal searchbrd form-style1 bgc-white p50 p30-sm default-box-shadow1 bdrs12 text-center">
               <h2 className="title">Σχεδόν Έτοιμοι! </h2>
               <p className="fz20">
-                Έλεγξε το email σου για να επιβεβαιώσεις την εγγραφή του
-                λογαριασμού. ΠΡΟΣΟΧΗ! Πρέπει να επιβεβαιώσεις τον λογαριασμό σου αποκλειστικά από τον ίδιο browser που χρησιμοποίησες για την εγγραφή σου!
+                Έλεγξε το email σου για να επιβεβαιώσεις την εγγραφή του λογαριασμού.
               </p>
               <p>
                 * Εάν δεν βλέπεις το email στα εισερχόμενα, έλεγξε και στα spam.

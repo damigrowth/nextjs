@@ -429,7 +429,7 @@ export default function ServiceGallery({
                 <span className="fw600">{totalSize.toFixed(2)}MB</span>)
               </p>
               <p className="fz12 mb0">
-                Μέχρι <span className="fw600">3</span> βίντεο η ήχους
+                Μέχρι <span className="fw600">3</span> αρχεία βίντεο / ήχου
               </p>
               <p className="text-danger mb0" style={{ height: "10px" }}>
                 {error ? error : " "}

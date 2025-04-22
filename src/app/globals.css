@@ -549,12 +549,29 @@ a {
 }
 
 .select-input:hover .select__control {
-  border: 1px solid #e9e9e9;
+  border: 2px solid #1f4b3f;
+  color: var(--headings-color);
   cursor: text;
 }
 
+/* Διόρθωση για focused πεδία */
+.select-input:focus-within .select__control {
+  border: 2px solid #1f4b3f !important;
+  box-shadow: none !important;
+}
+
+.select-input .select__control--is-focused {
+  border: 2px solid #1f4b3f !important;
+  box-shadow: none !important;
+}
+
+.select-input .select__control:hover {
+  border: 2px solid #1f4b3f !important;
+}
+
 .select-input:focus .select__control {
-  border: 1px solid #222222;
+  border: 2px solid #1f4b3f;
+  color: var(--headings-color);
 }
 
 .select-input .select__menu {
@@ -794,9 +811,10 @@ a {
   margin: 0px;
   width: fit-content;
   border-radius: 10px;
-  padding: 0.2rem 1rem;
+  padding: 0.2rem 0.6rem;
   color: #6b7177;
   font-weight: 600;
+  border: 1px solid;
 }
 
 .tags .specialisation {
@@ -1107,7 +1125,7 @@ a {
   align-items: center;
   padding: 5px 10px;
   font-style: normal;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 15px;
   white-space: nowrap;
 }
@@ -1161,7 +1179,7 @@ a {
 
 .taxonomies-swiper-card {
   background-color: #fff;
-  border: 1px solid #e9e9e9;
+  border: 2px solid #e9e9e9;
   border-radius: 16px;
   cursor: pointer;
   color: var(--headings-color);
@@ -1176,6 +1194,10 @@ a {
   vertical-align: middle;
   line-height: 29.5px;
   white-space: nowrap;
+}
+
+.taxonomies-swiper-card:hover {
+  background-color: rgb(241, 252, 250);
 }
 
 .taxonomies-swiper .fas.fa-angle-right {
@@ -1205,6 +1227,7 @@ a {
   transition: transform 0.3s ease;
   background-color: #fff;
   border: 1px solid #e9e9e9;
+  box-shadow: rgba(64, 79, 104, 0.2) 0px 6px 15px;
   border-radius: 12px;
   margin-bottom: 30px;
   position: relative;
@@ -1268,11 +1291,7 @@ a {
 .service-card-title {
   margin-bottom: 10px;
   width: 100%;
-  height: 45px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  height: 50px;
 }
 
 .archives-banner {
@@ -1720,6 +1739,7 @@ a[href="#reviews-section"]:hover {
   font-size: 12px;
 }
 
+
 .message-received {
   justify-self: flex-start;
   border-top-left-radius: 0px;
@@ -1735,3 +1755,4 @@ a[href="#reviews-section"]:hover {
   border-bottom-right-radius: 18px;
   border-bottom-left-radius: 18px;
 }
+

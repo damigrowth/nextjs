@@ -8,7 +8,7 @@ import InstallBootstrap from "@/components/ui/InstallBootstrap";
 import Body from "@/components/ui/Body";
 import Footer from "@/components/ui/Footer";
 import { getData } from "@/lib/client/operations";
-import { ROOT_LAYOUT } from "@/lib/graphql/queries/main/global";
+import { ROOT_LAYOUT_WITH_ACTIVE_SERVICES } from "@/lib/graphql/queries/main/global";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ApolloWrapper } from "@/lib/client/apollo-wrapper";
@@ -23,7 +23,7 @@ if (typeof window !== "undefined") {
 }
 
 export const dynamic = "force-dynamic";
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export default async function RootLayout({ children }) {
   const isUnderMaintenance = false;
@@ -31,7 +31,7 @@ export default async function RootLayout({ children }) {
   const user = await getUser();
   const authenticated = user ? true : false;
 
-  const { header: headerData } = await getData(ROOT_LAYOUT, null, "HEADER");
+  const { header: headerData } = await getData(ROOT_LAYOUT_WITH_ACTIVE_SERVICES, null, "HEADER");
 
   const gaId = process.env.GA_ID;
 

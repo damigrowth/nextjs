@@ -13,7 +13,7 @@ export async function GET() {
     "terms",
     "login",
     "register",
-    "become-seller",
+    "for-pros",
     // Add archive index pages
     "categories",
     "ipiresies",

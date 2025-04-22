@@ -32,11 +32,11 @@ export const freelancerSortOptions = [
   },
   {
     value: "rate:asc",
-    label: "Αύξουσα εργατοώρα",
+    label: "Αύξουσα αμοιβή/ώρα",
   },
   {
     value: "rate:desc",
-    label: "Φθίνουσα εργατοώρα",
+    label: "Φθίνουσα αμοιβή/ώρα",
   },
   {
     value: "rating:desc",

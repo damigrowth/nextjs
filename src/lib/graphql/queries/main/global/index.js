@@ -51,4 +51,60 @@ const ROOT_LAYOUT = gql`
   }
 `;
 
-export { MAINTENANCE_STATUS, ROOT_LAYOUT };
+const ROOT_LAYOUT_WITH_ACTIVE_SERVICES = gql`
+  query RootLayoutWithActiveServices {
+    header {
+      data {
+        attributes {
+          categories(sort: "label:asc") {
+            data {
+              attributes {
+                label
+                slug
+                icon
+                subcategories(
+                  sort: "label:asc" 
+                  pagination: { limit: 6 }
+                  filters: {
+                    services: {
+                      id: { ne: null }
+                      status: { type: { eq: "Active" } }
+                      freelancer: { id: { ne: null } }
+                    }
+                  }
+                ) {
+                  data {
+                    attributes {
+                      label
+                      slug
+                      subdivisions(
+                        sort: "label:asc"
+                        pagination: { limit: 4 }
+                        filters: {
+                          services: {
+                            id: { ne: null }
+                            status: { type: { eq: "Active" } }
+                            freelancer: { id: { ne: null } }
+                          }
+                        }
+                      ) {
+                        data {
+                          attributes {
+                            label
+                            slug
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export { MAINTENANCE_STATUS, ROOT_LAYOUT, ROOT_LAYOUT_WITH_ACTIVE_SERVICES };

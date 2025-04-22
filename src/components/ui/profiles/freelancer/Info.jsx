@@ -94,7 +94,7 @@ export default function Info({
       <div className="price-widget pt25 bdrs8 prowidget">
         {rate && (
           <h3 className="widget-title mb30">
-            {rate}€<small className="fz15 fw500"> / εργατοώρα</small>
+            {rate}€<small className="fz15 fw500"> / ώρα</small>
           </h3>
         )}
 

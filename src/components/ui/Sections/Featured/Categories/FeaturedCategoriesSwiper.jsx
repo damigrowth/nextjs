@@ -17,7 +17,7 @@ export default function FeaturedCategoriesSwiper({ categories }) {
   return (
     <div className="row d-block d-lg-none">
       <div className="col-lg-12">
-        <div className="ui-browser wow fadeInUp">
+        <div className="ui-browser wow fadeInUp pb20">
           {showSwiper && (
             <Swiper
               slidesPerView={1}

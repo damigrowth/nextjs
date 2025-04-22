@@ -107,7 +107,7 @@ export default function FeaturesListEdit({ index }) {
         <div className="table-editing-bg p0 mt30">
           <div className="px30">
             <div className="row">
-              <div className="col-sm-6 text-start">
+              <div className="col-sm-6 text-start pb-4">
                 <button
                   type="button"
                   onClick={cancelEditingFeature}
@@ -116,7 +116,7 @@ export default function FeaturesListEdit({ index }) {
                   Ακύρωση
                 </button>
               </div>
-              <div className="col-sm-6 text-end">
+              <div className="col-sm-6 text-end pb-4">
                 <button
                   type="button"
                   onClick={saveEditingFeature}
