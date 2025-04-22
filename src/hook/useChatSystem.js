@@ -41,11 +41,7 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
       return;
     }
 
-    const serverUrl =
-      process.env.NEXT_PUBLIC_STRAPI_URL ||
-      (process.env.NODE_ENV === "production"
-        ? process.env.STRAPI_URL
-        : "http://localhost:1337");
+    const serverUrl = "https://api.doulitsa.gr";
 
     connectionAttemptsRef.current++;
 
