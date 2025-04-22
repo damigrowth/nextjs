@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { io } from "socket.io-client";
 import { useLazyQuery } from "@apollo/client";
 import { GET_CHAT_MESSAGES } from "@/lib/graphql/queries/main/message";
+import { useNotificationsStore } from "@/store/notifications/notificationsStore";
 
 /**
  * Real-time chat system hook that handles WebSocket connections and chat functionality
@@ -21,6 +22,10 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
   const [messages, setMessages] = useState([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [error, setError] = useState(null);
+
+  const setTotalUnreadCount = useNotificationsStore(
+    (state) => state.setTotalUnreadMessages
+  );
 
   const connectionAttemptsRef = useRef(0);
 
@@ -155,6 +160,7 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
       unreadCount,
       hasNewMessage,
       lastMessage,
+      totalUnreadCount,
     }) => {
       setChatList((prev) => {
         const updatedList = prev.map((chat) => {
@@ -171,6 +177,10 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
 
         return updatedList;
       });
+
+      if (totalUnreadCount !== undefined) {
+        setTotalUnreadCount(totalUnreadCount);
+      }
     };
 
     const handleNewChat = (chatData) => {

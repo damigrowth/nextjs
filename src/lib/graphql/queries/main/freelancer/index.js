@@ -305,6 +305,24 @@ const FREELANCERS_ALL = gql`
   }
 `;
 
+const FREELANCER_NOTIFICATIONS = gql`
+  query FreelancerNotifications($freelancerId: ID!) {
+    notifications(filters: { freelancer: { id: { eq: $freelancerId } } }) {
+      data {
+        id
+        attributes {
+          freelancer {
+            data {
+              id
+            }
+          }
+          totalUnreadCount
+        }
+      }
+    }
+  }
+`;
+
 export {
   FREELANCER_ID,
   FREELANCER_TYPES,
@@ -316,4 +334,5 @@ export {
   FREELANCERS_ARCHIVE_WITH_SKILLS,
   FEATURED_FREELANCERS,
   FREELANCERS_ALL,
+  FREELANCER_NOTIFICATIONS,
 };
