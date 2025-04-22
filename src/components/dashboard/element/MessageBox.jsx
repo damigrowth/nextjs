@@ -36,11 +36,27 @@ export default function MessageBox({
 
   /**
    * Scrolls the chat container to the bottom
+   * with improved reliability
    */
   const scrollChatToBottom = () => {
     if (chatContainerRef.current) {
       const container = chatContainerRef.current;
-      container.scrollTop = container.scrollHeight;
+
+      // Using requestAnimationFrame ensures the browser has painted the DOM
+      // before we attempt to scroll
+      requestAnimationFrame(() => {
+        container.scrollTop = container.scrollHeight;
+
+        // Double-check scroll position after a short delay to ensure it worked
+        setTimeout(() => {
+          if (
+            container.scrollTop + container.clientHeight <
+            container.scrollHeight - 20
+          ) {
+            container.scrollTop = container.scrollHeight;
+          }
+        }, 50);
+      });
     }
   };
 
@@ -62,8 +78,13 @@ export default function MessageBox({
    * Scrolls to bottom when messages change if shouldScrollToBottom is true
    */
   useEffect(() => {
-    if (shouldScrollToBottom) {
+    if (shouldScrollToBottom && messages.length > 0) {
+      // Immediate scroll attempt
+      scrollChatToBottom();
+
+      // Additional scroll attempts with increasing delays
       setTimeout(scrollChatToBottom, 100);
+      setTimeout(scrollChatToBottom, 300);
     }
   }, [messages, shouldScrollToBottom]);
 
@@ -131,6 +152,10 @@ export default function MessageBox({
     const messageContent = newMessage;
     setNewMessage("");
 
+    // Force scroll to bottom immediately when sending
+    setShouldScrollToBottom(true);
+    scrollChatToBottom();
+
     try {
       const success = await onSendMessage(messageContent);
 
@@ -139,12 +164,14 @@ export default function MessageBox({
         setNewMessage(messageContent); // Restore message text
       }
 
-      setShouldScrollToBottom(true);
+      // Additional scroll after message is sent
+      scrollChatToBottom();
 
       // Use a small delay to ensure the input is focused after state updates
       setTimeout(() => {
         focusMessageInput();
-      }, 10);
+        scrollChatToBottom(); // One more scroll for good measure
+      }, 50);
     } catch (error) {
       setSendError(`Error: ${error.message || "Failed to send"}`);
       setNewMessage(messageContent); // Restore message text
@@ -232,7 +259,7 @@ export default function MessageBox({
           minHeight: "400px",
           maxHeight: "60vh",
           overflowY: "auto",
-          paddingBottom: "100px", // Add extra padding at the bottom
+          // paddingBottom: "100px", // Add extra padding at the bottom
         }}
       >
         {isLoading ? (

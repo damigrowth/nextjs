@@ -1367,7 +1367,7 @@ li {
 .inbox_chatting_box {
   height: auto;
   margin-right: 10px;
-  max-height: 575px !important;
+  max-height: 450px !important;
   overflow-y: scroll;
   overflow-x: hidden;
   position: relative;
