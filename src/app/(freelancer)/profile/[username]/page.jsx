@@ -104,6 +104,7 @@ export default async function page({ params, searchParams }) {
           isAuthenticated={fid ? true : false}
         />
         <FreelancerProfile
+          fid={fid}
           freelancerId={freelancerId}
           username={username}
           freelancer={freelancer}

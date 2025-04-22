@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import React, { useState } from "react";
 
 /**
@@ -24,6 +23,9 @@ import React, { useState } from "react";
  * @param {string} [props.viber] - The freelancer's Viber phone number.
  * @param {string} [props.whatsapp] - The freelancer's WhatsApp phone number.
  * @param {string} [props.email] - The freelancer's email address.
+ * @param {string | number} [props.fid] - The ID of the freelancer.
+ * @param {string | number} [props.freelancerId] - The ID of the freelancer profile.
+ * @param {boolean} [props.isOwner] - Whether the current viewer is the owner of the profile.
  * @returns {JSX.Element} The Info component.
  */
 export default function Info({
@@ -35,6 +37,9 @@ export default function Info({
   viber,
   whatsapp,
   email,
+  fid,
+  freelancerId,
+  isOwner,
 }) {
   /**
    * Formats the website URL by removing the protocol (http:// or https://).
@@ -237,12 +242,21 @@ export default function Info({
           )}
         </div>
 
-        <div className="d-grid mt30">
-          <Link href="#" className="ud-btn btn-thm">
-            Επικοινωνία
-            <i className="fal fa-arrow-right-long" />
-          </Link>
-        </div>
+        {/* Conditionally render the contact button if not the owner and required IDs are present */}
+        {!isOwner && fid && freelancerId && (
+          <div className="d-grid mt30">
+            <button
+              type="button"
+              className="ud-btn btn-thm"
+              data-bs-toggle="modal"
+              data-bs-target="#startChatModal"
+              // onClick={handleButtonClick}
+              // disabled={isPending} // Only disable when action is pending
+            >
+              Επικοινωνία <i className="fal fa-arrow-right-long" />
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

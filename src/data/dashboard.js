@@ -9,7 +9,7 @@ export const dashboardNavigation = [
     id: 2,
     name: "Μηνύματα",
     icon: "flaticon-mail",
-    path: "#",
+    path: "/dashboard/messages",
   },
   {
     id: 3,
@@ -74,7 +74,7 @@ export const hasAccessMainNav = [
     id: 2,
     name: "Μηνύματα",
     icon: "flaticon-mail",
-    path: "#",
+    path: "/dashboard/messages",
   },
   {
     id: 3,
@@ -151,7 +151,7 @@ export const hasAccessUserMenuNav = [
     id: 3,
     name: "Μηνύματα",
     icon: "flaticon-mail",
-    path: "#",
+    path: "/dashboard/messages",
   },
   {
     id: 4,
@@ -196,7 +196,7 @@ export const noAccessMainNav = [
     id: 2,
     name: "Μηνύματα",
     icon: "flaticon-mail",
-    path: "#",
+    path: "/dashboard/messages",
   },
   {
     id: 3,
@@ -245,7 +245,7 @@ export const noAccessUserMenuNav = [
     id: 2,
     name: "Μηνύματα",
     icon: "flaticon-mail",
-    path: "#",
+    path: "/dashboard/messages",
   },
   {
     id: 3,

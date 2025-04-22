@@ -1518,11 +1518,11 @@ a {
     display: flex;
     flex-direction: column;
   }
-  
+
   .hsidebar-header {
     flex-shrink: 0;
   }
-  
+
   .hsidebar-content {
     flex-grow: 1;
     overflow-y: auto;
@@ -1530,19 +1530,19 @@ a {
     display: flex;
     flex-direction: column;
   }
-  
+
   .widget-wrapper {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
   }
-  
+
   .sidebar-accordion {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
   }
-  
+
   .sidebar-close-icon {
     display: block;
     position: absolute;
@@ -1551,7 +1551,7 @@ a {
     font-size: 16px;
     cursor: pointer;
   }
-  
+
   .mobile-filter-clear-btn {
     margin-top: auto !important;
     padding: 15px 0;
@@ -1560,7 +1560,7 @@ a {
     z-index: 10;
     flex-shrink: 0;
   }
-  
+
   .mobile-filter-clear-btn .ui-clear-btn {
     transition: all 0.3s ease;
   }
@@ -1739,6 +1739,20 @@ a[href="#reviews-section"]:hover {
   font-size: 12px;
 }
 
-.hero-home12 {
-  isolation: isolate;
+
+.message-received {
+  justify-self: flex-start;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 18px;
+  border-bottom-right-radius: 18px;
+  border-bottom-left-radius: 18px;
 }
+
+.message-sent {
+  justify-self: flex-end;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 18px;
+  border-bottom-left-radius: 18px;
+}
+

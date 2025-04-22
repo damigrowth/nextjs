@@ -37,3 +37,72 @@ export const timeAgo = (date) => {
     return "";
   }
 };
+
+/**
+ * Gets only the date part from a date string for comparison purposes
+ * @param {string} dateString - ISO date string
+ * @returns {string} Date in YYYY-MM-DD format for easy comparison
+ */
+export const getDatePart = (dateString) => {
+  if (!dateString) return "";
+  try {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0]; // Returns YYYY-MM-DD
+  } catch (error) {
+    return "";
+  }
+};
+
+/**
+ * Formats a date string to display time for today's messages, day and month for this year, or day/month/year for previous years
+ * @param {string} dateString - ISO date string to format
+ * @returns {string} Formatted time for today, day and month for this year, or day/month/year for previous years
+ */
+export const formatMessageTime = (dateString) => {
+  if (!dateString) return "";
+  try {
+    const messageDate = new Date(dateString);
+    if (isNaN(messageDate.getTime())) return "";
+
+    // Get hours and minutes
+    const hours = messageDate.getHours();
+    const minutes = messageDate.getMinutes().toString().padStart(2, "0");
+    const timeStr = `${hours}:${minutes}`;
+
+    const today = new Date();
+
+    // Check if the message is from today
+    const isToday =
+      messageDate.getDate() === today.getDate() &&
+      messageDate.getMonth() === today.getMonth() &&
+      messageDate.getFullYear() === today.getFullYear();
+
+    // Check if the message is from the current year
+    const isThisYear = messageDate.getFullYear() === today.getFullYear();
+
+    if (isToday) {
+      // For today's messages, just show the time
+      return timeStr;
+    } else if (isThisYear) {
+      // For messages from this year, show day and month
+      const options = {
+        day: "numeric",
+        month: "long",
+      };
+
+      const dateFormatter = new Intl.DateTimeFormat("el-GR", options);
+      const formattedDate = dateFormatter.format(messageDate);
+
+      return `${formattedDate} - ${timeStr}`;
+    } else {
+      // For messages from previous years, show day/month/year
+      const day = messageDate.getDate().toString().padStart(2, "0");
+      const month = (messageDate.getMonth() + 1).toString().padStart(2, "0");
+      const year = messageDate.getFullYear();
+
+      return `${day}/${month}/${year} - ${timeStr}`;
+    }
+  } catch (error) {
+    return "";
+  }
+};

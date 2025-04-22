@@ -1,10 +1,10 @@
-// UserMenu.jsx
 import { hasAccessUserMenuNav, noAccessUserMenuNav } from "@/data/dashboard";
 import UserMenuLink from "./UserMenuLink";
 import { getAccess, getUser } from "@/lib/auth/user";
 import UserImage from "@/components/user/UserImage";
 import Link from "next/link";
 import LogoutLink from "./LogoutLink";
+import MessagesMenu from "./MessagesMenu";
 
 export default async function UserMenu({ isMobile }) {
   const user = await getUser();
@@ -27,7 +27,10 @@ export default async function UserMenu({ isMobile }) {
       .filter(Boolean); // Remove null items
 
     return (
-      <li className="user_setting">
+      <li className="user_setting d-flex">
+        <div className="d-flex justify-content-center align-items-center mr20">
+          <MessagesMenu />
+        </div>
         <div className="dropdown">
           <div className="btn" data-bs-toggle="dropdown">
             <UserImage

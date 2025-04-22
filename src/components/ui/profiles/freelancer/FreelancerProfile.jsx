@@ -16,10 +16,13 @@ import FreelancerSchema from "@/utils/Seo/Schema/FreelancerSchema";
 import Protected from "@/components/auth/Protected";
 import FeaturedFile from "../../SingleService/FeaturedFile";
 import ServiceAudioFiles from "../../SingleService/ServiceAudioFiles";
+import StartChatModal from "@/components/modal/StartChatModal";
+// Removed StartChatButtonAndModal import here, it's now in Info.jsx
 
 export default function FreelancerProfile({
-  freelancer,
+  fid,
   freelancerId,
+  freelancer,
   username,
   services,
   servicesPage,
@@ -29,6 +32,8 @@ export default function FreelancerProfile({
   reviewsPage,
   isOwner,
 }) {
+  // Removed useState for modal
+
   const {
     firstName,
     lastName,
@@ -141,6 +146,10 @@ export default function FreelancerProfile({
                     viber={viber}
                     whatsapp={whatsapp}
                     email={visibility?.email && email}
+                    // Pass props needed for the contact button
+                    freelancerId={freelancerId}
+                    freelancerName={displayName}
+                    isOwner={isOwner}
                   />
                   <Skills
                     skills={skills?.data}
@@ -217,14 +226,25 @@ export default function FreelancerProfile({
               email={visibility?.email && email}
               viber={viber}
               whatsapp={whatsapp}
+              fid={fid}
+              freelancerId={freelancerId}
+              freelancerName={displayName}
+              isOwner={isOwner}
             />
             <Skills
               skills={skills?.data}
               specialization={specialization?.data}
             />
+            {/* Contact button rendering removed from here, handled within Info */}
           </StickySidebar>
         </div>
       </div>
+      {/* Modal rendering removed */}
+      <StartChatModal
+        fid={fid}
+        freelancerId={freelancerId}
+        displayName={displayName}
+      />
     </section>
   );
 }
