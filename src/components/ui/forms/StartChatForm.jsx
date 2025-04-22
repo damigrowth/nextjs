@@ -37,7 +37,11 @@ export default function StartChatForm({ fid, freelancerId }) {
     if (!fid) return;
 
     const serverUrl =
-      process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+      process.env.NEXT_PUBLIC_STRAPI_URL ||
+      (process.env.NODE_ENV === "production"
+        ? process.env.STRAPI_URL
+        : "http://localhost:1337");
+
     const newSocket = io(serverUrl, {
       query: { freelancerId: fid },
       reconnection: true,
