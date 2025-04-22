@@ -8,9 +8,9 @@ export default function OurFeature1() {
           <div className="row wow fadeInUp">
             <div className="col-lg-12">
               <div className="main-title">
-                <h2>How It Works</h2>
+                <h2>Προσφέρεις υπηρεσίες;</h2>
                 <p className="text">
-                  Most viewed and all-time top-selling services
+                  Δες την διαδικασία για να προβληθείς στην Doulitsa. Είναι πολύ απλή!
                 </p>
               </div>
             </div>

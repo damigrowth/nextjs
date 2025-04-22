@@ -60,7 +60,7 @@ export default function NewFaqInputs({ editMode = false }) {
           ) : null}
 
           <div className="row pt20 ">
-            <div className="col-sm-6 text-start">
+            <div className="col-sm-6 text-start pb-4">
               <button
                 type="button"
                 onClick={clearNewFaq}
@@ -69,7 +69,7 @@ export default function NewFaqInputs({ editMode = false }) {
                 Ακύρωση Επεξεργασίας
               </button>
             </div>
-            <div className="col-sm-6 text-end">
+            <div className="col-sm-6 text-end pb-4">
               <button
                 type="button"
                 onClick={saveNewFaq}

@@ -14,14 +14,14 @@ export default function AboutArea1() {
                         data-bs-toggle="tab"
                         data-bs-target="#nav-accountpayment"
                       >
-                        <span>For Hiring</span>
+                        <span>Για Επαγγελματίες</span>
                       </button>
                       <button
                         className="nav-link text-start"
                         data-bs-toggle="tab"
                         data-bs-target="#nav-manageother"
                       >
-                        <span>For Freelancing</span>
+                        <span>Για Επιχειρήσεις</span>
                       </button>
                     </div>
                   </nav>
@@ -36,25 +36,15 @@ export default function AboutArea1() {
                   aria-labelledby="nav-accountpayment-tab"
                 >
                   <div className="for-hire">
-                    <h4>For Hiring</h4>
+                    <h4>Για Επαγγελματίες</h4>
                     <p className="text mb30">
-                      It is a long established fact that a reader will be
-                      distracted by the readable content of a page when looking
-                      at its layout. The point of using Lorem Ipsum is that it
-                      has a more-or-less normal distribution of letters, as
-                      opposed to using 'Content here, content here', making it
-                      look like readable English.
+                    Εάν είσαι Επαγγελματίας και θέλεις να προβληθείς στην πλατφόρμα μας, μπορείς να κάνεις Εγγραφή ως Επαγγελματίας και να δημιουργήσεις το προφίλ σου εύκολα και γρήγορα.
                     </p>
                     <p className="text mb40">
-                      Many desktop publishing packages and web page editors now
-                      use Lorem Ipsum as their default model text, and a search
-                      for 'lorem ipsum' will uncover many web sites still in
-                      their infancy. Various versions have evolved over the
-                      years, sometimes by accident, sometimes on purpose
-                      (injected humour and the like).
+                    Μπορείς να αναρτήσεις όλες τις υπηρεσίες που προσφέρεις για να σε βρουν νέοι πελάτες που ψάχνουν υπηρεσίες σαν τις δικές σου.
                     </p>
-                    <a className="ud-btn btn-thm-border mb25 me-4">
-                      Get Started
+                    <a href="/register#pro" className="ud-btn btn-thm mb25 me-4">
+                    Εγγραφή Επαγγελματία
                       <i className="fal fa-arrow-right-long" />
                     </a>
                   </div>
@@ -65,25 +55,17 @@ export default function AboutArea1() {
                   aria-labelledby="nav-manageother-tab"
                 >
                   <div className="for-hire">
-                    <h4>For Freelancing</h4>
+                    <h4>Για Επιχειρήσεις</h4>
                     <p className="text mb30">
-                      It is a long established fact that a reader will be
-                      distracted by the readable content of a page when looking
-                      at its layout. The point of using Lorem Ipsum is that it
-                      has a more-or-less normal distribution of letters, as
-                      opposed to using 'Content here, content here', making it
-                      look like readable English.
+                    Εάν είστε Επιχείρηση που προσφέρει υπηρεσίες, μπορείτε να κάνετε Εγγραφή ως Επιχείρηση και να δημιουργήσετε το προφίλ της Επιχείρησης σας εύκολα και γρήγορα.
+
                     </p>
                     <p className="text mb40">
-                      Many desktop publishing packages and web page editors now
-                      use Lorem Ipsum as their default model text, and a search
-                      for 'lorem ipsum' will uncover many web sites still in
-                      their infancy. Various versions have evolved over the
-                      years, sometimes by accident, sometimes on purpose
-                      (injected humour and the like).
+                    Μπορείτε να αναρτήσετε όλες τις υπηρεσίες που προσφέρετε για να σας βρουν νέοι πελάτες που ψάχνουν υπηρεσίες σαν τις δικές σας.
+
                     </p>
-                    <a className="ud-btn btn-thm-border mb25 me-4">
-                      Get Started
+                    <a href="/register#pro" className="ud-btn btn-thm mb25 me-4">
+                      Εγγραφή Επιχείρησης
                       <i className="fal fa-arrow-right-long" />
                     </a>
                   </div>

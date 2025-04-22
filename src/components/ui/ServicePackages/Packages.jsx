@@ -99,7 +99,7 @@ export default function Packages() {
         </div>
       </div>
       <div className="row pt10 ">
-        <div className="col-sm-6 text-start">
+        <div className="col-sm-6 text-start pb-4">
           {packages[tier].nav.previous ? (
             <button
               type="button"

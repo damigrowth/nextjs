@@ -4,7 +4,6 @@ import CounterInfo1 from "@/components/section/CounterInfo1";
 import CtaBanner1 from "@/components/section/CtaBanner1";
 import OurFaq1 from "@/components/section/OurFaq1";
 import OurFeature1 from "@/components/section/OurFeature1";
-import OurTeam1 from "@/components/section/OurTeam1";
 
 export const metadata = {
   title:
@@ -15,16 +14,13 @@ export default function page() {
   return (
     <>
       <Breadcumb1
-        title={"Work Your Way"}
-        brief={` Give your visitor a smooth online
-                                        experience with a solid UX design.`}
-        isBtnActive={true}
+        title={"Επαγγελματικά Προφίλ"}
+        brief={` Εάν είστε Επαγγελματίας ή Επιχείρηση, μπορείτε να αποκτήσετε εύκολα προβολή στην πλατφόρμα μας.`}
       />
       <AboutArea1 />
       <OurFeature1 />
       <CtaBanner1 />
       <CounterInfo1 />
-      <OurTeam1 />
       <OurFaq1 />
     </>
   );

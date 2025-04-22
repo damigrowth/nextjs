@@ -28,7 +28,7 @@ export default function CancelServiceForm() {
   };
 
   return (
-    <div className="mt-4 pt-4 border-top">
+    <div className="mt50 pt-5 border-top">
       <h4 className="mb-3">Διαγραφή Υπηρεσίας</h4>
       <p className="text-muted mb-4">
         Προσοχή: Η διαγραφή της υπηρεσίας είναι μη αναστρέψιμη ενέργεια.

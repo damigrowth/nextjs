@@ -7,8 +7,9 @@ import FeaturedFreelancers from "@/components/ui/Sections/Featured/Freelancers/F
 import AllTaxonomies from "@/components/ui/Sections/Taxonomies/AllTaxonomies";
 import Hero from "@/components/ui/Sections/Hero/Hero";
 import {
-  ALL_TOP_TAXONOMIES,
   FEATURED_CATEGORIES,
+  ALL_TOP_TAXONOMIES,
+  ALL_ACTIVE_TOP_TAXONOMIES,
 } from "@/lib/graphql/queries/main/taxonomies";
 import { FEATURED_SERVICES } from "@/lib/graphql/queries/main/service";
 import { FEATURED_FREELANCERS } from "@/lib/graphql/queries/main/freelancer";
@@ -54,9 +55,9 @@ export default async function page() {
   );
 
   const { topServiceSubcategories, topFreelancerSubcategories } = await getData(
-    ALL_TOP_TAXONOMIES,
+    ALL_ACTIVE_TOP_TAXONOMIES,
     null,
-    "TOP"
+    "ACTIVE_TOP"
   );
 
   const featuredCategories =
@@ -84,8 +85,8 @@ export default async function page() {
       <FeaturedFreelancers freelancers={featuredFreelancers} fid={fid} />
       <Stats />
       <AllTaxonomies
-        freelancerSubcategories={topFreelancerSubcategories.subcategories}
-        serviceSubcategories={topServiceSubcategories.subcategories}
+        freelancerSubcategories={topFreelancerSubcategories}
+        serviceSubcategories={topServiceSubcategories}
       />
     </>
   );

@@ -557,6 +557,7 @@ export default function PresentationForm({ freelancer, jwt }) {
               onChange={setWebsite}
               className="form-control input-group"
               errors={formState?.errors?.website}
+              icon="fa fa-globe"
             />
           </div>
           <div className="col-md-3">
@@ -565,12 +566,14 @@ export default function PresentationForm({ freelancer, jwt }) {
               id="viber"
               name="viber"
               type="tel"
+              placeholder="69ΧΧΧΧΧΧΧΧ"
               pattern="[0-9]*"
               inputMode="numeric"
               value={viber || ""}
               onChange={setViber}
               className="form-control input-group"
               errors={formState?.errors?.viber}
+              icon="fab fa-viber"
             />
           </div>
           <div className="col-md-3">
@@ -579,12 +582,14 @@ export default function PresentationForm({ freelancer, jwt }) {
               id="whatsapp"
               name="whatsapp"
               type="tel"
+              placeholder="69ΧΧΧΧΧΧΧΧ"
               pattern="[0-9]*"
               inputMode="numeric"
               value={whatsapp || ""}
               onChange={setWhatsapp}
               className="form-control input-group"
               errors={formState?.errors?.whatsapp}
+              icon="fab fa-whatsapp"
             />
           </div>
         </div>

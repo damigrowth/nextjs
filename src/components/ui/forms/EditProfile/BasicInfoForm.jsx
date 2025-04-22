@@ -67,6 +67,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
     switchCoverageMode,
     specialization,
     setSpecialization,
+    displayName,
   } = useEditProfileStore();
 
   const initialState = {
@@ -511,7 +512,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
         <div className="text-muted mb30">
           <div className="d-flex align-items-center mb2">
             <span className="me-2" style={{ color: '#6c757d' }}>•</span>
-            <span>Εικόνα Προφίλ</span>
+            <span>Εικόνα Προφίλ (Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο)</span>
           </div>
           <div className="d-flex align-items-center mb2">
             <span className="me-2" style={{ color: '#6c757d' }}>•</span>
@@ -538,6 +539,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
             }
           }}
           errors={formState?.errors?.image}
+          displayName={displayName}
         />
 
         <div className="mb20 mt20 col-md-6">
@@ -567,7 +569,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           />
         </div>
         <div className="row mb40">
-          <div className="col-md-4">
+          <div className="col-md-4 pb-4">
             <SearchableSelect
               name="category"
               label="Κατηγορία*"
@@ -651,7 +653,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           </div>
           {coverage?.onbase && (
             <div className="row mb20 mt20">
-              <div className="col-md-3">
+              <div className="col-md-3 pb-2">
                 <InputB
                   label="Διεύθυνση"
                   id="address"
@@ -663,7 +665,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                   errors={formState?.errors?.address}
                 />
               </div>
-              <div className="col-md-3">
+              <div className="col-md-3 pb-2">
                 <SearchableSelect
                   name="zipcode"
                   label="Τ.Κ."
@@ -692,7 +694,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                   errors={formState?.errors?.zipcode}
                 />
               </div>
-              <div className="col-md-3">
+              <div className="col-md-3 pb-2">
                 <SearchableSelect
                   name="area"
                   label="Περιοχή"
@@ -701,9 +703,12 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                   formatSymbols
                   capitalize
                   errors={formState?.errors?.area}
+                  customStyles={{
+                    indicatorsContainer: () => ({ display: 'none' })
+                  }}
                 />
               </div>
-              <div className="col-md-3">
+              <div className="col-md-3 pb-2">
                 <SearchableSelect
                   name="county"
                   label="Νομός"
@@ -714,13 +719,16 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                   formatSymbols
                   capitalize
                   errors={formState?.errors?.county}
+                  customStyles={{
+                    indicatorsContainer: () => ({ display: 'none' })
+                  }}
                 />
               </div>
             </div>
           )}
           {coverage?.onsite && (
             <div className="row mb20">
-              <div className="col-md-6">
+              <div className="col-md-6 pb-4">
                 <SearchableSelect
                   name="counties"
                   label="Νομοί"
@@ -769,7 +777,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           )}
         </div>
         <div className="row mb40 mt40">
-          <div className="col-md-6">
+          <div className="col-md-6 pb-4">
             <SearchableSelect
               name="skills"
               label="Δεξιότητες"
@@ -831,7 +839,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           </div>
           <div className="mb10 col-sm-2">
             <InputB
-              label="Εργατοώρα"
+              label="Μέση Αμοιβή / ώρα"
               id="rate"
               name="rate"
               type="number"

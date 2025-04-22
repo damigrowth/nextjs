@@ -14,26 +14,56 @@ export default function AllTaxonomies({
     return groupsArray;
   };
 
+  // Μετασχηματίζουμε τα δεδομένα αν έχουν τη μορφή response από το νέο query
+  const transformFreelancerData = useMemo(() => {
+    if (Array.isArray(freelancerSubcategories.data)) {
+      // Είναι από το νέο query ALL_ACTIVE_TOP_TAXONOMIES
+      return freelancerSubcategories.data.map(item => item.attributes);
+    }
+    // Είναι από το παλιό query ALL_TOP_TAXONOMIES
+    return freelancerSubcategories;
+  }, [freelancerSubcategories]);
+
+  const transformServiceData = useMemo(() => {
+    if (Array.isArray(serviceSubcategories.data)) {
+      // Είναι από το νέο query ALL_ACTIVE_TOP_TAXONOMIES
+      return serviceSubcategories.data.map(item => item.attributes);
+    }
+    // Είναι από το παλιό query ALL_TOP_TAXONOMIES
+    return serviceSubcategories;
+  }, [serviceSubcategories]);
+
   const freelancerGroups = useMemo(
-    () => groupItems(freelancerSubcategories),
-    [freelancerSubcategories]
+    () => groupItems(transformFreelancerData),
+    [transformFreelancerData]
   );
 
   const serviceGroups = useMemo(
-    () => groupItems(serviceSubcategories),
-    [serviceSubcategories]
+    () => groupItems(transformServiceData),
+    [transformServiceData]
   );
 
-  const taxonomies = [
-    {
+  // Αν δεν υπάρχουν δεδομένα για καμία από τις δύο κατηγορίες, μην εμφανίζουμε το section
+  if (freelancerGroups.length === 0 && serviceGroups.length === 0) {
+    return null;
+  }
+
+  const taxonomies = [];
+  
+  // Προσθέτουμε μόνο τις κατηγορίες που έχουν δεδομένα
+  if (freelancerGroups.length > 0) {
+    taxonomies.push({
       label: "Κατηγορίες Επαγγελμάτων",
       data: freelancerGroups,
-    },
-    {
+    });
+  }
+  
+  if (serviceGroups.length > 0) {
+    taxonomies.push({
       label: "Κατηγορίες Υπηρεσιών",
       data: serviceGroups,
-    },
-  ];
+    });
+  }
 
   return (
     <section className="pb90 pb30-md pt110 bgorange">
