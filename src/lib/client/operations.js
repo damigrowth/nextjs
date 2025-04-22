@@ -67,63 +67,85 @@ export const checkServerHealth = async () => {
   }
 };
 
-// Optimized getData with better caching and retry logic
-export const getData = cache(
-  async (query, variables, cacheKey = "NO_CACHE", extraTags = []) => {
-    validateEnvVars();
-    const token = await getToken();
+// Internal implementation of getData that is not cached
+const getDataInternal = async (
+  query,
+  variables,
+  cacheKey = "NO_CACHE",
+  extraTags = []
+) => {
+  validateEnvVars();
+  const token = await getToken();
 
-    const queryString = normalizeQuery(query);
-    const cacheConfig = CACHE_CONFIG[cacheKey] || {};
-    const { key, ttl } = cacheConfig;
+  const queryString = normalizeQuery(query);
+  const cacheConfig = CACHE_CONFIG[cacheKey] || {};
+  const { key, ttl } = cacheConfig;
 
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(key ? { "Cache-Control": `max-age=${ttl}, s-maxage=${ttl}` } : {}),
-      },
-      body: JSON.stringify({
-        query: queryString,
-        variables,
-      }),
-      ...(key && {
-        next: {
-          revalidate: ttl || 0,
-          tags: ["graphql", key, ...extraTags].filter(Boolean),
-        },
-      }),
-    };
+  // If cacheKey is NO_CACHE, we'll set explicit no-cache headers
+  const isNoCache = cacheKey === "NO_CACHE";
 
-    try {
-      const response = await fetchWithRetry(STRAPI_GRAPHQL, options);
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(isNoCache
+        ? { "Cache-Control": "no-store, max-age=0, must-revalidate" }
+        : key
+        ? { "Cache-Control": `max-age=${ttl}, s-maxage=${ttl}` }
+        : {}),
+    },
+    body: JSON.stringify({
+      query: queryString,
+      variables,
+    }),
+    ...(isNoCache
+      ? { cache: "no-store", next: { revalidate: 0 } }
+      : key && {
+          next: {
+            revalidate: ttl || 0,
+            tags: ["graphql", key, ...extraTags].filter(Boolean),
+          },
+        }),
+  };
 
-      if (!response.ok) {
-        const clonedResponse = response.clone();
-        const errorData = await clonedResponse.json();
-        console.log("GraphQL error:", errorData?.errors);
-        console.log("GraphQL response status:", response?.status);
+  try {
+    const response = await fetchWithRetry(STRAPI_GRAPHQL, options);
 
-        console.log("GraphQL response:", response);
-
-        // throw new Error(`Request failed with status ${response.status}`);
-      }
-
-      const jsonResponse = await response.json();
-
-      // TODO: Need to fix all forbidden errors!
-      // if (jsonResponse.errors) {
-      //   console.log("GraphQL response errors:", jsonResponse);
-      // }
-
-      return jsonResponse.data;
-    } catch (error) {
-      console.error("Server error:", error);
-      throw error;
+    if (!response.ok) {
+      const clonedResponse = response.clone();
+      const errorData = await clonedResponse.json();
+      console.log("GraphQL error:", errorData?.errors);
+      console.log("GraphQL response status:", response?.status);
     }
+
+    const jsonResponse = await response.json();
+    return jsonResponse.data;
+  } catch (error) {
+    console.error("Server error:", error);
+    throw error;
   }
-);
+};
+
+// Cached version of the function - only used when cacheKey is not NO_CACHE
+const getDataCached = cache(getDataInternal);
+
+// Smart getData that chooses between cached and uncached versions
+// Add async keyword to make it a valid Server Action
+export const getData = async (
+  query,
+  variables,
+  cacheKey = "NO_CACHE",
+  extraTags = []
+) => {
+  // If cacheKey is NO_CACHE, bypass React's cache function
+  if (cacheKey === "NO_CACHE") {
+    return getDataInternal(query, variables, cacheKey, extraTags);
+  }
+
+  // Otherwise use the cached version
+  return getDataCached(query, variables, cacheKey, extraTags);
+};
 
 // Version of getData specifically for public data (e.g., sitemaps) that avoids token/cookie usage
 export const getPublicData = cache(
