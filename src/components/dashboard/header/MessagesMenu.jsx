@@ -14,11 +14,10 @@ export default function MessagesMenu() {
     <div className="d-none d-sm-flex align-items-center justify-content-center">
       <Link
         href="/dashboard/messages"
-        className="position-relative text-center text-thm2 fz24"
+        className="position-relative text-center text-thm2 fz24 d-flex"
         aria-label="Messages"
-        style={{ width: "24px", height: "24px" }}
       >
-        <span className="flaticon-mail" />
+        <span className="flaticon-mail d-flex" />
         {!isOnMessagesPage && <MessagesBadge />}
       </Link>
     </div>
