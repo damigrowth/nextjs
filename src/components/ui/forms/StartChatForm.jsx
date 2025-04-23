@@ -10,17 +10,15 @@ import { io } from "socket.io-client";
  * @param {Object} props - Component properties
  * @param {string|number} props.fid - Current user ID required for the chat payload
  * @param {string|number} props.freelancerId - Target freelancer ID required for the chat payload
- * @param {string} [props.serviceTitle] - Optional service title to include in the predefined message
+ * @param {string} [props.title] - Optional  title to include in the predefined message
  * @returns {JSX.Element} Chat initiation form component
  */
-export default function StartChatForm({ fid, freelancerId, serviceTitle }) {
+export default function StartChatForm({ fid, freelancerId, title }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [socket, setSocket] = useState(null);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
-  const [messageContent, setMessageContent] = useState(
-    serviceTitle ? `Ενδιαφέρομαι για την υπηρεσία ${serviceTitle}...` : ""
-  );
+  const [messageContent, setMessageContent] = useState(title ? title : "");
 
   const initialState = {
     message: null,
@@ -35,13 +33,13 @@ export default function StartChatForm({ fid, freelancerId, serviceTitle }) {
   );
 
   /**
-   * Updates the message content when serviceTitle changes
+   * Updates the message content when title changes
    */
   useEffect(() => {
-    if (serviceTitle) {
-      setMessageContent(`Ενδιαφέρομαι για την υπηρεσία ${serviceTitle}...`);
+    if (title) {
+      setMessageContent(title);
     }
-  }, [serviceTitle]);
+  }, [title]);
 
   /**
    * Initializes socket connection for real-time chat functionality
