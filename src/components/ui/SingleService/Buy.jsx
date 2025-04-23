@@ -4,7 +4,7 @@ import useServiceOrderStore from "@/store/order/service";
 import Link from "next/link";
 import React, { useEffect } from "react";
 
-export default function Buy({ price, username, isOwner }) {
+export default function Buy({ price, isOwner }) {
   const { order, setOrder, calculateTotal } = useServiceOrderStore();
 
   useEffect(() => {
@@ -12,7 +12,7 @@ export default function Buy({ price, username, isOwner }) {
     calculateTotal();
   }, []);
 
-  if (!isOwner && (price === 0 || price === null)) {
+  if (!isOwner) {
     return (
       <div className="d-grid mt20">
         <button
@@ -21,18 +21,14 @@ export default function Buy({ price, username, isOwner }) {
           data-bs-toggle="modal"
           data-bs-target="#startChatModal"
         >
-          Επικοινωνία <i className="fal fa-arrow-right-long" />
+          {price === 0 || price === null
+            ? "Επικοινωνήστε"
+            : `Σύνολο ${order?.total}€`}{" "}
+          <i className="fal fa-arrow-right-long" />
         </button>
       </div>
     );
   } else {
-    return (
-      <Link href={`/profile/${username}`} className="ud-btn btn-thm">
-        {price === 0 || price === null
-          ? "Επικοινωνήστε"
-          : `Σύνολο ${order?.total}€`}
-        <i className="fal fa-arrow-right-long"></i>
-      </Link>
-    );
+    return null;
   }
 }

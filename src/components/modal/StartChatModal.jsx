@@ -10,13 +10,14 @@ import useModalCleanup from "@/hook/useModalCleanup";
  * @param {string|number} props.fid - ID of the current user
  * @param {string|number} props.freelancerId - ID of the target freelancer to chat with
  * @param {string} props.displayName - Display name of the target freelancer
+ * @param {string} [props.title] - Optional  title to include in the predefined message
  * @returns {JSX.Element} Modal containing a chat form
  */
 export default function StartChatModal({
   fid,
   freelancerId,
   displayName,
-  serviceTitle,
+  title,
 }) {
   const { handleLinkClick } = useModalCleanup("startChatModal");
 
@@ -50,7 +51,7 @@ export default function StartChatModal({
                 <StartChatForm
                   fid={fid}
                   freelancerId={freelancerId}
-                  serviceTitle={serviceTitle}
+                  title={title}
                 />
               ) : (
                 <div className="auth-btns">

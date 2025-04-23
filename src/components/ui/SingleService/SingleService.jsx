@@ -257,7 +257,7 @@ export default async function SingleService({
           </div>
           <StickySidebar>
             {fixed ? (
-              <OrderFixed price={price} addons={addons} username={username} />
+              <OrderFixed price={price} addons={addons} />
             ) : (
               <OrderPackages
                 packages={packages}
@@ -296,7 +296,11 @@ export default async function SingleService({
         fid={fid}
         freelancerId={freelancerId}
         displayName={displayName}
-        serviceTitle={title}
+        title={
+          price === 0 || price === null
+            ? `Ενδιαφέρομαι για την υπηρεσία ${title}...`
+            : `Ενδιαφέρομαι για την υπηρεσία ${title} (${price}€)...`
+        }
       />
     </section>
   );
