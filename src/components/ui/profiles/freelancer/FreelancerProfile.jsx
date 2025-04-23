@@ -239,7 +239,6 @@ export default function FreelancerProfile({
           </StickySidebar>
         </div>
       </div>
-      {/* Modal rendering removed */}
       <StartChatModal
         fid={fid}
         freelancerId={freelancerId}

@@ -71,7 +71,9 @@ export default function ContactDetails({
           <div className="fl-meta d-flex align-items-center justify-content-between">
             <div className="contact-meta-info left">
               {type?.data && (
-                <span className="fz14 fw500" style={{ color: '#6c757d' }}>{type.data.attributes.label}</span>
+                <span className="fz14 fw500" style={{ color: "#6c757d" }}>
+                  {type.data.attributes.label}
+                </span>
               )}
               <br />
               {category?.data && (
@@ -91,9 +93,10 @@ export default function ContactDetails({
             </div>
           </div>
         </div>
+
         <div className="d-grid mt30">
           <Link href={`/profile/${username}`} className="ud-btn btn-thm-border">
-            Επικοινωνία
+            Περισσότερα
             <i className="fal fa-arrow-right-long" />
           </Link>
         </div>

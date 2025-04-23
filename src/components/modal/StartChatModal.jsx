@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import StartChatForm from "../ui/forms/StartChatForm";
+import useModalCleanup from "@/hook/useModalCleanup";
 
 /**
  * Modal component that contains the form for starting a new chat with a freelancer
@@ -10,14 +12,20 @@ import StartChatForm from "../ui/forms/StartChatForm";
  * @param {string} props.displayName - Display name of the target freelancer
  * @returns {JSX.Element} Modal containing a chat form
  */
-export default function StartChatModal({ fid, freelancerId, displayName }) {
+export default function StartChatModal({
+  fid,
+  freelancerId,
+  displayName,
+  serviceTitle,
+}) {
+  const { handleLinkClick } = useModalCleanup("startChatModal");
+
   return (
     <div
       className="modal fade"
       id="startChatModal"
       tabIndex={-1}
       aria-labelledby="startChatModalLabel"
-      aria-hidden="true"
     >
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content position-relative">
@@ -31,10 +39,37 @@ export default function StartChatModal({ fid, freelancerId, displayName }) {
 
           <div className="modal-body px-4 pt-5">
             <div className="pb10">
-              <h4 className="text-black mb-3">Νέο Μήνυμα προς {displayName}</h4>
+              <h4 className="text-black mb-3">
+                {fid
+                  ? `Νέο Μήνυμα προς ${displayName}`
+                  : `Για να επικοινωνήσεις πρέπει να έχεις λογαριασμό`}
+              </h4>
             </div>
             <div className="row justify-content-center align-items-center">
-              <StartChatForm fid={fid} freelancerId={freelancerId} />
+              {fid ? (
+                <StartChatForm
+                  fid={fid}
+                  freelancerId={freelancerId}
+                  serviceTitle={serviceTitle}
+                />
+              ) : (
+                <div className="auth-btns">
+                  <Link
+                    className="mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent"
+                    href="/login"
+                    onClick={handleLinkClick}
+                  >
+                    Σύνδεση
+                  </Link>
+                  <Link
+                    className="mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent"
+                    href="/register"
+                    onClick={handleLinkClick}
+                  >
+                    Εγγραφή
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

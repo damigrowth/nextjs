@@ -19,6 +19,7 @@ import Protected from "@/components/auth/Protected";
 import { getUserId } from "@/lib/auth/user";
 import { redirect } from "next/navigation";
 import { getOtherServicesReviews } from "@/lib/service/service";
+import StartChatModal from "@/components/modal/StartChatModal";
 
 export default async function SingleService({
   slug,
@@ -115,6 +116,8 @@ export default async function SingleService({
     freelancerId
   );
 
+  const isOwner = fid === freelancerId;
+
   return (
     <section className="pt10 pb90 pb30-md bg-orange">
       <ServiceSchema
@@ -191,6 +194,7 @@ export default async function SingleService({
                         price={price}
                         addons={addons}
                         username={username}
+                        isOwner={isOwner}
                       />
                     ) : (
                       <OrderPackages
@@ -288,6 +292,12 @@ export default async function SingleService({
           </StickySidebar>
         </div>
       </div>
+      <StartChatModal
+        fid={fid}
+        freelancerId={freelancerId}
+        displayName={displayName}
+        serviceTitle={title}
+      />
     </section>
   );
 }
