@@ -84,7 +84,7 @@ export default function StartChatForm({ fid, freelancerId, serviceTitle }) {
         // Prepare chat data for the event
         const chatData = {
           id: formState.chatId.toString(),
-          name: "Συνομιλία", // Use the same name from the chat creation
+          name: `Chat${formState.chatId}`, // Use the same name from the chat creation
           isGroup: false,
           updatedAt: new Date().toISOString(),
           unreadCountMap: {
@@ -137,7 +137,6 @@ export default function StartChatForm({ fid, freelancerId, serviceTitle }) {
       // Create the chat payload
       const payload = {
         chat: {
-          name: `Συνομιλία`,
           participants: [fid, freelancerId],
           creator: fid,
         },
