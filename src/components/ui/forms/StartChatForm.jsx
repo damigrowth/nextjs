@@ -10,13 +10,17 @@ import { io } from "socket.io-client";
  * @param {Object} props - Component properties
  * @param {string|number} props.fid - Current user ID required for the chat payload
  * @param {string|number} props.freelancerId - Target freelancer ID required for the chat payload
+ * @param {string} [props.serviceTitle] - Optional service title to include in the predefined message
  * @returns {JSX.Element} Chat initiation form component
  */
-export default function StartChatForm({ fid, freelancerId }) {
+export default function StartChatForm({ fid, freelancerId, serviceTitle }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [socket, setSocket] = useState(null);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
+  const [messageContent, setMessageContent] = useState(
+    serviceTitle ? `Ενδιαφέρομαι για την υπηρεσία ${serviceTitle}...` : ""
+  );
 
   const initialState = {
     message: null,
@@ -29,6 +33,15 @@ export default function StartChatForm({ fid, freelancerId }) {
     initializeChat,
     initialState
   );
+
+  /**
+   * Updates the message content when serviceTitle changes
+   */
+  useEffect(() => {
+    if (serviceTitle) {
+      setMessageContent(`Ενδιαφέρομαι για την υπηρεσία ${serviceTitle}...`);
+    }
+  }, [serviceTitle]);
 
   /**
    * Initializes socket connection for real-time chat functionality
@@ -129,7 +142,7 @@ export default function StartChatForm({ fid, freelancerId }) {
           creator: fid,
         },
         message: {
-          content: formData.get("content"),
+          content: messageContent,
           author: fid,
         },
       };
@@ -138,6 +151,14 @@ export default function StartChatForm({ fid, freelancerId }) {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  /**
+   * Handles textarea content changes
+   * @param {Event} e - The change event
+   */
+  const handleContentChange = (e) => {
+    setMessageContent(e.target.value);
   };
 
   return (
@@ -152,10 +173,15 @@ export default function StartChatForm({ fid, freelancerId }) {
             className="form-control"
             id={`content-${fid}`}
             name="content"
-            rows="6"
+            rows="7"
             placeholder="Πληκτρολόγησε εδώ το μήνυμα…"
             required
             disabled={isSubmitting || isPending}
+            value={messageContent}
+            onChange={handleContentChange}
+            style={{
+              minHeight: "100px",
+            }}
           ></textarea>
         </div>
         {formState?.message && !formState.success && (

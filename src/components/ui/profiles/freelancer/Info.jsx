@@ -242,16 +242,14 @@ export default function Info({
           )}
         </div>
 
-        {/* Conditionally render the contact button if not the owner and required IDs are present */}
-        {!isOwner && fid && freelancerId && (
+        {/* Conditionally render the contact button if not the owner  */}
+        {!isOwner && (
           <div className="d-grid mt30">
             <button
               type="button"
               className="ud-btn btn-thm"
               data-bs-toggle="modal"
               data-bs-target="#startChatModal"
-              // onClick={handleButtonClick}
-              // disabled={isPending} // Only disable when action is pending
             >
               Επικοινωνία <i className="fal fa-arrow-right-long" />
             </button>

@@ -5,6 +5,7 @@ import UserImage from "@/components/user/UserImage";
 import Link from "next/link";
 import LogoutLink from "./LogoutLink";
 import MessagesMenu from "./MessagesMenu";
+import FavoritesMenu from "./FavouritesMenu";
 
 export default async function UserMenu({ isMobile }) {
   const user = await getUser();
@@ -29,6 +30,9 @@ export default async function UserMenu({ isMobile }) {
     return (
       <li className="user_setting d-flex">
         <div className="d-flex justify-content-center align-items-center mr20">
+          <FavoritesMenu />
+        </div>
+        <div className="d-flex justify-content-center align-items-center mr30">
           <MessagesMenu />
         </div>
         <div className="dropdown">

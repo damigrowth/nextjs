@@ -3,14 +3,14 @@ import NotificationItem from "./NotificationItem";
 
 export default function FavoritesMenu() {
   return (
-    <li className="d-none d-sm-block">
+    <div className="d-none d-sm-flex">
       <Link
         href="/dashboard/saved"
-        className="text-center mr5 text-thm2 dropdown-toggle fz20"
+        className="text-center mr5 text-thm2 fz20 d-flex"
         // type="button"
         // data-bs-toggle="dropdown"
       >
-        <span className="flaticon-like" />
+        <span className="flaticon-like d-flex" />
       </Link>
       {/* <div className="dropdown-menu">
         <div className="dboard_notific_dd px30 pt10 pb15">
@@ -41,6 +41,6 @@ export default function FavoritesMenu() {
           />
         </div>
       </div> */}
-    </li>
+    </div>
   );
 }
