@@ -299,8 +299,6 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
                   username: msg.attributes.author.data.attributes.username,
                   displayName:
                     msg.attributes.author.data.attributes.displayName,
-                  firstName: msg.attributes.author.data.attributes.firstName,
-                  lastName: msg.attributes.author.data.attributes.lastName,
                   status: msg.attributes.author.data.attributes.status,
                   type: msg.attributes.author.data.attributes.type,
                   image: msg.attributes.author.data.attributes.image?.data
