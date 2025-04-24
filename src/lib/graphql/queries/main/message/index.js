@@ -25,8 +25,22 @@ export const GET_CHAT_MESSAGES = gql`
             data {
               id
               attributes {
-                username # Assuming freelancer has username, adjust if needed
+                username
                 displayName
+                status {
+                  data {
+                    attributes {
+                      type
+                    }
+                  }
+                }
+                type {
+                  data {
+                    attributes {
+                      slug
+                    }
+                  }
+                }
                 image {
                   data {
                     id

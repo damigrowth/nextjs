@@ -1,4 +1,4 @@
-import { formatMessageTime } from "@/utils/timeAgo";
+import { formatCompactMessageTime } from "@/utils/timeAgo";
 import UserImage from "@/components/user/UserImage";
 
 export default function UserChatList1({ data, currentFreelancerId }) {
@@ -37,9 +37,15 @@ export default function UserChatList1({ data, currentFreelancerId }) {
       </div>
       <div className="d-sm-flex flex-grow-1">
         <div className="d-inline-block text-truncate">
-          <div className="fz15 fw500 dark-color ff-heading mb-0 text-truncate">
+          <div className="user-chat-list-item-name fz15 fw500 dark-color ff-heading mb-0 text-truncate">
             {displayName}
+            {data.unreadCount > 0 && (
+              <div className="user-chat-list-item-unread bg-danger d-flex align-items-center justify-content-center">
+                <span className="text-white">{data.unreadCount}</span>
+              </div>
+            )}
           </div>
+
           <p
             className={`preview mb-0 text-truncate ${
               data.unreadCount > 0 ? "fw600" : ""
@@ -50,23 +56,10 @@ export default function UserChatList1({ data, currentFreelancerId }) {
         </div>
         <div className="iul_notific ms-auto text-end">
           <small>
-            {formatMessageTime(data.lastMessage?.createdAt || data.updatedAt)}
+            {formatCompactMessageTime(
+              data.lastMessage?.createdAt || data.updatedAt
+            )}
           </small>
-          {data.unreadCount > 0 && (
-            <div
-              className="m_notif bg-danger d-flex align-items-center justify-content-center"
-              style={{
-                width: "20px",
-                height: "20px",
-                borderRadius: "50%",
-                fontSize: "11px",
-                marginLeft: "auto",
-                marginTop: "4px",
-              }}
-            >
-              <span className="text-white">{data.unreadCount}</span>
-            </div>
-          )}
         </div>
       </div>
     </div>
