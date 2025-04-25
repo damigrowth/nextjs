@@ -369,9 +369,13 @@ export default function MessageBox({
                 const hasError = msg.status === "error";
 
                 // Get Status and Type
-                const authorStatus = msg.author?.status?.data?.attributes?.type;
+                const authorStatus =
+                  msg.author?.status?.type ||
+                  msg.author?.status?.data?.attributes?.type;
 
-                const authorType = msg.author?.type?.data?.attributes?.slug;
+                const authorType =
+                  msg.author?.type?.slug ||
+                  msg.author?.type?.data?.attributes?.slug;
 
                 const isAuthorActive = authorStatus === "Active";
                 const isAuthorFreelancer = authorType === "freelancer";
