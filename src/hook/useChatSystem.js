@@ -1,4 +1,3 @@
-// src/hook/useChatSystem.js
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -6,6 +5,22 @@ import { io } from "socket.io-client";
 import { useLazyQuery } from "@apollo/client";
 import { GET_CHAT_MESSAGES } from "@/lib/graphql/queries/main/message";
 import { useNotificationsStore } from "@/store/notifications/notificationsStore";
+
+/**
+ * Helper function to sort chats by most recent message timestamp
+ * @param {Array} chats - Array of chat objects to sort
+ * @returns {Array} Sorted array of chats
+ */
+const sortChatsByLatestMessage = (chats) => {
+  return [...chats].sort((a, b) => {
+    // Get the timestamps for comparison
+    const aTimestamp = a.lastMessage?.createdAt || a.updatedAt;
+    const bTimestamp = b.lastMessage?.createdAt || b.updatedAt;
+
+    // Sort by most recent first
+    return new Date(bTimestamp) - new Date(aTimestamp);
+  });
+};
 
 /**
  * Real-time chat system hook that handles WebSocket connections and chat functionality
@@ -17,7 +32,10 @@ import { useNotificationsStore } from "@/store/notifications/notificationsStore"
 export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [chatList, setChatList] = useState(initialChatList);
+  // Sort the initialChatList when first setting the state
+  const [chatList, setChatList] = useState(
+    sortChatsByLatestMessage(initialChatList)
+  );
   const [selectedChat, setSelectedChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
@@ -128,29 +146,29 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
           return prev;
         }
 
-        const updated = prev
-          .map((chat) => {
-            if (chat.id.toString() === message.chatId.toString()) {
-              const isAuthor = messageAuthorId === currentUserIdStr;
-              const isCurrentChat =
-                chat.id.toString() === selectedChat?.id?.toString();
+        // Update the chat with the new message
+        const updatedList = prev.map((chat) => {
+          if (chat.id.toString() === message.chatId.toString()) {
+            const isAuthor = messageAuthorId === currentUserIdStr;
+            const isCurrentChat =
+              chat.id.toString() === selectedChat?.id?.toString();
 
-              const newUnreadCount =
-                isAuthor || isCurrentChat ? 0 : (chat.unreadCount || 0) + 1;
+            const newUnreadCount =
+              isAuthor || isCurrentChat ? 0 : (chat.unreadCount || 0) + 1;
 
-              return {
-                ...chat,
-                lastMessage: message,
-                hasNewMessage: !isAuthor && !isCurrentChat,
-                unreadCount: newUnreadCount,
-                updatedAt: message.createdAt,
-              };
-            }
-            return chat;
-          })
-          .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+            return {
+              ...chat,
+              lastMessage: message,
+              hasNewMessage: !isAuthor && !isCurrentChat,
+              unreadCount: newUnreadCount,
+              updatedAt: message.createdAt,
+            };
+          }
+          return chat;
+        });
 
-        return updated;
+        // Sort the updated list by latest message
+        return sortChatsByLatestMessage(updatedList);
       });
     };
 
@@ -174,7 +192,8 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
           return chat;
         });
 
-        return updatedList;
+        // Sort after updating to maintain proper order
+        return sortChatsByLatestMessage(updatedList);
       });
 
       if (totalUnreadCount !== undefined) {
@@ -212,11 +231,8 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
           unreadCount: chatData.unreadCountMap?.[currentFreelancerId] || 0,
         };
 
-        const updatedList = [newChat, ...prevList].sort(
-          (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
-        );
-
-        return updatedList;
+        // Add the new chat and sort the list
+        return sortChatsByLatestMessage([...prevList, newChat]);
       });
     };
 
@@ -251,13 +267,17 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
 
       socket.emit("mark_chat_read", { chat_id: chatId });
 
-      setChatList((prev) =>
-        prev.map((c) =>
+      setChatList((prev) => {
+        const updatedList = prev.map((c) =>
           c.id.toString() === chatId.toString()
             ? { ...c, hasNewMessage: false, unreadCount: 0 }
             : c
-        )
-      );
+        );
+
+        // Sort after marking as read to maintain proper order
+        // This is important as we don't want marking as read to change the order
+        return sortChatsByLatestMessage(updatedList);
+      });
     },
     [socket]
   );
@@ -319,6 +339,9 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
         }
 
         markChatAsRead(chat.id);
+
+        // Re-sort the chat list after selecting a chat to ensure proper order
+        setChatList((prev) => sortChatsByLatestMessage(prev));
       } catch (err) {
         setError(err.message);
       } finally {
