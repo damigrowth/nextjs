@@ -19,8 +19,22 @@ export const GET_FREELANCER_CHATS = gql`
               attributes {
                 username
                 displayName
-                firstName
-                lastName
+                type {
+                  data {
+                    id
+                    attributes {
+                      slug
+                    }
+                  }
+                }
+                status {
+                  data {
+                    id
+                    attributes {
+                      type
+                    }
+                  }
+                }
                 image {
                   data {
                     id
@@ -50,8 +64,22 @@ export const GET_FREELANCER_CHATS = gql`
                     attributes {
                       username
                       displayName
-                      firstName
-                      lastName
+                      type {
+                        data {
+                          id
+                          attributes {
+                            slug
+                          }
+                        }
+                      }
+                      status {
+                        data {
+                          id
+                          attributes {
+                            type
+                          }
+                        }
+                      }
                       image {
                         data {
                           id
@@ -95,8 +123,22 @@ export const GET_CHAT_MESSAGES = gql`
               attributes {
                 username
                 displayName
-                firstName
-                lastName
+                type {
+                  data {
+                    id
+                    attributes {
+                      slug
+                    }
+                  }
+                }
+                status {
+                  data {
+                    id
+                    attributes {
+                      type
+                    }
+                  }
+                }
                 image {
                   data {
                     id

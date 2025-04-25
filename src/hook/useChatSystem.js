@@ -299,8 +299,8 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
                   username: msg.attributes.author.data.attributes.username,
                   displayName:
                     msg.attributes.author.data.attributes.displayName,
-                  firstName: msg.attributes.author.data.attributes.firstName,
-                  lastName: msg.attributes.author.data.attributes.lastName,
+                  status: msg.attributes.author.data.attributes.status,
+                  type: msg.attributes.author.data.attributes.type,
                   image: msg.attributes.author.data.attributes.image?.data
                     ? {
                         ...msg.attributes.author.data.attributes.image.data
@@ -364,8 +364,8 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
                 id: currentUser.id.toString(),
                 displayName: currentUser.displayName || currentUser.username,
                 username: currentUser.username,
-                firstName: currentUser.firstName,
-                lastName: currentUser.lastName,
+                status: currentUser.status,
+                type: currentUser.type,
                 image: currentUser.image?.data
                   ? {
                       ...currentUser.image.data.attributes,

@@ -1309,6 +1309,7 @@ li {
 /* DashBoard Message Styles */
 .message_container {
   background-color: #ffffff;
+  border: 1px solid #6c757d;
   border-radius: 4px;
   height: 100%;
   overflow: hidden;
@@ -1319,10 +1320,11 @@ li {
   border-bottom: 1px solid #e9e9e9;
   padding: 30px;
   position: relative;
+  background-color: #fbf7ed;
 }
 .message_container .user_heading img {
   float: left;
-  margin-right: 10px;
+  /* margin-right: 10px; */
   border-radius: 50%;
 }
 .message_container .user_heading .preview {
@@ -1355,6 +1357,7 @@ li {
   height: 100px;
   padding: 20px 30px;
   width: 100%;
+  background-color: #fbf7ed;
 }
 .message_container .message_input button.btn {
   flex: 1;
@@ -1372,6 +1375,12 @@ li {
   overflow-x: hidden;
   position: relative;
 }
+@media screen and (max-width: 990px) {
+  .inbox_chatting_box {
+    padding-bottom: 70px;
+  }
+}
+
 .inbox_chatting_box::-webkit-scrollbar {
   background: transparent;
   border-radius: 10px;
@@ -1390,7 +1399,7 @@ li {
 }
 .inbox_chatting_box .chatting_content li {
   display: block;
-  padding: 25px 0 5px;
+  padding: 0px 0 5px;
   margin-bottom: 0;
   clear: both;
 }
@@ -1403,7 +1412,7 @@ li {
   max-width: 456px;
 }
 .inbox_chatting_box .chatting_content li.reply {
-  margin: -15px 0;
+  /* margin: -15px 0; */
 }
 .inbox_chatting_box .chatting_content li.reply p {
   background-color: rgba(91, 187, 123, 0.05);
@@ -1477,6 +1486,13 @@ li {
   height: 620px;
   overflow-y: scroll;
 }
+
+@media screen and (max-width: 990px) {
+  .chat-member-list {
+    height: fit-content;
+  }
+}
+
 .chat-member-list::-webkit-scrollbar {
   background: transparent;
   border-radius: 10px;

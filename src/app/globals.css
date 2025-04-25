@@ -1739,8 +1739,14 @@ a[href="#reviews-section"]:hover {
   font-size: 12px;
 }
 
+.message {
+  position: relative;
+  width: fit-content;
+  overflow-wrap: break-word;
+}
 
 .message-received {
+  position: relative;
   justify-self: flex-start;
   border-top-left-radius: 0px;
   border-top-right-radius: 18px;
@@ -1749,6 +1755,7 @@ a[href="#reviews-section"]:hover {
 }
 
 .message-sent {
+  position: relative;
   justify-self: flex-end;
   border-top-left-radius: 18px;
   border-top-right-radius: 0px;
@@ -1756,3 +1763,28 @@ a[href="#reviews-section"]:hover {
   border-bottom-left-radius: 18px;
 }
 
+.message-time {
+  /* position: absolute; */
+  bottom: 0px;
+  display: block;
+  font-size: 0.7rem;
+  color: #999;
+}
+
+.user-chat-list-item-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-chat-list-item-unread {
+  background-color: #1967d2;
+  border: 1px solid #ffffff;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 15px;
+  height: 20px;
+  width: 20px;
+}

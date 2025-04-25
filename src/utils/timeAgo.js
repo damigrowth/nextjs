@@ -106,3 +106,55 @@ export const formatMessageTime = (dateString) => {
     return "";
   }
 };
+
+/**
+ * Formats a date string to display in compact format:
+ * - Today: HH:MM
+ * - This year: DD/M
+ * - Previous years: DD/MM/YYYY
+ *
+ * @param {string} dateString - ISO date string to format
+ * @returns {string} Formatted date in compact format
+ */
+export const formatCompactMessageTime = (dateString) => {
+  if (!dateString) return "";
+  try {
+    const messageDate = new Date(dateString);
+    if (isNaN(messageDate.getTime())) return "";
+
+    // Get hours and minutes
+    const hours = messageDate.getHours();
+    const minutes = messageDate.getMinutes().toString().padStart(2, "0");
+    const timeStr = `${hours}:${minutes}`;
+
+    const today = new Date();
+
+    // Check if the message is from today
+    const isToday =
+      messageDate.getDate() === today.getDate() &&
+      messageDate.getMonth() === today.getMonth() &&
+      messageDate.getFullYear() === today.getFullYear();
+
+    // Check if the message is from the current year
+    const isThisYear = messageDate.getFullYear() === today.getFullYear();
+
+    if (isToday) {
+      // For today's messages, just show the time
+      return timeStr;
+    } else if (isThisYear) {
+      // For messages from this year, show day and month in compact format DD/M
+      const day = messageDate.getDate();
+      const month = messageDate.getMonth() + 1;
+      return `${day}/${month}`;
+    } else {
+      // For messages from previous years, show day/month/year
+      const day = messageDate.getDate().toString().padStart(2, "0");
+      const month = (messageDate.getMonth() + 1).toString().padStart(2, "0");
+      const year = messageDate.getFullYear();
+
+      return `${day}/${month}/${year}`;
+    }
+  } catch (error) {
+    return "";
+  }
+};
