@@ -10,6 +10,52 @@ import ChatMessagesSkeleton from "@/components/ui/Skeletons/ChatMessagesSkeleton
 import Link from "next/link";
 
 /**
+ * Converts URLs in text to clickable links that open in a new tab
+ * @param {string} text - Text that may contain URLs
+ * @returns {Array} Array of text and link elements
+ */
+const convertLinksToAnchors = (text) => {
+  if (!text) return "";
+
+  // URL regex pattern
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+  let lastIndex = 0;
+  let match;
+  const result = [];
+
+  // Find all matches and build result array properly
+  while ((match = urlRegex.exec(text)) !== null) {
+    // Add text before the URL
+    if (match.index > lastIndex) {
+      result.push(text.substring(lastIndex, match.index));
+    }
+
+    // Add the URL as a link
+    result.push(
+      <a
+        key={match.index}
+        href={match[0]}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-thm"
+      >
+        {match[0]}
+      </a>
+    );
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add remaining text after the last URL
+  if (lastIndex < text.length) {
+    result.push(text.substring(lastIndex));
+  }
+
+  return result;
+};
+
+/**
  * MessageBox component that displays chat messages and message input
  * @param {Object} props - Component props
  * @param {Object|null} props.selectedChat - Currently selected chat
@@ -274,12 +320,14 @@ export default function MessageBox({
       <div
         ref={chatContainerRef}
         className="inbox_chatting_box Gscrollbar"
-        style={{
-          minHeight: "400px",
-          maxHeight: "60vh",
-          overflowY: "auto",
-          // paddingBottom: "100px", // Add extra padding at the bottom
-        }}
+        style={
+          {
+            // minHeight: "400px",
+            // maxHeight: "60vh",
+            // overflowY: "auto",
+            // paddingBottom: "100px", // Add extra padding at the bottom
+          }
+        }
       >
         {isLoading ? (
           <ChatMessagesSkeleton />
@@ -392,6 +440,7 @@ export default function MessageBox({
                       const options = {
                         day: "numeric",
                         month: "long",
+                        year: "numeric",
                       };
                       const dateFormatter = new Intl.DateTimeFormat(
                         "el-GR",
@@ -399,16 +448,16 @@ export default function MessageBox({
                       );
                       const formattedDate = dateFormatter.format(messageDate);
 
-                      // Format the time part
-                      const hours = messageDate.getHours();
-                      const minutes = messageDate
-                        .getMinutes()
-                        .toString()
-                        .padStart(2, "0");
-                      const timeStr = `${hours}:${minutes}`;
+                      // // Format the time part
+                      // const hours = messageDate.getHours();
+                      // const minutes = messageDate
+                      //   .getMinutes()
+                      //   .toString()
+                      //   .padStart(2, "0");
+                      // const timeStr = `${hours}:${minutes}`;
 
                       // Combine them in the consistent format
-                      return `${formattedDate} - ${timeStr}`;
+                      return `${formattedDate}`;
                     })()
                   : "";
 
@@ -507,10 +556,11 @@ export default function MessageBox({
                                     : "Απέτυχε"
                                   : timeAgoText}
                               </small>{" "}
+                              {/* Removed "Εγώ" while keeping the link functionality */}
                               {authorPath ? (
-                                <Link href={authorPath}>Εγώ</Link>
+                                <Link href={authorPath}></Link>
                               ) : (
-                                <span>Εγώ</span>
+                                <></>
                               )}
                             </>
                           ) : (
@@ -546,7 +596,8 @@ export default function MessageBox({
                         isSent ? "message-sent" : "message-received"
                       } ${hasError ? "text-danger" : ""}`}
                     >
-                      {msg.content}
+                      {/* Convert links in message content to clickable links */}
+                      {convertLinksToAnchors(msg.content)}
                       <span className="message-time">{messageTime}</span>
                       {hasError && (
                         <small className="d-block mt-1 text-danger">
@@ -591,7 +642,7 @@ export default function MessageBox({
                 type="text"
                 placeholder={
                   isConnected
-                    ? "Γράψτε ένα μήνυμα"
+                    ? "Μήνυμα…"
                     : "Επανασύνδεση... Παρακαλώ περιμένετε"
                 }
                 value={newMessage}

@@ -1375,6 +1375,12 @@ li {
   overflow-x: hidden;
   position: relative;
 }
+@media screen and (max-width: 990px) {
+  .inbox_chatting_box {
+    padding-bottom: 70px;
+  }
+}
+
 .inbox_chatting_box::-webkit-scrollbar {
   background: transparent;
   border-radius: 10px;
@@ -1480,6 +1486,13 @@ li {
   height: 620px;
   overflow-y: scroll;
 }
+
+@media screen and (max-width: 990px) {
+  .chat-member-list {
+    height: fit-content;
+  }
+}
+
 .chat-member-list::-webkit-scrollbar {
   background: transparent;
   border-radius: 10px;

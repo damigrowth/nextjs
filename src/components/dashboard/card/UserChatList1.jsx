@@ -35,7 +35,7 @@ export default function UserChatList1({ data, currentFreelancerId }) {
           hideDisplayName={true}
         />
       </div>
-      <div className="d-sm-flex flex-grow-1">
+      <div className="d-flex flex-grow-1">
         <div className="d-inline-block text-truncate">
           <div className="user-chat-list-item-name fz15 fw500 dark-color ff-heading mb-0 text-truncate">
             {displayName}

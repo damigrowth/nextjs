@@ -63,7 +63,7 @@ export default function UserImage({
   );
 
   return (
-    <div className="user-image-container mb5-sm">
+    <div className="user-image-container">
       {path ? (
         <Link
           href={path}
