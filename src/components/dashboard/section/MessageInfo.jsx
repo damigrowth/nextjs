@@ -56,10 +56,13 @@ export default function MessageInfo({
     messages,
     isConnected,
     isLoadingMessages,
+    isLoadingMore,
+    hasMoreMessages,
     error,
     selectChat,
     sendMessage,
     markChatAsRead,
+    loadMoreMessages,
   } = useChatSystem({
     initialChatList,
     currentFreelancerId,
@@ -165,8 +168,11 @@ export default function MessageInfo({
             isConnected={isConnected}
             currentUserId={currentFreelancerId}
             isLoading={isLoadingMessages}
+            isLoadingMore={isLoadingMore}
+            hasMoreMessages={hasMoreMessages}
             onSendMessage={sendMessage}
             markChatAsRead={markChatAsRead}
+            onLoadMoreMessages={loadMoreMessages}
           />
         </div>
       </div>

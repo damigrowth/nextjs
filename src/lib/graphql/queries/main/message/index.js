@@ -1,15 +1,12 @@
 import { gql } from "@apollo/client"; // Assuming you use Apollo Client, adjust if using another client
 
 export const GET_CHAT_MESSAGES = gql`
-  # Query to get messages for a specific chat
-  query GetChatMessages($chatId: ID!) {
-    # Filter messages belonging to the given chatId, sort by creation time
+  query GetChatMessages($chatId: ID!, $page: Int, $pageSize: Int) {
     messages(
       filters: { chat: { id: { eq: $chatId } } }
-      sort: "createdAt:asc"
-      pagination: { limit: 100 }
+      sort: "createdAt:desc" # Fetch newest messages first for efficient pagination
+      pagination: { page: $page, pageSize: $pageSize }
     ) {
-      # Adjust pagination limit as needed
       data {
         id
         attributes {
@@ -21,23 +18,22 @@ export const GET_CHAT_MESSAGES = gql`
             }
           }
           author {
-            # Author is a freelancer
             data {
               id
               attributes {
                 username
                 displayName
-                status {
-                  data {
-                    attributes {
-                      type
-                    }
-                  }
-                }
                 type {
                   data {
                     attributes {
                       slug
+                    }
+                  }
+                }
+                status {
+                  data {
+                    attributes {
+                      type
                     }
                   }
                 }
@@ -46,6 +42,7 @@ export const GET_CHAT_MESSAGES = gql`
                     id
                     attributes {
                       formats
+                      url
                     }
                   }
                 }
@@ -54,8 +51,14 @@ export const GET_CHAT_MESSAGES = gql`
           }
         }
       }
+      meta {
+        pagination {
+          page
+          pageSize
+          pageCount
+          total
+        }
+      }
     }
   }
 `;
-
-// Add other message-related queries here if needed
