@@ -6,7 +6,10 @@ import NavMenu from "@/components/ui/NavMenu";
 
 export default function DashboardHeader() {
   return (
-    <header className="header-nav nav-innerpage-style menu-home4 dashboard_header main-menu-dashboard">
+    <header
+      id="dashboard-header"
+      className="header-nav nav-innerpage-style menu-home4 dashboard_header main-menu-dashboard"
+    >
       <nav className="posr">
         <div className="container-fluid pr30 pr15-xs pl30 posr menu_bdrt1">
           <div className="row align-items-center justify-content-between">
