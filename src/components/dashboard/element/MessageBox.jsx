@@ -113,15 +113,17 @@ export default function MessageBox({
   };
 
   /**
-   * Focuses the message input field
+   * Focuses the message input field without scrolling
    */
   const focusMessageInput = () => {
     if (messageInputRef.current) {
-      messageInputRef.current.focus();
+      // Use preventScroll: true to avoid automatic scrolling when focusing
+      messageInputRef.current.focus({ preventScroll: true });
     } else {
       // Try again with delays if not ready
       setTimeout(() => {
-        if (messageInputRef.current) messageInputRef.current.focus();
+        if (messageInputRef.current)
+          messageInputRef.current.focus({ preventScroll: true });
       }, 100);
     }
   };
@@ -280,7 +282,7 @@ export default function MessageBox({
   };
 
   return (
-    <div className="message_container mt30-md">
+    <div id="message-container" className="message_container mt30-md">
       <div className="user_heading px-0">
         <div className="wrap d-flex align-items-center mx30">
           {selectedChat && (

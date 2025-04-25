@@ -7,6 +7,37 @@ import MessageBox from "../element/MessageBox";
 import { useChatSystem } from "@/hook/useChatSystem";
 
 /**
+ * Helper function to scroll to the message container with header offset
+ */
+const scrollToMessageContainer = () => {
+  setTimeout(() => {
+    const container = document.getElementById("message-container");
+    const header = document.getElementById("dashboard-header");
+
+    if (container) {
+      // Get the position of the container relative to the viewport
+      const rect = container.getBoundingClientRect();
+
+      // Calculate header height or use a fallback value of 80px if header not found
+      const headerHeight = header ? header.offsetHeight : 80;
+
+      // Add a small additional padding (20px) for visual comfort
+      const offset = headerHeight + 20;
+
+      // Calculate the position to scroll to
+      // (current scroll position + element position - header height offset)
+      const scrollPosition = window.pageYOffset + rect.top - offset;
+
+      // Scroll to the calculated position
+      window.scrollTo({
+        top: scrollPosition,
+        behavior: "smooth",
+      });
+    }
+  }, 100);
+};
+
+/**
  * MessageInfo component that displays the chat interface with chat list and messages
  * @param {Object} props - Component props
  * @param {Array} props.initialChatList - Initial list of chats to display
@@ -58,6 +89,9 @@ export default function MessageInfo({
         selectChat(targetChat);
         setHasProcessedUrlChat(true);
 
+        // Scroll to message container when selecting chat from URL
+        scrollToMessageContainer();
+
         // Clean up URL after a short delay to ensure chat is selected
         setTimeout(() => {
           window.history.replaceState({}, "", window.location.pathname);
@@ -65,6 +99,15 @@ export default function MessageInfo({
       }
     }
   }, [chatList, selectChat, hasProcessedUrlChat]);
+
+  /**
+   * Handles chat selection with proper scrolling to message container
+   * @param {Object} chat - The chat to select
+   */
+  const handleChatSelect = (chat) => {
+    selectChat(chat);
+    scrollToMessageContainer();
+  };
 
   return (
     <div className="dashboard__content hover-bgc-color">
@@ -99,9 +142,7 @@ export default function MessageInfo({
                       className={`list-item pt5 ${
                         selectedChat?.id === chat.id ? "active" : ""
                       }`}
-                      onClick={() => {
-                        selectChat(chat);
-                      }}
+                      onClick={() => handleChatSelect(chat)}
                       style={{ cursor: "pointer" }}
                     >
                       <UserChatList1
