@@ -262,8 +262,10 @@ export default function MessageBox({
   const isOtherParticipantActive =
     otherParticipant?.status?.data?.attributes?.type === "Active";
 
+  const otherParticipantType = otherParticipant?.type?.data?.attributes?.slug;
+
   const isOtherParticipantFreelancer =
-    otherParticipant?.type?.data?.attributes?.slug === "freelancer";
+    otherParticipantType === "freelancer" || otherParticipantType === "company";
 
   const generatePathForOtherParticipant = () => {
     if (isOtherParticipantFreelancer && isOtherParticipantActive) {
@@ -380,7 +382,8 @@ export default function MessageBox({
                   msg.author?.type?.data?.attributes?.slug;
 
                 const isAuthorActive = authorStatus === "Active";
-                const isAuthorFreelancer = authorType === "freelancer";
+                const isAuthorFreelancer =
+                  authorType === "freelancer" || authorType === "company";
 
                 const authorPath =
                   isAuthorActive && isAuthorFreelancer
