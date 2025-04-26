@@ -15,6 +15,12 @@ export default async function MessagesPage() {
   const fid = await getFreelancerId();
   let initialChatList = [];
   let chatListError = null;
+  let chatListPagination = {
+    page: 1,
+    pageSize: 15,
+    pageCount: 1,
+    total: 0,
+  };
 
   try {
     if (!fid) {
@@ -22,7 +28,11 @@ export default async function MessagesPage() {
     } else {
       const data = await getData(
         GET_FREELANCER_CHATS,
-        { freelancerId: fid },
+        {
+          freelancerId: fid,
+          page: 1,
+          pageSize: 15,
+        },
         "FREELANCER_CHATS",
         [`freelancer:${fid}`]
       );
@@ -40,6 +50,11 @@ export default async function MessagesPage() {
               ...p.attributes,
             })) || [],
         }));
+
+        // Store pagination metadata
+        if (data.chats.meta?.pagination) {
+          chatListPagination = data.chats.meta.pagination;
+        }
       }
     }
   } catch (error) {
@@ -51,6 +66,7 @@ export default async function MessagesPage() {
       initialChatList={initialChatList}
       chatListError={chatListError}
       currentFreelancerId={fid}
+      initialChatListPagination={chatListPagination}
     />
   );
 }

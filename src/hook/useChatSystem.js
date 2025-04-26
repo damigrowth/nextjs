@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { io } from "socket.io-client";
 import { useLazyQuery } from "@apollo/client";
 import { GET_CHAT_MESSAGES } from "@/lib/graphql/queries/main/message";
+import { GET_FREELANCER_CHATS } from "@/lib/graphql/queries/main/chat";
 import { useNotificationsStore } from "@/store/notifications/notificationsStore";
 
 /**
@@ -26,10 +27,20 @@ const sortChatsByLatestMessage = (chats) => {
  * Real-time chat system hook that handles WebSocket connections and chat functionality
  * @param {Object} params - Hook parameters
  * @param {Array} [params.initialChatList=[]] - Initial list of chats to display
+ * @param {Object} [params.initialChatListPagination={}] - Initial pagination info for chat list
  * @param {string|number} params.currentFreelancerId - ID of the current freelancer/user
  * @returns {Object} Chat system state and functions
  */
-export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
+export function useChatSystem({
+  initialChatList = [],
+  initialChatListPagination = {
+    page: 1,
+    pageSize: 15,
+    pageCount: 1,
+    total: 0,
+  },
+  currentFreelancerId,
+}) {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   // Sort the initialChatList when first setting the state
@@ -38,11 +49,28 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
   );
   const [selectedChat, setSelectedChat] = useState(null);
   const [messages, setMessages] = useState([]);
+
+  // Chat list pagination state
+  const [isLoadingChats, setIsLoadingChats] = useState(false);
+  const [chatListPage, setChatListPage] = useState(
+    initialChatListPagination.page || 1
+  );
+  const [chatListPageSize] = useState(initialChatListPagination.pageSize || 15);
+  const [chatListPageCount, setChatListPageCount] = useState(
+    initialChatListPagination.pageCount || 1
+  );
+  const [totalChats, setTotalChats] = useState(
+    initialChatListPagination.total || 0
+  );
+  const [hasMoreChats, setHasMoreChats] = useState(
+    (initialChatListPagination.page || 1) <
+      (initialChatListPagination.pageCount || 1)
+  );
+
+  // Message pagination state
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState(null);
-
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [hasMoreMessages, setHasMoreMessages] = useState(false);
@@ -55,8 +83,13 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
   const connectionAttemptsRef = useRef(0);
   // For tracking if a load operation is in progress
   const loadingInProgressRef = useRef(false);
+  const loadingChatsInProgressRef = useRef(false);
 
   const [loadMessages] = useLazyQuery(GET_CHAT_MESSAGES, {
+    fetchPolicy: "network-only",
+  });
+
+  const [loadChats] = useLazyQuery(GET_FREELANCER_CHATS, {
     fetchPolicy: "network-only",
   });
 
@@ -264,6 +297,94 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
       socket.off("new_chat", handleNewChat);
     };
   }, [socket, selectedChat, currentFreelancerId]);
+
+  /**
+   * Loads more chats for the chat list with debounce protection
+   * @returns {Promise<boolean>} True if more chats were loaded, false otherwise
+   */
+  const loadMoreChats = useCallback(async () => {
+    // Prevent multiple simultaneous load operations
+    if (
+      !currentFreelancerId ||
+      isLoadingChats ||
+      loadingChatsInProgressRef.current ||
+      !hasMoreChats
+    ) {
+      return false;
+    }
+
+    // Set a flag to prevent duplicate load calls while scrolling
+    loadingChatsInProgressRef.current = true;
+    setIsLoadingChats(true);
+
+    const nextPage = chatListPage + 1;
+
+    try {
+      const result = await loadChats({
+        variables: {
+          freelancerId: currentFreelancerId,
+          page: nextPage,
+          pageSize: chatListPageSize,
+        },
+      });
+
+      if (result.data?.chats?.data) {
+        const newChats = result.data.chats.data.map((chat) => ({
+          id: chat.id,
+          ...chat.attributes,
+          lastMessage: chat.attributes.lastMessage?.data?.attributes || null,
+          hasNewMessage:
+            (chat.attributes.unreadCountMap?.[currentFreelancerId] || 0) > 0,
+          unreadCount:
+            chat.attributes.unreadCountMap?.[currentFreelancerId] || 0,
+          participants:
+            chat.attributes.participants?.data?.map((p) => ({
+              id: p.id,
+              ...p.attributes,
+            })) || [],
+        }));
+
+        // Add new chats to the chat list and sort
+        setChatList((prevChats) => {
+          // Filter out any duplicates
+          const uniqueNewChats = newChats.filter(
+            (newChat) =>
+              !prevChats.some((prevChat) => prevChat.id === newChat.id)
+          );
+
+          return sortChatsByLatestMessage([...prevChats, ...uniqueNewChats]);
+        });
+
+        // Update pagination state
+        if (result.data.chats.meta?.pagination) {
+          const { page, pageCount, total } = result.data.chats.meta.pagination;
+          setChatListPage(page);
+          setChatListPageCount(pageCount);
+          setTotalChats(total);
+          setHasMoreChats(page < pageCount);
+        }
+
+        return true;
+      }
+      return false;
+    } catch (err) {
+      setError(err.message);
+      return false;
+    } finally {
+      // Add small delay before setting loading flags to false
+      setTimeout(() => {
+        setIsLoadingChats(false);
+        loadingChatsInProgressRef.current = false;
+      }, 200);
+    }
+  }, [
+    currentFreelancerId,
+    isLoadingChats,
+    hasMoreChats,
+    chatListPage,
+    chatListPageSize,
+    loadChats,
+  ]);
 
   /**
    * Marks a chat as read for the current user
@@ -537,10 +658,18 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
     hasMoreMessages,
     totalMessages,
     error,
+
+    // Chat list pagination
+    isLoadingChats,
+    hasMoreChats,
+    totalChats,
+
+    // Functions
     selectChat,
     sendMessage,
     markChatAsRead,
     loadMoreMessages,
+    loadMoreChats,
     currentPage,
   };
 }
