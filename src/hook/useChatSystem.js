@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { io } from "socket.io-client";
 import { useLazyQuery } from "@apollo/client";
 import { GET_CHAT_MESSAGES } from "@/lib/graphql/queries/main/message";
+import { GET_FREELANCER_CHATS } from "@/lib/graphql/queries/main/chat";
 import { useNotificationsStore } from "@/store/notifications/notificationsStore";
 
 /**
@@ -26,10 +27,20 @@ const sortChatsByLatestMessage = (chats) => {
  * Real-time chat system hook that handles WebSocket connections and chat functionality
  * @param {Object} params - Hook parameters
  * @param {Array} [params.initialChatList=[]] - Initial list of chats to display
+ * @param {Object} [params.initialChatListPagination={}] - Initial pagination info for chat list
  * @param {string|number} params.currentFreelancerId - ID of the current freelancer/user
  * @returns {Object} Chat system state and functions
  */
-export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
+export function useChatSystem({
+  initialChatList = [],
+  initialChatListPagination = {
+    page: 1,
+    pageSize: 15,
+    pageCount: 1,
+    total: 0,
+  },
+  currentFreelancerId,
+}) {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   // Sort the initialChatList when first setting the state
@@ -38,16 +49,47 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
   );
   const [selectedChat, setSelectedChat] = useState(null);
   const [messages, setMessages] = useState([]);
+
+  // Chat list pagination state
+  const [isLoadingChats, setIsLoadingChats] = useState(false);
+  const [chatListPage, setChatListPage] = useState(
+    initialChatListPagination.page || 1
+  );
+  const [chatListPageSize] = useState(initialChatListPagination.pageSize || 15);
+  const [chatListPageCount, setChatListPageCount] = useState(
+    initialChatListPagination.pageCount || 1
+  );
+  const [totalChats, setTotalChats] = useState(
+    initialChatListPagination.total || 0
+  );
+  const [hasMoreChats, setHasMoreChats] = useState(
+    (initialChatListPagination.page || 1) <
+      (initialChatListPagination.pageCount || 1)
+  );
+
+  // Message pagination state
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
+  const [totalMessages, setTotalMessages] = useState(0);
 
   const setTotalUnreadCount = useNotificationsStore(
     (state) => state.setTotalUnreadMessages
   );
 
   const connectionAttemptsRef = useRef(0);
+  // For tracking if a load operation is in progress
+  const loadingInProgressRef = useRef(false);
+  const loadingChatsInProgressRef = useRef(false);
 
   const [loadMessages] = useLazyQuery(GET_CHAT_MESSAGES, {
+    fetchPolicy: "network-only",
+  });
+
+  const [loadChats] = useLazyQuery(GET_FREELANCER_CHATS, {
     fetchPolicy: "network-only",
   });
 
@@ -133,6 +175,7 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
             return updatedMessages;
           }
 
+          // Add new message at the end (since we display oldest first)
           return [...updatedMessages, message];
         });
       }
@@ -256,6 +299,94 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
   }, [socket, selectedChat, currentFreelancerId]);
 
   /**
+   * Loads more chats for the chat list with debounce protection
+   * @returns {Promise<boolean>} True if more chats were loaded, false otherwise
+   */
+  const loadMoreChats = useCallback(async () => {
+    // Prevent multiple simultaneous load operations
+    if (
+      !currentFreelancerId ||
+      isLoadingChats ||
+      loadingChatsInProgressRef.current ||
+      !hasMoreChats
+    ) {
+      return false;
+    }
+
+    // Set a flag to prevent duplicate load calls while scrolling
+    loadingChatsInProgressRef.current = true;
+    setIsLoadingChats(true);
+
+    const nextPage = chatListPage + 1;
+
+    try {
+      const result = await loadChats({
+        variables: {
+          freelancerId: currentFreelancerId,
+          page: nextPage,
+          pageSize: chatListPageSize,
+        },
+      });
+
+      if (result.data?.chats?.data) {
+        const newChats = result.data.chats.data.map((chat) => ({
+          id: chat.id,
+          ...chat.attributes,
+          lastMessage: chat.attributes.lastMessage?.data?.attributes || null,
+          hasNewMessage:
+            (chat.attributes.unreadCountMap?.[currentFreelancerId] || 0) > 0,
+          unreadCount:
+            chat.attributes.unreadCountMap?.[currentFreelancerId] || 0,
+          participants:
+            chat.attributes.participants?.data?.map((p) => ({
+              id: p.id,
+              ...p.attributes,
+            })) || [],
+        }));
+
+        // Add new chats to the chat list and sort
+        setChatList((prevChats) => {
+          // Filter out any duplicates
+          const uniqueNewChats = newChats.filter(
+            (newChat) =>
+              !prevChats.some((prevChat) => prevChat.id === newChat.id)
+          );
+
+          return sortChatsByLatestMessage([...prevChats, ...uniqueNewChats]);
+        });
+
+        // Update pagination state
+        if (result.data.chats.meta?.pagination) {
+          const { page, pageCount, total } = result.data.chats.meta.pagination;
+          setChatListPage(page);
+          setChatListPageCount(pageCount);
+          setTotalChats(total);
+          setHasMoreChats(page < pageCount);
+        }
+
+        return true;
+      }
+      return false;
+    } catch (err) {
+      setError(err.message);
+      return false;
+    } finally {
+      // Add small delay before setting loading flags to false
+      setTimeout(() => {
+        setIsLoadingChats(false);
+        loadingChatsInProgressRef.current = false;
+      }, 200);
+    }
+  }, [
+    currentFreelancerId,
+    isLoadingChats,
+    hasMoreChats,
+    chatListPage,
+    chatListPageSize,
+    loadChats,
+  ]);
+
+  /**
    * Marks a chat as read for the current user
    * @param {string|number} chatId - ID of the chat to mark as read
    */
@@ -283,6 +414,82 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
   );
 
   /**
+   * Loads more messages (older ones) for the current chat
+   * @returns {Promise<boolean>} True if more messages were loaded, false otherwise
+   */
+  const loadMoreMessages = useCallback(async () => {
+    if (!selectedChat || isLoadingMore || loadingInProgressRef.current) {
+      return false;
+    }
+
+    const nextPage = currentPage + 1;
+    setIsLoadingMore(true);
+    loadingInProgressRef.current = true;
+
+    try {
+      const result = await loadMessages({
+        variables: {
+          chatId: selectedChat.id,
+          page: nextPage,
+          pageSize: pageSize,
+        },
+      });
+
+      if (result.data?.messages?.data) {
+        const transformedMessages = result.data.messages.data.map((msg) => ({
+          id: msg.id.toString(),
+          content: msg.attributes.content,
+          createdAt: msg.attributes.createdAt,
+          author: msg.attributes.author?.data
+            ? {
+                id: msg.attributes.author.data.id.toString(),
+                username: msg.attributes.author.data.attributes.username,
+                displayName: msg.attributes.author.data.attributes.displayName,
+                status: msg.attributes.author.data.attributes.status,
+                type: msg.attributes.author.data.attributes.type,
+                image: msg.attributes.author.data.attributes.image?.data
+                  ? {
+                      ...msg.attributes.author.data.attributes.image.data
+                        .attributes,
+                      id: msg.attributes.author.data.attributes.image.data.id,
+                    }
+                  : null,
+              }
+            : null,
+          chatId: selectedChat.id,
+        }));
+
+        // Reverse messages to show oldest first
+        const oldMessages = transformedMessages.reverse();
+
+        // Add older messages to the beginning of the array
+        setMessages((prevMessages) => [...oldMessages, ...prevMessages]);
+
+        // Update pagination state
+        const { page, pageCount } = result.data.messages.meta.pagination;
+        setCurrentPage(page);
+        setHasMoreMessages(page < pageCount);
+
+        // Add a small delay before resolving to allow the DOM to update
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        return true;
+      }
+      return false;
+    } catch (err) {
+      setError(err.message);
+      return false;
+    } finally {
+      // Add small delay before setting loading flags to false
+      // This helps ensure DOM updates complete first
+      setTimeout(() => {
+        setIsLoadingMore(false);
+        loadingInProgressRef.current = false;
+      }, 200);
+    }
+  }, [selectedChat, isLoadingMore, currentPage, pageSize, loadMessages]);
+
+  /**
    * Selects a chat and loads its messages
    * @param {Object} chat - Chat object to select
    */
@@ -299,13 +506,22 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
       setSelectedChat(chat);
       setIsLoadingMessages(true);
 
+      // Reset pagination when selecting a new chat
+      setCurrentPage(1);
+      setHasMoreMessages(false);
+      loadingInProgressRef.current = false;
+
       try {
         if (socket?.connected) {
           socket.emit("join_chat", chat.id);
         }
 
         const result = await loadMessages({
-          variables: { chatId: chat.id },
+          variables: {
+            chatId: chat.id,
+            page: 1,
+            pageSize: pageSize,
+          },
         });
 
         if (result.data?.messages?.data) {
@@ -333,9 +549,19 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
             chatId: chat.id,
           }));
 
-          setMessages(transformedMessages);
+          // Reverse messages to show oldest first
+          setMessages(transformedMessages.reverse());
+
+          // Set pagination metadata
+          const { page, pageCount, total } =
+            result.data.messages.meta.pagination;
+          // Only set hasMoreMessages to true if there are more pages
+          setHasMoreMessages(page < pageCount);
+          setTotalMessages(total);
         } else {
           setMessages([]);
+          setHasMoreMessages(false);
+          setTotalMessages(0);
         }
 
         markChatAsRead(chat.id);
@@ -348,7 +574,7 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
         setIsLoadingMessages(false);
       }
     },
-    [socket, selectedChat, loadMessages, markChatAsRead]
+    [socket, selectedChat, loadMessages, markChatAsRead, pageSize]
   );
 
   /**
@@ -400,6 +626,7 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
           chatId: selectedChat.id,
         };
 
+        // Add optimistic message at the end of the list (newest)
         setMessages((prev) => [...prev, optimisticMessage]);
 
         socket.emit("send_message", messageData, (response) => {
@@ -427,9 +654,22 @@ export function useChatSystem({ initialChatList = [], currentFreelancerId }) {
     messages,
     isConnected,
     isLoadingMessages,
+    isLoadingMore,
+    hasMoreMessages,
+    totalMessages,
     error,
+
+    // Chat list pagination
+    isLoadingChats,
+    hasMoreChats,
+    totalChats,
+
+    // Functions
     selectChat,
     sendMessage,
     markChatAsRead,
+    loadMoreMessages,
+    loadMoreChats,
+    currentPage,
   };
 }

@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
 
 export const GET_FREELANCER_CHATS = gql`
-  query GetFreelancerChats($freelancerId: ID!) {
+  query GetFreelancerChats($freelancerId: ID!, $page: Int, $pageSize: Int) {
     chats(
       filters: { participants: { id: { eq: $freelancerId } } }
       sort: "updatedAt:desc"
+      pagination: { page: $page, pageSize: $pageSize }
     ) {
       data {
         id
@@ -95,6 +96,14 @@ export const GET_FREELANCER_CHATS = gql`
               }
             }
           }
+        }
+      }
+      meta {
+        pagination {
+          page
+          pageSize
+          pageCount
+          total
         }
       }
     }

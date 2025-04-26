@@ -63,8 +63,11 @@ const convertLinksToAnchors = (text) => {
  * @param {boolean} props.isConnected - Whether the socket connection is active
  * @param {string|number} props.currentUserId - ID of the current user
  * @param {boolean} props.isLoading - Whether messages are currently loading
+ * @param {boolean} props.isLoadingMore - Whether more messages are being loaded
+ * @param {boolean} props.hasMoreMessages - Whether more messages can be loaded
  * @param {Function} props.onSendMessage - Callback to send a message
  * @param {Function} props.markChatAsRead - Callback to mark a chat as read
+ * @param {Function} props.onLoadMoreMessages - Callback to load more messages
  * @returns {JSX.Element} Rendered message box component
  */
 export default function MessageBox({
@@ -73,116 +76,141 @@ export default function MessageBox({
   isConnected,
   currentUserId,
   isLoading,
+  isLoadingMore,
+  hasMoreMessages,
   onSendMessage,
   markChatAsRead,
+  onLoadMoreMessages,
 }) {
   const [newMessage, setNewMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState(null);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
 
+  // Simple flag to prevent auto-scroll during load more
+  const [isLoadingMoreLocal, setIsLoadingMoreLocal] = useState(false);
+
+  // References to DOM elements
   const messagesEndRef = useRef(null);
   const messageInputRef = useRef(null);
   const chatContainerRef = useRef(null);
-  const wasEnterKeySend = useRef(false);
 
-  /**
-   * Scrolls the chat container to the bottom
-   * with improved reliability
-   */
-  const scrollChatToBottom = () => {
+  // Store scroll position and height for restoration
+  const scrollPositionRef = useRef({ top: 0, height: 0 });
+
+  // Function to scroll to bottom of messages
+  const scrollToBottom = () => {
+    // Don't auto-scroll during load more - this is critical!
+    if (isLoadingMoreLocal) return;
+
     if (chatContainerRef.current) {
-      const container = chatContainerRef.current;
-
-      // Using requestAnimationFrame ensures the browser has painted the DOM
-      // before we attempt to scroll
-      requestAnimationFrame(() => {
-        container.scrollTop = container.scrollHeight;
-
-        // Double-check scroll position after a short delay to ensure it worked
-        setTimeout(() => {
-          if (
-            container.scrollTop + container.clientHeight <
-            container.scrollHeight - 20
-          ) {
-            container.scrollTop = container.scrollHeight;
-          }
-        }, 50);
-      });
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
   };
 
-  /**
-   * Focuses the message input field without scrolling
-   */
-  const focusMessageInput = () => {
-    if (messageInputRef.current) {
-      // Use preventScroll: true to avoid automatic scrolling when focusing
-      messageInputRef.current.focus({ preventScroll: true });
-    } else {
-      // Try again with delays if not ready
-      setTimeout(() => {
-        if (messageInputRef.current)
-          messageInputRef.current.focus({ preventScroll: true });
-      }, 100);
-    }
-  };
-
-  /**
-   * Scrolls to bottom when messages change if shouldScrollToBottom is true
-   */
+  // Auto-scroll when messages change (if we're at bottom)
   useEffect(() => {
+    // Skip if loading more
+    if (isLoadingMoreLocal) return;
+
     if (shouldScrollToBottom && messages.length > 0) {
-      // Immediate scroll attempt
-      scrollChatToBottom();
-
-      // Additional scroll attempts with increasing delays
-      setTimeout(scrollChatToBottom, 100);
-      setTimeout(scrollChatToBottom, 300);
+      scrollToBottom();
     }
-  }, [messages, shouldScrollToBottom]);
+  }, [messages, shouldScrollToBottom, isLoadingMoreLocal]);
 
-  /**
-   * Focuses input and scrolls to bottom when chat changes
-   */
+  // Reset state when chat changes
   useEffect(() => {
-    if (selectedChat) {
-      setShouldScrollToBottom(true);
-      focusMessageInput();
-    }
-  }, [selectedChat]);
+    if (!selectedChat) return;
 
-  /**
-   * Focuses input after messages load
-   */
-  useEffect(() => {
-    if (!isLoading && messages.length > 0) {
-      setShouldScrollToBottom(true);
-      focusMessageInput();
-    }
-  }, [isLoading, messages.length]);
+    setIsLoadingMoreLocal(false);
+    setShouldScrollToBottom(true);
 
-  /**
-   * Sets up scroll detection to determine if we should auto-scroll
-   */
-  useEffect(() => {
-    const handleScroll = () => {
-      if (chatContainerRef.current) {
-        const { scrollTop, scrollHeight, clientHeight } =
-          chatContainerRef.current;
-        // Consider "at bottom" if within 100px of bottom
-        const atBottom =
-          Math.abs(scrollHeight - scrollTop - clientHeight) < 100;
-        setShouldScrollToBottom(atBottom);
+    // Scroll to bottom after chat changes
+    setTimeout(scrollToBottom, 100);
+
+    // Focus input after a delay
+    setTimeout(() => {
+      if (messageInputRef.current && !isLoadingMoreLocal) {
+        messageInputRef.current.focus({ preventScroll: true });
       }
+    }, 150);
+  }, [selectedChat, isLoadingMoreLocal]);
+
+  // Track scroll position to determine if we're at bottom
+  useEffect(() => {
+    if (!chatContainerRef.current) return;
+
+    const handleScroll = () => {
+      // Don't update scroll state if we're loading more
+      if (isLoadingMoreLocal) return;
+
+      const container = chatContainerRef.current;
+      if (!container) return;
+
+      // Determine if we're at bottom (within 150px)
+      const { scrollHeight, scrollTop, clientHeight } = container;
+      const atBottom = scrollHeight - scrollTop - clientHeight < 150;
+
+      setShouldScrollToBottom(atBottom);
     };
 
     const container = chatContainerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
-      return () => container.removeEventListener("scroll", handleScroll);
+    container.addEventListener("scroll", handleScroll);
+
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [isLoadingMoreLocal]);
+
+  /**
+   * Simple load more handler with scroll position preservation
+   */
+  const handleLoadMore = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isLoadingMore || isLoadingMoreLocal || !hasMoreMessages) {
+      return;
     }
-  }, []);
+
+    // Set local loading state
+    setIsLoadingMoreLocal(true);
+
+    // Store scroll position before loading more
+    if (chatContainerRef.current) {
+      scrollPositionRef.current = {
+        top: chatContainerRef.current.scrollTop,
+        height: chatContainerRef.current.scrollHeight,
+      };
+    }
+
+    try {
+      // Load more messages
+      await onLoadMoreMessages();
+
+      // Wait a bit for the DOM to update, then restore scroll position
+      setTimeout(() => {
+        if (chatContainerRef.current) {
+          const newHeight = chatContainerRef.current.scrollHeight;
+          const heightDiff = newHeight - scrollPositionRef.current.height;
+          chatContainerRef.current.scrollTop =
+            scrollPositionRef.current.top + heightDiff;
+        }
+
+        // Add a second delay before resetting the loading state
+        // This ensures scroll position is fully restored before allowing auto-scrolling
+        setTimeout(() => {
+          setIsLoadingMoreLocal(false);
+        }, 100);
+      }, 50);
+    } catch (error) {
+      console.error("Error loading more messages:", error);
+      setIsLoadingMoreLocal(false);
+    }
+  };
 
   /**
    * Handles sending a new message
@@ -206,9 +234,11 @@ export default function MessageBox({
     const messageContent = newMessage;
     setNewMessage("");
 
-    // Force scroll to bottom immediately when sending
-    setShouldScrollToBottom(true);
-    scrollChatToBottom();
+    // If not loading more, scroll to bottom when sending
+    if (!isLoadingMoreLocal) {
+      setShouldScrollToBottom(true);
+      scrollToBottom();
+    }
 
     try {
       const success = await onSendMessage(messageContent);
@@ -218,14 +248,16 @@ export default function MessageBox({
         setNewMessage(messageContent); // Restore message text
       }
 
-      // Additional scroll after message is sent
-      scrollChatToBottom();
+      // Only auto-scroll if not loading more
+      if (!isLoadingMoreLocal) {
+        scrollToBottom();
 
-      // Use a small delay to ensure the input is focused after state updates
-      setTimeout(() => {
-        focusMessageInput();
-        scrollChatToBottom(); // One more scroll for good measure
-      }, 50);
+        setTimeout(() => {
+          if (messageInputRef.current) {
+            messageInputRef.current.focus({ preventScroll: true });
+          }
+        }, 50);
+      }
     } catch (error) {
       setSendError(`Error: ${error.message || "Failed to send"}`);
       setNewMessage(messageContent); // Restore message text
@@ -241,7 +273,6 @@ export default function MessageBox({
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      wasEnterKeySend.current = true;
       handleSendMessage(e);
     }
   };
@@ -283,8 +314,42 @@ export default function MessageBox({
     }
   };
 
+  /**
+   * Renders the load more button - only when we have more messages
+   */
+  const renderLoadMoreButton = () => {
+    if (!hasMoreMessages || isLoading) return null;
+
+    return (
+      <div className="text-center my-3">
+        <button
+          className="btn btn-sm btn-light"
+          onClick={handleLoadMore}
+          disabled={isLoadingMore || isLoadingMoreLocal}
+        >
+          {isLoadingMore || isLoadingMoreLocal ? (
+            <>
+              <span
+                className="spinner-border spinner-border-sm mr-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Φόρτωση...
+            </>
+          ) : (
+            "Φόρτωση παλαιότερων μηνυμάτων"
+          )}
+        </button>
+      </div>
+    );
+  };
+
   return (
-    <div id="message-container" className="message_container mt30-md">
+    <div
+      id="message-container"
+      className="message_container mt30-md"
+      style={{ position: "relative" }}
+    >
       <div className="user_heading px-0">
         <div className="wrap d-flex align-items-center mx30">
           {selectedChat && (
@@ -312,28 +377,14 @@ export default function MessageBox({
                 <h6 className="name mb-0">{displayName}</h6>
               )}
 
-              <p className="preview ml10">
-                {/* {chatStatus === "Active" ? "Ενεργός" : "Αποσυνδεδημένος"}{" "} */}
-                {isSending && "• Αποστολή..."}
-              </p>
+              <p className="preview ml10">{isSending && "• Αποστολή..."}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div
-        ref={chatContainerRef}
-        className="inbox_chatting_box Gscrollbar"
-        style={
-          {
-            // minHeight: "400px",
-            // maxHeight: "60vh",
-            // overflowY: "auto",
-            // paddingBottom: "100px", // Add extra padding at the bottom
-          }
-        }
-      >
-        {isLoading ? (
+      <div ref={chatContainerRef} className="inbox_chatting_box Gscrollbar">
+        {isLoading && messages.length === 0 ? (
           <ChatMessagesSkeleton />
         ) : !selectedChat ? (
           <p className="text-center p-5">
@@ -345,6 +396,9 @@ export default function MessageBox({
           </p>
         ) : (
           <ul className="chatting_content">
+            {/* Load More button at original position */}
+            {renderLoadMoreButton()}
+
             {messages
               .map((msg, index) => {
                 if (!msg || !msg.id) {
@@ -457,15 +511,6 @@ export default function MessageBox({
                       );
                       const formattedDate = dateFormatter.format(messageDate);
 
-                      // // Format the time part
-                      // const hours = messageDate.getHours();
-                      // const minutes = messageDate
-                      //   .getMinutes()
-                      //   .toString()
-                      //   .padStart(2, "0");
-                      // const timeStr = `${hours}:${minutes}`;
-
-                      // Combine them in the consistent format
                       return `${formattedDate}`;
                     })()
                   : "";
@@ -643,7 +688,12 @@ export default function MessageBox({
             <form
               className="d-flex align-items-center"
               onSubmit={handleSendMessage}
-              onClick={focusMessageInput}
+              onClick={() => {
+                // Only focus if not in loading state
+                if (!isLoadingMoreLocal && messageInputRef.current) {
+                  messageInputRef.current.focus({ preventScroll: true });
+                }
+              }}
             >
               <input
                 ref={messageInputRef}
@@ -661,14 +711,19 @@ export default function MessageBox({
                 }}
                 onKeyPress={handleKeyPress}
                 onFocus={handleInputFocus}
-                disabled={!isConnected || isSending}
+                disabled={!isConnected || isSending || isLoadingMoreLocal}
                 autoComplete="off"
                 spellCheck="false"
               />
               <button
                 type="submit"
                 className="btn ud-btn btn-thm"
-                disabled={!isConnected || !newMessage.trim() || isSending}
+                disabled={
+                  !isConnected ||
+                  !newMessage.trim() ||
+                  isSending ||
+                  isLoadingMoreLocal
+                }
               >
                 {isSending ? (
                   <>

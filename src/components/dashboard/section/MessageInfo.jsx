@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import DashboardNavigation from "../header/DashboardNavigation";
 import UserChatList1 from "../card/UserChatList1";
 import MessageBox from "../element/MessageBox";
@@ -43,12 +43,19 @@ const scrollToMessageContainer = () => {
  * @param {Array} props.initialChatList - Initial list of chats to display
  * @param {string|null} props.chatListError - Error message if chat list failed to load
  * @param {string|number} props.currentFreelancerId - ID of the current freelancer/user
+ * @param {Object} props.initialChatListPagination - Initial pagination info for chats
  * @returns {JSX.Element} Rendered message interface with chat sidebar and message area
  */
 export default function MessageInfo({
   initialChatList,
   chatListError: initialChatListError,
   currentFreelancerId,
+  initialChatListPagination = {
+    page: 1,
+    pageSize: 15,
+    pageCount: 1,
+    total: 0,
+  },
 }) {
   const {
     chatList,
@@ -56,17 +63,32 @@ export default function MessageInfo({
     messages,
     isConnected,
     isLoadingMessages,
+    isLoadingMore,
+    hasMoreMessages,
+
+    // Chat list pagination
+    isLoadingChats,
+    hasMoreChats,
+    totalChats,
+
+    // Functions
     error,
     selectChat,
     sendMessage,
     markChatAsRead,
+    loadMoreMessages,
+    loadMoreChats,
   } = useChatSystem({
     initialChatList,
+    initialChatListPagination,
     currentFreelancerId,
   });
 
   // Track if we've handled the URL chat parameter
   const [hasProcessedUrlChat, setHasProcessedUrlChat] = useState(false);
+
+  // Reference to the chat list scroll container
+  const chatListContainerRef = useRef(null);
 
   /**
    * Handles URL-based chat selection when component loads or chat list changes
@@ -109,6 +131,37 @@ export default function MessageInfo({
     scrollToMessageContainer();
   };
 
+  /**
+   * Handles scroll events in the chat list to implement lazy loading
+   */
+  const handleChatListScroll = () => {
+    const container = chatListContainerRef.current;
+    if (!container || isLoadingChats || !hasMoreChats) return;
+
+    // Calculate distance from bottom (in pixels)
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+
+    // Load more when user scrolls to within 200px of bottom
+    if (distanceFromBottom < 200) {
+      loadMoreChats();
+    }
+  };
+
+  // Set up scroll listener
+  useEffect(() => {
+    const container = chatListContainerRef.current;
+    if (container) {
+      container.addEventListener("scroll", handleChatListScroll);
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", handleChatListScroll);
+      }
+    };
+  }, [isLoadingChats, hasMoreChats]);
+
   return (
     <div className="dashboard__content hover-bgc-color">
       <div className="row pb40">
@@ -120,7 +173,7 @@ export default function MessageInfo({
             <h2>Μηνύματα</h2>
             {/* <small className="text-muted">
               Σύνδεση: {isConnected ? "✅" : "❌"} | Συνομιλίες:{" "}
-              {chatList.length}
+              {chatList.length}/{totalChats}
             </small> */}
           </div>
         </div>
@@ -130,27 +183,56 @@ export default function MessageInfo({
         <div className="col-lg-6 col-xl-5 col-xxl-4">
           <div className="message_container">
             <div className="inbox_user_list">
-              <div className="chat-member-list pr20">
+              <div
+                ref={chatListContainerRef}
+                className="chat-member-list pr20 Gscrollbar"
+                style={{
+                  scrollBehavior: "smooth",
+                }}
+              >
                 {initialChatListError || error ? (
                   <p className="text-danger p-3">
                     Σφάλμα: {initialChatListError || error}
                   </p>
                 ) : chatList.length > 0 ? (
-                  chatList.map((chat) => (
-                    <div
-                      key={chat.id}
-                      className={`list-item pt5 ${
-                        selectedChat?.id === chat.id ? "active" : ""
-                      }`}
-                      onClick={() => handleChatSelect(chat)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <UserChatList1
-                        data={chat}
-                        currentFreelancerId={currentFreelancerId}
-                      />
-                    </div>
-                  ))
+                  <>
+                    {chatList.map((chat) => (
+                      <div
+                        key={chat.id}
+                        className={`list-item pt5 ${
+                          selectedChat?.id === chat.id ? "active" : ""
+                        }`}
+                        onClick={() => handleChatSelect(chat)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <UserChatList1
+                          data={chat}
+                          currentFreelancerId={currentFreelancerId}
+                        />
+                      </div>
+                    ))}
+
+                    {/* Infinite Scroll Loading Indicator */}
+                    {isLoadingChats && (
+                      <div className="text-center my-3 py-2">
+                        <span
+                          className="spinner-border spinner-border-sm mr-2"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                        <span className="text-muted">Φόρτωση...</span>
+                      </div>
+                    )}
+
+                    {/* Show end of chats message when all are loaded */}
+                    {!hasMoreChats &&
+                      chatList.length > 0 &&
+                      !isLoadingChats && (
+                        <div className="text-center my-3">
+                          <small className="text-muted">Τέλος συνομιλιών</small>
+                        </div>
+                      )}
+                  </>
                 ) : (
                   <p className="p-3">Δεν βρέθηκαν συνομιλίες.</p>
                 )}
@@ -165,8 +247,11 @@ export default function MessageInfo({
             isConnected={isConnected}
             currentUserId={currentFreelancerId}
             isLoading={isLoadingMessages}
+            isLoadingMore={isLoadingMore}
+            hasMoreMessages={hasMoreMessages}
             onSendMessage={sendMessage}
             markChatAsRead={markChatAsRead}
+            onLoadMoreMessages={loadMoreMessages}
           />
         </div>
       </div>
