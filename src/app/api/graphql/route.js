@@ -3,66 +3,106 @@ import { getToken } from "@/lib/auth/token";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
-  const token = await getToken();
-
-  // Clone the request and add Authorization header
-  const headers = new Headers(request.headers);
-
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
-  }
-
-  // Get the body content
-  const body = await request.text();
-
-  // Get the original URL from the request
-  const url =
-    process.env.STRAPI_GRAPHQL_URL || "https://api.doulitsa.gr/graphql";
-
   try {
+    const token = await getToken();
+
+    // Get the body content first
+    let bodyText;
+    try {
+      bodyText = await request.text();
+    } catch (error) {
+      console.error("Error reading request body:", error);
+      return NextResponse.json(
+        { errors: [{ message: "Failed to read request body" }] },
+        { status: 400 }
+      );
+    }
+
+    // Validate that the body is proper JSON
+    try {
+      JSON.parse(bodyText);
+    } catch (error) {
+      console.error("Invalid GraphQL request JSON:", error);
+      return NextResponse.json(
+        { errors: [{ message: "Invalid request: Not a valid JSON body" }] },
+        { status: 400 }
+      );
+    }
+
+    // Prepare headers
+    const headers = new Headers();
+    headers.set("Content-Type", "application/json");
+
+    // Copy important headers from original request
+    if (request.headers.has("accept")) {
+      headers.set("Accept", request.headers.get("accept"));
+    }
+
+    // Add auth token if available
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+
+    // Get the target URL
+    const url =
+      process.env.STRAPI_GRAPHQL_URL || "https://api.doulitsa.gr/graphql";
+
     // Forward the request to the actual GraphQL endpoint
     const response = await fetch(url, {
       method: "POST",
       headers,
-      body: body,
-      duplex: "half",
+      body: bodyText,
     });
 
-    // Check if the response is OK before trying to parse it
+    // If the response from Strapi is not ok, handle the error
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("GraphQL API error response:", errorText);
+      const statusCode = response.status;
+      let errorMessage;
+
+      try {
+        // Try to get error details
+        const errorBody = await response.text();
+        console.error(
+          `Strapi GraphQL error (${statusCode}):`,
+          errorBody.substring(0, 500)
+        );
+        errorMessage = `GraphQL server responded with status ${statusCode}`;
+      } catch (readError) {
+        console.error("Failed to read error response:", readError);
+        errorMessage = "Failed to read error response from GraphQL server";
+      }
+
       return NextResponse.json(
-        {
-          errors: [
-            { message: `GraphQL API responded with status ${response.status}` },
-          ],
-        },
-        { status: response.status }
+        { errors: [{ message: errorMessage }] },
+        { status: statusCode }
       );
     }
 
-    // Try to parse the response as JSON with error handling
-    let data;
+    // Try to parse the successful response
     try {
-      data = await response.json();
-    } catch (parseError) {
-      console.error("JSON parse error:", parseError);
-      // Get the response text for debugging
-      const responseText = await response.clone().text();
-      console.error("Response text:", responseText.substring(0, 200)); // Log first 200 chars
+      const data = await response.json();
+      return NextResponse.json(data);
+    } catch (jsonError) {
+      console.error("Failed to parse JSON response:", jsonError);
+
+      // Clone and get text for additional debugging
+      try {
+        const clonedResponse = response.clone();
+        const textResponse = await clonedResponse.text();
+        console.error("Raw response:", textResponse.substring(0, 500));
+      } catch (cloneError) {
+        console.error("Failed to get raw response text:", cloneError);
+      }
 
       return NextResponse.json(
-        { errors: [{ message: "Invalid JSON response from GraphQL API" }] },
-        { status: 500 }
+        { errors: [{ message: "Invalid JSON response from GraphQL server" }] },
+        { status: 502 }
       );
     }
-
-    return NextResponse.json(data);
   } catch (error) {
-    console.error("GraphQL proxy error:", error);
+    console.error("Unhandled GraphQL proxy error:", error);
     return NextResponse.json(
-      { errors: [{ message: "Failed to fetch from GraphQL API" }] },
+      { errors: [{ message: "Internal server error in GraphQL proxy" }] },
       { status: 500 }
     );
   }
