@@ -25,11 +25,39 @@ export async function POST(request) {
       method: "POST",
       headers,
       body: body,
-      duplex: "half", // Add this line to fix the error
+      duplex: "half",
     });
 
-    // Clone and return the response
-    const data = await response.json();
+    // Check if the response is OK before trying to parse it
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("GraphQL API error response:", errorText);
+      return NextResponse.json(
+        {
+          errors: [
+            { message: `GraphQL API responded with status ${response.status}` },
+          ],
+        },
+        { status: response.status }
+      );
+    }
+
+    // Try to parse the response as JSON with error handling
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      // Get the response text for debugging
+      const responseText = await response.clone().text();
+      console.error("Response text:", responseText.substring(0, 200)); // Log first 200 chars
+
+      return NextResponse.json(
+        { errors: [{ message: "Invalid JSON response from GraphQL API" }] },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(data);
   } catch (error) {
     console.error("GraphQL proxy error:", error);
