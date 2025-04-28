@@ -5,34 +5,46 @@ export const CACHE_CONFIG = {
   },
   USERS: {
     key: "users",
-    ttl: 10 * 60, // 1 hour
+    ttl: 300, // 5 minutes
   },
   SERVICES: {
     key: "services",
-    ttl: 24 * 60 * 60, // 1 day
-  },
-  COLLECTIONS: {
-    key: "collections",
-    ttl: 7 * 24 * 60 * 60, // 1 week
-  },
-  ANALYTICS: {
-    key: "analytics",
-    ttl: 30 * 24 * 60 * 60, // 1 month
-  },
-  TOP: {
-    key: "top",
-    ttl: 24 * 60 * 60, // 1 day
-  },
-  HEADER: {
-    key: "header",
-    ttl: 24 * 60 * 60, // 1 day
-  },
-  SAVED_STATUS: {
-    key: "saved-status",
-    ttl: 60 * 60,
+    ttl: 600, // 10 minutes
   },
   HOME_SERVICES: {
     key: "home-services",
-    ttl: 60 * 60,
+    ttl: 300, // 5 minutes
+  },
+  HOME_FREELANCERS: {
+    key: "home-freelancers",
+    ttl: 300, // 5 minutes
+  },
+  FEATURED_CATEGORIES: {
+    key: "featured-categories",
+    ttl: 900, // 15 minutes
+  },
+  COLLECTIONS: {
+    key: "collections",
+    ttl: 3600, // 1 hour
+  },
+  ANALYTICS: {
+    key: "analytics",
+    ttl: 3600, // 1 hour
+  },
+  TOP: {
+    key: "top",
+    ttl: 1800, // 30 minutes
+  },
+  ACTIVE_TOP: {
+    key: "active-top",
+    ttl: 900, // 15 minutes
+  },
+  HEADER: {
+    key: "header",
+    ttl: 1800, // 30 minutes
+  },
+  SAVED_STATUS: {
+    key: "saved-status",
+    ttl: 0, // 0 minute
   },
 };

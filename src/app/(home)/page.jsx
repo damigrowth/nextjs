@@ -18,8 +18,8 @@ import { inspect } from "@/utils/inspect";
 import { getFreelancerId } from "@/lib/users/freelancer";
 import HomeSchema from "@/utils/Seo/Schema/HomeSchema";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 3600; // 1 hour
+// Remove dynamic = "force-dynamic" if it exists
+export const revalidate = 300; // 5 minutes
 export const fetchCache = "force-cache";
 
 // Static SEO
@@ -39,9 +39,12 @@ export async function generateMetadata() {
 export default async function page() {
   const fid = await getFreelancerId();
 
-  //TODO: Add batch query - combine all queries
+  // Apply consistent caching for all data fetches
   const { featuredEntity: featuredCategoriesData } = await getData(
-    FEATURED_CATEGORIES
+    FEATURED_CATEGORIES,
+    null,
+    "FEATURED_CATEGORIES",
+    ["featured-categories"]
   );
 
   const { featuredEntity: featuredServicesData } = await getData(
@@ -50,14 +53,20 @@ export default async function page() {
     "HOME_SERVICES",
     ["home-services"]
   );
+
+  // Add proper caching for featured freelancers - this is the key change
   const { featuredEntity: featuredFreelancersData } = await getData(
-    FEATURED_FREELANCERS
+    FEATURED_FREELANCERS,
+    null,
+    "HOME_FREELANCERS", // Use cache key instead of default NO_CACHE
+    ["home-freelancers"]
   );
 
   const { topServiceSubcategories, topFreelancerSubcategories } = await getData(
     ALL_ACTIVE_TOP_TAXONOMIES,
     null,
-    "ACTIVE_TOP"
+    "ACTIVE_TOP",
+    ["active-top"]
   );
 
   const featuredCategories =
