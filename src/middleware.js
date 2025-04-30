@@ -10,7 +10,28 @@ export async function middleware(request) {
   const isUnderMaintenance = false;
 
   const token = getTokenFromRequest(request);
+  // console.log("token", token);
   const freelancer = await getFreelancerId();
+
+  // Check for the problematic state: token exists but no freelancer profile
+  if (token && !freelancer) {
+    // Create redirect response with error message
+    const response = NextResponse.redirect(
+      new URL("/login?error=missing_profile", request.url)
+    );
+
+    // Clear the token by setting an expired cookie
+    response.cookies.set("jwt", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 0, // Expire immediately
+    });
+
+    return response;
+  }
+
   const authenticated = Boolean(token && freelancer);
 
   const maintenancePublicPaths = [
