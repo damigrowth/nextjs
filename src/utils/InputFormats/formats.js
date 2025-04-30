@@ -23,9 +23,9 @@ export const keepOnlyNumbers = (str) => {
   return str.toString().replace(/[^\d]/g, "");
 };
 
-// New function to allow only English letters
-export const allowOnlyEnglishLetters = (str) => {
-  return str.replace(/[^a-zA-Z]/g, "");
+// Changed function to allow English letters, numbers, hyphens, and underscores
+export const formatUsername = (str) => {
+  return str.replace(/[^a-zA-Z0-9_-]/g, "");
 };
 
 export const formatInput = ({
@@ -35,6 +35,7 @@ export const formatInput = ({
   capitalize,
   lowerCase,
   englishOnly,
+  usernameFormat,
   type,
   value,
   min,
@@ -63,9 +64,13 @@ export const formatInput = ({
     }
   }
 
-  // Apply English-only filter first if specified
-  if (englishOnly) {
-    formattedValue = allowOnlyEnglishLetters(formattedValue);
+  // Apply username format first if specified
+  if (usernameFormat) {
+    formattedValue = formatUsername(formattedValue);
+  }
+  // Apply English-only filter if specified (maintaining backward compatibility)
+  else if (englishOnly) {
+    formattedValue = formatUsername(formattedValue);
   }
 
   // Apply number formatting only if formatNumbers is true

@@ -134,7 +134,7 @@ const RegisterForm = () => {
           autoComplete="username"
           errorId="username-error"
           formatSpaces
-          englishOnly
+          usernameFormat
           lowerCase
         />
       </div>
