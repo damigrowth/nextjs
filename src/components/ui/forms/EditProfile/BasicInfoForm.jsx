@@ -119,8 +119,8 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
       searchTerm,
       page,
       additionalVariables: {
-        onsiteZipcodesPage: page,
-        onsiteZipcodesPageSize: 10,
+        onbaseZipcodesPage: page,
+        onbaseZipcodesPageSize: 10,
       },
     });
 
@@ -134,8 +134,8 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
       searchTerm,
       page,
       additionalVariables: {
-        onsiteCountyPage: page,
-        onsiteCountyPageSize: 10,
+        onsiteCountiesPage: page,
+        onsiteCountiesPageSize: 10,
       },
     });
 
