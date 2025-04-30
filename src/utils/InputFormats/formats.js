@@ -23,12 +23,18 @@ export const keepOnlyNumbers = (str) => {
   return str.toString().replace(/[^\d]/g, "");
 };
 
+// New function to allow only English letters
+export const allowOnlyEnglishLetters = (str) => {
+  return str.replace(/[^a-zA-Z]/g, "");
+};
+
 export const formatInput = ({
   formatNumbers,
   formatSymbols,
   formatSpaces,
   capitalize,
   lowerCase,
+  englishOnly,
   type,
   value,
   min,
@@ -55,6 +61,11 @@ export const formatInput = ({
       // Explicitly return empty string if formatting resulted in empty
       return "";
     }
+  }
+
+  // Apply English-only filter first if specified
+  if (englishOnly) {
+    formattedValue = allowOnlyEnglishLetters(formattedValue);
   }
 
   // Apply number formatting only if formatNumbers is true

@@ -28,7 +28,8 @@ const consentOptions = [
 ];
 
 const RegisterForm = () => {
-  const { type, role, roles, setAuthRole, consent, setConsent, setAuthType } = authStore();
+  const { type, role, roles, setAuthRole, consent, setConsent, setAuthType } =
+    authStore();
   const formRef = useRef(null);
 
   const [state, formAction, isPending] = useActionState(register, {
@@ -39,9 +40,9 @@ const RegisterForm = () => {
 
   useEffect(() => {
     const hash = window.location.hash;
-    if (hash === '#user') {
+    if (hash === "#user") {
       setAuthType(1);
-    } else if (hash === '#pro') {
+    } else if (hash === "#pro") {
       setAuthType(2);
     }
   }, []);
@@ -133,7 +134,7 @@ const RegisterForm = () => {
           autoComplete="username"
           errorId="username-error"
           formatSpaces
-          formatSymbols
+          englishOnly
           lowerCase
         />
       </div>
