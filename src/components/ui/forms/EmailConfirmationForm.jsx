@@ -64,7 +64,14 @@ export default function EmailConfirmationForm({ confirmationToken }) {
         </div>
         <h4 className="text-thm2 mb-2">Επιτυχής Ταυτοποίηση!</h4>
         <p>{state.message}</p>
-        <p className="text-muted">Ανακατεύθυνση στον πίνακα ελέγχου...</p>
+        <div className="d-flex justify-content-center align-items-center">
+          <div className="spinner-border text-thm mb-3" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="text-muted ml10">
+            Ανακατεύθυνση στον πίνακα ελέγχου...
+          </p>
+        </div>
       </div>
     );
   }
