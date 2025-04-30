@@ -5,7 +5,7 @@ import {
   cutSpaces,
   cutSymbols,
   restrictCapitalLetters,
-  allowOnlyEnglishLetters,
+  formatUsername,
 } from "@/utils/InputFormats/formats";
 import React, { useState } from "react";
 import { useFormStatus } from "react-dom";
@@ -31,6 +31,7 @@ export default function Input({
   capitalize,
   lowerCase,
   englishOnly,
+  usernameFormat,
   append,
 }) {
   const { pending } = useFormStatus();
@@ -40,9 +41,13 @@ export default function Input({
   const handleInputChange = (event) => {
     let formattedValue = event.target.value;
 
-    // Apply English-only filter first if specified
-    if (englishOnly) {
-      formattedValue = allowOnlyEnglishLetters(formattedValue);
+    // Apply username format first if specified
+    if (usernameFormat) {
+      formattedValue = formatUsername(formattedValue);
+    }
+    // Apply English-only filter if specified (maintaining backward compatibility)
+    else if (englishOnly) {
+      formattedValue = formatUsername(formattedValue);
     }
 
     if (formatNumbers) {
