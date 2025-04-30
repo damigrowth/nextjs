@@ -5,6 +5,7 @@ import {
   cutSpaces,
   cutSymbols,
   restrictCapitalLetters,
+  allowOnlyEnglishLetters,
 } from "@/utils/InputFormats/formats";
 import React, { useState } from "react";
 import { useFormStatus } from "react-dom";
@@ -29,6 +30,7 @@ export default function Input({
   formatSymbols,
   capitalize,
   lowerCase,
+  englishOnly,
   append,
 }) {
   const { pending } = useFormStatus();
@@ -37,6 +39,11 @@ export default function Input({
 
   const handleInputChange = (event) => {
     let formattedValue = event.target.value;
+
+    // Apply English-only filter first if specified
+    if (englishOnly) {
+      formattedValue = allowOnlyEnglishLetters(formattedValue);
+    }
 
     if (formatNumbers) {
       formattedValue = cutNumbers(formattedValue);
