@@ -138,7 +138,11 @@ const FEATURED_SERVICES = gql`
     featuredEntity {
       data {
         attributes {
-          services(filters: { status: { type: { eq: "Active" } } }) {
+          services(
+            filters: { status: { type: { eq: "Active" } } }
+            pagination: { page: 1, pageSize: 30 }
+            sort: "updatedAt:desc"
+          ) {
             ...FeaturedService
           }
         }

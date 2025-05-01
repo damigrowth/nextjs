@@ -1,32 +1,58 @@
 import React from "react";
-import CategoryTabs from "./CategoryTabs";
-import ServicesList from "./ServicesList";
+import { Suspense } from "react";
+import FeaturedServiceCard from "@/components/ui/Cards/FeaturedServiceCard";
+import FeaturedServiceSliderCard from "@/components/ui/Cards/FeaturedServiceSliderCard";
+import ServicesClientWrapper from "./ServicesClientWrapper";
 
-export default function FeaturedServices({ categories, services, fid }) {
+// This remains a Server Component that can be async
+export default async function FeaturedServices({ categories, services, fid }) {
+  // Filter out invalid services up front
+  const validServices = services.filter(
+    (service) =>
+      service?.attributes?.freelancer?.data?.attributes &&
+      service.attributes.media?.data?.length > 0
+  );
+
+  // Pre-render all service cards on the server
+  const renderedServiceCards = await Promise.all(
+    validServices.map(async (service) => {
+      // Preprocess service data
+      const serviceData = { id: service.id, ...service.attributes };
+      const categorySlug =
+        service.attributes.category?.data?.attributes?.slug || "";
+
+      // Pre-render the appropriate card component based on media length
+      const serviceCard =
+        service.attributes.media?.data?.length > 1 ? (
+          <FeaturedServiceSliderCard service={serviceData} fid={fid} />
+        ) : (
+          <FeaturedServiceCard service={serviceData} fid={fid} />
+        );
+
+      // Return processed data for the client component
+      return {
+        id: service.id,
+        categorySlug,
+        renderedCard: (
+          <Suspense fallback={<div className="card-skeleton">Loading...</div>}>
+            {serviceCard}
+          </Suspense>
+        ),
+      };
+    })
+  );
+
+  // Prepare and pass category data for filtering
+  const categoryData = categories.map((cat) => ({
+    slug: cat.attributes.slug,
+    label: cat.attributes.label,
+  }));
+
+  // Pass the pre-rendered cards and category data to the client wrapper
   return (
-    <section className={`pt-0 pb100 pt100 bgorange`}>
-      <div className="container">
-        <div className="row align-items-center wow fadeInUp">
-          <div className="col-xl-3">
-            <div className="main-title mb30-lg">
-              <h2 className="title">Δημοφιλείς Υπηρεσίες</h2>
-              <p className="paragraph">
-                Οι υπηρεσίες με τη μεγαλύτερη ζήτηση.
-              </p>
-            </div>
-          </div>
-          <div className="col-xl-9">
-            <div className="navpill-style2 at-home9 mb50-lg">
-              <CategoryTabs categories={categories} />
-            </div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-lg-12">
-            <ServicesList services={services} fid={fid} />
-          </div>
-        </div>
-      </div>
-    </section>
+    <ServicesClientWrapper
+      renderedServiceCards={renderedServiceCards}
+      categories={categoryData}
+    />
   );
 }
