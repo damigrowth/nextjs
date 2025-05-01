@@ -13,8 +13,6 @@ const useHomeStore = create((set) => ({
       searchTerm: "", // Reset searchTerm
       isSearchDropdownOpen: true, // Show dropdown with category results
     })),
-  featuredCategory: "",
-  setFeaturedCategory: (payload) => set(() => ({ featuredCategory: payload })),
   taxonomy: 0,
   setTaxonomy: (payload) => set(() => ({ taxonomy: payload })),
 }));

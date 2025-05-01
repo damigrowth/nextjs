@@ -8,17 +8,15 @@ import AllTaxonomies from "@/components/ui/Sections/Taxonomies/AllTaxonomies";
 import Hero from "@/components/ui/Sections/Hero/Hero";
 import {
   FEATURED_CATEGORIES,
-  ALL_TOP_TAXONOMIES,
   ALL_ACTIVE_TOP_TAXONOMIES,
 } from "@/lib/graphql/queries/main/taxonomies";
 import { FEATURED_SERVICES } from "@/lib/graphql/queries/main/service";
 import { FEATURED_FREELANCERS } from "@/lib/graphql/queries/main/freelancer";
 import { Meta } from "@/utils/Seo/Meta/Meta";
-import { inspect } from "@/utils/inspect";
 import { getFreelancerId } from "@/lib/users/freelancer";
 import HomeSchema from "@/utils/Seo/Schema/HomeSchema";
+import { Suspense } from "react";
 
-// Remove dynamic = "force-dynamic" if it exists
 export const revalidate = 300; // 5 minutes
 export const fetchCache = "force-cache";
 
@@ -37,9 +35,10 @@ export async function generateMetadata() {
 }
 
 export default async function page() {
+  // Get user ID if logged in
   const fid = await getFreelancerId();
 
-  // Apply consistent caching for all data fetches
+  // Apply strong caching for all data fetches
   const { featuredEntity: featuredCategoriesData } = await getData(
     FEATURED_CATEGORIES,
     null,
@@ -47,6 +46,7 @@ export default async function page() {
     ["featured-categories"]
   );
 
+  // Load all services with caching
   const { featuredEntity: featuredServicesData } = await getData(
     FEATURED_SERVICES,
     null,
@@ -54,11 +54,11 @@ export default async function page() {
     ["home-services"]
   );
 
-  // Add proper caching for featured freelancers - this is the key change
+  // Add proper caching for featured freelancers
   const { featuredEntity: featuredFreelancersData } = await getData(
     FEATURED_FREELANCERS,
     null,
-    "HOME_FREELANCERS", // Use cache key instead of default NO_CACHE
+    "HOME_FREELANCERS",
     ["home-freelancers"]
   );
 
@@ -69,29 +69,42 @@ export default async function page() {
     ["active-top"]
   );
 
+  // Process data
   const featuredCategories =
-    featuredCategoriesData?.data?.attributes?.categories?.data;
+    featuredCategoriesData?.data?.attributes?.categories?.data || [];
+
   const featuredServices =
-    featuredServicesData?.data?.attributes?.services?.data;
+    featuredServicesData?.data?.attributes?.services?.data || [];
+
   const featuredFreelancers =
-    featuredFreelancersData?.data?.attributes?.freelancers?.data.filter((f) => {
-      return f.attributes.image.data !== null;
-    });
+    featuredFreelancersData?.data?.attributes?.freelancers?.data?.filter(
+      (f) => {
+        return f?.attributes?.image?.data !== null;
+      }
+    ) || [];
 
   return (
     <>
       <HomeSchema />
-      <Hero
-        categories={featuredCategoriesData?.data?.attributes?.categories?.data}
-      />
+      <Hero categories={featuredCategories} />
       <FeaturedCategories categories={featuredCategories} />
       <Features />
-      <FeaturedServices
-        categories={featuredCategories}
-        services={featuredServices}
-        fid={fid}
-      />
-      <FeaturedFreelancers freelancers={featuredFreelancers} fid={fid} />
+      <Suspense
+        fallback={<div className="py-5 text-center">Loading services...</div>}
+      >
+        <FeaturedServices
+          categories={featuredCategories}
+          services={featuredServices}
+          fid={fid}
+        />
+      </Suspense>
+      <Suspense
+        fallback={
+          <div className="py-5 text-center">Loading freelancers...</div>
+        }
+      >
+        <FeaturedFreelancers freelancers={featuredFreelancers} fid={fid} />
+      </Suspense>
       <Stats />
       <AllTaxonomies
         freelancerSubcategories={topFreelancerSubcategories}
