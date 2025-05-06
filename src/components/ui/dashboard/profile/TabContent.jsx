@@ -9,6 +9,7 @@ import TabNavigation from "./TabNavigation";
 import TabWrapper from "./TabWrapper";
 import { redirect } from "next/navigation";
 import { getToken } from "@/lib/auth/token";
+import VerificationForm from "../../forms/EditProfile/VerificationForm";
 
 export async function TabContent() {
   const freelancer = await getFreelancer();
@@ -44,6 +45,12 @@ export async function TabContent() {
       index: 3,
       label: "Παρουσίαση",
       content: <PresentationForm freelancer={freelancer} jwt={jwt} />,
+      showForUser: false,
+    },
+    {
+      index: 4,
+      label: "Πιστοποίηση",
+      content: <VerificationForm freelancer={freelancer} jwt={jwt} />,
       showForUser: false,
     },
     {

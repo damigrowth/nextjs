@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { postData } from "../client/operations";
-import { UPDATE_FREELANCER } from "../graphql/mutations";
+import { UPDATE_FREELANCER, VERIFICATION } from "../graphql/mutations";
 import { revalidatePath } from "next/cache";
 import {
   accountSchema,
@@ -11,7 +11,71 @@ import {
   billingSchema,
   billingSchemaOptional,
   presentationSchema,
+  verificationFormSchema,
 } from "../validation/profile";
+
+export async function verificationUpdate(prevState, formData) {
+  try {
+    const afm = formData.get("afm");
+    const brandName = formData.get("brandName");
+    const address = formData.get("address");
+    const phone = formData.get("phone");
+
+    const fields = {
+      afm,
+      brandName,
+      address,
+      phone,
+    };
+
+    const validationResult = verificationFormSchema.safeParse(fields);
+
+    if (!validationResult.success) {
+      const fieldErrors = {};
+
+      Object.entries(validationResult.error.flatten().fieldErrors).forEach(
+        ([field, messages]) => {
+          if (messages && messages.length > 0) {
+            fieldErrors[field] = {
+              field,
+              message: messages[0],
+            };
+          }
+        }
+      );
+
+      return {
+        data: null,
+        errors: fieldErrors,
+        message: null,
+      };
+    }
+
+    const data = await postData(VERIFICATION, {
+      data: {
+        afm,
+        brandName,
+        address,
+        phone,
+      },
+    });
+
+    if (!data?.data?.createEmail?.data?.id) {
+      return {
+        success: false,
+        message: "Αποτυχία αποστολής αίτησης πιστοποίησης. Δοκιμάστε ξανά.",
+      };
+    } else {
+      return {
+        success: true,
+        message: "Επιτυχία αποστολής αίτησης πιστοποίησης!",
+      };
+    }
+  } catch (error) {
+    console.error("Verification update failed:", error);
+    throw error;
+  }
+}
 
 export async function updateFreelancerStatus(id) {
   try {

@@ -1,5 +1,33 @@
 import { z } from "zod";
 
+export const verificationFormSchema = z.object({
+  afm: z
+    .number()
+    .refine((val) => val !== null && val.toString().length === 9, {
+      message: "Το ΑΦΜ πρέπει να έχει ακριβώς 9 ψηφία",
+    })
+    .nullable()
+    .refine((val) => val !== null, {
+      message: "Το ΑΦΜ είναι υποχρεωτικό",
+    }),
+  brandName: z
+    .string()
+    .min(2, "Η επωνυμία είναι υποχρεωτική")
+    .optional()
+    .nullable(),
+  address: z
+    .string()
+    .min(2, "Η διεύθυνση είναι υποχρεωτική")
+    .optional()
+    .nullable(),
+  phone: z
+    .number()
+    .min(1000000000, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")
+    .max(999999999999, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")
+    .optional()
+    .nullable(),
+});
+
 export const accountSchema = z.object({
   displayName: z
     .string()
