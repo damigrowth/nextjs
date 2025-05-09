@@ -13492,6 +13492,10 @@ section.pb40-md.pb90 > div > div.row.d-block.d-lg-none > div > div.row {
   font-weight: 500;
 }
 
+.text-orange {
+  color: #ff7800;
+}
+
 .bgorange {
   background-color: #fbf7ed;
 }
