@@ -3,6 +3,7 @@
 export default function SaveButton({
   hidden = false,
   isPending = false,
+  disabled = false,
   hasChanges = false,
   loadingText = "Ενημέρωση Στοιχείων...",
   defaultText = "Ενημέρωση Στοιχείων",
@@ -15,7 +16,7 @@ export default function SaveButton({
 }) {
   if (hidden) return null;
 
-  const isDisabled = !hasChanges || isPending;
+  const isDisabled = !hasChanges || isPending || disabled;
 
   const buttonClasses = `
     ud-btn 
