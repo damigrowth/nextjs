@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const verificationFormSchema = z.object({
-  afm: z
+  afm: z.coerce // Add coerce here
     .number()
     .refine((val) => val !== null && val.toString().length === 9, {
       message: "Το ΑΦΜ πρέπει να έχει ακριβώς 9 ψηφία",
@@ -20,7 +20,7 @@ export const verificationFormSchema = z.object({
     .min(2, "Η διεύθυνση είναι υποχρεωτική")
     .optional()
     .nullable(),
-  phone: z
+  phone: z.coerce // Add coerce here
     .number()
     .min(1000000000, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")
     .max(999999999999, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")

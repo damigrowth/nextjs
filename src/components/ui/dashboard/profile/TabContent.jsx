@@ -47,12 +47,21 @@ export async function TabContent() {
       content: <PresentationForm freelancer={freelancer} jwt={jwt} />,
       showForUser: false,
     },
-    {
-      index: 4,
-      label: "Πιστοποίηση",
-      content: <VerificationForm freelancer={freelancer} jwt={jwt} />,
-      showForUser: false,
-    },
+    freelancer.verified
+      ? null
+      : {
+          index: 4,
+          label: "Πιστοποίηση",
+          content: (
+            <VerificationForm
+              fid={freelancer.id}
+              email={freelancer.email}
+              verificationData={freelancer.verification}
+            />
+          ),
+          showForUser: false,
+        },
+
     {
       index: 4,
       label: "Στοιχεία Τιμολόγησης",

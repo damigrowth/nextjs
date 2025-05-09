@@ -409,8 +409,8 @@ const UPDATE_CHAT = gql`
 `;
 
 const VERIFICATION = gql`
-  mutation Contact($data: EmailInput!) {
-    createEmail(data: $data) {
+  mutation verification($data: VerificationInput!) {
+    createVerification(data: $data) {
       data {
         id
       }

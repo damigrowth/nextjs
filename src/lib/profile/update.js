@@ -16,11 +16,16 @@ import {
 
 export async function verificationUpdate(prevState, formData) {
   try {
+    // Get form values directly - let the Zod schema handle coercion
+    const fid = formData.get("fid");
+    const email = formData.get("email");
     const afm = formData.get("afm");
     const brandName = formData.get("brandName");
     const address = formData.get("address");
     const phone = formData.get("phone");
 
+    // Prepare the data for validation
+    // The z.coerce in the schema will handle string-to-number conversion
     const fields = {
       afm,
       brandName,
@@ -28,6 +33,7 @@ export async function verificationUpdate(prevState, formData) {
       phone,
     };
 
+    // Validate using Zod schema with coerce
     const validationResult = verificationFormSchema.safeParse(fields);
 
     if (!validationResult.success) {
@@ -51,29 +57,58 @@ export async function verificationUpdate(prevState, formData) {
       };
     }
 
+    const validatedData = validationResult.data;
+
+    // Make the API call with validated data
+    // The schema already coerced string values to numbers where needed
     const data = await postData(VERIFICATION, {
       data: {
-        afm,
-        brandName,
-        address,
-        phone,
+        afm: validatedData.afm,
+        brandName: validatedData.brandName || "",
+        address: validatedData.address || "",
+        phone: validatedData.phone,
+        email,
+        status: 2,
+        publishedAt: new Date(),
+        freelancer: fid,
       },
     });
 
-    if (!data?.data?.createEmail?.data?.id) {
+    // Check for successful response
+    if (!data?.data?.createVerification?.data?.id) {
       return {
-        success: false,
-        message: "Αποτυχία αποστολής αίτησης πιστοποίησης. Δοκιμάστε ξανά.",
+        data: null,
+        errors: {
+          submit: {
+            field: "submit",
+            message: "Αποτυχία αποστολής αίτησης πιστοποίησης. Δοκιμάστε ξανά.",
+          },
+        },
+        message: null,
       };
     } else {
+      revalidatePath("/dashboard/profile");
       return {
-        success: true,
+        data: data.data.createVerification.data,
+        errors: null,
         message: "Επιτυχία αποστολής αίτησης πιστοποίησης!",
       };
     }
   } catch (error) {
     console.error("Verification update failed:", error);
-    throw error;
+
+    return {
+      data: null,
+      errors: {
+        submit: {
+          field: "submit",
+          message:
+            error.message ||
+            "Προέκυψε σφάλμα κατά την επεξεργασία της αίτησης.",
+        },
+      },
+      message: null,
+    };
   }
 }
 
