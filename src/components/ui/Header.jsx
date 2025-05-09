@@ -9,24 +9,24 @@ import UserMenu from "../dashboard/header/UserMenu";
 
 export default function Header({ user, header }) {
   const categories = header
-    ? header.data.attributes.categories.data.map((item, i) => ({
+    ? header.data?.attributes?.categories?.data?.map((item, i) => ({
         id: i + 1,
-        label: item.attributes.label,
-        slug: item.attributes.slug,
-        icon: item.attributes.icon,
-        subcategories: item.attributes.subcategories.data.map(
-          (subcategory) => ({
-            label: subcategory.attributes.label,
-            slug: subcategory.attributes.slug,
-            subdivisions: subcategory.attributes.subdivisions.data.map(
-              (subdivision) => ({
-                label: subdivision.attributes.label,
-                slug: subdivision.attributes.slug,
-              })
-            ),
-          })
-        ),
-      }))
+        label: item.attributes?.label,
+        slug: item.attributes?.slug,
+        icon: item.attributes?.icon,
+        subcategories:
+          item.attributes?.subcategories?.data?.map((subcategory) => ({
+            label: subcategory.attributes?.label,
+            slug: subcategory.attributes?.slug,
+            subdivisions:
+              subcategory.attributes?.subdivisions?.data?.map(
+                (subdivision) => ({
+                  label: subdivision.attributes?.label,
+                  slug: subdivision.attributes?.slug,
+                })
+              ) || [],
+          })) || [],
+      })) || []
     : [];
   return (
     <>
