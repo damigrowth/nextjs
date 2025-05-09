@@ -3,15 +3,50 @@
 import React, { useMemo, useState } from "react";
 import { useActionState } from "react";
 import { verificationUpdate } from "@/lib/profile/update";
-import useEditProfileStore from "@/store/dashboard/profile";
 import InputB from "@/components/inputs/InputB";
 import Alert from "../../alerts/Alert";
 import SaveButton from "../../buttons/SaveButton";
-import RadioSelect from "../../Archives/Inputs/RadioSelect";
 import { useFormChanges } from "@/hook/useFormChanges";
 import PulsatingDot from "../../PulsatingDot";
 
+/**
+ * @typedef {object} VerificationData
+ * @property {object} [data] - The main data object for verification.
+ * @property {string} [data.id] - The ID of the verification record.
+ * @property {object} [data.attributes] - Attributes of the verification record.
+ * @property {string|null} [data.attributes.afm] - The AFM (tax number).
+ * @property {string} [data.attributes.brandName] - The brand name.
+ * @property {string} [data.attributes.address] - The billing address.
+ * @property {string|null} [data.attributes.phone] - The phone number.
+ * @property {object} [data.attributes.status] - The status object.
+ * @property {object} [data.attributes.status.data] - The data for the status.
+ * @property {object} [data.attributes.status.data.attributes] - Attributes of the status.
+ * @property {string} [data.attributes.status.data.attributes.type] - The type of verification status (e.g., "Active", "Pending").
+ */
+
+/**
+ * @typedef {object} FormState
+ * @property {any} data - Data returned from the server action.
+ * @property {object} errors - Validation errors from the server action.
+ * @property {string|null} message - A message from the server action (e.g., success message).
+ */
+
+/**
+ * VerificationForm component for freelancers to submit or view their verification details.
+ * It handles displaying the current verification status and allows users to submit
+ * verification information like AFM, brand name, address, and phone.
+ *
+ * @param {object} props - The component's props.
+ * @param {string} props.fid - The freelancer ID.
+ * @param {string} props.email - The freelancer's email.
+ * @param {VerificationData} props.verificationData - Existing verification data for the freelancer.
+ * @returns {JSX.Element} The verification form component.
+ */
 export default function VerificationForm({ fid, email, verificationData }) {
+  /**
+   * Initial state for the form action.
+   * @type {FormState}
+   */
   const initialState = {
     data: null,
     errors: {},
@@ -23,6 +58,11 @@ export default function VerificationForm({ fid, email, verificationData }) {
     initialState
   );
 
+  /**
+   * Original values of the verification form, derived from `verificationData` prop.
+   * Used to track changes in the form.
+   * @type {{id: string|null, afm: string|null, brandName: string, address: string, phone: string|null}}
+   */
   const originalValues = {
     id: verificationData?.data?.id || null,
     afm: verificationData?.data?.attributes?.afm || null,
@@ -36,13 +76,24 @@ export default function VerificationForm({ fid, email, verificationData }) {
   const [showForm, setShowForm] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
 
+  /**
+   * The type of the current verification status (e.g., "Active", "Pending").
+   * Extracted from `verificationData`.
+   * @type {string|undefined}
+   */
   const verificationStatusType =
     verificationData?.data?.attributes?.status?.data?.attributes?.type;
 
+  /**
+   * Determines and sets the form's title, visibility, and disabled state
+   * based on the `verificationStatusType`.
+   * This function is memoized using `useMemo` to run only when `verificationStatusType` changes.
+   */
   const getVerificationStatus = () => {
     if (verificationStatusType === "Active") {
       setTitle("Πιστοποιημένο Προφίλ");
       setShowForm(false);
+      setIsDisabled(false);
     } else if (verificationStatusType === "Pending") {
       setTitle("Πιστοποίηση σε Εξέληξη");
       setShowForm(true);
@@ -50,22 +101,32 @@ export default function VerificationForm({ fid, email, verificationData }) {
     } else {
       setTitle("Αίτηση Πιστοποίησης");
       setShowForm(true);
+      setIsDisabled(false);
     }
   };
 
+  /**
+   * `useMemo` hook to call `getVerificationStatus` when `verificationStatusType` changes.
+   * This updates the UI elements like title and form visibility based on the status.
+   */
   useMemo(() => getVerificationStatus(), [verificationStatusType]);
 
+  /**
+   * Handles changes to form input fields.
+   * Updates the `verification` state.
+   * Converts "afm" and "phone" fields to numbers, or null if empty.
+   *
+   * @param {string} name - The name of the input field.
+   * @param {string} value - The new value of the input field.
+   */
   const handleFieldChange = (name, value) => {
-    // For afm and phone, handle numeric conversion
     if (name === "afm" || name === "phone") {
-      // Convert to number if value exists and isn't empty, otherwise null
       const numValue = value && value.trim() !== "" ? Number(value) : null;
       setVerification((prevState) => ({
         ...prevState,
         [name]: numValue,
       }));
     } else {
-      // For string fields, use the value directly
       setVerification((prevState) => ({
         ...prevState,
         [name]: value,
@@ -76,8 +137,6 @@ export default function VerificationForm({ fid, email, verificationData }) {
   const { changes, hasChanges } = useFormChanges(verification, originalValues);
 
   const handleSubmit = async (formData) => {
-    // We'll let the server action and Zod schema handle the validation
-    // and coercion of values through the standard form submission
     return formAction(formData);
   };
 
@@ -195,7 +254,7 @@ export default function VerificationForm({ fid, email, verificationData }) {
 
             <SaveButton
               orientation="end"
-              disabled={isDisabled}
+              disabled={isDisabled || !hasChanges}
               isPending={isPending}
               hasChanges={hasChanges}
               variant="primary"
