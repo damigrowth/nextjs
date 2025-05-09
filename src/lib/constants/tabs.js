@@ -1,10 +1,11 @@
 // Map Greek tab names to English URL-friendly names
 export const tabNameToHash = {
-  "Λογαριασμός": "logariasmos",
+  Λογαριασμός: "logariasmos",
   "Βασικά Στοιχεία": "basikastoixeia",
   "Πρόσθετα Στοιχεία": "prostheta",
-  "Παρουσίαση": "parousiasi",
-  "Στοιχεία Τιμολόγησης": "timologisi"
+  Παρουσίαση: "parousiasi",
+  Πιστοποίηση: "pistopoihisi",
+  "Στοιχεία Τιμολόγησης": "timologisi",
 };
 
 // Map English URL-friendly names back to Greek tab names

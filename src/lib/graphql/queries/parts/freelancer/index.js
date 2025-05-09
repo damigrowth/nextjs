@@ -435,6 +435,25 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
         }
       }
     }
+    verification {
+      data {
+        id
+        attributes {
+          afm
+          brandName
+          address
+          phone
+          status {
+            data {
+              id
+              attributes {
+                type
+              }
+            }
+          }
+        }
+      }
+    }
     billing_details {
       ...BillingDetails
     }

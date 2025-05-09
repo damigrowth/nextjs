@@ -408,6 +408,16 @@ const UPDATE_CHAT = gql`
   }
 `;
 
+const VERIFICATION = gql`
+  mutation verification($data: VerificationInput!) {
+    createVerification(data: $data) {
+      data {
+        id
+      }
+    }
+  }
+`;
+
 export {
   POST_REVIEW,
   POST_SERVICE,
@@ -439,4 +449,5 @@ export {
   CREATE_CHAT,
   UPDATE_CHAT,
   CREATE_MESSAGE,
+  VERIFICATION,
 };
