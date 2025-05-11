@@ -418,6 +418,22 @@ const VERIFICATION = gql`
   }
 `;
 
+const CHANGE_PASSWORD = gql`
+  mutation changePassword(
+    $currentPassword: String!
+    $password: String! # Changed from $newPassword
+    $passwordConfirmation: String! # Changed from $confirmPassword
+  ) {
+    changePassword(
+      currentPassword: $currentPassword
+      password: $password # Use the new GQL variable
+      passwordConfirmation: $passwordConfirmation # Use the new GQL variable
+    ) {
+      jwt
+    }
+  }
+`;
+
 export {
   POST_REVIEW,
   POST_SERVICE,
@@ -450,4 +466,5 @@ export {
   UPDATE_CHAT,
   CREATE_MESSAGE,
   VERIFICATION,
+  CHANGE_PASSWORD,
 };

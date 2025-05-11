@@ -2643,7 +2643,7 @@ textarea.form-control-lg {
 .input-group-sm > .form-select {
   padding-right: 3rem;
 }
-.input-group:not(.has-validation) > .dropdown-toggle:nth-last-child(n + 3),
+/* .input-group:not(.has-validation) > .dropdown-toggle:nth-last-child(n + 3),
 .input-group:not(.has-validation)
   > .form-floating:not(:last-child)
   > .form-control,
@@ -2683,7 +2683,7 @@ textarea.form-control-lg {
 .input-group > .form-floating:not(:first-child) > .form-select {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-}
+} */
 .valid-feedback {
   display: none;
   width: 100%;
