@@ -9,8 +9,8 @@ import useEditProfileStore from "@/store/dashboard/profile";
 import Alert from "../../alerts/Alert";
 import { useFormChanges } from "@/hook/useFormChanges";
 import DeleteAccountForm from "../DeleteAccountForm";
-import DeleteModal from "@/components/dashboard/modal/DeleteModal";
 import ProfileImageInput from "@/components/inputs/ProfileImageInput";
+import ChangePasswordForm from "@/components/dashboard/section/ChangePasswordForm";
 
 export default function AccountForm({ freelancer, type, jwt }) {
   // Added jwt prop
@@ -286,6 +286,17 @@ export default function AccountForm({ freelancer, type, jwt }) {
             </div>
           </div>
 
+          <div className="ps-widget bdrs4 overflow-hidden position-relative pt10 pb10">
+            <button
+              type="button"
+              className="btn-none"
+              data-bs-toggle="modal"
+              data-bs-target="#changePasswordModal"
+            >
+              Αλλαγή Κωδικού
+            </button>
+          </div>
+
           {formState?.errors && (
             <Alert
               type="error"
@@ -310,6 +321,7 @@ export default function AccountForm({ freelancer, type, jwt }) {
           />
         </div>
       </form>
+      <ChangePasswordForm />
       <DeleteAccountForm username={username} />
     </>
   );

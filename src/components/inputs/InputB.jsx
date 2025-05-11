@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { formatInput } from "@/utils/InputFormats/formats";
 
 /**
@@ -58,6 +58,8 @@ export default function InputB({
   className,
   icon,
 }) {
+  const [showPassword, setShowPassword] = useState(false);
+
   /**
    * Handles the input change event.
    * Formats the raw input value based on props.
@@ -146,9 +148,11 @@ export default function InputB({
           {label}
         </label>
       )}
-      <div className="input-group">
+      <div className="input-group position-relative">
         <input
-          type={type}
+          type={
+            type === "password" ? (showPassword ? "text" : "password") : type
+          }
           id={id}
           name={name}
           min={min}
@@ -165,6 +169,28 @@ export default function InputB({
           inputMode={type === "number" ? "decimal" : "text"}
           pattern={type === "number" ? "[0-9]*" : undefined}
         />
+        {type === "password" && (
+          <button
+            type="button"
+            className="password-toggle"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              /* Basic styling, adjust as needed */ position: "absolute",
+              right: append ? "50px" : "10px", // Adjust if there's an append
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              padding: "0.375rem 0.75rem", // Match form-control padding
+              zIndex: 3, // Ensure it's above the input
+            }}
+          >
+            <i
+              className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
+            ></i>
+          </button>
+        )}
         {append && <span className="input-group-text">{append}</span>}
       </div>
       {errors && (
