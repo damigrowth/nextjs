@@ -9,7 +9,7 @@ import Body from "@/components/ui/Body";
 import Footer from "@/components/ui/Footer";
 import { getData } from "@/lib/client/operations";
 import { ROOT_LAYOUT_WITH_ACTIVE_SERVICES } from "@/lib/graphql/queries/main/global";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ApolloWrapper } from "@/lib/client/apollo-wrapper";
 import { CookiesBanner } from "@/components/ui/banners/CookiesBanner";
@@ -39,24 +39,7 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="el">
-      {/* Google Tag Manager */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src= 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f); })(window,document,'script','dataLayer','GTM-KR7N94L4');`,
-        }}
-      />
-      {/* End Google Tag Manager */}
       <Body>
-        {/* Google Tag Manager (noscript) */}
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-KR7N94L4"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          ></iframe>
-        </noscript>
-        {/* End Google Tag Manager (noscript) */}
         <InstallBootstrap />
         <div className="wrapper ovh mm-page mm-slideout">
           {(!isUnderMaintenance || authenticated) && (
@@ -82,6 +65,7 @@ export default async function RootLayout({ children }) {
           <NavMenuMobileWrapper header={headerData} />
         </PathChecker>
         <SpeedInsights />
+        <GoogleTagManager gtmId="GTM-KR7N94L4" />
         <GoogleAnalytics gaId={gaId} />
         <CookiesBanner />
       </Body>
