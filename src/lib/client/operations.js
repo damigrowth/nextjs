@@ -244,8 +244,30 @@ export const postData = async (mutation, variables, jwt) => {
     // });
 
     // Log the full error response
-    if (error.networkError?.result) {
-      console.log("GraphQL Response Errors:", error.networkError.result.errors);
+    console.error(
+      "[postData Vercel Debug] Raw Apollo Client Error Object:",
+      JSON.stringify(error, Object.getOwnPropertyNames(error))
+    );
+    if (error.graphQLErrors) {
+      console.error(
+        "[postData Vercel Debug] graphQLErrors:",
+        JSON.stringify(error.graphQLErrors)
+      );
+    }
+    if (error.networkError) {
+      console.error(
+        "[postData Vercel Debug] networkError:",
+        JSON.stringify(
+          error.networkError,
+          Object.getOwnPropertyNames(error.networkError)
+        )
+      );
+      if (error.networkError?.result?.errors) {
+        console.error(
+          "[postData Vercel Debug] networkError.result.errors:",
+          JSON.stringify(error.networkError.result.errors)
+        );
+      }
     }
 
     const fieldErrors = {};
@@ -263,6 +285,15 @@ export const postData = async (mutation, variables, jwt) => {
     const translatedMainErrorMessage =
       strapiErrorTranslations[mainErrorMessage] || mainErrorMessage;
 
+    console.error(
+      "[postData Vercel Debug] mainErrorMessage:",
+      mainErrorMessage
+    );
+    console.error(
+      "[postData Vercel Debug] translatedMainErrorMessage:",
+      translatedMainErrorMessage
+    );
+
     const translatedFieldErrors = {};
     if (error.graphQLErrors?.[0]?.extensions?.errors) {
       Object.entries(error.graphQLErrors[0].extensions.errors).forEach(
@@ -275,6 +306,10 @@ export const postData = async (mutation, variables, jwt) => {
         }
       );
     }
+    console.error(
+      "[postData Vercel Debug] translatedFieldErrors:",
+      JSON.stringify(translatedFieldErrors)
+    );
 
     return {
       error: translatedMainErrorMessage,
