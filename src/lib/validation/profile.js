@@ -33,12 +33,6 @@ export const accountSchema = z.object({
     .string()
     .min(2, "Το όνομα προβολής πρέπει να έχει τουλάχιστον 2 χαρακτήρες")
     .max(50, "Το όνομα προβολής δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες"),
-  phone: z
-    .number()
-    .min(1000000000, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")
-    .max(999999999999, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")
-    .optional()
-    .nullable(),
 });
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
@@ -208,8 +202,6 @@ export const basicInfoSchema = z.object({
     .optional()
     .nullable()
     .or(z.literal("")),
-  rate: z.number().min(10).max(50000).optional(),
-  commencement: z.number().min(1900).max(new Date().getFullYear()).optional(),
 });
 
 export const presentationSchema = z.object({
@@ -370,6 +362,13 @@ export const presentationSchema = z.object({
     address: z.boolean(),
   }),
   portfolio: z.array(z.any()).optional(),
+  // Added phone validation
+  phone: z
+    .number()
+    .min(1000000000, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")
+    .max(999999999999, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")
+    .optional()
+    .nullable(),
 });
 
 export const additionalInfoSchema = z.object({
@@ -401,6 +400,14 @@ export const additionalInfoSchema = z.object({
   contactTypes: z.array(z.string()).optional().nullable(),
   payment_methods: z.array(z.string()).optional().nullable(),
   settlement_methods: z.array(z.string()).optional().nullable(),
+  // Added rate and commencement
+  rate: z.number().min(10).max(50000).optional().nullable(),
+  commencement: z
+    .number()
+    .min(1900)
+    .max(new Date().getFullYear())
+    .optional()
+    .nullable(),
 });
 
 export const billingSchemaOptional = z.object({

@@ -58,10 +58,6 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
     setSubcategory,
     skills,
     setSkills,
-    rate,
-    setRate,
-    commencement,
-    setCommencement,
     coverage,
     setCoverage,
     switchCoverageMode,
@@ -91,8 +87,6 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
     subcategory: freelancer.subcategory,
     skills: freelancer.skills,
     specialization: freelancer.specialization,
-    rate: Number(freelancer.rate) || 0,
-    commencement: Number(freelancer.commencement) || 0,
     coverage: freelancer.coverage,
   };
 
@@ -104,8 +98,6 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
     subcategory,
     skills,
     specialization,
-    rate: Number(rate) || 0,
-    commencement: Number(commencement) || 0,
     coverage,
   };
 
@@ -396,7 +388,6 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
         validationResult?.errors &&
         Object.keys(validationResult.errors).length > 0
       ) {
-        
         setIsSubmitting(false);
         return; // Stop the submission if validation fails
       }
@@ -499,8 +490,6 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
     }
   }, [formState?.errors]);
 
-  
-
   return (
     <form action={handleSubmit}>
       <div className="form-style1">
@@ -508,18 +497,28 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           <h5 className="list-title heading">Βασικά Στοιχεία</h5>
         </div>
 
-        <p className="text-muted mb0">Για τη δημόσια προβολή του προφίλ θα πρέπει να υπάρχουν:</p>
+        <p className="text-muted mb0">
+          Για τη δημόσια προβολή του προφίλ θα πρέπει να υπάρχουν:
+        </p>
         <div className="text-muted mb30">
           <div className="d-flex align-items-center mb2">
-            <span className="me-2" style={{ color: '#6c757d' }}>•</span>
-            <span>Εικόνα Προφίλ (Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο)</span>
+            <span className="me-2" style={{ color: "#6c757d" }}>
+              •
+            </span>
+            <span>
+              Εικόνα Προφίλ (Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο)
+            </span>
           </div>
           <div className="d-flex align-items-center mb2">
-            <span className="me-2" style={{ color: '#6c757d' }}>•</span>
+            <span className="me-2" style={{ color: "#6c757d" }}>
+              •
+            </span>
             <span>Κατηγορία/Υποκατηγορία</span>
           </div>
           <div className="d-flex align-items-center">
-            <span className="me-2" style={{ color: '#6c757d' }}>•</span>
+            <span className="me-2" style={{ color: "#6c757d" }}>
+              •
+            </span>
             <span>Τρόποι παροχής των Υπηρεσιών (τουλάχιστον μία επιλογή)</span>
           </div>
         </div>
@@ -611,7 +610,9 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           </div>
         </div>
         <div className="boxede">
-          <label className="form-label fw700 dark-color mb10">Τρόποι παροχής των Υπηρεσιών*</label>
+          <label className="form-label fw700 dark-color mb10">
+            Τρόποι παροχής των Υπηρεσιών*
+          </label>
           <div className="row ">
             <label className="form-label dark-color mb10">
               Προσφέρω τις υπηρεσίες:
@@ -704,7 +705,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                   capitalize
                   errors={formState?.errors?.area}
                   customStyles={{
-                    indicatorsContainer: () => ({ display: 'none' })
+                    indicatorsContainer: () => ({ display: "none" }),
                   }}
                 />
               </div>
@@ -720,7 +721,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
                   capitalize
                   errors={formState?.errors?.county}
                   customStyles={{
-                    indicatorsContainer: () => ({ display: 'none' })
+                    indicatorsContainer: () => ({ display: "none" }),
                   }}
                 />
               </div>
@@ -801,55 +802,22 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
             />
           </div>
           <div className="col-md-3">
-          <SearchableSelect
-            name="specialization"
-            label="Εξειδίκευση"
-            labelPlural="εξειδικεύσεις"
-            value={specialization.data || null}
-            staticOptions={specializations}
-            onSelect={handleSpecializationSelect}
-            isMulti={false}
-            isClearable={true}
-            formatSymbols
-            capitalize
-            errors={formState?.errors?.specialization}
-            isDisabled={skills?.data?.length === 0}
-            resetDependency={
-              skills.data ? skills.data.map((s) => s.id).join("-") : "none"
-            }
-          />
-        </div>
-        </div>
-      
-
-        <div className="row">
-          <div className="mb10 col-sm-3">
-            <InputB
-              label="Έτος έναρξης δραστηριότητας"
-              id="commencement"
-              name="commencement"
-              type="number"
-              min={1900}
-              max={2025}
-              value={commencement || ""}
-              onChange={setCommencement}
-              className="form-control input-group"
-              errors={formState?.errors?.commencement}
-            />
-          </div>
-          <div className="mb10 col-sm-2">
-            <InputB
-              label="Μέση Αμοιβή / ώρα"
-              id="rate"
-              name="rate"
-              type="number"
-              min={10}
-              max={50000}
-              value={rate || ""}
-              onChange={setRate}
-              className="form-control input-group"
-              append="€"
-              errors={formState?.errors?.rate}
+            <SearchableSelect
+              name="specialization"
+              label="Εξειδίκευση"
+              labelPlural="εξειδικεύσεις"
+              value={specialization.data || null}
+              staticOptions={specializations}
+              onSelect={handleSpecializationSelect}
+              isMulti={false}
+              isClearable={true}
+              formatSymbols
+              capitalize
+              errors={formState?.errors?.specialization}
+              isDisabled={skills?.data?.length === 0}
+              resetDependency={
+                skills.data ? skills.data.map((s) => s.id).join("-") : "none"
+              }
             />
           </div>
         </div>
