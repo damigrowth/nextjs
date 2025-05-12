@@ -57,6 +57,8 @@ export default function PresentationForm({ freelancer, jwt }) {
     setViber,
     whatsapp,
     setWhatsapp,
+    phone, // Added phone state
+    setPhone, // Added phone setter
   } = useEditProfileStore();
 
   /**
@@ -113,6 +115,7 @@ export default function PresentationForm({ freelancer, jwt }) {
     },
     viber: freelancer.viber || null,
     whatsapp: freelancer.whatsapp || null,
+    phone: freelancer.phone ? Number(freelancer.phone) : null, // Added phone
   };
 
   /**
@@ -125,6 +128,7 @@ export default function PresentationForm({ freelancer, jwt }) {
     socials,
     viber,
     whatsapp,
+    phone: phone ? Number(phone) : null, // Added phone
   };
 
   /**
@@ -382,6 +386,9 @@ export default function PresentationForm({ freelancer, jwt }) {
         formChangesToValidate.viber = changes.viber;
       if (changes.whatsapp !== undefined)
         formChangesToValidate.whatsapp = changes.whatsapp;
+      if (changes.phone !== undefined)
+        // Added phone validation check
+        formChangesToValidate.phone = changes.phone;
 
       const mediaValidationState = {
         hasNewMedia: mediaState.media.some((item) => item.file instanceof File),
@@ -462,6 +469,10 @@ export default function PresentationForm({ freelancer, jwt }) {
         formChanges.whatsapp =
           changes.whatsapp === "" ? null : changes.whatsapp;
       }
+      if (changes.phone !== undefined) {
+        // Added phone to final changes
+        formChanges.phone = changes.phone === "" ? null : Number(changes.phone);
+      }
 
       finalFormData.append("changes", JSON.stringify(formChanges));
 
@@ -515,10 +526,45 @@ export default function PresentationForm({ freelancer, jwt }) {
         <div className="bdrb1 pb15 mb25">
           <h5 className="list-title heading">Παρουσίαση</h5>
         </div>
+
+        {/* 1st row: Phone - Website */}
+        <div className="row mb20">
+          <div className="col-md-3">
+            <InputB
+              label="Τηλέφωνο"
+              id="phone"
+              name="phone"
+              type="tel"
+              pattern="[0-9]*"
+              inputMode="numeric"
+              value={phone || ""}
+              onChange={setPhone}
+              className="form-control input-group"
+              errors={formState?.errors?.phone}
+              icon="fa fa-phone" // Optional: Add an icon
+            />
+          </div>
+          <div className="col-md-3">
+            <InputB
+              label="Ιστότοπος"
+              id="website"
+              name="website"
+              type="url"
+              placeholder="https://selida.gr"
+              value={website}
+              onChange={setWebsite}
+              className="form-control input-group"
+              errors={formState?.errors?.website}
+              icon="fa fa-globe"
+            />
+          </div>
+        </div>
+
+        {/* 2nd row: Visibility Toggles */}
         <label className="form-label fw700 dark-color mb10">
           Εμφάνιση στο προφίλ
         </label>
-        <div className="row">
+        <div className="row mb40">
           <div className="col-md-2">
             <SwitchB
               label="Email"
@@ -545,21 +591,23 @@ export default function PresentationForm({ freelancer, jwt }) {
           </div>
         </div>
 
-        <div className="row mb40 mt40">
-          <div className="col-md-3">
-            <InputB
-              label="Ιστότοπος"
-              id="website"
-              name="website"
-              type="url"
-              placeholder="https://selida.gr"
-              value={website}
-              onChange={setWebsite}
-              className="form-control input-group"
-              errors={formState?.errors?.website}
-              icon="fa fa-globe"
-            />
-          </div>
+        {/* 3rd row: Media Gallery */}
+        <label className="form-label fw700 dark-color mb10">
+          Δείγμα εργασιών
+        </label>
+        <MediaGallery
+          initialMedia={freelancer.portfolio?.data || []}
+          onUpdate={handleMediaUpdate}
+          onSave={handleMediaSave}
+          isPending={isSubmitting || isPending}
+          custom={true}
+          maxSize={15}
+          maxVideos={3}
+          maxAudio={3}
+        />
+
+        {/* 4th row: Viber - Whatsapp */}
+        <div className="row mb20 mt40">
           <div className="col-md-3">
             <InputB
               label="Viber"
@@ -594,26 +642,15 @@ export default function PresentationForm({ freelancer, jwt }) {
           </div>
         </div>
 
-        <label className="form-label fw700 dark-color">Κοινωνικά Δίκτυα</label>
+        {/* 5th row: Social Networks */}
+        <label className="form-label fw700 dark-color mt20">
+          Κοινωνικά Δίκτυα
+        </label>
         <SocialsInputs
           data={socials}
           username={freelancer.username}
           onChange={setSocial}
           errors={socialErrors}
-        />
-
-        <label className="form-label fw700 dark-color mb0">
-          Δείγμα εργασιών
-        </label>
-        <MediaGallery
-          initialMedia={freelancer.portfolio?.data || []}
-          onUpdate={handleMediaUpdate}
-          onSave={handleMediaSave}
-          isPending={isSubmitting || isPending}
-          custom={true}
-          maxSize={15}
-          maxVideos={3}
-          maxAudio={3}
         />
 
         {formState?.errors && formState?.errors?.submit && (

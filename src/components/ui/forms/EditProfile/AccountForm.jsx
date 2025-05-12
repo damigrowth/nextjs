@@ -27,27 +27,17 @@ export default function AccountForm({ freelancer, type, jwt }) {
 
   const isUser = type === "user";
 
-  const {
-    image,
-    setImage,
-    email,
-    username,
-    displayName,
-    phone,
-    setDisplayName,
-    setPhone,
-  } = useEditProfileStore();
+  const { image, setImage, email, username, displayName, setDisplayName } =
+    useEditProfileStore();
 
   // Conditionally define values based on user type
   const originalValues = {
     displayName: freelancer.displayName,
-    phone: freelancer.phone ? Number(freelancer.phone) : null,
     ...(isUser && { image: freelancer.image || { data: null } }), // Include image only for users
   };
 
   const currentValues = {
     displayName,
-    phone: phone ? Number(phone) : null,
     ...(isUser && { image }), // Include image only for users
   };
 
@@ -268,20 +258,6 @@ export default function AccountForm({ freelancer, type, jwt }) {
                 onChange={setDisplayName}
                 className="form-control input-group"
                 errors={formState?.errors?.displayName}
-              />
-            </div>
-            <div className="mb10 col-md-3">
-              <InputB
-                label="Τηλέφωνο"
-                id="phone"
-                name="phone"
-                type="tel"
-                pattern="[0-9]*"
-                inputMode="numeric"
-                value={phone || ""}
-                onChange={setPhone}
-                className="form-control input-group"
-                errors={formState?.errors?.phone}
               />
             </div>
           </div>

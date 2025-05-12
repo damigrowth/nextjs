@@ -1,5 +1,6 @@
 "use client";
 
+import InputB from "@/components/inputs/InputB"; // Added import
 import TextArea from "@/components/inputs/TextArea";
 import useEditProfileStore from "@/store/dashboard/profile";
 import { useActionState, useCallback } from "react";
@@ -35,6 +36,10 @@ export default function AdditionalInfoForm({ freelancer, type }) {
     setSettlementMethods,
     size,
     setSize,
+    rate, // Added state
+    setRate, // Added setter
+    commencement, // Added state
+    setCommencement, // Added setter
   } = useEditProfileStore();
 
   const initialState = {
@@ -65,6 +70,16 @@ export default function AdditionalInfoForm({ freelancer, type }) {
 
   const getChangedFields = () => {
     const changes = {};
+
+    // Check rate changes
+    if (Number(rate) !== (Number(freelancer.rate) || 0)) {
+      changes.rate = Number(rate) || 0;
+    }
+
+    // Check commencement changes
+    if (Number(commencement) !== (Number(freelancer.commencement) || 0)) {
+      changes.commencement = Number(commencement) || 0;
+    }
 
     const sizeDataChanged = size?.data?.id !== freelancer.size?.data?.id;
 
@@ -227,6 +242,39 @@ export default function AdditionalInfoForm({ freelancer, type }) {
       <div className="form-style1">
         <div className="bdrb1 pb15 mb25">
           <h5 className="list-title heading">Πρόσθετα Στοιχεία</h5>
+        </div>
+
+        {/* Added row for commencement and rate */}
+        <div className="row mb20">
+          <div className="mb10 col-sm-3">
+            <InputB
+              label="Έτος έναρξης δραστηριότητας"
+              id="commencement"
+              name="commencement"
+              type="number"
+              min={1900}
+              max={2025}
+              value={commencement || ""}
+              onChange={setCommencement}
+              className="form-control input-group"
+              errors={formState?.errors?.commencement}
+            />
+          </div>
+          <div className="mb10 col-sm-2">
+            <InputB
+              label="Μέση Αμοιβή / ώρα"
+              id="rate"
+              name="rate"
+              type="number"
+              min={10}
+              max={50000}
+              value={rate || ""}
+              onChange={setRate}
+              className="form-control input-group"
+              append="€"
+              errors={formState?.errors?.rate}
+            />
+          </div>
         </div>
 
         <div className="row mb20">
