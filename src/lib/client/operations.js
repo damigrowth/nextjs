@@ -14,6 +14,23 @@ import { getToken } from "../auth/token";
 import { CACHE_CONFIG } from "../cache/config";
 import { normalizeQuery } from "@/utils/queries";
 
+// Translation map for common Strapi errors
+const strapiErrorTranslations = {
+  "Invalid identifier or password": "Λάθος email ή κωδικός",
+  "Email or Username are already taken":
+    "Το email ή το Username χρησιμοποιούνται ήδη",
+  "An error occurred during account creation":
+    "Προέκυψε σφάλμα κατά τη δημιουργία λογαριασμού",
+  "Email is not confirmed": "Το email δεν έχει επιβεβαιωθεί",
+  "Your account has been disabled": "Ο λογαριασμός σας έχει απενεργοποιηθεί",
+  "A user with this email has already registered":
+    "Ένας χρήστης με αυτό το email έχει ήδη εγγραφεί",
+  "Invalid code provided": "Μη έγκυρος κωδικός",
+  "This email is already taken": "Αυτό το email χρησιμοποιείται ήδη",
+  "Username already taken": "Το Username χρησιμοποιείται ήδη",
+  // Add more translations as needed
+};
+
 export async function fetchWithRetry(url, options, retries = 3, backoff = 300) {
   for (let i = 0; i < retries; i++) {
     try {
@@ -115,8 +132,8 @@ const getDataInternal = async (
     if (!response.ok) {
       const clonedResponse = response.clone();
       const errorData = await clonedResponse.json();
-      console.log("GraphQL error:", errorData?.errors);
-      console.log("GraphQL response status:", response?.status);
+      // console.log("GraphQL error:", errorData?.errors);
+      // console.log("GraphQL response status:", response?.status);
     }
 
     const jsonResponse = await response.json();
@@ -220,11 +237,11 @@ export const postData = async (mutation, variables, jwt) => {
     });
     return { data };
   } catch (error) {
-    console.error("GraphQL Error:", {
-      message: error.message,
-      graphQLErrors: error.graphQLErrors,
-      networkError: error.networkError,
-    });
+    // console.error("GraphQL Error:", {
+    //   message: error.message,
+    //   graphQLErrors: error.graphQLErrors,
+    //   networkError: error.networkError,
+    // });
 
     // Log the full error response
     if (error.networkError?.result) {
@@ -241,9 +258,27 @@ export const postData = async (mutation, variables, jwt) => {
       );
     }
 
+    const mainErrorMessage =
+      error.graphQLErrors?.[0]?.message || "An error occurred";
+    const translatedMainErrorMessage =
+      strapiErrorTranslations[mainErrorMessage] || mainErrorMessage;
+
+    const translatedFieldErrors = {};
+    if (error.graphQLErrors?.[0]?.extensions?.errors) {
+      Object.entries(error.graphQLErrors[0].extensions.errors).forEach(
+        ([key, value]) => {
+          // Assuming value[0].message is the error message for the field
+          const fieldErrorMessage = value[0].message;
+          translatedFieldErrors[key] = [
+            strapiErrorTranslations[fieldErrorMessage] || fieldErrorMessage,
+          ];
+        }
+      );
+    }
+
     return {
-      error: error.graphQLErrors?.[0]?.message || "An error occurred",
-      errors: fieldErrors,
+      error: translatedMainErrorMessage,
+      errors: translatedFieldErrors,
     };
   }
 };
