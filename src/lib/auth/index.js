@@ -97,6 +97,13 @@ export async function login(prevState, formData) {
     identifier: formData.get("identifier"),
     password: formData.get("password"),
   });
+  console.log(
+    "%cMyProject%cline:96%cvalidatedFields",
+    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+    "color:#fff;background:rgb(131, 175, 155);padding:3px;border-radius:2px",
+    validatedFields
+  );
 
   if (!validatedFields.success) {
     return {
@@ -111,7 +118,13 @@ export async function login(prevState, formData) {
     identifier,
     password,
   });
-
+  console.log(
+    "%cMyProject%cline:112%cresponse",
+    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+    "color:#fff;background:rgb(20, 68, 106);padding:3px;border-radius:2px",
+    response
+  );
   if (response?.data?.login?.jwt) {
     await setToken(response.data.login.jwt);
     redirect("/dashboard/profile");
