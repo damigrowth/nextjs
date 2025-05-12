@@ -115,14 +115,16 @@ export default function AddServiceForm({ coverage, jwt }) {
         }
         return false;
 
+      case "addonsFaq": // Combined step is optional
+        return false;
+
       case "gallery":
         // Check if media is uploaded
         const { media } = useCreateServiceStore.getState();
         return media.length === 0;
 
-      // For addons and faq, they're usually optional
       default:
-        return false;
+        return false; // Default to not disabled
     }
   };
 
@@ -165,15 +167,16 @@ export default function AddServiceForm({ coverage, jwt }) {
           savePackages();
           success = !errors || !errors.active;
           break;
-        case "addons":
-          // Save addons
+        // case "addons": // This case is now redundant
+        //   // Save addons
+        //   saveAddons();
+        //   success = true; // Always true as it's optional
+        //   break;
+        case "addonsFaq": // Combined step
+          // Save addons and faq
           saveAddons();
-          success = true; // Always true as it's optional
-          break;
-        case "faq":
-          // Save faq
           saveFaq();
-          success = true; // Always true as it's optional
+          success = true; // Always true as both are optional
           break;
         case "gallery":
           // Save gallery and validate
@@ -318,8 +321,12 @@ export default function AddServiceForm({ coverage, jwt }) {
           <>
             {step === "type" && <ServiceType coverage={coverage} />}
             {step === "packages" && <ServicePackages />}
-            {step === "addons" && <ServiceAddons />}
-            {step === "faq" && <ServiceFaq />}
+            {step === "addonsFaq" && ( // Render both for combined step
+              <>
+                <ServiceAddons />
+                <ServiceFaq />
+              </>
+            )}
             {step === "gallery" && (
               <ServiceGallery isPending={isSubmitting || isPending} />
             )}

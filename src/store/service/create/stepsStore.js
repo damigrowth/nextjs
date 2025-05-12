@@ -6,18 +6,15 @@ const initialFixedStepsTypeState = {
   },
   info: {
     previous: "type",
-    next: "addons",
+    next: "addonsFaq", // Changed
   },
-  addons: {
+  addonsFaq: {
+    // New combined step
     previous: "info",
-    next: "faq",
-  },
-  faq: {
-    previous: "addons",
     next: "gallery",
   },
   gallery: {
-    previous: "faq",
+    previous: "addonsFaq", // Changed
     next: null,
   },
 };
@@ -32,18 +29,15 @@ const initialPackagesStepsTypeState = {
   },
   packages: {
     previous: "info",
-    next: "addons",
+    next: "addonsFaq", // Changed
   },
-  addons: {
+  addonsFaq: {
+    // New combined step
     previous: "packages",
-    next: "faq",
-  },
-  faq: {
-    previous: "addons",
     next: "gallery",
   },
   gallery: {
-    previous: "faq",
+    previous: "addonsFaq", // Changed
     next: null,
   },
 };
