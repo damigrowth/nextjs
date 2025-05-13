@@ -13,12 +13,13 @@ import { cache } from "react";
 import { getToken } from "../auth/token";
 import { CACHE_CONFIG } from "../cache/config";
 import { normalizeQuery } from "@/utils/queries";
+import { strapiErrorTranslations } from "@/utils/errors";
 
 export async function fetchWithRetry(url, options, retries = 3, backoff = 300) {
   for (let i = 0; i < retries; i++) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
+      const timeout = setTimeout(() => controller.abort(), 10000); // Increased timeout to 10 seconds
 
       const response = await fetch(url, {
         ...options,
@@ -115,8 +116,8 @@ const getDataInternal = async (
     if (!response.ok) {
       const clonedResponse = response.clone();
       const errorData = await clonedResponse.json();
-      console.log("GraphQL error:", errorData?.errors);
-      console.log("GraphQL response status:", response?.status);
+      // console.log("GraphQL error:", errorData?.errors);
+      // console.log("GraphQL response status:", response?.status);
     }
 
     const jsonResponse = await response.json();
@@ -220,17 +221,6 @@ export const postData = async (mutation, variables, jwt) => {
     });
     return { data };
   } catch (error) {
-    console.error("GraphQL Error:", {
-      message: error.message,
-      graphQLErrors: error.graphQLErrors,
-      networkError: error.networkError,
-    });
-
-    // Log the full error response
-    if (error.networkError?.result) {
-      console.log("GraphQL Response Errors:", error.networkError.result.errors);
-    }
-
     const fieldErrors = {};
 
     if (error.graphQLErrors?.[0]?.extensions?.errors) {
@@ -241,9 +231,27 @@ export const postData = async (mutation, variables, jwt) => {
       );
     }
 
+    const mainErrorMessage =
+      error.graphQLErrors?.[0]?.message || "An error occurred";
+    const translatedMainErrorMessage =
+      strapiErrorTranslations[mainErrorMessage] || mainErrorMessage;
+
+    const translatedFieldErrors = {};
+    if (error.graphQLErrors?.[0]?.extensions?.errors) {
+      Object.entries(error.graphQLErrors[0].extensions.errors).forEach(
+        ([key, value]) => {
+          // Assuming value[0].message is the error message for the field
+          const fieldErrorMessage = value[0].message;
+          translatedFieldErrors[key] = [
+            strapiErrorTranslations[fieldErrorMessage] || fieldErrorMessage,
+          ];
+        }
+      );
+    }
+
     return {
-      error: error.graphQLErrors?.[0]?.message || "An error occurred",
-      errors: fieldErrors,
+      error: translatedMainErrorMessage,
+      errors: translatedFieldErrors,
     };
   }
 };
@@ -265,13 +273,13 @@ export const putData = async (mutation, variables) => {
     });
     return data;
   } catch (error) {
-    if (error.graphQLErrors) {
-      console.log("GraphQL Errors:", error.graphQLErrors);
-    }
-    if (error.networkError) {
-      console.log("Network Error:", error.networkError);
-    }
-    console.log("Failed to put GraphQL data!", error);
+    // if (error.graphQLErrors) {
+    //   console.log("GraphQL Errors:", error.graphQLErrors);
+    // }
+    // if (error.networkError) {
+    //   console.log("Network Error:", error.networkError);
+    // }
+    // console.log("Failed to put GraphQL data!", error);
   }
 };
 

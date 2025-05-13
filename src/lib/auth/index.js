@@ -1,23 +1,16 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { z } from "zod";
 import {
-  // REGISTER_USER, // Keep commented or remove if not used elsewhere
-  START_REGISTRATION, // Import the new mutation
-  COMPLETE_REGISTRATION, // Import the new mutation
-  UPDATE_USER,
-  CREATE_FREELANCER,
+  START_REGISTRATION,
+  COMPLETE_REGISTRATION,
   FORGOT_PASSWORD,
   RESET_PASSWORD,
   LOGIN_USER,
-  EMAIL_CONFIRMATION, // Keep for completeRegistration for now
 } from "../graphql/mutations";
 import { postData } from "../client/operations";
 import { loginSchema, registerSchema } from "../validation/auth";
 import { removeToken, setToken } from "./token";
-import { inspect } from "@/utils/inspect";
-import { cookies } from "next/headers";
 
 /**
  * Server action to handle the first step of user registration (startRegistration).
