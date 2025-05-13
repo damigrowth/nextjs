@@ -1,23 +1,16 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { z } from "zod";
 import {
-  // REGISTER_USER, // Keep commented or remove if not used elsewhere
-  START_REGISTRATION, // Import the new mutation
-  COMPLETE_REGISTRATION, // Import the new mutation
-  UPDATE_USER,
-  CREATE_FREELANCER,
+  START_REGISTRATION,
+  COMPLETE_REGISTRATION,
   FORGOT_PASSWORD,
   RESET_PASSWORD,
   LOGIN_USER,
-  EMAIL_CONFIRMATION, // Keep for completeRegistration for now
 } from "../graphql/mutations";
 import { postData } from "../client/operations";
 import { loginSchema, registerSchema } from "../validation/auth";
 import { removeToken, setToken } from "./token";
-import { inspect } from "@/utils/inspect";
-import { cookies } from "next/headers";
 
 /**
  * Server action to handle the first step of user registration (startRegistration).
@@ -97,13 +90,6 @@ export async function login(prevState, formData) {
     identifier: formData.get("identifier"),
     password: formData.get("password"),
   });
-  console.log(
-    "%cMyProject%cline:96%cvalidatedFields",
-    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-    "color:#fff;background:rgb(131, 175, 155);padding:3px;border-radius:2px",
-    validatedFields
-  );
 
   if (!validatedFields.success) {
     return {
@@ -118,13 +104,7 @@ export async function login(prevState, formData) {
     identifier,
     password,
   });
-  console.log(
-    "%cMyProject%cline:112%cresponse",
-    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-    "color:#fff;background:rgb(20, 68, 106);padding:3px;border-radius:2px",
-    response
-  );
+
   if (response?.data?.login?.jwt) {
     await setToken(response.data.login.jwt);
     redirect("/dashboard/profile");
