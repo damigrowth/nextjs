@@ -148,7 +148,7 @@ export default async function page({ params, searchParams }) {
     page: "subd_p",
     pageSize: "subd_ps",
     // Use filtered results if available, otherwise use search results
-    options: categorySearch ? subdivisionsSearch?.data : subdivisionsForFilteredResults?.data,
+    options: categorySearch ? (subdivisionsSearch?.data || []) : (subdivisionsForFilteredResults?.data || []),
     pagination: categorySearch ? subdivisionsSearch?.meta?.pagination : subdivisionsForFilteredResults?.meta?.pagination,
     rootLabel: "Όλες οι κατηγορίες",
     defaultLabel: `${

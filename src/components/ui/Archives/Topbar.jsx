@@ -6,7 +6,7 @@ import SearchChip from "./Chips/SearchChip";
 export default function Topbar({ meta, single, plural, sortOptions }) {
   let total = 0;
 
-  if (meta.total === 0) {
+  if (!meta || meta.total === 0) {
     total = `0 ${plural}`;
   } else if (meta.total === 1) {
     total = meta.total + " " + single;

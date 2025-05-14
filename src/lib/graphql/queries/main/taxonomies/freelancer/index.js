@@ -1,17 +1,137 @@
 import { gql } from "@apollo/client";
 import { PAGINATION, SINGLE_IMAGE } from "../../../fragments/global";
 
-// const FREELANCER_CATEGORIES = gql`
-//   query GetFreelancerCategories {
-//     freelancerCategories(sort: "label:asc") {
-//       data {
-//         ...FreelancerCategoryFull
-//       }
-//     }
-//   }
-//   ${FREELANCER_CATEGORY_FULL}
-// `;
+// Fixed FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS query
+const FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS = gql`
+  query FreelancerCategoriesForFilteredFreelancers(
+    $min: Int
+    $max: Int
+    $paymentMethods: [ID]
+    $contactTypes: [ID]
+    $coverageOnline: Boolean
+    $coverageCounty: ID
+    $type: String
+    $skills: [String]
+    $experience: Int
+    $top: Boolean
+    $verified: Boolean
+    $categoriesPage: Int
+    $categoriesPageSize: Int
+  ) {
+    categoriesForFilteredResults: freelancerCategories(
+      filters: {
+        and: [
+          {
+            freelancers: {
+              type: { slug: { eq: $type, ne: "user" } }
+              email: { ne: "" }
+              username: { ne: "" }
+              displayName: { ne: "" }
+              rate: { gte: $min, lte: $max }
+              status: { id: { eq: 1 } }
+              payment_methods: { id: { in: $paymentMethods } }
+              contactTypes: { id: { in: $contactTypes } }
+              coverage: { online: { eq: $coverageOnline } }
+              skills: { slug: { in: $skills } }
+              yearsOfExperience: { gte: $experience }
+              topLevel: { eq: $top }
+              verified: { eq: $verified }
+            }
+          }
+          {
+            or: [
+              { freelancers: { coverage: { county: { id: { eq: $coverageCounty } } } } }
+              { freelancers: { coverage: { areas: { county: { id: { eq: $coverageCounty } } } } } }
+            ]
+          }
+        ]
+      }
+      pagination: { page: $categoriesPage, pageSize: $categoriesPageSize }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          plural
+          slug
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+`;
 
+// Fixed FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS query
+const FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS = gql`
+  query FreelancerSubcategoriesForFilteredFreelancers(
+    $min: Int
+    $max: Int
+    $paymentMethods: [ID]
+    $contactTypes: [ID]
+    $coverageOnline: Boolean
+    $coverageCounty: ID
+    $type: String
+    $categorySlug: String!
+    $skills: [String]
+    $experience: Int
+    $top: Boolean
+    $verified: Boolean
+    $subcategoriesPage: Int
+    $subcategoriesPageSize: Int
+  ) {
+    subcategoriesForFilteredResults: freelancerSubcategories(
+      filters: {
+        type: { slug: { eq: $type } }
+        category: { slug: { eq: $categorySlug } }
+        and: [
+          {
+            freelancers: {
+              type: { slug: { eq: $type, ne: "user" } }
+              email: { ne: "" }
+              username: { ne: "" }
+              displayName: { ne: "" }
+              rate: { gte: $min, lte: $max }
+              status: { id: { eq: 1 } }
+              payment_methods: { id: { in: $paymentMethods } }
+              contactTypes: { id: { in: $contactTypes } }
+              coverage: { online: { eq: $coverageOnline } }
+              category: { slug: { eq: $categorySlug } }
+              skills: { slug: { in: $skills } }
+              yearsOfExperience: { gte: $experience }
+              topLevel: { eq: $top }
+              verified: { eq: $verified }
+            }
+          }
+          {
+            or: [
+              { freelancers: { coverage: { county: { id: { eq: $coverageCounty } } } } }
+              { freelancers: { coverage: { areas: { county: { id: { eq: $coverageCounty } } } } } }
+            ]
+          }
+        ]
+      }
+      pagination: { page: $subcategoriesPage, pageSize: $subcategoriesPageSize }
+      sort: "label:asc"
+    ) {
+      data {
+        attributes {
+          label
+          plural
+          slug
+        }
+      }
+      meta {
+        ...Pagination
+      }
+    }
+  }
+  ${PAGINATION}
+`;
+
+// Also need to export all the other queries that were in the original file
 const FREELANCER_CATEGORIES = gql`
   query FreelancerCategories {
     categories: freelancerCategories(sort: "label:asc") {
@@ -253,12 +373,12 @@ const FREELANCERS_ARCHIVE_ALL = gql`
       data {
         attributes {
           slug
-          updatedAt # Added subcategory updatedAt
+          updatedAt
           category {
             data {
               attributes {
                 slug
-                updatedAt # Added category updatedAt
+                updatedAt
               }
             }
           }
@@ -328,166 +448,20 @@ const FREELANCER_PROFILE_SUBCATEGORIES = gql`
   ${PAGINATION}
 `;
 
-const FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS = gql`
-  query FreelancerCategoriesForFilteredFreelancers(
-    $min: Int
-    $max: Int
-    $paymentMethods: [ID]
-    $contactTypes: [ID]
-    $coverageOnline: Boolean
-    $coverageCounty: ID
-    $type: String
-    $skills: [String]
-    $experience: Int
-    $top: Boolean
-    $verified: Boolean
-    $categoriesPage: Int
-    $categoriesPageSize: Int
-  ) {
-    categoriesForFilteredResults: freelancerCategories(
-      filters: {
-        and: [
-          {
-            freelancers: {
-              and: [
-                {
-                  type: {
-                    and: [{ slug: { eq: $type } }, { slug: { ne: "user" } }]
-                  }
-                }
-                { email: { ne: "" } }
-                { username: { ne: "" } }
-                { displayName: { ne: "" } }
-                { rate: { gte: $min, lte: $max } }
-                { status: { id: { eq: 1 } } }
-                { payment_methods: { id: { in: $paymentMethods } } }
-                { contactTypes: { id: { in: $contactTypes } } }
-                {
-                  coverage: {
-                    online: { eq: $coverageOnline }
-                    or: [
-                      { county: { id: { eq: $coverageCounty } } }
-                      { areas: { county: { id: { eq: $coverageCounty } } } }
-                    ]
-                  }
-                }
-                { skills: { slug: { in: $skills } } }
-                { yearsOfExperience: { gte: $experience } }
-                { topLevel: { eq: $top } }
-                { verified: { eq: $verified } }
-              ]
-            }
-          }
-        ]
-      }
-      pagination: { page: $categoriesPage, pageSize: $categoriesPageSize }
-      sort: "label:asc"
-    ) {
-      data {
-        attributes {
-          label
-          plural
-          slug
-        }
-      }
-      meta {
-        ...Pagination
-      }
-    }
-  }
-  ${PAGINATION}
-`;
-
-const FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS = gql`
-  query FreelancerSubcategoriesForFilteredFreelancers(
-    $min: Int
-    $max: Int
-    $paymentMethods: [ID]
-    $contactTypes: [ID]
-    $coverageOnline: Boolean
-    $coverageCounty: ID
-    $type: String
-    $categorySlug: String!
-    $skills: [String]
-    $experience: Int
-    $top: Boolean
-    $verified: Boolean
-    $subcategoriesPage: Int
-    $subcategoriesPageSize: Int
-  ) {
-    subcategoriesForFilteredResults: freelancerSubcategories(
-      filters: {
-        and: [
-          { type: { slug: { eq: $type } } }
-          { category: { slug: { eq: $categorySlug } } }
-          {
-            freelancers: {
-              and: [
-                {
-                  type: {
-                    and: [{ slug: { eq: $type } }, { slug: { ne: "user" } }]
-                  }
-                }
-                { email: { ne: "" } }
-                { username: { ne: "" } }
-                { displayName: { ne: "" } }
-                { rate: { gte: $min, lte: $max } }
-                { status: { id: { eq: 1 } } }
-                { payment_methods: { id: { in: $paymentMethods } } }
-                { contactTypes: { id: { in: $contactTypes } } }
-                {
-                  coverage: {
-                    online: { eq: $coverageOnline }
-                    or: [
-                      { county: { id: { eq: $coverageCounty } } }
-                      { areas: { county: { id: { eq: $coverageCounty } } } }
-                    ]
-                  }
-                }
-                { category: { slug: { eq: $categorySlug } } }
-                { skills: { slug: { in: $skills } } }
-                { yearsOfExperience: { gte: $experience } }
-                { topLevel: { eq: $top } }
-                { verified: { eq: $verified } }
-              ]
-            }
-          }
-        ]
-      }
-      pagination: { page: $subcategoriesPage, pageSize: $subcategoriesPageSize }
-      sort: "label:asc"
-    ) {
-      data {
-        attributes {
-          label
-          plural
-          slug
-        }
-      }
-      meta {
-        ...Pagination
-      }
-    }
-  }
-  ${PAGINATION}
-`;
-
-// Query for Pros Sitemap: Fetches categories and nested subcategories with active freelancers (limit 1000)
 const PROS_ALL = gql`
   query ProsAll {
-    # Renamed query operation name
     freelancerCategories(
       filters: {
         freelancers: { id: { ne: null }, status: { type: { eq: "Active" } } }
       }
       sort: "label:asc"
-      pagination: { limit: 1000 } # Limit categories to 1000
+      pagination: { limit: 1000 }
     ) {
       data {
         id
         attributes {
           slug
-          updatedAt # Category updatedAt
+          updatedAt
           subcategories(
             filters: {
               type: { type: { eq: "freelancer" } }
@@ -496,13 +470,13 @@ const PROS_ALL = gql`
                 status: { type: { eq: "Active" } }
               }
             }
-            pagination: { limit: 1000 } # Limit subcategories to 1000
+            pagination: { limit: 1000 }
           ) {
             data {
               id
               attributes {
                 slug
-                updatedAt # Subcategory updatedAt
+                updatedAt
               }
             }
           }
@@ -512,22 +486,20 @@ const PROS_ALL = gql`
   }
 `;
 
-// Query for Companies Sitemap: Fetches categories and nested subcategories with active companies (limit 1000)
 const COMPANIES_ALL = gql`
   query CompaniesAll {
-    # Renamed query operation name
     freelancerCategories(
       filters: {
         freelancers: { id: { ne: null }, status: { type: { eq: "Active" } } }
       }
       sort: "label:asc"
-      pagination: { limit: 1000 } # Limit categories to 1000
+      pagination: { limit: 1000 }
     ) {
       data {
         id
         attributes {
           slug
-          updatedAt # Category updatedAt
+          updatedAt
           subcategories(
             filters: {
               type: { type: { eq: "company" } }
@@ -536,13 +508,13 @@ const COMPANIES_ALL = gql`
                 status: { type: { eq: "Active" } }
               }
             }
-            pagination: { limit: 1000 } # Limit subcategories to 1000
+            pagination: { limit: 1000 }
           ) {
             data {
               id
               attributes {
                 slug
-                updatedAt # Subcategory updatedAt
+                updatedAt
               }
             }
           }
@@ -567,5 +539,5 @@ export {
   FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS,
   FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS,
   PROS_ALL,
-  COMPANIES_ALL, // Export the new companies query
+  COMPANIES_ALL,
 };

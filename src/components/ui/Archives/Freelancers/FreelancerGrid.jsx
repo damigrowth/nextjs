@@ -8,7 +8,7 @@ export default async function FreelancerGrid({
   taxonomies,
   type,
 }) {
-  const freelancers = freelancersData.map((freelancer) => ({
+  const freelancers = (freelancersData || []).map((freelancer) => ({
     id: freelancer.id,
     ...freelancer.attributes,
   }));

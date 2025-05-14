@@ -95,7 +95,7 @@ export default function VerificationForm({ fid, email, verificationData }) {
       setShowForm(false);
       setIsDisabled(false);
     } else if (verificationStatusType === "Pending") {
-      setTitle("Πιστοποίηση σε Εξέληξη");
+      setTitle("Πιστοποίηση σε Εξέλιξη");
       setShowForm(true);
       setIsDisabled(true);
     } else {
@@ -208,7 +208,7 @@ export default function VerificationForm({ fid, email, verificationData }) {
               </div>
               <div className="col-sm-3 mb20">
                 <InputB
-                  label="Διεύθυνση Τιμολόγησης"
+                  label="Διεύθυνση"
                   id="address"
                   name="address"
                   type="text"

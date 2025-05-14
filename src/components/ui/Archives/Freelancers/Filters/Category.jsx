@@ -2,7 +2,7 @@ import React from "react";
 import SearchSelect from "../../Inputs/SearchSelect";
 
 export default function Category({ selectData }) {
-  const options = selectData.options[0].reduce((acc, cat) => {
+  const options = (selectData.options[0] || []).reduce((acc, cat) => {
     const plural = cat.attributes.plural;
     if (!acc.some((option) => option.label === plural)) {
       acc.push({ value: cat.attributes.slug, label: plural });

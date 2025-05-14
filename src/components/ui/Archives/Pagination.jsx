@@ -4,7 +4,8 @@ import React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function Pagination({ meta, plural }) {
-  const { pageSize, pageCount, total } = meta;
+  // Handle undefined meta by providing default values
+  const { pageSize = 10, pageCount = 0, total = 0 } = meta || {};
 
   const router = useRouter();
   const pathname = usePathname();
@@ -22,7 +23,8 @@ export default function Pagination({ meta, plural }) {
 
   const pages = Array.from({ length: pageCount }, (_, i) => i + 1);
 
-  if (total < 20) return null;
+  // Don't show pagination if meta is undefined, total is less than 20, or pageCount is 0
+  if (!meta || total < 20 || pageCount <= 1) return null;
 
   return (
     <div className="mbp_pagination text-center">
