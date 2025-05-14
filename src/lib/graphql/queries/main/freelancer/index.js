@@ -125,28 +125,23 @@ const FREELANCERS_ARCHIVE = gql`
   ) {
     freelancers(
       filters: {
-        and: [
-          { type: { slug: { eq: $type } } }
-          { type: { slug: { ne: "user" } } }
-          { email: { ne: "" } }
-          { username: { ne: "" } }
-          { displayName: { ne: "" } }
-          { rate: { gte: $min, lte: $max } }
-          { status: { id: { eq: 1 } } }
-          { payment_methods: { id: { in: $paymentMethods } } }
-          { contactTypes: { id: { in: $contactTypes } } }
-          { coverage: { online: { eq: $coverageOnline } } }
-          {
-            or: [
-              { coverage: { county: { id: { eq: $coverageCounty } } } }
-              { coverage: { areas: { county: { id: { eq: $coverageCounty } } } } }
-            ]
-          }
-          { category: { id: { ne: null }, slug: { eq: $cat } } }
-          { subcategory: { id: { ne: null }, slug: { eq: $sub } } }
-          { yearsOfExperience: { gte: $experience } }
-          { topLevel: { eq: $top } }
-          { verified: { eq: $verified } }
+        type: { slug: { eq: $type, ne: "user" } }
+        email: { ne: "" }
+        username: { ne: "" }
+        displayName: { ne: "" }
+        rate: { gte: $min, lte: $max }
+        status: { id: { eq: 1 } }
+        payment_methods: { id: { in: $paymentMethods } }
+        contactTypes: { id: { in: $contactTypes } }
+        coverage: { online: { eq: $coverageOnline } }
+        category: { id: { ne: null }, slug: { eq: $cat } }
+        subcategory: { id: { ne: null }, slug: { eq: $sub } }
+        yearsOfExperience: { gte: $experience }
+        topLevel: { eq: $top }
+        verified: { eq: $verified }
+        or: [
+          { coverage: { county: { id: { eq: $coverageCounty } } } }
+          { coverage: { areas: { county: { id: { eq: $coverageCounty } } } } }
         ]
       }
       sort: $sort
@@ -187,29 +182,24 @@ const FREELANCERS_ARCHIVE_WITH_SKILLS = gql`
   ) {
     freelancers(
       filters: {
-        and: [
-          { type: { slug: { eq: $type } } }
-          { type: { slug: { ne: "user" } } }
-          { email: { ne: "" } }
-          { username: { ne: "" } }
-          { displayName: { ne: "" } }
-          { rate: { gte: $min, lte: $max } }
-          { status: { id: { eq: 1 } } }
-          { payment_methods: { id: { in: $paymentMethods } } }
-          { contactTypes: { id: { in: $contactTypes } } }
-          { coverage: { online: { eq: $coverageOnline } } }
-          {
-            or: [
-              { coverage: { county: { id: { eq: $coverageCounty } } } }
-              { coverage: { areas: { county: { id: { eq: $coverageCounty } } } } }
-            ]
-          }
-          { category: { id: { ne: null }, slug: { eq: $cat } } }
-          { skills: { slug: { in: $skills } } }
-          { subcategory: { id: { ne: null }, slug: { eq: $sub } } }
-          { yearsOfExperience: { gte: $experience } }
-          { topLevel: { eq: $top } }
-          { verified: { eq: $verified } }
+        type: { slug: { eq: $type, ne: "user" } }
+        email: { ne: "" }
+        username: { ne: "" }
+        displayName: { ne: "" }
+        rate: { gte: $min, lte: $max }
+        status: { id: { eq: 1 } }
+        payment_methods: { id: { in: $paymentMethods } }
+        contactTypes: { id: { in: $contactTypes } }
+        coverage: { online: { eq: $coverageOnline } }
+        category: { id: { ne: null }, slug: { eq: $cat } }
+        skills: { slug: { in: $skills } }
+        subcategory: { id: { ne: null }, slug: { eq: $sub } }
+        yearsOfExperience: { gte: $experience }
+        topLevel: { eq: $top }
+        verified: { eq: $verified }
+        or: [
+          { coverage: { county: { id: { eq: $coverageCounty } } } }
+          { coverage: { areas: { county: { id: { eq: $coverageCounty } } } } }
         ]
       }
       sort: $sort
