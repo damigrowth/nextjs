@@ -85,6 +85,16 @@ const getDataInternal = async (
   // If cacheKey is NO_CACHE, we'll set explicit no-cache headers
   const isNoCache = cacheKey === "NO_CACHE";
 
+  // Filter out null or undefined variables before sending
+  const filteredVariables = {};
+  if (variables) {
+    for (const [varKey, varValue] of Object.entries(variables)) {
+      if (varValue !== null && varValue !== undefined) {
+        filteredVariables[varKey] = varValue;
+      }
+    }
+  }
+
   const options = {
     method: "POST",
     headers: {
@@ -98,7 +108,7 @@ const getDataInternal = async (
     },
     body: JSON.stringify({
       query: queryString,
-      variables,
+      variables: filteredVariables, // Use filtered variables
     }),
     ...(isNoCache
       ? { cache: "no-store", next: { revalidate: 0 } }
@@ -123,7 +133,7 @@ const getDataInternal = async (
     const jsonResponse = await response.json();
     return jsonResponse.data;
   } catch (error) {
-    console.error("Server error:", error);
+    console.error("Server error in getDataInternal:", error); // Added more specific error origin
     throw error;
   }
 };

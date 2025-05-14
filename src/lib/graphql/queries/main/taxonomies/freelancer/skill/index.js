@@ -63,6 +63,7 @@ const FREELANCER_PROFILE_SKILLS = gql`
   ${SKILL_ENTITY}
 `;
 
+// Fixed SKILLS_FOR_FILTERED_FREELANCERS query
 const SKILLS_FOR_FILTERED_FREELANCERS = gql`
   query SkillsForFilteredFreelancers(
     $min: Int
@@ -83,28 +84,30 @@ const SKILLS_FOR_FILTERED_FREELANCERS = gql`
     skillsForFilteredResults: skills(
       filters: {
         label: { containsi: $label }
-        freelancers: {
-          and: [
-            { type: { and: [{ slug: { eq: $type } }, { slug: { ne: "user" } }] } }
-            { email: { ne: "" } }
-            { username: { ne: "" } }
-            { displayName: { ne: "" } }
-            { rate: { gte: $min, lte: $max } }
-            { status: { id: { eq: 1 } } }
-            { payment_methods: { id: { in: $paymentMethods } } }
-            { contactTypes: { id: { in: $contactTypes } } }
-            { coverage: {
-              online: { eq: $coverageOnline }
-              or: [
-                { county: { id: { eq: $coverageCounty } } }
-                { areas: { county: { id: { eq: $coverageCounty } } } }
-              ]
-            } }
-            { yearsOfExperience: { gte: $experience } }
-            { topLevel: { eq: $top } }
-            { verified: { eq: $verified } }
-          ]
-        }
+        and: [
+          {
+            freelancers: {
+              type: { slug: { eq: $type, ne: "user" } }
+              email: { ne: "" }
+              username: { ne: "" }
+              displayName: { ne: "" }
+              rate: { gte: $min, lte: $max }
+              status: { id: { eq: 1 } }
+              payment_methods: { id: { in: $paymentMethods } }
+              contactTypes: { id: { in: $contactTypes } }
+              coverage: { online: { eq: $coverageOnline } }
+              yearsOfExperience: { gte: $experience }
+              topLevel: { eq: $top }
+              verified: { eq: $verified }
+            }
+          }
+          {
+            or: [
+              { freelancers: { coverage: { county: { id: { eq: $coverageCounty } } } } }
+              { freelancers: { coverage: { areas: { county: { id: { eq: $coverageCounty } } } } } }
+            ]
+          }
+        ]
       }
       pagination: { page: $skillsPage, pageSize: $skillsPageSize }
       sort: "label:asc"
@@ -127,6 +130,7 @@ const SKILLS_FOR_FILTERED_FREELANCERS = gql`
   ${SKILL_ENTITY}
 `;
 
+// Fixed SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY query
 const SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY = gql`
   query SkillsForFilteredFreelancersWithCategory(
     $min: Int
@@ -149,29 +153,31 @@ const SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY = gql`
       filters: {
         label: { containsi: $label }
         category: { slug: { eq: $cat } }
-        freelancers: {
-          and: [
-            { type: { and: [{ slug: { eq: $type } }, { slug: { ne: "user" } }] } }
-            { email: { ne: "" } }
-            { username: { ne: "" } }
-            { displayName: { ne: "" } }
-            { rate: { gte: $min, lte: $max } }
-            { status: { id: { eq: 1 } } }
-            { payment_methods: { id: { in: $paymentMethods } } }
-            { contactTypes: { id: { in: $contactTypes } } }
-            { coverage: {
-              online: { eq: $coverageOnline }
-              or: [
-                { county: { id: { eq: $coverageCounty } } }
-                { areas: { county: { id: { eq: $coverageCounty } } } }
-              ]
-            } }
-            { category: { id: { ne: null }, slug: { eq: $cat } } }
-            { yearsOfExperience: { gte: $experience } }
-            { topLevel: { eq: $top } }
-            { verified: { eq: $verified } }
-          ]
-        }
+        and: [
+          {
+            freelancers: {
+              type: { slug: { eq: $type, ne: "user" } }
+              email: { ne: "" }
+              username: { ne: "" }
+              displayName: { ne: "" }
+              rate: { gte: $min, lte: $max }
+              status: { id: { eq: 1 } }
+              payment_methods: { id: { in: $paymentMethods } }
+              contactTypes: { id: { in: $contactTypes } }
+              coverage: { online: { eq: $coverageOnline } }
+              category: { id: { ne: null }, slug: { eq: $cat } }
+              yearsOfExperience: { gte: $experience }
+              topLevel: { eq: $top }
+              verified: { eq: $verified }
+            }
+          }
+          {
+            or: [
+              { freelancers: { coverage: { county: { id: { eq: $coverageCounty } } } } }
+              { freelancers: { coverage: { areas: { county: { id: { eq: $coverageCounty } } } } } }
+            ]
+          }
+        ]
       }
       pagination: { page: $skillsPage, pageSize: $skillsPageSize }
       sort: "label:asc"
@@ -186,10 +192,8 @@ const SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY = gql`
         slug: { in: $slugs }
         category: { slug: { eq: $cat } }
         freelancers: {
-          and: [
-            { id: { notNull: true } },
-            { category: { id: { ne: null }, slug: { eq: $cat } } }
-          ]
+          id: { notNull: true }
+          category: { id: { ne: null }, slug: { eq: $cat } }
         }
       }
     ) {
@@ -200,4 +204,9 @@ const SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY = gql`
   ${SKILL_ENTITY}
 `;
 
-export { SKILLS_SEARCH, FREELANCER_PROFILE_SKILLS, SKILLS_FOR_FILTERED_FREELANCERS, SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY };
+export {
+  SKILLS_SEARCH,
+  FREELANCER_PROFILE_SKILLS,
+  SKILLS_FOR_FILTERED_FREELANCERS,
+  SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY,
+};

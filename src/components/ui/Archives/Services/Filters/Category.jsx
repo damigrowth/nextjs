@@ -2,7 +2,7 @@ import React from "react";
 import SearchSelect from "../../Inputs/SearchSelect";
 
 export default function Category({ selectData }) {
-  const optionsData = selectData.options.map((cat) => ({
+  const optionsData = (selectData?.options || []).map((cat) => ({
     value: cat.attributes.slug,
     label: cat.attributes.label,
   }));
