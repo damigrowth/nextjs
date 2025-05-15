@@ -182,6 +182,65 @@ export default function VerificationForm({ fid, email, verificationData }) {
                 errors={formState?.errors?.afm}
                 disabled={isDisabled}
               />
+              <div className="col-sm-3 mb20">
+                <InputB
+                  label="ΑΦΜ*"
+                  id="afm"
+                  name="afm"
+                  type="text"
+                  pattern="[0-9]*"
+                  inputMode="numeric"
+                  value={verification.afm !== null ? verification.afm : ""}
+                  onChange={(value) => handleFieldChange("afm", value)}
+                  maxLength={9}
+                  className="form-control"
+                  errors={formState?.errors?.afm}
+                  disabled={isDisabled}
+                />
+              </div>
+              <div className="col-sm-3 mb20">
+                <InputB
+                  label="Επωνυμία"
+                  id="brandName"
+                  name="brandName"
+                  type="text"
+                  value={verification.brandName}
+                  onChange={(value) => handleFieldChange("brandName", value)}
+                  maxLength={50}
+                  className="form-control"
+                  errors={formState?.errors?.brandName}
+                  disabled={isDisabled}
+                />
+              </div>
+              <div className="col-sm-3 mb20">
+                <InputB
+                  label="Διεύθυνση"
+                  id="address"
+                  name="address"
+                  type="text"
+                  value={verification.address}
+                  onChange={(value) => handleFieldChange("address", value)}
+                  className="form-control"
+                  errors={formState?.errors?.address}
+                  disabled={isDisabled}
+                />
+              </div>
+              <div className="col-md-3 mb20">
+                <InputB
+                  label="Τηλέφωνο"
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  pattern="[0-9]*"
+                  inputMode="numeric"
+                  maxLength={10}
+                  value={verification.phone !== null ? verification.phone : ""}
+                  onChange={(value) => handleFieldChange("phone", value)}
+                  className="form-control input-group"
+                  errors={formState?.errors?.phone}
+                  disabled={isDisabled}
+                />
+              </div>
             </div>
             <div className="col-sm-3 mb20">
               <InputB

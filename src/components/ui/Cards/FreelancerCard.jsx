@@ -32,7 +32,7 @@ export default async function FreelancerCard({
   let showSaveButton = false;
 
   // if user is logged in and is not the same user, show save button
-  if (fid !== id) {
+  if (fid && fid !== id) {
     showSaveButton = true;
     savedStatus = await getSavedStatus("freelancer", id);
   }

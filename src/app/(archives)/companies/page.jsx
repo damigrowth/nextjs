@@ -171,8 +171,8 @@ export default async function page({ params, searchParams }) {
     pageSize: ["cat_ps", "covc_ps"],
     disabled: "cov_o",
     options: [
-      categorySearch ? categoriesSearch?.data : categoriesForFilteredResults?.data, 
-      counties?.data
+      categorySearch ? (categoriesSearch?.data || []) : (categoriesForFilteredResults?.data || []), 
+      counties?.data || []
     ],
     pagination: [
       categorySearch ? categoriesSearch?.meta?.pagination : categoriesForFilteredResults?.meta?.pagination,

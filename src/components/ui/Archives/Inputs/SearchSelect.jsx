@@ -351,7 +351,9 @@ export default function SearchSelect({
       }`}
       onClick={() => {
         selectHandler(item);
-        setSearch("");
+        startTransition(() => {
+          setSearch("");
+        });
       }}
     >
       <a>

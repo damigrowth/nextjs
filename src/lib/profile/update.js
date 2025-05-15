@@ -2,8 +2,13 @@
 
 import { z } from "zod";
 import { postData } from "../client/operations";
-import { UPDATE_FREELANCER, VERIFICATION } from "../graphql/mutations";
+import {
+  CHANGE_PASSWORD,
+  UPDATE_FREELANCER,
+  VERIFICATION,
+} from "../graphql/mutations";
 import { revalidatePath } from "next/cache";
+import { removeToken } from "@/lib/auth/token"; // Added import for removeToken
 import {
   accountSchema,
   profileImageSchema, // Assuming profileImageSchema exists or we define one
@@ -12,6 +17,7 @@ import {
   billingSchemaOptional,
   presentationSchema,
   verificationFormSchema,
+  passwordChangeSchema, // Added import
 } from "../validation/profile";
 
 export async function verificationUpdate(prevState, formData) {
@@ -56,7 +62,6 @@ export async function verificationUpdate(prevState, formData) {
         message: null,
       };
     }
-
     const validatedData = validationResult.data;
 
     // Make the API call with validated data
@@ -112,6 +117,124 @@ export async function verificationUpdate(prevState, formData) {
   }
 }
 
+export async function updatePassword(prevState, formData) {
+  try {
+    const currentPassword = formData.get("currentPassword");
+    const newPassword = formData.get("newPassword");
+    const confirmPassword = formData.get("confirmPassword");
+
+    const validationResult = passwordChangeSchema.safeParse({
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    });
+
+    if (!validationResult.success) {
+      const fieldErrors = {};
+      Object.entries(validationResult.error.flatten().fieldErrors).forEach(
+        ([field, messages]) => {
+          if (messages && messages.length > 0) {
+            fieldErrors[field] = { field, message: messages[0] };
+          }
+        }
+      );
+      return {
+        data: null,
+        errors: fieldErrors,
+        message: null,
+        success: false,
+      };
+    }
+
+    const {
+      currentPassword: validatedCurrentPassword,
+      newPassword: validatedNewPassword,
+      confirmPassword: validatedConfirmPassword,
+    } = validationResult.data;
+
+    // Call the backend to change the password
+    // This assumes your postData function can handle raw GQL strings or you have it defined elsewhere
+    // You might need to adjust how you call your GraphQL endpoint
+    const { data, error } = await postData(CHANGE_PASSWORD, {
+      currentPassword: validatedCurrentPassword,
+      password: validatedNewPassword, // Pass the value from Zod's newPassword as 'password'
+      passwordConfirmation: validatedConfirmPassword, // Pass the value from Zod's confirmPassword as 'passwordConfirmation'
+    });
+
+    if (error || !data?.changePassword?.jwt) {
+      // Strapi's changePassword mutation returns jwt directly
+      // Attempt to parse a more specific error message if available from Strapi
+      let errorMessage = "Ο τρέχων κωδικός είναι λανθασμένος";
+      if (error?.message) {
+        try {
+          // Strapi often returns errors in a nested structure
+          const parsedError = JSON.parse(error.message);
+          if (parsedError?.error?.message) {
+            errorMessage = parsedError.error.message;
+            // Translate common Strapi error messages
+            if (
+              errorMessage
+                .toLowerCase()
+                .includes("invalid identifier or password")
+            ) {
+              errorMessage = "Ο τρέχων κωδικός είναι λανθασμένος.";
+            } else if (
+              errorMessage.toLowerCase().includes("passwords don't match")
+            ) {
+              errorMessage = "Οι νέοι κωδικοί δεν ταιριάζουν (σφάλμα server)."; // Should be caught by Zod ideally
+            }
+          }
+        } catch (e) {
+          // If parsing fails, use the generic error message from the error object
+          errorMessage = error.message || errorMessage;
+        }
+      }
+
+      return {
+        data: null,
+        errors: {
+          submit: {
+            field: "submit",
+            message: errorMessage,
+          },
+          // Optionally, set error on currentPassword if that's the likely issue
+          currentPassword: {
+            field: "currentPassword",
+            message: errorMessage.includes("λανθασμένος")
+              ? "Ο τρέχων κωδικός είναι λανθασμένος."
+              : "",
+          },
+        },
+        message: null,
+        success: false,
+      };
+    }
+
+    // revalidatePath("/dashboard/profile"); // Moved to performPostPasswordChangeActions
+    // await removeToken(); // Moved to performPostPasswordChangeActions
+
+    return {
+      data: data.changePassword, // Adjust based on actual response
+      errors: null,
+      message: "Ο κωδικός πρόσβασης άλλαξε με επιτυχία!",
+      success: true,
+    };
+  } catch (error) {
+    console.error("Password update failed:", error);
+    return {
+      data: null,
+      errors: {
+        submit: {
+          field: "submit",
+          message: "Προέκυψε ένα μη αναμενόμενο σφάλμα. Δοκιμάστε ξανά.",
+        },
+      },
+      message: null,
+      success: false,
+    };
+  }
+}
+
 export async function updateFreelancerStatus(id) {
   try {
     const { data, error } = await postData(UPDATE_FREELANCER, {
@@ -162,14 +285,14 @@ export async function updateAccountInfo(prevState, formData) {
   }
 
   // --- Start Simplified Validation ---
-  // 1. Schema for non-image fields only
+  // 1. Schema for non-image fields only (phone is already removed from accountSchema)
   const nonImageSchemaFields = { ...accountSchema.shape };
   delete nonImageSchemaFields.image; // Ensure image is not in the base schema
 
   // 2. Create partial schema for changed non-image fields
   const partialNonImageSchema = z.object(
     Object.keys(changedFields).reduce((acc, field) => {
-      // Only include non-image fields that are in accountSchema
+      // Only include non-image fields that are in accountSchema (phone is already removed)
       if (nonImageSchemaFields[field] && field !== "image") {
         acc[field] = nonImageSchemaFields[field];
       }
@@ -462,7 +585,8 @@ export async function updateBasicInfo(prevState, formData) {
           payload[field] = (validationState[field].data || []).map(
             (item) => item.id
           );
-        } else {
+        } else if (field !== "rate" && field !== "commencement") {
+          // Exclude rate and commencement
           payload[field] = validationState[field];
         }
       }
@@ -546,45 +670,42 @@ export async function updatePresentationInfo(prevState, formData) {
     // Collect validation errors
     const errors = {};
 
-    // Validate website format if changed
-    if (changes.website !== undefined) {
-      // Simple URL validation
-      if (changes.website && !isValidUrl(changes.website)) {
-        errors.website = {
-          message: "Εισάγετε έγκυρη διεύθυνση ιστοσελίδας",
-        };
-      }
-    }
+    // Validate changed fields using presentationSchema
+    const fieldsToValidate = {};
+    if (changes.website !== undefined)
+      fieldsToValidate.website = changes.website;
+    if (changes.socials !== undefined)
+      fieldsToValidate.socials = changes.socials;
+    if (changes.viber !== undefined) fieldsToValidate.viber = changes.viber;
+    if (changes.whatsapp !== undefined)
+      fieldsToValidate.whatsapp = changes.whatsapp;
+    if (changes.phone !== undefined) fieldsToValidate.phone = changes.phone; // Add phone
+    if (changes.visibility !== undefined)
+      fieldsToValidate.visibility = changes.visibility; // Add visibility
 
-    // Validate social media URLs if changed
-    if (changes.socials) {
-      const socialErrors = {};
-
-      // Check each platform that has a URL
-      Object.entries(changes.socials).forEach(([platform, data]) => {
-        if (data && data.url) {
-          // Skip empty URLs
-          if (data.url.trim() === "") {
-            return;
-          }
-
-          // Validate URL format
-          if (!isValidUrl(data.url)) {
-            socialErrors[platform] = {
-              message: "Εισάγετε μία έγκυρη διεύθυνση URL",
-            };
-          }
-
-          // Additional platform-specific validation could be added here
-          // For example, checking if the URL matches the expected pattern for each platform
+    // Create a partial schema for only the changed fields
+    const partialSchema = z.object(
+      Object.keys(fieldsToValidate).reduce((acc, field) => {
+        if (presentationSchema.shape[field]) {
+          acc[field] = presentationSchema.shape[field];
         }
-      });
+        return acc;
+      }, {})
+    );
 
-      // Add social errors if any were found
-      if (Object.keys(socialErrors).length > 0) {
-        errors.socials = socialErrors;
-      }
+    const validationResult = partialSchema.safeParse(fieldsToValidate);
+
+    if (!validationResult.success) {
+      Object.entries(validationResult.error.flatten().fieldErrors).forEach(
+        ([field, messages]) => {
+          if (messages && messages.length > 0) {
+            errors[field] = { message: messages[0] };
+          }
+        }
+      );
     }
+
+    // Note: The social media URL validation is now implicitly handled by the partialSchema validation above
 
     // For validation-only requests, check media state if provided
     if (validateOnly && formData.get("mediaState")) {
@@ -716,9 +837,17 @@ export async function updateAdditionalInfo(prevState, formData) {
     changedFields.size = changedFields.size || null;
   }
 
-  // Handle terms separately since it's a simple field
+  // Handle terms, rate, and commencement separately since they are simple fields
   if (changedFields.terms !== undefined) {
-    changedFields.terms = formData.get("terms");
+    changedFields.terms = formData.get("terms"); // Assuming terms is still passed via formData if needed, otherwise use changedFieldsRaw
+  }
+  if (changedFields.rate !== undefined) {
+    // Use the value already processed in getChangedFields
+    changedFields.rate = changedFieldsRaw.rate;
+  }
+  if (changedFields.commencement !== undefined) {
+    // Use the value already processed in getChangedFields
+    changedFields.commencement = changedFieldsRaw.commencement;
   }
 
   // Create schema for only the changed fields
@@ -755,6 +884,16 @@ export async function updateAdditionalInfo(prevState, formData) {
   // Handle terms field
   if (validationResult.data.terms !== undefined) {
     payload.terms = validationResult.data.terms;
+  }
+
+  // Handle rate field
+  if (validationResult.data.rate !== undefined) {
+    payload.rate = validationResult.data.rate;
+  }
+
+  // Handle commencement field
+  if (validationResult.data.commencement !== undefined) {
+    payload.commencement = validationResult.data.commencement;
   }
 
   // Handle size field
@@ -869,4 +1008,24 @@ export async function updateBillingDetails(prevState, formData) {
     errors: null,
     message: "Τα στοιχεία τιμολόγησης ενημερώθηκαν με επιτυχία",
   };
+}
+
+export async function successfulPasswordChange() {
+  try {
+    // Ensure revalidatePath is called correctly.
+    // If it's meant to be conditional or needs specific data, adjust accordingly.
+    revalidatePath("/dashboard/profile");
+    await removeToken();
+    // console.log("Post password change actions: Token removed and path revalidated.");
+    return {
+      success: true,
+      message: "Post-password change actions completed successfully.",
+    };
+  } catch (error) {
+    console.error("Error in performPostPasswordChangeActions:", error);
+    return {
+      success: false,
+      error: "Failed to complete post-password change actions.",
+    };
+  }
 }

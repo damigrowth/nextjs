@@ -40,7 +40,7 @@ export default function ServicesArchive({
       heading: "Πιστοποιημένα Προφίλ",
       params: ["ver"],
       component: <Verified />,
-      noCollapse: true
+      noCollapse: true,
     },
     {
       heading: "Κατηγορία",
@@ -48,11 +48,11 @@ export default function ServicesArchive({
       childPath,
       component: <Category selectData={selectData} />,
     },
-    {
-      heading: "Tags",
-      params: ["tags"],
-      component: <Tags selectData={multiSelectData} />,
-    },
+    // {
+    //   heading: "Tags",
+    //   params: ["tags"],
+    //   component: <Tags selectData={multiSelectData} />,
+    // },
     /* { heading: "Χρόνος παράδοσης", params: ["time"], component: <Time /> }, */
   ];
 

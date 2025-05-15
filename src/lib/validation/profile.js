@@ -25,12 +25,6 @@ export const accountSchema = z.object({
     .string()
     .min(2, "Το όνομα προβολής πρέπει να έχει τουλάχιστον 2 χαρακτήρες")
     .max(50, "Το όνομα προβολής δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες"),
-  phone: z
-    .number()
-    .min(1000000000, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")
-    .max(999999999999, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")
-    .optional()
-    .nullable(),
 });
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
@@ -200,8 +194,6 @@ export const basicInfoSchema = z.object({
     .optional()
     .nullable()
     .or(z.literal("")),
-  rate: z.number().min(10).max(50000).optional(),
-  commencement: z.number().min(1900).max(new Date().getFullYear()).optional(),
 });
 
 export const presentationSchema = z.object({
@@ -362,6 +354,13 @@ export const presentationSchema = z.object({
     address: z.boolean(),
   }),
   portfolio: z.array(z.any()).optional(),
+  // Added phone validation
+  phone: z
+    .number()
+    .min(1000000000, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")
+    .max(999999999999, "Ο αριθμός τηλεφώνου πρέπει να έχει 10-12 ψηφία")
+    .optional()
+    .nullable(),
 });
 
 export const additionalInfoSchema = z.object({
@@ -393,6 +392,14 @@ export const additionalInfoSchema = z.object({
   contactTypes: z.array(z.string()).optional().nullable(),
   payment_methods: z.array(z.string()).optional().nullable(),
   settlement_methods: z.array(z.string()).optional().nullable(),
+  // Added rate and commencement
+  rate: z.number().min(10).max(50000).optional().nullable(),
+  commencement: z
+    .number()
+    .min(1900)
+    .max(new Date().getFullYear())
+    .optional()
+    .nullable(),
 });
 
 export const billingSchemaOptional = z.object({
@@ -466,3 +473,27 @@ export const billingSchema = z.object({
       message: "Η διεύθυνση είναι υποχρεωτική",
     }),
 });
+
+export const passwordChangeSchema = z
+  .object({
+    currentPassword: z
+      .string()
+      .min(1, "Ο ισχύον κωδικός είναι υποχρεωτικός.")
+      .min(8, "Ο ισχύον κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες."),
+    newPassword: z
+      .string()
+      .min(1, "Ο νέος κωδικός είναι υποχρεωτικός.")
+      .min(8, "Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες."),
+    confirmPassword: z
+      .string()
+      .min(1, "Η επανάληψη κωδικού είναι υποχρεωτική.")
+      .min(8, "Η επανάληψη κωδικού πρέπει να έχει τουλάχιστον 8 χαρακτήρες."),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Οι νέοι κωδικοί δεν ταιριάζουν.",
+    path: ["confirmPassword"], // Set error on confirmPassword field
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "Ο νέος κωδικός πρέπει να είναι διαφορετικός από τον τρέχοντα.",
+    path: ["newPassword"], // Set error on newPassword field
+  });

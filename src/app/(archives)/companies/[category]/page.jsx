@@ -183,8 +183,8 @@ export default async function page({ params, searchParams }) {
     pageSize: ["subc_ps", "covc_ps"],
     disabled: "cov_o",
     options: [
-      subcategorySearch ? subcategoriesSearch?.data : subcategoriesForFilteredResults?.data, 
-      counties?.data
+      subcategorySearch ? (subcategoriesSearch?.data || []) : (subcategoriesForFilteredResults?.data || []), 
+      counties?.data || []
     ],
     pagination: [
       subcategorySearch ? subcategoriesSearch?.meta?.pagination : subcategoriesForFilteredResults?.meta?.pagination,

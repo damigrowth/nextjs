@@ -174,7 +174,7 @@ export default async function page({ params, searchParams }) {
     page: ["subc_p", "covc_p"],
     pageSize: ["subc_ps", "covc_ps"],
     disabled: "cov_o",
-    options: [subcategoriesSearch?.data, counties?.data],
+    options: [subcategoriesSearch?.data || [], counties?.data || []],
     pagination: [
       subcategoriesSearch?.meta?.pagination,
       counties?.meta?.pagination,

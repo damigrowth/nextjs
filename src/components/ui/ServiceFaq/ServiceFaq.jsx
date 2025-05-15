@@ -13,7 +13,7 @@ export default function ServiceFaq({ custom, editMode = false }) {
     <div
       className={
         !custom
-          ? "ps-widget bdrs12 p30 mb30 overflow-hidden position-relative"
+          ? "ps-widget bdrs12 p30 mb50 overflow-hidden position-relative"
           : "ps-widget mb30 overflow-hidden position-relative"
       }
     >
