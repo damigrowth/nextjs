@@ -1,15 +1,7 @@
 import { z } from "zod";
 
 export const verificationFormSchema = z.object({
-  afm: z.coerce // Add coerce here
-    .number()
-    .refine((val) => val !== null && val.toString().length === 9, {
-      message: "Το ΑΦΜ πρέπει να έχει ακριβώς 9 ψηφία",
-    })
-    .nullable()
-    .refine((val) => val !== null, {
-      message: "Το ΑΦΜ είναι υποχρεωτικό",
-    }),
+  afm: z.string().min(2, "Το ΑΦΜ είναι υποχρεωτικό"),
   brandName: z
     .string()
     .min(2, "Η επωνυμία είναι υποχρεωτική")

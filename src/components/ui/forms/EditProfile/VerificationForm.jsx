@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react"; // useEffect removed
 import { useActionState } from "react";
 import { verificationUpdate } from "@/lib/profile/update";
 import InputB from "@/components/inputs/InputB";
@@ -14,7 +14,7 @@ import PulsatingDot from "../../PulsatingDot";
  * @property {object} [data] - The main data object for verification.
  * @property {string} [data.id] - The ID of the verification record.
  * @property {object} [data.attributes] - Attributes of the verification record.
- * @property {string|null} [data.attributes.afm] - The AFM (tax number).
+ * @property {string} [data.attributes.afm] - The AFM (tax number).
  * @property {string} [data.attributes.brandName] - The brand name.
  * @property {string} [data.attributes.address] - The billing address.
  * @property {string|null} [data.attributes.phone] - The phone number.
@@ -61,11 +61,11 @@ export default function VerificationForm({ fid, email, verificationData }) {
   /**
    * Original values of the verification form, derived from `verificationData` prop.
    * Used to track changes in the form.
-   * @type {{id: string|null, afm: string|null, brandName: string, address: string, phone: string|null}}
+   * @type {{id: string|null, afm: string, brandName: string, address: string, phone: string|null}}
    */
   const originalValues = {
-    id: verificationData?.data?.id || null,
-    afm: verificationData?.data?.attributes?.afm || null,
+    id: verificationData?.data?.id || "",
+    afm: verificationData?.data?.attributes?.afm || "",
     brandName: verificationData?.data?.attributes?.brandName || "",
     address: verificationData?.data?.attributes?.address || "",
     phone: verificationData?.data?.attributes?.phone || null,
@@ -73,7 +73,6 @@ export default function VerificationForm({ fid, email, verificationData }) {
 
   const [verification, setVerification] = useState(originalValues);
   const [title, setTitle] = useState("Αίτηση Πιστοποίησης");
-  const [showForm, setShowForm] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
 
   /**
@@ -84,32 +83,28 @@ export default function VerificationForm({ fid, email, verificationData }) {
   const verificationStatusType =
     verificationData?.data?.attributes?.status?.data?.attributes?.type;
 
-  /**
-   * Determines and sets the form's title, visibility, and disabled state
-   * based on the `verificationStatusType`.
-   * This function is memoized using `useMemo` to run only when `verificationStatusType` changes.
-   */
-  const getVerificationStatus = () => {
-    if (verificationStatusType === "Active") {
-      setTitle("Πιστοποιημένο Προφίλ");
-      setShowForm(false);
-      setIsDisabled(false);
-    } else if (verificationStatusType === "Pending") {
-      setTitle("Πιστοποίηση σε Εξέληξη");
-      setShowForm(true);
-      setIsDisabled(true);
-    } else {
-      setTitle("Αίτηση Πιστοποίησης");
-      setShowForm(true);
-      setIsDisabled(false);
-    }
-  };
+  // Derive isVerified directly
+  const isVerified =
+    verificationStatusType === "Active" ||
+    verificationStatusType === "Completed";
 
   /**
-   * `useMemo` hook to call `getVerificationStatus` when `verificationStatusType` changes.
-   * This updates the UI elements like title and form visibility based on the status.
+   * `useMemo` hook to set title and disabled state
+   * based on `isVerified` (derived) and `verificationStatusType`.
    */
-  useMemo(() => getVerificationStatus(), [verificationStatusType]);
+  useMemo(() => {
+    if (isVerified) {
+      setTitle("Πιστοποιημένο Προφίλ");
+      setIsDisabled(true); // Form fields disabled
+    } else if (verificationStatusType === "Pending") {
+      setTitle("Πιστοποίηση σε Εξέλιξη");
+      setIsDisabled(true); // Form fields disabled
+    } else {
+      // Not verified and not pending
+      setTitle("Αίτηση Πιστοποίησης");
+      setIsDisabled(false); // Form fields enabled
+    }
+  }, [isVerified, verificationStatusType]); // Depends on derived isVerified and prop
 
   /**
    * Handles changes to form input fields.
@@ -120,7 +115,7 @@ export default function VerificationForm({ fid, email, verificationData }) {
    * @param {string} value - The new value of the input field.
    */
   const handleFieldChange = (name, value) => {
-    if (name === "afm" || name === "phone") {
+    if (name === "phone") {
       const numValue = value && value.trim() !== "" ? Number(value) : null;
       setVerification((prevState) => ({
         ...prevState,
@@ -143,12 +138,12 @@ export default function VerificationForm({ fid, email, verificationData }) {
   return (
     <form action={handleSubmit}>
       <div className="form-style1">
-        <div className={`${!showForm ? "" : "bdrb1 pb15 mb25"}`}>
+        <div className="bdrb1 pb15 mb25">
           <div className="d-flex align-items-center mb10">
-            {!showForm && (
+            {isVerified && (
               <i className="d-block flaticon-success fa-xl text-thm vam mr10" />
             )}
-            {isDisabled && (
+            {!isVerified && verificationStatusType === "Pending" && (
               <PulsatingDot
                 color="#ff9800"
                 size={10}
@@ -159,111 +154,106 @@ export default function VerificationForm({ fid, email, verificationData }) {
             )}
             <h5 className="d-block list-title heading mb-0">{title}</h5>
           </div>
-          {isDisabled && (
+          {!isVerified && verificationStatusType === "Pending" && (
             <p className="mb-0">
               Η αίτηση πιστοποίησης έχει υποβληθεί και είναι σε κατάσταση
               αξιολόγησης.
             </p>
           )}
         </div>
-        {showForm && (
-          <>
-            <div className="row">
-              <input type="hidden" name="fid" value={fid} />
-              <input type="hidden" name="email" value={email} />
-              <input
-                type="hidden"
-                name="verificationId"
-                value={verification.id}
-              />
-              <div className="col-sm-3 mb20">
-                <InputB
-                  label="ΑΦΜ*"
-                  id="afm"
-                  name="afm"
-                  type="text"
-                  pattern="[0-9]*"
-                  inputMode="numeric"
-                  value={verification.afm !== null ? verification.afm : ""}
-                  onChange={(value) => handleFieldChange("afm", value)}
-                  maxLength={9}
-                  className="form-control"
-                  errors={formState?.errors?.afm}
-                  disabled={isDisabled}
-                />
-              </div>
-              <div className="col-sm-3 mb20">
-                <InputB
-                  label="Επωνυμία"
-                  id="brandName"
-                  name="brandName"
-                  type="text"
-                  value={verification.brandName}
-                  onChange={(value) => handleFieldChange("brandName", value)}
-                  maxLength={50}
-                  className="form-control"
-                  errors={formState?.errors?.brandName}
-                  disabled={isDisabled}
-                />
-              </div>
-              <div className="col-sm-3 mb20">
-                <InputB
-                  label="Διεύθυνση Τιμολόγησης"
-                  id="address"
-                  name="address"
-                  type="text"
-                  value={verification.address}
-                  onChange={(value) => handleFieldChange("address", value)}
-                  className="form-control"
-                  errors={formState?.errors?.address}
-                  disabled={isDisabled}
-                />
-              </div>
-              <div className="col-md-3 mb20">
-                <InputB
-                  label="Τηλέφωνο"
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  pattern="[0-9]*"
-                  inputMode="numeric"
-                  maxLength={10}
-                  value={verification.phone !== null ? verification.phone : ""}
-                  onChange={(value) => handleFieldChange("phone", value)}
-                  className="form-control input-group"
-                  errors={formState?.errors?.phone}
-                  disabled={isDisabled}
-                />
-              </div>
-            </div>
-            {formState?.errors?.submit && (
-              <Alert
-                type="error"
-                message={formState.errors.submit.message}
-                className="mt-3"
-              />
-            )}
-
-            {formState?.message && !formState?.errors?.submit && (
-              <Alert
-                type="success"
-                message={formState.message}
-                className="mt-3"
-              />
-            )}
-
-            <SaveButton
-              orientation="end"
-              disabled={isDisabled || !hasChanges}
-              isPending={isPending}
-              hasChanges={hasChanges}
-              variant="primary"
-              icon="fa-solid fa-paper-plane"
-              defaultText="Αποστολή Αίτησης"
-              loadingText="Αποστολή Αίτησης"
+        <>
+          <div className="row">
+            <input type="hidden" name="fid" value={fid} />
+            <input type="hidden" name="email" value={email} />
+            <input
+              type="hidden"
+              name="verificationId"
+              value={verification.id}
             />
-          </>
-        )}
+            <div className="col-sm-3 mb20">
+              <InputB
+                label="ΑΦΜ*"
+                id="afm"
+                name="afm"
+                type="text"
+                value={verification.afm || ""}
+                onChange={(value) => handleFieldChange("afm", value)}
+                className="form-control"
+                errors={formState?.errors?.afm}
+                disabled={isDisabled}
+              />
+            </div>
+            <div className="col-sm-3 mb20">
+              <InputB
+                label="Επωνυμία"
+                id="brandName"
+                name="brandName"
+                type="text"
+                value={verification.brandName}
+                onChange={(value) => handleFieldChange("brandName", value)}
+                maxLength={50}
+                className="form-control"
+                errors={formState?.errors?.brandName}
+                disabled={isDisabled}
+              />
+            </div>
+            <div className="col-sm-3 mb20">
+              <InputB
+                label="Διεύθυνση"
+                id="address"
+                name="address"
+                type="text"
+                value={verification.address}
+                onChange={(value) => handleFieldChange("address", value)}
+                className="form-control"
+                errors={formState?.errors?.address}
+                disabled={isDisabled}
+              />
+            </div>
+            <div className="col-md-3 mb20">
+              <InputB
+                label="Τηλέφωνο"
+                id="phone"
+                name="phone"
+                type="tel"
+                pattern="[0-9]*"
+                inputMode="numeric"
+                maxLength={10}
+                value={verification.phone !== null ? verification.phone : ""}
+                onChange={(value) => handleFieldChange("phone", value)}
+                className="form-control input-group"
+                errors={formState?.errors?.phone}
+                disabled={isDisabled}
+              />
+            </div>
+          </div>
+          {formState?.errors?.submit && (
+            <Alert
+              type="error"
+              message={formState.errors.submit.message}
+              className="mt-3"
+            />
+          )}
+
+          {formState?.message && !formState?.errors?.submit && (
+            <Alert
+              type="success"
+              message={formState.message}
+              className="mt-3"
+            />
+          )}
+
+          <SaveButton
+            orientation="end"
+            disabled={isDisabled || !hasChanges}
+            isPending={isPending}
+            hasChanges={hasChanges}
+            variant="primary"
+            icon="fa-solid fa-paper-plane"
+            defaultText="Αποστολή Αίτησης"
+            loadingText="Αποστολή Αίτησης"
+          />
+        </>
       </div>
     </form>
   );
