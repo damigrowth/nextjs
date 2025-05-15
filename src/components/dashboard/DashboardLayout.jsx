@@ -2,10 +2,12 @@ import React from "react";
 import DashboardHeader from "./header/DashboardHeader";
 import DashboardSidebar from "./sidebar/DashboardSidebar";
 import DashboardWrapper from "./DashboardWrapper";
-import { getAccess, getUser, getUserMe } from "@/lib/auth/user";
+import { getAccess } from "@/lib/auth/user";
 import DashboardFooter from "./footer/DashboardFooter";
 import { getToken } from "@/lib/auth/token";
 import { redirect } from "next/navigation";
+import ReportIssueFloatingButton from "./button/ReportIssueFloatingButton";
+import ReportIssueForm from "../ui/forms/ReportIssueForm";
 
 export default async function DashboardLayout({ children }) {
   const token = await getToken();
@@ -27,6 +29,8 @@ export default async function DashboardLayout({ children }) {
         </DashboardWrapper>
       </div>
       <DashboardFooter />
+      <ReportIssueFloatingButton />
+      <ReportIssueForm />
     </>
   );
 }
