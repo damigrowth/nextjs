@@ -20,6 +20,7 @@ import { getUserId } from "@/lib/auth/user";
 import { redirect } from "next/navigation";
 import { getOtherServicesReviews } from "@/lib/service/service";
 import StartChatModal from "@/components/modal/StartChatModal";
+import ServiceReportForm from "../forms/ServiceReportForm";
 
 export default async function SingleService({
   slug,
@@ -252,6 +253,16 @@ export default async function SingleService({
                     />
                   )}
                 </Protected>
+
+                <div className="text-start mt50">
+                  <button
+                    className="ud-btn btn-thm-border mb25 me-4"
+                    data-bs-toggle="modal"
+                    data-bs-target="#serviceReportModal" // This ID should match the ID in ServiceReportModal.jsx
+                  >
+                    Αναφορά Υπηρεσίας
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -301,6 +312,13 @@ export default async function SingleService({
             ? `Ενδιαφέρομαι για την υπηρεσία ${title}...`
             : `Ενδιαφέρομαι για την υπηρεσία ${title} (${price}€)...`
         }
+      />
+      <ServiceReportForm
+        fid={fid}
+        email={email}
+        displayName={displayName}
+        serviceId={serviceId}
+        title={title}
       />
     </section>
   );
