@@ -218,7 +218,7 @@ export default function VerificationForm({ fid, email, verificationData }) {
                 type="tel"
                 pattern="[0-9]*"
                 inputMode="numeric"
-                maxLength={10}
+                maxLength={12}
                 value={verification.phone !== null ? verification.phone : ""}
                 onChange={(value) => handleFieldChange("phone", value)}
                 className="form-control input-group"
