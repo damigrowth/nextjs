@@ -1,6 +1,7 @@
 import FreelancerProfile from "@/components/ui/profiles/freelancer/FreelancerProfile";
 import {
   getFeaturedServicesByFreelancer,
+  getFreelancer,
   getFreelancerByUsername,
   getFreelancerId,
   getReviewsByFreelancer,
@@ -40,7 +41,14 @@ export default async function page({ params, searchParams }) {
   const { services: searchParmasServices, reviews: searchParmasReviews } =
     await searchParams;
 
-  const fid = await getFreelancerId();
+  const currentFreelancer = await getFreelancer();
+
+  const {
+    id: fid,
+    displayName: freelancerDisplayName,
+    username: freelancerUsername,
+    email: freelancerEmail,
+  } = currentFreelancer;
 
   const { freelancer } = await getFreelancerByUsername(username);
 
@@ -105,6 +113,9 @@ export default async function page({ params, searchParams }) {
         />
         <FreelancerProfile
           fid={fid}
+          freelancerDisplayName={freelancerDisplayName}
+          freelancerUsername={freelancerUsername}
+          freelancerEmail={freelancerEmail}
           freelancerId={freelancerId}
           username={username}
           freelancer={freelancer}

@@ -17,10 +17,13 @@ import Protected from "@/components/auth/Protected";
 import FeaturedFile from "../../SingleService/FeaturedFile";
 import ServiceAudioFiles from "../../SingleService/ServiceAudioFiles";
 import StartChatModal from "@/components/modal/StartChatModal";
-// Removed StartChatButtonAndModal import here, it's now in Info.jsx
+import FreelancerReportForm from "../../forms/FreelancerReportForm";
 
 export default function FreelancerProfile({
   fid,
+  freelancerDisplayName,
+  freelancerUsername,
+  freelancerEmail,
   freelancerId,
   freelancer,
   username,
@@ -32,8 +35,6 @@ export default function FreelancerProfile({
   reviewsPage,
   isOwner,
 }) {
-  // Removed useState for modal
-
   const {
     firstName,
     lastName,
@@ -134,7 +135,6 @@ export default function FreelancerProfile({
               />
               <Industries industries={industries?.data} />
 
-              {/* Mobile Sidebar Content */}
               <div className="d-lg-none">
                 <div className="blog-sidebar column">
                   <Info
@@ -146,7 +146,6 @@ export default function FreelancerProfile({
                     viber={viber}
                     whatsapp={whatsapp}
                     email={visibility?.email && email}
-                    // Pass props needed for the contact button
                     freelancerId={freelancerId}
                     freelancerName={displayName}
                     isOwner={isOwner}
@@ -214,6 +213,18 @@ export default function FreelancerProfile({
                   </>
                 )}
               </Protected>
+
+              {!isOwner && fid && (
+                <div className="text-start mt50">
+                  <button
+                    className="ud-btn btn-thm-border mb25 me-4"
+                    data-bs-toggle="modal"
+                    data-bs-target="#freelancerReportModal"
+                  >
+                    Αναφορά Προφίλ
+                  </button>
+                </div>
+              )}
             </div>
           </div>
           <StickySidebar>
@@ -235,7 +246,6 @@ export default function FreelancerProfile({
               skills={skills?.data}
               specialization={specialization?.data}
             />
-            {/* Contact button rendering removed from here, handled within Info */}
           </StickySidebar>
         </div>
       </div>
@@ -243,6 +253,21 @@ export default function FreelancerProfile({
         fid={fid}
         freelancerId={freelancerId}
         displayName={displayName}
+      />
+
+      <FreelancerReportForm
+        reporter={{
+          id: fid,
+          email: freelancerEmail,
+          displayName: freelancerDisplayName,
+          username: freelancerUsername,
+        }}
+        reported={{
+          id: freelancerId,
+          email: email,
+          displayName: displayName,
+          username: username,
+        }}
       />
     </section>
   );
