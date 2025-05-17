@@ -11,6 +11,7 @@ import {
 } from "@/lib/graphql/queries/main/dashboard";
 import Link from "next/link";
 import { getAccess, getUser } from "@/lib/auth/user";
+import DraftServices from "./DraftServices";
 
 export default async function DashboardInfo() {
   const user = await getUser();
@@ -53,7 +54,10 @@ export default async function DashboardInfo() {
           <div className="col-lg-12">
             <div className="dashboard_title_area">
               {hasAccess ? (
-                <h2>Πίνακας Ελέγχου</h2>
+                <div>
+                  <h2>Πίνακας Ελέγχου</h2>
+                  <DraftServices />
+                </div>
               ) : (
                 <h2>Καλώς ήρθες, {user.displayName}!</h2>
               )}

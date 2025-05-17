@@ -1,5 +1,6 @@
 import Link from "next/link";
 import DashboardNavigation from "@/components/dashboard/header/DashboardNavigation";
+import DraftServices from "@/components/dashboard/section/DraftServices";
 
 export function DashboardHeader({
   title = "Διαχείριση Υπηρεσιών",
@@ -16,6 +17,7 @@ export function DashboardHeader({
       <div className={showButton ? "col-lg-9" : "col-lg-12"}>
         <div className="dashboard_title_area">
           <h2>{title}</h2>
+          <DraftServices />
         </div>
       </div>
       {showButton && (
