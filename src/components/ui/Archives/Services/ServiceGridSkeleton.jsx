@@ -9,9 +9,9 @@ export default function ServiceGridSkeleton() {
           <div key={i}>
             <Skeleton
               count={1}
-              height={232}
+              height={191}
               borderRadius={4}
-              style={{ marginBottom: "30px" }}
+              style={{ display: "block" }}
             />
           </div>
         ))}

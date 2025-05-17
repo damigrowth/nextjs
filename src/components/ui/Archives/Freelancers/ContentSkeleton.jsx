@@ -12,7 +12,7 @@ export default function ContentSkeleton() {
           <div className="text-center text-md-start">
             <p className="text mb-0 mb10-sm">
               <span className="fw500">
-                <Skeleton count={1} height={20} width={115} />
+                <Skeleton count={1} height={18} width={115} />
               </span>
             </p>
           </div>
@@ -25,12 +25,6 @@ export default function ContentSkeleton() {
         </div>
       </div>
       <FreelancerGridSkeleton />
-      <div className="row mt30">
-        <div className="mbp_pagination text-center">
-          <ul className="page_navigation"></ul>
-          <p className="mt10 mb-0 pagination_page_count text-center"></p>
-        </div>
-      </div>
     </>
   );
 }
