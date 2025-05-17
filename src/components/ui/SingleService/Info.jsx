@@ -68,7 +68,13 @@ export default function Info({
             <div className="details">
               <h5 className="title">Συνδρομή</h5>
               <p className="mb-0 text">
-                {subscription_type === "month" ? "Μηνιαία" : "Ετήσια"}
+                {{
+                  month: "Μηνιαία",
+                  year: "Ετήσια",
+                  per_case: "Κατά περίπτωση",
+                  per_hour: "Ανά Ώρα",
+                  per_session: "Ανά Συνεδρία",
+                }[subscription_type] || "Άγνωστο"}
               </p>
             </div>
           </div>
