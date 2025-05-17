@@ -162,3 +162,11 @@ export const budgetOptions = [
     slug: "50",
   },
 ];
+
+export const subscriptionTypeOptions = [
+  { value: "month", label: "Μηνιαία Συνδρομή" },
+  { value: "year", label: "Ετήσια Συνδρομή" },
+  { value: "per_case", label: "Κατά περίπτωση" },
+  { value: "per_hour", label: "Ανά Ώρα" },
+  { value: "per_session", label: "Ανά Συνεδρία" },
+];

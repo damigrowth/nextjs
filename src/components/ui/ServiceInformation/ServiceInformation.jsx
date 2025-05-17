@@ -15,6 +15,7 @@ import SearchableSelect from "../Archives/Inputs/SearchableSelect";
 import { normalizeQuery } from "@/utils/queries";
 import { searchData } from "@/lib/client/operations";
 import SwitchB from "../Archives/Inputs/SwitchB";
+import { subscriptionTypeOptions } from "@/data/global/collections";
 
 export default function ServiceInformation() {
   const {
@@ -226,20 +227,15 @@ export default function ServiceInformation() {
     [setInfo]
   );
 
-  const subscriptionTypeOptions = [
-    { value: "month", label: "Μηνιαία Συνδρομή" },
-    { value: "year", label: "Ετήσια Συνδρομή" },
-  ];
-
   // Format for SearchableSelect component
   const selectedSubscriptionType = info.subscription_type
     ? {
         id: info.subscription_type,
         attributes: {
           label:
-            info.subscription_type === "month"
-              ? "Μηνιαία Συνδρομή"
-              : "Ετήσια Συνδρομή",
+            subscriptionTypeOptions.find(
+              (opt) => opt.value === info.subscription_type
+            )?.label || "Άγνωστο",
         },
       }
     : null;
@@ -487,8 +483,8 @@ export default function ServiceInformation() {
               <div className="mb20 ">
                 <SearchableSelect
                   name="subscription-type"
-                  label="Τύπος Συνδρομής"
-                  labelPlural="τύποι συνδρομής"
+                  label="Πληρωμή"
+                  labelPlural="τύποι πληρωμής"
                   staticOptions={subscriptionTypeOptions}
                   value={selectedSubscriptionType}
                   onSelect={handleSubscriptionTypeSelect}
