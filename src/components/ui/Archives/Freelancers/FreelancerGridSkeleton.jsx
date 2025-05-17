@@ -8,9 +8,12 @@ export default function FreelancerGridSkeleton() {
         <div key={i} className="col-sm-6 col-xl-4">
           <Skeleton
             count={1}
-            height={427}
-            borderRadius={4}
-            style={{ marginBottom: "30px" }}
+            height={352}
+            borderRadius={12}
+            style={{
+              display: "block",
+              marginBottom: "10px",
+            }}
           />
         </div>
       ))}

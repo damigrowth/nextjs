@@ -1,14 +1,12 @@
-import React, { Suspense } from "react";
+import React from "react";
 import Sidebar from "../Sidebar";
 import Price from "./Filters/Price";
-import Time from "./Filters/Time";
 import Category from "./Filters/Category";
 import Verified from "./Filters/Verified";
 import Content from "./Content";
 import ContentSkeleton from "./ContentSkeleton";
-import BorderSpinner from "../../Spinners/BorderSpinner";
 import SidebarModal from "../SidebarModal";
-import Tags from "./Filters/Tags";
+import Pending from "../../suspense/Pending";
 
 export default function ServicesArchive({
   taxonomies,
@@ -18,21 +16,22 @@ export default function ServicesArchive({
   selectData,
   multiSelectData,
 }) {
-  // Remove 'cat_s' from searchParams
-  const filteredSearchParams = Object.fromEntries(
-    Object.entries(searchParams).filter(
-      ([key]) =>
-        key !== "cat_s" &&
-        key !== "tags_s" &&
-        key !== "tags_p" &&
-        key !== "tags_ps" &&
-        key !== "cov_c_s" &&
-        key !== "covc_p" &&
-        key !== "covc_ps" &&
-        key !== "cat_p" &&
-        key !== "cat_ps"
-    )
-  );
+  // // This was used for Suspense key
+  // // Remove 'cat_s' from searchParams
+  // const filteredSearchParams = Object.fromEntries(
+  //   Object.entries(searchParams).filter(
+  //     ([key]) =>
+  //       key !== "cat_s" &&
+  //       key !== "tags_s" &&
+  //       key !== "tags_p" &&
+  //       key !== "tags_ps" &&
+  //       key !== "cov_c_s" &&
+  //       key !== "covc_p" &&
+  //       key !== "covc_ps" &&
+  //       key !== "cat_p" &&
+  //       key !== "cat_ps"
+  //   )
+  // );
 
   const filters = [
     { heading: "Τιμή", params: ["min", "max"], component: <Price /> },
@@ -65,16 +64,12 @@ export default function ServicesArchive({
               <Sidebar filters={filters} searchParams={searchParams} />
             </div>
             <div className="col-lg-9 archive-content">
-              <BorderSpinner className="archive-content-spinner" />
-              <Suspense
-                key={JSON.stringify(filteredSearchParams)}
-                fallback={<ContentSkeleton />}
-              >
+              <Pending fallback={<ContentSkeleton />}>
                 <Content
                   paramsFilters={paramsFilters}
                   taxonomies={taxonomies}
                 />
-              </Suspense>
+              </Pending>
             </div>
           </div>
         </div>

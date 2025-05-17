@@ -1,18 +1,14 @@
-import React, { Suspense } from "react";
+import React from "react";
 import Sidebar from "../Sidebar";
-import Rate from "./Filters/Rate";
 import PaymentMethods from "./Filters/PaymentMethods";
-import ContactTypes from "./Filters/ContactTypes";
 import Coverage from "./Filters/Coverage";
 import Category from "./Filters/Category";
-import Experience from "./Filters/Experience";
 import Content from "./Content";
 import ContentSkeleton from "./ContentSkeleton";
-import BorderSpinner from "../../Spinners/BorderSpinner";
 import SidebarModal from "../SidebarModal";
-import Top from "./Filters/Top";
 import Verified from "./Filters/Verified";
 import Skills from "./Filters/Skills";
+import Pending from "../../suspense/Pending";
 
 export default function FreelancersArchive({
   taxonomies,
@@ -24,28 +20,29 @@ export default function FreelancersArchive({
   multiSelectData,
   childPath,
 }) {
+  // This was used for Suspense key
   // Remove 'cov_c_s' from searchParams
-  const filteredSearchParams = Object.fromEntries(
-    Object.entries(searchParams).filter(
-      ([key]) =>
-        key !== "cat_s" &&
-        key !== "skills_s" &&
-        key !== "skills_p" &&
-        key !== "skills_ps" &&
-        key !== "cov_c_s" &&
-        key !== "covc_p" &&
-        key !== "covc_ps" &&
-        key !== "cat_p" &&
-        key !== "cat_ps"
-    )
-  );
+  // const filteredSearchParams = Object.fromEntries(
+  //   Object.entries(searchParams).filter(
+  //     ([key]) =>
+  //       key !== "cat_s" &&
+  //       key !== "skills_s" &&
+  //       key !== "skills_p" &&
+  //       key !== "skills_ps" &&
+  //       key !== "cov_c_s" &&
+  //       key !== "covc_p" &&
+  //       key !== "covc_ps" &&
+  //       key !== "cat_p" &&
+  //       key !== "cat_ps"
+  //   )
+  // );
 
   const filters = [
     {
       heading: "Πιστοποιημένα Προφίλ",
       params: ["ver"],
       component: <Verified />,
-      noCollapse: true
+      noCollapse: true,
     },
     {
       heading: "Κατηγορία",
@@ -87,16 +84,12 @@ export default function FreelancersArchive({
               <Sidebar filters={filters} searchParams={searchParams} />
             </div>
             <div className="col-lg-9 archive-content">
-              <BorderSpinner className="archive-content-spinner" />
-              <Suspense
-                key={JSON.stringify(filteredSearchParams)}
-                fallback={<ContentSkeleton />}
-              >
+              <Pending fallback={<ContentSkeleton />}>
                 <Content
                   paramsFilters={paramsFilters}
                   taxonomies={taxonomies}
                 />
-              </Suspense>
+              </Pending>
             </div>
           </div>
         </div>
