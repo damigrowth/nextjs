@@ -402,6 +402,14 @@ const SERVICES_BY_FREELANCER_FOR_REVIEWS = gql`
   ${PAGINATION}
 `;
 
+const DRAFT_SERVICES = gql`
+  query GetDraftServices {
+    draftServices {
+      count
+    }
+  }
+`;
+
 export {
   SERVICE_BY_ID,
   SERVICES_BY_ID,
@@ -417,4 +425,5 @@ export {
   SERVICES_ALL,
   SERVICES_BY_FREELANCER,
   SERVICES_BY_FREELANCER_FOR_REVIEWS,
+  DRAFT_SERVICES,
 };
