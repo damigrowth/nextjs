@@ -24,7 +24,9 @@ export default function Features() {
                   <span className={feature.iconClass}></span>
                 </div>
                 <div className="details textpad">
-                  <h4 className="title mt10 mb-3" style={{ color: "#5bbb7b" }}>{feature.title}</h4>
+                  <h4 className="title mt10 mb-3" style={{ color: "#5bbb7b" }}>
+                    {feature.title}
+                  </h4>
                   <p
                     style={{ color: "#ffffff" }}
                     dangerouslySetInnerHTML={{ __html: feature.description }}
