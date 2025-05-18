@@ -145,7 +145,7 @@ const FREELANCERS_ARCHIVE = gql`
         ]
       }
       sort: $sort
-      pagination: { page: $page, pageSize: 20 }
+      pagination: { page: $page, pageSize: 21 }
     ) {
       data {
         id
@@ -203,7 +203,7 @@ const FREELANCERS_ARCHIVE_WITH_SKILLS = gql`
         ]
       }
       sort: $sort
-      pagination: { page: $page, pageSize: 20 }
+      pagination: { page: $page, pageSize: 21 }
     ) {
       data {
         id
