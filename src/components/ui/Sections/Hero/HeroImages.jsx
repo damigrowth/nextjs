@@ -22,6 +22,7 @@ export default function HeroImages() {
         className="img-0"
         src="/images/about/home12-hero-img.png"
         alt=" image "
+        priority
       />
       <div className="iconbox-small1 text-start d-flex wow fadeInRight default-box-shadow4 bounce-x animate-up-1">
         <span className="icon flaticon-review"></span>

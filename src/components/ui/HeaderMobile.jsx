@@ -1,5 +1,4 @@
 import React from "react";
-import UserImage from "../user/UserImage";
 import Link from "next/link";
 import Image from "next/image";
 import UserMenu from "../dashboard/header/UserMenu";
@@ -17,6 +16,8 @@ export default function HeaderMobile() {
                   width={133}
                   src="/images/doulitsa-logo.svg"
                   alt="Header Logo"
+                  unoptimized
+                  priority
                 />
               </Link>
               <div className="d-flex align-items-center right-side text-end">
