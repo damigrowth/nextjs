@@ -214,7 +214,7 @@ export default function FreelancerProfile({
                 )}
               </Protected>
 
-              {!isOwner && fid && (
+              {!isOwner && (
                 <div className="text-start mt50">
                   <button
                     className="ud-btn btn-thm-border mb25 me-4"
