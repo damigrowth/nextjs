@@ -43,12 +43,10 @@ export default async function page({ params, searchParams }) {
 
   const currentFreelancer = await getFreelancer();
 
-  const {
-    id: fid,
-    displayName: freelancerDisplayName,
-    username: freelancerUsername,
-    email: freelancerEmail,
-  } = currentFreelancer;
+  const fid = currentFreelancer?.id;
+  const freelancerDisplayName = currentFreelancer?.displayName;
+  const freelancerUsername = currentFreelancer?.username;
+  const freelancerEmail = currentFreelancer?.email;
 
   const { freelancer } = await getFreelancerByUsername(username);
 
