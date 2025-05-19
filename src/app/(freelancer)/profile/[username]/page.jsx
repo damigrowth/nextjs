@@ -55,7 +55,7 @@ export default async function page({ params, searchParams }) {
   if (!freelancer || freelancer.image.data === null) {
     redirect("/not-found");
   } else {
-    const freelancerId = freelancer.id;
+    const freelancerId = freelancer?.id;
 
     let servicesPage = parseInt(searchParmasServices, 10);
     servicesPage = !servicesPage || servicesPage < 1 ? 1 : servicesPage;
