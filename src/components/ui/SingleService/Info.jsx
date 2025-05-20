@@ -66,7 +66,7 @@ export default function Info({
               <span className="flaticon-recycle" />
             </div>
             <div className="details">
-              <h5 className="title">Συνδρομή</h5>
+              <h5 className="title">Πληρωμή</h5>
               <p className="mb-0 text">
                 {{
                   month: "Μηνιαία",
