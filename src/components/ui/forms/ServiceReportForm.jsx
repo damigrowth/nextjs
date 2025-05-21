@@ -45,39 +45,81 @@ const initialActionState = {
 /**
  * ServiceReportForm component allows users to submit service-specific reports.
  * It handles form state, input changes, submission, and response feedback.
+ *
  * @param {object} props - Component props.
- * @param {string|number} props.fid - ID of the freelancer being reported.
- * @param {string} props.email - Email of the freelancer being reported.
- * @param {string} props.displayName - Display name of the freelancer being reported.
- * @param {string|number} props.serviceId - ID of the service being reported.
- * @param {string} props.title - Title of the service being reported.
+ * @param {object} props.reporter - The user submitting the report.
+ * @param {string} props.reporter.id - ID of the reporter.
+ * @param {string} [props.reporter.email] - Email of the reporter (optional).
+ * @param {string} [props.reporter.displayName] - Display name of the reporter (optional).
+ * @param {string} [props.reporter.username] - Username of the reporter (optional).
+ * @param {object} props.reported - The freelancer being reported (owner of the service).
+ * @param {string} props.reported.id - ID of the reported freelancer.
+ * @param {string} [props.reported.email] - Email of the reported freelancer (optional).
+ * @param {string} [props.reported.displayName] - Display name of the reported freelancer (optional).
+ * @param {string} [props.reported.username] - Username of the reported freelancer (optional).
+ * @param {object} props.service - The service being reported.
+ * @param {string} props.service.id - ID of the service.
+ * @param {string} props.service.title - Title of the service.
  * @returns {JSX.Element} The service report form component.
  */
-export default function ServiceReportForm({
-  fid,
-  email,
-  displayName,
-  serviceId,
-  title,
-}) {
+export default function ServiceReportForm({ reporter, reported, service }) {
+  /**
+   * @type {[object, function, boolean]} state
+   * @description Manages the state of the form action, including messages, errors, and success status.
+   * `state`: The current state from the server action.
+   * `formAction`: The function to trigger the server action.
+   * `isPending`: A boolean indicating if the server action is currently pending.
+   */
   const [state, formAction, isPending] = useActionState(
     createServiceReport,
     initialActionState
   );
+
+  /**
+   * @type {[object, function]} formValues
+   * @description Manages the values of the form fields (e.g., description).
+   */
   const [formValues, setFormValues] = useState(initialFormState);
+
+  /**
+   * @type {[string, function]} currentUrl
+   * @description Stores the current URL of the page, to be included in the report.
+   */
   const [currentUrl, setCurrentUrl] = useState("");
+
+  /**
+   * @type {[boolean, function]} isPendingTransition
+   * @description Manages the pending state for transitions, e.g., when resetting the action state.
+   * `isPendingTransition`: A boolean indicating if a transition is pending.
+   * `startTransition`: Function to start a new transition.
+   */
   const [isPendingTransition, startTransition] = useTransition();
+
+  /**
+   * @type {React.RefObject} closeButtonRef
+   * @description Ref for the modal's close button, used to programmatically close the modal.
+   */
   const closeButtonRef = useRef(null);
 
+  /**
+   * @type {{changes: object, hasChanges: boolean}} useFormChangesResult
+   * @description Custom hook to track changes in form values compared to their initial state.
+   * `changes`: An object detailing which fields have changed.
+   * `hasChanges`: A boolean indicating if any form field has changed.
+   */
   const { changes, hasChanges } = useFormChanges(formValues, initialFormState);
 
+  /**
+   * @type {{handleLinkClick: function}} useModalCleanupResult
+   * @description Custom hook to handle cleanup when a modal is closed via a link click (e.g., navigating away).
+   */
   const { handleLinkClick } = useModalCleanup("serviceReportModal");
 
   /**
+   * Updates the form state when an input field (e.g., description textarea) changes.
    * @function handleInputChange
-   * @description Updates the form state when an input field changes.
    * @param {string|number} value - The new value of the input field.
-   * @param {string} name - The name of the input field.
+   * @param {string} name - The name of the input field (e.g., "description").
    */
   const handleInputChange = (value, name) => {
     setFormValues((prev) => ({
@@ -153,15 +195,20 @@ export default function ServiceReportForm({
 
   return (
     <ServiceReportModal closeButtonRef={closeButtonRef}>
-      {fid ? (
+      {reporter.id ? (
         <form action={formAction} className="w-100">
           <input type="hidden" name="currentUrl" value={currentUrl} />
-          <input type="hidden" name="serviceId" value={serviceId || ""} />
-          <input type="hidden" name="title" value={title || ""} />
-          <input type="hidden" name="fid" value={fid || ""} />
-          <input type="hidden" name="email" value={email || ""} />
-          <input type="hidden" name="displayName" value={displayName || ""} />
-
+          <input
+            type="hidden"
+            name="reporter"
+            value={JSON.stringify(reporter)}
+          />
+          <input
+            type="hidden"
+            name="reported"
+            value={JSON.stringify(reported)}
+          />
+          <input type="hidden" name="service" value={JSON.stringify(service)} />
           <div className="mb-3">
             <TextArea
               label="Περιγραφή"

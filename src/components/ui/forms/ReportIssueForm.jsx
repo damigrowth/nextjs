@@ -7,6 +7,7 @@ import React, {
   useRef,
   useTransition,
 } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import CheckSelect from "../Archives/Inputs/CheckSelect";
 import TextArea from "../../inputs/TextArea";
 import SaveButton from "../buttons/SaveButton";
@@ -45,6 +46,9 @@ export default function ReportIssueForm() {
   const [currentUrl, setCurrentUrl] = useState("");
   const [isPendingTransition, startTransition] = useTransition();
   const closeButtonRef = useRef(null);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [currentHash, setCurrentHash] = useState("");
 
   const { changes, hasChanges } = useFormChanges(formValues, initialFormState);
 
@@ -84,12 +88,36 @@ export default function ReportIssueForm() {
     },
   ];
 
-  // Set the current URL when the component mounts
+  // Effect to update currentHash when window.location.hash changes
+  useEffect(() => {
+    const updateHash = () => {
+      setCurrentHash(window.location.hash);
+    };
+
+    // Set initial hash
+    if (typeof window !== "undefined") {
+      updateHash();
+    }
+
+    window.addEventListener("hashchange", updateHash);
+    return () => {
+      window.removeEventListener("hashchange", updateHash);
+    };
+  }, []);
+
+  // Set the current URL when the component mounts or relevant parts change
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setCurrentUrl(window.location.href);
+      const paramsString = searchParams.toString();
+      const queryString = paramsString ? `?${paramsString}` : "";
+      // Use currentHash from state, ensuring it's an empty string if not present
+      const hashString = currentHash || "";
+
+      const fullUrl =
+        window.location.origin + pathname + queryString + hashString;
+      setCurrentUrl(fullUrl);
     }
-  }, []);
+  }, [pathname, searchParams, currentHash]); // Add currentHash to dependencies
 
   // Handle success and reset everything
   useEffect(() => {

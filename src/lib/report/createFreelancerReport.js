@@ -131,8 +131,7 @@ export async function createFreelancerReport(prevState, formData) {
       /\n/g,
       "<br>"
     )}<br><br>`;
-
-    emailMessage += `<strong>Αναφερόμενος Freelancer (Ποιος αναφέρθηκε):</strong><br>`;
+    emailMessage += `<strong>Αναφορά για το προφίλ:</strong><br>`;
     emailMessage += `ID: ${reported.id}<br>`;
     if (reported.displayName)
       emailMessage += `Όνομα: ${reported.displayName}<br>`;
@@ -140,7 +139,7 @@ export async function createFreelancerReport(prevState, formData) {
     if (reported.username) emailMessage += `Username: ${reported.username}<br>`;
     emailMessage += `<a href="https://api.doulitsa.gr/admin/content-manager/collection-types/api::freelancer.freelancer/${reported.id}" target="_blank">Προβολή Αναφερόμενου στο Strapi</a><br><br>`;
 
-    emailMessage += `<strong>Αναφέρων Freelancer (Ποιος έκανε την αναφορά):</strong><br>`;
+    emailMessage += `<strong>Υποβολή αναφοράς από:</strong><br>`;
     emailMessage += `ID: ${reporter.id}<br>`;
     if (reporter.displayName)
       emailMessage += `Όνομα: ${reporter.displayName}<br>`;
@@ -155,6 +154,10 @@ export async function createFreelancerReport(prevState, formData) {
         name: reporter.displayName,
         email: reporter.email,
         message: emailMessage,
+        subject: "Λάβαμε την αναφορά σου!",
+        adminSubject: `Νέα Αναφορά Προφίλ! - ${reporter.email}`,
+        title: `Λάβαμε την αναφορά σου ${reporter.displayName}!`,
+        adminTitle: "Νέα Φόρμα Αναφοράς Προφίλ",
       },
     };
 
