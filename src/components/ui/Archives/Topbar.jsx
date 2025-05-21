@@ -4,23 +4,24 @@ import FiltersModalBtn from "./SidebarModalBtn";
 import SearchChip from "./Chips/SearchChip";
 
 export default function Topbar({ meta, single, plural, sortOptions }) {
-  let total = 0;
+  // 21/5/2025 Hidden total until changed
+  // let total = 0;
 
-  if (!meta || meta.total === 0) {
-    total = `0 ${plural}`;
-  } else if (meta.total === 1) {
-    total = meta.total + " " + single;
-  } else if (meta.total > 1) {
-    total = meta.total + " " + plural;
-  }
+  // if (!meta || meta.total === 0) {
+  //   total = `0 ${plural}`;
+  // } else if (meta.total === 1) {
+  //   total = meta.total + " " + single;
+  // } else if (meta.total > 1) {
+  //   total = meta.total + " " + plural;
+  // }
 
   return (
     <div className="row align-items-center mb20">
       <div className="col-md-6">
         <div className="d-flex text-center text-md-start">
-          <p className="text mb-0 mb10-sm">
+          {/* <p className="text mb-0 mb10-sm">
             <span className="fw500 data-loading-element">{total}</span>
-          </p>
+          </p> */}
           <SearchChip />
         </div>
       </div>
