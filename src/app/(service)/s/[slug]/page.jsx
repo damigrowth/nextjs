@@ -57,7 +57,12 @@ export default async function page({ params, searchParams }) {
 
     const { categories } = await getData(CATEGORIES);
 
-    const { id: fid, displayName, username, email } = await getFreelancer();
+    const freelancer = await getFreelancer();
+
+    const fid = freelancer?.id;
+    const email = freelancer?.email;
+    const displayName = freelancer?.displayName;
+    const username = freelancer?.username;
 
     let savedStatus;
 
