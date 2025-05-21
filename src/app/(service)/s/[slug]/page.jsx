@@ -1,21 +1,14 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import SingleService from "@/components/ui/SingleService/SingleService";
-import {
-  getReviewsByService,
-  getServiceById,
-  getServiceBySlug,
-  getServicesById,
-} from "@/lib/service/service";
-import ServiceBreadcrumb from "@/components/ui/breadcrumbs/service/ServiceBreadcrumb";
+import { getReviewsByService, getServicesById } from "@/lib/service/service";
 import { getData } from "@/lib/client/operations";
 import Tabs from "@/components/ui/Archives/Tabs";
 import { Meta } from "@/utils/Seo/Meta/Meta";
 import { CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/service";
-import FeaturedServices from "@/components/ui/SingleService/Featured";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
 import { getSavedStatus } from "@/lib/save";
-import { getFreelancerId } from "@/lib/users/freelancer";
+import { getFreelancer } from "@/lib/users/freelancer";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -64,7 +57,7 @@ export default async function page({ params, searchParams }) {
 
     const { categories } = await getData(CATEGORIES);
 
-    const fid = await getFreelancerId();
+    const { id: fid, displayName, username, email } = await getFreelancer();
 
     let savedStatus;
 
@@ -91,6 +84,9 @@ export default async function page({ params, searchParams }) {
           <SingleService
             slug={slug}
             fid={fid}
+            freelancerDisplayName={displayName}
+            freelancerUsername={username}
+            freelancerEmail={email}
             serviceId={serviceId}
             service={service}
             reviews={reviews}

@@ -13,7 +13,7 @@ import FeaturedFiles from "./FeaturedFiles";
 import Reviews from "../Reviews/Reviews";
 import Terms from "./Terms";
 import FeaturedFile from "./FeaturedFile";
-import ServiceAudioFiles from "./ServiceAudioFiles"; // Import the new component
+import ServiceAudioFiles from "./ServiceAudioFiles";
 import ServiceSchema from "@/utils/Seo/Schema/ServiceSchema";
 import Protected from "@/components/auth/Protected";
 import { getUserId } from "@/lib/auth/user";
@@ -23,14 +23,15 @@ import StartChatModal from "@/components/modal/StartChatModal";
 import ServiceReportForm from "../forms/ServiceReportForm";
 
 export default async function SingleService({
-  slug,
   fid,
+  freelancerDisplayName,
+  freelancerUsername,
+  freelancerEmail,
   serviceId,
   service,
   reviews,
   reviewsPage,
   reviewsMeta,
-  isAuthenticated,
 }) {
   const {
     title,
@@ -314,11 +315,22 @@ export default async function SingleService({
         }
       />
       <ServiceReportForm
-        fid={fid}
-        email={email}
-        displayName={displayName}
-        serviceId={serviceId}
-        title={title}
+        reporter={{
+          id: fid,
+          email: freelancerEmail,
+          displayName: freelancerDisplayName,
+          username: freelancerUsername,
+        }}
+        reported={{
+          id: freelancerId,
+          email: email,
+          displayName: displayName,
+          username: username,
+        }}
+        service={{
+          id: serviceId,
+          title: title,
+        }}
       />
     </section>
   );
