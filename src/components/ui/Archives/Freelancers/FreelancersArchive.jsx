@@ -20,22 +20,21 @@ export default function FreelancersArchive({
   multiSelectData,
   childPath,
 }) {
-  // This was used for Suspense key
   // Remove 'cov_c_s' from searchParams
-  // const filteredSearchParams = Object.fromEntries(
-  //   Object.entries(searchParams).filter(
-  //     ([key]) =>
-  //       key !== "cat_s" &&
-  //       key !== "skills_s" &&
-  //       key !== "skills_p" &&
-  //       key !== "skills_ps" &&
-  //       key !== "cov_c_s" &&
-  //       key !== "covc_p" &&
-  //       key !== "covc_ps" &&
-  //       key !== "cat_p" &&
-  //       key !== "cat_ps"
-  //   )
-  // );
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(
+      ([key]) =>
+        key !== "cat_s" &&
+        key !== "skills_s" &&
+        key !== "skills_p" &&
+        key !== "skills_ps" &&
+        key !== "cov_c_s" &&
+        key !== "covc_p" &&
+        key !== "covc_ps" &&
+        key !== "cat_p" &&
+        key !== "cat_ps"
+    )
+  );
 
   const filters = [
     {
@@ -84,7 +83,10 @@ export default function FreelancersArchive({
               <Sidebar filters={filters} searchParams={searchParams} />
             </div>
             <div className="col-lg-9 archive-content">
-              <Pending fallback={<ContentSkeleton />}>
+              <Pending
+                fallback={<ContentSkeleton />}
+                keys={filteredSearchParams}
+              >
                 <Content
                   paramsFilters={paramsFilters}
                   taxonomies={taxonomies}
