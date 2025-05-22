@@ -4,7 +4,7 @@ import { Meta } from "@/utils/Seo/Meta/Meta";
 import {
   CATEGORIES,
   SUBCATEGORIES_SEARCH_FILTERED,
-  CATEGORIES_FOR_FILTERED_SERVICES,
+  SUBCATEGORIES_FOR_FILTERED_SERVICES,
 } from "@/lib/graphql/queries/main/taxonomies/service";
 import Tabs from "@/components/ui/Archives/Tabs";
 import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
@@ -78,18 +78,20 @@ export default async function page({ searchParams }) {
   let tagsSearch = tags_s ? tags_s : undefined;
 
   // Fetch categories based on filtered services
+  const subcategoriesQueryVariables = {
+    search: paramsFilters.search,
+    min: paramsFilters.min,
+    max: paramsFilters.max,
+    time: paramsFilters.time,
+    tags: paramsFilters.tags,
+    verified: paramsFilters.verified,
+    subcategoryPage: paramsFilters.subcategoryPage,
+    subcategoryPageSize: paramsFilters.subcategoryPageSize,
+  };
+
   const { subcategoriesForFilteredResults } = await getData(
-    CATEGORIES_FOR_FILTERED_SERVICES,
-    {
-      search: paramsFilters.search,
-      min: paramsFilters.min,
-      max: paramsFilters.max,
-      time: paramsFilters.time,
-      tags: paramsFilters.tags,
-      verified: paramsFilters.verified,
-      subcategoryPage: paramsFilters.subcategoryPage,
-      subcategoryPageSize: paramsFilters.subcategoryPageSize,
-    }
+    SUBCATEGORIES_FOR_FILTERED_SERVICES,
+    subcategoriesQueryVariables
   );
 
   // Fallback to old query for search functionality only
