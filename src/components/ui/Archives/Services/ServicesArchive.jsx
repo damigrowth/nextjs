@@ -16,22 +16,21 @@ export default function ServicesArchive({
   selectData,
   multiSelectData,
 }) {
-  // // This was used for Suspense key
-  // // Remove 'cat_s' from searchParams
-  // const filteredSearchParams = Object.fromEntries(
-  //   Object.entries(searchParams).filter(
-  //     ([key]) =>
-  //       key !== "cat_s" &&
-  //       key !== "tags_s" &&
-  //       key !== "tags_p" &&
-  //       key !== "tags_ps" &&
-  //       key !== "cov_c_s" &&
-  //       key !== "covc_p" &&
-  //       key !== "covc_ps" &&
-  //       key !== "cat_p" &&
-  //       key !== "cat_ps"
-  //   )
-  // );
+  // Remove 'cat_s' from searchParams
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(
+      ([key]) =>
+        key !== "cat_s" &&
+        key !== "tags_s" &&
+        key !== "tags_p" &&
+        key !== "tags_ps" &&
+        key !== "cov_c_s" &&
+        key !== "covc_p" &&
+        key !== "covc_ps" &&
+        key !== "cat_p" &&
+        key !== "cat_ps"
+    )
+  );
 
   const filters = [
     { heading: "Τιμή", params: ["min", "max"], component: <Price /> },
@@ -64,7 +63,10 @@ export default function ServicesArchive({
               <Sidebar filters={filters} searchParams={searchParams} />
             </div>
             <div className="col-lg-9 archive-content">
-              <Pending fallback={<ContentSkeleton />}>
+              <Pending
+                fallback={<ContentSkeleton />}
+                keys={filteredSearchParams}
+              >
                 <Content
                   paramsFilters={paramsFilters}
                   taxonomies={taxonomies}

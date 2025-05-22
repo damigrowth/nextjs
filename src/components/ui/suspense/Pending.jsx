@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-export default function Pending({ children, fallback }) {
+export default function Pending({ children, fallback, keys }) {
   const [isPending, setIsPending] = useState(false);
 
   useEffect(() => {
@@ -24,5 +24,11 @@ export default function Pending({ children, fallback }) {
     return () => observer.disconnect();
   }, []);
 
-  return isPending ? fallback : children;
+  return isPending ? (
+    fallback
+  ) : (
+    <Suspense fallback={fallback} key={JSON.stringify(keys)}>
+      {children}
+    </Suspense>
+  );
 }
