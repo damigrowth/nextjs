@@ -25,7 +25,7 @@
     "fslightbox-react": "^1.8.0",
     "graphql": "^16.8.2",
     "js-cookie": "^3.0.5",
-    "lodash.debounce": "^4.17.21",
+    "lodash.debounce": "4.0.8",
     "react-countup": "^6.4.2",
     "react-dropzone": "^14.2.3",
     "react-google-recaptcha": "^3.1.0",
