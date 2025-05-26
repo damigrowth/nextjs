@@ -18,9 +18,7 @@ const cookieConfig = {
  */
 export const getToken = async () => {
   const cookieStore = await cookies();
-
   const token = (await cookieStore.get(TOKEN_NAME)?.value) ?? null;
-
   return token;
 };
 
@@ -30,7 +28,6 @@ export const getToken = async () => {
  */
 export const isAuthenticated = async () => {
   const token = await getToken();
-
   return Boolean(token);
 };
 
@@ -41,7 +38,6 @@ export const isAuthenticated = async () => {
  */
 export const setToken = async (token, options = {}) => {
   const cookieStore = await cookies();
-
   await cookieStore.set(TOKEN_NAME, token, {
     ...cookieConfig,
     ...options,
@@ -53,7 +49,6 @@ export const setToken = async (token, options = {}) => {
  */
 export const removeToken = async () => {
   const cookieStore = await cookies();
-
   await cookieStore.set(TOKEN_NAME, '', {
     ...cookieConfig,
     maxAge: 0,
@@ -66,7 +61,6 @@ export const removeToken = async () => {
  */
 export const getAuthHeader = async () => {
   const token = await getToken();
-
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
@@ -76,5 +70,7 @@ export const getAuthHeader = async () => {
  * @returns {string|null}
  */
 export const getTokenFromRequest = async (request) => {
+  // The 'request' object itself contains the cookies, no need to await it.
+  // console.log('Request', request); // Keep this for debugging if needed
   return request.cookies.get(TOKEN_NAME)?.value ?? null;
 };

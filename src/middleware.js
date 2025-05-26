@@ -11,9 +11,8 @@ export async function middleware(request) {
 
   const isUnderMaintenance = false;
 
-  const token = getTokenFromRequest(request);
+  const token = await getTokenFromRequest(request);
 
-  // console.log("token", token);
   const freelancer = await getFreelancerId(token);
 
   // Check for the problematic state: token exists but no freelancer profile
