@@ -1,5 +1,6 @@
-import { gql } from "@apollo/client";
-import { SINGLE_IMAGE } from "../../global";
+import { gql } from '@apollo/client';
+
+import { SINGLE_IMAGE } from '../../global';
 
 const FREELANCER_CATEGORY = gql`
   fragment FreelancerCategory on FreelancerCategoryEntityResponse {

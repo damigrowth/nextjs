@@ -1,11 +1,12 @@
-import { gql } from "@apollo/client";
-import { SPECIALIZATION_ENTITY } from "../specialisation";
+import { gql } from '@apollo/client';
+
+import { VISIBILITY } from '../../components/global';
+import { SINGLE_IMAGE } from '../../global';
 import {
   FREELANCER_CATEGORY,
   FREELANCER_SUBCATEGORY_PARTIAL,
-} from "../../taxonomies/freelancer";
-import { SINGLE_IMAGE } from "../../global";
-import { VISIBILITY } from "../../components/global";
+} from '../../taxonomies/freelancer';
+import { SPECIALIZATION_ENTITY } from '../specialisation';
 
 const FREELANCER_SMALL = gql`
   fragment FreelancerSmall on FreelancerEntityResponse {
@@ -99,7 +100,6 @@ const FREELANCER_REFERENCE = gql`
       ...FreelancerSubcategoryPartial
     }
   }
-
   ${SINGLE_IMAGE}
   ${VISIBILITY}
   ${SPECIALIZATION_ENTITY}
@@ -109,8 +109,8 @@ const FREELANCER_REFERENCE = gql`
 `;
 
 export {
-  FREELANCER_TYPE,
   FREELANCER_BASIC,
   FREELANCER_REFERENCE,
   FREELANCER_SMALL,
+  FREELANCER_TYPE,
 };

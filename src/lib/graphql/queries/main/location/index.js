@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
-import { PAGINATION } from "../../fragments/global";
+import { gql } from '@apollo/client';
+import { PAGINATION } from '../../fragments';
 
 const COUNTIES_SEARCH = gql`
   query CountiesSearch(
@@ -199,10 +199,10 @@ const ONSITE_AREAS = gql`
 `;
 
 export {
-  COUNTIES_SEARCH,
   AREAS_SEARCH,
-  ZIPCODES_SEARCH,
+  COUNTIES_SEARCH,
   ONBASE_ZIPCODES,
   ONSITE_AREAS,
   ONSITE_COUNTIES,
+  ZIPCODES_SEARCH,
 };

@@ -1,6 +1,5 @@
-import { TAG } from "@/lib/graphql/queries/fragments/entities/tag";
-import { PAGINATION } from "@/lib/graphql/queries/fragments/global";
-import { gql } from "@apollo/client";
+import { PAGINATION, TAG } from '@/lib/graphql/queries/fragments';
+import { gql } from '@apollo/client';
 
 // const TAGS = gql`
 //   query GetTags {
@@ -12,7 +11,6 @@ import { gql } from "@apollo/client";
 //   }
 //   ${TAG}
 // `;
-
 const TAGS_SEARCH = gql`
   query TagsSearch(
     $label: String
@@ -110,11 +108,11 @@ const TAGS_FOR_FILTERED_SERVICES = gql`
                 { subdivision: { label_normalized: { containsi: $search } } }
                 { tags: { label_normalized: { containsi: $search } } }
               ]
-            },
-            { price: { gte: $min, lte: $max } },
-            { time: { lte: $time } },
-            { freelancer: { id: { notNull: true } } },
-            { status: { type: { eq: "Active" } } },
+            }
+            { price: { gte: $min, lte: $max } }
+            { time: { lte: $time } }
+            { freelancer: { id: { notNull: true } } }
+            { status: { type: { eq: "Active" } } }
             { freelancer: { verified: { eq: $verified } } }
           ]
         }
@@ -171,16 +169,16 @@ const TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY = gql`
                 { subdivision: { label_normalized: { containsi: $search } } }
                 { tags: { label_normalized: { containsi: $search } } }
               ]
-            },
-            { price: { gte: $min, lte: $max } },
-            { time: { lte: $time } },
-            { freelancer: { id: { notNull: true } } },
-            { status: { type: { eq: "Active" } } },
-            { freelancer: { verified: { eq: $verified } } },
+            }
+            { price: { gte: $min, lte: $max } }
+            { time: { lte: $time } }
+            { freelancer: { id: { notNull: true } } }
+            { status: { type: { eq: "Active" } } }
+            { freelancer: { verified: { eq: $verified } } }
             {
               or: [
-                { category: { slug: { eq: $cat } } },
-                { subcategory: { slug: { eq: $cat } } },
+                { category: { slug: { eq: $cat } } }
+                { subcategory: { slug: { eq: $cat } } }
                 { subdivision: { slug: { eq: $cat } } }
               ]
             }
@@ -202,11 +200,11 @@ const TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY = gql`
         slug: { in: $slugs }
         services: {
           and: [
-            { id: { notNull: true } },
+            { id: { notNull: true } }
             {
               or: [
-                { category: { slug: { eq: $cat } } },
-                { subcategory: { slug: { eq: $cat } } },
+                { category: { slug: { eq: $cat } } }
+                { subcategory: { slug: { eq: $cat } } }
                 { subdivision: { slug: { eq: $cat } } }
               ]
             }
@@ -223,4 +221,10 @@ const TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY = gql`
   ${TAG}
 `;
 
-export { TAGS_SEARCH, TAGS_SEARCH_SIMPLE, TAGS_SEARCH_COMPLETE, TAGS_FOR_FILTERED_SERVICES, TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY };
+export {
+  TAGS_FOR_FILTERED_SERVICES,
+  TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY,
+  TAGS_SEARCH,
+  TAGS_SEARCH_COMPLETE,
+  TAGS_SEARCH_SIMPLE,
+};

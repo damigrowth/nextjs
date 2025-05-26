@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const MIN_BUDGET_ENTITY = gql`
   fragment MinBudget on BudgetEntityResponse {

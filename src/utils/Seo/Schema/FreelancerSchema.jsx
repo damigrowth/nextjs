@@ -1,5 +1,6 @@
-import React from "react";
-import JsonLd from "./JsonLd";
+import React from 'react';
+
+import JsonLd from './JsonLd';
 
 export default function FreelancerSchema({
   username,
@@ -11,28 +12,28 @@ export default function FreelancerSchema({
   profileImage,
 }) {
   const reviewsData = reviews.map((review) => ({
-    "@type": "Review",
+    '@type': 'Review',
     reviewRating: {
-      "@type": "Rating",
+      '@type': 'Rating',
       ratingValue: review.attributes.rating,
     },
     author: {
-      "@type": "Person",
+      '@type': 'Person',
       name: review?.attributes?.user?.data?.attributes?.displayName,
     },
   }));
 
   const data = {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
     name: displayName,
     address: {
-      "@type": "PostalAddress",
+      '@type': 'PostalAddress',
       addressLocality: location,
-      addressCountry: "GR",
+      addressCountry: 'GR',
     },
     aggregateRating: {
-      "@type": "AggregateRating",
+      '@type': 'AggregateRating',
       ratingValue: rating,
       reviewCount: reviews_total,
     },

@@ -1,13 +1,11 @@
-import { gql } from "@apollo/client";
-import { USER_MAIN, USER_RELATIONS } from "../../parts/user";
-import { SINGLE_IMAGE } from "../../fragments/global";
-import { ROLE } from "../../fragments/entities/user";
-import { ORDERS } from "../../fragments/entities/order";
+import { gql } from '@apollo/client';
 import {
   FREELANCER_MAIN,
-  FREELANCER_RELATIONS,
   FREELANCER_RELATIONS_WITHOUT_USER,
-} from "../../parts/freelancer";
+  USER_MAIN,
+  USER_RELATIONS,
+} from '../../parts';
+import { ORDERS, ROLE, SINGLE_IMAGE } from '../../fragments';
 
 const ME = gql`
   query GetME {
@@ -112,7 +110,6 @@ const USER = gql`
       }
     }
   }
-
   ${SINGLE_IMAGE}
   ${FREELANCER_MAIN}
   ${FREELANCER_RELATIONS_WITHOUT_USER}
@@ -120,4 +117,4 @@ const USER = gql`
   ${ORDERS}
 `;
 
-export { ME, USER, USER_PARTIAL, USER_BY_ID_BASIC, USER_BY_ID };
+export { ME, USER, USER_BY_ID, USER_BY_ID_BASIC, USER_PARTIAL };

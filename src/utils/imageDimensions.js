@@ -9,6 +9,7 @@ export const getBestDimensions = (formats) => {
     if (formats.small) {
       return formats.small;
     }
+
     return formats.thumbnail;
   } else {
     return null;

@@ -1,24 +1,30 @@
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import MobileNavigation2 from "@/components/header/MobileNavigation2";
-import AddServiceInfo from "@/components/ui/AddServiceInfo";
-import { getToken } from "@/lib/auth/token";
-import { getUser } from "@/lib/auth/user";
-import { getFreelancer } from "@/lib/users/freelancer";
-import { inspect } from "@/utils/inspect";
+import { getToken, getUser } from '@/actions';
+import { AddServiceForm } from '@/components/form';
+import { DashboardNavigation } from '@/components/navigation';
 
 export const metadata = {
-  title: "Δημιουργία Υπηρεσίας",
+  title: 'Δημιουργία Υπηρεσίας',
 };
 
 export default async function page() {
   const user = await getUser();
+
   const jwt = await getToken();
+
   const freelancer = user.freelancer.data.attributes;
+
   const coverage = freelancer.coverage;
 
   return (
-    <>
-      <AddServiceInfo coverage={coverage} jwt={jwt} />
-    </>
+    <div className='dashboard__content dashboard-bg'>
+      <div className='row pb40'>
+        <div className='col-lg-12'>
+          <DashboardNavigation />
+        </div>
+        <div className='col-lg-12'>
+          <AddServiceForm coverage={coverage} jwt={jwt} />
+        </div>
+      </div>
+    </div>
   );
 }

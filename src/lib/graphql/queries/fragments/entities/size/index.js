@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const SIZE = gql`
   fragment Size on SizeEntityResponse {

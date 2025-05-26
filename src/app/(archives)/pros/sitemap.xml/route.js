@@ -1,11 +1,12 @@
 // Route Handler for /pros/sitemap.xml (Pros Archive)
-import { getPublicData } from "@/lib/client/operations";
+import { getPublicData } from '@/lib/client/operations';
+import { PROS_ALL } from '@/lib/graphql';
 // Import the renamed query PROS_ALL
-import { PROS_ALL } from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import { generateSitemapXml } from "@/utils/sitemapUtils";
+import { generateSitemapXml } from '@/utils/sitemapUtils';
 
 export async function GET() {
-  const baseUrl = process.env.LIVE_URL || "https://doulitsa.gr";
+  const baseUrl = process.env.LIVE_URL || 'https://doulitsa.gr';
+
   let allUrls = [];
 
   try {
@@ -19,8 +20,8 @@ export async function GET() {
     // Process the nested data to generate URLs
     categoriesWithSubcategories.forEach((category) => {
       const categoryAttr = category.attributes;
-      if (!categoryAttr?.slug) return; // Skip if category slug is missing
 
+      if (!categoryAttr?.slug) return; // Skip if category slug is missing
       // Add category URL
       allUrls.push({
         url: `${baseUrl}/pros/${categoryAttr.slug}`,
@@ -29,10 +30,11 @@ export async function GET() {
 
       // Add subcategory URLs
       const subcategories = categoryAttr.subcategories?.data || [];
+
       subcategories.forEach((subcategory) => {
         const subcategoryAttr = subcategory.attributes;
-        if (!subcategoryAttr?.slug) return; // Skip if subcategory slug is missing
 
+        if (!subcategoryAttr?.slug) return; // Skip if subcategory slug is missing
         allUrls.push({
           url: `${baseUrl}/pros/${categoryAttr.slug}/${subcategoryAttr.slug}`,
           lastModified: new Date(subcategoryAttr.updatedAt || Date.now()),
@@ -40,7 +42,7 @@ export async function GET() {
       });
     });
   } catch (error) {
-    console.error("Error fetching pros archive for sitemap:", error);
+    console.error('Error fetching pros archive for sitemap:', error);
     // Optionally return an empty sitemap or an error response
   }
 
@@ -50,7 +52,7 @@ export async function GET() {
   return new Response(xmlContent, {
     status: 200,
     headers: {
-      "Content-Type": "application/xml",
+      'Content-Type': 'application/xml',
       // Optional: Cache control headers
       // 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate', // Cache for 1 day
     },

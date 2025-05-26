@@ -1,5 +1,6 @@
-import { gql } from "@apollo/client";
-import { SINGLE_IMAGE } from "../../global";
+import { gql } from '@apollo/client';
+
+import { SINGLE_IMAGE } from '../../global';
 
 const CATEGORY = gql`
   fragment Category on CategoryEntity {
@@ -113,9 +114,9 @@ const CATEGORY_FULL = gql`
 export {
   CATEGORY,
   CATEGORY_ENTITY,
-  SUBCATEGORY_ENTITY,
-  SUBDIVISION_ENTITY,
-  SUBCATEGORY,
   CATEGORY_FULL,
+  SUBCATEGORY,
+  SUBCATEGORY_ENTITY,
   SUBDIVISION,
+  SUBDIVISION_ENTITY,
 };

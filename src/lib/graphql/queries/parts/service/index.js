@@ -1,19 +1,20 @@
-import { gql } from "@apollo/client";
-import { FREELANCER_PARTIAL } from "../freelancer";
+import { gql } from '@apollo/client';
+import { FREELANCER_PARTIAL } from '../freelancer';
 import {
+  ADDONS,
   CATEGORY,
+  FAQ,
+  FREELANCER_SMALL,
+  MULTIPLE_FILES,
+  PACKAGES,
+  RATING,
+  SERVICE_TYPE,
+  SINGLE_IMAGE,
+  STATUS,
   SUBCATEGORY_ENTITY,
   SUBDIVISION_ENTITY,
-} from "../../fragments/taxonomies/service";
-import { ADDONS, FAQ, PACKAGES } from "../../fragments/components/pricing";
-import { MULTIPLE_FILES, SINGLE_IMAGE, STATUS } from "../../fragments/global";
-import { RATING } from "../../fragments/entities/rating";
-import { TAG } from "../../fragments/entities/tag";
-import {
-  FREELANCER_BASIC,
-  FREELANCER_SMALL,
-} from "../../fragments/entities/freelancer";
-import { SERVICE_TYPE } from "../../fragments/components/service";
+  TAG,
+} from '../../fragments';
 
 const SERVICE_MAIN = gql`
   fragment ServiceMain on Service {
@@ -232,13 +233,13 @@ const FEATURED_SERVICE = gql`
 `;
 
 export {
-  SERVICE_MAIN,
-  SERVICE_RELATIONS,
-  SERVICE_SEO,
-  SERVICE_PARTIAL_MAIN,
-  SERVICE_PARTIAL_RELATIONS,
-  SERVICE_PARTIAL,
+  FEATURED_SERVICE,
   FEATURED_SERVICE_MAIN,
   FEATURED_SERVICE_RELATIONS,
-  FEATURED_SERVICE,
+  SERVICE_MAIN,
+  SERVICE_PARTIAL,
+  SERVICE_PARTIAL_MAIN,
+  SERVICE_PARTIAL_RELATIONS,
+  SERVICE_RELATIONS,
+  SERVICE_SEO,
 };

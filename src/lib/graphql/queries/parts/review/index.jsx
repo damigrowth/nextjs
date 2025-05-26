@@ -1,8 +1,6 @@
-import { gql } from "@apollo/client";
-import { SERVICE } from "../../fragments/entities/service";
-import { STATUS, TYPE } from "../../fragments/global";
-import { FREELANCER_PARTIAL } from "../freelancer";
-import { DISLIKES, LIKES } from "../../fragments/entities/review";
+import { gql } from '@apollo/client';
+import { FREELANCER_PARTIAL } from '../freelancer';
+import { DISLIKES, LIKES, SERVICE, STATUS, TYPE } from '../../fragments';
 
 const REVIEW_MAIN = gql`
   fragment ReviewMain on Review {
@@ -60,4 +58,4 @@ const REVIEW = gql`
   ${REVIEW_RELATIONS}
 `;
 
-export { REVIEW_MAIN, REVIEW_RELATIONS, REVIEW };
+export { REVIEW, REVIEW_MAIN, REVIEW_RELATIONS };

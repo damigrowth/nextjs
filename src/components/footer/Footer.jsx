@@ -1,181 +1,126 @@
-"use client";
-import Link from "next/link";
-import FooterHeader from "./FooterHeader";
-import { usePathname } from "next/navigation";
-import FooterSelect2 from "./FooterSelect2";
-import { about, category, support } from "@/data/footer";
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 
-export default function Footer() {
-  const path = usePathname();
+import {
+  accountLinks,
+  firstColumnLinks,
+  proLinks,
+  secondColumnLinks,
+} from '@/constants/footer';
 
+import Socials from '../icon/socials';
+
+export default async function Footer() {
   return (
     <>
-      <section
-        className={`footer-style1 pt25 pb-0 
-                ${
-                  path === "/home-2"
-                    ? "at-home6 home2-footer-radius"
-                    : path === "/home-4"
-                    ? "at-home7"
-                    : path === "/home-6"
-                    ? "at-home6"
-                    : path === "/home-10"
-                    ? "at-home10"
-                    : path === "/home-11"
-                    ? "at-home11"
-                    : ""
-                }
-                 `}
-      >
-        <div className="container">
-          <FooterHeader />
-          <div className="row">
-            <div className="col-sm-6 col-lg-3">
-              <div
-                className={`link-style1 mb-4 mb-sm-5 ${
-                  path === "/home-4"
-                    ? "light-style at-home8"
-                    : path === "/home-11"
-                    ? "light-style at-home11"
-                    : ""
-                }`}
-              >
-                <h5
-                  className={`mb15 ${path !== "/home-4" ? "text-white" : ""}`}
-                >
-                  About
-                </h5>
-                <div className="link-list">
-                  {about.map((item, i) => (
-                    <Link key={i} href={item.path}>
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="col-sm-6 col-lg-3">
-              <div
-                className={`link-style1 mb-4 mb-sm-5 ${
-                  path === "/home-4"
-                    ? "light-style at-home8"
-                    : path === "/home-11"
-                    ? "light-style at-home11"
-                    : ""
-                }`}
-              >
-                <h5
-                  className={`mb15 ${path !== "/home-4" ? "text-white" : ""}`}
-                >
-                  Categories
-                </h5>
-                <ul className="ps-0">
-                  {category.map((item, i) => (
-                    <li key={i}>
-                      <Link href={item.path}>{item.name}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="col-sm-6 col-lg-3">
-              <div
-                className={`link-style1 mb-4 mb-sm-5 ${
-                  path === "/home-4"
-                    ? "light-style at-home8"
-                    : path === "/home-11"
-                    ? "light-style at-home11"
-                    : ""
-                }`}
-              >
-                <h5
-                  className={`mb15 ${path !== "/home-4" ? "text-white" : ""}`}
-                >
-                  Support
-                </h5>
-                <ul className="ps-0">
-                  {support.map((item, i) => (
-                    <li key={i}>
-                      <Link href={item.path}>{item.name}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="col-sm-6 col-lg-3">
-              <div className="footer-widget">
-                <div className="footer-widget mb-4 mb-sm-5">
-                  <div className="mailchimp-widget">
-                    <h5 className="title text-white mb20">Subscribe</h5>
-                    <div
-                      className={`mailchimp-style1 ${
-                        path === "/home-11" ? " at-home11" : ""
-                      }`}
-                    >
-                      <input
-                        type="email"
-                        className="form-control"
-                        placeholder="Your email address"
-                      />
-                      <button type="submit">Send</button>
+      <section className='footer-style1 at-home2 pb-0 pt60'>
+        <div className='container'>
+          <div className='row'>
+            <div className='col-lg-6'>
+              <div className='footer-widget mb-4 mb-lg-5'>
+                <div className='row justify-content-between'>
+                  <div className='col-auto'>
+                    <div className='link-style1 mb-3'>
+                      <h6 className='mb10'>
+                        <Link href={'/about'} className='text-white'>
+                          Σχετικά
+                        </Link>
+                      </h6>
+                      <div className='link-list'>
+                        {firstColumnLinks.map((item, i) => (
+                          <Link key={i} href={`/${item.attributes.slug}`}>
+                            {item.attributes.title}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className='col-auto'>
+                    <div className='link-style1 mb-3'>
+                      <h6 className='mb10'>
+                        <Link href={'/categories'} className='text-white'>
+                          Υπηρεσίες
+                        </Link>
+                      </h6>
+                      <ul className='ps-0'>
+                        {secondColumnLinks.map((item, i) => (
+                          <li key={i}>
+                            <Link href={`/categories/${item.attributes.slug}`}>
+                              {item.attributes.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className='col-auto'>
+                    <div className='link-style1 mb-3'>
+                      <h6 className='mb10'>
+                        <Link href={'/dashboard'} className='text-white'>
+                          Ο Λογαριασμός μου
+                        </Link>
+                      </h6>
+                      <ul className='ps-0'>
+                        {accountLinks.map((item, i) => (
+                          <li key={i}>
+                            <Link href={item.slug}>{item.label}</Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className='link-style1 mb-3 pt10'>
+                      <h6 className='text-white mb10 '>Επαγγελματικά Προφίλ</h6>
+                      <ul className='ps-0'>
+                        {proLinks.map((item, i) => (
+                          <li key={i}>
+                            <Link href={item.slug}>{item.label}</Link>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 </div>
-                <div className="app-widget mb-4 mb-sm-5">
-                  <h5 className="title text-white mb20">Apps</h5>
-                  <div className="row mb-4 mb-lg-5">
-                    <div className="col-lg-12">
-                      <a className="app-list d-flex align-items-center mb10">
-                        <i className="fab fa-apple fz17 mr15" />
-                        <h6
-                          className={`app-title fz15 fw400 mb-0 ${
-                            path === "/home-11" ? "text-white" : ""
-                          }`}
+              </div>
+            </div>
+            <div className='col-lg-6 col-xl-4 offset-xl-2'>
+              <div className='footer-widget mb-4 mb-lg-5'>
+                <Link className='footer-logo' href='/'>
+                  <Image
+                    height={45}
+                    width={123}
+                    className='mb40 object-fit-contain'
+                    src='/images/doulitsa-logo.svg'
+                    alt='Doulitsa logo'
+                  />
+                </Link>
+                <div className='row mb-4 mb-lg-5'>
+                  <div className='col-auto'>
+                    <div className='contact-info'>
+                      <p className='mb-2 text-white'>Ερωτήσεις?</p>
+                      <h5 className='info-mail '>
+                        <a
+                          className='text-white'
+                          href='mailto:contact@doulitsa.gr'
                         >
-                          iOS App
-                        </h6>
-                      </a>
-                      <a className="app-list d-flex align-items-center">
-                        <i className="fab fa-google-play fz15 mr15" />
-                        <h6
-                          className={`app-title fz15 fw400 mb-0 ${
-                            path === "/home-11" ? "text-white" : ""
-                          }`}
-                        >
-                          Android App
-                        </h6>
-                      </a>
+                          contact@doulitsa.gr
+                        </a>
+                      </h5>
                     </div>
                   </div>
                 </div>
+                <Socials />
               </div>
             </div>
           </div>
         </div>
-        <div className="container white-bdrt1 py-4">
-          <div className="row align-items-center">
-            <div className="col-md-6">
-              <div className="text-center text-lg-start">
-                <p
-                  className={`copyright-text mb-2 mb-md-0  ${
-                    path === "/home-11" ? "text-white" : "text-white-light"
-                  } ff-heading`}
-                >
-                  © Doulitsa. 2023{" "}
-                  <Link
-                    href="https://themeforest.net/user/ib-themes/portfolio"
-                    target="_blank"
-                    style={{ color: "inherit" }}
-                  >
-                    ib-themes
-                  </Link>
-                  . All rights reserved.
+        <div className='container white-bdrt1 py-4'>
+          <div className='row'>
+            <div className='col-sm-6'>
+              <div className='text-center text-lg-start'>
+                <p className='copyright-text mb-2 mb-md-0 text-white-light ff-heading'>
+                  © Doulitsa 2025 All rights reserved.
                 </p>
-              </div>
-            </div>
-            <div className="col-md-6">
-              <div className="footer_bottom_right_btns text-center text-lg-end">
-                <FooterSelect2 />
               </div>
             </div>
           </div>

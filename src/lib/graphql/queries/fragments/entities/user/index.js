@@ -1,6 +1,7 @@
-import { gql } from "@apollo/client";
-import { SINGLE_IMAGE } from "../../global";
-import { VISIBILITY } from "../../components/global";
+import { gql } from '@apollo/client';
+
+import { VISIBILITY } from '../../components/global';
+import { SINGLE_IMAGE } from '../../global';
 
 const ROLE = gql`
   fragment Role on UsersPermissionsRoleEntityResponse {
@@ -14,7 +15,7 @@ const ROLE = gql`
   }
 `;
 
-const VERIFICATION = gql`
+const VERIFICATION_FRAGMENT = gql`
   fragment Verification on VerificationEntityResponse {
     data {
       id
@@ -50,7 +51,7 @@ const USER_REFERENCE = gql`
   ${SINGLE_IMAGE}
 `;
 
-const USER_PARTIAL = gql`
+const USER_PARTIAL_FRAGMENT = gql`
   fragment UserPartial on UsersPermissionsUserEntityResponse {
     data {
       id
@@ -74,4 +75,4 @@ const USER_PARTIAL = gql`
   ${VISIBILITY}
 `;
 
-export { ROLE, VERIFICATION, USER_REFERENCE, USER_PARTIAL };
+export { ROLE, USER_PARTIAL_FRAGMENT, USER_REFERENCE, VERIFICATION_FRAGMENT };

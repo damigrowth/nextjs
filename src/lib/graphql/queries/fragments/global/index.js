@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const SINGLE_IMAGE = gql`
   fragment SingleImage on UploadFileEntityResponse {
@@ -68,4 +68,4 @@ const STATUS = gql`
   }
 `;
 
-export { SINGLE_IMAGE, MULTIPLE_FILES, PAGINATION, TYPE, STATUS };
+export { MULTIPLE_FILES, PAGINATION, SINGLE_IMAGE, STATUS, TYPE };

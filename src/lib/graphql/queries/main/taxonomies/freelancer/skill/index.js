@@ -1,6 +1,5 @@
-import { SKILL_ENTITY } from "@/lib/graphql/queries/fragments/entities/skill";
-import { PAGINATION } from "@/lib/graphql/queries/fragments/global";
-import { gql } from "@apollo/client";
+import { PAGINATION, SKILL_ENTITY } from '@/lib/graphql/queries/fragments';
+import { gql } from '@apollo/client';
 
 const SKILLS_SEARCH = gql`
   query SkillsSearch(
@@ -103,8 +102,18 @@ const SKILLS_FOR_FILTERED_FREELANCERS = gql`
           }
           {
             or: [
-              { freelancers: { coverage: { county: { id: { eq: $coverageCounty } } } } }
-              { freelancers: { coverage: { areas: { county: { id: { eq: $coverageCounty } } } } } }
+              {
+                freelancers: {
+                  coverage: { county: { id: { eq: $coverageCounty } } }
+                }
+              }
+              {
+                freelancers: {
+                  coverage: {
+                    areas: { county: { id: { eq: $coverageCounty } } }
+                  }
+                }
+              }
             ]
           }
         ]
@@ -173,8 +182,18 @@ const SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY = gql`
           }
           {
             or: [
-              { freelancers: { coverage: { county: { id: { eq: $coverageCounty } } } } }
-              { freelancers: { coverage: { areas: { county: { id: { eq: $coverageCounty } } } } } }
+              {
+                freelancers: {
+                  coverage: { county: { id: { eq: $coverageCounty } } }
+                }
+              }
+              {
+                freelancers: {
+                  coverage: {
+                    areas: { county: { id: { eq: $coverageCounty } } }
+                  }
+                }
+              }
             ]
           }
         ]
@@ -205,8 +224,8 @@ const SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY = gql`
 `;
 
 export {
-  SKILLS_SEARCH,
   FREELANCER_PROFILE_SKILLS,
   SKILLS_FOR_FILTERED_FREELANCERS,
   SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY,
+  SKILLS_SEARCH,
 };

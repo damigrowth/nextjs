@@ -1,33 +1,34 @@
-import React from "react";
-import { getData } from "@/lib/client/operations";
-import { Meta } from "@/utils/Seo/Meta/Meta";
+import React from 'react';
+
+import { Banner } from '@/components/banner';
+import { BreadcrumbArchives } from '@/components/breadcrumb';
+import { ServicesArchive } from '@/components/content';
+import { Tabs } from '@/components/section';
+import { getData } from '@/lib/client/operations';
 import {
   CATEGORIES,
-  SUBCATEGORIES_SEARCH_FILTERED,
   SUBCATEGORIES_FOR_FILTERED_SERVICES,
-} from "@/lib/graphql/queries/main/taxonomies/service";
-import Tabs from "@/components/ui/Archives/Tabs";
-import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
-import Banner from "@/components/ui/Archives/Banner";
-import ServicesArchive from "@/components/ui/Archives/Services/ServicesArchive";
-import {
-  TAGS_SEARCH,
+  SUBCATEGORIES_SEARCH_FILTERED,
   TAGS_FOR_FILTERED_SERVICES,
-} from "@/lib/graphql/queries/main/taxonomies/service/tag";
-import { normalizeTerm } from "@/utils/normalizeTerm";
+  TAGS_SEARCH,
+} from '@/lib/graphql';
+import { normalizeTerm } from '@/utils/normalizeTerm';
+import { Meta } from '@/utils/Seo/Meta/Meta';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
+
 export const revalidate = 3600;
+
 export const dynamicParams = true;
 
 // Dynamic SEO
 export async function generateMetadata() {
   const { meta } = await Meta({
-    titleTemplate: "Υπηρεσίες | Doulitsa",
+    titleTemplate: 'Υπηρεσίες | Doulitsa',
     descriptionTemplate:
-      "Ανακάλυψε τις υπηρεσίες που θα καλύψουν τις ανάγκες σου.",
+      'Ανακάλυψε τις υπηρεσίες που θα καλύψουν τις ανάγκες σου.',
     size: 150,
-    url: "/ipiresies",
+    url: '/ipiresies',
   });
 
   return meta;
@@ -59,7 +60,7 @@ export default async function page({ searchParams }) {
   const addFilter = (condition, value) => (condition ? value : undefined);
 
   const paramsFilters = {
-    search: normalizeTerm(search || "") || undefined,
+    search: normalizeTerm(search || '') || undefined,
     min: addFilter(min, parseInt(min, 10)),
     max: addFilter(max, parseInt(max, 10)),
     time: addFilter(time, parseInt(time, 10)),
@@ -68,13 +69,14 @@ export default async function page({ searchParams }) {
     subcategoryPageSize: addFilter(subc_ps, parseInt(subc_ps, 10)),
     tagsPage: addFilter(tags_p, parseInt(tags_p, 10)) || 1,
     tagsPageSize: addFilter(tags_ps, parseInt(tags_ps, 10)) || 10,
-    tags: tags?.split(",").filter(Boolean),
-    verified: addFilter(ver === "", true),
+    tags: tags?.split(',').filter(Boolean),
+    verified: addFilter(ver === '', true),
     page: !page || parseInt(page, 10) < 1 ? 1 : parseInt(page, 10),
-    sort: sort ? sort : "publishedAt:desc",
+    sort: sort ? sort : 'publishedAt:desc',
   };
 
   let categorySearch = cat_s ? cat_s : undefined;
+
   let tagsSearch = tags_s ? tags_s : undefined;
 
   // Fetch categories based on filtered services
@@ -91,7 +93,7 @@ export default async function page({ searchParams }) {
 
   const { subcategoriesForFilteredResults } = await getData(
     SUBCATEGORIES_FOR_FILTERED_SERVICES,
-    subcategoriesQueryVariables
+    subcategoriesQueryVariables,
   );
 
   // Fallback to old query for search functionality only
@@ -112,10 +114,10 @@ export default async function page({ searchParams }) {
       verified: paramsFilters.verified,
       tagsPage: paramsFilters.tagsPage,
       tagsPageSize: paramsFilters.tagsPageSize,
-      label: tagsSearch || "",
+      label: tagsSearch || '',
       slugs: paramsFilters.tags || [],
     },
-    "tags"
+    'tags',
   );
 
   // Fallback to old query for search functionality only
@@ -128,15 +130,15 @@ export default async function page({ searchParams }) {
           tagsPageSize: paramsFilters.tagsPageSize,
           slugs: paramsFilters.tags,
         },
-        "tags"
+        'tags',
       )
     : { tagsBySearch: { data: [], meta: { pagination: {} } } };
 
   const selectData = {
-    option: "cat",
-    search: "cat_s",
-    page: "subc_p",
-    pageSize: "subc_ps",
+    option: 'cat',
+    search: 'cat_s',
+    page: 'subc_p',
+    pageSize: 'subc_ps',
     // Use filtered results if available, otherwise use search results
     options: categorySearch
       ? subcategoriesSearch?.data || []
@@ -144,18 +146,18 @@ export default async function page({ searchParams }) {
     pagination: categorySearch
       ? subcategoriesSearch?.meta?.pagination
       : subcategoriesForFilteredResults?.meta?.pagination,
-    rootLabel: "Όλες οι κατηγορίες",
-    defaultLabel: "Όλες οι κατηγορίες",
+    rootLabel: 'Όλες οι κατηγορίες',
+    defaultLabel: 'Όλες οι κατηγορίες',
     // defaultLabel={currCategory ? `${currCategory}` : "Όλες οι κατηγορίες"}
   };
 
   const multiSelectData = {
-    option: "tags",
-    search: "tags_s",
-    page: "tags_p",
-    pageSize: "tags_ps",
-    rootLabel: "Όλα τα tags",
-    defaultLabel: "Όλα τα tags",
+    option: 'tags',
+    search: 'tags_s',
+    page: 'tags_p',
+    pageSize: 'tags_ps',
+    rootLabel: 'Όλα τα tags',
+    defaultLabel: 'Όλα τα tags',
     // Combine both results and remove duplicates by slug
     options: [
       ...new Map(
@@ -164,7 +166,7 @@ export default async function page({ searchParams }) {
             ? oldTagsBySearch?.data || []
             : tagsForFilteredResults?.data || []),
           ...(tagsBySlug?.data || []),
-        ].map((item) => [item.attributes.slug, item])
+        ].map((item) => [item.attributes.slug, item]),
       ).values(),
     ],
     pagination: tagsSearch
@@ -174,11 +176,14 @@ export default async function page({ searchParams }) {
 
   return (
     <>
-      <Tabs type="categories" categories={categories?.data} />
-      <Breadcrumb parentPathLabel="Υπηρεσίες" parentPathLink="ipiresies" />
+      <Tabs type='categories' categories={categories?.data} />
+      <BreadcrumbArchives
+        parentPathLabel='Υπηρεσίες'
+        parentPathLink='ipiresies'
+      />
       <Banner
-        heading="Όλες οι Υπηρεσίες"
-        description="Ανακάλυψε τις καλύτερες υπηρεσίες για οποιαδήποτε ανάγκη, από τους καλύτερους επαγγελματίες."
+        heading='Όλες οι Υπηρεσίες'
+        description='Ανακάλυψε τις καλύτερες υπηρεσίες για οποιαδήποτε ανάγκη, από τους καλύτερους επαγγελματίες.'
       />
       <ServicesArchive
         searchParams={allSearchParams}

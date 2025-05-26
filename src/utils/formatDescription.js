@@ -1,12 +1,12 @@
 export const formatDescription = (text) => {
   const desc = text
-    .split("\n")
+    .split('\n')
     .map((text, index) =>
-      text.trim() !== "" ? (
+      text.trim() !== '' ? (
         <p key={index}>{text}</p>
       ) : (
-        <div key={index} className="line-break"></div>
-      )
+        <div key={index} className='line-break'></div>
+      ),
     );
 
   return desc;

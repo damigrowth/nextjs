@@ -1,26 +1,28 @@
-import React from "react";
-import JsonLd from "./JsonLd";
+import React from 'react';
+
+import JsonLd from './JsonLd';
 
 export default function HomeSchema() {
   const baseUrl = process.env.LIVE_URL;
+
   const logoUrl = `${baseUrl}/images/doulitsa-logo.svg`;
 
   const searchUrlTemplate = `/ipiresies?search={search_term_string}`;
 
   const schema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Doulitsa",
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Doulitsa',
     url: baseUrl,
     logo: logoUrl,
-    sameAs: ["https://www.linkedin.com/company/doulitsa"],
+    sameAs: ['https://www.linkedin.com/company/doulitsa'],
     potentialAction: {
-      "@type": "SearchAction",
+      '@type': 'SearchAction',
       target: `${baseUrl}${searchUrlTemplate}`,
-      "query-input": {
-        "@type": "PropertyValueSpecification",
+      'query-input': {
+        '@type': 'PropertyValueSpecification',
         valueRequired: true,
-        valueName: "search_term_string",
+        valueName: 'search_term_string',
       },
     },
   };

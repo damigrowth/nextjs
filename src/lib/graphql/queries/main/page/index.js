@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const GET_PAGE_BY_SLUG = gql`
   query GetPage($slug: String) {

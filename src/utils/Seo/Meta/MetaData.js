@@ -1,14 +1,15 @@
-"use server";
+'use server';
 
-import { truncateText } from "@/utils/truncateText";
-import { headers } from "next/headers";
+import { truncateText } from '@/utils/truncateText';
 
 export async function MetaData({ title, description, size, image, url }) {
   const truncatedDescription = truncateText(description, size);
-  const fallbackDescription =
-    "Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.";
 
-  const fallbackImage = "/images/fallback/doulitsa.png";
+  const fallbackDescription =
+    'Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.';
+
+  const fallbackImage = '/images/fallback/doulitsa.png';
+
   const baseUrl = process.env.LIVE_URL;
 
   const meta = {
@@ -19,26 +20,26 @@ export async function MetaData({ title, description, size, image, url }) {
       title,
       description: truncatedDescription || fallbackDescription,
       url: `${baseUrl}${url}`,
-      siteName: "Doulitsa",
+      siteName: 'Doulitsa',
       images: [
         {
-          url: !image || image === "" ? fallbackImage : image,
+          url: !image || image === '' ? fallbackImage : image,
           width: 1600,
           height: 900,
           alt: title,
         },
       ],
-      locale: "el_GR",
-      type: "website",
+      locale: 'el_GR',
+      type: 'website',
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title,
       description: truncatedDescription || fallbackDescription,
-      creator: "@doulitsa",
+      creator: '@doulitsa',
       images: [
         {
-          url: !image || image === "" ? fallbackImage : image,
+          url: !image || image === '' ? fallbackImage : image,
           width: 1600,
           height: 900,
           alt: title,
@@ -48,7 +49,7 @@ export async function MetaData({ title, description, size, image, url }) {
     alternates: {
       canonical: `${baseUrl}${url}`,
       languages: {
-        "el-GR": `${baseUrl}${url}`,
+        'el-GR': `${baseUrl}${url}`,
       },
     },
   };

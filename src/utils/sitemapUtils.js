@@ -1,11 +1,10 @@
-// Shared helper function to generate sitemap XML structure
-
-/**
- * Generates the XML content for a sitemap URL set, including only loc and lastmod.
- * @param {Array<{url: string, lastModified: Date}>} urls - Array of URL objects.
- * @returns {string} - The generated XML string.
- */
 export function generateSitemapXml(urls) {
+  // Shared helper function to generate sitemap XML structure
+  /**
+   * Generates the XML content for a sitemap URL set, including only loc and lastmod.
+   * @param {Array<{url: string, lastModified: Date}>} urls - Array of URL objects.
+   * @returns {string} - The generated XML string.
+   */
   const urlEntries = urls
     .map(
       // Only include loc and lastmod
@@ -13,9 +12,9 @@ export function generateSitemapXml(urls) {
   <url>
     <loc>${url}</loc>
     <lastmod>${lastModified.toISOString()}</lastmod>
-  </url>`
+  </url>`,
     )
-    .join("");
+    .join('');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

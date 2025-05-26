@@ -1,26 +1,26 @@
-import React from "react";
-import { getData } from "@/lib/client/operations";
-import Tabs from "@/components/ui/Archives/Tabs";
-import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
-import Banner from "@/components/ui/Archives/Banner";
+import { Banner } from '@/components/banner';
+import { BreadcrumbArchives } from '@/components/breadcrumb';
+import { TaxonomiesArchive } from '@/components/content';
+import { Tabs } from '@/components/section';
+import { getData } from '@/lib/client/operations';
 import {
-  CATEGORIES,
   ALL_TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES,
-} from "@/lib/graphql/queries/main/taxonomies/service";
-import { Meta } from "@/utils/Seo/Meta/Meta";
-import TaxonomiesArchive from "@/components/ui/Archives/Taxonomies/TaxonomiesArchive";
+  CATEGORIES,
+} from '@/lib/graphql';
+import { Meta } from '@/utils/Seo/Meta/Meta';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
+
 export const revalidate = 3600;
 
 // Static SEO
 export async function generateMetadata() {
   const { meta } = await Meta({
-    titleTemplate: "Κατηγορίες | Doulitsa",
+    titleTemplate: 'Κατηγορίες | Doulitsa',
     descriptionTemplate:
-      "Ανακάλυψε τις κατηγορίες υπηρεσιών που χρειάζεσαι απο τους επαγγελματίες μας.",
+      'Ανακάλυψε τις κατηγορίες υπηρεσιών που χρειάζεσαι απο τους επαγγελματίες μας.',
     size: 150,
-    url: "/categories",
+    url: '/categories',
   });
 
   return meta;
@@ -29,21 +29,28 @@ export async function generateMetadata() {
 export default async function page() {
   const { categories } = await getData(CATEGORIES);
 
-  const { categories: archiveCategories, subcategories, subdivisions } = await getData(ALL_TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES);
+  const {
+    categories: archiveCategories,
+    subcategories,
+    subdivisions,
+  } = await getData(ALL_TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES);
 
   // Δημιουργία του archive αντικειμένου για το TaxonomiesArchive component
   const archive = {
     subcategories,
-    subdivisions
+    subdivisions,
   };
 
   return (
     <>
-      <Tabs type="categories" categories={categories?.data} />
-      <Breadcrumb parentPathLabel="Κατηγορίες" parentPathLink="categories" />
+      <Tabs type='categories' categories={categories?.data} />
+      <BreadcrumbArchives
+        parentPathLabel='Κατηγορίες'
+        parentPathLink='categories'
+      />
       <Banner
-        heading="Όλες οι Κατηγορίες"
-        description="Ανακάλυψε όλες τις υπηρεσίες για κάθε ανάγκη από τους καλύτερους επαγγελματίες."
+        heading='Όλες οι Κατηγορίες'
+        description='Ανακάλυψε όλες τις υπηρεσίες για κάθε ανάγκη από τους καλύτερους επαγγελματίες.'
       />
       <TaxonomiesArchive archive={archive} />
     </>

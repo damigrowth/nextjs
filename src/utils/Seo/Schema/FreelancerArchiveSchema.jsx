@@ -1,5 +1,6 @@
-import React from "react";
-import JsonLd from "./JsonLd";
+import React from 'react';
+
+import JsonLd from './JsonLd';
 
 export default function FreelancerArchiveSchema({
   type,
@@ -9,23 +10,21 @@ export default function FreelancerArchiveSchema({
   const entitiesData = entities.map((entity, i) =>
     entity.username
       ? {
-          "@type": "ListItem",
+          '@type': 'ListItem',
           position: i + 1,
           url: `${process.env.LIVE_URL}/profile/${entity.username}`,
         }
-      : null
+      : null,
   );
 
   const taxonomiesLabels = `${
-    taxonomies.category ? " - " + taxonomies.category.plural : ""
-  }${taxonomies.subcategory ? " - " + taxonomies.subcategory.plural : ""}`;
+    taxonomies.category ? ' - ' + taxonomies.category.plural : ''
+  }${taxonomies.subcategory ? ' - ' + taxonomies.subcategory.plural : ''}`;
 
   const data = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: `${
-      type === "company" ? "Επιχειρήσεις" : "Επαγγελματίες"
-    }${taxonomiesLabels}`,
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `${type === 'company' ? 'Επιχειρήσεις' : 'Επαγγελματίες'}${taxonomiesLabels}`,
     itemListElement: entitiesData,
   };
 

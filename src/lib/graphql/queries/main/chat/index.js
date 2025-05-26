@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 export const GET_FREELANCER_CHATS = gql`
   query GetFreelancerChats($freelancerId: ID!, $page: Int, $pageSize: Int) {
@@ -104,62 +104,6 @@ export const GET_FREELANCER_CHATS = gql`
           pageSize
           pageCount
           total
-        }
-      }
-    }
-  }
-`;
-
-export const GET_CHAT_MESSAGES = gql`
-  query GetChatMessages($chatId: ID!) {
-    messages(
-      filters: { chat: { id: { eq: $chatId } } }
-      sort: "createdAt:asc"
-    ) {
-      data {
-        id
-        attributes {
-          content
-          createdAt
-          readBy {
-            data {
-              id
-            }
-          }
-          author {
-            data {
-              id
-              attributes {
-                username
-                displayName
-                type {
-                  data {
-                    id
-                    attributes {
-                      slug
-                    }
-                  }
-                }
-                status {
-                  data {
-                    id
-                    attributes {
-                      type
-                    }
-                  }
-                }
-                image {
-                  data {
-                    id
-                    attributes {
-                      formats
-                      url
-                    }
-                  }
-                }
-              }
-            }
-          }
         }
       }
     }

@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const MAINTENANCE_STATUS = gql`
   query Maintenance {
@@ -63,7 +63,7 @@ const ROOT_LAYOUT_WITH_ACTIVE_SERVICES = gql`
                 slug
                 icon
                 subcategories(
-                  sort: "label:asc" 
+                  sort: "label:asc"
                   pagination: { limit: 6 }
                   filters: {
                     services: {

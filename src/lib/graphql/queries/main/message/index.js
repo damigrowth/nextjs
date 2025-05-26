@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client"; // Assuming you use Apollo Client, adjust if using another client
+import { gql } from '@apollo/client';
 
 export const GET_CHAT_MESSAGES = gql`
   query GetChatMessages($chatId: ID!, $page: Int, $pageSize: Int) {

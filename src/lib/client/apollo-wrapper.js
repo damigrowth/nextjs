@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import { ApolloLink, HttpLink } from "@apollo/client";
+import { ApolloLink, HttpLink } from '@apollo/client';
 import {
+  ApolloClient,
   ApolloNextAppProvider,
   InMemoryCache,
-  ApolloClient,
   SSRMultipartLink,
-} from "@apollo/experimental-nextjs-app-support";
+} from '@apollo/experimental-nextjs-app-support';
 
 function makeClient() {
   const httpLink = new HttpLink({
-    uri: "/api/graphql",
-    credentials: "include", // This ensures cookies are sent with requests
+    uri: '/api/graphql',
+    credentials: 'include', // This ensures cookies are sent with requests
     fetchOptions: {
-      cache: "no-store",
+      cache: 'no-store',
     },
   });
 
   return new ApolloClient({
     cache: new InMemoryCache(),
     link:
-      typeof window === "undefined"
+      typeof window === 'undefined'
         ? ApolloLink.from([
             new SSRMultipartLink({
               stripDefer: true,

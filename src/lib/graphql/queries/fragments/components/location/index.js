@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const COVERAGE = gql`
   fragment Coverage on ComponentLocationCoverage {

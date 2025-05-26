@@ -1,15 +1,12 @@
-import React from "react";
-
 export default async function PrivacyPage() {
   return (
-    <div className="pages-content">
+    <div className='pages-content'>
       <section>
         <h2>Ι. Πολιτική απορρήτου</h2>
-
         <p>
           <span>
             1. Ο υπεύθυνος επεξεργασίας δεδομένων προσωπικού χαρακτήρα, ήτοι ο
-            ιστότοπος με το domain name{" "}
+            ιστότοπος με το domain name{' '}
           </span>
           <span>doulitsa.gr</span>
           <span>
@@ -24,7 +21,7 @@ export default async function PrivacyPage() {
           <span>2. Ο </span>
           <span>doulitsa.gr</span>
           <span>
-            {" "}
+            {' '}
             επιμελώς ασχολείται με την έρευνα για την καλύτερη προστασία των
             προσωπικών δεδομένων κατά την επεξεργασία των πληροφοριών των
             χρηστών, που αντλούνται από την επίσκεψη ή χρήση των υπηρεσιών της
@@ -47,15 +44,16 @@ export default async function PrivacyPage() {
             3. Παρακαλείται ο χρήστης να αναγνώσει τους όρους της πολιτικής
             απορρήτου της ιστοσελίδας μας, προκειμένου να ενημερωθεί σχετικά με
             τις πληροφορίες που συλλέγονται από τον ίδιο, όταν επισκέπτεται την
-            ιστοσελίδα του{" "}
+            ιστοσελίδα του{' '}
           </span>
           <span>doulitsa.gr</span>
           <span>
-            {" "}
+            {' '}
             και όταν κάνει χρήση των διαδικτυακών υπηρεσιών του, πώς αυτές
             μπορούν να χρησιμοποιηθούν και να κοινοποιηθούν, πώς προστατεύονται
             οι πληροφορίες αυτές και ποια είναι τα δικαιώματά του. Με την
-            επίσκεψη στην ιστοσελίδα και τη χρήση των διαδικτυακών υπηρεσιών του{" "}
+            επίσκεψη στην ιστοσελίδα και τη χρήση των διαδικτυακών υπηρεσιών
+            του{' '}
           </span>
           <span>doulitsa.gr</span>
           <span>
@@ -72,7 +70,6 @@ export default async function PrivacyPage() {
           <span>II. Συλλογή δεδομένων πλοήγησης</span>
           <span />
         </h2>
-
         <p>
           <span>
             1. Τα πληροφοριακά συστήματα, οι διαδικασίες και οι υπολογιστικές
@@ -80,7 +77,7 @@ export default async function PrivacyPage() {
             εφαρμογής μας κατά τη διάρκεια της λειτουργίας τους, αντλούν
             ορισμένα προσωπικά δεδομένα, η δε «άντληση» αυτή εκτελείται
             αυτομάτως από τους μηχανισμούς πρόσβασης και λειτουργίας και τα
-            πρωτόκολλα που χρησιμοποιούνται στο διαδίκτυο.{" "}
+            πρωτόκολλα που χρησιμοποιούνται στο διαδίκτυο.{' '}
           </span>
           <span />
         </p>
@@ -88,7 +85,7 @@ export default async function PrivacyPage() {
         <p>
           <span>
             2. Πλέον συγκεκριμένα, κάθε φορά που ο χρήστης συνδέεται με τον
-            ιστότοπο του{" "}
+            ιστότοπο του{' '}
           </span>
           <span>doulitsa.gr</span>
           <span>
@@ -98,7 +95,7 @@ export default async function PrivacyPage() {
             γραμμικών δεδομένων. Στην κατηγορία αυτή περιλαμβάνονται δεδομένα,
             όπως διευθύνσεις IP, ονόματα τομέα των υπολογιστών που
             χρησιμοποιούνται από τους χρήστες, που συνδέονται με την ιστοσελίδα
-            και την εφαρμογή μας, το πρόγραμμα{" "}
+            και την εφαρμογή μας, το πρόγραμμα{' '}
           </span>
           <span>
             περιήγησης του χρήστη με τη μορφή URI (Uniform Resource Identifier),
@@ -110,7 +107,6 @@ export default async function PrivacyPage() {
             και το περιβάλλον υπολογιστή του χρήστη.
           </span>
         </p>
-
         <p>
           <span>Τα δεδομένα αυτά μπορούν να χρησιμοποιηθούν από το </span>
           <span>doulitsa.gr</span>
@@ -122,7 +118,6 @@ export default async function PrivacyPage() {
             λειτουργίας τους.
           </span>
         </p>
-
         <p>
           <span>
             Επιπροσθέτως, τα ανωτέρω δεδομένα μπορούν να χρησιμοποιηθούν προς
@@ -140,18 +135,16 @@ export default async function PrivacyPage() {
           <span>III. Cookies </span>
           <span />
         </h2>
-
         <p>
           <span>Η ιστοσελίδα της doulitsa.gr </span>
           <span>χρησιμοποι</span>
           <span>εί</span>
           <span>
-            {" "}
+            {' '}
             cookies. Τα cookies είναι αρχεία κειμένου αποθηκευμένα σε ένα
             σύστημα υπολογιστή διαμέσου ενός προγράμματος περιήγησης διαδικτύου.
           </span>
         </p>
-
         <p>
           <span>
             Πολλές ιστοσελίδες και διακομιστές χρησιμοποιούν cookies. Πολλά
@@ -168,7 +161,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>Μέσω της χρήσης cookies, η </span>
           <span>doulitsa.gr </span>
@@ -196,7 +188,7 @@ export default async function PrivacyPage() {
             χρήση του cookie της ιστοσελίδας μας μέσω της σχετικής επιλογής του
             προγράμματος περιήγησης διαδικτύου που χρησιμοποιεί, καθώς και να
             αρνηθεί οριστικά τη χρήση cookies. Επιπροσθέτως, το ήδη
-            χρησιμοποιούμενο cookie μπορεί να διαγραφεί ανά{" "}
+            χρησιμοποιούμενο cookie μπορεί να διαγραφεί ανά{' '}
           </span>
           <span>
             πάσα στιγμή μέσω ενός προγράμματος περιήγησης διαδικτύου ή άλλου
@@ -216,7 +208,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Μπορείτε να ρυθμίσετε τον Browser σας, να σας ενημερώνει κάθε φορά
@@ -234,7 +225,6 @@ export default async function PrivacyPage() {
           <span>IV. Κατηγορίες Δεδομένων</span>
           <span />
         </h2>
-
         <p>
           <span>
             Οι κατηγορίες δεδομένων που μπορεί να επεξεργαζόμαστε είναι:
@@ -287,7 +277,7 @@ export default async function PrivacyPage() {
               <span>
                 Δεδομένα υπηρεσιών, δηλαδή δεδομένα από τη χρήση του ιστότοπου
                 και των υπηρεσιών του, κατά την εγγραφή κυρίως του χρήστη για
-                χρήση των υπηρεσιών του ιστότοπου{" "}
+                χρήση των υπηρεσιών του ιστότοπου{' '}
               </span>
               <span />
               <span /> 
@@ -341,12 +331,10 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </h2>
-
         <p>
           <span>-Το περιεχόμενο της αγγελίας σας.</span>
           <span />
         </p>
-
         <p>
           <span>
             -Το τηλέφωνο και email επικοινωνίας που θα συνοδεύουν τη
@@ -356,7 +344,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Τα παραπάνω στοιχεία δημοσιεύονται στην ιστοσελίδα και στις mobile
@@ -377,7 +364,6 @@ export default async function PrivacyPage() {
             πλατφόρμας της doulitsa.gr
           </span>
         </h2>
-
         <p>
           <span>
             Όταν συμπληρώσετε την φόρμα εκδήλωσης ενδιαφέροντος σε αγγελίες
@@ -386,7 +372,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Ειδικά για αγγελίες που αφορούν θέσεις Εργασίας, αν μέσω της φόρμας
@@ -395,7 +380,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Το αίτημα απευθείας ανάθεσης και το αίτημα αναζήτησης ακινήτου ή
@@ -411,7 +395,6 @@ export default async function PrivacyPage() {
           <span>VIΙ. Σκοπός της Επεξεργασίας</span>
           <span />
         </h2>
-
         <p>
           <span>
             1. Τα δεδομένα που συλλέγονται μέσω της ιστοσελίδας μας και της
@@ -430,21 +413,20 @@ export default async function PrivacyPage() {
             2. Εκτός της αυτόματης συλλογής των δεδομένων πλοήγησης, που
             αναφέρεται στην προηγούμενη παράγραφο, ο χρήστης έχει το δικαίωμα να
             παρέχει οικειοθελώς πληροφορίες προσωπικών δεδομένων, που θα
-            συλλέγονται από το{" "}
+            συλλέγονται από το{' '}
           </span>
           <span>doulitsa.gr</span>
           <span>
-            {" "}
+            {' '}
             αποκλειστικά μέσω της συμπλήρωσης ορισμένου πεδίου εισαγωγής (εφεξής
             «Φόρμα Επικοινωνίας»), που προτείνεται για να εισάγουν τα δεδομένα
-            τους οι χρήστες, στον ιστότοπο και την εφαρμογή του. Οι φόρμες{" "}
+            τους οι χρήστες, στον ιστότοπο και την εφαρμογή του. Οι φόρμες{' '}
           </span>
           <span>
             επικοινωνίας είναι διαφορετικού τύπου, ανάλογα με το είδος
             υπηρεσίας, την οποία σκοπεύει να χρησιμοποιήσει ο χρήστης.
           </span>
         </p>
-
         <p>
           <span>3</span>
           <span>
@@ -458,7 +440,6 @@ export default async function PrivacyPage() {
             ζητούνται.
           </span>
         </p>
-
         <p>
           <span>
             Τα δεδομένα θα υποβάλλονται σε επεξεργασία, σε ηλεκτρονική ή και σε
@@ -473,7 +454,6 @@ export default async function PrivacyPage() {
             σύμφωνα με τα διαλαμβανόμενα στο άρθρο 4 του Κανονισμού.
           </span>
         </p>
-
         <p>
           <span>
             Προβλέπονται κατάλληλα μέτρα ασφαλείας για την αποφυγή
@@ -492,16 +472,15 @@ export default async function PrivacyPage() {
           <span>VΙIΙ. Ανάγκη για ρητή συγκατάθεση</span>
           <span />
         </h2>
-
         <p>
           <span>
-            1. Κατά τη χρήση μέρους των υπηρεσιών της ιστοσελίδας μας,{" "}
+            1. Κατά τη χρήση μέρους των υπηρεσιών της ιστοσελίδας μας,{' '}
           </span>
           <span>όπως ενδεικτικώς αναφέρεται</span>
           <span>
-            {" "}
+            {' '}
             η επικοινωνία, διαφήμιση, τα συλλεγέντα προσωπικά δεδομένα (π.χ. το
-            όνομα, τα στοιχεία επικοινωνίας, και όποια άλλα στοιχεία{" "}
+            όνομα, τα στοιχεία επικοινωνίας, και όποια άλλα στοιχεία{' '}
           </span>
           <span>δημοσιεύονται</span>
           <span>), </span>
@@ -532,7 +511,6 @@ export default async function PrivacyPage() {
           <span>ΙΧ. Φύση της παροχής δεδομένων</span>
           <span />
         </h2>
-
         <p>
           <span>
             Η παροχή δεδομένων είναι προαιρετική, αλλά σε περίπτωση άρνησης
@@ -553,7 +531,6 @@ export default async function PrivacyPage() {
           <span>X. Μέθοδοι Επεξεργασίας</span>
           <span />
         </h2>
-
         <p>
           <span>1.</span>
           <span>
@@ -603,7 +580,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </h2>
-
         <p>
           <span>1.</span>
           <span>
@@ -620,7 +596,7 @@ export default async function PrivacyPage() {
           <span>To </span>
           <span>doulitsa.gr</span>
           <span>
-            {" "}
+            {' '}
             λαμβάνει όλα τα απαραίτητα τεχνικά και οργανωτικά μέτρα για την
             ασφάλεια και την προστασία των προσωπικών δεδομένων του χρήστη από
             τυχαία ή μη καταστροφή, απώλεια, μη εξουσιοδοτημένη τροποποίηση,
@@ -629,31 +605,30 @@ export default async function PrivacyPage() {
             καλόπιστη και κάθε δυνατή προσπάθεια από την ιστοσελίδα μας για την
             αποθήκευση προσωπικών δεδομένων των χρηστών σε ένα ασφαλές
             λειτουργικό περιβάλλον, το οποίο δεν είναι ανοιχτό για το κοινό,
-            σημειώνεται, ότι δεν υπάρχει πλήρης ή τέλεια ασφάλεια και{" "}
+            σημειώνεται, ότι δεν υπάρχει πλήρης ή τέλεια ασφάλεια και{' '}
           </span>
           <span>τ</span>
           <span>ο </span>
           <span>doulitsa.gr</span>
           <span>
-            {" "}
+            {' '}
             δεν μπορεί να εγγυηθεί ότι δεν θα υπάρξουν ακούσιες αποκαλύψεις των
             προσωπικών δεδομένων του χρήστη. Ο τελευταίος πρέπει να ενημερώνει
             άμεσα την ιστοσελίδα μας σε περίπτωση που τα στοιχεία επικοινωνίας
             του έχουν χαθεί, κλαπεί ή χρησιμοποιηθεί χωρίς την άδειά του. Σε
-            τέτοια περίπτωση, θα καταργήσουμε τα στοιχεία{" "}
+            τέτοια περίπτωση, θα καταργήσουμε τα στοιχεία{' '}
           </span>
           <span>
             επικοινωνίας με τον χρήστη από το λογαριασμό του και θα ενημερώσουμε
             τα αρχεία μας αναλόγως.
           </span>
         </p>
-
         <p>
           <span>3.</span>
           <span>To </span>
           <span>doulitsa.gr</span>
           <span>
-            {" "}
+            {' '}
             διατηρεί το δικαίωμα να προβεί - ενδεικτικά και όχι περιοριστικά -
             σε ενέργειες, όπως: α) καταγραφή και αποθήκευση κάθε επικοινωνίας
             του επισκέπτη- χρήστη με την ιστοσελίδα, συμπεριλαμβανομένων των
@@ -661,7 +636,7 @@ export default async function PrivacyPage() {
           </span>
           <span>,</span>
           <span>
-            {" "}
+            {' '}
             β) διερεύνηση οιασδήποτε καταγγελίας σε περίπτωση που κάποια
             επικοινωνία δεν συμμορφώνεται με τους όρους και προϋποθέσεις χρήσης
             αυτού και απόφαση κατά τη διακριτική του ευχέρεια να αποσύρει ή να
@@ -682,7 +657,6 @@ export default async function PrivacyPage() {
           <span>ΧΙΙ. Επικοινωνία</span>
           <span />
         </h2>
-
         <p>
           <span>
             Υπεύθυνος επεξεργασίας για τους σκοπούς του Γενικού Κανονισμού
@@ -697,15 +671,13 @@ export default async function PrivacyPage() {
           <span>DAMI ΜΟΝΟΠΡΟΣΩΠΗ Ι.Κ.Ε.</span>
           <span />
         </p>
-
         <p>
           <span>Λ. ΚΗΦΙΣΙΑΣ ΑΡ. 16 ΑΘΗΝΑ </span>
           <span />
         </p>
-
         <p>
           <span>Email: </span>
-          <a href="mailto:contact@doulitsa.gr">
+          <a href='mailto:contact@doulitsa.gr'>
             <span>contact@doulitsa.gr</span>
           </a>
         </p>
@@ -727,12 +699,11 @@ export default async function PrivacyPage() {
           <span>XΙΙΙ. Πεδίο επικοινωνίας και διάδοση δεδομένων</span>
           <span />
         </h2>
-
         <p>
           <span>
             Τα δεδομένα που παρέχονται από τον χρήστη θα κοινοποιούνται και θα
             χρησιμοποιούνται αποκλειστικά από τον υπεύθυνο επεξεργασίας
-            δεδομένων (To{" "}
+            δεδομένων (To{' '}
           </span>
           <span>doulitsa.gr</span>
           <span>
@@ -744,17 +715,17 @@ export default async function PrivacyPage() {
           </span>
           <span> </span>
           <span>
-            Σε αυτές τις περιπτώσεις οι εταιρείες δρουν ανεξάρτητα και το{" "}
+            Σε αυτές τις περιπτώσεις οι εταιρείες δρουν ανεξάρτητα και το{' '}
           </span>
           <span>doulitsa.gr</span>
           <span>
-            {" "}
+            {' '}
             δεν είναι υπεύθυνος για την επεξεργασία των δεδομένων από αυτούς.
-            Επίσης το{" "}
+            Επίσης το{' '}
           </span>
           <span>doulitsa.gr</span>
           <span>
-            {" "}
+            {' '}
             δεν είναι υπεύθυνος για το περιεχόμενο και τη συμμόρφωση με τον
             Κανονισμό περί απορρήτου από ιστότοπους που δε διαχειρίζεται ο
             ίδιος.
@@ -767,7 +738,6 @@ export default async function PrivacyPage() {
           <span>XIV. Διάρκεια της επεξεργασίας</span>
           <span />
         </h2>
-
         <p>
           <span>
             Η επεξεργασία των δεδομένων δεν θα διαρκεί περισσότερο από ό,τι
@@ -778,7 +748,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Η επεξεργασία θα διαρκέσει έως ότου το ενδιαφερόμενο μέρος
@@ -787,7 +756,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Επίσης, θα είναι δυνατόν να διαρκέσει και για όσο χρονικό διάστημα η
@@ -805,7 +773,6 @@ export default async function PrivacyPage() {
           <span>XV. Δικαιώματα του χρήστη</span>
           <span />
         </h2>
-
         <p>
           <span>
             Η νομοθεσία προστασίας των προσωπικών δεδομένων, παρέχει στον
@@ -816,7 +783,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Μπορεί, επίσης, να ζητήσει να γνωρίζει την προέλευση των δεδομένων,
@@ -830,7 +796,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Μπορεί επίσης να ζητήσει τη διαγραφή των δεδομένων του, τη διόρθωσή
@@ -855,7 +820,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </h2>
-
         <p>
           <span>
             Στην παρούσα ιστοσελίδα ο υπεύθυνος επεξεργασίας έχει ενσωματώσει το
@@ -867,7 +831,7 @@ export default async function PrivacyPage() {
             ιστοσελίδας έφθασε ορισμένο πρόσωπο σε άλλη ιστοσελίδα (η
             ονομαζόμενη σελίδα παραπομπής - referrer), ποια υπο-σελίδα της
             ιστοσελίδας επισκέφθηκε ή πόσο συχνά και με ποια διάρκεια προβλήθηκε
-            η{" "}
+            η{' '}
           </span>
           <span>
             υπο-σελίδα. Η διαδικτυακή ανάλυση χρησιμοποιείται κυρίως για τη
@@ -876,7 +840,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             H εταιρεία που διαχειρίζεται το στοιχείο της Google Analytics είναι
@@ -885,7 +848,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Ο σκοπός του στοιχείου της Google Analytics είναι η ανάλυση της
@@ -898,7 +860,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Η Google Analytics τοποθετεί cookies στο πληροφοριακό σύστημα του
@@ -919,7 +880,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Τα cookies χρησιμοποιούνται για την αποθήκευση πληροφορικών
@@ -936,7 +896,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Το υποκείμενο των δεδομένων μπορεί, όπως αναφέρθηκε ανωτέρω, να
@@ -963,7 +922,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </h2>
-
         <p>
           <span>
             Στην παρούσα ιστοσελίδα, ο υπεύθυνος επεξεργασίας έχει ενσωματώσει
@@ -980,11 +938,10 @@ export default async function PrivacyPage() {
             Facebook είναι η Facebook, Inc., 1 Hacker Way, Menlo Park, CA 94025,
             United States. Αν ένα πρόσωπο διαμένει εκτός των Ηνωμένων Πολιτειών
             ή του Καναδά, υπεύθυνος επεξεργασίας είναι η Facebook Ireland Ltd.,
-            4 Grand Canal Square, Grand Canal Harbour, Dublin 2, Ireland.{" "}
+            4 Grand Canal Square, Grand Canal Harbour, Dublin 2, Ireland.{' '}
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Αν το υποκείμενο των δεδομένων είναι την ίδια στιγμή συνδεδεμένο στο
@@ -1003,7 +960,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Το Facebook λαμβάνει πάντοτε, μέσω του στοιχείου Facebook,
@@ -1016,16 +972,16 @@ export default async function PrivacyPage() {
             Facebook, τότε αυτός ή αυτή μπορεί να την αποτρέψει αν αποσυνδεθεί
             από το λογαριασμό του/της στο Facebook πριν την επίσκεψη στην
             ιστοσελίδα μας. Οι κατευθυντήριες γραμμές του Facebook για την
-            προστασία των δεδομένων, που είναι διαθέσιμες στην ιστοσελίδα{" "}
+            προστασία των δεδομένων, που είναι διαθέσιμες στην ιστοσελίδα{' '}
           </span>
-          <a href="https://facebook.com/about/privacy/">
+          <a href='https://facebook.com/about/privacy/'>
             <span>https://facebook.com/about/privacy/</span>
           </a>
           <span>
             , παρέχουν πληροφορίες για τη συλλογή, την επεξεργασία και τη χρήση
             δεδομένων προσωπικού χαρακτήρα από το Facebook. Επιπλέον, επεξηγούν
             ποιες επιλογές παρέχει το Facebook για την προστασία της
-            ιδιωτικότητας του υποκειμένου των δεδομένων.{" "}
+            ιδιωτικότητας του υποκειμένου των δεδομένων.{' '}
           </span>
         </p>
         <h2>
@@ -1039,7 +995,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </h2>
-
         <p>
           <span>
             Στην παρούσα ιστοσελίδα ο υπεύθυνος επεξεργασίας έχει ενσωματώσει το
@@ -1062,7 +1017,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Αν το υποκείμενο των δεδομένων εισέλθει στην ιστοσελίδα μας μέσω
@@ -1080,7 +1034,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Τα δεδομένα κι οι πληροφορίες που συλλέχθηκαν μέσω της χρήσης του
@@ -1106,7 +1059,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Το υποκείμενο των δεδομένων μπορεί, όπως αναφέρθηκε ανωτέρω, να
@@ -1122,9 +1074,9 @@ export default async function PrivacyPage() {
             δυνατότητα εναντίωσης στη διαφήμιση βάσει ενδιαφέροντος από την
             Google. Για να συμβεί αυτό, το υποκείμενο των δεδομένων θα πρέπει να
             κάνει χρήση μέσα από κάθε πρόγραμμα περιήγησης διαδικτύου που
-            χρησιμοποιεί του συνδέσμου{" "}
+            χρησιμοποιεί του συνδέσμου{' '}
           </span>
-          <a href="https://www.google.com/settings/ads">
+          <a href='https://www.google.com/settings/ads'>
             <span>www.google.com/settings/ads</span>
           </a>
           <span> και να κάνει τις επιλογές που επιθυμεί.</span>
@@ -1140,7 +1092,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </h2>
-
         <p>
           <span>
             Στην παρούσα ιστοσελίδα ο υπεύθυνος επεξεργασίας έχει ενσωματώσει
@@ -1161,7 +1112,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Αν το υποκείμενο των δεδομένων είναι την ίδια στιγμή συνδεδεμένο στο
@@ -1182,19 +1132,19 @@ export default async function PrivacyPage() {
             στιγμή που εισέρχεται στην ιστοσελίδα μας. Αυτό προκύπτει
             ανεξαρτήτως αν κάνει κλικ στο εικονίδιο του Instagram ή όχι. Αν το
             υποκείμενο των δεδομένων δεν επιθυμεί τη μετάδοση πληροφοριών στο
-            Instagram, τότε αυτός ή αυτή{" "}
+            Instagram, τότε αυτός ή αυτή{' '}
           </span>
           <span>
             μπορούν να την αποτρέψουν εφόσον αποσυνδεθούν από το λογαριασμό τους
             στο Instagram πριν εισέλθουν στην ιστοσελίδα μας. Περαιτέρω
             πληροφορίες κι οι διατάξεις προστασίας δεδομένων που εφαρμόζει το
-            Ιnstagram στο  σύνδεσμο{" "}
+            Ιnstagram στο  σύνδεσμο{' '}
           </span>
-          <a href="https://help.instagram.com/155833707900388">
+          <a href='https://help.instagram.com/155833707900388'>
             <span>https://help.instagram.com/155833707900388</span>
           </a>
           <span> and </span>
-          <a href="https://www.instagram.com/about/legal/privacy/">
+          <a href='https://www.instagram.com/about/legal/privacy/'>
             <span>https://www.instagram.com/about/legal/privacy/</span>
           </a>
           <span>.</span>
@@ -1206,7 +1156,6 @@ export default async function PrivacyPage() {
           <span>XX. Διαφήμιση</span>
           <span />
         </h2>
-
         <p>
           <span>
             Κατά τη διάρκεια της επίσκεψή σας στα μέσα της doulitsa.gr
@@ -1228,7 +1177,6 @@ export default async function PrivacyPage() {
           <a />
           <span>ΧXI. Μηνύματα marketing / Ενημερώσεις</span>
         </h2>
-
         <p>
           <span>
             Η doulitsa.gr θα ζητήσει την άδεια σας για την αποστολή ενημερωτικών
@@ -1236,18 +1184,16 @@ export default async function PrivacyPage() {
             διαγωνισμούς για λογαριασμό της ή/και συνεργατών της, χωρίς όμως να
             τους παρέχει τα δεδομένα αυτά για δική τους χρήση. Μπορείτε να
             αρνηθείτε ή να διακόψετε τη λήψη αυτών των μηνυμάτων όποτε
-            επιθυμείτε.{" "}
+            επιθυμείτε.{' '}
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Διακοπή μπορείτε να κάvετε οποτεδήποτε με τους κάτωθι τρόπους:
           </span>
           <span />
         </p>
-
         <p>
           <span>
             α) Ακολουθώντας τις σχετικές οδηγίες που περιέχονται σε κάθε
@@ -1255,7 +1201,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             β) Επικοινωνώντας με το contact@doulitsa.gr, με αίτημα τη διαγραφή
@@ -1263,7 +1208,6 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>
             Η διακοπή των marketing μηνυμάτων δεν σημαίνει και διακοπή των
@@ -1280,7 +1224,6 @@ export default async function PrivacyPage() {
           <span>XXII. Μεταφορά δεδομένων </span>
           <span />
         </h2>
-
         <p>
           <span>
             Τα προσωπικά δεδομένα που συλλέγονται μέσω της ιστοσελίδας μας και
@@ -1292,12 +1235,11 @@ export default async function PrivacyPage() {
           </span>
           <span />
         </p>
-
         <p>
           <span>Επίσης, τo </span>
           <span>doulitsa.gr</span>
           <span>
-            {" "}
+            {' '}
             σε καμία περίπτωση δεν πωλεί τα προσωπικά δεδομένα του χρήστη, ενώ
             κατά την κοινοποίησή τους σε τρίτους, στα πλαίσια των ανωτέρω
             αναφερθεισών υπηρεσιών, αυτό γίνεται αποκλειστικά και μόνο για την

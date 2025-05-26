@@ -1,4 +1,4 @@
-import { getEntityValues } from "./getEntityValues";
+import { getEntityValues } from './getEntityValues';
 
 export function formatTemplate(template, entity) {
   return template.replace(/%([^%]+)%/g, (match, property) => {

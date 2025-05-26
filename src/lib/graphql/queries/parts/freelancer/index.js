@@ -1,34 +1,31 @@
-import { gql } from "@apollo/client";
-import { COVERAGE } from "../../fragments/components/location";
-import { SOCIALS } from "../../fragments/components/socials";
+import { gql } from '@apollo/client';
 import {
-  FREELANCER_SMALL,
-  FREELANCER_TYPE,
-} from "../../fragments/entities/freelancer";
-import {
-  FREELANCER_CATEGORY,
-  FREELANCER_SUBCATEGORY_PARTIAL,
-} from "../../fragments/taxonomies/freelancer";
-import { CONTACT_TYPES } from "../../fragments/entities/contact";
-import { PAYMENT_METHOD } from "../../fragments/entities/payment";
-import { SETTLEMENT_METHOD } from "../../fragments/entities/settlement";
-import { SERVICES } from "../../fragments/entities/service";
-import { ORDERS } from "../../fragments/entities/order";
-import { SKILLS } from "../../fragments/entities/skill";
-import { SIZE } from "../../fragments/entities/size";
-import { SPECIALIZATION_ENTITY } from "../../fragments/entities/specialisation";
-import { MIN_BUDGET_ENTITY } from "../../fragments/entities/budget";
-import { INDUSTRIES_ENTITY } from "../../fragments/entities/industry";
-import { MULTIPLE_FILES, SINGLE_IMAGE } from "../../fragments/global";
-import { RATING } from "../../fragments/entities/rating";
-import { VISIBILITY } from "../../fragments/components/global";
-import { REVIEW_DISLIKES, REVIEW_LIKES } from "../../fragments/entities/review";
-import {
+  BILLING_DETAILS,
   CATEGORY,
-  CATEGORY_ENTITY,
+  CONTACT_TYPES_FRAGMENT,
+  COVERAGE,
+  FREELANCER_CATEGORY,
+  FREELANCER_SMALL,
+  FREELANCER_SUBCATEGORY_PARTIAL,
+  FREELANCER_TYPE,
+  INDUSTRIES_ENTITY,
+  MIN_BUDGET_ENTITY,
+  MULTIPLE_FILES,
+  ORDERS,
+  PAYMENT_METHOD,
+  RATING,
+  REVIEW_DISLIKES,
+  REVIEW_LIKES,
+  SERVICES,
+  SETTLEMENT_METHOD,
+  SINGLE_IMAGE,
+  SIZE,
+  SKILLS,
+  SOCIALS,
+  SPECIALIZATION_ENTITY,
   SUBCATEGORY_ENTITY,
-} from "../../fragments/taxonomies/service";
-import { BILLING_DETAILS } from "../../fragments/components/pricing";
+  VISIBILITY,
+} from '../../fragments';
 
 const FREELANCER_PARTIAL_MAIN = gql`
   fragment FreelancerPartialMain on Freelancer {
@@ -103,7 +100,7 @@ const FREELANCER_PARTIAL_RELATIONS = gql`
   ${FREELANCER_TYPE}
   ${FREELANCER_CATEGORY}
   ${FREELANCER_SUBCATEGORY_PARTIAL}
-  ${CONTACT_TYPES}
+  ${CONTACT_TYPES_FRAGMENT}
   ${PAYMENT_METHOD}
   ${SETTLEMENT_METHOD}
   ${REVIEW_LIKES}
@@ -295,7 +292,7 @@ const FREELANCER_RELATIONS = gql`
   ${SPECIALIZATION_ENTITY}
   ${MIN_BUDGET_ENTITY}
   ${INDUSTRIES_ENTITY}
-  ${CONTACT_TYPES}
+  ${CONTACT_TYPES_FRAGMENT}
   ${PAYMENT_METHOD}
   ${SETTLEMENT_METHOD}
   ${MULTIPLE_FILES}
@@ -472,7 +469,7 @@ const FREELANCER_RELATIONS_WITHOUT_USER = gql`
   ${SPECIALIZATION_ENTITY}
   ${MIN_BUDGET_ENTITY}
   ${INDUSTRIES_ENTITY}
-  ${CONTACT_TYPES}
+  ${CONTACT_TYPES_FRAGMENT}
   ${PAYMENT_METHOD}
   ${SETTLEMENT_METHOD}
   ${MULTIPLE_FILES}
@@ -513,11 +510,11 @@ const FREELANCER_SEO = gql`
 `;
 
 export {
+  FREELANCER_MAIN,
+  FREELANCER_PARTIAL,
   FREELANCER_PARTIAL_MAIN,
   FREELANCER_PARTIAL_RELATIONS,
-  FREELANCER_RELATIONS_WITHOUT_USER,
-  FREELANCER_PARTIAL,
-  FREELANCER_MAIN,
   FREELANCER_RELATIONS,
+  FREELANCER_RELATIONS_WITHOUT_USER,
   FREELANCER_SEO,
 };

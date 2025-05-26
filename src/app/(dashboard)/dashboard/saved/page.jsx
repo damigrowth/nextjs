@@ -1,12 +1,13 @@
-import SavedInfo from "@/components/ui/dashboard/saved/SavedInfo";
-import { getFreelancer } from "@/lib/users/freelancer";
+import { getFreelancer } from '@/actions';
+import { SavedInfo } from '@/components/content';
 
 export const metadata = {
-  title: "Αποθηκευμένα",
+  title: 'Αποθηκευμένα',
 };
 
 export default async function page() {
   const freelancer = await getFreelancer();
+
   const saved_services =
     freelancer.saved_services.data.length > 0
       ? freelancer.saved_services.data
