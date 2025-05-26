@@ -139,6 +139,7 @@ const getDataInternal = async (
       console.warn(
         `Redirect detected for GraphQL query. Status: ${response.status}, URL: ${response.url}`,
       );
+
       return null; // Return null to indicate a non-successful fetch due to redirect
     }
 
