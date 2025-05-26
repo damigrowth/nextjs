@@ -1,13 +1,13 @@
 import { Suspense } from 'react';
 
 import { HeaderDashboardInner } from '../header';
-import ManageServiceCardSkeleton from '../skeleton/skeleton-service-edit-card';
-import ServicesTableDashboard from '../table/table-dashboard-services';
+import { ManageServiceCardSkeleton } from '../skeleton';
+import { ServicesTableDashboard } from '../table';
 
 export default function ManageServiceInfo({ fid, page }) {
   return (
     <div className='dashboard__content hover-bgc-color'>
-      <HeaderDashboardInner showButton={true} />
+      <HeaderDashboardInner showButton={true} showDraftServices={true} />
       <div className='row'>
         <div className='col-xl-12'>
           <div className='ps-widget bgc-white bdrs4 p30 mb30 overflow-hidden position-relative'>

@@ -1,1 +1,1 @@
-export { default as TableDashboardServices } from './table-dashboard-services';
+export { default as ServicesTableDashboard } from './table-dashboard-services';

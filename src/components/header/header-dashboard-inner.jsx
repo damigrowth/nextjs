@@ -9,6 +9,7 @@ export default function DashboardHeader({
   buttonText = 'Προσθήκη Υπηρεσίας',
   buttonHref = '/dashboard/services/add',
   buttonIcon = 'fal fa-arrow-right-long',
+  showDraftServices = false,
 }) {
   return (
     <div className='row pb40'>
@@ -18,7 +19,7 @@ export default function DashboardHeader({
       <div className={showButton ? 'col-lg-9' : 'col-lg-12'}>
         <div className='dashboard_title_area'>
           <h2>{title}</h2>
-          <DraftServices />
+          {showDraftServices && <DraftServices />}
         </div>
       </div>
       {showButton && (

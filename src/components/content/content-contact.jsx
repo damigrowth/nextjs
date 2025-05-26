@@ -1,8 +1,5 @@
-import React from 'react';
-
-import Breadcrumb from '../breadcrumb/breadcrumb-about';
-import Contact from '../section/section-contact';
-import Faq from '../section/section-contact-faq';
+import { Breadcrumb } from '../breadcrumb';
+import { Contact, Faq } from '../section';
 
 export default function ContactContent({ data }) {
   return (

@@ -131,6 +131,17 @@ const getDataInternal = async (
   try {
     const response = await fetchWithRetry(STRAPI_GRAPHQL, options);
 
+    // Check for redirect status codes (3xx)
+    if (
+      response.redirected ||
+      (response.status >= 300 && response.status < 400)
+    ) {
+      console.warn(
+        `Redirect detected for GraphQL query. Status: ${response.status}, URL: ${response.url}`,
+      );
+      return null; // Return null to indicate a non-successful fetch due to redirect
+    }
+
     if (!response.ok) {
       const clonedResponse = response.clone();
 
