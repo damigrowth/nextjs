@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
-import { PAGINATION } from "../../fragments/global";
+import { gql } from '@apollo/client';
+import { PAGINATION } from '../../fragments';
 
 export const MIN_BUDGET = gql`
   query MinBudget($name: String, $minBudgetPage: Int, $minBudgetPageSize: Int) {

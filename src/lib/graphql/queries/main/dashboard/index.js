@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
-import { PAGINATION } from "../../fragments/global";
+import { gql } from '@apollo/client';
+import { PAGINATION } from '../../fragments';
 
 export const ALL_SERVICES_DASHBOARD = gql`
   query AllServicesDashboard($id: ID!) {

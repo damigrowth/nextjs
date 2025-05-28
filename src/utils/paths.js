@@ -1,5 +1,5 @@
 export const getPathSegments = (path) => {
-  return path.split("/").filter(Boolean);
+  return path.split('/').filter(Boolean);
 };
 
 export const getPathname = (path, index) => {

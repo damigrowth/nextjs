@@ -1,7 +1,6 @@
-// Input Field Validation
-
 export const validateInputFieldLength = (type, key, number, field, message) => {
-  if (type === ">=" && key.length >= number) {
+  // Input Field Validation
+  if (type === '>=' && key.length >= number) {
     return {
       errors: {
         field: field,
@@ -10,8 +9,7 @@ export const validateInputFieldLength = (type, key, number, field, message) => {
       },
     };
   }
-
-  if (type === ">" && key.length > number) {
+  if (type === '>' && key.length > number) {
     return {
       errors: {
         field: field,
@@ -20,8 +18,7 @@ export const validateInputFieldLength = (type, key, number, field, message) => {
       },
     };
   }
-
-  if (type === "=" && key.length === number) {
+  if (type === '=' && key.length === number) {
     return {
       errors: {
         field: field,
@@ -30,8 +27,7 @@ export const validateInputFieldLength = (type, key, number, field, message) => {
       },
     };
   }
-
-  if (type === "<" && key.length < number) {
+  if (type === '<' && key.length < number) {
     return {
       errors: {
         field: field,
@@ -40,8 +36,7 @@ export const validateInputFieldLength = (type, key, number, field, message) => {
       },
     };
   }
-
-  if (type === "<=" && key.length <= number) {
+  if (type === '<=' && key.length <= number) {
     return {
       errors: {
         field: field,

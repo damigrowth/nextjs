@@ -1,7 +1,7 @@
-import StatementInfo from "@/components/dashboard/section/StatementInfo";
+import { StatementInfo } from '@/components/content';
 
 export const metadata = {
-  title: "Παραγγελίες",
+  title: 'Παραγγελίες',
 };
 
 export default function page() {

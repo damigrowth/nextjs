@@ -1,5 +1,4 @@
-import Header3 from "@/components/header/Header3";
-import PageNotFound from "@/components/section/PageNotFound";
+import { PageNotFound } from '@/components/global';
 
 export default function NotFound() {
   return <PageNotFound />;

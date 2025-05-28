@@ -1,16 +1,16 @@
-@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&amp;display=swap");
-@import "./../../public/css/bootstrap.min.css";
-@import "./../../public/css/animate.css";
-@import "./../../public/css/ace-responsive-menu.css";
-@import "./../../public/css/menu.css";
-@import "./../../public/css/fontawesome.css";
-@import "./../../public/css/flaticon.css";
-@import "./../../public/css/bootstrap-select.min.css";
-@import "./../../public/css/slider.css";
-@import "./../../public/css/style.css";
-@import "./../../public/css/ud-custom-spacing.css";
-@import "./../../public/css/dashbord_navitaion.css";
-@import "./../../public/css/responsive.css";
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&amp;display=swap');
+@import './../../public/css/bootstrap.min.css';
+@import './../../public/css/animate.css';
+@import './../../public/css/ace-responsive-menu.css';
+@import './../../public/css/menu.css';
+@import './../../public/css/fontawesome.css';
+@import './../../public/css/flaticon.css';
+@import './../../public/css/bootstrap-select.min.css';
+@import './../../public/css/slider.css';
+@import './../../public/css/style.css';
+@import './../../public/css/ud-custom-spacing.css';
+@import './../../public/css/dashbord_navitaion.css';
+@import './../../public/css/responsive.css';
 
 html {
   scroll-behavior: smooth;
@@ -333,7 +333,9 @@ a {
 .ui-fav-active {
   background-color: #5bbb7b !important;
   color: #fff !important;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* hero search list active */
@@ -366,7 +368,7 @@ a {
 }
 
 .ui-social-media::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: -20px;
   left: 50%;
@@ -586,9 +588,7 @@ a {
   --bs-dropdown-border-color: var(--bs-border-color-translucent);
   --bs-dropdown-border-radius: var(--bs-border-radius);
   --bs-dropdown-border-width: var(--bs-border-width);
-  --bs-dropdown-inner-border-radius: calc(
-    var(--bs-border-radius) - var(--bs-border-width)
-  );
+  --bs-dropdown-inner-border-radius: calc(var(--bs-border-radius) - var(--bs-border-width));
   --bs-dropdown-divider-bg: var(--bs-border-color-translucent);
   --bs-dropdown-divider-margin-y: 0.5rem;
   --bs-dropdown-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -618,8 +618,7 @@ a {
   border-radius: 8px;
 }
 
-.select-input
-  .select__option:hover:not([class*="select__option--is-selected"]) {
+.select-input .select__option:hover:not([class*='select__option--is-selected']) {
   background-color: #e0f1e0;
 }
 
@@ -742,7 +741,7 @@ a {
 }
 
 .small-addon-container .small-addon-checkmark:after {
-  content: "";
+  content: '';
   position: absolute;
   left: 5px;
   top: 2px;
@@ -902,11 +901,13 @@ a {
   border-radius: 8px;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
 }
 
 .tooltip::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: -20px;
   left: 50%;
@@ -1433,7 +1434,10 @@ a {
   border-color: transparent;
   background-color: #fff;
   border: 1px solid #e6e6e6;
-  transition: all 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+  transition:
+    all 0.3s ease,
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 .save-button-form button:hover {
@@ -1695,7 +1699,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: "#f0f0f0";
+  background-color: '#f0f0f0';
 }
 
 .audio-preview audio {
@@ -1722,11 +1726,11 @@ a {
 }
 
 /* Hover effect for clickable rating */
-a[href="#reviews-section"] {
+a[href='#reviews-section'] {
   transition: opacity 0.2s ease-in-out;
 }
 
-a[href="#reviews-section"]:hover {
+a[href='#reviews-section']:hover {
   opacity: 0.8;
 }
 

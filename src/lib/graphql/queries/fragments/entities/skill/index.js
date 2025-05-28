@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const SKILLS = gql`
   fragment Skills on SkillRelationResponseCollection {
@@ -24,4 +24,4 @@ const SKILL_ENTITY = gql`
   }
 `;
 
-export { SKILLS, SKILL_ENTITY };
+export { SKILL_ENTITY, SKILLS };

@@ -1,5 +1,4 @@
-import FreelancerProfileSkeleton from "@/components/ui/Skeletons/FreelancerProfileSkeleton";
-import React from "react";
+import { FreelancerProfileSkeleton } from '@/components/skeleton';
 
 export default function loading() {
   return <FreelancerProfileSkeleton />;

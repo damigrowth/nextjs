@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const LIKES = gql`
   fragment Likes on FreelancerRelationResponseCollection {
@@ -32,4 +32,4 @@ const REVIEW_DISLIKES = gql`
   }
 `;
 
-export { LIKES, DISLIKES, REVIEW_LIKES, REVIEW_DISLIKES };
+export { DISLIKES, LIKES, REVIEW_DISLIKES, REVIEW_LIKES };

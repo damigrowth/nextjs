@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
-const CONTACT_TYPES = gql`
+const CONTACT_TYPES_FRAGMENT = gql`
   fragment ContactTypes on ContactTypeRelationResponseCollection {
     data {
       id
@@ -12,4 +12,4 @@ const CONTACT_TYPES = gql`
   }
 `;
 
-export { CONTACT_TYPES };
+export { CONTACT_TYPES_FRAGMENT };

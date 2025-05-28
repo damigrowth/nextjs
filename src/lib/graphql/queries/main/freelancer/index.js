@@ -1,16 +1,18 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
+
+import {
+  FREELANCER_CATEGORY,
+  FREELANCER_REFERENCE,
+  FREELANCER_SUBCATEGORY_PARTIAL,
+  PAGINATION,
+  SINGLE_IMAGE,
+  SPECIALIZATION_ENTITY,
+} from '../../fragments';
 import {
   FREELANCER_MAIN,
   FREELANCER_RELATIONS,
   FREELANCER_SEO,
-} from "../../parts/freelancer";
-import { PAGINATION, SINGLE_IMAGE } from "../../fragments/global";
-import { FREELANCER_REFERENCE } from "../../fragments/entities/freelancer";
-import {
-  FREELANCER_CATEGORY,
-  FREELANCER_SUBCATEGORY_PARTIAL,
-} from "../../fragments/taxonomies/freelancer";
-import { SPECIALIZATION_ENTITY } from "../../fragments/entities/specialisation";
+} from '../../parts';
 
 const FREELANCER_ID = gql`
   query FreelancerId($id: ID!) {
@@ -312,15 +314,15 @@ const FREELANCER_NOTIFICATIONS = gql`
 `;
 
 export {
-  FREELANCER_ID,
-  FREELANCER_TYPES,
+  COUNT_FREELANCERS_BY_RATING,
+  FEATURED_FREELANCERS,
   FREELANCER_BY_ID,
   FREELANCER_BY_USERNAME,
+  FREELANCER_ID,
+  FREELANCER_NOTIFICATIONS,
   FREELANCER_PAGE_SEO,
-  COUNT_FREELANCERS_BY_RATING,
+  FREELANCER_TYPES,
+  FREELANCERS_ALL,
   FREELANCERS_ARCHIVE,
   FREELANCERS_ARCHIVE_WITH_SKILLS,
-  FEATURED_FREELANCERS,
-  FREELANCERS_ALL,
-  FREELANCER_NOTIFICATIONS,
 };

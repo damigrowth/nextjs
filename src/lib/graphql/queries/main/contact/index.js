@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const CONTACT_TYPES = gql`
   query ContactTypes {

@@ -1,7 +1,7 @@
-import MyProfileInfo from "@/components/dashboard/section/MyProfileInfo";
+import { MyProfileInfo } from '@/components/content';
 
 export const metadata = {
-  title: "Διαχείριση Προφίλ",
+  title: 'Διαχείριση Προφίλ',
 };
 
 export default async function page() {

@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const SETTLEMENT_METHOD = gql`
   fragment SettlementMethod on SettlementMethodRelationResponseCollection {

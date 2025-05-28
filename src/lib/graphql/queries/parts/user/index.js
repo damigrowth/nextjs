@@ -1,7 +1,5 @@
-import { gql } from "@apollo/client";
-import { SINGLE_IMAGE } from "../../fragments/global";
-import { ROLE } from "../../fragments/entities/user";
-import { ORDERS } from "../../fragments/entities/order";
+import { gql } from '@apollo/client';
+import { ORDERS, ROLE, SINGLE_IMAGE } from '../../fragments';
 
 const USER_MAIN = gql`
   fragment UserMain on UsersPermissionsUser {

@@ -1,5 +1,4 @@
-import { gql } from "@apollo/client";
-import { MULTIPLE_FILES, PAGINATION } from "../../fragments/global";
+import { gql } from '@apollo/client';
 import {
   FEATURED_SERVICE,
   FEATURED_SERVICE_MAIN,
@@ -9,12 +8,14 @@ import {
   SERVICE_PARTIAL_RELATIONS,
   SERVICE_RELATIONS,
   SERVICE_SEO,
-} from "../../parts/service";
+} from '../../parts';
 import {
   CATEGORY,
+  MULTIPLE_FILES,
+  PAGINATION,
   SUBCATEGORY_ENTITY,
   SUBDIVISION_ENTITY,
-} from "../../fragments/taxonomies/service";
+} from '../../fragments';
 
 const SERVICE_BY_ID = gql`
   query ServiceById($id: ID!) {
@@ -411,19 +412,19 @@ const DRAFT_SERVICES = gql`
 `;
 
 export {
+  COUNT_SERVICES_BY_RATING,
+  DRAFT_SERVICES,
+  FEATURED_SERVICES,
+  FEATURED_SERVICES_BY_FREELANCER,
   SERVICE_BY_ID,
-  SERVICES_BY_ID,
   SERVICE_BY_SLUG,
   SERVICE_PAGE_SEO,
-  COUNT_SERVICES_BY_RATING,
-  FEATURED_SERVICES_BY_FREELANCER,
   SERVICE_UID,
-  FEATURED_SERVICES,
+  SERVICES_ALL,
   SERVICES_ARCHIVE,
   SERVICES_ARCHIVE_WITH_TAGS,
   SERVICES_BY_CATEGORY,
-  SERVICES_ALL,
   SERVICES_BY_FREELANCER,
   SERVICES_BY_FREELANCER_FOR_REVIEWS,
-  DRAFT_SERVICES,
+  SERVICES_BY_ID,
 };

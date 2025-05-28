@@ -1,58 +1,73 @@
-import React from "react";
-import { redirect } from "next/navigation";
-import SingleService from "@/components/ui/SingleService/SingleService";
-import { getReviewsByService, getServicesById } from "@/lib/service/service";
-import { getData } from "@/lib/client/operations";
-import Tabs from "@/components/ui/Archives/Tabs";
-import { Meta } from "@/utils/Seo/Meta/Meta";
-import { CATEGORIES } from "@/lib/graphql/queries/main/taxonomies/service";
-import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
-import { getSavedStatus } from "@/lib/save";
-import { getFreelancer } from "@/lib/users/freelancer";
+import { redirect } from 'next/navigation';
 
-export const dynamic = "force-dynamic";
+import {
+  getFreelancer,
+  getReviewsByService,
+  getSavedStatus,
+  getServicesById,
+} from '@/actions';
+// import FeaturedServices from "@/components/ui/SingleService/Featured";
+import { BreadcrumbArchives } from '@/components/breadcrumb';
+import { Tabs } from '@/components/section';
+import { getData } from '@/lib/client/operations';
+import { CATEGORIES } from '@/lib/graphql';
+import { Meta } from '@/utils/Seo/Meta/Meta';
+import SingleService from '@/components/content/content-service';
+
+export const dynamic = 'force-dynamic';
+
 export const revalidate = 3600;
+
 export const dynamicParams = true;
 
 // Dynamic SEO
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const parts = slug.split("-");
+
+  const parts = slug.split('-');
+
   const serviceId = parts[parts.length - 1];
+
   const data = {
-    type: "services",
+    type: 'services',
     params: { id: serviceId },
-    titleTemplate: "%title% από %displayName%",
-    descriptionTemplate: "%category% - %description%",
+    titleTemplate: '%title% από %displayName%',
+    descriptionTemplate: '%category% - %description%',
     size: 100,
     customUrl: `/s`,
   };
+
   const { meta } = await Meta(data);
+
   return meta;
 }
 
 export default async function page({ params, searchParams }) {
   const { slug } = await params;
+
   const { reviews: searchParamsReviews } = await searchParams;
 
-  const parts = slug.split("-");
+  const parts = slug.split('-');
+
   const paramsServiceId = parts[parts.length - 1];
 
   const service = await getServicesById(paramsServiceId);
 
-  if (!service || service?.status?.data?.attributes?.type !== "Active") {
-    redirect("/not-found");
+  if (!service || service?.status?.data?.attributes?.type !== 'Active') {
+    redirect('/not-found');
   } else {
     const serviceId = service.id;
 
     let reviewsPage = parseInt(searchParamsReviews, 10);
+
     reviewsPage = !reviewsPage || reviewsPage < 1 ? 1 : reviewsPage;
+
     const reviewsPageSize = reviewsPage * 3;
 
     const { reviews, reviewsMeta } = await getReviewsByService(
       serviceId,
       1,
-      reviewsPageSize
+      reviewsPageSize,
     );
 
     const { categories } = await getData(CATEGORIES);
@@ -60,23 +75,26 @@ export default async function page({ params, searchParams }) {
     const freelancer = await getFreelancer();
 
     const fid = freelancer?.id;
+
     const email = freelancer?.email;
+
     const displayName = freelancer?.displayName;
+
     const username = freelancer?.username;
 
     let savedStatus;
 
     if (fid) {
-      savedStatus = await getSavedStatus("service", serviceId);
+      savedStatus = await getSavedStatus('service', serviceId);
     }
 
     return (
       <>
-        <Tabs type="categories" categories={categories?.data} />
-        <div className="bgc-thm3">
-          <Breadcrumb
-            parentPathLabel="Υπηρεσίες"
-            parentPathLink="ipiresies"
+        <Tabs type='categories' categories={categories?.data} />
+        <div className='bgc-thm3'>
+          <BreadcrumbArchives
+            parentPathLabel='Υπηρεσίες'
+            parentPathLink='ipiresies'
             category={service?.category?.data?.attributes}
             subcategory={service?.subcategory?.data?.attributes}
             subdivision={service?.subdivision?.data?.attributes}

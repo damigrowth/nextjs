@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const PAYMENT_METHOD = gql`
   fragment PaymentMethod on PaymentMethodRelationResponseCollection {

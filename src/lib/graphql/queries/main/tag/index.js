@@ -1,4 +1,4 @@
-const { gql } = require("@apollo/client");
+import { gql } from '@apollo/client';
 
 export const DRAFT_TAG = gql`
   query GetDraftTag($slug: String!) {

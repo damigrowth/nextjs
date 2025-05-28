@@ -1,33 +1,33 @@
-import Banner from "@/components/ui/Archives/Banner";
-import Breadcrumb from "@/components/ui/Archives/Breadcrumb";
-import FreelancersArchive from "@/components/ui/Archives/Freelancers/FreelancersArchive";
-import Tabs from "@/components/ui/Archives/Tabs";
-import { getData } from "@/lib/client/operations";
-import { COUNTIES_SEARCH } from "@/lib/graphql/queries/main/location";
+import { Banner } from '@/components/banner';
+import { BreadcrumbArchives } from '@/components/breadcrumb';
+import { FreelancersArchive } from '@/components/content';
+import { Tabs } from '@/components/section';
+import { getData } from '@/lib/client/operations';
 import {
+  COUNTIES_SEARCH,
   FREELANCER_CATEGORIES,
-  FREELANCER_TAXONOMIES_BY_SLUG,
+  FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS,
   FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
-  FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS
-} from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import { 
-  SKILLS_SEARCH, 
-  SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY 
-} from "@/lib/graphql/queries/main/taxonomies/freelancer/skill";
-import { Meta } from "@/utils/Seo/Meta/Meta";
+  FREELANCER_TAXONOMIES_BY_SLUG,
+  SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY,
+  SKILLS_SEARCH,
+} from '@/lib/graphql';
+import { Meta } from '@/utils/Seo/Meta/Meta';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
+
 export const revalidate = 3600;
+
 export const dynamicParams = true;
 
 // Static SEO
 export async function generateMetadata() {
   const { meta } = await Meta({
-    titleTemplate: "Επιχειρήσεις | Doulitsa",
+    titleTemplate: 'Επιχειρήσεις | Doulitsa',
     descriptionTemplate:
-      "Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές.",
+      'Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές.',
     size: 150,
-    url: "/companies",
+    url: '/companies',
   });
 
   return meta;
@@ -40,7 +40,7 @@ export default async function page({ params, searchParams }) {
 
   const { categoryBySlug } = await getData(FREELANCER_TAXONOMIES_BY_SLUG, {
     category,
-    type: "company",
+    type: 'company',
   });
 
   const currCategory = categoryBySlug?.data[0]?.attributes;
@@ -61,7 +61,7 @@ export default async function page({ params, searchParams }) {
     covc_s,
     covc_p,
     covc_ps,
-    subc,
+    // subc,
     subc_s,
     subc_p,
     subc_ps,
@@ -80,21 +80,21 @@ export default async function page({ params, searchParams }) {
 
   // Utility function to convert a comma-separated string to an array of integers
   const toIntArray = (str) =>
-    str ? str.split(",").map((id) => parseInt(id, 10)) : undefined;
+    str ? str.split(',').map((id) => parseInt(id, 10)) : undefined;
 
   const addFilter = (condition, value) => (condition ? value : undefined);
 
   const paramsFilters = {
-    type: "company",
+    type: 'company',
     min: addFilter(min, parseInt(min, 10)),
     max: addFilter(max, parseInt(max, 10)),
     paymentMethods: addFilter(pay_m && pay_m.length > 0, toIntArray(pay_m)),
     contactTypes: addFilter(con_t && con_t.length > 0, toIntArray(con_t)),
     cat: category,
     experience: addFilter(exp, parseInt(exp, 10)),
-    top: addFilter(top === "", true),
-    verified: addFilter(ver === "", true),
-    coverageOnline: addFilter(cov_o === "", true),
+    top: addFilter(top === '', true),
+    verified: addFilter(ver === '', true),
+    coverageOnline: addFilter(cov_o === '', true),
     coverageCounty: addFilter(covc, parseInt(covc, 10)),
     coverageCountyPage: addFilter(covc_p, parseInt(covc_p, 10)),
     coverageCountyPageSize: addFilter(covc_ps, parseInt(covc_ps, 10)),
@@ -102,43 +102,48 @@ export default async function page({ params, searchParams }) {
     subcategoriesPageSize: addFilter(subc_ps, parseInt(subc_ps, 10)),
     skillsPage: addFilter(skills_p, parseInt(skills_p, 10)) || 1,
     skillsPageSize: addFilter(skills_ps, parseInt(skills_ps, 10)) || 10,
-    skills: skills?.split(",").filter(Boolean),
+    skills: skills?.split(',').filter(Boolean),
     page: !page || parseInt(page, 10) < 1 ? 1 : parseInt(page, 10),
-    sort: sort ? sort : "publishedAt:desc",
+    sort: sort ? sort : 'publishedAt:desc',
   };
 
   let subcategorySearch = subc_s ? subc_s : undefined;
+
   let coverageCountySearch = covc_s ? covc_s : undefined;
+
   let skillsSearch = skills_s ? skills_s : undefined;
 
   // Fetch subcategories based on filtered freelancers
-  const { subcategoriesForFilteredResults } = await getData(FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS, {
-    min: paramsFilters.min,
-    max: paramsFilters.max,
-    paymentMethods: paramsFilters.paymentMethods,
-    contactTypes: paramsFilters.contactTypes,
-    coverageOnline: paramsFilters.coverageOnline,
-    coverageCounty: paramsFilters.coverageCounty,
-    type: paramsFilters.type,
-    categorySlug: category,
-    skills: paramsFilters.skills,
-    experience: paramsFilters.experience,
-    top: paramsFilters.top,
-    verified: paramsFilters.verified,
-    subcategoriesPage: paramsFilters.subcategoriesPage,
-    subcategoriesPageSize: paramsFilters.subcategoriesPageSize,
-  });
+  const { subcategoriesForFilteredResults } = await getData(
+    FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS,
+    {
+      min: paramsFilters.min,
+      max: paramsFilters.max,
+      paymentMethods: paramsFilters.paymentMethods,
+      contactTypes: paramsFilters.contactTypes,
+      coverageOnline: paramsFilters.coverageOnline,
+      coverageCounty: paramsFilters.coverageCounty,
+      type: paramsFilters.type,
+      categorySlug: category,
+      skills: paramsFilters.skills,
+      experience: paramsFilters.experience,
+      top: paramsFilters.top,
+      verified: paramsFilters.verified,
+      subcategoriesPage: paramsFilters.subcategoriesPage,
+      subcategoriesPageSize: paramsFilters.subcategoriesPageSize,
+    },
+  );
 
   // Fallback to old query for search functionality only
   const { subcategoriesSearch } = await getData(
     FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
     {
-      type: "company",
+      type: 'company',
       categorySlug: category,
       searchTerm: subcategorySearch,
       subcategoriesPage: paramsFilters.subcategoriesPage,
       subcategoriesPageSize: paramsFilters.subcategoriesPageSize,
-    }
+    },
   );
 
   const { counties } = await getData(COUNTIES_SEARCH, {
@@ -148,82 +153,94 @@ export default async function page({ params, searchParams }) {
   });
 
   // Fetch skills based on filtered freelancers with category filter
-  const { skillsForFilteredResults, skillsBySlug } = await getData(SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY, {
-    min: paramsFilters.min,
-    max: paramsFilters.max,
-    paymentMethods: paramsFilters.paymentMethods,
-    contactTypes: paramsFilters.contactTypes,
-    coverageOnline: paramsFilters.coverageOnline,
-    coverageCounty: paramsFilters.coverageCounty,
-    type: paramsFilters.type,
-    cat: category,
-    experience: paramsFilters.experience,
-    top: paramsFilters.top,
-    verified: paramsFilters.verified,
-    label: skillsSearch || "",
-    skillsPage: paramsFilters.skillsPage,
-    skillsPageSize: paramsFilters.skillsPageSize,
-    slugs: paramsFilters.skills || [],
-  }, "skills");
-
-  // Fallback to old query for search functionality only
-  const { skillsBySearch: oldSkillsBySearch } = skillsSearch ? 
-    await getData(SKILLS_SEARCH, {
-      label: skillsSearch,
-      category: category,
+  const { skillsForFilteredResults, skillsBySlug } = await getData(
+    SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY,
+    {
+      min: paramsFilters.min,
+      max: paramsFilters.max,
+      paymentMethods: paramsFilters.paymentMethods,
+      contactTypes: paramsFilters.contactTypes,
+      coverageOnline: paramsFilters.coverageOnline,
+      coverageCounty: paramsFilters.coverageCounty,
+      type: paramsFilters.type,
+      cat: category,
+      experience: paramsFilters.experience,
+      top: paramsFilters.top,
+      verified: paramsFilters.verified,
+      label: skillsSearch || '',
       skillsPage: paramsFilters.skillsPage,
       skillsPageSize: paramsFilters.skillsPageSize,
-      slugs: paramsFilters.skills,
-    }, "skills") : { skillsBySearch: { data: [], meta: { pagination: {} } } };
+      slugs: paramsFilters.skills || [],
+    },
+    'skills',
+  );
+
+  // Fallback to old query for search functionality only
+  const { skillsBySearch: oldSkillsBySearch } = skillsSearch
+    ? await getData(
+        SKILLS_SEARCH,
+        {
+          label: skillsSearch,
+          category: category,
+          skillsPage: paramsFilters.skillsPage,
+          skillsPageSize: paramsFilters.skillsPageSize,
+          slugs: paramsFilters.skills,
+        },
+        'skills',
+      )
+    : { skillsBySearch: { data: [], meta: { pagination: {} } } };
 
   const selectData = {
-    option: ["subc", "covc"],
-    search: ["subc_s", "covc_s"],
-    page: ["subc_p", "covc_p"],
-    pageSize: ["subc_ps", "covc_ps"],
-    disabled: "cov_o",
+    option: ['subc', 'covc'],
+    search: ['subc_s', 'covc_s'],
+    page: ['subc_p', 'covc_p'],
+    pageSize: ['subc_ps', 'covc_ps'],
+    disabled: 'cov_o',
     options: [
-      subcategorySearch ? (subcategoriesSearch?.data || []) : (subcategoriesForFilteredResults?.data || []), 
-      counties?.data || []
+      subcategorySearch
+        ? subcategoriesSearch?.data || []
+        : subcategoriesForFilteredResults?.data || [],
+      counties?.data || [],
     ],
     pagination: [
-      subcategorySearch ? subcategoriesSearch?.meta?.pagination : subcategoriesForFilteredResults?.meta?.pagination,
+      subcategorySearch
+        ? subcategoriesSearch?.meta?.pagination
+        : subcategoriesForFilteredResults?.meta?.pagination,
       counties?.meta?.pagination,
     ],
-    rootLabel: ["Όλες οι κατηγορίες", "Όλες οι περιοχές"],
-    defaultLabel: [
-      "Όλες οι κατηγορίες",
-      "Όλες οι περιοχές",
-    ],
+    rootLabel: ['Όλες οι κατηγορίες', 'Όλες οι περιοχές'],
+    defaultLabel: ['Όλες οι κατηγορίες', 'Όλες οι περιοχές'],
   };
 
   const multiSelectData = {
-    option: "skills",
-    search: "skills_s",
-    page: "skills_p",
-    pageSize: "skills_ps",
-    rootLabel: "Όλες οι δεξιότητες",
-    defaultLabel: "Όλες οι δεξιότητες",
+    option: 'skills',
+    search: 'skills_s',
+    page: 'skills_p',
+    pageSize: 'skills_ps',
+    rootLabel: 'Όλες οι δεξιότητες',
+    defaultLabel: 'Όλες οι δεξιότητες',
     // Combine both results and remove duplicates by slug
     options: [
       ...new Map(
         [
-          ...(skillsSearch ? oldSkillsBySearch?.data || [] : skillsForFilteredResults?.data || []), 
-          ...(skillsBySlug?.data || [])
-        ].map(
-          (item) => [item.attributes.slug, item]
-        )
+          ...(skillsSearch
+            ? oldSkillsBySearch?.data || []
+            : skillsForFilteredResults?.data || []),
+          ...(skillsBySlug?.data || []),
+        ].map((item) => [item.attributes.slug, item]),
       ).values(),
     ],
-    pagination: skillsSearch ? oldSkillsBySearch?.meta?.pagination : skillsForFilteredResults?.meta?.pagination,
+    pagination: skillsSearch
+      ? oldSkillsBySearch?.meta?.pagination
+      : skillsForFilteredResults?.meta?.pagination,
   };
 
   return (
     <>
-      <Tabs type="company" categories={categories?.data} />
-      <Breadcrumb
-        parentPathLabel="Επιχειρήσεις"
-        parentPathLink="companies"
+      <Tabs type='company' categories={categories?.data} />
+      <BreadcrumbArchives
+        parentPathLabel='Επιχειρήσεις'
+        parentPathLink='companies'
         category={currCategory}
       />
       <Banner
@@ -233,7 +250,11 @@ export default async function page({ params, searchParams }) {
       />
       <FreelancersArchive
         taxonomies={taxonomies}
-        categories={subcategorySearch ? subcategoriesSearch?.data : subcategoriesForFilteredResults?.data}
+        categories={
+          subcategorySearch
+            ? subcategoriesSearch?.data
+            : subcategoriesForFilteredResults?.data
+        }
         counties={counties?.data}
         searchParams={allSearchParams}
         paramsFilters={paramsFilters}

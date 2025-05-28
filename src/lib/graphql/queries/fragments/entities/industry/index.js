@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const INDUSTRIES_ENTITY = gql`
   fragment Industries on IndustryRelationResponseCollection {

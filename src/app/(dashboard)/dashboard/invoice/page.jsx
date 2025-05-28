@@ -1,10 +1,9 @@
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import InvoiceInfo from "@/components/dashboard/section/InvoiceInfo";
-
-import MobileNavigation2 from "@/components/header/MobileNavigation2";
+import DashboardLayout from '@/components/layout/layout-dashboard';
+import { MobileNavigation2 } from '@/components/navigation';
+import { InvoiceInfo } from '@/components/section';
 
 export const metadata = {
-  title: "Doulitsa - Freelance Marketplace React/Next Js Template | Invoice",
+  title: 'Doulitsa - Freelance Marketplace React/Next Js Template | Invoice',
 };
 
 export default function page() {

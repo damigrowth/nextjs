@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
-import { CATEGORY_FULL } from "../../fragments/taxonomies/service";
+import { gql } from '@apollo/client';
+// import { CATEGORY_FULL } from "../../fragments/taxonomies/service";
 
 const ALL_TAXONOMIES = gql`
   query AllTaxonomies {
@@ -67,10 +67,7 @@ const ALL_ACTIVE_TOP_TAXONOMIES = gql`
   query AllActiveTopTaxonomies {
     topFreelancerSubcategories: freelancerSubcategories(
       filters: {
-        freelancers: { 
-          id: { ne: null },
-          status: { type: { eq: "Active" } }
-        }
+        freelancers: { id: { ne: null }, status: { type: { eq: "Active" } } }
       }
       sort: "label:asc"
       pagination: { limit: 100 }
@@ -251,9 +248,12 @@ const CATEGORIES_ALL = gql`
 `;
 
 export {
-  ALL_TAXONOMIES,
-  FEATURED_CATEGORIES,
-  CATEGORIES_ALL,
-  ALL_TOP_TAXONOMIES,
   ALL_ACTIVE_TOP_TAXONOMIES,
+  ALL_TAXONOMIES,
+  ALL_TOP_TAXONOMIES,
+  CATEGORIES_ALL,
+  FEATURED_CATEGORIES,
 };
+
+export * from './freelancer';
+export * from './service';

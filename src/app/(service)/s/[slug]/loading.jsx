@@ -1,5 +1,4 @@
-import SingleServiceSkeleton from "@/components/ui/Skeletons/SingleServiceSkeleton";
-import React from "react";
+import { SingleServiceSkeleton } from '@/components/skeleton';
 
 export default function loading() {
   return <SingleServiceSkeleton />;

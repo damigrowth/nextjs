@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
-import { PAGINATION, SINGLE_IMAGE } from "../../../fragments/global";
+import { gql } from '@apollo/client';
+import { PAGINATION, SINGLE_IMAGE } from '../../../fragments';
 
 // Fixed FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS query
 const FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS = gql`
@@ -40,8 +40,18 @@ const FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS = gql`
           }
           {
             or: [
-              { freelancers: { coverage: { county: { id: { eq: $coverageCounty } } } } }
-              { freelancers: { coverage: { areas: { county: { id: { eq: $coverageCounty } } } } } }
+              {
+                freelancers: {
+                  coverage: { county: { id: { eq: $coverageCounty } } }
+                }
+              }
+              {
+                freelancers: {
+                  coverage: {
+                    areas: { county: { id: { eq: $coverageCounty } } }
+                  }
+                }
+              }
             ]
           }
         ]
@@ -107,8 +117,18 @@ const FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS = gql`
           }
           {
             or: [
-              { freelancers: { coverage: { county: { id: { eq: $coverageCounty } } } } }
-              { freelancers: { coverage: { areas: { county: { id: { eq: $coverageCounty } } } } } }
+              {
+                freelancers: {
+                  coverage: { county: { id: { eq: $coverageCounty } } }
+                }
+              }
+              {
+                freelancers: {
+                  coverage: {
+                    areas: { county: { id: { eq: $coverageCounty } } }
+                  }
+                }
+              }
             ]
           }
         ]
@@ -525,19 +545,21 @@ const COMPANIES_ALL = gql`
 `;
 
 export {
+  COMPANIES_ALL,
   FREELANCER_CATEGORIES,
+  FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS,
   FREELANCER_CATEGORIES_SEARCH,
-  FREELANCER_SUBCATEGORIES,
-  FREELANCER_SUBCATEGORIES_SEARCH,
-  FREELANCER_TAXONOMIES_BY_SLUG,
-  FREELANCERS_ARCHIVE_SEO,
   FREELANCER_CATEGORIES_SEARCH_FILTERED,
-  FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
-  FREELANCERS_ARCHIVE_ALL,
   FREELANCER_PROFILE_CATEGORIES,
   FREELANCER_PROFILE_SUBCATEGORIES,
-  FREELANCER_CATEGORIES_FOR_FILTERED_FREELANCERS,
+  FREELANCER_SUBCATEGORIES,
   FREELANCER_SUBCATEGORIES_FOR_FILTERED_FREELANCERS,
+  FREELANCER_SUBCATEGORIES_SEARCH,
+  FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
+  FREELANCER_TAXONOMIES_BY_SLUG,
+  FREELANCERS_ARCHIVE_ALL,
+  FREELANCERS_ARCHIVE_SEO,
   PROS_ALL,
-  COMPANIES_ALL,
 };
+
+export * from './skill';

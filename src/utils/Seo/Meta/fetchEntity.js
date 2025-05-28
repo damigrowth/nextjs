@@ -1,10 +1,12 @@
-"use server";
+'use server';
 
-import { getData } from "@/lib/client/operations";
-import { FREELANCER_PAGE_SEO } from "@/lib/graphql/queries/main/freelancer";
-import { SERVICE_PAGE_SEO } from "@/lib/graphql/queries/main/service";
-import { FREELANCERS_ARCHIVE_SEO } from "@/lib/graphql/queries/main/taxonomies/freelancer";
-import { SERVICES_ARCHIVE_SEO } from "@/lib/graphql/queries/main/taxonomies/service";
+import { getData } from '@/lib/client/operations';
+import {
+  FREELANCER_PAGE_SEO,
+  FREELANCERS_ARCHIVE_SEO,
+  SERVICE_PAGE_SEO,
+  SERVICES_ARCHIVE_SEO,
+} from '@/lib/graphql';
 
 const ENTITY_QUERIES = {
   services: SERVICE_PAGE_SEO,
@@ -18,6 +20,7 @@ const ENTITY_QUERIES = {
 
 export async function fetchEntity(type, params) {
   const query = ENTITY_QUERIES[type];
+
   if (!query) throw new Error(`Unsupported entity type: ${type}`);
 
   const data = await getData(query, params);

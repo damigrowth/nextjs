@@ -1,22 +1,21 @@
-// This file now acts as the Route Handler for /sitemap.xml (the index)
-// NOTE: For this to work correctly, this file should be moved to
-// src/app/sitemap.xml/route.js after other sitemaps are created.
-// We modify it here first for clarity.
+export async function GET() {
+  // This file now acts as the Route Handler for /sitemap.xml (the index)
+  // NOTE: For this to work correctly, this file should be moved to
+  // src/app/sitemap.xml/route.js after other sitemaps are created.
+  // We modify it here first for clarity.
+  // Helper function to generate XML structure
+  function generateSitemapIndexXml(sitemapLocations) {
+    const sitemapEntries = sitemapLocations
+      .map((loc) => `  <sitemap><loc>${loc}</loc></sitemap>`)
+      .join('\n');
 
-// Helper function to generate XML structure
-function generateSitemapIndexXml(sitemapLocations) {
-  const sitemapEntries = sitemapLocations
-    .map((loc) => `  <sitemap><loc>${loc}</loc></sitemap>`)
-    .join("\n");
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
+    return `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${sitemapEntries}
 </sitemapindex>`;
-}
+  }
 
-export async function GET() {
-  const baseUrl = process.env.LIVE_URL || "https://doulitsa.gr";
+  const baseUrl = process.env.LIVE_URL || 'https://doulitsa.gr';
 
   // Define the locations of all the individual sitemaps
   // These paths correspond to the Route Handlers we will create
@@ -37,7 +36,7 @@ export async function GET() {
   return new Response(xmlContent, {
     status: 200,
     headers: {
-      "Content-Type": "application/xml",
+      'Content-Type': 'application/xml',
       // Optional: Cache control headers
       // 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate',
     },

@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format } from 'date-fns';
 
 /**
  * Formats a given date string to 'dd MMMM yyyy'.
@@ -7,6 +7,8 @@ import { format } from "date-fns";
  */
 export const formatDate = (dateStr, type) => {
   const date = new Date(dateStr);
+
   const formattedDate = format(date, type);
+
   return { formattedDate };
 };

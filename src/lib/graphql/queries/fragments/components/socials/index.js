@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const SOCIALS = gql`
   fragment Socials on ComponentSocialsList {

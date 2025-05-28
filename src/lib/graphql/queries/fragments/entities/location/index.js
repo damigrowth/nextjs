@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const COUNTY = gql`
   fragment County on CountyEntityResponse {
@@ -55,4 +55,4 @@ const COUNTIES = gql`
   }
 `;
 
-export { COUNTY, AREA, AREAS, ZIPCODE, COUNTIES };
+export { AREA, AREAS, COUNTIES, COUNTY, ZIPCODE };

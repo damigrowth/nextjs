@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const BASIC_PACKAGE = gql`
   fragment BasicPackage on ComponentPricingBasicPackage {
@@ -96,11 +96,11 @@ const BILLING_DETAILS = gql`
 `;
 
 export {
-  BASIC_PACKAGE,
-  STANDARD_PACKAGE,
-  PREMIUM_PACKAGE,
-  PACKAGES,
   ADDONS,
-  FAQ,
+  BASIC_PACKAGE,
   BILLING_DETAILS,
+  FAQ,
+  PACKAGES,
+  PREMIUM_PACKAGE,
+  STANDARD_PACKAGE,
 };

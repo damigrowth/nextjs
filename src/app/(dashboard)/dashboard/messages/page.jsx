@@ -1,10 +1,10 @@
-import MessageInfo from "@/components/dashboard/section/MessageInfo";
-import { getFreelancerId } from "@/lib/users/freelancer";
-import { getData } from "@/lib/client/operations";
-import { GET_FREELANCER_CHATS } from "@/lib/graphql/queries/main/chat";
+import { getFreelancerId } from '@/actions';
+import { MessageInfo } from '@/components/content';
+import { getData } from '@/lib/client/operations';
+import { GET_FREELANCER_CHATS } from '@/lib/graphql';
 
 export const metadata = {
-  title: "Μηνύματα | Doulitsa",
+  title: 'Μηνύματα | Doulitsa',
 };
 
 /**
@@ -13,8 +13,11 @@ export const metadata = {
  */
 export default async function MessagesPage() {
   const fid = await getFreelancerId();
+
   let initialChatList = [];
+
   let chatListError = null;
+
   let chatListPagination = {
     page: 1,
     pageSize: 15,
@@ -24,7 +27,7 @@ export default async function MessagesPage() {
 
   try {
     if (!fid) {
-      chatListError = "Δεν βρέθηκε προφίλ freelancer";
+      chatListError = 'Δεν βρέθηκε προφίλ freelancer';
     } else {
       const data = await getData(
         GET_FREELANCER_CHATS,
@@ -33,8 +36,8 @@ export default async function MessagesPage() {
           page: 1,
           pageSize: 15,
         },
-        "FREELANCER_CHATS",
-        [`freelancer:${fid}`]
+        'FREELANCER_CHATS',
+        [`freelancer:${fid}`],
       );
 
       if (data?.chats?.data) {
@@ -50,7 +53,6 @@ export default async function MessagesPage() {
               ...p.attributes,
             })) || [],
         }));
-
         // Store pagination metadata
         if (data.chats.meta?.pagination) {
           chatListPagination = data.chats.meta.pagination;
@@ -58,7 +60,7 @@ export default async function MessagesPage() {
       }
     }
   } catch (error) {
-    chatListError = error.message || "Αποτυχία φόρτωσης δεδομένων σελίδας";
+    chatListError = error.message || 'Αποτυχία φόρτωσης δεδομένων σελίδας';
   }
 
   return (
