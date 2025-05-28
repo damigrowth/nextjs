@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useEffect, useOptimistic, useRef, useTransition } from 'react';
-import { RotatingLines } from 'react-loader-spinner';
-// Dynamic import fix for hydration error
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import {
@@ -326,15 +324,13 @@ export default function SearchSelect({
             }}
             components={{
               LoadingIndicator: () => (
-                <RotatingLines
-                  visible={true}
-                  height='20'
-                  width='20'
-                  color='grey'
-                  strokeWidth='4'
-                  animationDuration='0.65'
-                  ariaLabel='rotating-lines-loading'
-                />
+                <div
+                  className='spinner-border text-thm mb-3'
+                  role='status'
+                  style={{ width: '20px', height: '20px', fontSize: '20px' }}
+                >
+                  <span className='visually-hidden'>Loading...</span>
+                </div>
               ),
             }}
             noOptionsMessage={({ inputValue }) =>
@@ -342,19 +338,6 @@ export default function SearchSelect({
             }
           />
         </div>
-        {/* {isLoadMorePending && (
-          <div className="text-center mt-2">
-            <RotatingLines
-              visible={true}
-              height="25"
-              width="25"
-              color="grey"
-              strokeWidth="4"
-              animationDuration="0.65"
-              ariaLabel="rotating-lines-loading"
-            />
-          </div>
-        )} */}
       </div>
     );
   }
@@ -426,18 +409,13 @@ export default function SearchSelect({
               </div>
               <div className='inner show position-relative'>
                 <div className='search-content-spinner'>
-                  <RotatingLines
-                    visible={isSearchPending}
-                    height='25'
-                    width='25'
-                    color='grey'
-                    strokeWidth='4'
-                    animationDuration='0.65'
-                    ariaLabel='rotating-lines-loading'
-                    wrapperStyle={{}}
-                    wrapperClass=''
-                    className='search-content-spinner'
-                  />
+                  <div
+                    className='spinner-border text-thm mb-3'
+                    role='status'
+                    style={{ width: '25px', height: '25px', fontSize: '25px' }}
+                  >
+                    <span className='visually-hidden'>Loading...</span>
+                  </div>
                 </div>
                 <ul
                   ref={dropdownRef}
@@ -468,18 +446,17 @@ export default function SearchSelect({
                   )}
                   {isLoadMorePending && (
                     <li className='text-center'>
-                      <RotatingLines
-                        visible={true}
-                        height='25'
-                        width='25'
-                        color='grey'
-                        strokeWidth='4'
-                        animationDuration='0.65'
-                        ariaLabel='rotating-lines-loading'
-                        wrapperStyle={{}}
-                        wrapperClass=''
-                        className='loading-more-spinner'
-                      />
+                      <div
+                        className='spinner-border text-thm mb-3'
+                        role='status'
+                        style={{
+                          width: '25px',
+                          height: '25px',
+                          fontSize: '25px',
+                        }}
+                      >
+                        <span className='visually-hidden'>Loading...</span>
+                      </div>
                     </li>
                   )}
                 </ul>
