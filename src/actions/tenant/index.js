@@ -3,6 +3,7 @@ export * from './additional.js';
 export * from './basic.js';
 export * from './billing.js';
 export * from './chat.js';
+export * from './onboarding.js';
 export * from './password.js';
 export * from './presentation.js';
 export * from './profile.js';

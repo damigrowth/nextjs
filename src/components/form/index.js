@@ -8,6 +8,7 @@ export { default as ChangePasswordForm } from './form-change-password';
 export { default as ContactForm } from './form-contact-form';
 export { default as Search } from './form-home-search';
 export { default as LogoutLink } from './form-logout';
+export { default as OnboardingForm } from './form-onboarding';
 export { default as AccountForm } from './form-profile-account';
 export { default as AdditionalInfoForm } from './form-profile-additional-info';
 export { default as BasicInfoForm } from './form-profile-basic-info';
