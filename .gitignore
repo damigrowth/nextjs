@@ -1,6 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-public\css
 # dependencies
 /node_modules
 /.pnp
@@ -65,18 +64,5 @@ sentry.server.config.js
 sentry.edge.config.js
 sentry.client.config.js
 README.md
-public/images/about/cta-side-bg-3.html
-public/css/ud-custom-spacing.css
-public/css/style.css
-public/css/slider.css
-public/css/responsive.css
-public/css/menu.css
-public/css/magnific-popup.css
-public/css/jquery-ui.min.css
-public/css/googlemap.css
-public/css/fontawesome.css
-public/css/flaticon.css
-public/css/bootstrap.min.css
-public/css/bootstrap-select.min.css
+public
 public/css/animate.css
-public/css/ace-responsive-menu.css
