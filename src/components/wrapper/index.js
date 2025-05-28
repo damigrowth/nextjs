@@ -4,6 +4,8 @@ export { default as Pending } from './pending';
 export { default as Protected } from './protected';
 export { default as NotificationsProvider } from './provider-notifications';
 export { default as DashboardWrapper } from './wrapper-dashboard';
+export { default as ActiveDashboard } from './wrapper-dashboard-active';
+export { default as InactiveDashboard } from './wrapper-dashboard-inavtive';
 export { default as FreelancersListWrapper } from './wrapper-featured-freelancers';
 export { default as WrapperNotifications } from './wrapper-notifications';
 export { default as ServicesClientWrapper } from './wrapper-services-client';

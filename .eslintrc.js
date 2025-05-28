@@ -24,6 +24,12 @@ module.exports = {
     'react-hooks',
     'boundaries',
   ],
+  ignorePatterns: [
+    'src/**',
+    '!src/app/**',
+    '!src/components/**',
+    '!src/actions/**',
+  ],
   extends: [
     'eslint:recommended',
     'plugin:import/errors',
@@ -73,6 +79,7 @@ module.exports = {
         tabWidth: 2,
         trailingComma: 'all',
         useTabs: false,
+        endOfLine: 'lf',
       },
     ],
     'padding-line-between-statements': [

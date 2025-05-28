@@ -1,37 +1,39 @@
 import React from 'react';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { getAccess, getToken } from '@/actions';
+import { getFreelancerActivationStatus, getToken } from '@/actions';
 
-import { ReportIssueFloatingButton } from '../button';
-import { DashboardFooter } from '../footer';
-import { ReportIssueForm } from '../form';
-import { DashboardHeader } from '../header';
-import { DashboardSidebar } from '../sidebar';
-import { DashboardWrapper } from '../wrapper';
+import { ActiveDashboard, InactiveDashboard } from '../wrapper';
 
 export default async function DashboardLayout({ children }) {
   const token = await getToken();
 
   if (!token) {
-    // Use Next.js redirect function directly
     redirect('/login');
   }
 
-  const hasAccess = await getAccess(['freelancer', 'company']);
+  const freelancer = await getFreelancerActivationStatus();
 
-  return (
-    <>
-      <DashboardHeader />
-      <div className='dashboard_content_wrapper'>
-        <DashboardWrapper>
-          <DashboardSidebar hasAccess={hasAccess} />
-          <div className='dashboard__main pl0-md'>{children}</div>
-        </DashboardWrapper>
-      </div>
-      <DashboardFooter />
-      <ReportIssueFloatingButton />
-      <ReportIssueForm />
-    </>
+  const isActive = freelancer?.isActive;
+
+  // Get the current path to check if it's start or success page
+  // Check if we're on the success page via middleware header
+  const headersList = await headers();
+
+  const currentPath = headersList.get('x-current-path') || '';
+
+  // Show inactive layout for both /dashboard/start and /dashboard/saved/success
+  const isOnboardingPath = currentPath.startsWith('/dashboard/start');
+
+  const isSuccessPath = currentPath === '/dashboard/saved/success';
+
+  const shouldShowInactiveDashboard =
+    !isActive || isOnboardingPath || isSuccessPath;
+
+  return shouldShowInactiveDashboard ? (
+    <InactiveDashboard>{children}</InactiveDashboard>
+  ) : (
+    <ActiveDashboard>{children}</ActiveDashboard>
   );
 }
