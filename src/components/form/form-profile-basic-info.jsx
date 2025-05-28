@@ -32,7 +32,7 @@ import { normalizeQuery } from '@/utils/queries';
 import { AlertForm } from '../alert';
 import { SaveButton } from '../button';
 
-export default function BasicInfoForm({ freelancer, type, jwt }) {
+export default function BasicInfoForm({ freelancer, type }) {
   // Create a default coverage object to use when coverage is null
   const defaultCoverage = {
     online: false,
@@ -414,7 +414,7 @@ export default function BasicInfoForm({ freelancer, type, jwt }) {
           };
 
           // This is a client-side operation, so we use await
-          const uploadedIds = await uploadData([image], mediaOptions, jwt);
+          const uploadedIds = await uploadData([image], mediaOptions);
 
           uploadedImageId = uploadedIds[0];
           if (!uploadedImageId) {
