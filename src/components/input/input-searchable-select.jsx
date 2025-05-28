@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import { RotatingLines } from 'react-loader-spinner';
 import { components } from 'react-select';
 import { AsyncPaginate } from 'react-select-async-paginate';
 
@@ -9,13 +10,15 @@ import { formatInput } from '@/utils/InputFormats/formats';
 const LoadingMessage = ({ children, isPaginating, ...props }) => (
   <components.LoadingMessage {...props}>
     <div className='flex items-center justify-center space-x-2'>
-      <div
-        className='spinner-border text-thm mb-3'
-        role='status'
-        style={{ width: '20px', height: '20px', fontSize: '20px' }}
-      >
-        <span className='visually-hidden'>Loading...</span>
-      </div>
+      <RotatingLines
+        visible={true}
+        height='20'
+        width='20'
+        color='grey'
+        strokeWidth='4'
+        animationDuration='0.65'
+        ariaLabel='loading-results'
+      />
       <span>
         {isPaginating ? 'Φόρτωση περισσότερων...' : 'Φόρτωση αποτελεσμάτων...'}
       </span>
@@ -31,13 +34,15 @@ const NoOptionsMessage = ({ children, selectProps, ...props }) => {
           <span>{selectProps.error}</span>
           {selectProps.isRetrying && (
             <div className='mt-1'>
-              <div
-                className='spinner-border text-thm mb-3'
-                role='status'
-                style={{ width: '16px', height: '16px', fontSize: '16px' }}
-              >
-                <span className='visually-hidden'>Loading...</span>
-              </div>
+              <RotatingLines
+                visible={true}
+                height='16'
+                width='16'
+                color='grey'
+                strokeWidth='4'
+                animationDuration='0.65'
+                ariaLabel='retrying'
+              />
               <span className='ml-2'>Επανάληψη...</span>
             </div>
           )}
