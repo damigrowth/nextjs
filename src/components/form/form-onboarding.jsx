@@ -11,10 +11,7 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { updateOnboardingInfo, uploadData } from '@/actions';
-import {
-  OnboardingFormSchema,
-  OnboardingFormSchemaWithMedia,
-} from '@/actions/schema/onboarding';
+
 import {
   InputB,
   MediaGallery,
@@ -736,8 +733,8 @@ export default function OnboardingForm({ fid, displayName }) {
   // console.log('formState', formState);
 
   // Check if we should show success state
-  const isSuccess =
-    formState?.message && formState?.onboardingComplete && !formState?.errors;
+  // const isSuccess =
+  //   formState?.message && formState?.onboardingComplete && !formState?.errors;
 
   // State to track if we should show success from URL parameter
   // const [showSuccessFromUrl, setShowSuccessFromUrl] = useState(false);
