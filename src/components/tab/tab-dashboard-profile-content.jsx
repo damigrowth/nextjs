@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import { getFreelancer, getToken } from '@/actions';
+import { getFreelancer } from '@/actions';
 
 import {
   AccountForm,
@@ -16,8 +16,6 @@ import { Tab, TabWrapper } from '.';
 export default async function TabDashboardProfileContent() {
   const freelancer = await getFreelancer();
 
-  const jwt = await getToken();
-
   if (!freelancer) {
     redirect('/login');
   }
@@ -30,13 +28,13 @@ export default async function TabDashboardProfileContent() {
     {
       index: 0,
       label: 'Λογαριασμός',
-      content: <AccountForm freelancer={freelancer} type={type} jwt={jwt} />,
+      content: <AccountForm freelancer={freelancer} type={type} />,
       showForUser: true,
     },
     {
       index: 1,
       label: 'Βασικά Στοιχεία',
-      content: <BasicInfoForm freelancer={freelancer} type={type} jwt={jwt} />,
+      content: <BasicInfoForm freelancer={freelancer} type={type} />,
       showForUser: false,
     },
     {
@@ -48,7 +46,7 @@ export default async function TabDashboardProfileContent() {
     {
       index: 3,
       label: 'Παρουσίαση',
-      content: <PresentationForm freelancer={freelancer} jwt={jwt} />,
+      content: <PresentationForm freelancer={freelancer} />,
       showForUser: false,
     },
     {

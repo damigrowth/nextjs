@@ -8,11 +8,11 @@ import {
 } from '@/actions';
 // import FeaturedServices from "@/components/ui/SingleService/Featured";
 import { BreadcrumbArchives } from '@/components/breadcrumb';
+import SingleService from '@/components/content/content-service';
 import { Tabs } from '@/components/section';
 import { getData } from '@/lib/client/operations';
 import { CATEGORIES } from '@/lib/graphql';
 import { Meta } from '@/utils/Seo/Meta/Meta';
-import SingleService from '@/components/content/content-service';
 
 export const dynamic = 'force-dynamic';
 
