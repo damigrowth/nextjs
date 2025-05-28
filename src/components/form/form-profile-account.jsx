@@ -11,8 +11,7 @@ import { SaveButton } from '../button';
 import { InputB, ProfileImageInput } from '../input';
 import { ChangePasswordForm, DeleteAccountForm } from '.';
 
-export default function AccountForm({ freelancer, type, jwt }) {
-  // Added jwt prop
+export default function AccountForm({ freelancer, type }) {
   const initialState = {
     data: null,
     errors: {},
@@ -102,7 +101,7 @@ export default function AccountForm({ freelancer, type, jwt }) {
             };
 
             // This is a client-side operation, so we use await
-            const uploadedIds = await uploadData([image], mediaOptions, jwt); // Use jwt prop
+            const uploadedIds = await uploadData([image], mediaOptions);
 
             uploadedImageId = uploadedIds[0];
             if (!uploadedImageId) {

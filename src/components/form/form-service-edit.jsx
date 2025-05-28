@@ -411,7 +411,7 @@ export default function EditServiceForm({ service, jwt }) {
           field: 'media',
         };
 
-        newMediaIds = await uploadData(newFiles, mediaOptions, jwt);
+        newMediaIds = await uploadData(newFiles, mediaOptions);
       }
 
       // Combine existing and new media IDs
