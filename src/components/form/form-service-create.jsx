@@ -238,7 +238,7 @@ export default function AddServiceForm({ coverage, jwt }) {
           };
 
           // Try to upload the files and get their IDs
-          newMediaIds = await uploadData(newFiles, mediaOptions, jwt);
+          newMediaIds = await uploadData(newFiles, mediaOptions);
           // If we have files but no IDs returned, there was an upload error
           if (newMediaIds.length === 0 && newFiles.length > 0) {
             throw new Error('Failed to upload media files');

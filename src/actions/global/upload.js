@@ -7,6 +7,8 @@ import createUploadLink from 'apollo-upload-client/createUploadLink.mjs';
 import { UPLOAD } from '@/lib/graphql';
 import { postMedia } from '@/lib/rest/api';
 
+import { getToken } from '../auth';
+
 // Upload media to Strapi
 export async function uploadMedia(files, options = {}) {
   // Early return if no valid files
@@ -48,8 +50,10 @@ export async function uploadMedia(files, options = {}) {
   }
 }
 
-export async function uploadData(files, options, jwt) {
+export async function uploadData(files, options) {
   if (!files?.length) return [];
+
+  const jwt = await getToken();
 
   const uploadClient = new ApolloClient({
     cache: new InMemoryCache(),
