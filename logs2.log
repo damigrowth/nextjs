@@ -1,0 +1,278 @@
+MyProjectline:9paramsFilters {
+  type: 'freelancer',
+  min: undefined,
+  max: undefined,
+  paymentMethods: undefined,
+  contactTypes: undefined,
+  cat: 'pliroforiki',
+  sub: undefined,
+  experience: undefined,
+  top: undefined,
+  verified: undefined,
+  coverageOnline: undefined,
+  coverageCounty: undefined,
+  coverageCountyPage: undefined,
+  coverageCountyPageSize: undefined,
+  subcategoriesPage: undefined,
+  subcategoriesPageSize: undefined,
+  skillsPage: 1,
+  skillsPageSize: 10,
+  skills: undefined,
+  page: 1,
+  sort: 'publishedAt:desc'
+}
+MyProjectline:9taxonomies {
+  current: 'Πληροφορική',
+  category: {
+    label: 'Πληροφορική',
+    plural: 'Πληροφορική',
+    slug: 'pliroforiki',
+    description: 'Πληροφορική',
+    image: { data: [Object] }
+  },
+  subcategory: null
+}
+MyProjectline:15query {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: [Object],
+      variableDefinitions: [Array],
+      directives: [],
+      selectionSet: [Object]
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: [Object],
+      typeCondition: [Object],
+      directives: [],
+      selectionSet: [Object]
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: [Object],
+      typeCondition: [Object],
+      directives: [],
+      selectionSet: [Object]
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: [Object],
+      typeCondition: [Object],
+      directives: [],
+      selectionSet: [Object]
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: [Object],
+      typeCondition: [Object],
+      directives: [],
+      selectionSet: [Object]
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: [Object],
+      typeCondition: [Object],
+      directives: [],
+      selectionSet: [Object]
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: [Object],
+      typeCondition: [Object],
+      directives: [],
+      selectionSet: [Object]
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: [Object],
+      typeCondition: [Object],
+      directives: [],
+      selectionSet: [Object]
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: [Object],
+      typeCondition: [Object],
+      directives: [],
+      selectionSet: [Object]
+    }
+  ],
+  loc: Location {
+    start: 0,
+    end: 3043,
+    source: Source {
+      body: '\n' +
+        '  query FreelancersArchive(\n' +
+        '    $min: Int\n' +
+        '    $max: Int\n' +
+        '    $paymentMethods: [ID]\n' +
+        '    $contactTypes: [ID]\n' +
+        '    $coverageOnline: Boolean\n' +
+        '    $coverageCounty: ID\n' +
+        '    $type: String\n' +
+        '    $cat: String\n' +
+        '    $sub: String\n' +
+        '    $experience: Int\n' +
+        '    $top: Boolean\n' +
+        '    $verified: Boolean\n' +
+        '    $sort: [String]\n' +
+        '    $page: Int\n' +
+        '  ) {\n' +
+        '    freelancers(\n' +
+        '      filters: {\n' +
+        '        and: [\n' +
+        '          { type: { and: [{ slug: { eq: $type } }, { slug: { ne: "user" } }] } }\n' +
+        '          { email: { ne: "" } }\n' +
+        '          { username: { ne: "" } }\n' +
+        '          { displayName: { ne: "" } }\n' +
+        '          { rate: { gte: $min, lte: $max } }\n' +
+        '          { status: { id: { eq: 1 } } }\n' +
+        '          { payment_methods: { id: { in: $paymentMethods } } }\n' +
+        '          { contactTypes: { id: { in: $contactTypes } } }\n' +
+        '          {\n' +
+        '            coverage: {\n' +
+        '              online: { eq: $coverageOnline }\n' +
+        '              or: [\n' +
+        '                { county: { id: { eq: $coverageCounty } } }\n' +
+        '                { areas: { county: { id: { eq: $coverageCounty } } } }\n' +
+        '              ]\n' +
+        '            }\n' +
+        '          }\n' +
+        '          { category: { id: { ne: null }, slug: { eq: $cat } } }\n' +
+        '          { subcategory: { id: { ne: null }, slug: { eq: $sub } } }\n' +
+        '          { yearsOfExperience: { gte: $experience } }\n' +
+        '          { topLevel: { eq: $top } }\n' +
+        '          { verified: { eq: $verified } }\n' +
+        '        ]\n' +
+        '      }\n' +
+        '      sort: $sort\n' +
+        '      pagination: { page: $page, pageSize: 20 }\n' +
+        '    ) {\n' +
+        '      data {\n' +
+        '        id\n' +
+        '        attributes {\n' +
+        '          ...FreelancerReference\n' +
+        '        }\n' +
+        '      }\n' +
+        '      meta {\n' +
+        '        ...Pagination\n' +
+        '      }\n' +
+        '    }\n' +
+        '  }\n' +
+        '  \n' +
+        '  fragment Pagination on ResponseCollectionMeta {\n' +
+        '    pagination {\n' +
+        '      page\n' +
+        '      pageSize\n' +
+        '      pageCount\n' +
+        '      total\n' +
+        '    }\n' +
+        '  }\n' +
+        '\n' +
+        '  \n' +
+        '  fragment FreelancerReference on Freelancer {\n' +
+        '    username\n' +
+        '    tagline\n' +
+        '    rating\n' +
+        '    reviews_total\n' +
+        '    rate\n' +
+        '    topLevel\n' +
+        '    firstName\n' +
+        '    lastName\n' +
+        '    displayName\n' +
+        '    email\n' +
+        '    phone\n' +
+        '    verified\n' +
+        '    image {\n' +
+        '      ...SingleImage\n' +
+        '    }\n' +
+        '    visibility {\n' +
+        '      ...Visibility\n' +
+        '    }\n' +
+        '    specialization {\n' +
+        '      ...SpecializationEntity\n' +
+        '    }\n' +
+        '    type {\n' +
+        '      ...FreelancerType\n' +
+        '    }\n' +
+        '    category {\n' +
+        '      ...FreelancerCategory\n' +
+        '    }\n' +
+        '    subcategory {\n' +
+        '      ...FreelancerSubcategoryPartial\n' +
+        '    }\n' +
+        '  }\n' +
+        '\n' +
+        '  \n' +
+        '  fragment SingleImage on UploadFileEntityResponse {\n' +
+        '    data {\n' +
+        '      id\n' +
+        '      attributes {\n' +
+        '        formats\n' +
+        '      }\n' +
+        '    }\n' +
+        '  }\n' +
+        '\n' +
+        '  \n' +
+        '  fragment Visibility on ComponentGlobalVisibility {\n' +
+        '    phone\n' +
+        '    email\n' +
+        '    address\n' +
+        '  }\n' +
+        '\n' +
+        '  \n' +
+        '  fragment SpecializationEntity on SkillEntityResponse {\n' +
+        '    data {\n' +
+        '      id\n' +
+        '      attributes {\n' +
+        '        label\n' +
+        '        slug\n' +
+        '      }\n' +
+        '    }\n' +
+        '  }\n' +
+        '\n' +
+        '  \n' +
+        '  fragment FreelancerCategory on FreelancerCategoryEntityResponse {\n' +
+        '    data {\n' +
+        '      id\n' +
+        '      attributes {\n' +
+        '        label\n' +
+        '        plural\n' +
+        '        slug\n' +
+        '      }\n' +
+        '    }\n' +
+        '  }\n' +
+        '\n' +
+        '  \n' +
+        '  fragment FreelancerSubcategoryPartial on FreelancerSubcategoryEntityResponse {\n' +
+        '    data {\n' +
+        '      id\n' +
+        '      attributes {\n' +
+        '        label\n' +
+        '        plural\n' +
+        '        slug\n' +
+        '      }\n' +
+        '    }\n' +
+        '  }\n' +
+        '\n' +
+        '  \n' +
+        '  fragment FreelancerType on FreelancerTypeEntityResponse {\n' +
+        '    data {\n' +
+        '      id\n' +
+        '      attributes {\n' +
+        '        label\n' +
+        '        slug\n' +
+        '      }\n' +
+        '    }\n' +
+        '  }\n' +
+        '\n' +
+        '\n',
+      name: 'GraphQL request',
+      locationOffset: [Object]
+    }
+  }
+}
+MyProjectline:20freelancers null
