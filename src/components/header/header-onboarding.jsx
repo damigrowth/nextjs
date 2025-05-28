@@ -1,12 +1,9 @@
 import React from 'react';
 
-import { NavMenu } from '@/components/navigation';
-
-import ToggleButton from '../button/button-toggle-header';
 import HeaderDashboardLogo from './header-dashboard-logo';
 import HeaderMenus from './header-menus';
 
-export default function DashboardHeader() {
+export default function OnboardingHeader() {
   return (
     <header
       id='dashboard-header'
@@ -17,16 +14,10 @@ export default function DashboardHeader() {
           <div className='row align-items-center justify-content-between'>
             <div className='col-6 col-lg-auto'>
               <div className='text-center text-lg-start d-flex align-items-center'>
-                <HeaderDashboardLogo />
-                <ToggleButton />
-                <div className='dashboard-navmenu'>
-                  <NavMenu />
-                </div>
-                {/* <MobileSearchButton />
-                <SearchBar /> */}
+                <HeaderDashboardLogo notClickable />
               </div>
             </div>
-            <HeaderMenus isProfileActive={true} />
+            <HeaderMenus isProfileActive={false} />
           </div>
         </div>
       </nav>

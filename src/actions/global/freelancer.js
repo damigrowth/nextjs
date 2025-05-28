@@ -134,3 +134,37 @@ export async function getFeaturedServicesByFreelancer(uid, pageSize) {
     return [];
   }
 }
+
+export async function getFreelancerActivationStatus() {
+  try {
+    let freelancer = null;
+
+    const freelancerData = await getFreelancer();
+
+    if (freelancerData) {
+      freelancer = freelancerData.id;
+
+      const type = freelancerData.type.data.attributes.slug;
+
+      const isFreelancer = type === 'freelancer' || type === 'company';
+
+      const status = freelancerData?.status?.data?.id;
+
+      const isActiveStatus = status === '1';
+
+      if (isFreelancer && isActiveStatus) {
+        return { freelancer, isActive: true };
+      } else if (!isFreelancer && !isActiveStatus) {
+        return { freelancer, isActive: true };
+      } else if (isFreelancer && !isActiveStatus) {
+        return { freelancer, isActive: false };
+      } else {
+        return { freelancer, isActive: false };
+      }
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching freelancer status:', error);
+  }
+}

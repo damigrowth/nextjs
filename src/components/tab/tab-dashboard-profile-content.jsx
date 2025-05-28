@@ -10,8 +10,8 @@ import {
   PresentationForm,
   VerificationForm,
 } from '../form';
-import { Tab, TabWrapper } from '.';
 import { TabNavigation } from '../navigation';
+import { Tab, TabWrapper } from '.';
 
 export default async function TabDashboardProfileContent() {
   const freelancer = await getFreelancer();

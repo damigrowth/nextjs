@@ -8,7 +8,7 @@ const MIN_WIDTH = 80;
 
 const MIN_HEIGHT = 80;
 
-const imageSchema = z
+export const imageSchema = z
   .union([
     // Case 1: Existing valid image
     z.object({
