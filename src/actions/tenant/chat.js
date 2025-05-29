@@ -7,8 +7,7 @@ import {
   CREATE_MESSAGE,
   UPDATE_CHAT,
 } from '@/lib/graphql';
-
-import { getToken } from '../auth';
+import { getToken } from '../auth/token';
 
 /**
  * Server action that initializes a chat between users
