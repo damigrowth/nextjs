@@ -38,10 +38,8 @@ export async function login(prevState, formData) {
   if (response?.data?.login?.jwt) {
     await setToken(response.data.login.jwt);
 
-    return {
-      success: true,
-      message: 'Επιτυχής σύνδεση!',
-    };
+    // Redirect to login page to trigger middleware check
+    redirect('/login');
   } else {
     return {
       errors: {},
