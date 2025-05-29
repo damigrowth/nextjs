@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import { Input } from '@/components/input';
 import { login } from '@/actions/auth/login';
+import { useRouter } from 'next/navigation';
 
 const LoginForm = () => {
   const initialState = {
@@ -13,6 +14,16 @@ const LoginForm = () => {
   };
 
   const [state, formAction, isPending] = useActionState(login, initialState);
+
+  const router = useRouter();
+
+  // Trigger middleware after successful login
+  React.useEffect(() => {
+    if (state?.success) {
+      // Navigate to same page to trigger middleware
+      router.replace('/login');
+    }
+  }, [state, router]);
 
   return (
     <form action={formAction}>
