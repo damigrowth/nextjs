@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQuery } from '@apollo/client';
 
-import { revalidateSaved } from '@/actions';
 import {
   SAVE_FREELANCER,
   SAVE_SERVICE,
@@ -13,6 +12,7 @@ import {
   UNSAVE_FREELANCER,
   UNSAVE_SERVICE,
 } from '@/lib/graphql';
+import { revalidateSaved } from '@/actions/shared/save';
 
 export default function SaveForm({
   type,

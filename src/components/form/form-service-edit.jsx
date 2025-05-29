@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import { flushSync } from 'react-dom';
 
-import { editService, uploadData } from '@/actions';
 import {
   InputB,
   SearchableSelect,
@@ -31,6 +30,8 @@ import { normalizeQuery } from '@/utils/queries';
 
 import { AlertForm } from '../alert';
 import { SaveButton } from '../button';
+import { editService } from '@/actions/service/edit';
+import { uploadData } from '@/actions/shared/upload';
 
 export default function EditServiceForm({ service, jwt }) {
   const initialState = {

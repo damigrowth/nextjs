@@ -1,6 +1,5 @@
+import { getToken } from '@/actions/auth/token';
 import { NextResponse } from 'next/server';
-
-import { getToken } from '@/actions';
 
 // app/api/graphql/route.js
 export async function POST(request) {

@@ -3,13 +3,13 @@
 import React, { useActionState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
-import { register } from '@/actions';
 import authStore from '@/stores/authStore';
 
 import { FormButton } from '../button';
 import Input from '../input/input-a';
 import CheckSelect from '../input/input-check-select';
 import RadioSelect from '../input/input-radio-select';
+import { register } from '@/actions/auth/register';
 
 const consentOptions = [
   {

@@ -1,19 +1,18 @@
 import { redirect } from 'next/navigation';
 
-import {
-  getFeaturedServicesByFreelancer,
-  getFreelancer,
-  getFreelancerByUsername,
-  // getFreelancerId,
-  getReviewsByFreelancer,
-  getSavedStatus,
-} from '@/actions';
 import { ProfileBreadcrumb } from '@/components/breadcrumb';
 import { FreelancerProfile } from '@/components/content';
 import { Tabs } from '@/components/section';
 import { getData } from '@/lib/client/operations';
 import { FREELANCER_CATEGORIES } from '@/lib/graphql';
 import { Meta } from '@/utils/Seo/Meta/Meta';
+import {
+  getFeaturedServicesByFreelancer,
+  getFreelancer,
+  getFreelancerByUsername,
+  getReviewsByFreelancer,
+} from '@/actions/shared/freelancer';
+import { getSavedStatus } from '@/actions/shared/save';
 
 export const dynamic = 'force-dynamic';
 

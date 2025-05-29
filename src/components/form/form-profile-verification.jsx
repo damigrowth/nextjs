@@ -2,13 +2,13 @@
 
 import { useActionState, useMemo, useState } from 'react';
 
-import { verificationUpdate } from '@/actions';
 import { InputB } from '@/components/input';
 import { useFormChanges } from '@/hooks/useFormChanges';
 
 import { AlertForm } from '../alert';
 import { SaveButton } from '../button';
 import { IconPulsatingDot } from '../icon';
+import { verificationUpdate } from '@/actions/tenant/verification';
 
 /**
  * @typedef {object} VerificationData

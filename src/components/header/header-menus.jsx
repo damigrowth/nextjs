@@ -1,5 +1,4 @@
-import { getFreelancer } from '@/actions';
-
+import { getFreelancer } from '@/actions/shared/freelancer';
 import { LogoutLink } from '../form';
 import UserMenu from '../menu/menu-user';
 

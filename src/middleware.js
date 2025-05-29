@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-
-import { getFreelancerActivationStatus, getTokenFromRequest } from '@/actions'; // Changed import
+import { getTokenFromRequest } from './actions/auth/token';
+import { getFreelancerActivationStatus } from './actions/shared/freelancer';
 
 export async function middleware(request) {
   const currentPath = request.nextUrl.pathname;

@@ -1,4 +1,4 @@
-import { getFreelancerId } from '@/actions';
+import { getFreelancerId } from '@/actions/shared/freelancer';
 import { ManageServiceInfo } from '@/components/content';
 
 export const metadata = {

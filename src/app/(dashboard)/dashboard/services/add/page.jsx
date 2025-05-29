@@ -1,4 +1,5 @@
-import { getToken, getUser } from '@/actions';
+import { getToken } from '@/actions/auth/token';
+import { getUser } from '@/actions/shared/user';
 import { AddServiceForm } from '@/components/form';
 import { DashboardNavigation } from '@/components/navigation';
 

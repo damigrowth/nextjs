@@ -1,12 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
 
-import { getSavedStatus } from '@/actions';
 import { UserImage } from '@/components/avatar';
 import { formatRating } from '@/utils/formatRating';
 
 import { VerifiedBadge } from '../badge';
 import SaveForm from '../form/form-save';
+import { getSavedStatus } from '@/actions/shared/save';
 
 export default async function FreelancerCard({
   freelancer,

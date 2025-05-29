@@ -1,8 +1,7 @@
 'use client';
 
+import { reviewReaction } from '@/actions/tenant/reaction';
 import { useState } from 'react';
-
-import { reviewReaction } from '@/actions';
 
 // REMOVED DISLIKES
 function ReactionButton({ type, reactions, setReactions }) {

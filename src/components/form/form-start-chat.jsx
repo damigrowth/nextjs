@@ -3,8 +3,7 @@
 import React, { useActionState, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { io } from 'socket.io-client';
-
-import { initializeChat } from '@/actions';
+import { initializeChat } from '@/actions/tenant/chat';
 
 /**
  * Form component for initiating a chat conversation between users

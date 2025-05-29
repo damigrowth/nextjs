@@ -3,8 +3,8 @@
 import React, { useActionState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { homeSearch } from '@/actions';
 import useHomeStore from '@/stores/home/homeStore';
+import { homeSearch } from '@/actions/shared/search';
 
 const debounce = (func, delay) => {
   let timeoutId;

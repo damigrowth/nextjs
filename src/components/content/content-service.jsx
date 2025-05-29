@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
 
-import { getOtherServicesReviews, getUserId } from '@/actions';
 import ServiceSchema from '@/utils/Seo/Schema/ServiceSchema';
 
 import ServiceReportForm from '../form/form-report-service';
@@ -22,6 +21,8 @@ import Packages from '../parts/service-packages';
 import Terms from '../parts/service-terms';
 import StickySidebar from '../sidebar/sidebar-sticky';
 import Protected from '../wrapper/protected';
+import { getUserId } from '@/actions/shared/user';
+import { getOtherServicesReviews } from '@/actions/shared/service';
 
 export default async function SingleService({
   fid,

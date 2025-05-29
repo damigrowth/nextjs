@@ -1,7 +1,6 @@
 'use server';
 
-import { getToken } from '@/actions';
-
+import { getToken } from '@/actions/auth/token';
 import {
   STRAPI_API_URL,
   STRAPI_TOKEN,

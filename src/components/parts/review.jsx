@@ -1,13 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
 
-import { getUserId } from '@/actions';
 // import ReviewReactions from "./ReviewRe@/actions";
 import { UserImage } from '@/components/avatar';
 import { formatDate } from '@/utils/formatDate';
 import { formatUserRating } from '@/utils/formatRating';
 
 import Rating from './review-rating';
+import { getUserId } from '@/actions/shared/user';
 
 export default async function Review({
   reviewId,

@@ -6,8 +6,7 @@ import createUploadLink from 'apollo-upload-client/createUploadLink.mjs';
 
 import { UPLOAD } from '@/lib/graphql';
 import { postMedia } from '@/lib/rest/api';
-
-import { getToken } from '../auth';
+import { getToken } from '../auth/token';
 
 // Upload media to Strapi
 export async function uploadMedia(files, options = {}) {

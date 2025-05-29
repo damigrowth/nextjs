@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import Link from 'next/link';
 
-import { createServiceReport } from '@/actions';
 import { ServiceReportModal } from '@/components/modal';
 import { useFormChanges } from '@/hooks/useFormChanges';
 import useModalCleanup from '@/hooks/useModalCleanup';
@@ -17,6 +16,7 @@ import useModalCleanup from '@/hooks/useModalCleanup';
 import Alert from '../alert/alert-form';
 import SaveButton from '../button/button-form-save';
 import TextArea from '../input/input-text-area';
+import { createServiceReport } from '@/actions/service/report';
 
 /**
  * @constant {object} initialFormState

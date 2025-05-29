@@ -1,7 +1,5 @@
 import { redirect } from 'next/navigation';
 
-import { getFreelancer } from '@/actions';
-
 import {
   AccountForm,
   AdditionalInfoForm,
@@ -12,6 +10,7 @@ import {
 } from '../form';
 import { TabNavigation } from '../navigation';
 import { Tab, TabWrapper } from '.';
+import { getFreelancer } from '@/actions/shared/freelancer';
 
 export default async function TabDashboardProfileContent() {
   const freelancer = await getFreelancer();

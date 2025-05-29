@@ -2,10 +2,9 @@
 
 import { useActionState } from 'react';
 
-import { resetPassword } from '@/actions';
-
 import { FormButton } from '../button';
 import { Input } from '../input';
+import { resetPassword } from '@/actions/auth/password-reset';
 
 const ResetPasswordForm = ({ resetCode }) => {
   const [state, formAction, isPending] = useActionState(resetPassword, {

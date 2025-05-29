@@ -8,7 +8,6 @@ import React, {
   useState,
 } from 'react';
 
-import { updateBasicInfo, uploadData } from '@/actions';
 import {
   InputB,
   ProfileImageInput,
@@ -31,6 +30,8 @@ import { normalizeQuery } from '@/utils/queries';
 
 import { AlertForm } from '../alert';
 import { SaveButton } from '../button';
+import { updateBasicInfo } from '@/actions/tenant/basic';
+import { uploadData } from '@/actions/shared/upload';
 
 export default function BasicInfoForm({ freelancer, type }) {
   // Create a default coverage object to use when coverage is null

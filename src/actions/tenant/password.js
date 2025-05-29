@@ -2,11 +2,11 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { removeToken } from '@/actions';
 import { postData } from '@/lib/client/operations';
 import { CHANGE_PASSWORD } from '@/lib/graphql';
 
 import { passwordChangeSchema } from '../schema/password';
+import { removeToken } from '../auth/token';
 
 export async function updatePassword(prevState, formData) {
   try {

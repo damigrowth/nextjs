@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-
 import {
   CookieCategories,
   getConsentDefaults,
   getCookieConsent,
   setCookieConsent,
-} from '@/actions';
+} from '@/actions/shared/cookies';
 
 export default function CookiesBanner() {
   const [showBanner, setShowBanner] = useState(false);

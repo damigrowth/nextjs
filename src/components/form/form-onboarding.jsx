@@ -10,8 +10,6 @@ import {
 } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { updateOnboardingInfo, uploadData } from '@/actions';
-
 import {
   InputB,
   MediaGallery,
@@ -35,6 +33,8 @@ import { normalizeQuery } from '@/utils/queries';
 import { AlertForm } from '../alert';
 import { SaveButton } from '../button';
 import { HeadingOnboarding } from '../heading';
+import { updateOnboardingInfo } from '@/actions/tenant/onboarding';
+import { uploadData } from '@/actions/shared/upload';
 
 /**
  * @typedef {import('@/lib/types').Freelancer} Freelancer
