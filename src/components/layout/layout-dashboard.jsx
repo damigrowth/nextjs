@@ -28,7 +28,7 @@ export default async function DashboardLayout({ children }) {
   // Show inactive layout for both /dashboard/start and /dashboard/saved/success
   const isOnboardingPath = currentPath.startsWith('/dashboard/start');
 
-  const isSuccessPath = currentPath === '/dashboard/saved/success';
+  const isSuccessPath = currentPath === '/dashboard/start/success';
 
   const shouldShowInactiveDashboard =
     !isActive || isOnboardingPath || isSuccessPath;
