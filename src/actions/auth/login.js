@@ -39,7 +39,7 @@ export async function login(prevState, formData) {
 
   if (response?.data?.login?.jwt) {
     await setToken(response.data.login.jwt);
-    redirect('/dashboard/profile');
+    redirect('/dashboard');
   } else {
     return {
       errors: {},
