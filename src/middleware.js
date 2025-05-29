@@ -104,13 +104,6 @@ export async function middleware(request) {
   const isSuccessPath = currentPath === '/dashboard/start/success';
   const isActive = freelancer?.isActive;
 
-  // Debugging
-  console.log('currentPath', currentPath);
-  console.log('authenticated', authenticated);
-  console.log('isActive', isActive);
-  console.log('isOnboardingPath', isOnboardingPath);
-  console.log('isSuccessPath', isSuccessPath);
-
   // Update the redirect logic (around line 93-107):
   // Status 0 (inactive) + tries to access dashboard (except start/success) → redirect to /dashboard/start
   if (
@@ -120,7 +113,6 @@ export async function middleware(request) {
     !isOnboardingPath &&
     !isSuccessPath
   ) {
-    console.log('redirecting to /dashboard/start');
     return NextResponse.redirect(new URL('/dashboard/start', request.url));
   }
 
@@ -131,13 +123,11 @@ export async function middleware(request) {
 
   if (authenticated && isSuccessPath) {
     const referrer = request.headers.get('referer');
-    console.log('referrer', referrer);
 
     const allowedReferrer = new URL('/dashboard/start', request.url).toString();
 
     // Check if referrer is not the onboarding form
     if (!referrer || !referrer.includes(allowedReferrer)) {
-      console.log('Redirecting from success page: Invalid referrer');
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }

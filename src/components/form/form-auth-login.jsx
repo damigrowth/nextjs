@@ -14,13 +14,6 @@ const LoginForm = () => {
 
   const [state, formAction, isPending] = useActionState(login, initialState);
 
-  React.useEffect(() => {
-    if (state?.success) {
-      // Full page refresh to trigger middleware
-      window.location.reload();
-    }
-  }, [state]);
-
   return (
     <form action={formAction}>
       <div className='mb25'>

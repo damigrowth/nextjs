@@ -254,7 +254,8 @@ export const getPublicData = cache(
 
 // Generic GraphQL mutation function
 export const postData = async (mutation, variables, jwt) => {
-  const token = (await getToken()) || jwt;
+  const token =
+    jwt || (mutation.toString().includes('login') ? null : await getToken());
 
   const client = getClient();
 
