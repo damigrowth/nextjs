@@ -2,13 +2,13 @@
 
 import React, { useActionState } from 'react';
 
-import { updateBillingDetails } from '@/actions';
 import { InputB, RadioSelect } from '@/components/input';
 import { useFormChanges } from '@/hooks/useFormChanges';
 import useEditProfileStore from '@/stores/dashboard/profile';
 
 import { AlertForm } from '../alert';
 import { SaveButton } from '../button';
+import { updateBillingDetails } from '@/actions/tenant/billing';
 
 const billingOptions = [
   { value: 'receipt', label: 'Απόδειξη' },

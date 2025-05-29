@@ -1,4 +1,4 @@
-import { getFreelancerId } from '@/actions';
+import { getFreelancerId } from '@/actions/shared/freelancer';
 import { MessageInfo } from '@/components/content';
 import { getData } from '@/lib/client/operations';
 import { GET_FREELANCER_CHATS } from '@/lib/graphql';

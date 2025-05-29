@@ -2,7 +2,6 @@
 
 import { startTransition, useActionState, useState } from 'react';
 
-import { updateAccountInfo, uploadData } from '@/actions';
 import { useFormChanges } from '@/hooks/useFormChanges';
 import useEditProfileStore from '@/stores/dashboard/profile';
 
@@ -10,6 +9,8 @@ import { AlertForm } from '../alert';
 import { SaveButton } from '../button';
 import { InputB, ProfileImageInput } from '../input';
 import { ChangePasswordForm, DeleteAccountForm } from '.';
+import { updateAccountInfo } from '@/actions/tenant/account';
+import { uploadData } from '@/actions/shared/upload';
 
 export default function AccountForm({ freelancer, type }) {
   const initialState = {

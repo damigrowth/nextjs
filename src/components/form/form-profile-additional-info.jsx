@@ -2,7 +2,6 @@
 
 import { useActionState, useCallback } from 'react';
 
-import { updateAdditionalInfo } from '@/actions';
 import {
   CheckSelect,
   InputB,
@@ -23,6 +22,7 @@ import { normalizeQuery } from '@/utils/queries';
 
 import { AlertForm } from '../alert';
 import { SaveButton } from '../button';
+import { updateAdditionalInfo } from '@/actions/tenant/additional';
 
 export default function AdditionalInfoForm({ freelancer, type }) {
   const {

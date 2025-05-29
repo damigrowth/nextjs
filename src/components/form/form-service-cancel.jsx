@@ -3,8 +3,8 @@
 import React, { useActionState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 
-import { cancelService } from '@/actions';
 import { DeleteModal } from '@/components/modal';
+import { cancelService } from '@/actions/service/cancel';
 
 export default function CancelServiceForm() {
   const params = useParams();

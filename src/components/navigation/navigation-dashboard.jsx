@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { getAccess, getUser } from '@/actions';
 import {
   hasAccessAccountNav,
   hasAccessMainNav,
@@ -14,6 +13,7 @@ import {
   noAccessMainNav,
   noAccessUserMenuNav,
 } from '@/constants/dashboard';
+import { getAccess } from '@/actions/shared/user';
 
 export default function DashboardNavigation({ hasAccess }) {
   const [isActive, setActive] = useState(false);

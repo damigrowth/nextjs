@@ -2,12 +2,15 @@
 
 import { useActionState, useEffect, useState } from 'react';
 
-import { successfulPasswordChange, updatePassword } from '@/actions';
 import Alert from '@/components/alert/alert-form';
 import { SaveButton } from '@/components/button';
 import { InputB } from '@/components/input';
 
 import ChangePasswordModal from '../modal/modal-change-password';
+import {
+  successfulPasswordChange,
+  updatePassword,
+} from '@/actions/tenant/password';
 
 /**
  * @typedef {object} FormState

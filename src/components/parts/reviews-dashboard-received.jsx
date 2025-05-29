@@ -1,4 +1,4 @@
-import { getUser } from '@/actions';
+import { getUser } from '@/actions/shared/user';
 import { Pagination1 } from '@/components/pagination';
 import { ReviewComment } from '@/components/parts';
 import { getData } from '@/lib/client/operations';

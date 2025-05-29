@@ -1,4 +1,4 @@
-import { getToken } from '@/actions';
+import { getToken } from '@/actions/auth/token';
 import { CancelServiceForm, EditServiceForm } from '@/components/form';
 import { HeaderDashboardInner } from '@/components/header';
 import { getData } from '@/lib/client/operations';

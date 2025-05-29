@@ -2,8 +2,7 @@
 
 import React, { useActionState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-
-import { confirmTokenAction } from '@/actions';
+import { confirmTokenAction } from '@/actions/auth/confirm-token';
 
 export default function EmailConfirmationForm({ confirmationToken }) {
   const [state, formAction, isPending] = useActionState(confirmTokenAction, {

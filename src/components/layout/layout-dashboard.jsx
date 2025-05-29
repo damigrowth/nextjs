@@ -2,9 +2,9 @@ import React from 'react';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { getFreelancerActivationStatus, getToken } from '@/actions';
-
 import { ActiveDashboard, InactiveDashboard } from '../wrapper';
+import { getFreelancerActivationStatus } from '@/actions/shared/freelancer';
+import { getToken } from '@/actions/auth/token';
 
 export default async function DashboardLayout({ children }) {
   const token = await getToken();

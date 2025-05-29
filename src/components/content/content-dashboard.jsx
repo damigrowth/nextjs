@@ -1,6 +1,5 @@
 import Link from 'next/link';
 
-import { getAccess, getUser } from '@/actions';
 import { getData } from '@/lib/client/operations';
 import {
   ALL_REVIEWS_RECEIVED_DASHBOARD,
@@ -10,6 +9,7 @@ import {
 
 import DraftServices from '../heading/title-dashboard-services-draft';
 import DashboardNavigation from '../navigation/navigation-dashboard';
+import { getAccess, getUser } from '@/actions/shared/user';
 
 export default async function DashboardInfo() {
   const user = await getUser();

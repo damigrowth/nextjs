@@ -4,7 +4,6 @@
 // import { print } from 'graphql/language/printer';
 import { cache } from 'react';
 
-import { getToken } from '@/actions';
 import { strapiErrorTranslations } from '@/utils/errors';
 import { normalizeQuery } from '@/utils/queries';
 
@@ -16,6 +15,7 @@ import {
   validateEnvVars,
 } from '../strapi';
 import { getClient } from '.';
+import { getToken } from '@/actions/auth/token';
 
 export async function fetchWithRetry(url, options, retries = 3, backoff = 300) {
   for (let i = 0; i < retries; i++) {

@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import Link from 'next/link';
 
-import { createFreelancerReport } from '@/actions';
 import { FreelancerReportModal } from '@/components/modal';
 import { useFormChanges } from '@/hooks/useFormChanges';
 import useModalCleanup from '@/hooks/useModalCleanup';
@@ -17,6 +16,7 @@ import useModalCleanup from '@/hooks/useModalCleanup';
 import { AlertForm } from '../alert';
 import { SaveButton } from '../button';
 import { TextArea } from '../input';
+import { createFreelancerReport } from '@/actions/tenant/report';
 
 /**
  * @constant {object} initialFormState

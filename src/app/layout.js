@@ -1,7 +1,6 @@
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
-import { getUser } from '@/actions';
 import { CookiesBanner } from '@/components/banner';
 import { BottomToTop } from '@/components/button';
 import { Footer } from '@/components/footer';
@@ -17,6 +16,7 @@ import { ROOT_LAYOUT_WITH_ACTIVE_SERVICES } from '@/lib/graphql';
 import './globals.css';
 import 'react-tooltip/dist/react-tooltip.css';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { getUser } from '@/actions/shared/user';
 
 if (typeof window !== 'undefined') {
   import('bootstrap');

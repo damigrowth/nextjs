@@ -2,7 +2,6 @@
 
 import { useActionState, useCallback, useState } from 'react';
 
-import { createReview } from '@/actions';
 import { searchData } from '@/lib/client/operations';
 import { SERVICES_BY_FREELANCER_FOR_REVIEWS } from '@/lib/graphql';
 import { normalizeTerm } from '@/utils/normalizeTerm';
@@ -14,6 +13,7 @@ import SearchableSelect from '../input/input-searchable-select';
 import TextArea from '../input/input-text-area';
 import Rating from '../parts/review-rating';
 import ReviewSuccess from '../parts/review-success';
+import { createReview } from '@/actions/shared/review';
 
 export default function AddModelReviewForm({ type, serviceId, freelancerId }) {
   const initialFormData = {

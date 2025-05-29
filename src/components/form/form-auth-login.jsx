@@ -4,8 +4,8 @@ import React, { useActionState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { login } from '@/actions';
 import { Input } from '@/components/input';
+import { login } from '@/actions/auth/login';
 
 const LoginForm = () => {
   const initialState = {

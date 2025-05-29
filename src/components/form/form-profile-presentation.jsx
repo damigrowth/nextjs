@@ -8,7 +8,6 @@ import {
   useState,
 } from 'react';
 
-import { updatePresentationInfo, uploadData } from '@/actions';
 import {
   InputB,
   MediaGallery,
@@ -20,6 +19,8 @@ import useEditProfileStore from '@/stores/dashboard/profile';
 
 import { AlertForm } from '../alert';
 import { SaveButton } from '../button';
+import { updatePresentationInfo } from '@/actions/tenant/presentation';
+import { uploadData } from '@/actions/shared/upload';
 
 /**
  * @typedef {import('@/lib/types').Freelancer} Freelancer

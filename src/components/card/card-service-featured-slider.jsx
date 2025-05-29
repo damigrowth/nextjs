@@ -1,11 +1,11 @@
 import Link from 'next/link';
 
-import { getSavedStatus } from '@/actions';
 import { UserImage } from '@/components/avatar';
 import { formatRating } from '@/utils/formatRating';
 
 import SaveFrom from '../form/form-save';
 import FeaturedServiceSlideCardMedia from './card-service-media-slider';
+import { getSavedStatus } from '@/actions/shared/save';
 
 export default async function FeaturedServiceSliderCard({
   service,

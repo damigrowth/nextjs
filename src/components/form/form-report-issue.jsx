@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
-import { createIssueReport } from '@/actions';
 import { useFormChanges } from '@/hooks/useFormChanges';
 
 import Alert from '../alert/alert-form';
@@ -17,6 +16,7 @@ import SaveButton from '../button/button-form-save';
 import CheckSelect from '../input/input-check-select';
 import TextArea from '../input/input-text-area';
 import ReportIssueModal from '../modal/modal-report-issue';
+import { createIssueReport } from '@/actions/shared/report';
 
 /**
  * Initial state for the report issue form.

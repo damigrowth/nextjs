@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { logout } from '@/actions';
+import { logout } from '@/actions/auth/logout';
 
 export default function LogoutLink({ item, custom }) {
   return (

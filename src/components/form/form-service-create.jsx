@@ -8,7 +8,6 @@ import React, {
 } from 'react';
 import { flushSync } from 'react-dom';
 
-import { createService, uploadData } from '@/actions';
 import useCreateServiceStore from '@/stores/service/create/createServiceStore';
 
 import { AlertForm } from '../alert';
@@ -22,6 +21,8 @@ import {
   ServiceType,
 } from '../input';
 import { ServiceSuccess } from '../parts';
+import { createService } from '@/actions/service/create';
+import { uploadData } from '@/actions/shared/upload';
 
 export default function AddServiceForm({ coverage, jwt }) {
   const {

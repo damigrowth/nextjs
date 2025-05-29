@@ -1,11 +1,10 @@
-import { getAccess } from '@/actions';
-
 import { ReportIssueFloatingButton } from '../button';
 import { DashboardFooter } from '../footer';
 import { ReportIssueForm } from '../form';
 import { DashboardHeader } from '../header';
 import { DashboardSidebar } from '../sidebar';
 import { DashboardWrapper } from '.';
+import { getAccess } from '@/actions/shared/user';
 
 export default async function ActiveDashboard({ children, isProfileActive }) {
   const hasAccess = await getAccess(['freelancer', 'company']);

@@ -2,8 +2,8 @@
 
 import { useActionState, useEffect, useRef, useState } from 'react';
 
-import { deleteAccount } from '@/actions';
 import { DeleteModal } from '@/components/modal';
+import { deleteAccount } from '@/actions/auth/account';
 
 export default function DeleteAccountForm({ username }) {
   const formRef = useRef(null);

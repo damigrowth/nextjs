@@ -1,11 +1,5 @@
 import { redirect } from 'next/navigation';
 
-import {
-  getFreelancer,
-  getReviewsByService,
-  getSavedStatus,
-  getServicesById,
-} from '@/actions';
 // import FeaturedServices from "@/components/ui/SingleService/Featured";
 import { BreadcrumbArchives } from '@/components/breadcrumb';
 import { Tabs } from '@/components/section';
@@ -13,6 +7,9 @@ import { getData } from '@/lib/client/operations';
 import { CATEGORIES } from '@/lib/graphql';
 import { Meta } from '@/utils/Seo/Meta/Meta';
 import SingleService from '@/components/content/content-service';
+import { getReviewsByService, getServicesById } from '@/actions/shared/service';
+import { getFreelancer } from '@/actions/shared/freelancer';
+import { getSavedStatus } from '@/actions/shared/save';
 
 export const dynamic = 'force-dynamic';
 

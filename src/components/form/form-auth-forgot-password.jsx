@@ -2,10 +2,9 @@
 
 import React, { useActionState, useState } from 'react';
 
-import { forgotPassword } from '@/actions';
-
 import FormButton from '../button/button-form';
 import Input from '../input/input-a';
+import { forgotPassword } from '@/actions/auth/password-forgot';
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState('');

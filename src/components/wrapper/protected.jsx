@@ -1,6 +1,5 @@
+import { getUserMe } from '@/actions/shared/user';
 import Link from 'next/link';
-
-import { getUserMe } from '@/actions';
 
 export default async function Protected({ children, message }) {
   const user = await getUserMe();

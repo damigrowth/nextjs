@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 
-import { getSavedStatus } from '@/actions';
 import { UserImage } from '@/components/avatar';
 
 import { Badges } from '../badge';
@@ -9,6 +8,7 @@ import SaveForm from '../form/form-save';
 import CardReviews from './card-reviews';
 import ServiceCardFile from './card-service-file';
 import ServiceCardFiles from './card-service-files';
+import { getSavedStatus } from '@/actions/shared/save';
 
 export default async function ServiceCard({ service, fid }) {
   const { title, price, slug, category, subcategory, media, freelancer } =

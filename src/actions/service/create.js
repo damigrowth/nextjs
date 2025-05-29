@@ -3,8 +3,8 @@
 import { postData } from '@/lib/client/operations';
 import { POST_SERVICE } from '@/lib/graphql';
 
-import { getFreelancerId } from '../global/freelancer';
-import { createTags } from '../global/tags';
+import { getFreelancerId } from '../shared/freelancer';
+import { createTags } from '../shared/tags';
 
 // Create service
 export async function createService(prevState, formData) {

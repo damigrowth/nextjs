@@ -1,4 +1,4 @@
-import { getFreelancer } from '@/actions';
+import { getFreelancer } from '@/actions/shared/freelancer';
 import { SavedInfo } from '@/components/content';
 
 export const metadata = {

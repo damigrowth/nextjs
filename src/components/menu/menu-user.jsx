@@ -1,6 +1,5 @@
 import Link from 'next/link';
 
-import { getAccess, getUser } from '@/actions';
 import { UserImage } from '@/components/avatar';
 import {
   hasAccessUserMenuNav,
@@ -11,6 +10,7 @@ import MessagesMenu from '../button/button-messages';
 import SavedMenu from '../button/button-saved';
 import LogoutLink from '../form/form-logout';
 import UserMenuLink from './menu-user-link';
+import { getAccess, getUser } from '@/actions/shared/user';
 
 export default async function UserMenu({ isMobile }) {
   const user = await getUser();

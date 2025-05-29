@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 
-import { getFreelancerId } from '@/actions';
 import { AllTaxonomies } from '@/components/content';
 import { HeroHome } from '@/components/hero';
 import { FeaturedFreelancers, Features, Stats } from '@/components/section';
@@ -15,6 +14,7 @@ import {
 } from '@/lib/graphql';
 import { Meta } from '@/utils/Seo/Meta/Meta';
 import HomeSchema from '@/utils/Seo/Schema/HomeSchema';
+import { getFreelancerId } from '@/actions/shared/freelancer';
 
 export const revalidate = 300; // 5 minutes
 

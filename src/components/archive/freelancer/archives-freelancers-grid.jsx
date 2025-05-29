@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { getFreelancerId } from '@/actions';
 import FreelancerArchiveSchema from '@/utils/Seo/Schema/FreelancerArchiveSchema';
 
 import FreelancerCard from '../../card/freelancer-card';
+import { getFreelancerId } from '@/actions/shared/freelancer';
 
 export default async function FreelancerGrid({
   freelancers: freelancersData,

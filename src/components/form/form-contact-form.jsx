@@ -1,9 +1,8 @@
 'use client';
 
+import { submitContactForm } from '@/actions/shared/contact';
 import React, { useActionState, useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
-
-import { submitContactForm } from '@/actions';
 
 export default function ContactForm({ form, siteKey }) {
   const [state, formAction, isPending] = useActionState(submitContactForm, {

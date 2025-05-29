@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 
-import { getAccess } from '@/actions';
 import { DashboardNavigation } from '@/components/navigation';
 
 import { GivenReviewsSection, ReceivedReviewsSection } from '../parts';
 import { GivenReviewsSkeleton, ReceivedReviewsSkeleton } from '../skeleton';
+import { getAccess } from '@/actions/shared/user';
 
 const ReviewsHeader = () => (
   <div className='row pb40'>
