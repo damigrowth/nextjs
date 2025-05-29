@@ -1,20 +1,12 @@
 'use server';
 
+import { redirect } from 'next/navigation';
 import { postData } from '@/lib/client/operations';
 import { LOGIN_USER } from '@/lib/graphql';
-
 import { loginSchema } from '../schema/login';
 import { setToken } from './token';
+import { getFreelancerActivationStatus } from '@/actions/shared/freelancer';
 
-/**
- * Server action to handle user login.
- * Validates identifier and password using loginSchema.
- * Calls the LOGIN_USER mutation. Sets the JWT token on success and redirects to the dashboard.
- *
- * @param {object} prevState - The previous state from useActionState.
- * @param {FormData} formData - The form data containing login credentials.
- * @returns {Promise<{ errors: object, message: string } | void>} Returns an error object or redirects.
- */
 export async function login(prevState, formData) {
   const validatedFields = loginSchema.safeParse({
     identifier: formData.get('identifier'),
@@ -23,6 +15,7 @@ export async function login(prevState, formData) {
 
   if (!validatedFields.success) {
     return {
+      success: false,
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Λάθος στοιχεία συνδεσης.',
     };
@@ -30,23 +23,25 @@ export async function login(prevState, formData) {
 
   const { identifier, password } = validatedFields.data;
 
-  const response = await postData(LOGIN_USER, {
-    identifier,
-    password,
-  });
+  // Don't wrap the redirect part in try/catch
+  const response = await postData(LOGIN_USER, { identifier, password }, null);
 
   if (response?.data?.login?.jwt) {
     await setToken(response.data.login.jwt);
 
-    // No redirect - just return success
-    return {
-      success: true,
-      message: 'Επιτυχής σύνδεση!',
-    };
+    const freelancer = await getFreelancerActivationStatus();
+
+    // Direct redirect - Next.js handles the "error" internally
+    if (freelancer?.isActive) {
+      redirect('/dashboard');
+    } else {
+      redirect('/dashboard/start');
+    }
   } else {
     return {
+      success: false,
       errors: {},
-      message: response.error || 'Κάτι πήγε στραβά. Δοκιμάστε ξανά.',
+      message: response?.error || 'Λάθος στοιχεία σύνδεσης.',
     };
   }
 }
