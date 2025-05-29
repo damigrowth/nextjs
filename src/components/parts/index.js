@@ -40,7 +40,7 @@ export { default as OrderFixed } from './service-order-fixed';
 export { default as OrderPackages } from './service-order-packages';
 export { default as Packages } from './service-packages';
 export { default as PackagesBtns } from './service-packages-buttons';
-export { default as Terms } from './service-terms';
+export { default as DescriptionBlock } from './description-block';
 export { default as TaxonomiesGrid } from './taxonomies-grid';
 export { default as AllTaxonomiesList } from './taxonomies-list';
 export { default as TaxonomiesSwiper } from './taxonomies-swiper';

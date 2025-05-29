@@ -2,7 +2,7 @@ import React from 'react';
 
 import { formatDescription } from '@/utils/formatDescription';
 
-export default function Terms({ heading, text }) {
+export default function DescriptionBlock({ heading, text }) {
   if (!text) {
     return null;
   } else {

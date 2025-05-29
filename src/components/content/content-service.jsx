@@ -18,7 +18,7 @@ import Meta from '../parts/service-meta';
 import OrderFixed from '../parts/service-order-fixed';
 import OrderPackages from '../parts/service-order-packages';
 import Packages from '../parts/service-packages';
-import Terms from '../parts/service-terms';
+import DescriptionBlock from '../parts/description-block';
 import StickySidebar from '../sidebar/sidebar-sticky';
 import Protected from '../wrapper/protected';
 import { getUserId } from '@/actions/shared/user';
@@ -231,7 +231,7 @@ export default async function SingleService({
                   </div>
                 </div>
                 {faq?.length > 0 && <Faq faq={faq} />}
-                <Terms heading='Όροι Συνεργασίας' text={terms} />
+                <DescriptionBlock heading='Όροι Συνεργασίας' text={terms} />
                 <Reviews
                   reviews={reviews}
                   rating={freelancerRating}

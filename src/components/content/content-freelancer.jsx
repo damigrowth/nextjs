@@ -15,11 +15,11 @@ import Skills from '../parts/freelancer-skills';
 import TermsFreelancer from '../parts/freelancer-terms';
 import Reviews from '../parts/reviews';
 import ServiceAudioFiles from '../parts/service-audio-files';
-import Description from '../parts/service-description';
 import FeaturedFile from '../parts/service-featured-file';
 import FeaturedFiles from '../parts/service-featured-files';
 import StickySidebar from '../sidebar/sidebar-sticky';
 import Protected from '../wrapper/protected';
+import { DescriptionBlock } from '../parts';
 
 export default function FreelancerProfile({
   fid,
@@ -127,7 +127,7 @@ export default function FreelancerProfile({
               yearsOfExperience={yearsOfExperience}
             />
             <div className='service-about'>
-              <Description heading='Σχετικά' text={description} />
+              <DescriptionBlock heading='Σχετικά' text={description} />
               <FeaturesFreelancer
                 minBudget={minBudget?.data}
                 size={size?.data?.attributes}
