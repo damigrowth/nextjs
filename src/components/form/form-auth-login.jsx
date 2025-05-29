@@ -2,7 +2,6 @@
 
 import React, { useActionState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import { Input } from '@/components/input';
 import { login } from '@/actions/auth/login';
@@ -14,15 +13,6 @@ const LoginForm = () => {
   };
 
   const [state, formAction, isPending] = useActionState(login, initialState);
-
-  const router = useRouter();
-
-  React.useEffect(() => {
-    if (state?.success) {
-      // Simple client-side navigation after successful login
-      router.push('/dashboard');
-    }
-  }, [state, router]);
 
   return (
     <form action={formAction}>
