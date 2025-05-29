@@ -15,7 +15,7 @@ export async function updateFreelancerStatus(id) {
     });
 
     if (error) throw error;
-    revalidatePath('/dashboard/profile');
+    // revalidatePath('/dashboard/profile');
 
     return data;
   } catch (error) {

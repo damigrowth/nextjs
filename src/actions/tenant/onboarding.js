@@ -338,15 +338,9 @@ export async function updateOnboardingInfo(prevState, formData) {
   }
 
   // Revalidation (same as basic.js but with additional paths for onboarding)
-  revalidatePath('/dashboard/profile');
-  revalidatePath('/dashboard/start');
+  // revalidatePath('/dashboard/profile');
+  // revalidatePath('/dashboard/start');
   // revalidatePath(`/freelancer/${data.attributes.username}`);
 
   redirect('/dashboard/start/success');
-  // return {
-  //   data,
-  //   errors: null,
-  //   message: 'Η εγγραφή ολοκληρώθηκε επιτυχώς!',
-  //   onboardingComplete: true, // Add this line
-  // };
 }
