@@ -1,7 +1,5 @@
 'use server';
 
-import { redirect } from 'next/navigation';
-
 import { postData } from '@/lib/client/operations';
 import { LOGIN_USER } from '@/lib/graphql';
 
@@ -39,7 +37,11 @@ export async function login(prevState, formData) {
 
   if (response?.data?.login?.jwt) {
     await setToken(response.data.login.jwt);
-    redirect('/dashboard');
+
+    return {
+      success: true,
+      message: 'Επιτυχής σύνδεση!',
+    };
   } else {
     return {
       errors: {},

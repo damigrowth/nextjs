@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { postData } from '@/lib/client/operations';
@@ -336,11 +335,6 @@ export async function updateOnboardingInfo(prevState, formData) {
       };
     }
   }
-
-  // Revalidation (same as basic.js but with additional paths for onboarding)
-  // revalidatePath('/dashboard/profile');
-  // revalidatePath('/dashboard/start');
-  // revalidatePath(`/freelancer/${data.attributes.username}`);
 
   redirect('/dashboard/start/success');
 }

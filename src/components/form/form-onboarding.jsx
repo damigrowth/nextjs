@@ -8,7 +8,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
   InputB,
@@ -61,10 +60,6 @@ import { uploadData } from '@/actions/shared/upload';
  * @returns {JSX.Element} The OnboardingForm component.
  */
 export default function OnboardingForm({ fid, displayName }) {
-  const router = useRouter();
-
-  const searchParams = useSearchParams();
-
   // Create a default coverage object to use when coverage is null
   const defaultCoverage = {
     online: false,
@@ -729,24 +724,6 @@ export default function OnboardingForm({ fid, displayName }) {
       }));
     }
   }, [formState?.errors]);
-
-  // console.log('formState', formState);
-
-  // Check if we should show success state
-  // const isSuccess =
-  //   formState?.message && formState?.onboardingComplete && !formState?.errors;
-
-  // State to track if we should show success from URL parameter
-  // const [showSuccessFromUrl, setShowSuccessFromUrl] = useState(false);
-
-  // Check URL for success parameter on client side
-  // useEffect(() => {
-  //   if (isSuccess) {
-  //     console.log('redirecting to /dashboard/saved/success');
-
-  //     router.replace('/dashboard/saved/success');
-  //   }
-  // }, [isSuccess, router]);
 
   return (
     <>
