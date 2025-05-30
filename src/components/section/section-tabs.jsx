@@ -6,6 +6,19 @@ import { usePathname } from 'next/navigation';
 
 import { getPathname } from '@/utils/paths';
 
+/**
+ * Renders a tab navigation component for different categories or types of listings.
+ * It dynamically generates links based on the current path and provided categories.
+ *
+ * @param {Object} props - The component props.
+ * @param {Array<Object>} props.categories - An array of category objects, each with `attributes.slug`, `attributes.label`, and `attributes.plural`.
+ * @param {boolean} [props.plural] - If true, uses the `plural` attribute for category labels if available.
+ * @param {string} [props.freelancerCategory] - The slug of the currently active freelancer category, if applicable.
+ * @param {string} [props.serviceCategory] - The slug of the currently active service category, if applicable.
+ * @param {boolean} [props.categoriesRoute] - If true, forces category links to start with '/categories/'.
+ * @param {string} props.type - The type of listing (e.g., 'categories', 'freelancer', 'company', 'user', 'service') to determine parent path and label.
+ * @returns {JSX.Element} The Tabs component.
+ */
 export default function Tabs({
   categories,
   plural,
@@ -18,9 +31,7 @@ export default function Tabs({
 
   const category = getPathname(pathName, 1);
 
-  // Compute parent values directly based on type
   let parentLabel = 'Όλες οι κατηγορίες';
-
   let parentPath = 'categories';
 
   switch (type) {

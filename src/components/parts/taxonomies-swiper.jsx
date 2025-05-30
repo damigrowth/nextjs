@@ -6,6 +6,15 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
+/**
+ * Renders a Swiper component for displaying a list of taxonomies (subdivisions).
+ * It shows a horizontal scrollable list of links to specific taxonomy pages.
+ *
+ * @param {Object} props - The component props.
+ * @param {Array<Object>} props.taxonomies - An array of taxonomy objects to display in the swiper.
+ *   Each object should have `slug`, `label`, and `subcategory.data.attributes.slug`.
+ * @returns {JSX.Element} The TaxonomiesSwiper component.
+ */
 export default function TaxonomiesSwiper({ taxonomies }) {
   const [swiperLoaded, setSwiperLoaded] = useState(false);
 

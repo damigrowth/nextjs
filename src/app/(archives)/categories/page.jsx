@@ -13,7 +13,10 @@ export const dynamic = 'force-dynamic';
 
 export const revalidate = 3600;
 
-// Static SEO
+/**
+ * Generates static SEO metadata for the categories page.
+ * @returns {Promise<Object>} The metadata object for the page.
+ */
 export async function generateMetadata() {
   const { meta } = await Meta({
     titleTemplate: 'Κατηγορίες | Doulitsa',
@@ -26,6 +29,11 @@ export async function generateMetadata() {
   return meta;
 }
 
+/**
+ * Renders the Categories archive page.
+ * Fetches categories and taxonomies data to display a list of categories with active services.
+ * @returns {JSX.Element} The Categories archive page component.
+ */
 export default async function page() {
   const { categories } = await getData(CATEGORIES);
 
@@ -35,9 +43,18 @@ export default async function page() {
     subdivisions,
   } = await getData(ALL_TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES);
 
-  // Δημιουργία του archive αντικειμένου για το TaxonomiesArchive component
+  const categoriesWithFilteredSubcategories =
+    archiveCategories?.data
+      ?.filter((category) => category.attributes.subcategories.data.length > 0)
+      ?.map((category) => ({
+        ...category.attributes,
+        subdivisions: {
+          data: category.attributes.subcategories.data,
+        },
+      })) || [];
+
   const archive = {
-    subcategories,
+    categories: categoriesWithFilteredSubcategories,
     subdivisions,
   };
 

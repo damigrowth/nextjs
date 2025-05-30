@@ -4,6 +4,16 @@ import Image from 'next/image';
 import BannerVidBox from './banner-vid-box';
 import BannerVidBtn from './banner-vid-btn';
 
+/**
+ * Renders a banner component for archive pages.
+ * It displays a heading, description, and an optional image and video button.
+ * @param {Object} props - The component props.
+ * @param {string} props.heading - The main heading text for the banner.
+ * @param {string} props.description - The descriptive text for the banner.
+ * @param {string} [props.image] - The URL of the image to display on the banner. Defaults to a placeholder if not provided.
+ * @param {boolean} [props.withVideo] - If true, a video box and button will be displayed.
+ * @returns {JSX.Element} The Banner component.
+ */
 export default function Banner({ heading, description, image, withVideo }) {
   const bannerImage = !image
     ? '/images/vector-img/vector-service-v1.png'
