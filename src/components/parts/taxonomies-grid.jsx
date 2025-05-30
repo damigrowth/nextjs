@@ -2,13 +2,27 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function TaxonomiesGrid({ taxonomies }) {
+/**
+ * Renders a grid of taxonomies (categories or subcategories).
+ * Each item in the grid displays an image, title, and a list of associated subdivisions.
+ *
+ * @param {Object} props - The component props.
+ * @param {Array<Object>} props.taxonomies - An array of taxonomy objects to display. Each object should have `slug`, `label`, `image`, and `subdivisions.data` (an array of subdivision objects with `attributes.slug` and `attributes.label`).
+ * @param {boolean} [props.isMainCategoriesPage=false] - A flag indicating if the current page is the main categories archive. This affects the link structure.
+ * @returns {JSX.Element} The TaxonomiesGrid component.
+ */
+export default function TaxonomiesGrid({
+  taxonomies,
+  isMainCategoriesPage = false,
+}) {
   const fallbackImage = '/images/vector-img/vector-service-v1.png';
 
   return (
     <section className='pt0'>
       <div className='container'>
-        <h2 className='mb20'>Κατηγορίες</h2>
+        <h2 className='mb20'>
+          {isMainCategoriesPage ? 'Κατηγορίες' : 'Κατηγορίες'}
+        </h2>
         <div className='taxonomies-grid'>
           {taxonomies &&
             taxonomies.map((taxonomy, index) => (
@@ -24,16 +38,26 @@ export default function TaxonomiesGrid({ taxonomies }) {
                   />
                 </div>
                 <div className='taxonomies-grid-info'>
-                  <Link href={`/ipiresies/${taxonomy.slug}`}>
+                  <Link
+                    href={
+                      isMainCategoriesPage
+                        ? `/categories/${taxonomy.slug}`
+                        : `/ipiresies/${taxonomy.slug}`
+                    }
+                  >
                     <h3 className='taxonomies-grid-title'>{taxonomy.label}</h3>
                   </Link>
                   <ul className='taxonomies-grid-list'>
-                    {taxonomy.subdivisions.data.map((subdivision, subIndex) => (
+                    {taxonomy.subdivisions.data.map((item, subIndex) => (
                       <li key={subIndex} className='taxonomies-grid-list-item'>
                         <Link
-                          href={`/ipiresies/${taxonomy.slug}/${subdivision.attributes.slug}`}
+                          href={
+                            isMainCategoriesPage
+                              ? `/ipiresies/${item.attributes.slug}`
+                              : `/ipiresies/${taxonomy.slug}/${item.attributes.slug}`
+                          }
                         >
-                          {subdivision.attributes.label}
+                          {item.attributes.label}
                         </Link>
                       </li>
                     ))}

@@ -430,6 +430,22 @@ const ALL_TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES = gql`
           image {
             ...SingleImage
           }
+          subcategories(
+            filters: {
+              services: {
+                id: { ne: null }
+                status: { type: { eq: "Active" } }
+                freelancer: { id: { ne: null } }
+              }
+            }
+          ) {
+            data {
+              attributes {
+                label
+                slug
+              }
+            }
+          }
         }
       }
     }
