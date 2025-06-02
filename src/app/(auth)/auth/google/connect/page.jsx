@@ -111,7 +111,7 @@ const GoogleRedirectContent = () => {
               sessionStorage.removeItem('google_oauth_display_name');
 
               const response = await fetch(
-                `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/auth/google/create-user`,
+                `${process.env.NEXT_PUBLIC_STRAPI_URL || process.env.STRAPI_URL}/api/auth/google/create-user`,
                 {
                   method: 'POST',
                   headers: {
@@ -180,7 +180,7 @@ const GoogleRedirectContent = () => {
                 sessionStorage.removeItem('google_oauth_display_name');
 
                 const response = await fetch(
-                  `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/auth/google/create-user`,
+                  `${process.env.NEXT_PUBLIC_STRAPI_URL || process.env.STRAPI_URL}/api/auth/google/create-user`,
                   {
                     method: 'POST',
                     headers: {
@@ -230,7 +230,7 @@ const GoogleRedirectContent = () => {
 
                 try {
                   const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/auth/google/create-user`,
+                    `${process.env.NEXT_PUBLIC_STRAPI_URL || process.env.STRAPI_URL}/api/auth/google/create-user`,
                     {
                       method: 'POST',
                       headers: {
@@ -302,7 +302,7 @@ const GoogleRedirectContent = () => {
 
               try {
                 const response = await fetch(
-                  `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/auth/google/create-user`,
+                  `${process.env.NEXT_PUBLIC_STRAPI_URL || process.env.STRAPI_URL}/api/auth/google/create-user`,
                   {
                     method: 'POST',
                     headers: {

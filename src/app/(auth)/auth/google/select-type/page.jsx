@@ -51,7 +51,7 @@ const GoogleSelectTypeContent = () => {
       // Simple account - create account using the temporary token
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/auth/google/complete-professional`,
+          `${process.env.NEXT_PUBLIC_STRAPI_URL || process.env.STRAPI_URL}/api/auth/google/complete-professional`,
           {
             method: 'POST',
             headers: {
