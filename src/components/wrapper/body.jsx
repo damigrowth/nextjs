@@ -20,6 +20,8 @@ export default function Body({ children }) {
     if (!mounted) return '';
 
     return `${
+      path.startsWith('/connect') ||
+      path.startsWith('/auth') ||
       path === '/register' ||
       path === '/register/success' ||
       path == '/email-confirmation' ||
