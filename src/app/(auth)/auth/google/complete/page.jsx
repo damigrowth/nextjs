@@ -136,7 +136,7 @@ const GoogleCompleteMinimalContent = () => {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_STRAPI_URL || process.env.STRAPI_URL}/api/auth/google/complete-professional`,
+        `https://api.doulitsa.gr/api/auth/google/complete-professional`,
         {
           method: 'POST',
           headers: {

@@ -14,8 +14,7 @@ const GoogleLoginButton = ({
     if (disabled) return;
 
     // Use your existing Strapi Google OAuth endpoint
-    const baseUrl =
-      process.env.NEXT_PUBLIC_STRAPI_URL || process.env.STRAPI_URL;
+    const baseUrl = 'https://api.doulitsa.gr';
     let googleAuthUrl = `${baseUrl}/api/connect/google`;
 
     // Add account type and other parameters as query params for our custom flow
