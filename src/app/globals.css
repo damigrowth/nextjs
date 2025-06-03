@@ -1855,3 +1855,8 @@ a[href='#reviews-section']:hover {
   width: 100%;
   max-width: 950px;
 }
+
+.btn-thm.btn-auth-google {
+  background-color: black;
+  border: 2px solid black;
+}
