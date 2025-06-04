@@ -9,14 +9,16 @@ import {
 
 import DraftServices from '../heading/title-dashboard-services-draft';
 import DashboardNavigation from '../navigation/navigation-dashboard';
-import { getAccess, getUser } from '@/actions/shared/user';
+import { getAccess } from '@/actions/shared/user';
+import { getFreelancer } from '@/actions/shared/freelancer';
 
 export default async function DashboardInfo() {
-  const user = await getUser();
-
   const hasAccess = await getAccess(['freelancer', 'company']);
 
-  const freelancerId = user.freelancer.data.id;
+  const freelancer = await getFreelancer();
+
+  const freelancerId = freelancer?.id;
+  const freelancerDisplayName = freelancer?.displayName;
 
   let data = {};
 
@@ -57,7 +59,7 @@ export default async function DashboardInfo() {
                   <DraftServices />
                 </div>
               ) : (
-                <h2>Καλώς ήρθες, {user.displayName}!</h2>
+                <h2>Καλώς ήρθες, {freelancerDisplayName}!</h2>
               )}
             </div>
           </div>

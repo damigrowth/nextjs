@@ -80,7 +80,6 @@ const LoginForm = () => {
         </div>
       </form>
 
-      {/* Google OAuth Login - Moved below the Σύνδεση button */}
       <div className='text-center position-relative mb20'>
         <span className='bg-white px-3 text-muted'>ή</span>
         <hr
