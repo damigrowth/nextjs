@@ -56,7 +56,7 @@ const GoogleLoginButton = ({
       onClick={handleGoogleLogin}
       disabled={disabled}
       className={`
-        ud-btn btn-dark 
+        ud-btn btn-thm btn-auth-google
         d-flex align-items-center justify-content-center 
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         ${className}

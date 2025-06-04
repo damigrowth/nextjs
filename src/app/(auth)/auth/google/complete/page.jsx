@@ -274,10 +274,12 @@ const GoogleCompleteMinimalContent = () => {
                     id='username'
                     name='username'
                     disabled={isSubmitting}
-                    // placeholder='π.χ. john_doe ή company_name'
+                    autoComplete='username'
                     errorId='username-error'
                     required
-                    helpText='Μόνο γράμματα, αριθμοί, και τους χαρακτήρες _ - (3-30 χαρακτήρες)'
+                    formatSpaces
+                    usernameFormat
+                    lowerCase
                   />
                 </div>
 

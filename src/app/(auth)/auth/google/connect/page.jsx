@@ -376,10 +376,8 @@ const GoogleRedirectContent = () => {
                   <span className='sr-only'></span>
                 </div>
               </div>
-              <h2 className='title text-success'>Επεξεργασία...</h2>
-              <p className='paragraph'>
-                Ολοκληρώνουμε τη σύνδεση με το Google σας...
-              </p>
+              <h2 className='title text-success'>Σύνδεση...</h2>
+              <p className='paragraph'>Σύνδεση με λογαριασμό Google...</p>
             </div>
           </div>
         </div>

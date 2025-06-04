@@ -10,6 +10,7 @@ import Input from '../input/input-a';
 import CheckSelect from '../input/input-check-select';
 import RadioSelect from '../input/input-radio-select';
 import { register } from '@/actions/auth/register';
+import GoogleLoginButton from '@/components/button/google-login-button';
 
 const consentOptions = [
   {
@@ -180,6 +181,22 @@ const RegisterForm = () => {
           icon='arrow'
         />
       </div>
+
+      <div className='text-center position-relative mb20'>
+        <span className='bg-white px-3 text-muted'>ή</span>
+        <hr
+          className='position-absolute top-50 start-0 w-100'
+          style={{ zIndex: -1 }}
+        />
+      </div>
+
+      {type > 0 && (
+        <div className='mb30'>
+          <GoogleLoginButton accountType={type} className='mb20 w-100'>
+            Εγγραφή με Google
+          </GoogleLoginButton>
+        </div>
+      )}
     </form>
   );
 };
