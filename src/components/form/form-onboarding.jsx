@@ -57,9 +57,10 @@ import { uploadData } from '@/actions/shared/upload';
  * @param {object} props - The component props.
  * @param {string} props.fid - The freelancer ID.
  * @param {string} props.displayName - The freelancer display name.
+ * @param {string} props.type - The freelancer type.
  * @returns {JSX.Element} The OnboardingForm component.
  */
-export default function OnboardingForm({ fid, displayName }) {
+export default function OnboardingForm({ fid, displayName, type }) {
   // Create a default coverage object to use when coverage is null
   const defaultCoverage = {
     online: false,
@@ -343,6 +344,7 @@ export default function OnboardingForm({ fid, displayName }) {
         page,
         additionalVariables: {
           categorySlug: category.data?.attributes?.slug || '',
+          type: type || '',
           subcategoriesPage: page,
           subcategoriesPageSize: 10,
         },
@@ -735,7 +737,8 @@ export default function OnboardingForm({ fid, displayName }) {
           </div>
 
           {/* Image */}
-          <label className='form-label fw500 dark-color'>Εικόνα Προφίλ *</label>
+          <label className='form-label dark-color mb0'>Εικόνα Προφίλ *</label>
+          <p>Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο.</p>
           <ProfileImageInput
             name='image'
             image={
@@ -800,17 +803,25 @@ export default function OnboardingForm({ fid, displayName }) {
 
           {/* Description */}
           <div className='mb20'>
+            <label
+              htmlFor='description'
+              className='heading-color ff-heading fw500 mb0'
+            >
+              Περιγραφή*
+            </label>
+            <p>Μια περιγραφή για εσάς και τις υπηρεσίες που προσφέρετε.</p>
             <TextArea
               id='description'
               name='description'
               label='Περιγραφή*'
-              placeholder='Μια περιγραφή για εσάς και τις υπηρεσίες που προσφέρετε.'
+              placeholder='Τουλάχιστον 80 χαρακτήρες (2-3 προτάσεις)'
               minLength={80}
               maxLength={5000}
               counter
               value={description}
               onChange={setDescription}
               errors={formState?.errors?.description}
+              hideLabel={true}
             />
           </div>
 
@@ -819,7 +830,7 @@ export default function OnboardingForm({ fid, displayName }) {
             <label className='form-label fw700 dark-color mb10'>
               Τρόποι παροχής των Υπηρεσιών*
             </label>
-            <div className='row '>
+            <div className='row coverage-fields'>
               <label className='form-label dark-color mb10'>
                 Προσφέρω τις υπηρεσίες:
               </label>
@@ -985,11 +996,11 @@ export default function OnboardingForm({ fid, displayName }) {
           </div>
 
           {/* Portfolio */}
-          <label className='form-label fw700 dark-color mb10'>
-            Portfolio (προαιρετικό)
+          <label className='form-label fw700 dark-color mb0 mt10'>
+            Portfolio - Δείγμα εργασιών (προαιρετικό)
           </label>
-          <p className='text-muted mb10'>
-            Αρχεία από τις εργασίες που έχετε υλοποιήσει.
+          <p className='text-muted mb0'>
+            Αρχεία από εργασίες που έχετε υλοποιήσει.
           </p>
           <MediaGallery
             initialMedia={[]}
