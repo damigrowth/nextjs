@@ -510,31 +510,6 @@ export default function BasicInfoForm({ freelancer, type }) {
         <div className='bdrb1 pb15 mb10'>
           <h5 className='list-title heading'>Βασικά Στοιχεία</h5>
         </div>
-        <p className='text-muted mb0'>
-          Για τη δημόσια προβολή του προφίλ θα πρέπει να υπάρχουν:
-        </p>
-        <div className='text-muted mb30'>
-          <div className='d-flex align-items-center mb2'>
-            <span className='me-2' style={{ color: '#6c757d' }}>
-              •
-            </span>
-            <span>
-              Εικόνα Προφίλ (Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο)
-            </span>
-          </div>
-          <div className='d-flex align-items-center mb2'>
-            <span className='me-2' style={{ color: '#6c757d' }}>
-              •
-            </span>
-            <span>Κατηγορία/Υποκατηγορία</span>
-          </div>
-          <div className='d-flex align-items-center'>
-            <span className='me-2' style={{ color: '#6c757d' }}>
-              •
-            </span>
-            <span>Τρόποι παροχής των Υπηρεσιών (τουλάχιστον μία επιλογή)</span>
-          </div>
-        </div>
         <label className='form-label fw500 dark-color'>Εικόνα Προφίλ*</label>
         <ProfileImageInput
           name='image'
