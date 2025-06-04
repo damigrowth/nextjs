@@ -1860,3 +1860,12 @@ a[href='#reviews-section']:hover {
   background-color: black;
   border: 2px solid black;
 }
+
+.onboarding-form label {
+  font-weight: bold;
+}
+
+.onboarding-form .coverage-fields label {
+  font-weight: normal;
+}
+

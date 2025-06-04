@@ -10,5 +10,13 @@ export default async function page() {
 
   const displayName = freelancer?.displayName || 'Νέος Χρήστης';
 
-  return <OnboardingForm fid={freelancer?.id} displayName={displayName} />;
+  const type = freelancer?.type?.data?.attributes?.slug;
+
+  return (
+    <OnboardingForm
+      fid={freelancer?.id}
+      displayName={displayName}
+      type={type}
+    />
+  );
 }
