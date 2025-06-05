@@ -1,12 +1,19 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 
 export default function ServiceSuccess({ id, title }) {
+  const handleAddServiceReload = (e) => {
+    e.preventDefault();
+    window.location.reload();
+  };
+
   return (
     <div className='ps-widget bdrs12 p30 mb30 overflow-hidden position-relative'>
       <div className='success-container'>
         <div className='success-icon bgc-thm'>
-          <i className='flaticon-success vam fz40 text-white ' />
+          <i className='flaticon-success vam fz40 text-white' />
         </div>
         <h3 className='list-title text-center'>
           Επιτυχής δημιουργία υπηρεσίας!
@@ -18,12 +25,13 @@ export default function ServiceSuccess({ id, title }) {
           ελέγχου της.
         </p>
         <div className='success-btns'>
-          <Link
-            href='/dashboard/services/add'
+          <button
+            type='button'
+            onClick={handleAddServiceReload}
             className='ud-btn btn-thm bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3'
           >
             Προσθήκη Νέας Υπηρεσίας
-          </Link>
+          </button>
           <Link
             href='/dashboard/services'
             className='ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3'
