@@ -6,7 +6,7 @@ import { DashboardSidebar } from '../sidebar';
 import { DashboardWrapper } from '.';
 import { getAccess } from '@/actions/shared/user';
 
-export default async function ActiveDashboard({ children, isProfileActive }) {
+export default async function ActiveDashboard({ children }) {
   const hasAccess = await getAccess(['freelancer', 'company']);
 
   return (
