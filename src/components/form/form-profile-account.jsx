@@ -12,7 +12,7 @@ import { ChangePasswordForm, DeleteAccountForm } from '.';
 import { updateAccountInfo } from '@/actions/tenant/account';
 import { uploadData } from '@/actions/shared/upload';
 
-export default function AccountForm({ freelancer, type }) {
+export default function AccountForm({ freelancer, type, token }) {
   const initialState = {
     data: null,
     errors: {},
@@ -102,7 +102,7 @@ export default function AccountForm({ freelancer, type }) {
             };
 
             // This is a client-side operation, so we use await
-            const uploadedIds = await uploadData([image], mediaOptions);
+            const uploadedIds = await uploadData([image], mediaOptions, token);
 
             uploadedImageId = uploadedIds[0];
             if (!uploadedImageId) {

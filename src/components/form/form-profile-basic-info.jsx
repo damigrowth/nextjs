@@ -33,7 +33,7 @@ import { SaveButton } from '../button';
 import { updateBasicInfo } from '@/actions/tenant/basic';
 import { uploadData } from '@/actions/shared/upload';
 
-export default function BasicInfoForm({ freelancer, type }) {
+export default function BasicInfoForm({ freelancer, type, token }) {
   // Create a default coverage object to use when coverage is null
   const defaultCoverage = {
     online: false,
@@ -415,7 +415,7 @@ export default function BasicInfoForm({ freelancer, type }) {
           };
 
           // This is a client-side operation, so we use await
-          const uploadedIds = await uploadData([image], mediaOptions);
+          const uploadedIds = await uploadData([image], mediaOptions, token);
 
           uploadedImageId = uploadedIds[0];
           if (!uploadedImageId) {

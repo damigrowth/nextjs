@@ -25,8 +25,8 @@ export default async function FreelancerGrid({
         taxonomies={taxonomies}
       />
       {freelancers.length > 0 ? (
-        freelancers.map((freelancer, i) => (
-          <div key={i} className='col-sm-6 col-xl-4'>
+        freelancers.map((freelancer) => (
+          <div key={freelancer.id} className='col-sm-6 col-xl-4'>
             <FreelancerCard freelancer={freelancer} fid={fid} linkedName />
           </div>
         ))

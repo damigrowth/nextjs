@@ -187,8 +187,14 @@ export const getData = async (
   extraTags = [],
   providedToken = null,
 ) => {
-  // Get user token to determine if this is user-specific
-  const userToken = providedToken || (await getToken());
+  // CRITICAL FIX: Only get token if NO token was provided
+  // Never mix provided tokens with cookie tokens
+  let userToken = null;
+  if (providedToken !== null) {
+    userToken = providedToken;
+  } else {
+    userToken = await getToken();
+  }
 
   // CRITICAL SECURITY: NEVER cache user-specific data
   const isUserSpecificQuery =

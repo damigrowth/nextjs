@@ -49,10 +49,18 @@ export async function uploadMedia(files, options = {}) {
   }
 }
 
-export async function uploadData(files, options) {
+export async function uploadData(files, options, providedToken = null) {
   if (!files?.length) return [];
 
-  const jwt = await getToken();
+  // CRITICAL FIX: Use provided token OR get from cookies
+  // Never mix provided tokens with cookie tokens
+  let jwt = null;
+  if (providedToken !== null) {
+    jwt = providedToken;
+  } else {
+    jwt = await getToken();
+  }
+
 
   const uploadClient = new ApolloClient({
     cache: new InMemoryCache(),

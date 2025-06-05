@@ -11,9 +11,17 @@ import {
 import { TabNavigation } from '../navigation';
 import { Tab, TabWrapper } from '.';
 import { getFreelancer } from '@/actions/shared/freelancer';
+import { getToken } from '@/actions/auth/token';
 
 export default async function TabDashboardProfileContent() {
-  const freelancer = await getFreelancer();
+  // SECURITY FIX: Get explicit token
+  const token = await getToken();
+  
+  if (!token) {
+    redirect('/login');
+  }
+
+  const freelancer = await getFreelancer(token);
 
   if (!freelancer) {
     redirect('/login');
@@ -27,25 +35,25 @@ export default async function TabDashboardProfileContent() {
     {
       index: 0,
       label: 'Λογαριασμός',
-      content: <AccountForm freelancer={freelancer} type={type} />,
+      content: <AccountForm freelancer={freelancer} type={type} token={token} />,
       showForUser: true,
     },
     {
       index: 1,
       label: 'Βασικά Στοιχεία',
-      content: <BasicInfoForm freelancer={freelancer} type={type} />,
+      content: <BasicInfoForm freelancer={freelancer} type={type} token={token} />,
       showForUser: false,
     },
     {
       index: 2,
       label: 'Πρόσθετα Στοιχεία',
-      content: <AdditionalInfoForm freelancer={freelancer} type={type} />,
+      content: <AdditionalInfoForm freelancer={freelancer} type={type} token={token} />,
       showForUser: false,
     },
     {
       index: 3,
       label: 'Παρουσίαση',
-      content: <PresentationForm freelancer={freelancer} />,
+      content: <PresentationForm freelancer={freelancer} token={token} />,
       showForUser: false,
     },
     {
@@ -56,6 +64,7 @@ export default async function TabDashboardProfileContent() {
           fid={freelancer.id}
           email={freelancer.email}
           verificationData={freelancer.verification}
+          token={token}
         />
       ),
       showForUser: false,
@@ -63,7 +72,7 @@ export default async function TabDashboardProfileContent() {
     {
       index: 4,
       label: 'Στοιχεία Τιμολόγησης',
-      content: <BillingDetailsForm freelancer={freelancer} />,
+      content: <BillingDetailsForm freelancer={freelancer} token={token} />,
       showForUser: true,
     },
   ];
