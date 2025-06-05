@@ -17,7 +17,7 @@ export const data = {
     },
     phone: {
       title: 'Τηλέφωνο',
-      number: '210 300 67 34',
+      number: '210 300 8149',
     },
     email: {
       title: 'Email',
