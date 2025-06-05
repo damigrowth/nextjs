@@ -3,9 +3,11 @@ export const CACHE_CONFIG = {
     key: null,
     ttl: 0, // No caching
   },
+  // SECURITY WARNING: User-specific data should NEVER be cached
+  // The USERS cache is DISABLED to prevent cross-user data leakage
   USERS: {
-    key: 'users',
-    ttl: 300, // 5 minutes
+    key: null, // DISABLED - was 'users'
+    ttl: 0, // DISABLED - was 300 (5 minutes) 
   },
   SERVICES: {
     key: 'services',
@@ -44,7 +46,7 @@ export const CACHE_CONFIG = {
     ttl: 1800, // 30 minutes
   },
   SAVED_STATUS: {
-    key: 'saved-status',
-    ttl: 0, // 0 minute
+    key: null, // SECURITY: Don't cache user-specific saved status
+    ttl: 0, // No caching for user-specific data
   },
 };

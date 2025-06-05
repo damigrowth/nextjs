@@ -4,6 +4,7 @@ import { getData } from '@/lib/client/operations';
 import { USER, USER_PARTIAL } from '@/lib/graphql';
 
 import { getToken } from '../auth/token';
+import { logout } from '../auth/logout';
 
 const ME_QUERY = `
   query {
@@ -81,9 +82,130 @@ export async function getUser(token = null) {
 
   if (!uid) return null;
 
-  const user = await getData(USER, { id: uid }, token);
+  try {
+    // CRITICAL: Always use NO_CACHE for user data to prevent cross-user data leakage
+    const user = await getData(USER, { id: uid }, 'NO_CACHE', [], token);
+    const userData = user?.usersPermissionsUser?.data?.attributes;
 
-  return user?.usersPermissionsUser?.data?.attributes ?? null;
+    if (!userData) {
+      console.error(
+        'SECURITY_ALERT: No user data found for authenticated user ID:',
+        uid,
+      );
+      return null;
+    }
+
+    // CRITICAL SECURITY: Verify user data integrity
+    if (userData.freelancer?.data) {
+      const freelancerData = userData.freelancer.data;
+      const freelancerEmail = freelancerData.attributes?.email;
+      const freelancerUserId = uid;
+      const userEmail = userData.email;
+
+      // Check for email mismatch
+      if (freelancerEmail && userEmail && freelancerEmail !== userEmail) {
+        console.error('SECURITY_ALERT: Email mismatch detected', {
+          userId: uid,
+          userEmail,
+          freelancerId: freelancerData.id,
+          freelancerEmail,
+          timestamp: Date.now(),
+        });
+
+        // Log this critical security issue
+        try {
+          await fetch('/api/security/log-mismatch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'EMAIL_MISMATCH',
+              userId: uid,
+              userEmail,
+              freelancerId: freelancerData.id,
+              freelancerEmail,
+              timestamp: Date.now(),
+            }),
+          }).catch(() => {}); // Silent fail for logging
+        } catch {}
+
+        // Return null to force re-authentication
+        logout();
+        return null;
+      }
+
+      // Check for user ID mismatch in freelancer relationship
+      if (freelancerUserId && freelancerUserId !== uid) {
+        console.error('SECURITY_ALERT: User-Freelancer relationship mismatch', {
+          currentUserId: uid,
+          freelancerUserId: freelancerUserId,
+          freelancerId: freelancerData.id,
+          email: userEmail,
+          timestamp: Date.now(),
+        });
+
+        // Log this critical security issue
+        try {
+          await fetch('/api/security/log-mismatch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'USER_FREELANCER_MISMATCH',
+              currentUserId: uid,
+              freelancerUserId: freelancerUserId,
+              freelancerId: freelancerData.id,
+              email: userEmail,
+              timestamp: Date.now(),
+            }),
+          }).catch(() => {}); // Silent fail for logging
+        } catch {}
+
+        // Return null to force re-authentication
+        logout();
+        return null;
+      }
+
+      // Check for username consistency
+      const freelancerUsername = freelancerData.attributes?.username;
+      const userUsername = userData.username;
+
+      if (
+        freelancerUsername &&
+        userUsername &&
+        freelancerUsername !== userUsername
+      ) {
+        console.warn('DATA_INCONSISTENCY: Username mismatch detected', {
+          userId: uid,
+          userUsername,
+          freelancerId: freelancerData.id,
+          freelancerUsername,
+          timestamp: Date.now(),
+        });
+
+        // This is less critical but still worth logging
+        try {
+          await fetch('/api/security/log-mismatch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'USERNAME_INCONSISTENCY',
+              userId: uid,
+              userUsername,
+              freelancerId: freelancerData.id,
+              freelancerUsername,
+              timestamp: Date.now(),
+            }),
+          }).catch(() => {}); // Silent fail for logging
+        } catch {}
+
+        // Don't block access for username mismatch, but log it
+      }
+    }
+
+    return userData;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return null;
+  }
 }
 
 export async function getUserPartial(token = null) {
@@ -91,7 +213,14 @@ export async function getUserPartial(token = null) {
 
   if (!uid) return null;
 
-  const userBasic = await getData(USER_PARTIAL, { id: uid }, token);
+  // CRITICAL: Always use NO_CACHE for user data to prevent cross-user data leakage
+  const userBasic = await getData(
+    USER_PARTIAL,
+    { id: uid },
+    'NO_CACHE',
+    [],
+    token,
+  );
 
   return userBasic?.usersPermissionsUser?.data?.attributes ?? null;
 }

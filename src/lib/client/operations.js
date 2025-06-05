@@ -78,10 +78,12 @@ const getDataInternal = async (
   variables,
   cacheKey = 'NO_CACHE',
   extraTags = [],
+  userToken = null, // Accept token as parameter for cache isolation
 ) => {
   validateEnvVars();
 
-  const token = await getToken();
+  // Use provided token or get from cookies
+  const token = userToken !== null ? userToken : await getToken();
 
   const queryString = normalizeQuery(query);
 
@@ -101,6 +103,11 @@ const getDataInternal = async (
         filteredVariables[varKey] = varValue;
       }
     }
+  }
+
+  // SECURITY LOG: Log user-specific queries for monitoring
+  if (userToken) {
+    // console.log('🔒 USER_QUERY: Executing with authentication token');
   }
 
   const options = {
@@ -167,23 +174,44 @@ const getDataInternal = async (
   }
 };
 
-// Cached version of the function - only used when cacheKey is not NO_CACHE
-const getDataCached = cache(getDataInternal);
+// SIMPLIFIED: Cache only for public data (no user tokens)
+const getDataCached = cache(async (query, variables, cacheKey, extraTags) => {
+  return getDataInternal(query, variables, cacheKey, extraTags, null); // null = no user token
+});
 
-// Smart getData that chooses between cached and uncached versions
-// Add async keyword to make it a valid Server Action
+// SIMPLIFIED: Always use NO_CACHE for any user-related data
 export const getData = async (
   query,
   variables,
   cacheKey = 'NO_CACHE',
   extraTags = [],
+  providedToken = null,
 ) => {
-  // If cacheKey is NO_CACHE, bypass React's cache function
-  if (cacheKey === 'NO_CACHE') {
-    return getDataInternal(query, variables, cacheKey, extraTags);
+  // Get user token to determine if this is user-specific
+  const userToken = providedToken || (await getToken());
+
+  // CRITICAL SECURITY: NEVER cache user-specific data
+  const isUserSpecificQuery =
+    userToken || // If there's any token, it's user-specific
+    query.toString().includes('me') ||
+    query.toString().includes('getUser') ||
+    query.toString().includes('usersPermissionsUser') ||
+    query.toString().includes('freelancer') ||
+    query.toString().includes('Freelancer') ||
+    variables?.id; // User ID queries
+
+  // FORCE NO_CACHE for ALL user-specific queries
+  if (isUserSpecificQuery) {
+    // console.log('🔒 SECURITY: Using NO_CACHE for user-specific query');
+    return getDataInternal(query, variables, 'NO_CACHE', extraTags, userToken);
   }
 
-  // Otherwise use the cached version
+  // Only cache public/non-user data
+  if (cacheKey === 'NO_CACHE') {
+    return getDataInternal(query, variables, 'NO_CACHE', extraTags, userToken);
+  }
+
+  // For truly public data only (no token), use caching
   return getDataCached(query, variables, cacheKey, extraTags);
 };
 
