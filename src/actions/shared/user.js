@@ -83,7 +83,7 @@ export async function getUser(token = null) {
   if (!uid) return null;
 
   try {
-    // CRITICAL: Always use NO_CACHE for user data to prevent cross-user data leakage
+    // CRITICAL SECURITY: Use explicit token isolation
     const user = await getData(USER, { id: uid }, 'NO_CACHE', [], token);
     const userData = user?.usersPermissionsUser?.data?.attributes;
 
@@ -91,7 +91,38 @@ export async function getUser(token = null) {
       console.error(
         'SECURITY_ALERT: No user data found for authenticated user ID:',
         uid,
+        'with token type:',
+        token ? 'provided' : 'from_cookies'
       );
+      return null;
+    }
+
+    // CRITICAL SECURITY: Verify the returned user ID matches the expected ID
+    if (userData.id && Number(userData.id) !== Number(uid)) {
+      console.error('CRITICAL_SECURITY_ALERT: User ID mismatch in response!', {
+        requestedUserId: uid,
+        returnedUserId: userData.id,
+        email: userData.email,
+        timestamp: Date.now(),
+      });
+
+      // Log this critical security issue
+      try {
+        await fetch('/api/security/log-mismatch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'CRITICAL_USER_ID_MISMATCH',
+            requestedUserId: uid,
+            returnedUserId: userData.id,
+            email: userData.email,
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {}); // Silent fail for logging
+      } catch {}
+
+      // Force logout and return null
+      logout();
       return null;
     }
 
@@ -134,7 +165,7 @@ export async function getUser(token = null) {
       }
 
       // Check for user ID mismatch in freelancer relationship
-      if (freelancerUserId && freelancerUserId !== uid) {
+      if (freelancerUserId && Number(freelancerUserId) !== Number(uid)) {
         console.error('SECURITY_ALERT: User-Freelancer relationship mismatch', {
           currentUserId: uid,
           freelancerUserId: freelancerUserId,

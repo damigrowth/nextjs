@@ -44,7 +44,7 @@ import { uploadData } from '@/actions/shared/upload';
  * @param {string} props.jwt - The JWT token for authenticated requests.
  * @returns {JSX.Element} The PresentationForm component.
  */
-export default function PresentationForm({ freelancer }) {
+export default function PresentationForm({ freelancer, token }) {
   /**
    * Zustand store state and setters for presentation form fields.
    */
@@ -446,7 +446,7 @@ export default function PresentationForm({ freelancer }) {
         };
 
         try {
-          newMediaIds = await uploadData(newFiles, mediaOptions);
+          newMediaIds = await uploadData(newFiles, mediaOptions, token);
           if (!newMediaIds.length && newFiles.length > 0) {
             throw new Error('Failed to upload media files');
           }

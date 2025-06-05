@@ -10,6 +10,7 @@ import {
   OnboardingFormSchemaWithMedia,
 } from '../schema/onboarding';
 import { updateFreelancerStatus } from './status';
+import { getFreelancerId } from '../shared/freelancer';
 
 /**
  * Server action to update freelancer onboarding information.
@@ -21,6 +22,56 @@ import { updateFreelancerStatus } from './status';
  */
 export async function updateOnboardingInfo(prevState, formData) {
   const id = formData.get('id');
+
+  // CRITICAL SECURITY: Validate that the freelancer ID matches the authenticated user
+  const authenticatedFreelancerId = await getFreelancerId();
+  
+  if (!authenticatedFreelancerId) {
+    console.error('SECURITY_ALERT: No authenticated freelancer ID found');
+    return {
+      data: null,
+      errors: {
+        submit: {
+          field: 'submit',
+          message: 'Σφάλμα ταυτοποίησης χρήστη',
+        },
+      },
+      message: null,
+    };
+  }
+
+  if (String(id) !== String(authenticatedFreelancerId)) {
+    console.error('CRITICAL_SECURITY_ALERT: Freelancer ID mismatch in onboarding!', {
+      requestedFreelancerId: id,
+      authenticatedFreelancerId: authenticatedFreelancerId,
+      timestamp: Date.now()
+    });
+
+    // Log this critical security issue
+    try {
+      await fetch('/api/security/log-mismatch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'ONBOARDING_FREELANCER_ID_MISMATCH',
+          requestedFreelancerId: id,
+          authenticatedFreelancerId: authenticatedFreelancerId,
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {}); // Silent fail for logging
+    } catch {}
+
+    return {
+      data: null,
+      errors: {
+        submit: {
+          field: 'submit',
+          message: 'Σφάλμα ταυτοποίησης - παρακαλώ συνδεθείτε ξανά',
+        },
+      },
+      message: null,
+    };
+  }
 
   const validateOnly = formData.get('validateOnly') === 'true';
 

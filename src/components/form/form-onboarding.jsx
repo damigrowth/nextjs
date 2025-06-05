@@ -60,7 +60,7 @@ import { uploadData } from '@/actions/shared/upload';
  * @param {string} props.type - The freelancer type.
  * @returns {JSX.Element} The OnboardingForm component.
  */
-export default function OnboardingForm({ fid, displayName, type }) {
+export default function OnboardingForm({ fid, displayName, type, token }) {
   // Create a default coverage object to use when coverage is null
   const defaultCoverage = {
     online: false,
@@ -565,7 +565,7 @@ export default function OnboardingForm({ fid, displayName, type }) {
           };
 
           // This is a client-side operation, so we use await
-          const uploadedIds = await uploadData([image], mediaOptions);
+          const uploadedIds = await uploadData([image], mediaOptions, token);
 
           uploadedImageId = uploadedIds[0];
           if (!uploadedImageId) {
@@ -607,7 +607,7 @@ export default function OnboardingForm({ fid, displayName, type }) {
         };
 
         try {
-          newPortfolioIds = await uploadData(newPortfolioFiles, mediaOptions);
+          newPortfolioIds = await uploadData(newPortfolioFiles, mediaOptions, token);
           if (!newPortfolioIds.length && newPortfolioFiles.length > 0) {
             throw new Error('Failed to upload portfolio files');
           }
