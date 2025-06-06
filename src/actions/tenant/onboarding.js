@@ -249,11 +249,17 @@ export async function updateOnboardingInfo(prevState, formData) {
     }
   }
 
-  // If there are validation errors, return them (same as basic.js - no Zod validation)
+  // If there are validation errors, return them with generic submit message
   if (Object.keys(errors).length > 0) {
     return {
       data: null,
-      errors,
+      errors: {
+        ...errors,
+        submit: {
+          field: 'submit',
+          message: 'Προσοχή: Πρέπει να συμπληρωθούν όλα τα απαραίτητα πεδία!'
+        }
+      },
       message: null,
     };
   }
