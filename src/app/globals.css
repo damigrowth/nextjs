@@ -2242,3 +2242,9 @@ a[href='#reviews-section']:hover {
     min-height: 400px;
   }
 }
+
+/* Onboarding form styling */
+
+.onboarding-form .dropzone-container {
+  margin-bottom: 20px;
+}
