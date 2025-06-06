@@ -18,7 +18,7 @@ export async function confirmTokenAction(prevState, token) {
   if (!token) {
     return {
       success: false,
-      message: 'Missing confirmation token.',
+      message: 'Λείπει το token επιβεβαίωσης.',
       redirect: false,
     };
   }
@@ -33,13 +33,20 @@ export async function confirmTokenAction(prevState, token) {
 
     // Handle potential GraphQL errors
     if (result.error) {
-      return { success: false, message: result.error, redirect: false };
+      console.error('GraphQL Error in confirmTokenAction:', result.error);
+      return { 
+        success: false, 
+        message: result.error,
+        redirect: false 
+      };
     }
 
     // Handle application-level errors from the mutation
     if (!result?.data?.completeRegistration?.success) {
       const errorMessage =
         result?.data?.completeRegistration?.message || 'Η επιβεβαίωση απέτυχε.';
+
+      console.error('Registration completion failed:', errorMessage);
 
       return {
         success: false,
@@ -49,26 +56,43 @@ export async function confirmTokenAction(prevState, token) {
     }
 
     // Success case
-    const { jwt } = result.data.completeRegistration;
+    const { jwt, message, alreadyConfirmed } = result.data.completeRegistration;
 
+    // Set the authentication token if we have one
     if (jwt) {
-      await setToken(jwt); // Set the authentication token
+      await setToken(jwt);
     }
+
+    // Determine the final message
+    const finalMessage = message || 
+      (alreadyConfirmed ? 'Το email σας έχει ήδη επιβεβαιωθεί!' : 'Επιτυχής επιβεβαίωση email!');
 
     const finalState = {
       success: true,
-      message: `Επιτυχία εγγραφής!`,
+      message: finalMessage,
       redirect: true,
+      alreadyConfirmed: alreadyConfirmed || false,
     };
+
+    console.log('Email confirmation successful:', finalMessage);
 
     return finalState;
   } catch (error) {
     // Catch unexpected errors during the process
     console.error('Unexpected error in confirmTokenAction:', error);
 
+    // Check for specific error types
+    let errorMessage = 'Προέκυψε σφάλμα κατά την επιβεβαίωση.';
+    
+    if (error.message?.includes('network') || error.message?.includes('fetch')) {
+      errorMessage = 'Πρόβλημα σύνδεσης. Παρακαλώ δοκιμάστε ξανά.';
+    } else if (error.message?.includes('timeout')) {
+      errorMessage = 'Η αίτηση έλαβε timeout. Παρακαλώ δοκιμάστε ξανά.';
+    }
+
     return {
       success: false,
-      message: 'An unexpected error occurred during confirmation.', // Generic message for unhandled errors
+      message: errorMessage,
       redirect: false,
     };
   }
