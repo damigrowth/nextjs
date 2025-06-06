@@ -1869,3 +1869,376 @@ a[href='#reviews-section']:hover {
   font-weight: normal;
 }
 
+/* ============================================
+   PAGINATION STYLES
+   ============================================ */
+
+.services-page-content {
+  min-height: 500px;
+  width: 100%;
+}
+
+/* Loading placeholder */
+.loading-placeholder {
+  padding: 60px 20px;
+}
+
+.featured-services-spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Fix container boundaries */
+.service-card-wrapper {
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Fix inner Swiper dimensions */
+.service-card-wrapper .swiper {
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.service-card-wrapper .swiper-slide {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.service-card-wrapper .swiper-wrapper {
+  max-width: 100% !important;
+}
+
+/* Fix inner swiper navigation */
+.service-card-wrapper .swiper__parent {
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+}
+
+.service-card-wrapper .swiper__btn {
+  width: 25px;
+  height: 25px;
+  min-width: 25px;
+  min-height: 25px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.service-card-wrapper .list-thumb {
+  padding-bottom: 40px;
+  position: relative;
+}
+
+/* Style outer swiper */
+.outer-swiper {
+  position: relative;
+}
+
+.service-card-wrapper .swiper-pagination-bullet {
+  width: 6px;
+  height: 6px;
+}
+
+.outer-swiper .swiper-slide {
+  height: auto;
+}
+
+.service-card-wrapper img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Enhanced bullet pagination */
+.swiper__pagination {
+  position: relative !important;
+  margin: 0 20px;
+}
+
+.swiper__pagination .swiper-pagination-bullet {
+  width: 14px;
+  height: 14px;
+  background: #e9ecef;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0 6px;
+}
+
+.swiper-horizontal > .swiper-pagination-bullets,
+.swiper-pagination-bullets.swiper-pagination-horizontal,
+.swiper-pagination-custom,
+.swiper-pagination-fraction {
+  bottom: 3px !important;
+}
+
+.swiper__pagination .swiper-pagination-bullet:hover {
+  background: #6c757d;
+  transform: scale(1.1);
+}
+
+.swiper__pagination .swiper-pagination-bullet-active {
+  background: #007bff;
+  transform: scale(1.3);
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+}
+
+/* Dynamic bullets styling */
+.swiper__pagination .swiper-pagination-bullet-active-main {
+  background: #007bff;
+}
+
+.swiper__pagination .swiper-pagination-bullet-active-prev,
+.swiper__pagination .swiper-pagination-bullet-active-next {
+  background: #6c757d;
+  transform: scale(0.8);
+}
+
+.swiper__pagination .swiper-pagination-bullet-active-prev-prev,
+.swiper__pagination .swiper-pagination-bullet-active-next-next {
+  background: #adb5bd;
+  transform: scale(0.6);
+}
+
+/* Page info */
+.page-info {
+  text-align: center;
+  color: #6c757d;
+  font-size: 14px;
+  margin-top: 20px;
+  padding: 10px;
+}
+
+.category-filter-indicator {
+  color: #007bff;
+  font-weight: 500;
+}
+
+/* Enable grabbing cursor */
+.outer-swiper {
+  cursor: grab;
+}
+
+.outer-swiper:active {
+  cursor: grabbing;
+}
+
+.swiper-navigation-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .swiper-navigation-wrapper {
+    gap: 20px;
+  }
+
+  .swiper__btn {
+    width: 45px;
+    height: 45px;
+    font-size: 14px;
+  }
+
+  .swiper__pagination .swiper-pagination-bullet {
+    width: 12px;
+    height: 12px;
+    margin: 0 4px;
+  }
+
+  .services-page-content {
+    min-height: 400px;
+  }
+}
+
+/* Touch feedback */
+.outer-swiper .swiper-slide {
+  transition: transform 0.1s ease;
+}
+
+/* Loading animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.services-page-content {
+  animation: fadeIn 0.4s ease;
+}
+
+.navi_pagi_bottom_center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+/* Empty state styling */
+.empty-state {
+  padding: 40px 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.empty-state-icon {
+  opacity: 0.6;
+}
+
+.empty-state-title {
+  color: #495057;
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 15px;
+}
+
+.empty-state .btn {
+  transition: all 0.3s ease;
+}
+
+.empty-state .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+}
+
+/* Freelancers page content */
+.freelancers-page-content {
+  min-height: 420px;
+  width: 100%;
+  animation: fadeIn 0.4s ease;
+}
+
+/* Fix container boundaries */
+.freelancer-card-wrapper {
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Style outer swiper for freelancers */
+.outer-swiper-freelancers {
+  position: relative;
+  cursor: grab;
+}
+
+.outer-swiper-freelancers:active {
+  cursor: grabbing;
+}
+
+.outer-swiper-freelancers .swiper-slide {
+  height: auto;
+  transition: transform 0.1s ease;
+}
+
+/* Freelancer-specific pagination styling */
+.swiper__pagination__freelancers {
+  position: relative !important;
+  margin: 0 20px;
+}
+
+.swiper__pagination__freelancers .swiper-pagination-bullet {
+  width: 14px;
+  height: 14px;
+  background: #e9ecef;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0 6px;
+}
+
+.swiper__pagination__freelancers .swiper-pagination-bullet:hover {
+  background: #6c757d;
+  transform: scale(1.1);
+}
+
+.swiper__pagination__freelancers .swiper-pagination-bullet-active {
+  background: #fff !important;
+  transform: scale(1.3);
+}
+
+/* Dynamic bullets styling for freelancers */
+.swiper__pagination__freelancers .swiper-pagination-bullet-active-main {
+  background: #007bff;
+}
+
+.swiper__pagination__freelancers .swiper-pagination-bullet-active-prev,
+.swiper__pagination__freelancers .swiper-pagination-bullet-active-next {
+  background: #6c757d;
+  transform: scale(0.8);
+}
+
+.swiper__pagination__freelancers .swiper-pagination-bullet-active-prev-prev,
+.swiper__pagination__freelancers .swiper-pagination-bullet-active-next-next {
+  background: #adb5bd;
+  transform: scale(0.6);
+}
+
+/* Freelancer-specific navigation button overrides for dark background */
+.bgc-dark .swiper__btn {
+  color: #fff;
+}
+
+.bgc-dark .swiper__btn.swiper-button-disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Center container for freelancers */
+.navi_pagi_bottom_center_freelancers {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+/* Empty state styling for freelancers */
+.empty-state-freelancers {
+  padding: 40px 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.empty-state-freelancers .empty-state-icon {
+  opacity: 0.6;
+}
+
+.empty-state-freelancers .empty-state-title {
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 15px;
+}
+
+.empty-state-freelancers .text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.empty-state-freelancers .btn {
+  transition: all 0.3s ease;
+}
+
+.empty-state-freelancers .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+}
+
+/* Mobile responsiveness for freelancer pagination */
+@media (max-width: 768px) {
+  .swiper__pagination__freelancers .swiper-pagination-bullet {
+    width: 12px;
+    height: 12px;
+    margin: 0 4px;
+  }
+
+  .freelancers-page-content {
+    min-height: 400px;
+  }
+}

@@ -124,11 +124,33 @@ const ALL_ACTIVE_TOP_TAXONOMIES = gql`
 
 const FEATURED_CATEGORIES = gql`
   query FeaturedCategories {
-    featuredEntity {
+    categories(
+      filters: {
+        services: {
+          id: { ne: null }
+          status: { type: { eq: "Active" } }
+          freelancer: { id: { ne: null } }
+        }
+        featured: { eq: true }
+      }
+      sort: "label:asc"
+    ) {
       data {
         id
         attributes {
-          categories(
+          label
+          slug
+          description
+          icon
+          image {
+            data {
+              id
+              attributes {
+                formats
+              }
+            }
+          }
+          subcategories(
             filters: {
               services: {
                 id: { ne: null }
@@ -142,17 +164,17 @@ const FEATURED_CATEGORIES = gql`
               attributes {
                 label
                 slug
-                description
-                icon
-                image {
+                category {
                   data {
                     id
                     attributes {
-                      formats
+                      label
+                      slug
+                      icon
                     }
                   }
                 }
-                subcategories(
+                subdivisions(
                   filters: {
                     services: {
                       id: { ne: null }
@@ -166,49 +188,12 @@ const FEATURED_CATEGORIES = gql`
                     attributes {
                       label
                       slug
-                      category {
+                      subcategory {
                         data {
                           id
                           attributes {
                             label
                             slug
-                            icon
-                          }
-                        }
-                      }
-                      subdivisions(
-                        filters: {
-                          services: {
-                            id: { ne: null }
-                            status: { type: { eq: "Active" } }
-                            freelancer: { id: { ne: null } }
-                          }
-                        }
-                      ) {
-                        data {
-                          id
-                          attributes {
-                            label
-                            slug
-                            subcategory {
-                              data {
-                                id
-                                attributes {
-                                  label
-                                  slug
-                                  category {
-                                    data {
-                                      id
-                                      attributes {
-                                        label
-                                        slug
-                                        icon
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
                             category {
                               data {
                                 id
@@ -219,6 +204,16 @@ const FEATURED_CATEGORIES = gql`
                                 }
                               }
                             }
+                          }
+                        }
+                      }
+                      category {
+                        data {
+                          id
+                          attributes {
+                            label
+                            slug
+                            icon
                           }
                         }
                       }

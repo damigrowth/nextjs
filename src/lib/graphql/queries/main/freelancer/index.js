@@ -223,48 +223,51 @@ const FREELANCERS_ARCHIVE_WITH_SKILLS = gql`
 `;
 
 const FEATURED_FREELANCERS = gql`
-  query FeaturedFreelancers {
-    featuredEntity {
+  query FeaturedFreelancers(
+    $page: Int = 1
+    $pageSize: Int = 4
+  ) {
+    freelancers(
+      filters: {
+        type: { slug: { ne: "user" } }
+        email: { ne: "" }
+        username: { ne: "" }
+        displayName: { ne: "" }
+        status: { id: { eq: 1 } }
+        category: { id: { ne: null } }
+        subcategory: { id: { ne: null } }
+        featured: { eq: true }
+      }
+      pagination: { page: $page, pageSize: $pageSize }
+      sort: "updatedAt:desc"
+    ) {
       data {
+        id
         attributes {
-          freelancers(
-            filters: {
-              type: { slug: { ne: "user" } }
-              email: { ne: "" }
-              username: { ne: "" }
-              displayName: { ne: "" }
-              status: { id: { eq: 1 } }
-              category: { id: { ne: null } }
-              subcategory: { id: { ne: null } }
-            }
-          ) {
-            data {
-              id
-              attributes {
-                username
-                firstName
-                lastName
-                displayName
-                rating
-                reviews_total
-                topLevel
-                verified
-                image {
-                  ...SingleImage
-                }
-                specialization {
-                  ...SpecializationEntity
-                }
-                category {
-                  ...FreelancerCategory
-                }
-                subcategory {
-                  ...FreelancerSubcategoryPartial
-                }
-              }
-            }
+          username
+          firstName
+          lastName
+          displayName
+          rating
+          reviews_total
+          topLevel
+          verified
+          image {
+            ...SingleImage
+          }
+          specialization {
+            ...SpecializationEntity
+          }
+          category {
+            ...FreelancerCategory
+          }
+          subcategory {
+            ...FreelancerSubcategoryPartial
           }
         }
+      }
+      meta {
+        ...Pagination
       }
     }
   }
@@ -272,6 +275,7 @@ const FEATURED_FREELANCERS = gql`
   ${SPECIALIZATION_ENTITY}
   ${FREELANCER_CATEGORY}
   ${FREELANCER_SUBCATEGORY_PARTIAL}
+  ${PAGINATION}
 `;
 
 const FREELANCERS_ALL = gql`
