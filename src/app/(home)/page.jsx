@@ -2,9 +2,14 @@ import { Suspense } from 'react';
 
 import { AllTaxonomies } from '@/components/content';
 import { HeroHome } from '@/components/hero';
-import { FeaturedFreelancers, Features, Stats } from '@/components/section';
-import FeaturedCategories from '@/components/section/section-featured-categories';
-import FeaturedServices from '@/components/section/section-services-featured';
+import {
+  Features,
+  Stats,
+  FeaturedServicesHome,
+  FeaturedFreelancersHome,
+  FeaturedCategoriesHome,
+} from '@/components/section';
+
 import { getData } from '@/lib/client/operations';
 import {
   ALL_ACTIVE_TOP_TAXONOMIES,
@@ -34,12 +39,27 @@ export async function generateMetadata() {
   return meta;
 }
 
-export default async function page() {
+export default async function page({ searchParams }) {
+  const params = await searchParams;
+
+  // Build GraphQL query parameters from URL searchParams
+  const servicesParams = {
+    page: Number(params?.sp) || 1,
+    pageSize: Number(params?.sps) || 4,
+    category: params?.sc || undefined,
+  };
+
+  // Freelancers only have pagination, no category filtering
+  const freelancersParams = {
+    page: Number(params?.fp) || 1,
+    pageSize: Number(params?.fps) || 4,
+  };
+
   // Get user ID if logged in
   const fid = await getFreelancerId();
 
   // Apply strong caching for all data fetches
-  const { featuredEntity: featuredCategoriesData } = await getData(
+  const { categories } = await getData(
     FEATURED_CATEGORIES,
     null,
     'FEATURED_CATEGORIES',
@@ -47,17 +67,17 @@ export default async function page() {
   );
 
   // Load all services with caching
-  const { featuredEntity: featuredServicesData } = await getData(
+  const { services } = await getData(
     FEATURED_SERVICES,
-    null,
+    servicesParams,
     'HOME_SERVICES',
     ['home-services'],
   );
 
-  // Add proper caching for featured freelancers
-  const { featuredEntity: featuredFreelancersData } = await getData(
+  // Add proper caching for featured freelancers with pagination
+  const { freelancers } = await getData(
     FEATURED_FREELANCERS,
-    null,
+    freelancersParams,
     'HOME_FREELANCERS',
     ['home-freelancers'],
   );
@@ -69,41 +89,26 @@ export default async function page() {
     ['active-top'],
   );
 
-  // Process data
-  const featuredCategories =
-    featuredCategoriesData?.data?.attributes?.categories?.data || [];
-
-  const featuredServices =
-    featuredServicesData?.data?.attributes?.services?.data || [];
-
-  const featuredFreelancers =
-    featuredFreelancersData?.data?.attributes?.freelancers?.data?.filter(
-      (f) => {
-        return f?.attributes?.image?.data !== null;
-      },
-    ) || [];
-
   return (
     <>
       <HomeSchema />
-      <HeroHome categories={featuredCategories} />
-      <FeaturedCategories categories={featuredCategories} />
+      <HeroHome categories={categories?.data || []} />
+      <FeaturedCategoriesHome categories={categories?.data || []} />
       <Features />
-      <Suspense
-        fallback={<div className='py-5 text-center'>Loading services...</div>}
-      >
-        <FeaturedServices
-          categories={featuredCategories}
-          services={featuredServices}
+      <Suspense fallback={<div className='py-5 text-center'>Φόρτωση...</div>}>
+        <FeaturedServicesHome
+          categories={categories?.data || []}
+          services={services?.data || []}
+          pagination={services?.meta?.pagination}
           fid={fid}
         />
       </Suspense>
-      <Suspense
-        fallback={
-          <div className='py-5 text-center'>Loading freelancers...</div>
-        }
-      >
-        <FeaturedFreelancers freelancers={featuredFreelancers} fid={fid} />
+      <Suspense fallback={<div className='py-5 text-center'>Φόρτωση...</div>}>
+        <FeaturedFreelancersHome
+          freelancers={freelancers?.data || []}
+          pagination={freelancers?.meta?.pagination}
+          fid={fid}
+        />
       </Suspense>
       <Stats />
       <AllTaxonomies

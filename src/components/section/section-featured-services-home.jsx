@@ -2,27 +2,38 @@ import React, { Suspense } from 'react';
 
 import FeaturedServiceCard from '../card/card-service-featured';
 import FeaturedServiceSliderCard from '../card/card-service-featured-slider';
-import ServicesClientWrapper from '../wrapper/wrapper-services-client';
+import { ServicesClientWrapper } from '../wrapper';
 
-// This remains a Server Component that can be async
-export default async function FeaturedServices({ categories, services, fid }) {
-  // Filter out invalid services up front
+/**
+ * @typedef {object} FeaturedServicesHomeProps
+ * @property {Array<object>} categories - List of service categories.
+ * @property {Array<object>} services - List of service data.
+ * @property {object} pagination - Pagination information.
+ * @property {string} fid - Freelancer ID.
+ */
+
+/**
+ * FeaturedServicesHome component displays a list of featured services.
+ * This is a Server Component that pre-renders service cards and passes them to a client wrapper.
+ * @param {FeaturedServicesHomeProps} props - The component props.
+ * @returns {Promise<JSX.Element>} A promise that resolves to the JSX element for the featured services section.
+ */
+export default async function FeaturedServicesHome({
+  categories,
+  services,
+  pagination,
+  fid,
+}) {
   const validServices = services.filter(
     (service) =>
       service?.attributes?.freelancer?.data?.attributes &&
       service.attributes.media?.data?.length > 0,
   );
 
-  // Pre-render all service cards on the server
   const renderedServiceCards = await Promise.all(
     validServices.map(async (service) => {
-      // Preprocess service data
       const serviceData = { id: service.id, ...service.attributes };
 
-      const categorySlug =
-        service.attributes.category?.data?.attributes?.slug || '';
-
-      // Pre-render the appropriate card component based on media length
       const serviceCard =
         service.attributes.media?.data?.length > 1 ? (
           <FeaturedServiceSliderCard service={serviceData} fid={fid} />
@@ -30,10 +41,8 @@ export default async function FeaturedServices({ categories, services, fid }) {
           <FeaturedServiceCard service={serviceData} fid={fid} />
         );
 
-      // Return processed data for the client component
       return {
         id: service.id,
-        categorySlug,
         renderedCard: (
           <Suspense fallback={<div className='card-skeleton'>Loading...</div>}>
             {serviceCard}
@@ -43,17 +52,16 @@ export default async function FeaturedServices({ categories, services, fid }) {
     }),
   );
 
-  // Prepare and pass category data for filtering
   const categoryData = categories.map((cat) => ({
     slug: cat.attributes.slug,
     label: cat.attributes.label,
   }));
 
-  // Pass the pre-rendered cards and category data to the client wrapper
   return (
     <ServicesClientWrapper
       renderedServiceCards={renderedServiceCards}
       categories={categoryData}
+      pagination={pagination}
     />
   );
 }

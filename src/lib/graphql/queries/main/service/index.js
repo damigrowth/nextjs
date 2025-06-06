@@ -135,22 +135,35 @@ const SERVICE_UID = gql`
 `;
 
 const FEATURED_SERVICES = gql`
-  query FeaturedServices {
-    featuredEntity {
+  query FeaturedServices(
+    $page: Int = 1
+    $pageSize: Int = 4
+    $category: String
+  ) {
+    services(
+      filters: {
+        status: { type: { eq: "Active" } }
+        featured: { eq: true }
+        category: { slug: { eq: $category } }
+      }
+      pagination: { page: $page, pageSize: $pageSize }
+      sort: "updatedAt:desc"
+    ) {
       data {
+        id
         attributes {
-          services(
-            filters: { status: { type: { eq: "Active" } } }
-            pagination: { page: 1, pageSize: 30 }
-            sort: "updatedAt:desc"
-          ) {
-            ...FeaturedService
-          }
+          ...ServicePartialMain
+          ...ServicePartialRelations
         }
+      }
+      meta {
+        ...Pagination
       }
     }
   }
-  ${FEATURED_SERVICE}
+  ${SERVICE_PARTIAL_MAIN}
+  ${SERVICE_PARTIAL_RELATIONS}
+  ${PAGINATION}
 `;
 
 // Το αρχικό query χωρίς tag φιλτράρισμα

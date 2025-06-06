@@ -8,4 +8,5 @@ export { default as ActiveDashboard } from './wrapper-dashboard-active';
 export { default as InactiveDashboard } from './wrapper-dashboard-inavtive';
 export { default as FreelancersListWrapper } from './wrapper-featured-freelancers';
 export { default as WrapperNotifications } from './wrapper-notifications';
-export { default as ServicesClientWrapper } from './wrapper-services-client';
+export { default as ServicesClientWrapper } from './wrapper-featured-services-client';
+export { default as FreelancersClientWrapper } from './wrapper-featured-freelancers-client';
