@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import {
   CookieCategories,
@@ -11,18 +12,41 @@ import {
 
 export default function CookiesBanner() {
   const [showBanner, setShowBanner] = useState(false);
-
   const [showPreferences, setShowPreferences] = useState(false);
-
   const [preferences, setPreferences] = useState(getConsentDefaults());
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const existingConsent = getCookieConsent();
+    // Defer cookie banner initialization to not block LCP
+    const initializeCookieBanner = () => {
+      const existingConsent = getCookieConsent();
 
-    if (!existingConsent) {
-      setShowBanner(true);
+      if (!existingConsent) {
+        // Use requestIdleCallback to further defer non-critical rendering
+        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+          window.requestIdleCallback(() => {
+            setShowBanner(true);
+            setMounted(true);
+          });
+        } else {
+          // Fallback for browsers without requestIdleCallback
+          setTimeout(() => {
+            setShowBanner(true);
+            setMounted(true);
+          }, 100);
+        }
+      } else {
+        setPreferences(existingConsent);
+        setMounted(true);
+      }
+    };
+
+    // Wait for the page to be fully loaded before showing cookie banner
+    if (document.readyState === 'complete') {
+      initializeCookieBanner();
     } else {
-      setPreferences(existingConsent);
+      window.addEventListener('load', initializeCookieBanner);
+      return () => window.removeEventListener('load', initializeCookieBanner);
     }
   }, []);
 
@@ -58,19 +82,27 @@ export default function CookiesBanner() {
     }));
   };
 
-  if (!showBanner && !showPreferences) return null;
+  // Don't render until mounted and needed
+  if (!mounted || (!showBanner && !showPreferences)) return null;
 
-  return (
+  const bannerContent = (
     <>
       {/* Main Banner - Simplified Design */}
       {showBanner && !showPreferences && (
-        <div className='cookie-banner-wrapper cookies-banner'>
+        <div
+          className='cookie-banner-wrapper cookies-banner'
+          style={{
+            // Use contain to optimize rendering
+            contain: 'layout style paint',
+          }}
+        >
           <div className='d-flex justify-content-between align-items-start mb-3'>
             <h6 className='mb-0'>Αποδοχή Cookies</h6>
             <button
               className='btn-close'
               onClick={() => setShowBanner(false)}
               style={{ padding: '0', background: 'none', border: 'none' }}
+              aria-label='Κλείσιμο banner cookies'
             >
               <i className='fal fa-xmark'></i>
             </button>
@@ -241,4 +273,9 @@ export default function CookiesBanner() {
       </div>
     </>
   );
+
+  // Use portal to render at the end of body to avoid blocking LCP
+  return typeof window !== 'undefined'
+    ? createPortal(bannerContent, document.body)
+    : null;
 }
