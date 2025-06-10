@@ -2248,3 +2248,40 @@ a[href='#reviews-section']:hover {
 .onboarding-form .dropzone-container {
   margin-bottom: 20px;
 }
+
+/* Optimization Styles */
+
+/* Critical styles for LCP H1 - load immediately */
+.home12-hero-content h1 {
+  font-display: swap !important;
+  contain: layout style paint;
+  will-change: auto;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 25px;
+  color: inherit;
+  /* Ensure it renders even if main CSS is delayed */
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  color: #222222;
+}
+
+/* Prevent any layout blocking */
+.home12-hero-content {
+  contain: layout style;
+}
+
+/* Ensure container doesn't block rendering */
+.hero-home12 {
+  min-height: auto;
+  contain: layout;
+}
+
+/* Critical responsive styles */
+@media (max-width: 768px) {
+  .home12-hero-content h1 {
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+  }
+}
