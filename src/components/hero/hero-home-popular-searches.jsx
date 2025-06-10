@@ -3,10 +3,8 @@ import Link from 'next/link';
 export default function PopularSearches({ subcategories }) {
   return (
     <>
-      <p className='animate-up-2 dark-color ff-heading mt30 mb15'>
-        Δημοφιλείς Αναζητήσεις
-      </p>
-      <div className='home9-tags at-home12 d-md-flex align-items-center animate-up-4'>
+      <p className='dark-color ff-heading mt30 mb15'>Δημοφιλείς Αναζητήσεις</p>
+      <div className='home9-tags at-home12 d-md-flex align-items-center'>
         {subcategories.map((sub, i) => (
           <Link
             href={`/ipiresies/${sub.slug}`}
