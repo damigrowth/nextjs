@@ -21,7 +21,7 @@ export default function HeroContent({ categories }) {
 
   return (
     <div className='home12-hero-content'>
-      <span className='d-inline-block tag animate-up-1 mb15 fit'>
+      <span className='d-inline-block tag mb15 fit'>
         <Link
           href='/categories'
           className='text-decoration-none text-white hover:text-white'
@@ -29,12 +29,12 @@ export default function HeroContent({ categories }) {
           Κατάλογος Υπηρεσιών
         </Link>
       </span>
-      <h1 className='animate-up-1 mb25'>
+      <h1 className='mb25'>
         Οι καλύτερες Υπηρεσίες
         <br />
         στην οθόνη σου.
       </h1>
-      <h2 className='heading-p animate-up-2'>
+      <h2 className='heading-p'>
         Άμεση αναζήτηση υπηρεσιών από Επαγγελματίες και Επιχειρήσεις.
       </h2>
       <SearchBar categories={categories} subcategories={subcategories} />

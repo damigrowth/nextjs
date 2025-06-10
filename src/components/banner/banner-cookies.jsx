@@ -11,67 +11,75 @@ import {
 } from '@/actions/shared/cookies';
 
 export default function CookiesBanner() {
+  // COMPLETELY PREVENT RENDERING INITIALLY
+  const [canRender, setCanRender] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
   const [preferences, setPreferences] = useState(getConsentDefaults());
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Defer cookie banner initialization to not block LCP
-    const initializeCookieBanner = () => {
-      const existingConsent = getCookieConsent();
+    // Check consent first - if exists, never show banner
+    const existingConsent = getCookieConsent();
+    if (existingConsent) {
+      setPreferences(existingConsent);
+      return; // Exit completely - no banner needed
+    }
 
-      if (!existingConsent) {
-        // Use requestIdleCallback to further defer non-critical rendering
-        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-          window.requestIdleCallback(() => {
-            setShowBanner(true);
-            setMounted(true);
-          });
-        } else {
-          // Fallback for browsers without requestIdleCallback
-          setTimeout(() => {
-            setShowBanner(true);
-            setMounted(true);
-          }, 100);
-        }
-      } else {
-        setPreferences(existingConsent);
-        setMounted(true);
-      }
+    // NUCLEAR OPTION: Wait 10 seconds minimum before even considering showing
+    const enableRenderingAfterDelay = () => {
+      // console.log('🍪 Cookie banner: Starting 10-second delay...');
+
+      setTimeout(() => {
+        // console.log('🍪 Cookie banner: 10 seconds passed, enabling rendering...');
+        setCanRender(true);
+
+        // Wait additional 2 seconds before actually showing
+        setTimeout(() => {
+          // console.log('🍪 Cookie banner: Now showing banner');
+          setShowBanner(true);
+        }, 2000);
+      }, 10000); // 10 second delay
     };
 
-    // Wait for the page to be fully loaded before showing cookie banner
+    // Only start the process after page is completely loaded
     if (document.readyState === 'complete') {
-      initializeCookieBanner();
+      enableRenderingAfterDelay();
     } else {
-      window.addEventListener('load', initializeCookieBanner);
-      return () => window.removeEventListener('load', initializeCookieBanner);
+      window.addEventListener('load', enableRenderingAfterDelay, {
+        once: true,
+      });
     }
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('load', enableRenderingAfterDelay);
+    };
   }, []);
 
   const handleAcceptAll = () => {
     const allAccepted = Object.keys(preferences).reduce((acc, key) => {
       if (key !== 'lastUpdated') acc[key] = true;
-
       return acc;
     }, {});
 
     setCookieConsent(allAccepted);
     setPreferences(allAccepted);
     setShowBanner(false);
+    setCanRender(false);
   };
 
   const handleAcceptNecessary = () => {
     setCookieConsent(getConsentDefaults());
     setPreferences(getConsentDefaults());
     setShowBanner(false);
+    setCanRender(false);
   };
 
   const handleSavePreferences = () => {
     setCookieConsent(preferences);
     setShowBanner(false);
     setShowPreferences(false);
+    setCanRender(false);
   };
 
   const handleToggleCategory = (category) => {
@@ -82,60 +90,70 @@ export default function CookiesBanner() {
     }));
   };
 
-  // Don't render until mounted and needed
-  if (!mounted || (!showBanner && !showPreferences)) return null;
+  // TRIPLE CHECK: Absolutely no rendering unless all conditions met
+  if (!canRender || !showBanner) {
+    return null; // Render nothing at all
+  }
 
   const bannerContent = (
     <>
-      {/* Main Banner - Simplified Design */}
-      {showBanner && !showPreferences && (
-        <div
-          className='cookie-banner-wrapper cookies-banner'
-          style={{
-            // Use contain to optimize rendering
-            contain: 'layout style paint',
-          }}
-        >
-          <div className='d-flex justify-content-between align-items-start mb-3'>
-            <h6 className='mb-0'>Αποδοχή Cookies</h6>
-            <button
-              className='btn-close'
-              onClick={() => setShowBanner(false)}
-              style={{ padding: '0', background: 'none', border: 'none' }}
-              aria-label='Κλείσιμο banner cookies'
-            >
-              <i className='fal fa-xmark'></i>
-            </button>
-          </div>
-          <p className='small mb-3' style={{ fontSize: '13px', color: '#666' }}>
-            Χρησιμοποιούμε cookies για να σου προσφέρουμε μια καλύτερη
-            προσωποποιημένη εμπειρία και να σε βοηθήσουμε να βρεις εύκολα αυτό
-            που ψάχνεις.
-            <Link href='/privacy' className='text-decoration-none ms-1'>
-              Πολιτική Απορρήτου
-            </Link>
-            .
-          </p>
-          <div className='d-flex justify-content-between gap-2'>
-            <button
-              className='ud-btn btn-dark-border add-joining'
-              data-bs-toggle='modal'
-              data-bs-target='#cookieModal'
-              style={{ flex: 1 }}
-            >
-              Προσαρμογή
-            </button>
-            <button
-              className='ud-btn btn-thm2 add-joining'
-              onClick={handleAcceptAll}
-              style={{ flex: 1 }}
-            >
-              Αποδοχή Όλων
-            </button>
-          </div>
+      {/* Main Banner - Only renders after 12+ seconds */}
+      <div
+        className='cookie-banner-wrapper cookies-banner'
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 9999,
+          contain: 'layout style paint',
+          transform: 'translateZ(0)',
+          willChange: 'auto',
+        }}
+      >
+        <div className='d-flex justify-content-between align-items-start mb-3'>
+          <h6 className='mb-0'>Αποδοχή Cookies</h6>
+          <button
+            className='btn-close'
+            onClick={() => {
+              setShowBanner(false);
+              setCanRender(false);
+            }}
+            style={{ padding: '0', background: 'none', border: 'none' }}
+            aria-label='Κλείσιμο banner cookies'
+          >
+            <i className='fal fa-xmark'></i>
+          </button>
         </div>
-      )}
-      {/* Preferences Modal */}
+        <p className='small mb-3' style={{ fontSize: '13px', color: '#666' }}>
+          Χρησιμοποιούμε cookies για να σου προσφέρουμε μια καλύτερη
+          προσωποποιημένη εμπειρία και να σε βοηθήσουμε να βρεις εύκολα αυτό που
+          ψάχνεις.
+          <Link href='/privacy' className='text-decoration-none ms-1'>
+            Πολιτική Απορρήτου
+          </Link>
+          .
+        </p>
+        <div className='d-flex justify-content-between gap-2'>
+          <button
+            className='ud-btn btn-dark-border add-joining'
+            data-bs-toggle='modal'
+            data-bs-target='#cookieModal'
+            style={{ flex: 1 }}
+          >
+            Προσαρμογή
+          </button>
+          <button
+            className='ud-btn btn-thm2 add-joining'
+            onClick={handleAcceptAll}
+            style={{ flex: 1 }}
+          >
+            Αποδοχή Όλων
+          </button>
+        </div>
+      </div>
+
+      {/* Modal */}
       <div
         className='modal fade'
         id='cookieModal'
@@ -151,9 +169,7 @@ export default function CookiesBanner() {
                 className='btn-close'
                 data-bs-dismiss='modal'
                 aria-label='Close'
-              >
-                {/* <i className="fal fa-xmark" /> */}
-              </button>
+              />
             </div>
             <div className='modal-body'>
               <div className='cookie-preferences'>
@@ -178,6 +194,7 @@ export default function CookiesBanner() {
                     </div>
                   </div>
                 </div>
+
                 {/* Analytics Cookies */}
                 <div className='mb-4'>
                   <div className='d-flex justify-content-between align-items-center mb-2'>
@@ -202,6 +219,7 @@ export default function CookiesBanner() {
                     </div>
                   </div>
                 </div>
+
                 {/* Marketing Cookies */}
                 <div className='mb-4'>
                   <div className='d-flex justify-content-between align-items-center mb-2'>
@@ -226,6 +244,7 @@ export default function CookiesBanner() {
                     </div>
                   </div>
                 </div>
+
                 {/* Preference Cookies */}
                 <div className='mb-4'>
                   <div className='d-flex justify-content-between align-items-center mb-2'>
@@ -274,7 +293,7 @@ export default function CookiesBanner() {
     </>
   );
 
-  // Use portal to render at the end of body to avoid blocking LCP
+  // Portal to body only after all conditions are met
   return typeof window !== 'undefined'
     ? createPortal(bannerContent, document.body)
     : null;
