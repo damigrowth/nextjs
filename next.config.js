@@ -5,8 +5,17 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "20mb",
     },
+    // Enable Web Vitals attribution for LCP debugging
+    webVitalsAttribution: ['CLS', 'LCP'],
+    // Optimize package imports for better tree-shaking
+    optimizePackageImports: ['@apollo/client', 'react-loading-skeleton'],
   },
   images: {
+    // Advanced image optimization settings
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    formats: ['image/avif', 'image/webp'], // AVIF first for better compression
+    minimumCacheTTL: 2678400, // 31 days - reduce revalidations
     remotePatterns: [
       {
         hostname: "res.cloudinary.com",
