@@ -17,13 +17,24 @@ function StaticHeroContent() {
         </a>
       </span>
       
-      {/* Critical LCP H1 - renders immediately */}
+      {/* Critical LCP H1 - renders immediately with inline styles */}
       <h1 
         className='mb25' 
         style={{ 
+          // CRITICAL: Prevent render delay
+          fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          fontSize: 'clamp(1.6rem, 5vw, 2.5rem)',
+          fontWeight: 700,
+          lineHeight: 1.2,
+          color: '#ffffff',
+          marginBottom: '25px',
+          display: 'block',
           fontDisplay: 'swap',
           contain: 'layout style paint',
-          willChange: 'auto'
+          willChange: 'auto',
+          opacity: 1,
+          visibility: 'visible',
+          transform: 'none'
         }}
       >
         Οι καλύτερες Υπηρεσίες
