@@ -17,25 +17,31 @@ export default function Body({ children }) {
   }, []);
 
   const getBodyClasses = () => {
-    if (!mounted) return '';
-
-    return `${
-      path.startsWith('/connect') ||
+    // Allow basic classes even before mounting for LCP
+    const basicClasses = path.startsWith('/connect') ||
       path.startsWith('/auth') ||
       path === '/register' ||
       path === '/register/success' ||
       path == '/email-confirmation' ||
       path === '/login'
         ? 'bgc-thm4 mm-wrapper mm-wrapper--position-left-front'
-        : ''
-    } ${filtersModalToggled ? 'menu-hidden-sidebar-content' : ''} ${
+        : '';
+    
+    if (!mounted) {
+      return basicClasses; // Return basic classes before full mounting
+    }
+
+    return `${basicClasses} ${filtersModalToggled ? 'menu-hidden-sidebar-content' : ''} ${
       path.startsWith('/dashboard') ? '' : ''
     }`;
   };
 
   return (
     <body suppressHydrationWarning className={getBodyClasses()}>
-      {mounted ? children : null}
+      {/* CRITICAL CHANGE: Always render children, but add data-mounted attribute */}
+      <div data-mounted={mounted}>
+        {children}
+      </div>
     </body>
   );
 }
