@@ -2250,49 +2250,17 @@ a[href='#reviews-section']:hover {
   margin-bottom: 20px;
 }
 
-/* Optimization Styles */
-
-/* CRITICAL LCP OPTIMIZATIONS - Added to prevent 710ms render delay */
-
-/* Critical hero image container - optimize for LCP */
-.home12-hero-img {
-  /* Prevent layout shift with content-visibility */
-  content-visibility: auto;
-  contain-intrinsic-size: 810px 860px;
-  /* Optimize rendering */
-  contain: layout style paint;
-  /* Enable GPU acceleration */
-  transform: translateZ(0);
-  will-change: auto;
-  /* Prevent flash of unstyled content */
-  min-height: 860px;
-}
-
-/* Critical styles for main hero image */
-.home12-hero-img .img-0 {
-  /* Ensure immediate rendering */
-  display: block !important;
-  /* Optimize image rendering */
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: optimize-contrast;
-  /* Prevent any layout blocking */
-  contain: layout style;
-  /* Critical: Prevent render delays */
-  content-visibility: auto;
-  contain-intrinsic-size: 810px 860px;
-}
-
-/* Prevent any layout blocking */
+/* Hero content performance */
 .home12-hero-content {
   contain: layout style;
-  /* Enable content-visibility for better performance */
-  content-visibility: auto;
 }
 
-/* Ensure container doesn't block rendering */
 .hero-home12 {
-  min-height: auto;
   contain: layout;
-  /* Optimize section rendering */
-  content-visibility: auto;
+}
+
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }

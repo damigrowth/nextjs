@@ -56,7 +56,7 @@ export default async function FreelancerCard({
           <UserImage
             height={90}
             width={90}
-            image={image.data?.attributes?.formats?.thumbnail?.url}
+            image={image?.data?.attributes?.formats?.thumbnail?.url}
             alt='user-image'
             firstName={firstName}
             lastName={lastName}
