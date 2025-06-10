@@ -19,7 +19,6 @@ function StaticHeroContent() {
 
       {/* Critical LCP H1 - renders immediately with inline styles */}
       <h1
-        className='mb25'
         style={{
           // CRITICAL: Prevent render delay
           fontFamily:
@@ -61,7 +60,7 @@ export default function Hero({ categories }) {
     <section className='hero-home12 overflow-hidden'>
       <div className='container'>
         <div className='row'>
-          <div className='col-xl-7'>
+          <div className='col-xl-7 hero-left'>
             {/* Static content renders immediately - no data dependencies */}
             <StaticHeroContent />
 
