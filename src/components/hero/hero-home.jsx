@@ -16,17 +16,18 @@ function StaticHeroContent() {
           Κατάλογος Υπηρεσιών
         </a>
       </span>
-      
+
       {/* Critical LCP H1 - renders immediately with inline styles */}
-      <h1 
-        className='mb25' 
-        style={{ 
+      <h1
+        className='mb25'
+        style={{
           // CRITICAL: Prevent render delay
-          fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          fontFamily:
+            'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           fontSize: 'clamp(1.6rem, 5vw, 2.5rem)',
           fontWeight: 700,
           lineHeight: 1.2,
-          color: '#ffffff',
+          color: '#000',
           marginBottom: '25px',
           display: 'block',
           fontDisplay: 'swap',
@@ -34,14 +35,14 @@ function StaticHeroContent() {
           willChange: 'auto',
           opacity: 1,
           visibility: 'visible',
-          transform: 'none'
+          transform: 'none',
         }}
       >
         Οι καλύτερες Υπηρεσίες
         <br />
         στην οθόνη σου.
       </h1>
-      
+
       {/* H2 also renders immediately */}
       <h2 className='heading-p'>
         Άμεση αναζήτηση υπηρεσιών από Επαγγελματίες και Επιχειρήσεις.
@@ -63,15 +64,26 @@ export default function Hero({ categories }) {
           <div className='col-xl-7'>
             {/* Static content renders immediately - no data dependencies */}
             <StaticHeroContent />
-            
+
             {/* Dynamic content renders when data is ready */}
             <div style={{ marginTop: '20px' }}>
-              <Suspense fallback={
-                <div style={{ height: '120px', display: 'flex', alignItems: 'center' }}>
-                  <div className='spinner-border spinner-border-sm me-2' role='status'></div>
-                  <span>Φόρτωση επιλογών...</span>
-                </div>
-              }>
+              <Suspense
+                fallback={
+                  <div
+                    style={{
+                      height: '120px',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div
+                      className='spinner-border spinner-border-sm me-2'
+                      role='status'
+                    ></div>
+                    <span>Φόρτωση επιλογών...</span>
+                  </div>
+                }
+              >
                 <DynamicHeroContent categories={categories} />
               </Suspense>
             </div>
