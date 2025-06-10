@@ -19,7 +19,6 @@ function StaticHeroContent() {
 
       {/* Critical LCP H1 - renders immediately with inline styles */}
       <h1
-        className='mb25'
         style={{
           // CRITICAL: Prevent render delay
           fontFamily:
