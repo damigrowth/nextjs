@@ -101,11 +101,6 @@ export default function CookiesBanner() {
       <div
         className='cookie-banner-wrapper cookies-banner'
         style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 9999,
           contain: 'layout style paint',
           transform: 'translateZ(0)',
           willChange: 'auto',
