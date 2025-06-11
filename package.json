@@ -52,6 +52,7 @@
     "@babel/plugin-syntax-import-assertions": "^7.27.1",
     "@babel/plugin-syntax-jsx": "^7.27.1",
     "@babel/preset-env": "^7.27.2",
+    "@fullhuman/postcss-purgecss": "^7.0.2",
     "@stylistic/eslint-plugin-js": "^4.4.0",
     "eslint": "8.42.0",
     "eslint-config-next": "^15.4.0-canary.51",
@@ -64,6 +65,8 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "next": "^15.1.6",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-preset-env": "^10.2.2",
     "prettier": "^3.5.3",
     "react": "19.0.0",
     "react-dom": "19.0.0"
