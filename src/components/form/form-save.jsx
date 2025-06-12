@@ -110,10 +110,15 @@ export default function SaveForm({
           displaySaved ? 'active' : ''
         }`}
       >
-        <IconHeart
-          type={displaySaved ? 'solid' : 'regular'}
+        <div
           className={`icon dark-color fz12 mr10 ${displaySaved ? 'ui-fav-active' : ''}`}
-        />
+        >
+          <IconHeart
+            type={displaySaved ? 'solid' : 'regular'}
+            style={{ marginBottom: '1px' }}
+          />
+        </div>
+
         <div className='h6 mb-0'>
           {displaySaved ? 'Αποθηκεύτηκε' : 'Αποθήκευση'}
         </div>
