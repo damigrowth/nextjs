@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import useHomeStore from '@/stores/home/homeStore';
 import { homeSearch } from '@/actions/shared/search';
+import { IconMagnifyingGlass } from '@/components/icon/fa';
 
 const debounce = (func, delay) => {
   let timeoutId;
@@ -136,7 +137,7 @@ export default function Search() {
               <span className='sr-only'>Loading...</span>
             </div>
           ) : (
-            <span className='icon far fa-magnifying-glass' />
+            <IconMagnifyingGlass className='icon-magnifying-glass' />
           )}
           <input
             type='hidden'

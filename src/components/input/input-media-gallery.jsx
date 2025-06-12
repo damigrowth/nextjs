@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { IconMusic, IconFloppyDisk } from '@/components/icon/fa';
 
 export default function MediaGallery({
   initialMedia = [],
@@ -554,7 +555,7 @@ export default function MediaGallery({
                   backgroundColor: '#f0f0f0',
                 }}
               >
-                <i className='fa-solid fa-music fa-3x'></i>
+                <IconMusic size='3x' />
                 <audio controls className='mt-2'>
                   <source src={url} type={mime || 'audio/mpeg'} />
                 </audio>
@@ -605,7 +606,7 @@ export default function MediaGallery({
                   backgroundColor: '#f0f0f0',
                 }}
               >
-                <i className='fa-solid fa-music fa-3x'></i>
+                <IconMusic size='3x' />
                 <audio controls className='mt-2'>
                   <source src={item.url} type={item.file.type} />
                 </audio>
@@ -741,7 +742,7 @@ export default function MediaGallery({
                 <span className='sr-only'></span>
               </div>
             ) : (
-              <i className='fa-solid fa-floppy-disk'></i>
+              <IconFloppyDisk />
             )}
           </button>
         )}

@@ -13,6 +13,7 @@ import {
   UNSAVE_SERVICE,
 } from '@/lib/graphql';
 import { revalidateSaved } from '@/actions/shared/save';
+import { IconHeart } from '@/components/icon/fa';
 
 export default function SaveForm({
   type,
@@ -96,10 +97,9 @@ export default function SaveForm({
   const renderContent = () => {
     if (variant === 'heart') {
       return (
-        <span
-          className={`${
-            displaySaved ? 'fas fa-heart ui-fav-active' : 'far fa-heart'
-          } ${isLoading ? 'opacity-75' : ''}`}
+        <IconHeart
+          type={displaySaved ? 'solid' : 'regular'}
+          className={`${displaySaved ? 'ui-fav-active' : ''} ${isLoading ? 'opacity-75' : ''}`}
         />
       );
     }
@@ -110,10 +110,9 @@ export default function SaveForm({
           displaySaved ? 'active' : ''
         }`}
       >
-        <span
-          className={`icon dark-color fz12 mr10 ${
-            displaySaved ? 'fas fa-heart ui-fav-active' : 'far fa-heart'
-          }`}
+        <IconHeart
+          type={displaySaved ? 'solid' : 'regular'}
+          className={`icon dark-color fz12 mr10 ${displaySaved ? 'ui-fav-active' : ''}`}
         />
         <div className='h6 mb-0'>
           {displaySaved ? 'Αποθηκεύτηκε' : 'Αποθήκευση'}

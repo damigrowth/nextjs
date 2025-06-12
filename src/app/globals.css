@@ -4,7 +4,6 @@
 @import './../../public/css/animate.css';
 @import './../../public/css/ace-responsive-menu.css';
 @import './../../public/css/menu.css';
-@import './../../public/css/fontawesome.css';
 @import './../../public/css/flaticon.css';
 @import './../../public/css/bootstrap-select.min.css';
 @import './../../public/css/slider.css';
@@ -479,6 +478,10 @@ a {
   transform: rotate(0deg) !important;
 }
 
+.no-rotate svg {
+  transform: rotate(0deg) !important;
+}
+
 .btn-dark-disabled {
   opacity: 0.5;
 }
@@ -589,7 +592,9 @@ a {
   --bs-dropdown-border-color: var(--bs-border-color-translucent);
   --bs-dropdown-border-radius: var(--bs-border-radius);
   --bs-dropdown-border-width: var(--bs-border-width);
-  --bs-dropdown-inner-border-radius: calc(var(--bs-border-radius) - var(--bs-border-width));
+  --bs-dropdown-inner-border-radius: calc(
+    var(--bs-border-radius) - var(--bs-border-width)
+  );
   --bs-dropdown-divider-bg: var(--bs-border-color-translucent);
   --bs-dropdown-divider-margin-y: 0.5rem;
   --bs-dropdown-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -619,7 +624,8 @@ a {
   border-radius: 8px;
 }
 
-.select-input .select__option:hover:not([class*='select__option--is-selected']) {
+.select-input
+  .select__option:hover:not([class*='select__option--is-selected']) {
   background-color: #e0f1e0;
 }
 
@@ -1078,6 +1084,10 @@ a {
   white-space: nowrap;
 }
 
+.flex-nowrap {
+  flex-wrap: nowrap;
+}
+
 .search-chip {
   display: flex;
   justify-content: center;
@@ -1192,6 +1202,7 @@ a {
   padding: 15px 25px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
   vertical-align: middle;
   line-height: 29.5px;
@@ -1202,7 +1213,7 @@ a {
   background-color: rgb(241, 252, 250);
 }
 
-.taxonomies-swiper .fas.fa-angle-right {
+.taxonomies-swiper .fa-angle-right {
   color: #a0a0a0;
   margin-left: 15px;
   font-size: 14px;
@@ -1929,7 +1940,7 @@ a[href='#reviews-section']:hover {
 }
 
 .service-card-wrapper .list-thumb {
-  padding-bottom: 40px;
+  /* padding-bottom: 40px; */
   position: relative;
 }
 
@@ -2263,4 +2274,37 @@ a[href='#reviews-section']:hover {
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.icon-magnifying-glass {
+  bottom: 20px;
+  color: var(--headings-color);
+  font-size: 16px;
+  left: 20px;
+  position: absolute;
+}
+
+.fa-arrow-right-long {
+  margin-left: 10px;
+}
+
+.fa-arrow-left-long {
+  margin-right: 10px;
+}
+
+.ud-btn svg {
+  margin-left: 10px;
+  font-size: 16px;
+  transform: rotate(-45deg);
+  font-weight: 300;
+}
+
+.archive-dropdown {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.archive-dropdown:after {
+  font-size: 17px;
 }

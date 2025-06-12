@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, useState } from 'react';
 
 import { DeleteModal } from '@/components/modal';
 import { deleteAccount } from '@/actions/auth/account';
+import { IconCheckCircle, IconCheck } from '@/components/icon/fa';
 
 export default function DeleteAccountForm({ username }) {
   const formRef = useRef(null);
@@ -95,10 +96,7 @@ export default function DeleteAccountForm({ username }) {
       >
         {deleteState?.success && (
           <div className='modal-body text-center p-5'>
-            <i
-              className='fa-solid fa-check-circle text-thm2'
-              style={{ fontSize: '3rem' }}
-            ></i>
+            <IconCheckCircle className='text-thm2' size='3x' />
             <h4 className='mt-3'>Ο λογαριασμός σας διαγράφηκε με επιτυχία</h4>
             <p className='mb-4'>Ανακατεύθυνση στην αρχική σελίδα...</p>
             <div className='spinner-border text-thm' role='status'>
@@ -129,8 +127,7 @@ export default function DeleteAccountForm({ username }) {
             )}
             {isConfirmMatch && (
               <div className='text-success small mt-1'>
-                <i className='fa-solid fa-check me-1'></i> Το username
-                επιβεβαιώθηκε
+                <IconCheck className='me-1' /> Το username επιβεβαιώθηκε
               </div>
             )}
           </form>

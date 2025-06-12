@@ -2,6 +2,7 @@
 
 import React, { useCallback, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { IconTrashCan } from '@/components/icon/fa';
 
 export default function ClearBtn() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function ClearBtn() {
       href='#archive'
       disabled={isPending}
       onClick={clearHandler}
-      className='ud-btn btn-thm ui-clear-btn w-100'
+      className='ud-btn btn-thm ui-clear-btn w-100 no-rotate'
     >
       Καθαρισμός φίλτρων
       {isPending ? (
@@ -31,7 +32,7 @@ export default function ClearBtn() {
           <span className='sr-only'></span>
         </div>
       ) : (
-        <span className='fas fa-trash-can pl10 '></span>
+        <IconTrashCan />
       )}
     </a>
   );

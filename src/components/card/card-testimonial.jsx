@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { IconQuoteLeft } from '@/components/icon/fa';
 
 export default function TestimonialCard({
   title,
@@ -14,7 +15,7 @@ export default function TestimonialCard({
     <div className='testimonial-style1 default-box-shadow1 position-relative bdrs16'>
       <div className='testimonial-content'>
         <h4 className='title text-thm'>{title}</h4>
-        <span className='icon fas fa-quote-left' />
+        <IconQuoteLeft className='icon' />
         <h4 className='t_content'>{comment}</h4>
       </div>
       <div className='thumb d-flex align-items-center'>

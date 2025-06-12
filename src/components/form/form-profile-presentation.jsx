@@ -16,6 +16,12 @@ import {
 } from '@/components/input';
 import { useFormChanges } from '@/hooks/useFormChanges';
 import useEditProfileStore from '@/stores/dashboard/profile';
+import {
+  IconPhone,
+  IconGlobe,
+  IconViber,
+  IconWhatsapp,
+} from '@/components/icon/fa';
 
 import { AlertForm } from '../alert';
 import { SaveButton } from '../button';
@@ -562,7 +568,7 @@ export default function PresentationForm({ freelancer, token }) {
               onChange={setPhone}
               className='form-control input-group'
               errors={formState?.errors?.phone}
-              icon='fa fa-phone' // Optional: Add an icon
+              IconComponent={IconPhone} // Optional: Add an icon
             />
           </div>
           <div className='col-md-3'>
@@ -576,7 +582,7 @@ export default function PresentationForm({ freelancer, token }) {
               onChange={setWebsite}
               className='form-control input-group'
               errors={formState?.errors?.website}
-              icon='fa fa-globe'
+              IconComponent={IconGlobe}
             />
           </div>
         </div>
@@ -639,7 +645,7 @@ export default function PresentationForm({ freelancer, token }) {
               onChange={setViber}
               className='form-control input-group'
               errors={formState?.errors?.viber}
-              icon='fab fa-viber'
+              IconComponent={IconViber}
             />
           </div>
           <div className='col-md-3'>
@@ -655,7 +661,7 @@ export default function PresentationForm({ freelancer, token }) {
               onChange={setWhatsapp}
               className='form-control input-group'
               errors={formState?.errors?.whatsapp}
-              icon='fab fa-whatsapp'
+              IconComponent={IconWhatsapp}
             />
           </div>
         </div>

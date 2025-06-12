@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { ArrowRightLong } from '@/components/icon/fa';
+
 export default function Breadcumb1({ title, brief, isBtnActive }) {
   return (
     <>
@@ -34,7 +36,7 @@ export default function Breadcumb1({ title, brief, isBtnActive }) {
                   {isBtnActive && (
                     <Link className='ud-btn btn-thm' href='/contact'>
                       Become Seller
-                      <i className='fal fa-arrow-right-long' />
+                      <ArrowRightLong />
                     </Link>
                   )}
                 </div>

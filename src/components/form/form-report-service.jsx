@@ -16,6 +16,7 @@ import useModalCleanup from '@/hooks/useModalCleanup';
 import Alert from '../alert/alert-form';
 import SaveButton from '../button/button-form-save';
 import TextArea from '../input/input-text-area';
+import { IconPaperPlane } from '@/components/icon/fa';
 import { createServiceReport } from '@/actions/service/report';
 
 /**
@@ -248,7 +249,7 @@ export default function ServiceReportForm({ reporter, reported, service }) {
             hasChanges={hasChanges}
             disabled={isPending || isPendingTransition || !hasChanges}
             className='w-100'
-            icon='fa-solid fa-paper-plane'
+            IconComponent={IconPaperPlane}
           />
         </form>
       ) : (

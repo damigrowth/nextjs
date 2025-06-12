@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { formatRating } from '@/utils/formatRating';
+import { IconStar } from '@/components/icon/fa';
 
 import ReviewStatsForm from '../form/form-reviews-stats';
 import ReviewStatsLine from './review-stats-line';
@@ -65,13 +66,13 @@ export default function ReviewStats({
           <div className='wrapper mx-auto'>
             <div className='t-review mb15'>
               {formatRating(rating)}{' '}
-              <i
-                className='fas fa-star vam review-color'
+              <IconStar
+                className='vam review-color'
                 style={{
                   paddingBottom: '0.3em',
                   fontSize: isServicePage ? '36px' : '48px',
                 }}
-              ></i>
+              />
             </div>
             <h5>
               {rating_global?.attributes && rating_global.attributes.label}

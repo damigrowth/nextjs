@@ -13,6 +13,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { getBestDimensions } from '@/utils/imageDimensions';
 
 import { MediaThumb, VideoPreview } from '../card';
+import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
 
 export default function FeaturedFiles({ files, title, border }) {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
@@ -116,10 +117,10 @@ export default function FeaturedFiles({ files, title, border }) {
             )}
           </div>
           <button type='button' className='prev-btn'>
-            <i className='far fa-arrow-left-long' />
+            <ArrowLeftLong />
           </button>
           <button type='button' className='next-btn'>
-            <i className='far fa-arrow-right-long' />
+            <ArrowRightLong />
           </button>
         </div>
         {showSwiper && (

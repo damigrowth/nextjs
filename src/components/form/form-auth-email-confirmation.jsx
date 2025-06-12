@@ -4,6 +4,13 @@ import React, { useActionState, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { confirmTokenAction } from '@/actions/auth/confirm-token';
 import { isAuthenticated } from '@/actions/auth/token';
+import {
+  IconCheckCircle,
+  IconInfoCircle,
+  IconClock,
+  IconExclamationTriangle,
+  IconExclamationCircle,
+} from '@/components/icon/fa';
 
 export default function EmailConfirmationForm({ confirmationToken }) {
   const [state, formAction, isPending] = useActionState(confirmTokenAction, {
@@ -26,7 +33,7 @@ export default function EmailConfirmationForm({ confirmationToken }) {
       try {
         const authenticated = await isAuthenticated();
         setIsUserAuthenticated(authenticated);
-        
+
         if (authenticated) {
           // User is already logged in, redirect to dashboard
           console.log('User already authenticated, redirecting to dashboard');
@@ -52,11 +59,16 @@ export default function EmailConfirmationForm({ confirmationToken }) {
     // 2. User is not already authenticated
     // 3. Token exists
     // 4. Haven't submitted yet
-    if (authCheckComplete && !isUserAuthenticated && confirmationToken && !hasSubmittedToken.current) {
+    if (
+      authCheckComplete &&
+      !isUserAuthenticated &&
+      confirmationToken &&
+      !hasSubmittedToken.current
+    ) {
       // Check if this token was already used (stored in sessionStorage)
       const usedTokenKey = `email_confirmed_${confirmationToken.substring(0, 16)}`;
       const tokenAlreadyUsed = sessionStorage.getItem(usedTokenKey);
-      
+
       if (tokenAlreadyUsed) {
         console.log('Token already used, showing success message');
         setConfirmationState('success');
@@ -87,9 +99,9 @@ export default function EmailConfirmationForm({ confirmationToken }) {
       // Store successful confirmation to prevent future attempts with same token
       const usedTokenKey = `email_confirmed_${confirmationToken.substring(0, 16)}`;
       sessionStorage.setItem(usedTokenKey, 'true');
-      
+
       setConfirmationState('success');
-      
+
       const timer = setTimeout(() => {
         router.push('/dashboard');
         router.refresh();
@@ -107,54 +119,58 @@ export default function EmailConfirmationForm({ confirmationToken }) {
       return {
         type: 'already_confirmed',
         title: 'Email Ήδη Επιβεβαιωμένο',
-        message: 'Το email σας έχει ήδη επιβεβαιωθεί. Μπορείτε να συνδεθείτε κανονικά.',
+        message:
+          'Το email σας έχει ήδη επιβεβαιωθεί. Μπορείτε να συνδεθείτε κανονικά.',
         showLoginButton: true,
-        icon: 'info-circle',
-        color: 'warning'
+        IconComponent: IconInfoCircle,
+        color: 'warning',
       };
     }
-    
+
     if (message?.includes('λήξει')) {
       return {
         type: 'expired',
         title: 'Σύνδεσμος Έχει Λήξει',
-        message: 'Ο σύνδεσμος επιβεβαίωσης έχει λήξει. Παρακαλώ κάντε νέα εγγραφή.',
+        message:
+          'Ο σύνδεσμος επιβεβαίωσης έχει λήξει. Παρακαλώ κάντε νέα εγγραφή.',
         showRegisterButton: true,
-        icon: 'clock',
-        color: 'danger'
+        IconComponent: IconClock,
+        color: 'danger',
       };
     }
-    
+
     if (message?.includes('Google')) {
       return {
         type: 'google_token',
         title: 'Token Google',
-        message: 'Αυτό το token ανήκει σε εγγραφή μέσω Google. Παρακαλώ ολοκληρώστε την εγγραφή σας μέσω Google.',
+        message:
+          'Αυτό το token ανήκει σε εγγραφή μέσω Google. Παρακαλώ ολοκληρώστε την εγγραφή σας μέσω Google.',
         showGoogleButton: true,
-        icon: 'exclamation-triangle',
-        color: 'warning'
+        IconComponent: IconExclamationTriangle,
+        color: 'warning',
       };
     }
-    
+
     if (message?.includes('έγκυρος')) {
       return {
         type: 'invalid',
         title: 'Μη Έγκυρος Σύνδεσμος',
-        message: 'Ο σύνδεσμος επιβεβαίωσης δεν είναι έγκυρος ή έχει ήδη χρησιμοποιηθεί.',
+        message:
+          'Ο σύνδεσμος επιβεβαίωσης δεν είναι έγκυρος ή έχει ήδη χρησιμοποιηθεί.',
         showContactInfo: true,
-        icon: 'exclamation-circle',
-        color: 'danger'
+        IconComponent: IconExclamationCircle,
+        color: 'danger',
       };
     }
-    
+
     // Default error
     return {
       type: 'generic',
       title: 'Σφάλμα Επιβεβαίωσης',
       message: message || 'Προέκυψε σφάλμα κατά την επιβεβαίωση του email σας.',
       showContactInfo: true,
-      icon: 'exclamation-circle',
-      color: 'danger'
+      IconComponent: IconExclamationCircle,
+      color: 'danger',
     };
   };
 
@@ -163,7 +179,7 @@ export default function EmailConfirmationForm({ confirmationToken }) {
     return (
       <div className='text-center'>
         <div className='text-thm2 mb-3'>
-          <i className='fa fa-check-circle fa-3x'></i>
+          <IconCheckCircle size='3x' />
         </div>
         <h4 className='text-thm2 mb-2'>Το email σας έχει ήδη επιβεβαιωθεί!</h4>
         <p>Είστε ήδη συνδεδεμένοι. Ανακατεύθυνση στον πίνακα ελέγχου...</p>
@@ -178,38 +194,50 @@ export default function EmailConfirmationForm({ confirmationToken }) {
   }
 
   // Show loading while checking auth or processing
-  if (!authCheckComplete || confirmationState === 'checking' || 
-      (confirmationState === 'processing' && isPending)) {
+  if (
+    !authCheckComplete ||
+    confirmationState === 'checking' ||
+    (confirmationState === 'processing' && isPending)
+  ) {
     return (
       <div className='text-center'>
         <div className='spinner-border text-thm mb-3' role='status'>
           <span className='visually-hidden'>Loading...</span>
         </div>
         <p className='text-muted'>
-          {!authCheckComplete ? 'Έλεγχος κατάστασης...' : 'Επιβεβαίωση email σε εξέλιξη...'}
+          {!authCheckComplete
+            ? 'Έλεγχος κατάστασης...'
+            : 'Επιβεβαίωση email σε εξέλιξη...'}
         </p>
       </div>
     );
   }
 
   // Show success state
-  if (confirmationState === 'success' || (state?.success && !state?.message?.includes('σφάλμα'))) {
+  if (
+    confirmationState === 'success' ||
+    (state?.success && !state?.message?.includes('σφάλμα'))
+  ) {
     const isAlreadyConfirmed = state?.message?.includes('ήδη επιβεβαιωθεί');
-    
+
     return (
       <div className='text-center'>
         <div className='text-thm2 mb-3'>
-          <i className='fa fa-check-circle fa-3x'></i>
+          <IconCheckCircle size='3x' />
         </div>
         <h4 className='text-thm2 mb-2'>
-          {isAlreadyConfirmed ? 'Email Ήδη Επιβεβαιωμένο!' : 'Επιτυχής Επιβεβαίωση!'}
+          {isAlreadyConfirmed
+            ? 'Email Ήδη Επιβεβαιωμένο!'
+            : 'Επιτυχής Επιβεβαίωση!'}
         </h4>
         <p>{state?.message || 'Το email σας επιβεβαιώθηκε με επιτυχία!'}</p>
         <div className='d-flex justify-content-center align-items-center mt-3'>
           <div className='spinner-border text-thm me-2' role='status'>
             <span className='visually-hidden'>Loading...</span>
           </div>
-          <span className='text-muted'>Ανακατεύθυνση στον πίνακα ελέγχου...</span>
+          <span className='text-muted'>
+            Ανακατεύθυνση στον πίνακα ελέγχου...
+          </span>
         </div>
       </div>
     );
@@ -218,11 +246,13 @@ export default function EmailConfirmationForm({ confirmationToken }) {
   // Show error state
   if (confirmationState === 'error' && state?.message && !state?.success) {
     const errorDetails = getErrorDetails(state.message);
-    
+
     return (
       <div className='text-center'>
         <div className={`mb-3 text-${errorDetails.color}`}>
-          <i className={`fa fa-${errorDetails.icon} fa-3x`}></i>
+          {errorDetails.IconComponent && (
+            <errorDetails.IconComponent size='3x' />
+          )}
         </div>
         <h4 className={`mb-2 text-${errorDetails.color}`}>
           {errorDetails.title}
@@ -230,7 +260,7 @@ export default function EmailConfirmationForm({ confirmationToken }) {
         <p className={`text-${errorDetails.color} mb-3`}>
           {errorDetails.message}
         </p>
-        
+
         {/* Action buttons based on error type */}
         <div className='d-flex gap-2 justify-content-center mb-3'>
           {errorDetails.showLoginButton && (
@@ -249,17 +279,20 @@ export default function EmailConfirmationForm({ confirmationToken }) {
             </a>
           )}
         </div>
-        
+
         {/* Contact information for help */}
         {errorDetails.showContactInfo && (
           <div className='mt-4 p-3 bg-light rounded'>
             <h6 className='text-muted mb-2'>Χρειάζεστε βοήθεια;</h6>
             <p className='text-muted small mb-0'>
               Επικοινωνήστε μαζί μας στο{' '}
-              <a href='mailto:contact@doulitsa.gr' className='text-decoration-none'>
+              <a
+                href='mailto:contact@doulitsa.gr'
+                className='text-decoration-none'
+              >
                 contact@doulitsa.gr
-              </a>
-              {' '}και θα σας βοηθήσουμε άμεσα.
+              </a>{' '}
+              και θα σας βοηθήσουμε άμεσα.
             </p>
           </div>
         )}

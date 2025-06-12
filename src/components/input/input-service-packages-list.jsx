@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 
 import { InputB, TextArea } from '@/components/input';
 import useCreateServiceStore from '@/stores/service/create/createServiceStore';
+import { IconFloppyDisk } from '@/components/icon/fa';
 
 import NewFeatureInputs from './input-service-packages-feature-create';
 import FeaturesList from './input-service-packages-features';
@@ -135,7 +136,7 @@ export default function Packages() {
         onClick={savePackages}
       >
         Αποθήκευση
-        <i className='fa-solid fa-floppy-disk'></i>
+        <IconFloppyDisk />
       </button>
     </div>
   );

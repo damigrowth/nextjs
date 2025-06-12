@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { FreelancerCard } from '@/components/card';
 import { FreelancersClientWrapper } from '../wrapper';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 /**
  * @typedef {object} FeaturedFreelancersHomeProps
@@ -63,7 +64,7 @@ export default async function FeaturedFreelancersHome({
             <div className='text-start text-lg-end mb-4 mb-lg-2'>
               <Link className='ud-btn2 text-white' href='/pros'>
                 Όλοι οι Επαγγελματίες
-                <i className='fal fa-arrow-right-long' />
+                <ArrowRightLong />
               </Link>
             </div>
           </div>

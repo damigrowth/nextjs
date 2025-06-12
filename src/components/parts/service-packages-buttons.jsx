@@ -3,6 +3,7 @@
 import React from 'react';
 
 import useServiceOrderStore from '@/stores/order/service';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function PackagesBtns({ packages }) {
   const { setOrder, calculateTotal } = useServiceOrderStore();
@@ -23,7 +24,7 @@ export default function PackagesBtns({ packages }) {
             className='ud-btn btn-thm'
           >
             Επιλογή
-            <i className='fal fa-arrow-right-long' />
+            <ArrowRightLong />
           </button>
         </td>
       ))}

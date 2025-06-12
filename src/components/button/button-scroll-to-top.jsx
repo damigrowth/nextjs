@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { IconAngleUp } from '@/components/icon/fa';
 
 export default function BottomToTop() {
   const [isBottom, setBottom] = useState(false);
@@ -36,7 +37,7 @@ export default function BottomToTop() {
         onClick={bottomToTopHandler}
         className={`scrollToHome ${isBottom ? 'show' : ''}`}
       >
-        <i className='fas fa-angle-up' />
+        <IconAngleUp />
       </a>
     </>
   );

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { IconPlay } from '@/components/icon/fa';
 
 /**
  * Renders a video preview component.
@@ -136,8 +137,7 @@ export default function VideoPreview({ previewUrl, videoUrl, mime }) {
                 alignItems: 'center',
               }}
             >
-              <i
-                className='fas fa-play'
+              <IconPlay
                 style={{
                   fontSize: '28px',
                   color: 'white',

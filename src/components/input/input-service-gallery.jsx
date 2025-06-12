@@ -6,6 +6,7 @@ import imageCompression from 'browser-image-compression';
 
 import useCreateServiceStore from '@/stores/service/create/createServiceStore';
 import useEditServiceStore from '@/stores/service/edit/editServiceStore';
+import { IconMusic, IconFloppyDisk } from '@/components/icon/fa';
 
 export default function ServiceGallery({
   isPending,
@@ -324,7 +325,7 @@ export default function ServiceGallery({
                 backgroundColor: '#f0f0f0',
               }}
             >
-              <i className='fa-solid fa-music fa-3x'></i>
+              <IconMusic size='3x' />
               <audio controls className='mt-2'>
                 <source
                   src={item.file.attributes.url}
@@ -368,7 +369,7 @@ export default function ServiceGallery({
         case 'audio':
           return (
             <div className='audio-preview'>
-              <i className='fa-solid fa-music fa-3x'></i>
+              <IconMusic size='3x' />
               <audio controls>
                 <source src={item.url} type={item.file.type} />
               </audio>
@@ -475,7 +476,7 @@ export default function ServiceGallery({
                 <span className="sr-only"></span>
               </div>
             ) : (
-              <i className="fa-solid fa-floppy-disk"></i>
+              <IconFloppyDisk />
             )}
           </button>
         )} */}

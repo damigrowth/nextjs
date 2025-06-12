@@ -7,6 +7,8 @@ import { formatRating } from '@/utils/formatRating';
 import { VerifiedBadge } from '../badge';
 import SaveForm from '../form/form-save';
 import { getSavedStatus } from '@/actions/shared/save';
+import { ArrowRightLong } from '@/components/icon/fa';
+import { IconStar } from '@/components/icon/fa';
 
 export default async function FreelancerCard({
   freelancer,
@@ -89,7 +91,7 @@ export default async function FreelancerCard({
           </p>
           {reviews_total > 0 ? (
             <p className='mb-0 fz14 list-inline-item '>
-              <i className='fas fa-star vam fz10 review-color mb5'></i>{' '}
+              <IconStar className='vam fz10 review-color mb5' />{' '}
               <span className='dark-color fw500'>{formatRating(rating)}</span>
               <span className='ml5 review-count-text'>
                 {reviews_total === 1
@@ -115,7 +117,7 @@ export default async function FreelancerCard({
               className='ud-btn btn-light-thm'
             >
               Περισσότερα
-              <i className='fal fa-arrow-right-long' />
+              <ArrowRightLong />
             </Link>
           </div>
         </div>

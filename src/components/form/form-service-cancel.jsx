@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 
 import { DeleteModal } from '@/components/modal';
 import { cancelService } from '@/actions/service/cancel';
+import { IconTrash } from '@/components/icon/fa';
 
 export default function CancelServiceForm() {
   const params = useParams();
@@ -43,7 +44,7 @@ export default function CancelServiceForm() {
         data-bs-target='#cancelServiceModal'
       >
         Διαγραφή
-        <i className='fa-solid fa-trash ms-2'></i>
+        <IconTrash className='ms-2' />
       </button>
       {formState?.message && (
         <div

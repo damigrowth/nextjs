@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { IconFlag } from '@/components/icon/fa';
 
 export default function ReportIssueFloatingButton() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -29,7 +30,7 @@ export default function ReportIssueFloatingButton() {
       data-bs-toggle='modal'
       data-bs-target='#reportIssueModal'
     >
-      <i className='fas fa-flag' />
+      <IconFlag />
     </a>
   );
 }

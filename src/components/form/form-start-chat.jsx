@@ -4,6 +4,7 @@ import React, { useActionState, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { io } from 'socket.io-client';
 import { initializeChat } from '@/actions/tenant/chat';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 /**
  * Form component for initiating a chat conversation between users
@@ -219,7 +220,7 @@ export default function StartChatForm({ fid, freelancerId, title }) {
             ) : (
               <>
                 Αποστολή
-                <i className='fal fa-arrow-right-long ms-2' />
+                <ArrowRightLong className='ms-2' />
               </>
             )}
           </button>

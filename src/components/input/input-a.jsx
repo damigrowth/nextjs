@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { IconEye, IconEyeSlash } from '@/components/icon/fa';
 import { useFormStatus } from 'react-dom';
 
 import {
@@ -101,9 +102,7 @@ export default function Input({
             className='password-toggle'
             onClick={() => setShowPassword(!showPassword)}
           >
-            <i
-              className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
-            ></i>
+            {showPassword ? <IconEyeSlash /> : <IconEye />}
           </button>
         )}
         {append && <span className='input-group-text'>{append}</span>}

@@ -5,6 +5,7 @@ import { RatingTotal, Socials } from '@/components/parts';
 import { getYearsOfExperience } from '@/utils/getYearsOfExperience';
 
 import { VerifiedBadge } from '../badge';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function ContactDetails({
   firstName,
@@ -95,7 +96,7 @@ export default function ContactDetails({
         <div className='d-grid mt30'>
           <Link href={`/profile/${username}`} className='ud-btn btn-thm-border'>
             Περισσότερα
-            <i className='fal fa-arrow-right-long' />
+            <ArrowRightLong />
           </Link>
         </div>
       </div>

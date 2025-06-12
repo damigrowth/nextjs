@@ -2,6 +2,7 @@
 
 import { reviewReaction } from '@/actions/tenant/reaction';
 import { useState } from 'react';
+import { IconThumbsUp, IconThumbsDown } from '@/components/icon/fa';
 
 // REMOVED DISLIKES
 function ReactionButton({ type, reactions, setReactions }) {
@@ -44,17 +45,19 @@ function ReactionButton({ type, reactions, setReactions }) {
 
   return (
     <button onClick={handleReaction}>
-      <i
-        className={
-          type === 'like'
-            ? `fas fa-thumbs-up ${reactions.likes.includes(reactions.uid) ? 'reacted_on_like' : ''}`
-            : '' /* `fas fa-thumbs-down ${
-                reactions.dislikes.includes(reactions.uid)
-                  ? "reacted_on_dislike"
-                  : ""
-              }` */
-        }
-      />
+      {type === 'like' ? (
+        <IconThumbsUp
+          className={`${reactions.likes.includes(reactions.uid) ? 'reacted_on_like' : ''}`}
+        />
+      ) : (
+        '' /* <IconThumbsDown
+                className={`${
+                  reactions.dislikes.includes(reactions.uid)
+                    ? "reacted_on_dislike"
+                    : ""
+                }`}
+              /> */
+      )}
       <span className='review_reactions_counter'>
         {reactions.likes.length > 0 ? reactions.likes.length : ''}
       </span>

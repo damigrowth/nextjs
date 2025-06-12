@@ -6,6 +6,8 @@ import Link from 'next/link';
 import useServiceOrderStore from '@/stores/order/service';
 
 import Addons from './service-addons';
+import { ArrowRightLong } from '@/components/icon/fa';
+import { IconCheck, IconTimes } from '@/components/icon/fa';
 
 const tabs = ['Απλό', 'Κανονικό', 'Προχωρημένο'];
 
@@ -90,13 +92,11 @@ export default function OrderPackages({
                               }
                             >
                               {feature.isCheckField ? (
-                                <i
-                                  className={
-                                    feature.checked
-                                      ? 'far fa-check text-thm3 bgc-thm3-light'
-                                      : 'far fa-times text-red bgc-red-light'
-                                  }
-                                />
+                                feature.checked ? (
+                                  <IconCheck className='text-thm3 bgc-thm3-light' />
+                                ) : (
+                                  <IconTimes className='text-red bgc-red-light' />
+                                )
                               ) : // <span>{feature.value}</span>
                               null}
                               {feature.isCheckField
@@ -116,7 +116,7 @@ export default function OrderPackages({
         <div className='d-grid'>
           <Link href={`/profile/${username}`} className='ud-btn btn-thm'>
             Αγορά {order.total}€
-            <i className='fal fa-arrow-right-long' />
+            <ArrowRightLong />
           </Link>
         </div>
       </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 
 import { formatRating } from '@/utils/formatRating';
+import { IconStar } from '@/components/icon/fa';
 
 export default function RatingTotal({
   totalReviews,
@@ -10,8 +11,8 @@ export default function RatingTotal({
 }) {
   const ratingContent = (
     <p className={`mb-0 fz14 ${clickable ? 'cursor-pointer' : ''}`}>
-      <i
-        className='fas fa-star vam review-color'
+      <IconStar
+        className='vam review-color'
         style={{ fontSize: 17, marginBottom: '2px' }}
       />
       <span className='ml5 dark-color fw500'>{formatRating(rating)}</span>

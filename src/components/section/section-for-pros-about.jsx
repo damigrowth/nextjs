@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function AboutArea1() {
   return (
@@ -53,7 +54,7 @@ export default function AboutArea1() {
                     className='ud-btn btn-thm mb25 me-4'
                   >
                     Εγγραφή Επαγγελματία
-                    <i className='fal fa-arrow-right-long' />
+                    <ArrowRightLong />
                   </Link>
                 </div>
               </div>
@@ -79,7 +80,7 @@ export default function AboutArea1() {
                     className='ud-btn btn-thm mb25 me-4'
                   >
                     Εγγραφή Επιχείρησης
-                    <i className='fal fa-arrow-right-long' />
+                    <ArrowRightLong />
                   </Link>
                 </div>
               </div>

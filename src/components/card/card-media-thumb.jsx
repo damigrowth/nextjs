@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { IconVideo, IconMusic, IconPlay } from '@/components/icon/fa';
 
 /**
  * Renders a media thumbnail component, typically used in carousels or galleries.
@@ -103,15 +104,15 @@ export const MediaThumb = ({
           unoptimized={true}
         />
       )}
-      {!showPreview && (
-        <i
-          className={isVideo ? 'fas fa-video' : 'fas fa-music'}
-          style={fallbackIconStyle}
-        />
-      )}
+      {!showPreview &&
+        (isVideo ? (
+          <IconVideo style={fallbackIconStyle} />
+        ) : (
+          <IconMusic style={fallbackIconStyle} />
+        ))}
       {isVideo && (
         <div style={playIconOverlayStyle}>
-          <i className='fas fa-play' style={playIconStyle} />
+          <IconPlay style={playIconStyle} />
         </div>
       )}
     </div>

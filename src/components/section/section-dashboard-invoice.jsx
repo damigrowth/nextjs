@@ -3,6 +3,7 @@ import { invoice } from '@/constants/dashboard';
 
 import InvoiceCard1 from '../card/card-invoice';
 import DashboardNavigation from '../navigation/navigation-dashboard';
+import { IconMagnifyingGlass } from '@/components/icon/fa';
 
 export default function InvoiceInfo() {
   return (
@@ -29,7 +30,7 @@ export default function InvoiceInfo() {
                   placeholder='Search Invoice'
                 />
                 <label>
-                  <span className='far fa-magnifying-glass' />
+                  <IconMagnifyingGlass className='icon-magnifying-glass' />
                 </label>
               </div>
             </div>

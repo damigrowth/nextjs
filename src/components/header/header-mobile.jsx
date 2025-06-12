@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { IconTimes } from '@/components/icon/fa';
 
 import UserMenu from '../menu/menu-user';
 
@@ -41,7 +42,7 @@ export default function HeaderMobile() {
           </div>
           <div className='posr'>
             <div className='mobile_menu_close_btn'>
-              <span className='far fa-times' />
+              <IconTimes />
             </div>
           </div>
         </div>

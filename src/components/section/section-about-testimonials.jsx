@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { IconQuoteLeft } from '@/components/icon/fa';
 
 export default function TestimonialsAbout({ data }) {
   return (
@@ -26,7 +27,7 @@ export default function TestimonialsAbout({ data }) {
                     >
                       <div className='testimonial-style2 at-about2 text-center'>
                         <div className='testi-content text-center'>
-                          <span className='icon fas fa-quote-left' />
+                          <IconQuoteLeft className='icon' />
                           <h4 className='testi-text'>{testimonial.text}</h4>
                         </div>
                       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function Invoice() {
   // print handler
@@ -22,7 +23,7 @@ export default function Invoice() {
                   className='ud-btn btn-thm invoice_down_print'
                 >
                   Print this invoice
-                  <i className='fal fa-arrow-right-long' />
+                  <ArrowRightLong />
                 </a>
               </div>
             </div>

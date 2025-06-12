@@ -7,6 +7,11 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 // Import required modules for Swiper v8
 import SwiperCore, { Navigation, Pagination } from 'swiper';
 import Link from 'next/link';
+import {
+  ArrowLeftLong,
+  ArrowRightLong,
+  IconMagnifyingGlass,
+} from '@/components/icon/fa';
 
 SwiperCore.use([Navigation, Pagination]);
 
@@ -277,13 +282,13 @@ export default function ServicesClientWrapper({
                       key={`navigation-${activeCategory || 'all'}`}
                     >
                       <button className='swiper__btn btn__prev__services'>
-                        <i className='far fa-arrow-left-long' />
+                        <ArrowLeftLong />
                       </button>
 
                       <div className='swiper__pagination swiper__pagination__services'></div>
 
                       <button className='swiper__btn btn__next__services'>
-                        <i className='far fa-arrow-right-long' />
+                        <ArrowRightLong />
                       </button>
                     </div>
                   )}
@@ -293,10 +298,9 @@ export default function ServicesClientWrapper({
                   <div className='col-12 text-center py-5'>
                     <div className='empty-state'>
                       <div className='empty-state-icon mb-3'>
-                        <i
-                          className='fas fa-search'
+                        <IconMagnifyingGlass
                           style={{ fontSize: '3rem', color: '#adb5bd' }}
-                        ></i>
+                        />
                       </div>
                       <h4 className='empty-state-title'>
                         {!activeCategory
@@ -311,7 +315,7 @@ export default function ServicesClientWrapper({
                       {activeCategory && (
                         <Link className='ud-btn2 text-black' href='/ipiresies'>
                           Όλες οι Υπηρεσίες
-                          <i className='fal fa-arrow-right-long' />
+                          <ArrowRightLong />
                         </Link>
                       )}
                     </div>

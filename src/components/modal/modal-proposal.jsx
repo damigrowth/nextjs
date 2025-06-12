@@ -1,3 +1,5 @@
+import { ArrowRightLong } from '@/components/icon/fa';
+
 export default function ProposalModal1() {
   return (
     <>
@@ -49,7 +51,7 @@ export default function ProposalModal1() {
                   aria-label='Close'
                 >
                   Update
-                  <i className='fal fa-arrow-right-long' />
+                  <ArrowRightLong />
                 </button>
               </form>
             </div>

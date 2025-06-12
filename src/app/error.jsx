@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowRightLong } from '@/components/icon/fa';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -40,7 +41,7 @@ export default function ErrorBoundary() {
                 </p>
                 <Link href='/' className='ud-btn btn-thm'>
                   Πίσω στην αρχική
-                  <i className='fal fa-arrow-right-long' />
+                  <ArrowRightLong />
                 </Link>
               </div>
             </div>

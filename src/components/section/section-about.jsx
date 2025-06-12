@@ -1,5 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowRightLong } from '@/components/icon/fa';
+import { IconCheck } from '@/components/icon/fa';
 
 export default function About({ data }) {
   return (
@@ -34,7 +36,7 @@ export default function About({ data }) {
                 <ul className='mb20'>
                   {data.list.map((item, i) => (
                     <li key={i}>
-                      <i className='far fa-check' />
+                      <IconCheck />
                       {item}
                     </li>
                   ))}
@@ -42,7 +44,7 @@ export default function About({ data }) {
               </div>
               <Link href={data.button.link} className='ud-btn btn-thm-border'>
                 {data.button.text}
-                <i className='fal fa-arrow-right-long' />
+                <ArrowRightLong />
               </Link>
             </div>
           </div>

@@ -13,6 +13,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { getBestDimensions } from '@/utils/imageDimensions';
 
 import VideoPreview from './card-video-preview';
+import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
 // Import the new component
 
 export default function ServiceCardFiles({
@@ -121,11 +122,11 @@ export default function ServiceCardFiles({
             className='swiper__parent'
             style={{ bottom: isThumbnail ? '5px' : undefined }}
           >
-            <div className='row justify-content-center'>
+            <div className='row justify-content-center flex-nowrap'>
               {!isThumbnail && (
                 <div className='col-auto'>
                   <button className='swiper__btn swiper__btn-2 btn__prev__018'>
-                    <i className='far fa-arrow-left-long' />
+                    <ArrowLeftLong />
                   </button>
                 </div>
               )}
@@ -135,7 +136,7 @@ export default function ServiceCardFiles({
               {!isThumbnail && (
                 <div className='col-auto'>
                   <button className='swiper__btn swiper__btn-2 btn__next__018'>
-                    <i className='far fa-arrow-right-long' />
+                    <ArrowRightLong />
                   </button>
                 </div>
               )}

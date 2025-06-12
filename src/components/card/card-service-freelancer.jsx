@@ -3,6 +3,7 @@ import Link from 'next/link';
 import CardReviews from './card-reviews';
 import ServiceCardFile from './card-service-file';
 import ServiceCardFiles from './card-service-files';
+import { IconHeart } from '@/components/icon/fa';
 
 export default function ServiceCard({
   media,
@@ -56,7 +57,7 @@ export default function ServiceCard({
             onClick={() => setFavActive(!isFavActive)}
             className={`listing-fav fz12 ${isFavActive ? "ui-fav-active" : ""}`}
           >
-            <span className="far fa-heart" />
+            <IconHeart type='regular' />
           </a> */}
         </div>
         <div className='list-content'>

@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 
 import useServiceOrderStore from '@/stores/order/service';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function Buy({ price, isOwner }) {
   const { order, setOrder, calculateTotal } = useServiceOrderStore();
@@ -24,7 +25,7 @@ export default function Buy({ price, isOwner }) {
           {price === 0 || price === null
             ? 'Επικοινωνήστε'
             : `Σύνολο ${order?.total}€`}{' '}
-          <i className='fal fa-arrow-right-long' />
+          <ArrowRightLong />
         </button>
       </div>
     );
