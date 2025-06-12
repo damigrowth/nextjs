@@ -57,6 +57,7 @@
     "@babel/plugin-syntax-jsx": "^7.27.1",
     "@babel/preset-env": "^7.27.2",
     "@stylistic/eslint-plugin-js": "^4.4.0",
+    "cssnano": "^7.0.7",
     "eslint": "8.42.0",
     "eslint-config-next": "^15.4.0-canary.51",
     "eslint-config-prettier": "^10.1.5",

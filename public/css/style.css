@@ -10625,37 +10625,45 @@ input:focus-visible {
 }
 
 /*	Social Styles svg  */
-.social-style1 svg {
+.social-style1 .social-icon {
   color: #ffffff;
   border-radius: 50%;
   height: 40px;
   line-height: 40px;
-  text-align: center;
   width: 40px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   -webkit-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
   -ms-transition: all 0.4s ease;
   -o-transition: all 0.4s ease;
   transition: all 0.4s ease;
 }
-.social-style1 svg:hover {
+.social-style1 .social-icon:hover {
   background-color: rgba(255, 255, 255, 0.05);
+}
+.social-style1 .social-icon svg {
+  width: 20px;
+  height: 20px;
+  color: var(--body-text-color);
 }
 .social-style1.light-style svg {
   color: var(--headings-color);
 }
-.social-style1.light-style svg:hover {
+.social-style1.light-style .social-icon:hover {
   background-color: var(--headings-color);
   color: #ffffff;
 }
-.social-style1.light-style2 svg {
+.social-style1.light-style2 .social-icon {
   color: var(--headings-color);
 }
-.social-style1.light-style2 svg:hover {
+.social-style1.light-style2 .social-icon:hover {
   background-color: #f7f7f7;
   color: var(--headings-color);
 }
-.social-style1.at-home15 svg:hover {
+.social-style1.at-home15 .social-icon:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 

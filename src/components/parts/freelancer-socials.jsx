@@ -87,6 +87,7 @@ export default function Socials({ socials = {}, email, phone, website }) {
                 ? 'noopener'
                 : undefined
             }
+            className='social-icon'
           >
             <IconComponent className='list-inline-item d-flex align-items-center justify-content-center' />
           </a>
