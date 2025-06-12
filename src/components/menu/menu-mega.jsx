@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useClickOutside } from '@/hooks/useClickOutside';
 
 import MegaMenuPillar from './menu-mega-pillar';
+import { IconAngleRight } from '../icon/fa';
 
 export default function MegaMenu({ categories, staticMenuClass }) {
   const [isActive, setIsActive] = useState(false);
@@ -45,6 +46,7 @@ export default function MegaMenu({ categories, staticMenuClass }) {
               >
                 <span className={`menu-icn ${category.icon}`} />
                 <span className='menu-title'>{category.label}</span>
+                <IconAngleRight className='menu-arrow' />
               </Link>
               <div className='drop-menu'>
                 {category.subcategories.map((subcategory, i) => (
