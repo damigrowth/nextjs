@@ -7,7 +7,7 @@ export default function SaveButton({
   hasChanges = false,
   loadingText = 'Ενημέρωση Στοιχείων...',
   defaultText = 'Ενημέρωση Στοιχείων',
-  icon = 'fa-solid fa-floppy-disk',
+  IconComponent = null,
   emoji = '',
   variant = 'dark',
   orientation = 'left',
@@ -44,7 +44,7 @@ export default function SaveButton({
             <span className='sr-only'></span>
           </div>
         ) : (
-          <>{icon ? <i className={icon}></i> : ` ${emoji}`}</>
+          <>{IconComponent ? <IconComponent /> : ` ${emoji}`}</>
         )}
       </button>
     </div>

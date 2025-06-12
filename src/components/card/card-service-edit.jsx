@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { IconEye } from '@/components/icon/fa';
 
 import ServiceCardFile from './card-service-file';
 import ServiceCardFiles from './card-service-files';
@@ -47,7 +48,7 @@ export default function EditServiceCard({ service }) {
                   target='_blank'
                   className='ml10'
                 >
-                  <i className='fa-solid fa-eye'></i>
+                  <IconEye />
                 </Link>
               </h6>
             </div>

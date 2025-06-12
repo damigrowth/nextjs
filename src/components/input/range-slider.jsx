@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from 'react';
 import ReactSlider from 'react-slider';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { debounce } from 'lodash';
+import { IconMinus, ArrowRightLong } from '@/components/icon/fa';
 
 export default function RangeSlider({ iniMin, iniMax, type = 'price' }) {
   const searchParams = useSearchParams();
@@ -134,7 +135,7 @@ export default function RangeSlider({ iniMin, iniMax, type = 'price' }) {
                 value={min}
                 onChange={(e) => handleSlider(e, 'min')}
               />
-              <span className='fa-sharp fa-solid fa-minus mx-1 dark-color' />
+              <IconMinus className='mx-1 dark-color' />
               <input
                 type='text'
                 className='amount2 w-100'
@@ -163,7 +164,7 @@ export default function RangeSlider({ iniMin, iniMax, type = 'price' }) {
         className="done-btn ud-btn btn-thm drop_btn3"
       >
         Apply
-        <i className="fal fa-arrow-right-long" />
+        <ArrowRightLong />
       </button> */}
     </div>
   );

@@ -3,6 +3,7 @@
 import { submitContactForm } from '@/actions/shared/contact';
 import React, { useActionState, useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function ContactForm({ form, siteKey }) {
   const [state, formAction, isPending] = useActionState(submitContactForm, {
@@ -96,7 +97,7 @@ export default function ContactForm({ form, siteKey }) {
                     <span className='sr-only'></span>
                   </span>
                 ) : (
-                  <i className='fal fa-arrow-right-long' />
+                  <ArrowRightLong />
                 )}
               </button>
             </div>

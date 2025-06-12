@@ -1,5 +1,6 @@
 'use client';
 
+import { IconAngleLeft, IconAngleRight } from '@/components/icon/fa';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export default function Pagination1({
@@ -78,7 +79,7 @@ export default function Pagination1({
               onClick={() => page > 1 && handlePageChange(page - 1)}
               disabled={page <= 1}
             >
-              <span className='fas fa-angle-left' />
+              <IconAngleLeft />
             </button>
           </li>
           {/* Page numbers */}
@@ -106,7 +107,7 @@ export default function Pagination1({
               onClick={() => page < pageCount && handlePageChange(page + 1)}
               disabled={page >= pageCount}
             >
-              <span className='fas fa-angle-right' />
+              <IconAngleRight />
             </button>
           </li>
         </ul>

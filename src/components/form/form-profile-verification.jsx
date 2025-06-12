@@ -7,8 +7,9 @@ import { useFormChanges } from '@/hooks/useFormChanges';
 
 import { AlertForm } from '../alert';
 import { SaveButton } from '../button';
-import { IconPulsatingDot } from '../icon';
+import { IconPaperPlane } from '@/components/icon/fa';
 import { verificationUpdate } from '@/actions/tenant/verification';
+import { IconPulsatingDot } from '../icon';
 
 /**
  * @typedef {object} VerificationData
@@ -143,7 +144,10 @@ export default function VerificationForm({ fid, email, verificationData }) {
         <div className='bdrb1 pb15 mb25'>
           <div className='d-flex align-items-center mb10'>
             {isVerified && (
-              <i className='d-block flaticon-success fa-xl text-thm vam mr10' />
+              <IconCheckCircle
+                className='d-block text-thm vam mr10'
+                size='xl'
+              />
             )}
             {!isVerified && verificationStatusType === 'Pending' && (
               <IconPulsatingDot
@@ -249,7 +253,7 @@ export default function VerificationForm({ fid, email, verificationData }) {
             isPending={isPending}
             hasChanges={hasChanges}
             variant='primary'
-            icon='fa-solid fa-paper-plane'
+            IconComponent={IconPaperPlane}
             defaultText='Αποστολή Αίτησης'
             loadingText='Αποστολή Αίτησης'
           />

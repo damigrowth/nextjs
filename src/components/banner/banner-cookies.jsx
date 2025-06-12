@@ -9,6 +9,7 @@ import {
   getCookieConsent,
   setCookieConsent,
 } from '@/actions/shared/cookies';
+import { IconXmark } from '@/components/icon/fa';
 
 export default function CookiesBanner() {
   // COMPLETELY PREVENT RENDERING INITIALLY
@@ -117,7 +118,7 @@ export default function CookiesBanner() {
             style={{ padding: '0', background: 'none', border: 'none' }}
             aria-label='Κλείσιμο banner cookies'
           >
-            <i className='fal fa-xmark'></i>
+            <IconXmark />
           </button>
         </div>
         <p className='small mb-3' style={{ fontSize: '13px', color: '#666' }}>

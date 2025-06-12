@@ -3,6 +3,7 @@
 import React from 'react';
 
 import useCreateServiceStore from '@/stores/service/create/createServiceStore';
+import { IconCheckCircle, IconTimesCircle } from '@/components/icon/fa';
 
 import FeaturesListEdit from './input-service-packages-feature-edit';
 
@@ -18,9 +19,9 @@ export default function FeaturesListItem({ feature, index }) {
           {feature.isCheckField ? (
             <div>
               {feature.checked ? (
-                <span className='fas fa-check-circle fz18 text-success' />
+                <IconCheckCircle className='fz18 text-success' />
               ) : (
-                <span className='fas fa-times-circle fz18 text-danger' />
+                <IconTimesCircle className='fz18 text-danger' />
               )}
             </div>
           ) : (

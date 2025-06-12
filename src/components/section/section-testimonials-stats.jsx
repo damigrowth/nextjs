@@ -10,6 +10,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { testimonials } from '../../constants/data';
 import TestimonialCard from '../card/card-testimonial';
+import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
 
 export default function Testimonials() {
   const [showSwiper, setShowSwiper] = useState(false);
@@ -57,7 +58,7 @@ export default function Testimonials() {
       <div className='row justify-content-center'>
         <div className='col-auto'>
           <button className='swiper__btn btn__prev__003'>
-            <i className='far fa-arrow-left-long' />
+            <ArrowLeftLong />
           </button>
         </div>
         <div className='col-auto'>
@@ -65,7 +66,7 @@ export default function Testimonials() {
         </div>
         <div className='col-auto'>
           <button className='swiper__btn btn__next__003'>
-            <i className='far fa-arrow-right-long' />
+            <ArrowRightLong />
           </button>
         </div>
       </div>

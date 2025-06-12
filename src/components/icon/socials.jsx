@@ -1,4 +1,10 @@
 import React from 'react';
+import {
+  IconLinkedinIn,
+  IconFacebookF,
+  IconTwitter,
+  IconInstagram,
+} from '@/components/icon/fa';
 
 export default function Socials() {
   return (
@@ -9,18 +15,18 @@ export default function Socials() {
         target='_blank'
         rel='noopener'
       >
-        <i className='fab fa-linkedin-in list-inline-item' />
+        <IconLinkedinIn className='list-inline-item' />
       </a>
       <h5 className='text-white'>Βρες μας στο Linkedin </h5>
       <div className='social-style1'>
         {/* <a>
-          <i className="fab fa-facebook-f list-inline-item" />
+          <IconFacebookF className="list-inline-item" />
         </a>
         <a>
-          <i className="fab fa-twitter list-inline-item" />
+          <IconTwitter className="list-inline-item" />
         </a>
         <a>
-          <i className="fab fa-instagram list-inline-item" />
+          <IconInstagram className="list-inline-item" />
         </a> */}
       </div>
     </div>

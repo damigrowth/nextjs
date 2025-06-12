@@ -1,5 +1,6 @@
 import { UserImage } from '@/components/avatar';
 import { timeAgo } from '@/utils/timeAgo';
+import { IconStar } from '@/components/icon/fa';
 
 export default function ReviewComment({
   i,
@@ -32,7 +33,7 @@ export default function ReviewComment({
             <h6 className='mt-0 mb-1'>{reviewer?.displayName}</h6>
             <div className='d-flex align-items-center'>
               <div>
-                <i className='fas fa-star vam fz10 review-color me-2' />
+                <IconStar className='vam fz10 review-color me-2' />
                 <span className='fz15 fw500'>{rating}</span>
               </div>
               <div className='ms-3'>

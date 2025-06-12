@@ -9373,14 +9373,14 @@ li.mm-listitem:focus {
     padding: 5px 15px;
   }
 }
-#mega-menu .menu li a.dropdown:after {
+/* #mega-menu .menu li a.dropdown:after {
   content: "";
   position: absolute;
   font-family: "Font Awesome 6 Pro";
   right: 30px;
   font-size: 14px;
   color: var(--headings-color);
-}
+} */
 #mega-menu .menu li:first-child {
   border-radius: 4px 0 0 0;
 }

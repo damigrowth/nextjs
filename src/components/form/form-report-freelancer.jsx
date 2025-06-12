@@ -16,6 +16,7 @@ import useModalCleanup from '@/hooks/useModalCleanup';
 import { AlertForm } from '../alert';
 import { SaveButton } from '../button';
 import { TextArea } from '../input';
+import { IconPaperPlane } from '@/components/icon/fa';
 import { createFreelancerReport } from '@/actions/tenant/report';
 
 /**
@@ -203,7 +204,7 @@ export default function FreelancerReportForm({ reporter, reported }) {
             hasChanges={hasChanges}
             disabled={isPending || isPendingTransition || !hasChanges}
             className='w-100'
-            icon='fa-solid fa-paper-plane'
+            IconComponent={IconPaperPlane}
           />
         </form>
       ) : (

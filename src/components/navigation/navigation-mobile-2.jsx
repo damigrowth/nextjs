@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { IconTimes } from '@/components/icon/fa';
 
 export default function MobileNavigation2() {
   return (
@@ -37,7 +38,7 @@ export default function MobileNavigation2() {
             </div>
             <div className='posr'>
               <div className='mobile_menu_close_btn'>
-                <span className='far fa-times' />
+                <IconTimes />
               </div>
             </div>
           </div>

@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useState, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { IconArrowDownLong } from '@/components/icon/fa';
 
 export default function LoadMoreBtn({
   name,
@@ -57,7 +58,7 @@ export default function LoadMoreBtn({
             <span className='sr-only'></span>
           </div>
         ) : (
-          <i className='fal fa-arrow-down-long'></i>
+          <IconArrowDownLong />
         )}
       </button>
     </div>

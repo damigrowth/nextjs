@@ -14,6 +14,7 @@ import { useFormChanges } from '@/hooks/useFormChanges';
 import Alert from '../alert/alert-form';
 import SaveButton from '../button/button-form-save';
 import CheckSelect from '../input/input-check-select';
+import { IconPaperPlane } from '@/components/icon/fa';
 import TextArea from '../input/input-text-area';
 import ReportIssueModal from '../modal/modal-report-issue';
 import { createIssueReport } from '@/actions/shared/report';
@@ -236,7 +237,7 @@ export default function ReportIssueForm() {
           hasChanges={hasChanges}
           disabled={isPending || isPendingTransition || !hasChanges}
           className='w-100'
-          icon='fa-solid fa-paper-plane'
+          IconComponent={IconPaperPlane}
         />
       </form>
     </ReportIssueModal>

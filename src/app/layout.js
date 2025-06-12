@@ -13,6 +13,10 @@ import { ApolloWrapper } from '@/lib/client/apollo-wrapper';
 import { getData } from '@/lib/client/operations';
 import { ROOT_LAYOUT_WITH_ACTIVE_SERVICES } from '@/lib/graphql';
 
+import '@fortawesome/fontawesome-svg-core/styles.css';
+import { config } from '@fortawesome/fontawesome-svg-core';
+config.autoAddCss = false; /* eslint-disable import/first */
+
 import './globals.css';
 import 'react-tooltip/dist/react-tooltip.css';
 import 'react-loading-skeleton/dist/skeleton.css';

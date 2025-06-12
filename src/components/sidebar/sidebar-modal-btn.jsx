@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import useArchiveStore from '@/stores/archive/archiveStore';
+import { TimesIcon } from '@/components/icon/fa';
 
 export default function SidebarModalBtn({ type }) {
   const { filtersModalHandler } = useArchiveStore();
@@ -29,7 +30,7 @@ export default function SidebarModalBtn({ type }) {
   if (type === 'close') {
     return (
       <div onClick={handleClose} className='sidebar-close-icon'>
-        <span className='far fa-times' />
+        <TimesIcon />
       </div>
     );
   } else {

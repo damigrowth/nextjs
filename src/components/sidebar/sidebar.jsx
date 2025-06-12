@@ -38,7 +38,10 @@ export default function Sidebar({ filters, searchParams }) {
                 aria-expanded={!isCollapsed ? 'true' : 'false'}
                 aria-controls={`collapse${index}`}
               >
-                <div className='card-header' id={`heading${index}`}>
+                <div
+                  className='dropdown dropdown-toggle archive-dropdown'
+                  id={`heading${index}`}
+                >
                   <h4 className='archive-filters-title'>{filter.heading}</h4>
                 </div>
               </button>

@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { UserImage } from '@/components/avatar';
 import { formatRating } from '@/utils/formatRating';
+import { IconStar } from '@/components/icon/fa';
 
 import SaveFrom from '../form/form-save';
 import FeaturedServiceSlideCardMedia from './card-service-media-slider';
@@ -67,7 +68,7 @@ export default async function FeaturedServiceSliderCard({
           <div className='review-meta d-flex align-items-center'>
             {reviews_total && (
               <>
-                <i className='fas fa-star fz10 review-color me-2' />
+                <IconStar className='fz10 review-color me-2' />
                 <p className='mb-0 body-color fz14'>
                   <span className='dark-color me-2'>
                     {formatRating(rating)}

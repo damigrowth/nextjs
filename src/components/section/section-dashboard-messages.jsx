@@ -11,6 +11,7 @@ import {
   getDatePart,
   timeAgo,
 } from '@/utils/timeAgo';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 /**
  * Converts URLs in text to clickable links that open in a new tab
@@ -738,7 +739,7 @@ export default function MessageBox({
                 ) : (
                   <>
                     Αποστολή
-                    <i className='fal fa-arrow-right-long ms-2' />
+                    <ArrowRightLong className='ms-2' />
                   </>
                 )}
               </button>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FreelancerCard } from '@/components/card';
 
 import FreelancersListWrapper from '../wrapper/wrapper-featured-freelancers';
+import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
 
 export default function FeaturedFreelancers({
   freelancers: freelancersData,
@@ -34,7 +35,7 @@ export default function FeaturedFreelancers({
               <div className='text-start text-lg-end mb-4 mb-lg-2'>
                 <Link className='ud-btn2 text-white' href='/pros'>
                   Όλοι οι Επαγγελματίες
-                  <i className='fal fa-arrow-right-long' />
+                  <ArrowRightLong />
                 </Link>
               </div>
             </div>
@@ -54,7 +55,7 @@ export default function FeaturedFreelancers({
               <div className='row justify-content-center'>
                 <div className='col-auto'>
                   <button className='swiper__btn swiper__btn-2 btn__prev__013'>
-                    <i className='far fa-arrow-left-long' />
+                    <ArrowLeftLong />
                   </button>
                 </div>
                 <div className='col-auto'>
@@ -62,7 +63,7 @@ export default function FeaturedFreelancers({
                 </div>
                 <div className='col-auto'>
                   <button className='swiper__btn swiper__btn-2 btn__next__013'>
-                    <i className='far fa-arrow-right-long' />
+                    <ArrowRightLong />
                   </button>
                 </div>
               </div>

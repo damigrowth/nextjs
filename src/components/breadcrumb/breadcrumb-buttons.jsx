@@ -1,6 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+import {
+  IconFacebookF,
+  IconLinkedinIn,
+  IconEnvelope,
+  IconLink,
+} from '@/components/icon/fa';
 
 import SaveForm from '../form/form-save';
 
@@ -59,16 +65,16 @@ export default function BreadcrumbButtons({
         {shareToggle && (
           <div className='ui-social-media'>
             <a onClick={() => handleShareClick('facebook')}>
-              <i className='fa-brands fa-facebook-f'></i>
+              <IconFacebookF />
             </a>
             <a onClick={() => handleShareClick('linkedin')}>
-              <i className='fa-brands fa-linkedin-in'></i>
+              <IconLinkedinIn />
             </a>
             <a onClick={() => handleShareClick('email')}>
-              <i className='fa-solid fa-envelope'></i>
+              <IconEnvelope />
             </a>
             <a onClick={() => handleShareClick('copy')}>
-              <i className='fa-solid fa-link'></i>
+              <IconLink />
             </a>
           </div>
         )}

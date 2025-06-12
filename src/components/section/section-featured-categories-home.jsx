@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { categoriesClassNames } from '../../constants/data';
 import FeaturedCategoriesSwiper from './section-featured-categories-swiper';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 export default async function FeaturedCategories({ categories }) {
   const featuredCategories = categories.map((item, i) => ({
@@ -28,7 +29,7 @@ export default async function FeaturedCategories({ categories }) {
             <div className='text-start text-lg-end mb-4 mb-lg-2'>
               <Link className='ud-btn2' href='/categories'>
                 Όλες οι Κατηγορίες
-                <i className='fal fa-arrow-right-long'></i>
+                <ArrowRightLong />
               </Link>
             </div>
           </div>

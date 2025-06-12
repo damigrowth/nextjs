@@ -5,6 +5,7 @@ import { useActionState, useEffect, useState } from 'react';
 import Alert from '@/components/alert/alert-form';
 import { SaveButton } from '@/components/button';
 import { InputB } from '@/components/input';
+import { IconKey } from '@/components/icon/fa';
 
 import ChangePasswordModal from '../modal/modal-change-password';
 import {
@@ -182,7 +183,8 @@ export default function ChangePasswordForm() {
                     confirmPassword.trim() !== ''
                   }
                   defaultText='Αλλαγή Κωδικού'
-                  icon='far fa-key'
+                  IconComponent={IconKey}
+                  type='regular'
                   variant='primary'
                 />
               </div>

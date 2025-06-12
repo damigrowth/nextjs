@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { IconAngleLeft, IconAngleRight } from '@/components/icon/fa';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export default function Pagination({ meta, plural }) {
@@ -38,7 +39,7 @@ export default function Pagination({ meta, plural }) {
             onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
             style={{ cursor: currentPage === 1 ? 'default' : 'pointer' }}
           >
-            <span className='fas fa-angle-left' />
+            <IconAngleLeft />
           </a>
         </li>
         {pages.map((page) => (
@@ -68,7 +69,7 @@ export default function Pagination({ meta, plural }) {
               cursor: currentPage === pageCount ? 'default' : 'pointer',
             }}
           >
-            <span className='fas fa-angle-right' />
+            <IconAngleRight />
           </a>
         </li>
       </ul>

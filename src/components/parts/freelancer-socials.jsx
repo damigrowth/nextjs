@@ -1,4 +1,17 @@
 import React from 'react';
+import {
+  IconFacebookF,
+  IconLinkedinIn,
+  IconX,
+  IconYoutube,
+  IconGithub,
+  IconInstagram,
+  IconBehance,
+  IconDribbble,
+  IconEnvelope,
+  IconPhone,
+  IconGlobe,
+} from '@/components/icon/fa';
 
 export default function Socials({ socials = {}, email, phone, website }) {
   const {
@@ -13,23 +26,53 @@ export default function Socials({ socials = {}, email, phone, website }) {
   } = socials || {};
 
   const socialsData = [
-    facebook?.url && { icon: 'fa-facebook-f', data: facebook },
-    linkedin?.url && { icon: 'fa-linkedin-in', data: linkedin },
-    x?.url && { icon: 'fa-x', data: x },
-    youtube?.url && { icon: 'fa-youtube', data: youtube },
-    github?.url && { icon: 'fa-github', data: github },
-    instagram?.url && { icon: 'fa-instagram', data: instagram },
-    behance?.url && { icon: 'fa-behance', data: behance },
-    dribbble?.url && { icon: 'fa-dribbble', data: dribbble },
-    email && { icon: 'flaticon-mail', data: { url: `mailto:${email}` } },
-    phone && { icon: 'flaticon-call', data: { url: `tel:${phone}` } },
-    website && { icon: 'flaticon-website', data: { url: website } },
+    facebook?.url && {
+      data: facebook,
+      component: IconFacebookF,
+    },
+    linkedin?.url && {
+      data: linkedin,
+      component: IconLinkedinIn,
+    },
+    x?.url && { data: x, component: IconX },
+    youtube?.url && {
+      data: youtube,
+      component: IconYoutube,
+    },
+    github?.url && { data: github, component: IconGithub },
+    instagram?.url && {
+      data: instagram,
+      component: IconInstagram,
+    },
+    behance?.url && {
+      data: behance,
+      component: IconBehance,
+    },
+    dribbble?.url && {
+      data: dribbble,
+      component: IconDribbble,
+    },
+    email && {
+      data: { url: `mailto:${email}` },
+      component: IconEnvelope,
+    },
+    phone && {
+      data: { url: `tel:${phone}` },
+      component: IconPhone,
+    },
+    website && {
+      data: { url: website },
+      component: IconGlobe,
+    },
   ].filter(Boolean); // Filter out any null entries
 
   return (
     <div className='social-style1 pt20 pb30 light-style2 socials-list'>
-      {socialsData.map((social, index) =>
-        social.data ? (
+      {socialsData.map((social, index) => {
+        const IconComponent = social.component;
+        if (!IconComponent) return null; // Fallback for icons not mapped
+
+        return social.data ? (
           <a
             key={index}
             id={social.data.label}
@@ -45,12 +88,10 @@ export default function Socials({ socials = {}, email, phone, website }) {
                 : undefined
             }
           >
-            <i
-              className={`fab ${social.icon} list-inline-item d-flex align-items-center justify-content-center`}
-            />
+            <IconComponent className='list-inline-item d-flex align-items-center justify-content-center' />
           </a>
-        ) : null,
-      )}
+        ) : null;
+      })}
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { normalizeQuery } from '@/utils/queries';
 import Alert from '../alert/alert-form';
 import SaveButton from '../button/button-form-save';
 import SearchableSelect from '../input/input-searchable-select';
+import { IconPaperPlane } from '@/components/icon/fa';
 import TextArea from '../input/input-text-area';
 import Rating from '../parts/review-rating';
 import ReviewSuccess from '../parts/review-success';
@@ -211,7 +212,7 @@ export default function AddModelReviewForm({ type, serviceId, freelancerId }) {
                 )}
               <SaveButton
                 isPending={isPending}
-                icon='fa-solid fa-paper-plane'
+                IconComponent={IconPaperPlane}
                 defaultText='Δημοσίευση Αξιολόγησης'
                 hasChanges={hasChanges}
               />

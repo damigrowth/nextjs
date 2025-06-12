@@ -1,4 +1,5 @@
 import React from 'react';
+import { IconCheck, IconTimes } from '@/components/icon/fa';
 
 import PackagesBtns from './service-packages-buttons';
 
@@ -40,13 +41,11 @@ export default function Packages({ packages }) {
                             : 'check_circle bgc-red'
                         }
                       >
-                        <span
-                          className={
-                            pack.features[featureIndex].checked
-                              ? 'fas fa-check'
-                              : 'fas fa-times'
-                          }
-                        />
+                        {pack.features[featureIndex].checked ? (
+                          <IconCheck />
+                        ) : (
+                          <IconTimes />
+                        )}
                       </div>
                     ) : (
                       pack.features[featureIndex].value

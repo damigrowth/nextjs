@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { IconBars } from '@/components/icon/fa';
 
 import {
   hasAccessAccountNav,
@@ -91,7 +92,7 @@ export default function DashboardNavigation({ hasAccess }) {
       <div className='dashboard_navigationbar d-block d-lg-none'>
         <div className='dropdown'>
           <button onClick={() => setActive(!isActive)} className='dropbtn'>
-            <i className='fa fa-bars pr10' /> Διαχείριση
+            <IconBars className='pr10' /> Διαχείριση
           </button>
           <ul className={`dropdown-content ${isActive ? 'show' : ''}`}>
             {menuItems.map((item, i) => (

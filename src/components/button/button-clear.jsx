@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import listingStore from '@/stores/listingStore';
 import priceStore from '@/stores/priceStore';
+import { ArrowRightLong } from '../icon/fa';
 
 export default function ClearButton({ alwaysShow = false }) {
   const router = useRouter();
@@ -131,7 +133,7 @@ export default function ClearButton({ alwaysShow = false }) {
           className='ud-btn btn-thm ui-clear-btn w-100'
         >
           Καθαρισμός φίλτρων
-          <i className='fal fa-arrow-right-long'></i>
+          <ArrowRightLong />
         </button>
       ) : (
         ''

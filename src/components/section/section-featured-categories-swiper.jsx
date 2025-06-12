@@ -8,6 +8,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Navigation, Pagination } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
 
 export default function FeaturedCategoriesSwiper({ categories }) {
   const [showSwiper, setShowSwiper] = useState(false);
@@ -90,7 +91,7 @@ export default function FeaturedCategoriesSwiper({ categories }) {
         <div className='row'>
           <div className='col-auto'>
             <button className='swiper__btn btn__prev__001'>
-              <i className='far fa-arrow-left-long' />
+              <ArrowLeftLong />
             </button>
           </div>
           <div className='col-auto'>
@@ -98,7 +99,7 @@ export default function FeaturedCategoriesSwiper({ categories }) {
           </div>
           <div className='col-auto'>
             <button className='swiper__btn btn__next__001'>
-              <i className='far fa-arrow-right-long' />
+              <ArrowRightLong />
             </button>
           </div>
         </div>

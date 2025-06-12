@@ -9,6 +9,7 @@ import React, {
   useState,
 } from 'react';
 import Image from 'next/image';
+import { IconMusic } from '@/components/icon/fa';
 
 // Create a context for media management
 const MediaContext = createContext(null);
@@ -320,7 +321,7 @@ export function MediaProvider({ children, initialMedia = [] }) {
                 backgroundColor: '#f0f0f0',
               }}
             >
-              <i className='fa-solid fa-music fa-3x'></i>
+              <IconMusic size='3x' />
             </div>
           );
       }

@@ -11,6 +11,7 @@ import DraftServices from '../heading/title-dashboard-services-draft';
 import DashboardNavigation from '../navigation/navigation-dashboard';
 import { getAccess } from '@/actions/shared/user';
 import { getFreelancer } from '@/actions/shared/freelancer';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 export default async function DashboardInfo() {
   const hasAccess = await getAccess(['freelancer', 'company']);
@@ -134,21 +135,21 @@ export default async function DashboardInfo() {
                       className='ud-btn btn-thm2 mb25 me-4'
                     >
                       Διαχείριση Προφίλ
-                      <i className='fal fa-arrow-right-long' />
+                      <ArrowRightLong />
                     </Link>
                     <Link
                       href='/dashboard/services/add'
                       className='ud-btn btn-thm2 mb25 me-4'
                     >
                       Προσθήκη Υπηρεσίας
-                      <i className='fal fa-arrow-right-long' />
+                      <ArrowRightLong />
                     </Link>
                     <Link
                       href='/dashboard/services'
                       className='ud-btn btn-thm2 mb25 me-4'
                     >
                       Διαχείριση Υπηρεσιών
-                      <i className='fal fa-arrow-right-long' />
+                      <ArrowRightLong />
                     </Link>
                   </div>
                 </div>
@@ -190,15 +191,15 @@ export default async function DashboardInfo() {
             <div className='d-flex pb30 gap-3 mt-4 flex-wrap'>
               <Link href='/ipiresies' className='ud-btn btn-thm2 mb25 me-4'>
                 Όλες οι Υπηρεσίες
-                <i className='fal fa-arrow-right-long' />
+                <ArrowRightLong />
               </Link>
               <Link href='/pros' className='ud-btn btn-thm2 mb25 me-4'>
                 Επαγγελματίες
-                <i className='fal fa-arrow-right-long' />
+                <ArrowRightLong />
               </Link>
               <Link href='/companies' className='ud-btn btn-thm2 mb25 me-4'>
                 Επιχειρήσεις
-                <i className='fal fa-arrow-right-long' />
+                <ArrowRightLong />
               </Link>
             </div>
           </div>

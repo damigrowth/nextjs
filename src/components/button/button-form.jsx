@@ -1,4 +1,6 @@
 import React from 'react';
+import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function FormButton({
   type,
@@ -18,9 +20,9 @@ export default function FormButton({
     }
     switch (icon) {
       case 'arrow':
-        return <i className='fal fa-arrow-right-long' />;
+        return <ArrowRightLong />;
       case 'save':
-        return <i className='fa-solid fa-floppy-disk' />;
+        return <FontAwesomeIcon icon={faFloppyDisk} />;
       default:
         return null;
     }

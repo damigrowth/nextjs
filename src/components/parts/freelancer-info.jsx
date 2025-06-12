@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ArrowRightLong } from '@/components/icon/fa';
+import { IconViber, IconWhatsapp } from '@/components/icon/fa';
 
 /**
  * Renders the information widget for a freelancer's profile.
@@ -157,13 +159,12 @@ export default function InfoFreelancer({
                     target='_blank'
                     rel='noopener noreferrer'
                   >
-                    <i
-                      className='fab fa-viber'
+                    <IconViber
                       style={{
                         color: '#665CAC',
                         fontSize: '1.3em',
                       }}
-                    ></i>
+                    />
                   </a>
                 )}
                 {whatsapp && (
@@ -174,13 +175,12 @@ export default function InfoFreelancer({
                     className='me-2'
                     title={`Whatsapp: ${whatsapp}`}
                   >
-                    <i
-                      className='fab fa-whatsapp'
+                    <IconWhatsapp
                       style={{
                         color: '#25D366',
                         fontSize: '1.45em',
                       }}
-                    ></i>
+                    />
                   </a>
                 )}
                 {showPhone ? (
@@ -244,7 +244,7 @@ export default function InfoFreelancer({
               data-bs-toggle='modal'
               data-bs-target='#startChatModal'
             >
-              Επικοινωνία <i className='fal fa-arrow-right-long' />
+              Επικοινωνία <ArrowRightLong />
             </button>
           </div>
         )}

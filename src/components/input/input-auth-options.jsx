@@ -3,6 +3,7 @@
 import React from 'react';
 
 import authStore from '@/stores/authStore';
+import { ArrowLeftLong } from '@/components/icon/fa';
 
 export default function AuthTypeOptions() {
   const { type, setAuthType } = authStore();
@@ -15,7 +16,8 @@ export default function AuthTypeOptions() {
           onClick={() => setAuthType(0)}
           className='ud-btn btn-white2 mb25 me-4'
         >
-          <i className='fal fa-arrow-left-long mr10 ml0'></i>Προηγούμενο Βήμα
+          <ArrowLeftLong className='mr10 ml0' />
+          Προηγούμενο Βήμα
         </a>
       </>
     );

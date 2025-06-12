@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function FunFact({ data }) {
   return (
@@ -35,7 +36,7 @@ export default function FunFact({ data }) {
                   className='ud-btn btn-thm'
                 >
                   {data.leftSection.buttonText}
-                  <i className='fal fa-arrow-right-long' />
+                  <ArrowRightLong />
                 </Link>
               </div>
             </div>

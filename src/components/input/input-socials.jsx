@@ -1,47 +1,57 @@
 import React from 'react';
 
 import { InputB } from '@/components/input';
+import {
+  IconFacebookF,
+  IconInstagram,
+  IconLinkedinIn,
+  IconX,
+  IconYoutube,
+  IconGithub,
+  IconBehance,
+  IconDribbble,
+} from '@/components/icon/fa';
 
 const SocialsInputs = ({ data = {}, username, onChange, errors }) => {
   const socialPlatforms = {
     facebook: {
       label: 'Facebook',
-      icon: 'facebook-f',
+      icon: IconFacebookF,
       placeholder: 'https://facebook.com/',
     },
     instagram: {
       label: 'Instagram',
-      icon: 'instagram',
+      icon: IconInstagram,
       placeholder: 'https://instagram.com/',
     },
     linkedin: {
       label: 'LinkedIn',
-      icon: 'linkedin-in',
+      icon: IconLinkedinIn,
       placeholder: 'https://linkedin.com/',
     },
     x: {
       label: 'X',
-      icon: 'x',
+      icon: IconX,
       placeholder: 'https://x.com/',
     },
     youtube: {
       label: 'YouTube',
-      icon: 'youtube',
+      icon: IconYoutube,
       placeholder: 'https://youtube.com/@',
     },
     github: {
       label: 'GitHub',
-      icon: 'github',
+      icon: IconGithub,
       placeholder: 'https://github.com/',
     },
     behance: {
       label: 'Behance',
-      icon: 'behance',
+      icon: IconBehance,
       placeholder: 'https://behance.net/',
     },
     dribbble: {
       label: 'Dribbble',
-      icon: 'dribbble',
+      icon: IconDribbble,
       placeholder: 'https://dribbble.com/',
     },
   };
@@ -68,7 +78,7 @@ const SocialsInputs = ({ data = {}, username, onChange, errors }) => {
             errors={
               errors && { field: platform, message: errors[platform]?.message }
             }
-            icon={`fab fa-${config.icon}`}
+            IconComponent={config.icon}
           />
         </div>
       ))}

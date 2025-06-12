@@ -7,6 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 // Import required modules for Swiper v8
 import SwiperCore, { Navigation, Pagination } from 'swiper';
 import Link from 'next/link';
+import { ArrowLeftLong, ArrowRightLong, IconUsers } from '@/components/icon/fa';
 
 SwiperCore.use([Navigation, Pagination]);
 
@@ -148,13 +149,13 @@ export default function FreelancersClientWrapper({
           {pageCount > 1 && (
             <div className='swiper-navigation-wrapper'>
               <button className='swiper__btn btn__prev__freelancers'>
-                <i className='far fa-arrow-left-long' />
+                <ArrowLeftLong />
               </button>
 
               <div className='swiper__pagination swiper__pagination__freelancers'></div>
 
               <button className='swiper__btn btn__next__freelancers'>
-                <i className='far fa-arrow-right-long' />
+                <ArrowRightLong />
               </button>
             </div>
           )}
@@ -164,13 +165,12 @@ export default function FreelancersClientWrapper({
           <div className='col-12 text-center py-5'>
             <div className='empty-state-freelancers'>
               <div className='empty-state-icon mb-3'>
-                <i
-                  className='fas fa-users'
+                <IconUsers
                   style={{
                     fontSize: '3rem',
                     color: 'rgba(255, 255, 255, 0.5)',
                   }}
-                ></i>
+                />
               </div>
               <h4 className='empty-state-title'>Δεν βρέθηκαν επαγγελματίες.</h4>
               <p className='text-muted mb-3'>
@@ -178,7 +178,7 @@ export default function FreelancersClientWrapper({
               </p>
               <Link className='ud-btn2 text-white' href='/pros'>
                 Όλοι οι Επαγγελματίες
-                <i className='fal fa-arrow-right-long' />
+                <ArrowRightLong />
               </Link>
             </div>
           </div>

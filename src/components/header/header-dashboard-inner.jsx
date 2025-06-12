@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 import DraftServices from '@/components/heading/title-dashboard-services-draft';
 import { DashboardNavigation } from '@/components/navigation';
@@ -8,7 +9,7 @@ export default function DashboardHeader({
   showButton = false,
   buttonText = 'Προσθήκη Υπηρεσίας',
   buttonHref = '/dashboard/services/add',
-  buttonIcon = 'fal fa-arrow-right-long',
+  ButtonIconComponent = ArrowRightLong, // Default to ArrowRightLong
   showDraftServices = false,
 }) {
   return (
@@ -30,7 +31,7 @@ export default function DashboardHeader({
               className='ud-btn btn-dark default-box-shadow2'
             >
               {buttonText}
-              <i className={buttonIcon} />
+              {ButtonIconComponent && <ButtonIconComponent />}
             </Link>
           </div>
         </div>

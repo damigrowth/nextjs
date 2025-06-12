@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Input } from '@/components/input';
 import GoogleLoginButton from '@/components/button/google-login-button';
 import { login } from '@/actions/auth/login';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 const LoginForm = () => {
   const initialState = {
@@ -74,7 +75,7 @@ const LoginForm = () => {
                 <span className='sr-only'></span>
               </span>
             ) : (
-              <i className='fal fa-arrow-right-long' />
+              <ArrowRightLong />
             )}
           </button>
         </div>

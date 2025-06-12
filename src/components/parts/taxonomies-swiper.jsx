@@ -5,6 +5,7 @@ import 'swiper/css';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { IconAngleRight } from '@/components/icon/fa';
 
 /**
  * Renders a Swiper component for displaying a list of taxonomies (subdivisions).
@@ -49,7 +50,7 @@ export default function TaxonomiesSwiper({ taxonomies }) {
                     className='taxonomies-swiper-card'
                   >
                     <span>{taxonomy.label}</span>
-                    <span className='fas fa-angle-right'></span>
+                    <IconAngleRight />
                   </Link>
                 </SwiperSlide>
               ))}

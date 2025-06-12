@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { IconEye, IconEyeSlash } from '@/components/icon/fa';
 
 import { formatInput } from '@/utils/InputFormats/formats';
 
@@ -31,7 +32,7 @@ import { formatInput } from '@/utils/InputFormats/formats';
  * @param {object|string} [props.errors] - Error object or string for displaying validation errors.
  * @param {function(string|number): void} props.onChange - Callback function triggered on input value change. Receives the formatted value (integer or empty string for number, string otherwise).
  * @param {string} [props.className] - Additional CSS classes for the input element.
- * @param {string} [icon] - CSS class for an optional icon to display before the label.
+ * @param {JSX.Element} [IconComponent] -Component Icon .
  * @returns {JSX.Element} The InputB component.
  */
 export default function InputB({
@@ -57,7 +58,7 @@ export default function InputB({
   errors,
   onChange,
   className,
-  icon,
+  IconComponent, // Changed from icon string to IconComponent
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -147,7 +148,7 @@ export default function InputB({
     <div className='mb10'>
       {hideLabel === undefined && (
         <label htmlFor={id} className='form-label fw500 dark-color'>
-          {icon && <span className={`pr10 ${icon}`} />}
+          {IconComponent && <IconComponent className='pr10' />}
           {label}
         </label>
       )}
@@ -189,9 +190,7 @@ export default function InputB({
               zIndex: 3, // Ensure it's above the input
             }}
           >
-            <i
-              className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
-            ></i>
+            {showPassword ? <IconEyeSlash /> : <IconEye />}
           </button>
         )}
         {append && <span className='input-group-text'>{append}</span>}

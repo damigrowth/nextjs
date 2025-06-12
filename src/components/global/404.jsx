@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function PageNotFound() {
   return (
@@ -38,7 +39,7 @@ export default function PageNotFound() {
                 </p>
                 <Link href='/' className='ud-btn btn-thm'>
                   Πίσω στην Αρχική
-                  <i className='fal fa-arrow-right-long' />
+                  <ArrowRightLong />
                 </Link>
               </div>
             </div>
