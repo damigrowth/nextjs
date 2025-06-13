@@ -379,25 +379,13 @@ export const postData = async (mutation, variables, jwt) => {
       });
     }
 
-    // FIXED: Simple compatible error (no class extending, just plain string with properties)
-    function createCompatibleError(message, type, statusCode) {
-      // Create a plain string
-      const errorString = String(message);
-
-      // Add properties to make it work with both error patterns
-      errorString.message = errorString; // error.message returns the same string
-      errorString.type = type;
-      errorString.statusCode = statusCode;
-      errorString.timestamp = new Date().toISOString();
-
-      return errorString;
-    }
-
-    const compatibleError = createCompatibleError(
-      errorInfo.greekMessage,
-      errorInfo.type,
-      errorInfo.statusCode,
-    );
+    // ULTRA SIMPLE: Just create a plain object (Next.js friendly)
+    const compatibleError = {
+      message: errorInfo.greekMessage, // Greek message for users
+      type: errorInfo.type,
+      statusCode: errorInfo.statusCode,
+      timestamp: new Date().toISOString(),
+    };
 
     return {
       error: compatibleError, // Works as both string AND object, Next.js serializable!
