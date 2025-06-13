@@ -15,6 +15,7 @@ import {
 } from '../strapi';
 import { getClient } from '.';
 import { getToken } from '@/actions/auth/token';
+import { strapiErrorTranslations } from '@/utils/errors';
 
 export async function fetchWithRetry(url, options, retries = 3, backoff = 300) {
   for (let i = 0; i < retries; i++) {
@@ -334,8 +335,7 @@ export const postData = async (mutation, variables, jwt) => {
 
     // Safe access to translations (in case strapiErrorTranslations is undefined)
     const translatedMainErrorMessage =
-      (typeof strapiErrorTranslations === 'object' &&
-        strapiErrorTranslations[mainErrorMessage]) ||
+      (strapiErrorTranslations && strapiErrorTranslations[mainErrorMessage]) ||
       mainErrorMessage;
 
     const translatedFieldErrors = {};
