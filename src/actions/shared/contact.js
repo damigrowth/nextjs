@@ -76,14 +76,24 @@ export async function submitContactForm(prevState, formData) {
       },
     });
 
-    if (!data?.data?.createEmail?.data?.id) {
-      return {
-        success: false,
-        message: 'Αποτυχία αποστολής μηνύματος. Δοκιμάστε ξανά.',
-      };
-    } else {
+    // ✅ Check SUCCESS first
+    if (data?.data?.createEmail?.data?.id) {
       return { success: true, message: 'Επιτυχία αποστολής μηνύματος!' };
     }
+
+    // ✅ Handle ERRORS from postData (Greek messages)
+    if (data?.error) {
+      return {
+        success: false,
+        message: data.error, // Greek error message from postData
+      };
+    }
+
+    // ✅ Fallback if no data and no error
+    return {
+      success: false,
+      message: 'Αποτυχία αποστολής μηνύματος. Δοκιμάστε ξανά.',
+    };
   } catch (error) {
     console.error('Σφάλμα κατά την υποβολή της φόρμας επικοινωνίας:', error);
 

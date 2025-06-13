@@ -48,8 +48,7 @@ export async function deleteAccount(prevState, formData) {
     console.error('Error deleting account:', error);
 
     return {
-      message:
-        error.message || 'Σφάλμα κατά τη διαγραφή. Προσπαθήστε ξανά αργότερα.',
+      message: error || 'Σφάλμα κατά τη διαγραφή. Προσπαθήστε ξανά αργότερα.',
       error: true,
       success: false,
     };

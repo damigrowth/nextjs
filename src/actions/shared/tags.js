@@ -34,17 +34,27 @@ export async function createTags(tags) {
 
         const response = await postData(CREATE_TAG, payload);
 
-        if (!response?.data?.createTag?.data?.id) {
+        // ✅ Handle ERRORS from postData (Greek messages)
+        if (response?.error) {
+          return {
+            error: true,
+            message: response.error, // Greek error message from postData
+          };
+        }
+
+        // ✅ Check SUCCESS
+        if (response?.data?.createTag?.data?.id) {
+          createdTags.push({
+            id: response.data.createTag.data.id,
+            label: response.data.createTag.data.attributes.label,
+          });
+        } else {
+          // ✅ Fallback if no data and no error
           return {
             error: true,
             message: `Το tag "${tag.label}" δεν μπόρεσε να δημιουργηθεί.`,
           };
         }
-
-        createdTags.push({
-          id: response.data.createTag.data.id,
-          label: response.data.createTag.data.attributes.label,
-        });
       } catch (error) {
         if (error.message?.includes('unique')) {
           return {

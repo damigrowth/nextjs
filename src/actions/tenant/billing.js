@@ -55,23 +55,34 @@ export async function updateBillingDetails(prevState, formData) {
     billing_details: processedBillingDetails,
   };
 
-  const { data, error } = await postData(UPDATE_FREELANCER, {
+  const response = await postData(UPDATE_FREELANCER, {
     id,
     data: payload,
   });
 
-  if (error) {
+  // ✅ Check SUCCESS first  
+  if (response?.data?.updateFreelancer?.data) {
+    revalidatePath('/dashboard/profile');
+    return {
+      data: response.data.updateFreelancer.data,
+      errors: null,
+      message: 'Τα στοιχεία τιμολόγησης ενημερώθηκαν με επιτυχία',
+    };
+  }
+
+  // ✅ Handle ERRORS from postData (Greek messages)
+  if (response?.error) {
     return {
       data: null,
-      errors: { submit: error },
+      errors: { submit: response.error }, // Greek error message from postData
       message: null,
     };
   }
-  revalidatePath('/dashboard/profile');
 
+  // ✅ Fallback if no data and no error
   return {
-    data: data.updateFreelancer.data,
-    errors: null,
-    message: 'Τα στοιχεία τιμολόγησης ενημερώθηκαν με επιτυχία',
+    data: null,
+    errors: { submit: 'Αποτυχία ενημέρωσης στοιχείων. Δοκιμάστε ξανά.' },
+    message: null,
   };
 }

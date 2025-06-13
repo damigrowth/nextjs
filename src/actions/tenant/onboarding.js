@@ -352,46 +352,61 @@ export async function updateOnboardingInfo(prevState, formData) {
     };
   }
 
-  // API call (same pattern as basic.js)
-  const { data, error } = await postData(UPDATE_FREELANCER, {
+  // API call
+  const response = await postData(UPDATE_FREELANCER, {
     id,
     data: payload,
   });
 
-  if (error) {
+  // ✅ Check SUCCESS first
+  if (response?.data?.updateFreelancer?.data) {
+    // If onboarding is complete, update status as well
+    if (onboardingComplete) {
+      try {
+        await updateFreelancerStatus(id);
+      } catch (statusError) {
+        console.error('Status update failed:', statusError);
+        // Return success for profile update but note status update failed
+        return {
+          data: response.data,
+          errors: {
+            submit: {
+              field: 'submit',
+              message:
+                'Το προφίλ ενημερώθηκε αλλά υπήρξε πρόβλημα με την ενεργοποίηση',
+            },
+          },
+          message: null,
+        };
+      }
+    }
+
+    redirect('/dashboard/start/success');
+  }
+
+  // ✅ Handle ERRORS from postData (Greek messages)
+  if (response?.error) {
     return {
       data: null,
       errors: {
         submit: {
           field: 'submit',
-          message: error.message || 'Error during update',
+          message: response.error, // Greek error message from postData
         },
       },
       message: null,
     };
   }
 
-  // If onboarding is complete, update status as well
-  if (onboardingComplete) {
-    try {
-      await updateFreelancerStatus(id);
-    } catch (statusError) {
-      console.error('Status update failed:', statusError);
-
-      // Return success for profile update but note status update failed
-      return {
-        data,
-        errors: {
-          submit: {
-            field: 'submit',
-            message:
-              'Το προφίλ ενημερώθηκε αλλά υπήρξε πρόβλημα με την ενεργοποίηση',
-          },
-        },
-        message: null,
-      };
-    }
-  }
-
-  redirect('/dashboard/start/success');
+  // ✅ Fallback if no data and no error
+  return {
+    data: null,
+    errors: {
+      submit: {
+        field: 'submit',
+        message: 'Αποτυχία ενημέρωσης. Δοκιμάστε ξανά.',
+      },
+    },
+    message: null,
+  };
 }

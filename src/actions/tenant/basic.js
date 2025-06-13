@@ -236,7 +236,7 @@ export async function updateBasicInfo(prevState, formData) {
         errors: {
           submit: {
             field: 'submit',
-            message: error.message || 'Error during update',
+            message: error || 'Error during update',
           },
         },
         message: null,
@@ -257,7 +257,7 @@ export async function updateBasicInfo(prevState, formData) {
       errors: {
         submit: {
           field: 'submit',
-          message: error.message || 'Προέκυψε σφάλμα κατά την ενημέρωση',
+          message: error || 'Προέκυψε σφάλμα κατά την ενημέρωση',
         },
       },
       message: null,

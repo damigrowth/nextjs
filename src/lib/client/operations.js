@@ -4,7 +4,6 @@
 // import { print } from 'graphql/language/printer';
 import { cache } from 'react';
 
-import { strapiErrorTranslations } from '@/utils/errors';
 import { normalizeQuery } from '@/utils/queries';
 
 import { CACHE_CONFIG } from '../cache/config';
@@ -16,6 +15,7 @@ import {
 } from '../strapi';
 import { getClient } from '.';
 import { getToken } from '@/actions/auth/token';
+import { strapiErrorTranslations } from '@/utils/errors';
 
 export async function fetchWithRetry(url, options, retries = 3, backoff = 300) {
   for (let i = 0; i < retries; i++) {
@@ -286,11 +286,9 @@ export const getPublicData = cache(
   },
 );
 
-// Generic GraphQL mutation function
 export const postData = async (mutation, variables, jwt) => {
   const token =
     jwt || (mutation.toString().includes('login') ? null : await getToken());
-
   const client = getClient();
 
   try {
@@ -303,11 +301,27 @@ export const postData = async (mutation, variables, jwt) => {
         },
       },
     });
-
     return { data };
   } catch (error) {
-    const fieldErrors = {};
+    // Handle network errors (timeouts, connection issues)
+    if (error.networkError) {
+      let networkMessage = 'Πρόβλημα σύνδεσης - παρακαλώ προσπαθήστε ξανά';
 
+      if (error.networkError.statusCode === 401) {
+        networkMessage = 'Αποτυχία ταυτοποίησης - παρακαλώ συνδεθείτε ξανά';
+      } else if (error.networkError.statusCode === 500) {
+        networkMessage =
+          'Σφάλμα διακομιστή - παρακαλώ προσπαθήστε ξανά αργότερα';
+      }
+
+      return {
+        error: networkMessage,
+        errors: {},
+      };
+    }
+
+    // Your original GraphQL error handling (keep as-is)
+    const fieldErrors = {};
     if (error.graphQLErrors?.[0]?.extensions?.errors) {
       Object.entries(error.graphQLErrors[0].extensions.errors).forEach(
         ([key, value]) => {
@@ -319,19 +333,20 @@ export const postData = async (mutation, variables, jwt) => {
     const mainErrorMessage =
       error.graphQLErrors?.[0]?.message || 'An error occurred';
 
+    // Safe access to translations (in case strapiErrorTranslations is undefined)
     const translatedMainErrorMessage =
-      strapiErrorTranslations[mainErrorMessage] || mainErrorMessage;
+      (strapiErrorTranslations && strapiErrorTranslations[mainErrorMessage]) ||
+      mainErrorMessage;
 
     const translatedFieldErrors = {};
-
     if (error.graphQLErrors?.[0]?.extensions?.errors) {
       Object.entries(error.graphQLErrors[0].extensions.errors).forEach(
         ([key, value]) => {
-          // Assuming value[0].message is the error message for the field
           const fieldErrorMessage = value[0].message;
-
           translatedFieldErrors[key] = [
-            strapiErrorTranslations[fieldErrorMessage] || fieldErrorMessage,
+            (typeof strapiErrorTranslations === 'object' &&
+              strapiErrorTranslations[fieldErrorMessage]) ||
+              fieldErrorMessage,
           ];
         },
       );

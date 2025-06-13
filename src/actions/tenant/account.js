@@ -120,30 +120,44 @@ export async function updateAccountInfo(prevState, formData) {
 
   // --- End Simplified Payload Preparation ---
   // API call
-  const { data, error } = await postData(UPDATE_FREELANCER, {
+  const response = await postData(UPDATE_FREELANCER, {
     id: formData.get('id'),
     data: payload, // Send the final payload
   });
 
-  // ... rest of the error handling and success response ...
-  if (error) {
+  // ✅ Check SUCCESS first
+  if (response?.data?.updateFreelancer?.data) {
+    revalidatePath('/dashboard/profile');
+    return {
+      data: response.data.updateFreelancer.data,
+      errors: null,
+      message: 'Τα στοιχεία ενημερώθηκαν με επιτυχία',
+    };
+  }
+
+  // ✅ Handle ERRORS from postData (Greek messages)
+  if (response?.error) {
     return {
       data: null,
       errors: {
         submit: {
-          // Ensure submit error has field and message
           field: 'submit',
-          message: error.message || 'Error during update',
+          message: response.error, // Greek error message from postData
         },
       },
       message: null,
     };
   }
-  revalidatePath('/dashboard/profile');
 
+  // ✅ Fallback if no data and no error
   return {
-    data: data.updateFreelancer.data,
-    errors: null,
-    message: 'Τα στοιχεία ενημερώθηκαν με επιτυχία',
+    data: null,
+    errors: {
+      submit: {
+        field: 'submit',
+        message: 'Αποτυχία ενημέρωσης. Δοκιμάστε ξανά.',
+      },
+    },
+    message: null,
   };
 }

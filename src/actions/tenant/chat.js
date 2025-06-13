@@ -87,9 +87,15 @@ export async function initializeChat(prevState, formData) {
 
       const newChat = await postData(CREATE_CHAT, chatInput, jwt);
 
+      // ✅ Handle ERRORS from postData (Greek messages)
       if (newChat?.error) {
-        throw new Error(newChat.error);
+        return {
+          message: newChat.error, // Greek error message from postData
+          error: true,
+          success: false,
+        };
       }
+      
       chatId = newChat.data.createChat.data.id;
     }
 
@@ -106,8 +112,13 @@ export async function initializeChat(prevState, formData) {
 
     const newMessage = await postData(CREATE_MESSAGE, messageInput, jwt);
 
+    // ✅ Handle ERRORS from postData (Greek messages)
     if (newMessage?.error) {
-      throw new Error(newMessage.error);
+      return {
+        message: newMessage.error, // Greek error message from postData
+        error: true,
+        success: false,
+      };
     }
     // Update chat's lastMessage
     await postData(
@@ -128,6 +139,7 @@ export async function initializeChat(prevState, formData) {
       chatId,
     };
   } catch (error) {
+    // ✅ Safety net to prevent 500 pages and preserve Greek messages
     return {
       message: error.message || 'Αποτυχία έναρξης συνομιλίας',
       error: true,

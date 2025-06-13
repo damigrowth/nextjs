@@ -48,26 +48,37 @@ export async function createReview(prevState, formData) {
 
     const response = await postData(POST_REVIEW, { data: payload });
 
-    const reviewId = response?.data?.createReview?.data?.id;
-
-    if (reviewId) {
+    // ✅ Check SUCCESS first
+    if (response?.data?.createReview?.data?.id) {
       return {
         data: {
-          id: reviewId,
+          id: response.data.createReview.data.id,
         },
         errors: {},
         message: 'Η αξιολόγησή σας υποβλήθηκε με επιτυχία!',
       };
-    } else {
+    }
+
+    // ✅ Handle ERRORS from postData (Greek messages)
+    if (response?.error) {
       return {
         errors: {
-          submit:
-            'Δεν ήταν δυνατή η υποβολή της αξιολόγησης. Προσπαθήστε ξανά.',
+          submit: response.error, // Greek error message from postData
         },
         message: null,
         data: null,
       };
     }
+
+    // ✅ Fallback if no data and no error
+    return {
+      errors: {
+        submit:
+          'Δεν ήταν δυνατή η υποβολή της αξιολόγησης. Προσπαθήστε ξανά.',
+      },
+      message: null,
+      data: null,
+    };
   } catch (error) {
     console.error(error);
 
