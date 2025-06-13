@@ -21,20 +21,29 @@ export async function cancelService(prevState, formData) {
 
   const response = await postData(EDIT_SERVICE, payload, jwt);
 
-  if (!response?.data?.updateService?.data) {
+  // ✅ Check SUCCESS first
+  if (response?.data?.updateService?.data) {
+    revalidatePath(`/dashboard/services`);
     return {
-      message: 'Η διαγραφή της υπηρεσίας απέτυχε!',
+      message: 'Η υπηρεσία διαγράφηκε με επιτυχία!',
+      error: false,
+      success: true,
+    };
+  }
+
+  // ✅ Handle ERRORS from postData (Greek messages)
+  if (response?.error) {
+    return {
+      message: response.error, // Greek error message from postData
       error: true,
       success: false,
     };
   }
-  // Revalidate edit service page
-  revalidatePath(`/dashboard/services`);
 
-  // Return success instead of redirecting
+  // ✅ Fallback if no data and no error
   return {
-    message: 'Η υπηρεσία διαγράφηκε με επιτυχία!',
-    error: false,
-    success: true,
+    message: 'Η διαγραφή της υπηρεσίας απέτυχε!',
+    error: true,
+    success: false,
   };
 }

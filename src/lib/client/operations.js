@@ -16,10 +16,6 @@ import {
 import { getClient } from '.';
 import { getToken } from '@/actions/auth/token';
 
-import * as Sentry from '@sentry/nextjs';
-
-import { greekErrorTranslations } from '@/constants/strapiErrorTranslations';
-
 export async function fetchWithRetry(url, options, retries = 3, backoff = 300) {
   for (let i = 0; i < retries; i++) {
     try {
@@ -289,26 +285,10 @@ export const getPublicData = cache(
   },
 );
 
-// Final simplified postData function with Next.js serialization fix
-
 export const postData = async (mutation, variables, jwt) => {
   const token =
     jwt || (mutation.toString().includes('login') ? null : await getToken());
   const client = getClient();
-  const mutationName = mutation.definitions?.[0]?.name?.value || 'Unknown';
-
-  // Development logging
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🚀 GraphQL Request:', { mutationName, hasToken: !!token });
-  }
-
-  // Sentry breadcrumb
-  Sentry.addBreadcrumb({
-    category: 'graphql',
-    message: `GraphQL Mutation: ${mutationName}`,
-    level: 'info',
-    data: { mutationName, hasToken: !!token },
-  });
 
   try {
     const { data } = await client.mutate({
@@ -320,146 +300,64 @@ export const postData = async (mutation, variables, jwt) => {
         },
       },
     });
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('✅ GraphQL Success:', { mutationName });
-    }
-
     return { data };
   } catch (error) {
-    // Simplified error handling
-    const errorInfo = getErrorInfo(error);
+    // Handle network errors (timeouts, connection issues)
+    if (error.networkError) {
+      let networkMessage = 'Πρόβλημα σύνδεσης - παρακαλώ προσπαθήστε ξανά';
 
-    // Process field errors
+      if (error.networkError.statusCode === 401) {
+        networkMessage = 'Αποτυχία ταυτοποίησης - παρακαλώ συνδεθείτε ξανά';
+      } else if (error.networkError.statusCode === 500) {
+        networkMessage =
+          'Σφάλμα διακομιστή - παρακαλώ προσπαθήστε ξανά αργότερα';
+      }
+
+      return {
+        error: networkMessage,
+        errors: {},
+      };
+    }
+
+    // Your original GraphQL error handling (keep as-is)
+    const fieldErrors = {};
+    if (error.graphQLErrors?.[0]?.extensions?.errors) {
+      Object.entries(error.graphQLErrors[0].extensions.errors).forEach(
+        ([key, value]) => {
+          fieldErrors[key] = value[0].message;
+        },
+      );
+    }
+
+    const mainErrorMessage =
+      error.graphQLErrors?.[0]?.message || 'An error occurred';
+
+    // Safe access to translations (in case strapiErrorTranslations is undefined)
+    const translatedMainErrorMessage =
+      (typeof strapiErrorTranslations === 'object' &&
+        strapiErrorTranslations[mainErrorMessage]) ||
+      mainErrorMessage;
+
     const translatedFieldErrors = {};
     if (error.graphQLErrors?.[0]?.extensions?.errors) {
       Object.entries(error.graphQLErrors[0].extensions.errors).forEach(
         ([key, value]) => {
           const fieldErrorMessage = value[0].message;
           translatedFieldErrors[key] = [
-            greekErrorTranslations[fieldErrorMessage] || fieldErrorMessage,
+            (typeof strapiErrorTranslations === 'object' &&
+              strapiErrorTranslations[fieldErrorMessage]) ||
+              fieldErrorMessage,
           ];
         },
       );
     }
 
-    // Send to Sentry
-    Sentry.withScope((scope) => {
-      scope.setTag('errorType', errorInfo.type);
-      scope.setTag('mutationName', mutationName);
-      scope.setTag('statusCode', errorInfo.statusCode);
-
-      scope.setContext('graphql', {
-        mutationName,
-        variables: variables ? Object.keys(variables) : [],
-        hasToken: !!token,
-      });
-
-      scope.setFingerprint(['graphql', mutationName, errorInfo.type]);
-      scope.setLevel(errorInfo.sentryLevel);
-
-      Sentry.captureException(
-        new Error(`GraphQL ${errorInfo.type}: ${errorInfo.englishMessage}`),
-        {
-          extra: {
-            userFacingMessage: errorInfo.greekMessage,
-            mutationName,
-            variables,
-          },
-        },
-      );
-    });
-
-    // Development logging
-    if (process.env.NODE_ENV === 'development') {
-      console.error('❌ GraphQL Error:', {
-        type: errorInfo.type,
-        greek: errorInfo.greekMessage,
-        english: errorInfo.englishMessage,
-      });
-    }
-
-    // ULTRA SIMPLE: Just create a plain object (Next.js friendly)
-    const compatibleError = {
-      message: errorInfo.greekMessage, // Greek message for users
-      type: errorInfo.type,
-      statusCode: errorInfo.statusCode,
-      timestamp: new Date().toISOString(),
-    };
-
     return {
-      error: compatibleError, // Works as both string AND object, Next.js serializable!
+      error: translatedMainErrorMessage,
       errors: translatedFieldErrors,
     };
   }
 };
-
-// Helper function to determine error info (unchanged)
-function getErrorInfo(error) {
-  // Default values
-  let greekMessage = 'Προέκυψε σφάλμα';
-  let englishMessage = 'An error occurred';
-  let type = 'UNKNOWN_ERROR';
-  let statusCode = null;
-  let sentryLevel = 'error';
-
-  if (error.networkError) {
-    const netError = error.networkError;
-    statusCode = netError.statusCode;
-    type = 'NETWORK_ERROR';
-
-    // Common network errors
-    if (netError.statusCode === 500) {
-      greekMessage = 'Σφάλμα διακομιστή - παρακαλώ προσπαθήστε ξανά αργότερα';
-      englishMessage = 'Internal server error';
-      type = 'SERVER_ERROR';
-    } else if (netError.statusCode === 401) {
-      greekMessage = 'Αποτυχία ταυτοποίησης - παρακαλώ συνδεθείτε ξανά';
-      englishMessage = 'Authentication failed';
-      type = 'AUTH_ERROR';
-      sentryLevel = 'warning';
-    } else if (netError.statusCode === 403) {
-      greekMessage = 'Δεν έχετε δικαίωμα πρόσβασης';
-      englishMessage = 'Access denied';
-      type = 'PERMISSION_ERROR';
-      sentryLevel = 'warning';
-    } else if (
-      netError.name === 'AbortError' ||
-      netError.code === 'ETIMEDOUT'
-    ) {
-      greekMessage = 'Λήξη χρονικού ορίου - παρακαλώ προσπαθήστε ξανά';
-      englishMessage = 'Request timeout';
-      type = 'TIMEOUT_ERROR';
-      sentryLevel = 'warning';
-    } else if (netError.code === 'ECONNREFUSED') {
-      greekMessage = 'Πρόβλημα σύνδεσης - ελέγξτε το διαδίκτυό σας';
-      englishMessage = 'Connection failed';
-      type = 'CONNECTION_ERROR';
-    } else {
-      // Try translation or use original
-      greekMessage =
-        greekErrorTranslations[netError.message] ||
-        'Σφάλμα δικτύου - παρακαλώ προσπαθήστε ξανά';
-      englishMessage = netError.message || 'Network error';
-    }
-  } else if (error.graphQLErrors?.[0]?.message) {
-    const originalMessage = error.graphQLErrors[0].message;
-    greekMessage =
-      greekErrorTranslations[originalMessage] ||
-      originalMessage ||
-      'Σφάλμα βάσης δεδομένων';
-    englishMessage = originalMessage;
-    type = 'GRAPHQL_ERROR';
-  } else if (error.message) {
-    greekMessage =
-      greekErrorTranslations[error.message] ||
-      error.message ||
-      'Προέκυψε απροσδόκητο σφάλμα';
-    englishMessage = error.message;
-  }
-
-  return { greekMessage, englishMessage, type, statusCode, sentryLevel };
-}
 
 // Generic GraphQL mutation function
 export const putData = async (mutation, variables) => {

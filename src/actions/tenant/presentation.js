@@ -116,29 +116,43 @@ export async function updatePresentationInfo(prevState, formData) {
     }
 
     // Make the API call to update the freelancer presentation info
-    const { data, error } = await postData(UPDATE_FREELANCER, {
+    const response = await postData(UPDATE_FREELANCER, {
       id,
       data: changes,
     });
 
-    if (error) {
+    // ✅ Check SUCCESS first
+    if (response?.data?.updateFreelancer?.data) {
+      revalidatePath('/dashboard/profile');
+      return {
+        data: response.data,
+        errors: null,
+        message: 'Τα στοιχεία ενημερώθηκαν με επιτυχία',
+      };
+    }
+
+    // ✅ Handle ERRORS from postData (Greek messages)
+    if (response?.error) {
       return {
         data: null,
         errors: {
           submit: {
-            message: error.message || 'Error during update',
+            message: response.error, // Greek error message from postData
           },
         },
         message: null,
       };
     }
-    // Success - revalidate the path to refresh data
-    revalidatePath('/dashboard/profile');
 
+    // ✅ Fallback if no data and no error
     return {
-      data,
-      errors: null,
-      message: 'Τα στοιχεία ενημερώθηκαν με επιτυχία',
+      data: null,
+      errors: {
+        submit: {
+          message: 'Αποτυχία ενημέρωσης. Δοκιμάστε ξανά.',
+        },
+      },
+      message: null,
     };
   } catch (error) {
     console.error('Update failed:', error);

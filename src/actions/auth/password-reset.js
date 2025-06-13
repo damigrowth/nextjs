@@ -15,32 +15,55 @@ import { logout } from './logout';
  * @returns {Promise<{ success: boolean, message: string }>} Returns a state object indicating success or failure.
  */
 export async function resetPassword(prevState, formData) {
-  const password = formData.get('password');
+  try {
+    const password = formData.get('password');
+    const passwordConfirmation = formData.get('passwordConfirmation');
+    const resetCode = formData.get('resetCode');
 
-  const passwordConfirmation = formData.get('passwordConfirmation');
+    const response = await postData(RESET_PASSWORD, {
+      password,
+      passwordConfirmation,
+      resetCode,
+    });
 
-  const resetCode = formData.get('resetCode');
+    // ✅ Check for SUCCESS first
+    if (response?.data?.resetPassword?.jwt) {
+      await logout();
+      return {
+        success: true,
+        message: 'Ο κωδικός σας άλλαξε με επιτυχία!',
+      };
+    }
 
-  const response = await postData(RESET_PASSWORD, {
-    password,
-    passwordConfirmation,
-    resetCode,
-  });
+    // ✅ Handle ERRORS
+    if (response?.error) {
+      // Special case for expired reset code
+      if (response.error.includes('Λανθασμένος κωδικός επιβεβαίωσης')) {
+        return {
+          success: false,
+          message:
+            'Ο σύνδεσμος επαναφοράς έχει λήξει. Χρησιμοποιήστε νέο σύνδεσμο επαναφοράς κωδικού.',
+        };
+      }
 
-  if (response.error?.includes('Λανθασμένος κωδικός επιβεβαίωσης')) {
+      // ✅ Handle ALL other errors from postData (Greek messages)
+      return {
+        success: false,
+        message: response.error, // Already translated Greek message
+      };
+    }
+
+    // ✅ Fallback if no data and no error (shouldn't happen)
     return {
       success: false,
-      message:
-        'Ο σύνδεσμος επαναφοράς έχει λήξει. Χρησιμοποιήστε νέο σύνδεσμο επαναφοράς κωδικού.',
+      message: 'Προέκυψε σφάλμα κατά την επαναφορά κωδικού.',
+    };
+  } catch (error) {
+    // ✅ Safety net to prevent 500 pages
+    console.error('Reset password error:', error);
+    return {
+      success: false,
+      message: 'Προέκυψε απροσδόκητο σφάλμα. Παρακαλώ προσπαθήστε ξανά.',
     };
   }
-
-  if (response?.data?.resetPassword?.jwt) {
-    await logout();
-  }
-
-  return {
-    success: true,
-    message: 'Ο κωδικός σας άλλαξε με επιτυχία!',
-  };
 }

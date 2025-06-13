@@ -2,17 +2,14 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-
 import { postData } from '@/lib/client/operations';
 import { EDIT_SERVICE } from '@/lib/graphql';
-
 import { createTags } from '../shared/tags';
 import { serviceEditSchema } from '../schema/service';
 
 export async function editService(prevState, formData) {
   try {
     const changedFields = JSON.parse(formData.get('changes'));
-
     const serviceId = formData.get('service-id');
 
     // Special case: check if subcategory is being updated but subdivision is missing or null
@@ -38,11 +35,9 @@ export async function editService(prevState, formData) {
     // Create a partial schema based on changed fields
     const partialSchema = z.object(
       Object.keys(changedFields).reduce((acc, field) => {
-        // Get the schema for this field from our serviceEditSchema
         if (serviceEditSchema.shape[field]) {
           acc[field] = serviceEditSchema.shape[field];
         }
-
         return acc;
       }, {}),
     );
@@ -64,12 +59,10 @@ export async function editService(prevState, formData) {
       );
 
       if (firstErrorField) {
-        // Get the error message
         const errorMessage =
           formattedErrors[firstErrorField].id?.[0] ||
           formattedErrors[firstErrorField]._errors[0];
 
-        // Return in the expected format
         return {
           ...prevState,
           message: 'Σφάλμα επικύρωσης',
@@ -111,9 +104,7 @@ export async function editService(prevState, formData) {
           .filter((tag) => !tag.isNewTerm && !tag.id.startsWith('new-'))
           .map((tag) => ({
             id: tag.id,
-            // Preserve label data
             label: tag.label || tag.data?.attributes?.label || '',
-            // Keep any additional attributes
             ...(tag.attributes ? { attributes: tag.attributes } : {}),
             ...(tag.data ? { data: tag.data } : {}),
           }))
@@ -125,8 +116,6 @@ export async function editService(prevState, formData) {
 
     // Create new tags if any exist
     let allTagIds = existingTags.map((tag) => tag.id);
-
-    // For payload construction, keep a full tags array with complete data
     let fullTagsData = [...existingTags];
 
     if (newTags.length > 0) {
@@ -135,14 +124,12 @@ export async function editService(prevState, formData) {
       if (result.error) {
         return {
           ...prevState,
-          message: result.message,
-          errors: result.message,
+          message: result.error, // ✅ Use result.error (Greek string)
+          errors: result.error, // ✅ Consistent format
           data: null,
         };
       }
-      // Add new tag IDs to the list
       allTagIds = [...allTagIds, ...result.data.map((tag) => tag.id)];
-      // Add complete new tag data to the full tags array
       fullTagsData = [
         ...fullTagsData,
         ...result.data.map((tag) => ({
@@ -170,13 +157,12 @@ export async function editService(prevState, formData) {
     if (description !== undefined) payload.data.description = description;
     if (price !== undefined) payload.data.price = price;
     if (status !== undefined) payload.data.status = status === 'Active' ? 1 : 2;
+
     // Handle taxonomy fields carefully - they're required in the database
     if (category !== undefined) {
       if (category && category.id && category.id !== 0 && category.id !== '0') {
         payload.data.category = category.id;
       } else {
-        // Cannot set to null - required field
-        // If the user tried to set category to null/invalid, return error
         if (
           changedFields.category === null ||
           (category &&
@@ -194,6 +180,7 @@ export async function editService(prevState, formData) {
         }
       }
     }
+
     if (subcategory !== undefined) {
       if (
         subcategory &&
@@ -203,8 +190,6 @@ export async function editService(prevState, formData) {
       ) {
         payload.data.subcategory = subcategory.id;
       } else {
-        // Cannot set to null - required field
-        // If the user tried to set subcategory to null/invalid, return error
         if (
           changedFields.subcategory === null ||
           (subcategory &&
@@ -222,6 +207,7 @@ export async function editService(prevState, formData) {
         }
       }
     }
+
     if (subdivision !== undefined) {
       if (
         subdivision &&
@@ -231,8 +217,6 @@ export async function editService(prevState, formData) {
       ) {
         payload.data.subdivision = subdivision.id;
       } else {
-        // Cannot set to null - required field
-        // If the user tried to set subdivision to null/invalid, return error
         if (
           changedFields.subdivision === null ||
           (subdivision &&
@@ -250,16 +234,18 @@ export async function editService(prevState, formData) {
         }
       }
     }
+
     // Include tag IDs for the API
     if (allTagIds !== undefined && allTagIds.length > 0) {
       payload.data.tags = allTagIds;
-      // We can also store the full tags data if needed for the response
       payload.fullTagsData = fullTagsData;
     }
+
     // Include media IDs if they've changed
     if (finalMediaIds !== undefined) {
       payload.data.media = finalMediaIds;
     }
+
     // Include addons and FAQ if they've changed
     if (addons !== undefined) payload.data.addons = addons;
     if (faq !== undefined) payload.data.faq = faq;
@@ -267,31 +253,43 @@ export async function editService(prevState, formData) {
     // Make the API request
     const response = await postData(EDIT_SERVICE, payload);
 
-    if (!response?.data?.updateService?.data) {
-      console.error('API error:', response);
+    // ✅ Check for SUCCESS first
+    if (response?.data?.updateService?.data) {
+      revalidatePath(`/dashboard/services/edit/${serviceId}`);
 
       return {
         ...prevState,
-        message: 'Η ενημέρωση υπηρεσίας απέτυχε!',
-        errors: response,
+        message: 'Η ενημέρωση υπηρεσίας ολοκληρώθηκε επιτυχώς!',
+        errors: null,
+        data: response.data.updateService.data,
+      };
+    }
+
+    // ✅ Handle ERRORS
+    if (response?.error) {
+      return {
+        ...prevState,
+        message: response.error, // ✅ Greek error message from postData
+        errors: response.error, // ✅ Consistent format
         data: null,
       };
     }
-    // Revalidate edit service page
-    revalidatePath(`/dashboard/services/edit/${serviceId}`);
+
+    // ✅ Fallback if no data and no error (shouldn't happen)
+    return {
+      ...prevState,
+      message: 'Η ενημέρωση υπηρεσίας απέτυχε - παρακαλώ προσπαθήστε ξανά.',
+      errors: 'Η ενημέρωση υπηρεσίας απέτυχε - παρακαλώ προσπαθήστε ξανά.',
+      data: null,
+    };
+  } catch (error) {
+    // ✅ Safety net with Greek message
+    console.error('Edit service error:', error);
 
     return {
       ...prevState,
-      message: 'Η ενημέρωση υπηρεσίας ολοκληρώθηκε επιτυχώς!',
-      errors: null,
-      data: response.data.updateService.data,
-    };
-  } catch (error) {
-    console.error(error);
-
-    return {
-      errors: error?.message,
-      message: 'Server error. Please try again later.',
+      message: 'Προέκυψε απροσδόκητο σφάλμα κατά την ενημέρωση υπηρεσίας.',
+      errors: 'Προέκυψε απροσδόκητο σφάλμα κατά την ενημέρωση υπηρεσίας.',
       data: null,
     };
   }

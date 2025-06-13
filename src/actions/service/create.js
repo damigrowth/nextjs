@@ -2,16 +2,13 @@
 
 import { postData } from '@/lib/client/operations';
 import { POST_SERVICE } from '@/lib/graphql';
-
 import { getFreelancerId } from '../shared/freelancer';
 import { createTags } from '../shared/tags';
 
-// Create service
 export async function createService(prevState, formData) {
   try {
     const parseField = (fieldName, type) => {
       let parsedField;
-
       const fieldValue = formData.get(fieldName);
 
       if (fieldValue !== null) {
@@ -44,8 +41,8 @@ export async function createService(prevState, formData) {
       if (result.error) {
         return {
           ...prevState,
-          message: result.message,
-          errors: result.message,
+          message: result.error, // ✅ Use result.error (should be Greek string)
+          errors: result.error, // ✅ Consistent with message
           data: null,
         };
       }
@@ -82,14 +79,8 @@ export async function createService(prevState, formData) {
 
     const response = await postData(POST_SERVICE, payload);
 
-    if (!response?.data?.createService?.data) {
-      return {
-        ...prevState,
-        message: 'Η δημιουργία υπηρεσίας απέτυχε!',
-        errors: response,
-        data: null,
-      };
-    } else {
+    // ✅ Check for SUCCESS first
+    if (response?.data?.createService?.data) {
       return {
         ...prevState,
         message: 'Η δημιουργία υπηρεσίας ολοκληρώθηκε επιτυχώς!',
@@ -97,12 +88,32 @@ export async function createService(prevState, formData) {
         data: response.data.createService.data,
       };
     }
+
+    // ✅ Handle ERRORS
+    if (response?.error) {
+      return {
+        ...prevState,
+        message: response.error, // ✅ Greek error message from postData
+        errors: response.error, // ✅ Consistent format
+        data: null,
+      };
+    }
+
+    // ✅ Fallback if no data and no error (shouldn't happen)
+    return {
+      ...prevState,
+      message: 'Η δημιουργία υπηρεσίας απέτυχε - παρακαλώ προσπαθήστε ξανά.',
+      errors: 'Η δημιουργία υπηρεσίας απέτυχε - παρακαλώ προσπαθήστε ξανά.',
+      data: null,
+    };
   } catch (error) {
-    console.error(error);
+    // ✅ Safety net with Greek message
+    console.error('Create service error:', error);
 
     return {
-      errors: error?.message,
-      message: 'Server error. Please try again later.',
+      ...prevState,
+      message: 'Προέκυψε απροσδόκητο σφάλμα κατά τη δημιουργία υπηρεσίας.',
+      errors: 'Προέκυψε απροσδόκητο σφάλμα κατά τη δημιουργία υπηρεσίας.',
       data: null,
     };
   }

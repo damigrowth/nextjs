@@ -58,7 +58,6 @@ export async function verificationUpdate(prevState, formData) {
     const validatedData = validationResult.data;
 
     // Make the API call with validated data
-    // The schema already coerced string values to numbers where needed
     const data = await postData(VERIFICATION, {
       data: {
         afm: validatedData.afm,
@@ -72,27 +71,41 @@ export async function verificationUpdate(prevState, formData) {
       },
     });
 
-    // Check for successful response
-    if (!data?.data?.createVerification?.data?.id) {
-      return {
-        data: null,
-        errors: {
-          submit: {
-            field: 'submit',
-            message: 'Αποτυχία αποστολής αίτησης πιστοποίησης. Δοκιμάστε ξανά.',
-          },
-        },
-        message: null,
-      };
-    } else {
+    // ✅ Check SUCCESS first
+    if (data?.data?.createVerification?.data?.id) {
       revalidatePath('/dashboard/profile');
-
       return {
         data: data.data.createVerification.data,
         errors: null,
         message: 'Επιτυχία αποστολής αίτησης πιστοποίησης!',
       };
     }
+
+    // ✅ Handle ERRORS from postData (Greek messages)
+    if (data?.error) {
+      return {
+        data: null,
+        errors: {
+          submit: {
+            field: 'submit',
+            message: data.error, // Greek error message from postData
+          },
+        },
+        message: null,
+      };
+    }
+
+    // ✅ Fallback if no data and no error
+    return {
+      data: null,
+      errors: {
+        submit: {
+          field: 'submit',
+          message: 'Αποτυχία αποστολής αίτησης πιστοποίησης. Δοκιμάστε ξανά.',
+        },
+      },
+      message: null,
+    };
   } catch (error) {
     console.error('Verification update failed:', error);
 
