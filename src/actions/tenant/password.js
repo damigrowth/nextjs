@@ -48,42 +48,33 @@ export async function updatePassword(prevState, formData) {
     } = validationResult.data;
 
     // Call the backend to change the password
-    // This assumes your postData function can handle raw GQL strings or you have it defined elsewhere
-    // You might need to adjust how you call your GraphQL endpoint
-    const { data, error } = await postData(CHANGE_PASSWORD, {
+    const response = await postData(CHANGE_PASSWORD, {
       currentPassword: validatedCurrentPassword,
-      password: validatedNewPassword, // Pass the value from Zod's newPassword as 'password'
-      passwordConfirmation: validatedConfirmPassword, // Pass the value from Zod's confirmPassword as 'passwordConfirmation'
+      password: validatedNewPassword,
+      passwordConfirmation: validatedConfirmPassword,
     });
 
-    if (error || !data?.changePassword?.jwt) {
-      // Strapi's changePassword mutation returns jwt directly
-      // Attempt to parse a more specific error message if available from Strapi
-      let errorMessage = 'Ο τρέχων κωδικός είναι λανθασμένος';
+    // ✅ Check SUCCESS first
+    if (response?.data?.changePassword?.jwt) {
+      return {
+        data: response.data.changePassword,
+        errors: null,
+        message: 'Ο κωδικός πρόσβασης άλλαξε με επιτυχία!',
+        success: true,
+      };
+    }
 
-      if (error?.message) {
-        try {
-          // Strapi often returns errors in a nested structure
-          const parsedError = JSON.parse(error.message);
+    // ✅ Handle ERRORS from postData (Greek messages)
+    if (response?.error) {
+      // Attempt to parse more specific error messages if available from Strapi
+      let errorMessage = response.error; // Start with the Greek error from postData
 
-          if (parsedError?.error?.message) {
-            errorMessage = parsedError.error.message;
-            // Translate common Strapi error messages
-            if (
-              errorMessage
-                .toLowerCase()
-                .includes('invalid identifier or password')
-            ) {
-              errorMessage = 'Ο τρέχων κωδικός είναι λανθασμένος.';
-            } else if (
-              errorMessage.toLowerCase().includes("passwords don't match")
-            ) {
-              errorMessage = 'Οι νέοι κωδικοί δεν ταιριάζουν (σφάλμα server).'; // Should be caught by Zod ideally
-            }
-          }
-        } catch (e) {
-          // If parsing fails, use the generic error message from the error object
-          errorMessage = error.message || errorMessage;
+      // If it's still an English error from Strapi, translate common messages
+      if (typeof errorMessage === 'string') {
+        if (errorMessage.toLowerCase().includes('invalid identifier or password')) {
+          errorMessage = 'Ο τρέχων κωδικός είναι λανθασμένος.';
+        } else if (errorMessage.toLowerCase().includes("passwords don't match")) {
+          errorMessage = 'Οι νέοι κωδικοί δεν ταιριάζουν (σφάλμα server).';
         }
       }
 
@@ -92,13 +83,12 @@ export async function updatePassword(prevState, formData) {
         errors: {
           submit: {
             field: 'submit',
-            message: errorMessage,
+            message: errorMessage, // Translated Greek error message
           },
-          // Optionally, set error on currentPassword if that's the likely issue
           currentPassword: {
             field: 'currentPassword',
-            message: errorMessage.includes('λανθασμένος')
-              ? 'Ο τρέχων κωδικός είναι λανθασμένος.'
+            message: errorMessage.includes('λανθασμένος') 
+              ? 'Ο τρέχων κωδικός είναι λανθασμένος.' 
               : '',
           },
         },
@@ -107,13 +97,17 @@ export async function updatePassword(prevState, formData) {
       };
     }
 
-    // revalidatePath("/dashboard/profile"); // Moved to performPostPasswordChangeActions
-    // await removeToken(); // Moved to performPostPasswordChangeActions
+    // ✅ Fallback if no data and no error
     return {
-      data: data.changePassword, // Adjust based on actual response
-      errors: null,
-      message: 'Ο κωδικός πρόσβασης άλλαξε με επιτυχία!',
-      success: true,
+      data: null,
+      errors: {
+        submit: {
+          field: 'submit',
+          message: 'Ο τρέχων κωδικός είναι λανθασμένος',
+        },
+      },
+      message: null,
+      success: false,
     };
   } catch (error) {
     console.error('Password update failed:', error);
