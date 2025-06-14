@@ -5,11 +5,31 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "20mb",
     },
-    // Enable Web Vitals attribution for LCP debugging
-    webVitalsAttribution: ['CLS', 'LCP'],
+    // Enable Web Vitals attribution for better debugging
+    webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB'],
+    
     // Optimize package imports for better tree-shaking
-    optimizePackageImports: ['@apollo/client', 'react-loading-skeleton'],
+    optimizePackageImports: [
+      '@apollo/client',
+      'react-loading-skeleton', 
+      'zustand',
+      '@fortawesome/react-fontawesome',
+      '@fortawesome/free-solid-svg-icons',
+      '@fortawesome/free-regular-svg-icons',
+      '@fortawesome/free-brands-svg-icons',
+      'swiper',
+      'react-countup',
+      'date-fns',
+      'lodash.debounce'
+    ],
+    
+    // External packages for server components
+    serverComponentsExternalPackages: [
+      'apollo-upload-client',
+      '@sentry/nextjs'
+    ],
   },
+  
   images: {
     // Advanced image optimization settings
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
