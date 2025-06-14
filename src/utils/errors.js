@@ -25,13 +25,13 @@ export const strapiErrorTranslations = {
     'Ο νέος κωδικός πρέπει να διαφέρει από τον τρέχοντα',
 
   // Token errors
-  'Invalid token': 'Μη έγκυρο token',
-  'Token has expired': 'Το token έχει λήξει',
-  'Invalid reset token': 'Μη έγκυρο token επαναφοράς',
-  'Reset token has expired': 'Το token επαναφοράς έχει λήξει',
-  'Token already used': 'Το token έχει ήδη χρησιμοποιηθεί',
-  'Invalid confirmation token': 'Μη έγκυρο token επιβεβαίωσης',
-  'Confirmation token has expired': 'Το token επιβεβαίωσης έχει λήξει',
+  'Invalid token': 'Μη έγκυρος σύνδεσμος',
+  'Token has expired': 'Ο σύνδεσμος έχει λήξει',
+  'Invalid reset token': 'Μη έγκυρος σύνδεσμος επαναφοράς',
+  'Reset token has expired': 'Ο σύνδεσμος επαναφοράς έχει λήξει',
+  'Token already used': 'Ο σύνδεσμος έχει ήδη χρησιμοποιηθεί',
+  'Invalid confirmation token': 'Μη έγκυρος σύνδεσμος επιβεβαίωσης',
+  'Confirmation token has expired': 'Ο σύνδεσμος επιβεβαίωσης έχει λήξει',
 
   // Permission & Authorization errors
   Forbidden: 'Δεν έχετε δικαίωμα πρόσβασης',
@@ -106,6 +106,8 @@ export const strapiErrorTranslations = {
 
   // Email-related errors
   'Email already confirmed': 'Το email έχει ήδη επιβεβαιωθεί',
+  'Your account email is not confirmed':
+    'Το email του λογαριασμου δεν έχει επιβεβαιωθεί',
   'Email not found': 'Το email δεν βρέθηκε',
   'Invalid email address': 'Μη έγκυρη διεύθυνση email',
   'Email sending failed': 'Η αποστολή email απέτυχε',
