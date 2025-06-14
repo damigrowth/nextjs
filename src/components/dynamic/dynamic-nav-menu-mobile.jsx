@@ -8,7 +8,7 @@ const NavMenuMobileWrapper = dynamic(
       default: mod.NavMenuMobileWrapper,
     })),
   {
-    ssr: false,
+    ssr: true, // Changed to true so offcanvas is available immediately
     loading: () => (
       <div className='mobile-nav-loading' style={{ display: 'none' }}>
         {/* Hidden loading state since mobile nav is hidden by default */}
@@ -17,6 +17,6 @@ const NavMenuMobileWrapper = dynamic(
   },
 );
 
-export default function NavMenuMobileWrapperu_D(props) {
+export default function NavMenuMobileWrapper_D(props) {
   return <NavMenuMobileWrapper {...props} />;
 }

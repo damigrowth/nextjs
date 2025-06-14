@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 
 const NavMenuMobile = dynamic(() => import('./NavMenuMobile'), {
-  ssr: false,
+  ssr: true, // Changed to true so offcanvas is available immediately for Bootstrap
 });
 
 export default function NavMenuMobileWrapper({ header }) {
