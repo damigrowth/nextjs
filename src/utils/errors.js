@@ -106,6 +106,8 @@ export const strapiErrorTranslations = {
 
   // Email-related errors
   'Email already confirmed': 'Το email έχει ήδη επιβεβαιωθεί',
+  'Your account email is not confirmed':
+    'Το email του λογαριασμου δεν έχει επιβεβαιωθεί',
   'Email not found': 'Το email δεν βρέθηκε',
   'Invalid email address': 'Μη έγκυρη διεύθυνση email',
   'Email sending failed': 'Η αποστολή email απέτυχε',
