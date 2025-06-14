@@ -9,7 +9,7 @@ export const metadata = {
 export default async function page() {
   // SECURITY FIX: Get the token explicitly for this request
   const token = await getToken();
-  
+
   if (!token) {
     throw new Error('No authentication token found');
   }
@@ -23,14 +23,6 @@ export default async function page() {
 
   const displayName = freelancer?.displayName || 'Νέος Χρήστης';
   const type = freelancer?.type?.data?.attributes?.slug;
-
-  // SECURITY LOG: Track onboarding access
-  console.log('🔒 ONBOARDING_ACCESS:', {
-    freelancerId: freelancer.id,
-    displayName: displayName,
-    type: type,
-    timestamp: Date.now()
-  });
 
   return (
     <OnboardingForm

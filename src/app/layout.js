@@ -1,12 +1,9 @@
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
-import { CookiesBanner } from '@/components/banner';
-import { BottomToTop } from '@/components/button';
 import { Footer } from '@/components/footer';
 import { InstallBootstrap } from '@/components/global';
 import { Header } from '@/components/header';
-import { NavMenuMobileWrapper } from '@/components/navigation';
 import { Body, PathChecker } from '@/components/wrapper';
 import Notifications from '@/components/wrapper/wrapper-notifications';
 import { ApolloWrapper } from '@/lib/client/apollo-wrapper';
@@ -21,6 +18,11 @@ import './globals.css';
 import 'react-tooltip/dist/react-tooltip.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { getUser } from '@/actions/shared/user';
+import {
+  BottomToTop_D,
+  CookiesBanner_D,
+  NavMenuMobileWrapper_D,
+} from '@/components/dynamic';
 
 if (typeof window !== 'undefined') {
   import('bootstrap');
@@ -68,16 +70,16 @@ export default async function RootLayout({ children }) {
                 <Footer />
               </PathChecker>
             )}
-            <BottomToTop />
+            <BottomToTop_D />
           </div>
         </div>
         <PathChecker excludes='/dashboard'>
-          <NavMenuMobileWrapper header={headerData} />
+          <NavMenuMobileWrapper_D header={headerData} />
         </PathChecker>
         <SpeedInsights />
         <GoogleTagManager gtmId='GTM-KR7N94L4' />
         <GoogleAnalytics gaId={gaId} />
-        <CookiesBanner />
+        <CookiesBanner_D />
       </Body>
     </html>
   );
