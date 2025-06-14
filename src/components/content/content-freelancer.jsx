@@ -2,9 +2,6 @@ import React from 'react';
 
 import FreelancerSchema from '@/utils/Seo/Schema/FreelancerSchema';
 
-import FreelancerReportForm from '../form/form-report-freelancer';
-import AddModelReviewForm from '../form/form-reviews-create';
-import StartChatModal from '../modal/modal-chat-create';
 import FeaturedServices from '../parts/freelancer-featured-services';
 import FeaturesFreelancer from '../parts/freelancer-features';
 import Industries from '../parts/freelancer-industries';
@@ -16,10 +13,15 @@ import TermsFreelancer from '../parts/freelancer-terms';
 import Reviews from '../parts/reviews';
 import ServiceAudioFiles from '../parts/service-audio-files';
 import FeaturedFile from '../parts/service-featured-file';
-import FeaturedFiles from '../parts/service-featured-files';
 import StickySidebar from '../sidebar/sidebar-sticky';
 import Protected from '../wrapper/protected';
 import { DescriptionBlock } from '../parts';
+import {
+  AddModelReviewForm_D,
+  FreelancerReportForm_D,
+  ServiceFeaturedFiles_D,
+  StartChatModal_D,
+} from '../dynamic';
 
 export default function FreelancerProfile({
   fid,
@@ -93,7 +95,7 @@ export default function FreelancerProfile({
     .map((file) => file.attributes); // Map to attributes for the component
 
   return (
-    <section className='pt10 pb90 pb30-md'>
+    <section className='pt10 pb90 pb30-md bg-white'>
       <FreelancerSchema
         username={username}
         displayName={displayName}
@@ -169,7 +171,7 @@ export default function FreelancerProfile({
               {portfolio.data.length > 0 && (
                 <>
                   {portfolio.data.length > 1 ? (
-                    <FeaturedFiles files={portfolio.data} border />
+                    <ServiceFeaturedFiles_D files={portfolio.data} border />
                   ) : (
                     <FeaturedFile
                       file={portfolio?.data[0]}
@@ -199,7 +201,7 @@ export default function FreelancerProfile({
                 {!isOwner && (
                   <>
                     {services.length > 0 ? (
-                      <AddModelReviewForm
+                      <AddModelReviewForm_D
                         type='freelancer'
                         freelancerId={freelancerId}
                       />
@@ -244,12 +246,12 @@ export default function FreelancerProfile({
           </StickySidebar>
         </div>
       </div>
-      <StartChatModal
+      <StartChatModal_D
         fid={fid}
         freelancerId={freelancerId}
         displayName={displayName}
       />
-      <FreelancerReportForm
+      <FreelancerReportForm_D
         reporter={{
           id: fid,
           email: freelancerEmail,

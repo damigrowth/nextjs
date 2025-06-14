@@ -2,9 +2,6 @@ import { redirect } from 'next/navigation';
 
 import ServiceSchema from '@/utils/Seo/Schema/ServiceSchema';
 
-import ServiceReportForm from '../form/form-report-service';
-import AddModelReviewForm from '../form/form-reviews-create';
-import StartChatModal from '../modal/modal-chat-create';
 import Reviews from '../parts/reviews';
 import Addons from '../parts/service-addons';
 import ServiceAudioFiles from '../parts/service-audio-files';
@@ -12,7 +9,6 @@ import ContactDetails from '../parts/service-contact-details';
 import Description from '../parts/service-description';
 import Faq from '../parts/service-faq';
 import FeaturedFile from '../parts/service-featured-file';
-import FeaturedFiles from '../parts/service-featured-files';
 import Info from '../parts/service-info';
 import Meta from '../parts/service-meta';
 import OrderFixed from '../parts/service-order-fixed';
@@ -23,6 +19,12 @@ import StickySidebar from '../sidebar/sidebar-sticky';
 import Protected from '../wrapper/protected';
 import { getUserId } from '@/actions/shared/user';
 import { getOtherServicesReviews } from '@/actions/shared/service';
+import {
+  ServiceReportForm_D,
+  AddModelReviewForm_D,
+  StartChatModal_D,
+  ServiceFeaturedFiles_D,
+} from '../dynamic';
 
 export default async function SingleService({
   fid,
@@ -174,7 +176,7 @@ export default async function SingleService({
                 {media.data.length > 0 && (
                   <>
                     {media.data.length > 1 ? (
-                      <FeaturedFiles files={media.data} />
+                      <ServiceFeaturedFiles_D files={media.data} />
                     ) : (
                       <FeaturedFile
                         formats={media?.data[0]?.attributes?.formats}
@@ -245,7 +247,7 @@ export default async function SingleService({
                 />
                 <Protected message='Κάνε σύνδεση για να αξιολογήσεις την υπηρεσία.'>
                   {fid !== freelancerId && (
-                    <AddModelReviewForm
+                    <AddModelReviewForm_D
                       type='service'
                       serviceId={serviceId}
                       freelancerId={freelancerId}
@@ -301,7 +303,7 @@ export default async function SingleService({
           </StickySidebar>
         </div>
       </div>
-      <StartChatModal
+      <StartChatModal_D
         fid={fid}
         freelancerId={freelancerId}
         displayName={displayName}
@@ -311,7 +313,7 @@ export default async function SingleService({
             : `Ενδιαφέρομαι για την υπηρεσία ${title} (${price}€)...`
         }
       />
-      <ServiceReportForm
+      <ServiceReportForm_D
         reporter={{
           id: fid,
           email: freelancerEmail,

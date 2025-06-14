@@ -1,12 +1,11 @@
 import Link from 'next/link';
 
-import UserImage from '../avatar/user-image';
-import MegaMenu from '../menu/menu-mega';
 import UserMenu from '../menu/menu-user';
 import NavMenu from '../navigation/navigation-menu';
 import HeaderLogo from './header-logo';
 import HeaderMobile from './header-mobile';
 import HeaderStickyWrapper from './header-sticky';
+import { MegaMenu_D } from '../dynamic';
 
 export default function Header({ user, header }) {
   const categories = header
@@ -40,7 +39,7 @@ export default function Header({ user, header }) {
                 <div className='d-flex align-items-center justify-content-between'>
                   <HeaderLogo />
                   <div className='home1_style'>
-                    <MegaMenu categories={categories} />
+                    <MegaMenu_D categories={categories} />
                   </div>
                   {/* <Navigation /> */}
                   <NavMenu />

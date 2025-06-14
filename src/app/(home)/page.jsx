@@ -1,14 +1,12 @@
 import { Suspense } from 'react';
 
-import { AllTaxonomies } from '@/components/content';
 import { HeroHome } from '@/components/hero';
 import {
-  Features,
-  Stats,
   FeaturedServicesHome,
   FeaturedFreelancersHome,
   FeaturedCategoriesHome,
 } from '@/components/section';
+import { Features_D, Stats_D, AllTaxonomies_D } from '@/components/dynamic';
 
 import { getData } from '@/lib/client/operations';
 import {
@@ -94,7 +92,7 @@ export default async function page({ searchParams }) {
       <HomeSchema />
       <HeroHome categories={categories?.data || []} />
       <FeaturedCategoriesHome categories={categories?.data || []} />
-      <Features />
+      <Features_D />
       <Suspense fallback={<div className='py-5 text-center'>Φόρτωση...</div>}>
         <FeaturedServicesHome
           categories={categories?.data || []}
@@ -110,8 +108,8 @@ export default async function page({ searchParams }) {
           fid={fid}
         />
       </Suspense>
-      <Stats />
-      <AllTaxonomies
+      <Stats_D />
+      <AllTaxonomies_D
         freelancerSubcategories={topFreelancerSubcategories}
         serviceSubcategories={topServiceSubcategories}
       />
