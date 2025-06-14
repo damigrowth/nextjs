@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { IconTimes } from '@/components/icon/fa';
 
 import UserMenu from '../menu/menu-user';
+import { IconMobileMenu } from '../icon';
 
 export default function HeaderMobile() {
   return (
@@ -30,12 +31,7 @@ export default function HeaderMobile() {
                   data-bs-target='#offcanvasExample'
                   aria-controls='offcanvasExample'
                 >
-                  <Image
-                    height={20}
-                    width={20}
-                    src='/images/mobile-dark-nav-icon.svg'
-                    alt='icon'
-                  />
+                  <IconMobileMenu />
                 </a>
               </div>
             </div>
