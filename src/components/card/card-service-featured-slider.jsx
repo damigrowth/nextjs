@@ -6,12 +6,12 @@ import { IconStar } from '@/components/icon/fa';
 
 import SaveFrom from '../form/form-save';
 import FeaturedServiceSlideCardMedia from './card-service-media-slider';
-import { getSavedStatus } from '@/actions/shared/save';
 
 export default async function FeaturedServiceSliderCard({
   service,
   fid,
   showDelete,
+  savedStatus = null, // Accept savedStatus as prop
 }) {
   const { id, media, category, title, slug, freelancer, price } = service;
 
@@ -29,12 +29,7 @@ export default async function FeaturedServiceSliderCard({
     reviews_total,
   } = freelancerData;
 
-  let savedStatus = null;
-
-  // if user is logged in and is not the same user, show save button
-  if (fid) {
-    savedStatus = await getSavedStatus('service', id);
-  }
+  // savedStatus is now passed as prop, no need to fetch
 
   return (
     <>

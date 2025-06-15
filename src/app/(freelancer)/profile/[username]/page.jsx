@@ -12,7 +12,7 @@ import {
   getFreelancerByUsername,
   getReviewsByFreelancer,
 } from '@/actions/shared/freelancer';
-import { getSavedStatus } from '@/actions/shared/save';
+import { isFreelancerSaved } from '@/utils/savedStatus';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,11 +92,9 @@ export default async function page({ params, searchParams }) {
       freelancer?.type?.data?.attributes?.label
     } ${freelancer?.subcategory?.data ? freelancer?.subcategory?.data?.attributes?.label : ''}`;
 
-    let savedStatus = null;
-
-    if (fid !== freelancerId) {
-      savedStatus = await getSavedStatus('freelancer', freelancerId);
-    }
+    // Use saved freelancers data instead of individual query
+    const savedFreelancers = currentFreelancer?.saved_freelancers?.data || [];
+    const savedStatus = fid !== freelancerId ? isFreelancerSaved(freelancerId, savedFreelancers) : null;
 
     return (
       <>

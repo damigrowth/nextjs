@@ -6,7 +6,6 @@ import { formatRating } from '@/utils/formatRating';
 
 import { VerifiedBadge } from '../badge';
 import SaveForm from '../form/form-save';
-import { getSavedStatus } from '@/actions/shared/save';
 import { ArrowRightLong } from '@/components/icon/fa';
 import { IconStar } from '@/components/icon/fa';
 
@@ -15,6 +14,7 @@ export default async function FreelancerCard({
   fid,
   linkedName,
   showDelete,
+  savedStatus = null, // Accept savedStatus as prop
 }) {
   const {
     id,
@@ -32,14 +32,12 @@ export default async function FreelancerCard({
     subcategory,
   } = freelancer;
 
-  let savedStatus = null;
-
   let showSaveButton = false;
 
   // if user is logged in and is not the same user, show save button
   if (fid && fid !== id) {
     showSaveButton = true;
-    savedStatus = await getSavedStatus('freelancer', id);
+    // savedStatus is now passed as prop, no need to fetch
   }
 
   return (

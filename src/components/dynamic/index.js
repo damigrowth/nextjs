@@ -18,3 +18,5 @@ export { default as NavMenuMobileWrapper_D } from './dynamic-nav-menu-mobile';
 export { default as Stats_D } from './dynamic-stats';
 export { default as AllTaxonomies_D } from './dynamic-all-taxonomies';
 export { default as Features_D } from './dynamic-features';
+export { default as FeaturedServicesHome_D } from './dynamic-featured-services-home';
+export { default as FeaturedFreelancersHome_D } from './dynamic-featured-freelancers-home';

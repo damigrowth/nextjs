@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 
 import { FreelancerCard } from '@/components/card';
+import { getBatchFreelancerSavedStatuses } from '@/utils/savedStatus';
 
 import FreelancersListWrapper from '../wrapper/wrapper-featured-freelancers';
 import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
@@ -9,11 +10,16 @@ import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
 export default function FeaturedFreelancers({
   freelancers: freelancersData,
   fid,
+  savedFreelancers = [], // Accept saved freelancers data
 }) {
   const freelancers = freelancersData.map((freelancer) => ({
     id: freelancer.id,
     ...freelancer.attributes,
   }));
+
+  // Calculate saved statuses for all freelancers at once
+  const freelancerIds = freelancers.map(f => f.id);
+  const savedFreelancerStatuses = getBatchFreelancerSavedStatuses(freelancerIds, savedFreelancers);
 
   return (
     <>
@@ -49,6 +55,7 @@ export default function FeaturedFreelancers({
                     freelancer={freelancer}
                     fid={fid}
                     linkedName
+                    savedStatus={savedFreelancerStatuses[freelancer.id]}
                   />
                 ))}
               </FreelancersListWrapper>

@@ -15,6 +15,9 @@ export default function ServicesTab({ services, fid }) {
       {services.map((service, i) => {
         if (!service?.freelancer?.data?.attributes) return null;
 
+        // For saved services dashboard, savedStatus is always true
+        const savedStatus = true;
+
         return (
           <div key={service.id} className='col-sm-6 col-xl-3'>
             {service.media?.data?.length > 1 ? (
@@ -22,12 +25,14 @@ export default function ServicesTab({ services, fid }) {
                 service={service}
                 fid={fid}
                 showDelete={true}
+                savedStatus={savedStatus}
               />
             ) : (
               <FeaturedServiceCard
                 service={service}
                 fid={fid}
                 showDelete={true}
+                savedStatus={savedStatus}
               />
             )}
           </div>

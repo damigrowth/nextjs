@@ -8,9 +8,8 @@ import SaveForm from '../form/form-save';
 import CardReviews from './card-reviews';
 import ServiceCardFile from './card-service-file';
 import ServiceCardFiles from './card-service-files';
-import { getSavedStatus } from '@/actions/shared/save';
 
-export default async function ServiceCard({ service, fid }) {
+export default async function ServiceCard({ service, fid, savedStatus = null }) {
   const { title, price, slug, category, subcategory, media, freelancer } =
     service.attributes;
 
@@ -35,11 +34,9 @@ export default async function ServiceCard({ service, fid }) {
     reviews_total,
   } = freelancerData;
 
-  let saveStatus = null;
+  let saveStatus = savedStatus;
 
-  if (fid) {
-    saveStatus = await getSavedStatus('service', service.id);
-  }
+  // Note: savedStatus is now passed as prop, no need to fetch
 
   return (
     <div className='data-loading-element listing-style1 list-style d-block d-xl-flex align-items-center'>

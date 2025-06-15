@@ -14,6 +14,7 @@ export default async function FeaturedServiceCard({
   service,
   fid,
   showDelete,
+  savedStatus = null, // Accept savedStatus prop for consistency (not used in this card)
 }) {
   const { id, media, category, title, slug, freelancer, price } = service;
 
