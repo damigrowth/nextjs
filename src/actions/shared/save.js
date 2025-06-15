@@ -23,18 +23,21 @@ export async function revalidateSaved(type, id) {
   // revalidatePath("/");
 }
 
-export async function getSavedStatus(type, id) {
-  const response = await getData(
-    type === 'service' ? SAVED_SERVICE : SAVED_FREELANCER,
-    type === 'service' ? { serviceId: id } : { freelancerId: id },
-    'SAVED_STATUS',
-    [`saved-${type}`, `saved-${type}-${id}`],
-  );
+// Note: getBatchSavedStatus removed - now using user's saved data directly
+// via utils/savedStatus.js for better performance
 
-  return type === 'service'
-    ? !!response?.checkSavedService?.isSaved
-    : !!response?.checkSavedFreelancer?.isSaved;
-}
+// export async function getSavedStatus(type, id) {
+//   const response = await getData(
+//     type === 'service' ? SAVED_SERVICE : SAVED_FREELANCER,
+//     type === 'service' ? { serviceId: id } : { freelancerId: id },
+//     'SAVED_STATUS',
+//     [`saved-${type}`, `saved-${type}-${id}`],
+//   );
+
+//   return type === 'service'
+//     ? !!response?.checkSavedService?.isSaved
+//     : !!response?.checkSavedFreelancer?.isSaved;
+// }
 
 export async function saveCollectionEntry(prevState, formData) {
   const me = await getUserMe();

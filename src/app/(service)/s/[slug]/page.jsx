@@ -9,7 +9,7 @@ import { Meta } from '@/utils/Seo/Meta/Meta';
 import SingleService from '@/components/content/content-service';
 import { getReviewsByService, getServicesById } from '@/actions/shared/service';
 import { getFreelancer } from '@/actions/shared/freelancer';
-import { getSavedStatus } from '@/actions/shared/save';
+import { isServiceSaved } from '@/utils/savedStatus';
 
 export const dynamic = 'force-dynamic';
 
@@ -79,11 +79,9 @@ export default async function page({ params, searchParams }) {
 
     const username = freelancer?.username;
 
-    let savedStatus;
-
-    if (fid) {
-      savedStatus = await getSavedStatus('service', serviceId);
-    }
+    // Use saved services data instead of individual query
+    const savedServices = freelancer?.saved_services?.data || [];
+    const savedStatus = isServiceSaved(serviceId, savedServices);
 
     return (
       <>

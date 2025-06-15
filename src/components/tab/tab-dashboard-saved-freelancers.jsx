@@ -13,6 +13,7 @@ export default function FreelancersTab({ freelancers, fid }) {
                   fid={fid}
                   showDelete={true}
                   linkedName
+                  savedStatus={true} // For saved freelancers dashboard, savedStatus is always true
                 />
               </div>
             ),

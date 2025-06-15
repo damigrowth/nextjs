@@ -8,6 +8,7 @@ import { SERVICES_ARCHIVE, SERVICES_ARCHIVE_WITH_TAGS } from '@/lib/graphql';
 
 import { serviceSortOptions } from '../../../constants/options';
 import { getFreelancerId } from '@/actions/shared/freelancer';
+import { getFreelancer } from '@/actions/shared/freelancer';
 
 export default async function ArchivesServicesContent({
   paramsFilters,
@@ -23,6 +24,10 @@ export default async function ArchivesServicesContent({
 
   const fid = await getFreelancerId();
 
+  // Get saved data for performance optimization
+  const freelancer = await getFreelancer();
+  const savedServices = freelancer?.saved_services?.data || [];
+
   return (
     <>
       <Topbar
@@ -35,6 +40,7 @@ export default async function ArchivesServicesContent({
         services={services?.data}
         taxonomies={taxonomies}
         fid={fid}
+        savedServices={savedServices}
       />
       <div className='row mt30'>
         <Pagination meta={services?.meta?.pagination} plural='υπηρεσίες' />

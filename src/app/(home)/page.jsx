@@ -1,12 +1,14 @@
 import { Suspense } from 'react';
 
 import { HeroHome } from '@/components/hero';
+import { FeaturedCategoriesHome } from '@/components/section';
 import {
-  FeaturedServicesHome,
-  FeaturedFreelancersHome,
-  FeaturedCategoriesHome,
-} from '@/components/section';
-import { Features_D, Stats_D, AllTaxonomies_D } from '@/components/dynamic';
+  Features_D,
+  Stats_D,
+  AllTaxonomies_D,
+  FeaturedServicesHome_D,
+  FeaturedFreelancersHome_D,
+} from '@/components/dynamic';
 
 import { getData } from '@/lib/client/operations';
 import {
@@ -17,7 +19,7 @@ import {
 } from '@/lib/graphql';
 import { Meta } from '@/utils/Seo/Meta/Meta';
 import HomeSchema from '@/utils/Seo/Schema/HomeSchema';
-import { getFreelancerId } from '@/actions/shared/freelancer';
+import { getFreelancer, getFreelancerId } from '@/actions/shared/freelancer';
 
 export const revalidate = 300; // 5 minutes
 
@@ -87,27 +89,31 @@ export default async function page({ searchParams }) {
     ['active-top'],
   );
 
+  const freelancer = await getFreelancer();
+
+  // Get user's saved data for efficient saved status checking
+  const savedServices = freelancer?.saved_services?.data || [];
+  const savedFreelancers = freelancer?.saved_freelancers?.data || [];
+
   return (
     <>
       <HomeSchema />
       <HeroHome categories={categories?.data || []} />
       <FeaturedCategoriesHome categories={categories?.data || []} />
       <Features_D />
-      <Suspense fallback={<div className='py-5 text-center'>Φόρτωση...</div>}>
-        <FeaturedServicesHome
-          categories={categories?.data || []}
-          services={services?.data || []}
-          pagination={services?.meta?.pagination}
-          fid={fid}
-        />
-      </Suspense>
-      <Suspense fallback={<div className='py-5 text-center'>Φόρτωση...</div>}>
-        <FeaturedFreelancersHome
-          freelancers={freelancers?.data || []}
-          pagination={freelancers?.meta?.pagination}
-          fid={fid}
-        />
-      </Suspense>
+      <FeaturedServicesHome_D
+        categories={categories?.data || []}
+        services={services?.data || []}
+        pagination={services?.meta?.pagination}
+        fid={fid}
+        savedServices={savedServices}
+      />
+      <FeaturedFreelancersHome_D
+        freelancers={freelancers?.data || []}
+        pagination={freelancers?.meta?.pagination}
+        fid={fid}
+        savedFreelancers={savedFreelancers}
+      />
       <Stats_D />
       <AllTaxonomies_D
         freelancerSubcategories={topFreelancerSubcategories}

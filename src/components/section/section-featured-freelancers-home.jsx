@@ -3,12 +3,14 @@ import Link from 'next/link';
 import { FreelancerCard } from '@/components/card';
 import { FreelancersClientWrapper } from '../wrapper';
 import { ArrowRightLong } from '@/components/icon/fa';
+import { getBatchFreelancerSavedStatuses } from '@/utils/savedStatus';
 
 /**
  * @typedef {object} FeaturedFreelancersHomeProps
  * @property {Array<object>} freelancers - List of freelancer data.
  * @property {object} pagination - Pagination information.
  * @property {string} fid - Freelancer ID.
+ * @property {Array<object>} savedFreelancers - User's saved freelancers data.
  */
 
 /**
@@ -21,17 +23,30 @@ export default async function FeaturedFreelancersHome({
   freelancers: freelancersData,
   pagination,
   fid,
+  savedFreelancers = [], // User's saved freelancers data
 }) {
   const validFreelancers = freelancersData.filter(
     (freelancer) => freelancer?.attributes?.image?.data !== null,
   );
 
+  // Use saved freelancers data to create saved statuses lookup
+  const freelancerIds = validFreelancers.map(f => f.id);
+  const savedStatuses = getBatchFreelancerSavedStatuses(freelancerIds, savedFreelancers);
+
   const renderedFreelancerCards = await Promise.all(
     validFreelancers.map(async (freelancer) => {
       const freelancerData = { id: freelancer.id, ...freelancer.attributes };
+      
+      // Get saved status from batch-fetched data
+      const savedStatus = savedStatuses[freelancer.id] || null;
 
       const freelancerCard = (
-        <FreelancerCard freelancer={freelancerData} fid={fid} linkedName />
+        <FreelancerCard 
+          freelancer={freelancerData} 
+          fid={fid} 
+          linkedName 
+          savedStatus={savedStatus}
+        />
       );
 
       return {

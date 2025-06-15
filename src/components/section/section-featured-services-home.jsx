@@ -3,6 +3,7 @@ import React, { Suspense } from 'react';
 import FeaturedServiceCard from '../card/card-service-featured';
 import FeaturedServiceSliderCard from '../card/card-service-featured-slider';
 import { ServicesClientWrapper } from '../wrapper';
+import { getBatchServiceSavedStatuses } from '@/utils/savedStatus';
 
 /**
  * @typedef {object} FeaturedServicesHomeProps
@@ -10,6 +11,7 @@ import { ServicesClientWrapper } from '../wrapper';
  * @property {Array<object>} services - List of service data.
  * @property {object} pagination - Pagination information.
  * @property {string} fid - Freelancer ID.
+ * @property {Array<object>} savedServices - User's saved services data.
  */
 
 /**
@@ -23,6 +25,7 @@ export default async function FeaturedServicesHome({
   services,
   pagination,
   fid,
+  savedServices = [], // User's saved services data
 }) {
   const validServices = services.filter(
     (service) =>
@@ -30,15 +33,30 @@ export default async function FeaturedServicesHome({
       service.attributes.media?.data?.length > 0,
   );
 
+  // Use saved services data to create saved statuses lookup
+  const serviceIds = validServices.map(s => s.id);
+  const savedStatuses = getBatchServiceSavedStatuses(serviceIds, savedServices);
+
   const renderedServiceCards = await Promise.all(
     validServices.map(async (service) => {
       const serviceData = { id: service.id, ...service.attributes };
+      
+      // Get saved status from batch-fetched data
+      const savedStatus = savedStatuses[service.id] || null;
 
       const serviceCard =
         service.attributes.media?.data?.length > 1 ? (
-          <FeaturedServiceSliderCard service={serviceData} fid={fid} />
+          <FeaturedServiceSliderCard 
+            service={serviceData} 
+            fid={fid} 
+            savedStatus={savedStatus}
+          />
         ) : (
-          <FeaturedServiceCard service={serviceData} fid={fid} />
+          <FeaturedServiceCard 
+            service={serviceData} 
+            fid={fid} 
+            savedStatus={savedStatus}
+          />
         );
 
       return {
