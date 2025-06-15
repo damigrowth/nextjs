@@ -11,7 +11,7 @@ const nextConfig = {
     // Optimize package imports for better tree-shaking
     optimizePackageImports: [
       '@apollo/client',
-      'react-loading-skeleton', 
+      'react-loading-skeleton',
       'zustand',
       '@fortawesome/react-fontawesome',
       '@fortawesome/free-solid-svg-icons',
@@ -20,16 +20,10 @@ const nextConfig = {
       'swiper',
       'react-countup',
       'date-fns',
-      'lodash.debounce'
-    ],
-    
-    // External packages for server components
-    serverComponentsExternalPackages: [
-      'apollo-upload-client',
-      '@sentry/nextjs'
+      'lodash.debounce',
     ],
   },
-  
+
   images: {
     // Advanced image optimization settings
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
