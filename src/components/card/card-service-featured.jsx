@@ -32,7 +32,8 @@ export default async function FeaturedServiceCard({
     reviews_total,
   } = freelancerData;
 
-  const fallbackImage = '/images/fallback/service.png';
+  const fallbackImage =
+    'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076750/Static/service_ngrppj.webp';
 
   const firstMediaItem = media.data.length > 0 ? media.data[0] : null;
 

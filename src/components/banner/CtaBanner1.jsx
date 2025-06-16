@@ -71,7 +71,7 @@ export default function CtaBanner1() {
             height={500}
             width={500}
             className='cta-banner3-img wow fadeInLeft h-100 object-fit-cover'
-            src='/images/about/about-5.jpg'
+            src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750083636/Static/about-5_nmvx1j.webp'
             alt='cta banner 3'
             data-wow-delay='300ms'
           />

@@ -5,7 +5,7 @@ import JsonLd from './JsonLd';
 export default function HomeSchema() {
   const baseUrl = process.env.LIVE_URL;
 
-  const logoUrl = `${baseUrl}/images/doulitsa-logo.svg`;
+  const logoUrl = `https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo_t9qnum.svg`;
 
   const searchUrlTemplate = `/ipiresies?search={search_term_string}`;
 

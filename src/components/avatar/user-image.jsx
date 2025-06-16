@@ -29,7 +29,7 @@ export default function UserImage({
             <Image
               width={30}
               height={30}
-              src='/images/top-badge.png'
+              src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076624/Static/top-badge_rajlxi.webp'
               alt='top badge'
             />
             <TooltipTop anchor='top-level'>

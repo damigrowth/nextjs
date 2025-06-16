@@ -9,7 +9,7 @@ export default function HeaderLogo() {
         <Image
           width={133}
           height={40}
-          src='/images/doulitsa-logo.svg'
+          src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo_t9qnum.svg'
           alt='Doulitsa Logo'
           unoptimized
           priority
@@ -19,7 +19,7 @@ export default function HeaderLogo() {
         <Image
           width={133}
           height={40}
-          src='/images/doulitsa-logo.svg'
+          src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo_t9qnum.svg'
           alt='Doulitsa Logo'
           unoptimized
           priority

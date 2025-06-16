@@ -44,7 +44,7 @@ export default function SidebarModalBtn({ type }) {
           height={18}
           width={18}
           className='me-2'
-          src='/images/icon/all-filter-icon.svg'
+          src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750081363/Static/all-filter-icon_t5mqsg.svg'
           alt='icon'
         />
         Όλα τα φίλτρα

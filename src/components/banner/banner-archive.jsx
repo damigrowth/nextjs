@@ -16,7 +16,7 @@ import BannerVidBtn from './banner-vid-btn';
  */
 export default function Banner({ heading, description, image, withVideo }) {
   const bannerImage = !image
-    ? '/images/vector-img/vector-service-v1.png'
+    ? 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071394/Static/vector-service-v1_p6jy69.webp'
     : image;
 
   return (
@@ -27,14 +27,14 @@ export default function Banner({ heading, description, image, withVideo }) {
             height={226}
             width={198}
             className='left-top-img wow zoomIn'
-            src='/images/vector-img/left-top.png'
+            src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071394/Static/left-top_dnznwz.webp'
             alt='vector'
           />
           <Image
             height={181}
             width={255}
             className='right-bottom-img wow zoomIn'
-            src='/images/vector-img/right-bottom.png'
+            src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071395/Static/right-bottom_w0dkoq.webp'
             alt='vector'
           />
           <Image

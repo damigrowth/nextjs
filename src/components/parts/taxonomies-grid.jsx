@@ -15,7 +15,8 @@ export default function TaxonomiesGrid({
   taxonomies,
   isMainCategoriesPage = false,
 }) {
-  const fallbackImage = '/images/vector-img/vector-service-v1.png';
+  const fallbackImage =
+    'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071394/Static/vector-service-v1_p6jy69.webp';
 
   return (
     <section className='pt0'>

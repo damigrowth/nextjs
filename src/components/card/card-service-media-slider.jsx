@@ -20,7 +20,8 @@ export default function ServiceSlideCardMedia({ media, path }) {
   // Add path prop
   const [showSwiper, setShowSwiper] = useState(false);
 
-  const fallbackImage = '/images/fallback/service.png'; // Define fallback
+  const fallbackImage =
+    'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076750/Static/service_ngrppj.webp'; // Define fallback
 
   // Re-introduce filtering to exclude audio files
   const displayMedia = media.data.filter(

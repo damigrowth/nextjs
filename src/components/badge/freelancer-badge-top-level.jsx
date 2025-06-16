@@ -12,7 +12,7 @@ export default function TopLevelBadge({ topLevel }) {
         <Image
           width={22}
           height={22}
-          src='/images/top-badge.png'
+          src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076624/Static/top-badge_rajlxi.webp'
           alt='top badge'
         />
       </div>

@@ -15,7 +15,7 @@ export default function MobileMenuContainer({ children }) {
         console.warn('Failed to load Bootstrap offcanvas:', error);
       }
     };
-    
+
     initializeOffcanvas();
   }, []);
 
@@ -32,7 +32,7 @@ export default function MobileMenuContainer({ children }) {
             alt='Header Logo'
             width='133'
             height='40'
-            src='/images/doulitsa-logo.svg'
+            src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo_t9qnum.svg'
           />
         </Link>
         <button
@@ -42,9 +42,7 @@ export default function MobileMenuContainer({ children }) {
           aria-label='Close'
         />
       </div>
-      <div className='offcanvas-body'>
-        {children}
-      </div>
+      <div className='offcanvas-body'>{children}</div>
     </div>
   );
 }

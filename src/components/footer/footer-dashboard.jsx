@@ -53,7 +53,7 @@ export default function DashboardFooter() {
                 height={45}
                 width={123}
                 className='mb40 object-fit-contain'
-                src='/images/doulitsa-logo-white.svg'
+                src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo-white_rjmcei.svg'
                 alt='Doulitsa logo'
               />
             </Link>
