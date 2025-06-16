@@ -7,7 +7,8 @@ import { getBestDimensions } from '@/utils/imageDimensions';
 import VideoPreview from './card-video-preview';
 
 export default function ServiceCardFile({ file, path, width, height }) {
-  const fallbackImage = '/images/fallback/service.png';
+  const fallbackImage =
+    'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076750/Static/service_ngrppj.webp';
 
   if (!file) {
     return (

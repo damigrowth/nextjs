@@ -9,14 +9,14 @@ export default function HeroImages() {
       <Image
         width={810}
         height={860}
-        style={{ 
+        style={{
           height: 'fit-content',
           // Critical: Prevent layout shift and ensure fast rendering
           containIntrinsicSize: '810px 860px',
-          contentVisibility: 'auto'
+          contentVisibility: 'auto',
         }}
         className='img-0'
-        src='/images/about/home12-hero-img.png'
+        src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750069512/Static/home12-hero-img_g2jdtm.webp'
         alt='Doulitsa Hero Εικόνα'
         priority
         fetchPriority='high'
@@ -24,11 +24,11 @@ export default function HeroImages() {
         // Optimized responsive sizes for better performance
         sizes='(max-width: 640px) 100vw, (max-width: 828px) 90vw, (max-width: 1200px) 75vw, 810px'
         // Enable modern formats
-        placeholder="empty"
+        placeholder='empty'
         // Optimize decoding
-        decoding="async"
+        decoding='async'
         // Prevent render blocking
-        loading="eager"
+        loading='eager'
       />
 
       {/* Optimized secondary images */}
@@ -36,16 +36,16 @@ export default function HeroImages() {
         <Image
           width={90}
           height={90}
-          style={{ 
+          style={{
             height: 'fit-content',
-            containIntrinsicSize: '90px 90px'
+            containIntrinsicSize: '90px 90px',
           }}
           className='img-3 bounce-y'
-          src='/images/team/home12-img-3.png'
+          src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750084063/Static/home12-img-3_rtgiou.webp'
           alt='Doulitsa Hero Illustration'
           loading='lazy'
           quality={75}
-          decoding="async"
+          decoding='async'
         />
       </div>
 

@@ -27,16 +27,16 @@ export default function MetaFreelancer({
         height={226}
         style={{ height: 'fit-content' }}
         className='left-top-img wow zoomIn'
-        src='/images/vector-img/left-top.png'
-        alt=''
+        src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071394/Static/left-top_dnznwz.webp'
+        alt='left top'
       />
       <Image
         width={255}
         height={181}
         style={{ height: 'fit-content' }}
         className='right-bottom-img wow zoomIn'
-        src='/images/vector-img/right-bottom.png'
-        alt=''
+        src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071395/Static/right-bottom_w0dkoq.webp'
+        alt='right bottom'
       />
       <div className='row wow fadeInUp'>
         <div className='col-xl-12'>

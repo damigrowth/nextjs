@@ -13,7 +13,7 @@ export default function ToggleButton() {
         <Image
           height={18}
           width={20}
-          src='/images/dashboard-navicon.svg'
+          src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750081375/Static/dashboard-navicon_rvxyi1.svg'
           alt='navicon'
         />
       </a>

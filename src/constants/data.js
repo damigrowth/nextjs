@@ -29,7 +29,8 @@ export const testimonials = [
       '“Η επιχείρηση μου είναι μια μικρή ξενοδοχειακή μονάδα. Η Doulitsa με βοηθάει να βρίσκω επαγγελματίες που δεν θα μπορούσα να προσλάβω σε μόνιμη θέση.”',
     name: 'Δημήτρης Κ.',
     category: 'Ξενοδόχος',
-    image: '/images/testimonials/dimitris60.png',
+    image:
+      'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071301/Static/dimitris60_sghbb2.webp',
   },
   {
     id: 'katerina',
@@ -38,7 +39,8 @@ export const testimonials = [
       '“Βρήκα γρήγορα έναν επαγγελματία designer για να μου σχεδιάσει ένα καινούργιο logo και έμεινα απόλυτα ικανοποιημένη!”',
     name: 'Κατερίνα Ζ.',
     category: 'Επιχειρηματίας',
-    image: '/images/testimonials/katerina60.png',
+    image:
+      'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071212/Static/katerina60_omarhe.webp',
     active: true,
   },
   {
@@ -48,7 +50,8 @@ export const testimonials = [
       '“Μέσα από την πλατφόρμα σας μπόρεσα να παρουσιάσω όλη τη δουλειά μου και να με εντοπίσουν νέους πελάτες, αλλά και συνεργάτες.”',
     name: 'Μάριος Θ.',
     category: 'Web Developer',
-    image: '/images/testimonials/marios60.png',
+    image:
+      'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071226/Static/marios60_z8fucv.webp',
   },
 ];
 

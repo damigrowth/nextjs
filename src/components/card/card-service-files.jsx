@@ -24,7 +24,8 @@ export default function ServiceCardFiles({
   fontSize,
   isThumbnail,
 }) {
-  const fallbackImage = '/images/fallback/service.png';
+  const fallbackImage =
+    'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076750/Static/service_ngrppj.webp';
 
   // Define the slide content rendering logic separately
   const renderSlideContent = (file) => {

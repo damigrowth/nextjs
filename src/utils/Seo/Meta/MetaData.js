@@ -8,7 +8,8 @@ export async function MetaData({ title, description, size, image, url }) {
   const fallbackDescription =
     'Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.';
 
-  const fallbackImage = '/images/fallback/doulitsa.png';
+  const fallbackImage =
+    'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076707/Static/doulitsa_zmuykg.png';
 
   const baseUrl = process.env.LIVE_URL;
 

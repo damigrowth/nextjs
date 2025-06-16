@@ -15,7 +15,7 @@ export default function PageNotFound() {
                     height={300}
                     width={300}
                     className='w-100'
-                    src='/images/icon/error-page-img.svg'
+                    src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750081347/Static/error-page-img_rr1uvk.svg'
                     alt='error-page-img'
                   />
                 </div>

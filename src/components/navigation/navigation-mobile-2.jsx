@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { IconTimes } from '@/components/icon/fa';
+import { IconMobileMenu } from '../icon';
 
 export default function MobileNavigation2() {
   return (
@@ -14,7 +15,7 @@ export default function MobileNavigation2() {
                   <Image
                     height={40}
                     width={133}
-                    src='/images/header-logo3.svg'
+                    src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080999/Static/header-logo3_lenmsm.svg'
                     alt='Header Logo'
                   />
                 </Link>
@@ -26,12 +27,7 @@ export default function MobileNavigation2() {
                     data-bs-target='#offcanvasExample'
                     aria-controls='offcanvasExample'
                   >
-                    <Image
-                      height={20}
-                      width={20}
-                      src='/images/mobile-dark-nav-icon.svg'
-                      alt='icon'
-                    />
+                    <IconMobileMenu />
                   </a>
                 </div>
               </div>

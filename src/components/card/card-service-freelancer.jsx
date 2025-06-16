@@ -22,7 +22,8 @@ export default function ServiceCard({
       ? title.slice(0, maxTitleLength) + '...'
       : title;
 
-  const fallbackImage = '/images/fallback/service.png';
+  const fallbackImage =
+    'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076750/Static/service_ngrppj.webp';
 
   return (
     <>

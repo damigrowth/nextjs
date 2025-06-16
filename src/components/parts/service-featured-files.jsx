@@ -65,7 +65,7 @@ export default function FeaturedFiles({ files, title, border }) {
                       return (
                         <SwiperSlide key={i}>
                           <Image
-                            src='/images/fallback/service.png'
+                            src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076750/Static/service_ngrppj.webp'
                             alt={`gallery-image-${i}`}
                             width={800}
                             height={600}

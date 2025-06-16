@@ -14,14 +14,14 @@ export default function Breadcumb1({ title, brief, isBtnActive }) {
             height={226}
             width={198}
             className='left-top-img wow zoomIn'
-            src='/images/vector-img/left-top.png'
+            src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071394/Static/left-top_dnznwz.webp'
             alt='object 1'
           />
           <Image
             height={181}
             width={255}
             className='right-bottom-img wow zoomIn'
-            src='/images/vector-img/right-bottom.png'
+            src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071395/Static/right-bottom_w0dkoq.webp'
             alt='object 2'
           />
           <div className='container'>

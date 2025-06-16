@@ -38,7 +38,7 @@ export default function Invoice() {
                         <Image
                           height={40}
                           width={133}
-                          src='/images/header-logo-dark.svg'
+                          src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/header-logo-dark_fs19b9.svg'
                           alt='logo'
                         />
                       </div>

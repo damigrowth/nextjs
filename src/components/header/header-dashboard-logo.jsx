@@ -10,7 +10,7 @@ export default function HeaderDashboardLogo({ notClickable }) {
           <Image
             height={40}
             width={133}
-            src='/images/doulitsa-logo.svg'
+            src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo_t9qnum.svg'
             alt='logo'
           />
         </div>
@@ -19,7 +19,7 @@ export default function HeaderDashboardLogo({ notClickable }) {
           <Image
             height={40}
             width={133}
-            src='/images/doulitsa-logo.svg'
+            src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo_t9qnum.svg'
             alt='logo'
           />
         </Link>

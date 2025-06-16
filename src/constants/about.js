@@ -8,7 +8,8 @@ export const data = {
     heading: 'Έλα και εσύ στην καλύτερη πλατφόρμα Επαγγελματιών',
     description:
       'Έλα και εσύ στη Doulitsa, την πλατφόρμα που επαναπροσδιορίζει τη σύνδεση επαγγελματιών με πελάτες. Από την πρώτη στιγμή απολαμβάνεις ευκολία, ασφάλεια και άμεση πρόσβαση σε κορυφαίους επαγγελματίες. Ανακάλυψε νέες συνεργασίες, με διαφάνεια, αξιοπιστία και σιγουριά. Η Doulitsa φέρνει νέες ευκαιρίες στην πόρτα σου!',
-    image: '/images/about/about-page-image-1.png',
+    image:
+      'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750069606/Static/about-page-image-1_x5y8jm.webp',
     list: [
       'Βρες ικανούς επαγγελματίες, άμεσα και αξιόπιστα.',
       'Ανακάλυψε υπηρεσίες με κορυφαίες αξιολογήσεις και ειδικές προσφορές!',
@@ -46,7 +47,8 @@ export const data = {
   cta1: {
     title: 'Είσαι έτοιμος για την επόμενη συνεργασία σου;',
     subtitle: '',
-    image: '/images/about/about-page-image-2.png',
+    image:
+      'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750070089/Static/about-page-image-2_oa6vxw.webp',
     alt: 'alt-image',
     lists: [
       {
@@ -95,8 +97,10 @@ export const data = {
       ],
     },
     images: {
-      leftTop: '/images/vector-img/left-top.png',
-      rightBottom: '/images/vector-img/right-bottom.png',
+      leftTop:
+        'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071394/Static/left-top_dnznwz.webp',
+      rightBottom:
+        'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071395/Static/right-bottom_w0dkoq.webp',
     },
   },
   testimonials: {
@@ -111,7 +115,8 @@ export const data = {
         author: {
           name: 'Δημήτρης Κ.',
           category: 'Ξενοδόχος',
-          image: '/images/testimonials/dimitris140.png',
+          image:
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071235/Static/dimitris140_wuoksx.webp',
         },
       },
       {
@@ -121,7 +126,8 @@ export const data = {
         author: {
           name: 'Κατερίνα Ζ.',
           category: 'Επιχειρηματίας',
-          image: '/images/testimonials/katerina140.png',
+          image:
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071209/Static/katerina140_ztoig5.webp',
         },
         active: true,
       },
@@ -132,13 +138,15 @@ export const data = {
         author: {
           name: 'Μάριος Θ.',
           category: 'Web Developer',
-          image: '/images/testimonials/marios140.png',
+          image:
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071225/Static/marios140_qokg42.webp',
         },
       },
     ],
   },
   cta2: {
-    image: '/images/about/about-page-image-3.png',
+    image:
+      'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750070110/Static/about-page-image-3_bzuclt.webp',
     title: 'Ψάχνεις για κάποια Υπηρεσία;',
     subtitle: 'Ξεκίνα την αναζήτηση και κάνε Doulitsa 😉',
     boxes: [
