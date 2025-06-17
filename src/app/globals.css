@@ -2319,3 +2319,86 @@ a[href='#reviews-section']:hover {
   margin: auto;
   opacity: 0.7;
 }
+
+/* Optimized VideoPreview CSS - Reduces DOM depth significantly */
+
+.video-preview-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  background-color: #000;
+  overflow: hidden;
+}
+
+.play-button-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  transition: background 0.3s ease;
+}
+
+.video-preview-container:hover .play-button-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* CSS-only play icon - replaces FontAwesome to reduce DOM depth */
+.play-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.play-icon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 55%; /* Slightly offset to center the triangle visually */
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid white;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+.video-preview-container:hover .play-icon {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .play-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .play-icon::before {
+    border-left: 10px solid white;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+  }
+}
+
+@media (max-width: 480px) {
+  .play-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .play-icon::before {
+    border-left: 8px solid white;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+  }
+}
