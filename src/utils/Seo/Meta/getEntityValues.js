@@ -22,7 +22,11 @@ export function getEntityValues(entity, property) {
 
   const arcCategoryPlural = entity?.plural;
 
+  const arcSubcategoryPlural = entity?.plural;
+
   const arcCategoryDesc = entity?.description;
+
+  const arcSubcategoryDesc = entity?.description;
 
   const arcCategoryImage = getBestDimensions(
     entity?.image?.data?.attributes?.formats,
@@ -45,8 +49,12 @@ export function getEntityValues(entity, property) {
       return arcCategory || '';
     case 'arcCategoryPlural':
       return arcCategoryPlural || '';
+    case 'arcSubcategoryPlural':
+      return arcSubcategoryPlural || '';
     case 'arcCategoryDesc':
       return arcCategoryDesc || '';
+    case 'arcSubcategoryDesc':
+      return arcSubcategoryDesc || '';
     case 'image':
       return singleImage || arcCategoryImage || '';
     default:

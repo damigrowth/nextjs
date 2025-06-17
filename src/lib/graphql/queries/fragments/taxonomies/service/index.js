@@ -45,6 +45,20 @@ const SUBDIVISION_ENTITY = gql`
   }
 `;
 
+const SUBDIVISION_ENTITY_FULL = gql`
+  fragment SubdivisionEntityFull on SubdivisionEntity {
+    id
+    attributes {
+      label
+      slug
+      image {
+        ...SingleImage
+      }
+    }
+  }
+  ${SINGLE_IMAGE}
+`;
+
 const SUBCATEGORY = gql`
   fragment Subcategory on SubcategoryEntity {
     id
@@ -119,4 +133,5 @@ export {
   SUBCATEGORY_ENTITY,
   SUBDIVISION,
   SUBDIVISION_ENTITY,
+  SUBDIVISION_ENTITY_FULL,
 };

@@ -16,7 +16,8 @@ export default async function FeaturedServiceCard({
   showDelete,
   savedStatus = null, // Accept savedStatus prop for consistency (not used in this card)
 }) {
-  const { id, media, category, title, slug, freelancer, price } = service;
+  const { id, media, category, subdivision, title, slug, freelancer, price } =
+    service;
 
   const freelancerData = freelancer?.data?.attributes;
 
@@ -32,7 +33,14 @@ export default async function FeaturedServiceCard({
     reviews_total,
   } = freelancerData;
 
+  const subdivisionImage = getBestDimensions(
+    subdivision?.data?.attributes?.image?.data?.attributes?.formats,
+  );
+
+  const fallback = subdivisionImage?.url;
+
   const fallbackImage =
+    fallback ||
     'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076750/Static/service_ngrppj.webp';
 
   const firstMediaItem = media.data.length > 0 ? media.data[0] : null;

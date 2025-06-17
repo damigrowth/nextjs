@@ -6,8 +6,15 @@ import { getBestDimensions } from '@/utils/imageDimensions';
 
 import VideoPreview from './card-video-preview';
 
-export default function ServiceCardFile({ file, path, width, height }) {
+export default function ServiceCardFile({
+  file,
+  path,
+  width,
+  height,
+  fallback,
+}) {
   const fallbackImage =
+    fallback ||
     'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076750/Static/service_ngrppj.webp';
 
   if (!file) {

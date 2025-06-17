@@ -20,15 +20,20 @@ export const revalidate = 3600;
 
 export const dynamicParams = true;
 
-// Static SEO
-export async function generateMetadata() {
-  const { meta } = await Meta({
-    titleTemplate: 'Επιχειρήσεις | Doulitsa',
+export async function generateMetadata({ params }) {
+  const { category } = await params;
+
+  const data = {
+    type: 'freelancerCategory',
+    params: { category, type: 'company' },
+    titleTemplate: '%arcCategoryPlural% - Αναζήτηση για Επιχειρήσεις',
     descriptionTemplate:
-      'Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές.',
-    size: 150,
-    url: '/companies',
-  });
+      'Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές. %arcCategoryDesc%',
+    size: 200,
+    url: `/companies/${category}`,
+  };
+
+  const { meta } = await Meta(data);
 
   return meta;
 }
