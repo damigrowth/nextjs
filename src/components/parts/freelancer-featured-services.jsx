@@ -23,19 +23,29 @@ export default async function FeaturedServices({
           : `${meta.total} Υπηρεσία`}{' '}
       </h4>
       <div className='row mb35'>
-        {services.map((service, i) => (
-          <div className='col-sm-6 col-xl-4' key={i}>
-            <ServiceCard
-              media={service.attributes.media.data}
-              price={service.attributes.price}
-              category={service.attributes.category.data.attributes.label}
-              title={service.attributes.title}
-              rating={service.attributes.rating}
-              reviews_total={service.attributes.reviews_total}
-              slug={service.attributes.slug}
-            />
-          </div>
-        ))}
+        {services.map((service, i) => {
+          const subdivisionImage = getBestDimensions(
+            service.attributes.subdivision?.data?.attributes?.image?.data
+              ?.attributes?.formats,
+          );
+
+          const fallbackImage = subdivisionImage?.url;
+
+          return (
+            <div className='col-sm-6 col-xl-4' key={i}>
+              <ServiceCard
+                media={service.attributes.media.data}
+                price={service.attributes.price}
+                category={service.attributes.category.data.attributes.label}
+                title={service.attributes.title}
+                rating={service.attributes.rating}
+                reviews_total={service.attributes.reviews_total}
+                slug={service.attributes.slug}
+                fallback={fallbackImage}
+              />
+            </div>
+          );
+        })}
       </div>
       <LoadMoreBtn
         name='Υπηρεσίες'

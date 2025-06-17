@@ -8,10 +8,23 @@ import SaveForm from '../form/form-save';
 import CardReviews from './card-reviews';
 import ServiceCardFile from './card-service-file';
 import ServiceCardFiles from './card-service-files';
+import { getBestDimensions } from '@/utils/imageDimensions';
 
-export default async function ServiceCard({ service, fid, savedStatus = null }) {
-  const { title, price, slug, category, subcategory, media, freelancer } =
-    service.attributes;
+export default async function ServiceCard({
+  service,
+  fid,
+  savedStatus = null,
+}) {
+  const {
+    title,
+    price,
+    slug,
+    category,
+    subcategory,
+    subdivision,
+    media,
+    freelancer,
+  } = service.attributes;
 
   if (!freelancer.data) {
     return null;
@@ -36,6 +49,12 @@ export default async function ServiceCard({ service, fid, savedStatus = null }) 
 
   let saveStatus = savedStatus;
 
+  const subdivisionImage = getBestDimensions(
+    subdivision?.data?.attributes?.image?.data?.attributes?.formats,
+  );
+
+  const fallbackImage = subdivisionImage?.url;
+
   // Note: savedStatus is now passed as prop, no need to fetch
 
   return (
@@ -50,6 +69,7 @@ export default async function ServiceCard({ service, fid, savedStatus = null }) 
           <ServiceCardFile
             file={media?.data[0]?.attributes}
             path={`/s/${slug}`}
+            fallback={fallbackImage}
           />
         )}
       </div>

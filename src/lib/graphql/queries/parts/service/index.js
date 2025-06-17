@@ -13,6 +13,7 @@ import {
   STATUS,
   SUBCATEGORY_ENTITY,
   SUBDIVISION_ENTITY,
+  SUBDIVISION_ENTITY_FULL,
   TAG,
 } from '../../fragments';
 
@@ -159,6 +160,11 @@ const SERVICE_PARTIAL_RELATIONS = gql`
         ...SubcategoryEntity
       }
     }
+    subdivision {
+      data {
+        ...SubdivisionEntityFull
+      }
+    }
     media {
       ...MultipleFiles
     }
@@ -168,6 +174,7 @@ const SERVICE_PARTIAL_RELATIONS = gql`
   }
   ${CATEGORY}
   ${SUBCATEGORY_ENTITY}
+  ${SUBDIVISION_ENTITY_FULL}
   ${MULTIPLE_FILES}
   ${SINGLE_IMAGE}
   ${FREELANCER_SMALL}
@@ -210,11 +217,17 @@ const FEATURED_SERVICE_RELATIONS = gql`
         ...Category
       }
     }
+    subdivision {
+      data {
+        ...SubdivisionEntityFull
+      }
+    }
     media {
       ...MultipleFiles
     }
   }
   ${CATEGORY}
+  ${SUBDIVISION_ENTITY_FULL}
   ${MULTIPLE_FILES}
 `;
 

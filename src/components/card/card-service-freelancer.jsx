@@ -13,6 +13,7 @@ export default function ServiceCard({
   rating,
   reviews_total,
   slug,
+  fallback,
 }) {
   //   const [isFavActive, setFavActive] = useState(false);
   const maxTitleLength = 50;
@@ -21,9 +22,6 @@ export default function ServiceCard({
     title.length > maxTitleLength
       ? title.slice(0, maxTitleLength) + '...'
       : title;
-
-  const fallbackImage =
-    'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076750/Static/service_ngrppj.webp';
 
   return (
     <>
@@ -40,6 +38,7 @@ export default function ServiceCard({
               path={`/s/${slug}`}
               width={255}
               height={190}
+              fallback={fallback}
             />
           )}
           {/* <Link href={`/s/${slug}`}>
