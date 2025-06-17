@@ -63,7 +63,9 @@ export default async function FeaturedServiceCard({
           className='w-100'
           src={imageUrl}
           alt={`featured-service-${title}-freelancer-${username}`}
-          style={{ objectFit: 'cover', height: '247px' }} // Ensure consistent height
+          style={{ objectFit: 'cover', height: '247px' }}
+          sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 331px"
+          priority={false}
         />
       </Link>
     );
@@ -90,6 +92,8 @@ export default async function FeaturedServiceCard({
         src={fallbackImage}
         alt={`featured-service-${title}-freelancer-${username}`}
         style={{ objectFit: 'cover', height: '247px' }}
+        sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 331px"
+        priority={false}
       />
     );
   }
