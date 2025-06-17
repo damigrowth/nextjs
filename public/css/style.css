@@ -6775,3 +6775,35 @@ section.pb40-md.pb90 > div > div.row.d-block.d-lg-none > div > div.row {
     float: right;
   }
 }
+
+.social-style1.light-style2 .social-icon {
+  color: var(--headings-color);
+}
+
+.social-style1 .social-icon svg {
+  color: var(--body-text-color);
+  height: 20px;
+  width: 20px;
+}
+
+.social-style1 .social-icon {
+  align-items: center;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  line-height: 40px;
+  text-align: center;
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  -ms-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+  width: 40px;
+}
+
+.social-style1.light-style2 .social-icon:hover {
+  background-color: #f7f7f7;
+  color: var(--headings-color);
+}
