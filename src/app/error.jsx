@@ -1,8 +1,8 @@
 'use client';
 
 import { ArrowRightLong } from '@/components/icon/fa';
+import LinkNP from '@/components/link';
 import Image from 'next/image';
-import Link from 'next/link';
 
 export default function ErrorBoundary() {
   // { error }
@@ -39,10 +39,10 @@ export default function ErrorBoundary() {
                   {/* <br className="d-none d-lg-block" />
                   Error: {error.message} */}
                 </p>
-                <Link href='/' className='ud-btn btn-thm'>
+                <LinkNP href='/' className='ud-btn btn-thm'>
                   Πίσω στην αρχική
                   <ArrowRightLong />
-                </Link>
+                </LinkNP>
               </div>
             </div>
           </div>

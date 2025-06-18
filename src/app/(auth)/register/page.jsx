@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { RegisterForm } from '@/components/form';
 import { AuthTypeOptions, RegisterHeading } from '@/components/input';
@@ -38,9 +38,9 @@ export default function page() {
                 <RegisterHeading />
                 <p className='text mt20'>
                   Έχεις ήδη λογαριασμό?{' '}
-                  <Link href='/login' className='text-thm'>
+                  <LinkNP href='/login' className='text-thm'>
                     Σύνδεση!
-                  </Link>
+                  </LinkNP>
                 </p>
               </div>
               <AuthTypeOptions />

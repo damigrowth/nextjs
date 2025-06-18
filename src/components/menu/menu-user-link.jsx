@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { usePathname } from 'next/navigation';
 
 export default function UserMenuLink({ item }) {
@@ -10,7 +10,7 @@ export default function UserMenuLink({ item }) {
   const isProfile = item.path.startsWith('/profile/');
 
   return (
-    <Link
+    <LinkNP
       className={`dropdown-item ${path === item.path ? 'active' : ''} ${
         item.path === '#' ? 'disabled' : ''
       }`}
@@ -20,6 +20,6 @@ export default function UserMenuLink({ item }) {
     >
       <i className={`${item.icon} mr10`} />
       <span>{item.name}</span>
-    </Link>
+    </LinkNP>
   );
 }

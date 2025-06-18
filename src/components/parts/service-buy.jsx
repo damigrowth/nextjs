@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import useServiceOrderStore from '@/stores/order/service';
 import { ArrowRightLong } from '@/components/icon/fa';

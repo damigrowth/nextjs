@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { getData } from '@/lib/client/operations';
 import {
@@ -102,12 +102,12 @@ export default async function DashboardInfo() {
                 <div className="ps-widget bgc-white bdrs4 p30 mb30 overflow-hidden position-relative">
                   <div className="d-flex justify-content-between bdrb1 pb15 mb20">
                     <h5 className="title">Δημοφιλείς Υπηρεσίες</h5>
-                    <Link
+                    <LinkNP
                       href="/dashboard/services"
                       className="text-decoration-underline text-thm6"
                     >
                       Περισσότερα
-                    </Link>
+                    </LinkNP>
                   </div>
                   {data?.popularServices.services.data.length > 0 ? (
                     <div className="dashboard-img-service">
@@ -130,27 +130,27 @@ export default async function DashboardInfo() {
                     <h5 className='title'>Συντομεύσεις</h5>
                   </div>
                   <div className='d-grid gap-3'>
-                    <Link
+                    <LinkNP
                       href='/dashboard/profile'
                       className='ud-btn btn-thm2 mb25 me-4'
                     >
                       Διαχείριση Προφίλ
                       <ArrowRightLong />
-                    </Link>
-                    <Link
+                    </LinkNP>
+                    <LinkNP
                       href='/dashboard/services/add'
                       className='ud-btn btn-thm2 mb25 me-4'
                     >
                       Προσθήκη Υπηρεσίας
                       <ArrowRightLong />
-                    </Link>
-                    <Link
+                    </LinkNP>
+                    <LinkNP
                       href='/dashboard/services'
                       className='ud-btn btn-thm2 mb25 me-4'
                     >
                       Διαχείριση Υπηρεσιών
                       <ArrowRightLong />
-                    </Link>
+                    </LinkNP>
                   </div>
                 </div>
               </div>
@@ -180,7 +180,7 @@ export default async function DashboardInfo() {
           <div>
             Μπορείς να συμπληρώσεις τα στοιχεία σου στην{' '}
             <strong>
-              <Link href='/dashboard/profile'>Διαχείριση Προφίλ </Link>
+              <LinkNP href='/dashboard/profile'>Διαχείριση Προφίλ </LinkNP>
             </strong>
             . <br />
             Ακόμα, μπορείς να αποθηκεύσεις τις Αγαπημένες σου υπηρεσίες και τα
@@ -189,18 +189,18 @@ export default async function DashboardInfo() {
             να υποβάλεις μια αξιολόγηση. <br />
             Θα βοηθήσεις έτσι, και άλλους χρήστες να βρουν αυτό που ψάχνουν!
             <div className='d-flex pb30 gap-3 mt-4 flex-wrap'>
-              <Link href='/ipiresies' className='ud-btn btn-thm2 mb25 me-4'>
+              <LinkNP href='/ipiresies' className='ud-btn btn-thm2 mb25 me-4'>
                 Όλες οι Υπηρεσίες
                 <ArrowRightLong />
-              </Link>
-              <Link href='/pros' className='ud-btn btn-thm2 mb25 me-4'>
+              </LinkNP>
+              <LinkNP href='/pros' className='ud-btn btn-thm2 mb25 me-4'>
                 Επαγγελματίες
                 <ArrowRightLong />
-              </Link>
-              <Link href='/companies' className='ud-btn btn-thm2 mb25 me-4'>
+              </LinkNP>
+              <LinkNP href='/companies' className='ud-btn btn-thm2 mb25 me-4'>
                 Επιχειρήσεις
                 <ArrowRightLong />
-              </Link>
+              </LinkNP>
             </div>
           </div>
         )}

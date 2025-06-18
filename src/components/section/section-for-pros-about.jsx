@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function AboutArea1() {
@@ -49,13 +49,13 @@ export default function AboutArea1() {
                     να σε βρουν νέοι πελάτες που ψάχνουν υπηρεσίες σαν τις δικές
                     σου.
                   </p>
-                  <Link
+                  <LinkNP
                     href='/register#pro'
                     className='ud-btn btn-thm mb25 me-4'
                   >
                     Εγγραφή Επαγγελματία
                     <ArrowRightLong />
-                  </Link>
+                  </LinkNP>
                 </div>
               </div>
               <div
@@ -75,13 +75,13 @@ export default function AboutArea1() {
                     να σας βρουν νέοι πελάτες που ψάχνουν υπηρεσίες σαν τις
                     δικές σας.
                   </p>
-                  <Link
+                  <LinkNP
                     href='/register#pro'
                     className='ud-btn btn-thm mb25 me-4'
                   >
                     Εγγραφή Επιχείρησης
                     <ArrowRightLong />
-                  </Link>
+                  </LinkNP>
                 </div>
               </div>
             </div>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { setToken } from '@/actions/auth/token';
 import { getFreelancerActivationStatus } from '@/actions/shared/freelancer';
@@ -154,9 +154,9 @@ const GoogleSelectTypeContent = () => {
               <div className='text-center'>
                 <p className='text'>
                   Θέλετε να χρησιμοποιήσετε διαφορετικό τρόπο?{' '}
-                  <Link href='/register' className='text-thm'>
+                  <LinkNP href='/register' className='text-thm'>
                     Κλασική Εγγραφή
-                  </Link>
+                  </LinkNP>
                 </p>
               </div>
             </div>

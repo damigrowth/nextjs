@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { usePathname } from 'next/navigation';
 import { IconBars } from '@/components/icon/fa';
 
@@ -76,7 +76,7 @@ export default function DashboardNavigation({ hasAccess }) {
     }
 
     // Regular nav items as links
-    return <Link href={item.path}>{commonContent}</Link>;
+    return <LinkNP href={item.path}>{commonContent}</LinkNP>;
   };
 
   if (isLoading) {

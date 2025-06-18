@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 export default function ServiceSuccess({ id, title }) {
   const handleAddServiceReload = (e) => {
@@ -32,12 +32,12 @@ export default function ServiceSuccess({ id, title }) {
           >
             Προσθήκη Νέας Υπηρεσίας
           </button>
-          <Link
+          <LinkNP
             href='/dashboard/services'
             className='ud-btn btn-dark bdrs4 d-flex justify-content-end align-items-center gap-2 default-box-shadow p3'
           >
             Διαχείριση Υπηρεσιών
-          </Link>
+          </LinkNP>
         </div>
       </div>
     </div>

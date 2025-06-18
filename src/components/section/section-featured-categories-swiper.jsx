@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
 
@@ -48,28 +48,28 @@ export default function FeaturedCategoriesSwiper({ categories }) {
                 <SwiperSlide key={index}>
                   <div className='item'>
                     <div className='iconbox-style1 bdr1 default-box-shadow3'>
-                      <Link href={`/categories/${item.attributes.slug}`}>
+                      <LinkNP href={`/categories/${item.attributes.slug}`}>
                         <div className='icon'>
                           <span className={item.attributes.icon}></span>
                         </div>
-                      </Link>
+                      </LinkNP>
                       <div className='details mt20'>
                         {/* <p className="text mb5">{item.skill} skills</p> */}
                         <h4 className='title'>
-                          <Link href={`/categories/${item.attributes.slug}`}>
+                          <LinkNP href={`/categories/${item.attributes.slug}`}>
                             {item.attributes.label}
-                          </Link>
+                          </LinkNP>
                         </h4>
                         <p className='mb-0'>
                           {item.attributes.subcategories.data
                             .slice(0, 3)
                             .map((sub, i) => (
                               <span key={i}>
-                                <Link
+                                <LinkNP
                                   href={`/ipiresies/${sub.attributes.slug}`}
                                 >
                                   {sub.attributes.label}
-                                </Link>
+                                </LinkNP>
                                 {i < 2 &&
                                 i <
                                   item.attributes.subcategories.data.length - 1

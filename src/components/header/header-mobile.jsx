@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { IconTimes } from '@/components/icon/fa';
 
 import UserMenu from '../menu/menu-user';
@@ -13,7 +13,7 @@ export default function HeaderMobile() {
         <div className='header bdrb1'>
           <div className='menu_and_widgets'>
             <div className='mobile_menu_bar d-flex justify-content-between align-items-center'>
-              <Link className='mobile_logo' href='/'>
+              <LinkNP className='mobile_logo' href='/'>
                 <Image
                   height={40}
                   width={133}
@@ -22,7 +22,7 @@ export default function HeaderMobile() {
                   unoptimized
                   priority
                 />
-              </Link>
+              </LinkNP>
               <div className='d-flex align-items-center right-side text-end'>
                 <UserMenu isMobile />
                 <a

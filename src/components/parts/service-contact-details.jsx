@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { UserImage } from '@/components/avatar';
 import { RatingTotal, Socials } from '@/components/parts';
@@ -47,13 +47,13 @@ export default function ContactDetails({
             />
           </div>
           <div className='ml20'>
-            <Link
+            <LinkNP
               href={`/profile/${username}`}
               className='d-flex align-items-center'
             >
               <h5 className='title mb-1 mr5'>{displayName}</h5>
               <VerifiedBadge verified={verified} />
-            </Link>
+            </LinkNP>
             <p className='mb-0'>{tagline}</p>
             <RatingTotal totalReviews={totalReviews} rating={rating} />
           </div>
@@ -94,10 +94,13 @@ export default function ContactDetails({
           </div>
         </div>
         <div className='d-grid mt30'>
-          <Link href={`/profile/${username}`} className='ud-btn btn-thm-border'>
+          <LinkNP
+            href={`/profile/${username}`}
+            className='ud-btn btn-thm-border'
+          >
             Περισσότερα
             <ArrowRightLong />
-          </Link>
+          </LinkNP>
         </div>
       </div>
     </>

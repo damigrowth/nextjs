@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { formatRating } from '@/utils/formatRating';
 import { getBestDimensions } from '@/utils/imageDimensions';
@@ -56,7 +56,7 @@ export default async function FeaturedServiceCard({
     const imageUrl = formatResult?.url || fallbackImage;
 
     mediaContent = (
-      <Link href={`/s/${slug}`}>
+      <LinkNP href={`/s/${slug}`}>
         <Image
           height={247}
           width={331}
@@ -64,10 +64,10 @@ export default async function FeaturedServiceCard({
           src={imageUrl}
           alt={`featured-service-${title}-freelancer-${username}`}
           style={{ objectFit: 'cover', height: '247px' }}
-          sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 331px"
+          sizes='(max-width: 640px) 280px, (max-width: 1024px) 320px, 331px'
           priority={false}
         />
-      </Link>
+      </LinkNP>
     );
   } else if (firstMediaAttributes?.mime?.startsWith('video/')) {
     // It's a video
@@ -92,7 +92,7 @@ export default async function FeaturedServiceCard({
         src={fallbackImage}
         alt={`featured-service-${title}-freelancer-${username}`}
         style={{ objectFit: 'cover', height: '247px' }}
-        sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 331px"
+        sizes='(max-width: 640px) 280px, (max-width: 1024px) 320px, 331px'
         priority={false}
       />
     );
@@ -117,9 +117,9 @@ export default async function FeaturedServiceCard({
           {category.data?.attributes?.label}
         </p>
         <h5 className='service-card-title'>
-          <Link href={`/s/${slug}`}>
+          <LinkNP href={`/s/${slug}`}>
             {title.length > 60 ? `${title.slice(0, 60)}...` : title}
-          </Link>
+          </LinkNP>
         </h5>
         <div className='review-meta d-flex align-items-center'>
           {reviews_total && (

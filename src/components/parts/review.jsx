@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 // import ReviewReactions from "./ReviewRe@/actions";
 import { UserImage } from '@/components/avatar';
@@ -49,9 +49,12 @@ export default async function Review({
         <div className='ml20'>
           <h6 className='mt-0 mb-0'>{displayName}</h6>
           {showReviewsModel && (
-            <Link href={`/s/${service.slug}`} className='review-service-title'>
+            <LinkNP
+              href={`/s/${service.slug}`}
+              className='review-service-title'
+            >
               <span>{service.title}</span>
-            </Link>
+            </LinkNP>
           )}
           <div className='d-flex align-items-center'>
             <div className='d-flex align-items-center'>

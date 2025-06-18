@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 export default function HeaderDashboardLogo({ notClickable }) {
   return (
@@ -15,14 +15,14 @@ export default function HeaderDashboardLogo({ notClickable }) {
           />
         </div>
       ) : (
-        <Link href='/' className='logo'>
+        <LinkNP href='/' className='logo'>
           <Image
             height={40}
             width={133}
             src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo_t9qnum.svg'
             alt='logo'
           />
-        </Link>
+        </LinkNP>
       )}
     </div>
   );

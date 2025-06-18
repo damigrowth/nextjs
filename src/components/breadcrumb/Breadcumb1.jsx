@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { ArrowRightLong } from '@/components/icon/fa';
 
@@ -34,10 +34,10 @@ export default function Breadcumb1({ title, brief, isBtnActive }) {
                   <h2 className='text-white'>{title}</h2>
                   <p className='text mb30 text-white'>{brief}</p>
                   {isBtnActive && (
-                    <Link className='ud-btn btn-thm' href='/contact'>
+                    <LinkNP className='ud-btn btn-thm' href='/contact'>
                       Become Seller
                       <ArrowRightLong />
-                    </Link>
+                    </LinkNP>
                   )}
                 </div>
               </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { UserImage } from '@/components/avatar';
 
@@ -83,7 +83,7 @@ export default async function ServiceCard({
         <div className='archive-service-card-meta'>
           <div>
             <h5 className='list-title'>
-              <Link href={`/s/${slug}`}>{title}</Link>
+              <LinkNP href={`/s/${slug}`}>{title}</LinkNP>
             </h5>
             <p className='list-text body-color fz14 mb-1'>
               {category?.data?.attributes?.label}{' '}

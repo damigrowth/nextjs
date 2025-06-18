@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { UserImage } from '@/components/avatar';
 import { formatRating } from '@/utils/formatRating';
@@ -56,9 +56,9 @@ export default async function FeaturedServiceSliderCard({
             {category?.data?.attributes?.label}
           </p>
           <h5 className='service-card-title'>
-            <Link href={`/s/${slug}`}>
+            <LinkNP href={`/s/${slug}`}>
               {title.length > 60 ? `${title.slice(0, 60)}...` : title}
-            </Link>
+            </LinkNP>
           </h5>
           <div className='review-meta d-flex align-items-center'>
             {reviews_total && (

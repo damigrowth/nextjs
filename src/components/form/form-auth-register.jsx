@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useActionState, useEffect, useRef } from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import authStore from '@/stores/authStore';
 
@@ -18,13 +18,13 @@ const consentOptions = [
     label: (
       <span>
         Αποδέχομαι τους{' '}
-        <Link href='/terms' target='_blank' className='text-thm'>
+        <LinkNP href='/terms' target='_blank' className='text-thm'>
           Όρους Χρήσης
-        </Link>{' '}
+        </LinkNP>{' '}
         και την{' '}
-        <Link href='/privacy' target='_blank' className='text-thm'>
+        <LinkNP href='/privacy' target='_blank' className='text-thm'>
           Πολιτική Απορρήτου
-        </Link>
+        </LinkNP>
       </span>
     ),
   },

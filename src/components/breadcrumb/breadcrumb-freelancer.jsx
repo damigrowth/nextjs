@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import BreadcrumbButtons from './breadcrumb-buttons';
 
@@ -22,33 +22,33 @@ export default function ProfileBreadcrumb({
           <div className='col-sm-8 col-lg-10'>
             <div className='breadcumb-style1 mb10-xs'>
               <div className='breadcumb-list'>
-                <Link href='/'>Αρχική</Link>
+                <LinkNP href='/'>Αρχική</LinkNP>
                 {type === 'company' ? (
-                  <Link href='/companies'>
+                  <LinkNP href='/companies'>
                     <span className='heading-p-gray'>Επιχειρήσεις</span>
-                  </Link>
+                  </LinkNP>
                 ) : (
-                  <Link href={`/${parentSlug}`}>
+                  <LinkNP href={`/${parentSlug}`}>
                     <span className='heading-p-gray'>Επαγγελματίες</span>
-                  </Link>
+                  </LinkNP>
                 )}
                 {category?.data?.attributes && (
-                  <Link
+                  <LinkNP
                     href={`/${parentSlug}/${category.data.attributes.slug}`}
                   >
                     <span className='heading-p-gray'>
                       {category.data.attributes.plural}
                     </span>
-                  </Link>
+                  </LinkNP>
                 )}
                 {subcategory?.data?.attributes && (
-                  <Link
+                  <LinkNP
                     href={`/${parentSlug}/${category.data.attributes.slug}/${subcategory.data.attributes.slug}`}
                   >
                     <span className='heading-p'>
                       {subcategory.data.attributes.plural}
                     </span>
-                  </Link>
+                  </LinkNP>
                 )}
               </div>
             </div>

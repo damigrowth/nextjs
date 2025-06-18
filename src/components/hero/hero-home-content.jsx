@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import PopularSearches from './hero-home-popular-searches';
 import SearchBar from './hero-home-search-bar';

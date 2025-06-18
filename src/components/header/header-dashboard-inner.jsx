@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { ArrowRightLong } from '@/components/icon/fa';
 
 import DraftServices from '@/components/heading/title-dashboard-services-draft';
@@ -26,13 +26,13 @@ export default function DashboardHeader({
       {showButton && (
         <div className='col-lg-3'>
           <div className='text-lg-end'>
-            <Link
+            <LinkNP
               href={buttonHref}
               className='ud-btn btn-dark default-box-shadow2'
             >
               {buttonText}
               {ButtonIconComponent && <ButtonIconComponent />}
-            </Link>
+            </LinkNP>
           </div>
         </div>
       )}

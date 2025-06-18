@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { ArrowRightLong } from '@/components/icon/fa';
 import { IconCheck } from '@/components/icon/fa';
 
@@ -42,10 +42,10 @@ export default function About({ data }) {
                   ))}
                 </ul>
               </div>
-              <Link href={data.button.link} className='ud-btn btn-thm-border'>
+              <LinkNP href={data.button.link} className='ud-btn btn-thm-border'>
                 {data.button.text}
                 <ArrowRightLong />
-              </Link>
+              </LinkNP>
             </div>
           </div>
         </div>

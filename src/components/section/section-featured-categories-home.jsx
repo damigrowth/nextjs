@@ -1,6 +1,6 @@
 import React from 'react';
 // import BrowserCategoryCard1 from "../card/BrowserCategoryCard1";
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { categoriesClassNames } from '../../constants/data';
 import FeaturedCategoriesSwiper from './section-featured-categories-swiper';
@@ -27,10 +27,10 @@ export default async function FeaturedCategories({ categories }) {
           </div>
           <div className='col-lg-3'>
             <div className='text-start text-lg-end mb-4 mb-lg-2'>
-              <Link className='ud-btn2' href='/categories'>
+              <LinkNP className='ud-btn2' href='/categories'>
                 Όλες οι Κατηγορίες
                 <ArrowRightLong />
-              </Link>
+              </LinkNP>
             </div>
           </div>
         </div>
@@ -38,26 +38,26 @@ export default async function FeaturedCategories({ categories }) {
           {featuredCategories.map((item, i) => (
             <div key={i} className={item.classNames}>
               <div className='iconbox-style1 at-home12-v2'>
-                <Link href={`/categories/${item.attributes.slug}`}>
+                <LinkNP href={`/categories/${item.attributes.slug}`}>
                   <div className='icon'>
                     <span className={item.attributes.icon}></span>
                   </div>
-                </Link>
+                </LinkNP>
                 <div className='details mt20'>
                   {/* <p className="text mb5">{item.skills} skills</p> */}
                   <h4 className='title'>
-                    <Link href={`/categories/${item.attributes.slug}`}>
+                    <LinkNP href={`/categories/${item.attributes.slug}`}>
                       {item.attributes.label}
-                    </Link>
+                    </LinkNP>
                   </h4>
                   <p className='mb-0'>
                     {item.attributes.subcategories.data
                       .slice(0, 3)
                       .map((sub, i) => (
                         <span key={i}>
-                          <Link href={`/ipiresies/${sub.attributes.slug}`}>
+                          <LinkNP href={`/ipiresies/${sub.attributes.slug}`}>
                             {sub.attributes.label}
-                          </Link>
+                          </LinkNP>
                           {i < 2 &&
                           i < item.attributes.subcategories.data.length - 1
                             ? ', '

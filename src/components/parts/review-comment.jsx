@@ -43,9 +43,9 @@ export default function ReviewComment({
           </div>
         </div>
         <p className='text mt20 mb20'>{comment}</p>
-        {/* <Link href="/service-single" className="ud-btn bgc-thm4 text-thm">
+        {/* <LinkNP href="/service-single" className="ud-btn bgc-thm4 text-thm">
           Respond
-        </Link> */}
+        </LinkNP> */}
       </div>
     </>
   );

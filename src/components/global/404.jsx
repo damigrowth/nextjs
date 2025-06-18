@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function PageNotFound() {
@@ -37,10 +37,10 @@ export default function PageNotFound() {
                   αναζήτηση ή χρησιμοποίησε το κουμπί πίσω στην Αρχική{' '}
                   <br className='d-none d-lg-block' />
                 </p>
-                <Link href='/' className='ud-btn btn-thm'>
+                <LinkNP href='/' className='ud-btn btn-thm'>
                   Πίσω στην Αρχική
                   <ArrowRightLong />
-                </Link>
+                </LinkNP>
               </div>
             </div>
           </div>

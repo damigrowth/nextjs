@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { FreelancerCard } from '@/components/card';
 import { FreelancersClientWrapper } from '../wrapper';
 import { ArrowRightLong } from '@/components/icon/fa';
@@ -30,21 +30,24 @@ export default async function FeaturedFreelancersHome({
   );
 
   // Use saved freelancers data to create saved statuses lookup
-  const freelancerIds = validFreelancers.map(f => f.id);
-  const savedStatuses = getBatchFreelancerSavedStatuses(freelancerIds, savedFreelancers);
+  const freelancerIds = validFreelancers.map((f) => f.id);
+  const savedStatuses = getBatchFreelancerSavedStatuses(
+    freelancerIds,
+    savedFreelancers,
+  );
 
   const renderedFreelancerCards = await Promise.all(
     validFreelancers.map(async (freelancer) => {
       const freelancerData = { id: freelancer.id, ...freelancer.attributes };
-      
+
       // Get saved status from batch-fetched data
       const savedStatus = savedStatuses[freelancer.id] || null;
 
       const freelancerCard = (
-        <FreelancerCard 
-          freelancer={freelancerData} 
-          fid={fid} 
-          linkedName 
+        <FreelancerCard
+          freelancer={freelancerData}
+          fid={fid}
+          linkedName
           savedStatus={savedStatus}
         />
       );
@@ -77,10 +80,10 @@ export default async function FeaturedFreelancersHome({
           </div>
           <div className='col-lg-3'>
             <div className='text-start text-lg-end mb-4 mb-lg-2'>
-              <Link className='ud-btn2 text-white' href='/pros'>
+              <LinkNP className='ud-btn2 text-white' href='/pros'>
                 Όλοι οι Επαγγελματίες
                 <ArrowRightLong />
-              </Link>
+              </LinkNP>
             </div>
           </div>
         </div>

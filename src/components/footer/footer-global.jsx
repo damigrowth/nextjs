@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import {
   accountLinks,
@@ -23,15 +23,15 @@ export default async function Footer() {
                   <div className='col-auto'>
                     <div className='link-style1 mb-3'>
                       <h6 className='mb10'>
-                        <Link href={'/about'} className='text-white'>
+                        <LinkNP href={'/about'} className='text-white'>
                           Σχετικά
-                        </Link>
+                        </LinkNP>
                       </h6>
                       <div className='link-list'>
                         {firstColumnLinks.map((item, i) => (
-                          <Link key={i} href={`/${item.attributes.slug}`}>
+                          <LinkNP key={i} href={`/${item.attributes.slug}`}>
                             {item.attributes.title}
-                          </Link>
+                          </LinkNP>
                         ))}
                       </div>
                     </div>
@@ -39,16 +39,18 @@ export default async function Footer() {
                   <div className='col-auto'>
                     <div className='link-style1 mb-3'>
                       <h6 className='mb10'>
-                        <Link href={'/categories'} className='text-white'>
+                        <LinkNP href={'/categories'} className='text-white'>
                           Υπηρεσίες
-                        </Link>
+                        </LinkNP>
                       </h6>
                       <ul className='ps-0'>
                         {secondColumnLinks.map((item, i) => (
                           <li key={i}>
-                            <Link href={`/categories/${item.attributes.slug}`}>
+                            <LinkNP
+                              href={`/categories/${item.attributes.slug}`}
+                            >
                               {item.attributes.label}
-                            </Link>
+                            </LinkNP>
                           </li>
                         ))}
                       </ul>
@@ -57,14 +59,14 @@ export default async function Footer() {
                   <div className='col-auto'>
                     <div className='link-style1 mb-3'>
                       <h6 className='mb10'>
-                        <Link href={'/dashboard'} className='text-white'>
+                        <LinkNP href={'/dashboard'} className='text-white'>
                           Ο Λογαριασμός μου
-                        </Link>
+                        </LinkNP>
                       </h6>
                       <ul className='ps-0'>
                         {accountLinks.map((item, i) => (
                           <li key={i}>
-                            <Link href={item.slug}>{item.label}</Link>
+                            <LinkNP href={item.slug}>{item.label}</LinkNP>
                           </li>
                         ))}
                       </ul>
@@ -74,7 +76,7 @@ export default async function Footer() {
                       <ul className='ps-0'>
                         {proLinks.map((item, i) => (
                           <li key={i}>
-                            <Link href={item.slug}>{item.label}</Link>
+                            <LinkNP href={item.slug}>{item.label}</LinkNP>
                           </li>
                         ))}
                       </ul>
@@ -85,7 +87,7 @@ export default async function Footer() {
             </div>
             <div className='col-lg-6 col-xl-4 offset-xl-2'>
               <div className='footer-widget mb-4 mb-lg-5'>
-                <Link className='footer-logo' href='/'>
+                <LinkNP className='footer-logo' href='/'>
                   <Image
                     height={45}
                     width={123}
@@ -93,7 +95,7 @@ export default async function Footer() {
                     src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo_t9qnum.svg'
                     alt='Doulitsa logo'
                   />
-                </Link>
+                </LinkNP>
                 <div className='row mb-4 mb-lg-5'>
                   <div className='col-auto'>
                     <div className='contact-info'>

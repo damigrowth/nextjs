@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useActionState } from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { Input } from '@/components/input';
 import GoogleLoginButton from '@/components/button/google-login-button';
@@ -49,9 +49,9 @@ const LoginForm = () => {
           />
         </div>
         <div className='checkbox-style1 d-block d-sm-flex align-items-center justify-content-between mb20'>
-          <Link href='/forgot-password' className='fz14 ff-heading'>
+          <LinkNP href='/forgot-password' className='fz14 ff-heading'>
             Ξέχασες τον κωδικό σου?
-          </Link>
+          </LinkNP>
         </div>
         {state?.message && (
           <div

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { useClickOutside } from '@/hooks/useClickOutside';
 
@@ -39,7 +39,7 @@ export default function MegaMenu({ categories, staticMenuClass }) {
         <ul ref={inputRef} className={`menu pl0 ${isActive ? 'active' : ''}`}>
           {categories.map((category) => (
             <li key={category.id}>
-              <Link
+              <LinkNP
                 href={`/categories/${category.slug}`}
                 className='dropdown'
                 prefetch={false}
@@ -47,7 +47,7 @@ export default function MegaMenu({ categories, staticMenuClass }) {
                 <span className={`menu-icn ${category.icon}`} />
                 <span className='menu-title'>{category.label}</span>
                 <IconAngleRight className='menu-arrow' />
-              </Link>
+              </LinkNP>
               <div className='drop-menu'>
                 {category.subcategories.map((subcategory, i) => (
                   <div key={i}>

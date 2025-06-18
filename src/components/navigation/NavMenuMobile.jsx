@@ -1,7 +1,7 @@
 'use client';
 
 import { Menu, MenuItem, Sidebar, SubMenu } from 'react-pro-sidebar';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { usePathname } from 'next/navigation';
 
 import { isActiveNavigation } from '@/utils/isActiveNavigation';
@@ -68,7 +68,7 @@ export default function NavMenuMobile({ header }) {
                       {item2.children.map((item3, i3) => (
                         <MenuItem
                           key={i3}
-                          component={<Link href={item3.path} />}
+                          component={<LinkNP href={item3.path} />}
                           className={
                             item3.path === path ||
                             item3.path === path.replace(/\/\d+$/, '')
@@ -76,23 +76,17 @@ export default function NavMenuMobile({ header }) {
                               : ''
                           }
                         >
-                          <span data-bs-dismiss='offcanvas'>
-                            {item3.name}
-                          </span>
+                          <span data-bs-dismiss='offcanvas'>{item3.name}</span>
                         </MenuItem>
                       ))}
                     </SubMenu>
                   ) : (
                     <MenuItem
                       key={i2}
-                      component={<Link href={item2.path} />}
-                      className={
-                        item2.path === path ? 'ui-mobile-active' : ''
-                      }
+                      component={<LinkNP href={item2.path} />}
+                      className={item2.path === path ? 'ui-mobile-active' : ''}
                     >
-                      <span data-bs-dismiss='offcanvas'>
-                        {item2.name}
-                      </span>
+                      <span data-bs-dismiss='offcanvas'>{item2.name}</span>
                     </MenuItem>
                   ),
                 )}
@@ -100,7 +94,7 @@ export default function NavMenuMobile({ header }) {
             ) : (
               <MenuItem
                 key={i}
-                component={<Link href={item.path} />}
+                component={<LinkNP href={item.path} />}
                 className={item.path === path ? 'ui-mobile-active' : ''}
               >
                 <span data-bs-dismiss='offcanvas'>{item.name}</span>

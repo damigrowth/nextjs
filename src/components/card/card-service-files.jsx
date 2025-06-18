@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 
 import { getBestDimensions } from '@/utils/imageDimensions';
@@ -34,7 +34,7 @@ export default function ServiceCardFiles({
     if (file.formats) {
       // It's an image
       return (
-        <Link href={path}>
+        <LinkNP href={path}>
           <Image
             height={height || 245}
             width={width || 329}
@@ -53,7 +53,7 @@ export default function ServiceCardFiles({
             })()}
             alt='service-thumbnail'
           />
-        </Link>
+        </LinkNP>
       );
     } else if (file.mime?.startsWith('video/')) {
       // It's a video

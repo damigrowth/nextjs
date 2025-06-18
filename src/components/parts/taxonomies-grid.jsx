@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 /**
  * Renders a grid of taxonomies (categories or subcategories).
@@ -39,7 +39,7 @@ export default function TaxonomiesGrid({
                   />
                 </div>
                 <div className='taxonomies-grid-info'>
-                  <Link
+                  <LinkNP
                     href={
                       isMainCategoriesPage
                         ? `/categories/${taxonomy.slug}`
@@ -47,11 +47,11 @@ export default function TaxonomiesGrid({
                     }
                   >
                     <h3 className='taxonomies-grid-title'>{taxonomy.label}</h3>
-                  </Link>
+                  </LinkNP>
                   <ul className='taxonomies-grid-list'>
                     {taxonomy.subdivisions.data.map((item, subIndex) => (
                       <li key={subIndex} className='taxonomies-grid-list-item'>
-                        <Link
+                        <LinkNP
                           href={
                             isMainCategoriesPage
                               ? `/ipiresies/${item.attributes.slug}`
@@ -59,7 +59,7 @@ export default function TaxonomiesGrid({
                           }
                         >
                           {item.attributes.label}
-                        </Link>
+                        </LinkNP>
                       </li>
                     ))}
                   </ul>

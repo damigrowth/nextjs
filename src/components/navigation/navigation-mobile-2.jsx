@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { IconTimes } from '@/components/icon/fa';
 import { IconMobileMenu } from '../icon';
 
@@ -11,16 +11,16 @@ export default function MobileNavigation2() {
           <div className='header bdrb1'>
             <div className='menu_and_widgets'>
               <div className='mobile_menu_bar d-flex justify-content-between align-items-center'>
-                <Link className='mobile_logo' href='/home-2'>
+                <LinkNP className='mobile_logo' href='/home-2'>
                   <Image
                     height={40}
                     width={133}
                     src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080999/Static/header-logo3_lenmsm.svg'
                     alt='Header Logo'
                   />
-                </Link>
+                </LinkNP>
                 <div className='right-side text-end'>
-                  <Link href='/login'>join</Link>
+                  <LinkNP href='/login'>join</LinkNP>
                   <a
                     className='menubar ml30'
                     data-bs-toggle='offcanvas'

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 // Lightweight offcanvas shell that's always present for Bootstrap
 export default function MobileMenuContainer({ children }) {
@@ -27,14 +27,14 @@ export default function MobileMenuContainer({ children }) {
       aria-labelledby='offcanvasExampleLabel'
     >
       <div className='offcanvas-header border-bottom'>
-        <Link href='/'>
+        <LinkNP href='/'>
           <Image
             alt='Header Logo'
             width='133'
             height='40'
             src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo_t9qnum.svg'
           />
-        </Link>
+        </LinkNP>
         <button
           type='button'
           className='btn-close'
