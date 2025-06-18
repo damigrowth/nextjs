@@ -2,10 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-
-// Import required modules for Swiper v8
-import SwiperCore, { Navigation, Pagination } from 'swiper';
+import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 import Link from 'next/link';
 import {
   ArrowLeftLong,
@@ -13,7 +10,13 @@ import {
   IconMagnifyingGlass,
 } from '@/components/icon/fa';
 
-SwiperCore.use([Navigation, Pagination]);
+let swiperModules = null;
+const getSwiperModules = async () => {
+  if (!swiperModules) {
+    swiperModules = await loadSwiperModules();
+  }
+  return swiperModules;
+};
 
 /**
  * @typedef {object} ServicesClientWrapperProps
@@ -38,6 +41,7 @@ export default function ServicesClientWrapper({
   const searchParams = useSearchParams();
 
   const [isSwiperReady, setIsSwiperReady] = useState(false);
+  const [modules, setModules] = useState([]);
 
   const activeCategory = searchParams.get('sc') || undefined;
 
@@ -45,6 +49,13 @@ export default function ServicesClientWrapper({
 
   const currentPage = pagination?.page || 1;
   const pageCount = pagination?.pageCount || 1;
+
+  // Load Swiper modules on component mount
+  useEffect(() => {
+    getSwiperModules().then((loadedModules) => {
+      setModules([loadedModules.Navigation, loadedModules.Pagination]);
+    });
+  }, []);
 
   const handleSlideChange = (swiper) => {
     const newPage = swiper.activeIndex + 1;
@@ -252,9 +263,10 @@ export default function ServicesClientWrapper({
             <div className='navi_pagi_bottom_center'>
               {filteredServices.length > 0 ? (
                 <>
-                  {isSwiperReady ? (
+                  {isSwiperReady && modules.length > 0 ? (
                     <Swiper
                       {...swiperConfig}
+                      modules={modules}
                       key={`services-swiper-${activeCategory || 'all'}-${isSwiperReady}`}
                       className='mySwiper outer-swiper'
                     >

@@ -1,20 +1,14 @@
 'use client';
 
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Navigation, Pagination } from 'swiper';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 
 import { getBestDimensions } from '@/utils/imageDimensions';
 
 import VideoPreview from './card-video-preview';
 import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
-// Import the new component
 
 export default function ServiceCardFiles({
   media,
@@ -24,6 +18,14 @@ export default function ServiceCardFiles({
   fontSize,
   isThumbnail,
 }) {
+  const [modules, setModules] = useState([]);
+
+  useEffect(() => {
+    loadSwiperModules().then((loadedModules) => {
+      setModules([loadedModules.Navigation, loadedModules.Pagination]);
+    });
+  }, []);
+
   const fallbackImage =
     'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076750/Static/service_ngrppj.webp';
 
@@ -93,57 +95,68 @@ export default function ServiceCardFiles({
     // Remove the outer Link component
     <div className='list-thumb flex-shrink-0 height'>
       <div className='listing-thumbIn-slider position-relative navi_pagi_bottom_center slider-1-grid'>
-        <Swiper
-          navigation={{
-            prevEl: '.btn__prev__018',
-            nextEl: '.btn__next__018',
-          }}
-          modules={[Navigation, Pagination]}
-          className='mySwiper'
-          loop={true}
-          pagination={{
-            el: '.swiper__pagination__018',
-            clickable: true,
-          }}
-        >
-          {media
-            .filter((item) => !item.mime?.startsWith('audio/')) // Filter out audio files
-            .map(
-              (
-                file,
-                index, // Use 'file' object to access all attributes
-              ) => (
-                // Render the slide content using the helper function
-                <SwiperSlide key={index}>
-                  {renderSlideContent(file)}
-                </SwiperSlide>
-              ),
-            )}
-          <div
-            className='swiper__parent'
-            style={{ bottom: isThumbnail ? '5px' : undefined }}
+        {modules.length > 0 ? (
+          <Swiper
+            navigation={{
+              prevEl: '.btn__prev__018',
+              nextEl: '.btn__next__018',
+            }}
+            modules={modules}
+            className='mySwiper'
+            loop={true}
+            pagination={{
+              el: '.swiper__pagination__018',
+              clickable: true,
+            }}
           >
-            <div className='row justify-content-center flex-nowrap'>
-              {!isThumbnail && (
-                <div className='col-auto'>
-                  <button className='swiper__btn swiper__btn-2 btn__prev__018'>
-                    <ArrowLeftLong />
-                  </button>
-                </div>
+            {media
+              .filter((item) => !item.mime?.startsWith('audio/')) // Filter out audio files
+              .map(
+                (
+                  file,
+                  index, // Use 'file' object to access all attributes
+                ) => (
+                  // Render the slide content using the helper function
+                  <SwiperSlide key={index}>
+                    {renderSlideContent(file)}
+                  </SwiperSlide>
+                ),
               )}
-              <div className='col-auto'>
-                <div className='swiper__pagination swiper__pagination-2 swiper__pagination__018'></div>
+            <div
+              className='swiper__parent'
+              style={{ bottom: isThumbnail ? '5px' : undefined }}
+            >
+              <div className='row justify-content-center flex-nowrap'>
+                {!isThumbnail && (
+                  <div className='col-auto'>
+                    <button className='swiper__btn swiper__btn-2 btn__prev__018'>
+                      <ArrowLeftLong />
+                    </button>
+                  </div>
+                )}
+                <div className='col-auto'>
+                  <div className='swiper__pagination swiper__pagination-2 swiper__pagination__018'></div>
+                </div>
+                {!isThumbnail && (
+                  <div className='col-auto'>
+                    <button className='swiper__btn swiper__btn-2 btn__next__018'>
+                      <ArrowRightLong />
+                    </button>
+                  </div>
+                )}
               </div>
-              {!isThumbnail && (
-                <div className='col-auto'>
-                  <button className='swiper__btn swiper__btn-2 btn__next__018'>
-                    <ArrowRightLong />
-                  </button>
-                </div>
-              )}
+            </div>
+          </Swiper>
+        ) : (
+          <div
+            className='d-flex align-items-center justify-content-center'
+            style={{ height: height || '200px' }}
+          >
+            <div className='spinner-border text-primary' role='status'>
+              <span className='visually-hidden'>Loading...</span>
             </div>
           </div>
-        </Swiper>
+        )}
       </div>
     </div>
     // Removed closing div from outer Link

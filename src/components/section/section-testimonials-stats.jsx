@@ -1,12 +1,7 @@
 'use client';
 
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-
 import React, { useEffect, useState } from 'react';
-import { Navigation, Pagination } from 'swiper';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 
 import { testimonials } from '../../constants/data';
 import TestimonialCard from '../card/card-testimonial';
@@ -14,9 +9,13 @@ import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
 
 export default function Testimonials() {
   const [showSwiper, setShowSwiper] = useState(false);
+  const [modules, setModules] = useState([]);
 
   useEffect(() => {
-    setShowSwiper(true);
+    loadSwiperModules().then((loadedModules) => {
+      setModules([loadedModules.Navigation, loadedModules.Pagination]);
+      setShowSwiper(true);
+    });
   }, []);
 
   return (
@@ -25,7 +24,7 @@ export default function Testimonials() {
         className='ui-hightest-rated mb15 wow fadeInUp'
         data-wow-delay='300ms'
       >
-        {showSwiper && (
+        {showSwiper && modules.length > 0 && (
           <Swiper
             slidesPerView={1}
             spaceBetween={30}
@@ -33,7 +32,7 @@ export default function Testimonials() {
               prevEl: '.btn__prev__003',
               nextEl: '.btn__next__003',
             }}
-            modules={[Navigation, Pagination]}
+            modules={modules}
             className='mySwiper'
             loop={true}
             pagination={{

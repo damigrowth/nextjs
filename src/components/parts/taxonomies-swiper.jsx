@@ -1,10 +1,8 @@
 'use client';
 
-import 'swiper/css';
-
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide } from '@/components/swiper';
 import { IconAngleRight } from '@/components/icon/fa';
 
 /**

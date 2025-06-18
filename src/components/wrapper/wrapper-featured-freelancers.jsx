@@ -1,12 +1,7 @@
 'use client';
 
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-
 import React, { useEffect, useState } from 'react';
-import { Navigation, Pagination } from 'swiper';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 
 export default function FreelancersListWrapper({
   children,
@@ -25,23 +20,27 @@ export default function FreelancersListWrapper({
   paginationClass = 'swiper__pagination__013',
 }) {
   const [showSwiper, setShowSwiper] = useState(false);
+  const [modules, setModules] = useState([]);
 
   useEffect(() => {
-    setShowSwiper(true);
+    loadSwiperModules().then((loadedModules) => {
+      setModules([loadedModules.Navigation, loadedModules.Pagination]);
+      setShowSwiper(true);
+    });
   }, []);
 
   const itemCount = React.Children.count(children);
 
   return (
     <div className='navi_pagi_bottom_center'>
-      {showSwiper && (
+      {showSwiper && modules.length > 0 && (
         <Swiper
           spaceBetween={spaceBetween}
           navigation={{
             prevEl: `.${navigationClass.prev}`,
             nextEl: `.${navigationClass.next}`,
           }}
-          modules={[Navigation, Pagination]}
+          modules={modules}
           className='mySwiper'
           loop={loop && itemCount > slidesPerView[1200]}
           pagination={{
