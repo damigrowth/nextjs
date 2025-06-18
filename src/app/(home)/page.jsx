@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 
-import { HeroHome } from '@/components/hero';
+import { HeroHomeOptimized } from '@/components/hero';
 import { FeaturedCategoriesHome } from '@/components/section';
 import {
   Features_D,
@@ -22,7 +22,6 @@ import HomeSchema from '@/utils/Seo/Schema/HomeSchema';
 import { getFreelancer, getFreelancerId } from '@/actions/shared/freelancer';
 
 export const revalidate = 300; // 5 minutes
-
 export const fetchCache = 'force-cache';
 
 // Static SEO
@@ -39,7 +38,35 @@ export async function generateMetadata() {
   return meta;
 }
 
-export default async function page({ searchParams }) {
+// Loading component for non-critical sections
+function SectionLoader({ children, delay = 0 }) {
+  return (
+    <Suspense
+      fallback={
+        <div style={{ 
+          height: '200px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          opacity: 0.7
+        }}>
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      }
+    >
+      {children}
+    </Suspense>
+  );
+}
+
+export default async function OptimizedHomePage({ searchParams }) {
+  // Performance mark
+  if (typeof performance !== 'undefined') {
+    performance.mark('home-page-render-start');
+  }
+
   const params = await searchParams;
 
   // Build GraphQL query parameters from URL searchParams
@@ -49,7 +76,6 @@ export default async function page({ searchParams }) {
     category: params?.sc || undefined,
   };
 
-  // Freelancers only have pagination, no category filtering
   const freelancersParams = {
     page: Number(params?.fp) || 1,
     pageSize: Number(params?.fps) || 4,
@@ -58,7 +84,7 @@ export default async function page({ searchParams }) {
   // Get user ID if logged in
   const fid = await getFreelancerId();
 
-  // Apply strong caching for all data fetches
+  // CRITICAL: Load categories first for hero component
   const { categories } = await getData(
     FEATURED_CATEGORIES,
     null,
@@ -66,30 +92,33 @@ export default async function page({ searchParams }) {
     ['featured-categories'],
   );
 
-  // Load all services with caching
-  const { services } = await getData(
-    FEATURED_SERVICES,
-    servicesParams,
-    'HOME_SERVICES',
-    ['home-services'],
-  );
-
-  // Add proper caching for featured freelancers with pagination
-  const { freelancers } = await getData(
-    FEATURED_FREELANCERS,
-    freelancersParams,
-    'HOME_FREELANCERS',
-    ['home-freelancers'],
-  );
-
-  const { topServiceSubcategories, topFreelancerSubcategories } = await getData(
-    ALL_ACTIVE_TOP_TAXONOMIES,
-    null,
-    'ACTIVE_TOP',
-    ['active-top'],
-  );
-
-  const freelancer = await getFreelancer();
+  // Load other data in parallel but don't block critical render
+  const [
+    { services },
+    { freelancers },
+    { topServiceSubcategories, topFreelancerSubcategories },
+    freelancer
+  ] = await Promise.all([
+    getData(
+      FEATURED_SERVICES,
+      servicesParams,
+      'HOME_SERVICES',
+      ['home-services'],
+    ),
+    getData(
+      FEATURED_FREELANCERS,
+      freelancersParams,
+      'HOME_FREELANCERS',
+      ['home-freelancers'],
+    ),
+    getData(
+      ALL_ACTIVE_TOP_TAXONOMIES,
+      null,
+      'ACTIVE_TOP',
+      ['active-top'],
+    ),
+    getFreelancer()
+  ]);
 
   // Get user's saved data for efficient saved status checking
   const savedServices = freelancer?.saved_services?.data || [];
@@ -98,27 +127,47 @@ export default async function page({ searchParams }) {
   return (
     <>
       <HomeSchema />
-      <HeroHome categories={categories?.data || []} />
+      
+      {/* CRITICAL: Hero renders immediately with static content */}
+      <HeroHomeOptimized categories={categories?.data || []} />
+      
+      {/* CRITICAL: Featured categories render next */}
       <FeaturedCategoriesHome categories={categories?.data || []} />
-      <Features_D />
-      <FeaturedServicesHome_D
-        categories={categories?.data || []}
-        services={services?.data || []}
-        pagination={services?.meta?.pagination}
-        fid={fid}
-        savedServices={savedServices}
-      />
-      <FeaturedFreelancersHome_D
-        freelancers={freelancers?.data || []}
-        pagination={freelancers?.meta?.pagination}
-        fid={fid}
-        savedFreelancers={savedFreelancers}
-      />
-      <Stats_D />
-      <AllTaxonomies_D
-        freelancerSubcategories={topFreelancerSubcategories}
-        serviceSubcategories={topServiceSubcategories}
-      />
+      
+      {/* NON-CRITICAL: Load remaining sections with progressive enhancement */}
+      <SectionLoader delay={100}>
+        <Features_D />
+      </SectionLoader>
+
+      <SectionLoader delay={200}>
+        <FeaturedServicesHome_D
+          categories={categories?.data || []}
+          services={services?.data || []}
+          pagination={services?.meta?.pagination}
+          fid={fid}
+          savedServices={savedServices}
+        />
+      </SectionLoader>
+
+      <SectionLoader delay={300}>
+        <FeaturedFreelancersHome_D
+          freelancers={freelancers?.data || []}
+          pagination={freelancers?.meta?.pagination}
+          fid={fid}
+          savedFreelancers={savedFreelancers}
+        />
+      </SectionLoader>
+
+      <SectionLoader delay={400}>
+        <Stats_D />
+      </SectionLoader>
+
+      <SectionLoader delay={500}>
+        <AllTaxonomies_D
+          freelancerSubcategories={topFreelancerSubcategories}
+          serviceSubcategories={topServiceSubcategories}
+        />
+      </SectionLoader>
     </>
   );
 }
