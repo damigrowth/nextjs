@@ -3,6 +3,9 @@ import LinkNP from '@/components/link';
 import LoginForm from '@/components/form/form-auth-login';
 import { Meta } from '@/utils/Seo/Meta/Meta';
 
+export const dynamic = 'force-static';
+export const revalidate = false;
+
 // Static SEO
 export async function generateMetadata() {
   const { meta } = await Meta({

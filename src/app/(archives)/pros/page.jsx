@@ -15,9 +15,8 @@ import {
 } from '@/lib/graphql/queries/main/taxonomies/freelancer/skill';
 import { Meta } from '@/utils/Seo/Meta/Meta';
 
-export const dynamic = 'force-dynamic';
-
-export const revalidate = 3600;
+export const dynamic = 'auto';
+export const revalidate = 1800;
 
 export const dynamicParams = true;
 

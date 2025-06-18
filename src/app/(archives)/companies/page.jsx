@@ -13,9 +13,8 @@ import {
 } from '@/lib/graphql';
 import { Meta } from '@/utils/Seo/Meta/Meta';
 
-export const dynamic = 'force-dynamic';
-
-export const revalidate = 3600;
+export const dynamic = 'auto';
+export const revalidate = 1800;
 
 export const dynamicParams = true;
 

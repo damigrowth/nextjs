@@ -11,13 +11,11 @@
  * - Terms and conditions acceptance
  * - Integration with temporary session validation
  * - Real-time form validation and error handling
- *
- * @author Dom Vournias
  */
 
 'use client';
 
-import React, { useState, useEffect, useActionState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import LinkNP from '@/components/link';
 

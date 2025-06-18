@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import LinkNP from '@/components/link';
 
-import { setToken } from '@/actions/auth/token';
+// import { setToken } from '@/actions/auth/token';
 import { getFreelancerActivationStatus } from '@/actions/shared/freelancer';
 
 const GoogleSelectTypeContent = () => {
