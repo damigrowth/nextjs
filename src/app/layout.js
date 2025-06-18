@@ -18,7 +18,6 @@ config.autoAddCss = false; /* eslint-disable import/first */
 
 import 'react-tooltip/dist/react-tooltip.css';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { getUser } from '@/actions/shared/user';
 import {
   BottomToTop_D,
   CookiesBanner_D,
@@ -29,16 +28,10 @@ if (typeof window !== 'undefined') {
   import('bootstrap');
 }
 
-export const dynamic = 'force-dynamic';
-
 export const revalidate = 86400;
 
 export default async function RootLayout({ children }) {
   const isUnderMaintenance = false;
-
-  const user = await getUser();
-
-  const authenticated = user ? true : false;
 
   const { header: headerData } = await getData(
     ROOT_LAYOUT_WITH_ACTIVE_SERVICES,
@@ -48,29 +41,21 @@ export default async function RootLayout({ children }) {
 
   const gaId = process.env.GA_ID;
 
-  const freelancerId = user?.freelancer?.data?.id;
-
   return (
     <html lang='el'>
       <Body>
         <InstallBootstrap />
         <div className='wrapper ovh mm-page mm-slideout'>
-          {(!isUnderMaintenance || authenticated) && (
-            <PathChecker excludes='/dashboard'>
-              <Header user={user} header={headerData} />
-            </PathChecker>
-          )}
+          <PathChecker excludes='/dashboard'>
+            <Header header={headerData} />
+          </PathChecker>
           <div className='body_content'>
             <ApolloWrapper>
-              <Notifications freelancerId={freelancerId}>
-                {children}
-              </Notifications>
+              <Notifications>{children}</Notifications>
             </ApolloWrapper>
-            {(!isUnderMaintenance || authenticated) && (
-              <PathChecker excludes='/dashboard'>
-                <Footer />
-              </PathChecker>
-            )}
+            <PathChecker excludes='/dashboard'>
+              <Footer />
+            </PathChecker>
             <BottomToTop_D />
           </div>
         </div>

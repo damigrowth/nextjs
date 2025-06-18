@@ -6,8 +6,9 @@ import HeaderLogo from './header-logo';
 import HeaderMobile from './header-mobile';
 import HeaderStickyWrapper from './header-sticky';
 import { MegaMenu_D } from '../dynamic';
+import { RegisterProButton } from '../button';
 
-export default function Header({ user, header }) {
+export default function Header({ header }) {
   const categories = header
     ? header.data?.attributes?.categories?.data?.map((item, i) => ({
         id: i + 1,
@@ -48,13 +49,7 @@ export default function Header({ user, header }) {
               </div>
               <div className='col-auto pe-0 pe-xl-3'>
                 <div className='d-flex align-items-center'>
-                  {!user && (
-                    <LinkNP className='mx15-xl mx30' href='/register#pro'>
-                      <span className='hide-below-1400'>
-                        Καταχώριση Επαγγελματία
-                      </span>
-                    </LinkNP>
-                  )}
+                  <RegisterProButton />
                   <UserMenu />
                 </div>
               </div>
