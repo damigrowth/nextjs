@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { getBestDimensions } from '@/utils/imageDimensions';
 
@@ -19,7 +19,7 @@ export default function ServiceCardFile({
 
   if (!file) {
     return (
-      <Link href={path}>
+      <LinkNP href={path}>
         <div className='list-thumb flex-shrink-0 height'>
           <Image
             height={height || 245}
@@ -29,13 +29,13 @@ export default function ServiceCardFile({
             alt='service-thumbnail'
           />
         </div>
-      </Link>
+      </LinkNP>
     );
   } else {
     // Conditionally render Link only for images
     if (file.formats) {
       return (
-        <Link href={path}>
+        <LinkNP href={path}>
           <div className='list-thumb flex-shrink-0 height'>
             <Image
               height={height || 245}
@@ -51,7 +51,7 @@ export default function ServiceCardFile({
               alt='service-thumbnail'
             />
           </div>
-        </Link>
+        </LinkNP>
       );
     } else {
       // Render without Link for non-images (audio, video, fallback)

@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function FunFact({ data }) {
@@ -31,13 +31,13 @@ export default function FunFact({ data }) {
                 <p className='text-thm2 fz15 mb25'>
                   {data.leftSection.description}
                 </p>
-                <Link
+                <LinkNP
                   href={data.leftSection.buttonLink}
                   className='ud-btn btn-thm'
                 >
                   {data.leftSection.buttonText}
                   <ArrowRightLong />
-                </Link>
+                </LinkNP>
               </div>
             </div>
             <div

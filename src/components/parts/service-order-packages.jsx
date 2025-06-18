@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import useServiceOrderStore from '@/stores/order/service';
 
@@ -114,10 +114,10 @@ export default function OrderPackages({
         </div>
         {addons.length > 0 && <Addons addons={addons} small />}
         <div className='d-grid'>
-          <Link href={`/profile/${username}`} className='ud-btn btn-thm'>
+          <LinkNP href={`/profile/${username}`} className='ud-btn btn-thm'>
             Αγορά {order.total}€
             <ArrowRightLong />
-          </Link>
+          </LinkNP>
         </div>
       </div>
     </>

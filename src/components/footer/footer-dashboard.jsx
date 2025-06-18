@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { Socials } from '@/components/icon';
 import { firstColumnLinks } from '@/constants/footer';
@@ -11,15 +11,15 @@ export default function DashboardFooter() {
         <div className='row justify-content-between'>
           <div className='link-style1 mb-3 col-12 col-sm-auto'>
             <h6 className='mb10'>
-              <Link href={'/about'} className='text-white'>
+              <LinkNP href={'/about'} className='text-white'>
                 Σχετικά
-              </Link>
+              </LinkNP>
             </h6>
             <div className='link-list'>
               {firstColumnLinks.map((item, i) => (
-                <Link key={i} href={`/${item.attributes.slug}`}>
+                <LinkNP key={i} href={`/${item.attributes.slug}`}>
                   {item.attributes.title}
-                </Link>
+                </LinkNP>
               ))}
             </div>
           </div>
@@ -48,7 +48,7 @@ export default function DashboardFooter() {
             </div>
           </div>
           <div className='col-md-6 text-center text-sm-end'>
-            <Link className='footer-logo' href='/'>
+            <LinkNP className='footer-logo' href='/'>
               <Image
                 height={45}
                 width={123}
@@ -56,7 +56,7 @@ export default function DashboardFooter() {
                 src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo-white_rjmcei.svg'
                 alt='Doulitsa logo'
               />
-            </Link>
+            </LinkNP>
           </div>
         </div>
       </div>

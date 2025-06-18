@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { ArrowLeftLong, ArrowRightLong, IconUsers } from '@/components/icon/fa';
 
 let swiperModules = null;
@@ -197,10 +197,10 @@ export default function FreelancersClientWrapper({
               <p className='text-muted mb-3'>
                 Δοκιμάστε να ελέγξετε αργότερα ή επικοινωνήστε μαζί μας.
               </p>
-              <Link className='ud-btn2 text-white' href='/pros'>
+              <LinkNP className='ud-btn2 text-white' href='/pros'>
                 Όλοι οι Επαγγελματίες
                 <ArrowRightLong />
-              </Link>
+              </LinkNP>
             </div>
           </div>
         </div>

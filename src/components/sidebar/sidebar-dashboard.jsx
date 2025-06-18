@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { usePathname } from 'next/navigation';
 
 import {
@@ -38,10 +38,10 @@ export default function DashboardSidebar({ hasAccess }) {
 
     // Regular nav items as links
     return (
-      <Link href={item.path} className={commonClasses}>
+      <LinkNP href={item.path} className={commonClasses}>
         <i className={`${item.icon} mr15`} />
         {item.name}
-      </Link>
+      </LinkNP>
     );
   };
 

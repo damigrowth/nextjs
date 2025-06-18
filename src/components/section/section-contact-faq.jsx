@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 export default function Faq({ data, className }) {
   return (
@@ -9,7 +9,7 @@ export default function Faq({ data, className }) {
             <div className='main-title text-center'>
               <h2 className='title'>{data.title}</h2>
               <p className='paragraph mt10'>
-                {data.subtitle} <Link href='/faq'>FAQ</Link>.
+                {data.subtitle} <LinkNP href='/faq'>FAQ</LinkNP>.
               </p>
             </div>
           </div>

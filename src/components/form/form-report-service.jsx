@@ -7,7 +7,7 @@ import React, {
   useState,
   useTransition,
 } from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { ServiceReportModal } from '@/components/modal';
 import { useFormChanges } from '@/hooks/useFormChanges';
@@ -258,20 +258,20 @@ export default function ServiceReportForm({ reporter, reported, service }) {
             Για να κάνεις αναφορά πρέπει να έχεις λογαριασμό
           </h4>
           <div className='auth-btns'>
-            <Link
+            <LinkNP
               className='mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent'
               href='/login'
               onClick={handleLinkClick}
             >
               Σύνδεση
-            </Link>
-            <Link
+            </LinkNP>
+            <LinkNP
               className='mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent'
               href='/register'
               onClick={handleLinkClick}
             >
               Εγγραφή
-            </Link>
+            </LinkNP>
           </div>
         </div>
       )}

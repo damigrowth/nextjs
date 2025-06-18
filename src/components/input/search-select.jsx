@@ -4,7 +4,7 @@ import React, { useEffect, useOptimistic, useRef, useTransition } from 'react';
 import { RotatingLines } from 'react-loader-spinner';
 // Dynamic import fix for hydration error
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import {
   useParams,
   usePathname,
@@ -384,12 +384,12 @@ export default function SearchSelect({
       className={`dropdown-item p0 ${params.category === item.value ? 'selected active' : ''}`}
       onClick={() => selectLinkHandler(item)}
     >
-      <Link
+      <LinkNP
         href={generateLink(item.value)}
         className='archive-search-select-list-link'
       >
         <span className='text'>{item.label}</span>
-      </Link>
+      </LinkNP>
     </li>
   ));
 

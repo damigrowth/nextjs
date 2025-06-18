@@ -19,7 +19,7 @@
 
 import React, { useState, useEffect, useActionState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import authStore from '@/stores/authStore';
 import { FormButton } from '@/components/button';
@@ -33,13 +33,13 @@ const consentOptions = [
     label: (
       <span>
         Αποδέχομαι τους{' '}
-        <Link href='/terms' target='_blank' className='text-thm'>
+        <LinkNP href='/terms' target='_blank' className='text-thm'>
           Όρους Χρήσης
-        </Link>{' '}
+        </LinkNP>{' '}
         και την{' '}
-        <Link href='/privacy' target='_blank' className='text-thm'>
+        <LinkNP href='/privacy' target='_blank' className='text-thm'>
           Πολιτική Απορρήτου
-        </Link>
+        </LinkNP>
       </span>
     ),
   },
@@ -326,9 +326,9 @@ const GoogleCompleteMinimalContent = () => {
               <div className='text-center'>
                 <p className='text'>
                   Θέλετε να χρησιμοποιήσετε διαφορετικό λογαριασμό?{' '}
-                  <Link href='/register' className='text-thm'>
+                  <LinkNP href='/register' className='text-thm'>
                     Ξεκινήστε ξανά
-                  </Link>
+                  </LinkNP>
                 </p>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { UserImage } from '@/components/avatar';
 import {
@@ -86,21 +86,21 @@ export default async function UserMenu({ isMobile }) {
   } else {
     return !isMobile ? (
       <div className='auth-btns'>
-        <Link
+        <LinkNP
           className='mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent'
           href='/login'
         >
           Σύνδεση
-        </Link>
-        <Link
+        </LinkNP>
+        <LinkNP
           className='mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent'
           href='/register'
         >
           Εγγραφή
-        </Link>
+        </LinkNP>
       </div>
     ) : (
-      <Link href='/login'>Σύνδεση</Link>
+      <LinkNP href='/login'>Σύνδεση</LinkNP>
     );
   }
 }

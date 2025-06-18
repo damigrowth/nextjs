@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import useModalCleanup from '@/hooks/useModalCleanup';
 
@@ -56,20 +56,20 @@ export default function StartChatModal({
                 />
               ) : (
                 <div className='auth-btns'>
-                  <Link
+                  <LinkNP
                     className='mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent'
                     href='/login'
                     onClick={handleLinkClick}
                   >
                     Σύνδεση
-                  </Link>
-                  <Link
+                  </LinkNP>
+                  <LinkNP
                     className='mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent'
                     href='/register'
                     onClick={handleLinkClick}
                   >
                     Εγγραφή
-                  </Link>
+                  </LinkNP>
                 </div>
               )}
             </div>

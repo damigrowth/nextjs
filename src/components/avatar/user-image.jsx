@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import InitialsImage from '../parts/freelancer-image-initials';
 import TooltipTop from '../tooltip/tooltip-top';
@@ -66,12 +66,12 @@ export default function UserImage({
   return (
     <div className='user-image-container'>
       {path ? (
-        <Link
+        <LinkNP
           href={path}
           className='d-flex justify-content-center align-items-center'
         >
           {content}
-        </Link>
+        </LinkNP>
       ) : (
         content
       )}

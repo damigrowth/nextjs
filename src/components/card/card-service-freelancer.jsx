@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import CardReviews from './card-reviews';
 import ServiceCardFile from './card-service-file';
@@ -41,7 +41,7 @@ export default function ServiceCard({
               fallback={fallback}
             />
           )}
-          {/* <Link href={`/s/${slug}`}>
+          {/* <LinkNP href={`/s/${slug}`}>
             {media.length === 0 && (
               <Image
                 height={190}
@@ -52,7 +52,7 @@ export default function ServiceCard({
               />
             )}
             {media.length > 1 && <div>multiple images</div>}
-          </Link> */}
+          </LinkNP> */}
           {/* <a
             onClick={() => setFavActive(!isFavActive)}
             className={`listing-fav fz12 ${isFavActive ? "ui-fav-active" : ""}`}
@@ -63,7 +63,7 @@ export default function ServiceCard({
         <div className='list-content'>
           <p className='list-text body-color fz14 mb-1'>{category}</p>
           <h6 className='list-title service-card-title'>
-            <Link href={`/s/${slug}`}>{truncatedTitle}</Link>
+            <LinkNP href={`/s/${slug}`}>{truncatedTitle}</LinkNP>
           </h6>
           <CardReviews rating={rating} reviews_total={reviews_total} />
           {price > 0 && (

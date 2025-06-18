@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { usePathname } from 'next/navigation';
 
 import { getPathname } from '@/utils/paths';
@@ -65,16 +65,16 @@ export default function Tabs({
             <div className='listings_category_nav_list_menu'>
               <ul className='mb0 d-flex ps-0'>
                 <li>
-                  <Link
+                  <LinkNP
                     href={`/${categoriesRoute ? 'categories' : parentPath}`}
                     className={!category ? 'active' : ''}
                   >
                     {parentLabel}
-                  </Link>
+                  </LinkNP>
                 </li>
                 {categories.map((cat, index) => (
                   <li key={index}>
-                    <Link
+                    <LinkNP
                       href={`/${categoriesRoute ? 'categories' : parentPath}/${
                         cat.attributes.slug
                       }`}
@@ -87,7 +87,7 @@ export default function Tabs({
                       }
                     >
                       {plural ? cat.attributes.plural : cat.attributes.label}
-                    </Link>
+                    </LinkNP>
                   </li>
                 ))}
               </ul>

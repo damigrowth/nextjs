@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import BreadcrumbButtons from './breadcrumb-buttons';
 
@@ -42,19 +42,19 @@ export default async function BreadcrumbArchives({
           <div className='col-sm-8 col-lg-10'>
             <div className='breadcumb-style1'>
               <div className='breadcumb-list'>
-                <Link href='/'>Αρχική</Link>
-                <Link href={`/${parentPathLink}`}>{parentPathLabel}</Link>
+                <LinkNP href='/'>Αρχική</LinkNP>
+                <LinkNP href={`/${parentPathLink}`}>{parentPathLabel}</LinkNP>
                 {category && (
-                  <Link
+                  <LinkNP
                     href={`/${categoriesRoute ? 'categories' : parentPathLink}/${category.slug}`}
                   >
                     {plural ? category.plural : category.label}
-                  </Link>
+                  </LinkNP>
                 )}
                 {subcategory === subdivision ? (
                   <>
                     {subcategory && (
-                      <Link
+                      <LinkNP
                         href={
                           categoriesRoute
                             ? `/${parentPathLink}/${subcategory.slug}`
@@ -62,13 +62,13 @@ export default async function BreadcrumbArchives({
                         }
                       >
                         {plural ? subcategory.plural : subcategory.label}
-                      </Link>
+                      </LinkNP>
                     )}
                   </>
                 ) : (
                   <>
                     {subcategory && (
-                      <Link
+                      <LinkNP
                         href={
                           categoriesRoute
                             ? `/${parentPathLink}/${subcategory.slug}`
@@ -76,10 +76,10 @@ export default async function BreadcrumbArchives({
                         }
                       >
                         {plural ? subcategory.plural : subcategory.label}
-                      </Link>
+                      </LinkNP>
                     )}
                     {subcategory && subdivision && (
-                      <Link
+                      <LinkNP
                         href={
                           categoriesRoute
                             ? `/${parentPathLink}/${subcategory.slug}/${subdivision.slug}`
@@ -88,7 +88,7 @@ export default async function BreadcrumbArchives({
                         className='archive-breadcrump-active'
                       >
                         {plural ? subdivision.plural : subdivision.label}
-                      </Link>
+                      </LinkNP>
                     )}
                   </>
                 )}

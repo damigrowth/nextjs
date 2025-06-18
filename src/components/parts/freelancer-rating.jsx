@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { formatRating } from '@/utils/formatRating';
 import { IconStar } from '@/components/icon/fa';
@@ -27,9 +27,9 @@ export default function RatingTotal({
   if (totalReviews === 0 || totalReviews === null) return null;
   if (clickable) {
     return (
-      <Link href='#reviews-section' className='text-decoration-none'>
+      <LinkNP href='#reviews-section' className='text-decoration-none'>
         {ratingContent}
-      </Link>
+      </LinkNP>
     );
   }
 

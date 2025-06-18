@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { IconEye } from '@/components/icon/fa';
 
 import ServiceCardFile from './card-service-file';
@@ -40,16 +40,16 @@ export default function EditServiceCard({ service }) {
             </div>
             <div className='list-content flex-grow-1 py-0 pl15 pl0-lg'>
               <h6 className='list-title mb-0'>
-                <Link href={`/dashboard/services/edit/${service.id}`}>
+                <LinkNP href={`/dashboard/services/edit/${service.id}`}>
                   {service.attributes.title}
-                </Link>
-                <Link
+                </LinkNP>
+                <LinkNP
                   href={`/s/${service.attributes.slug}`}
                   target='_blank'
                   className='ml10'
                 >
                   <IconEye />
-                </Link>
+                </LinkNP>
               </h6>
             </div>
           </div>
@@ -80,7 +80,7 @@ export default function EditServiceCard({ service }) {
         </td>
         <td className='align-top'>
           <div className='d-flex justify-content-end'>
-            <Link
+            <LinkNP
               href={`/dashboard/services/edit/${service.id}`}
               className='icon'
               // id="edit"
@@ -88,7 +88,7 @@ export default function EditServiceCard({ service }) {
               // data-bs-target="#proposalModal"
             >
               <span className='flaticon-pencil' />
-            </Link>
+            </LinkNP>
           </div>
         </td>
       </tr>

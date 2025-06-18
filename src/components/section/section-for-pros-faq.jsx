@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 export default function OurFaq1() {
   return (
@@ -10,9 +10,9 @@ export default function OurFaq1() {
               <h2 className='title'>Συχνές Ερωτήσεις</h2>
               <p className='paragraph mt10'>
                 Αν έχεις περισσότερες ερωτήσεις πήγαινε στη σελίδα{' '}
-                <Link href='/faq' className='text-decoration-underline'>
+                <LinkNP href='/faq' className='text-decoration-underline'>
                   FAQ
-                </Link>
+                </LinkNP>
                 .
               </p>
             </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import useHomeStore from '@/stores/home/homeStore';
 
@@ -56,9 +56,9 @@ export default function AllTaxonomiesList({ list, tabIndex }) {
 
                   return (
                     <li key={i2}>
-                      <Link href={`/${type}/${path}`}>
+                      <LinkNP href={`/${type}/${path}`}>
                         {item.plural || item.label}
-                      </Link>
+                      </LinkNP>
                     </li>
                   );
                 })}

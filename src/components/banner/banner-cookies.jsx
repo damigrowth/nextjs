@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import {
   CookieCategories,
   getConsentDefaults,
@@ -125,9 +125,9 @@ export default function CookiesBanner() {
           Χρησιμοποιούμε cookies για να σου προσφέρουμε μια καλύτερη
           προσωποποιημένη εμπειρία και να σε βοηθήσουμε να βρεις εύκολα αυτό που
           ψάχνεις.
-          <Link href='/privacy' className='text-decoration-none ms-1'>
+          <LinkNP href='/privacy' className='text-decoration-none ms-1'>
             Πολιτική Απορρήτου
-          </Link>
+          </LinkNP>
           .
         </p>
         <div className='d-flex justify-content-between gap-2'>

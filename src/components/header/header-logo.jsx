@@ -1,11 +1,11 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 export default function HeaderLogo() {
   return (
     <div className='logos'>
-      <Link className='header-logo logo1' href='/'>
+      <LinkNP className='header-logo logo1' href='/'>
         <Image
           width={133}
           height={40}
@@ -14,8 +14,8 @@ export default function HeaderLogo() {
           unoptimized
           priority
         />
-      </Link>
-      <Link className='header-logo logo2' href='/'>
+      </LinkNP>
+      <LinkNP className='header-logo logo2' href='/'>
         <Image
           width={133}
           height={40}
@@ -24,7 +24,7 @@ export default function HeaderLogo() {
           unoptimized
           priority
         />
-      </Link>
+      </LinkNP>
     </div>
   );
 }

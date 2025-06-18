@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { Swiper, SwiperSlide } from '@/components/swiper';
 import { IconAngleRight } from '@/components/icon/fa';
 
@@ -43,13 +43,13 @@ export default function TaxonomiesSwiper({ taxonomies }) {
             {taxonomies &&
               taxonomies.map((taxonomy, i) => (
                 <SwiperSlide key={i}>
-                  <Link
+                  <LinkNP
                     href={`/ipiresies/${taxonomy.subcategory.data.attributes.slug}/${taxonomy.slug}`}
                     className='taxonomies-swiper-card'
                   >
                     <span>{taxonomy.label}</span>
                     <IconAngleRight />
-                  </Link>
+                  </LinkNP>
                 </SwiperSlide>
               ))}
           </Swiper>

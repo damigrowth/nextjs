@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { FreelancerCard } from '@/components/card';
 import { getBatchFreelancerSavedStatuses } from '@/utils/savedStatus';
@@ -18,8 +18,11 @@ export default function FeaturedFreelancers({
   }));
 
   // Calculate saved statuses for all freelancers at once
-  const freelancerIds = freelancers.map(f => f.id);
-  const savedFreelancerStatuses = getBatchFreelancerSavedStatuses(freelancerIds, savedFreelancers);
+  const freelancerIds = freelancers.map((f) => f.id);
+  const savedFreelancerStatuses = getBatchFreelancerSavedStatuses(
+    freelancerIds,
+    savedFreelancers,
+  );
 
   return (
     <>
@@ -39,10 +42,10 @@ export default function FeaturedFreelancers({
             </div>
             <div className='col-lg-3'>
               <div className='text-start text-lg-end mb-4 mb-lg-2'>
-                <Link className='ud-btn2 text-white' href='/pros'>
+                <LinkNP className='ud-btn2 text-white' href='/pros'>
                   Όλοι οι Επαγγελματίες
                   <ArrowRightLong />
-                </Link>
+                </LinkNP>
               </div>
             </div>
           </div>

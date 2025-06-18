@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import LoginForm from '@/components/form/form-auth-login';
 import { Meta } from '@/utils/Seo/Meta/Meta';
@@ -40,9 +40,9 @@ export default async function page() {
                 {!isUnderMaintenance && (
                   <p className='text'>
                     Δεν έχεις λογαριασμό;{' '}
-                    <Link href='/register' className='text-thm'>
+                    <LinkNP href='/register' className='text-thm'>
                       Εγγραφή!
-                    </Link>
+                    </LinkNP>
                   </p>
                 )}
               </div>

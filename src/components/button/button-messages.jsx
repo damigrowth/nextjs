@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { usePathname } from 'next/navigation';
 
 import MessagesBadge from '../badge/badge-messages';
@@ -13,14 +13,14 @@ export default function MessagesMenu() {
 
   return (
     <div className='d-none d-sm-flex align-items-center justify-content-center'>
-      <Link
+      <LinkNP
         href='/dashboard/messages'
         className='position-relative text-center text-thm2 fz24 d-flex'
         aria-label='Messages'
       >
         <span className='flaticon-mail d-flex' />
         {!isOnMessagesPage && <MessagesBadge />}
-      </Link>
+      </LinkNP>
     </div>
   );
 }

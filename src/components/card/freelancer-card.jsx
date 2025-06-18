@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { UserImage } from '@/components/avatar';
 import { formatRating } from '@/utils/formatRating';
@@ -69,13 +69,13 @@ export default async function FreelancerCard({
         </div>
         <div className='review'>
           {linkedName ? (
-            <Link
+            <LinkNP
               href={`/profile/${username}`}
               className='d-flex align-items-center justify-content-center mb-1'
             >
               <h5 className='title m0 mr5 text-bold'>{displayName}</h5>
               <VerifiedBadge verified={verified} />
-            </Link>
+            </LinkNP>
           ) : (
             <div className='d-flex align-items-center justify-content-center mb-1'>
               <h5 className='title m0 mr5 text-bold'>{displayName}</h5>
@@ -110,13 +110,13 @@ export default async function FreelancerCard({
             <div className='empty-card-tags'>&nbsp;</div>
           )}
           <div className='d-grid mt15'>
-            <Link
+            <LinkNP
               href={`/profile/${username}`}
               className='ud-btn btn-light-thm'
             >
               Περισσότερα
               <ArrowRightLong />
-            </Link>
+            </LinkNP>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 
 import { getBestDimensions } from '@/utils/imageDimensions';
@@ -55,7 +55,7 @@ export default function ServiceSlideCardMedia({ media, path }) {
               const formatResult = getBestDimensions(attributes.formats);
 
               slideContent = (
-                <Link href={path || '#'}>
+                <LinkNP href={path || '#'}>
                   {' '}
                   {/* Add Link wrapper, provide fallback href */}
                   <Image
@@ -66,7 +66,7 @@ export default function ServiceSlideCardMedia({ media, path }) {
                     alt='thumbnail'
                     style={{ objectFit: 'cover', height: '247px' }} // Ensure consistent height
                   />
-                </Link>
+                </LinkNP>
               );
             } else if (attributes.mime?.startsWith('video/')) {
               // Only check for video now

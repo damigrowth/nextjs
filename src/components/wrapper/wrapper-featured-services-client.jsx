@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 import {
   ArrowLeftLong,
   ArrowRightLong,
@@ -325,10 +325,13 @@ export default function ServicesClientWrapper({
                           : 'Δοκιμάστε μια διαφορετική κατηγορία ή δείτε όλες τις διαθέσιμες υπηρεσίες.'}
                       </p>
                       {activeCategory && (
-                        <Link className='ud-btn2 text-black' href='/ipiresies'>
+                        <LinkNP
+                          className='ud-btn2 text-black'
+                          href='/ipiresies'
+                        >
                           Όλες οι Υπηρεσίες
                           <ArrowRightLong />
-                        </Link>
+                        </LinkNP>
                       )}
                     </div>
                   </div>

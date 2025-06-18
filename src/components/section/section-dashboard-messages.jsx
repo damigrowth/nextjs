@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+import LinkNP from '@/components/link';
 
 import { UserImage } from '@/components/avatar';
 import { ChatMessagesSkeleton } from '@/components/skeleton';
@@ -370,9 +370,9 @@ export default function MessageBox({
           <div className='meta d-sm-flex justify-content-sm-between align-items-center flex-grow-1'>
             <div className='authors d-flex align-items-center justify-content-center'>
               {generatePathForOtherParticipant() ? (
-                <Link href={generatePathForOtherParticipant()}>
+                <LinkNP href={generatePathForOtherParticipant()}>
                   {displayName}
-                </Link>
+                </LinkNP>
               ) : (
                 <h6 className='name mb-0'>{displayName}</h6>
               )}
@@ -617,7 +617,7 @@ export default function MessageBox({
                               </small>{' '}
                               {/* Removed "Εγώ" while keeping the link functionality */}
                               {authorPath ? (
-                                <Link href={authorPath}></Link>
+                                <LinkNP href={authorPath}></LinkNP>
                               ) : (
                                 <></>
                               )}
@@ -625,9 +625,9 @@ export default function MessageBox({
                           ) : (
                             <>
                               {authorPath ? (
-                                <Link href={authorPath}>
+                                <LinkNP href={authorPath}>
                                   {authorDisplayName}
-                                </Link>
+                                </LinkNP>
                               ) : (
                                 <span>{authorDisplayName}</span>
                               )}
