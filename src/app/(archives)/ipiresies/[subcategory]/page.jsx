@@ -4,7 +4,7 @@ import { Banner } from '@/components/banner';
 import { BreadcrumbArchives } from '@/components/breadcrumb';
 import { ServicesArchive } from '@/components/content';
 import { Tabs } from '@/components/section';
-import { getData } from '@/lib/client/operations';
+import { getPublicData } from '@/lib/client/operations';
 import {
   CATEGORIES,
   SUBDIVISIONS_FOR_FILTERED_SERVICES,
@@ -18,6 +18,7 @@ import { Meta } from '@/utils/Seo/Meta/Meta';
 
 export const dynamic = 'auto';
 export const revalidate = 1800;
+export const fetchCache = 'force-cache';
 
 export const dynamicParams = true;
 
@@ -42,9 +43,9 @@ export async function generateMetadata({ params }) {
 export default async function page({ params, searchParams }) {
   const { subcategory } = await params;
 
-  const { categories } = await getData(CATEGORIES);
+  const { categories } = await getPublicData(CATEGORIES);
 
-  const { subcategoryBySlug } = await getData(TAXONOMIES_BY_SLUG, {
+  const { subcategoryBySlug } = await getPublicData(TAXONOMIES_BY_SLUG, {
     subcategory,
     subdivision: '',
   });
@@ -104,7 +105,7 @@ export default async function page({ params, searchParams }) {
   let tagsSearch = tags_s ? tags_s : undefined;
 
   // Fetch subdivisions based on filtered services
-  const { subdivisionsForFilteredResults } = await getData(
+  const { subdivisionsForFilteredResults } = await getPublicData(
     SUBDIVISIONS_FOR_FILTERED_SERVICES,
     {
       search: paramsFilters.search,
@@ -120,7 +121,7 @@ export default async function page({ params, searchParams }) {
   );
 
   // Fallback to old query for search functionality only
-  const { subdivisionsSearch } = await getData(SUBDIVISIONS_SEARCH_FILTERED, {
+  const { subdivisionsSearch } = await getPublicData(SUBDIVISIONS_SEARCH_FILTERED, {
     subcategorySlug: subcategory,
     searchTerm: categorySearch,
     subdivisionPage: paramsFilters.subdivisionPage,
@@ -128,7 +129,7 @@ export default async function page({ params, searchParams }) {
   });
 
   // Fetch tags based on filtered services with category filter
-  const { tagsForFilteredResults, tagsBySlug } = await getData(
+  const { tagsForFilteredResults, tagsBySlug } = await getPublicData(
     TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY,
     {
       search: paramsFilters.search,
@@ -147,7 +148,7 @@ export default async function page({ params, searchParams }) {
 
   // Fallback to old query for search functionality only
   const { tagsBySearch: oldTagsBySearch } = tagsSearch
-    ? await getData(
+    ? await getPublicData(
         TAGS_SEARCH,
         {
           label: tagsSearch,

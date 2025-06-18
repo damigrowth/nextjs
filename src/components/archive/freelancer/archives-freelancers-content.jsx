@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getData } from '@/lib/client/operations';
+import { getPublicData } from '@/lib/client/operations';
 import {
   FREELANCERS_ARCHIVE,
   FREELANCERS_ARCHIVE_WITH_SKILLS,
@@ -18,7 +18,7 @@ export default async function Content({ paramsFilters, taxonomies }) {
       ? FREELANCERS_ARCHIVE_WITH_SKILLS
       : FREELANCERS_ARCHIVE;
 
-  const { freelancers } = await getData(query, paramsFilters);
+  const { freelancers } = await getPublicData(query, paramsFilters);
 
   return (
     <>

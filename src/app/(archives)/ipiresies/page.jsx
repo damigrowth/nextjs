@@ -4,7 +4,7 @@ import { Banner } from '@/components/banner';
 import { BreadcrumbArchives } from '@/components/breadcrumb';
 import { ServicesArchive } from '@/components/content';
 import { Tabs } from '@/components/section';
-import { getData } from '@/lib/client/operations';
+import { getPublicData } from '@/lib/client/operations';
 import {
   CATEGORIES,
   SUBCATEGORIES_FOR_FILTERED_SERVICES,
@@ -17,6 +17,7 @@ import { Meta } from '@/utils/Seo/Meta/Meta';
 
 export const dynamic = 'auto';
 export const revalidate = 1800;
+export const fetchCache = 'force-cache';
 
 export const dynamicParams = true;
 
@@ -34,7 +35,7 @@ export async function generateMetadata() {
 }
 
 export default async function page({ searchParams }) {
-  const { categories } = await getData(CATEGORIES);
+  const { categories } = await getPublicData(CATEGORIES);
 
   const {
     search,
@@ -90,20 +91,20 @@ export default async function page({ searchParams }) {
     subcategoryPageSize: paramsFilters.subcategoryPageSize,
   };
 
-  const { subcategoriesForFilteredResults } = await getData(
+  const { subcategoriesForFilteredResults } = await getPublicData(
     SUBCATEGORIES_FOR_FILTERED_SERVICES,
     subcategoriesQueryVariables,
   );
 
   // Fallback to old query for search functionality only
-  const { subcategoriesSearch } = await getData(SUBCATEGORIES_SEARCH_FILTERED, {
+  const { subcategoriesSearch } = await getPublicData(SUBCATEGORIES_SEARCH_FILTERED, {
     searchTerm: categorySearch,
     subcategoryPage: paramsFilters.subcategoryPage,
     subcategoryPageSize: paramsFilters.subcategoryPageSize,
   });
 
   // Fetch tags based on filtered services (without category filter since we're on the main page)
-  const { tagsForFilteredResults, tagsBySlug } = await getData(
+  const { tagsForFilteredResults, tagsBySlug } = await getPublicData(
     TAGS_FOR_FILTERED_SERVICES,
     {
       search: paramsFilters.search,
@@ -121,7 +122,7 @@ export default async function page({ searchParams }) {
 
   // Fallback to old query for search functionality only
   const { tagsBySearch: oldTagsBySearch } = tagsSearch
-    ? await getData(
+    ? await getPublicData(
         TAGS_SEARCH,
         {
           label: tagsSearch,

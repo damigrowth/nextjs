@@ -1,6 +1,6 @@
 'use server';
 
-import { getData } from '@/lib/client/operations';
+import { getPublicData } from '@/lib/client/operations';
 import {
   FREELANCER_PAGE_SEO,
   FREELANCERS_ARCHIVE_SEO,
@@ -23,7 +23,7 @@ export async function fetchEntity(type, params) {
 
   if (!query) throw new Error(`Unsupported entity type: ${type}`);
 
-  const data = await getData(query, params);
+  const data = await getPublicData(query, params);
 
   let entity = null;
 
