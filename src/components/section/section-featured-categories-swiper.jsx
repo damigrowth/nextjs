@@ -1,27 +1,26 @@
 'use client';
 
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Navigation, Pagination } from 'swiper';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
 
 export default function FeaturedCategoriesSwiper({ categories }) {
   const [showSwiper, setShowSwiper] = useState(false);
+  const [modules, setModules] = useState([]);
 
   useEffect(() => {
-    setShowSwiper(true);
+    loadSwiperModules().then((loadedModules) => {
+      setModules([loadedModules.Navigation, loadedModules.Pagination]);
+      setShowSwiper(true);
+    });
   }, []);
 
   return (
     <div className='row d-block d-lg-none'>
       <div className='col-lg-12'>
         <div className='ui-browser wow fadeInUp pb20'>
-          {showSwiper && (
+          {showSwiper && modules.length > 0 && (
             <Swiper
               slidesPerView={1}
               navigation={{
@@ -29,7 +28,7 @@ export default function FeaturedCategoriesSwiper({ categories }) {
                 nextEl: '.btn__next__001',
               }}
               spaceBetween={30}
-              modules={[Navigation, Pagination]}
+              modules={modules}
               className='mySwiper'
               loop={true}
               pagination={{

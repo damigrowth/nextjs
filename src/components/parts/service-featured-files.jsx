@@ -1,14 +1,8 @@
 'use client';
 
-import 'swiper/css';
-import 'swiper/css/free-mode';
-import 'swiper/css/navigation';
-import 'swiper/css/thumbs';
-
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { FreeMode, Navigation, Thumbs } from 'swiper';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 
 import { getBestDimensions } from '@/utils/imageDimensions';
 
@@ -17,11 +11,18 @@ import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
 
 export default function FeaturedFiles({ files, title, border }) {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
-
   const [showSwiper, setShowSwiper] = useState(false);
+  const [modules, setModules] = useState([]);
 
   useEffect(() => {
-    setShowSwiper(true);
+    loadSwiperModules().then((loadedModules) => {
+      setModules([
+        loadedModules.FreeMode,
+        loadedModules.Navigation,
+        loadedModules.Thumbs,
+      ]);
+      setShowSwiper(true);
+    });
   }, []);
 
   // Filter out audio files before mapping to attributes
@@ -38,7 +39,7 @@ export default function FeaturedFiles({ files, title, border }) {
             className='thumb px50 py25-sm px30-sm py30'
             // style={{ borderRadius: "20px", overflow: "hidden" }}
           >
-            {showSwiper && (
+            {showSwiper && modules.length > 0 && (
               <Swiper
                 loop={true}
                 spaceBetween={10}
@@ -52,7 +53,7 @@ export default function FeaturedFiles({ files, title, border }) {
                       ? thumbsSwiper
                       : null,
                 }}
-                modules={[FreeMode, Navigation, Thumbs]}
+                modules={modules}
                 className='mySwiper2'
               >
                 {galleryFiles.map((file, i) => {
@@ -123,7 +124,7 @@ export default function FeaturedFiles({ files, title, border }) {
             <ArrowRightLong />
           </button>
         </div>
-        {showSwiper && (
+        {showSwiper && modules.length > 0 && (
           <Swiper
             onSwiper={setThumbsSwiper}
             // loop={true}
@@ -131,7 +132,7 @@ export default function FeaturedFiles({ files, title, border }) {
             slidesPerView={4}
             // freeMode={true}
             watchSlidesProgress={true}
-            modules={[FreeMode, Navigation, Thumbs]}
+            modules={modules}
             className='mySwiper ui-service-gig-slder-bottom mb60 '
           >
             {galleryFiles.map((file, i) => {

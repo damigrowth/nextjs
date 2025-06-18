@@ -1,15 +1,18 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useRef } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-
-// Import required modules for Swiper v8
-import SwiperCore, { Navigation, Pagination } from 'swiper';
+import React, { useEffect, useRef, useState } from 'react';
+import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 import Link from 'next/link';
 import { ArrowLeftLong, ArrowRightLong, IconUsers } from '@/components/icon/fa';
 
-SwiperCore.use([Navigation, Pagination]);
+let swiperModules = null;
+const getSwiperModules = async () => {
+  if (!swiperModules) {
+    swiperModules = await loadSwiperModules();
+  }
+  return swiperModules;
+};
 
 /**
  * @typedef {object} FreelancersClientWrapperProps
@@ -31,10 +34,19 @@ export default function FreelancersClientWrapper({
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const [modules, setModules] = useState([]);
+
   const filteredFreelancers = renderedFreelancerCards;
 
   const currentPage = pagination?.page || 1;
   const pageCount = pagination?.pageCount || 1;
+
+  // Load Swiper modules on component mount
+  useEffect(() => {
+    getSwiperModules().then((loadedModules) => {
+      setModules([loadedModules.Navigation, loadedModules.Pagination]);
+    });
+  }, []);
 
   const handleSlideChange = (swiper) => {
     const newPage = swiper.activeIndex + 1;
@@ -139,14 +151,23 @@ export default function FreelancersClientWrapper({
     <div className='navi_pagi_bottom_center_freelancers'>
       {filteredFreelancers.length > 0 ? (
         <>
-          <Swiper
-            {...swiperConfig}
-            className='mySwiper outer-swiper-freelancers'
-          >
-            {dataPageSlides}
-          </Swiper>
+          {modules.length > 0 ? (
+            <Swiper
+              {...swiperConfig}
+              modules={modules}
+              className='mySwiper outer-swiper-freelancers'
+            >
+              {dataPageSlides}
+            </Swiper>
+          ) : (
+            <div className='text-center py-5'>
+              <div className='spinner-border text-thm2' role='status'>
+                <span className='visually-hidden'>Loading...</span>
+              </div>
+            </div>
+          )}
 
-          {pageCount > 1 && (
+          {pageCount > 1 && modules.length > 0 && (
             <div className='swiper-navigation-wrapper'>
               <button className='swiper__btn btn__prev__freelancers'>
                 <ArrowLeftLong />

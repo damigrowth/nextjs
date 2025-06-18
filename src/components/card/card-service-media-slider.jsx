@@ -1,27 +1,21 @@
 'use client';
 
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link'; // Import Link
-import { Navigation, Pagination } from 'swiper';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import Link from 'next/link';
+import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 
 import { getBestDimensions } from '@/utils/imageDimensions';
 
 import VideoPreview from './card-video-preview';
 import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
-// Import VideoPreview
 
 export default function ServiceSlideCardMedia({ media, path }) {
-  // Add path prop
   const [showSwiper, setShowSwiper] = useState(false);
+  const [modules, setModules] = useState([]);
 
   const fallbackImage =
-    'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076750/Static/service_ngrppj.webp'; // Define fallback
+    'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076750/Static/service_ngrppj.webp';
 
   // Re-introduce filtering to exclude audio files
   const displayMedia = media.data.filter(
@@ -29,18 +23,21 @@ export default function ServiceSlideCardMedia({ media, path }) {
   );
 
   useEffect(() => {
-    setShowSwiper(true);
+    loadSwiperModules().then((loadedModules) => {
+      setModules([loadedModules.Navigation, loadedModules.Pagination]);
+      setShowSwiper(true);
+    });
   }, []);
 
   return (
     <>
-      {showSwiper && (
+      {showSwiper && modules.length > 0 && (
         <Swiper
           navigation={{
             prevEl: '.btn__prev__005',
             nextEl: '.btn__next__005',
           }}
-          modules={[Navigation, Pagination]}
+          modules={modules}
           className='mySwiper'
           loop={true}
           pagination={{
@@ -118,6 +115,16 @@ export default function ServiceSlideCardMedia({ media, path }) {
             </div>
           </div>
         </Swiper>
+      )}
+      {!showSwiper && (
+        <div
+          className='d-flex align-items-center justify-content-center'
+          style={{ height: '247px' }}
+        >
+          <div className='spinner-border text-primary' role='status'>
+            <span className='visually-hidden'>Loading...</span>
+          </div>
+        </div>
       )}
     </>
   );
