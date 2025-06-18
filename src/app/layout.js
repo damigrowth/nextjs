@@ -1,3 +1,5 @@
+import '../styles/globals.css';
+
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
@@ -14,7 +16,6 @@ import '@fortawesome/fontawesome-svg-core/styles.css';
 import { config } from '@fortawesome/fontawesome-svg-core';
 config.autoAddCss = false; /* eslint-disable import/first */
 
-import './globals.css';
 import 'react-tooltip/dist/react-tooltip.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { getUser } from '@/actions/shared/user';

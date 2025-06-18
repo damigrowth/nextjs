@@ -1,3 +1,6 @@
+// FontAwesome Icons Export - Both Original and Optimized Versions
+
+// ===== EXISTING COMPONENTS (keep for backward compatibility) =====
 export { default as IconTimes } from './icon-times';
 export { default as IconBars } from './icon-bars';
 export { default as IconCheck } from './icon-check';
@@ -50,3 +53,81 @@ export { default as IconTrash } from './icon-trash';
 export { default as IconMagnifyingGlass } from './icon-magnifying-glass';
 export { default as TimesIcon } from './icon-times';
 export { default as IconUsers } from './icon-users';
+
+// ===== OPTIMIZED COMPONENTS (recommended for new code) =====
+export {
+  OptimizedIcon,
+  IconHeart as IconHeartOpt,
+  IconStar as IconStarOpt,
+  IconCheck as IconCheckOpt,
+  IconTimes as IconTimesOpt,
+  IconBars as IconBarsOpt,
+  IconThumbsUp as IconThumbsUpOpt,
+  IconThumbsDown as IconThumbsDownOpt,
+  IconAngleRight as IconAngleRightOpt,
+  IconAngleLeft as IconAngleLeftOpt,
+  IconAngleUp as IconAngleUpOpt,
+  ArrowRightLong as ArrowRightLongOpt,
+  ArrowLeftLong as ArrowLeftLongOpt,
+  IconArrowDownLong as IconArrowDownLongOpt,
+  IconMinus as IconMinusOpt,
+  IconEye as IconEyeOpt,
+  IconEyeSlash as IconEyeSlashOpt,
+  IconPlay as IconPlayOpt,
+  IconFlag as IconFlagOpt,
+  IconTrashCan as IconTrashCanOpt,
+  IconTrash as IconTrashOpt,
+  IconEnvelope as IconEnvelopeOpt,
+  IconLink as IconLinkOpt,
+  IconXmark as IconXmarkOpt,
+  IconInfoCircle as IconInfoCircleOpt,
+  IconClock as IconClockOpt,
+  IconExclamationCircle as IconExclamationCircleOpt,
+  IconExclamationTriangle as IconExclamationTriangleOpt,
+  IconKey as IconKeyOpt,
+  IconPaperPlane as IconPaperPlaneOpt,
+  IconMagnifyingGlass as IconMagnifyingGlassOpt,
+  IconUsers as IconUsersOpt,
+  IconMusic as IconMusicOpt,
+  IconFloppyDisk as IconFloppyDiskOpt,
+  IconCheckCircle as IconCheckCircleOpt,
+  IconTimesCircle as IconTimesCircleOpt,
+  IconPhone as IconPhoneOpt,
+  IconGlobe as IconGlobeOpt,
+  IconVideo as IconVideoOpt,
+  IconQuoteLeft as IconQuoteLeftOpt,
+  // Brand icons
+  IconFacebookF as IconFacebookFOpt,
+  IconLinkedinIn as IconLinkedinInOpt,
+  IconTwitter as IconTwitterOpt,
+  IconX as IconXOpt,
+  IconYoutube as IconYoutubeOpt,
+  IconGithub as IconGithubOpt,
+  IconInstagram as IconInstagramOpt,
+  IconBehance as IconBehanceOpt,
+  IconDribbble as IconDribbbleOpt,
+  IconViber as IconViberOpt,
+  IconWhatsapp as IconWhatsappOpt,
+  IconGoogle as IconGoogleOpt,
+} from './optimized-components';
+
+// ===== UTILITIES =====
+export { iconMap, getIcon } from './optimized-icons';
+
+// ===== USAGE EXAMPLES =====
+/*
+// Using existing components (no change needed):
+import { IconHeart, ArrowRightLong } from '@/components/icon/fa';
+
+// Using optimized components (recommended for new code):
+import { IconHeartOpt, ArrowRightLongOpt } from '@/components/icon/fa';
+
+// Using the utility function for dynamic icons:
+import { OptimizedIcon } from '@/components/icon/fa';
+<OptimizedIcon iconName="heart" type="solid" />
+<OptimizedIcon iconName="heart" type="regular" />
+
+// Using the centralized icon getter:
+import { getIcon } from '@/components/icon/fa';
+const heartIcon = getIcon('heart', 'solid');
+*/

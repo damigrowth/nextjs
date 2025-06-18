@@ -1,4 +1,5 @@
 export { default as HeroHome } from './hero-home';
+export { default as HeroHomeOptimized } from './hero-home-optimized';
 export { default as HeroContent } from './hero-home-content';
 export { default as HeroImages } from './hero-home-images';
 export { default as PopularSearches } from './hero-home-popular-searches';
