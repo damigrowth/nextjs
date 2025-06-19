@@ -1,8 +1,9 @@
 import { z } from 'zod';
+import { SUPPORTED_FORMATS } from '@/utils/media-validation';
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png'];
+const ACCEPTED_IMAGE_TYPES = SUPPORTED_FORMATS.profileImage.mimeTypes;
 
 const MIN_WIDTH = 80;
 
@@ -42,7 +43,7 @@ export const imageSchema = z
       )
       .refine(
         (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
-        'Επιτρέπονται μόνο αρχεία .jpg και .png',
+        `Επιτρέπονται μόνο αρχεία ${SUPPORTED_FORMATS.profileImage.displayFormats.join(', ')}`,
       )
       .optional(),
     // Case 3: Empty/undefined
