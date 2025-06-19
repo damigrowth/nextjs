@@ -2,7 +2,7 @@ import { Banner } from '@/components/banner';
 import { BreadcrumbArchives } from '@/components/breadcrumb';
 import { FreelancersArchive } from '@/components/content';
 import { Tabs } from '@/components/section';
-import { getData } from '@/lib/client/operations';
+import { getPublicData } from '@/lib/client/operations';
 import {
   COUNTIES_SEARCH,
   FREELANCER_CATEGORIES,
@@ -13,9 +13,9 @@ import {
 } from '@/lib/graphql';
 import { Meta } from '@/utils/Seo/Meta/Meta';
 
-export const dynamic = 'force-dynamic';
-
-export const revalidate = 3600;
+export const dynamic = 'auto';
+export const revalidate = 1800;
+export const fetchCache = 'force-cache';
 
 export const dynamicParams = true;
 
@@ -41,9 +41,9 @@ export async function generateMetadata({ params }) {
 export default async function page({ params, searchParams }) {
   const { category, subcategory } = await params;
 
-  const { categories } = await getData(FREELANCER_CATEGORIES);
+  const { categories } = await getPublicData(FREELANCER_CATEGORIES);
 
-  const { categoryBySlug, subcategoryBySlug } = await getData(
+  const { categoryBySlug, subcategoryBySlug } = await getPublicData(
     FREELANCER_TAXONOMIES_BY_SLUG,
     {
       category,
@@ -125,7 +125,7 @@ export default async function page({ params, searchParams }) {
 
   let skillsSearch = skills_s ? skills_s : undefined;
 
-  const { subcategoriesSearch } = await getData(
+  const { subcategoriesSearch } = await getPublicData(
     FREELANCER_SUBCATEGORIES_SEARCH_FILTERED,
     {
       type: 'freelancer',
@@ -136,14 +136,14 @@ export default async function page({ params, searchParams }) {
     },
   );
 
-  const { counties } = await getData(COUNTIES_SEARCH, {
+  const { counties } = await getPublicData(COUNTIES_SEARCH, {
     name: coverageCountySearch,
     coverageCountyPage: paramsFilters.coverageCountyPage,
     coverageCountyPageSize: paramsFilters.coverageCountyPageSize,
   });
 
   // Fetch skills based on filtered freelancers with category filter
-  const { skillsForFilteredResults, skillsBySlug } = await getData(
+  const { skillsForFilteredResults, skillsBySlug } = await getPublicData(
     SKILLS_FOR_FILTERED_FREELANCERS_WITH_CATEGORY,
     {
       min: paramsFilters.min,
@@ -167,7 +167,7 @@ export default async function page({ params, searchParams }) {
 
   // Fallback to old query for search functionality only
   const { skillsBySearch: oldSkillsBySearch } = skillsSearch
-    ? await getData(
+    ? await getPublicData(
         SKILLS_SEARCH,
         {
           label: skillsSearch,

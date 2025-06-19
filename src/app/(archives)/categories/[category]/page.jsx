@@ -2,16 +2,16 @@ import { Banner } from '@/components/banner';
 import { BreadcrumbArchives } from '@/components/breadcrumb';
 import { TaxonomiesArchive } from '@/components/content';
 import { Tabs } from '@/components/section';
-import { getData } from '@/lib/client/operations';
+import { getPublicData } from '@/lib/client/operations';
 import {
   CATEGORIES,
   TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES,
 } from '@/lib/graphql';
 import { Meta } from '@/utils/Seo/Meta/Meta';
 
-export const dynamic = 'force-dynamic';
-
-export const revalidate = 3600;
+export const dynamic = 'auto';
+export const revalidate = 1800;
+export const fetchCache = 'force-cache';
 
 export const dynamicParams = true;
 
@@ -48,13 +48,13 @@ export async function generateMetadata({ params }) {
 export default async function page({ params }) {
   const { category } = await params;
 
-  const { categories } = await getData(CATEGORIES);
+  const { categories } = await getPublicData(CATEGORIES);
 
   const {
     category: categoryData,
     subcategories,
     subdivisions,
-  } = await getData(TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES, {
+  } = await getPublicData(TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES, {
     category,
   });
 

@@ -2,16 +2,15 @@ import { Banner } from '@/components/banner';
 import { BreadcrumbArchives } from '@/components/breadcrumb';
 import { TaxonomiesArchive } from '@/components/content';
 import { Tabs } from '@/components/section';
-import { getData } from '@/lib/client/operations';
+import { getPublicData } from '@/lib/client/operations';
 import {
   ALL_TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES,
   CATEGORIES,
 } from '@/lib/graphql';
 import { Meta } from '@/utils/Seo/Meta/Meta';
 
-export const dynamic = 'force-dynamic';
-
-export const revalidate = 3600;
+export const dynamic = 'force-static';
+export const revalidate = false;
 
 /**
  * Generates static SEO metadata for the categories page.
@@ -31,17 +30,17 @@ export async function generateMetadata() {
 
 /**
  * Renders the Categories archive page.
- * Fetches categories and taxonomies data to display a list of categories with active services.
- * @returns {JSX.Element} The Categories archive page component.
+ * This page is STATIC (no searchParams) for optimal performance
  */
 export default async function page() {
-  const { categories } = await getData(CATEGORIES);
+  // No searchParams usage - enables static generation
+  const { categories } = await getPublicData(CATEGORIES);
 
   const {
     categories: archiveCategories,
     subcategories,
     subdivisions,
-  } = await getData(ALL_TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES);
+  } = await getPublicData(ALL_TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES);
 
   const categoriesWithFilteredSubcategories =
     archiveCategories?.data

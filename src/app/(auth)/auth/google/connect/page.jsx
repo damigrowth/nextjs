@@ -10,9 +10,6 @@
  * - Resume incomplete professional registrations
  * - Integration with pending-registration temporary sessions
  * - Error handling and user feedback
- *
- * @author Dom Vournias
- * @version 1.5.0 - Added support for resuming incomplete professional registrations
  */
 
 'use client';

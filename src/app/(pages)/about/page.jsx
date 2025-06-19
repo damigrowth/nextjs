@@ -4,6 +4,9 @@ import { AboutContent } from '@/components/content';
 import { data } from '@/constants/about';
 import { Meta } from '@/utils/Seo/Meta/Meta';
 
+export const dynamic = 'force-static';
+export const revalidate = false;
+
 // Static SEO
 export async function generateMetadata() {
   const { meta } = await Meta({

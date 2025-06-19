@@ -1,3 +1,6 @@
+export const dynamic = 'force-static';
+export const revalidate = false;
+
 export default async function PrivacyPage() {
   return (
     <div className='pages-content'>

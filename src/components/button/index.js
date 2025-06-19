@@ -10,3 +10,4 @@ export { default as SavedMenu } from './button-saved';
 export { default as BottomToTop } from './button-scroll-to-top';
 export { default as ToggleButton } from './button-toggle-header';
 export { NavigationButtons } from './buttons-navigation';
+export { default as RegisterProButton } from './button-register-pro';
