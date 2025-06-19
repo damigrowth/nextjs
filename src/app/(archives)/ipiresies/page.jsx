@@ -91,20 +91,31 @@ export default async function page({ searchParams }) {
     subcategoryPageSize: paramsFilters.subcategoryPageSize,
   };
 
-  const { subcategoriesForFilteredResults } = await getPublicData(
+  const subcategoriesResponse = await getPublicData(
     SUBCATEGORIES_FOR_FILTERED_SERVICES,
     subcategoriesQueryVariables,
   );
 
+  const { subcategoriesForFilteredResults } = subcategoriesResponse || {
+    subcategoriesForFilteredResults: { data: [], meta: { pagination: {} } },
+  };
+
   // Fallback to old query for search functionality only
-  const { subcategoriesSearch } = await getPublicData(SUBCATEGORIES_SEARCH_FILTERED, {
-    searchTerm: categorySearch,
-    subcategoryPage: paramsFilters.subcategoryPage,
-    subcategoryPageSize: paramsFilters.subcategoryPageSize,
-  });
+  const subcategoriesSearchResponse = await getPublicData(
+    SUBCATEGORIES_SEARCH_FILTERED,
+    {
+      searchTerm: categorySearch,
+      subcategoryPage: paramsFilters.subcategoryPage,
+      subcategoryPageSize: paramsFilters.subcategoryPageSize,
+    },
+  );
+
+  const { subcategoriesSearch } = subcategoriesSearchResponse || {
+    subcategoriesSearch: { data: [], meta: { pagination: {} } },
+  };
 
   // Fetch tags based on filtered services (without category filter since we're on the main page)
-  const { tagsForFilteredResults, tagsBySlug } = await getPublicData(
+  const tagsResponse = await getPublicData(
     TAGS_FOR_FILTERED_SERVICES,
     {
       search: paramsFilters.search,
@@ -120,8 +131,13 @@ export default async function page({ searchParams }) {
     'tags',
   );
 
+  const { tagsForFilteredResults, tagsBySlug } = tagsResponse || {
+    tagsForFilteredResults: { data: [], meta: { pagination: {} } },
+    tagsBySlug: { data: [], meta: { pagination: {} } },
+  };
+
   // Fallback to old query for search functionality only
-  const { tagsBySearch: oldTagsBySearch } = tagsSearch
+  const oldTagsResponse = tagsSearch
     ? await getPublicData(
         TAGS_SEARCH,
         {
@@ -132,7 +148,11 @@ export default async function page({ searchParams }) {
         },
         'tags',
       )
-    : { tagsBySearch: { data: [], meta: { pagination: {} } } };
+    : null;
+
+  const { tagsBySearch: oldTagsBySearch } = oldTagsResponse || {
+    tagsBySearch: { data: [], meta: { pagination: {} } },
+  };
 
   const selectData = {
     option: 'cat',

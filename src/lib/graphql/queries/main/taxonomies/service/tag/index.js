@@ -99,16 +99,14 @@ const TAGS_FOR_FILTERED_SERVICES = gql`
         and: [
           { label: { containsi: $label } }
           {
-            services: {
-              or: [
-                { title_normalized: { containsi: $search } }
-                { description_normalized: { containsi: $search } }
-                { category: { label_normalized: { containsi: $search } } }
-                { subcategory: { label_normalized: { containsi: $search } } }
-                { subdivision: { label_normalized: { containsi: $search } } }
-                { tags: { label_normalized: { containsi: $search } } }
-              ]
-            }
+            or: [
+              { services: { title_normalized: { containsi: $search } } }
+              { services: { description_normalized: { containsi: $search } } }
+              { services: { category: { label_normalized: { containsi: $search } } } }
+              { services: { subcategory: { label_normalized: { containsi: $search } } } }
+              { services: { subdivision: { label_normalized: { containsi: $search } } } }
+              { services: { tags: { label_normalized: { containsi: $search } } } }
+            ]
           }
           { services: { price: { gte: $min, lte: $max } } }
           { services: { time: { lte: $time } } }
@@ -162,16 +160,14 @@ const TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY = gql`
         and: [
           { label: { containsi: $label } }
           {
-            services: {
-              or: [
-                { title_normalized: { containsi: $search } }
-                { description_normalized: { containsi: $search } }
-                { category: { label_normalized: { containsi: $search } } }
-                { subcategory: { label_normalized: { containsi: $search } } }
-                { subdivision: { label_normalized: { containsi: $search } } }
-                { tags: { label_normalized: { containsi: $search } } }
-              ]
-            }
+            or: [
+              { services: { title_normalized: { containsi: $search } } }
+              { services: { description_normalized: { containsi: $search } } }
+              { services: { category: { label_normalized: { containsi: $search } } } }
+              { services: { subcategory: { label_normalized: { containsi: $search } } } }
+              { services: { subdivision: { label_normalized: { containsi: $search } } } }
+              { services: { tags: { label_normalized: { containsi: $search } } } }
+            ]
           }
           { services: { price: { gte: $min, lte: $max } } }
           { services: { time: { lte: $time } } }
@@ -179,13 +175,11 @@ const TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY = gql`
           { services: { status: { type: { eq: "Active" } } } }
           { services: { freelancer: { verified: { eq: $verified } } } }
           {
-            services: {
-              or: [
-                { category: { slug: { eq: $cat } } }
-                { subcategory: { slug: { eq: $cat } } }
-                { subdivision: { slug: { eq: $cat } } }
-              ]
-            }
+            or: [
+              { services: { category: { slug: { eq: $cat } } } }
+              { services: { subcategory: { slug: { eq: $cat } } } }
+              { services: { subdivision: { slug: { eq: $cat } } } }
+            ]
           }
         ]
       }
@@ -205,13 +199,11 @@ const TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY = gql`
           { slug: { in: $slugs } }
           { services: { id: { notNull: true } } }
           {
-            services: {
-              or: [
-                { category: { slug: { eq: $cat } } }
-                { subcategory: { slug: { eq: $cat } } }
-                { subdivision: { slug: { eq: $cat } } }
-              ]
-            }
+            or: [
+              { services: { category: { slug: { eq: $cat } } } }
+              { services: { subcategory: { slug: { eq: $cat } } } }
+              { services: { subdivision: { slug: { eq: $cat } } } }
+            ]
           }
         ]
       }

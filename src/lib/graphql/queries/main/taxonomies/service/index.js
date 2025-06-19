@@ -823,26 +823,21 @@ const SUBCATEGORIES_FOR_FILTERED_SERVICES = gql`
     subcategoriesForFilteredResults: subcategories(
       filters: {
         and: [
+          { services: { price: { gte: $min, lte: $max } } }
+          { services: { time: { lte: $time } } }
+          { services: { status: { type: { eq: "Active" } } } }
+          { services: { tags: { slug: { in: $tags } } } }
+          { services: { freelancer: { id: { notNull: true } } } }
+          { services: { freelancer: { verified: { eq: $verified } } } }
           {
-            services: {
-              price: { gte: $min, lte: $max }
-              time: { lte: $time }
-              status: { type: { eq: "Active" } }
-              tags: { slug: { in: $tags } }
-              freelancer: { id: { notNull: true }, verified: { eq: $verified } }
-            }
-          }
-          {
-            services: {
-              or: [
-                { title_normalized: { containsi: $search } }
-                { description_normalized: { containsi: $search } }
-                { category: { label_normalized: { containsi: $search } } }
-                { subcategory: { label_normalized: { containsi: $search } } }
-                { subdivision: { label_normalized: { containsi: $search } } }
-                { tags: { label_normalized: { containsi: $search } } }
-              ]
-            }
+            or: [
+              { services: { title_normalized: { containsi: $search } } }
+              { services: { description_normalized: { containsi: $search } } }
+              { services: { category: { label_normalized: { containsi: $search } } } }
+              { services: { subcategory: { label_normalized: { containsi: $search } } } }
+              { services: { subdivision: { label_normalized: { containsi: $search } } } }
+              { services: { tags: { label_normalized: { containsi: $search } } } }
+            ]
           }
         ]
       }
@@ -879,26 +874,21 @@ const SUBDIVISIONS_FOR_FILTERED_SERVICES = gql`
       filters: {
         and: [
           { subcategory: { slug: { eq: $subcategorySlug } } }
+          { services: { price: { gte: $min, lte: $max } } }
+          { services: { time: { lte: $time } } }
+          { services: { status: { type: { eq: "Active" } } } }
+          { services: { tags: { slug: { in: $tags } } } }
+          { services: { freelancer: { id: { notNull: true } } } }
+          { services: { freelancer: { verified: { eq: $verified } } } }
           {
-            services: {
-              price: { gte: $min, lte: $max }
-              time: { lte: $time }
-              status: { type: { eq: "Active" } }
-              tags: { slug: { in: $tags } }
-              freelancer: { id: { notNull: true }, verified: { eq: $verified } }
-            }
-          }
-          {
-            services: {
-              or: [
-                { title_normalized: { containsi: $search } }
-                { description_normalized: { containsi: $search } }
-                { category: { label_normalized: { containsi: $search } } }
-                { subcategory: { label_normalized: { containsi: $search } } }
-                { subdivision: { label_normalized: { containsi: $search } } }
-                { tags: { label_normalized: { containsi: $search } } }
-              ]
-            }
+            or: [
+              { services: { title_normalized: { containsi: $search } } }
+              { services: { description_normalized: { containsi: $search } } }
+              { services: { category: { label_normalized: { containsi: $search } } } }
+              { services: { subcategory: { label_normalized: { containsi: $search } } } }
+              { services: { subdivision: { label_normalized: { containsi: $search } } } }
+              { services: { tags: { label_normalized: { containsi: $search } } } }
+            ]
           }
         ]
       }

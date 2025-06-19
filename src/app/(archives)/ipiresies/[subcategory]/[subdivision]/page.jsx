@@ -110,7 +110,7 @@ export default async function page({ params, searchParams }) {
   let tagsSearch = tags_s ? tags_s : undefined;
 
   // Fetch subdivisions based on filtered services
-  const { subdivisionsForFilteredResults } = await getPublicData(
+  const subdivisionsResponse = await getPublicData(
     SUBDIVISIONS_FOR_FILTERED_SERVICES,
     {
       search: paramsFilters.search,
@@ -125,16 +125,27 @@ export default async function page({ params, searchParams }) {
     },
   );
 
+  const { subdivisionsForFilteredResults } = subdivisionsResponse || {
+    subdivisionsForFilteredResults: { data: [], meta: { pagination: {} } },
+  };
+
   // Fallback to old query for search functionality only
-  const { subdivisionsSearch } = await getPublicData(SUBDIVISIONS_SEARCH_FILTERED, {
-    subcategorySlug: subcategory,
-    searchTerm: categorySearch,
-    subdivisionPage: paramsFilters.subdivisionPage,
-    subdivisionPageSize: paramsFilters.subdivisionPageSize,
-  });
+  const subdivisionsSearchResponse = await getPublicData(
+    SUBDIVISIONS_SEARCH_FILTERED,
+    {
+      subcategorySlug: subcategory,
+      searchTerm: categorySearch,
+      subdivisionPage: paramsFilters.subdivisionPage,
+      subdivisionPageSize: paramsFilters.subdivisionPageSize,
+    },
+  );
+
+  const { subdivisionsSearch } = subdivisionsSearchResponse || {
+    subdivisionsSearch: { data: [], meta: { pagination: {} } },
+  };
 
   // Fetch tags based on filtered services with category filter
-  const { tagsForFilteredResults, tagsBySlug } = await getPublicData(
+  const tagsResponse = await getPublicData(
     TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY,
     {
       search: paramsFilters.search,
@@ -151,8 +162,13 @@ export default async function page({ params, searchParams }) {
     'tags',
   );
 
+  const { tagsForFilteredResults, tagsBySlug } = tagsResponse || {
+    tagsForFilteredResults: { data: [], meta: { pagination: {} } },
+    tagsBySlug: { data: [], meta: { pagination: {} } },
+  };
+
   // Fallback to old query for search functionality only
-  const { tagsBySearch: oldTagsBySearch } = tagsSearch
+  const oldTagsResponse = tagsSearch
     ? await getPublicData(
         TAGS_SEARCH,
         {
@@ -163,7 +179,11 @@ export default async function page({ params, searchParams }) {
         },
         'tags',
       )
-    : { tagsBySearch: { data: [], meta: { pagination: {} } } };
+    : null;
+
+  const { tagsBySearch: oldTagsBySearch } = oldTagsResponse || {
+    tagsBySearch: { data: [], meta: { pagination: {} } },
+  };
 
   const multiSelectData = {
     option: 'tags',
