@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { IconMusic, IconFloppyDisk } from '@/components/icon/fa';
+import { generateAcceptString, getMediaType, getStrapiMediaType, SUPPORTED_FORMATS, validateFileType } from '@/utils/media-validation';
 
 export default function MediaGallery({
   initialMedia = [],
@@ -33,6 +34,7 @@ export default function MediaGallery({
     browserNotSupported:
       'Το πρόγραμμα περιήγησης σας δεν υποστηρίζει το tag βίντεο.',
     unsupportedFile: 'Λυπούμαστε, αυτός ο τύπος αρχείου δεν επιτρέπεται.',
+    supportedFormats: `Υποστηριζόμενοι τύποι: Εικόνες (${SUPPORTED_FORMATS.image.displayFormats.join(', ')}), Βίντεο (${SUPPORTED_FORMATS.video.displayFormats.join(', ')}), Ήχος (${SUPPORTED_FORMATS.audio.displayFormats.join(', ')})`,
     fileCount: {
       singular: 'αρχείο',
       plural: 'αρχεία',
@@ -192,16 +194,6 @@ export default function MediaGallery({
     }
   }, [error, clearError]);
 
-  const getMediaType = useCallback((fileType) => {
-    if (typeof fileType === 'string') {
-      if (fileType.startsWith('image/')) return 'image';
-      if (fileType.startsWith('video/')) return 'video';
-      if (fileType.startsWith('audio/')) return 'audio';
-    }
-
-    return 'unknown';
-  }, []);
-
   const handleDropMedia = useCallback(
     (files) => {
       // Ensure we have actual file objects
@@ -236,7 +228,15 @@ export default function MediaGallery({
       }).length;
 
       for (const file of files) {
-        const mediaType = getMediaType(file.type);
+        // Use enhanced validation for better file type detection
+        const validation = validateFileType(file, ['image', 'video', 'audio']);
+        
+        if (!validation.isValid) {
+          setError(validation.error);
+          continue;
+        }
+        
+        const mediaType = validation.type;
 
         if (
           mediaType === 'video' &&
@@ -266,7 +266,15 @@ export default function MediaGallery({
           break;
         }
 
-        const blob = URL.createObjectURL(file);
+        // Create blob URL with iOS Safari error handling
+        let blob;
+        try {
+          blob = URL.createObjectURL(file);
+        } catch (error) {
+          console.error('Blob URL creation failed for file:', file.name, error);
+          // Continue without blob URL - the file is still valid
+          blob = null;
+        }
 
         newFiles.push({ file, url: blob });
         newTotalSize += fileSize;
@@ -455,63 +463,8 @@ export default function MediaGallery({
       }
       // For existing media from Strapi
       if (item.file.attributes) {
-        // Determine media type based on available information
-        let mediaType = 'unknown';
-
-        const mime = item.file.attributes.mime;
-
-        // First try to use the mime type directly if available
-        if (mime) {
-          mediaType = getMediaType(mime);
-        }
-        // Then try to get mime type from formats if available
-        else if (
-          item.file.attributes.formats &&
-          Object.keys(item.file.attributes.formats).length > 0
-        ) {
-          // If it has formats, it's likely an image
-          const format = Object.values(item.file.attributes.formats)[0];
-
-          if (format && format.mime) {
-            mediaType = getMediaType(format.mime);
-          }
-        }
-        // Otherwise try to guess from the URL or file extension
-        else if (item.file.attributes.url) {
-          const url = item.file.attributes.url;
-
-          let urlPath;
-
-          try {
-            urlPath = new URL(url).pathname;
-          } catch (e) {
-            // If URL parsing fails, just use the url string
-            urlPath = url;
-          }
-          // Check if URL contains video/upload and ends with audio extension
-          if (
-            urlPath.includes('/video/upload/') &&
-            (urlPath.endsWith('.mp3') ||
-              urlPath.endsWith('.wav') ||
-              urlPath.endsWith('.ogg') ||
-              urlPath.endsWith('.m4a'))
-          ) {
-            mediaType = 'audio';
-          }
-          // Check for video extensions
-          else if (
-            urlPath.endsWith('.mp4') ||
-            urlPath.endsWith('.webm') ||
-            urlPath.endsWith('.mov') ||
-            urlPath.endsWith('.avi')
-          ) {
-            mediaType = 'video';
-          }
-          // Check if URL contains image/upload (Cloudinary pattern)
-          else if (urlPath.includes('/image/upload/')) {
-            mediaType = 'image';
-          }
-        }
+        // Use the enhanced Strapi media type detection
+        const mediaType = getStrapiMediaType(item.file);
 
         // Get the URL from attributes
         const url = item.file.attributes.url;
@@ -537,9 +490,11 @@ export default function MediaGallery({
                 className='object-fit-cover'
                 style={{ height: '166px', width: '190px' }}
                 controls
+                preload="metadata"
+                playsInline
               >
                 <source src={url} type={mime || 'video/mp4'} />
-                {labels.browserNotSupported}
+                <span>Το βίντεο δεν μπορεί να αναπαραχθεί</span>
               </video>
             );
           case 'audio':
@@ -579,6 +534,16 @@ export default function MediaGallery({
                 src={item.url}
                 style={{ height: '166px', width: '190px' }}
                 alt={item.file.name}
+                onError={(e) => {
+                  // Fallback for iOS Safari blob URL issues
+                  if (item.file instanceof File && item.url?.startsWith('blob:')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      e.target.src = event.target.result;
+                    };
+                    reader.readAsDataURL(item.file);
+                  }
+                }}
               />
             );
           case 'video':
@@ -587,9 +552,11 @@ export default function MediaGallery({
                 className='object-fit-cover'
                 style={{ height: '166px', width: '190px' }}
                 controls
+                preload="metadata"
+                playsInline
               >
                 <source src={item.url} type={item.file.type} />
-                {labels.browserNotSupported}
+                <span>Το βίντεο δεν μπορεί να αναπαραχθεί</span>
               </video>
             );
           case 'audio':
@@ -659,7 +626,7 @@ export default function MediaGallery({
             type='file'
             name='media-files'
             id='media-files'
-            accept='image/*,video/*,audio/*'
+            accept={generateAcceptString(['image', 'video', 'audio'])}
             placeholder={labels.selectFiles}
             multiple
             onChange={(e) => {
@@ -697,6 +664,9 @@ export default function MediaGallery({
                 {labels.maxVideosText}{' '}
                 <span className='fw600'>{maxVideos}</span>{' '}
                 {labels.videosOrAudio}
+              </p>
+              <p className='fz12 mb0 text-muted'>
+                {labels.supportedFormats}
               </p>
               <p className='text-danger mb0' style={{ height: '10px' }}>
                 {error ? error : ' '}

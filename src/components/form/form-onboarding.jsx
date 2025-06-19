@@ -727,6 +727,22 @@ export default function OnboardingForm({ fid, displayName, type, token }) {
     }
   }, [formState?.errors]);
 
+  // Force re-render for iOS Safari error display
+  useEffect(() => {
+    if (formState?.errors && Object.keys(formState.errors).length > 0) {
+      // Force a small delay to ensure DOM is updated
+      const timer = setTimeout(() => {
+        // Scroll to first error field for mobile
+        const firstErrorField = document.querySelector('.text-danger');
+        if (firstErrorField && window.innerWidth <= 768) {
+          firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [formState?.errors]);
+
   return (
     <>
       <HeadingOnboarding />

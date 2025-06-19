@@ -4,6 +4,11 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 
 import { InitialsImage } from '@/components/parts';
+import {
+  validateFileType,
+  SUPPORTED_FORMATS,
+  generateAcceptString,
+} from '@/utils/media-validation';
 
 export default function ProfileImageInput({
   image,
@@ -39,30 +44,44 @@ export default function ProfileImageInput({
 
       if (fileSize > 3) {
         setError('Το μέγεθος του αρχείου πρέπει να είναι μικρότερο από 3MB');
-
         return;
       }
-      // File type validation
-      if (!file.type.startsWith('image/')) {
-        setError('Επιτρέπονται μόνο αρχεία εικόνας');
-
+      // Enhanced file validation using utility for profile images (restricted)
+      const validation = validateFileType(file, ['image'], true);
+      if (!validation.isValid) {
+        setError(validation.error);
         return;
       }
-      if (!['image/jpeg', 'image/png'].includes(file.type)) {
-        setError('Επιτρέπονται μόνο αρχεία .jpg και .png');
 
+      // Additional size check (3MB limit for profile images)
+      if (fileSize > 3) {
+        setError('Το μέγεθος του αρχείου πρέπει να είναι μικρότερο από 3MB');
         return;
       }
-      // Create blob URL for preview
+
+      // Clean up previous blob URL
       if (previewUrl?.startsWith('blob:')) {
         URL.revokeObjectURL(previewUrl);
       }
 
-      const blob = URL.createObjectURL(file);
-
-      setPreviewUrl(blob);
-      setError('');
-      onChange(file);
+      // Create blob URL with error handling for iOS Safari
+      try {
+        const blob = URL.createObjectURL(file);
+        setPreviewUrl(blob);
+        setError('');
+        onChange(file);
+      } catch (error) {
+        // Fallback for iOS Safari blob URL issues
+        console.error('Blob URL creation failed:', error);
+        setError('');
+        onChange(file);
+        // Use FileReader as fallback for preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setPreviewUrl(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -100,7 +119,7 @@ export default function ProfileImageInput({
             <Image
               height={142}
               width={142}
-              className='rounded-circle wa-xs'
+              className='rounded-circle'
               src={getImageSource()}
               style={{
                 height: '71px',
@@ -124,7 +143,7 @@ export default function ProfileImageInput({
                 <input
                   name={name}
                   type='file'
-                  accept='.png, .jpg, .jpeg'
+                  accept={generateAcceptString(['image'], true)}
                   className='d-none'
                   onChange={handleImageChange}
                 />
@@ -137,7 +156,8 @@ export default function ProfileImageInput({
           </div>
           <p className='text fz13 mb-0 mt-2' style={{ maxWidth: '400px' }}>
             Μέγιστο μέγεθος αρχείου: 3MB, Ελάχιστες διαστάσεις: 80x80.
-            Επιτρεπόμενοι τύποι αρχείων: .jpg & .png
+            Επιτρεπόμενοι τύποι αρχείων:{' '}
+            {SUPPORTED_FORMATS.profileImage.displayFormats.join(', ')}
           </p>
         </div>
       </div>

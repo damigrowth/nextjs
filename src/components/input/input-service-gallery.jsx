@@ -7,6 +7,7 @@ import imageCompression from 'browser-image-compression';
 import useCreateServiceStore from '@/stores/service/create/createServiceStore';
 import useEditServiceStore from '@/stores/service/edit/editServiceStore';
 import { IconMusic, IconFloppyDisk } from '@/components/icon/fa';
+import { generateAcceptString, getMediaType, validateFileType } from '@/utils/media-validation';
 
 export default function ServiceGallery({
   isPending,
@@ -95,16 +96,6 @@ export default function ServiceGallery({
     }
   }, [error, clearError]);
 
-  const getMediaType = (fileType) => {
-    if (typeof fileType === 'string') {
-      if (fileType.startsWith('image/')) return 'image';
-      if (fileType.startsWith('video/')) return 'video';
-      if (fileType.startsWith('audio/')) return 'audio';
-    }
-
-    return 'unknown';
-  };
-
   const handleDropMedia = async (files) => {
     const newFiles = [];
 
@@ -160,13 +151,15 @@ export default function ServiceGallery({
           finalFileType = 'image/jpeg';
         }
 
-        const mediaType = getMediaType(finalFileType);
-
-        // Type validation
-        if (!['image', 'video', 'audio'].includes(mediaType)) {
-          setError('Μη υποστηριζόμενος τύπος αρχείου');
+        // Use enhanced validation for better file type detection
+        const validation = validateFileType({ type: finalFileType, name: file.name }, ['image', 'video', 'audio']);
+        
+        if (!validation.isValid) {
+          setError(validation.error);
           continue;
         }
+        
+        const mediaType = validation.type;
         // Rest of validation logic...
         if (
           mediaType === 'video' &&
@@ -403,7 +396,7 @@ export default function ServiceGallery({
             type='file'
             name='media-files'
             id='media-files'
-            accept='image/*,video/*,audio/*'
+            accept={generateAcceptString(['image', 'video', 'audio'])}
             placeholder='Επιλογή αρχείων'
             multiple
             onChange={(e) => handleDropMedia(Array.from(e.target.files))}

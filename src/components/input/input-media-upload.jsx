@@ -8,6 +8,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import { generateAcceptString, getMediaType, validateFileType } from '@/utils/media-validation';
 import Image from 'next/image';
 import { IconMusic } from '@/components/icon/fa';
 
@@ -146,17 +147,6 @@ export function MediaProvider({ children, initialMedia = [] }) {
     };
   }, [media, originalMedia]);
 
-  // Get media type utility
-  const getMediaType = (fileType) => {
-    if (typeof fileType === 'string') {
-      if (fileType.startsWith('image/')) return 'image';
-      if (fileType.startsWith('video/')) return 'video';
-      if (fileType.startsWith('audio/')) return 'audio';
-    }
-
-    return 'unknown';
-  };
-
   // Add media with validation
   const addMedia = (files) => {
     const newFiles = [];
@@ -183,7 +173,15 @@ export function MediaProvider({ children, initialMedia = [] }) {
     }).length;
 
     for (const file of files) {
-      const mediaType = getMediaType(file.type);
+      // Use enhanced validation for better file type detection
+      const validation = validateFileType(file, ['image', 'video', 'audio']);
+      
+      if (!validation.isValid) {
+        setError(validation.error);
+        continue;
+      }
+      
+      const mediaType = validation.type;
 
       // Validate video count
       if (
@@ -420,7 +418,7 @@ export function MediaUpload({
           type='file'
           name={`media-files-${context}`}
           id={`media-files-${context}`}
-          accept='image/*,video/*,audio/*'
+          accept={generateAcceptString(['image', 'video', 'audio'])}
           placeholder='Επιλογή αρχείων'
           multiple
           onChange={(e) => addMedia(Array.from(e.target.files))}
