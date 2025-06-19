@@ -465,9 +465,10 @@ export default function MediaGallery({
       if (item.file.attributes) {
         // Use the enhanced Strapi media type detection
         const mediaType = getStrapiMediaType(item.file);
-
-        // Get the URL from attributes
+        
+        // Get the URL and MIME type from attributes
         const url = item.file.attributes.url;
+        const mime = item.file.attributes.mime;
 
         if (!url) {
           return <p>{labels.unsupportedFile}</p>;
