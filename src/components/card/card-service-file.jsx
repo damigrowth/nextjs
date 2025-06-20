@@ -2,7 +2,8 @@ import React from 'react';
 import Image from 'next/image';
 import LinkNP from '@/components/link';
 
-import { getBestDimensions } from '@/utils/imageDimensions';
+import { getImage } from '@/utils/image';
+import { getMediaType } from '@/utils/media-validation';
 
 import VideoPreview from './card-video-preview';
 
@@ -32,8 +33,14 @@ export default function ServiceCardFile({
       </LinkNP>
     );
   } else {
-    // Conditionally render Link only for images
-    if (file.formats) {
+    // Check if the file is an image using MIME type
+    const mediaType = getMediaType(file.mime);
+    
+    if (mediaType === 'image') {
+      // Create imageData structure that our utility expects
+      const imageData = { data: { attributes: file } };
+      const imageUrl = getImage(imageData, { size: 'medium' }) || fallbackImage;
+
       return (
         <LinkNP href={path}>
           <div className='list-thumb flex-shrink-0 height'>
@@ -41,59 +48,44 @@ export default function ServiceCardFile({
               height={height || 245}
               width={width || 329}
               className='w-100 h-100 object-fit-cover'
-              src={(() => {
-                const formatResult = getBestDimensions(file.formats);
-
-                return formatResult && formatResult.url
-                  ? formatResult.url
-                  : fallbackImage;
-              })()}
+              src={imageUrl}
               alt='service-thumbnail'
             />
           </div>
         </LinkNP>
       );
-    } else {
-      // Render without Link for non-images (audio, video, fallback)
+    } else if (mediaType === 'video') {
+      // Render VideoPreview for video files
       return (
         <div className='list-thumb flex-shrink-0 height'>
-          {file.mime?.startsWith('audio/') ? ( // Explicitly check for audio MIME type
-            // Render fallback image if it's audio
-            <Image
-              height={height || 245}
-              width={width || 329}
-              className='w-100 h-100 object-fit-cover'
-              src={fallbackImage}
-              alt='service-thumbnail'
+          <div
+            style={{
+              width: width ? `${width}px` : '100%',
+              height: height ? `${height}px` : '100%',
+            }}
+          >
+            <VideoPreview
+              previewUrl={file.previewUrl}
+              videoUrl={file.url}
+              mime={file.mime}
             />
-          ) : file.mime?.startsWith('video/') ? ( // Check if it's video
-            // Render VideoPreview for video files
-            <div
-              style={{
-                width: width ? `${width}px` : '100%',
-                height: height ? `${height}px` : '100%',
-              }}
-            >
-              {' '}
-              {/* Container with dimensions */}
-              <VideoPreview
-                previewUrl={file.previewUrl} // Pass previewUrl
-                videoUrl={file.url} // Pass videoUrl
-                mime={file.mime} // Pass mime
-              />
-            </div>
-          ) : (
-            // Fallback for any other non-image, non-audio, non-video type (or if video check fails)
-            // Render fallback image as a safe default
-            <Image
-              height={height || 245}
-              width={width || 329}
-              className='w-100 h-100 object-fit-cover'
-              src={fallbackImage}
-              alt='service-thumbnail'
-            />
-          )}
+          </div>
         </div>
+      );
+    } else {
+      // For audio files or unknown types, render fallback image
+      return (
+        <LinkNP href={path}>
+          <div className='list-thumb flex-shrink-0 height'>
+            <Image
+              height={height || 245}
+              width={width || 329}
+              className='w-100 h-100 object-fit-cover'
+              src={fallbackImage}
+              alt='service-thumbnail'
+            />
+          </div>
+        </LinkNP>
       );
     }
   }

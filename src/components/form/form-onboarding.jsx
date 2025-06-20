@@ -19,6 +19,7 @@ import {
 } from '@/components/input';
 import { useFormChanges } from '@/hooks/useFormChanges';
 import { searchData } from '@/lib/client/operations';
+import { getImage } from '@/utils/image';
 import {
   FREELANCER_PROFILE_CATEGORIES,
   FREELANCER_PROFILE_SUBCATEGORIES,
@@ -757,10 +758,7 @@ export default function OnboardingForm({ fid, displayName, type, token }) {
           <p>Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο.</p>
           <ProfileImageInput
             name='image'
-            image={
-              image?.data?.attributes?.formats?.thumbnail?.url ||
-              image?.data?.attributes?.url
-            }
+            image={getImage(image, { size: 'avatar' })}
             onChange={(newImage) => {
               // Make sure we're setting the image correctly for both File objects and API data
               if (newImage instanceof File) {

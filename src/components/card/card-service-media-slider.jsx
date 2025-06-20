@@ -5,7 +5,8 @@ import Image from 'next/image';
 import LinkNP from '@/components/link';
 import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 
-import { getBestDimensions } from '@/utils/imageDimensions';
+import { getImage } from '@/utils/image';
+import { getMediaType } from '@/utils/media-validation';
 
 import VideoPreview from './card-video-preview';
 import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
@@ -50,26 +51,26 @@ export default function ServiceSlideCardMedia({ media, path }) {
 
             let slideContent;
 
-            if (attributes.formats) {
-              // It's an image - Wrap with Link
-              const formatResult = getBestDimensions(attributes.formats);
+            const mediaType = getMediaType(attributes.mime);
+
+            if (mediaType === 'image') {
+              // It's an image - use utility for better fallback handling
+              const imageData = { data: { attributes } };
+              const imageUrl = getImage(imageData, { size: 'medium' }) || fallbackImage;
 
               slideContent = (
                 <LinkNP href={path || '#'}>
-                  {' '}
-                  {/* Add Link wrapper, provide fallback href */}
                   <Image
                     height={247}
                     width={331}
                     className='w-100 object-fit-cover'
-                    src={formatResult?.url || fallbackImage}
+                    src={imageUrl}
                     alt='thumbnail'
-                    style={{ objectFit: 'cover', height: '247px' }} // Ensure consistent height
+                    style={{ objectFit: 'cover', height: '247px' }}
                   />
                 </LinkNP>
               );
-            } else if (attributes.mime?.startsWith('video/')) {
-              // Only check for video now
+            } else if (mediaType === 'video') {
               // It's a video
               slideContent = (
                 <div style={{ width: '331px', height: '247px' }}>

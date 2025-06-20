@@ -1,6 +1,7 @@
 import React from 'react';
 
 import FreelancerSchema from '@/utils/Seo/Schema/FreelancerSchema';
+import { getImage } from '@/utils/image';
 
 import FeaturedServices from '../parts/freelancer-featured-services';
 import FeaturesFreelancer from '../parts/freelancer-features';
@@ -103,7 +104,7 @@ export default function FreelancerProfile({
         rating={rating}
         reviews_total={reviews_total}
         reviews={reviews}
-        profileImage={image.data?.attributes?.formats?.thumbnail?.url}
+        profileImage={getImage(image, { size: 'avatar' })}
       />
       <div className='container'>
         <div className='row wow fadeInUp'>
@@ -115,7 +116,7 @@ export default function FreelancerProfile({
               lastName={lastName}
               tagline={tagline}
               socials={socials}
-              image={image.data?.attributes?.formats?.thumbnail?.url}
+              image={getImage(image, { size: 'avatar' })}
               rating={rating}
               totalReviews={reviews_total}
               verified={verified}

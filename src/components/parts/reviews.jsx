@@ -1,6 +1,7 @@
 import LoadMoreBtn from '../button/button-load-more';
 import Review from './review';
 import ReviewStats from './review-stats';
+import { getImage } from '@/utils/image';
 
 export default async function Reviews({
   reviews,
@@ -51,10 +52,9 @@ export default async function Reviews({
                           displayName={
                             review.author.data.attributes.displayName
                           }
-                          image={
-                            review?.author?.data?.attributes?.image?.data
-                              ?.attributes?.formats?.thumbnail?.url
-                          }
+                          image={getImage(
+                            review?.author?.data?.attributes?.image
+                          , { size: 'avatar' })}
                           date={review.publishedAt}
                           comment={review.comment}
                           likes={review.likes?.data}
@@ -108,10 +108,9 @@ export default async function Reviews({
                             displayName={
                               review.author.data.attributes.displayName
                             }
-                            image={
-                              review?.author?.data?.attributes?.image?.data
-                                ?.attributes?.formats?.thumbnail?.url
-                            }
+                            image={getImage(
+                              review?.author?.data?.attributes?.image
+                            , { size: 'avatar' })}
                             date={review.publishedAt}
                             comment={review.comment}
                             likes={review.likes?.data}

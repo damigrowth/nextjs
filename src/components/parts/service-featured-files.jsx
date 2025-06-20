@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 
-import { getBestDimensions } from '@/utils/imageDimensions';
+import { getImage } from '@/utils/image';
+import { getMediaType } from '@/utils/media-validation';
 
 import { MediaThumb, VideoPreview } from '../card';
 import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
@@ -58,11 +59,14 @@ export default function FeaturedFiles({ files, title, border }) {
               >
                 {galleryFiles.map((file, i) => {
                   // Map over the full file object
-                  if (file.formats) {
-                    // Check for image formats
-                    const formatResult = getBestDimensions(file.formats);
-
-                    if (!formatResult) {
+                  const mediaType = getMediaType(file.mime);
+                  
+                  if (mediaType === 'image') {
+                    // Create imageData structure that our utility expects
+                    const imageData = { data: { attributes: file } };
+                    const imageUrl = getImage(imageData, { size: 'card' });
+                    
+                    if (!imageUrl) {
                       return (
                         <SwiperSlide key={i}>
                           <Image
@@ -76,12 +80,10 @@ export default function FeaturedFiles({ files, title, border }) {
                       );
                     }
 
-                    // Image rendering logic (remains the same)
-                    const imageWidth = formatResult.width;
-
-                    const imageHeight = formatResult.height;
-
-                    const imageUrl = formatResult.url;
+                    // Get the best image data including dimensions
+                    const imageData_full = getImage(imageData, { size: 'large', returnType: 'full' });
+                    const imageWidth = imageData_full?.width || 800;
+                    const imageHeight = imageData_full?.height || 600;
 
                     return (
                       <SwiperSlide key={i}>
@@ -94,7 +96,7 @@ export default function FeaturedFiles({ files, title, border }) {
                         />
                       </SwiperSlide>
                     );
-                  } else if (file.mime?.startsWith('video/')) {
+                  } else if (mediaType === 'video') {
                     // Check if it's video
                     return (
                       <SwiperSlide key={i}>
@@ -137,18 +139,23 @@ export default function FeaturedFiles({ files, title, border }) {
           >
             {galleryFiles.map((file, i) => {
               // Map over full file object for thumbnails too
-              if (file.formats) {
-                // Check for image formats
-                const imageWidth =
-                  file.formats?.small?.width || file.formats.thumbnail.width;
+              const mediaType = getMediaType(file.mime);
+              
+              if (mediaType === 'image') {
+                // Create imageData structure for thumbnails
+                const imageData = { data: { attributes: file } };
+                const imageUrl = getImage(imageData, { size: 'card' });
+                
+                if (!imageUrl) {
+                  return null;
+                }
+                
+                // Get the best image data including dimensions for thumbnails
+                const imageData_full = getImage(imageData, { size: 'small', returnType: 'full' });
+                const imageWidth = imageData_full?.width || 150;
+                const imageHeight = imageData_full?.height || 150;
 
-                const imageHeight =
-                  file.formats?.small?.height || file.formats.thumbnail.height;
-
-                const imageUrl =
-                  file.formats?.small?.url || file.formats.thumbnail.url;
-
-                // Image thumbnail rendering (remains the same)
+                // Image thumbnail rendering
                 return (
                   <SwiperSlide key={i}>
                     <Image
@@ -159,7 +166,7 @@ export default function FeaturedFiles({ files, title, border }) {
                     />
                   </SwiperSlide>
                 );
-              } else if (file.mime?.startsWith('video/')) {
+              } else if (mediaType === 'video') {
                 // Check for video
                 return (
                   <SwiperSlide key={i}>

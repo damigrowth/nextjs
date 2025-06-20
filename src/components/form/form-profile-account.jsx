@@ -3,6 +3,7 @@
 import { startTransition, useActionState, useState } from 'react';
 
 import { useFormChanges } from '@/hooks/useFormChanges';
+import { getImage } from '@/utils/image';
 import useEditProfileStore from '@/stores/dashboard/profile';
 
 import { AlertForm } from '../alert';
@@ -212,10 +213,7 @@ export default function AccountForm({ freelancer, type, token }) {
               </label>
               <ProfileImageInput
                 name='image'
-                image={
-                  image?.data?.attributes?.formats?.thumbnail?.url ||
-                  image?.data?.attributes?.url
-                }
+                image={getImage(image, { size: 'avatar' })}
                 displayName={displayName}
                 onChange={(newImage) => {
                   // Make sure we're setting the image correctly for both File objects and API data

@@ -8,7 +8,7 @@ import SaveForm from '../form/form-save';
 import CardReviews from './card-reviews';
 import ServiceCardFile from './card-service-file';
 import ServiceCardFiles from './card-service-files';
-import { getBestDimensions } from '@/utils/imageDimensions';
+import { getImage } from '@/utils/image';
 
 export default async function ServiceCard({
   service,
@@ -49,11 +49,13 @@ export default async function ServiceCard({
 
   let saveStatus = savedStatus;
 
-  const subdivisionImage = getBestDimensions(
-    subdivision?.data?.attributes?.image?.data?.attributes?.formats,
+  // Use the new utility to get subdivision image with fallback
+  const subdivisionImageUrl = getImage(
+    subdivision?.data?.attributes?.image,
+    { size: 'medium' }
   );
 
-  const fallbackImage = subdivisionImage?.url;
+  const fallbackImage = subdivisionImageUrl;
 
   // Note: savedStatus is now passed as prop, no need to fetch
 
@@ -100,7 +102,7 @@ export default async function ServiceCard({
               firstName={firstName}
               lastName={lastName}
               displayName={displayName}
-              image={avatar?.data?.attributes?.formats?.thumbnail?.url}
+              image={getImage(avatar, { size: 'avatar' })}
               alt={avatar?.formats?.thumbnail?.provider_metadata?.public_id}
               width={30}
               height={30}

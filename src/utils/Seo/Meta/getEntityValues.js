@@ -1,4 +1,4 @@
-import { getBestDimensions } from '@/utils/imageDimensions';
+import { getImage } from '@/utils/image';
 
 export function getEntityValues(entity, property) {
   const title = entity.title;
@@ -14,9 +14,9 @@ export function getEntityValues(entity, property) {
 
   const tagline = entity.tagline;
 
-  const singleImage = getBestDimensions(
-    entity?.media?.data?.[0]?.attributes?.formats,
-  )?.url;
+  const singleImage = getImage(
+    entity?.media?.data?.[0]
+  , { size: 'banner' });
 
   const arcCategory = entity?.label;
 
@@ -28,9 +28,9 @@ export function getEntityValues(entity, property) {
 
   const arcSubcategoryDesc = entity?.description;
 
-  const arcCategoryImage = getBestDimensions(
-    entity?.image?.data?.attributes?.formats,
-  )?.url;
+  const arcCategoryImage = getImage(
+    entity?.image
+  , { size: 'banner' });
 
   switch (property) {
     case 'title':

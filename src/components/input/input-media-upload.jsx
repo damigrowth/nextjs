@@ -11,6 +11,7 @@ import React, {
 import { generateAcceptString, getMediaType, validateFileType } from '@/utils/media-validation';
 import Image from 'next/image';
 import { IconMusic } from '@/components/icon/fa';
+import { getImage } from '@/utils/image';
 
 // Create a context for media management
 const MediaContext = createContext(null);
@@ -268,12 +269,16 @@ export function MediaProvider({ children, initialMedia = [] }) {
   const renderMediaPreview = (item) => {
     // For existing media from Strapi
     if (item.file.attributes) {
+      // Use utility to get the best image URL with fallback
+      const imageData = { data: { attributes: item.file.attributes } };
+      const imageUrl = getImage(imageData, { size: 'small' }) || item.file.attributes.url;
+      
       return (
         <Image
           height={119}
           width={136}
           className='object-fit-cover'
-          src={item.file.attributes.url}
+          src={imageUrl}
           style={{ height: '166px', width: '190px' }}
           alt={item.file.attributes.name}
         />

@@ -13,11 +13,10 @@ import {
   SKILLS_SEARCH,
 } from '@/lib/graphql';
 import { Meta } from '@/utils/Seo/Meta/Meta';
+import { getImage } from '@/utils/image';
 
-export const dynamic = 'auto';
-export const revalidate = 1800;
-export const fetchCache = 'force-cache';
-
+export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 export const dynamicParams = true;
 
 // Dynamic SEO
@@ -44,10 +43,13 @@ export default async function page({ params, searchParams }) {
 
   const { categories } = await getPublicData(FREELANCER_CATEGORIES);
 
-  const { categoryBySlug } = await getPublicData(FREELANCER_TAXONOMIES_BY_SLUG, {
-    category,
-    type: 'freelancer',
-  });
+  const { categoryBySlug } = await getPublicData(
+    FREELANCER_TAXONOMIES_BY_SLUG,
+    {
+      category,
+      type: 'freelancer',
+    },
+  );
 
   const currCategory = categoryBySlug?.data[0]?.attributes;
 
@@ -254,9 +256,7 @@ export default async function page({ params, searchParams }) {
       <Banner
         heading={taxonomies?.category?.label}
         description={taxonomies?.category?.description}
-        image={
-          taxonomies?.category?.image?.data?.attributes?.formats?.small?.url
-        }
+        image={getImage(taxonomies?.category?.image, { size: 'small' })}
       />
       <FreelancersArchive
         taxonomies={taxonomies}

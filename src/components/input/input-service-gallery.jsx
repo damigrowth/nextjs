@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import imageCompression from 'browser-image-compression';
+import { getImage } from '@/utils/image';
 
 import useCreateServiceStore from '@/stores/service/create/createServiceStore';
 import useEditServiceStore from '@/stores/service/edit/editServiceStore';
@@ -152,7 +153,7 @@ export default function ServiceGallery({
         }
 
         // Use enhanced validation for better file type detection
-        const validation = validateFileType({ type: finalFileType, name: file.name }, ['image', 'video', 'audio']);
+        const validation = validateFileType(processedFile, ['image', 'video', 'audio']);
         
         if (!validation.isValid) {
           setError(validation.error);
@@ -281,12 +282,16 @@ export default function ServiceGallery({
       }
       switch (mediaType) {
         case 'image':
+          // Use utility to get the best image URL with fallback
+          const imageData = { data: { attributes: item.file.attributes } };
+          const imageUrl = getImage(imageData, { size: 'small' }) || item.file.attributes.url;
+          
           return (
             <Image
               height={119}
               width={136}
               className='object-fit-cover'
-              src={item.file.attributes.url}
+              src={imageUrl}
               style={{ height: '166px', width: '190px' }}
               alt={item.file.attributes.name}
             />

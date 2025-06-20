@@ -28031,7 +28031,7 @@ a[href='#reviews-section']:hover {
 
 .service-card-wrapper img {
   max-width: 100%;
-  height: auto;
+  /* height: auto; */
 }
 
 /* Enhanced bullet pagination */

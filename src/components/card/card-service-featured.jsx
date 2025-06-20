@@ -3,7 +3,8 @@ import Image from 'next/image';
 import LinkNP from '@/components/link';
 
 import { formatRating } from '@/utils/formatRating';
-import { getBestDimensions } from '@/utils/imageDimensions';
+import { getImage } from '@/utils/image';
+import { getMediaType } from '@/utils/media-validation';
 import { IconStar } from '@/components/icon/fa';
 
 import UserImage from '../avatar/user-image';
@@ -33,11 +34,13 @@ export default async function FeaturedServiceCard({
     reviews_total,
   } = freelancerData;
 
-  const subdivisionImage = getBestDimensions(
-    subdivision?.data?.attributes?.image?.data?.attributes?.formats,
+  // Use the new utility to get subdivision image with fallback
+  const subdivisionImageUrl = getImage(
+    subdivision?.data?.attributes?.image,
+    { size: 'medium' }
   );
 
-  const fallback = subdivisionImage?.url;
+  const fallback = subdivisionImageUrl;
 
   const fallbackImage =
     fallback ||
@@ -49,11 +52,12 @@ export default async function FeaturedServiceCard({
 
   let mediaContent;
 
-  if (firstMediaAttributes?.formats) {
-    // It's an image
-    const formatResult = getBestDimensions(firstMediaAttributes.formats);
+  const mediaType = getMediaType(firstMediaAttributes?.mime);
 
-    const imageUrl = formatResult?.url || fallbackImage;
+  if (mediaType === 'image') {
+    // It's an image - use our utility for better fallback handling
+    const imageData = { data: { attributes: firstMediaAttributes } };
+    const imageUrl = getImage(imageData, { size: 'medium' }) || fallbackImage;
 
     mediaContent = (
       <LinkNP href={`/s/${slug}`}>
@@ -69,7 +73,7 @@ export default async function FeaturedServiceCard({
         />
       </LinkNP>
     );
-  } else if (firstMediaAttributes?.mime?.startsWith('video/')) {
+  } else if (mediaType === 'video') {
     // It's a video
     mediaContent = (
       <div style={{ width: '331px', height: '247px' }}>
@@ -137,7 +141,7 @@ export default async function FeaturedServiceCard({
         <hr className='my-2' />
         <div className='list-meta d-flex justify-content-between align-items-center mt15'>
           <UserImage
-            image={avatar?.data?.attributes?.formats?.thumbnail?.url}
+            image={getImage(avatar, { size: 'avatar' })}
             width={30}
             height={30}
             firstName={firstName}
