@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getBestDimensions } from '@/utils/imageDimensions';
+import { getImage } from '@/utils/image';
 
 import LoadMoreBtn from '../button/button-load-more';
 import ServiceCard from '../card/card-service-freelancer';
@@ -24,12 +24,13 @@ export default async function FeaturedServices({
       </h4>
       <div className='row mb35'>
         {services.map((service, i) => {
-          const subdivisionImage = getBestDimensions(
-            service.attributes.subdivision?.data?.attributes?.image?.data
-              ?.attributes?.formats,
+          // Use the new utility to get subdivision image with fallback
+          const subdivisionImageUrl = getImage(
+            service.attributes.subdivision?.data?.attributes?.image,
+            { size: 'medium' }
           );
 
-          const fallbackImage = subdivisionImage?.url;
+          const fallbackImage = subdivisionImageUrl;
 
           return (
             <div className='col-sm-6 col-xl-4' key={i}>

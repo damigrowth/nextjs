@@ -1,6 +1,7 @@
 import LinkNP from '@/components/link';
 
 import { UserImage } from '@/components/avatar';
+import { getImage } from '@/utils/image';
 import {
   hasAccessUserMenuNav,
   noAccessUserMenuNav,
@@ -50,9 +51,7 @@ export default async function UserMenu({ isMobile }) {
               lastName={freelancer.lastName}
               displayName={freelancer.displayName}
               hideDisplayName
-              image={
-                freelancer?.image?.data?.attributes?.formats?.thumbnail?.url
-              }
+              image={getImage(freelancer?.image, { size: 'avatar' })}
               alt={
                 freelancer?.image?.data?.attributes?.formats?.thumbnail
                   ?.provider_metadata?.public_id

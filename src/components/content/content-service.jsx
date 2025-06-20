@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 
 import ServiceSchema from '@/utils/Seo/Schema/ServiceSchema';
+import { getImage } from '@/utils/image';
 
 import Reviews from '../parts/reviews';
 import Addons from '../parts/service-addons';
@@ -135,7 +136,7 @@ export default async function SingleService({
         rating={rating}
         reviews_total={reviews_total}
         faq={faq}
-        image={image?.data?.attributes?.formats?.thumbnail?.url}
+        image={getImage(image, { size: 'avatar' })}
       />
       <div className='container'>
         <div className='row wrap service-wrapper'>
@@ -148,7 +149,7 @@ export default async function SingleService({
                   lastName={lastName}
                   displayName={displayName}
                   username={username}
-                  image={image.data?.attributes?.formats?.thumbnail?.url}
+                  image={getImage(image, { size: 'avatar' })}
                   views={views?.data?.length}
                   verified={verified}
                   topLevel={topLevel}
@@ -219,7 +220,7 @@ export default async function SingleService({
                       verified={verified}
                       base={base}
                       rate={rate}
-                      image={image?.data?.attributes?.formats?.thumbnail?.url}
+                      image={getImage(image, { size: 'avatar' })}
                       rating={freelancerRating}
                       totalReviews={freelancerReviewsTotal}
                       socials={socials}
@@ -289,7 +290,7 @@ export default async function SingleService({
               verified={verified}
               base={base}
               rate={rate}
-              image={image?.data?.attributes?.formats?.thumbnail?.url}
+              image={getImage(image, { size: 'avatar' })}
               rating={freelancerRating}
               totalReviews={freelancerReviewsTotal}
               socials={socials}

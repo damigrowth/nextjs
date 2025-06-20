@@ -1,6 +1,7 @@
 import { UserImage } from '@/components/avatar';
 import { timeAgo } from '@/utils/timeAgo';
 import { IconStar } from '@/components/icon/fa';
+import { getImage } from '@/utils/image';
 
 export default function ReviewComment({
   i,
@@ -21,7 +22,7 @@ export default function ReviewComment({
             lastName={reviewer?.lastName}
             displayName={reviewer?.displayName}
             hideDisplayName
-            image={reviewer?.image?.formats?.thumbnail?.url}
+            image={getImage(reviewer?.image, { size: 'avatar' })}
             alt={
               reviewer?.image?.formats?.thumbnail?.provider_metadata?.public_id
             }

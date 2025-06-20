@@ -8,6 +8,7 @@ import {
   TAXONOMIES_ARCHIVE_WITH_ACTIVE_SERVICES,
 } from '@/lib/graphql';
 import { Meta } from '@/utils/Seo/Meta/Meta';
+import { getImage } from '@/utils/image';
 
 export const dynamic = 'auto';
 export const revalidate = 1800;
@@ -77,7 +78,7 @@ export default async function page({ params }) {
       <Banner
         heading={archiveCategory?.label}
         description={archiveCategory?.description}
-        image={archiveCategory?.image?.data?.attributes?.formats?.small?.url}
+        image={getImage(archiveCategory?.image, { size: 'small' })}
       />
       <TaxonomiesArchive archive={archive} />
     </>

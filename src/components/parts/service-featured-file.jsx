@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 
-import { getBestDimensions } from '@/utils/imageDimensions';
+import { getImage } from '@/utils/image';
 
 import VideoPreview from '../card/card-video-preview';
 
@@ -16,10 +16,13 @@ export default function FeaturedFile({ file, formats }) {
 
   const fileAttributes = file.attributes;
 
-  if (fileAttributes.formats) {
-    image = getBestDimensions(formats || fileAttributes.formats); // Use formats prop if available, else from file
-  } else {
-    image = null;
+  // Create imageData structure that our utility expects
+  const imageData = { data: { attributes: fileAttributes } };
+  const imageUrl = getImage(imageData, { size: 'large' });
+  
+  if (imageUrl) {
+    // Get the best image data including dimensions
+    image = getImage(imageData, { size: 'large', returnType: 'full' });
   }
   // If the file is audio, render nothing
   if (fileAttributes.mime?.startsWith('audio/')) {

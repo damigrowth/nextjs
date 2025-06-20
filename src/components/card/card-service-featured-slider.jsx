@@ -3,6 +3,7 @@ import LinkNP from '@/components/link';
 import { UserImage } from '@/components/avatar';
 import { formatRating } from '@/utils/formatRating';
 import { IconStar } from '@/components/icon/fa';
+import { getImage } from '@/utils/image';
 
 import SaveFrom from '../form/form-save';
 import FeaturedServiceSlideCardMedia from './card-service-media-slider';
@@ -78,7 +79,7 @@ export default async function FeaturedServiceSliderCard({
           <hr className='my-2' />
           <div className='list-meta d-flex justify-content-between align-items-center mt15'>
             <UserImage
-              image={avatar?.data?.attributes?.formats?.thumbnail?.url}
+              image={getImage(avatar, { size: 'avatar' })}
               width={30}
               height={30}
               firstName={firstName}

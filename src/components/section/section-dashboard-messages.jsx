@@ -12,6 +12,7 @@ import {
   timeAgo,
 } from '@/utils/timeAgo';
 import { ArrowRightLong } from '@/components/icon/fa';
+import { getImage } from '@/utils/image';
 
 /**
  * Converts URLs in text to clickable links that open in a new tab
@@ -481,16 +482,13 @@ export default function MessageBox({
                     : '';
 
                 // Get image paths considering various data structures
-                const authorImage =
-                  msg.author?.image?.formats?.thumbnail?.url ||
-                  msg.author?.image?.url;
+                // For msg.author.image, it's already the attributes object from chat system
+                const authorImage = msg.author?.image?.url || null;
 
                 const authorDisplayName = msg.author?.displayName || authorName;
 
-                // Current user image path
-                const currentUserImage =
-                  currentUser?.image?.data?.attributes?.formats?.thumbnail
-                    ?.url || currentUser?.image?.data?.attributes?.url;
+                // Current user image path - full Strapi structure
+                const currentUserImage = getImage(currentUser?.image, { size: 'avatar' });
 
                 // Get time for the timestamp
                 const messageTime = messageDate

@@ -15,11 +15,10 @@ import {
 } from '@/lib/graphql';
 import { normalizeTerm } from '@/utils/normalizeTerm';
 import { Meta } from '@/utils/Seo/Meta/Meta';
+import { getImage } from '@/utils/image';
 
-export const dynamic = 'auto';
-export const revalidate = 1800;
-export const fetchCache = 'force-cache';
-
+export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 export const dynamicParams = true;
 
 // Dynamic SEO
@@ -242,7 +241,7 @@ export default async function page({ params, searchParams }) {
       <Banner
         heading={currSubdivision.label}
         description={currSubdivision.description}
-        image={currSubdivision.image?.data?.attributes?.formats?.small?.url}
+        image={getImage(currSubdivision.image, { size: 'small' })}
       />
       <ServicesArchive
         taxonomies={taxonomies}

@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import LinkNP from '@/components/link';
+import { getImage } from '@/utils/image';
 
 /**
  * Renders a grid of taxonomies (categories or subcategories).
@@ -32,8 +33,7 @@ export default function TaxonomiesGrid({
                   <Image
                     fill
                     src={
-                      taxonomy?.image?.data?.attributes?.formats?.small?.url ||
-                      fallbackImage
+                      getImage(taxonomy?.image, { size: 'banner' }) || fallbackImage
                     }
                     alt='vector'
                   />

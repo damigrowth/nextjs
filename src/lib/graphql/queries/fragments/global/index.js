@@ -5,7 +5,20 @@ const SINGLE_IMAGE = gql`
     data {
       id
       attributes {
+        name
         formats
+        size
+        url
+        mime
+        alternativeText
+        caption
+        width
+        height
+        hash
+        ext
+        previewUrl
+        provider
+        provider_metadata
       }
     }
   }

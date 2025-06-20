@@ -12,11 +12,10 @@ import {
   SKILLS_SEARCH,
 } from '@/lib/graphql';
 import { Meta } from '@/utils/Seo/Meta/Meta';
+import { getImage } from '@/utils/image';
 
-export const dynamic = 'auto';
-export const revalidate = 1800;
-export const fetchCache = 'force-cache';
-
+export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 export const dynamicParams = true;
 
 // Dynamic SEO
@@ -234,7 +233,7 @@ export default async function page({ params, searchParams }) {
       <Banner
         heading={currSubcategory?.plural}
         description={currSubcategory?.description}
-        image={currSubcategory?.image?.data?.attributes?.formats?.small?.url}
+        image={getImage(currSubcategory?.image, { size: 'small' })}
       />
       <FreelancersArchive
         taxonomies={taxonomies}

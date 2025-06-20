@@ -5,7 +5,8 @@ import Image from 'next/image';
 import LinkNP from '@/components/link';
 import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 
-import { getBestDimensions } from '@/utils/imageDimensions';
+import { getImage } from '@/utils/image';
+import { getMediaType } from '@/utils/media-validation';
 
 import VideoPreview from './card-video-preview';
 import { ArrowLeftLong, ArrowRightLong } from '@/components/icon/fa';
@@ -31,8 +32,13 @@ export default function ServiceCardFiles({
 
   // Define the slide content rendering logic separately
   const renderSlideContent = (file) => {
-    if (file.formats) {
-      // It's an image
+    const mediaType = getMediaType(file.mime);
+    
+    if (mediaType === 'image') {
+      // It's an image - use utility for better fallback handling
+      const imageData = { data: { attributes: file } };
+      const imageUrl = getImage(imageData, { size: 'medium' }) || fallbackImage;
+
       return (
         <LinkNP href={path}>
           <Image
@@ -44,18 +50,12 @@ export default function ServiceCardFiles({
               width: width ? `${width}px` : '300px',
               height: height ? `${height}px` : '200px',
             }}
-            src={(() => {
-              const formatResult = getBestDimensions(file.formats);
-
-              return formatResult && formatResult.url
-                ? formatResult.url
-                : fallbackImage;
-            })()}
+            src={imageUrl}
             alt='service-thumbnail'
           />
         </LinkNP>
       );
-    } else if (file.mime?.startsWith('video/')) {
+    } else if (mediaType === 'video') {
       // It's a video
       return (
         <div
@@ -72,7 +72,7 @@ export default function ServiceCardFiles({
         </div>
       );
     } else {
-      // Fallback (e.g., non-image, non-video, non-audio)
+      // Fallback (e.g., audio or unknown types)
       // Render fallback image without link
       return (
         <Image
