@@ -28,7 +28,7 @@ export async function generateMetadata({ params }) {
     params: { category, type: 'freelancer' },
     titleTemplate: '%arcCategoryPlural% - Αναζήτηση για Επαγγελματίες',
     descriptionTemplate:
-      'Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές. %arcCategoryDesc%',
+      'Βρες τους Καλύτερους Επαγγελματίες, δες τις υπηρεσίες τους, αξιολογήσεις και τιμές. %arcCategoryPlural%',
     size: 200,
     url: `/pros/${category}`,
   };

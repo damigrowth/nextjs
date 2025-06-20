@@ -22,7 +22,7 @@ export async function generateMetadata() {
   const { meta } = await Meta({
     titleTemplate: 'Επιχειρήσεις | Doulitsa',
     descriptionTemplate:
-      'Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές.',
+      'Βρες τις Καλύτερες Επιχειρήσεις, δες τις υπηρεσίες τους, αξιολογήσεις και τιμές.',
     size: 150,
     url: '/companies',
   });

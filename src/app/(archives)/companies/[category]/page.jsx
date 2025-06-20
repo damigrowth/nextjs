@@ -27,7 +27,7 @@ export async function generateMetadata({ params }) {
     params: { category, type: 'company' },
     titleTemplate: '%arcCategoryPlural% - Αναζήτηση για Επιχειρήσεις',
     descriptionTemplate:
-      'Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές. %arcCategoryDesc%',
+      'Βρες τις Καλύτερες Επιχειρήσεις, δες τις υπηρεσίες τους, αξιολογήσεις και τιμές. %arcCategoryPlural%',
     size: 200,
     url: `/companies/${category}`,
   };

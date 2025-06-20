@@ -24,7 +24,7 @@ export async function generateMetadata() {
   const { meta } = await Meta({
     titleTemplate: 'Επαγγελματίες | Doulitsa',
     descriptionTemplate:
-      'Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές.',
+      'Βρες τους Καλύτερους Επαγγελματίες, δες τις υπηρεσίες τους, αξιολογήσεις και τιμές.',
     size: 150,
     url: '/pros',
   });
