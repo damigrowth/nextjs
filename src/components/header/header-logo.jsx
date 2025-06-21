@@ -13,6 +13,7 @@ export default function HeaderLogo() {
           alt='Doulitsa Logo'
           unoptimized
           priority
+          loading='eager'
         />
       </LinkNP>
       <LinkNP className='header-logo logo2' href='/'>
@@ -23,6 +24,7 @@ export default function HeaderLogo() {
           alt='Doulitsa Logo'
           unoptimized
           priority
+          loading='eager'
         />
       </LinkNP>
     </div>
