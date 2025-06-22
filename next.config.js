@@ -4,8 +4,6 @@ const nextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: '20mb',
-      modern: true,
-      legacyBrowsers: false,
     },
     // Enable Web Vitals attribution for better debugging
     webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB'],

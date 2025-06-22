@@ -1,7 +1,23 @@
-import HeroContent from './hero-home-content';
+import { Suspense } from 'react';
 import HeroImages from './hero-home-images';
 
-// Static content that renders immediately - matches original structure exactly
+// Lazy load heavy SearchBar component AFTER H1 renders
+const HeroContent = dynamic(() => import('./hero-home-content'), {
+  loading: () => (
+    <div className='advance-search-tab searchaki bgc-white p10 bdrs4-sm bdrs60 searchbrd banner-btn position-relative zi1 mt30'>
+      <div className='row'>
+        <div className='col-12 text-center'>
+          <div style={{ padding: '20px', color: '#999' }}>Loading search...</div>
+        </div>
+      </div>
+    </div>
+  )
+});
+
+// Import dynamic properly
+import dynamic from 'next/dynamic';
+
+// Static content that renders immediately - EXACT same classes as before
 function StaticHeroContent() {
   return (
     <div className='home12-hero-content'>
@@ -14,10 +30,10 @@ function StaticHeroContent() {
         </a>
       </span>
 
-      {/* Critical LCP H1 - renders immediately with optimized inline styles */}
+      {/* CRITICAL LCP H1 - Same styling, but with performance optimizations */}
       <h1
         style={{
-          // CRITICAL: Prevent render delay - optimized from original
+          // CRITICAL: Keep original font but optimize loading
           fontFamily:
             'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           fontSize: 'clamp(1.6rem, 5vw, 2.5rem)',
@@ -26,12 +42,11 @@ function StaticHeroContent() {
           color: '#000',
           marginBottom: '25px',
           display: 'block',
-          fontDisplay: 'swap',
-          contain: 'layout style paint',
-          willChange: 'auto',
           opacity: 1,
           visibility: 'visible',
-          transform: 'none',
+          // Performance optimizations - invisible to user
+          contain: 'layout style paint',
+          textRendering: 'optimizeSpeed',
         }}
       >
         Οι καλύτερες Υπηρεσίες
@@ -39,17 +54,12 @@ function StaticHeroContent() {
         στην οθόνη σου.
       </h1>
 
-      {/* H2 also renders immediately - exact same as original */}
+      {/* H2 with original class - same styling */}
       <h2 className='heading-p'>
         Άμεση αναζήτηση υπηρεσιών από Επαγγελματίες και Επιχειρήσεις.
       </h2>
     </div>
   );
-}
-
-// Dynamic content that renders immediately - NO loading states
-function DynamicHeroContent({ categories }) {
-  return <HeroContent categories={categories} />;
 }
 
 export default function OptimizedHero({ categories }) {
@@ -58,13 +68,11 @@ export default function OptimizedHero({ categories }) {
       <div className='container'>
         <div className='row'>
           <div className='col-xl-7 hero-left'>
-            {/* Static content renders immediately - no data dependencies */}
+            {/* CRITICAL: Static H1/H2 render immediately - no JavaScript dependency */}
             <StaticHeroContent />
 
-            {/* Dynamic content renders immediately - NO loading states */}
-            <div style={{ marginTop: '20px' }}>
-              <DynamicHeroContent categories={categories} />
-            </div>
+            {/* NON-CRITICAL: SearchBar loads after H1 is painted */}
+            <HeroContent categories={categories} />
           </div>
           <div className='col-xl-5 d-none d-xl-block'>
             <HeroImages />
