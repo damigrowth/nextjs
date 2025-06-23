@@ -15,3 +15,8 @@ export { default as ServiceSlideCardMedia } from './card-service-media-slider';
 export { default as TestimonialCard } from './card-testimonial';
 export { default as VideoPreview } from './card-video-preview';
 export { default as FreelancerCard } from './freelancer-card';
+
+// Client versions for use in client components
+export { default as FeaturedServiceCardClient } from './card-service-featured-client';
+export { default as FeaturedServiceSliderCardClient } from './card-service-featured-slider-client';
+export { default as FreelancerCardClient } from './freelancer-card-client';

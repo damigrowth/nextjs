@@ -9,3 +9,14 @@ export { GivenReviewsSkeleton } from './skeleton-dashboard-reviews';
 export { default as FreelancerProfileSkeleton } from './skeleton-freelancer';
 export { default as SingleServiceSkeleton } from './skeleton-service';
 export { default as ManageServiceCardSkeleton } from './skeleton-service-edit-card';
+export {
+  default as SkeletonServiceCardFeatured,
+  SkeletonServiceCardGrid,
+  InlineServiceCardSkeleton,
+} from './skeleton-service-card-featured';
+
+export {
+  default as SkeletonFreelancerCard,
+  SkeletonFreelancerCardGrid,
+} from './skeleton-freelancer-card-featured';
+

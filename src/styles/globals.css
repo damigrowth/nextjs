@@ -11930,6 +11930,76 @@ Copyright (c) 2015 Daniel Eden
   animation-name: flash;
 }
 
+@-webkit-keyframes flash-small {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+
+  25%,
+  75% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes flash-small {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+
+  25%,
+  75% {
+    opacity: 0.85;
+  }
+}
+
+.flash-small {
+  -webkit-animation-name: flash-small;
+  animation-name: flash-small;
+  -webkit-animation-duration: 3s;
+  animation-duration: 3s;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+}
+
+@-webkit-keyframes flash-big {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+
+  25%,
+  75% {
+    opacity: 0.65;
+  }
+}
+
+@keyframes flash-big {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+
+  25%,
+  75% {
+    opacity: 0.65;
+  }
+}
+
+.flash-big {
+  -webkit-animation-name: flash-big;
+  animation-name: flash-big;
+  -webkit-animation-duration: 3s;
+  animation-duration: 3s;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+}
+
 /* originally authored by Nick Pettit - https://github.com/nickpettit/glide */
 
 @-webkit-keyframes pulse {
@@ -20107,143 +20177,6 @@ li {
   background-color: #ffede8;
 }
 
-.hero-home12 {
-  background-color: #fbf7ed;
-  background-image: linear-gradient(0deg, #ffffff 0%, #ffe9b2 100%);
-  display: flex;
-  align-items: center;
-  height: 800px;
-  padding: 0;
-}
-
-/* Responsive styles for screens under 400px */
-@media screen and (max-width: 300px) {
-  .hero-home12 {
-    padding-top: 6rem;
-  }
-}
-
-@media screen and (max-width: 992px) {
-  .hero-home12 {
-    height: 680px;
-  }
-}
-
-.home12-hero-content {
-  position: relative;
-}
-.home12-hero-content .tag {
-  background-color: #198754;
-  border-radius: 120px;
-  color: #ffffff;
-  font-family: sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  padding: 5px 17px;
-  width: fit-content;
-}
-
-.home12-hero-content .tag:hover {
-  background-color: #5bbb7b;
-  cursor: default;
-}
-
-.home12-hero-img .img-0 {
-  bottom: 0;
-  position: absolute;
-}
-.home12-hero-img .img-1 {
-  left: 70px;
-  position: absolute;
-  top: 0;
-  z-index: 1;
-}
-.home12-hero-img .img-2 {
-  right: -100px;
-  position: absolute;
-  top: 100px;
-  width: 108px;
-  z-index: 1;
-}
-@media (max-width: 1500px) {
-  .home12-hero-img .img-2 {
-    right: 0;
-    top: 0;
-  }
-}
-.home12-hero-img .img-3 {
-  position: absolute;
-  right: -100px;
-  top: 450px;
-  width: 80px;
-  z-index: 1;
-}
-@media (max-width: 1500px) {
-  .home12-hero-img .img-3 {
-    right: 0;
-  }
-}
-.home12-hero-img .iconbox-small1 {
-  border-radius: 16px;
-  -webkit-box-shadow: 10px 10px 40px rgba(34, 34, 34, 0.05);
-  -moz-box-shadow: 10px 10px 40px rgba(34, 34, 34, 0.05);
-  -o-box-shadow: 10px 10px 40px rgba(34, 34, 34, 0.05);
-  box-shadow: 10px 10px 40px rgba(34, 34, 34, 0.05);
-  margin-left: 4%;
-  padding: 20px 30px 20px 20px;
-  bottom: 100px;
-  top: auto;
-}
-@media (max-width: 767.98px) {
-  .home12-hero-img .iconbox-small1 {
-    position: absolute;
-  }
-}
-.home12-hero-img .iconbox-small1 .icon {
-  background-color: #ffe598;
-  color: #222222;
-  left: 0;
-  position: relative;
-  top: 0;
-}
-.home12-hero-img .iconbox-small1:hover .icon {
-  background-color: #ffd700;
-  color: #222222;
-}
-.home12-hero-img .iconbox-small2 {
-  border-radius: 16px;
-  -webkit-box-shadow: 10px 10px 40px rgba(34, 34, 34, 0.05);
-  -moz-box-shadow: 10px 10px 40px rgba(34, 34, 34, 0.05);
-  -o-box-shadow: 10px 10px 40px rgba(34, 34, 34, 0.05);
-  box-shadow: 10px 10px 40px rgba(34, 34, 34, 0.05);
-  bottom: 250px;
-  padding: 20px 30px 20px 20px;
-  margin-left: 200px;
-  top: auto;
-}
-@media (max-width: 1500px) {
-  .home12-hero-img .iconbox-small2 {
-    right: 0;
-  }
-}
-@media (max-width: 767.98px) {
-  .home12-hero-img .iconbox-small2 {
-    position: absolute;
-    right: 0;
-  }
-}
-.home12-hero-img .iconbox-small2 .icon {
-  background-color: #198754;
-  color: #ffffff;
-  left: 0;
-  position: relative;
-  top: 0;
-}
-.home12-hero-img .iconbox-small2:hover .icon {
-  background-color: #821987;
-  color: #ffffff;
-}
-
 .review_reactions button {
   color: #697488;
   font-family: sans-serif;
@@ -21789,39 +21722,6 @@ textarea {
 @media (max-width: 575.98px) {
   .freelancer-single-style .online {
     top: -30px;
-  }
-}
-
-.bounce-y {
-  transform: translatey(0px);
-  animation: bounceY 6s ease-in-out infinite;
-}
-
-@keyframes bounceY {
-  0% {
-    transform: translatey(0px);
-  }
-  50% {
-    transform: translatey(-20px);
-  }
-  100% {
-    transform: translatey(0px);
-  }
-}
-.bounce-x {
-  transform: translatey(0px);
-  animation: bounceX 6s ease-in-out infinite;
-}
-
-@keyframes bounceX {
-  0% {
-    transform: translatex(0px);
-  }
-  50% {
-    transform: translatex(-20px);
-  }
-  100% {
-    transform: translatex(0px);
   }
 }
 
@@ -28333,12 +28233,6 @@ a[href='#reviews-section']:hover {
 
 .hero-home12 {
   contain: layout;
-}
-
-.hero-left {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .icon-magnifying-glass {

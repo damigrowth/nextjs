@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect } from 'react';
 import LinkNP from '@/components/link';
 
 import { UserImage } from '@/components/avatar';
@@ -11,19 +14,50 @@ import MessagesMenu from '../button/button-messages';
 import SavedMenu from '../button/button-saved';
 import LogoutLink from '../form/form-logout';
 import UserMenuLink from './menu-user-link';
-import { getAccess, getUser } from '@/actions/shared/user';
+import useFreelancerStore from '@/stores/freelancer';
+import Skeleton from 'react-loading-skeleton';
 
-export default async function UserMenu({ isMobile }) {
-  const user = await getUser();
+export default function UserMenu({ isMobile }) {
+  const {
+    username,
+    displayName,
+    firstName,
+    lastName,
+    image,
+    hasAccess,
+    isAuthenticated,
+    isConfirmed,
+    isLoading,
+    fetchFreelancer,
+  } = useFreelancerStore();
 
-  if (user && user.confirmed) {
-    const hasAccess = await getAccess(['freelancer', 'company']);
+  // Fetch auth data on component mount
+  useEffect(() => {
+    fetchFreelancer();
+  }, [fetchFreelancer]);
 
+  // Show loading state while fetching
+  if (isLoading) {
+    return !isMobile ? (
+      <div className='auth-btns'>
+        <Skeleton width={40} height={40} borderRadius={'20%'} />
+      </div>
+    ) : (
+      <div
+        style={{
+          width: '20px',
+          height: '20px',
+          backgroundColor: 'rgba(0,0,0,0.1)',
+          borderRadius: '10px',
+        }}
+      />
+    );
+  }
+
+  if (isAuthenticated && isConfirmed) {
     const allNav = hasAccess ? hasAccessUserMenuNav : noAccessUserMenuNav;
 
-    const userProfilePath = `/profile/${user.username}`;
-
-    const freelancer = user?.freelancer?.data?.attributes;
+    const userProfilePath = `/profile/${username}`;
 
     // Modify the nav items to use dynamic profile path or filter out profile for non-access users
     const modifiedNav = allNav
@@ -47,14 +81,14 @@ export default async function UserMenu({ isMobile }) {
         <div className='dropdown'>
           <div className='btn' data-bs-toggle='dropdown'>
             <UserImage
-              firstName={freelancer.firstName}
-              lastName={freelancer.lastName}
-              displayName={freelancer.displayName}
+              firstName={firstName}
+              lastName={lastName}
+              displayName={displayName}
               hideDisplayName
-              image={getImage(freelancer?.image, { size: 'avatar' })}
+              image={getImage(image, { size: 'avatar' })}
               alt={
-                freelancer?.image?.data?.attributes?.formats?.thumbnail
-                  ?.provider_metadata?.public_id
+                image?.data?.attributes?.formats?.thumbnail?.provider_metadata
+                  ?.public_id
               }
               width={40}
               height={40}

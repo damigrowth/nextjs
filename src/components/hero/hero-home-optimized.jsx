@@ -1,17 +1,16 @@
-import { Suspense } from 'react';
 import HeroImages from './hero-home-images';
 
 // Lazy load heavy SearchBar component AFTER H1 renders
 const HeroContent = dynamic(() => import('./hero-home-content'), {
   loading: () => (
-    <div className='advance-search-tab searchaki bgc-white p10 bdrs4-sm bdrs60 searchbrd banner-btn position-relative zi1 mt30'>
-      <div className='row'>
-        <div className='col-12 text-center'>
-          <div style={{ padding: '20px', color: '#999' }}>Loading search...</div>
+    <div className='hero-home-loading'>
+      <div className='row-div'>
+        <div className='inner'>
+          <div className='inner-text'>Loading search...</div>
         </div>
       </div>
     </div>
-  )
+  ),
 });
 
 // Import dynamic properly
@@ -20,14 +19,9 @@ import dynamic from 'next/dynamic';
 // Static content that renders immediately - EXACT same classes as before
 function StaticHeroContent() {
   return (
-    <div className='home12-hero-content'>
-      <span className='d-inline-block tag mb15 fit'>
-        <a
-          href='/categories'
-          className='text-decoration-none text-white hover:text-white'
-        >
-          Κατάλογος Υπηρεσιών
-        </a>
+    <div className='home-hero-content'>
+      <span className='tag'>
+        <a href='/categories'>Κατάλογος Υπηρεσιών</a>
       </span>
 
       {/* CRITICAL LCP H1 - Same styling, but with performance optimizations */}
@@ -55,7 +49,16 @@ function StaticHeroContent() {
       </h1>
 
       {/* H2 with original class - same styling */}
-      <h2 className='heading-p'>
+      <h2
+        style={{
+          fontFamily: 'sans-serif',
+          fontSize: '15px',
+          fontWeight: 400,
+          lineHeight: 1.85,
+          color: '#222',
+          marginBottom: '0px',
+        }}
+      >
         Άμεση αναζήτηση υπηρεσιών από Επαγγελματίες και Επιχειρήσεις.
       </h2>
     </div>
@@ -64,17 +67,17 @@ function StaticHeroContent() {
 
 export default function OptimizedHero({ categories }) {
   return (
-    <section className='hero-home12 overflow-hidden'>
-      <div className='container'>
-        <div className='row'>
-          <div className='col-xl-7 hero-left'>
+    <section className='home-hero'>
+      <div className='home-hero-container'>
+        <div className='row-div'>
+          <div className='home-hero-left'>
             {/* CRITICAL: Static H1/H2 render immediately - no JavaScript dependency */}
             <StaticHeroContent />
 
             {/* NON-CRITICAL: SearchBar loads after H1 is painted */}
             <HeroContent categories={categories} />
           </div>
-          <div className='col-xl-5 d-none d-xl-block'>
+          <div className='home-hero-right'>
             <HeroImages />
           </div>
         </div>
