@@ -12,28 +12,39 @@ const nextConfig = {
     optimizeServerReact: true,
     serverMinification: true,
 
+    optimizeCss: true,
     // Optimize package imports for better tree-shaking
-    // optimizePackageImports: [
-    //   '@apollo/client',
-    //   'react-loading-skeleton',
-    //   'zustand',
-    //   '@fortawesome/react-fontawesome',
-    //   '@fortawesome/free-solid-svg-icons',
-    //   '@fortawesome/free-regular-svg-icons',
-    //   '@fortawesome/free-brands-svg-icons',
-    //   'swiper',
-    //   'react-countup',
-    //   'date-fns',
-    //   'lodash.debounce',
-    // ],
+    optimizePackageImports: [
+      '@apollo/client',
+      'react-loading-skeleton',
+      'zustand',
+      '@fortawesome/react-fontawesome',
+      '@fortawesome/free-solid-svg-icons',
+      '@fortawesome/free-regular-svg-icons',
+      '@fortawesome/free-brands-svg-icons',
+      'swiper',
+      'react-countup',
+      'date-fns',
+      'lodash.debounce',
+    ],
+  },
+
+  // Turbopack configuration (stable)
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
   },
 
   images: {
-    // Advanced image optimization settings
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    formats: ['image/avif', 'image/webp'], // AVIF first for better compression
-    minimumCacheTTL: 2678400, // 31 days - reduce revalidations
+    // Optimized for mobile-first responsive images
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 160, 200, 256, 331],
+    formats: ['image/webp'],
+    minimumCacheTTL: 2678400, // 31 days
     remotePatterns: [
       {
         hostname: "res.cloudinary.com",
@@ -54,6 +65,68 @@ const nextConfig = {
         permanent: true,
       },
     ];
+  },
+
+  // CRITICAL: Webpack optimizations for LCP improvement
+  webpack: (config, { dev, isServer }) => {
+    if (!dev && !isServer) {
+      // Split chunks more aggressively for better caching
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          default: false,
+          vendors: false,
+          // Apollo/GraphQL chunk
+          apollo: {
+            name: 'apollo',
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/](@apollo|graphql)/,
+            priority: 40,
+          },
+          // FontAwesome chunk
+          fontawesome: {
+            name: 'fontawesome',
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/]@fortawesome/,
+            priority: 30,
+          },
+          // React/UI libraries chunk
+          react: {
+            name: 'react',
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/](react|react-dom|react-select|react-slider|swiper)/,
+            priority: 20,
+          },
+          // Vendor chunk for other packages
+          vendor: {
+            name: 'vendor',
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/]/,
+            priority: 10,
+          },
+        },
+      };
+
+      // Optimize module concatenation
+      config.optimization.concatenateModules = true;
+
+      // Remove console logs in production
+      config.optimization.minimizer.forEach((minimizer) => {
+        if (minimizer.constructor.name === 'TerserPlugin') {
+          minimizer.options.terserOptions.compress.drop_console = true;
+        }
+      });
+    }
+
+    return config;
+  },
+
+  // Enable compression
+  compress: true,
+
+  // Modern browser targeting for smaller bundles
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
 };
 
