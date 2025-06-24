@@ -1,6 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
+import { revalidateTag } from 'next/cache';
 
 const TOKEN_NAME = 'jwt';
 
@@ -46,6 +47,9 @@ export const setToken = async (token, options = {}) => {
     ...cookieConfig,
     ...options,
   });
+
+  // Revalidate freelancer data across the site after login
+  revalidateTag('freelancer');
 };
 
 /**
@@ -58,6 +62,9 @@ export const removeToken = async () => {
     ...cookieConfig,
     maxAge: 0,
   });
+
+  // Revalidate freelancer data across the site after logout  
+  revalidateTag('freelancer');
 };
 
 /**

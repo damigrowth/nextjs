@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 import LinkNP from '@/components/link';
@@ -9,6 +8,7 @@ import {
   ArrowRightLong,
   IconMagnifyingGlass,
 } from '@/components/icon/fa';
+import { SkeletonServiceCardGrid } from '@/components/skeleton';
 
 let swiperModules = null;
 const getSwiperModules = async () => {
@@ -19,35 +19,25 @@ const getSwiperModules = async () => {
 };
 
 /**
- * @typedef {object} ServicesClientWrapperProps
- * @property {Array<object>} renderedServiceCards - Pre-rendered service cards from the server component.
- * @property {Array<object>} categories - List of service categories with slug and label.
- * @property {object} pagination - Pagination information including page, pageCount, pageSize, and total.
- */
-
-/**
- * ServicesClientWrapper component provides client-side interactivity for featured services,
- * including category filtering and Swiper-based pagination.
- * @param {ServicesClientWrapperProps} props - The component props.
- * @returns {JSX.Element} The JSX element for the services client wrapper.
+ * ServicesClientWrapper - Fixed to show single consistent skeleton
  */
 export default function ServicesClientWrapper({
   renderedServiceCards,
   categories,
   pagination,
+  isLoading = false,
+  onPageChange,
+  onCategoryChange,
+  currentPage: propCurrentPage,
+  activeCategory: propActiveCategory,
 }) {
   const swiperRef = useRef(null);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const [isSwiperReady, setIsSwiperReady] = useState(false);
   const [modules, setModules] = useState([]);
 
-  const activeCategory = searchParams.get('sc') || undefined;
-
+  // Use props or default values
+  const activeCategory = propActiveCategory || undefined;
   const filteredServices = renderedServiceCards;
-
-  const currentPage = pagination?.page || 1;
+  const currentPage = propCurrentPage || pagination?.page || 1;
   const pageCount = pagination?.pageCount || 1;
 
   // Load Swiper modules on component mount
@@ -59,101 +49,72 @@ export default function ServicesClientWrapper({
 
   const handleSlideChange = (swiper) => {
     const newPage = swiper.activeIndex + 1;
-    if (newPage !== currentPage) {
-      handlePageChange(newPage);
+    if (newPage !== currentPage && !isLoading && onPageChange) {
+      console.log(`📄 Services pagination: page ${currentPage} → ${newPage}`);
+      onPageChange(newPage, activeCategory);
     }
   };
 
   const handlePageChange = (newPage) => {
-    const current = new URLSearchParams(Array.from(searchParams.entries()));
-    current.set('sp', newPage.toString());
-
-    if (activeCategory) {
-      current.set('sc', activeCategory);
-    } else {
-      current.delete('sc');
+    if (isLoading || !onPageChange) {
+      console.log('⏳ Skipping page change - loading or no callback');
+      return;
     }
 
-    const query = current.toString();
-    router.push(`/?${query}`, { scroll: false });
+    console.log(`📄 Manual page change: ${currentPage} → ${newPage}`);
+    onPageChange(newPage, activeCategory);
   };
 
   const handleCategoryChange = (categorySlug) => {
-    const current = new URLSearchParams(Array.from(searchParams.entries()));
-
-    current.set('sp', '1');
-
-    if (categorySlug) {
-      current.set('sc', categorySlug);
-    } else {
-      current.delete('sc');
+    if (isLoading || !onCategoryChange) {
+      console.log('⏳ Skipping category change - loading or no callback');
+      return;
     }
 
-    const query = current.toString();
-    router.push(`/?${query}`, { scroll: false });
+    console.log(
+      `📂 Category change: ${activeCategory || 'all'} → ${categorySlug || 'all'}`,
+    );
+    onCategoryChange(categorySlug);
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsSwiperReady(true);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    setIsSwiperReady(false);
-    const timer = setTimeout(() => {
-      setIsSwiperReady(true);
-    }, 50);
-
-    return () => clearTimeout(timer);
-  }, [activeCategory]);
-
+  // Update swiper position when page changes (without destroying)
   useEffect(() => {
     if (
       swiperRef.current &&
-      swiperRef.current.activeIndex !== currentPage - 1
+      swiperRef.current.activeIndex !== currentPage - 1 &&
+      !isLoading
     ) {
       swiperRef.current.slideTo(currentPage - 1, 0);
     }
-  }, [currentPage]);
+  }, [currentPage, isLoading]);
 
+  // Reset to first page when category changes
   useEffect(() => {
     if (swiperRef.current && currentPage === 1) {
       swiperRef.current.slideTo(0, 0);
     }
   }, [activeCategory]);
 
-  useEffect(() => {
-    if (swiperRef.current) {
-      swiperRef.current.destroy(true, true);
-      swiperRef.current = null;
-    }
-
-    const timer = setTimeout(() => {
-      if (swiperRef.current) {
-        swiperRef.current.update();
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [activeCategory]);
-
+  /**
+   * FIXED: Create swiper slides - only show real content, no skeletons in inactive slides
+   */
   const createDataPageSlides = () => {
     const slides = [];
 
-    if (filteredServices.length === 0) {
+    // Don't create slides if we're loading - this prevents multiple skeletons
+    if (isLoading || filteredServices.length === 0) {
       return slides;
     }
 
+    // Create slides for each page, but ALL pages show actual content
     for (let page = 1; page <= pageCount; page++) {
       slides.push(
         <SwiperSlide key={`page-${page}`}>
           <div className='services-page-content'>
-            {page === currentPage ? (
-              <div className='row'>
-                {filteredServices.map((service) => (
+            <div className='row'>
+              {/* For current page, show actual cards. For other pages, show empty placeholder */}
+              {page === currentPage ? (
+                filteredServices.map((service) => (
                   <div
                     key={service.id}
                     className='col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4'
@@ -162,20 +123,12 @@ export default function ServicesClientWrapper({
                       {service.renderedCard}
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className='row'>
-                <div className='col-12 text-center py-5'>
-                  <div className='loading-placeholder'>
-                    <div className='spinner-border text-thm2' role='status'>
-                      <span className='visually-hidden'>Loading...</span>
-                    </div>
-                    <p className='mt-3 text-muted'>Φόρτωση σελίδας {page}...</p>
-                  </div>
-                </div>
-              </div>
-            )}
+                ))
+              ) : (
+                /* Empty placeholder for inactive pages - no skeleton */
+                <div style={{ minHeight: '400px' }} />
+              )}
+            </div>
           </div>
         </SwiperSlide>,
       );
@@ -205,18 +158,18 @@ export default function ServicesClientWrapper({
       swiperRef.current = swiper;
     },
     onSlideChange: handleSlideChange,
-    allowTouchMove: true,
+    allowTouchMove: !isLoading,
     watchSlidesProgress: true,
     touchRatio: 1,
     touchAngle: 45,
-    grabCursor: true,
+    grabCursor: !isLoading,
     speed: 300,
-    preventClicks: false,
-    preventClicksPropagation: false,
+    preventClicks: isLoading,
+    preventClicksPropagation: isLoading,
   };
 
   return (
-    <section className='pt-0 pb100 pt100 bgorange'>
+    <section className='pb100 pt100 bgorange'>
       <div className='container'>
         <div className='row align-items-center wow fadeInUp'>
           <div className='col-xl-3'>
@@ -235,8 +188,11 @@ export default function ServicesClientWrapper({
                   <button
                     className={`nav-link fw500 dark-color ${
                       !activeCategory ? 'active' : ''
-                    }`}
-                    onClick={() => handleCategoryChange(undefined)}
+                    } ${isLoading ? 'disabled' : ''}`}
+                    onClick={() =>
+                      !isLoading && handleCategoryChange(undefined)
+                    }
+                    disabled={isLoading}
                   >
                     Όλες οι Υπηρεσίες
                   </button>
@@ -246,8 +202,11 @@ export default function ServicesClientWrapper({
                     <button
                       className={`nav-link fw500 dark-color ${
                         activeCategory === category.slug ? 'active' : ''
-                      }`}
-                      onClick={() => handleCategoryChange(category.slug)}
+                      } ${isLoading ? 'disabled' : ''}`}
+                      onClick={() =>
+                        !isLoading && handleCategoryChange(category.slug)
+                      }
+                      disabled={isLoading}
                     >
                       {category.label}
                     </button>
@@ -261,34 +220,29 @@ export default function ServicesClientWrapper({
         <div className='row wow fadeInUp'>
           <div className='col-lg-12'>
             <div className='navi_pagi_bottom_center'>
-              {filteredServices.length > 0 ? (
+              {/* FIXED: Single consistent loading state */}
+              {isLoading ? (
+                /* Show single skeleton during loading */
+                <SkeletonServiceCardGrid count={4} />
+              ) : filteredServices.length > 0 ? (
                 <>
-                  {isSwiperReady && modules.length > 0 ? (
+                  {/* Only show swiper when we have data and modules are ready */}
+                  {modules.length > 0 ? (
                     <Swiper
                       {...swiperConfig}
                       modules={modules}
-                      key={`services-swiper-${activeCategory || 'all'}-${isSwiperReady}`}
+                      key={`services-swiper-${activeCategory || 'all'}`}
                       className='mySwiper outer-swiper'
                     >
                       {dataPageSlides}
                     </Swiper>
                   ) : (
-                    <div
-                      className='swiper-loading'
-                      style={{
-                        minHeight: '400px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <div className='spinner-border text-thm2' role='status'>
-                        <span className='visually-hidden'>Initializing...</span>
-                      </div>
-                    </div>
+                    /* Brief loading while modules load - same skeleton */
+                    <SkeletonServiceCardGrid count={4} />
                   )}
 
-                  {pageCount > 1 && isSwiperReady && (
+                  {/* Navigation controls */}
+                  {pageCount > 1 && modules.length > 0 && (
                     <div
                       className='swiper-navigation-wrapper'
                       key={`navigation-${activeCategory || 'all'}`}
@@ -306,6 +260,7 @@ export default function ServicesClientWrapper({
                   )}
                 </>
               ) : (
+                /* Empty state */
                 <div className='row justify-content-center'>
                   <div className='col-12 text-center py-5'>
                     <div className='empty-state'>

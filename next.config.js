@@ -7,21 +7,25 @@ const nextConfig = {
     },
     // Enable Web Vitals attribution for better debugging
     webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB'],
-    
+
+    // CRITICAL: Modern JavaScript optimizations
+    optimizeServerReact: true,
+    serverMinification: true,
+
     // Optimize package imports for better tree-shaking
-    optimizePackageImports: [
-      '@apollo/client',
-      'react-loading-skeleton',
-      'zustand',
-      '@fortawesome/react-fontawesome',
-      '@fortawesome/free-solid-svg-icons',
-      '@fortawesome/free-regular-svg-icons',
-      '@fortawesome/free-brands-svg-icons',
-      'swiper',
-      'react-countup',
-      'date-fns',
-      'lodash.debounce',
-    ],
+    // optimizePackageImports: [
+    //   '@apollo/client',
+    //   'react-loading-skeleton',
+    //   'zustand',
+    //   '@fortawesome/react-fontawesome',
+    //   '@fortawesome/free-solid-svg-icons',
+    //   '@fortawesome/free-regular-svg-icons',
+    //   '@fortawesome/free-brands-svg-icons',
+    //   'swiper',
+    //   'react-countup',
+    //   'date-fns',
+    //   'lodash.debounce',
+    // ],
   },
 
   images: {

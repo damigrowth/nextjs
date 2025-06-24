@@ -1,8 +1,7 @@
+import '../styles/critical.css';
 import '../styles/globals.css';
 
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
-import { SpeedInsights } from '@vercel/speed-insights/next';
-
 import { Footer } from '@/components/footer';
 import { InstallBootstrap } from '@/components/global';
 import { Header } from '@/components/header';
@@ -24,19 +23,15 @@ import {
   NavMenuMobileWrapper_D,
 } from '@/components/dynamic';
 
-if (typeof window !== 'undefined') {
-  import('bootstrap');
-}
-
-export const revalidate = 86400;
-
 export default async function RootLayout({ children }) {
-  const isUnderMaintenance = false;
+  // const isUnderMaintenance = false;
 
+  // Cache header data for better performance
   const { header: headerData } = await getData(
     ROOT_LAYOUT_WITH_ACTIVE_SERVICES,
     null,
     'HEADER',
+    ['header'],
   );
 
   const gaId = process.env.GA_ID;
@@ -62,7 +57,6 @@ export default async function RootLayout({ children }) {
         <PathChecker excludes='/dashboard'>
           <NavMenuMobileWrapper_D header={headerData} />
         </PathChecker>
-        <SpeedInsights />
         <GoogleTagManager gtmId='GTM-KR7N94L4' />
         <GoogleAnalytics gaId={gaId} />
         <CookiesBanner_D />

@@ -27,7 +27,7 @@ export async function login(prevState, formData) {
   const response = await postData(LOGIN_USER, { identifier, password }, null);
 
   if (response?.data?.login?.jwt) {
-    await setToken(response.data.login.jwt);
+    await setToken(response.data.login.jwt); // This now automatically calls revalidateTag('freelancer')
 
     const freelancer = await getFreelancerActivationStatus();
 

@@ -22,6 +22,7 @@ export default function SaveForm({
   className = '',
   variant = 'heart',
   isAuthenticated = false,
+  initialSavedStatus = null, // Prop to skip individual queries
 }) {
   const router = useRouter();
 
@@ -32,32 +33,49 @@ export default function SaveForm({
   const variables =
     type === 'service' ? { serviceId: id } : { freelancerId: id };
 
+  // Skip individual query if savedStatus is provided from context
+  const skipQuery = initialSavedStatus !== null;
+
   const {
     data,
     loading: queryLoading,
     refetch,
   } = useQuery(QUERY, {
     variables,
-    skip: !id,
+    skip: !id || skipQuery, // Skip query if we have saved status from context
     fetchPolicy: 'cache-first',
   });
 
   const [saveItem] = useMutation(
     type === 'service' ? SAVE_SERVICE : SAVE_FREELANCER,
     {
-      onCompleted: () => refetch(),
+      onCompleted: () => {
+        // Only refetch if we're using the individual query
+        if (!skipQuery) {
+          refetch();
+        }
+      },
     },
   );
 
   const [unsaveItem] = useMutation(
     type === 'service' ? UNSAVE_SERVICE : UNSAVE_FREELANCER,
     {
-      onCompleted: () => refetch(),
+      onCompleted: () => {
+        // Only refetch if we're using the individual query
+        if (!skipQuery) {
+          refetch();
+        }
+      },
     },
   );
 
   useEffect(() => {
-    if (data) {
+    if (skipQuery && initialSavedStatus !== null) {
+      // Use provided saved status from context
+      setOptimisticSaved(!!initialSavedStatus);
+    } else if (data) {
+      // Use data from individual query
       const saved =
         type === 'service'
           ? data.checkSavedService?.isSaved
@@ -65,13 +83,12 @@ export default function SaveForm({
 
       setOptimisticSaved(!!saved);
     }
-  }, [data, type]);
+  }, [data, type, skipQuery, initialSavedStatus]);
 
   const handleSave = async () => {
     if (!isAuthenticated) {
       router.push('/login');
-
-      return; // Important: exit the function early
+      return;
     }
 
     const previousState = optimisticSaved;
@@ -90,9 +107,12 @@ export default function SaveForm({
     }
   };
 
-  const isLoading = queryLoading;
+  const isLoading = skipQuery ? false : queryLoading;
 
-  const displaySaved = data ? optimisticSaved : false;
+  // Use saved status based on the data source
+  const displaySaved = skipQuery 
+    ? optimisticSaved 
+    : (data ? optimisticSaved : false);
 
   const renderContent = () => {
     if (variant === 'heart') {

@@ -1,67 +1,127 @@
-import React, { Suspense } from 'react';
+'use client';
+
+import React, { useEffect, useState, Suspense, memo } from 'react';
+import { useLazyQuery } from '@apollo/client';
 import LinkNP from '@/components/link';
-import { FreelancerCard } from '@/components/card';
+import FreelancerCardClient from '../card/freelancer-card-client';
 import { FreelancersClientWrapper } from '../wrapper';
 import { ArrowRightLong } from '@/components/icon/fa';
-import { getBatchFreelancerSavedStatuses } from '@/utils/savedStatus';
+import { useFreelancer } from '@/hooks/useFreelancer';
+import { FEATURED_FREELANCERS } from '@/lib/graphql';
 
 /**
- * @typedef {object} FeaturedFreelancersHomeProps
- * @property {Array<object>} freelancers - List of freelancer data.
- * @property {object} pagination - Pagination information.
- * @property {string} fid - Freelancer ID.
- * @property {Array<object>} savedFreelancers - User's saved freelancers data.
+ * FeaturedFreelancersHome - Simplified pagination approach:
+ * - Initial data from server-side (ISR)
+ * - Pure client-side pagination via useLazyQuery (no URL changes)
+ * - Freelancer data from context (shared across components)
  */
-
-/**
- * FeaturedFreelancersHome component displays a list of featured freelancers.
- * This is a Server Component that pre-renders freelancer cards and passes them to a client wrapper.
- * @param {FeaturedFreelancersHomeProps} props - The component props.
- * @returns {Promise<JSX.Element>} A promise that resolves to the JSX element for the featured freelancers section.
- */
-export default async function FeaturedFreelancersHome({
-  freelancers: freelancersData,
-  pagination,
-  fid,
-  savedFreelancers = [], // User's saved freelancers data
+const FeaturedFreelancersHome = memo(function FeaturedFreelancersHome({
+  initialFreelancers = [],
+  initialPagination = {},
 }) {
-  const validFreelancers = freelancersData.filter(
+  const freelancerData = useFreelancer();
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(4);
+
+  const [freelancersData, setFreelancersData] = useState({
+    freelancers: initialFreelancers,
+    pagination: initialPagination,
+    isLoading: false,
+  });
+
+  const [fetchFreelancers, { loading: freelancersLoading }] = useLazyQuery(
+    FEATURED_FREELANCERS,
+    {
+      fetchPolicy: 'cache-first',
+      errorPolicy: 'all',
+      onCompleted: (data) => {
+        setFreelancersData({
+          freelancers: data?.freelancers?.data || [],
+          pagination: data?.freelancers?.meta?.pagination || {},
+          isLoading: false,
+        });
+      },
+      onError: (error) => {
+        console.error('❌ Freelancers lazy query error:', error);
+        setFreelancersData((prev) => ({ ...prev, isLoading: false }));
+      },
+    },
+  );
+
+  useEffect(() => {
+    const isFirstPage = currentPage === 1;
+    const isDefaultPageSize = pageSize === 4;
+
+    if (isFirstPage && isDefaultPageSize) {
+      console.log('👨‍💼 Using initial server data for freelancers');
+      setFreelancersData({
+        freelancers: initialFreelancers,
+        pagination: initialPagination,
+        isLoading: false,
+      });
+      return;
+    }
+
+    setFreelancersData((prev) => ({ ...prev, isLoading: true }));
+    fetchFreelancers({
+      variables: {
+        page: currentPage,
+        pageSize: pageSize,
+      },
+    });
+  }, [
+    currentPage,
+    pageSize,
+    fetchFreelancers,
+    initialFreelancers,
+    initialPagination,
+  ]);
+
+  // Pagination callback
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const isLoading =
+    freelancersLoading || freelancerData.isLoading || freelancersData.isLoading;
+
+  const validFreelancers = freelancersData.freelancers.filter(
     (freelancer) => freelancer?.attributes?.image?.data !== null,
   );
 
-  // Use saved freelancers data to create saved statuses lookup
-  const freelancerIds = validFreelancers.map((f) => f.id);
-  const savedStatuses = getBatchFreelancerSavedStatuses(
-    freelancerIds,
-    savedFreelancers,
-  );
+  // Pre-render freelancer cards with user data
+  const renderedFreelancerCards = validFreelancers.map((freelancer) => {
+    const freelancerInfo = { id: freelancer.id, ...freelancer.attributes };
 
-  const renderedFreelancerCards = await Promise.all(
-    validFreelancers.map(async (freelancer) => {
-      const freelancerData = { id: freelancer.id, ...freelancer.attributes };
+    // Find saved status from freelancer data
+    const savedStatus =
+      freelancerData.savedFreelancers.find(
+        (saved) =>
+          saved.id === freelancer.id || saved.id === String(freelancer.id),
+      ) || null;
 
-      // Get saved status from batch-fetched data
-      const savedStatus = savedStatuses[freelancer.id] || null;
+    const freelancerCard = (
+      <FreelancerCardClient
+        freelancer={freelancerInfo}
+        fid={freelancerData.fid}
+        linkedName
+        savedStatus={savedStatus}
+      />
+    );
 
-      const freelancerCard = (
-        <FreelancerCard
-          freelancer={freelancerData}
-          fid={fid}
-          linkedName
-          savedStatus={savedStatus}
-        />
-      );
-
-      return {
-        id: freelancer.id,
-        renderedCard: (
-          <Suspense fallback={<div className='card-skeleton'>Loading...</div>}>
-            {freelancerCard}
-          </Suspense>
-        ),
-      };
-    }),
-  );
+    return {
+      id: freelancer.id,
+      renderedCard: (
+        <Suspense
+          key={freelancer.id}
+          fallback={<div className='card-skeleton'>Loading...</div>}
+        >
+          {freelancerCard}
+        </Suspense>
+      ),
+    };
+  });
 
   return (
     <section className='bgc-dark pb90 pb30-md'>
@@ -91,11 +151,16 @@ export default async function FeaturedFreelancersHome({
           <div className='col-lg-12'>
             <FreelancersClientWrapper
               renderedFreelancerCards={renderedFreelancerCards}
-              pagination={pagination}
+              pagination={freelancersData.pagination}
+              isLoading={isLoading}
+              onPageChange={handlePageChange}
+              currentPage={currentPage}
             />
           </div>
         </div>
       </div>
     </section>
   );
-}
+});
+
+export default FeaturedFreelancersHome;

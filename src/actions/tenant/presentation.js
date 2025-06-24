@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { z } from 'zod';
 
 import { postData } from '@/lib/client/operations';
@@ -124,6 +124,7 @@ export async function updatePresentationInfo(prevState, formData) {
     // ✅ Check SUCCESS first
     if (response?.data?.updateFreelancer?.data) {
       revalidatePath('/dashboard/profile');
+      revalidateTag('freelancer'); // Refresh UserMenu across site
       return {
         data: response.data,
         errors: null,

@@ -1,10 +1,10 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { Swiper, SwiperSlide, loadSwiperModules } from '@/components/swiper';
 import LinkNP from '@/components/link';
 import { ArrowLeftLong, ArrowRightLong, IconUsers } from '@/components/icon/fa';
+import { SkeletonFreelancerCardGrid } from '../skeleton';
 
 let swiperModules = null;
 const getSwiperModules = async () => {
@@ -15,33 +15,22 @@ const getSwiperModules = async () => {
 };
 
 /**
- * @typedef {object} FreelancersClientWrapperProps
- * @property {Array<object>} renderedFreelancerCards - Pre-rendered freelancer cards from the server component.
- * @property {object} pagination - Pagination information including page, pageCount, pageSize, and total.
- */
-
-/**
- * FreelancersClientWrapper component provides client-side interactivity for featured freelancers,
- * including Swiper-based pagination.
- * @param {FreelancersClientWrapperProps} props - The component props.
- * @returns {JSX.Element} The JSX element for the freelancers client wrapper.
+ * FreelancersClientWrapper - Fixed to show single consistent skeleton
  */
 export default function FreelancersClientWrapper({
   renderedFreelancerCards,
   pagination,
+  isLoading = false,
+  onPageChange,
+  currentPage: propCurrentPage,
 }) {
   const swiperRef = useRef(null);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
   const [modules, setModules] = useState([]);
 
   const filteredFreelancers = renderedFreelancerCards;
-
-  const currentPage = pagination?.page || 1;
+  const currentPage = propCurrentPage || pagination?.page || 1;
   const pageCount = pagination?.pageCount || 1;
 
-  // Load Swiper modules on component mount
   useEffect(() => {
     getSwiperModules().then((loadedModules) => {
       setModules([loadedModules.Navigation, loadedModules.Pagination]);
@@ -50,42 +39,50 @@ export default function FreelancersClientWrapper({
 
   const handleSlideChange = (swiper) => {
     const newPage = swiper.activeIndex + 1;
-    if (newPage !== currentPage) {
-      handlePageChange(newPage);
+    if (newPage !== currentPage && !isLoading && onPageChange) {
+      onPageChange(newPage);
     }
   };
 
   const handlePageChange = (newPage) => {
-    const current = new URLSearchParams(Array.from(searchParams.entries()));
-    current.set('fp', newPage.toString());
+    if (isLoading || !onPageChange) {
+      return;
+    }
 
-    const query = current.toString();
-    router.push(`/?${query}`, { scroll: false });
+    onPageChange(newPage);
   };
 
+  // Update swiper position when page changes (without destroying)
   useEffect(() => {
     if (
       swiperRef.current &&
-      swiperRef.current.activeIndex !== currentPage - 1
+      swiperRef.current.activeIndex !== currentPage - 1 &&
+      !isLoading
     ) {
       swiperRef.current.slideTo(currentPage - 1, 0);
     }
-  }, [currentPage]);
+  }, [currentPage, isLoading]);
 
+  /**
+   * FIXED: Create swiper slides - only show real content, no skeletons in inactive slides
+   */
   const createDataPageSlides = () => {
     const slides = [];
 
-    if (filteredFreelancers.length === 0) {
+    // Don't create slides if we're loading - this prevents multiple skeletons
+    if (isLoading || filteredFreelancers.length === 0) {
       return slides;
     }
 
+    // Create slides for each page, but ALL pages show actual content
     for (let page = 1; page <= pageCount; page++) {
       slides.push(
         <SwiperSlide key={`page-${page}`}>
           <div className='freelancers-page-content'>
-            {page === currentPage ? (
-              <div className='row'>
-                {filteredFreelancers.map((freelancer) => (
+            <div className='row'>
+              {/* For current page, show actual cards. For other pages, show empty placeholder */}
+              {page === currentPage ? (
+                filteredFreelancers.map((freelancer) => (
                   <div
                     key={freelancer.id}
                     className='col-xl-3 col-lg-4 col-md-6 col-sm-12 mb-4'
@@ -94,20 +91,12 @@ export default function FreelancersClientWrapper({
                       {freelancer.renderedCard}
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className='row'>
-                <div className='col-12 text-center py-5'>
-                  <div className='loading-placeholder'>
-                    <div className='spinner-border text-thm2' role='status'>
-                      <span className='visually-hidden'>Loading...</span>
-                    </div>
-                    <p className='mt-3 text-muted'>Φόρτωση σελίδας {page}...</p>
-                  </div>
-                </div>
-              </div>
-            )}
+                ))
+              ) : (
+                /* Empty placeholder for inactive pages - no skeleton */
+                <div style={{ minHeight: '400px' }} />
+              )}
+            </div>
           </div>
         </SwiperSlide>,
       );
@@ -137,36 +126,40 @@ export default function FreelancersClientWrapper({
       swiperRef.current = swiper;
     },
     onSlideChange: handleSlideChange,
-    allowTouchMove: true,
+    allowTouchMove: !isLoading,
     watchSlidesProgress: true,
     touchRatio: 1,
     touchAngle: 45,
-    grabCursor: true,
+    grabCursor: !isLoading,
     speed: 300,
-    preventClicks: false,
-    preventClicksPropagation: false,
+    preventClicks: isLoading,
+    preventClicksPropagation: isLoading,
   };
 
   return (
     <div className='navi_pagi_bottom_center_freelancers'>
-      {filteredFreelancers.length > 0 ? (
+      {/* FIXED: Single consistent loading state */}
+      {isLoading ? (
+        /* Show single skeleton during loading */
+        <SkeletonFreelancerCardGrid count={4} />
+      ) : filteredFreelancers.length > 0 ? (
         <>
+          {/* Only show swiper when we have data and modules are ready */}
           {modules.length > 0 ? (
             <Swiper
               {...swiperConfig}
               modules={modules}
+              key={`freelancers-swiper`}
               className='mySwiper outer-swiper-freelancers'
             >
               {dataPageSlides}
             </Swiper>
           ) : (
-            <div className='text-center py-5'>
-              <div className='spinner-border text-thm2' role='status'>
-                <span className='visually-hidden'>Loading...</span>
-              </div>
-            </div>
+            /* Brief loading while modules load - same skeleton */
+            <SkeletonFreelancerCardGrid count={4} />
           )}
 
+          {/* Navigation controls */}
           {pageCount > 1 && modules.length > 0 && (
             <div className='swiper-navigation-wrapper'>
               <button className='swiper__btn btn__prev__freelancers'>
@@ -182,6 +175,7 @@ export default function FreelancersClientWrapper({
           )}
         </>
       ) : (
+        /* Empty state */
         <div className='row justify-content-center'>
           <div className='col-12 text-center py-5'>
             <div className='empty-state-freelancers'>
@@ -193,7 +187,9 @@ export default function FreelancersClientWrapper({
                   }}
                 />
               </div>
-              <h4 className='empty-state-title'>Δεν βρέθηκαν επαγγελματίες.</h4>
+              <h4 className='empty-state-title text-white'>
+                Δεν βρέθηκαν επαγγελματίες.
+              </h4>
               <p className='text-muted mb-3'>
                 Δοκιμάστε να ελέγξετε αργότερα ή επικοινωνήστε μαζί μας.
               </p>

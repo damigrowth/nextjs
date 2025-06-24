@@ -30,6 +30,7 @@ export async function getFreelancer() {
   if (freelancerData) {
     freelancer = {
       id: freelancerData.id,
+      confirmed: user.confirmed,
       ...freelancerData.attributes,
     };
   }

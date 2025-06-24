@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 export default function HeroImages() {
   return (
-    <div className='home12-hero-img'>
+    <div className='home-hero-img'>
       {/* Main LCP Image - Ultra-Optimized for Next.js 15 */}
       <Image
         width={810}
@@ -32,7 +32,7 @@ export default function HeroImages() {
       />
 
       {/* Optimized secondary images */}
-      <div className='position-relative'>
+      <div className='img-3-container'>
         <Image
           width={90}
           height={90}
@@ -40,7 +40,7 @@ export default function HeroImages() {
             height: 'fit-content',
             containIntrinsicSize: '90px 90px',
           }}
-          className='img-3 bounce-y'
+          className='img-3'
           src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750084063/Static/home12-img-3_rtgiou.webp'
           alt='Doulitsa Hero Illustration'
           loading='lazy'
@@ -49,19 +49,19 @@ export default function HeroImages() {
         />
       </div>
 
-      <div className='iconbox-small1 text-start d-flex wow fadeInRight default-box-shadow4 bounce-x animate-up-1'>
+      <div className='iconbox iconbox-small1 bounce-x'>
         <span className='icon flaticon-review'></span>
-        <div className='details pl20'>
-          <h6 className='mb-1'>Κριτικές 5*</h6>
-          <p className='text fz13 mb-0'>TOP επαγγελματίες</p>
+        <div className='iconbox-inner'>
+          <h6>Κριτικές 5*</h6>
+          <p>TOP επαγγελματίες</p>
         </div>
       </div>
 
-      <div className='iconbox-small2 text-start d-flex wow fadeInLeft default-box-shadow4 bounce-y animate-up-2'>
+      <div className='iconbox iconbox-small2 bounce-y'>
         <span className='icon flaticon-rocket'></span>
-        <div className='details pl20'>
-          <h6 className='mb-1'>100+ νέες</h6>
-          <p className='text fz13 mb-0'>Διαθέσιμες Υπηρεσίες</p>
+        <div className='iconbox-inner'>
+          <h6>100+ νέες</h6>
+          <p>Διαθέσιμες Υπηρεσίες</p>
         </div>
       </div>
     </div>
