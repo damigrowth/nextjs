@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import LinkNP from '@/components/link';
 
 import { UserImage } from '@/components/avatar';
@@ -14,29 +13,23 @@ import MessagesMenu from '../button/button-messages';
 import SavedMenu from '../button/button-saved';
 import LogoutLink from '../form/form-logout';
 import UserMenuLink from './menu-user-link';
-import useFreelancerStore from '@/stores/freelancer';
+import { useFreelancer } from '@/hooks/useFreelancer';
 import Skeleton from 'react-loading-skeleton';
 
 export default function UserMenu({ isMobile }) {
   const {
+    isAuthenticated,
+    isConfirmed,
     username,
     displayName,
     firstName,
     lastName,
     image,
     hasAccess,
-    isAuthenticated,
-    isConfirmed,
     isLoading,
-    fetchFreelancer,
-  } = useFreelancerStore();
+  } = useFreelancer();
 
-  // Fetch auth data on component mount
-  useEffect(() => {
-    fetchFreelancer();
-  }, [fetchFreelancer]);
-
-  // Show loading state while fetching
+  // Show loading state
   if (isLoading) {
     return !isMobile ? (
       <div className='auth-btns'>
@@ -54,21 +47,19 @@ export default function UserMenu({ isMobile }) {
     );
   }
 
+  // Authenticated user
   if (isAuthenticated && isConfirmed) {
     const allNav = hasAccess ? hasAccessUserMenuNav : noAccessUserMenuNav;
-
     const userProfilePath = `/profile/${username}`;
 
-    // Modify the nav items to use dynamic profile path or filter out profile for non-access users
     const modifiedNav = allNav
       .map((item) => {
         if (item.path === '/profile') {
           return hasAccess ? { ...item, path: userProfilePath } : null;
         }
-
         return item;
       })
-      .filter(Boolean); // Remove null items
+      .filter(Boolean);
 
     return (
       <li className='user_setting d-flex'>
@@ -86,10 +77,6 @@ export default function UserMenu({ isMobile }) {
               displayName={displayName}
               hideDisplayName
               image={getImage(image, { size: 'avatar' })}
-              alt={
-                image?.data?.attributes?.formats?.thumbnail?.provider_metadata
-                  ?.public_id
-              }
               width={40}
               height={40}
             />
@@ -116,24 +103,25 @@ export default function UserMenu({ isMobile }) {
         </div>
       </li>
     );
-  } else {
-    return !isMobile ? (
-      <div className='auth-btns'>
-        <LinkNP
-          className='mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent'
-          href='/login'
-        >
-          Σύνδεση
-        </LinkNP>
-        <LinkNP
-          className='mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent'
-          href='/register'
-        >
-          Εγγραφή
-        </LinkNP>
-      </div>
-    ) : (
-      <LinkNP href='/login'>Σύνδεση</LinkNP>
-    );
   }
+
+  // Not authenticated
+  return !isMobile ? (
+    <div className='auth-btns'>
+      <LinkNP
+        className='mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent'
+        href='/login'
+      >
+        Σύνδεση
+      </LinkNP>
+      <LinkNP
+        className='mr15-xl mr10 ud-btn btn-dark add-joining bdrs50 dark-color bg-transparent'
+        href='/register'
+      >
+        Εγγραφή
+      </LinkNP>
+    </div>
+  ) : (
+    <LinkNP href='/login'>Σύνδεση</LinkNP>
+  );
 }

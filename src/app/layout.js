@@ -2,8 +2,6 @@ import '../styles/critical.css';
 import '../styles/globals.css';
 
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
-// import { SpeedInsights } from '@vercel/speed-insights/next';
-
 import { Footer } from '@/components/footer';
 import { InstallBootstrap } from '@/components/global';
 import { Header } from '@/components/header';
@@ -59,9 +57,6 @@ export default async function RootLayout({ children }) {
         <PathChecker excludes='/dashboard'>
           <NavMenuMobileWrapper_D header={headerData} />
         </PathChecker>
-
-        {/* Let Next.js 15 + @next/third-parties handle these properly */}
-        {/* <SpeedInsights /> */}
         <GoogleTagManager gtmId='GTM-KR7N94L4' />
         <GoogleAnalytics gaId={gaId} />
         <CookiesBanner_D />

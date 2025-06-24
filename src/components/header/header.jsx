@@ -1,12 +1,10 @@
-import LinkNP from '@/components/link';
-
-import UserMenu from '../menu/menu-user';
-import NavMenu from '../navigation/navigation-menu';
+import { NavMenu } from '../navigation';
 import HeaderLogo from './header-logo';
 import HeaderMobile from './header-mobile';
 import HeaderStickyWrapper from './header-sticky';
 import { MegaMenu_D } from '../dynamic';
 import { RegisterProButton } from '../button';
+import { UserMenu } from '../menu';
 
 export default function Header({ header }) {
   const categories = header
