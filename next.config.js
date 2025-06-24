@@ -3,30 +3,30 @@ const nextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: '20mb',
-      cssChunking: true,
     },
+    cssChunking: true,
     // Enable Web Vitals attribution for better debugging
     webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB'],
     // CRITICAL: Modern JavaScript optimizations
     optimizeServerReact: true,
     serverMinification: true,
     optimizeCss: true,
-    // Optimize package imports for better tree-shaking
-    optimizePackageImports: [
-      '@apollo/client',
-      'react-loading-skeleton',
-      'zustand',
-      '@fortawesome/react-fontawesome',
-      '@fortawesome/free-solid-svg-icons',
-      '@fortawesome/free-regular-svg-icons',
-      '@fortawesome/free-brands-svg-icons',
-      'swiper',
-      'react-countup',
-      'date-fns',
-      'lodash.debounce',
-    ],
   },
-
+  compress: true,
+  reactStrictMode: true,
+  transpilePackages: [
+    '@apollo/client',
+    'react-loading-skeleton',
+    'zustand',
+    '@fortawesome/react-fontawesome',
+    '@fortawesome/free-solid-svg-icons',
+    '@fortawesome/free-regular-svg-icons',
+    '@fortawesome/free-brands-svg-icons',
+    'swiper',
+    'react-countup',
+    'date-fns',
+    'lodash.debounce',
+  ],
   // Turbopack configuration (stable)
   turbopack: {
     rules: {
@@ -36,7 +36,6 @@ const nextConfig = {
       },
     },
   },
-
   images: {
     // Optimized for mobile-first responsive images
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
@@ -49,7 +48,6 @@ const nextConfig = {
       },
     ],
   },
-
   async redirects() {
     return [
       {
@@ -63,14 +61,6 @@ const nextConfig = {
         permanent: true,
       },
     ];
-  },
-
-  // Enable Gzip/Brotli compression
-  compress: true,
-
-  // Modern browser targeting for smaller bundles
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
   },
 };
 
