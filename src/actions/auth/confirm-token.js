@@ -60,7 +60,7 @@ export async function confirmTokenAction(prevState, token) {
 
     // Set the authentication token if we have one
     if (jwt) {
-      await setToken(jwt);
+      await setToken(jwt); // This now automatically calls revalidateTag('freelancer')
     }
 
     // Determine the final message

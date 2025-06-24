@@ -1,7 +1,6 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { revalidateTag } from 'next/cache';
 import { postData } from '@/lib/client/operations';
 import { LOGIN_USER } from '@/lib/graphql';
 import { loginSchema } from '../schema/login';
@@ -28,10 +27,7 @@ export async function login(prevState, formData) {
   const response = await postData(LOGIN_USER, { identifier, password }, null);
 
   if (response?.data?.login?.jwt) {
-    await setToken(response.data.login.jwt);
-    
-    // Trigger client-side refetch of freelancer data
-    revalidateTag('freelancer');
+    await setToken(response.data.login.jwt); // This now automatically calls revalidateTag('freelancer')
 
     const freelancer = await getFreelancerActivationStatus();
 

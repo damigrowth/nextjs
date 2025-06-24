@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 import { postData } from '@/lib/client/operations';
 import { UPDATE_FREELANCER } from '@/lib/graphql';
@@ -243,6 +243,7 @@ export async function updateBasicInfo(prevState, formData) {
       };
     }
     revalidatePath('/dashboard/profile');
+    revalidateTag('freelancer'); // Refresh UserMenu across site
 
     return {
       data,

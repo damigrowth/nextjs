@@ -1,7 +1,6 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { revalidateTag } from 'next/cache';
 
 import { removeToken } from './token';
 
@@ -12,10 +11,6 @@ import { removeToken } from './token';
  * @returns {Promise<void>} Redirects the user.
  */
 export async function logout() {
-  await removeToken();
-  
-  // Trigger client-side refetch of freelancer data
-  revalidateTag('freelancer');
-  
+  await removeToken(); // This now automatically calls revalidateTag('freelancer')
   redirect('/login');
 }
