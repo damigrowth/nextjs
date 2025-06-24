@@ -11,8 +11,8 @@ const nextConfig = {
     // CRITICAL: Modern JavaScript optimizations
     optimizeServerReact: true,
     serverMinification: true,
-
     optimizeCss: true,
+
     // Optimize package imports for better tree-shaking
     optimizePackageImports: [
       '@apollo/client',
@@ -51,9 +51,9 @@ const nextConfig = {
       },
     ],
   },
+
   async redirects() {
     return [
-      // Basic redirect
       {
         source: "/s",
         destination: "/ipiresies",
@@ -67,53 +67,51 @@ const nextConfig = {
     ];
   },
 
-  // CRITICAL: Webpack optimizations for LCP improvement
+  // SIMPLIFIED: Minimal chunking for better initial load
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
-      // Split chunks more aggressively for better caching
+      // Minimal chunking strategy - prioritize initial load speed
       config.optimization.splitChunks = {
         chunks: 'all',
+        minSize: 30000,
+        maxSize: 250000, // Prevent huge chunks
         cacheGroups: {
           default: false,
           vendors: false,
-          // Apollo/GraphQL chunk
-          apollo: {
-            name: 'apollo',
+          // Single vendor chunk for critical dependencies only
+          framework: {
+            name: 'framework',
             chunks: 'all',
-            test: /[\\/]node_modules[\\/](@apollo|graphql)/,
+            test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
             priority: 40,
+            enforce: true,
           },
-          // FontAwesome chunk
-          fontawesome: {
-            name: 'fontawesome',
-            chunks: 'all',
-            test: /[\\/]node_modules[\\/]@fortawesome/,
-            priority: 30,
-          },
-          // React/UI libraries chunk
-          react: {
-            name: 'react',
-            chunks: 'all',
-            test: /[\\/]node_modules[\\/](react|react-dom|react-select|react-slider|swiper)/,
-            priority: 20,
-          },
-          // Vendor chunk for other packages
-          vendor: {
-            name: 'vendor',
+          // Everything else in one optimized vendor chunk
+          lib: {
+            name: 'lib',
             chunks: 'all',
             test: /[\\/]node_modules[\\/]/,
-            priority: 10,
+            priority: 30,
+            minChunks: 1,
+            reuseExistingChunk: true,
           },
         },
       };
 
-      // Optimize module concatenation
-      config.optimization.concatenateModules = true;
-
-      // Remove console logs in production
+      // Aggressive tree shaking
+      config.optimization.usedExports = true;
+      config.optimization.sideEffects = false;
+      
+      // Remove console logs and optimize
       config.optimization.minimizer.forEach((minimizer) => {
         if (minimizer.constructor.name === 'TerserPlugin') {
-          minimizer.options.terserOptions.compress.drop_console = true;
+          minimizer.options.terserOptions.compress = {
+            ...minimizer.options.terserOptions.compress,
+            drop_console: true,
+            drop_debugger: true,
+            pure_funcs: ['console.log', 'console.info'],
+            unused: true,
+          };
         }
       });
     }
@@ -124,7 +122,7 @@ const nextConfig = {
   // Enable compression
   compress: true,
 
-  // Modern browser targeting for smaller bundles
+  // Modern browser targeting
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
@@ -132,40 +130,14 @@ const nextConfig = {
 
 module.exports = nextConfig;
 
-
 // Injected content via Sentry wizard below
-
 const { withSentryConfig } = require('@sentry/nextjs');
 
 module.exports = withSentryConfig(module.exports, {
-  // For all available options, see:
-  // https://www.npmjs.com/package/@sentry/webpack-plugin#options
-
   org: 'httpsdomvourniasdev',
   project: 'javascript-nextjs',
-
-  // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
-
-  // For all available options, see:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-
-  // Upload a larger set of source maps for prettier stack traces (increases build time)
-  // Disabling this to reduce the size of serialized strings in webpack cache.
   widenClientFileUpload: false,
-
-  // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-  // This can increase your server load as well as your hosting bill.
-  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-  // side errors will fail.
-  // tunnelRoute: "/monitoring",
-
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
-
-  // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-  // See the following for more information:
-  // https://docs.sentry.io/product/crons/
-  // https://vercel.com/docs/cron-jobs
   automaticVercelMonitors: true,
 });
