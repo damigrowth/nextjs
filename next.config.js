@@ -4,38 +4,23 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '20mb',
     },
+    reactCompiler: true,
     inlineCss: true,
-    cssChunking: true,
-    // Enable Web Vitals attribution for better debugging
-    webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB'],
-    // CRITICAL: Modern JavaScript optimizations
-    optimizeServerReact: true,
-    serverMinification: true,
     optimizeCss: true,
-  },
-  compress: true,
-  reactStrictMode: true,
-  transpilePackages: [
-    '@apollo/client',
-    'react-loading-skeleton',
-    'zustand',
-    '@fortawesome/react-fontawesome',
-    '@fortawesome/free-solid-svg-icons',
-    '@fortawesome/free-regular-svg-icons',
-    '@fortawesome/free-brands-svg-icons',
-    'swiper',
-    'react-countup',
-    'date-fns',
-    'lodash.debounce',
-  ],
-  // Turbopack configuration (stable)
-  turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    },
+    webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB'],
+    optimizePackageImports: [
+      '@apollo/client',
+      'react-loading-skeleton',
+      'zustand',
+      '@fortawesome/react-fontawesome',
+      '@fortawesome/free-solid-svg-icons',
+      '@fortawesome/free-regular-svg-icons',
+      '@fortawesome/free-brands-svg-icons',
+      'swiper',
+      'react-countup',
+      'date-fns',
+      'lodash.debounce',
+    ],
   },
   images: {
     // Optimized for mobile-first responsive images
@@ -49,6 +34,7 @@ const nextConfig = {
       },
     ],
   },
+
   async redirects() {
     return [
       {
@@ -63,6 +49,9 @@ const nextConfig = {
       },
     ];
   },
+
+  // Enable compression
+  compress: true,
 };
 
 module.exports = nextConfig;
