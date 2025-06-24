@@ -4,6 +4,7 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '20mb',
     },
+    inlineCss: true,
     cssChunking: true,
     // Enable Web Vitals attribution for better debugging
     webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB'],
