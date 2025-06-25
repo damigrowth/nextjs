@@ -1,8 +1,7 @@
 import { EmailConfirmationForm } from '@/components/form';
 import { Meta } from '@/utils/Seo/Meta/Meta';
 
-export const dynamic = 'force-static';
-export const revalidate = false;
+export const dynamic = 'force-dynamic';
 
 // Static SEO
 export async function generateMetadata() {
