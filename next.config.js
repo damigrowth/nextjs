@@ -30,6 +30,7 @@ const nextConfig = {
     minimumCacheTTL: 2678400, // 31 days
     remotePatterns: [
       {
+        protocol: 'https',
         hostname: 'res.cloudinary.com',
       },
     ],
