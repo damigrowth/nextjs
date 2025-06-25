@@ -20,6 +20,9 @@ export const withHeaders = (next) => {
     responseHeaders.set('X-XSS-Protection', '1; mode=block');
     responseHeaders.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
+    // Force HTTPS for all requests - THIS FIXES THE MIXED CONTENT ISSUE
+    responseHeaders.set('Content-Security-Policy', 'upgrade-insecure-requests');
+
     return NextResponse.next({
       headers: responseHeaders,
       request: {
