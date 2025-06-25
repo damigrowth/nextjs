@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ClearButton } from '@/components/button';
+import { ClearBtn } from '@/components/button';
 
 import SidebarModalBtn from './sidebar-modal-btn';
 import SidebarModalOverlay from './sidebar-modal-overlay';
@@ -68,7 +68,7 @@ export default function SidebarModal({ filters, searchParams }) {
                 })}
               </div>
               <div className='mt-4 mb-3 mobile-filter-clear-btn'>
-                <ClearButton alwaysShow={true} />
+                <ClearBtn />
               </div>
             </div>
           </div>
