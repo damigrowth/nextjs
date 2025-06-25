@@ -1,5 +1,4 @@
-export { default as ClearButton } from './button-clear';
-export { default as ClearBtn } from './button-clear_';
+export { default as ClearBtn } from './button-clear';
 export { default as ReportIssueFloatingButton } from './button-floating-report';
 export { default as FormButton } from './button-form';
 export { default as SaveButton } from './button-form-save';

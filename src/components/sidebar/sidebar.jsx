@@ -1,6 +1,5 @@
 import React from 'react';
-
-import ClearBtn from '../button/button-clear_';
+import { ClearBtn } from '../button';
 
 export default function Sidebar({ filters, searchParams }) {
   return (
