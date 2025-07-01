@@ -23,6 +23,7 @@ const nextConfig = {
     ],
   },
   images: {
+    unoptimized: true,
     // Optimized for mobile-first responsive images
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 160, 200, 256, 331],
