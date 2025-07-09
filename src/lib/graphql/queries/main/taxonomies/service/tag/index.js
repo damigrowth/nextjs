@@ -83,7 +83,7 @@ const TAGS_SEARCH_COMPLETE = gql`
 `;
 
 const TAGS_FOR_FILTERED_SERVICES = gql`
-  query TagsForFilteredServices(
+  query TagsForFilteredServicesOptimized(
     $search: String
     $min: Int
     $max: Int
@@ -96,24 +96,14 @@ const TAGS_FOR_FILTERED_SERVICES = gql`
   ) {
     tagsForFilteredResults: tags(
       filters: {
-        and: [
-          { label: { containsi: $label } }
-          {
-            or: [
-              { services: { title_normalized: { containsi: $search } } }
-              { services: { description_normalized: { containsi: $search } } }
-              { services: { category: { label_normalized: { containsi: $search } } } }
-              { services: { subcategory: { label_normalized: { containsi: $search } } } }
-              { services: { subdivision: { label_normalized: { containsi: $search } } } }
-              { services: { tags: { label_normalized: { containsi: $search } } } }
-            ]
-          }
-          { services: { price: { gte: $min, lte: $max } } }
-          { services: { time: { lte: $time } } }
-          { services: { freelancer: { id: { notNull: true } } } }
-          { services: { status: { type: { eq: "Active" } } } }
-          { services: { freelancer: { verified: { eq: $verified } } } }
-        ]
+        label: { containsi: $label }
+        services: {
+          status: { type: { eq: "Active" } }
+          freelancer: { id: { notNull: true }, verified: { eq: $verified } }
+          price: { gte: $min, lte: $max }
+          time: { lte: $time }
+          title_normalized: { containsi: $search }
+        }
       }
       pagination: { page: $tagsPage, pageSize: $tagsPageSize }
       sort: "label:asc"
@@ -126,12 +116,7 @@ const TAGS_FOR_FILTERED_SERVICES = gql`
       }
     }
     tagsBySlug: tags(
-      filters: {
-        and: [
-          { slug: { in: $slugs } }
-          { services: { id: { not: { null: true } } } }
-        ]
-      }
+      filters: { slug: { in: $slugs }, services: { id: { notNull: true } } }
     ) {
       data {
         ...Tag
@@ -143,7 +128,7 @@ const TAGS_FOR_FILTERED_SERVICES = gql`
 `;
 
 const TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY = gql`
-  query TagsForFilteredServicesWithCategory(
+  query TagsForFilteredServicesWithCategoryOptimized(
     $search: String
     $min: Int
     $max: Int
@@ -157,31 +142,15 @@ const TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY = gql`
   ) {
     tagsForFilteredResults: tags(
       filters: {
-        and: [
-          { label: { containsi: $label } }
-          {
-            or: [
-              { services: { title_normalized: { containsi: $search } } }
-              { services: { description_normalized: { containsi: $search } } }
-              { services: { category: { label_normalized: { containsi: $search } } } }
-              { services: { subcategory: { label_normalized: { containsi: $search } } } }
-              { services: { subdivision: { label_normalized: { containsi: $search } } } }
-              { services: { tags: { label_normalized: { containsi: $search } } } }
-            ]
-          }
-          { services: { price: { gte: $min, lte: $max } } }
-          { services: { time: { lte: $time } } }
-          { services: { freelancer: { id: { notNull: true } } } }
-          { services: { status: { type: { eq: "Active" } } } }
-          { services: { freelancer: { verified: { eq: $verified } } } }
-          {
-            or: [
-              { services: { category: { slug: { eq: $cat } } } }
-              { services: { subcategory: { slug: { eq: $cat } } } }
-              { services: { subdivision: { slug: { eq: $cat } } } }
-            ]
-          }
-        ]
+        label: { containsi: $label }
+        services: {
+          status: { type: { eq: "Active" } }
+          freelancer: { id: { notNull: true }, verified: { eq: $verified } }
+          price: { gte: $min, lte: $max }
+          time: { lte: $time }
+          category: { slug: { eq: $cat } }
+          title_normalized: { containsi: $search }
+        }
       }
       pagination: { page: $tagsPage, pageSize: $tagsPageSize }
       sort: "label:asc"
@@ -195,17 +164,8 @@ const TAGS_FOR_FILTERED_SERVICES_WITH_CATEGORY = gql`
     }
     tagsBySlug: tags(
       filters: {
-        and: [
-          { slug: { in: $slugs } }
-          { services: { id: { notNull: true } } }
-          {
-            or: [
-              { services: { category: { slug: { eq: $cat } } } }
-              { services: { subcategory: { slug: { eq: $cat } } } }
-              { services: { subdivision: { slug: { eq: $cat } } } }
-            ]
-          }
-        ]
+        slug: { in: $slugs }
+        services: { id: { notNull: true }, category: { slug: { eq: $cat } } }
       }
     ) {
       data {

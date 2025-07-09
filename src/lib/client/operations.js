@@ -253,7 +253,7 @@ export const getPublicData = cache(
     };
 
     try {
-      const response = await fetchWithRetry(STRAPI_GRAPHQL, options);
+      const response = await fetch(STRAPI_GRAPHQL, options);
 
       if (!response.ok) {
         const clonedResponse = response.clone();
