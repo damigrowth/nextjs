@@ -24,8 +24,11 @@ export default async function FreelancerGrid({
   const savedFreelancers = freelancer?.saved_freelancers?.data || [];
 
   // Calculate saved statuses for all freelancers at once
-  const freelancerIds = freelancers.map(f => f.id);
-  const savedFreelancerStatuses = getBatchFreelancerSavedStatuses(freelancerIds, savedFreelancers);
+  const freelancerIds = freelancers.map((f) => f.id);
+  const savedFreelancerStatuses = getBatchFreelancerSavedStatuses(
+    freelancerIds,
+    savedFreelancers,
+  );
 
   return (
     <div className='row'>
@@ -37,10 +40,10 @@ export default async function FreelancerGrid({
       {freelancers.length > 0 ? (
         freelancers.map((freelancer) => (
           <div key={freelancer.id} className='col-sm-6 col-xl-4'>
-            <FreelancerCard 
-              freelancer={freelancer} 
-              fid={fid} 
-              linkedName 
+            <FreelancerCard
+              freelancer={freelancer}
+              fid={fid}
+              linkedName
               savedStatus={savedFreelancerStatuses[freelancer.id]}
             />
           </div>
