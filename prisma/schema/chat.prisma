@@ -1,0 +1,78 @@
+model Chat {
+  id        String   @id @default(cuid())
+  name      String?
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign Keys (explicit)
+  creatorId     String
+  lastMessageId String? @unique // Optional reference to last message
+
+  // Direct Relations
+  creator     Profile  @relation(fields: [creatorId], references: [id])
+  lastMessage Message? @relation("ChatLastMessage", fields: [lastMessageId], references: [id])
+
+  // One-to-many Relations
+  members  ChatMember[]
+  messages Message[]    @relation("ChatMessages")
+
+  // Indexes for performance
+  @@index([creatorId])
+  @@index([published, createdAt])
+  @@index([lastMessageId])
+  @@map("chats")
+}
+
+model ChatMember {
+  chatId    String
+  profileId String
+
+  chat    Chat    @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@id([chatId, profileId])
+  @@index([profileId])
+  @@map("chat_members")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  read      Boolean  @default(false)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign Keys (explicit)
+  authorId String
+  chatId   String
+
+  // Direct Relations
+  author Profile @relation(fields: [authorId], references: [id])
+  chat   Chat    @relation("ChatMessages", fields: [chatId], references: [id], onDelete: Cascade)
+
+  // Optional back-reference for lastMessage
+  lastMessageOf Chat? @relation("ChatLastMessage")
+
+  // Many-to-many Relations (explicit junction table)
+  readBy MessageRead[]
+
+  // Indexes for performance
+  @@index([authorId])
+  @@index([chatId, createdAt])
+  @@map("messages")
+}
+
+model MessageRead {
+  messageId String
+  uid       String
+  readAt    DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [uid], references: [id], onDelete: Cascade)
+
+  @@id([messageId, uid])
+  @@index([uid])
+  @@map("message_reads")
+}

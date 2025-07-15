@@ -1,0 +1,30 @@
+// Contact form submissions domain
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  subject   String?
+  status    String   @default("new")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contacts")
+}
+
+model PendingRegistration {
+  id           String   @id @default(cuid())
+  token        String   @unique
+  email        String
+  username     String
+  passwordHash String
+  type         String
+  role         String?
+  displayName  String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("pending_registrations")
+}

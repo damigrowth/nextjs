@@ -1,0 +1,22 @@
+model Review {
+  id        String  @id @default(cuid())
+  rating    Int
+  comment   String? @db.Text
+  published Boolean @default(true)
+
+  sid      String?
+  pid      String
+  authorId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  service Service? @relation(fields: [sid], references: [id], onDelete: SetNull)
+  profile Profile  @relation("ReviewReceiver", fields: [pid], references: [id], onDelete: Cascade)
+  author  User     @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([pid])
+  @@index([authorId])
+  @@index([rating])
+  @@map("reviews")
+}

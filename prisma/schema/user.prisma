@@ -1,0 +1,107 @@
+enum UserType {
+  USER
+  FREELANCER
+  COMPANY
+}
+
+enum JourneyStep {
+  EMAIL_VERIFICATION
+  ONBOARDING
+  DASHBOARD
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  name          String?
+  image         String?  // Better Auth required field
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Journey & Account Management
+  type               Int     @default(1) // 1=USER, 2=FREELANCER, 3=COMPANY
+  step               String  @default("EMAIL_VERIFICATION")
+  onboardingComplete Boolean @default(false)
+  confirmed          Boolean @default(false)
+  blocked            Boolean @default(false)
+
+  // Basic Info
+  username    String? @unique
+  displayName String?
+  firstName   String?
+  lastName    String?
+  phone       String?
+  city        String?
+  county      String?
+  zipcode     String?
+
+  // Better Auth Relations
+  sessions Session[]
+  accounts Account[]
+
+  // Your existing relations
+  profile      Profile?
+  reviewsGiven Review[]      @relation("ReviewAuthor")
+  messagesRead MessageRead[]
+  media        Media[]       // All media uploaded by this user
+
+  @@index([type])
+  @@index([step])
+  @@index([confirmed, blocked])
+  @@map("users")
+}
+
+// Profile - ONLY for freelancers and companies (type > 1)
+model Profile {
+  id  String @id @default(cuid())
+  uid String @unique
+
+  // Profile Type - Freelancer or Company
+  type String?
+
+  // Professional Details
+  tagline     String?
+  description String? @db.Text
+  website     String?
+  experience  Int?
+  rate        Int?
+  size        String?
+  skills      String?
+  phone       String?
+
+  // Location
+  city    String?
+  county  String?
+  zipcode String?
+
+  // Professional Status
+  verified    Boolean @default(false)
+  featured    Boolean @default(false)
+  rating      Float   @default(0)
+  reviewCount Int     @default(0)
+
+  // Visibility & Activity
+  published Boolean  @default(false)
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user            User            @relation(fields: [uid], references: [id], onDelete: Cascade)
+  services        Service[]
+  reviewsReceived Review[]        @relation("ReviewReceiver")
+  chatsCreated    Chat[]
+  messagesSent    Message[]
+  chatMemberships ChatMember[]
+  
+  // Media Relations
+  image     Media? @relation("ProfileAvatar")  // Single avatar image
+  portfolio Media[] @relation("ProfilePortfolio") // Multiple portfolio files
+
+  @@index([uid])
+  @@index([published, featured])
+  @@index([verified, rating])
+  @@map("profiles")
+}
