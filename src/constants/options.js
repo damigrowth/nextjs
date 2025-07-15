@@ -58,18 +58,3 @@ export const serviceTimeOptions = [
     label: 'Μέχρι 30 ημέρες',
   },
 ];
-
-export const freelancerExperienceOptions = [
-  {
-    value: '1',
-    label: '1+',
-  },
-  {
-    value: '3',
-    label: '3+',
-  },
-  {
-    value: '5',
-    label: '5+',
-  },
-];
