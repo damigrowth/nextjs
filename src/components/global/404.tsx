@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import LinkNP from '@/components/link';
-import { ArrowRightLong } from '@/components/icon/fa';
+// import LinkNP from '@/components/link';
+// import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function PageNotFound() {
   return (
@@ -37,10 +37,10 @@ export default function PageNotFound() {
                   αναζήτηση ή χρησιμοποίησε το κουμπί πίσω στην Αρχική{' '}
                   <br className='d-none d-lg-block' />
                 </p>
-                <LinkNP href='/' className='ud-btn btn-thm'>
-                  Πίσω στην Αρχική
-                  <ArrowRightLong />
-                </LinkNP>
+                {/* <LinkNP href='/' className='ud-btn btn-thm'> */}
+                Πίσω στην Αρχική
+                {/* <ArrowRightLong /> */}
+                {/* </LinkNP> */}
               </div>
             </div>
           </div>
