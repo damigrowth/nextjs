@@ -20,15 +20,18 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
-  // Better Auth additional fields
-  type              Int      @default(1)
-  step              String   @default("EMAIL_VERIFICATION")
-  onboardingComplete Boolean @default(false)
+  // Auth flow fields
+  role              String   @default("user")    // user, freelancer, company, admin
+  step              String   @default("EMAIL_VERIFICATION") // EMAIL_VERIFICATION, ONBOARDING, DASHBOARD
+  
+  // Admin plugin fields (will be added automatically by Better Auth)
+  banned            Boolean  @default(false)
+  banReason         String?
+  banExpires        DateTime?
+  
+  // Profile fields (username and displayName kept for auth purposes)
   username          String?  @unique
   displayName       String?
-  firstName         String?
-  lastName          String?
-  phone             String?
   confirmed         Boolean  @default(false)
   blocked           Boolean  @default(false)
   

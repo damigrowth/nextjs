@@ -1,5 +1,3 @@
-// Contact form submissions domain
-
 model Contact {
   id        String   @id @default(cuid())
   name      String

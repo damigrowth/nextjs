@@ -1,48 +1,27 @@
-// Media and file management domain - Updated for specific field relations
-
-enum MediaType {
-  AVATAR          // Profile image (single)
-  PORTFOLIO       // Profile portfolio (multiple) 
-  SERVICE_IMAGE   // Service media (multiple)
-  GENERAL         // General uploads
-}
-
 model Media {
-  id        String    @id @default(cuid())
-  publicId  String    @unique // Cloudinary public_id
-  url       String    // Cloudinary URL
-  secureUrl String?   // Cloudinary secure_url
-  width     Int?
-  height    Int?
-  format    String?   // jpg, png, pdf, etc.
-  bytes     Int?      // File size
-  folder    String?   // Cloudinary folder
-  type      MediaType @default(GENERAL)
-  
-  // Metadata
-  originalName String?
-  alt          String? // Alt text for accessibility
-  caption      String? // Optional caption
-  
-  // Timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations - Specific foreign keys for different use cases
-  userId String // Who uploaded it (always required)
-  
-  // Profile Relations (mutually exclusive)
-  profileAvatarId   String? @unique // For Profile.image (one-to-one)
-  profilePortfolioId String?        // For Profile.portfolio (one-to-many)
-  
-  // Service Relations
-  serviceMediaId String?            // For Service.media (one-to-many)
-
-  // Relation Fields
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  profileAvatar     Profile? @relation("ProfileAvatar", fields: [profileAvatarId], references: [id], onDelete: Cascade)
-  profilePortfolio  Profile? @relation("ProfilePortfolio", fields: [profilePortfolioId], references: [id], onDelete: Cascade) 
-  serviceMedia      Service? @relation("ServiceMedia", fields: [serviceMediaId], references: [id], onDelete: Cascade)
+  id                 String    @id @default(cuid())
+  publicId           String    @unique
+  url                String
+  secureUrl          String?
+  width              Int?
+  height             Int?
+  format             String?
+  bytes              Int?
+  folder             String?
+  type               MediaType @default(GENERAL)
+  originalName       String?
+  alt                String?
+  caption            String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  userId             String
+  profileAvatarId    String?   @unique
+  profilePortfolioId String?
+  serviceMediaId     String?
+  profileAvatar      Profile?  @relation("ProfileAvatar", fields: [profileAvatarId], references: [id], onDelete: Cascade)
+  profilePortfolio   Profile?  @relation("ProfilePortfolio", fields: [profilePortfolioId], references: [id], onDelete: Cascade)
+  serviceMedia       Service?  @relation("ServiceMedia", fields: [serviceMediaId], references: [id], onDelete: Cascade)
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([profileAvatarId])
@@ -52,4 +31,11 @@ model Media {
   @@index([folder])
   @@index([publicId])
   @@map("media")
+}
+
+enum MediaType {
+  AVATAR
+  PORTFOLIO
+  SERVICE_IMAGE
+  GENERAL
 }
