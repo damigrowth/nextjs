@@ -3,9 +3,10 @@
 import { useEffect } from 'react';
 import Image from 'next/image';
 import LinkNP from '@/components/link';
+import { MobileMenuContainerProps } from '@/types/components';
 
 // Lightweight offcanvas shell that's always present for Bootstrap
-export default function MobileMenuContainer({ children }) {
+export default function MobileMenuContainer({ children }: MobileMenuContainerProps) {
   useEffect(() => {
     // Ensure Bootstrap offcanvas is available after component mounts
     const initializeOffcanvas = async () => {

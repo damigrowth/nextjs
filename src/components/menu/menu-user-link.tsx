@@ -3,8 +3,9 @@
 import React from 'react';
 import LinkNP from '@/components/link';
 import { usePathname } from 'next/navigation';
+import { UserMenuLinkProps } from '@/types/components';
 
-export default function UserMenuLink({ item }) {
+export default function UserMenuLink({ item }: UserMenuLinkProps) {
   const path = usePathname();
 
   const isProfile = item.path.startsWith('/profile/');

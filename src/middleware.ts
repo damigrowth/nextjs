@@ -1,22 +1,14 @@
 import {
   stackMiddlewares,
   withLowercaseRedirect,
-  withAuth,
-  withMaintenance,
-  withProtectedRoutes,
-  withAuthRedirects,
-  withOnboarding,
+  withSimpleAuth,
   withHeaders,
 } from './middlewares';
 
 const middlewares = [
   withLowercaseRedirect, // 1. Normalize URLs first
-  withAuth, // 2. Get auth data
-  withMaintenance, // 3. Check maintenance mode
-  withProtectedRoutes, // 4. Protect authenticated routes
-  withAuthRedirects, // 5. Handle login/register redirects
-  withOnboarding, // 6. Handle onboarding flow
-  withHeaders, // 7. Set headers (last)
+  withSimpleAuth, // 2. Simple auth (cookie check only - page level handles details)
+  withHeaders, // 3. Set headers (last)
 ];
 
 export default stackMiddlewares(middlewares);

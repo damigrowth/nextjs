@@ -5,12 +5,13 @@ import LinkNP from '@/components/link';
 import { usePathname } from 'next/navigation';
 
 import { isActiveNavigation } from '@/utils/isActiveNavigation';
+import { NavMenuMobileProps, NavigationItem } from '@/types/components';
 
-export default function NavMenuMobile({ header }) {
+export default function NavMenuMobile({ header }: NavMenuMobileProps) {
   const path = usePathname();
 
   // Default categories if header is null
-  const categories = header?.data?.attributes?.categories?.data
+  const categories: NavigationItem[] = header?.data?.attributes?.categories?.data
     ? header.data.attributes.categories.data.map((item, i) => ({
         id: i + 1,
         name: item.attributes.label,
@@ -18,7 +19,7 @@ export default function NavMenuMobile({ header }) {
       }))
     : [];
 
-  const menus = [
+  const menus: NavigationItem[] = [
     {
       id: 1,
       name: 'Κατηγορίες',

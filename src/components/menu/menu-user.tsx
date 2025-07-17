@@ -15,8 +15,9 @@ import LogoutLink from '../form/form-logout';
 import UserMenuLink from './menu-user-link';
 import { useFreelancer } from '@/hooks/useFreelancer';
 import Skeleton from 'react-loading-skeleton';
+import { UserMenuProps, MenuItem } from '@/types/components';
 
-export default function UserMenu({ isMobile }) {
+export default function UserMenu({ isMobile }: UserMenuProps) {
   const {
     isAuthenticated,
     isConfirmed,
@@ -59,7 +60,7 @@ export default function UserMenu({ isMobile }) {
         }
         return item;
       })
-      .filter(Boolean);
+      .filter(Boolean) as MenuItem[];
 
     return (
       <li className='user_setting d-flex'>

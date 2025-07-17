@@ -35,39 +35,39 @@ export async function generateStaticParams() {
 }
 
 export default async function OptimizedHomePage({ searchParams }) {
-  const params = await searchParams;
+  // const params = await searchParams;
 
-  const homeData = await getData(
-    HOME_PAGE,
-    {
-      servicesPage: 1,
-      servicesPageSize: 4,
-      freelancersPage: 1,
-      freelancersPageSize: 4,
-    },
-    'HOME_PAGE',
-    ['home-page'],
-  );
+  // const homeData = await getData(
+  //   HOME_PAGE,
+  //   {
+  //     servicesPage: 1,
+  //     servicesPageSize: 4,
+  //     freelancersPage: 1,
+  //     freelancersPageSize: 4,
+  //   },
+  //   'HOME_PAGE',
+  //   ['home-page'],
+  // );
 
-  const {
-    categories = { data: [] },
-    services = { data: [], meta: { pagination: {} } },
-    freelancers = { data: [], meta: { pagination: {} } },
-    topServiceSubcategories = [],
-    topFreelancerSubcategories = [],
-  } = homeData || {};
+  // const {
+  //   categories = { data: [] },
+  //   services = { data: [], meta: { pagination: {} } },
+  //   freelancers = { data: [], meta: { pagination: {} } },
+  //   topServiceSubcategories = [],
+  //   topFreelancerSubcategories = [],
+  // } = homeData || {};
 
   return (
     <>
       <HomeSchema />
 
-      <HeroHomeOptimized categories={categories?.data || []} />
+      {/* <HeroHomeOptimized categories={categories?.data || []} />
 
-      <FeaturedCategoriesHome categories={categories?.data || []} />
+      <FeaturedCategoriesHome categories={categories?.data || []} /> */}
 
       <Features_D />
 
-      <FeaturedServicesHome_D
+      {/* <FeaturedServicesHome_D
         categories={categories?.data || []}
         initialServices={services?.data || []}
         initialPagination={services?.meta?.pagination || {}}
@@ -76,14 +76,14 @@ export default async function OptimizedHomePage({ searchParams }) {
       <FeaturedFreelancersHome_D
         initialFreelancers={freelancers?.data || []}
         initialPagination={freelancers?.meta?.pagination || {}}
-      />
+      /> */}
 
       <Stats_D />
-
+      {/* 
       <AllTaxonomies_D
         freelancerSubcategories={topFreelancerSubcategories}
         serviceSubcategories={topServiceSubcategories}
-      />
+      /> */}
     </>
   );
 }

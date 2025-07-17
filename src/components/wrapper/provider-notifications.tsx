@@ -5,21 +5,21 @@ import { useEffect } from 'react';
 import useNotificationsSocket from '@/hooks/useNotificationsSocket';
 import { useNotificationsStore } from '@/stores/notifications/notificationsStore';
 
+interface NotificationsProviderProps {
+  freelancerId: string | number | null;
+  totalUnreadCount: number;
+  children: React.ReactNode;
+}
+
 /**
  * Client-side provider component that sets up notification handling and real-time updates.
  * Initializes the notifications store with server data and establishes socket connection.
- *
- * @param {Object} props - Component props
- * @param {string|number|null} props.freelancerId - ID of the freelancer or null if not logged in
- * @param {number} props.totalUnreadCount - Initial count of unread messages from server
- * @param {React.ReactNode} props.children - Child components to render
- * @returns {React.ReactNode} Children components with notification context
  */
 export default function NotificationsProvider({
   freelancerId,
   totalUnreadCount,
   children,
-}) {
+}: NotificationsProviderProps) {
   const { setTotalUnreadMessages } = useNotificationsStore();
 
   // Initialize store with server-provided data

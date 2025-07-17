@@ -23,16 +23,20 @@ import {
   NavMenuMobileWrapper_D,
 } from '@/components/dynamic';
 
-export default async function RootLayout({ children }) {
+interface RootLayoutProps {
+  children: React.ReactNode;
+}
+
+export default async function RootLayout({ children }: RootLayoutProps) {
   // const isUnderMaintenance = false;
 
   // Cache header data for better performance
-  const { header: headerData } = await getData(
-    ROOT_LAYOUT_WITH_ACTIVE_SERVICES,
-    null,
-    'HEADER',
-    ['header'],
-  );
+  // const { header: headerData } = await getData(
+  //   ROOT_LAYOUT_WITH_ACTIVE_SERVICES,
+  //   null,
+  //   'HEADER',
+  //   ['header'],
+  // );
 
   const gaId = process.env.GA_ID;
 
@@ -42,7 +46,7 @@ export default async function RootLayout({ children }) {
         <InstallBootstrap />
         <div className='wrapper ovh mm-page mm-slideout'>
           <PathChecker excludes='/dashboard'>
-            <Header header={headerData} />
+            <Header />
           </PathChecker>
           <div className='body_content'>
             <ApolloWrapper>
@@ -55,7 +59,7 @@ export default async function RootLayout({ children }) {
           </div>
         </div>
         <PathChecker excludes='/dashboard'>
-          <NavMenuMobileWrapper_D header={headerData} />
+          <NavMenuMobileWrapper_D />
         </PathChecker>
         <GoogleTagManager gtmId='GTM-KR7N94L4' />
         <GoogleAnalytics gaId={gaId} />

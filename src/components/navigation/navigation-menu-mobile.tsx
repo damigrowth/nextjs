@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import MobileMenuContainer from './mobile-menu-container';
+import { NavMenuMobileWrapperProps } from '@/types/components';
 
 const NavMenuMobile = dynamic(() => import('./NavMenuMobile'), {
   ssr: false, // Back to false for performance - content loads dynamically
@@ -14,7 +15,7 @@ const NavMenuMobile = dynamic(() => import('./NavMenuMobile'), {
   ),
 });
 
-export default function NavMenuMobileWrapper({ header }) {
+export default function NavMenuMobileWrapper({ header }: NavMenuMobileWrapperProps) {
   return (
     <MobileMenuContainer>
       <NavMenuMobile header={header} />

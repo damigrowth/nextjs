@@ -17,6 +17,8 @@ const NavMenuMobileWrapper = dynamic(
   },
 );
 
-export default function NavMenuMobileWrapper_D(props) {
+import { NavMenuMobileWrapperProps } from '@/types/components';
+
+export default function NavMenuMobileWrapper_D(props: NavMenuMobileWrapperProps) {
   return <NavMenuMobileWrapper {...props} />;
 }

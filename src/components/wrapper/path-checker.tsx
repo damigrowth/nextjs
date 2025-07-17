@@ -2,7 +2,14 @@
 
 import { usePathname } from 'next/navigation';
 
-export default function PathChecker({ children, excludes, includes, paths }) {
+interface PathCheckerProps {
+  children: React.ReactNode;
+  excludes?: string;
+  includes?: string;
+  paths?: string[];
+}
+
+export default function PathChecker({ children, excludes, includes, paths }: PathCheckerProps) {
   const pathname = usePathname();
 
   // Check exclusions

@@ -6,27 +6,27 @@ import { MegaMenu_D } from '../dynamic';
 import { RegisterProButton } from '../button';
 import { UserMenu } from '../menu';
 
-export default function Header({ header }) {
-  const categories = header
-    ? header.data?.attributes?.categories?.data?.map((item, i) => ({
-        id: i + 1,
-        label: item.attributes?.label,
-        slug: item.attributes?.slug,
-        icon: item.attributes?.icon,
-        subcategories:
-          item.attributes?.subcategories?.data?.map((subcategory) => ({
-            label: subcategory.attributes?.label,
-            slug: subcategory.attributes?.slug,
-            subdivisions:
-              subcategory.attributes?.subdivisions?.data?.map(
-                (subdivision) => ({
-                  label: subdivision.attributes?.label,
-                  slug: subdivision.attributes?.slug,
-                }),
-              ) || [],
-          })) || [],
-      })) || []
-    : [];
+export default function Header() {
+  // const categories = header
+  //   ? header.data?.attributes?.categories?.data?.map((item, i) => ({
+  //       id: i + 1,
+  //       label: item.attributes?.label,
+  //       slug: item.attributes?.slug,
+  //       icon: item.attributes?.icon,
+  //       subcategories:
+  //         item.attributes?.subcategories?.data?.map((subcategory) => ({
+  //           label: subcategory.attributes?.label,
+  //           slug: subcategory.attributes?.slug,
+  //           subdivisions:
+  //             subcategory.attributes?.subdivisions?.data?.map(
+  //               (subdivision) => ({
+  //                 label: subdivision.attributes?.label,
+  //                 slug: subdivision.attributes?.slug,
+  //               }),
+  //             ) || [],
+  //         })) || [],
+  //     })) || []
+  //   : [];
 
   return (
     <>
@@ -38,7 +38,8 @@ export default function Header({ header }) {
                 <div className='d-flex align-items-center justify-content-between'>
                   <HeaderLogo />
                   <div className='home1_style'>
-                    <MegaMenu_D categories={categories} />
+                    {/* Needs Static Taxonomy */}
+                    {/* <MegaMenu_D categories={categories} /> */}
                   </div>
                   {/* <Navigation /> */}
                   <NavMenu />

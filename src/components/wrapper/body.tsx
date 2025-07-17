@@ -5,7 +5,11 @@ import { usePathname } from 'next/navigation';
 
 import useArchiveStore from '@/stores/archive/archiveStore';
 
-export default function Body({ children }) {
+interface BodyProps {
+  children: React.ReactNode;
+}
+
+export default function Body({ children }: BodyProps) {
   const { filtersModalToggled } = useArchiveStore();
 
   const path = usePathname();
@@ -17,6 +21,9 @@ export default function Body({ children }) {
   }, []);
 
   const getBodyClasses = () => {
+    // Handle null path during SSR
+    if (!path) return '';
+    
     // Allow basic classes even before mounting for LCP
     const basicClasses = path.startsWith('/connect') ||
       path.startsWith('/auth') ||

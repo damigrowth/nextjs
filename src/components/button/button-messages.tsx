@@ -4,15 +4,16 @@ import LinkNP from '@/components/link';
 import { usePathname } from 'next/navigation';
 
 import MessagesBadge from '../badge/badge-messages';
+import { MessagesMenuProps } from '@/types/components';
 
-export default function MessagesMenu() {
+export default function MessagesMenu({ className }: MessagesMenuProps) {
   const pathname = usePathname();
 
   // Don't show badge when on messages page
   const isOnMessagesPage = pathname === '/dashboard/messages';
 
   return (
-    <div className='d-none d-sm-flex align-items-center justify-content-center'>
+    <div className={`d-none d-sm-flex align-items-center justify-content-center ${className || ''}`}>
       <LinkNP
         href='/dashboard/messages'
         className='position-relative text-center text-thm2 fz24 d-flex'
