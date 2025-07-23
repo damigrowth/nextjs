@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/actions/shared/auth';
-import { Meta } from 'oldcode/utils/Seo/Meta/Meta';
-import OnboardingForm from '@/components/form/form-onboarding';
+import { Meta } from '@/lib/seo/Meta';
+import { getCurrentUser } from '@/actions';
+import { OnboardingForm } from '@/components/forms';
 
 export const dynamic = 'force-dynamic';
 
