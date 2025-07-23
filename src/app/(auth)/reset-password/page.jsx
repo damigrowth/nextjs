@@ -1,5 +1,5 @@
-import ResetPasswordForm from '@/components/form/form-auth-reset-password';
-import { Meta } from '@/utils/Seo/Meta/Meta';
+import ResetPasswordForm from 'oldcode/components/form/form-auth-reset-password';
+import { Meta } from 'oldcode/utils/Seo/Meta/Meta';
 
 export const dynamic = 'force-dynamic';
 

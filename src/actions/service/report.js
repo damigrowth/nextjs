@@ -3,7 +3,7 @@
 import { postData } from '@/lib/client/operations';
 import { CONTACT } from '@/lib/graphql';
 
-import { ServiceReportSchema } from '../schema/report';
+import { serviceReportSchema } from '@/lib/validations';
 
 /**
  * @async
@@ -77,7 +77,7 @@ export async function createServiceReport(prevState, formData) {
       service: parsedService,
     };
 
-    const validationResult = ServiceReportSchema.safeParse(dataToValidate);
+    const validationResult = serviceReportSchema.safeParse(dataToValidate);
 
     if (!validationResult.success) {
       const fieldErrors = {};

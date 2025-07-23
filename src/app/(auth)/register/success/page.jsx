@@ -1,4 +1,4 @@
-import { Meta } from '@/utils/Seo/Meta/Meta';
+import { Meta } from 'oldcode/utils/Seo/Meta/Meta';
 
 export const dynamic = 'force-static';
 export const revalidate = false;

@@ -3,7 +3,7 @@
 import { postData } from '@/lib/client/operations';
 import { CONTACT } from '@/lib/graphql';
 
-import { contactFormSchema } from '../schema/contact';
+import { contactFormSchema } from '@/lib/validations';
 
 async function verifyCaptcha(token) {
   try {

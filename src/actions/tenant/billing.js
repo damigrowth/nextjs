@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { postData } from '@/lib/client/operations';
 import { UPDATE_FREELANCER } from '@/lib/graphql';
 
-import { billingSchema, billingSchemaOptional } from '../schema/billing';
+import { billingSchema, billingOptionalSchema } from '@/lib/validations';
 
 export async function updateBillingDetails(prevState, formData) {
   const billing_details = JSON.parse(formData.get('billing_details'));
@@ -15,7 +15,7 @@ export async function updateBillingDetails(prevState, formData) {
   // Choose validation schema based on invoice flag
   const validationSchema = billing_details.invoice
     ? billingSchema
-    : billingSchemaOptional;
+    : billingOptionalSchema;
 
   // Validate billing details with the appropriate schema
   const validationResult = validationSchema.safeParse(billing_details);

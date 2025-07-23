@@ -3,7 +3,10 @@
 import dynamic from 'next/dynamic';
 
 const CookiesBanner = dynamic(
-  () => import('../banner').then((mod) => ({ default: mod.CookiesBanner })),
+  () =>
+    import('../banner').then((mod) => ({
+      default: mod.CookiesBanner,
+    })),
   {
     ssr: false,
     loading: () => null, // No loading state needed for cookies banner

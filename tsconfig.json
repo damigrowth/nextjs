@@ -15,7 +15,16 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/actions/*": ["./src/actions/*"],
+      "@/types/*": ["./src/lib/types/*"],
+      "@/hooks/*": ["./src/lib/hooks/*"],
+      "@/utils/*": ["./src/lib/utils/*"],
+      "@/validations/*": ["./src/lib/validations/*"],
+      "@/constants/*": ["./src/constants/*"],
+      "@/styles/*": ["./src/styles/*"]
     },
     "allowImportingTsExtensions": true,
     "plugins": [
@@ -32,5 +41,5 @@
     "**/*.js",
     "**/*.jsx"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "oldcode"]
 }

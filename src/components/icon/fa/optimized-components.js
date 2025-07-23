@@ -32,7 +32,7 @@ const OptimizedIcon = memo(function OptimizedIcon({
   );
 });
 
-// Enhanced versions of your existing icon components
+// Optimized versions of your existing icon components
 export const IconHeart = memo(({ type = 'solid', ...props }) => (
   <OptimizedIcon iconName="heart" type={type} {...props} />
 ));

@@ -2,25 +2,29 @@
 
 import LinkNP from '@/components/link';
 import { usePathname } from 'next/navigation';
+import { Mail } from 'lucide-react';
 
-import MessagesBadge from '../badge/badge-messages';
-import { MessagesMenuProps } from '@/types/components';
+// import MessagesBadge from '../../../oldcode/components/badge/badge-messages';
 
-export default function MessagesMenu({ className }: MessagesMenuProps) {
+export default function MessagesMenu({ className }: { className?: string }) {
+  // export default function MessagesMenu({ className }: MessagesMenuProps) {
   const pathname = usePathname();
 
   // Don't show badge when on messages page
   const isOnMessagesPage = pathname === '/dashboard/messages';
 
   return (
-    <div className={`d-none d-sm-flex align-items-center justify-content-center ${className || ''}`}>
+    <div
+      className={`hidden sm:flex items-center justify-center ${className || ''}`}
+    >
       <LinkNP
         href='/dashboard/messages'
-        className='position-relative text-center text-thm2 fz24 d-flex'
+        className='relative text-center flex'
+        style={{ color: '#1f4b3f' }}
         aria-label='Messages'
       >
-        <span className='flaticon-mail d-flex' />
-        {!isOnMessagesPage && <MessagesBadge />}
+        <Mail className='w-5 h-5 flex' />
+        {/* {!isOnMessagesPage && <MessagesBadge />} */}
       </LinkNP>
     </div>
   );

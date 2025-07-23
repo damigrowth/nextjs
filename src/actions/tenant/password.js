@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { postData } from '@/lib/client/operations';
 import { CHANGE_PASSWORD } from '@/lib/graphql';
 
-import { passwordChangeSchema } from '../schema/password';
+import { passwordChangeSchema } from '@/lib/validations';
 import { removeToken } from '../auth/token';
 
 export async function updatePassword(prevState, formData) {

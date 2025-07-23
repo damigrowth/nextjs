@@ -1,15 +1,22 @@
 import React from 'react';
 import LinkNP from '../link';
-import { getToken } from '@/actions/auth/token';
+import { Button } from '@/components/ui/button';
+import { getCurrentSession } from '@/actions/auth';
 
 export default async function RegisterProButton() {
-  const token = await getToken();
+  const session = await getCurrentSession();
 
-  if (token) return null;
+  if (session) return null;
 
   return (
-    <LinkNP className='mx15-xl mx30' href='/register#pro'>
-      <span className='hide-below-1400 pb0'>Καταχώριση Επαγγελματία</span>
-    </LinkNP>
+    <div className='xl:mx-[15px] mx-[30px]'>
+      <Button
+        asChild
+        variant='link'
+        className='hidden xl:inline-flex text-green-800 hover:text-green-600 p-0 h-auto font-medium'
+      >
+        <LinkNP href='/register#pro'>Καταχώριση Επαγγελματία</LinkNP>
+      </Button>
+    </div>
   );
 }

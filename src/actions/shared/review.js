@@ -3,7 +3,7 @@
 import { postData } from '@/lib/client/operations';
 import { POST_REVIEW } from '@/lib/graphql';
 
-import { reviewSchema } from '../schema/review';
+import { advancedReviewSchema } from '@/lib/validations';
 import { getFreelancerId } from './freelancer';
 
 export async function createReview(prevState, formData) {
@@ -15,7 +15,7 @@ export async function createReview(prevState, formData) {
     const authorId = await getFreelancerId();
 
     // Validate review data using Zod schema
-    const validation = reviewSchema.safeParse(review);
+    const validation = advancedReviewSchema.safeParse(review);
 
     if (!validation.success) {
       const validationErrors = validation.error.errors.reduce((acc, error) => {

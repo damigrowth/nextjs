@@ -1,13 +1,15 @@
 import LinkNP from '@/components/link';
+import { Heart } from 'lucide-react';
 
 export default function SavedMenu() {
   return (
-    <div className='d-none d-sm-flex'>
+    <div className='hidden sm:flex'>
       <LinkNP
         href='/dashboard/saved'
-        className='text-center mr5 text-thm2 fz20 d-flex'
+        className='text-center mr-1 flex'
+        style={{ color: '#1f4b3f' }}
       >
-        <span className='flaticon-like d-flex' />
+        <Heart className='w-5 h-5 flex' />
       </LinkNP>
     </div>
   );

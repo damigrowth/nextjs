@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { postData } from '@/lib/client/operations';
 import { EDIT_SERVICE } from '@/lib/graphql';
 import { createTags } from '../shared/tags';
-import { serviceEditSchema } from '../schema/service';
+import { serviceEditSchema } from '@/lib/validations';
 
 export async function editService(prevState, formData) {
   try {

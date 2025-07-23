@@ -3,7 +3,7 @@
 import { postData } from '@/lib/client/operations';
 import { CONTACT } from '@/lib/graphql';
 
-import { FreelancerReportSchema } from '../schema/report';
+import { freelancerReportSchema } from '@/lib/validations';
 
 /**
  * @async
@@ -62,7 +62,7 @@ export async function createFreelancerReport(prevState, formData) {
       reported: normalizeOptionalFields(parsedReported),
     };
 
-    const validationResult = FreelancerReportSchema.safeParse(dataToValidate);
+    const validationResult = freelancerReportSchema.safeParse(dataToValidate);
 
     if (!validationResult.success) {
       const fieldErrors = {};

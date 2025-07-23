@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { postData } from '@/lib/client/operations';
 import { UPDATE_FREELANCER } from '@/lib/graphql';
 
-import { presentationSchema } from '../schema/presentation';
+import { presentationSchema } from '@/lib/validations';
 
 export async function updatePresentationInfo(prevState, formData) {
   try {

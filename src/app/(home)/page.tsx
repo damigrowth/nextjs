@@ -1,33 +1,40 @@
-import { HeroHomeOptimized } from '@/components/hero';
-import { FeaturedCategoriesHome } from '@/components/section';
-import {
-  Features_D,
-  Stats_D,
-  AllTaxonomies_D,
-  FeaturedServicesHome_D,
-  FeaturedFreelancersHome_D,
-} from '@/components/dynamic';
+// import { HeroHomeOptimized } from '@/components/hero';
+// import { FeaturedCategoriesHome } from 'oldcode/components/section';
+// import {
+//   Features_D,
+//   Stats_D,
+//   AllTaxonomies_D,
+//   FeaturedServicesHome_D,
+//   FeaturedFreelancersHome_D,
+// } from '@/components/dynamic';
 
-import { getData } from '@/lib/client/operations';
-import { HOME_PAGE } from '@/lib/graphql/queries/main/page';
-import { Meta } from '@/utils/Seo/Meta/Meta';
-import HomeSchema from '@/utils/Seo/Schema/HomeSchema';
+import { Meta } from '@/lib/seo/Meta';
+
+// import { getData } from '@/lib/client/operations';
+// import { HOME_PAGE } from '@/lib/graphql/queries/main/page';
+// import HomeSchema from 'oldcode/utils/Seo/Schema/HomeSchema';
 
 export const dynamic = 'force-static'; // Generate at build time
 export const revalidate = 900; // Revalidate every 15 minutes (public content only)
 export const fetchCache = 'force-cache';
 
 export async function generateMetadata() {
-  const { meta } = await Meta({
-    titleTemplate:
-      'Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη',
-    descriptionTemplate:
-      'Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.',
-    size: 160,
-    url: '/',
-  });
-
-  return meta;
+  // Temporarily simplified to isolate the RangeError
+  return {
+    title: 'Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη',
+    description: 'Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.',
+  };
+  
+  // Original code (commented out to isolate issue):
+  // const { meta } = await Meta({
+  //   titleTemplate:
+  //     'Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη',
+  //   descriptionTemplate:
+  //     'Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.',
+  //   size: 160,
+  //   url: '/',
+  // });
+  // return meta;
 }
 
 export async function generateStaticParams() {
@@ -59,13 +66,13 @@ export default async function OptimizedHomePage({ searchParams }) {
 
   return (
     <>
-      <HomeSchema />
+      {/* <HomeSchema /> */}
 
       {/* <HeroHomeOptimized categories={categories?.data || []} />
 
       <FeaturedCategoriesHome categories={categories?.data || []} /> */}
 
-      <Features_D />
+      {/* <Features_D /> */}
 
       {/* <FeaturedServicesHome_D
         categories={categories?.data || []}
@@ -78,7 +85,7 @@ export default async function OptimizedHomePage({ searchParams }) {
         initialPagination={freelancers?.meta?.pagination || {}}
       /> */}
 
-      <Stats_D />
+      {/* <Stats_D /> */}
       {/* 
       <AllTaxonomies_D
         freelancerSubcategories={topFreelancerSubcategories}

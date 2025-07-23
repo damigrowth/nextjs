@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 
 const NavMenuMobileWrapper = dynamic(
   () =>
-    import('../navigation').then((mod) => ({
+    import('../layout/navigation').then((mod) => ({
       default: mod.NavMenuMobileWrapper,
     })),
   {
@@ -19,6 +19,8 @@ const NavMenuMobileWrapper = dynamic(
 
 import { NavMenuMobileWrapperProps } from '@/types/components';
 
-export default function NavMenuMobileWrapper_D(props: NavMenuMobileWrapperProps) {
+export default function NavMenuMobileWrapper_D(
+  props: NavMenuMobileWrapperProps,
+) {
   return <NavMenuMobileWrapper {...props} />;
 }

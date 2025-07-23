@@ -19,11 +19,11 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import LinkNP from '@/components/link';
 
-import authStore from '@/stores/authStore';
+import authStore from 'oldcode/utils/stores/authStore';
 import { FormButton } from '@/components/button';
-import Input from '@/components/input/input-a';
-import RadioSelect from '@/components/input/input-radio-select';
-import CheckSelect from '@/components/input/input-check-select';
+import Input from 'oldcode/components/input/input-a';
+import RadioSelect from 'oldcode/components/input/input-radio-select';
+import CheckSelect from 'oldcode/components/input/input-check-select';
 
 const consentOptions = [
   {

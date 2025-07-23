@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { postData } from '@/lib/client/operations';
 import { UPDATE_FREELANCER } from '@/lib/graphql';
 
-import { accountSchema } from '../schema/account';
+import { accountUpdateSchema } from '@/lib/validations';
 
 export async function updateAccountInfo(prevState, formData) {
   const changedFields = JSON.parse(formData.get('changes'));
@@ -46,15 +46,15 @@ export async function updateAccountInfo(prevState, formData) {
   }
 
   // --- Start Simplified Validation ---
-  // 1. Schema for non-image fields only (phone is already removed from accountSchema)
-  const nonImageSchemaFields = { ...accountSchema.shape };
+  // 1. Schema for non-image fields only (phone is already removed from accountUpdateSchema)
+  const nonImageSchemaFields = { ...accountUpdateSchema.shape };
 
   delete nonImageSchemaFields.image; // Ensure image is not in the base schema
 
   // 2. Create partial schema for changed non-image fields
   const partialNonImageSchema = z.object(
     Object.keys(changedFields).reduce((acc, field) => {
-      // Only include non-image fields that are in accountSchema (phone is already removed)
+      // Only include non-image fields that are in accountUpdateSchema (phone is already removed)
       if (nonImageSchemaFields[field] && field !== 'image') {
         acc[field] = nonImageSchemaFields[field];
       }

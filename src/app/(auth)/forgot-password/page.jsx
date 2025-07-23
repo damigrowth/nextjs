@@ -1,7 +1,7 @@
 import React from 'react';
 
-import ForgotPasswordForm from '@/components/form/form-auth-forgot-password';
-import { Meta } from '@/utils/Seo/Meta/Meta';
+import ForgotPasswordForm from 'oldcode/components/form/form-auth-forgot-password';
+import { Meta } from 'oldcode/utils/Seo/Meta/Meta';
 
 export const dynamic = 'force-static';
 export const revalidate = false;

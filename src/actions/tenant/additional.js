@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { postData } from '@/lib/client/operations';
 import { UPDATE_FREELANCER } from '@/lib/graphql';
 
-import { additionalInfoSchema } from '../schema/additional';
+import { additionalProfileInfoSchema } from '@/lib/validations';
 
 export async function updateAdditionalInfo(prevState, formData) {
   const id = formData.get('id');
@@ -55,7 +55,7 @@ export async function updateAdditionalInfo(prevState, formData) {
   // Create schema for only the changed fields
   const partialSchema = z.object(
     Object.keys(changedFields).reduce((acc, field) => {
-      acc[field] = additionalInfoSchema.shape[field];
+      acc[field] = additionalProfileInfoSchema.shape[field];
 
       return acc;
     }, {}),

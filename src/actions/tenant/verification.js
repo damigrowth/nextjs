@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { postData } from '@/lib/client/operations';
 import { VERIFICATION } from '@/lib/graphql';
 
-import { verificationFormSchema } from '../schema/verification';
+import { verificationFormSchema } from '@/lib/validations';
 
 export async function verificationUpdate(prevState, formData) {
   try {

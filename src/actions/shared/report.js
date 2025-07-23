@@ -3,7 +3,7 @@
 import { postData } from '@/lib/client/operations';
 import { CONTACT } from '@/lib/graphql';
 
-import { ReportSchema } from '../schema/report';
+import { reportIssueSchema } from '@/lib/validations';
 import { getFreelancer } from './freelancer';
 
 /**
@@ -47,7 +47,7 @@ export async function createIssueReport(prevState, formData) {
       currentUrl: formData.get('currentUrl'), // Get currentUrl
     };
 
-    const validationResult = ReportSchema.safeParse(rawFormData);
+    const validationResult = reportIssueSchema.safeParse(rawFormData);
 
     if (!validationResult.success) {
       const fieldErrors = {};
