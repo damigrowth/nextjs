@@ -137,4 +137,5 @@
   },
   "prisma": {
     "schema": "./prisma/schema/"
+  }
 }
