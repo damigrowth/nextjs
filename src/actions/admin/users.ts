@@ -4,19 +4,19 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import {
-  listUsersSchema,
-  createAdminUserSchema,
-  setRoleSchema,
-  banUserSchema,
-  unbanUserSchema,
-  removeUserSchema,
-  impersonateUserSchema,
-  revokeSessionSchema,
-  revokeUserSessionsSchema,
-  updateAdminUserSchema,
-  setUserPasswordSchema,
-} from '@/lib/validations';
+// legacy exports
+// import {
+//   listUsersSchema,
+//   createAdminUserSchema,
+//   setRoleSchema,
+//   banUserSchema,
+//   unbanUserSchema,
+//   removeUserSchema,
+//   impersonateUserSchema,
+
+//   updateAdminUserSchema,
+//   setUserPasswordSchema,
+// } from '@/lib/validations';
 
 // Import admin-specific schemas
 import {
@@ -29,6 +29,8 @@ import {
   adminRemoveUserSchema,
   adminImpersonateUserSchema,
   adminSetPasswordSchema,
+  revokeSessionSchema,
+  revokeUserSessionsSchema,
 } from '@/lib/validations/admin';
 
 // Import types from centralized validation schemas
@@ -387,9 +389,9 @@ export async function updateUser(data: z.infer<typeof adminUpdateUserSchema>) {
     // Handle role update if provided
     if (updateFields.role) {
       const roleResult = await auth.api.setRole({
-        body: { 
-          userId, 
-          role: updateFields.role as any // Type assertion for custom roles
+        body: {
+          userId,
+          role: updateFields.role as any, // Type assertion for custom roles
         },
         headers: await headers(),
       });
@@ -404,7 +406,8 @@ export async function updateUser(data: z.infer<typeof adminUpdateUserSchema>) {
     if (!hasUpdates) {
       return {
         success: false,
-        error: 'No supported fields to update. Only role updates are currently supported via Better Auth API.',
+        error:
+          'No supported fields to update. Only role updates are currently supported via Better Auth API.',
       };
     }
 

@@ -1,5 +1,5 @@
-import { NotFound } from '@/components/common';
+import { Four0Four } from '@/components/common';
 
 export default function NotFound() {
-  return <NotFound />;
+  return <Four0Four />;
 }

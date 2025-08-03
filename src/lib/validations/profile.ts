@@ -4,7 +4,12 @@
  */
 
 import { z } from 'zod';
-import { phoneSchema, urlSchema, paginationSchema, fileUploadSchema } from './shared';
+import {
+  phoneSchema,
+  urlSchema,
+  paginationSchema,
+  fileUploadSchema,
+} from './shared';
 
 // =============================================
 // PROFILE CRUD SCHEMAS
@@ -13,16 +18,29 @@ import { phoneSchema, urlSchema, paginationSchema, fileUploadSchema } from './sh
 export const createProfileSchema = z.object({
   // Profile professional fields
   type: z.string().min(1, 'Type is required').optional(),
-  tagline: z.string().max(100, 'Tagline must be less than 100 characters').optional(),
-  description: z.string().min(80, 'Description must be at least 80 characters').max(2000, 'Description must be less than 2000 characters').optional(),
+  tagline: z
+    .string()
+    .max(100, 'Tagline must be less than 100 characters')
+    .optional(),
+  description: z
+    .string()
+    .min(80, 'Description must be at least 80 characters')
+    .max(2000, 'Description must be less than 2000 characters')
+    .optional(),
   website: urlSchema.optional(),
   experience: z.number().int().min(0).optional(),
   rate: z.number().int().min(0).optional(),
   size: z.string().optional(),
-  skills: z.string().optional(),
-  
+  skills: z
+    .array(z.string().min(1, 'Skill ID is required'))
+    .max(10, 'Μπορείτε να επιλέξετε έως 10 δεξιότητες')
+    .optional(),
+
   // Personal information
-  username: z.string().min(3, 'Username must be at least 3 characters').optional(),
+  username: z
+    .string()
+    .min(3, 'Username must be at least 3 characters')
+    .optional(),
   displayName: z.string().min(1).optional(),
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),
@@ -30,7 +48,7 @@ export const createProfileSchema = z.object({
   city: z.string().optional(),
   county: z.string().optional(),
   zipcode: z.string().optional(),
-  
+
   // Status fields
   verified: z.boolean().default(false),
   featured: z.boolean().default(false),
@@ -38,19 +56,21 @@ export const createProfileSchema = z.object({
   isActive: z.boolean().default(false),
 });
 
-export const updateProfileSchema = createProfileSchema.partial();
+export const updateProfileBasicInfoActionSchema = createProfileSchema.partial();
 
-export const profileQuerySchema = z.object({
-  search: z.string().optional(),
-  type: z.string().optional(),
-  verified: z.coerce.boolean().optional(),
-  featured: z.coerce.boolean().optional(),
-  published: z.coerce.boolean().optional(),
-  minRate: z.coerce.number().min(0).optional(),
-  maxRate: z.coerce.number().min(0).optional(),
-  city: z.string().optional(),
-  county: z.string().optional(),
-}).merge(paginationSchema);
+export const profileQuerySchema = z
+  .object({
+    search: z.string().optional(),
+    type: z.string().optional(),
+    verified: z.coerce.boolean().optional(),
+    featured: z.coerce.boolean().optional(),
+    published: z.coerce.boolean().optional(),
+    minRate: z.coerce.number().min(0).optional(),
+    maxRate: z.coerce.number().min(0).optional(),
+    city: z.string().optional(),
+    county: z.string().optional(),
+  })
+  .merge(paginationSchema);
 
 // =============================================
 // PROFILE IMAGE SCHEMAS
@@ -84,111 +104,55 @@ export const profileImageSchema = z
   ])
   .optional();
 
-// =============================================
-// COVERAGE/LOCATION SCHEMAS
-// =============================================
-
+// Coverage/Location validation for professionals
 export const coverageSchema = z.object({
-  online: z.boolean().default(false),
-  onbase: z.boolean().default(false),
-  onsite: z.boolean().default(false),
+  online: z.boolean(),
+  onbase: z.boolean(),
+  onsite: z.boolean(),
   address: z.string().optional(),
-  area: z.object({
-    data: z.object({
-      id: z.string(),
-      attributes: z.object({
-        name: z.string(),
-      }),
-    }).nullable(),
-  }),
-  county: z.object({
-    data: z.object({
-      id: z.string(),
-      attributes: z.object({
-        name: z.string(),
-      }),
-    }).nullable(),
-  }),
-  zipcode: z.object({
-    data: z.object({
+  area: z
+    .object({
       id: z.string(),
       name: z.string(),
-    }).nullable(),
-  }),
-  counties: z.object({
-    data: z.array(z.object({
+    })
+    .nullable()
+    .optional(),
+  county: z
+    .object({
       id: z.string(),
-      attributes: z.object({
+      name: z.string(),
+    })
+    .nullable()
+    .optional(),
+  zipcode: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+    })
+    .nullable()
+    .optional(),
+  counties: z
+    .array(
+      z.object({
+        id: z.string(),
         name: z.string(),
       }),
-    })),
-  }),
-  areas: z.object({
-    data: z.array(z.object({
-      id: z.string(),
-      attributes: z.object({
+    )
+    .optional(),
+  areas: z
+    .array(
+      z.object({
+        id: z.string(),
         name: z.string(),
-        county: z.object({
-          data: z.object({
+        county: z
+          .object({
             id: z.string(),
-            attributes: z.object({
-              name: z.string(),
-            }),
-          }),
-        }),
+            name: z.string(),
+          })
+          .optional(),
       }),
-    })),
-  }),
-}).superRefine((cov, ctx) => {
-  // At least one coverage type must be selected
-  if (!cov.online && !cov.onbase && !cov.onsite) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'You must select at least one coverage type',
-      path: ['coverage'],
-    });
-  }
-  // Validate onbase requirements
-  if (cov.onbase) {
-    if (!cov.address?.trim()) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Address is required for on-base coverage',
-        path: ['address'],
-      });
-    }
-    if (!cov.zipcode?.data?.id) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Zip code is required for on-base coverage',
-        path: ['zipcode'],
-      });
-    }
-    if (!cov.county?.data?.id) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'County is required for on-base coverage',
-        path: ['county'],
-      });
-    }
-    if (!cov.area?.data?.id) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Area is required for on-base coverage',
-        path: ['area'],
-      });
-    }
-  }
-  // Validate onsite requirements
-  if (cov.onsite) {
-    if (!cov.counties?.data?.length && !cov.areas?.data?.length) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'At least one county or area is required for on-site coverage',
-        path: ['counties'],
-      });
-    }
-  }
+    )
+    .optional(),
 });
 
 // =============================================
@@ -293,10 +257,7 @@ export const socialMediaSchema = z.object({
       url: z
         .string()
         .url('Enter a valid X link')
-        .regex(
-          /^https?:\/\/(www\.)?(twitter|x)\.com\/.*$/,
-          'Invalid X link',
-        )
+        .regex(/^https?:\/\/(www\.)?(twitter|x)\.com\/.*$/, 'Invalid X link')
         .optional()
         .nullable()
         .or(z.literal('')),
@@ -308,10 +269,7 @@ export const socialMediaSchema = z.object({
       url: z
         .string()
         .url('Enter a valid YouTube link')
-        .regex(
-          /^https?:\/\/(www\.)?youtube\.com\/.*$/,
-          'Invalid YouTube link',
-        )
+        .regex(/^https?:\/\/(www\.)?youtube\.com\/.*$/, 'Invalid YouTube link')
         .optional()
         .nullable()
         .or(z.literal('')),
@@ -323,10 +281,7 @@ export const socialMediaSchema = z.object({
       url: z
         .string()
         .url('Enter a valid GitHub link')
-        .regex(
-          /^https?:\/\/(www\.)?github\.com\/.*$/,
-          'Invalid GitHub link',
-        )
+        .regex(/^https?:\/\/(www\.)?github\.com\/.*$/, 'Invalid GitHub link')
         .optional()
         .nullable()
         .or(z.literal('')),
@@ -353,10 +308,7 @@ export const socialMediaSchema = z.object({
       url: z
         .string()
         .url('Enter a valid Behance link')
-        .regex(
-          /^https?:\/\/(www\.)?behance\.net\/.*$/,
-          'Invalid Behance link',
-        )
+        .regex(/^https?:\/\/(www\.)?behance\.net\/.*$/, 'Invalid Behance link')
         .optional()
         .nullable()
         .or(z.literal('')),
@@ -425,21 +377,9 @@ export const billingOptionalSchema = z.object({
       message: 'Tax number is required',
     }),
   doy: z.string().min(2, 'Tax office is required').optional().nullable(),
-  brandName: z
-    .string()
-    .min(2, 'Brand name is required')
-    .optional()
-    .nullable(),
-  profession: z
-    .string()
-    .min(2, 'Profession is required')
-    .optional()
-    .nullable(),
-  address: z
-    .string()
-    .min(2, 'Address is required')
-    .optional()
-    .nullable(),
+  brandName: z.string().min(2, 'Brand name is required').optional().nullable(),
+  profession: z.string().min(2, 'Profession is required').optional().nullable(),
+  address: z.string().min(2, 'Address is required').optional().nullable(),
 });
 
 export const billingSchema = z.object({
@@ -490,16 +430,8 @@ export const billingSchema = z.object({
 
 export const verificationFormSchema = z.object({
   afm: z.string().min(2, 'Tax number is required'),
-  brandName: z
-    .string()
-    .min(2, 'Brand name is required')
-    .optional()
-    .nullable(),
-  address: z
-    .string()
-    .min(2, 'Address is required')
-    .optional()
-    .nullable(),
+  brandName: z.string().min(2, 'Brand name is required').optional().nullable(),
+  address: z.string().min(2, 'Address is required').optional().nullable(),
   phone: z.coerce
     .number()
     .min(1000000000, 'Phone number must be 10-12 digits')
@@ -508,16 +440,80 @@ export const verificationFormSchema = z.object({
     .nullable(),
 });
 
+export const cloudinaryResourceSchema = z.object({
+  public_id: z.string(),
+  secure_url: z.string(),
+  width: z.number().optional(),
+  height: z.number().optional(),
+  resource_type: z.enum(['image', 'video', 'raw']),
+  format: z.string().optional(),
+});
+
+export const imageSchema = cloudinaryResourceSchema.nullable();
+
+// Category/Subcategory selection for onboarding - now accepts ID strings
+export const categorySchema = z.string().min(1, 'Κατηγορία είναι υποχρεωτική');
+
+// Profile update schema for basic info form
+export const profileBasicInfoUpdateSchema = z.object({
+  image: z.any().nullable().optional(),
+  tagline: z
+    .string()
+    .min(10, 'Το tagline πρέπει να έχει τουλάχιστον 10 χαρακτήρες')
+    .max(100, 'Το tagline δεν μπορεί να υπερβαίνει τους 100 χαρακτήρες')
+    .optional(),
+  bio: z
+    .string()
+    .min(80, 'Η περιγραφή πρέπει να έχει τουλάχιστον 80 χαρακτήρες')
+    .max(5000, 'Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες'),
+  category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
+  subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
+  skills: z
+    .array(z.string().min(1, 'Skill ID is required'))
+    .min(1, 'Επιλέξτε τουλάχιστον μία δεξιότητα')
+    .max(10, 'Μπορείτε να επιλέξετε έως 10 δεξιότητες')
+    .optional(),
+  speciality: z.string().min(1, 'Η ειδικότητα είναι υποχρεωτική').optional(),
+  coverage: coverageSchema,
+});
+
+// Main onboarding form schema - bio, category, subcategory, coverage are required, image is optional for client validation
+export const onboardingFormSchema = z.object({
+  image: imageSchema, // Optional for client-side validation, required on server
+  category: categorySchema, // Required - now a string slug
+  subcategory: categorySchema, // Required - now a string slug
+  bio: z
+    .string() // Required - renamed from description
+    .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες.')
+    .max(5000, 'Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες.'),
+  coverage: coverageSchema, // Required
+  portfolio: z.array(cloudinaryResourceSchema).optional(), // Optional - Cloudinary resources
+});
+
+// Extended onboarding schema with media handling
+export const onboardingFormSchemaWithMedia = onboardingFormSchema.extend({
+  hasNewMedia: z.boolean().optional(),
+  hasDeletedMedia: z.boolean().optional(),
+  mediaCount: z.number().optional(),
+});
+
 // =============================================
 // TYPE EXPORTS
 // =============================================
 
 export type CreateProfileInput = z.infer<typeof createProfileSchema>;
-export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type updateProfileBasicInfoActionInput = z.infer<
+  typeof updateProfileBasicInfoActionSchema
+>;
 export type ProfileQueryInput = z.infer<typeof profileQuerySchema>;
 export type BasicProfileInfoInput = z.infer<typeof basicProfileInfoSchema>;
-export type AdditionalProfileInfoInput = z.infer<typeof additionalProfileInfoSchema>;
+export type AdditionalProfileInfoInput = z.infer<
+  typeof additionalProfileInfoSchema
+>;
 export type SocialMediaInput = z.infer<typeof socialMediaSchema>;
 export type PresentationInput = z.infer<typeof presentationSchema>;
 export type BillingInput = z.infer<typeof billingSchema>;
 export type VerificationInput = z.infer<typeof verificationFormSchema>;
+export type ProfileBasicInfoUpdateInput = z.infer<
+  typeof profileBasicInfoUpdateSchema
+>;

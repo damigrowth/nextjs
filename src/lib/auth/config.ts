@@ -3,7 +3,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { nextCookies } from 'better-auth/next-js';
 import { admin, apiKey } from 'better-auth/plugins';
 import { PrismaClient, User } from '@prisma/client';
-import { sendAuthEmail } from '@/lib/api/handlers/emails';
+import { sendAuthEmail } from '@/lib/email';
 
 const prisma = new PrismaClient();
 
@@ -19,17 +19,29 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url, token }, request) => {
       try {
-        await sendAuthEmail('VERIFICATION', user, url);
+        if (!user.email) {
+          console.error(
+            'Cannot send verification email: user email is missing',
+          );
+          return;
+        }
+        await sendAuthEmail('VERIFICATION', user as User, url);
       } catch (error) {
         console.error('Failed to send verification email:', error);
         // Don't throw error here to prevent registration from failing
       }
     },
-    autoSignInAfterVerification: false,
+    autoSignInAfterVerification: true,
   },
   sendResetPassword: async ({ user, url, token }, request) => {
     try {
-      await sendAuthEmail('PASSWORD_RESET', user, url);
+      if (!user.email) {
+        console.error(
+          'Cannot send password reset email: user email is missing',
+        );
+        return;
+      }
+      await sendAuthEmail('PASSWORD_RESET', user as User, url);
     } catch (error) {
       console.error('Failed to send password reset email:', error);
       // Don't throw error here to prevent reset from failing
@@ -126,12 +138,24 @@ export const auth = betterAuth({
               }
             } else {
               // Professional users (freelancer/company) go to onboarding
-              await prisma.user.update({
+              console.log('Setting professional user step to ONBOARDING:', {
+                userId: userWithFields.id,
+                role: userWithFields.role,
+                currentStep: userWithFields.step,
+              });
+
+              const updatedUser = await prisma.user.update({
                 where: { id: userWithFields.id },
                 data: {
                   step: 'ONBOARDING',
                   confirmed: true,
                 },
+              });
+
+              console.log('User step updated successfully:', {
+                userId: updatedUser.id,
+                newStep: updatedUser.step,
+                role: updatedUser.role,
               });
             }
           }
@@ -169,6 +193,6 @@ export const auth = betterAuth({
         maxRequests: 1000, // 1000 requests per hour for admin operations
       },
     }),
-    nextCookies(),
+    nextCookies(), // MUST be the last plugin in the array
   ],
 });

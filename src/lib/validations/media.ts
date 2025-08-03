@@ -118,7 +118,7 @@ export const documentUploadSchema = fileUploadValidationSchema.extend({
 // =============================================
 
 export const cloudinaryUploadSchema = z.object({
-  file: z.union([z.string(), z.instanceof(File)]),
+  file: z.string(), // Only allow string (URL or public_id) for cloudinary uploads
   folder: z.string().optional(),
   publicId: z.string().optional(),
   tags: z.array(z.string()).optional(),

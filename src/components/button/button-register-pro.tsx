@@ -1,7 +1,7 @@
 import React from 'react';
 import LinkNP from '../link';
 import { Button } from '@/components/ui/button';
-import { getCurrentSession } from '@/actions/auth';
+import { getCurrentSession } from '@/actions/auth/server';
 
 export default async function RegisterProButton() {
   const session = await getCurrentSession();

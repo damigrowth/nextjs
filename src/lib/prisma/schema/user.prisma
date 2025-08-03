@@ -1,0 +1,88 @@
+model User {
+  id                 String        @id @default(cuid())
+  email              String        @unique
+  emailVerified      Boolean       @default(false)
+  name               String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  step               String        @default("EMAIL_VERIFICATION")
+  confirmed          Boolean       @default(false)
+  blocked            Boolean       @default(false)
+  username           String?       @unique // Keep in user for auth purposes
+  displayName        String?       // Keep in user for auth purposes
+  banExpires         DateTime?
+  banReason          String?
+  banned             Boolean       @default(false)
+  role               String        @default("user")
+  accounts           Account[]
+  media              Media[]
+  messagesRead       MessageRead[]
+  profile            Profile?
+  reviewsGiven       Review[]      @relation("ReviewAuthor")
+  sessions           Session[]
+
+  @@index([role])
+  @@index([step])
+  @@index([confirmed, blocked])
+  @@map("users")
+}
+
+model Profile {
+  id              String       @id @default(cuid())
+  uid             String       @unique
+  type            String?
+  tagline         String?
+  bio             String?
+  website         String?
+  experience      Int?
+  rate            Int?
+  size            String?
+  skills          String[]     // Array of skill IDs from taxonomy  
+  speciality      String?      // Speciality ID from taxonomy
+  category        String?      // Service category ID from taxonomy
+  subcategory     String?      // Service subcategory ID from taxonomy
+  
+  // Fields moved from User table
+  username        String?      // Duplicated from User for profile purposes
+  displayName     String?      // Duplicated from User for profile purposes
+  firstName       String?      // Moved from User
+  lastName        String?      // Moved from User
+  phone           String?      // Moved from User
+  coverage        Json?        // Coverage options and location data
+  
+  // Media fields for onboarding form
+  image           Json?        // Profile image CloudinaryResource
+  portfolio       Json?        // Portfolio media CloudinaryResource array
+  
+  verified        Boolean      @default(false)
+  featured        Boolean      @default(false)
+  rating          Float        @default(0)
+  reviewCount     Int          @default(0)
+  published       Boolean      @default(false)
+  isActive        Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  chatMemberships ChatMember[]
+  chatsCreated    Chat[]
+  messagesSent    Message[]
+  user            User         @relation(fields: [uid], references: [id], onDelete: Cascade)
+  reviewsReceived Review[]     @relation("ReviewReceiver")
+  services        Service[]
+
+  @@index([uid])
+  @@index([published, featured])
+  @@index([verified, rating])
+  @@map("profiles")
+}
+
+enum UserType {
+  USER
+  FREELANCER
+  COMPANY
+}
+
+enum JourneyStep {
+  EMAIL_VERIFICATION
+  ONBOARDING
+  DASHBOARD
+}

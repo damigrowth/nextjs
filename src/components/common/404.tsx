@@ -2,7 +2,7 @@ import Image from 'next/image';
 // import LinkNP from '@/components/link';
 // import { ArrowRightLong } from '@/components/icon/fa';
 
-export default function NotFound() {
+export default function Four0Four() {
   return (
     <>
       <section className='our-error'>

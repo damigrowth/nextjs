@@ -1,1 +1,1 @@
-export { default as CookiesBanner } from './banner-cookies';
+// export { default as CookiesBanner } from './banner-cookies';

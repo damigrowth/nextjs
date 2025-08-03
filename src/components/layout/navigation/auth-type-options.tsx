@@ -17,26 +17,26 @@ export default function AuthTypeOptions(): JSX.Element | null {
           variant='outline'
           icon='arrow-left'
           iconPosition='left'
-          className='mb-6 mr-4 bg-white border-2 border-white text-gray-800 hover:bg-green-500 hover:text-white hover:border-green-600'
+          className='mb-6 hover:bg-green-500 hover:text-white hover:border-green-500'
         />
       </>
     );
   } else if (type === 0) {
     return (
-      <div className='mb-5 lg:mb-8'>
+      <div>
         <FormButton
           text='Εγγραφή ως Απλό Προφίλ'
           onClick={() => setAuthType(1)}
           type='button'
           variant='default'
-          className='bg-[#1f4b3f] border-2 border-[#1f4b3f] text-white hover:bg-[#5bbb7b] hover:border-[#1f4b3f] mr-5 mb-6 h-10 px-7'
+          className='mr-5 mb-6'
         />
         <FormButton
           text='Επαγγελματικό Προφίλ'
           onClick={() => setAuthType(2)}
           type='button'
           variant='default'
-          className='bg-[#1f4b3f] border-2 border-[#1f4b3f] text-white hover:bg-[#5bbb7b] hover:border-[#1f4b3f] lg:mr-2.5 h-10 px-7'
+          className='mr-5 mb-6'
         />
       </div>
     );

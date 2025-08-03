@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BellIcon, CheckIcon, XIcon } from "lucide-react"
 
+export const dynamic = 'force-dynamic';
+
 const notifications = [
   {
     id: 1,

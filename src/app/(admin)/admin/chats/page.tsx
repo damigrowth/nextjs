@@ -7,6 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { SearchIcon, MessageSquareIcon, EyeIcon, FlagIcon } from "lucide-react"
 
+// Force dynamic rendering for admin pages
+export const dynamic = 'force-dynamic';
+
 const chatsData = [
   {
     id: 1,

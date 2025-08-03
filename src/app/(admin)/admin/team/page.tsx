@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { SearchIcon, UserPlusIcon, EditIcon, TrashIcon, MailIcon, PhoneIcon, ShieldIcon } from "lucide-react"
 
+export const dynamic = 'force-dynamic';
+
 const teamData = [
   {
     id: 1,

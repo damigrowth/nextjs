@@ -5,7 +5,6 @@ import LinkNP from '@/components/link';
 import { useRouter } from 'next/navigation';
 
 import UserImage from '@/components/avatar/user-image';
-import { getImage } from '@/lib/utils/misc/image';
 import {
   hasAccessUserMenuNav,
   noAccessUserMenuNav,
@@ -13,8 +12,8 @@ import {
 
 import MessagesMenu from '../button/button-messages';
 import SavedMenu from '../button/button-saved';
-// import { useFreelancer } from '@/hooks/useFreelancer';
-import Skeleton from 'react-loading-skeleton';
+import { signOut } from '@/lib/auth/client';
+import { useAuth } from '@/components/providers/auth';
 import { UserMenuProps, MenuItem } from '@/types/components';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,6 +38,7 @@ import {
   LogOut,
   ExternalLink,
 } from 'lucide-react';
+import { Skeleton } from '../ui/skeleton';
 
 // Icon mapping function
 const getMenuIcon = (iconName: string) => {
@@ -57,149 +57,186 @@ const getMenuIcon = (iconName: string) => {
 
 export default function UserMenu({ isMobile }: UserMenuProps) {
   const router = useRouter();
-  // const {
-  //   isAuthenticated,
-  //   isConfirmed,
-  //   username,
-  //   displayName,
-  //   firstName,
-  //   lastName,
-  //   image,
-  //   hasAccess,
-  //   isLoading,
-  // } = useFreelancer();
+  const {
+    isLoading,
+    username,
+    displayName,
+    firstName,
+    lastName,
+    image,
+    email,
+    isAuthenticated,
+    isConfirmed,
+    hasAccess,
+    hasProfile,
+    isProfessional,
+    clearAuth,
+  } = useAuth();
 
   const handleLogout = async () => {
-    // Add logout logic here
-    router.push('/logout');
+    try {
+      await signOut();
+      window.location.href = '/';
+    } catch (error) {
+      window.location.href = '/';
+    }
   };
 
   // Show loading state
-  // if (isLoading) {
-  //   return !isMobile ? (
-  //     <div className='flex items-center space-x-2'>
-  //       <Skeleton width={40} height={40} borderRadius={'20%'} />
-  //     </div>
-  //   ) : (
-  //     <div className='w-5 h-5 bg-black/10 rounded-xl' />
-  //   );
-  // }
+  if (isLoading) {
+    return !isMobile ? (
+      <div className='flex items-center space-x-2'>
+        <Skeleton className='w-10 h-10 rounded-xl' />
+      </div>
+    ) : (
+      <div className='w-5 h-5 bg-black/10 rounded-xl' />
+    );
+  }
 
   // Authenticated user
-  // if (isAuthenticated && isConfirmed) {
-  //   const allNav = hasAccess ? hasAccessUserMenuNav : noAccessUserMenuNav;
-  //   const userProfilePath = `/profile/${username}`;
+  if (isAuthenticated && isConfirmed) {
+    let modifiedNav: MenuItem[] = [];
 
-  //   const modifiedNav = allNav
-  //     .map((item) => {
-  //       if (item.path === '/profile') {
-  //         return hasAccess ? { ...item, path: userProfilePath } : null;
-  //       }
-  //       return item;
-  //     })
-  //     .filter(Boolean) as MenuItem[];
+    if (isProfessional && !hasProfile) {
+      // Only show logout for professional users without profile (still in onboarding)
+      modifiedNav = [
+        {
+          id: 90,
+          name: 'Αποσύνδεση',
+          path: '/logout',
+          icon: 'flaticon-logout',
+        },
+      ];
+    } else {
+      // Normal menu for completed users
+      const allNav = hasAccess ? hasAccessUserMenuNav : noAccessUserMenuNav;
+      const userProfilePath = `/profile/${username}`;
 
-  //   return (
-  //     <li className='relative flex items-center'>
-  //       <div className='flex justify-center items-center mr-5'>
-  //         <SavedMenu />
-  //       </div>
-  //       <div className='flex justify-center items-center mr-8'>
-  //         <MessagesMenu />
-  //       </div>
-  //       <DropdownMenu>
-  //         <DropdownMenuTrigger asChild>
-  //           <Button
-  //             variant='ghost'
-  //             className='p-0 h-auto w-auto hover:bg-transparent focus:ring-0 focus:ring-offset-0'
-  //           >
-  //             <UserImage
-  //               firstName={firstName}
-  //               lastName={lastName}
-  //               displayName={displayName}
-  //               hideDisplayName
-  //               image={getImage(image, { size: 'avatar' })}
-  //               width={40}
-  //               height={40}
-  //             />
-  //           </Button>
-  //         </DropdownMenuTrigger>
-  //         <DropdownMenuContent className='w-56' align='end' forceMount>
-  //           <DropdownMenuLabel className='font-normal'>
-  //             <div className='flex flex-col space-y-1'>
-  //               <p className='text-sm font-medium leading-none'>
-  //                 {displayName || `${firstName} ${lastName}`.trim() || 'User'}
-  //               </p>
-  //               <p className='text-xs leading-none text-muted-foreground'>
-  //                 {username ? `@${username}` : ''}
-  //               </p>
-  //             </div>
-  //           </DropdownMenuLabel>
-  //           <DropdownMenuSeparator />
+      modifiedNav = allNav
+        .map((item) => {
+          if (item.path === '/profile') {
+            return hasAccess ? { ...item, path: userProfilePath } : null;
+          }
+          return item;
+        })
+        .filter(Boolean) as MenuItem[];
+    }
 
-  //           <DropdownMenuGroup>
-  //             {modifiedNav.map((item) => {
-  //               if (item.path === '/logout') {
-  //                 return (
-  //                   <React.Fragment key={item.id}>
-  //                     <DropdownMenuSeparator />
-  //                     <DropdownMenuItem
-  //                       className='cursor-pointer'
-  //                       onClick={handleLogout}
-  //                     >
-  //                       <span className='text-muted-foreground'>
-  //                         {getMenuIcon(item.icon)}
-  //                       </span>
-  //                       <span>{item.name}</span>
-  //                     </DropdownMenuItem>
-  //                   </React.Fragment>
-  //                 );
-  //               }
+    return (
+      <div className='flex items-center space-x-4'>
+        {!isMobile && (
+          <>
+            <div className='flex justify-center items-center'>
+              <SavedMenu />
+            </div>
+            <div className='flex justify-center items-center pr-3'>
+              <MessagesMenu />
+            </div>
+          </>
+        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant='ghost'
+              className='p-0 h-auto w-auto hover:bg-transparent focus:ring-0 focus:ring-offset-0 focus:outline-none focus-visible:ring-0'
+            >
+              <UserImage
+                firstName={firstName}
+                lastName={lastName}
+                displayName={displayName}
+                hideDisplayName
+                image={image}
+                width={40}
+                height={40}
+              />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className='w-56' align='end' forceMount>
+            <DropdownMenuLabel className='font-normal'>
+              <div className='flex flex-col space-y-1'>
+                <p className='text-sm font-medium leading-none'>
+                  {displayName || `${firstName} ${lastName}`.trim() || 'User'}
+                </p>
+                <p className='text-xs leading-none text-muted-foreground'>
+                  {username ? `@${username}` : email || ''}
+                </p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
 
-  //               const isExternalProfile = item.path.startsWith('/profile/');
+            <DropdownMenuGroup>
+              {modifiedNav.map((item) => {
+                if (item.path === '/logout') {
+                  return (
+                    <React.Fragment key={item.id + '-' + item.name}>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className='cursor-pointer'
+                        onClick={handleLogout}
+                      >
+                        <span className='text-muted-foreground mr-2'>
+                          {getMenuIcon(item.icon)}
+                        </span>
+                        <span>{item.name}</span>
+                      </DropdownMenuItem>
+                    </React.Fragment>
+                  );
+                }
 
-  //               return (
-  //                 <DropdownMenuItem key={item.id} asChild>
-  //                   <LinkNP
-  //                     href={item.path}
-  //                     className='cursor-pointer'
-  //                     {...(isExternalProfile && {
-  //                       target: '_blank',
-  //                       rel: 'noopener noreferrer',
-  //                     })}
-  //                   >
-  //                     <div className='flex items-center w-full space-x-2'>
-  //                       <span className='text-muted-foreground'>
-  //                         {getMenuIcon(item.icon)}
-  //                       </span>
-  //                       <span className='flex-1'>{item.name}</span>
-  //                       {isExternalProfile && (
-  //                         <ExternalLink className='w-3 h-3 ml-auto' />
-  //                       )}
-  //                     </div>
-  //                   </LinkNP>
-  //                 </DropdownMenuItem>
-  //               );
-  //             })}
-  //           </DropdownMenuGroup>
-  //         </DropdownMenuContent>
-  //       </DropdownMenu>
-  //     </li>
-  //   );
-  // }
+                const isExternalProfile = item.path.startsWith('/profile/');
+
+                return (
+                  <DropdownMenuItem key={item.id} asChild>
+                    <LinkNP
+                      href={item.path}
+                      className='cursor-pointer'
+                      {...(isExternalProfile && {
+                        target: '_blank',
+                        rel: 'noopener noreferrer',
+                      })}
+                    >
+                      <div className='flex items-center w-full space-x-2'>
+                        <span className='text-muted-foreground'>
+                          {getMenuIcon(item.icon)}
+                        </span>
+                        <span className='flex-1'>{item.name}</span>
+                        {isExternalProfile && (
+                          <ExternalLink className='w-3 h-3 ml-auto' />
+                        )}
+                      </div>
+                    </LinkNP>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    );
+  }
 
   // Not authenticated
   return !isMobile ? (
     <div className='flex items-center space-x-2'>
-      <Button asChild variant='outline' size='sm'>
+      <Button
+        asChild
+        variant='outline'
+        size='default'
+        className='hover:bg-secondary hover:text-secondary-foreground hover:border-secondary'
+      >
         <LinkNP href='/login'>Σύνδεση</LinkNP>
       </Button>
-      <Button asChild variant='outline' size='sm'>
+      <Button asChild size='default'>
         <LinkNP href='/register'>Εγγραφή</LinkNP>
       </Button>
     </div>
   ) : (
-    <Button asChild variant='ghost' size='sm'>
+    <Button
+      asChild
+      variant='ghost'
+      size='default'
+      className='hover:bg-secondary hover:text-secondary-foreground hover:border-secondary'
+    >
       <LinkNP href='/login'>Σύνδεση</LinkNP>
     </Button>
   );

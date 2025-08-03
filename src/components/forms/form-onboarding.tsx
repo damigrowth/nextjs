@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, {
+  useRef,
+  useActionState,
+  useEffect,
+  useState,
+  useTransition,
+} from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,6 +15,7 @@ import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { FormButton } from '@/components/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
@@ -38,6 +45,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Icons
 import {
@@ -49,18 +57,34 @@ import {
 } from 'lucide-react';
 
 // Custom components and hooks
-// import { ProfileImageInput, MediaGallery } from 'oldcode/components/input';
+import MediaUpload from '../upload/media-upload';
 
 import { useSession } from '@/lib/auth/client';
-import { api, profileApi } from '@/lib/utils/api-client';
 
 // Static constants and dataset utilities
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import { locationOptions } from '@/constants/datasets/locations';
-import { findById } from '@/lib/utils/datasets';
+import { formatInput } from '@/lib/utils/validation/formats';
+import {
+  findById,
+  findBySlug,
+  getLabelBySlug,
+  getChildrenById,
+  getChildrenBySlug,
+  filterByField,
+  getAllZipcodes,
+  toggleItemInArray,
+  resetCoverageDependencies,
+} from '@/lib/utils/datasets';
 
 // Zod schemas
 import { onboardingFormSchemaWithMedia } from '@/lib/validations';
+
+// Server action
+import { completeOnboarding } from '@/actions/auth/complete-onboarding';
+
+// Types
+import { CloudinaryResource } from '@/lib/types/cloudinary';
 
 // Use existing Zod schema
 type OnboardingFormData = z.infer<typeof onboardingFormSchemaWithMedia>;
@@ -69,22 +93,30 @@ interface OnboardingFormProps {
   // Props will be derived from useAuth hook
 }
 
+const initialState = {
+  success: false,
+  message: '',
+};
+
 /**
  * Pure React Hook Form onboarding form
  * No Zustand needed - RHF handles all state management
  * Integrates with existing formatting utilities and custom components
  */
 export default function OnboardingForm({}: OnboardingFormProps) {
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const [state, action, isPending] = useActionState(
+    completeOnboarding,
+    initialState,
+  );
 
-  // Media state (only thing that needs separate state)
-  const [mediaState, setMediaState] = useState({
-    media: [],
-    deletedMediaIds: [],
-    hasChanges: false,
-    initialMediaIds: [],
-  });
+  const [isUploading, setIsUploading] = useState(false);
+  const [isTransitionPending, startTransition] = useTransition();
+
+  // Refs for media upload components
+  const profileImageRef = useRef<any>(null);
+  const portfolioRef = useRef<any>(null);
+
+  // No longer need media state - handled by react-hook-form
 
   // Get auth data from BetterAuth
   const { data: sessionData, isPending: isLoading } = useSession();
@@ -94,28 +126,36 @@ export default function OnboardingForm({}: OnboardingFormProps) {
     resolver: zodResolver(onboardingFormSchemaWithMedia),
     defaultValues: {
       image: null,
-      category: { data: null },
-      subcategory: { data: null },
-      description: '',
+      category: '',
+      subcategory: '',
+      bio: '',
       coverage: {
         online: false,
         onbase: false,
         onsite: false,
         address: '',
-        area: { data: null },
-        county: { data: null },
-        zipcode: { data: null },
-        counties: { data: [] },
-        areas: { data: [] },
+        area: null,
+        county: null,
+        zipcode: null,
+        counties: [],
+        areas: [],
       },
+      portfolio: [],
     },
     mode: 'onChange', // Real-time validation
   });
 
   const user = sessionData?.user || null;
   const isAuthenticated = !!user;
-  const displayName =
-    user?.displayName || user?.name || user?.username || 'User';
+
+  // Handle successful onboarding completion and redirect
+  useEffect(() => {
+    if (state.success) {
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 2000);
+    }
+  }, [state.success]);
 
   // Loading state
   if (isLoading) {
@@ -174,14 +214,12 @@ export default function OnboardingForm({}: OnboardingFormProps) {
   const watchedCoverage = watch('coverage');
 
   // Helper functions for formatting inputs
-  const handleDescriptionChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>,
-  ) => {
+  const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const formattedValue = formatInput({
       value: e.target.value,
       maxLength: 5000,
     });
-    setValue('description', formattedValue, {
+    setValue('bio', formattedValue, {
       shouldDirty: true,
       shouldValidate: true,
     });
@@ -201,46 +239,20 @@ export default function OnboardingForm({}: OnboardingFormProps) {
 
   // Search handlers are no longer needed since we use static data directly in the Combobox components
 
-  // Selection handlers
+  // Selection handlers - store only ID values
   const handleCategorySelect = (selected: any) => {
-    const categoryObj = selected
-      ? {
-          id: selected.id,
-          attributes: {
-            label: selected.attributes.label,
-            slug: selected.attributes.slug,
-          },
-        }
-      : null;
-
-    setValue(
-      'category',
-      { data: categoryObj },
-      { shouldDirty: true, shouldValidate: true },
-    );
-    setValue(
-      'subcategory',
-      { data: null },
-      { shouldDirty: true, shouldValidate: true },
-    );
+    setValue('category', selected.id, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue('subcategory', null, { shouldDirty: true, shouldValidate: true });
   };
 
   const handleSubcategorySelect = (selected: any) => {
-    const subcategoryObj = selected
-      ? {
-          id: selected.id,
-          attributes: {
-            label: selected.attributes.label,
-            slug: selected.attributes.slug,
-          },
-        }
-      : null;
-
-    setValue(
-      'subcategory',
-      { data: subcategoryObj },
-      { shouldDirty: true, shouldValidate: true },
-    );
+    setValue('subcategory', selected.id, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   };
 
   // Coverage handlers
@@ -253,15 +265,7 @@ export default function OnboardingForm({}: OnboardingFormProps) {
 
     // Reset dependent fields when disabling modes
     if (!newCoverage[type]) {
-      if (type === 'onbase') {
-        newCoverage.address = '';
-        newCoverage.area = { data: null };
-        newCoverage.county = { data: null };
-        newCoverage.zipcode = { data: null };
-      } else if (type === 'onsite') {
-        newCoverage.areas = { data: [] };
-        newCoverage.counties = { data: [] };
-      }
+      Object.assign(newCoverage, resetCoverageDependencies(newCoverage, type));
     }
 
     setValue('coverage', newCoverage, {
@@ -270,94 +274,67 @@ export default function OnboardingForm({}: OnboardingFormProps) {
     });
   };
 
-  // Media handlers
-  const handleMediaUpdate = (media: any[], deletedIds: number[]) => {
-    setMediaState((prev) => ({
-      ...prev,
-      media,
-      deletedMediaIds: Array.from(
-        new Set([...prev.deletedMediaIds, ...deletedIds]),
-      ),
-      hasChanges: true,
-    }));
-  };
-
-  const handleMediaSave = async (media: any[], deletedIds: number[]) => {
-    handleMediaUpdate(media, deletedIds);
-    return true;
-  };
-
-  // 🎯 Simple change detection - combines form and media changes
+  // 🎯 Simple change detection using react-hook-form
   const hasFormChanges = () => {
-    return isDirty || mediaState.hasChanges;
+    return isDirty;
   };
 
-  // Form submission using Hono API
-  const onSubmit = async (data: OnboardingFormData) => {
-    setSubmitError(null);
-    setSubmitSuccess(null);
-
+  // Handle form submission with media upload logic
+  const handleFormSubmit = async (formData: FormData) => {
     if (!isAuthenticated || !user) {
-      setSubmitError(
-        'Πρέπει να είστε συνδεδεμένος για να ολοκληρώσετε το προφίλ',
-      );
       return;
     }
 
-    try {
-      // Step 1: Prepare API payload matching the actual Profile schema
-      const payload = {
-        // Basic profile info
-        type: data.category?.data?.attributes?.slug || '',
-        tagline: data.subcategory?.data?.attributes?.label || '',
-        description: data.description,
+    startTransition(async () => {
+      try {
+        setIsUploading(true);
 
-        // Profile contact fields (moved from User to Profile)
-        firstName: user.name?.split(' ')[0] || '',
-        lastName: user.name?.split(' ').slice(1).join(' ') || '',
-        displayName: user.displayName || user.name || '',
-        username: user.username || '',
+        // Handle image upload if needed
+        if (profileImageRef.current?.hasFiles()) {
+          await profileImageRef.current.uploadFiles();
+        }
 
-        // Location fields (now in Profile)
-        city: data.coverage?.area?.data?.attributes?.name || '',
-        county: data.coverage?.county?.data?.attributes?.name || '',
-        zipcode: data.coverage?.zipcode?.data?.name || '',
+        // Handle portfolio upload if needed
+        if (portfolioRef.current?.hasFiles()) {
+          await portfolioRef.current.uploadFiles();
+        }
 
-        // Default values
-        rate: 0,
-        experience: 0,
-        skills: '', // Can be populated later from category/subcategory
-        published: true, // Make profile visible
-      };
+        // Get all form values and add them to FormData
+        const formValues = getValues();
 
-      // Step 2: Submit to Hono API using utility client
-      const result = await profileApi.create(payload);
+        // Add all form fields to FormData
+        const fields = {
+          // Basic string fields
+          bio: formValues.bio,
+          category: formValues.category,
+          subcategory: formValues.subcategory,
+          // JSON fields (will be stringified)
+          image: formValues.image,
+          portfolio: formValues.portfolio,
+          coverage: formValues.coverage,
+        };
 
-      if (!result.success) {
-        throw new Error(result.error || 'Σφάλμα κατά την αποθήκευση');
+        Object.entries(fields).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            // JSON fields need to be stringified
+            if (['image', 'portfolio', 'coverage'].includes(key)) {
+              formData.set(key, JSON.stringify(value));
+            } else {
+              // String fields can be added directly
+              formData.set(key, value as string);
+            }
+          }
+        });
+
+        setIsUploading(false);
+
+        // Call the server action within startTransition - this is the correct way per React docs
+        await action(formData);
+      } catch (error) {
+        console.error('Form submission error:', error);
+        setIsUploading(false);
       }
-
-      setSubmitSuccess('Το προφίλ σας ολοκληρώθηκε με επιτυχία!');
-
-      // 🎯 Reset form using RHF's built-in reset
-      reset();
-      setMediaState({
-        media: [],
-        deletedMediaIds: [],
-        hasChanges: false,
-        initialMediaIds: [],
-      });
-
-      // Update onboarding step to DASHBOARD
-      await profileApi.updateOnboardingStep('DASHBOARD');
-    } catch (error) {
-      console.error('Submission error:', error);
-      setSubmitError(
-        error instanceof Error
-          ? error.message
-          : 'Αποτυχία ολοκλήρωσης προφίλ. Παρακαλώ δοκιμάστε ξανά.',
-      );
-    }
+    });
   };
 
   return (
@@ -374,7 +351,7 @@ export default function OnboardingForm({}: OnboardingFormProps) {
 
         <CardContent className='pt-4'>
           <Form {...form}>
-            <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+            <form action={handleFormSubmit} className='space-y-6'>
               {/* Image Field */}
               <FormField
                 control={control}
@@ -388,19 +365,20 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                       Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο.
                     </p>
                     <FormControl>
-                      {/* <ProfileImageInput
-                        name='image'
-                        image={getImage(field.value, { size: 'avatar' })}
-                        onChange={(newImage) => {
-                          if (newImage instanceof File) {
-                            field.onChange(newImage);
-                          } else {
-                            field.onChange({ data: newImage?.data || null });
-                          }
-                        }}
-                        errors={errors.image}
-                        displayName={displayName}
-                      /> */}
+                      <MediaUpload
+                        ref={profileImageRef}
+                        value={field.value}
+                        onChange={field.onChange}
+                        uploadPreset='doulitsa_new'
+                        multiple={false}
+                        folder={`users/${user?.username}/profile`}
+                        maxFileSize={3000000} // 3MB
+                        allowedFormats={['jpg', 'jpeg', 'png', 'webp']}
+                        placeholder='Ανεβάστε εικόνα προφίλ'
+                        type='image'
+                        error={errors.image?.message}
+                        signed={false}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -427,11 +405,8 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                                 role='combobox'
                                 className='w-full justify-between'
                               >
-                                {field.value.data
-                                  ? proTaxonomies.find(
-                                      (category) =>
-                                        category.id === field.value.data.id,
-                                    )?.label
+                                {field.value
+                                  ? findById(proTaxonomies, field.value)?.label
                                   : 'Επιλέξτε κατηγορία...'}
                                 <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                               </Button>
@@ -450,18 +425,12 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                                       value={category.label}
                                       key={category.id}
                                       onSelect={() => {
-                                        handleCategorySelect({
-                                          id: category.id,
-                                          attributes: {
-                                            label: category.label,
-                                            slug: category.slug,
-                                          },
-                                        });
+                                        handleCategorySelect(category);
                                       }}
                                     >
                                       <Check
                                         className={
-                                          field.value.data?.id === category.id
+                                          field.value === category.id
                                             ? 'mr-2 h-4 w-4 opacity-100'
                                             : 'mr-2 h-4 w-4 opacity-0'
                                         }
@@ -492,19 +461,22 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                                 variant='outline'
                                 role='combobox'
                                 className='w-full justify-between'
-                                disabled={!watchedCategory?.data}
+                                disabled={!watchedCategory}
                               >
-                                {field.value.data
-                                  ? watchedCategory?.data
-                                    ? proTaxonomies
-                                        .find(
-                                          (cat) =>
-                                            cat.id === watchedCategory.data.id,
-                                        )
-                                        ?.children?.find(
-                                          (sub) =>
-                                            sub.id === field.value.data.id,
-                                        )?.label
+                                {field.value
+                                  ? watchedCategory
+                                    ? (() => {
+                                        const category = findById(
+                                          proTaxonomies,
+                                          watchedCategory,
+                                        );
+                                        const subcategories =
+                                          category?.children || [];
+                                        return findById(
+                                          subcategories,
+                                          field.value,
+                                        )?.label;
+                                      })()
                                     : 'Επιλέξτε πρώτα κατηγορία'
                                   : 'Επιλέξτε υποκατηγορία...'}
                                 <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
@@ -519,41 +491,39 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                                   Δεν βρέθηκαν υποκατηγορίες.
                                 </CommandEmpty>
                                 <CommandGroup>
-                                  {watchedCategory?.data &&
-                                    proTaxonomies
-                                      .find(
-                                        (cat) =>
-                                          cat.id === watchedCategory.data.id,
-                                      )
-                                      ?.children?.filter(
-                                        (sub) =>
-                                          !user?.role || sub.type === user.role,
-                                      )
-                                      .map((subcategory) => (
-                                        <CommandItem
-                                          value={subcategory.label}
-                                          key={subcategory.id}
-                                          onSelect={() => {
-                                            handleSubcategorySelect({
-                                              id: subcategory.id,
-                                              attributes: {
-                                                label: subcategory.label,
-                                                slug: subcategory.slug,
-                                              },
-                                            });
-                                          }}
-                                        >
-                                          <Check
-                                            className={
-                                              field.value.data?.id ===
-                                              subcategory.id
-                                                ? 'mr-2 h-4 w-4 opacity-100'
-                                                : 'mr-2 h-4 w-4 opacity-0'
-                                            }
-                                          />
-                                          {subcategory.label}
-                                        </CommandItem>
-                                      ))}
+                                  {watchedCategory &&
+                                    (() => {
+                                      const category = findById(
+                                        proTaxonomies,
+                                        watchedCategory,
+                                      );
+                                      const subcategories =
+                                        category?.children || [];
+                                      return user?.role
+                                        ? filterByField(
+                                            subcategories,
+                                            'type',
+                                            user.role,
+                                          )
+                                        : subcategories;
+                                    })().map((subcategory) => (
+                                      <CommandItem
+                                        value={subcategory.label}
+                                        key={subcategory.id}
+                                        onSelect={() => {
+                                          handleSubcategorySelect(subcategory);
+                                        }}
+                                      >
+                                        <Check
+                                          className={
+                                            field.value === subcategory.id
+                                              ? 'mr-2 h-4 w-4 opacity-100'
+                                              : 'mr-2 h-4 w-4 opacity-0'
+                                          }
+                                        />
+                                        {subcategory.label}
+                                      </CommandItem>
+                                    ))}
                                 </CommandGroup>
                               </CommandList>
                             </Command>
@@ -566,10 +536,10 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                 </div>
               </div>
 
-              {/* Description */}
+              {/* Bio */}
               <FormField
                 control={control}
-                name='description'
+                name='bio'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='text-sm font-medium text-gray-700'>
@@ -584,7 +554,7 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                         className='min-h-[120px] w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                         rows={5}
                         value={field.value}
-                        onChange={handleDescriptionChange}
+                        onChange={handleBioChange}
                       />
                     </FormControl>
                     <div className='text-sm text-gray-500'>
@@ -692,7 +662,151 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                       )}
                     />
 
-                    {/* Zipcode Combobox */}
+                    {/* County Combobox - First selection */}
+                    <div className='space-y-2'>
+                      <FormLabel className='text-sm font-medium text-gray-700'>
+                        Νομός
+                      </FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant='outline'
+                            role='combobox'
+                            className='w-full justify-between'
+                          >
+                            {watchedCoverage?.county?.name ||
+                              'Επιλέξτε νομό...'}
+                            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className='w-full p-0'>
+                          <Command>
+                            <CommandInput placeholder='Αναζήτηση νομού...' />
+                            <CommandList>
+                              <CommandEmpty>Δεν βρέθηκαν νομοί.</CommandEmpty>
+                              <CommandGroup>
+                                {locationOptions.map((county) => (
+                                  <CommandItem
+                                    value={county.name}
+                                    key={county.id}
+                                    onSelect={() => {
+                                      const currentCoverage =
+                                        getValues('coverage');
+                                      setValue(
+                                        'coverage',
+                                        {
+                                          ...currentCoverage,
+                                          county: {
+                                            id: county.id,
+                                            name:
+                                              county.name || county.name || '',
+                                          },
+                                          area: null, // Reset dependent fields
+                                          zipcode: null,
+                                        },
+                                        {
+                                          shouldDirty: true,
+                                          shouldValidate: true,
+                                        },
+                                      );
+                                    }}
+                                  >
+                                    <Check
+                                      className={
+                                        watchedCoverage?.county?.id ===
+                                        county.id
+                                          ? 'mr-2 h-4 w-4 opacity-100'
+                                          : 'mr-2 h-4 w-4 opacity-0'
+                                      }
+                                    />
+                                    {county.name || county.name}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    {/* Area Combobox - Second selection */}
+                    <div className='space-y-2'>
+                      <FormLabel className='text-sm font-medium text-gray-700'>
+                        Περιοχή
+                      </FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant='outline'
+                            role='combobox'
+                            className='w-full justify-between'
+                            disabled={!watchedCoverage?.county}
+                          >
+                            {watchedCoverage?.area?.name ||
+                              (watchedCoverage?.county
+                                ? 'Επιλέξτε περιοχή...'
+                                : 'Επιλέξτε πρώτα νομό')}
+                            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className='w-full p-0'>
+                          <Command>
+                            <CommandInput placeholder='Αναζήτηση περιοχής...' />
+                            <CommandList>
+                              <CommandEmpty>
+                                Δεν βρέθηκαν περιοχές.
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {watchedCoverage?.county &&
+                                  (() => {
+                                    const selectedCounty = locationOptions.find(
+                                      (c) =>
+                                        c.id === watchedCoverage.county?.id,
+                                    );
+                                    return selectedCounty?.children || [];
+                                  })().map((area) => (
+                                    <CommandItem
+                                      value={area.name || area.name || ''}
+                                      key={area.id}
+                                      onSelect={() => {
+                                        const currentCoverage =
+                                          getValues('coverage');
+                                        setValue(
+                                          'coverage',
+                                          {
+                                            ...currentCoverage,
+                                            area: {
+                                              id: area.id,
+                                              name:
+                                                area.name || area.name || '',
+                                            },
+                                            zipcode: null, // Reset dependent field
+                                          },
+                                          {
+                                            shouldDirty: true,
+                                            shouldValidate: true,
+                                          },
+                                        );
+                                      }}
+                                    >
+                                      <Check
+                                        className={
+                                          watchedCoverage?.area?.id === area.id
+                                            ? 'mr-2 h-4 w-4 opacity-100'
+                                            : 'mr-2 h-4 w-4 opacity-0'
+                                        }
+                                      />
+                                      {area.name || area.name}
+                                    </CommandItem>
+                                  ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    {/* Zipcode Combobox - Third selection */}
                     <div className='space-y-2'>
                       <FormLabel className='text-sm font-medium text-gray-700'>
                         Τ.Κ.
@@ -703,9 +817,12 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                             variant='outline'
                             role='combobox'
                             className='w-full justify-between'
+                            disabled={!watchedCoverage?.area}
                           >
-                            {watchedCoverage?.zipcode?.data?.name ||
-                              'Επιλέξτε Τ.Κ...'}
+                            {watchedCoverage?.zipcode?.name ||
+                              (watchedCoverage?.area
+                                ? 'Επιλέξτε Τ.Κ...'
+                                : 'Επιλέξτε πρώτα περιοχή')}
                             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                           </Button>
                         </PopoverTrigger>
@@ -715,93 +832,60 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                             <CommandList>
                               <CommandEmpty>Δεν βρέθηκαν Τ.Κ.</CommandEmpty>
                               <CommandGroup>
-                                {locationOptions.map((county) =>
-                                  county.children?.map((area) =>
-                                    area.children?.map((zipcode) => (
-                                      <CommandItem
-                                        value={zipcode.name}
-                                        key={zipcode.id}
-                                        onSelect={() => {
-                                          const currentCoverage =
-                                            getValues('coverage');
-                                          setValue(
-                                            'coverage',
-                                            {
-                                              ...currentCoverage,
-                                              zipcode: {
-                                                data: {
-                                                  id: zipcode.id,
-                                                  name: zipcode.name,
-                                                },
-                                              },
-                                              area: {
-                                                data: {
-                                                  id: area.id,
-                                                  attributes: {
-                                                    name: area.name,
-                                                  },
-                                                },
-                                              },
-                                              county: {
-                                                data: {
-                                                  id: county.id,
-                                                  attributes: {
-                                                    name: county.name,
-                                                  },
-                                                },
-                                              },
+                                {watchedCoverage?.area &&
+                                  (() => {
+                                    const selectedCounty = locationOptions.find(
+                                      (c) =>
+                                        c.id === watchedCoverage.county?.id,
+                                    );
+                                    const selectedArea =
+                                      selectedCounty?.children?.find(
+                                        (a) =>
+                                          a.id === watchedCoverage.area?.id,
+                                      );
+                                    return selectedArea?.children || [];
+                                  })().map((zipcode) => (
+                                    <CommandItem
+                                      value={zipcode.name || zipcode.name || ''}
+                                      key={zipcode.id}
+                                      onSelect={() => {
+                                        const currentCoverage =
+                                          getValues('coverage');
+                                        setValue(
+                                          'coverage',
+                                          {
+                                            ...currentCoverage,
+                                            zipcode: {
+                                              id: zipcode.id,
+                                              name:
+                                                zipcode.name ||
+                                                zipcode.name ||
+                                                '',
                                             },
-                                            { shouldDirty: true },
-                                          );
-                                        }}
-                                      >
-                                        <Check
-                                          className={
-                                            watchedCoverage?.zipcode?.data
-                                              ?.id === zipcode.id
-                                              ? 'mr-2 h-4 w-4 opacity-100'
-                                              : 'mr-2 h-4 w-4 opacity-0'
-                                          }
-                                        />
-                                        {zipcode.name} - {area.name},{' '}
-                                        {county.name}
-                                      </CommandItem>
-                                    )),
-                                  ),
-                                )}
+                                          },
+                                          {
+                                            shouldDirty: true,
+                                            shouldValidate: true,
+                                          },
+                                        );
+                                      }}
+                                    >
+                                      <Check
+                                        className={
+                                          watchedCoverage?.zipcode?.id ===
+                                          zipcode.id
+                                            ? 'mr-2 h-4 w-4 opacity-100'
+                                            : 'mr-2 h-4 w-4 opacity-0'
+                                        }
+                                      />
+                                      {zipcode.name || zipcode.name}
+                                    </CommandItem>
+                                  ))}
                               </CommandGroup>
                             </CommandList>
                           </Command>
                         </PopoverContent>
                       </Popover>
-                    </div>
-
-                    {/* Area - Read only */}
-                    <div className='space-y-2'>
-                      <FormLabel className='text-sm font-medium text-gray-700'>
-                        Περιοχή
-                      </FormLabel>
-                      <Input
-                        value={
-                          watchedCoverage?.area?.data?.attributes?.name || ''
-                        }
-                        disabled
-                        className='w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100'
-                      />
-                    </div>
-
-                    {/* County - Read only */}
-                    <div className='space-y-2'>
-                      <FormLabel className='text-sm font-medium text-gray-700'>
-                        Νομός
-                      </FormLabel>
-                      <Input
-                        value={
-                          watchedCoverage?.county?.data?.attributes?.name || ''
-                        }
-                        disabled
-                        className='w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100'
-                      />
                     </div>
                   </div>
                 </div>
@@ -825,8 +909,8 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                             role='combobox'
                             className='w-full justify-between'
                           >
-                            {watchedCoverage?.counties?.data?.length > 0
-                              ? `${watchedCoverage.counties.data.length} νομοί επιλεγμένοι`
+                            {watchedCoverage?.counties?.length > 0
+                              ? `${watchedCoverage.counties.length} νομοί επιλεγμένοι`
                               : 'Επιλέξτε νομούς...'}
                             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                           </Button>
@@ -845,38 +929,22 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                                       const currentCoverage =
                                         getValues('coverage');
                                       const currentCounties =
-                                        currentCoverage?.counties?.data || [];
-                                      const countyExists = currentCounties.some(
-                                        (c: any) => c.id === county.id,
-                                      );
+                                        currentCoverage?.counties || [];
 
-                                      let newCounties;
-                                      if (countyExists) {
-                                        // Remove county
-                                        newCounties = currentCounties.filter(
-                                          (c: any) => c.id !== county.id,
-                                        );
-                                      } else {
-                                        // Add county
-                                        newCounties = [
-                                          ...currentCounties,
-                                          {
-                                            id: county.id,
-                                            attributes: { name: county.name },
-                                          },
-                                        ];
-                                      }
+                                      const newCounties = toggleItemInArray(
+                                        currentCounties,
+                                        { id: county.id, name: county.name },
+                                      );
 
                                       // Filter areas to only include those in selected counties
                                       const newCountyIds = newCounties.map(
                                         (c: any) => c.id,
                                       );
                                       const currentAreas =
-                                        currentCoverage?.areas?.data || [];
+                                        currentCoverage?.areas || [];
                                       const updatedAreas = currentAreas.filter(
                                         (area: any) => {
-                                          const countyData =
-                                            area.data?.attributes?.county?.data;
+                                          const countyData = area.county;
                                           return (
                                             countyData &&
                                             newCountyIds.includes(countyData.id)
@@ -888,8 +956,8 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                                         'coverage',
                                         {
                                           ...currentCoverage,
-                                          counties: { data: newCounties },
-                                          areas: { data: updatedAreas },
+                                          counties: newCounties,
+                                          areas: updatedAreas,
                                         },
                                         { shouldDirty: true },
                                       );
@@ -897,7 +965,7 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                                   >
                                     <Check
                                       className={
-                                        watchedCoverage?.counties?.data?.some(
+                                        watchedCoverage?.counties?.some(
                                           (c: any) => c.id === county.id,
                                         )
                                           ? 'mr-2 h-4 w-4 opacity-100'
@@ -924,11 +992,11 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                             variant='outline'
                             role='combobox'
                             className='w-full justify-between'
-                            disabled={!watchedCoverage?.counties?.data?.length}
+                            disabled={!watchedCoverage?.counties?.length}
                           >
-                            {watchedCoverage?.areas?.data?.length > 0
-                              ? `${watchedCoverage.areas.data.length} περιοχές επιλεγμένες`
-                              : watchedCoverage?.counties?.data?.length > 0
+                            {watchedCoverage?.areas?.length > 0
+                              ? `${watchedCoverage.areas.length} περιοχές επιλεγμένες`
+                              : watchedCoverage?.counties?.length > 0
                                 ? 'Επιλέξτε περιοχές...'
                                 : 'Επιλέξτε πρώτα νομούς'}
                             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
@@ -942,73 +1010,57 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                                 Δεν βρέθηκαν περιοχές.
                               </CommandEmpty>
                               <CommandGroup>
-                                {watchedCoverage?.counties?.data?.map(
+                                {watchedCoverage?.counties?.flatMap(
                                   (selectedCounty: any) => {
                                     const county = locationOptions.find(
                                       (c) => c.id === selectedCounty.id,
                                     );
-                                    return county?.children?.map((area) => (
-                                      <CommandItem
-                                        value={area.name}
-                                        key={area.id}
-                                        onSelect={() => {
-                                          const currentCoverage =
-                                            getValues('coverage');
-                                          const currentAreas =
-                                            currentCoverage?.areas?.data || [];
-                                          const areaExists = currentAreas.some(
-                                            (a: any) => a.id === area.id,
-                                          );
+                                    return (
+                                      county?.children?.map((area) => (
+                                        <CommandItem
+                                          value={area.name}
+                                          key={`${selectedCounty.id}-${area.id}`}
+                                          onSelect={() => {
+                                            const currentCoverage =
+                                              getValues('coverage');
+                                            const currentAreas =
+                                              currentCoverage?.areas || [];
 
-                                          let newAreas;
-                                          if (areaExists) {
-                                            // Remove area
-                                            newAreas = currentAreas.filter(
-                                              (a: any) => a.id !== area.id,
-                                            );
-                                          } else {
-                                            // Add area
-                                            newAreas = [
-                                              ...currentAreas,
+                                            const newAreas = toggleItemInArray(
+                                              currentAreas,
                                               {
                                                 id: area.id,
-                                                attributes: {
-                                                  name: area.name,
-                                                  county: {
-                                                    data: {
-                                                      id: county.id,
-                                                      attributes: {
-                                                        name: county.name,
-                                                      },
-                                                    },
-                                                  },
+                                                name: area.name,
+                                                county: {
+                                                  id: county.id,
+                                                  name: county.name,
                                                 },
                                               },
-                                            ];
-                                          }
+                                            );
 
-                                          setValue(
-                                            'coverage',
-                                            {
-                                              ...currentCoverage,
-                                              areas: { data: newAreas },
-                                            },
-                                            { shouldDirty: true },
-                                          );
-                                        }}
-                                      >
-                                        <Check
-                                          className={
-                                            watchedCoverage?.areas?.data?.some(
-                                              (a: any) => a.id === area.id,
-                                            )
-                                              ? 'mr-2 h-4 w-4 opacity-100'
-                                              : 'mr-2 h-4 w-4 opacity-0'
-                                          }
-                                        />
-                                        {area.name} - {county.name}
-                                      </CommandItem>
-                                    ));
+                                            setValue(
+                                              'coverage',
+                                              {
+                                                ...currentCoverage,
+                                                areas: newAreas,
+                                              },
+                                              { shouldDirty: true },
+                                            );
+                                          }}
+                                        >
+                                          <Check
+                                            className={
+                                              watchedCoverage?.areas?.some(
+                                                (a: any) => a.id === area.id,
+                                              )
+                                                ? 'mr-2 h-4 w-4 opacity-100'
+                                                : 'mr-2 h-4 w-4 opacity-0'
+                                            }
+                                          />
+                                          {area.name} - {county.name}
+                                        </CommandItem>
+                                      )) || []
+                                    );
                                   },
                                 )}
                               </CommandGroup>
@@ -1022,59 +1074,124 @@ export default function OnboardingForm({}: OnboardingFormProps) {
               )}
 
               {/* Portfolio */}
-              <div className='space-y-4'>
-                <h3 className='text-lg font-semibold text-gray-900 border-b pb-2'>
-                  Portfolio - Δείγμα εργασιών (προαιρετικό)
-                </h3>
-                <p className='text-sm text-gray-600'>
-                  Αρχεία από εργασίες που έχετε υλοποιήσει.
-                </p>
-                {/* <MediaGallery
-                  initialMedia={[]}
-                  onUpdate={handleMediaUpdate}
-                  onSave={handleMediaSave}
-                  isPending={isSubmitting}
-                  custom={true}
-                  maxSize={15}
-                  maxVideos={3}
-                  maxAudio={3}
-                /> */}
-              </div>
+              <FormField
+                control={control}
+                name='portfolio'
+                render={({ field }) => (
+                  <FormItem>
+                    <div className='space-y-4'>
+                      <h3 className='text-lg font-semibold text-gray-900 border-b pb-2'>
+                        Portfolio - Δείγμα εργασιών (προαιρετικό)
+                      </h3>
+                      <FormControl>
+                        <MediaUpload
+                          ref={portfolioRef}
+                          value={field.value || []}
+                          onChange={field.onChange}
+                          uploadPreset='doulitsa_new'
+                          multiple={true}
+                          folder={`users/${user?.username}/portfolio`}
+                          maxFiles={10}
+                          maxFileSize={15000000} // 15MB
+                          allowedFormats={[
+                            'jpg',
+                            'jpeg',
+                            'png',
+                            'webp',
+                            'mp4',
+                            'mov',
+                          ]}
+                          placeholder='Προσθήκη αρχείων portfolio'
+                          type='auto'
+                          error={errors.portfolio?.message}
+                          signed={false}
+                        />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              {/* Alert Messages */}
-              {submitError && (
-                <div className='p-4 rounded-md border bg-red-50 border-red-200 text-red-800'>
-                  <div className='flex items-center'>
-                    <AlertCircle className='w-5 h-5 mr-2' />
-                    {submitError}
-                  </div>
-                </div>
+              {/* Error Display */}
+              {state.message && !state.success && (
+                <Alert variant='destructive'>
+                  <AlertCircle className='h-4 w-4' />
+                  <AlertDescription>{state.message}</AlertDescription>
+                </Alert>
               )}
-              {submitSuccess && (
-                <div className='p-4 rounded-md border bg-green-50 border-green-200 text-green-800'>
-                  <div className='flex items-center'>
-                    <CheckCircle className='w-5 h-5 mr-2' />
-                    {submitSuccess}
+
+              {/* Success Display */}
+              {state.message && state.success && (
+                <Alert className='border-green-200 bg-green-50 text-green-800'>
+                  <CheckCircle className='h-4 w-4' />
+                  <AlertDescription>{state.message}</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Debug Info */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className='p-4 bg-gray-100 rounded text-xs space-y-2'>
+                  <div>isValid: {isValid.toString()}</div>
+                  <div>isDirty: {isDirty.toString()}</div>
+                  <div>Errors: {JSON.stringify(errors, null, 2)}</div>
+                  <div>Form Values: {JSON.stringify(getValues(), null, 2)}</div>
+                  <div>
+                    Manual Validation:{' '}
+                    {(() => {
+                      try {
+                        const result =
+                          onboardingFormSchemaWithMedia.safeParse(getValues());
+                        if (result.success) {
+                          return 'SUCCESS: Form is valid';
+                        } else {
+                          return JSON.stringify(
+                            {
+                              success: false,
+                              errors: result.error.issues.map((err) => ({
+                                path: err.path.join('.'),
+                                message: err.message,
+                                code: err.code,
+                              })),
+                            },
+                            null,
+                            2,
+                          );
+                        }
+                      } catch (e) {
+                        return `Error: ${e.message}`;
+                      }
+                    })()}
                   </div>
+                  <button
+                    type='button'
+                    onClick={() => {
+                      form.trigger();
+                    }}
+                    className='px-4 py-2 bg-gray-200 rounded text-sm'
+                  >
+                    Trigger Validation
+                  </button>
                 </div>
               )}
 
               {/* Submit Button */}
-              <div className='pt-4'>
-                <Button
+              <div className='pt-4 flex justify-center'>
+                <FormButton
                   type='submit'
-                  disabled={isSubmitting || !hasFormChanges() || !isValid}
-                  className='w-full py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition-colors duration-200 flex items-center justify-center disabled:opacity-50'
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className='w-5 h-5 mr-2 animate-spin' />
-                      Ολοκλήρωση Εγγραφής...
-                    </>
-                  ) : (
-                    'Ολοκλήρωση Εγγραφής'
-                  )}
-                </Button>
+                  text='Ολοκλήρωση Εγγραφής'
+                  loadingText={
+                    isUploading
+                      ? 'Ανέβασμα αρχείων...'
+                      : 'Ολοκλήρωση Εγγραφής...'
+                  }
+                  loading={isPending || isUploading || isTransitionPending}
+                  disabled={
+                    isPending || isUploading || isTransitionPending || !isValid
+                  }
+                  className='w-2/3'
+                  variant='default'
+                />
               </div>
             </form>
           </Form>

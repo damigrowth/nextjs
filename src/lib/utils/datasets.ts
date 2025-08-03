@@ -98,14 +98,37 @@ export function getChildrenById<T extends DatasetItem>(
 }
 
 /**
+ * Get children of an item by slug
+ */
+export function getChildrenBySlug<T extends DatasetItem>(
+  dataset: T[], 
+  slug: string
+): T[] {
+  const item = findBySlug(dataset, slug);
+  return (item?.children as T[]) || [];
+}
+
+/**
+ * Get the display label for a category/subcategory by slug
+ * Useful for forms and display components
+ */
+export function getLabelBySlug<T extends DatasetItem>(
+  dataset: T[], 
+  slug: string
+): string | undefined {
+  const item = findBySlug(dataset, slug);
+  return item?.label;
+}
+
+/**
  * Filter dataset by field value
  */
 export function filterByField<T extends DatasetItem>(
   dataset: T[], 
-  field: keyof T, 
+  field: keyof T | string, 
   value: any
 ): T[] {
-  return dataset.filter(item => item[field] === value);
+  return dataset.filter(item => (item as any)[field] === value);
 }
 
 /**
@@ -261,4 +284,73 @@ export function validateHierarchy<T extends DatasetItem>(
   if (!parent?.children) return false;
   
   return findById(parent.children as T[], childId) !== undefined;
+}
+
+// =============================================================================
+// FORM-SPECIFIC UTILITIES
+// =============================================================================
+
+/**
+ * Flatten location data to extract all zipcodes with their area and county information
+ */
+export function getAllZipcodes<T extends DatasetItem>(locationOptions: T[]): Array<{
+  id: string;
+  name: string;
+  area: { id: string; name: string };
+  county: { id: string; name: string };
+}> {
+  const zipcodes: Array<{
+    id: string;
+    name: string;
+    area: { id: string; name: string };
+    county: { id: string; name: string };
+  }> = [];
+  
+  locationOptions.forEach(county => {
+    county.children?.forEach(area => {
+      area.children?.forEach(zipcode => {
+        zipcodes.push({
+          id: zipcode.id,
+          name: zipcode.name || zipcode.label || '',
+          area: { id: area.id, name: area.name || area.label || '' },
+          county: { id: county.id, name: county.name || county.label || '' }
+        });
+      });
+    });
+  });
+  
+  return zipcodes;
+}
+
+/**
+ * Toggle an item in an array (add if doesn't exist, remove if exists)
+ */
+export function toggleItemInArray<T extends { id: string }>(
+  array: T[], 
+  item: T
+): T[] {
+  const exists = array.some(c => c.id === item.id);
+  return exists 
+    ? array.filter(c => c.id !== item.id)
+    : [...array, item];
+}
+
+/**
+ * Reset coverage dependencies based on coverage type
+ */
+export function resetCoverageDependencies(coverage: any, type: 'online' | 'onbase' | 'onsite') {
+  const newCoverage = { ...coverage };
+  
+  if (type === 'onbase') {
+    newCoverage.address = '';
+    newCoverage.area = null;
+    newCoverage.county = null;
+    newCoverage.zipcode = null;
+  } else if (type === 'onsite') {
+    newCoverage.areas = [];
+    newCoverage.counties = [];
+  }
+  // 'online' type doesn't have dependencies to reset
+  
+  return newCoverage;
 }

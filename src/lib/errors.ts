@@ -77,7 +77,7 @@ const translations: { [key: string]: string } = {
   'Relation does not exist': 'Η σχέση δεν υπάρχει',
 
   // Rate limiting errors
-  'Too many requests': 'Πάρα πολλές αιτήσεις',
+  'Too many requests': 'Πάρα πολλές προσπάθειες. Παρακαλώ δοκιμάστε ξανά αργότερα.',
   'Rate limit exceeded': 'Υπέρβαση ορίου αιτήσεων',
   'Please try again later': 'Παρακαλώ δοκιμάστε ξανά αργότερα',
 
@@ -131,7 +131,6 @@ const translations: { [key: string]: string } = {
   'INVALID_PASSWORD': 'Λάθος κωδικός',
   'Invalid password': 'Λάθος κωδικός',
   'TOO_MANY_REQUESTS': 'Πάρα πολλές προσπάθειες. Παρακαλώ δοκιμάστε ξανά αργότερα.',
-  'Too many requests': 'Πάρα πολλές προσπάθειες. Παρακαλώ δοκιμάστε ξανά αργότερα.',
 
   // Generic fallbacks for untranslated errors
   'Something went wrong': 'Κάτι πήγε στραβά',

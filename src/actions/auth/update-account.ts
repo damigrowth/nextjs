@@ -1,288 +1,105 @@
 'use server';
 
 import { auth } from '@/lib/auth';
-import { accountUpdateSchema, deleteAccountSchema } from '@/lib/validations/auth';
-import { ActionResult } from '@/lib/types/api';
-import { AccountUpdateInput, DeleteAccountInput } from '@/lib/validations/auth';
-import { requireAuth } from './check-auth';
-import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
+import { z } from 'zod';
+import { PrismaClient } from '@prisma/client';
 
-export async function updateAccount(prevState: any, formData: FormData): Promise<ActionResult<void>> {
+const prisma = new PrismaClient();
+
+const updateAccountSchema = z.object({
+  displayName: z
+    .string()
+    .min(2, 'Το όνομα προβολής πρέπει να έχει τουλάχιστον 2 χαρακτήρες')
+    .max(50, 'Το όνομα προβολής δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες'),
+});
+
+type UpdateAccountInput = z.infer<typeof updateAccountSchema>;
+
+interface UpdateAccountResult {
+  success: boolean;
+  error?: string;
+  data?: any;
+}
+
+export async function updateAccount(input: UpdateAccountInput): Promise<UpdateAccountResult> {
   try {
-    // Ensure user is authenticated
-    const currentUser = await requireAuth();
+    // Validate input
+    const validatedInput = updateAccountSchema.parse(input);
 
-    const displayName = formData.get('displayName') as string;
+    // Get current session
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
-    const validatedFields = accountUpdateSchema.safeParse({ displayName });
-
-    if (!validatedFields.success) {
+    if (!session?.user) {
       return {
         success: false,
-        error: 'Invalid input data',
-        fieldErrors: validatedFields.error.flatten().fieldErrors,
+        error: 'Δεν είστε συνδεδεμένος',
       };
     }
 
-    const { displayName: validatedDisplayName } = validatedFields.data;
-
-    // Use Better Auth to update user
-    const result = await auth.api.updateUser({
+    // Update user displayName using Better Auth API
+    const userResult = await auth.api.updateUser({
+      headers: await headers(),
       body: {
-        displayName: validatedDisplayName,
+        name: validatedInput.displayName,
+        displayName: validatedInput.displayName,
       },
     });
 
-    if (!result) {
+    if (!userResult) {
       return {
         success: false,
-        error: 'Failed to update account',
+        error: 'Αποτυχία ενημέρωσης λογαριασμού',
       };
     }
 
-    return {
-      success: true,
-      data: undefined,
-    };
-  } catch (error: any) {
-    console.error('Update account error:', error);
-    
-    if (error.message === 'Authentication required') {
-      return {
-        success: false,
-        error: 'You must be logged in to update your account',
-      };
-    }
-
-    return {
-      success: false,
-      error: 'Account update failed. Please try again.',
-    };
-  }
-}
-
-/**
- * Update account function for programmatic use
- */
-export async function updateUserAccount(input: AccountUpdateInput): Promise<ActionResult<any>> {
-  try {
-    const currentUser = await requireAuth();
-
-    const validatedFields = accountUpdateSchema.safeParse(input);
-
-    if (!validatedFields.success) {
-      return {
-        success: false,
-        error: 'Invalid input',
-      };
-    }
-
-    const { displayName } = validatedFields.data;
-
-    const result = await auth.api.updateUser({
-      body: {
-        displayName,
-      },
-    });
-
-    if (!result) {
-      return {
-        success: false,
-        error: 'Failed to update account',
-      };
-    }
-
-    return {
-      success: true,
-      data: result.user,
-    };
-  } catch (error: any) {
-    console.error('Update account error:', error);
-    return {
-      success: false,
-      error: error.message || 'Account update failed',
-    };
-  }
-}
-
-/**
- * Update user step (for onboarding flow)
- */
-export async function updateUserStep(step: string): Promise<ActionResult<void>> {
-  try {
-    const currentUser = await requireAuth();
-
-    // Use Better Auth admin API to update user step
-    const result = await auth.api.updateUser({
-      body: {
-        step,
-      },
-    });
-
-    if (!result) {
-      return {
-        success: false,
-        error: 'Failed to update user step',
-      };
-    }
-
-    return {
-      success: true,
-      data: undefined,
-    };
-  } catch (error: any) {
-    console.error('Update user step error:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to update user step',
-    };
-  }
-}
-
-/**
- * Complete onboarding step
- */
-export async function completeOnboarding(): Promise<ActionResult<void>> {
-  try {
-    const currentUser = await requireAuth();
-
-    // Update user step to DASHBOARD
-    const result = await updateUserStep('DASHBOARD');
-
-    if (!result.success) {
-      return result;
-    }
-
-    return {
-      success: true,
-      data: undefined,
-    };
-  } catch (error: any) {
-    console.error('Complete onboarding error:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to complete onboarding',
-    };
-  }
-}
-
-/**
- * Delete user account
- */
-export async function deleteAccount(prevState: any, formData: FormData): Promise<ActionResult<void>> {
-  try {
-    const currentUser = await requireAuth();
-
-    const username = formData.get('username') as string;
-    const confirmUsername = formData.get('confirm-username') as string;
-
-    // Verify username matches confirmation
-    if (username !== confirmUsername) {
-      return {
-        success: false,
-        error: 'Username confirmation does not match',
-        fieldErrors: {
-          confirmUsername: ['Username confirmation does not match'],
+    // Update profile displayName if profile exists
+    try {
+      await prisma.profile.updateMany({
+        where: { uid: session.user.id },
+        data: {
+          displayName: validatedInput.displayName,
         },
-      };
-    }
-
-    const validatedFields = deleteAccountSchema.safeParse({
-      username,
-      confirmUsername,
-    });
-
-    if (!validatedFields.success) {
-      return {
-        success: false,
-        error: 'Invalid input data',
-        fieldErrors: validatedFields.error.flatten().fieldErrors,
-      };
-    }
-
-    // Use Better Auth to delete account
-    const result = await auth.api.deleteUser({
-      body: {
-        userId: currentUser.id,
-      },
-    });
-
-    if (!result) {
-      return {
-        success: false,
-        error: 'Account deletion failed',
-      };
-    }
-
-    // Sign out user after deletion
-    await auth.api.signOut({});
-
-    // Redirect to home page
-    redirect('/');
-
-  } catch (error: any) {
-    console.error('Delete account error:', error);
-
-    if (error.message === 'Authentication required') {
-      return {
-        success: false,
-        error: 'You must be logged in to delete your account',
-      };
-    }
-
-    return {
-      success: false,
-      error: 'Account deletion failed. Please try again.',
-    };
-  }
-}
-
-/**
- * Delete account function for programmatic use
- */
-export async function deleteUserAccount(input: DeleteAccountInput): Promise<ActionResult<void>> {
-  try {
-    const currentUser = await requireAuth();
-
-    const validatedFields = deleteAccountSchema.safeParse(input);
-
-    if (!validatedFields.success) {
-      return {
-        success: false,
-        error: 'Invalid input',
-      };
-    }
-
-    const { username, confirmUsername } = validatedFields.data;
-
-    if (username !== confirmUsername) {
-      return {
-        success: false,
-        error: 'Username confirmation does not match',
-      };
-    }
-
-    const result = await auth.api.deleteUser({
-      body: {
-        userId: currentUser.id,
-      },
-    });
-
-    if (!result) {
-      return {
-        success: false,
-        error: 'Account deletion failed',
-      };
+      });
+    } catch (profileError) {
+      // Profile might not exist, which is fine
+      console.log('Profile update skipped (may not exist):', profileError);
     }
 
     return {
       success: true,
+      data: userResult,
     };
   } catch (error: any) {
-    console.error('Delete account error:', error);
+    console.error('Update account error:', error);
+
+    if (error.name === 'ZodError') {
+      return {
+        success: false,
+        error: error.errors?.[0]?.message || 'Μη έγκυρα δεδομένα',
+      };
+    }
+
+    // Handle specific Better Auth errors
+    if (error.message?.includes('email')) {
+      return {
+        success: false,
+        error: 'Αυτό το email χρησιμοποιείται ήδη',
+      };
+    }
+
+    if (error.message?.includes('username')) {
+      return {
+        success: false,
+        error: 'Αυτό το username χρησιμοποιείται ήδη',
+      };
+    }
+
     return {
       success: false,
-      error: error.message || 'Account deletion failed',
+      error: error.message || 'Σφάλμα κατά την ενημέρωση του λογαριασμού',
     };
   }
 }

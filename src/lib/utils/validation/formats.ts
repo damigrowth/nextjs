@@ -46,6 +46,13 @@ export const formatUsername = (str: string): string => {
   return str.replace(/[^a-zA-Z0-9_-]/g, '');
 };
 
+export const formatDisplayName = (str: string): string => {
+  // Remove numbers and symbols, keep only letters (including Greek), spaces, and basic punctuation
+  let formatted = cutNumbers(str);
+  formatted = cutSymbols(formatted);
+  return formatted;
+};
+
 export const formatInput = (options: FormatInputOptions): string => {
   const {
     formatNumbers,

@@ -1,44 +1,47 @@
 import React from 'react';
-// import { headers } from 'next/headers';
-// import { redirect } from 'next/navigation';
-
-// import { ActiveDashboard, InactiveDashboard } from '../wrapper';
-// import { getFreelancerActivationStatus } from '@/actions/shared/freelancer';
-// import { getToken } from '@/actions/auth/token';
+import { DashboardSidebar } from './dashboard-sidebar';
+import { DashboardBreadcrumb } from './dashboard-breadcrumb';
+import { AuthProvider } from '@/components/providers/auth';
+import { getCurrentUser } from '@/actions/auth/server';
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
+import { Separator } from '@/components/ui/separator';
+import UserMenu from '@/components/menu/menu-user';
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
-  // const token = await getToken();
+  // Get auth data server-side to pass to client components
+  const userResult = await getCurrentUser();
+  const user = userResult.success ? userResult.data.user : null;
+  const profile = userResult.success ? userResult.data.profile : null;
+  const session = userResult.success ? userResult.data.session : null;
 
-  // if (!token) {
-  //   redirect('/login');
-  // }
-
-  // const freelancer = await getFreelancerActivationStatus();
-
-  // const isActive = freelancer?.isActive;
-
-  // // Get the current path to check if it's start or success page
-  // // Check if we're on the success page via middleware header
-  // const headersList = await headers();
-
-  // const currentPath = headersList.get('x-current-path') || '';
-
-  // // Show inactive layout for both /dashboard/start and /dashboard/saved/success
-  // const isOnboardingPath = currentPath.startsWith('/dashboard/start');
-
-  // const isSuccessPath = currentPath === '/dashboard/start/success';
-
-  // const shouldShowInactiveDashboard =
-  //   !isActive || isOnboardingPath || isSuccessPath;
-
-  // return shouldShowInactiveDashboard ? (
-  //   <InactiveDashboard>{children}</InactiveDashboard>
-  // ) : (
-  //   <ActiveDashboard>{children}</ActiveDashboard>
-  // );
+  return (
+    <AuthProvider initialUser={user} initialProfile={profile} initialSession={session}>
+      <SidebarProvider>
+        <DashboardSidebar />
+        <SidebarInset>
+          <header className="flex h-16 shrink-0 items-center justify-between gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+            <div className="flex items-center gap-2 px-4">
+              <SidebarTrigger className="-ml-1" />
+              <Separator orientation="vertical" className="mr-2 h-4" />
+              <DashboardBreadcrumb />
+            </div>
+            <div className="px-4">
+              <UserMenu />
+            </div>
+          </header>
+          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+            {children}
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
+    </AuthProvider>
+  );
 }

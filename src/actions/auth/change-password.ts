@@ -2,42 +2,41 @@
 
 import { auth } from '@/lib/auth';
 import { passwordChangeSchema } from '@/lib/validations/auth';
-import { ActionResult } from '@/lib/types/api';
+import { ActionResponse } from '@/lib/types/api';
 import { PasswordChangeInput } from '@/lib/validations/auth';
+import { getFormString } from '@/lib/utils/form';
+import { createValidationErrorResponse } from '@/lib/utils/zod';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { getSession } from './server';
 
-export async function changePassword(prevState: any, formData: FormData): Promise<ActionResult<void>> {
+export async function changePassword(
+  prevState: ActionResponse | null,
+  formData: FormData,
+): Promise<ActionResponse> {
   try {
-    const currentPassword = formData.get('currentPassword') as string;
-    const newPassword = formData.get('newPassword') as string;
-    const confirmPassword = formData.get('confirmPassword') as string;
-
     const validatedFields = passwordChangeSchema.safeParse({
-      currentPassword,
-      newPassword,
-      confirmPassword,
+      currentPassword: getFormString(formData, 'currentPassword'),
+      newPassword: getFormString(formData, 'newPassword'),
+      confirmPassword: getFormString(formData, 'confirmPassword'),
     });
 
     if (!validatedFields.success) {
-      return {
-        success: false,
-        error: 'Invalid input data',
-        fieldErrors: validatedFields.error.flatten().fieldErrors,
-      };
+      return createValidationErrorResponse(
+        validatedFields.error,
+        'Μη έγκυρα δεδομένα αλλαγής κωδικού',
+      );
     }
 
-    const { currentPassword: oldPassword, newPassword: validatedNewPassword } = validatedFields.data;
+    const { currentPassword: oldPassword, newPassword: validatedNewPassword } =
+      validatedFields.data;
 
     // Get current session to identify the user
-    const session = await auth.api.getSession({
-      headers: {
-        // Better Auth will handle getting the session from cookies
-      }
-    });
+    const sessionResult = await getSession();
 
-    if (!session?.user) {
+    if (!sessionResult.success || !sessionResult.data) {
       return {
         success: false,
-        error: 'You must be logged in to change your password',
+        message: 'Πρέπει να είστε συνδεδεμένος για να αλλάξετε τον κωδικό σας',
       };
     }
 
@@ -52,70 +51,16 @@ export async function changePassword(prevState: any, formData: FormData): Promis
     if (!result) {
       return {
         success: false,
-        error: 'Current password is incorrect',
+        message: 'Ο τρέχων κωδικός είναι λάθος',
       };
     }
 
     return {
       success: true,
-      data: undefined,
+      message: 'Ο κωδικός άλλαξε επιτυχώς!',
     };
   } catch (error: any) {
-    console.error('Change password error:', error);
-    
-    if (error.message?.includes('current password')) {
-      return {
-        success: false,
-        error: 'Current password is incorrect',
-      };
-    }
-
-    return {
-      success: false,
-      error: 'Password change failed. Please try again.',
-    };
-  }
-}
-
-/**
- * Change password function for programmatic use
- */
-export async function updateUserPassword(input: PasswordChangeInput): Promise<ActionResult<void>> {
-  try {
-    const validatedFields = passwordChangeSchema.safeParse(input);
-
-    if (!validatedFields.success) {
-      return {
-        success: false,
-        error: 'Invalid input',
-      };
-    }
-
-    const { currentPassword, newPassword } = validatedFields.data;
-
-    const result = await auth.api.changePassword({
-      body: {
-        currentPassword,
-        newPassword,
-      },
-    });
-
-    if (!result) {
-      return {
-        success: false,
-        error: 'Current password is incorrect',
-      };
-    }
-
-    return {
-      success: true,
-      data: undefined,
-    };
-  } catch (error: any) {
-    console.error('Update password error:', error);
-    return {
-      success: false,
-      error: error.message || 'Password update failed',
-    };
+    // Use comprehensive Better Auth error handling
+    return handleBetterAuthError(error);
   }
 }

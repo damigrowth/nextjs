@@ -12,22 +12,22 @@ export const withSimpleAuth = (next: Function) => {
 
       // Route type detection
       const isAuthPage = currentPath.startsWith('/auth/');
-      const isLoginPage = currentPath === '/login' || currentPath === '/auth/signin';
-      const isRegisterPage = currentPath === '/register' || currentPath === '/auth/signup';
+      const isLoginPage =
+        currentPath === '/login' || currentPath === '/auth/signin';
+      const isRegisterPage =
+        currentPath === '/register' || currentPath === '/auth/signup';
       const isDashboardPath = currentPath.startsWith('/dashboard');
       const isOnboardingPath = currentPath.startsWith('/onboarding');
-      const publicPaths = ['/', '/about', '/contact', '/privacy', '/terms', '/faq', '/for-pros'];
+      const publicPaths = [
+        '/',
+        '/about',
+        '/contact',
+        '/privacy',
+        '/terms',
+        '/faq',
+        '/for-pros',
+      ];
       const isPublicPath = publicPaths.includes(currentPath);
-
-      console.log('Simple auth check:', {
-        currentPath,
-        hasSessionCookie: !!sessionCookie,
-        isLoginPage,
-        isRegisterPage,
-        isDashboardPath,
-        isOnboardingPath,
-        isPublicPath
-      });
 
       // ===========================================
       // UNAUTHENTICATED USER FLOW
@@ -37,7 +37,7 @@ export const withSimpleAuth = (next: Function) => {
         if (isAuthPage || isLoginPage || isRegisterPage || isPublicPath) {
           return next(request, _next);
         }
-        
+
         // Protect dashboard and other protected routes
         if (isDashboardPath || isOnboardingPath) {
           console.log('No session cookie - redirecting to signin');
@@ -50,10 +50,10 @@ export const withSimpleAuth = (next: Function) => {
       // ===========================================
       // AUTHENTICATED USER FLOW (Optimistic)
       // ===========================================
-      
+
       // We have a session cookie, so we assume user is authenticated
       // Full validation and role-based redirects will happen at page level
-      
+
       // Set basic auth context for compatibility with existing code
       (request as any).auth = {
         hasSessionCookie: true,
@@ -76,13 +76,14 @@ export const withSimpleAuth = (next: Function) => {
       // Allow access to all routes for authenticated users
       // Page-level components will handle:
       // - Role-based access control
-      // - Onboarding step validation  
+      // - Onboarding step validation
       // - Email verification checks
       // - Profile completion checks
-      console.log('Session cookie found - allowing access, page will validate details');
-      
-      return next(request, _next);
+      console.log(
+        'Session cookie found - allowing access, page will validate details',
+      );
 
+      return next(request, _next);
     } catch (error) {
       console.error('Simple auth middleware error:', error);
 

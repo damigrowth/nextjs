@@ -1,0 +1,26 @@
+model Media {
+  id           String    @id @default(cuid())
+  publicId     String    @unique
+  secureUrl    String
+  width        Int?
+  height       Int?
+  format       String?
+  bytes        Int?
+  resourceType String    // 'image', 'video', 'raw'
+  folder       String?
+  originalName String?
+  userId       String
+  isTemporary  Boolean   @default(true)  // Mark as temp until used in form submission
+  usageContext String?   // 'profile_avatar', 'profile_portfolio', 'service_image'
+  usageId      String?   // ID of the profile/service using it
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([publicId])
+  @@index([isTemporary])
+  @@index([usageContext, usageId])
+  @@map("media")
+}

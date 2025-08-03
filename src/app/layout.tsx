@@ -1,6 +1,7 @@
 import '../styles/critical.css';
 import '../styles/globals.css';
 
+import Script from 'next/script';
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 
 import '@fortawesome/fontawesome-svg-core/styles.css';
@@ -11,11 +12,13 @@ config.autoAddCss = false; /* eslint-disable import/first */
 // import 'react-loading-skeleton/dist/skeleton.css';
 import {
   BottomToTop_D,
-  CookiesBanner_D,
+  // CookiesBanner_D,
   // NavMenuMobileWrapper_D,
 } from '@/components/dynamic';
 import { Footer, Header } from '@/components/layout';
 import { Body, Notifications, PathChecker } from '@/components/layout/wrapper';
+import { AuthProvider } from '@/components/providers/auth';
+import { getCurrentUser } from '@/actions/auth/server';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -24,30 +27,48 @@ interface RootLayoutProps {
 export default async function RootLayout({ children }: RootLayoutProps) {
   const gaId = process.env.GA_ID;
 
+  // Get initial auth data on server
+  const userResult = await getCurrentUser();
+
+  const initialUser = userResult.success ? userResult.data.user : null;
+  const initialProfile = userResult.success ? userResult.data.profile : null;
+  const initialSession = userResult.success ? userResult.data.session : null;
+
   return (
     <html lang='el'>
       <Body>
-        {/* <InstallBootstrap /> */}
-        <div className='overflow-hidden box-border min-h-screen bg-inherit relative z-[1] w-full transition-all duration-[0.4s] ease-in-out'>
-          <PathChecker excludes={['/dashboard', '/admin']}>
-            <Header />
-          </PathChecker>
-          <div>
-            <Notifications>{children}</Notifications>
+        <AuthProvider
+          initialUser={initialUser}
+          initialProfile={initialProfile}
+          initialSession={initialSession}
+        >
+          {/* <InstallBootstrap /> */}
+          <div className='overflow-hidden box-border min-h-screen bg-inherit relative z-[1] w-full'>
             <PathChecker excludes={['/dashboard', '/admin']}>
-              <Footer />
+              <Header />
             </PathChecker>
-            <BottomToTop_D />
+            <div>
+              <Notifications>{children}</Notifications>
+              <PathChecker excludes={['/dashboard', '/admin']}>
+                <Footer />
+              </PathChecker>
+              <BottomToTop_D />
+            </div>
           </div>
-        </div>
+        </AuthProvider>
         {/* <PathChecker excludes={['/dashboard', '/admin']}>
           <NavMenuMobileWrapper_D />
         </PathChecker> */}
         <GoogleTagManager gtmId='GTM-KR7N94L4' />
         <GoogleAnalytics gaId={gaId} />
-        <PathChecker excludes={'/admin'}>
+        {/* Cloudinary Upload Widget */}
+        <Script
+          src='https://upload-widget.cloudinary.com/global/all.js'
+          strategy='beforeInteractive'
+        />
+        {/* <PathChecker excludes={'/admin'}>
           <CookiesBanner_D />
-        </PathChecker>
+        </PathChecker> */}
       </Body>
     </html>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 // import useArchiveStore from '@/stores/archive/archiveStore';
@@ -15,10 +15,6 @@ export default function Body({ children }: BodyProps) {
   const path = usePathname();
 
   const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const getBodyClasses = () => {
     // Handle null path during SSR

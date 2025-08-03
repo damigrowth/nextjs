@@ -9,10 +9,10 @@
 // export { default as ServiceFeaturedFiles_D } fro../../oldcode/components/dynamic/dynamic-service-featured-filesles';
 
 // Layout Components
-export { default as CookiesBanner_D } from './dynamic-cookies-banner';
+// export { default as CookiesBanner_D } from './dynamic-cookies-banner';
 export { default as BottomToTop_D } from './dynamic-bottom-to-top';
 // export { default as MegaMenu_D } fro../../oldcode/components/dynamic/dynamic-mega-menuenu';
-export { default as NavMenuMobileWrapper_D } from './dynamic-nav-menu-mobile';
+// export { default as NavMenuMobileWrapper_D } from './dynamic-nav-menu-mobile';
 
 // Home Page Components
 // export { default as Stats_D } from './dynamic-stats';

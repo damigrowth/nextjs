@@ -6,7 +6,10 @@ import { resetPasswordSchema } from '@/lib/validations/auth';
 import { ActionResult } from '@/lib/types/api';
 import { ResetPasswordInput } from '@/lib/validations/auth';
 
-export async function resetPassword(prevState: any, formData: FormData): Promise<ActionResult<void>> {
+export async function resetPassword(
+  prevState: any,
+  formData: FormData,
+): Promise<ActionResult<void>> {
   try {
     const token = formData.get('token') as string;
     const newPassword = formData.get('newPassword') as string;
@@ -24,13 +27,14 @@ export async function resetPassword(prevState: any, formData: FormData): Promise
       };
     }
 
-    const { token: validatedToken, newPassword: validatedPassword } = validatedFields.data;
+    const { token: validatedToken, newPassword: validatedPassword } =
+      validatedFields.data;
 
     // Use Better Auth to reset password
     const result = await auth.api.resetPassword({
       body: {
         token: validatedToken,
-        password: validatedPassword,
+        newPassword: validatedPassword,
       },
     });
 
@@ -42,10 +46,9 @@ export async function resetPassword(prevState: any, formData: FormData): Promise
     }
 
     redirect('/login?message=password-reset-success');
-
   } catch (error: any) {
     console.error('Reset password error:', error);
-    
+
     if (error.message?.includes('token')) {
       return {
         success: false,
@@ -63,7 +66,9 @@ export async function resetPassword(prevState: any, formData: FormData): Promise
 /**
  * Reset password function for programmatic use
  */
-export async function resetUserPassword(input: ResetPasswordInput): Promise<ActionResult<void>> {
+export async function resetUserPassword(
+  input: ResetPasswordInput,
+): Promise<ActionResult<void>> {
   try {
     const validatedFields = resetPasswordSchema.safeParse(input);
 
@@ -79,7 +84,7 @@ export async function resetUserPassword(input: ResetPasswordInput): Promise<Acti
     const result = await auth.api.resetPassword({
       body: {
         token,
-        password: newPassword,
+        newPassword: newPassword,
       },
     });
 

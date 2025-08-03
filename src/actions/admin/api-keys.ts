@@ -2,11 +2,11 @@
 
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
-import { 
-  validateApiKeySchema, 
+import {
+  validateApiKeySchema,
   createAdminApiKeySchema,
-  updateAdminApiKeySchema
-} from '@/lib/validations';
+  updateAdminApiKeySchema,
+} from '@/lib/validations/admin';
 
 // Environment admin API keys (fallback for initial access)
 const ADMIN_API_KEYS =
@@ -36,9 +36,7 @@ async function getAdminSession() {
 /**
  * Validate an admin API key (environment or database)
  */
-export async function validateAdminApiKey(
-  data: { apiKey: string },
-) {
+export async function validateAdminApiKey(data: { apiKey: string }) {
   try {
     const { apiKey } = validateApiKeySchema.parse(data);
 
@@ -93,9 +91,11 @@ export async function validateAdminApiKey(
 /**
  * Create a new admin API key (requires existing admin access)
  */
-export async function createAdminApiKey(
-  data: { name: string; expiresIn?: number; metadata?: { purpose?: string; owner?: string } },
-) {
+export async function createAdminApiKey(data: {
+  name: string;
+  expiresIn?: number;
+  metadata?: { purpose?: string; owner?: string };
+}) {
   try {
     const session = await getAdminSession();
     const validatedData = createAdminApiKeySchema.parse(data);

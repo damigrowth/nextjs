@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
+    browserDebugInfoInTerminal: true,
+    clientSegmentCache: true,
+    devtoolSegmentExplorer: true,
     serverActions: {
       bodySizeLimit: '20mb',
     },
@@ -49,6 +52,11 @@ const nextConfig = {
         destination: '/pros',
         permanent: true,
       },
+      {
+        source: '/auth/sign-in',
+        destination: '/login',
+        permanent: true,
+      },
     ];
   },
 
@@ -57,15 +65,3 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
-
-// Injected content via Sentry wizard below
-const { withSentryConfig } = require('@sentry/nextjs');
-
-module.exports = withSentryConfig(module.exports, {
-  org: 'httpsdomvourniasdev',
-  project: 'javascript-nextjs',
-  silent: !process.env.CI,
-  widenClientFileUpload: false,
-  disableLogger: true,
-  automaticVercelMonitors: true,
-});

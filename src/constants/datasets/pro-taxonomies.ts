@@ -2854,4 +2854,3 @@ export const proTaxonomies = [
     child_count: 49,
   },
 ];
-

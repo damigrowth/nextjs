@@ -3,48 +3,33 @@
  * All authentication and authorization related types
  */
 
-/**
- * User type matching Prisma User model
- */
-export interface AuthUser {
-  id: string;
-  email: string;
-  emailVerified: boolean;
-  name?: string;
-  image?: string;
-  createdAt: Date;
-  updatedAt: Date;
-
-  // Auth flow fields (from User model)
-  role: 'user' | 'freelancer' | 'company' | 'admin';
-  step: 'EMAIL_VERIFICATION' | 'ONBOARDING' | 'DASHBOARD';
-  
-  // User status fields
-  confirmed: boolean;
-  blocked: boolean;
-  banned: boolean;
-  banReason?: string;
-  banExpires?: Date;
-
-  // Auth fields kept in User for auth purposes
-  username?: string;
-  displayName?: string;
-}
+// Import types from Better Auth for type inference
+import type { auth } from '@/lib/auth';
 
 /**
- * Session type matching Prisma Session model
+ * User type inferred from Better Auth server instance
  */
-export interface AuthSession {
+export type AuthUser = typeof auth.$Infer.Session.user;
+
+/**
+ * Session type inferred from Better Auth server instance
+ */
+export type AuthSession = typeof auth.$Infer.Session;
+
+/**
+ * Session data type (the session object without the user)
+ */
+export type AuthSessionData = {
   id: string;
+  token: string;
   userId: string;
   expiresAt: Date;
-  token: string;
   createdAt: Date;
   updatedAt: Date;
   ipAddress?: string;
   userAgent?: string;
-  user: AuthUser;
-}
+  impersonatedBy?: string;
+};
 
 /**
  * Type definitions
@@ -52,92 +37,10 @@ export interface AuthSession {
 export type UserRole = 'user' | 'freelancer' | 'company' | 'admin';
 export type AuthStep = 'EMAIL_VERIFICATION' | 'ONBOARDING' | 'DASHBOARD';
 
-/**
- * Auth state interface
- */
-export interface AuthState {
-  user?: AuthUser;
-  session?: AuthSession;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-
-  // User role helpers
-  isUser: boolean;
-  isFreelancer: boolean;
-  isCompany: boolean;
-  isAdmin: boolean;
-  isProfessional: boolean; // freelancer or company
-  hasAccess: boolean; // freelancer, company, or admin
-
-  // Status helpers
-  isConfirmed: boolean;
-  needsEmailVerification: boolean;
-  needsOnboarding: boolean;
-  canAccessDashboard: boolean;
-}
-
-/**
- * Better Auth client response types
- */
-export interface SignUpResponse {
-  data?: {
-    user: AuthUser;
-    session: AuthSession;
-  };
-  error?: {
-    message: string;
-    code?: string;
-  };
-}
-
-export interface SignInResponse {
-  data?: {
-    user: AuthUser;
-    session: AuthSession;
-  };
-  error?: {
-    message: string;
-    code?: string;
-  };
-}
-
-/**
- * Email verification types
- */
-export interface EmailVerificationRequest {
-  email: string;
-}
-
-export interface EmailVerificationResponse {
-  success: boolean;
-  message: string;
-}
-
-/**
- * Password reset types
- */
-export interface PasswordResetRequest {
-  email: string;
-}
-
-export interface PasswordResetResponse {
-  success: boolean;
-  message: string;
-}
-
-export interface PasswordResetConfirm {
-  token: string;
-  newPassword: string;
-}
-
-/**
- * Profile completion types (for OAuth users)
- */
-export interface ProfileCompletionData {
-  username: string;
-  displayName: string;
-  role: UserRole;
-}
+// Auth form UI types
+export type AuthType = 0 | 1 | 2; // 0 = no selection, 1 = user, 2 = professional
+export type ProRole = 2 | 3 | null; // 2 = freelancer, 3 = company, null = not selected
+export type ConsentType = boolean | string[];
 
 /**
  * Form validation types
@@ -146,98 +49,106 @@ export interface AuthFormErrors {
   [key: string]: string | undefined;
 }
 
-export interface AuthFormState {
-  isLoading: boolean;
-  errors: AuthFormErrors;
-  success?: string;
-}
-
 /**
- * Route protection types
+ * Profile with optional relations for auth context
  */
-export interface RouteGuard {
-  requireAuth: boolean;
-  requireRoles?: UserRole[];
-  requireStep?: AuthStep;
-  redirectTo?: string;
-}
-
-/**
- * User update types
- */
-export interface UserUpdateData {
-  name?: string;
-  username?: string;
-  displayName?: string;
-  role?: UserRole;
-  step?: AuthStep;
-  confirmed?: boolean;
-  blocked?: boolean;
-  banned?: boolean;
-  banReason?: string;
-  banExpires?: Date;
-}
-
-// OAuth specific types
-export interface OAuthUser {
-  id: string;
-  email: string;
-  name?: string;
-  image?: string;
-  emailVerified?: boolean;
-}
-
-export interface OAuthAccount {
-  provider: string;
-  providerAccountId: string;
-  type: 'oauth';
-  userId: string;
-  access_token?: string;
-  refresh_token?: string;
-  expires_at?: number;
-  token_type?: string;
-  scope?: string;
-  id_token?: string;
-}
-
-// Authentication result types
-export type AuthResult<T = any> = {
-  success: true;
-  data: T;
-} | {
-  success: false;
-  error: string;
-  code?: string;
+export type ProfileWithRelations = import('@prisma/client').Profile & {
+  services?: import('@prisma/client').Service[];
+  reviewsReceived?: import('@prisma/client').Review[];
+  chatMemberships?: import('@prisma/client').ChatMember[];
 };
 
-export interface LoginResult {
-  user: AuthUser;
-  session: AuthSession;
-  requiresOnboarding?: boolean;
-  requiresEmailVerification?: boolean;
-}
+/**
+ * Auth Context Types - Flattened structure with all user, session, and profile fields
+ */
+export interface AuthContextType {
+  // User fields (from User model)
+  id: string | null;
+  email: string | null;
+  emailVerified: boolean;
+  name: string | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  step: string | null;
+  confirmed: boolean;
+  blocked: boolean;
+  username: string | null;
+  displayName: string | null;
+  banExpires: Date | null;
+  banReason: string | null;
+  banned: boolean;
+  role: string | null;
 
-export interface RegisterResult {
-  user: AuthUser;
-  session?: AuthSession;
-  emailVerificationRequired: boolean;
-}
+  // Session fields (from Session model)
+  sessionId: string | null;
+  userId: string | null;
+  expiresAt: Date | null;
+  token: string | null;
+  sessionCreatedAt: Date | null;
+  sessionUpdatedAt: Date | null;
+  ipAddress: string | null;
+  userAgent: string | null;
 
-// Permission types
-export interface Permission {
-  action: string;
-  resource: string;
-  conditions?: Record<string, any>;
-}
+  // Profile fields (from Profile model)
+  profileId: string | null;
+  uid: string | null;
+  type: string | null;
+  tagline: string | null;
+  bio: string | null;
+  website: string | null;
+  experience: number | null;
+  rate: number | null;
+  size: string | null;
+  skills: string[] | null;
+  speciality: string | null;
+  category: string | null;
+  subcategory: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  phone: string | null;
+  coverage: any;
+  image: any;
+  portfolio: any;
+  verified: boolean;
+  featured: boolean;
+  rating: number;
+  reviewCount: number;
+  published: boolean;
+  isActive: boolean;
+  profileCreatedAt: Date | null;
+  profileUpdatedAt: Date | null;
 
-export interface RolePermissions {
-  role: string;
-  permissions: Permission[];
-}
+  // Relations
+  services: import('@prisma/client').Service[];
+  reviewsReceived: import('@prisma/client').Review[];
+  chatMemberships: import('@prisma/client').ChatMember[];
 
-export type PermissionCheck = (
-  user: AuthUser | null,
-  action: string,
-  resource: string,
-  context?: Record<string, any>
-) => boolean;
+  // State management
+  isLoading: boolean;
+  error: string | null;
+
+  // Computed auth status
+  isAuthenticated: boolean;
+  isConfirmed: boolean;
+  needsEmailVerification: boolean;
+  needsOnboarding: boolean;
+  hasAccess: boolean;
+  canAccessDashboard: boolean;
+
+  // Role checks
+  isAdmin: boolean;
+  isProfessional: boolean;
+  isSimpleUser: boolean;
+  isFreelancer: boolean;
+  isCompany: boolean;
+
+  // Profile status
+  hasProfile: boolean;
+
+  // Actions
+  initialize: () => Promise<void>;
+  refreshAuth: () => Promise<void>;
+  clearAuth: () => void;
+  hasRole: (roles: string | string[]) => boolean;
+  checkRole: (role: string) => boolean;
+}

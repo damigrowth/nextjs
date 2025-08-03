@@ -25,7 +25,7 @@ export async function forgotPassword(prevState: any, formData: FormData): Promis
     await auth.api.forgetPassword({
       body: {
         email: validatedEmail,
-        redirectTo: `${process.env.NEXTAUTH_URL}/reset-password`,
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
       },
     });
 
@@ -63,7 +63,7 @@ export async function sendPasswordResetEmail(input: ForgotPasswordInput): Promis
     await auth.api.forgetPassword({
       body: {
         email,
-        redirectTo: `${process.env.NEXTAUTH_URL}/reset-password`,
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
       },
     });
 

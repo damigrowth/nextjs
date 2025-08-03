@@ -5,7 +5,7 @@ import { Meta } from '@/lib/seo/Meta';
 import {
   redirectOnboardingUsers,
   redirectCompletedUsers,
-} from '@/actions/shared/auth';
+} from '@/actions/auth/server';
 import { RegisterForm } from '@/components/forms';
 import { RegisterHeading } from '@/components/layout/heading';
 import { AuthTypeOptions } from '@/components/layout/navigation';
@@ -50,7 +50,7 @@ export default async function RegisterPage(): Promise<JSX.Element> {
 
         {/* Form Section */}
         <div className='flex justify-center'>
-          <div className='xl:w-1/2 w-full max-w-2xl'>
+          <div className='xl:w-2/5 w-full max-w-2xl'>
             <div className='relative bg-white p-12 sm:p-8 rounded-xl shadow-lg border border-gray-300'>
               <div className='mb-8'>
                 <RegisterHeading />

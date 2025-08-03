@@ -11,12 +11,9 @@ export * from './auth';
 export * from './user';
 export * from './profile';
 export * from './service';
-export * from './review';
+// export * from './review';
 export * from './chat';
 export * from './media';
 
 // Admin validations
 export * from './admin';
-
-// Re-export from main validations file for backward compatibility
-export * from '../validations';

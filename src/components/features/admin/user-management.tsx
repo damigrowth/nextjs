@@ -126,8 +126,8 @@ interface User {
 interface UserListResponse {
   users: User[];
   total: number;
-  limit: number | undefined;
-  offset: number | undefined;
+  limit?: number;
+  offset?: number;
 }
 
 export function UserManagement() {
@@ -251,6 +251,8 @@ export function UserManagement() {
         email: data.email,
         password: data.password,
         role: data.role,
+        emailVerified: data.autoVerify,
+        confirmed: data.autoVerify,
       });
 
       if (result.success) {
@@ -426,8 +428,8 @@ export function UserManagement() {
         // Ensure result.data is an array
         const sessions = Array.isArray(result.data)
           ? result.data
-          : result.data?.sessions
-            ? result.data.sessions
+          : (result.data as any)?.sessions
+            ? (result.data as any).sessions
             : [];
         setUserSessions(sessions);
         setSelectedUser(user);

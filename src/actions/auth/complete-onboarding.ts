@@ -1,117 +1,128 @@
 'use server';
 
-import { getCurrentUser } from '@/actions/auth/check-auth';
-import { PrismaClient } from '@prisma/client';
-import { ActionResult } from '@/lib/types/api';
-import { onboardingSchema } from '@/lib/validations/auth';
-
-const prisma = new PrismaClient();
-
-interface OnboardingData {
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  city?: string;
-  county?: string;
-  zipcode?: string;
-  username?: string;
-  displayName?: string;
-  tagline?: string;
-  description?: string;
-  website?: string;
-  experience?: string | number;
-  rate?: string | number;
-}
+import { prisma } from '@/lib/prisma/client';
+import { ActionResponse } from '@/lib/types/api';
+import { requireAuth } from './server';
+import { Prisma } from '@prisma/client';
+import { CloudinaryResource } from '@/lib/types/cloudinary';
+import { onboardingFormSchemaWithMedia } from '@/lib/validations';
+import { getFormString, getFormJSON } from '@/lib/utils/form';
+import { createValidationErrorResponse } from '@/lib/utils/zod';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
 
 /**
- * Server action to complete onboarding and update user step
- * Updates user step from 'ONBOARDING' to 'DASHBOARD'
- * Also creates or updates user profile with onboarding data
+ * Complete onboarding action wrapper for useActionState
  */
-export async function completeOnboarding(profileData: OnboardingData = {}): Promise<ActionResult<void>> {
+export async function completeOnboarding(
+  prevState: ActionResponse | null,
+  formData: FormData,
+): Promise<ActionResponse> {
   try {
-    const userResult = await getCurrentUser();
-    
-    if (!userResult.success || !userResult.data) {
-      return { 
-        success: false, 
-        error: 'User not authenticated' 
-      };
-    }
-
-    const user = userResult.data as any;
+    // Get authenticated session
+    const session = await requireAuth();
+    const user = session.user;
 
     if (user.step !== 'ONBOARDING') {
-      return { 
-        success: false, 
-        error: 'User not in onboarding step' 
+      return {
+        success: false,
+        message: 'Ο λογαριασμός δεν είναι στη φάση ολοκλήρωσης εγγραφής',
       };
     }
+
+    // Extract form data
+    const bio = getFormString(formData, 'bio');
+    const category = getFormString(formData, 'category');
+    const subcategory = getFormString(formData, 'subcategory');
+
+    // Parse JSON fields with proper error handling
+    const imageData = getFormJSON<CloudinaryResource | null>(
+      formData,
+      'image',
+      null,
+    );
+    const portfolioData = getFormJSON<CloudinaryResource[]>(
+      formData,
+      'portfolio',
+      [],
+    );
+    const coverageData = getFormJSON<any>(formData, 'coverage', {});
+
+    // Validate required JSON fields
+    if (formData.get('image') && !imageData) {
+      return {
+        success: false,
+        message: 'Λάθος δεδομένα εικόνας προφίλ',
+      };
+    }
+
+    if (formData.get('coverage') && Object.keys(coverageData).length === 0) {
+      return {
+        success: false,
+        message: 'Λάθος δεδομένα κάλυψης υπηρεσιών',
+      };
+    }
+
+    // Validate form data with Zod schema
+    const validationResult = onboardingFormSchemaWithMedia.safeParse({
+      image: imageData,
+      bio,
+      category,
+      subcategory,
+      coverage: coverageData,
+      portfolio: portfolioData,
+    });
+
+    if (!validationResult.success) {
+      return createValidationErrorResponse(
+        validationResult.error,
+        'Μη έγκυρα δεδομένα φόρμας',
+      );
+    }
+
+    const data = validationResult.data;
+
+    // Create or update profile with onboarding data
+    await prisma.profile.upsert({
+      where: { uid: user.id },
+      update: {
+        bio: data.bio,
+        category: data.category,
+        subcategory: data.subcategory,
+        coverage: data.coverage as Prisma.JsonValue,
+        image: data.image as Prisma.JsonValue,
+        portfolio: data.portfolio as Prisma.JsonValue,
+        published: user.role !== 'user',
+        isActive: true,
+      },
+      create: {
+        bio: data.bio,
+        category: data.category,
+        subcategory: data.subcategory,
+        coverage: data.coverage as Prisma.JsonValue,
+        image: data.image as Prisma.JsonValue,
+        portfolio: data.portfolio as Prisma.JsonValue,
+        published: user.role !== 'user',
+        isActive: true,
+        user: {
+          connect: { id: user.id },
+        },
+      },
+    });
 
     // Update user step to DASHBOARD
     await prisma.user.update({
       where: { id: user.id },
       data: {
         step: 'DASHBOARD',
-        confirmed: true,
       },
     });
 
-    // Create or update profile with onboarding data
-    if (Object.keys(profileData).length > 0) {
-      await prisma.profile.upsert({
-        where: { uid: user.id },
-        update: {
-          // Profile fields from onboarding
-          firstName: profileData.firstName,
-          lastName: profileData.lastName,
-          phone: profileData.phone,
-          city: profileData.city,
-          county: profileData.county,
-          zipcode: profileData.zipcode,
-          username: profileData.username || user.username,
-          displayName: profileData.displayName || user.displayName,
-          // Professional fields
-          tagline: profileData.tagline,
-          description: profileData.description,
-          website: profileData.website,
-          experience: profileData.experience ? parseInt(profileData.experience) : null,
-          rate: profileData.rate ? parseInt(profileData.rate) : null,
-          published: user.role !== 'user', // Publish profile for professionals
-          isActive: true,
-        },
-        create: {
-          uid: user.id,
-          // Profile fields from onboarding
-          firstName: profileData.firstName,
-          lastName: profileData.lastName,
-          phone: profileData.phone,
-          city: profileData.city,
-          county: profileData.county,
-          zipcode: profileData.zipcode,
-          username: profileData.username || user.username,
-          displayName: profileData.displayName || user.displayName,
-          // Professional fields
-          tagline: profileData.tagline,
-          description: profileData.description,
-          website: profileData.website,
-          experience: profileData.experience ? parseInt(profileData.experience) : null,
-          rate: profileData.rate ? parseInt(profileData.rate) : null,
-          published: user.role !== 'user', // Publish profile for professionals
-          isActive: true,
-        },
-      });
-    }
-
-    return { 
-      success: true
+    return {
+      success: true,
+      message: 'Η εγγραφή ολοκληρώθηκε επιτυχώς!',
     };
-
-  } catch (error) {
-    console.error('Error completing onboarding:', error);
-    return { 
-      success: false, 
-      error: 'Failed to complete onboarding' 
-    };
+  } catch (error: any) {
+    // Use comprehensive Better Auth error handling
+    return handleBetterAuthError(error);
   }
 }

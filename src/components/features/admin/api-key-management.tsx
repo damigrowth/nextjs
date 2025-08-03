@@ -4,33 +4,67 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { 
-  KeyIcon, 
-  Plus, 
-  Copy, 
-  MoreHorizontal, 
-  Eye, 
-  EyeOff, 
-  Trash2, 
+import {
+  KeyIcon,
+  Plus,
+  Copy,
+  MoreHorizontal,
+  Eye,
+  EyeOff,
+  Trash2,
   Calendar,
   Shield,
   Clock,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
-import { 
-  createAdminApiKey, 
-  listAdminApiKeys, 
-  updateAdminApiKey, 
-  deleteAdminApiKey 
+import {
+  createAdminApiKey,
+  listAdminApiKeys,
+  updateAdminApiKey,
+  deleteAdminApiKey,
 } from '@/actions/admin/api-keys';
 
 interface ApiKey {
@@ -65,9 +99,9 @@ export function ApiKeyManagement() {
     try {
       setLoading(true);
       const result = await listAdminApiKeys();
-      
+
       if (result.success) {
-        setApiKeys(result.data);
+        // setApiKeys(result.data);
       } else {
         toast.error(result.error || 'Failed to load API keys');
       }
@@ -117,7 +151,7 @@ export function ApiKeyManagement() {
   const handleToggleKey = async (keyId: string, enabled: boolean) => {
     try {
       const result = await updateAdminApiKey(keyId, { enabled });
-      
+
       if (result.success) {
         toast.success(`API key ${enabled ? 'enabled' : 'disabled'}`);
         loadApiKeys();
@@ -133,7 +167,7 @@ export function ApiKeyManagement() {
   const handleDeleteKey = async (keyId: string) => {
     try {
       const result = await deleteAdminApiKey(keyId);
-      
+
       if (result.success) {
         toast.success('API key deleted successfully');
         loadApiKeys();
@@ -168,91 +202,103 @@ export function ApiKeyManagement() {
 
   const getStatusBadge = (key: ApiKey) => {
     if (!key.enabled) {
-      return <Badge variant="secondary">Disabled</Badge>;
+      return <Badge variant='secondary'>Disabled</Badge>;
     }
     if (isExpired(key.expiresAt)) {
-      return <Badge variant="destructive">Expired</Badge>;
+      return <Badge variant='destructive'>Expired</Badge>;
     }
-    return <Badge variant="default">Active</Badge>;
+    return <Badge variant='default'>Active</Badge>;
   };
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className='flex items-center justify-between'>
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">API Key Management</h2>
-          <p className="text-muted-foreground">
+          <h2 className='text-2xl font-bold tracking-tight'>
+            API Key Management
+          </h2>
+          <p className='text-muted-foreground'>
             Manage admin API keys for secure access to the admin panel
           </p>
         </div>
         <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
           <DialogTrigger asChild>
             <Button>
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className='mr-2 h-4 w-4' />
               Create API Key
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className='sm:max-w-md'>
             <DialogHeader>
               <DialogTitle>Create Admin API Key</DialogTitle>
               <DialogDescription>
-                Generate a new API key for admin panel access. Keys expire after the specified duration.
+                Generate a new API key for admin panel access. Keys expire after
+                the specified duration.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Key Name *</Label>
+            <div className='grid gap-4 py-4'>
+              <div className='space-y-2'>
+                <Label htmlFor='name'>Key Name *</Label>
                 <Input
-                  id="name"
-                  placeholder="e.g., Client Admin Access"
+                  id='name'
+                  placeholder='e.g., Client Admin Access'
                   value={createForm.name}
-                  onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, name: e.target.value })
+                  }
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="expiresIn">Expires In</Label>
-                <Select 
-                  value={createForm.expiresIn.toString()} 
-                  onValueChange={(value) => setCreateForm({ ...createForm, expiresIn: parseInt(value) })}
+              <div className='space-y-2'>
+                <Label htmlFor='expiresIn'>Expires In</Label>
+                <Select
+                  value={createForm.expiresIn.toString()}
+                  onValueChange={(value) =>
+                    setCreateForm({ ...createForm, expiresIn: parseInt(value) })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="30">30 days</SelectItem>
-                    <SelectItem value="90">90 days</SelectItem>
-                    <SelectItem value="180">6 months</SelectItem>
-                    <SelectItem value="365">1 year</SelectItem>
+                    <SelectItem value='30'>30 days</SelectItem>
+                    <SelectItem value='90'>90 days</SelectItem>
+                    <SelectItem value='180'>6 months</SelectItem>
+                    <SelectItem value='365'>1 year</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="purpose">Purpose</Label>
+              <div className='space-y-2'>
+                <Label htmlFor='purpose'>Purpose</Label>
                 <Input
-                  id="purpose"
-                  placeholder="e.g., Admin panel access"
+                  id='purpose'
+                  placeholder='e.g., Admin panel access'
                   value={createForm.purpose}
-                  onChange={(e) => setCreateForm({ ...createForm, purpose: e.target.value })}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, purpose: e.target.value })
+                  }
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="owner">Owner</Label>
+              <div className='space-y-2'>
+                <Label htmlFor='owner'>Owner</Label>
                 <Input
-                  id="owner"
-                  placeholder="e.g., Client name"
+                  id='owner'
+                  placeholder='e.g., Client name'
                   value={createForm.owner}
-                  onChange={(e) => setCreateForm({ ...createForm, owner: e.target.value })}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, owner: e.target.value })
+                  }
                 />
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setCreateModalOpen(false)}>
+              <Button
+                variant='outline'
+                onClick={() => setCreateModalOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleCreateApiKey}>
-                Create Key
-              </Button>
+              <Button onClick={handleCreateApiKey}>Create Key</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -260,42 +306,45 @@ export function ApiKeyManagement() {
 
       {/* Environment Variables Info */}
       <Alert>
-        <Shield className="h-4 w-4" />
+        <Shield className='h-4 w-4' />
         <AlertDescription>
-          <strong>Environment Variables:</strong> You can also set <code>ADMIN_API_KEYS</code> in your environment for fallback access.
+          <strong>Environment Variables:</strong> You can also set{' '}
+          <code>ADMIN_API_KEYS</code> in your environment for fallback access.
           Database keys provide better management and audit capabilities.
         </AlertDescription>
       </Alert>
 
       {/* New Key Display */}
       {showKey && (
-        <Alert className="border-green-200 bg-green-50">
-          <KeyIcon className="h-4 w-4" />
+        <Alert className='border-green-200 bg-green-50'>
+          <KeyIcon className='h-4 w-4' />
           <AlertDescription>
-            <div className="space-y-2">
-              <p className="font-medium text-green-800">API Key Created Successfully!</p>
-              <div className="flex items-center gap-2">
-                <code className="bg-white px-2 py-1 rounded text-sm font-mono text-green-900 border">
+            <div className='space-y-2'>
+              <p className='font-medium text-green-800'>
+                API Key Created Successfully!
+              </p>
+              <div className='flex items-center gap-2'>
+                <code className='bg-white px-2 py-1 rounded text-sm font-mono text-green-900 border'>
                   {showKey}
                 </code>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
+                <Button
+                  size='sm'
+                  variant='outline'
                   onClick={() => copyToClipboard(showKey)}
-                  className="h-8"
+                  className='h-8'
                 >
-                  <Copy className="h-3 w-3" />
+                  <Copy className='h-3 w-3' />
                 </Button>
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
+                <Button
+                  size='sm'
+                  variant='ghost'
                   onClick={() => setShowKey(null)}
-                  className="h-8"
+                  className='h-8'
                 >
-                  <EyeOff className="h-3 w-3" />
+                  <EyeOff className='h-3 w-3' />
                 </Button>
               </div>
-              <p className="text-xs text-green-700">
+              <p className='text-xs text-green-700'>
                 Save this key securely. You won't be able to see it again!
               </p>
             </div>
@@ -313,18 +362,20 @@ export function ApiKeyManagement() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-center">
-                <KeyIcon className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                <p className="text-muted-foreground">Loading API keys...</p>
+            <div className='flex items-center justify-center py-8'>
+              <div className='text-center'>
+                <KeyIcon className='mx-auto h-8 w-8 text-muted-foreground mb-2' />
+                <p className='text-muted-foreground'>Loading API keys...</p>
               </div>
             </div>
           ) : apiKeys.length === 0 ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-center">
-                <KeyIcon className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                <p className="text-muted-foreground">No API keys found</p>
-                <p className="text-sm text-muted-foreground">Create your first admin API key to get started</p>
+            <div className='flex items-center justify-center py-8'>
+              <div className='text-center'>
+                <KeyIcon className='mx-auto h-8 w-8 text-muted-foreground mb-2' />
+                <p className='text-muted-foreground'>No API keys found</p>
+                <p className='text-sm text-muted-foreground'>
+                  Create your first admin API key to get started
+                </p>
               </div>
             </div>
           ) : (
@@ -337,7 +388,7 @@ export function ApiKeyManagement() {
                   <TableHead>Created</TableHead>
                   <TableHead>Expires</TableHead>
                   <TableHead>Usage</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className='text-right'>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -345,69 +396,73 @@ export function ApiKeyManagement() {
                   <TableRow key={key.id}>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{key.name}</div>
+                        <div className='font-medium'>{key.name}</div>
                         {key.metadata?.owner && (
-                          <div className="text-sm text-muted-foreground">
+                          <div className='text-sm text-muted-foreground'>
                             Owner: {key.metadata.owner}
                           </div>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <code className="text-xs bg-muted px-2 py-1 rounded">
+                      <code className='text-xs bg-muted px-2 py-1 rounded'>
                         {key.start}...
                       </code>
                     </TableCell>
+                    <TableCell>{getStatusBadge(key)}</TableCell>
                     <TableCell>
-                      {getStatusBadge(key)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1 text-sm">
-                        <Calendar className="h-3 w-3" />
+                      <div className='flex items-center gap-1 text-sm'>
+                        <Calendar className='h-3 w-3' />
                         {formatDate(key.createdAt)}
                       </div>
                     </TableCell>
                     <TableCell>
                       {key.expiresAt ? (
-                        <div className={`flex items-center gap-1 text-sm ${isExpired(key.expiresAt) ? 'text-destructive' : ''}`}>
-                          <Clock className="h-3 w-3" />
+                        <div
+                          className={`flex items-center gap-1 text-sm ${isExpired(key.expiresAt) ? 'text-destructive' : ''}`}
+                        >
+                          <Clock className='h-3 w-3' />
                           {formatDate(key.expiresAt)}
                         </div>
                       ) : (
-                        <span className="text-sm text-muted-foreground">Never</span>
+                        <span className='text-sm text-muted-foreground'>
+                          Never
+                        </span>
                       )}
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm">
+                      <div className='text-sm'>
                         <div>{key.requestCount} requests</div>
                         {key.lastRequest && (
-                          <div className="text-muted-foreground">
+                          <div className='text-muted-foreground'>
                             Last: {formatDate(key.lastRequest)}
                           </div>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className='text-right'>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
+                          <Button variant='ghost' className='h-8 w-8 p-0'>
+                            <span className='sr-only'>Open menu</span>
+                            <MoreHorizontal className='h-4 w-4' />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align='end'>
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuItem
-                            onClick={() => handleToggleKey(key.id, !key.enabled)}
+                            onClick={() =>
+                              handleToggleKey(key.id, !key.enabled)
+                            }
                           >
                             {key.enabled ? 'Disable' : 'Enable'} Key
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={() => handleDeleteKey(key.id)}
-                            className="text-destructive"
+                            className='text-destructive'
                           >
-                            <Trash2 className="mr-2 h-4 w-4" />
+                            <Trash2 className='mr-2 h-4 w-4' />
                             Delete Key
                           </DropdownMenuItem>
                         </DropdownMenuContent>

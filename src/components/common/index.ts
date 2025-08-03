@@ -3,7 +3,7 @@
  * Shared/reusable components across the application
  */
 
-export { default as NotFound } from './404';
+export { default as Four0Four } from './404';
 
 // Additional common components will be moved here
 // export { default as LoadingSpinner } from './loading-spinner';

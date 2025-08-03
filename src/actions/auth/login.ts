@@ -3,119 +3,103 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { loginSchema } from '@/lib/validations/auth';
-import { ActionResult } from '@/lib/types/api';
+import { ActionResult, ActionResponse } from '@/lib/types/api';
 import { LoginInput } from '@/lib/validations/auth';
+import { AuthUser } from '@/lib/types/auth';
+import { headers } from 'next/headers';
+import { PrismaClient } from '@prisma/client';
+import { getFormString } from '@/lib/utils/form';
+import { createValidationErrorResponse } from '@/lib/utils/zod';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
 
-export async function login(prevState: any, formData: FormData): Promise<ActionResult<void>> {
+const prisma = new PrismaClient();
+
+export async function login(
+  prevState: ActionResponse | null,
+  formData: FormData,
+): Promise<ActionResponse> {
+  let user: AuthUser;
+
   try {
     const validatedFields = loginSchema.safeParse({
-      identifier: formData.get('identifier'),
-      password: formData.get('password'),
+      identifier: getFormString(formData, 'identifier'),
+      password: getFormString(formData, 'password'),
     });
 
     if (!validatedFields.success) {
-      return {
-        success: false,
-        error: 'Invalid login credentials',
-        fieldErrors: validatedFields.error.flatten().fieldErrors,
-      };
+      return createValidationErrorResponse(
+        validatedFields.error,
+        'Μη έγκυρα στοιχεία σύνδεσης',
+      );
     }
 
     const { identifier, password } = validatedFields.data;
 
+    // Validate that identifier is an email (Better Auth requires email)
+    if (!identifier.includes('@')) {
+      return {
+        success: false,
+        message: 'Παρακαλώ εισάγετε μια έγκυρη διεύθυνση email',
+      };
+    }
+
     // Use Better Auth to sign in
     const result = await auth.api.signInEmail({
       body: {
-        email: identifier.includes('@') ? identifier : `${identifier}@example.com`, // Handle username case
+        email: identifier,
         password,
       },
+      headers: await headers(),
     });
 
     if (!result.user) {
       return {
         success: false,
-        error: 'Invalid email or password',
+        message: 'Λάθος email ή κωδικός πρόσβασης',
       };
     }
 
-    // Check user status and redirect appropriately
-    const user = result.user as any;
-    
+    // Get complete user data from database (session might be null due to Better Auth limitation)
+    const basicUser = result.user;
+    const dbUser = await prisma.user.findUnique({
+      where: { id: basicUser.id },
+    });
+
+    if (!dbUser) {
+      return {
+        success: false,
+        message: 'Λογαριασμός δεν βρέθηκε',
+      };
+    }
+
+    user = dbUser as AuthUser;
+
     if (user.blocked) {
       return {
         success: false,
-        error: 'Your account has been blocked',
+        message: 'Ο λογαριασμός σας έχει αποκλειστεί',
       };
     }
-
-    if (!user.emailVerified) {
-      redirect('/email-confirmation');
-    }
-
-    // Redirect based on user step and role
-    if (user.step === 'ONBOARDING') {
-      redirect('/onboarding');
-    } else if (user.step === 'DASHBOARD') {
-      if (user.role === 'admin') {
-        redirect('/admin');
-      } else {
-        redirect('/dashboard');
-      }
-    } else {
-      redirect('/email-confirmation');
-    }
-
-  } catch (error) {
-    console.error('Login error:', error);
-    return {
-      success: false,
-      error: 'Login failed. Please try again.',
-    };
+  } catch (error: any) {
+    // Use comprehensive Better Auth error handling
+    return handleBetterAuthError(error);
   }
-}
 
-/**
- * Alternative login function using Better Auth client-side approach
- */
-export async function loginWithCredentials(input: LoginInput): Promise<ActionResult<{ user: any; session: any }>> {
-  try {
-    const validatedFields = loginSchema.safeParse(input);
+  // Handle redirects outside try/catch
+  if (!user.emailVerified) {
+    redirect('/register/success');
+  }
 
-    if (!validatedFields.success) {
-      return {
-        success: false,
-        error: 'Invalid input',
-      };
+  // Redirect based on user step and role
+  if (user.step === 'ONBOARDING') {
+    redirect('/onboarding');
+  } else if (user.step === 'DASHBOARD') {
+    if (user.role === 'admin') {
+      redirect('/admin');
+    } else {
+      redirect('/dashboard');
     }
-
-    const { identifier, password } = validatedFields.data;
-    
-    const result = await auth.api.signInEmail({
-      body: {
-        email: identifier.includes('@') ? identifier : `${identifier}@example.com`,
-        password,
-      },
-    });
-
-    if (!result.user || !result.session) {
-      return {
-        success: false,
-        error: 'Invalid credentials',
-      };
-    }
-
-    return {
-      success: true,
-      data: {
-        user: result.user,
-        session: result.session,
-      },
-    };
-  } catch (error) {
-    console.error('Login error:', error);
-    return {
-      success: false,
-      error: 'Login failed. Please try again.',
-    };
+  } else {
+    redirect('/register/success');
   }
 }

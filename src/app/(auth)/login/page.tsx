@@ -1,12 +1,14 @@
+import { JSX } from 'react';
 import { Metadata } from 'next';
 import LinkNP from '@/components/link';
 
 import { Meta } from '@/lib/seo/Meta';
-import {
-  redirectOnboardingUsers,
-  redirectCompletedUsers,
-} from '@/actions/shared/auth';
+
 import { LoginForm } from '@/components/forms';
+import {
+  redirectCompletedUsers,
+  redirectOnboardingUsers,
+} from '@/actions/auth/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,7 +53,7 @@ export default async function LoginPage(): Promise<JSX.Element> {
 
         {/* Form Section */}
         <div className='flex justify-center'>
-          <div className='xl:w-1/2 w-full max-w-2xl'>
+          <div className='xl:w-1/3 w-full max-w-2xl'>
             <div className='relative bg-white p-12 sm:p-8 rounded-xl shadow-lg border border-gray-300'>
               <div className='mb-8'>
                 <h4 className='text-xl font-semibold text-gray-900 mb-2'>

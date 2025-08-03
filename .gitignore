@@ -66,3 +66,6 @@ sentry.client.config.js
 README.md
 public
 public/css/animate.css
+docs
+legacy
+*.md
