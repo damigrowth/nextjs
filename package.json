@@ -5,7 +5,7 @@
   "engine": "yarn",
   "scripts": {
     "dev": "next dev --turbo",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "db:pull": "npx prisma db pull --schema=./src/lib/prisma/schema/",
