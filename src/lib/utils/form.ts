@@ -140,3 +140,77 @@ export function extractFormData<T extends Record<string, any>>(
 
   return { data, errors };
 }
+
+/**
+ * Parse JSON string or return object/default value
+ * Handles database JSON strings that may come as strings or objects
+ */
+export function parseJSONValue<T>(value: string | T | null | undefined, defaultValue: T): T {
+  // If value is null or undefined, return default
+  if (value === null || value === undefined) {
+    return defaultValue;
+  }
+  
+  // If value is already an object (not a string), return it
+  if (typeof value !== 'string') {
+    return value as T;
+  }
+  
+  // If value is a string, try to parse it as JSON
+  try {
+    return JSON.parse(value) as T;
+  } catch (error) {
+    console.error('Error parsing JSON value:', error, { value });
+    return defaultValue;
+  }
+}
+
+/**
+ * Populate FormData from React Hook Form values
+ * Automatically handles string fields, numeric fields, and JSON serialization
+ */
+export function populateFormData<T extends Record<string, any>>(
+  formData: FormData,
+  values: T,
+  config: {
+    stringFields?: (keyof T)[];
+    numericFields?: (keyof T)[];
+    jsonFields?: (keyof T)[];
+    booleanFields?: (keyof T)[];
+    skipEmpty?: boolean;
+  } = {}
+): void {
+  const { stringFields = [], numericFields = [], jsonFields = [], booleanFields = [], skipEmpty = true } = config;
+
+  // Add string fields
+  stringFields.forEach(field => {
+    const value = values[field];
+    if (!skipEmpty || (value !== null && value !== undefined && value !== '')) {
+      formData.set(field as string, String(value));
+    }
+  });
+
+  // Add numeric fields
+  numericFields.forEach(field => {
+    const value = values[field];
+    if (!skipEmpty || (value !== null && value !== undefined)) {
+      formData.set(field as string, String(value));
+    }
+  });
+
+  // Add JSON fields
+  jsonFields.forEach(field => {
+    const value = values[field];
+    if (!skipEmpty || (value !== null && value !== undefined)) {
+      formData.set(field as string, JSON.stringify(value));
+    }
+  });
+
+  // Add boolean fields
+  booleanFields.forEach(field => {
+    const value = values[field];
+    if (!skipEmpty || (value !== null && value !== undefined)) {
+      formData.set(field as string, value ? 'true' : 'false');
+    }
+  });
+}

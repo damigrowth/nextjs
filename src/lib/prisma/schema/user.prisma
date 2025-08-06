@@ -34,8 +34,9 @@ model Profile {
   tagline         String?
   bio             String?
   website         String?
-  experience      Int?
-  rate            Int?
+  
+  
+  
   size            String?
   skills          String[]     // Array of skill IDs from taxonomy  
   speciality      String?      // Speciality ID from taxonomy
@@ -53,6 +54,25 @@ model Profile {
   // Media fields for onboarding form
   image           Json?        // Profile image CloudinaryResource
   portfolio       Json?        // Portfolio media CloudinaryResource array
+
+  // Presentation fields
+  visibility      Json?        // Visibility settings {email, phone, address}
+  socials         Json?        // Social media links {facebook, instagram, linkedin, x, youtube, github, behance, dribbble}
+  viber           String?      // Viber contact
+  whatsapp        String?      // WhatsApp contact
+
+  //  Additional fields
+  rate              Int?
+  commencement      String?
+  experience        Int?
+  contactMethods    String[]
+  paymentMethods    String[]
+  settlementMethods String[]
+  budget            String?
+  industries        String[]
+  terms             String?
+  billing           Json?        // Billing information {receipt: boolean, invoice: boolean, afm: string, doy: string, name: string, profession: string, address: string}
+
   
   verified        Boolean      @default(false)
   featured        Boolean      @default(false)
@@ -68,11 +88,33 @@ model Profile {
   user            User         @relation(fields: [uid], references: [id], onDelete: Cascade)
   reviewsReceived Review[]     @relation("ReviewReceiver")
   services        Service[]
+  verification    Verification?
 
   @@index([uid])
   @@index([published, featured])
   @@index([verified, rating])
   @@map("profiles")
+}
+
+model Verification {
+  id        String   @id @default(cuid())
+  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  afm       String?  // Greek Tax ID (AFM)
+  name      String?  // Full business/personal name
+  address   String?  // Business address
+  phone     String?  // Contact phone
+  uid       String   // User ID reference
+  pid       String   @unique // Profile ID reference
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  profile   Profile  @relation(fields: [pid], references: [id], onDelete: Cascade)
+
+  @@index([uid])
+  @@index([pid])
+  @@index([status])
+  @@map("verifications")
 }
 
 enum UserType {

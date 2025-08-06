@@ -11,6 +11,12 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
   }),
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // Cache session data for 5 minutes in signed cookies
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
@@ -70,11 +76,11 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (user, context) => {
-          console.log('User creation before hook - user data:', user);
-          console.log(
-            'User creation before hook - context body:',
-            context.body,
-          );
+          // console.log('User creation before hook - user data:', user);
+          // console.log(
+          //   'User creation before hook - context body:',
+          //   context.body,
+          // );
 
           // Get the role from the request body and set it in the user data
           const requestRole = context.body?.role || 'user';
@@ -84,12 +90,12 @@ export const auth = betterAuth({
             role: requestRole, // Override the role with the one from the request
           };
 
-          console.log('Updated user with role:', updatedUser.role);
+          // console.log('Updated user with role:', updatedUser.role);
 
           return { data: updatedUser };
         },
         after: async (user) => {
-          console.log('User created - Full user object:', user);
+          // console.log('User created - Full user object:', user);
 
           // Set initial step based on role
           await prisma.user.update({
@@ -111,11 +117,11 @@ export const auth = betterAuth({
             userWithFields.emailVerified &&
             userWithFields.step === 'EMAIL_VERIFICATION'
           ) {
-            console.log('Email verification completed for user:', {
-              id: userWithFields.id,
-              email: userWithFields.email,
-              role: userWithFields.role,
-            });
+            // console.log('Email verification completed for user:', {
+            //   id: userWithFields.id,
+            //   email: userWithFields.email,
+            //   role: userWithFields.role,
+            // });
 
             // Update user step after email verification
             if (
@@ -138,11 +144,11 @@ export const auth = betterAuth({
               }
             } else {
               // Professional users (freelancer/company) go to onboarding
-              console.log('Setting professional user step to ONBOARDING:', {
-                userId: userWithFields.id,
-                role: userWithFields.role,
-                currentStep: userWithFields.step,
-              });
+              // console.log('Setting professional user step to ONBOARDING:', {
+              //   userId: userWithFields.id,
+              //   role: userWithFields.role,
+              //   currentStep: userWithFields.step,
+              // });
 
               const updatedUser = await prisma.user.update({
                 where: { id: userWithFields.id },
@@ -152,11 +158,11 @@ export const auth = betterAuth({
                 },
               });
 
-              console.log('User step updated successfully:', {
-                userId: updatedUser.id,
-                newStep: updatedUser.step,
-                role: updatedUser.role,
-              });
+              // console.log('User step updated successfully:', {
+              // userId: updatedUser.id,
+              // newStep: updatedUser.step,
+              //   role: updatedUser.role,
+              // });
             }
           }
         },

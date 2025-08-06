@@ -265,9 +265,9 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
           if (
             resources.some((r) => r.public_id === cloudinaryResource.public_id)
           ) {
-            console.log(
-              `Duplicate found: ${cloudinaryResource.public_id}, skipping`,
-            );
+            // console.log(
+            //   `Duplicate found: ${cloudinaryResource.public_id}, skipping`,
+            // );
             continue;
           }
 

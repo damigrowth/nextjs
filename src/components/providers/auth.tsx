@@ -7,6 +7,7 @@ import {
   AuthContextType,
   ProfileWithRelations,
 } from '@/lib/types/auth';
+import { convertImageData } from '@/lib/utils/media';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -76,6 +77,22 @@ const initialState: Omit<
   isActive: false,
   profileCreatedAt: null,
   profileUpdatedAt: null,
+
+  // Additional profile fields
+  commencement: null,
+  contactMethods: null,
+  paymentMethods: null,
+  settlementMethods: null,
+  budget: null,
+  industries: null,
+  terms: null,
+  billing: null,
+
+  // Presentation fields
+  visibility: null,
+  socials: null,
+  viber: null,
+  whatsapp: null,
 
   // Relations
   services: [],
@@ -195,15 +212,7 @@ export function AuthProvider({
               lastName: profileData.lastName,
               phone: profileData.phone,
               coverage: profileData.coverage,
-              image:
-                typeof profileData.image === 'object' &&
-                profileData.image &&
-                !Array.isArray(profileData.image) &&
-                'secure_url' in profileData.image
-                  ? (profileData.image as any).secure_url
-                  : typeof profileData.image === 'string'
-                    ? profileData.image
-                    : null,
+              image: convertImageData(profileData.image),
               portfolio: profileData.portfolio,
               verified: profileData.verified,
               featured: profileData.featured,
@@ -213,6 +222,20 @@ export function AuthProvider({
               isActive: profileData.isActive,
               profileCreatedAt: profileData.createdAt,
               profileUpdatedAt: profileData.updatedAt,
+              // Additional profile fields
+              commencement: profileData.commencement,
+              contactMethods: profileData.contactMethods,
+              paymentMethods: profileData.paymentMethods,
+              settlementMethods: profileData.settlementMethods,
+              budget: profileData.budget,
+              industries: profileData.industries,
+              terms: profileData.terms,
+              billing: profileData.billing,
+              // Presentation fields
+              visibility: profileData.visibility,
+              socials: profileData.socials,
+              viber: profileData.viber,
+              whatsapp: profileData.whatsapp,
               // Relations
               services: profileData.services || [],
               reviewsReceived: profileData.reviewsReceived || [],

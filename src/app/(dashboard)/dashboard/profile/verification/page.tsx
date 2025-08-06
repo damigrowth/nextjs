@@ -1,18 +1,16 @@
 import { VerificationForm } from '@/components/forms/profile';
+import { VerificationStatus } from '@/components/profile/verification-status';
+import { getVerificationStatus } from '@/actions/profiles/verification';
 
-export default function VerificationPage() {
+export default async function VerificationPage() {
+  // Fetch verification data server-side
+  const verificationResult = await getVerificationStatus();
+  const verificationData = verificationResult.success ? verificationResult.data : null;
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Πιστοποίηση</h1>
-        <p className="text-muted-foreground">
-          Πιστοποιήστε την ταυτότητα και τα στοιχεία σας
-        </p>
-      </div>
-      
-      <div className="bg-card rounded-lg p-6">
-        <VerificationForm />
-      </div>
+    <div className='space-y-6'>
+      <VerificationStatus verificationData={verificationData} />
+      <VerificationForm verificationData={verificationData} />
     </div>
   );
 }

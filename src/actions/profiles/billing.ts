@@ -6,18 +6,18 @@ import { ActionResult, ActionResponse } from '@/lib/types/api';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
 import { Prisma } from '@prisma/client';
 import {
-  profileBasicInfoUpdateSchema,
-  type ProfileBasicInfoUpdateInput,
+  billingSchema,
+  type BillingInput,
 } from '@/lib/validations/profile';
-import { getFormString, getFormJSON } from '@/lib/utils/form';
+import { getFormString, getFormBoolean } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
 
 /**
- * Server action wrapper for useActionState
+ * Server action for updating profile billing information
  * Follows SERVER_ACTIONS_PATTERNS.md template
  */
-export async function updateProfileBasicInfo(
+export async function updateProfileBilling(
   prevState: ActionResponse | null,
   formData: FormData,
 ): Promise<ActionResponse> {
@@ -36,55 +36,35 @@ export async function updateProfileBasicInfo(
     }
 
     // 3. Extract form data using utility functions
-    const tagline = getFormString(formData, 'tagline');
-    const bio = getFormString(formData, 'bio');
-    const category = getFormString(formData, 'category');
-    const subcategory = getFormString(formData, 'subcategory');
-    const speciality = getFormString(formData, 'speciality');
+    const receipt = getFormBoolean(formData, 'receipt');
+    const invoice = getFormBoolean(formData, 'invoice');
+    const afm = getFormString(formData, 'afm');
+    const doy = getFormString(formData, 'doy');
+    const name = getFormString(formData, 'name');
+    const profession = getFormString(formData, 'profession');
+    const address = getFormString(formData, 'address');
 
-
-    // Parse JSON fields with proper error handling
-    const imageData = getFormJSON<any>(formData, 'image', null);
-    const skillsData = getFormJSON<string[]>(formData, 'skills', []);
-    const coverageData = getFormJSON<any>(formData, 'coverage', {});
-
-    // 4. Validate JSON fields
-    if (formData.get('image') && !imageData) {
-      return {
-        success: false,
-        message: 'Λάθος δεδομένα εικόνας προφίλ',
-      };
-    }
-
-    if (formData.get('coverage') && Object.keys(coverageData).length === 0) {
-      return {
-        success: false,
-        message: 'Λάθος δεδομένα κάλυψης υπηρεσιών',
-      };
-    }
-
-    // 5. Validate form data with Zod schema
-    const validationResult = profileBasicInfoUpdateSchema.safeParse({
-      tagline,
-      bio,
-      category,
-      subcategory,
-      speciality,
-      image: imageData,
-      skills: skillsData,
-      coverage: coverageData,
+    // 4. Validate form data with Zod schema
+    const validationResult = billingSchema.safeParse({
+      receipt,
+      invoice,
+      afm,
+      doy,
+      name,
+      profession,
+      address,
     });
 
     if (!validationResult.success) {
       return createValidationErrorResponse(
         validationResult.error,
-        'Μη έγκυρα δεδομένα προφίλ',
+        'Μη έγκυρα δεδομένα τιμολόγησης',
       );
     }
 
     const data = validationResult.data;
 
-    // 6. Check if profile exists - we only update, never create
+    // 5. Check if profile exists - we only update, never create
     const existingProfile = await prisma.profile.findUnique({
       where: { uid: user.id },
     });
@@ -97,18 +77,22 @@ export async function updateProfileBasicInfo(
       };
     }
 
-    // 7. Update profile with proper JSON handling
+    // 6. Prepare billing data object
+    const billingData = {
+      receipt: data.receipt,
+      invoice: data.invoice,
+      afm: data.afm || '',
+      doy: data.doy || '',
+      name: data.name || '',
+      profession: data.profession || '',
+      address: data.address || '',
+    };
+
+    // 7. Update profile with billing information
     await prisma.profile.update({
       where: { uid: user.id },
       data: {
-        tagline: data.tagline,
-        bio: data.bio,
-        category: data.category,
-        subcategory: data.subcategory,
-        speciality: data.speciality,
-        skills: data.skills || [],
-        coverage: data.coverage as Prisma.JsonValue,
-        image: data.image as Prisma.JsonValue,
+        billing: billingData as Prisma.JsonValue,
         updatedAt: new Date(),
       },
     });
@@ -121,7 +105,7 @@ export async function updateProfileBasicInfo(
 
     return {
       success: true,
-      message: 'Το προφίλ σας ενημερώθηκε επιτυχώς!',
+      message: 'Τα στοιχεία τιμολόγησης ενημερώθηκαν επιτυχώς!',
     };
   } catch (error: any) {
     // 9. Use comprehensive Better Auth error handling

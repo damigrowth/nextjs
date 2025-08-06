@@ -9,31 +9,45 @@ import { ActionResponse } from '@/lib/types/api';
  * Greek translations for Better Auth error messages
  */
 const EL_GR: Record<string, string> = {
-  // Authentication errors
-  INVALID_EMAIL: 'Μη έγκυρο email',
-  INVALID_PASSWORD: 'Μη έγκυρος κωδικός',
-  INVALID_EMAIL_OR_PASSWORD: 'Μη έγκυρο email ή κωδικός',
-  INVALID_TOKEN: 'Μη έγκυρο token',
-
   // User related errors
-  USER_NOT_FOUND: 'Ο χρήστης δεν βρέθηκε',
+  USER_NOT_FOUND: 'Ο χρήστης δεν υπάρχει',
+  FAILED_TO_CREATE_USER: 'Αποτυχία δημιουργίας χρήστη',
+  FAILED_TO_UPDATE_USER: 'Αποτυχία ενημέρωσης χρήστη',
   USER_ALREADY_EXISTS: 'Ο χρήστης υπάρχει ήδη',
-  EMAIL_ALREADY_EXISTS: 'Το email δεν είναι διαθέσιμο',
   USER_EMAIL_NOT_FOUND: 'Το email του χρήστη δεν βρέθηκε',
-  EMAIL_NOT_VERIFIED: 'Το email δεν έχει επαληθευτεί',
-  ACCOUNT_NOT_FOUND: 'Ο λογαριασμός δεν βρέθηκε',
+  USER_ALREADY_HAS_PASSWORD: 'Ο χρήστης έχει ήδη κωδικό',
+  EMAIL_ALREADY_EXISTS: 'Το email δεν είναι διαθέσιμο',
   ACCOUNT_BLOCKED: 'Ο λογαριασμός έχει αποκλειστεί',
+
+  // Session related errors
+  FAILED_TO_CREATE_SESSION: 'Αποτυχία δημιουργίας συνεδρίας',
+  FAILED_TO_GET_SESSION: 'Αποτυχία ανάκτησης συνεδρίας',
+  SESSION_EXPIRED: 'Η συνεδρία έληξε',
+
+  // Authentication errors
+  INVALID_PASSWORD: 'Λάθος κωδικός',
+  INVALID_EMAIL: 'Λάθος email',
+  INVALID_EMAIL_OR_PASSWORD: 'Λάθος email ή κωδικός',
+  INVALID_TOKEN: 'Λάθος token',
+  EMAIL_NOT_VERIFIED: 'Το email δεν έχει επαληθευτεί',
+  CREDENTIAL_ACCOUNT_NOT_FOUND: 'Δεν βρέθηκε ο λογαριασμός',
 
   // Password related errors
   PASSWORD_TOO_SHORT: 'Ο κωδικός είναι πολύ μικρός',
   PASSWORD_TOO_LONG: 'Ο κωδικός είναι πολύ μεγάλος',
 
-  // Session related errors
-  SESSION_EXPIRED: 'Η συνεδρία έχει λήξει. Συνδεθείτε ξανά για να συνεχίσετε.',
+  // Social auth errors
+  SOCIAL_ACCOUNT_ALREADY_LINKED: 'Ο λογαριασμός κοινωνικού μέσου έχει συνδεθεί ήδη',
+  PROVIDER_NOT_FOUND: 'Δεν βρέθηκε ο πάροχος',
+  ID_TOKEN_NOT_SUPPORTED: 'Το id_token δεν υποστηρίζεται',
+  FAILED_TO_GET_USER_INFO: 'Αποτυχία ανάκτησης πληροφοριών του χρήστη',
+
+  // Account management errors
+  EMAIL_CAN_NOT_BE_UPDATED: 'Το email δεν μπορεί να ενημερωθεί',
+  FAILED_TO_UNLINK_LAST_ACCOUNT: 'Αποτυχία αποσύνδεσης του τελευταίου λογαριασμού',
+  ACCOUNT_NOT_FOUND: 'Ο λογαριασμός δεν βρέθηκε',
 
   // Database/Server errors
-  FAILED_TO_CREATE_USER: 'Αποτυχία δημιουργίας χρήστη',
-  FAILED_TO_UPDATE_USER: 'Αποτυχία ενημέρωσης χρήστη',
   INTERNAL_ERROR: 'Σφάλμα διακομιστή',
 
   // Generic fallback
@@ -44,56 +58,76 @@ const EL_GR: Record<string, string> = {
  * Field mapping for specific error codes
  */
 const FIELD_MAPPING: Record<string, string> = {
+  // Email related
   INVALID_EMAIL: 'email',
   INVALID_EMAIL_OR_PASSWORD: 'email',
   USER_EMAIL_NOT_FOUND: 'email',
   EMAIL_NOT_VERIFIED: 'email',
   EMAIL_ALREADY_EXISTS: 'email',
   USER_ALREADY_EXISTS: 'email',
+  EMAIL_CAN_NOT_BE_UPDATED: 'email',
 
+  // Password related
   INVALID_PASSWORD: 'password',
   PASSWORD_TOO_SHORT: 'password',
   PASSWORD_TOO_LONG: 'password',
+  USER_ALREADY_HAS_PASSWORD: 'password',
 
+  // Token related
   INVALID_TOKEN: 'token',
+  ID_TOKEN_NOT_SUPPORTED: 'token',
+
+  // Account related
+  ACCOUNT_NOT_FOUND: 'account',
+  ACCOUNT_BLOCKED: 'account',
+  CREDENTIAL_ACCOUNT_NOT_FOUND: 'account',
+  SOCIAL_ACCOUNT_ALREADY_LINKED: 'account',
+  FAILED_TO_UNLINK_LAST_ACCOUNT: 'account',
 };
 
 /**
  * Simple error pattern detection for Better Auth errors
  */
 const ERROR_PATTERNS: Array<{ pattern: RegExp; code: string }> = [
+  // User patterns
+  { pattern: /user.*not.*found/i, code: 'USER_NOT_FOUND' },
+  { pattern: /failed.*create.*user/i, code: 'FAILED_TO_CREATE_USER' },
+  { pattern: /failed.*update.*user/i, code: 'FAILED_TO_UPDATE_USER' },
+  { pattern: /user.*already.*exists/i, code: 'USER_ALREADY_EXISTS' },
+  { pattern: /user.*already.*has.*password/i, code: 'USER_ALREADY_HAS_PASSWORD' },
+
   // Email patterns
-  {
-    pattern: /user already exists|email.*already.*exists|duplicate.*email/i,
-    code: 'EMAIL_ALREADY_EXISTS',
-  },
+  { pattern: /email.*already.*exists|duplicate.*email/i, code: 'EMAIL_ALREADY_EXISTS' },
   { pattern: /invalid.*email|email.*invalid/i, code: 'INVALID_EMAIL' },
-  {
-    pattern: /email.*not.*found|user.*not.*found/i,
-    code: 'USER_EMAIL_NOT_FOUND',
-  },
+  { pattern: /email.*not.*found/i, code: 'USER_EMAIL_NOT_FOUND' },
   { pattern: /email.*not.*verified/i, code: 'EMAIL_NOT_VERIFIED' },
+  { pattern: /email.*can.*not.*be.*updated/i, code: 'EMAIL_CAN_NOT_BE_UPDATED' },
+
+  // Session patterns
+  { pattern: /failed.*create.*session/i, code: 'FAILED_TO_CREATE_SESSION' },
+  { pattern: /failed.*get.*session/i, code: 'FAILED_TO_GET_SESSION' },
+  { pattern: /session.*expired|expired.*session/i, code: 'SESSION_EXPIRED' },
 
   // Password patterns
-  {
-    pattern: /wrong.*password|incorrect.*password|invalid.*password/i,
-    code: 'INVALID_PASSWORD',
-  },
-  {
-    pattern: /password.*too.*short|password.*minimum/i,
-    code: 'PASSWORD_TOO_SHORT',
-  },
-  {
-    pattern: /password.*too.*long|password.*maximum/i,
-    code: 'PASSWORD_TOO_LONG',
-  },
+  { pattern: /wrong.*password|incorrect.*password|invalid.*password/i, code: 'INVALID_PASSWORD' },
+  { pattern: /invalid.*email.*or.*password/i, code: 'INVALID_EMAIL_OR_PASSWORD' },
+  { pattern: /password.*too.*short|password.*minimum/i, code: 'PASSWORD_TOO_SHORT' },
+  { pattern: /password.*too.*long|password.*maximum/i, code: 'PASSWORD_TOO_LONG' },
+
+  // Token patterns
+  { pattern: /invalid.*token/i, code: 'INVALID_TOKEN' },
+  { pattern: /id.*token.*not.*supported/i, code: 'ID_TOKEN_NOT_SUPPORTED' },
 
   // Account patterns
+  { pattern: /credential.*account.*not.*found/i, code: 'CREDENTIAL_ACCOUNT_NOT_FOUND' },
   { pattern: /account.*not.*found/i, code: 'ACCOUNT_NOT_FOUND' },
   { pattern: /account.*blocked|blocked.*account/i, code: 'ACCOUNT_BLOCKED' },
 
-  // Session patterns
-  { pattern: /session.*expired|expired.*session/i, code: 'SESSION_EXPIRED' },
+  // Social auth patterns
+  { pattern: /social.*account.*already.*linked/i, code: 'SOCIAL_ACCOUNT_ALREADY_LINKED' },
+  { pattern: /provider.*not.*found/i, code: 'PROVIDER_NOT_FOUND' },
+  { pattern: /failed.*get.*user.*info/i, code: 'FAILED_TO_GET_USER_INFO' },
+  { pattern: /failed.*unlink.*last.*account/i, code: 'FAILED_TO_UNLINK_LAST_ACCOUNT' },
 
   // Generic patterns
   { pattern: /internal.*error|server.*error/i, code: 'INTERNAL_ERROR' },

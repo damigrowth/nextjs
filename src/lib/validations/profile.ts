@@ -56,7 +56,7 @@ export const createProfileSchema = z.object({
   isActive: z.boolean().default(false),
 });
 
-export const updateProfileBasicInfoActionSchema = createProfileSchema.partial();
+export const updateProfileBasicInfoSchema = createProfileSchema.partial();
 
 export const profileQuerySchema = z
   .object({
@@ -199,22 +199,18 @@ export const additionalProfileInfoSchema = z.object({
     .optional()
     .nullable(),
   terms: z.string().optional().nullable(),
-  minBudget: z.string().optional().nullable(),
+  budget: z.string().optional().nullable(), // Updated field name
   industries: z
     .array(z.string())
     .max(10, 'You can select up to 10 industries')
     .optional()
     .nullable(),
-  contactTypes: z.array(z.string()).optional().nullable(),
-  payment_methods: z.array(z.string()).optional().nullable(),
-  settlement_methods: z.array(z.string()).optional().nullable(),
+  contactMethods: z.array(z.string()).optional().nullable(), // Updated field name
+  paymentMethods: z.array(z.string()).optional().nullable(), // Updated field name
+  settlementMethods: z.array(z.string()).optional().nullable(), // Updated field name
   rate: z.number().min(10).max(50000).optional().nullable(),
-  commencement: z
-    .number()
-    .min(1900)
-    .max(new Date().getFullYear())
-    .optional()
-    .nullable(),
+  commencement: z.string().optional().nullable(), // Changed to string to match schema
+  experience: z.number().int().min(0).optional().nullable(), // Added experience field
 });
 
 // =============================================
@@ -343,20 +339,36 @@ export const presentationSchema = z.object({
     .optional()
     .nullable()
     .or(z.literal('')),
-  socials: socialMediaSchema.optional(),
+  socials: socialMediaSchema.optional().nullable(),
   phone: z
     .string()
     .regex(/^\d{10,12}$/, 'Enter a valid phone number (10-12 digits)')
     .optional()
     .nullable()
     .or(z.literal('')),
+  viber: z
+    .string()
+    .regex(/^\d{10,12}$/, 'Enter a valid Viber number (10-12 digits)')
+    .optional()
+    .nullable()
+    .or(z.literal('')),
+  whatsapp: z
+    .string()
+    .regex(/^\d{10,12}$/, 'Enter a valid WhatsApp number (10-12 digits)')
+    .optional()
+    .nullable()
+    .or(z.literal('')),
   visibility: z
     .object({
-      profile: z.boolean().default(true),
-      socials: z.boolean().default(true),
-      phone: z.boolean().default(true),
+      email: z.boolean(),
+      phone: z.boolean(),
+      address: z.boolean(),
     })
-    .optional(),
+    .default({
+      email: true,
+      phone: true,
+      address: true,
+    }),
   portfolio: z.array(z.any()).optional().nullable(),
 });
 
@@ -364,80 +376,84 @@ export const presentationSchema = z.object({
 // BILLING SCHEMAS
 // =============================================
 
-export const billingOptionalSchema = z.object({
-  receipt: z.boolean(),
-  invoice: z.boolean(),
-  afm: z
-    .number()
-    .refine((val) => val !== null && val.toString().length === 9, {
-      message: 'Tax number must be exactly 9 digits',
-    })
-    .nullable()
-    .refine((val) => val !== null, {
-      message: 'Tax number is required',
-    }),
-  doy: z.string().min(2, 'Tax office is required').optional().nullable(),
-  brandName: z.string().min(2, 'Brand name is required').optional().nullable(),
-  profession: z.string().min(2, 'Profession is required').optional().nullable(),
-  address: z.string().min(2, 'Address is required').optional().nullable(),
-});
-
-export const billingSchema = z.object({
-  receipt: z.boolean(),
-  invoice: z.boolean(),
-  afm: z
-    .number()
-    .refine((val) => val !== null && val.toString().length === 9, {
-      message: 'Tax number must be exactly 9 digits',
-    })
-    .nullable()
-    .refine((val) => val !== null, {
-      message: 'Tax number is required',
-    }),
-  doy: z
-    .string()
-    .min(2, 'Tax office is required')
-    .nullable()
-    .refine((val) => val !== null, {
-      message: 'Tax office is required',
-    }),
-  brandName: z
-    .string()
-    .min(2, 'Brand name is required')
-    .nullable()
-    .refine((val) => val !== null, {
-      message: 'Brand name is required',
-    }),
-  profession: z
-    .string()
-    .min(2, 'Profession is required')
-    .nullable()
-    .refine((val) => val !== null, {
-      message: 'Profession is required',
-    }),
-  address: z
-    .string()
-    .min(2, 'Address is required')
-    .nullable()
-    .refine((val) => val !== null, {
-      message: 'Address is required',
-    }),
-});
+export const billingSchema = z
+  .object({
+    receipt: z.boolean(),
+    invoice: z.boolean(),
+    afm: z.string().optional().or(z.literal('')),
+    doy: z.string().optional().or(z.literal('')),
+    name: z.string().optional().or(z.literal('')),
+    profession: z.string().optional().or(z.literal('')),
+    address: z.string().optional().or(z.literal('')),
+  })
+  .refine(
+    (data) => {
+      // At least one option must be selected
+      return data.receipt || data.invoice;
+    },
+    {
+      message: 'Παρακαλώ επιλέξτε τύπο παραστατικού',
+      path: ['billingType'], // Use a separate field that doesn't exist to avoid checkbox styling
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.invoice) {
+        return (
+          data.afm &&
+          data.afm.trim() !== '' &&
+          data.doy &&
+          data.doy.trim() !== '' &&
+          data.name &&
+          data.name.trim() !== '' &&
+          data.profession &&
+          data.profession.trim() !== '' &&
+          data.address &&
+          data.address.trim() !== ''
+        );
+      }
+      return true;
+    },
+    {
+      message: 'Όλα τα πεδία είναι υποχρεωτικά όταν επιλέγεται τιμολόγιο',
+      path: ['invoiceFields'], // Use a separate field to avoid checkbox styling
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.invoice && data.afm) {
+        return /^\d{9}$/.test(data.afm.trim());
+      }
+      return true;
+    },
+    {
+      message: 'Ο ΑΦΜ πρέπει να είναι ακριβώς 9 ψηφία',
+      path: ['afm'],
+    },
+  );
 
 // =============================================
 // VERIFICATION SCHEMA
 // =============================================
 
 export const verificationFormSchema = z.object({
-  afm: z.string().min(2, 'Tax number is required'),
-  brandName: z.string().min(2, 'Brand name is required').optional().nullable(),
-  address: z.string().min(2, 'Address is required').optional().nullable(),
-  phone: z.coerce
-    .number()
-    .min(1000000000, 'Phone number must be 10-12 digits')
-    .max(999999999999, 'Phone number must be 10-12 digits')
-    .optional()
-    .nullable(),
+  afm: z
+    .string()
+    .min(1, 'Ο ΑΦΜ είναι υποχρεωτικός')
+    .max(20, 'Ο ΑΦΜ δεν μπορεί να υπερβαίνει τους 20 χαρακτήρες'),
+  name: z
+    .string()
+    .min(2, 'Το όνομα είναι υποχρεωτικό')
+    .max(100, 'Το όνομα δεν μπορεί να υπερβαίνει τους 100 χαρακτήρες'),
+  address: z
+    .string()
+    .min(5, 'Η διεύθυνση είναι υποχρεωτική')
+    .max(200, 'Η διεύθυνση δεν μπορεί να υπερβαίνει τους 200 χαρακτήρες'),
+  phone: z
+    .string()
+    .min(10, 'Το τηλέφωνο πρέπει να έχει 10 ψηφία')
+    .max(10, 'Το τηλέφωνο πρέπει να έχει 10 ψηφία')
+    .regex(/^69\d{8}$/, 'Το τηλέφωνο πρέπει να ξεκινάει με 69 και να έχει 10 ψηφία'),
 });
 
 export const cloudinaryResourceSchema = z.object({
@@ -461,20 +477,44 @@ export const profileBasicInfoUpdateSchema = z.object({
     .string()
     .min(10, 'Το tagline πρέπει να έχει τουλάχιστον 10 χαρακτήρες')
     .max(100, 'Το tagline δεν μπορεί να υπερβαίνει τους 100 χαρακτήρες')
-    .optional(),
+    .optional()
+    .or(z.literal('')),
   bio: z
     .string()
     .min(80, 'Η περιγραφή πρέπει να έχει τουλάχιστον 80 χαρακτήρες')
-    .max(5000, 'Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες'),
-  category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
-  subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
+    .max(5000, 'Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες')
+    .optional()
+    .or(z.literal('')),
+  category: z
+    .string()
+    .min(1, 'Η κατηγορία είναι υποχρεωτική')
+    .optional()
+    .or(z.literal('')),
+  subcategory: z
+    .string()
+    .min(1, 'Η υποκατηγορία είναι υποχρεωτική')
+    .optional()
+    .or(z.literal('')),
   skills: z
     .array(z.string().min(1, 'Skill ID is required'))
     .min(1, 'Επιλέξτε τουλάχιστον μία δεξιότητα')
     .max(10, 'Μπορείτε να επιλέξετε έως 10 δεξιότητες')
     .optional(),
-  speciality: z.string().min(1, 'Η ειδικότητα είναι υποχρεωτική').optional(),
-  coverage: coverageSchema,
+  speciality: z.string().optional().or(z.literal('')),
+  coverage: coverageSchema.optional(),
+});
+
+// Profile additional info update schema for new fields
+export const profileAdditionalInfoUpdateSchema = z.object({
+  rate: z.number().int().min(0).optional().nullable(),
+  commencement: z.string().optional().or(z.literal('')),
+  experience: z.number().int().min(0).optional().nullable(),
+  contactMethods: z.array(z.string()).optional(),
+  paymentMethods: z.array(z.string()).optional(),
+  settlementMethods: z.array(z.string()).optional(),
+  budget: z.string().optional().or(z.literal('')),
+  industries: z.array(z.string()).max(10, 'Maximum 10 industries allowed').optional(),
+  terms: z.string().optional().or(z.literal('')),
 });
 
 // Main onboarding form schema - bio, category, subcategory, coverage are required, image is optional for client validation
@@ -502,8 +542,8 @@ export const onboardingFormSchemaWithMedia = onboardingFormSchema.extend({
 // =============================================
 
 export type CreateProfileInput = z.infer<typeof createProfileSchema>;
-export type updateProfileBasicInfoActionInput = z.infer<
-  typeof updateProfileBasicInfoActionSchema
+export type updateProfileBasicInfoInput = z.infer<
+  typeof updateProfileBasicInfoSchema
 >;
 export type ProfileQueryInput = z.infer<typeof profileQuerySchema>;
 export type BasicProfileInfoInput = z.infer<typeof basicProfileInfoSchema>;
@@ -516,4 +556,7 @@ export type BillingInput = z.infer<typeof billingSchema>;
 export type VerificationInput = z.infer<typeof verificationFormSchema>;
 export type ProfileBasicInfoUpdateInput = z.infer<
   typeof profileBasicInfoUpdateSchema
+>;
+export type ProfileAdditionalInfoUpdateInput = z.infer<
+  typeof profileAdditionalInfoUpdateSchema
 >;

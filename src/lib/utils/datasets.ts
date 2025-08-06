@@ -354,3 +354,14 @@ export function resetCoverageDependencies(coverage: any, type: 'online' | 'onbas
   
   return newCoverage;
 }
+
+/**
+ * Filter skills by category ID
+ * Returns skills that belong to the specified category
+ */
+export function filterSkillsByCategory<T extends { id: string; category: string }>(
+  skills: T[], 
+  categoryId: string
+): T[] {
+  return skills.filter(skill => skill.category === categoryId);
+}

@@ -5,6 +5,7 @@
 
 // Import types from Better Auth for type inference
 import type { auth } from '@/lib/auth';
+import { CloudinaryResource } from './cloudinary';
 
 /**
  * User type inferred from Better Auth server instance
@@ -107,7 +108,7 @@ export interface AuthContextType {
   lastName: string | null;
   phone: string | null;
   coverage: any;
-  image: any;
+  image: CloudinaryResource | null;
   portfolio: any;
   verified: boolean;
   featured: boolean;
@@ -117,6 +118,22 @@ export interface AuthContextType {
   isActive: boolean;
   profileCreatedAt: Date | null;
   profileUpdatedAt: Date | null;
+
+  // Additional profile fields
+  commencement: string | null;
+  contactMethods: string[] | null;
+  paymentMethods: string[] | null;
+  settlementMethods: string[] | null;
+  budget: string | null;
+  industries: string[] | null;
+  terms: string | null;
+  billing: any;
+
+  // Presentation fields
+  visibility: any;
+  socials: any;
+  viber: string | null;
+  whatsapp: string | null;
 
   // Relations
   services: import('@prisma/client').Service[];

@@ -24,6 +24,7 @@ interface MultiSelectProps {
   placeholder?: string;
   maxItems?: number;
   className?: string;
+  showClearAll?: boolean;
 }
 
 export function MultiSelect({
@@ -33,6 +34,7 @@ export function MultiSelect({
   placeholder = 'Select items...',
   maxItems,
   className,
+  showClearAll = true,
 }: MultiSelectProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
@@ -71,6 +73,10 @@ export function MultiSelect({
     [selected, onChange, maxItems],
   );
 
+  const handleClearAll = React.useCallback(() => {
+    onChange([]);
+  }, [onChange]);
+
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       const input = inputRef.current;
@@ -96,13 +102,17 @@ export function MultiSelect({
       onKeyDown={handleKeyDown}
       className={`overflow-visible bg-transparent ${className || ''}`}
     >
-      <div className='group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2'>
-        <div className='flex flex-wrap gap-1'>
+      <div className='group relative flex items-center rounded-md border border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring'>
+        <div className='flex flex-wrap gap-1 flex-1 pr-8'>
           {selectedOptions.map((option) => (
-            <Badge key={option.value} variant='secondary'>
+            <Badge
+              key={option.value}
+              variant='default'
+              className='hover:bg-primary/90'
+            >
               {option.label}
               <button
-                className='ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2'
+                className='ml-1 rounded-full outline-none'
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleUnselect(option.value);
@@ -114,7 +124,7 @@ export function MultiSelect({
                 }}
                 onClick={() => handleUnselect(option.value)}
               >
-                <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
+                <X className='h-3 w-3 text-primary-foreground hover:text-primary-foreground' />
               </button>
             </Badge>
           ))}
@@ -131,6 +141,20 @@ export function MultiSelect({
             className='ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
           />
         </div>
+        {showClearAll && selectedOptions.length > 0 && (
+          <button
+            type='button'
+            className='absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 hover:bg-muted outline-none focus:ring-1 focus:ring-ring'
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onClick={handleClearAll}
+            title='Clear all selections'
+          >
+            <X className='h-4 w-4 text-muted-foreground hover:text-foreground' />
+          </button>
+        )}
       </div>
       <div className='relative mt-2'>
         <CommandList>

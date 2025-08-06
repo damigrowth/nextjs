@@ -14,7 +14,7 @@
  * - /lib/utils/misc/image.ts
  */
 
-import { CloudinaryResource } from '@/lib/types/cloudinary';
+import { CloudinaryResource, isCloudinaryResource } from '@/lib/types/cloudinary';
 
 // =============================================
 // SUPPORTED FORMATS CONFIGURATION
@@ -412,6 +412,52 @@ export const formatFileSize = (bytes: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 };
 
+/**
+ * Convert image data from Prisma Json to CloudinaryResource
+ * Handles conversion from database Json field to proper CloudinaryResource type
+ */
+export const convertImageData = (imageData: any): CloudinaryResource | null => {
+  if (!imageData) return null;
+  
+  // If it's already a valid CloudinaryResource, return it
+  if (isCloudinaryResource(imageData)) {
+    return imageData;
+  }
+  
+  // If it's a string URL, try to convert it
+  if (typeof imageData === 'string') {
+    const publicId = imageData.split('/').pop()?.split('.')[0] || '';
+    return {
+      public_id: publicId,
+      secure_url: imageData,
+      resource_type: 'image' as const,
+      format: imageData.split('.').pop(),
+      url: imageData,
+    };
+  }
+  
+  // If it's an object with the right properties, convert it
+  if (typeof imageData === 'object' && imageData.public_id && imageData.secure_url) {
+    return {
+      public_id: imageData.public_id,
+      secure_url: imageData.secure_url,
+      resource_type: imageData.resource_type || 'image',
+      format: imageData.format,
+      url: imageData.url || imageData.secure_url,
+      width: imageData.width,
+      height: imageData.height,
+      bytes: imageData.bytes,
+      created_at: imageData.created_at,
+      folder: imageData.folder,
+      original_filename: imageData.original_filename,
+      // Spread any other properties
+      ...imageData
+    } as CloudinaryResource;
+  }
+  
+  return null;
+};
+
 // =============================================
 // LEGACY SUPPORT (STRAPI)
 // =============================================
@@ -476,6 +522,7 @@ export default {
   // Cloudinary utilities
   getOptimizedCloudinaryUrl,
   getResourceDisplayName,
+  convertImageData,
   
   // Helper utilities
   formatFileSize,

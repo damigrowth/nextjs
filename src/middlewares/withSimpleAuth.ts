@@ -8,7 +8,7 @@ export const withSimpleAuth = (next: Function) => {
     try {
       // Official Better Auth approach: Only check cookie existence for lightweight routing
       const sessionCookie = getSessionCookie(request);
-      console.log('Session cookie exists:', !!sessionCookie);
+      // console.log('Session cookie exists:', !!sessionCookie);
 
       // Route type detection
       const isAuthPage = currentPath.startsWith('/auth/');
@@ -40,7 +40,7 @@ export const withSimpleAuth = (next: Function) => {
 
         // Protect dashboard and other protected routes
         if (isDashboardPath || isOnboardingPath) {
-          console.log('No session cookie - redirecting to signin');
+          // console.log('No session cookie - redirecting to signin');
           return NextResponse.redirect(new URL('/auth/signin', request.url));
         }
 
@@ -79,9 +79,9 @@ export const withSimpleAuth = (next: Function) => {
       // - Onboarding step validation
       // - Email verification checks
       // - Profile completion checks
-      console.log(
-        'Session cookie found - allowing access, page will validate details',
-      );
+      // console.log(
+      //   'Session cookie found - allowing access, page will validate details',
+      // );
 
       return next(request, _next);
     } catch (error) {

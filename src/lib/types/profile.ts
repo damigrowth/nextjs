@@ -32,6 +32,12 @@ export interface Profile {
   image?: CloudinaryResource; // CloudinaryResource JSON
   portfolio?: CloudinaryResource[]; // CloudinaryResource array JSON
 
+  // Presentation fields (JSON)
+  visibility?: VisibilitySettings; // Visibility settings JSON
+  socials?: SocialMedia; // Social media links JSON
+  viber?: string; // Viber contact
+  whatsapp?: string; // WhatsApp contact
+
   // Status fields
   verified: boolean;
   featured: boolean;
@@ -109,4 +115,11 @@ export interface SocialMedia {
 export interface SocialLink {
   url: string;
   verified?: boolean;
+}
+
+// Visibility settings type
+export interface VisibilitySettings {
+  email: boolean;
+  phone: boolean;
+  address: boolean;
 }

@@ -1,12 +1,16 @@
 import { createAuthClient } from 'better-auth/react';
-import { adminClient, apiKeyClient, inferAdditionalFields } from 'better-auth/client/plugins';
+import {
+  adminClient,
+  apiKeyClient,
+  inferAdditionalFields,
+} from 'better-auth/client/plugins';
 import type { auth } from '@/lib/auth/config';
 
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   fetchOptions: {
     onError: (ctx) => {
-      console.log('Auth Client Error Context:', ctx);
+      // console.log('Auth Client Error Context:', ctx);
 
       // Log detailed error information for debugging
       if (ctx.error) {
@@ -19,13 +23,13 @@ export const authClient = createAuthClient({
       }
     },
     onSuccess: async (ctx) => {
-      console.log('Auth Success:', ctx);
+      // console.log('Auth Success:', ctx);
     },
   },
   plugins: [
-    adminClient(), 
+    adminClient(),
     apiKeyClient(),
-    inferAdditionalFields<typeof auth>()
+    inferAdditionalFields<typeof auth>(),
   ],
 });
 

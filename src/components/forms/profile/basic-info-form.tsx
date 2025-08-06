@@ -64,7 +64,9 @@ import {
   filterByField,
   toggleItemInArray,
   resetCoverageDependencies,
+  filterSkillsByCategory,
 } from '@/lib/utils/datasets';
+import { populateFormData } from '@/lib/utils/form';
 
 // Import validation schema
 import {
@@ -73,7 +75,7 @@ import {
 } from '@/lib/validations/profile';
 
 // Import server action
-import { updateProfileBasicInfoActionAction } from '@/actions/profiles/basic-info';
+import { updateProfileBasicInfo } from '@/actions/profiles/basic-info';
 
 type ProfileFormData = ProfileBasicInfoUpdateInput;
 
@@ -84,7 +86,7 @@ const initialState = {
 
 export function BasicInfoForm() {
   const [state, action, isPending] = useActionState(
-    updateProfileBasicInfoActionAction,
+    updateProfileBasicInfo,
     initialState,
   );
 
@@ -117,18 +119,11 @@ export function BasicInfoForm() {
         areas: [],
       },
     },
-    mode: 'onChange',
+    mode: 'onChange', // Real-time validation per FORM_PATTERNS.md
   });
 
   // Get full auth context for all profile data
   const authContext = useAuth();
-  console.log(
-    '%cMyProject%cline:123%cauthContext',
-    'color:#fff;background:#ee6f57;padding:3px;border-radius:2px',
-    'color:#fff;background:#1f3c88;padding:3px;border-radius:2px',
-    'color:#fff;background:rgb(251, 178, 23);padding:3px;border-radius:2px',
-    authContext,
-  );
 
   // Update form values when user data is loaded
   useEffect(() => {
@@ -156,6 +151,17 @@ export function BasicInfoForm() {
     }
   }, [authContext, isLoading, form]);
 
+  // Handle successful form submission
+  useEffect(() => {
+    if (state.success) {
+      // Data will be refreshed automatically via revalidatePath in server action
+      // The layout will re-render with fresh server data and update the auth provider
+      console.log(
+        'Profile updated successfully - layout will refresh with new data',
+      );
+    }
+  }, [state.success]);
+
   const {
     handleSubmit,
     formState: { errors, isValid, isDirty },
@@ -167,6 +173,7 @@ export function BasicInfoForm() {
   // Watch specific fields for dependent logic
   const watchedCategory = watch('category');
   const watchedCoverage = watch('coverage');
+  const watchedSkills = watch('skills');
 
   // Helper functions for formatting inputs
   const handleTaglineChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -210,6 +217,10 @@ export function BasicInfoForm() {
       shouldValidate: true,
     });
     setValue('subcategory', '', { shouldDirty: true, shouldValidate: true });
+    
+    // Clear skills and speciality when category changes since available skills will change
+    setValue('skills', [], { shouldDirty: true, shouldValidate: true });
+    setValue('speciality', '', { shouldDirty: true, shouldValidate: true });
   };
 
   const handleSubcategorySelect = (selected: any) => {
@@ -238,33 +249,22 @@ export function BasicInfoForm() {
     });
   };
 
-  // Handle form submission with additional logic for file uploads
+  // Handle form submission following FORM_PATTERNS.md template
   const handleFormSubmit = async (formData: FormData) => {
     try {
-      // Handle image upload if needed
+      // Handle media uploads if needed
       if (profileImageRef.current?.hasFiles()) {
         await profileImageRef.current.uploadFiles();
-        const uploadedImage = getValues('image');
-        if (uploadedImage) {
-          formData.set('image', JSON.stringify(uploadedImage));
-        }
-      } else {
-        const currentImage = getValues('image');
-        if (currentImage) {
-          formData.set('image', JSON.stringify(currentImage));
-        }
       }
 
-      // Serialize complex fields
-      const skills = getValues('skills');
-      if (skills) {
-        formData.set('skills', JSON.stringify(skills));
-      }
-
-      const coverage = getValues('coverage');
-      if (coverage) {
-        formData.set('coverage', JSON.stringify(coverage));
-      }
+      // Get all form values and populate FormData using utility function
+      const allValues = getValues();
+      
+      populateFormData(formData, allValues, {
+        stringFields: ['tagline', 'bio', 'category', 'subcategory', 'speciality'],
+        jsonFields: ['image', 'skills', 'coverage'],
+        skipEmpty: true
+      });
 
       // Call the server action
       await action(formData);
@@ -529,28 +529,47 @@ export function BasicInfoForm() {
             <FormItem>
               <FormLabel>Δεξιότητες</FormLabel>
               <p className='text-sm text-gray-600'>
-                Επιλέξτε τις δεξιότητές σας (έως 10)
+                Επιλέξτε τις δεξιότητές σας (έως 10). Στη συνέχεια θα μπορέσετε
+                να επιλέξετε την κύρια ειδικότητά σας.
               </p>
               <FormControl>
                 <div className='space-y-2'>
                   <div className='text-sm text-gray-500'>
                     Επιλεγμένες: {field.value?.length || 0}/10
                   </div>
-                  <MultiSelect
-                    options={skills.map((skill) => ({
-                      value: skill.id,
-                      label: skill.label,
-                    }))}
-                    selected={field.value || []}
-                    onChange={(selected) => {
-                      setValue('skills', selected, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      });
-                    }}
-                    placeholder='Επιλέξτε δεξιότητες...'
-                    maxItems={10}
-                  />
+                  {watchedCategory ? (
+                    <MultiSelect
+                      options={filterSkillsByCategory(skills, watchedCategory).map((skill) => ({
+                        value: skill.id,
+                        label: skill.label,
+                      }))}
+                      selected={field.value || []}
+                      onChange={(selected) => {
+                        setValue('skills', selected, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+
+                        // Clear speciality if it's not in the selected skills anymore
+                        const currentSpeciality = getValues('speciality');
+                        if (
+                          currentSpeciality &&
+                          !selected.includes(currentSpeciality)
+                        ) {
+                          setValue('speciality', '', {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          });
+                        }
+                      }}
+                      placeholder='Επιλέξτε δεξιότητες...'
+                      maxItems={10}
+                    />
+                  ) : (
+                    <div className='p-4 text-center text-gray-500 bg-gray-50 rounded-md'>
+                      Επιλέξτε πρώτα μια κατηγορία για να δείτε τις διαθέσιμες δεξιότητες
+                    </div>
+                  )}
                 </div>
               </FormControl>
               <FormMessage />
@@ -566,26 +585,75 @@ export function BasicInfoForm() {
             <FormItem>
               <FormLabel>Ειδικότητα</FormLabel>
               <p className='text-sm text-gray-600'>
-                Επιλέξτε την κύρια ειδικότητά σας
+                Επιλέξτε την κύρια ειδικότητά σας από τις επιλεγμένες δεξιότητες
               </p>
+              {watchedSkills && watchedSkills.length > 0 && (
+                <p className='text-xs text-blue-600 bg-blue-50 p-2 rounded'>
+                  📋 Διθέσιμες επιλογές: {watchedSkills.length} δεξιότητες
+                </p>
+              )}
               <FormControl>
-                <div className='space-y-2'>
-                  <p className='text-sm text-gray-400'>
-                    Για τώρα θα χρησιμοποιήσουμε κείμενο. Θα ενημερωθεί όταν
-                    δημιουργηθεί το speciality taxonomy.
-                  </p>
-                  <Input
-                    type='text'
-                    placeholder='Προσωρινά: περιγράψτε την ειδικότητά σας'
-                    value={field.value || ''}
-                    onChange={(e) => {
-                      setValue('speciality', e.target.value, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      });
-                    }}
-                  />
-                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant='outline'
+                      role='combobox'
+                      className='w-full justify-between'
+                      disabled={!watchedSkills || watchedSkills.length === 0}
+                    >
+                      {field.value
+                        ? (() => {
+                            const selectedSkill = skills.find(
+                              (skill) => skill.id === field.value,
+                            );
+                            return (
+                              selectedSkill?.label || 'Μη έγκυρη ειδικότητα'
+                            );
+                          })()
+                        : watchedSkills && watchedSkills.length > 0
+                          ? 'Επιλέξτε ειδικότητα...'
+                          : 'Επιλέξτε πρώτα δεξιότητες'}
+                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className='w-full p-0'>
+                    <Command>
+                      <CommandInput placeholder='Αναζήτηση ειδικότητας...' />
+                      <CommandList>
+                        <CommandEmpty>Δεν βρέθηκαν ειδικότητες.</CommandEmpty>
+                        <CommandGroup>
+                          {watchedSkills &&
+                            watchedSkills
+                              .map((skillId: string) =>
+                                skills.find((skill) => skill.id === skillId),
+                              )
+                              .filter(Boolean)
+                              .map((skill) => (
+                                <CommandItem
+                                  value={skill!.label}
+                                  key={skill!.id}
+                                  onSelect={() => {
+                                    setValue('speciality', skill!.id, {
+                                      shouldDirty: true,
+                                      shouldValidate: true,
+                                    });
+                                  }}
+                                >
+                                  <Check
+                                    className={
+                                      field.value === skill!.id
+                                        ? 'mr-2 h-4 w-4 opacity-100'
+                                        : 'mr-2 h-4 w-4 opacity-0'
+                                    }
+                                  />
+                                  {skill!.label}
+                                </CommandItem>
+                              ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -1099,8 +1167,8 @@ export function BasicInfoForm() {
           />
           <FormButton
             type='submit'
-            text='Ενημέρωση Προφίλ'
-            loadingText='Ενημέρωση...'
+            text='Αποθήκευση'
+            loadingText='Αποθήκευση...'
             loading={isPending}
             disabled={isPending || !isValid || !isDirty}
           />
