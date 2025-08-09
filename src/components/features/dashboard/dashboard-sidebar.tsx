@@ -86,13 +86,13 @@ export function DashboardSidebar({
             },
             {
               title: 'Προσθήκη Υπηρεσίας',
-              url: '/dashboard/services/add',
+              url: '/dashboard/services/create',
             },
           ],
         },
         {
           title: 'Προσθήκη Υπηρεσίας',
-          url: '/dashboard/services/add',
+          url: '/dashboard/services/create',
           icon: Plus,
         },
       ]

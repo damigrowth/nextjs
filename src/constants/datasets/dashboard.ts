@@ -40,7 +40,7 @@ export const dashboardNavigation = [
     id: 7,
     name: 'Προσθήκη Υπηρεσίας',
     icon: 'flaticon-button',
-    path: '/dashboard/services/add',
+    path: '/dashboard/services/create',
   },
   {
     id: 8,
@@ -108,7 +108,7 @@ export const hasAccessServicesNav = [
     id: 1,
     name: 'Προσθήκη Υπηρεσίας',
     icon: 'flaticon-button',
-    path: '/dashboard/services/add',
+    path: '/dashboard/services/create',
   },
 ];
 
@@ -169,7 +169,7 @@ export const hasAccessUserMenuNav = [
     id: 6,
     name: 'Προσθήκη Υπηρεσίας',
     icon: 'flaticon-button',
-    path: '/dashboard/services/add',
+    path: '/dashboard/services/create',
   },
   {
     id: 7,
