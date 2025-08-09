@@ -15,6 +15,7 @@ import SavedMenu from '../button/button-saved';
 import { signOut } from '@/lib/auth/client';
 import { useAuth } from '@/components/providers/auth';
 import { UserMenuProps, MenuItem } from '@/types/components';
+import { getOptimizedCloudinaryUrl } from '@/lib/utils/media';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -145,7 +146,11 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
                 lastName={lastName}
                 displayName={displayName}
                 hideDisplayName
-                image={image}
+                image={typeof image === 'string' 
+                  ? image 
+                  : image 
+                  ? getOptimizedCloudinaryUrl(image, { width: 80, height: 80, crop: 'fill' })
+                  : null}
                 width={40}
                 height={40}
               />
