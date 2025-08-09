@@ -14,7 +14,7 @@ async function _getProfileByUserId(userId: string): Promise<Profile | null> {
     where: { uid: userId },
     include: {
       services: {
-        where: { published: true },
+        where: { status: 'published' },
         orderBy: { createdAt: 'desc' },
       },
       reviewsReceived: {
@@ -41,7 +41,9 @@ async function _getProfileByUserId(userId: string): Promise<Profile | null> {
 /**
  * Get user profile with all relations by user ID (authenticated) - Cached with tags
  */
-export async function getProfileByUserId(userId: string): Promise<ActionResult<Profile | null>> {
+export async function getProfileByUserId(
+  userId: string,
+): Promise<ActionResult<Profile | null>> {
   try {
     const getCachedProfile = unstable_cache(
       _getProfileByUserId,
@@ -49,7 +51,7 @@ export async function getProfileByUserId(userId: string): Promise<ActionResult<P
       {
         tags: [`user-${userId}`, `profile-${userId}`, 'profiles'],
         revalidate: 300, // 5 minutes cache
-      }
+      },
     );
 
     const profile = await getCachedProfile(userId);
@@ -70,16 +72,18 @@ export async function getProfileByUserId(userId: string): Promise<ActionResult<P
 /**
  * Get public profile by username (no authentication required)
  */
-export async function getPublicProfileByUsername(username: string): Promise<ActionResult<Profile | null>> {
+export async function getPublicProfileByUsername(
+  username: string,
+): Promise<ActionResult<Profile | null>> {
   try {
     const profile = await prisma.profile.findFirst({
-      where: { 
+      where: {
         username: username,
         published: true, // Only show published profiles
       },
       include: {
         services: {
-          where: { published: true },
+          where: { status: 'published' },
           orderBy: { createdAt: 'desc' },
         },
         reviewsReceived: {
