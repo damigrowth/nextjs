@@ -18,6 +18,7 @@ import {
 import { Footer, Header } from '@/components/layout';
 import { Body, Notifications, PathChecker } from '@/components/layout/wrapper';
 import { AuthProvider } from '@/components/providers/auth';
+import { Toaster } from '@/components/ui/sonner';
 import { getCurrentUser } from '@/actions/auth/server';
 
 interface RootLayoutProps {
@@ -69,6 +70,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         {/* <PathChecker excludes={'/admin'}>
           <CookiesBanner_D />
         </PathChecker> */}
+        <Toaster />
       </Body>
     </html>
   );

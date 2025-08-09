@@ -73,6 +73,8 @@ model Profile {
   terms             String?
   billing           Json?        // Billing information {receipt: boolean, invoice: boolean, afm: string, doy: string, name: string, profession: string, address: string}
 
+  // Rate limiting fields
+  lastServiceDraft  DateTime?    // Last time user saved a service draft
   
   verified        Boolean      @default(false)
   featured        Boolean      @default(false)
