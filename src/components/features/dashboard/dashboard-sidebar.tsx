@@ -36,6 +36,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/components/providers/auth';
+import { getOptimizedCloudinaryUrl } from '@/lib/utils/media';
 
 export function DashboardSidebar({
   ...props
@@ -123,7 +124,11 @@ export function DashboardSidebar({
   const userData = {
     name: displayName || 'User',
     email: email || '',
-    avatar: image || '/avatars/default.jpg',
+    avatar: typeof image === 'string' 
+      ? image 
+      : image 
+      ? getOptimizedCloudinaryUrl(image, { width: 32, height: 32, crop: 'fill' })
+      : '/avatars/default.jpg',
   };
 
   return (
