@@ -53,7 +53,6 @@ export async function updateProfileAdditionalInfo(
       return {
         success: false,
         message: 'Μη έγκυρα δεδομένα φόρμας',
-        errors: extractionErrors,
       };
     }
 

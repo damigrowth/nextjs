@@ -49,7 +49,6 @@ export async function submitVerificationRequest(
       return {
         success: false,
         message: 'Μη έγκυρα δεδομένα φόρμας',
-        errors: extractionErrors,
       };
     }
 

@@ -2,7 +2,7 @@
 
 import { revalidateTag } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
-import { ActionResponse } from '@/lib/types/api';
+import { ActionResponse, ActionResult } from '@/lib/types/api';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
 import { Prisma } from '@prisma/client';
 import {
@@ -36,21 +36,27 @@ export async function updateProfilePresentation(
     }
 
     // 3. Extract form data using ENHANCED utility function
-    const { data: extractedData, errors: extractionErrors } = extractFormData(formData, {
-      phone: { type: 'string', required: false, defaultValue: null },
-      website: { type: 'string', required: false, defaultValue: null },
-      viber: { type: 'string', required: false, defaultValue: null },
-      whatsapp: { type: 'string', required: false, defaultValue: null },
-      visibility: { type: 'json', required: false, defaultValue: { email: true, phone: true, address: true } },
-      socials: { type: 'json', required: false, defaultValue: {} },
-      portfolio: { type: 'json', required: false, defaultValue: [] },
-    });
+    const { data: extractedData, errors: extractionErrors } = extractFormData(
+      formData,
+      {
+        phone: { type: 'string', required: false, defaultValue: null },
+        website: { type: 'string', required: false, defaultValue: null },
+        viber: { type: 'string', required: false, defaultValue: null },
+        whatsapp: { type: 'string', required: false, defaultValue: null },
+        visibility: {
+          type: 'json',
+          required: false,
+          defaultValue: { email: true, phone: true, address: true },
+        },
+        socials: { type: 'json', required: false, defaultValue: {} },
+        portfolio: { type: 'json', required: false, defaultValue: [] },
+      },
+    );
 
     if (Object.keys(extractionErrors).length > 0) {
       return {
         success: false,
         message: 'Μη έγκυρα δεδομένα φόρμας',
-        errors: extractionErrors,
       };
     }
 
@@ -73,7 +79,8 @@ export async function updateProfilePresentation(
     if (!existingProfile) {
       return {
         success: false,
-        message: 'Το προφίλ δεν βρέθηκε. Παρακαλώ ολοκληρώστε πρώτα τη ρύθμιση.',
+        message:
+          'Το προφίλ δεν βρέθηκε. Παρακαλώ ολοκληρώστε πρώτα τη ρύθμιση.',
       };
     }
 
@@ -87,8 +94,8 @@ export async function updateProfilePresentation(
         whatsapp: data.whatsapp,
         visibility: JSON.stringify(data.visibility),
         socials: data.socials ? JSON.stringify(data.socials) : Prisma.DbNull,
-        portfolio: data.portfolio?.length 
-          ? JSON.stringify(data.portfolio) 
+        portfolio: data.portfolio?.length
+          ? JSON.stringify(data.portfolio)
           : Prisma.DbNull,
         updatedAt: new Date(),
       },
@@ -113,7 +120,16 @@ export async function updateProfilePresentation(
  * Server action to get profile presentation data
  * Returns the presentation-related fields from the profile
  */
-export async function getProfilePresentation(): Promise<ActionResponse> {
+export async function getProfilePresentation(): Promise<ActionResult<{
+  id: string;
+  phone: string | null;
+  website: string | null;
+  viber: string | null;
+  whatsapp: string | null;
+  visibility: any;
+  socials: any;
+  portfolio: any;
+}>> {
   try {
     // 1. Require authentication
     const session = await requireAuth();
@@ -137,7 +153,7 @@ export async function getProfilePresentation(): Promise<ActionResponse> {
     if (!profile) {
       return {
         success: false,
-        message: 'Το προφίλ δεν βρέθηκε',
+        error: 'Το προφίλ δεν βρέθηκε',
       };
     }
 
@@ -147,7 +163,9 @@ export async function getProfilePresentation(): Promise<ActionResponse> {
     let portfolio = null;
 
     try {
-      visibility = profile.visibility ? JSON.parse(profile.visibility as string) : null;
+      visibility = profile.visibility
+        ? JSON.parse(profile.visibility as string)
+        : null;
     } catch (e) {
       console.warn('Failed to parse visibility JSON:', e);
     }
@@ -159,7 +177,9 @@ export async function getProfilePresentation(): Promise<ActionResponse> {
     }
 
     try {
-      portfolio = profile.portfolio ? JSON.parse(profile.portfolio as string) : null;
+      portfolio = profile.portfolio
+        ? JSON.parse(profile.portfolio as string)
+        : null;
     } catch (e) {
       console.warn('Failed to parse portfolio JSON:', e);
     }
@@ -181,7 +201,8 @@ export async function getProfilePresentation(): Promise<ActionResponse> {
     console.error('Error getting profile presentation:', error);
     return {
       success: false,
-      message: 'Παρουσιάστηκε σφάλμα κατά την ανάκτηση των στοιχείων παρουσίασης',
+      error:
+        'Παρουσιάστηκε σφάλμα κατά την ανάκτηση των στοιχείων παρουσίασης',
     };
   }
 }
