@@ -1,128 +1,276 @@
-// 'use server';
+'use server';
 
-// import { auth } from '@/lib/auth';
-// import { prisma } from '@/lib/prisma/client';
-// import { revalidatePath } from 'next/cache';
-// import { headers } from 'next/headers';
-// import { z } from 'zod';
+import { revalidateTag } from 'next/cache';
+import { prisma } from '@/lib/prisma/client';
+import { ActionResponse } from '@/lib/types/api';
+import { requireAuth } from '@/actions/auth/server';
+import { getProfileByUserId } from '@/actions/profiles/get-profile';
+import { Prisma } from '@prisma/client';
+import {
+  createServiceSchema,
+  createServiceDraftSchema,
+  type CreateServiceInput,
+} from '@/lib/validations/service';
+import { extractFormData } from '@/lib/utils/form';
+import { createValidationErrorResponse } from '@/lib/utils/zod';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
 
-// const createServiceSchema = z.object({
-//   title: z
-//     .string()
-//     .min(1, 'Title is required')
-//     .max(100, 'Title must be less than 100 characters'),
-//   description: z
-//     .string()
-//     .min(10, 'Description must be at least 10 characters')
-//     .max(2000, 'Description must be less than 2000 characters'),
-//   price: z
-//     .number()
-//     .min(0, 'Price must be positive')
-//     .max(100000, 'Price is too high'),
-//   category: z.string().min(1, 'Category is required'),
-//   subcategory: z.string().optional(),
-//   tags: z.string().optional(),
-//   pricingType: z.string().optional(),
-//   duration: z.string().optional(),
-//   location: z.string().optional(),
-//   published: z.boolean().default(false),
-// });
+/**
+ * Server action for creating a new service using the multi-step form data
+ * Follows SERVER_ACTIONS_PATTERNS.md template
+ */
+export async function createServiceAction(
+  prevState: ActionResponse | null,
+  formData: FormData,
+): Promise<ActionResponse> {
+  return createServiceInternal(prevState, formData, 'pending');
+}
 
-// type ActionResult<T = any> = {
-//   success: boolean;
-//   data?: T;
-//   error?: string;
-// };
+/**
+ * Server action for saving service as draft
+ */
+export async function saveServiceAsDraftAction(
+  prevState: ActionResponse | null,
+  formData: FormData,
+): Promise<ActionResponse> {
+  return createServiceInternal(prevState, formData, 'draft');
+}
 
-// export async function createService(
-//   formData: FormData,
-// ): Promise<ActionResult<{ serviceId: string }>> {
-//   try {
-//     // Check authentication
-//     const session = await auth.api.getSession({
-//       headers: await headers(),
-//     });
+/**
+ * Internal function to handle service creation with status
+ */
+async function createServiceInternal(
+  prevState: ActionResponse | null,
+  formData: FormData,
+  status: 'draft' | 'pending' = 'draft',
+): Promise<ActionResponse> {
+  try {
+    // 1. Get authenticated session
+    const session = await requireAuth();
+    const user = session.user;
 
-//     if (!session?.user) {
-//       return { success: false, error: 'Authentication required' };
-//     }
+    // 2. Check permissions - only freelancers and companies can create services
+    if (user.role === 'user') {
+      return {
+        success: false,
+        message:
+          'Μόνο επαγγελματίες και επιχειρήσεις μπορούν να δημιουργήσουν υπηρεσίες',
+      };
+    }
 
-//     // Get user profile (required for service creation)
-//     const profile = await prisma.profile.findUnique({
-//       where: { uid: session.user.id },
-//     });
+    // 3. Get user profile using cached function
+    const profileResult = await getProfileByUserId(user.id);
 
-//     if (!profile) {
-//       return {
-//         success: false,
-//         error: 'Profile not found. Please complete your profile first.',
-//       };
-//     }
+    if (!profileResult.success) {
+      return {
+        success: false,
+        message: 'Σφάλμα κατά την ανάκτηση του προφίλ σας.',
+      };
+    }
 
-//     // Validate and parse form data
-//     const validatedData = createServiceSchema.parse({
-//       title: formData.get('title')?.toString(),
-//       description: formData.get('description')?.toString(),
-//       price: Number(formData.get('price')),
-//       category: formData.get('category')?.toString(),
-//       subcategory: formData.get('subcategory')?.toString() || undefined,
-//       tags: formData.get('tags')?.toString() || undefined,
-//       pricingType: formData.get('pricingType')?.toString() || undefined,
-//       duration: formData.get('duration')?.toString() || undefined,
-//       location: formData.get('location')?.toString() || undefined,
-//       published: formData.get('published') === 'true',
-//     });
+    if (!profileResult.data) {
+      return {
+        success: false,
+        message:
+          'Δεν βρέθηκε το προφίλ σας. Παρακαλώ ολοκληρώστε πρώτα τη ρύθμιση του προφίλ σας.',
+      };
+    }
 
-//     // Create service
-//     const service = await prisma.service.create({
-//       data: {
-//         ...validatedData,
-//         pid: profile.id,
-//       },
-//     });
+    const profile = profileResult.data;
 
-//     // Revalidate relevant pages
-//     revalidatePath('/dashboard/services');
-//     revalidatePath(`/profile/${profile.username}`);
+    // 4. Rate limiting check for draft saves
+    if (status === 'draft') {
+      const now = new Date();
+      const cooldownPeriod = 30 * 1000; // 30 seconds in milliseconds
+      
+      if (profile.lastServiceDraft) {
+        const lastDraftDate = new Date(profile.lastServiceDraft);
+        const timeSinceLastDraft = now.getTime() - lastDraftDate.getTime();
+        if (timeSinceLastDraft < cooldownPeriod) {
+          const remainingTime = Math.ceil((cooldownPeriod - timeSinceLastDraft) / 1000);
+          return {
+            success: false,
+            message: `Μπορείτε να αποθηκεύσετε προσχέδιο ξανά σε ${remainingTime} δευτερόλεπτα.`,
+          };
+        }
+      }
+    }
 
-//     return {
-//       success: true,
-//       data: { serviceId: service.id },
-//     };
-//   } catch (error) {
-//     console.error('Create service error:', error);
+    // 5. Extract form data using extractFormData utility
+    const isDraft = status === 'draft';
+    const { data: extractedData, errors: extractionErrors } = extractFormData(
+      formData,
+      {
+        title: { type: 'string', required: !isDraft },
+        description: { type: 'string', required: !isDraft },
+        category: { type: 'string', required: !isDraft },
+        subcategory: { type: 'string', required: !isDraft },
+        subdivision: { type: 'string', required: !isDraft },
+        subscriptionType: {
+          type: 'string',
+          required: false,
+          defaultValue: undefined,
+        },
+        type: {
+          type: 'json',
+          required: !isDraft,
+          defaultValue: {
+            presence: false,
+            online: false,
+            oneoff: false,
+            onbase: false,
+            subscription: false,
+            onsite: false,
+          },
+        },
+        tags: { type: 'json', required: !isDraft, defaultValue: [] },
+        addons: { type: 'json', required: false, defaultValue: [] },
+        faq: { type: 'json', required: false, defaultValue: [] },
+        media: { type: 'json', required: false, defaultValue: [] },
+        price: { type: 'int', required: !isDraft, defaultValue: 0 },
+        duration: { type: 'int', required: false, defaultValue: 0 },
+        fixed: { type: 'boolean', required: false, defaultValue: true },
+      },
+    );
 
-//     if (error instanceof z.ZodError) {
-//       return {
-//         success: false,
-//         error: error.errors.map((e) => e.message).join(', '),
-//       };
-//     }
+    if (Object.keys(extractionErrors).length > 0) {
+      return {
+        success: false,
+        message:
+          'Σφάλμα στα δεδομένα της φόρμας: ' +
+          Object.values(extractionErrors).join(', '),
+      };
+    }
 
-//     return {
-//       success: false,
-//       error:
-//         error instanceof Error ? error.message : 'Failed to create service',
-//     };
-//   }
-// }
+    // 5. Validate form data with appropriate Zod schema
+    const validationSchema = isDraft ? createServiceDraftSchema : createServiceSchema;
+    const validationResult = validationSchema.safeParse({
+      type: extractedData.type,
+      subscriptionType: extractedData.subscriptionType || undefined,
+      title: extractedData.title,
+      description: extractedData.description,
+      category: extractedData.category,
+      subcategory: extractedData.subcategory,
+      subdivision: extractedData.subdivision,
+      tags: extractedData.tags,
+      price: extractedData.price,
+      fixed: extractedData.fixed,
+      duration: extractedData.duration || undefined,
+      addons: extractedData.addons,
+      faq: extractedData.faq,
+      media: extractedData.media,
+    });
 
-// // Helper function to get service categories (can be moved to shared utilities later)
-// export async function getServiceCategories(): Promise<string[]> {
-//   try {
-//     const categories = await prisma.service.findMany({
-//       select: {
-//         category: true,
-//       },
-//       distinct: ['category'],
-//       orderBy: {
-//         category: 'asc',
-//       },
-//     });
+    if (!validationResult.success) {
+      return createValidationErrorResponse(
+        validationResult.error,
+        'Μη έγκυρα δεδομένα υπηρεσίας',
+      );
+    }
 
-//     return categories.map((c) => c.category);
-//   } catch (error) {
-//     console.error('Get categories error:', error);
-//     return [];
-//   }
-// }
+    const data = validationResult.data;
+
+    // 7. Type configuration is already in the correct Boolean structure from form
+    const typeConfig = data.type;
+
+    // 9. Create service in database and update profile if draft
+    if (status === 'draft') {
+      // Use transaction to create service and update lastServiceDraft atomically
+      await prisma.$transaction([
+        prisma.service.create({
+          data: {
+            title: data.title || '',
+            description: data.description || '',
+            category: data.category || '',
+            subcategory: data.subcategory || '',
+            subdivision: data.subdivision || '',
+            tags: data.tags || [],
+            price: data.price || 0,
+            fixed: data.fixed ?? true,
+            type: (data.type || {
+              presence: false,
+              online: false,
+              oneoff: false,
+              onbase: false,
+              subscription: false,
+              onsite: false,
+            }) as Prisma.JsonValue,
+            subscriptionType: data.subscriptionType || null,
+            duration: data.duration || 0,
+            location: null,
+            addons: (data.addons || []) as Prisma.JsonValue[],
+            faq: (data.faq || []) as Prisma.JsonValue[],
+            status: status,
+            featured: false,
+            profile: {
+              connect: { id: profile.id },
+            },
+          },
+        }),
+        prisma.profile.update({
+          where: { id: profile.id },
+          data: { lastServiceDraft: new Date() },
+        }),
+      ]);
+    } else {
+      // Regular service creation (non-draft)
+      await prisma.service.create({
+        data: {
+          title: data.title || '',
+          description: data.description || '',
+          category: data.category || '',
+          subcategory: data.subcategory || '',
+          subdivision: data.subdivision || '',
+          tags: data.tags || [],
+          price: data.price || 0,
+          fixed: data.fixed ?? true,
+          type: (data.type || {
+            presence: false,
+            online: false,
+            oneoff: false,
+            onbase: false,
+            subscription: false,
+            onsite: false,
+          }) as Prisma.JsonValue,
+          subscriptionType: data.subscriptionType || null,
+          duration: data.duration || 0,
+          location: null,
+          addons: (data.addons || []) as Prisma.JsonValue[],
+          faq: (data.faq || []) as Prisma.JsonValue[],
+          status: status,
+          featured: false,
+          profile: {
+            connect: { id: profile.id },
+          },
+        },
+      });
+    }
+
+    // 10. TODO: Handle media upload if provided
+    // Note: Media handling would go here when implementing file uploads
+    // For now, we skip media processing
+
+    // 11. Revalidate cached data
+    revalidateTag(`user-${user.id}`);
+    revalidateTag(`profile-${user.id}`);
+    revalidateTag('services');
+    revalidateTag(`user-services-${user.id}`);
+
+    // 12. Success response - let client handle navigation
+    if (status === 'draft') {
+      return {
+        success: true,
+        message: 'Η υπηρεσία αποθηκεύτηκε ως προσχέδιο επιτυχώς!',
+      };
+    } else {
+      return {
+        success: true,
+        message: 'Η υπηρεσία υποβλήθηκε για έγκριση επιτυχώς!',
+      };
+    }
+  } catch (error: any) {
+    // 13. Comprehensive error handling
+    console.error('Service creation error:', error);
+    return handleBetterAuthError(error);
+  }
+}
