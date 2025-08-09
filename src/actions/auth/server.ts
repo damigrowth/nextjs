@@ -1,5 +1,6 @@
 'use server';
 
+import { unstable_cache } from 'next/cache';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { ActionResult } from '@/lib/types/api';
@@ -22,12 +23,12 @@ export async function getSession(): Promise<
       headers: await headers(),
     });
 
-    console.log('getSession - session found: =>>>>>>>>>>>>>>>', session);
+    // console.log('getSession - session found: =>>>>>>>>>>>>>>>', session);
     // If we have a session but no user, the user was likely deleted
     if (session && !session.user) {
-      console.log(
-        'Session exists but user is null - user may have been deleted',
-      );
+      // console.log(
+      //   'Session exists but user is null - user may have been deleted',
+      // );
       return {
         success: false,
         error: 'Invalid session - user not found',
@@ -37,18 +38,18 @@ export async function getSession(): Promise<
     // Additional validation: check if user exists in database
     if (session?.user?.id) {
       try {
-        console.log(
-          'getSession - validating user in database:',
-          session.user.id,
-        );
+        // console.log(
+        //   'getSession - validating user in database:',
+        //   session.user.id,
+        // );
         const dbUser = await prisma.user.findUnique({
           where: { id: session.user.id },
         });
 
-        console.log('getSession - database user found:', !!dbUser);
+        // console.log('getSession - database user found:', !!dbUser);
 
         if (!dbUser) {
-          console.log('User not found in database - cleaning up session');
+          // console.log('User not found in database - cleaning up session');
           // User was deleted from database, invalidate session
           await auth.api.signOut({
             headers: await headers(),
@@ -88,7 +89,7 @@ export async function requireAuth(redirectTo = '/login') {
   const sessionResult = await getSession();
 
   if (!sessionResult.success || !sessionResult.data.session) {
-    console.log('Authentication required - redirecting to:', redirectTo);
+    // console.log('Authentication required - redirecting to:', redirectTo);
     redirect(redirectTo);
   }
 
@@ -96,7 +97,19 @@ export async function requireAuth(redirectTo = '/login') {
 }
 
 /**
+ * Internal function to fetch profile data (cached, no dynamic data)
+ */
+async function _getProfileForUser(userId: string): Promise<Profile | null> {
+  const profileResult = await getProfileByUserId(userId);
+  if (profileResult.success) {
+    return profileResult.data;
+  }
+  return null;
+}
+
+/**
  * Get current authenticated user with complete profile
+ * Uses Better Auth cookie caching + selective profile caching
  */
 export async function getCurrentUser(): Promise<
   ActionResult<{
@@ -106,6 +119,7 @@ export async function getCurrentUser(): Promise<
   }>
 > {
   try {
+    // Get session (not cached - uses Better Auth cookie cache if enabled)
     const sessionResult = await getSession();
 
     if (!sessionResult.success) {
@@ -116,16 +130,23 @@ export async function getCurrentUser(): Promise<
     }
 
     const { session: fullSessionData } = sessionResult.data;
-
     const user = fullSessionData?.user || null;
     const session = fullSessionData?.session || null;
     let profile: Profile | null = null;
 
+    // Only cache profile data if user exists
     if (user?.id) {
-      const profileResult = await getProfileByUserId(user.id);
-      if (profileResult.success) {
-        profile = profileResult.data;
-      }
+      // Cache only the profile fetch, not the session
+      const getCachedProfile = unstable_cache(
+        _getProfileForUser,
+        [`user-profile-${user.id}`],
+        {
+          tags: [`user-${user.id}`, `profile-${user.id}`, 'profiles'],
+          revalidate: 300, // 5 minutes cache
+        },
+      );
+
+      profile = await getCachedProfile(user.id);
     }
 
     return {

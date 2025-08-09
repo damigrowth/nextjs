@@ -297,7 +297,7 @@ export async function listUserSessions(userId: string) {
       headers: await headers(),
     });
 
-    console.log('Better Auth listUserSessions result:', result);
+    // console.log('Better Auth listUserSessions result:', result);
 
     // Better Auth returns { sessions: [...] }
     const sessions = result?.sessions || [];
