@@ -31,6 +31,7 @@ module.exports = {
   				DEFAULT: 'hsl(var(--secondary))',
   				foreground: 'hsl(var(--secondary-foreground))'
   			},
+  			third: 'hsl(var(--third))',
   			muted: {
   				DEFAULT: 'hsl(var(--muted))',
   				foreground: 'hsl(var(--muted-foreground))'
@@ -97,13 +98,31 @@ module.exports = {
   				'100%': {
   					opacity: '1'
   				}
+  			},
+  			'bounce-x': {
+  				'0%, 100%': {
+  					transform: 'translateX(0px)'
+  				},
+  				'50%': {
+  					transform: 'translateX(-20px)'
+  				}
+  			},
+  			'bounce-y': {
+  				'0%, 100%': {
+  					transform: 'translateY(0px)'
+  				},
+  				'50%': {
+  					transform: 'translateY(-20px)'
+  				}
   			}
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
   			'slide-in-down': 'slide-in-down 0.4s ease-in-out',
-  			'slide-in': 'slide-in 0.4s ease-in-out'
+  			'slide-in': 'slide-in 0.4s ease-in-out',
+  			'bounce-x': 'bounce-x 6s ease-in-out infinite',
+  			'bounce-y': 'bounce-y 6s ease-in-out infinite'
   		}
   	}
   },
