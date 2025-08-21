@@ -272,6 +272,8 @@
     --primary-foreground: 0 0% 98%;
     --secondary: 139.99 41% 55%;
     --secondary-foreground: 0 0% 98%;
+    /* --green: #198754; */
+    --third: 152.18 68.75% 31.37%;
     --muted: 0 0% 96.9%;
     --muted-foreground: 220 9% 46%;
     --accent: 0 0% 96.9%;
@@ -313,6 +315,7 @@
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 14.9%;
     --secondary-foreground: 0 0% 98%;
+    --third: 152.18 68.75% 31.37%;
     --muted: 0 0% 14.9%;
     --muted-foreground: 0 0% 63.9%;
     --accent: 0 0% 14.9%;
@@ -424,8 +427,6 @@
     @apply text-[var(--headings-color)] font-sans;
   }
 }
-
-
 
 @layer base {
   * {
