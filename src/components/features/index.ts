@@ -5,6 +5,7 @@
 
 // Admin components
 export * from './admin';
+export * from './home';
 
 // Auth components (when created)
 // export * from './auth';
