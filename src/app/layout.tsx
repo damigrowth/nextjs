@@ -44,18 +44,18 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           initialSession={initialSession}
         >
           {/* <InstallBootstrap /> */}
-          <div className='overflow-hidden box-border min-h-screen bg-inherit relative z-[1] w-full'>
-            <PathChecker excludes={['/dashboard', '/admin']}>
-              <Header />
-            </PathChecker>
-            <div>
-              <Notifications>{children}</Notifications>
-              <PathChecker excludes={['/dashboard', '/admin']}>
-                <Footer />
-              </PathChecker>
-              <BottomToTop_D />
-            </div>
-          </div>
+          {/* <div className='overflow-hidden box-border min-h-screen bg-inherit relative z-[1] w-full'> */}
+          <PathChecker excludes={['/dashboard', '/admin']}>
+            <Header />
+          </PathChecker>
+          <main className='mt-20'>
+            <Notifications>{children}</Notifications>
+          </main>
+          <PathChecker excludes={['/dashboard', '/admin']}>
+            <Footer />
+          </PathChecker>
+          <BottomToTop_D />
+          {/* </div> */}
         </AuthProvider>
         {/* <PathChecker excludes={['/dashboard', '/admin']}>
           <NavMenuMobileWrapper_D />
