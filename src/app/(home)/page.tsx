@@ -8,6 +8,15 @@
 //   FeaturedFreelancersHome_D,
 // } from '@/components/dynamic';
 
+import {
+  Categories,
+  Features,
+  Freelancers,
+  Hero,
+  Services,
+  Taxonomies,
+  Testimonials,
+} from '@/components/features';
 import { Meta } from '@/lib/seo/Meta';
 
 // import { getData } from '@/lib/client/operations';
@@ -22,9 +31,10 @@ export async function generateMetadata() {
   // Temporarily simplified to isolate the RangeError
   return {
     title: 'Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη',
-    description: 'Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.',
+    description:
+      'Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.',
   };
-  
+
   // Original code (commented out to isolate issue):
   // const { meta } = await Meta({
   //   titleTemplate:
@@ -67,12 +77,13 @@ export default async function OptimizedHomePage({ searchParams }) {
   return (
     <>
       {/* <HomeSchema /> */}
-
-      {/* <HeroHomeOptimized categories={categories?.data || []} />
-
-      <FeaturedCategoriesHome categories={categories?.data || []} /> */}
-
-      {/* <Features_D /> */}
+      <Hero />
+      <Categories />
+      <Features />
+      <Services />
+      <Freelancers />
+      <Testimonials />
+      <Taxonomies />
 
       {/* <FeaturedServicesHome_D
         categories={categories?.data || []}
@@ -85,7 +96,6 @@ export default async function OptimizedHomePage({ searchParams }) {
         initialPagination={freelancers?.meta?.pagination || {}}
       /> */}
 
-      {/* <Stats_D /> */}
       {/* 
       <AllTaxonomies_D
         freelancerSubcategories={topFreelancerSubcategories}
