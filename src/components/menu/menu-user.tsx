@@ -146,11 +146,17 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
                 lastName={lastName}
                 displayName={displayName}
                 hideDisplayName
-                image={typeof image === 'string' 
-                  ? image 
-                  : image 
-                  ? getOptimizedCloudinaryUrl(image, { width: 80, height: 80, crop: 'fill' })
-                  : null}
+                image={
+                  typeof image === 'string'
+                    ? image
+                    : image
+                      ? getOptimizedCloudinaryUrl(image, {
+                          width: 80,
+                          height: 80,
+                          crop: 'fill',
+                        })
+                      : null
+                }
                 width={40}
                 height={40}
               />
