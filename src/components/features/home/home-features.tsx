@@ -1,0 +1,70 @@
+'use client';
+
+import React from 'react';
+import { Search, UserCheck, CreditCard, MessageSquare } from 'lucide-react';
+import { featuresData } from '@/constants/datasets/data';
+
+type FeatureData = {
+  iconClass: string;
+  title: string;
+  description: string;
+};
+
+type Props = {
+  features?: FeatureData[];
+};
+
+// Map FontAwesome icons to Lucide React icons
+function getFeatureIcon(iconClass: string) {
+  const iconMap: { [key: string]: React.ReactNode } = {
+    'flaticon-cv': <Search size={40} />,
+    'flaticon-web-design': <UserCheck size={40} />,
+    'flaticon-secure': <CreditCard size={40} />,
+    'flaticon-customer-service': <MessageSquare size={40} />,
+  };
+
+  return iconMap[iconClass] || <Search size={40} />;
+}
+
+export default function FeaturesHome({ features }: Props) {
+  // Use provided features or fallback to default data
+  const featuresItems = features || featuresData;
+
+  return (
+    <section className='py-[120px] pt-10 pb-10 md:pb-[30px] bg-[#222]'>
+      <div className='container mx-auto px-6'>
+        <div className='flex flex-wrap'>
+          <div className='w-full'>
+            <div className='text-center mb-12'>
+              <h2 className='text-xl lg:text-2xl font-bold mb-4 text-[#5bbb7b]'>
+                Ψάχνεις κάποια υπηρεσία;
+              </h2>
+              <h3 className='text-sm text-white font-normal'>
+                Βρες Επαγγελματίες και Υπηρεσίες που Ταιριάζουν στις Ανάγκες
+                σου.
+              </h3>
+            </div>
+          </div>
+        </div>
+
+        <div className='flex flex-wrap'>
+          {featuresItems.map((feature, index) => (
+            <div key={index} className='w-full sm:w-1/2 lg:w-1/4'>
+              <div className='bg-transparent rounded-xl mb-1 mt-5 py-10 px-[30px] pb-[30px] relative transition-all duration-300 ease-in-out text-center group hover:shadow-[0px_6px_15px_rgba(64,79,104,0.05)]'>
+                <div className='bg-[#f1fcfa] border border-[#959595] rounded-full h-[110px] w-[110px] leading-[120px] mb-5 transition-all duration-300 ease-in-out text-[#1f4b3f] text-[40px] relative z-[1] group-hover:bg-[#198754] group-hover:text-white group-hover:shadow-none flex items-center justify-center place-self-center'>
+                  {getFeatureIcon(feature.iconClass)}
+                </div>
+                <div className='px-[30px] pb-5 pt-2'>
+                  <h4 className='text-[15px] font-bold mb-[5px] leading-[1.5em] pb-2 text-[#5bbb7b]'>
+                    {feature.title}
+                  </h4>
+                  <p className='text-white'>{feature.description}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
