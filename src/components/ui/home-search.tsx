@@ -5,13 +5,13 @@ import { Search } from 'lucide-react';
 import { cn } from '@/lib/utils/index';
 import { Button } from '@/components/ui/button';
 
-export interface HomeSearchProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface HomeSearchProps extends React.FormHTMLAttributes<HTMLFormElement> {
   onSearch?: (query: string) => void;
   placeholder?: string;
   buttonText?: string;
 }
 
-const HomeSearch = React.forwardRef<HTMLDivElement, HomeSearchProps>(
+const HomeSearch = React.forwardRef<HTMLFormElement, HomeSearchProps>(
   (
     {
       className,
@@ -64,7 +64,7 @@ const HomeSearch = React.forwardRef<HTMLDivElement, HomeSearchProps>(
               <div className='text-center md:text-left h-full flex items-center justify-center md:justify-end'>
                 <Button
                   type='submit'
-                  className='w-full md:w-auto h-11 bg-[#198754] text-primary-foreground hover:bg-secondary font-medium rounded-[60px] px-5 py-1.5 text-[15px] border-none outline-none focus:outline-none focus:ring-0 transition-all duration-[400ms] ease-in-out inline-block relative overflow-hidden text-center z-0'
+                  className='w-full md:w-auto h-11 bg-[#198754] text-primary-foreground hover:bg-secondary font-medium rounded-[60px] px-5 py-1.5 text-[15px] border-none outline-none focus:outline-none focus:ring-0 transition-all duration-300 ease-in-out inline-block relative overflow-hidden text-center z-0'
                 >
                   {buttonText}
                 </Button>

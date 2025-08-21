@@ -141,7 +141,7 @@ function HeroImages() {
 
         {/* Iconbox Small 1 - Glassmorphism design */}
         <div className='absolute rounded-2xl backdrop-blur-md bg-white/30 border border-white/50 shadow-[10px_10px_40px_rgba(34,34,34,0.1)] p-[20px_30px_20px_20px] text-left flex left-[2%] bottom-[-13%] z-[1] animate-bounce-x'>
-          <span className='bg-[#ffe598] hover:bg-[#ffd700] text-[#222222] hover:text-[#222222] left-0 relative top-0 rounded-full flex items-center justify-center text-2xl h-[50px] w-[50px] transition-all duration-[0.4s] ease-in-out'>
+          <span className='bg-[#ffe598] hover:bg-[#ffd700] text-[#222222] hover:text-[#222222] left-0 relative top-0 rounded-full flex items-center justify-center text-2xl h-[50px] w-[50px] transition-all duration-300 ease-in-out'>
             <Star className='h-6 w-6' />
           </span>
           <div className='pl-5'>
@@ -154,7 +154,7 @@ function HeroImages() {
 
         {/* Iconbox Small 2 - Glassmorphism design with white gradient */}
         <div className='absolute rounded-2xl backdrop-blur-md bg-gradient-to-t from-white/70 to-white/40 border border-white/50 shadow-[10px_10px_40px_rgba(34,34,34,0.1)] p-[20px_30px_20px_20px] text-left flex left-[20%] bottom-[20%] z-[1] animate-bounce-y'>
-          <span className='bg-[#198754] hover:bg-[#821987] text-white hover:text-white left-0 relative top-0 rounded-full flex items-center justify-center text-2xl h-[50px] w-[50px] transition-all duration-[0.4s] ease-in-out'>
+          <span className='bg-[#198754] hover:bg-[#821987] text-white hover:text-white left-0 relative top-0 rounded-full flex items-center justify-center text-2xl h-[50px] w-[50px] transition-all duration-300 ease-in-out'>
             <Rocket className='h-6 w-6' />
           </span>
           <div className='pl-5'>
