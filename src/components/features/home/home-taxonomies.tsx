@@ -22,7 +22,7 @@ const TaxonomyColumn = ({
       <li key={item.id} className='leading-10 list-none'>
         <Link
           href={`/${type}/${item.slug}`}
-          className='text-[15px] text-[rgb(34,34,34)] hover:text-[rgb(91,187,123)] hover:underline transition-colors'
+          className='text-sm text-dark hover:text-fourth hover:underline transition-colors'
         >
           {type === 'pros' ? item.plural || item.label : item.label}
         </Link>
@@ -65,26 +65,26 @@ export default function HomeTaxonomies() {
   const [activeTab, setActiveTab] = useState<'pros' | 'services'>('pros');
 
   return (
-    <section className='pt-16 pb-28 bg-[#fbf7ed]'>
+    <section className='pt-16 pb-28 bg-orangy'>
       <div className='container mx-auto px-6'>
         <div className='mb-12'>
           <div className='flex space-x-12'>
             <button
               onClick={() => setActiveTab('pros')}
-              className={`text-[20px] font-bold transition-colors ${
+              className={`text-xl font-bold transition-colors ${
                 activeTab === 'pros'
-                  ? 'text-[#222]'
-                  : 'text-[#222]/30 hover:text-[#222]'
+                  ? 'text-dark'
+                  : 'text-dark/30 hover:text-dark'
               }`}
             >
               Κατηγορίες Επαγγελμάτων
             </button>
             <button
               onClick={() => setActiveTab('services')}
-              className={`text-[20px] font-bold transition-colors ${
+              className={`text-xl font-bold transition-colors ${
                 activeTab === 'services'
-                  ? 'text-[#222]'
-                  : 'text-[#222]/30 hover:text-[#222]'
+                  ? 'text-dark'
+                  : 'text-dark/30 hover:text-dark'
               }`}
             >
               Κατηγορίες Υπηρεσιών

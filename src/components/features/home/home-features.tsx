@@ -31,12 +31,12 @@ export default function FeaturesHome({ features }: Props) {
   const featuresItems = features || featuresData;
 
   return (
-    <section className='py-[120px] pt-10 pb-10 md:pb-[30px] bg-[#222]'>
+    <section className='py-30 pt-10 pb-10 md:pb-8 bg-dark'>
       <div className='container mx-auto px-6'>
         <div className='flex flex-wrap'>
           <div className='w-full'>
             <div className='text-center mb-12'>
-              <h2 className='text-xl lg:text-2xl font-bold mb-4 text-[#5bbb7b]'>
+              <h2 className='text-xl lg:text-2xl font-bold mb-4 text-fourth'>
                 Ψάχνεις κάποια υπηρεσία;
               </h2>
               <h3 className='text-sm text-white font-normal'>
@@ -50,12 +50,12 @@ export default function FeaturesHome({ features }: Props) {
         <div className='flex flex-wrap'>
           {featuresItems.map((feature, index) => (
             <div key={index} className='w-full sm:w-1/2 lg:w-1/4'>
-              <div className='bg-transparent rounded-xl mb-1 mt-5 py-10 px-[30px] pb-[30px] relative transition-all duration-300 ease-in-out text-center group hover:shadow-[0px_6px_15px_rgba(64,79,104,0.05)]'>
-                <div className='bg-[#f1fcfa] border border-[#959595] rounded-full h-[110px] w-[110px] leading-[120px] mb-5 transition-all duration-300 ease-in-out text-[#1f4b3f] text-[40px] relative z-[1] group-hover:bg-[#198754] group-hover:text-white group-hover:shadow-none flex items-center justify-center place-self-center'>
+              <div className='bg-transparent rounded-xl mb-1 mt-5 py-10 px-8 pb-8 relative transition-all duration-300 ease-in-out text-center group hover:shadow-lg'>
+                <div className='bg-bluey border border-gray-500 rounded-full h-28 w-28 leading-30 mb-5 transition-all duration-300 ease-in-out text-primary text-4xl relative z-10 group-hover:bg-third group-hover:text-white group-hover:shadow-none flex items-center justify-center place-self-center'>
                   {getFeatureIcon(feature.iconClass)}
                 </div>
-                <div className='px-[30px] pb-5 pt-2'>
-                  <h4 className='text-[15px] font-bold mb-[5px] leading-[1.5em] pb-2 text-[#5bbb7b]'>
+                <div className='px-8 pb-5 pt-2'>
+                  <h4 className='text-sm font-bold mb-1 leading-6 pb-2 text-fourth'>
                     {feature.title}
                   </h4>
                   <p className='text-white'>{feature.description}</p>
