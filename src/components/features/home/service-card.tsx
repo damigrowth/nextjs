@@ -2,10 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Heart, Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { RatingDisplay } from '@/components/ui/rating-display';
+import { SaveButton } from '@/components/ui/save-button';
 import MediaDisplay from '@/components/ui/media-display';
 
 interface ServiceCardProps {
@@ -39,21 +39,10 @@ export default function ServiceCard({
   onSave,
   isSaved = false,
 }: ServiceCardProps) {
-  const handleSaveClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleSaveClick = () => {
     onSave?.(service.id);
   };
 
-  const truncateTitle = (title: string, maxLines: number = 3) => {
-    const words = title.split(' ');
-    // Rough estimation: ~8 words per line on average
-    const maxWords = maxLines * 8;
-    if (words.length > maxWords) {
-      return words.slice(0, maxWords).join(' ') + '...';
-    }
-    return title;
-  };
 
   const getInitials = (name: string) => {
     return name
@@ -77,18 +66,11 @@ export default function ServiceCard({
           />
 
           {/* Save Button */}
-          <Button
-            variant='ghost'
-            size='icon'
-            className='absolute top-3 right-3 bg-white/90 hover:bg-white border border-gray-200 shadow-sm rounded-full h-8 w-8'
-            onClick={handleSaveClick}
-          >
-            <Heart
-              className={`h-4 w-4 ${
-                isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600'
-              }`}
-            />
-          </Button>
+          <SaveButton
+            isSaved={isSaved}
+            onSave={handleSaveClick}
+            className='absolute top-3 right-3'
+          />
         </div>
 
         {/* Content Section */}
@@ -99,7 +81,7 @@ export default function ServiceCard({
           </p>
 
           {/* Title - Truncated to 2 lines */}
-          <h3 className='font-semibold text-[rgb(34,34,34)] mb-3 leading-tight text-base'>
+          <h3 className='font-semibold text-dark mb-3 leading-tight text-base'>
             <Link
               href={`/services/${service.slug}`}
               className='hover:text-third transition-colors'
@@ -119,18 +101,11 @@ export default function ServiceCard({
           </h3>
 
           {/* Rating */}
-          {service.reviewCount > 0 && (
-            <div className='flex items-center gap-1 mb-4'>
-              <Star className='h-4 w-4 fill-yellow-400 text-yellow-400' />
-              <span className='text-[14px] font-medium text-[rgb(34,34,34)]'>
-                {service.rating.toFixed(1)}
-              </span>
-              <span className='text-[14px] text-[rgb(34,34,34)]'>
-                ({service.reviewCount}{' '}
-                {service.reviewCount === 1 ? 'αξιολόγηση' : 'αξιολογήσεις'})
-              </span>
-            </div>
-          )}
+          <RatingDisplay
+            rating={service.rating}
+            reviewCount={service.reviewCount}
+            className='mb-4'
+          />
 
           {/* Separator Line */}
           <div className='border-t border-gray-200 pt-3 mt-auto'>
@@ -149,7 +124,7 @@ export default function ServiceCard({
                 </Avatar>
                 <Link
                   href={`/profile/${service.profile.username}`}
-                  className='text-sm text-gray-700 hover:text-third transition-colors font-medium'
+                  className='text-sm text-body hover:text-third transition-colors'
                 >
                   {service.profile.displayName}
                 </Link>
@@ -157,9 +132,11 @@ export default function ServiceCard({
 
               {/* Price */}
               {service.price && service.price > 0 && (
-                <div className='text-sm text-gray-700'>
-                  <span className='font-normal'>από </span>
-                  <span className='font-semibold'>{service.price}€</span>
+                <div className='text-base'>
+                  <span className='font-normal text-body'>από </span>
+                  <span className='font-semibold text-dark'>
+                    {service.price}€
+                  </span>
                 </div>
               )}
             </div>

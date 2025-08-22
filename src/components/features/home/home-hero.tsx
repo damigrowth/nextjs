@@ -106,7 +106,7 @@ function PopularSearches({ subcategories }: { subcategories: any[] }) {
           <Link href={`/ipiresies/${sub.slug}`} key={index}>
             <Badge
               variant='outline'
-              className='no-underline inline-block font-sans font-normal text-[12px] leading-[24px] py-[3px] px-[18px] rounded-[60px] border border-[#7d7d7d] bg-white text-[#222222] transition-colors duration-200 ease-in-out hover:bg-[rgb(226,255,235)] cursor-pointer'
+              className='no-underline inline-block font-sans font-normal text-[12px] leading-[24px] py-[3px] px-[18px] rounded-[60px] border border-[#7d7d7d] bg-white text-dark transition-colors duration-200 ease-in-out hover:bg-[rgb(226,255,235)] cursor-pointer'
             >
               {sub.label}
             </Badge>
@@ -140,9 +140,9 @@ function HeroImages() {
         />
 
         {/* Iconbox Small 1 - Glassmorphism design */}
-        <div className='absolute rounded-2xl backdrop-blur-md bg-white/30 border border-white/50 shadow-[10px_10px_40px_rgba(34,34,34,0.1)] p-[20px_30px_20px_20px] text-left flex left-[2%] bottom-[-13%] z-[1] animate-bounce-x'>
-          <span className='bg-[#ffe598] hover:bg-[#ffd700] text-[#222222] hover:text-[#222222] left-0 relative top-0 rounded-full flex items-center justify-center text-2xl h-[50px] w-[50px] transition-all duration-300 ease-in-out'>
-            <Star className='h-6 w-6' />
+        <div className='absolute rounded-2xl backdrop-blur-md bg-white/30 border border-white/50 shadow-lg p-5 pr-7 text-left flex left-[2%] bottom-[-13%] z-[1] animate-bounce-x'>
+          <span className='bg-yellow-light text-dark hover:text-dark left-0 relative top-0 rounded-full flex items-center justify-center text-2xl h-12 w-12'>
+            <Star className='h-6 w-6 text-dark/50' />
           </span>
           <div className='pl-5'>
             <h6 className='mb-[1px] font-semibold text-base text-gray-800'>
@@ -153,9 +153,9 @@ function HeroImages() {
         </div>
 
         {/* Iconbox Small 2 - Glassmorphism design with white gradient */}
-        <div className='absolute rounded-2xl backdrop-blur-md bg-gradient-to-t from-white/70 to-white/40 border border-white/50 shadow-[10px_10px_40px_rgba(34,34,34,0.1)] p-[20px_30px_20px_20px] text-left flex left-[20%] bottom-[20%] z-[1] animate-bounce-y'>
-          <span className='bg-[#198754] hover:bg-[#821987] text-white hover:text-white left-0 relative top-0 rounded-full flex items-center justify-center text-2xl h-[50px] w-[50px] transition-all duration-300 ease-in-out'>
-            <Rocket className='h-6 w-6' />
+        <div className='absolute rounded-2xl backdrop-blur-md bg-gradient-to-t from-white/70 to-white/40 border border-white/50 shadow-md p-5 pr-7 text-left flex left-[20%] bottom-[20%] z-[1] animate-bounce-y'>
+          <span className='bg-third left-0 relative top-0 rounded-full flex items-center justify-center text-2xl h-12 w-12'>
+            <Rocket className='h-6 w-6 text-white/50' />
           </span>
           <div className='pl-5'>
             <h6 className='mb-[1px] font-semibold text-base text-gray-900'>
@@ -214,23 +214,16 @@ function DynamicHeroContent({ categories }: { categories: Category[] }) {
 
 export default function HeroHome({ categories = [] }: Props) {
   return (
-    // Equivalent to: hero-home12 overflow-hidden (changed to overflow-visible for iconboxes)
-    <section className='overflow-visible bg-[#fbf7ed] bg-gradient-to-t from-[#fff] to-[#ffe9b2] [contain:layout]'>
-      {/* Equivalent to: container */}
+    <section className='overflow-visible bg-orangy bg-gradient-to-t from-white to-yellowish contain-layout'>
       <div className='container mx-auto mt-24 mb-52 pl-6'>
-        {/* Equivalent to: row */}
         <div className='flex flex-wrap overflow-visible'>
-          {/* Left Content - Equivalent to: col-xl-7 hero-left */}
           <div className='w-full flex flex-col justify-center xl:w-7/12 xl:pr-6'>
-            {/* Static content renders immediately - no data dependencies */}
             <StaticHeroContent />
 
-            {/* Dynamic content renders when data is ready */}
             <div className='mt-8'>
               <Suspense
                 fallback={
                   <div className='h-[120px] flex items-center'>
-                    {/* Equivalent to: spinner-border spinner-border-sm me-2 */}
                     <div
                       className='inline-block w-4 h-4 mr-2 border-2 border-current border-r-transparent rounded-full animate-spin'
                       role='status'
@@ -244,7 +237,6 @@ export default function HeroHome({ categories = [] }: Props) {
             </div>
           </div>
 
-          {/* Right Images - Equivalent to: col-xl-5 d-none d-xl-block */}
           <div className='hidden xl:block xl:w-5/12 overflow-visible'>
             <HeroImages />
           </div>
