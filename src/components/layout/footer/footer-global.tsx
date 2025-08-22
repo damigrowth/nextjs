@@ -13,7 +13,7 @@ import Socials from '@/components/icon/socials';
 
 export default async function Footer() {
   return (
-    <footer className='bg-gray-900 pb-0 pt-[60px]'>
+    <footer className='bg-dark pb-0 pt-[60px]'>
       <div className='container mx-auto px-4'>
         <div className='grid grid-cols-1 lg:grid-cols-12 gap-8'>
           <div className='lg:col-span-6'>

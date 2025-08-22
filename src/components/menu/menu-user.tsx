@@ -233,11 +233,11 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
         asChild
         variant='outline'
         size='default'
-        className='hover:bg-secondary hover:text-secondary-foreground hover:border-secondary'
+        className='hover:bg-secondary hover:text-secondary-foreground hover:border-secondary rounded-full'
       >
         <LinkNP href='/login'>Σύνδεση</LinkNP>
       </Button>
-      <Button asChild size='default'>
+      <Button asChild size='default' className='rounded-full'>
         <LinkNP href='/register'>Εγγραφή</LinkNP>
       </Button>
     </div>
@@ -246,7 +246,7 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
       asChild
       variant='ghost'
       size='default'
-      className='hover:bg-secondary hover:text-secondary-foreground hover:border-secondary'
+      className='hover:bg-secondary hover:text-secondary-foreground hover:border-secondary rounded-full'
     >
       <LinkNP href='/login'>Σύνδεση</LinkNP>
     </Button>
