@@ -1,4 +1,4 @@
-import { BasicInfoForm } from '@/components/forms/profile';
+import { BasicInfoForm } from '@/components';
 
 export default function BasicPage() {
   return (

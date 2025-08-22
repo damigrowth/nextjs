@@ -1,5 +1,5 @@
+import { DashboardLayout } from '@/components';
 import React from 'react';
-import { DashboardLayout } from '@/components/features/dashboard';
 
 export const dynamic = 'force-dynamic';
 

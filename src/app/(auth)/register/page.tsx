@@ -6,9 +6,11 @@ import {
   redirectOnboardingUsers,
   redirectCompletedUsers,
 } from '@/actions/auth/server';
-import { RegisterForm } from '@/components/forms';
-import { RegisterHeading } from '@/components/layout/heading';
-import { AuthTypeOptions } from '@/components/layout/navigation';
+import {
+  AuthTypeOptions,
+  FormAuthRegister,
+  HeadingFormRegister,
+} from '@/components/auth';
 import { JSX } from 'react';
 
 export const dynamic = 'force-dynamic';
@@ -53,7 +55,7 @@ export default async function RegisterPage(): Promise<JSX.Element> {
           <div className='xl:w-2/5 w-full max-w-2xl'>
             <div className='relative bg-white p-12 sm:p-8 rounded-xl shadow-lg border border-gray-300'>
               <div className='mb-8'>
-                <RegisterHeading />
+                <HeadingFormRegister />
                 <p className='text-gray-600 mt-5'>
                   Έχεις ήδη λογαριασμό?{' '}
                   <LinkNP
@@ -65,7 +67,7 @@ export default async function RegisterPage(): Promise<JSX.Element> {
                 </p>
               </div>
               <AuthTypeOptions />
-              <RegisterForm />
+              <FormAuthRegister />
             </div>
           </div>
         </div>

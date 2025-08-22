@@ -1,7 +1,5 @@
-import { AppSidebar } from '@/components/features/admin/app-sidebar';
-import { SiteHeader } from '@/components/features/admin/site-header';
+import { AdminGuard, AppSidebar, SiteHeader } from '@/components';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { AdminGuard } from '@/components/features/admin';
 
 export default function AdminLayout({
   children,

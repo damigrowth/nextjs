@@ -1,8 +1,2 @@
-export {
-  AuthProvider,
-  useAuth,
-  useAuthUser,
-  useAuthLoading,
-  useAuthPermissions,
-  useAuthUserInfo,
-} from './auth';
+// Providers
+export { AuthProvider, useAuth, useAuthUser, useAuthLoading, useAuthPermissions, useAuthUserInfo } from './auth-provider';

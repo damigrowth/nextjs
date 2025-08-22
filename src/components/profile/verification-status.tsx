@@ -15,37 +15,44 @@ type VerificationStatusProps = {
   verificationData: VerificationStatus;
 };
 
-export function VerificationStatus({ verificationData }: VerificationStatusProps) {
+export default function VerificationStatus({
+  verificationData,
+}: VerificationStatusProps) {
   const getStatusConfig = (status?: string) => {
     switch (status) {
       case 'APPROVED':
         return {
           title: 'Εγκεκριμένη Πιστοποίηση',
-          description: 'Το προφίλ σας έχει πιστοποιηθεί επιτυχώς και είναι πλέον εγκεκριμένο.',
-          icon: <ShieldCheck className='h-5 w-5 text-green-600' />
+          description:
+            'Το προφίλ σας έχει πιστοποιηθεί επιτυχώς και είναι πλέον εγκεκριμένο.',
+          icon: <ShieldCheck className='h-5 w-5 text-green-600' />,
         };
       case 'REJECTED':
         return {
           title: 'Πιστοποίηση Απορρίφθηκε',
-          description: 'Η αίτηση πιστοποίησης απορρίφθηκε. Παρακαλώ ελέγξτε τα στοιχεία σας και δοκιμάστε ξανά.',
-          icon: <AlertTriangle className='h-5 w-5 text-red-600' />
+          description:
+            'Η αίτηση πιστοποίησης απορρίφθηκε. Παρακαλώ ελέγξτε τα στοιχεία σας και δοκιμάστε ξανά.',
+          icon: <AlertTriangle className='h-5 w-5 text-red-600' />,
         };
       case 'PENDING':
         return {
           title: 'Πιστοποίηση σε Εξέλιξη',
-          description: 'Η αίτηση πιστοποίησης έχει υποβληθεί και είναι σε κατάσταση αξιολόγησης.',
-          icon: <PulsatingDot color='rgb(255, 152, 0)' size={10} />
+          description:
+            'Η αίτηση πιστοποίησης έχει υποβληθεί και είναι σε κατάσταση αξιολόγησης.',
+          icon: <PulsatingDot color='rgb(255, 152, 0)' size={10} />,
         };
       default:
         return {
           title: 'Πιστοποίηση',
           description: 'Πιστοποιήστε την ταυτότητα και τα στοιχεία σας',
-          icon: null
+          icon: null,
         };
     }
   };
 
-  const { title, description, icon } = getStatusConfig(verificationData?.status);
+  const { title, description, icon } = getStatusConfig(
+    verificationData?.status,
+  );
 
   return (
     <div>

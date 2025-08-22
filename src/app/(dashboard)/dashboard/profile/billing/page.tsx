@@ -1,4 +1,4 @@
-import { BillingForm } from '@/components/forms/profile';
+import { BillingForm } from '@/components';
 
 export default function BillingPage() {
   return (

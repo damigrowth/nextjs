@@ -9,14 +9,14 @@
 // } from '@/components/dynamic';
 
 import {
-  Categories,
-  Features,
-  Freelancers,
-  Hero,
-  Services,
-  Taxonomies,
-  Testimonials,
-} from '@/components/features';
+  CategoriesHome,
+  FeaturesHome,
+  FreelancersHome,
+  HeroHome,
+  ServicesHome,
+  TaxonomiesHome,
+  TestimonialsHome,
+} from '@/components';
 import { Meta } from '@/lib/seo/Meta';
 
 // import { getData } from '@/lib/client/operations';
@@ -77,13 +77,13 @@ export default async function OptimizedHomePage({ searchParams }) {
   return (
     <>
       {/* <HomeSchema /> */}
-      <Hero />
-      <Categories />
-      <Features />
-      <Services />
-      <Freelancers />
-      <Testimonials />
-      <Taxonomies />
+      <HeroHome />
+      <CategoriesHome />
+      <FeaturesHome />
+      <ServicesHome />
+      <FreelancersHome />
+      <TestimonialsHome />
+      <TaxonomiesHome />
 
       {/* <FeaturedServicesHome_D
         categories={categories?.data || []}

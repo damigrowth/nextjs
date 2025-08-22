@@ -4,7 +4,7 @@ import LinkNP from '@/components/link';
 
 import { Meta } from '@/lib/seo/Meta';
 
-import { LoginForm } from '@/components/forms';
+import { FormAuthLogin } from '@/components/auth';
 import {
   redirectCompletedUsers,
   redirectOnboardingUsers,
@@ -71,7 +71,7 @@ export default async function LoginPage(): Promise<JSX.Element> {
                   </p>
                 )}
               </div>
-              <LoginForm />
+              <FormAuthLogin />
             </div>
           </div>
         </div>

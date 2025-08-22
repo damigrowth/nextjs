@@ -15,11 +15,15 @@ import {
   // CookiesBanner_D,
   // NavMenuMobileWrapper_D,
 } from '@/components/dynamic';
-import { Footer, Header } from '@/components/layout';
-import { Body, Notifications, PathChecker } from '@/components/layout/wrapper';
-import { AuthProvider } from '@/components/providers/auth';
+import { Footer, Header } from '@/components/shared/layout';
+import {
+  Body,
+  Notifications,
+  PathChecker,
+} from '@/components/shared/layout/wrapper';
 import { Toaster } from '@/components/ui/sonner';
 import { getCurrentUser } from '@/actions/auth/server';
+import { AuthProvider } from '@/components';
 
 interface RootLayoutProps {
   children: React.ReactNode;

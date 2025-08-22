@@ -1,4 +1,4 @@
-import { AdditionalInfoForm } from '@/components/forms/profile';
+import { AdditionalInfoForm } from '@/components';
 
 export default function AdditionalPage() {
   return (

@@ -1,7 +1,4 @@
-import { ChartAreaInteractive } from '@/components/features/admin/chart-area-interactive';
-import { DataTable } from '@/components/features/admin/data-table';
-import { SectionCards } from '@/components/features/admin/section-cards';
-
+import { ChartAreaInteractive, DataTable, SectionCards } from '@/components';
 import data from './data.json';
 
 // Force dynamic rendering for admin pages

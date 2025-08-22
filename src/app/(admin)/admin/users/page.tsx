@@ -1,4 +1,4 @@
-import { UserManagement } from '@/components/features/admin';
+import { UserManagement } from '@/components';
 
 // Force dynamic rendering for admin pages
 export const dynamic = 'force-dynamic';

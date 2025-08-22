@@ -1,4 +1,4 @@
-import { ChartAreaInteractive } from '@/components/features/admin/chart-area-interactive';
+import { ChartAreaInteractive } from '@/components';
 import {
   Card,
   CardContent,

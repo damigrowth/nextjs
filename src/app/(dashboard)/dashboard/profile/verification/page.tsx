@@ -1,11 +1,13 @@
-import { VerificationForm } from '@/components/forms/profile';
-import { VerificationStatus } from '@/components/profile/verification-status';
+import { VerificationForm } from '@/components';
+import { VerificationStatus } from '@/components';
 import { getVerificationStatus } from '@/actions/profiles/verification';
 
 export default async function VerificationPage() {
   // Fetch verification data server-side
   const verificationResult = await getVerificationStatus();
-  const verificationData = verificationResult.success ? verificationResult.data : null;
+  const verificationData = verificationResult.success
+    ? verificationResult.data
+    : null;
 
   return (
     <div className='space-y-6'>

@@ -1,4 +1,4 @@
-import { PresentationForm } from '@/components/forms/profile';
+import { PresentationForm } from '@/components';
 
 export default function PresentationPage() {
   return (

@@ -1,15 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { AccountForm } from '@/components/forms/profile';
-import { ChangePasswordForm } from '@/components/forms/profile/change-password-form';
-import { DeleteAccountForm } from '@/components/forms/profile/delete-account-form';
+import { AccountForm } from '@/components';
+import { ChangePasswordForm } from '@/components';
+import { DeleteAccountForm } from '@/components';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Key, Trash2 } from 'lucide-react';
 
 export default function AccountPage() {
@@ -30,10 +26,13 @@ export default function AccountPage() {
       {/* Account Actions */}
       <div className='space-y-4'>
         <h2 className='text-lg font-semibold'>Ενέργειες Λογαριασμού</h2>
-        
+
         <div className='flex flex-col sm:flex-row gap-4'>
           {/* Change Password Button */}
-          <Dialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen}>
+          <Dialog
+            open={changePasswordOpen}
+            onOpenChange={setChangePasswordOpen}
+          >
             <DialogTrigger asChild>
               <Button variant='outline' className='flex items-center gap-2'>
                 <Key className='h-4 w-4' />
