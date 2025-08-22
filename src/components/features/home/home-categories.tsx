@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import {
-  ArrowRight,
   Code2,
   Palette,
   Megaphone,
@@ -16,8 +15,6 @@ import {
   Heart,
   Star,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   Carousel,
   CarouselContent,
@@ -25,6 +22,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { CarouselPagination } from '@/components/ui/carousel-pagination';
+import { SectionHeader } from '@/components/ui/section-header';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 
 type ServiceTaxonomy = {
@@ -75,20 +74,20 @@ function CategoryCard({ category }: { category: ServiceTaxonomy }) {
   const { label, slug, children } = category;
 
   return (
-    <div className='bg-transparent rounded-xl mb-1 mt-5 py-10 px-[30px] pb-[30px] relative transition-all duration-300 ease-in-out group'>
+    <div className='bg-transparent rounded-xl mb-1 mt-5 py-10 px-8 pb-8 relative transition-all duration-300 ease-in-out group'>
       <div className='text-center'>
         <Link href={`/categories/${slug}`} className='inline-block'>
-          <div className='relative inline-block text-[40px] text-[#1f4b3f] z-[1] mb-5 transition-all duration-300 ease-in-out before:content-[""] before:bg-[#fbf7ed] before:rounded-full before:absolute before:bottom-[-10px] before:right-[-20px] before:h-[40px] before:w-[40px] before:z-[-1] before:transition-all before:duration-300 before:ease-in-out group-hover:before:bg-[#eafac1]'>
+          <div className='relative inline-block text-4xl text-primary z-10 mb-5 transition-all duration-300 ease-in-out before:content-[""] before:bg-orangy before:rounded-full before:absolute before:-bottom-2.5 before:-right-5 before:h-10 before:w-10 before:-z-10 before:transition-all before:duration-300 before:ease-in-out group-hover:before:bg-sixth'>
             {getCategoryIcon(slug)}
           </div>
         </Link>
       </div>
 
       <div className='mt-5'>
-        <h4 className='text-[15px] mb-[5px] font-bold leading-[1.5em] text-center'>
+        <h4 className='text-sm mb-1 font-bold leading-6 text-center'>
           <Link
             href={`/categories/${slug}`}
-            className='text-gray-900 hover:text-[#198754] transition-colors'
+            className='text-gray-900 hover:text-third transition-colors'
           >
             {label}
           </Link>
@@ -99,7 +98,7 @@ function CategoryCard({ category }: { category: ServiceTaxonomy }) {
             <span key={i}>
               <Link
                 href={`/ipiresies/${sub.slug}`}
-                className='hover:text-[#198754] transition-colors'
+                className='hover:text-third transition-colors'
               >
                 {sub.label}
               </Link>
@@ -123,41 +122,18 @@ export default function CategoriesHome({ categories = [] }: Props) {
   return (
     <section className='pt-5 pb-24'>
       <div className='container mx-auto px-6'>
-        <div className='flex flex-wrap items-center mb-10'>
-          <div className='w-full lg:w-9/12'>
-            <div className='relative mb-8 lg:mb-15'>
-              <h2 className='text-xl lg:text-2xl font-bold text-gray-900 mb-3'>
-                Κατηγορίες
-              </h2>
-              <p className='text-gray-600 font-sans'>
-                Ανακάλυψε 100+ κατηγορίες υπηρεσιών.
-              </p>
-            </div>
-          </div>
-          <div className='w-full lg:w-3/12'>
-            <div className='text-left lg:text-right mb-4 lg:mb-2'>
-              <Button
-                asChild
-                variant='link'
-                className='text-gray-800 hover:text-primary hover:no-underline'
-              >
-                <Link
-                  href='/categories'
-                  className='inline-flex items-center gap-2'
-                >
-                  Όλες οι Κατηγορίες
-                  <ArrowRight className='h-4 w-4' />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+        <SectionHeader
+          title='Κατηγορίες'
+          description='Ανακάλυψε 100+ κατηγορίες υπηρεσιών.'
+          linkHref='/categories'
+          linkText='Όλες οι Κατηγορίες'
+        />
 
         <div className='hidden lg:flex flex-wrap'>
           {displayCategories.slice(0, 8).map((category, index) => {
             const getBootstrapClasses = (index: number) => {
               const baseClasses = 'w-1/2 sm:w-1/2 lg:w-1/3 xl:w-1/4';
-              let borderClasses = 'border border-[#e9e9e9] -mb-px';
+              let borderClasses = 'border border-border -mb-px';
 
               switch (index) {
                 case 0:
@@ -200,7 +176,7 @@ export default function CategoriesHome({ categories = [] }: Props) {
                       className='basis-full sm:basis-1/2'
                     >
                       <div className='p-1'>
-                        <div className='border border-[#e9e9e9] shadow-sm rounded-xl'>
+                        <div className='border border-border shadow-sm rounded-xl'>
                           <CategoryCard category={category} />
                         </div>
                       </div>
@@ -208,16 +184,11 @@ export default function CategoriesHome({ categories = [] }: Props) {
                   ))}
                 </CarouselContent>
 
-                <div className='flex flex-wrap mt-4'>
-                  <div className='w-auto'>
-                    <CarouselPrevious className='static translate-y-0 h-10 w-10 swiper__btn btn__prev__001' />
-                  </div>
-                  <div className='w-auto flex-1'>
-                    <div className='swiper__pagination swiper__pagination__001 text-center'></div>
-                  </div>
-                  <div className='w-auto'>
-                    <CarouselNext className='static translate-y-0 h-10 w-10 swiper__btn btn__next__001' />
-                  </div>
+                <div className='flex justify-center mt-4'>
+                  <CarouselPagination
+                    slideCount={Math.ceil(displayCategories.length / 2)}
+                    className='justify-center'
+                  />
                 </div>
               </Carousel>
             </div>

@@ -264,16 +264,16 @@ export default function ServicesHome() {
   };
 
   return (
-    <section className='py-16 bg-[#fbf7ed]'>
+    <section className='py-16 bg-orangy'>
       <div className='container mx-auto px-6'>
         {/* Header Section */}
         <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-12'>
           {/* Left Side - Title & Description */}
           <div className='flex-1 lg:max-w-2xl'>
-            <h2 className='text-[24px] font-bold text-[rgb(34,34,34)] leading-[31.5px] mb-2'>
+            <h2 className='text-2xl font-bold text-dark leading-8 mb-2'>
               Δημοφιλείς Υπηρεσίες
             </h2>
-            <p className='text-[15px] font-normal text-[rgb(34,34,34)] leading-[27.75px] mb-[15px]'>
+            <p className='text-sm font-normal text-dark leading-7 mb-4'>
               Οι υπηρεσίες με τη μεγαλύτερη ζήτηση.
             </p>
           </div>
@@ -285,7 +285,7 @@ export default function ServicesHome() {
                 key={category.id}
                 variant='ghost'
                 size='sm'
-                className={`px-4 py-5 rounded-full transition-all duration-300 font-medium text-base text-[#222] hover:text-third hover:bg-white border-none hover:border-gray-200 hover:shadow-sm ${
+                className={`px-4 py-5 rounded-full transition-all duration-300 font-medium text-base text-dark hover:text-third hover:bg-white border-none hover:border-gray-200 hover:shadow-sm ${
                   activeCategory === category.id
                     ? 'bg-white text-third border border-gray-200 shadow-sm'
                     : 'bg-transparent'
@@ -312,7 +312,7 @@ export default function ServicesHome() {
                 length: Math.ceil(filteredServices.length / 4),
               }).map((_, slideIndex) => (
                 <CarouselItem key={slideIndex} className='pl-4'>
-                  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+                  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
                     {filteredServices
                       .slice(slideIndex * 4, (slideIndex + 1) * 4)
                       .map((service) => (
@@ -327,10 +327,6 @@ export default function ServicesHome() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-
-            {/* Navigation Arrows */}
-            <CarouselPrevious className='absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 bg-white hover:bg-gray-50 border border-gray-200 shadow-md h-10 w-10 rounded-full' />
-            <CarouselNext className='absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 bg-white hover:bg-gray-50 border border-gray-200 shadow-md h-10 w-10 rounded-full' />
 
             {/* Pagination Dots */}
             <CarouselPagination
