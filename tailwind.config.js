@@ -7,6 +7,15 @@ module.exports = {
   ],
   theme: {
     extend: {
+      // screens: {
+      //   '2xl': '1400px',
+      //   '3xl': '1600px',
+      //   '4xl': '1700px',
+      // },
+      maxWidth: {
+        '3xl': '1600px',
+        '4xl': '1700px',
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
