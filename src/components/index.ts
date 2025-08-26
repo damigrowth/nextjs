@@ -5,9 +5,7 @@
 
 // Domain exports
 export * from './admin';
-export * from './pages';
 export * from './auth';
-export * from './dashboard';
 export * from './home';
 export * from './profile';
 export * from './services';
@@ -15,3 +13,4 @@ export * from './shared'; // includes LinkNP
 export * from './shared/layout';
 export * from './providers';
 export * from './guards';
+export * from './dashboard';

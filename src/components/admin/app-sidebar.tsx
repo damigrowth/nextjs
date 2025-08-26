@@ -18,7 +18,7 @@ import {
   UserCheckIcon,
 } from 'lucide-react';
 
-import { NavDocuments, NavMain, NavSecondary, NavUser } from '@/components';
+import { NavDocuments, AdminNavMain, AdminNavSecondary, AdminNavUser } from '@/components';
 
 import {
   Sidebar,
@@ -128,12 +128,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <AdminNavMain items={data.navMain} />
         <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className='mt-auto' />
+        <AdminNavSecondary items={data.navSecondary} className='mt-auto' />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <AdminNavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
   );
