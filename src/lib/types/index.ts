@@ -8,6 +8,7 @@ export * from './auth';
 export * from './user';
 export * from './api';
 export * from './components';
+export * from './email';
 
 // Re-export existing types (keep compatibility)
 export * from './profile';

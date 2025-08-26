@@ -7,6 +7,7 @@
 
 import { EMAIL_TEMPLATES } from '@/constants/email/templates';
 import { AuthUser } from '../types';
+import { EmailTemplateKey, EmailTemplate } from '@/lib/types/email';
 
 // Base64 encode for URL-safe JWT
 function base64urlEncode(input: string | ArrayBuffer): string {
@@ -300,6 +301,47 @@ export async function sendAuthEmail(
     };
   } catch (error) {
     console.error(`Failed to send email: ${type} to ${user.email}`, error);
+    throw error;
+  }
+}
+
+/**
+ * Send template-based email for forms and other purposes
+ */
+export async function sendTemplateEmail(
+  templateKey: EmailTemplateKey,
+  to: string | string[],
+  data: any,
+  options?: {
+    from?: string;
+    replyTo?: string;
+  },
+): Promise<EmailResult> {
+  const template = EMAIL_TEMPLATES[templateKey];
+  if (!template) {
+    throw new Error(`Template "${templateKey}" not found.`);
+  }
+
+  // Build email data
+  const emailData: EmailOptions = {
+    to,
+    from: options?.from || template.from,
+    replyTo: options?.replyTo || template.replyTo || undefined,
+    subject: typeof template.subject === 'function' ? template.subject(data) : template.subject,
+    html: typeof template.html === 'function' ? template.html(data) : template.html,
+  };
+
+  try {
+    const info = await sendEmail(emailData);
+    console.log(`Template email sent successfully: ${templateKey} to ${Array.isArray(to) ? to.join(', ') : to}`);
+
+    return {
+      messageId: info.messageId,
+      accepted: info.accepted,
+      rejected: info.rejected,
+    };
+  } catch (error) {
+    console.error(`Failed to send template email: ${templateKey}`, error);
     throw error;
   }
 }

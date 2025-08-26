@@ -3,10 +3,7 @@
 import dynamic from 'next/dynamic';
 
 const CookiesBanner = dynamic(
-  () =>
-    import('../shared/alerts').then((mod) => ({
-      default: mod.BannerCookies,
-    })),
+  () => import('../shared/banner-cookies'),
   {
     ssr: false,
     loading: () => null, // No loading state needed for cookies banner

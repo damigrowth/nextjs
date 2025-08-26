@@ -130,7 +130,7 @@ export function AuthProvider({
 }: AuthProviderProps) {
   const [state, setState] = useState(() => ({
     ...initialState,
-    isLoading: !initialUser, // Don't load if we have initial data
+    isLoading: !initialUser, // Don't load if we have initial server data
   }));
 
   const updateAuthState = (
@@ -276,12 +276,41 @@ export function AuthProvider({
   };
 
   const initialize = async () => {
-    // No client-side fetching needed - we use server-provided data
-    setState((prev) => ({
-      ...prev,
-      ...initialState,
-      isLoading: false,
-    }));
+    // If no initial data provided, fetch auth data client-side
+    if (!initialUser) {
+      try {
+        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+        
+        // Fetch current user data client-side
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+          const data = await response.json();
+          updateAuthState(data.user, data.session, data.profile);
+        } else {
+          // No authenticated user
+          setState((prev) => ({
+            ...prev,
+            ...initialState,
+            isLoading: false,
+          }));
+        }
+      } catch (error) {
+        console.error('Client-side auth initialization error:', error);
+        setState((prev) => ({
+          ...prev,
+          ...initialState,
+          isLoading: false,
+          error: 'Failed to initialize authentication',
+        }));
+      }
+    } else {
+      // Use server-provided initial data
+      setState((prev) => ({
+        ...prev,
+        ...initialState,
+        isLoading: false,
+      }));
+    }
   };
 
   const refreshAuth = async () => {
@@ -327,10 +356,10 @@ export function AuthProvider({
       // Update state with initial server data
       updateAuthState(initialUser, initialSession, initialProfile);
     } else {
-      // No user data - set to not loading
+      // No initial data - fetch client-side
       initialize();
     }
-  }, [initialUser, initialProfile, initialSession]);
+  }, []);
 
   const contextValue: AuthContextType = {
     ...state,

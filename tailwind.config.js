@@ -121,7 +121,7 @@ module.exports = {
             opacity: '1',
           },
         },
-        'bounce-x': {
+        'bounce-left': {
           '0%, 100%': {
             transform: 'translateX(0px)',
           },
@@ -129,12 +129,12 @@ module.exports = {
             transform: 'translateX(-20px)',
           },
         },
-        'bounce-y': {
+        'bounce-right': {
           '0%, 100%': {
-            transform: 'translateY(0px)',
+            transform: 'translateX(0px)',
           },
           '50%': {
-            transform: 'translateY(-20px)',
+            transform: 'translateX(20px)',
           },
         },
       },
@@ -143,8 +143,8 @@ module.exports = {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'slide-in-down': 'slide-in-down 0.4s ease-in-out',
         'slide-in': 'slide-in 0.4s ease-in-out',
-        'bounce-x': 'bounce-x 6s ease-in-out infinite',
-        'bounce-y': 'bounce-y 6s ease-in-out infinite',
+        'bounce-left': 'bounce-left 6s ease-in-out infinite',
+        'bounce-right': 'bounce-right 6s ease-in-out infinite',
       },
     },
   },

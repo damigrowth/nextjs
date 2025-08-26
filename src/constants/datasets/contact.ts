@@ -1,5 +1,5 @@
 export const data = {
-  breadcrumb: {
+  banner: {
     title: 'Επικοινωνία',
     description:
       'Εάν έχεις κάποια ερώτηση ή παρατήρηση, θα χαρούμε να μας την επικοινωνήσεις.',
@@ -37,8 +37,8 @@ export const data = {
   },
   faq: {
     title: 'Συχνές Ερωτήσεις',
-    subtitle: '',
-    questions: [
+    subtitle: 'Αν έχεις περισσότερες ερωτήσεις πήγαινε στη σελίδα',
+    list: [
       {
         id: 'One',
         question: 'Πώς μπορώ να επικοινωνήσω με την ομάδα σας;',
