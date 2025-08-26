@@ -22,31 +22,19 @@ import {
   PathChecker,
 } from '@/components/shared/layout/wrapper';
 import { Toaster } from '@/components/ui/sonner';
-import { getCurrentUser } from '@/actions/auth/server';
 import { AuthProvider } from '@/components';
 
 interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default async function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({ children }: RootLayoutProps) {
   const gaId = process.env.GA_ID;
-
-  // Get initial auth data on server
-  const userResult = await getCurrentUser();
-
-  const initialUser = userResult.success ? userResult.data.user : null;
-  const initialProfile = userResult.success ? userResult.data.profile : null;
-  const initialSession = userResult.success ? userResult.data.session : null;
 
   return (
     <html lang='el'>
       <Body>
-        <AuthProvider
-          initialUser={initialUser}
-          initialProfile={initialProfile}
-          initialSession={initialSession}
-        >
+        <AuthProvider>
           {/* <InstallBootstrap /> */}
           {/* <div className='overflow-hidden box-border min-h-screen bg-inherit relative z-[1] w-full'> */}
           <PathChecker excludes={['/dashboard', '/admin']}>

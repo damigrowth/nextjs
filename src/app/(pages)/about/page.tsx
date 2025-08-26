@@ -1,26 +1,27 @@
 import {
-  BannerAbout,
-  FaqAbout,
-  FeaturesAbout,
-  FeaturesCounterAbout,
-  FeaturesImageAbout,
-  FeaturesStatsAbout,
-  TestimonialsAbout,
-} from '@/components';
+  HeroBanner,
+  ContentHero,
+  StatisticsCounter,
+  FeaturesGrid,
+  StatsGrid,
+  TestimonialsSection,
+  ProcessSteps,
+  FaqSection,
+} from '@/components/shared';
+import { data } from '@/constants/datasets/about';
 import React from 'react';
 
-type Props = {};
-
-export default function AboutPage({}: Props) {
+export default function AboutPage() {
   return (
     <>
-      <BannerAbout />
-      <FeaturesCounterAbout />
-      <FeaturesAbout />
-      <FeaturesStatsAbout />
-      <TestimonialsAbout />
-      <FeaturesImageAbout />
-      <FaqAbout />
+      <HeroBanner data={data.banner} />
+      <ContentHero data={data.about} />
+      <StatisticsCounter data={data.counter} />
+      <FeaturesGrid data={data.features} />
+      <StatsGrid data={data.featuresStats} />
+      <TestimonialsSection data={data.testimonials} />
+      <ProcessSteps data={data.featuresImage} />
+      <FaqSection data={data.faq} />
     </>
   );
 }

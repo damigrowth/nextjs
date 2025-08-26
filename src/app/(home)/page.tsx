@@ -51,7 +51,7 @@ export async function generateStaticParams() {
   return [];
 }
 
-export default async function OptimizedHomePage({ searchParams }) {
+export default async function HomePage({ searchParams }) {
   // const params = await searchParams;
 
   // const homeData = await getData(
