@@ -1,8 +1,6 @@
 import React from 'react';
 
-type Props = {};
-
-export default function TermsPage({}: Props) {
+export default function TermsPage() {
   return (
     <div className='flex flex-col w-full'>
       <section className='mx-auto max-w-2xl py-12 px-5'>
