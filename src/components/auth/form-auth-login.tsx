@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useActionState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import LinkNP from '@/components/link';
@@ -32,7 +32,12 @@ const initialState = {
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [state, action, isPending] = useActionState(login, initialState);
+  
+  // Check for success messages from URL params
+  const message = searchParams?.get('message');
+  const showPasswordResetSuccess = message === 'password-reset-success';
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -65,14 +70,10 @@ const LoginForm: React.FC = () => {
     }
   }, [state.success, router]);
 
-  // Handle form submission with file upload logic
-  const handleFormSubmit = async (formData: FormData) => {
-    try {
-      // Call the server action
-      await action(formData);
-    } catch (error) {
-      console.error('Form submission error:', error);
-    }
+  // Handle form submission
+  const handleFormSubmit = (formData: FormData) => {
+    // Call the server action directly (no await)
+    action(formData);
   };
 
   const handleGoogleSignIn = async (): Promise<void> => {
@@ -154,6 +155,16 @@ const LoginForm: React.FC = () => {
               Ξέχασες τον κωδικό σου?
             </LinkNP>
           </div>
+
+          {/* Password Reset Success Message */}
+          {showPasswordResetSuccess && (
+            <Alert className='border-green-200 bg-green-50 text-green-800 mb-4'>
+              <CheckCircle className='h-4 w-4' />
+              <AlertDescription>
+                Ο κωδικός σου επαναφέρθηκε επιτυχώς! Μπορείς τώρα να συνδεθείς με τον νέο σου κωδικό.
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Error Display */}
           {state.message && !state.success && (

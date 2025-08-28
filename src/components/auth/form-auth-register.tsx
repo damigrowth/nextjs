@@ -136,29 +136,25 @@ export default function RegisterForm() {
   // Note: Redirect is now handled server-side in register
 
   // Handle form submission
-  const handleFormSubmit = async (formData: FormData) => {
-    try {
-      // Serialize complex fields
-      const consent = watch('consent');
-      if (consent) {
-        formData.set('consent', JSON.stringify(consent));
-      }
-
-      const authType = watch('authType');
-      if (authType) {
-        formData.set('authType', authType.toString());
-      }
-
-      const role = watch('role');
-      if (role) {
-        formData.set('role', role.toString());
-      }
-
-      // Call the server action
-      await action(formData);
-    } catch (error) {
-      console.error('Form submission error:', error);
+  const handleFormSubmit = (formData: FormData) => {
+    // Serialize complex fields
+    const consent = watch('consent');
+    if (consent) {
+      formData.set('consent', JSON.stringify(consent));
     }
+
+    const authType = watch('authType');
+    if (authType) {
+      formData.set('authType', authType.toString());
+    }
+
+    const role = watch('role');
+    if (role) {
+      formData.set('role', role.toString());
+    }
+
+    // Call the server action directly (no await)
+    action(formData);
   };
 
   const handleGoogleSignUp = async () => {
