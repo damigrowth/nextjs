@@ -137,6 +137,30 @@ module.exports = {
             transform: 'translateX(20px)',
           },
         },
+        'bounce-x': {
+          '0%, 100%': {
+            transform: 'translateX(0px)',
+          },
+          '50%': {
+            transform: 'translateX(-25px)',
+          },
+        },
+        'bounce-y': {
+          '0%, 100%': {
+            transform: 'translateY(0px)',
+          },
+          '50%': {
+            transform: 'translateY(-25px)',
+          },
+        },
+        'bounce-y-reverse': {
+          '0%, 100%': {
+            transform: 'translateY(0px)',
+          },
+          '50%': {
+            transform: 'translateY(25px)',
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -145,6 +169,9 @@ module.exports = {
         'slide-in': 'slide-in 0.4s ease-in-out',
         'bounce-left': 'bounce-left 6s ease-in-out infinite',
         'bounce-right': 'bounce-right 6s ease-in-out infinite',
+        'bounce-x': 'bounce-x 6s ease-in-out infinite',
+        'bounce-y': 'bounce-y 6s ease-in-out infinite',
+        'bounce-y-reverse': 'bounce-y-reverse 6s ease-in-out infinite',
       },
     },
   },
