@@ -33,7 +33,7 @@ import { updateProfileBilling } from '@/actions/profiles/billing';
 import { populateFormData } from '@/lib/utils/form';
 
 // Auth provider
-import { useAuth, useAuthLoading, useAuthUser } from '../providers';
+import { useDashboard } from '../providers';
 
 import { FormButton } from '../shared';
 
@@ -54,8 +54,7 @@ export default function BillingForm() {
   const [hasUserInteracted, setHasUserInteracted] = React.useState(false);
 
   // Get current user data
-  const user = useAuthUser();
-  const isLoading = useAuthLoading();
+  const { user, isLoading, hasProfile, billing } = useDashboard();
 
   const form = useForm<BillingFormData>({
     resolver: zodResolver(billingSchema),
@@ -71,13 +70,9 @@ export default function BillingForm() {
     mode: 'onChange',
   });
 
-  // Get full auth context for billing data
-  const authContext = useAuth();
-
   // Update form values when user data is loaded
   useEffect(() => {
-    if (!isLoading && authContext.hasProfile && authContext.billing) {
-      const billing = authContext.billing;
+    if (!isLoading && hasProfile && billing) {
       form.reset({
         receipt: billing.receipt || false,
         invoice: billing.invoice || false,
@@ -90,7 +85,7 @@ export default function BillingForm() {
       // User has existing billing data, so they can submit
       setHasUserInteracted(true);
     }
-  }, [authContext, isLoading, form]);
+  }, [hasProfile, isLoading, billing, form]);
 
   // Handle successful form submission
   useEffect(() => {
@@ -121,22 +116,18 @@ export default function BillingForm() {
   });
 
   // Handle form submission
-  const handleFormSubmit = async (formData: FormData) => {
-    try {
-      // Get all form values and populate FormData
-      const allValues = getValues();
+  const handleFormSubmit = (formData: FormData) => {
+    // Get all form values and populate FormData
+    const allValues = getValues();
 
-      populateFormData(formData, allValues, {
-        stringFields: ['afm', 'doy', 'name', 'profession', 'address'],
-        booleanFields: ['receipt', 'invoice'],
-        skipEmpty: false, // Keep all fields for billing data
-      });
+    populateFormData(formData, allValues, {
+      stringFields: ['afm', 'doy', 'name', 'profession', 'address'],
+      booleanFields: ['receipt', 'invoice'],
+      skipEmpty: false, // Keep all fields for billing data
+    });
 
-      // Call the server action
-      await action(formData);
-    } catch (error) {
-      console.error('Form submission error:', error);
-    }
+    // Call the server action
+    action(formData);
   };
 
   // Show loading state

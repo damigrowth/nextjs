@@ -26,7 +26,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 
 // Auth provider
-import { useAuthUser } from '../providers';
+import { useDashboard } from '../providers/dashboard-provider';
 
 // Icons
 import { AlertTriangle, Loader2 } from 'lucide-react';
@@ -61,8 +61,8 @@ export default function DeleteAccountForm({
   const [isPending, startTransition] = useTransition();
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Get current user data
-  const user = useAuthUser();
+  // Get dashboard context
+  const { user } = useDashboard();
 
   const form = useForm<DeleteAccountFormData>({
     resolver: zodResolver(deleteAccountSchema),

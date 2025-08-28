@@ -40,7 +40,7 @@ import {
 import XCustom from '@/components/icon/x-custom';
 
 // Auth and utilities
-import { useAuth, useAuthLoading, useAuthUser } from '../providers';
+import { useDashboard } from '../providers';
 import { populateFormData, parseJSONValue } from '@/lib/utils/form';
 
 // Validation schema and server action (FOLLOW EXISTING PATTERNS)
@@ -60,9 +60,7 @@ export default function PresentationForm() {
   );
 
   // Auth context
-  const user = useAuthUser();
-  const isLoading = useAuthLoading();
-  const authContext = useAuth();
+  const { user, isLoading, hasProfile, phone, website, viber, whatsapp, visibility, socials, portfolio } = useDashboard();
 
   // Media upload refs
   const mediaRef = useRef<any>(null);
@@ -101,23 +99,23 @@ export default function PresentationForm() {
 
   // Update form values when auth data loads
   useEffect(() => {
-    if (!isLoading && authContext.hasProfile) {
+    if (!isLoading && hasProfile) {
       console.log('Loading presentation form data:', {
-        visibility: authContext.visibility,
-        hasProfile: authContext.hasProfile,
+        visibility: visibility,
+        hasProfile: hasProfile,
       });
 
       form.reset({
-        phone: authContext.phone || '',
-        website: authContext.website || '',
-        viber: authContext.viber || '',
-        whatsapp: authContext.whatsapp || '',
-        visibility: parseJSONValue(authContext.visibility, {
+        phone: phone || '',
+        website: website || '',
+        viber: viber || '',
+        whatsapp: whatsapp || '',
+        visibility: parseJSONValue(visibility, {
           email: true,
           phone: true,
           address: true,
         }),
-        socials: parseJSONValue(authContext.socials, {
+        socials: parseJSONValue(socials, {
           facebook: { url: '' },
           instagram: { url: '' },
           linkedin: { url: '' },
@@ -127,10 +125,10 @@ export default function PresentationForm() {
           behance: { url: '' },
           dribbble: { url: '' },
         }),
-        portfolio: authContext.portfolio || [],
+        portfolio: portfolio || [],
       });
     }
-  }, [authContext, isLoading, form]);
+  }, [hasProfile, isLoading, phone, website, viber, whatsapp, visibility, socials, portfolio, form]);
 
   // Handle successful form submission
   useEffect(() => {
@@ -142,27 +140,23 @@ export default function PresentationForm() {
   }, [state.success]);
 
   // Form submission handler - EXACT PATTERN FROM CURRENT FORMS
-  const handleFormSubmit = async (formData: FormData) => {
-    try {
-      // Handle media uploads if needed
-      if (mediaRef.current?.hasFiles()) {
-        await mediaRef.current.uploadFiles();
-      }
+  const handleFormSubmit = (formData: FormData) => {
+    // Handle media uploads if needed
+    if (mediaRef.current?.hasFiles()) {
+      mediaRef.current.uploadFiles();
+    }
 
-      // Get all form values and populate FormData using ENHANCED utility
-      const allValues = getValues();
+    // Get all form values and populate FormData using ENHANCED utility
+    const allValues = getValues();
 
-      populateFormData(formData, allValues, {
+    populateFormData(formData, allValues, {
         stringFields: ['phone', 'website', 'viber', 'whatsapp'],
         jsonFields: ['visibility', 'socials', 'portfolio'],
         skipEmpty: true,
-      });
+    });
 
-      // Call server action
-      action(formData);
-    } catch (error) {
-      console.error('Form submission error:', error);
-    }
+    // Call server action
+    action(formData);
   };
 
   // Loading state

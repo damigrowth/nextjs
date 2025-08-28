@@ -5,7 +5,6 @@ import React, {
   useActionState,
   useEffect,
   useState,
-  useTransition,
 } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -108,7 +107,6 @@ export default function OnboardingForm({}: OnboardingFormProps) {
   );
 
   const [isUploading, setIsUploading] = useState(false);
-  const [isTransitionPending, startTransition] = useTransition();
 
   // Refs for media upload components
   const profileImageRef = useRef<any>(null);
@@ -116,8 +114,12 @@ export default function OnboardingForm({}: OnboardingFormProps) {
 
   // No longer need media state - handled by react-hook-form
 
-  // Get auth data from BetterAuth
-  const { data: sessionData, isPending: isLoading } = useSession();
+  // Get session data from Better Auth
+  const { data: session, isPending: isSessionPending, refetch } = useSession();
+  const user = session?.user;
+  const isLoading = isPending || isSessionPending;
+  const userId = user?.id;
+  const role = user?.role;
 
   // 🎯 RHF manages all form state - MUST be called before any conditional returns!
   const form = useForm<OnboardingFormData>({
@@ -143,17 +145,19 @@ export default function OnboardingForm({}: OnboardingFormProps) {
     mode: 'onChange', // Real-time validation
   });
 
-  const user = sessionData?.user || null;
-  const isAuthenticated = !!user;
+  // User data is available directly from useAuth hook
+  const isAuthenticated = !!userId;
 
   // Handle successful onboarding completion and redirect
   useEffect(() => {
     if (state.success) {
+      // Refresh the session data to update user step
+      refetch();
       setTimeout(() => {
         window.location.href = '/dashboard';
       }, 2000);
     }
-  }, [state.success]);
+  }, [state.success, refetch]);
 
   // Loading state
   if (isLoading) {
@@ -278,61 +282,54 @@ export default function OnboardingForm({}: OnboardingFormProps) {
   };
 
   // Handle form submission with media upload logic
-  const handleFormSubmit = async (formData: FormData) => {
+  const handleFormSubmit = (formData: FormData) => {
     if (!isAuthenticated || !user) {
       return;
     }
 
-    startTransition(async () => {
-      try {
-        setIsUploading(true);
+    setIsUploading(true);
 
-        // Handle image upload if needed
-        if (profileImageRef.current?.hasFiles()) {
-          await profileImageRef.current.uploadFiles();
+    // Handle image upload if needed
+    if (profileImageRef.current?.hasFiles()) {
+      profileImageRef.current.uploadFiles();
+    }
+
+    // Handle portfolio upload if needed
+    if (portfolioRef.current?.hasFiles()) {
+      portfolioRef.current.uploadFiles();
+    }
+
+    // Get all form values and add them to FormData
+    const formValues = getValues();
+
+    // Add all form fields to FormData
+    const fields = {
+      // Basic string fields
+      bio: formValues.bio,
+      category: formValues.category,
+      subcategory: formValues.subcategory,
+      // JSON fields (will be stringified)
+      image: formValues.image,
+      portfolio: formValues.portfolio,
+      coverage: formValues.coverage,
+    };
+
+    Object.entries(fields).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        // JSON fields need to be stringified
+        if (['image', 'portfolio', 'coverage'].includes(key)) {
+          formData.set(key, JSON.stringify(value));
+        } else {
+          // String fields can be added directly
+          formData.set(key, value as string);
         }
-
-        // Handle portfolio upload if needed
-        if (portfolioRef.current?.hasFiles()) {
-          await portfolioRef.current.uploadFiles();
-        }
-
-        // Get all form values and add them to FormData
-        const formValues = getValues();
-
-        // Add all form fields to FormData
-        const fields = {
-          // Basic string fields
-          bio: formValues.bio,
-          category: formValues.category,
-          subcategory: formValues.subcategory,
-          // JSON fields (will be stringified)
-          image: formValues.image,
-          portfolio: formValues.portfolio,
-          coverage: formValues.coverage,
-        };
-
-        Object.entries(fields).forEach(([key, value]) => {
-          if (value !== undefined && value !== null && value !== '') {
-            // JSON fields need to be stringified
-            if (['image', 'portfolio', 'coverage'].includes(key)) {
-              formData.set(key, JSON.stringify(value));
-            } else {
-              // String fields can be added directly
-              formData.set(key, value as string);
-            }
-          }
-        });
-
-        setIsUploading(false);
-
-        // Call the server action within startTransition - this is the correct way per React docs
-        await action(formData);
-      } catch (error) {
-        console.error('Form submission error:', error);
-        setIsUploading(false);
       }
     });
+
+    setIsUploading(false);
+
+    // Call the server action
+    action(formData);
   };
 
   return (
@@ -501,7 +498,7 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                                         ? filterByField(
                                             subcategories,
                                             'type',
-                                            user.role,
+                                            role,
                                           )
                                         : subcategories;
                                     })().map((subcategory) => (

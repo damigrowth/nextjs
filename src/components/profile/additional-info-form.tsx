@@ -65,7 +65,7 @@ import {
   settlementMethodsOptions,
   budgetOptions,
 } from '@/constants/datasets/options';
-import { industriesOptions } from '@/constants/datasets/industries';
+import { industriesOptions as industriesDataset } from '@/constants/datasets/industries';
 
 // Validation schema and server action
 import {
@@ -73,7 +73,7 @@ import {
   type ProfileAdditionalInfoUpdateInput,
 } from '@/lib/validations/profile';
 import { updateProfileAdditionalInfo } from '@/actions/profiles/additional-info';
-import { useAuth, useAuthLoading, useAuthUser } from '../providers';
+import { useDashboard } from '../providers';
 import { FormButton } from '../shared';
 
 const initialState = {
@@ -88,9 +88,20 @@ export default function AdditionalInfoForm() {
   );
 
   // Auth context
-  const user = useAuthUser();
-  const isLoading = useAuthLoading();
-  const authContext = useAuth();
+  const {
+    user,
+    isLoading,
+    hasProfile,
+    rate,
+    commencement,
+    experience,
+    contactMethods,
+    paymentMethods,
+    settlementMethods,
+    budget,
+    industries,
+    terms,
+  } = useDashboard();
 
   const form = useForm<ProfileAdditionalInfoUpdateInput>({
     resolver: zodResolver(profileAdditionalInfoUpdateSchema),
@@ -117,20 +128,33 @@ export default function AdditionalInfoForm() {
 
   // Update form values when auth data loads
   useEffect(() => {
-    if (!isLoading && authContext.hasProfile) {
+    if (!isLoading && hasProfile) {
       form.reset({
-        rate: authContext.rate || null,
-        commencement: authContext.commencement || '',
-        experience: authContext.experience || null,
-        contactMethods: authContext.contactMethods || [],
-        paymentMethods: authContext.paymentMethods || [],
-        settlementMethods: authContext.settlementMethods || [],
-        budget: authContext.budget || '',
-        industries: authContext.industries || [],
-        terms: authContext.terms || '',
+        rate: rate || null,
+        commencement: commencement || '',
+        experience: experience || null,
+        contactMethods: contactMethods || [],
+        paymentMethods: paymentMethods || [],
+        settlementMethods: settlementMethods || [],
+        budget: budget || '',
+        industries: industries || [],
+        terms: terms || '',
       });
     }
-  }, [authContext, isLoading, form]);
+  }, [
+    hasProfile,
+    isLoading,
+    rate,
+    commencement,
+    experience,
+    contactMethods,
+    paymentMethods,
+    settlementMethods,
+    budget,
+    industries,
+    terms,
+    form,
+  ]);
 
   // Handle successful form submission
   useEffect(() => {
@@ -142,28 +166,24 @@ export default function AdditionalInfoForm() {
   }, [state.success]);
 
   // Form submission handler using utility function
-  const handleFormSubmit = async (formData: FormData) => {
-    try {
-      // Get all form values and populate FormData using utility function
-      const allValues = getValues();
+  const handleFormSubmit = (formData: FormData) => {
+    // Get all form values and populate FormData using utility function
+    const allValues = getValues();
 
-      populateFormData(formData, allValues, {
-        stringFields: ['commencement', 'budget', 'terms'], // Simple text fields
-        numericFields: ['rate', 'experience'], // Numeric fields
-        jsonFields: [
-          'contactMethods',
-          'paymentMethods',
+    populateFormData(formData, allValues, {
+      stringFields: ['commencement', 'budget', 'terms'], // Simple text fields
+      numericFields: ['rate', 'experience'], // Numeric fields
+      jsonFields: [
+        'contactMethods',
+        'paymentMethods',
           'settlementMethods',
           'industries',
         ], // Arrays that need JSON.stringify
         skipEmpty: true, // Skip null/undefined/empty values
       });
 
-      // Call server action
-      await action(formData);
-    } catch (error) {
-      console.error('Form submission error:', error);
-    }
+    // Call server action
+    action(formData);
   };
 
   // Loading state
@@ -443,7 +463,7 @@ export default function AdditionalInfoForm() {
                 <FormLabel>Κλάδοι Δραστηριότητας</FormLabel>
                 <FormControl>
                   <MultiSelect
-                    options={industriesOptions.map((industry) => ({
+                    options={industriesDataset.map((industry) => ({
                       value: industry.id,
                       label: industry.label,
                     }))}

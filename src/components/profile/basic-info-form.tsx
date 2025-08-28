@@ -1,6 +1,11 @@
 'use client';
 
-import React, { useState, useRef, useActionState, useEffect } from 'react';
+import React, {
+  useState,
+  useRef,
+  useActionState,
+  useEffect,
+} from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -49,7 +54,7 @@ import { MultiSelect } from '@/components/ui/multi-select';
 // Static constants and dataset utilities
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import { locationOptions } from '@/constants/datasets/locations';
-import { skills } from '@/constants/datasets/skills';
+import { skills as skillsDataset } from '@/constants/datasets/skills';
 import { formatInput } from '@/lib/utils/validation/formats';
 import {
   findById,
@@ -68,8 +73,9 @@ import {
 
 // Import server action
 import { updateProfileBasicInfo } from '@/actions/profiles/basic-info';
-import { useAuth, useAuthLoading, useAuthUser } from '../providers';
+import { useDashboard } from '../providers';
 import { FormButton } from '../shared';
+import { useSession } from '@/lib/auth/client';
 
 type ProfileFormData = ProfileBasicInfoUpdateInput;
 
@@ -84,12 +90,26 @@ export default function BasicInfoForm() {
     initialState,
   );
 
+  const [isUploading, setIsUploading] = useState(false);
+  const { refetch } = useSession();
+
   // Refs for media upload
   const profileImageRef = useRef<any>(null);
 
   // Get current user data
-  const user = useAuthUser();
-  const isLoading = useAuthLoading();
+  const {
+    user,
+    isLoading,
+    hasProfile,
+    image,
+    tagline,
+    bio,
+    category,
+    subcategory,
+    skills,
+    speciality,
+    coverage,
+  } = useDashboard();
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileBasicInfoUpdateSchema),
@@ -116,21 +136,18 @@ export default function BasicInfoForm() {
     mode: 'onChange', // Real-time validation per FORM_PATTERNS.md
   });
 
-  // Get full auth context for all profile data
-  const authContext = useAuth();
-
   // Update form values when user data is loaded
   useEffect(() => {
-    if (!isLoading && authContext.hasProfile) {
+    if (!isLoading && hasProfile) {
       form.reset({
-        image: authContext.image || null,
-        tagline: authContext.tagline || '',
-        bio: authContext.bio || '',
-        category: authContext.category || '',
-        subcategory: authContext.subcategory || '',
-        skills: authContext.skills || [],
-        speciality: authContext.speciality || '',
-        coverage: authContext.coverage || {
+        image: image || null,
+        tagline: tagline || '',
+        bio: bio || '',
+        category: category || '',
+        subcategory: subcategory || '',
+        skills: skills || [],
+        speciality: speciality || '',
+        coverage: coverage || {
           online: false,
           onbase: false,
           onsite: false,
@@ -143,18 +160,27 @@ export default function BasicInfoForm() {
         },
       });
     }
-  }, [authContext, isLoading, form]);
+  }, [
+    hasProfile,
+    isLoading,
+    image,
+    tagline,
+    bio,
+    category,
+    subcategory,
+    skills,
+    speciality,
+    coverage,
+    form,
+  ]);
 
   // Handle successful form submission
   useEffect(() => {
     if (state.success) {
-      // Data will be refreshed automatically via revalidatePath in server action
-      // The layout will re-render with fresh server data and update the auth provider
-      console.log(
-        'Profile updated successfully - layout will refresh with new data',
-      );
+      // Refresh the session data to update the menu component
+      refetch();
     }
-  }, [state.success]);
+  }, [state.success, refetch]);
 
   const {
     handleSubmit,
@@ -168,6 +194,12 @@ export default function BasicInfoForm() {
   const watchedCategory = watch('category');
   const watchedCoverage = watch('coverage');
   const watchedSkills = watch('skills');
+  const watchedImage = watch('image');
+
+  // Helper function to check if image is present
+  const hasValidImage = () => {
+    return watchedImage !== null && watchedImage !== undefined;
+  };
 
   // Helper functions for formatting inputs
   const handleTaglineChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,34 +275,34 @@ export default function BasicInfoForm() {
     });
   };
 
-  // Handle form submission following FORM_PATTERNS.md template
-  const handleFormSubmit = async (formData: FormData) => {
-    try {
-      // Handle media uploads if needed
-      if (profileImageRef.current?.hasFiles()) {
-        await profileImageRef.current.uploadFiles();
-      }
+  // Wrapper action that handles media uploads and data population
+  const handleFormAction = (formData: FormData) => {
+    setIsUploading(true);
 
-      // Get all form values and populate FormData using utility function
-      const allValues = getValues();
-
-      populateFormData(formData, allValues, {
-        stringFields: [
-          'tagline',
-          'bio',
-          'category',
-          'subcategory',
-          'speciality',
-        ],
-        jsonFields: ['image', 'skills', 'coverage'],
-        skipEmpty: true,
-      });
-
-      // Call the server action
-      await action(formData);
-    } catch (error) {
-      console.error('Form submission error:', error);
+    // Handle image upload if needed
+    if (profileImageRef.current?.hasFiles()) {
+      profileImageRef.current.uploadFiles();
     }
+
+    // Get all form values and populate FormData using utility function
+    const allValues = getValues();
+
+    populateFormData(formData, allValues, {
+      stringFields: [
+        'tagline',
+        'bio',
+        'category',
+        'subcategory',
+        'speciality',
+      ],
+      jsonFields: ['image', 'skills', 'coverage'],
+      skipEmpty: true,
+    });
+
+    setIsUploading(false);
+
+    // Call the server action with populated FormData
+    action(formData);
   };
 
   // Show loading state
@@ -286,7 +318,7 @@ export default function BasicInfoForm() {
   return (
     <Form {...form}>
       <form
-        action={handleFormSubmit}
+        action={handleFormAction}
         className='space-y-6 p-6 border rounded-lg'
       >
         {/* Profile Image */}
@@ -296,7 +328,7 @@ export default function BasicInfoForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel className='text-sm font-medium text-gray-700'>
-                Εικόνα Προφίλ
+                Εικόνα Προφίλ*
               </FormLabel>
               <p className='text-sm text-gray-600'>
                 Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο.
@@ -540,7 +572,7 @@ export default function BasicInfoForm() {
                   {watchedCategory ? (
                     <MultiSelect
                       options={filterSkillsByCategory(
-                        skills,
+                        skillsDataset,
                         watchedCategory,
                       ).map((skill) => ({
                         value: skill.id,
@@ -607,7 +639,7 @@ export default function BasicInfoForm() {
                     >
                       {field.value
                         ? (() => {
-                            const selectedSkill = skills.find(
+                            const selectedSkill = skillsDataset.find(
                               (skill) => skill.id === field.value,
                             );
                             return (
@@ -629,7 +661,9 @@ export default function BasicInfoForm() {
                           {watchedSkills &&
                             watchedSkills
                               .map((skillId: string) =>
-                                skills.find((skill) => skill.id === skillId),
+                                skillsDataset.find(
+                                  (skill) => skill.id === skillId,
+                                ),
                               )
                               .filter(Boolean)
                               .map((skill) => (
@@ -1161,6 +1195,19 @@ export default function BasicInfoForm() {
           </Alert>
         )}
 
+        {/* Debug Info */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className='max-w-xl overflow-scroll p-4 bg-gray-100 rounded text-xs space-y-2'>
+            <div>isValid: {isValid.toString()}</div>
+            <div>isDirty: {isDirty.toString()}</div>
+            <div>hasValidImage: {hasValidImage().toString()}</div>
+            <div>Image Value: {JSON.stringify(getValues('image'))}</div>
+            <div>Username: {user?.username || 'undefined'}</div>
+            <div>User ID: {user?.id || 'undefined'}</div>
+            <div>Errors: {JSON.stringify(errors, null, 2)}</div>
+          </div>
+        )}
+
         <div className='flex justify-end space-x-4'>
           <FormButton
             variant='outline'
@@ -1174,7 +1221,12 @@ export default function BasicInfoForm() {
             text='Αποθήκευση'
             loadingText='Αποθήκευση...'
             loading={isPending}
-            disabled={isPending || !isValid || !isDirty}
+            disabled={
+              isPending ||
+              !isValid ||
+              !isDirty ||
+              !hasValidImage()
+            }
           />
         </div>
       </form>
