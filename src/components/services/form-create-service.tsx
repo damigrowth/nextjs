@@ -92,7 +92,7 @@ import {
   AddonsFaqStep,
   MediaStep,
 } from './steps';
-import { useAuthLoading, useAuthUser } from '../providers';
+import { useDashboard } from '../providers/dashboard-provider';
 
 const STEPS = [
   {
@@ -210,9 +210,8 @@ export default function CreateServiceForm() {
     initialState,
   );
 
-  // Auth context
-  const user = useAuthUser();
-  const isLoading = useAuthLoading();
+  // Dashboard context  
+  const { user, isLoading } = useDashboard();
 
   const {
     formState: { errors, isValid, isDirty },
@@ -384,70 +383,61 @@ export default function CreateServiceForm() {
   const progress = (currentStep / STEPS.length) * 100;
   const isLastStep = currentStep === STEPS.length;
 
-  // Form submission handlers - EXACT PATTERN FROM PRESENTATION FORM
-  const handleFormSubmit = async (formData: FormData) => {
-    try {
-      // Handle media uploads if needed
-      if (mediaRef.current?.hasFiles()) {
-        await mediaRef.current.uploadFiles();
-      }
-
-      // Get all form values and populate FormData using ENHANCED utility
-      const allValues = getValues();
-
-      populateFormData(formData, allValues, {
-        stringFields: [
-          'title',
-          'description',
-          'category',
-          'subcategory',
-          'subdivision',
-          'subscriptionType',
-        ],
-        jsonFields: ['type', 'tags', 'addons', 'faq', 'media'],
-        numericFields: ['price', 'duration'],
-        booleanFields: ['fixed'],
-        skipEmpty: true,
-      });
-
-      // Call server action
-      action(formData);
-    } catch (error) {
-      console.error('Form submission error:', error);
+  // Form submission handler
+  const handleFormSubmit = (formData: FormData) => {
+    // Handle media uploads if needed (sync operation)
+    if (mediaRef.current?.hasFiles()) {
+      mediaRef.current.uploadFiles();
     }
+
+    // Get all form values and populate FormData using ENHANCED utility
+    const allValues = getValues();
+
+    populateFormData(formData, allValues, {
+      stringFields: [
+        'title',
+        'description',
+        'category',
+        'subcategory',
+        'subdivision',
+        'subscriptionType',
+      ],
+      jsonFields: ['type', 'tags', 'addons', 'faq', 'media'],
+      numericFields: ['price', 'duration'],
+      booleanFields: ['fixed'],
+      skipEmpty: true,
+    });
+
+    // Call server action directly (no await)
+    action(formData);
   };
 
-  const handleSaveAsDraft = async (formData: FormData) => {
-    try {
-      // Handle media uploads if needed
-      if (mediaRef.current?.hasFiles()) {
-        await mediaRef.current.uploadFiles();
-      }
-
-      // Get all form values and populate FormData using ENHANCED utility
-      const allValues = getValues();
-
-      populateFormData(formData, allValues, {
-        stringFields: [
-          'title',
-          'description',
-          'category',
-          'subcategory',
-          'subdivision',
-          'subscriptionType',
-        ],
-        jsonFields: ['type', 'tags', 'addons', 'faq', 'media'],
-        numericFields: ['price', 'duration'],
-        booleanFields: ['fixed'],
-        skipEmpty: true,
-      });
-
-      // Call draft action
-      draftAction(formData);
-    } catch (error) {
-      console.error('Draft save error:', error);
-      toast.error('Σφάλμα κατά την αποθήκευση του προσχεδίου');
+  const handleSaveAsDraft = (formData: FormData) => {
+    // Handle media uploads if needed (sync operation)
+    if (mediaRef.current?.hasFiles()) {
+      mediaRef.current.uploadFiles();
     }
+
+    // Get all form values and populate FormData using ENHANCED utility
+    const allValues = getValues();
+
+    populateFormData(formData, allValues, {
+      stringFields: [
+        'title',
+        'description',
+        'category',
+        'subcategory',
+        'subdivision',
+        'subscriptionType',
+      ],
+      jsonFields: ['type', 'tags', 'addons', 'faq', 'media'],
+      numericFields: ['price', 'duration'],
+      booleanFields: ['fixed'],
+      skipEmpty: true,
+    });
+
+    // Call draft action directly (no await)
+    draftAction(formData);
   };
 
   const handleClearForm = () => {
@@ -462,11 +452,11 @@ export default function CreateServiceForm() {
     }
   };
 
-  const handleConfirmDraft = async () => {
+  const handleConfirmDraft = () => {
     // Keep dialog open, start the save process
-    startTransition(async () => {
+    startTransition(() => {
       const formData = new FormData();
-      await handleSaveAsDraft(formData);
+      handleSaveAsDraft(formData);
     });
   };
 
@@ -790,9 +780,9 @@ export default function CreateServiceForm() {
                           isDraftPending
                         }
                         onClick={() => {
-                          startTransition(async () => {
+                          startTransition(() => {
                             const formData = new FormData();
-                            await handleFormSubmit(formData);
+                            handleFormSubmit(formData);
                           });
                         }}
                       />
