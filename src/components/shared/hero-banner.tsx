@@ -72,7 +72,7 @@ export default function HeroBanner({
     : 'h-80';
 
   return (
-    <section className={`pt-14 px-4 lg:px-6 pb-6 ${className}`}>
+    <section className={`mt-10 lg:mt-20 pt-14 px-4 lg:px-6 pb-6 ${className}`}>
       <div
         className={`max-w-4xl mx-auto rounded-2xl relative flex items-center overflow-hidden ${containerClasses}`}
       >

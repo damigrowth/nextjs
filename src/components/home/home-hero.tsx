@@ -166,7 +166,7 @@ function HeroImages() {
       </div>
 
       {/* Secondary Image - positioned relative to the whole container */}
-      <div className='absolute right-[8%] bottom-[-18%] z-[1]'>
+      <div className='absolute right-[8%] bottom-[-10%] z-[1]'>
         <Image
           width={90}
           height={90}
@@ -175,7 +175,7 @@ function HeroImages() {
           loading='lazy'
           quality={75}
           decoding='async'
-          className='w-[80px] h-auto animate-bounce-y'
+          className='w-[80px] h-auto animate-bounce-y-reverse'
         />
       </div>
     </div>
@@ -211,7 +211,7 @@ function DynamicHeroContent({ categories }: { categories: Category[] }) {
 
 export default function HeroHome({ categories = [] }: Props) {
   return (
-    <section className='overflow-visible bg-orangy bg-gradient-to-t from-white to-yellowish contain-layout'>
+    <section className='overflow-visible bg-orangy bg-gradient-to-t from-white to-yellowish contain-layout mt-10 lg:mt-20'>
       <div className='container mx-auto mt-24 mb-52 pl-6'>
         <div className='flex flex-wrap overflow-visible'>
           <div className='w-full flex flex-col justify-center xl:w-7/12 xl:pr-6'>
