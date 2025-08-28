@@ -3,6 +3,8 @@
 import { prisma } from '@/lib/prisma/client';
 import { ActionResponse } from '@/lib/types/api';
 import { requireAuth } from './server';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 import { Prisma } from '@prisma/client';
 import { CloudinaryResource } from '@/lib/types/cloudinary';
 import { onboardingFormSchemaWithMedia } from '@/lib/validations';
@@ -109,13 +111,26 @@ export async function completeOnboarding(
       },
     });
 
-    // Update user step to DASHBOARD
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        step: 'DASHBOARD',
-      },
-    });
+    // Update user step to DASHBOARD and sync image using Better Auth API
+    try {
+      await auth.api.updateUser({
+        headers: await headers(),
+        body: {
+          step: 'DASHBOARD',
+          image: data.image ? JSON.stringify(data.image) : null,
+        },
+      });
+    } catch (authError) {
+      console.warn('Failed to update user via Better Auth, falling back to Prisma:', authError);
+      // Fallback to direct Prisma update if Better Auth fails
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          step: 'DASHBOARD',
+          image: data.image ? JSON.stringify(data.image) : null,
+        },
+      });
+    }
 
     return {
       success: true,

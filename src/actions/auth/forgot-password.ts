@@ -22,7 +22,7 @@ export async function forgotPassword(prevState: any, formData: FormData): Promis
     const { email: validatedEmail } = validatedFields.data;
 
     // Use Better Auth to send reset password email
-    await auth.api.forgetPassword({
+    await auth.api.requestPasswordReset({
       body: {
         email: validatedEmail,
         redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
@@ -60,7 +60,7 @@ export async function sendPasswordResetEmail(input: ForgotPasswordInput): Promis
 
     const { email } = validatedFields.data;
 
-    await auth.api.forgetPassword({
+    await auth.api.requestPasswordReset({
       body: {
         email,
         redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,

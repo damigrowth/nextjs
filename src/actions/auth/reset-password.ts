@@ -45,20 +45,23 @@ export async function resetPassword(
       };
     }
 
-    redirect('/login?message=password-reset-success');
+    return {
+      success: true,
+      message: 'Κωδικός επαναφέρθηκε επιτυχώς! Συνδέσου με τον νέο σου κωδικό.',
+    };
   } catch (error: any) {
     console.error('Reset password error:', error);
 
-    if (error.message?.includes('token')) {
+    if (error.message?.includes('token') || error.message?.includes('invalid token')) {
       return {
         success: false,
-        error: 'Invalid or expired reset token',
+        error: 'Ο σύνδεσμος επαναφοράς έχει λήξει ή έχει ήδη χρησιμοποιηθεί. Παρακαλούμε αιτηθείτε νέο σύνδεσμο.',
       };
     }
 
     return {
       success: false,
-      error: 'Password reset failed. Please try again.',
+      error: 'Η επαναφορά κωδικού απέτυχε. Παρακαλούμε δοκιμάστε ξανά.',
     };
   }
 }
