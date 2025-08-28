@@ -31,12 +31,13 @@ model Account {
   @@map("accounts")
 }
 
-model VerificationToken {
+model Verification {
+  id         String    @id @default(cuid())
   identifier String
-  token      String   @unique
-  expires    DateTime
-  id         String   @id @default(cuid())
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
 
-  @@unique([identifier, token])
-  @@map("verification_tokens")
+  @@map("verification")
 }

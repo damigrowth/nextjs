@@ -1,25 +1,28 @@
 model User {
-  id                 String        @id @default(cuid())
-  email              String        @unique
-  emailVerified      Boolean       @default(false)
-  name               String?
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
-  step               String        @default("EMAIL_VERIFICATION")
-  confirmed          Boolean       @default(false)
-  blocked            Boolean       @default(false)
-  username           String?       @unique // Keep in user for auth purposes
-  displayName        String?       // Keep in user for auth purposes
-  banExpires         DateTime?
-  banReason          String?
-  banned             Boolean       @default(false)
-  role               String        @default("user")
-  accounts           Account[]
-  media              Media[]
-  messagesRead       MessageRead[]
-  profile            Profile?
-  reviewsGiven       Review[]      @relation("ReviewAuthor")
-  sessions           Session[]
+  id            String        @id @default(cuid())
+  email         String        @unique
+  emailVerified Boolean       @default(false)
+  name          String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  step          String        @default("EMAIL_VERIFICATION")
+  confirmed     Boolean       @default(false)
+  blocked       Boolean       @default(false)
+  username      String?       @unique // Keep in user for auth purposes
+  displayName   String? // Keep in user for auth purposes
+  firstName     String? // Keep in user for menu/auth purposes
+  lastName      String? // Keep in user for menu/auth purposes
+  image         Json? // Profile image CloudinaryResource - synced from profile
+  banExpires    DateTime?
+  banReason     String?
+  banned        Boolean       @default(false)
+  role          String        @default("user")
+  accounts      Account[]
+  media         Media[]
+  messagesRead  MessageRead[]
+  profile       Profile?
+  reviewsGiven  Review[]      @relation("ReviewAuthor")
+  sessions      Session[]
 
   @@index([role])
   @@index([step])
@@ -28,38 +31,36 @@ model User {
 }
 
 model Profile {
-  id              String       @id @default(cuid())
-  uid             String       @unique
-  type            String?
-  tagline         String?
-  bio             String?
-  website         String?
-  
-  
-  
-  size            String?
-  skills          String[]     // Array of skill IDs from taxonomy  
-  speciality      String?      // Speciality ID from taxonomy
-  category        String?      // Service category ID from taxonomy
-  subcategory     String?      // Service subcategory ID from taxonomy
-  
+  id      String  @id @default(cuid())
+  uid     String  @unique
+  type    String?
+  tagline String?
+  bio     String?
+  website String?
+
+  size        String?
+  skills      String[] // Array of skill IDs from taxonomy  
+  speciality  String? // Speciality ID from taxonomy
+  category    String? // Service category ID from taxonomy
+  subcategory String? // Service subcategory ID from taxonomy
+
   // Fields moved from User table
-  username        String?      // Duplicated from User for profile purposes
-  displayName     String?      // Duplicated from User for profile purposes
-  firstName       String?      // Moved from User
-  lastName        String?      // Moved from User
-  phone           String?      // Moved from User
-  coverage        Json?        // Coverage options and location data
-  
+  username    String? // Duplicated from User for profile purposes
+  displayName String? // Duplicated from User for profile purposes
+  firstName   String? // Moved from User
+  lastName    String? // Moved from User
+  phone       String? // Moved from User
+  coverage    Json? // Coverage options and location data
+
   // Media fields for onboarding form
-  image           Json?        // Profile image CloudinaryResource
-  portfolio       Json?        // Portfolio media CloudinaryResource array
+  image     Json? // Profile image CloudinaryResource
+  portfolio Json? // Portfolio media CloudinaryResource array
 
   // Presentation fields
-  visibility      Json?        // Visibility settings {email, phone, address}
-  socials         Json?        // Social media links {facebook, instagram, linkedin, x, youtube, github, behance, dribbble}
-  viber           String?      // Viber contact
-  whatsapp        String?      // WhatsApp contact
+  visibility Json? // Visibility settings {email, phone, address}
+  socials    Json? // Social media links {facebook, instagram, linkedin, x, youtube, github, behance, dribbble}
+  viber      String? // Viber contact
+  whatsapp   String? // WhatsApp contact
 
   //  Additional fields
   rate              Int?
@@ -71,26 +72,26 @@ model Profile {
   budget            String?
   industries        String[]
   terms             String?
-  billing           Json?        // Billing information {receipt: boolean, invoice: boolean, afm: string, doy: string, name: string, profession: string, address: string}
+  billing           Json? // Billing information {receipt: boolean, invoice: boolean, afm: string, doy: string, name: string, profession: string, address: string}
 
   // Rate limiting fields
-  lastServiceDraft  DateTime?    // Last time user saved a service draft
-  
-  verified        Boolean      @default(false)
-  featured        Boolean      @default(false)
-  rating          Float        @default(0)
-  reviewCount     Int          @default(0)
-  published       Boolean      @default(false)
-  isActive        Boolean      @default(false)
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  lastServiceDraft DateTime? // Last time user saved a service draft
+
+  verified        Boolean              @default(false)
+  featured        Boolean              @default(false)
+  rating          Float                @default(0)
+  reviewCount     Int                  @default(0)
+  published       Boolean              @default(false)
+  isActive        Boolean              @default(false)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
   chatMemberships ChatMember[]
   chatsCreated    Chat[]
   messagesSent    Message[]
-  user            User         @relation(fields: [uid], references: [id], onDelete: Cascade)
-  reviewsReceived Review[]     @relation("ReviewReceiver")
+  user            User                 @relation(fields: [uid], references: [id], onDelete: Cascade)
+  reviewsReceived Review[]             @relation("ReviewReceiver")
   services        Service[]
-  verification    Verification?
+  verification    ProfileVerification?
 
   @@index([uid])
   @@index([published, featured])
@@ -98,20 +99,20 @@ model Profile {
   @@map("profiles")
 }
 
-model Verification {
+model ProfileVerification {
   id        String   @id @default(cuid())
   status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
-  afm       String?  // Greek Tax ID (AFM)
-  name      String?  // Full business/personal name
-  address   String?  // Business address
-  phone     String?  // Contact phone
-  uid       String   // User ID reference
+  afm       String? // Greek Tax ID (AFM)
+  name      String? // Full business/personal name
+  address   String? // Business address
+  phone     String? // Contact phone
+  uid       String // User ID reference
   pid       String   @unique // Profile ID reference
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   // Relations
-  profile   Profile  @relation(fields: [pid], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [pid], references: [id], onDelete: Cascade)
 
   @@index([uid])
   @@index([pid])
