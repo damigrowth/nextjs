@@ -90,27 +90,23 @@ export default function ContactForm({ formData, siteKey }: ContactFormProps) {
     }
   }, [state.success, reset]);
 
-  // Form submission handler - EXACT PATTERN FROM CURRENT FORMS
-  const handleFormSubmit = async (formData: FormData) => {
-    try {
-      // Get all form values and populate FormData using utility
-      const allValues = getValues();
+  // Form submission handler
+  const handleFormSubmit = (formData: FormData) => {
+    // Get all form values and populate FormData using utility
+    const allValues = getValues();
 
-      populateFormData(formData, allValues, {
-        stringFields: ['name', 'email', 'message'],
-        skipEmpty: false, // Don't skip empty for contact form
-      });
+    populateFormData(formData, allValues, {
+      stringFields: ['name', 'email', 'message'],
+      skipEmpty: false, // Don't skip empty for contact form
+    });
 
-      // Add captcha token to form data
-      if (captcha) {
-        formData.append('captchaToken', captcha);
-      }
-
-      // Call server action
-      action(formData);
-    } catch (error) {
-      console.error('Form submission error:', error);
+    // Add captcha token to form data
+    if (captcha) {
+      formData.append('captchaToken', captcha);
     }
+
+    // Call server action directly (no await)
+    action(formData);
   };
 
   return (
