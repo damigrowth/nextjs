@@ -28,6 +28,8 @@ export interface CloudinaryResource {
   original_filename?: string;
   batch_id?: string;
   upload_status?: string;
+  // Flag to indicate this is a pending upload (not yet uploaded to Cloudinary)
+  _pending?: boolean;
   // Index signature for JSON compatibility
   [key: string]: any;
 }

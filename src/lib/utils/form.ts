@@ -3,6 +3,10 @@
  * Helper functions for form data handling and processing
  */
 
+import { JsonValue } from '@prisma/client/runtime/library';
+import type { SocialMediaInput } from '@/lib/validations/profile';
+import type { ProfileVisibility } from '@/lib/types/auth';
+
 /**
  * Extract string value from FormData with optional default
  * Handles null/undefined values and provides type safety
@@ -213,4 +217,105 @@ export function populateFormData<T extends Record<string, any>>(
       formData.set(field as string, value ? 'true' : 'false');
     }
   });
+}
+
+// =============================================
+// TYPE-SAFE PROFILE DATA PARSERS
+// =============================================
+
+/**
+ * Parse visibility JSON with proper type safety
+ */
+export function parseVisibilityJSON(value: JsonValue | null | undefined): ProfileVisibility {
+  const defaultValue: ProfileVisibility = {
+    email: true,
+    phone: true,
+    address: true,
+  };
+  
+  if (!value || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return defaultValue;
+  }
+  
+  // value is JsonObject at this point
+  const obj = value as Record<string, unknown>;
+  
+  return {
+    email: typeof obj.email === 'boolean' ? obj.email : defaultValue.email,
+    phone: typeof obj.phone === 'boolean' ? obj.phone : defaultValue.phone,
+    address: typeof obj.address === 'boolean' ? obj.address : defaultValue.address,
+  };
+}
+
+/**
+ * Parse socials JSON with proper type safety
+ */
+export function parseSocialsJSON(value: JsonValue | null | undefined): SocialMediaInput {
+  const defaultValue: SocialMediaInput = {
+    facebook: { url: '' },
+    instagram: { url: '' },
+    linkedin: { url: '' },
+    x: { url: '' },
+    youtube: { url: '' },
+    github: { url: '' },
+    behance: { url: '' },
+    dribbble: { url: '' },
+  };
+  
+  if (!value || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return defaultValue;
+  }
+  
+  // value is JsonObject at this point
+  const obj = value as Record<string, unknown>;
+  
+  return {
+    facebook: parseSocialPlatform(obj.facebook, defaultValue.facebook),
+    instagram: parseSocialPlatform(obj.instagram, defaultValue.instagram),
+    linkedin: parseSocialPlatform(obj.linkedin, defaultValue.linkedin),
+    x: parseSocialPlatform(obj.x, defaultValue.x),
+    youtube: parseSocialPlatform(obj.youtube, defaultValue.youtube),
+    github: parseSocialPlatform(obj.github, defaultValue.github),
+    behance: parseSocialPlatform(obj.behance, defaultValue.behance),
+    dribbble: parseSocialPlatform(obj.dribbble, defaultValue.dribbble),
+  };
+}
+
+/**
+ * Helper function to parse individual social platform data
+ */
+function parseSocialPlatform(value: unknown, defaultValue: { url: string } | undefined): { url: string } | undefined {
+  if (!value || typeof value !== 'object' || value === null) {
+    return defaultValue;
+  }
+  
+  const obj = value as Record<string, unknown>;
+  return {
+    url: typeof obj.url === 'string' ? obj.url : defaultValue?.url || '',
+  };
+}
+
+/**
+ * Parse portfolio JSON array with proper type safety
+ */
+export function parsePortfolioJSON(value: JsonValue | null | undefined): any[] {
+  if (!value) {
+    return [];
+  }
+  
+  if (Array.isArray(value)) {
+    return value;
+  }
+  
+  // If it's a string, try to parse it
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  
+  return [];
 }
