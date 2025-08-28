@@ -20,6 +20,20 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
+    sendResetPassword: async ({ user, url, token }, request) => {
+      try {
+        if (!user.email) {
+          console.error(
+            'Cannot send password reset email: user email is missing',
+          );
+          return;
+        }
+        await sendAuthEmail('PASSWORD_RESET', user as User, url);
+      } catch (error) {
+        console.error('Failed to send password reset email:', error);
+        // Don't throw error here to prevent reset from failing
+      }
+    },
   },
   emailVerification: {
     sendOnSignUp: true,
@@ -39,20 +53,6 @@ export const auth = betterAuth({
     },
     autoSignInAfterVerification: true,
   },
-  sendResetPassword: async ({ user, url, token }, request) => {
-    try {
-      if (!user.email) {
-        console.error(
-          'Cannot send password reset email: user email is missing',
-        );
-        return;
-      }
-      await sendAuthEmail('PASSWORD_RESET', user as User, url);
-    } catch (error) {
-      console.error('Failed to send password reset email:', error);
-      // Don't throw error here to prevent reset from failing
-    }
-  },
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID || '',
@@ -68,6 +68,9 @@ export const auth = betterAuth({
       step: { type: 'string', defaultValue: 'EMAIL_VERIFICATION' },
       username: { type: 'string', required: false }, // Keep in user for auth
       displayName: { type: 'string', required: false }, // Keep in user for auth
+      firstName: { type: 'string', required: false }, // Keep in user for menu/auth
+      lastName: { type: 'string', required: false }, // Keep in user for menu/auth
+      image: { type: 'string', required: false }, // Profile image JSON string synced from profile
       confirmed: { type: 'boolean', defaultValue: false },
       blocked: { type: 'boolean', defaultValue: false },
     },

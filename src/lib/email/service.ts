@@ -6,7 +6,7 @@
  */
 
 import { EMAIL_TEMPLATES } from '@/constants/email/templates';
-import { AuthUser } from '../types';
+import { User } from '@prisma/client';
 import { EmailTemplateKey, EmailTemplate } from '@/lib/types/email';
 
 // Base64 encode for URL-safe JWT
@@ -265,7 +265,7 @@ export async function sendEmail(
 /**
  * Get email template by type
  */
-export function getEmailTemplate(type: string, user: AuthUser, url?: string) {
+export function getEmailTemplate(type: string, user: User, url?: string) {
   const template = EMAIL_TEMPLATES[type];
   if (!template) {
     throw new Error(`Template type "${type}" not found.`);
@@ -285,7 +285,7 @@ export function getEmailTemplate(type: string, user: AuthUser, url?: string) {
  */
 export async function sendAuthEmail(
   type: string,
-  user: AuthUser,
+  user: User,
   url?: string,
 ): Promise<EmailResult> {
   const emailData = getEmailTemplate(type, user, url);
@@ -373,4 +373,4 @@ export async function testEmailConnection(): Promise<{
 }
 
 // Export types for use in other modules
-export type { EmailOptions, EmailResult, AuthUser };
+export type { EmailOptions, EmailResult, User };
