@@ -8,6 +8,7 @@ import {
   ProfileWithRelations,
 } from '@/lib/types/auth';
 import { convertImageData } from '@/lib/utils/media';
+import { useSession } from '@/lib/auth/client';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -122,15 +123,13 @@ const initialState: Omit<
   hasProfile: false,
 };
 
-export function AuthProvider({
-  children,
-  initialUser = null,
-  initialProfile = null,
-  initialSession = null,
-}: AuthProviderProps) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  // Use Better Auth's hook directly - this has built-in caching  
+  const { data: session, isPending, error } = useSession();
+
   const [state, setState] = useState(() => ({
     ...initialState,
-    isLoading: !initialUser, // Don't load if we have initial server data
+    isLoading: true,
   }));
 
   const updateAuthState = (
@@ -275,61 +274,9 @@ export function AuthProvider({
     }
   };
 
-  const initialize = async () => {
-    // If no initial data provided, fetch auth data client-side
-    if (!initialUser) {
-      try {
-        setState((prev) => ({ ...prev, isLoading: true, error: null }));
-        
-        // Fetch current user data client-side
-        const response = await fetch('/api/auth/me');
-        if (response.ok) {
-          const data = await response.json();
-          updateAuthState(data.user, data.session, data.profile);
-        } else {
-          // No authenticated user
-          setState((prev) => ({
-            ...prev,
-            ...initialState,
-            isLoading: false,
-          }));
-        }
-      } catch (error) {
-        console.error('Client-side auth initialization error:', error);
-        setState((prev) => ({
-          ...prev,
-          ...initialState,
-          isLoading: false,
-          error: 'Failed to initialize authentication',
-        }));
-      }
-    } else {
-      // Use server-provided initial data
-      setState((prev) => ({
-        ...prev,
-        ...initialState,
-        isLoading: false,
-      }));
-    }
-  };
-
   const refreshAuth = async () => {
-    if (!state.id) {
-      await initialize();
-      return;
-    }
-
-    try {
-      setState((prev) => ({ ...prev, error: null }));
-      // Refresh would need to reconstruct the objects from flattened state
-      // For now, just clear error state
-    } catch (error) {
-      console.error('Auth refresh error:', error);
-      setState((prev) => ({
-        ...prev,
-        error: 'Failed to refresh authentication',
-      }));
-    }
+    // Better Auth's useSession hook handles refreshing automatically
+    setState((prev) => ({ ...prev, error: null }));
   };
 
   const clearAuth = () => {
@@ -350,20 +297,41 @@ export function AuthProvider({
     return state.role === role;
   };
 
-  // Initialize on mount
+  // Update state when Better Auth session changes
   useEffect(() => {
-    if (initialUser) {
-      // Update state with initial server data
-      updateAuthState(initialUser, initialSession, initialProfile);
-    } else {
-      // No initial data - fetch client-side
-      initialize();
+    if (!isPending) {
+      if (session?.user) {
+        // Get profile data if user is professional and has completed onboarding
+        const loadProfile = async () => {
+          let profile = null;
+          if (session.user.id && (session.user.role === 'freelancer' || session.user.role === 'company') && session.user.step === 'DASHBOARD') {
+            try {
+              const { getProfileByUserId } = await import('@/actions/profiles/get-profile');
+              const profileResult = await getProfileByUserId(session.user.id);
+              if (profileResult.success) {
+                profile = profileResult.data;
+              }
+            } catch (profileError) {
+              console.error('Failed to fetch profile:', profileError);
+            }
+          }
+          updateAuthState(session.user, session, profile);
+        };
+        
+        loadProfile();
+      } else {
+        setState((prev) => ({
+          ...prev,
+          ...initialState,
+          isLoading: false,
+          error: error?.message || null,
+        }));
+      }
     }
-  }, []);
+  }, [session, isPending, error]); // Run when session data changes
 
   const contextValue: AuthContextType = {
     ...state,
-    initialize,
     refreshAuth,
     clearAuth,
     hasRole,
