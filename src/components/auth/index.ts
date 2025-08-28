@@ -1,6 +1,8 @@
 // Auth Components
 export { default as FormAuthLogin } from './form-auth-login'
 export { default as FormAuthRegister } from './form-auth-register'
+export { default as FormForgotPassword } from './form-forgot-password'
+export { default as FormResetPassword } from './form-reset-password'
 export { default as GoogleLoginButton } from './button-login-goolge'
 export { default as RegisterProButton } from './button-register-pro'
 export { default as HeadingFormRegister } from './heading-form-register'

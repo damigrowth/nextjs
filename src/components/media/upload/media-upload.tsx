@@ -171,6 +171,30 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
         return updated.slice(0, maxFiles); // Respect maxFiles limit
       });
 
+      // Immediately update form to trigger isDirty state
+      if (newFiles.length > 0) {
+        // Create placeholder CloudinaryResource for pending files
+        const pendingResources = newFiles.map(file => ({
+          public_id: `pending_${file.id}`,
+          secure_url: file.preview,
+          original_filename: file.name,
+          bytes: file.size,
+          format: file.type.split('/')[1] || 'unknown',
+          resource_type: type === 'image' ? 'image' : 'auto',
+          width: 0,
+          height: 0,
+          created_at: new Date().toISOString(),
+          _pending: true, // Flag to indicate this is a pending upload
+        } as CloudinaryResource & { _pending: boolean }));
+
+        if (multiple) {
+          const allResources = [...resources, ...pendingResources];
+          onChange(allResources.length > 0 ? allResources : null);
+        } else {
+          onChange(pendingResources[0] || null);
+        }
+      }
+
       setUploadError(null);
     };
 
@@ -283,8 +307,9 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
           );
         }
 
-        // Update parent with uploaded resources
-        const allResources = [...resources, ...uploadedResources];
+        // Update parent with uploaded resources, filtering out pending resources
+        const nonPendingResources = resources.filter(r => !('_pending' in r && r._pending));
+        const allResources = [...nonPendingResources, ...uploadedResources];
         if (multiple) {
           onChange(allResources.length > 0 ? allResources : null);
         } else {
@@ -316,6 +341,16 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
         }
         return updated;
       });
+
+      // Remove corresponding pending resource from form value
+      const pendingId = `pending_${fileId}`;
+      const filteredResources = resources.filter(r => r.public_id !== pendingId);
+      
+      if (multiple) {
+        onChange(filteredResources.length > 0 ? filteredResources : null);
+      } else {
+        onChange(null);
+      }
     };
 
     // Remove uploaded resource

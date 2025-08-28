@@ -26,11 +26,11 @@ import type { CreateServiceInput } from '@/lib/validations/service';
 
 // Form context
 import { useFormContext } from 'react-hook-form';
-import { useAuthUser } from '@/components/providers';
+import { useDashboard } from '@/components/providers/dashboard-provider';
 
 export default function MediaStep() {
   const form = useFormContext<CreateServiceInput>();
-  const user = useAuthUser();
+  const { user } = useDashboard();
 
   return (
     <>
