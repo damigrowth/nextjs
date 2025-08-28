@@ -4,6 +4,8 @@ import { revalidateTag } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { ActionResult, ActionResponse } from '@/lib/types/api';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 import { Prisma } from '@prisma/client';
 import {
   profileBasicInfoUpdateSchema,
@@ -112,6 +114,27 @@ export async function updateProfileBasicInfo(
         updatedAt: new Date(),
       },
     });
+
+    // 7.5. Sync image to user table using Better Auth API (if image was updated)
+    if (data.image !== undefined) {
+      try {
+        await auth.api.updateUser({
+          headers: await headers(),
+          body: {
+            image: data.image ? JSON.stringify(data.image) : null,
+          },
+        });
+      } catch (authError) {
+        console.warn('Failed to update user via Better Auth, falling back to Prisma:', authError);
+        // Fallback to direct Prisma update if Better Auth fails
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            image: data.image ? JSON.stringify(data.image) : null,
+          },
+        });
+      }
+    }
 
     // 8. Revalidate cached data using tags - this will refresh data everywhere
     revalidateTag(`user-${user.id}`);
