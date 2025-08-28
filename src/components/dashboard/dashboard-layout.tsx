@@ -7,7 +7,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
-import { AuthProvider } from '../providers';
+import { DashboardProvider } from '../providers/dashboard-provider';
 import UserMenu from '../profile/menu-user';
 import DashboardSidebar from './dashboard-sidebar';
 
@@ -16,17 +16,15 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Get auth data server-side to pass to client components
+  // Single server-side fetch for entire dashboard session
   const userResult = await getCurrentUser();
   const user = userResult.success ? userResult.data.user : null;
   const profile = userResult.success ? userResult.data.profile : null;
-  const session = userResult.success ? userResult.data.session : null;
 
   return (
-    <AuthProvider
+    <DashboardProvider 
+      initialProfile={profile} 
       initialUser={user}
-      initialProfile={profile}
-      initialSession={session}
     >
       <SidebarProvider>
         <DashboardSidebar />
@@ -44,6 +42,6 @@ export default async function DashboardLayout({
           <div className='flex flex-1 flex-col gap-4 p-4 pt-0'>{children}</div>
         </SidebarInset>
       </SidebarProvider>
-    </AuthProvider>
+    </DashboardProvider>
   );
 }

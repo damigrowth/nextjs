@@ -27,7 +27,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { useAuth } from '../providers';
+import { useDashboard } from '../providers/dashboard-provider';
 
 export function NavUser({
   user,
@@ -40,7 +40,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
   const router = useRouter();
-  const { clearAuth } = useAuth();
+  const { clearAuth } = useDashboard();
 
   const handleLogout = async () => {
     try {

@@ -36,12 +36,12 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { getOptimizedCloudinaryUrl } from '@/lib/utils/media';
-import { useAuth } from '../providers';
+import { useDashboard } from '../providers/dashboard-provider';
 
 export default function DashboardSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
-  const { hasRole, displayName, email, image, isProfessional } = useAuth();
+  const { hasRole, displayName, email, image, isProfessional } = useDashboard();
 
   // Group 1: Main Navigation (always visible)
   const navMain = [

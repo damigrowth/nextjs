@@ -38,7 +38,7 @@ import {
 import { Skeleton } from '../ui/skeleton';
 import { MessagesMenu, SavedMenu } from '../dashboard';
 import UserImage from './user-image';
-import { useAuth } from '../providers';
+import { useSession } from '@/lib/auth/client';
 
 // Icon mapping function
 const getMenuIcon = (iconName: string) => {
@@ -57,21 +57,17 @@ const getMenuIcon = (iconName: string) => {
 
 export default function UserMenu({ isMobile }: UserMenuProps) {
   const router = useRouter();
-  const {
-    isLoading,
-    username,
-    displayName,
-    firstName,
-    lastName,
-    image,
-    email,
-    isAuthenticated,
-    isConfirmed,
-    hasAccess,
-    hasProfile,
-    isProfessional,
-    clearAuth,
-  } = useAuth();
+  const { data: session, isPending } = useSession();
+  
+  // Derive auth states from session data
+  const user = session?.user;
+  const isAuthenticated = !!user;
+  const isConfirmed = user?.emailVerified || false;
+  const needsEmailVerification = user && !user.emailVerified;
+  const needsOnboarding = user?.step === 'ONBOARDING' && (user?.role === 'freelancer' || user?.role === 'company');
+  const hasAccess = user?.step === 'DASHBOARD' || user?.role === 'admin';
+  const isProfessional = user?.role === 'freelancer' || user?.role === 'company';
+  const hasProfile = isProfessional && user?.step === 'DASHBOARD';
 
   const handleLogout = async () => {
     try {
@@ -83,7 +79,7 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
   };
 
   // Show loading state
-  if (isLoading) {
+  if (isPending) {
     return !isMobile ? (
       <div className='flex items-center space-x-2'>
         <Skeleton className='w-10 h-10 rounded-xl' />
@@ -93,8 +89,8 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
     );
   }
 
-  // Authenticated user
-  if (isAuthenticated && isConfirmed) {
+  // Authenticated user - simplified condition to prevent hydration issues
+  if (isAuthenticated) {
     let modifiedNav: MenuItem[] = [];
 
     if (isProfessional && !hasProfile) {
@@ -110,7 +106,7 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
     } else {
       // Normal menu for completed users
       const allNav = hasAccess ? hasAccessUserMenuNav : noAccessUserMenuNav;
-      const userProfilePath = `/profile/${username}`;
+      const userProfilePath = `/profile/${user?.username}`;
 
       modifiedNav = allNav
         .map((item) => {
@@ -141,20 +137,27 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
               className='p-0 h-auto w-auto hover:bg-transparent focus:ring-0 focus:ring-offset-0 focus:outline-none focus-visible:ring-0'
             >
               <UserImage
-                firstName={firstName}
-                lastName={lastName}
-                displayName={displayName}
+                firstName={user?.firstName || ''}
+                lastName={user?.lastName || ''}
+                displayName={user?.displayName || ''}
                 hideDisplayName
                 image={
-                  typeof image === 'string'
-                    ? image
-                    : image
-                      ? getOptimizedCloudinaryUrl(image, {
-                          width: 80,
-                          height: 80,
-                          crop: 'fill',
-                        })
-                      : null
+                  user?.image
+                    ? (() => {
+                        try {
+                          const imageData = typeof user.image === 'string' 
+                            ? JSON.parse(user.image) 
+                            : user.image;
+                          return getOptimizedCloudinaryUrl(imageData, {
+                            width: 80,
+                            height: 80,
+                            crop: 'fill',
+                          });
+                        } catch {
+                          return null;
+                        }
+                      })()
+                    : null
                 }
                 width={40}
                 height={40}
@@ -165,10 +168,10 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
             <DropdownMenuLabel className='font-normal'>
               <div className='flex flex-col space-y-1'>
                 <p className='text-sm font-medium leading-none'>
-                  {displayName || `${firstName} ${lastName}`.trim() || 'User'}
+                  {user?.displayName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'User'}
                 </p>
                 <p className='text-xs leading-none text-muted-foreground'>
-                  {username ? `@${username}` : email || ''}
+                  {user?.username ? `@${user.username}` : user?.email || ''}
                 </p>
               </div>
             </DropdownMenuLabel>
