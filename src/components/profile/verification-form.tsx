@@ -84,21 +84,17 @@ export default function VerificationForm({
   }, [state.success]);
 
   // Form submission handler
-  const handleFormSubmit = async (formData: FormData) => {
-    try {
-      // Get all form values and populate FormData
-      const allValues = getValues();
+  const handleFormSubmit = (formData: FormData) => {
+    // Get all form values and populate FormData
+    const allValues = getValues();
 
-      populateFormData(formData, allValues, {
-        stringFields: ['afm', 'name', 'address', 'phone'],
-        skipEmpty: false, // Don't skip empty values for required fields
-      });
+    populateFormData(formData, allValues, {
+      stringFields: ['afm', 'name', 'address', 'phone'],
+      skipEmpty: false, // Don't skip empty values for required fields
+    });
 
-      // Call server action
-      action(formData);
-    } catch (error) {
-      console.error('Form submission error:', error);
-    }
+    // Call server action directly (no await)
+    action(formData);
   };
 
   // Check if form should be disabled (pending or approved)

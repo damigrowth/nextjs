@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useTransition, useEffect } from 'react';
+import React, { useState, useActionState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -19,6 +19,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Auth provider
+import { useSession } from '@/lib/auth/client';
 
 // Icons
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
@@ -28,7 +29,9 @@ import {
   formatUsername,
   formatDisplayName,
 } from '@/lib/utils/validation/formats';
-import { useAuthLoading, useAuthUser } from '../providers';
+import { populateFormData } from '@/lib/utils/form';
+import { updateAccount } from '@/actions/auth/update-account';
+import { useDashboard } from '../providers/dashboard-provider';
 
 // Account form schema - only displayName is editable
 const accountFormSchema = z.object({
@@ -42,14 +45,17 @@ const accountFormSchema = z.object({
 
 type AccountFormData = z.infer<typeof accountFormSchema>;
 
-export default function AccountForm() {
-  const [isPending, startTransition] = useTransition();
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+const initialState = {
+  success: false,
+  message: '',
+};
 
-  // Get current user data from auth provider
-  const user = useAuthUser();
-  const isLoading = useAuthLoading();
+export default function AccountForm() {
+  const [state, action, isPending] = useActionState(updateAccount, initialState);
+  const { refetch } = useSession();
+
+  // Get dashboard context
+  const { user, isLoading } = useDashboard();
 
   const form = useForm<AccountFormData>({
     resolver: zodResolver(accountFormSchema),
@@ -73,41 +79,34 @@ export default function AccountForm() {
   }, [user, isLoading, form]);
 
   const {
-    handleSubmit,
     formState: { errors, isValid, isDirty },
     setValue,
     watch,
+    getValues,
   } = form;
 
-  const onSubmit = async (data: AccountFormData) => {
-    startTransition(async () => {
-      setSubmitError(null);
-      setSubmitSuccess(null);
+  // Handle successful form submission
+  useEffect(() => {
+    if (state.success) {
+      // Refresh the session data to update the menu component
+      refetch();
+      // Reset form dirty state
+      form.reset(getValues());
+    }
+  }, [state.success, refetch, form, getValues]);
 
-      try {
-        // Import and call server action for updating account
-        const { updateAccount } = await import('@/actions/auth/update-account');
+  // Form submission handler
+  const handleFormSubmit = (formData: FormData) => {
+    // Get all form values and populate FormData
+    const allValues = getValues();
 
-        const result = await updateAccount({
-          displayName: data.displayName,
-        });
-
-        if (!result.success) {
-          throw new Error(result.error || 'Σφάλμα κατά την ενημέρωση');
-        }
-
-        setSubmitSuccess('Οι ρυθμίσεις του λογαριασμού ενημερώθηκαν επιτυχώς!');
-
-        // Reset form dirty state
-        form.reset(data);
-      } catch (error: any) {
-        console.error('Account update error:', error);
-        setSubmitError(
-          error.message ||
-            'Αποτυχία ενημέρωσης λογαριασμού. Παρακαλώ δοκιμάστε ξανά.',
-        );
-      }
+    populateFormData(formData, allValues, {
+      stringFields: ['displayName'],
+      skipEmpty: false,
     });
+
+    // Call server action directly (no await)
+    action(formData);
   };
 
   // Show loading state
@@ -123,7 +122,7 @@ export default function AccountForm() {
   return (
     <Form {...form}>
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        action={handleFormSubmit}
         className='space-y-6 p-6 border rounded-lg'
       >
         {/* Form Fields in 3 columns: Email, Username, Display Name */}
@@ -195,18 +194,18 @@ export default function AccountForm() {
         </div>
 
         {/* Error Display */}
-        {submitError && (
+        {state.message && !state.success && (
           <Alert variant='destructive'>
             <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{submitError}</AlertDescription>
+            <AlertDescription>{state.message}</AlertDescription>
           </Alert>
         )}
 
         {/* Success Display */}
-        {submitSuccess && (
+        {state.message && state.success && (
           <Alert className='border-green-200 bg-green-50 text-green-800'>
             <CheckCircle className='h-4 w-4' />
-            <AlertDescription>{submitSuccess}</AlertDescription>
+            <AlertDescription>{state.message}</AlertDescription>
           </Alert>
         )}
 

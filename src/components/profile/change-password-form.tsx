@@ -70,14 +70,10 @@ export default function ChangePasswordForm({
     formState: { errors, isValid, isDirty },
   } = form;
 
-  // Handle form submission following the same pattern as login/register
-  const handleFormSubmit = async (formData: FormData) => {
-    try {
-      // Call the server action
-      await action(formData);
-    } catch (error) {
-      console.error('Form submission error:', error);
-    }
+  // Handle form submission
+  const handleFormSubmit = (formData: FormData) => {
+    // Call the server action directly (no await)
+    action(formData);
   };
 
   // Handle success state

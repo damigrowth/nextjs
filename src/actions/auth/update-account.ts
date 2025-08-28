@@ -22,7 +22,42 @@ interface UpdateAccountResult {
   data?: any;
 }
 
-export async function updateAccount(input: UpdateAccountInput): Promise<UpdateAccountResult> {
+interface ActionState {
+  success: boolean;
+  message: string;
+}
+
+export async function updateAccount(
+  prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  try {
+    // Extract data from FormData
+    const displayName = formData.get('displayName') as string;
+
+    const result = await updateAccountInternal({ displayName });
+
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.error || 'Σφάλμα κατά την ενημέρωση',
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Οι ρυθμίσεις του λογαριασμού ενημερώθηκαν επιτυχώς!',
+    };
+  } catch (error: any) {
+    console.error('Update account action error:', error);
+    return {
+      success: false,
+      message: error.message || 'Σφάλμα κατά την ενημέρωση του λογαριασμού',
+    };
+  }
+}
+
+export async function updateAccountInternal(input: UpdateAccountInput): Promise<UpdateAccountResult> {
   try {
     // Validate input
     const validatedInput = updateAccountSchema.parse(input);
@@ -39,23 +74,7 @@ export async function updateAccount(input: UpdateAccountInput): Promise<UpdateAc
       };
     }
 
-    // Update user displayName using Better Auth API
-    const userResult = await auth.api.updateUser({
-      headers: await headers(),
-      body: {
-        name: validatedInput.displayName,
-        displayName: validatedInput.displayName,
-      },
-    });
-
-    if (!userResult) {
-      return {
-        success: false,
-        error: 'Αποτυχία ενημέρωσης λογαριασμού',
-      };
-    }
-
-    // Update profile displayName if profile exists
+    // First update the profile if it exists (since it may trigger UI updates)
     try {
       await prisma.profile.updateMany({
         where: { uid: session.user.id },
@@ -64,8 +83,24 @@ export async function updateAccount(input: UpdateAccountInput): Promise<UpdateAc
         },
       });
     } catch (profileError) {
-      // Profile might not exist, which is fine
+      // Profile might not exist, which is fine for some users
       console.log('Profile update skipped (may not exist):', profileError);
+    }
+
+    // Then update the Better Auth user displayName
+    const userResult = await auth.api.updateUser({
+      headers: await headers(),
+      body: {
+        displayName: validatedInput.displayName,
+        name: validatedInput.displayName, // Also update name field for consistency
+      },
+    });
+
+    if (!userResult) {
+      return {
+        success: false,
+        error: 'Αποτυχία ενημέρωσης λογαριασμού',
+      };
     }
 
     return {
