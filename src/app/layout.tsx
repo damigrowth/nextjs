@@ -22,7 +22,6 @@ import {
   PathChecker,
 } from '@/components/shared/layout/wrapper';
 import { Toaster } from '@/components/ui/sonner';
-import { AuthProvider } from '@/components';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -34,24 +33,16 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang='el'>
       <Body>
-        <AuthProvider>
-          {/* <InstallBootstrap /> */}
-          {/* <div className='overflow-hidden box-border min-h-screen bg-inherit relative z-[1] w-full'> */}
-          <PathChecker excludes={['/dashboard', '/admin']}>
-            <Header />
-          </PathChecker>
-          <main className='mt-20'>
-            <Notifications>{children}</Notifications>
-          </main>
-          <PathChecker excludes={['/dashboard', '/admin']}>
-            <Footer />
-          </PathChecker>
-          <BottomToTop_D />
-          {/* </div> */}
-        </AuthProvider>
-        {/* <PathChecker excludes={['/dashboard', '/admin']}>
-          <NavMenuMobileWrapper_D />
-        </PathChecker> */}
+        <PathChecker excludes={['/dashboard', '/admin']}>
+          <Header />
+        </PathChecker>
+        <main>
+          <Notifications>{children}</Notifications>
+        </main>
+        <PathChecker excludes={['/dashboard', '/admin']}>
+          <Footer />
+        </PathChecker>
+        <BottomToTop_D />
         <GoogleTagManager gtmId='GTM-KR7N94L4' />
         <GoogleAnalytics gaId={gaId} />
         {/* Cloudinary Upload Widget */}

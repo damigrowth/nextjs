@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function TermsPage() {
   return (
-    <div className='flex flex-col w-full'>
+    <div className='mt-10 lg:mt-20 flex flex-col w-full'>
       <section className='mx-auto max-w-2xl py-12 px-5'>
         <h2>ΟΡΟΙ ΧΡΗΣΗΣ </h2>
         <span />
