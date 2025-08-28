@@ -3,13 +3,13 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { resetPasswordSchema } from '@/lib/validations/auth';
-import { ActionResult } from '@/lib/types/api';
+import { ActionResponse, ActionResult } from '@/lib/types/api';
 import { ResetPasswordInput } from '@/lib/validations/auth';
 
 export async function resetPassword(
-  prevState: any,
+  prevState: ActionResponse | null,
   formData: FormData,
-): Promise<ActionResult<void>> {
+): Promise<ActionResponse> {
   try {
     const token = formData.get('token') as string;
     const newPassword = formData.get('newPassword') as string;
@@ -22,8 +22,7 @@ export async function resetPassword(
     if (!validatedFields.success) {
       return {
         success: false,
-        error: 'Invalid input data',
-        fieldErrors: validatedFields.error.flatten().fieldErrors,
+        message: 'Λάθος στοιχεία',
       };
     }
 
@@ -41,7 +40,7 @@ export async function resetPassword(
     if (!result) {
       return {
         success: false,
-        error: 'Invalid or expired reset token',
+        message: 'Ο σύνδεσμος επαναφοράς έχει λήξει ή έχει ήδη χρησιμοποιηθεί.',
       };
     }
 
@@ -52,16 +51,20 @@ export async function resetPassword(
   } catch (error: any) {
     console.error('Reset password error:', error);
 
-    if (error.message?.includes('token') || error.message?.includes('invalid token')) {
+    if (
+      error.message?.includes('token') ||
+      error.message?.includes('invalid token')
+    ) {
       return {
         success: false,
-        error: 'Ο σύνδεσμος επαναφοράς έχει λήξει ή έχει ήδη χρησιμοποιηθεί. Παρακαλούμε αιτηθείτε νέο σύνδεσμο.',
+        message:
+          'Ο σύνδεσμος επαναφοράς έχει λήξει ή έχει ήδη χρησιμοποιηθεί. Παρακαλούμε αιτηθείτε νέο σύνδεσμο.',
       };
     }
 
     return {
       success: false,
-      error: 'Η επαναφορά κωδικού απέτυχε. Παρακαλούμε δοκιμάστε ξανά.',
+      message: 'Η επαναφορά κωδικού απέτυχε. Παρακαλούμε δοκιμάστε ξανά.',
     };
   }
 }
@@ -94,7 +97,7 @@ export async function resetUserPassword(
     if (!result) {
       return {
         success: false,
-        error: 'Invalid or expired reset token',
+        error: 'Ο σύνδεσμος επαναφοράς έχει λήξει ή έχει ήδη χρησιμοποιηθεί.',
       };
     }
 
