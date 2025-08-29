@@ -79,13 +79,13 @@ export async function submitVerificationRequest(
     }
 
     // 6. Check if verification already exists
-    const existingVerification = await prisma.verification.findUnique({
+    const existingVerification = await prisma.profileVerification.findUnique({
       where: { pid: profile.id },
     });
 
     if (existingVerification) {
       // Update existing verification
-      await prisma.verification.update({
+      await prisma.profileVerification.update({
         where: { pid: profile.id },
         data: {
           afm: data.afm,
@@ -110,7 +110,7 @@ export async function submitVerificationRequest(
       };
     } else {
       // Create new verification
-      await prisma.verification.create({
+      await prisma.profileVerification.create({
         data: {
           afm: data.afm,
           name: data.name,
@@ -163,7 +163,7 @@ async function _getVerificationByUserId(userId: string): Promise<{
   }
 
   // Get verification data
-  return await prisma.verification.findUnique({
+  return await prisma.profileVerification.findUnique({
     where: { pid: profile.id },
     select: {
       status: true,
