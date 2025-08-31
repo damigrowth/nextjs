@@ -229,7 +229,14 @@ async function migrateUsers(): Promise<MigrationStats> {
           });
 
           // Create account for authentication
-          const accountData = {
+          const accountData: {
+            userId: string;
+            accountId: string;
+            providerId: string;
+            createdAt: Date;
+            updatedAt: Date;
+            password?: string;
+          } = {
             userId: newUser.id,
             accountId: `${strapiUser.provider}_${strapiUser.id}`, // Unique identifier
             providerId: strapiUser.provider === 'local' ? 'credential' : 'google',
