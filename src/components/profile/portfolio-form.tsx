@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 
 // Auth and utilities
-import { populateFormData } from '@/lib/utils/form';
+import { populateFormData, parseJSONValue } from '@/lib/utils/form';
 
 // Validation schema and server action
 import { z } from 'zod';
@@ -85,9 +85,10 @@ export default function PortfolioForm({
 
   // Update form values when initial data is available
   useEffect(() => {
-    if (profile) {
+    if (profile?.portfolio) {
+      const portfolioData = parseJSONValue(profile.portfolio, []) as any[];
       form.reset({
-        portfolio: profile.portfolio || [],
+        portfolio: portfolioData,
       });
     }
   }, [profile, form]);
