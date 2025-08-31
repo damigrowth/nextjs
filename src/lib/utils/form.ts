@@ -233,7 +233,29 @@ export function parseVisibilityJSON(value: JsonValue | null | undefined): Profil
     address: true,
   };
   
-  if (!value || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+  if (!value) {
+    return defaultValue;
+  }
+  
+  // Handle JSON string from database
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      if (typeof parsed === 'object' && parsed !== null) {
+        return {
+          email: typeof parsed.email === 'boolean' ? parsed.email : defaultValue.email,
+          phone: typeof parsed.phone === 'boolean' ? parsed.phone : defaultValue.phone,
+          address: typeof parsed.address === 'boolean' ? parsed.address : defaultValue.address,
+        };
+      }
+    } catch (e) {
+      console.warn('Failed to parse visibility JSON:', e);
+    }
+    return defaultValue;
+  }
+  
+  // Handle non-string primitives
+  if (typeof value === 'number' || typeof value === 'boolean') {
     return defaultValue;
   }
   
@@ -248,50 +270,81 @@ export function parseVisibilityJSON(value: JsonValue | null | undefined): Profil
 }
 
 /**
- * Parse socials JSON with proper type safety
+ * Parse socials JSON with proper type safety for form input
+ * Returns objects with url properties for form fields, even if empty
  */
 export function parseSocialsJSON(value: JsonValue | null | undefined): SocialMediaInput {
-  const defaultValue: SocialMediaInput = {
-    facebook: { url: '' },
-    instagram: { url: '' },
-    linkedin: { url: '' },
-    x: { url: '' },
-    youtube: { url: '' },
-    github: { url: '' },
-    behance: { url: '' },
-    dribbble: { url: '' },
+  // For form inputs, we always need objects with url properties
+  const defaultPlatform = { url: '' };
+  const defaultSocials = {
+    facebook: defaultPlatform,
+    instagram: defaultPlatform,
+    linkedin: defaultPlatform,
+    x: defaultPlatform,
+    youtube: defaultPlatform,
+    github: defaultPlatform,
+    behance: defaultPlatform,
+    dribbble: defaultPlatform,
   };
   
-  if (!value || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-    return defaultValue;
+  if (!value) {
+    return defaultSocials;
+  }
+  
+  // Handle JSON string from database
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      if (typeof parsed === 'object' && parsed !== null) {
+        return {
+          facebook: parseSocialPlatform(parsed.facebook, defaultPlatform),
+          instagram: parseSocialPlatform(parsed.instagram, defaultPlatform),
+          linkedin: parseSocialPlatform(parsed.linkedin, defaultPlatform),
+          x: parseSocialPlatform(parsed.x, defaultPlatform),
+          youtube: parseSocialPlatform(parsed.youtube, defaultPlatform),
+          github: parseSocialPlatform(parsed.github, defaultPlatform),
+          behance: parseSocialPlatform(parsed.behance, defaultPlatform),
+          dribbble: parseSocialPlatform(parsed.dribbble, defaultPlatform),
+        };
+      }
+    } catch (e) {
+      console.warn('Failed to parse socials JSON:', e);
+    }
+    return defaultSocials;
+  }
+  
+  // Handle non-string primitives
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return defaultSocials;
   }
   
   // value is JsonObject at this point
   const obj = value as Record<string, unknown>;
   
   return {
-    facebook: parseSocialPlatform(obj.facebook, defaultValue.facebook),
-    instagram: parseSocialPlatform(obj.instagram, defaultValue.instagram),
-    linkedin: parseSocialPlatform(obj.linkedin, defaultValue.linkedin),
-    x: parseSocialPlatform(obj.x, defaultValue.x),
-    youtube: parseSocialPlatform(obj.youtube, defaultValue.youtube),
-    github: parseSocialPlatform(obj.github, defaultValue.github),
-    behance: parseSocialPlatform(obj.behance, defaultValue.behance),
-    dribbble: parseSocialPlatform(obj.dribbble, defaultValue.dribbble),
+    facebook: parseSocialPlatform(obj.facebook, defaultPlatform),
+    instagram: parseSocialPlatform(obj.instagram, defaultPlatform),
+    linkedin: parseSocialPlatform(obj.linkedin, defaultPlatform),
+    x: parseSocialPlatform(obj.x, defaultPlatform),
+    youtube: parseSocialPlatform(obj.youtube, defaultPlatform),
+    github: parseSocialPlatform(obj.github, defaultPlatform),
+    behance: parseSocialPlatform(obj.behance, defaultPlatform),
+    dribbble: parseSocialPlatform(obj.dribbble, defaultPlatform),
   };
 }
 
 /**
  * Helper function to parse individual social platform data
+ * Always returns an object with url property for form compatibility
  */
-function parseSocialPlatform(value: unknown, defaultValue: { url: string } | undefined): { url: string } | undefined {
+function parseSocialPlatform(value: unknown, defaultValue: { url: string }): { url: string } {
   if (!value || typeof value !== 'object' || value === null) {
     return defaultValue;
   }
   
   const obj = value as Record<string, unknown>;
   return {
-    url: typeof obj.url === 'string' ? obj.url : defaultValue?.url || '',
+    url: typeof obj.url === 'string' ? obj.url : defaultValue.url,
   };
 }
 
@@ -318,4 +371,78 @@ export function parsePortfolioJSON(value: JsonValue | null | undefined): any[] {
   }
   
   return [];
+}
+
+/**
+ * Parse coverage JSON with proper type safety
+ */
+export function parseCoverageJSON(value: JsonValue | null | undefined): {
+  online: boolean;
+  onbase: boolean;
+  onsite: boolean;
+  address?: string;
+  area?: { id: string; name: string; } | null;
+  county?: { id: string; name: string; } | null;
+  zipcode?: { id: string; name: string; } | null;
+  counties?: { id: string; name: string; }[];
+  areas?: { id: string; name: string; county?: { id: string; name: string; }; }[];
+} {
+  const defaultValue = {
+    online: false,
+    onbase: false,
+    onsite: false,
+    address: '',
+    area: null,
+    county: null,
+    zipcode: null,
+    counties: [],
+    areas: [],
+  };
+  
+  if (!value) {
+    return defaultValue;
+  }
+  
+  // Handle JSON string from database
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      if (typeof parsed === 'object' && parsed !== null) {
+        return {
+          online: typeof parsed.online === 'boolean' ? parsed.online : defaultValue.online,
+          onbase: typeof parsed.onbase === 'boolean' ? parsed.onbase : defaultValue.onbase,
+          onsite: typeof parsed.onsite === 'boolean' ? parsed.onsite : defaultValue.onsite,
+          address: typeof parsed.address === 'string' ? parsed.address : defaultValue.address,
+          area: parsed.area || defaultValue.area,
+          county: parsed.county || defaultValue.county,
+          zipcode: parsed.zipcode || defaultValue.zipcode,
+          counties: Array.isArray(parsed.counties) ? parsed.counties : defaultValue.counties,
+          areas: Array.isArray(parsed.areas) ? parsed.areas : defaultValue.areas,
+        };
+      }
+    } catch (e) {
+      console.warn('Failed to parse coverage JSON:', e);
+    }
+    return defaultValue;
+  }
+  
+  // Handle non-string primitives
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return defaultValue;
+  }
+  
+  // value is JsonObject at this point
+  const obj = value as Record<string, unknown>;
+  
+  return {
+    online: typeof obj.online === 'boolean' ? obj.online : defaultValue.online,
+    onbase: typeof obj.onbase === 'boolean' ? obj.onbase : defaultValue.onbase,
+    onsite: typeof obj.onsite === 'boolean' ? obj.onsite : defaultValue.onsite,
+    address: typeof obj.address === 'string' ? obj.address : defaultValue.address,
+    area: obj.area || defaultValue.area,
+    county: obj.county || defaultValue.county,
+    zipcode: obj.zipcode || defaultValue.zipcode,
+    counties: Array.isArray(obj.counties) ? obj.counties : defaultValue.counties,
+    areas: Array.isArray(obj.areas) ? obj.areas : defaultValue.areas,
+  };
 }
