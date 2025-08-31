@@ -90,19 +90,17 @@ export default function BillingForm({
         name: '',
         profession: '',
         address: '',
-      });
-      
-      const resetData = {
-        receipt: billingData.receipt || false,
-        invoice: billingData.invoice || false,
-        afm: billingData.afm || '',
-        doy: billingData.doy || '',
-        name: billingData.name || '',
-        profession: billingData.profession || '',
-        address: billingData.address || '',
+      }) as {
+        receipt: boolean;
+        invoice: boolean;
+        afm: string;
+        doy: string;
+        name: string;
+        profession: string;
+        address: string;
       };
-      
-      form.reset(resetData);
+
+      form.reset(billingData);
       // User has existing billing data, so they can submit
       setHasUserInteracted(true);
     }
@@ -142,7 +140,6 @@ export default function BillingForm({
     // Call the server action
     action(formData);
   };
-
 
   return (
     <Form {...form}>
