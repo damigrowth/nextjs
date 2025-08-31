@@ -92,7 +92,7 @@ import {
   AddonsFaqStep,
   MediaStep,
 } from './steps';
-import { useDashboard } from '../providers/dashboard-provider';
+import { AuthUser } from '@/lib/types/auth';
 
 const STEPS = [
   {
@@ -155,7 +155,11 @@ const STEP_FIELDS: Record<number, (keyof CreateServiceInput)[]> = {
   5: ['media'],
 };
 
-export default function CreateServiceForm() {
+interface CreateServiceFormProps {
+  initialUser: AuthUser | null;
+}
+
+export default function CreateServiceForm({ initialUser }: CreateServiceFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
@@ -210,8 +214,9 @@ export default function CreateServiceForm() {
     initialState,
   );
 
-  // Dashboard context  
-  const { user, isLoading } = useDashboard();
+  // Use initialUser prop
+  const user = initialUser;
+  const isLoading = false; // No loading state needed since user is passed as prop
 
   const {
     formState: { errors, isValid, isDirty },
@@ -520,7 +525,7 @@ export default function CreateServiceForm() {
       case 4:
         return <AddonsFaqStep />;
       case 5:
-        return <MediaStep />;
+        return <MediaStep user={user} />;
       default:
         return null;
     }

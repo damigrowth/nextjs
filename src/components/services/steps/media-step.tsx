@@ -21,16 +21,17 @@ import { Upload, Image, Video, AlertCircle } from 'lucide-react';
 
 // Types
 import type { CreateServiceInput } from '@/lib/validations/service';
-
-// Auth context for user info
+import type { AuthUser } from '@/lib/types/auth';
 
 // Form context
 import { useFormContext } from 'react-hook-form';
-import { useDashboard } from '@/components/providers/dashboard-provider';
 
-export default function MediaStep() {
+interface MediaStepProps {
+  user: AuthUser | null;
+}
+
+export default function MediaStep({ user }: MediaStepProps) {
   const form = useFormContext<CreateServiceInput>();
-  const { user } = useDashboard();
 
   return (
     <>

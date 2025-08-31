@@ -25,8 +25,8 @@ import {
 } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 
-// Auth provider
-import { useDashboard } from '../providers/dashboard-provider';
+// Types
+import { AuthUser } from '@/lib/types/auth';
 
 // Icons
 import { AlertTriangle, Loader2 } from 'lucide-react';
@@ -50,19 +50,18 @@ const deleteAccountSchema = z
 type DeleteAccountFormData = z.infer<typeof deleteAccountSchema>;
 
 interface DeleteAccountFormProps {
+  user: AuthUser | null;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
 export default function DeleteAccountForm({
+  user,
   onSuccess,
   onCancel,
 }: DeleteAccountFormProps) {
   const [isPending, startTransition] = useTransition();
   const [submitError, setSubmitError] = useState<string | null>(null);
-
-  // Get dashboard context
-  const { user } = useDashboard();
 
   const form = useForm<DeleteAccountFormData>({
     resolver: zodResolver(deleteAccountSchema),
@@ -88,7 +87,7 @@ export default function DeleteAccountForm({
 
       try {
         // Verify the username matches the current user
-        if (data.username !== user.username) {
+        if (!user || data.username !== user.username) {
           setSubmitError('Το username δεν ταιριάζει με τον λογαριασμό σας');
           return;
         }
@@ -153,12 +152,12 @@ export default function DeleteAccountForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Εισάγετε το username σας: <strong>{user.username}</strong>
+                  Εισάγετε το username σας: <strong>{user?.username}</strong>
                 </FormLabel>
                 <FormControl>
                   <Input
                     type='text'
-                    placeholder={user.username || 'username'}
+                    placeholder={user?.username || 'username'}
                     {...field}
                   />
                 </FormControl>
@@ -177,7 +176,7 @@ export default function DeleteAccountForm({
                 <FormControl>
                   <Input
                     type='text'
-                    placeholder={user.username || 'username'}
+                    placeholder={user?.username || 'username'}
                     {...field}
                     disabled={!watchedUsername}
                   />
