@@ -1,6 +1,26 @@
 import { BasicInfoForm } from '@/components';
+import { getCurrentUser } from '@/actions/auth/server';
+import { redirect } from 'next/navigation';
 
-export default function BasicPage() {
+export default async function BasicPage() {
+  // Fetch current user and profile data server-side
+  const userResult = await getCurrentUser({ revalidate: true });
+
+  if (!userResult.success || !userResult.data.user) {
+    redirect('/login');
+  }
+
+  const { user, profile } = userResult.data;
+
+  // Check if user has profile (only professionals with completed onboarding)
+  const hasProfile =
+    !!(user?.role === 'freelancer' || user?.role === 'company') &&
+    user?.step === 'DASHBOARD';
+
+  if (!hasProfile) {
+    redirect('/dashboard');
+  }
+
   return (
     <div className='space-y-6'>
       <div>
@@ -9,7 +29,7 @@ export default function BasicPage() {
           Επεξεργαστείτε τα βασικά στοιχεία του προφίλ σας
         </p>
       </div>
-      <BasicInfoForm />
+      <BasicInfoForm initialUser={user} initialProfile={profile} />
     </div>
   );
 }

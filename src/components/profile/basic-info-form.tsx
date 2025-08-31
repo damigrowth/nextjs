@@ -5,6 +5,7 @@ import React, {
   useRef,
   useActionState,
   useEffect,
+  useTransition,
 } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -63,55 +64,53 @@ import {
   resetCoverageDependencies,
   filterSkillsByCategory,
 } from '@/lib/utils/datasets';
-import { populateFormData } from '@/lib/utils/form';
+import { populateFormData, parseCoverageJSON } from '@/lib/utils/form';
 
 // Import validation schema
 import {
   profileBasicInfoUpdateSchema,
   type ProfileBasicInfoUpdateInput,
+  coverageSchema,
 } from '@/lib/validations/profile';
 
 // Import server action
 import { updateProfileBasicInfo } from '@/actions/profiles/basic-info';
-import { useDashboard } from '../providers';
 import { FormButton } from '../shared';
 import { useSession } from '@/lib/auth/client';
-
-type ProfileFormData = ProfileBasicInfoUpdateInput;
+import { AuthUser, ProfileWithRelations } from '@/lib/types/auth';
+import { useRouter } from 'next/navigation';
 
 const initialState = {
   success: false,
   message: '',
 };
 
-export default function BasicInfoForm() {
+interface BasicInfoFormProps {
+  initialUser: AuthUser | null;
+  initialProfile: ProfileWithRelations | null;
+}
+
+export default function BasicInfoForm({
+  initialUser,
+  initialProfile,
+}: BasicInfoFormProps) {
   const [state, action, isPending] = useActionState(
     updateProfileBasicInfo,
     initialState,
   );
 
   const [isUploading, setIsUploading] = useState(false);
+  const [isPendingTransition, startTransition] = useTransition();
   const { refetch } = useSession();
+  const router = useRouter();
 
   // Refs for media upload
   const profileImageRef = useRef<any>(null);
 
-  // Get current user data
-  const {
-    user,
-    isLoading,
-    hasProfile,
-    image,
-    tagline,
-    bio,
-    category,
-    subcategory,
-    skills,
-    speciality,
-    coverage,
-  } = useDashboard();
+  // Extract data from props
+  const profile = initialProfile;
 
-  const form = useForm<ProfileFormData>({
+  const form = useForm<ProfileBasicInfoUpdateInput>({
     resolver: zodResolver(profileBasicInfoUpdateSchema),
     defaultValues: {
       image: null,
@@ -136,52 +135,6 @@ export default function BasicInfoForm() {
     mode: 'onChange', // Real-time validation per FORM_PATTERNS.md
   });
 
-  // Update form values when user data is loaded
-  useEffect(() => {
-    if (!isLoading && hasProfile) {
-      form.reset({
-        image: image || null,
-        tagline: tagline || '',
-        bio: bio || '',
-        category: category || '',
-        subcategory: subcategory || '',
-        skills: skills || [],
-        speciality: speciality || '',
-        coverage: coverage || {
-          online: false,
-          onbase: false,
-          onsite: false,
-          address: '',
-          area: null,
-          county: null,
-          zipcode: null,
-          counties: [],
-          areas: [],
-        },
-      });
-    }
-  }, [
-    hasProfile,
-    isLoading,
-    image,
-    tagline,
-    bio,
-    category,
-    subcategory,
-    skills,
-    speciality,
-    coverage,
-    form,
-  ]);
-
-  // Handle successful form submission
-  useEffect(() => {
-    if (state.success) {
-      // Refresh the session data to update the menu component
-      refetch();
-    }
-  }, [state.success, refetch]);
-
   const {
     handleSubmit,
     formState: { errors, isValid, isDirty },
@@ -189,6 +142,42 @@ export default function BasicInfoForm() {
     getValues,
     watch,
   } = form;
+
+  // Update form values when initial data is available
+  useEffect(() => {
+    if (profile) {
+      const resetData = {
+        image: profile.image ? profile.image : null,
+        tagline: profile.tagline || '',
+        bio: profile.bio || '',
+        category: profile.category || '',
+        subcategory: profile.subcategory || '',
+        skills: profile.skills || [],
+        speciality: profile.speciality || '',
+        coverage: parseCoverageJSON(profile.coverage),
+      };
+      form.reset(resetData);
+    }
+  }, [profile, form]);
+
+  // Handle successful form submission - refresh session and page to get updated data
+  useEffect(() => {
+    if (state.success) {
+      // Reset loading states
+      setIsUploading(false);
+      // Refresh the session data to update the menu component with new image
+      refetch();
+      // Force a fresh server-side render to get the updated session data
+      router.refresh();
+    }
+  }, [state.success, refetch, router]);
+
+  // Reset loading states when form submission completes (success or failure)
+  useEffect(() => {
+    if (!isPending) {
+      setIsUploading(false);
+    }
+  }, [isPending]);
 
   // Watch specific fields for dependent logic
   const watchedCategory = watch('category');
@@ -276,49 +265,53 @@ export default function BasicInfoForm() {
   };
 
   // Wrapper action that handles media uploads and data population
-  const handleFormAction = (formData: FormData) => {
+  const handleFormAction = async (formData: FormData) => {
     setIsUploading(true);
 
-    // Handle image upload if needed
-    if (profileImageRef.current?.hasFiles()) {
-      profileImageRef.current.uploadFiles();
+    try {
+      // Check for pending files and upload if needed
+      const hasPendingFiles = profileImageRef.current?.hasFiles();
+
+      if (hasPendingFiles) {
+        await profileImageRef.current.uploadFiles();
+      }
+
+      // Get all form values AFTER upload completion
+      const allValues = getValues();
+
+      populateFormData(formData, allValues, {
+        stringFields: [
+          'tagline',
+          'bio',
+          'category',
+          'subcategory',
+          'speciality',
+        ],
+        jsonFields: ['image', 'skills', 'coverage'],
+        skipEmpty: true,
+      });
+
+      // Call the server action with populated FormData using startTransition
+      startTransition(() => {
+        action(formData);
+      });
+
+      // Note: Don't reset isUploading here, let it be handled by useEffect
+    } catch (error) {
+      console.error('❌ Upload failed:', error);
+      setIsUploading(false);
+      // Don't submit form if upload fails
     }
-
-    // Get all form values and populate FormData using utility function
-    const allValues = getValues();
-
-    populateFormData(formData, allValues, {
-      stringFields: [
-        'tagline',
-        'bio',
-        'category',
-        'subcategory',
-        'speciality',
-      ],
-      jsonFields: ['image', 'skills', 'coverage'],
-      skipEmpty: true,
-    });
-
-    setIsUploading(false);
-
-    // Call the server action with populated FormData
-    action(formData);
   };
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className='flex items-center justify-center p-8 border rounded-lg'>
-        <Loader2 className='w-6 h-6 animate-spin' />
-        <span className='ml-2'>Φόρτωση...</span>
-      </div>
-    );
-  }
 
   return (
     <Form {...form}>
       <form
-        action={handleFormAction}
+        onSubmit={(e) => {
+          e.preventDefault();
+          const formData = new FormData(e.currentTarget);
+          handleFormAction(formData);
+        }}
         className='space-y-6 p-6 border rounded-lg'
       >
         {/* Profile Image */}
@@ -340,7 +333,7 @@ export default function BasicInfoForm() {
                   onChange={field.onChange}
                   uploadPreset='doulitsa_new'
                   multiple={false}
-                  folder={`users/${user?.username}/profile`}
+                  folder={`users/${initialUser?.username}/profile`}
                   maxFileSize={3000000} // 3MB
                   allowedFormats={['jpg', 'jpeg', 'png', 'webp']}
                   placeholder='Ανεβάστε εικόνα προφίλ'
@@ -487,11 +480,11 @@ export default function BasicInfoForm() {
                                   watchedCategory,
                                 );
                                 const subcategories = category?.children || [];
-                                return user?.role
+                                return initialUser?.role
                                   ? filterByField(
                                       subcategories,
                                       'type',
-                                      user.role,
+                                      initialUser.role,
                                     )
                                   : subcategories;
                               })().map((subcategory) => (
@@ -1202,8 +1195,8 @@ export default function BasicInfoForm() {
             <div>isDirty: {isDirty.toString()}</div>
             <div>hasValidImage: {hasValidImage().toString()}</div>
             <div>Image Value: {JSON.stringify(getValues('image'))}</div>
-            <div>Username: {user?.username || 'undefined'}</div>
-            <div>User ID: {user?.id || 'undefined'}</div>
+            <div>Username: {initialUser?.username || 'undefined'}</div>
+            <div>User ID: {initialUser?.id || 'undefined'}</div>
             <div>Errors: {JSON.stringify(errors, null, 2)}</div>
           </div>
         )}
@@ -1220,9 +1213,11 @@ export default function BasicInfoForm() {
             type='submit'
             text='Αποθήκευση'
             loadingText='Αποθήκευση...'
-            loading={isPending}
+            loading={isPending || isPendingTransition || isUploading}
             disabled={
               isPending ||
+              isPendingTransition ||
+              isUploading ||
               !isValid ||
               !isDirty ||
               !hasValidImage()

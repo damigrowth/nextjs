@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useState, useActionState, useEffect } from 'react';
+import React, { useActionState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
 // Shadcn UI components
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Form,
@@ -22,102 +20,74 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useSession } from '@/lib/auth/client';
 
 // Icons
-import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, CheckCircle } from 'lucide-react';
 
 // Validation utilities
-import {
-  formatUsername,
-  formatDisplayName,
-} from '@/lib/utils/validation/formats';
+import { formatDisplayName } from '@/lib/utils/validation/formats';
 import { populateFormData } from '@/lib/utils/form';
 import { updateAccount } from '@/actions/auth/update-account';
-import { useDashboard } from '../providers/dashboard-provider';
-
-// Account form schema - only displayName is editable
-const accountFormSchema = z.object({
-  displayName: z
-    .string()
-    .min(2, 'Το όνομα προβολής πρέπει να έχει τουλάχιστον 2 χαρακτήρες')
-    .max(50, 'Το όνομα προβολής δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες'),
-  username: z.string().optional(), // Read-only
-  email: z.string().optional(), // Read-only
-});
-
-type AccountFormData = z.infer<typeof accountFormSchema>;
+import { FormButton } from '../shared';
+import { AuthUser } from '@/lib/types/auth';
+import { useRouter } from 'next/navigation';
+import {
+  accountUpdateSchema,
+  type AccountUpdateInput,
+} from '@/lib/validations/auth';
 
 const initialState = {
   success: false,
   message: '',
 };
 
-export default function AccountForm() {
-  const [state, action, isPending] = useActionState(updateAccount, initialState);
-  const { refetch } = useSession();
+interface AccountFormProps {
+  initialUser: AuthUser | null;
+}
 
-  // Get dashboard context
-  const { user, isLoading } = useDashboard();
+export default function AccountForm({ initialUser }: AccountFormProps) {
+  const [state, action, isPending] = useActionState(
+    updateAccount,
+    initialState,
+  );
+  const router = useRouter();
 
-  const form = useForm<AccountFormData>({
-    resolver: zodResolver(accountFormSchema),
+  const form = useForm<AccountUpdateInput>({
+    resolver: zodResolver(accountUpdateSchema),
     defaultValues: {
       displayName: '',
-      username: '',
-      email: '',
     },
     mode: 'onChange',
   });
 
-  // Update form values when user data is loaded
-  useEffect(() => {
-    if (user && !isLoading) {
-      form.reset({
-        displayName: user.displayName || '',
-        username: user.username || '',
-        email: user.email || '',
-      });
-    }
-  }, [user, isLoading, form]);
-
   const {
-    formState: { errors, isValid, isDirty },
-    setValue,
-    watch,
+    formState: { isValid, isDirty },
     getValues,
   } = form;
 
-  // Handle successful form submission
+  // Update form values when user data is available
+  useEffect(() => {
+    if (initialUser) {
+      form.reset({
+        displayName: initialUser.displayName || '',
+      });
+    }
+  }, [initialUser, form]);
+
+  // Handle successful form submission - refresh page to get updated session data
   useEffect(() => {
     if (state.success) {
-      // Refresh the session data to update the menu component
-      refetch();
-      // Reset form dirty state
-      form.reset(getValues());
+      router.refresh();
     }
-  }, [state.success, refetch, form, getValues]);
+  }, [state.success, router]);
 
   // Form submission handler
   const handleFormSubmit = (formData: FormData) => {
-    // Get all form values and populate FormData
     const allValues = getValues();
-
     populateFormData(formData, allValues, {
       stringFields: ['displayName'],
       skipEmpty: false,
     });
-
-    // Call server action directly (no await)
     action(formData);
   };
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className='flex items-center justify-center p-8 border rounded-lg'>
-        <Loader2 className='w-6 h-6 animate-spin' />
-        <span className='ml-2'>Φόρτωση...</span>
-      </div>
-    );
-  }
 
   return (
     <Form {...form}>
@@ -125,49 +95,34 @@ export default function AccountForm() {
         action={handleFormSubmit}
         className='space-y-6 p-6 border rounded-lg'
       >
-        {/* Form Fields in 3 columns: Email, Username, Display Name */}
         <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
           {/* Email - Read Only */}
-          <FormField
-            control={form.control}
-            name='email'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type='email'
-                    {...field}
-                    disabled
-                    readOnly
-                    className='bg-muted'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormItem>
+            <FormLabel>Email</FormLabel>
+            <FormControl>
+              <Input
+                type='email'
+                value={initialUser?.email || ''}
+                disabled
+                readOnly
+                className='bg-muted'
+              />
+            </FormControl>
+          </FormItem>
 
           {/* Username - Read Only */}
-          <FormField
-            control={form.control}
-            name='username'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input
-                    type='text'
-                    {...field}
-                    disabled
-                    readOnly
-                    className='bg-muted'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormItem>
+            <FormLabel>Username</FormLabel>
+            <FormControl>
+              <Input
+                type='text'
+                value={initialUser?.username || ''}
+                disabled
+                readOnly
+                className='bg-muted'
+              />
+            </FormControl>
+          </FormItem>
 
           {/* Display Name */}
           <FormField
@@ -210,24 +165,20 @@ export default function AccountForm() {
         )}
 
         <div className='flex justify-end space-x-4'>
-          <Button
+          <FormButton
             variant='outline'
             type='button'
+            text='Ακύρωση'
             onClick={() => form.reset()}
             disabled={isPending || !isDirty}
-          >
-            Ακύρωση
-          </Button>
-          <Button type='submit' disabled={isPending || !isValid || !isDirty}>
-            {isPending ? (
-              <>
-                <Loader2 className='w-4 h-4 mr-2 animate-spin' />
-                Αποθήκευση...
-              </>
-            ) : (
-              'Αποθήκευση'
-            )}
-          </Button>
+          />
+          <FormButton
+            type='submit'
+            text='Αποθήκευση'
+            loadingText='Αποθήκευση...'
+            loading={isPending}
+            disabled={isPending || !isValid || !isDirty}
+          />
         </div>
       </form>
     </Form>

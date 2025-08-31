@@ -84,7 +84,7 @@ export async function submitVerificationRequest(
     });
 
     if (existingVerification) {
-      // Update existing verification
+      // Update existing verificationi
       await prisma.profileVerification.update({
         where: { pid: profile.id },
         data: {

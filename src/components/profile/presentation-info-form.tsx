@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useActionState, useEffect } from 'react';
+import React, { useActionState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -16,9 +16,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-
-// Custom components
-import { MediaUpload } from '@/components/media';
 
 // Icons (lucide-react only)
 import {
@@ -40,134 +37,123 @@ import {
 import XCustom from '@/components/icon/x-custom';
 
 // Auth and utilities
-import { useDashboard } from '../providers';
-import { populateFormData, parseJSONValue } from '@/lib/utils/form';
+import { formatInput } from '@/lib/utils/validation/formats';
+import {
+  populateFormData,
+  parseVisibilityJSON,
+  parseSocialsJSON,
+} from '@/lib/utils/form';
 
-// Validation schema and server action (FOLLOW EXISTING PATTERNS)
-import { presentationSchema } from '@/lib/validations/profile';
+// Validation schema and server action
+import {
+  profilePresentationUpdateSchema,
+  type ProfilePresentationUpdateInput,
+} from '@/lib/validations/profile';
 import { updateProfilePresentation } from '@/actions/profiles/presentation';
 import { FormButton } from '../shared';
+import { AuthUser, ProfileWithRelations } from '@/lib/types/auth';
+import { useRouter } from 'next/navigation';
 
 const initialState = {
   success: false,
   message: '',
 };
 
-export default function PresentationForm() {
+// Default visibility configuration - outside component to prevent re-creation
+const initialVisibility = {
+  email: true,
+  phone: true,
+  address: true,
+};
+
+// Default socials configuration - outside component to prevent re-creation
+const initialSocials = {
+  facebook: { url: '' },
+  instagram: { url: '' },
+  linkedin: { url: '' },
+  x: { url: '' },
+  youtube: { url: '' },
+  github: { url: '' },
+  behance: { url: '' },
+  dribbble: { url: '' },
+};
+
+interface PresentationInfoFormProps {
+  initialUser: AuthUser | null;
+  initialProfile: ProfileWithRelations | null;
+}
+
+export default function PresentationInfoForm({
+  initialUser,
+  initialProfile,
+}: PresentationInfoFormProps) {
   const [state, action, isPending] = useActionState(
     updateProfilePresentation,
     initialState,
   );
 
-  // Auth context
-  const { user, isLoading, hasProfile, phone, website, viber, whatsapp, visibility, socials, portfolio } = useDashboard();
+  const router = useRouter();
 
-  // Media upload refs
-  const mediaRef = useRef<any>(null);
+  // Extract data from props
+  const profile = initialProfile;
 
-  const form = useForm({
-    resolver: zodResolver(presentationSchema),
+  const form = useForm<ProfilePresentationUpdateInput>({
+    resolver: zodResolver(profilePresentationUpdateSchema),
     defaultValues: {
       phone: '',
       website: '',
       viber: '',
       whatsapp: '',
-      visibility: {
-        email: true,
-        phone: true,
-        address: true,
-      },
-      socials: {
-        facebook: { url: '' },
-        instagram: { url: '' },
-        linkedin: { url: '' },
-        x: { url: '' },
-        youtube: { url: '' },
-        github: { url: '' },
-        behance: { url: '' },
-        dribbble: { url: '' },
-      },
-      portfolio: [],
+      visibility: initialVisibility,
+      socials: initialSocials,
     },
-    mode: 'onChange', // Real-time validation
+    mode: 'onChange',
   });
 
   const {
     formState: { errors, isValid, isDirty },
+    setValue,
     getValues,
+    watch,
   } = form;
 
-  // Update form values when auth data loads
+  // Update form values when initial data is available
   useEffect(() => {
-    if (!isLoading && hasProfile) {
-      console.log('Loading presentation form data:', {
-        visibility: visibility,
-        hasProfile: hasProfile,
-      });
-
-      form.reset({
-        phone: phone || '',
-        website: website || '',
-        viber: viber || '',
-        whatsapp: whatsapp || '',
-        visibility: parseJSONValue(visibility, {
-          email: true,
-          phone: true,
-          address: true,
-        }),
-        socials: parseJSONValue(socials, {
-          facebook: { url: '' },
-          instagram: { url: '' },
-          linkedin: { url: '' },
-          x: { url: '' },
-          youtube: { url: '' },
-          github: { url: '' },
-          behance: { url: '' },
-          dribbble: { url: '' },
-        }),
-        portfolio: portfolio || [],
-      });
+    if (profile) {
+      const resetData = {
+        phone: profile.phone || '',
+        website: profile.website || '',
+        viber: profile.viber || '',
+        whatsapp: profile.whatsapp || '',
+        visibility: parseVisibilityJSON(profile.visibility),
+        socials: parseSocialsJSON(profile.socials),
+      };
+      form.reset(resetData);
     }
-  }, [hasProfile, isLoading, phone, website, viber, whatsapp, visibility, socials, portfolio, form]);
+  }, [profile, form]);
 
   // Handle successful form submission
   useEffect(() => {
     if (state.success) {
-      console.log(
-        'Presentation form updated successfully - layout will refresh with new data',
-      );
+      // Refresh the page to get updated data
+      router.refresh();
     }
-  }, [state.success]);
+  }, [state.success, router]);
 
-  // Form submission handler - EXACT PATTERN FROM CURRENT FORMS
+  // Form submission handler using utility function
   const handleFormSubmit = (formData: FormData) => {
-    // Handle media uploads if needed
-    if (mediaRef.current?.hasFiles()) {
-      mediaRef.current.uploadFiles();
-    }
-
-    // Get all form values and populate FormData using ENHANCED utility
+    // Get all form values and populate FormData using utility function
     const allValues = getValues();
 
     populateFormData(formData, allValues, {
-        stringFields: ['phone', 'website', 'viber', 'whatsapp'],
-        jsonFields: ['visibility', 'socials', 'portfolio'],
-        skipEmpty: true,
+      stringFields: ['phone', 'website', 'viber', 'whatsapp'], // Simple text fields
+      jsonFields: ['visibility', 'socials'], // Objects that need JSON.stringify
+      skipEmpty: true, // Skip null/undefined/empty values
     });
 
     // Call server action
     action(formData);
   };
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className='flex items-center justify-center p-8 border rounded-lg'>
-        <Loader2 className='w-6 h-6 animate-spin' />
-        <span className='ml-2'>Φόρτωση...</span>
-      </div>
-    );
-  }
 
   return (
     <Form {...form}>
@@ -175,8 +161,8 @@ export default function PresentationForm() {
         action={handleFormSubmit}
         className='space-y-6 p-6 border rounded-lg'
       >
-        {/* Row 1: Phone and Website */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        {/* Contact Fields - All in one row */}
+        <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
           <FormField
             control={form.control}
             name='phone'
@@ -219,9 +205,53 @@ export default function PresentationForm() {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name='viber'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className='flex items-center gap-2'>
+                  <MessageCircle className='h-4 w-4 text-purple-500' />
+                  Viber
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder='69XXXXXXXX'
+                    maxLength={10}
+                    {...field}
+                    value={field.value || ''}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='whatsapp'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className='flex items-center gap-2'>
+                  <MessageCircle className='h-4 w-4 text-green-500' />
+                  WhatsApp
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder='69XXXXXXXX'
+                    maxLength={10}
+                    {...field}
+                    value={field.value || ''}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
-        {/* Row 2: Visibility Settings */}
+        {/* Row 3: Visibility Settings */}
         <div className='space-y-4'>
           <h4 className='text-sm font-medium'>Ορατότητα Στοιχείων</h4>
 
@@ -291,93 +321,7 @@ export default function PresentationForm() {
           </div>
         </div>
 
-        {/* Row 3: Portfolio */}
-        <FormField
-          control={form.control}
-          name='portfolio'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Χαρτοφυλάκιο</FormLabel>
-              <p className='text-sm text-muted-foreground'>
-                Προσθέστε έργα από το χαρτοφυλάκιό σας
-              </p>
-              <FormControl>
-                <MediaUpload
-                  ref={mediaRef}
-                  value={field.value || []}
-                  onChange={field.onChange}
-                  uploadPreset='doulitsa_new'
-                  multiple={true}
-                  folder={`users/${user?.username}/portfolio`}
-                  maxFileSize={5000000} // 5MB
-                  maxFiles={10}
-                  allowedFormats={[
-                    'jpg',
-                    'jpeg',
-                    'png',
-                    'webp',
-                    'mp4',
-                    'mov',
-                    'avi',
-                  ]}
-                  placeholder='Ανεβάστε εικόνες ή βίντεο'
-                  error={errors.portfolio?.message}
-                  signed={false}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Row 4: Viber and WhatsApp */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          <FormField
-            control={form.control}
-            name='viber'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='flex items-center gap-2'>
-                  <MessageCircle className='h-4 w-4 text-purple-500' />
-                  Viber
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='69XXXXXXXX'
-                    maxLength={10}
-                    {...field}
-                    value={field.value || ''}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name='whatsapp'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='flex items-center gap-2'>
-                  <MessageCircle className='h-4 w-4 text-green-500' />
-                  WhatsApp
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='69XXXXXXXX'
-                    maxLength={10}
-                    {...field}
-                    value={field.value || ''}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Row 5: Social Media */}
+        {/* Row 4: Social Media */}
         <div className='space-y-4'>
           <h4 className='text-sm font-medium'>Κοινωνικά Δίκτυα</h4>
 

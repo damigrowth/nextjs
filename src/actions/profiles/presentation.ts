@@ -6,8 +6,8 @@ import { ActionResponse, ActionResult } from '@/lib/types/api';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
 import { Prisma } from '@prisma/client';
 import {
-  presentationSchema,
-  type PresentationInput,
+  profilePresentationUpdateSchema,
+  type ProfilePresentationUpdateInput,
 } from '@/lib/validations/profile';
 import { extractFormData } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
@@ -49,7 +49,6 @@ export async function updateProfilePresentation(
           defaultValue: { email: true, phone: true, address: true },
         },
         socials: { type: 'json', required: false, defaultValue: {} },
-        portfolio: { type: 'json', required: false, defaultValue: [] },
       },
     );
 
@@ -61,7 +60,7 @@ export async function updateProfilePresentation(
     }
 
     // 4. Validate with Zod schema
-    const validationResult = presentationSchema.safeParse(extractedData);
+    const validationResult = profilePresentationUpdateSchema.safeParse(extractedData);
     if (!validationResult.success) {
       return createValidationErrorResponse(
         validationResult.error,
@@ -84,19 +83,16 @@ export async function updateProfilePresentation(
       };
     }
 
-    // 6. Database operation
-    await prisma.profile.update({
+    // 6. Database operation - update all fields directly like additional-info pattern
+    const result = await prisma.profile.update({
       where: { uid: user.id },
       data: {
-        phone: data.phone,
-        website: data.website,
-        viber: data.viber,
-        whatsapp: data.whatsapp,
-        visibility: JSON.stringify(data.visibility),
+        phone: data.phone || null,
+        website: data.website || null,
+        viber: data.viber || null,
+        whatsapp: data.whatsapp || null,
+        visibility: data.visibility ? JSON.stringify(data.visibility) : JSON.stringify({ email: true, phone: true, address: true }),
         socials: data.socials ? JSON.stringify(data.socials) : Prisma.DbNull,
-        portfolio: data.portfolio?.length
-          ? JSON.stringify(data.portfolio)
-          : Prisma.DbNull,
         updatedAt: new Date(),
       },
     });
@@ -105,6 +101,7 @@ export async function updateProfilePresentation(
     revalidateTag(`user-${user.id}`);
     revalidateTag(`profile-${user.id}`);
     revalidateTag('auth-data');
+    revalidateTag('profiles');
 
     return {
       success: true,
@@ -120,16 +117,17 @@ export async function updateProfilePresentation(
  * Server action to get profile presentation data
  * Returns the presentation-related fields from the profile
  */
-export async function getProfilePresentation(): Promise<ActionResult<{
-  id: string;
-  phone: string | null;
-  website: string | null;
-  viber: string | null;
-  whatsapp: string | null;
-  visibility: any;
-  socials: any;
-  portfolio: any;
-}>> {
+export async function getProfilePresentation(): Promise<
+  ActionResult<{
+    id: string;
+    phone: string | null;
+    website: string | null;
+    viber: string | null;
+    whatsapp: string | null;
+    visibility: any;
+    socials: any;
+  }>
+> {
   try {
     // 1. Require authentication
     const session = await requireAuth();
@@ -146,7 +144,6 @@ export async function getProfilePresentation(): Promise<ActionResult<{
         whatsapp: true,
         visibility: true,
         socials: true,
-        portfolio: true,
       },
     });
 
@@ -160,7 +157,6 @@ export async function getProfilePresentation(): Promise<ActionResult<{
     // 3. Parse JSON fields safely
     let visibility = null;
     let socials = null;
-    let portfolio = null;
 
     try {
       visibility = profile.visibility
@@ -176,14 +172,6 @@ export async function getProfilePresentation(): Promise<ActionResult<{
       console.warn('Failed to parse socials JSON:', e);
     }
 
-    try {
-      portfolio = profile.portfolio
-        ? JSON.parse(profile.portfolio as string)
-        : null;
-    } catch (e) {
-      console.warn('Failed to parse portfolio JSON:', e);
-    }
-
     return {
       success: true,
       data: {
@@ -194,15 +182,13 @@ export async function getProfilePresentation(): Promise<ActionResult<{
         whatsapp: profile.whatsapp,
         visibility,
         socials,
-        portfolio,
       },
     };
   } catch (error) {
     console.error('Error getting profile presentation:', error);
     return {
       success: false,
-      error:
-        'Παρουσιάστηκε σφάλμα κατά την ανάκτηση των στοιχείων παρουσίασης',
+      error: 'Παρουσιάστηκε σφάλμα κατά την ανάκτηση των στοιχείων παρουσίασης',
     };
   }
 }

@@ -2,7 +2,11 @@ import React from 'react';
 import Image from 'next/image';
 import LinkNP from '@/components/link';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 interface UserImageProps {
@@ -73,7 +77,7 @@ export default function UserImage({
     if (bigText) return 'text-4xl';
     if (width >= 80) return 'text-xl';
     if (width >= 60) return 'text-lg';
-    return 'text-sm';
+    return 'text-lg';
   };
 
   const avatarElement = (

@@ -5,6 +5,7 @@ import React, {
   useActionState,
   useEffect,
   useState,
+  useTransition,
 } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -107,6 +108,7 @@ export default function OnboardingForm({}: OnboardingFormProps) {
   );
 
   const [isUploading, setIsUploading] = useState(false);
+  const [isPendingTransition, startTransition] = useTransition();
 
   // Refs for media upload components
   const profileImageRef = useRef<any>(null);
@@ -151,6 +153,8 @@ export default function OnboardingForm({}: OnboardingFormProps) {
   // Handle successful onboarding completion and redirect
   useEffect(() => {
     if (state.success) {
+      // Clear upload state
+      setIsUploading(false);
       // Refresh the session data to update user step
       refetch();
       setTimeout(() => {
@@ -282,54 +286,62 @@ export default function OnboardingForm({}: OnboardingFormProps) {
   };
 
   // Handle form submission with media upload logic
-  const handleFormSubmit = (formData: FormData) => {
+  const handleFormSubmit = async (formData: FormData) => {
     if (!isAuthenticated || !user) {
       return;
     }
 
     setIsUploading(true);
 
-    // Handle image upload if needed
-    if (profileImageRef.current?.hasFiles()) {
-      profileImageRef.current.uploadFiles();
-    }
-
-    // Handle portfolio upload if needed
-    if (portfolioRef.current?.hasFiles()) {
-      portfolioRef.current.uploadFiles();
-    }
-
-    // Get all form values and add them to FormData
-    const formValues = getValues();
-
-    // Add all form fields to FormData
-    const fields = {
-      // Basic string fields
-      bio: formValues.bio,
-      category: formValues.category,
-      subcategory: formValues.subcategory,
-      // JSON fields (will be stringified)
-      image: formValues.image,
-      portfolio: formValues.portfolio,
-      coverage: formValues.coverage,
-    };
-
-    Object.entries(fields).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        // JSON fields need to be stringified
-        if (['image', 'portfolio', 'coverage'].includes(key)) {
-          formData.set(key, JSON.stringify(value));
-        } else {
-          // String fields can be added directly
-          formData.set(key, value as string);
-        }
+    try {
+      // Check for pending files and upload if needed
+      const hasImageFiles = profileImageRef.current?.hasFiles();
+      const hasPortfolioFiles = portfolioRef.current?.hasFiles();
+      
+      if (hasImageFiles) {
+        await profileImageRef.current.uploadFiles();
       }
-    });
 
-    setIsUploading(false);
+      if (hasPortfolioFiles) {
+        await portfolioRef.current.uploadFiles();
+      }
 
-    // Call the server action
-    action(formData);
+      // Get all form values and add them to FormData
+      const formValues = getValues();
+
+      // Add all form fields to FormData
+      const fields = {
+        // Basic string fields
+        bio: formValues.bio,
+        category: formValues.category,
+        subcategory: formValues.subcategory,
+        // JSON fields (will be stringified)
+        image: formValues.image,
+        portfolio: formValues.portfolio,
+        coverage: formValues.coverage,
+      };
+
+      Object.entries(fields).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          // JSON fields need to be stringified
+          if (['image', 'portfolio', 'coverage'].includes(key)) {
+            formData.set(key, JSON.stringify(value));
+          } else {
+            // String fields can be added directly
+            formData.set(key, value as string);
+          }
+        }
+      });
+
+      // Call the server action with startTransition
+      startTransition(() => {
+        action(formData);
+      });
+    } catch (error) {
+      console.error('❌ Upload failed:', error);
+      setIsUploading(false);
+      // Don't submit form if upload fails
+    }
   };
 
   return (
@@ -346,7 +358,14 @@ export default function OnboardingForm({}: OnboardingFormProps) {
 
         <CardContent className='pt-4'>
           <Form {...form}>
-            <form action={handleFormSubmit} className='space-y-6'>
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                handleFormSubmit(formData);
+              }}
+              className='space-y-6'
+            >
               {/* Image Field */}
               <FormField
                 control={control}
@@ -1180,9 +1199,9 @@ export default function OnboardingForm({}: OnboardingFormProps) {
                       ? 'Ανέβασμα αρχείων...'
                       : 'Ολοκλήρωση Εγγραφής...'
                   }
-                  loading={isPending || isUploading || isTransitionPending}
+                  loading={isPending || isUploading || isPendingTransition}
                   disabled={
-                    isPending || isUploading || isTransitionPending || !isValid
+                    isPending || isUploading || isPendingTransition || !isValid
                   }
                   className='w-2/3'
                   variant='default'

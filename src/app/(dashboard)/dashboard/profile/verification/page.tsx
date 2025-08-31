@@ -1,8 +1,28 @@
 import { VerificationForm } from '@/components';
 import { VerificationStatus } from '@/components';
 import { getVerificationStatus } from '@/actions/profiles/verification';
+import { getCurrentUser } from '@/actions/auth/server';
+import { redirect } from 'next/navigation';
 
 export default async function VerificationPage() {
+  // Fetch current user and profile data server-side
+  const userResult = await getCurrentUser();
+
+  if (!userResult.success || !userResult.data.user) {
+    redirect('/login');
+  }
+
+  const { user, profile } = userResult.data;
+
+  // Check if user has profile (only professionals with completed onboarding)
+  const hasProfile =
+    !!(user?.role === 'freelancer' || user?.role === 'company') &&
+    user?.step === 'DASHBOARD';
+
+  if (!hasProfile) {
+    redirect('/dashboard');
+  }
+
   // Fetch verification data server-side
   const verificationResult = await getVerificationStatus();
   const verificationData = verificationResult.success
@@ -12,7 +32,7 @@ export default async function VerificationPage() {
   return (
     <div className='space-y-6'>
       <VerificationStatus verificationData={verificationData} />
-      <VerificationForm verificationData={verificationData} />
+      <VerificationForm initialUser={user} initialProfile={profile} verificationData={verificationData} />
     </div>
   );
 }

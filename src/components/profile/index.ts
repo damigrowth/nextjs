@@ -2,7 +2,8 @@
 export { default as AccountForm } from './account-form';
 export { default as BasicInfoForm } from './basic-info-form';
 export { default as AdditionalInfoForm } from './additional-info-form';
-export { default as PresentationForm } from './presentation-form';
+export { default as PresentationInfoForm } from './presentation-info-form';
+export { default as PortfolioForm } from './portfolio-form';
 export { default as VerificationForm } from './verification-form';
 export { default as BillingForm } from './billing-form';
 export { default as DocumentsInterface } from './documents-interface';

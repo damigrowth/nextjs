@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useActionState, useEffect } from 'react';
+import React, { useActionState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -51,12 +51,8 @@ import {
 import { formatInput } from '@/lib/utils/validation/formats';
 import { populateFormData } from '@/lib/utils/form';
 
-// Dataset utilities (if needed)
-import {
-  findById,
-  filterByField,
-  toggleItemInArray,
-} from '@/lib/utils/datasets';
+// Dataset utilities
+import { findById } from '@/lib/utils/datasets';
 
 // Dataset options
 import {
@@ -73,35 +69,32 @@ import {
   type ProfileAdditionalInfoUpdateInput,
 } from '@/lib/validations/profile';
 import { updateProfileAdditionalInfo } from '@/actions/profiles/additional-info';
-import { useDashboard } from '../providers';
 import { FormButton } from '../shared';
+import { AuthUser, ProfileWithRelations } from '@/lib/types/auth';
+import { useRouter } from 'next/navigation';
 
 const initialState = {
   success: false,
   message: '',
 };
 
-export default function AdditionalInfoForm() {
+interface AdditionalInfoFormProps {
+  initialUser: AuthUser | null;
+  initialProfile: ProfileWithRelations | null;
+}
+
+export default function AdditionalInfoForm({
+  initialUser,
+  initialProfile,
+}: AdditionalInfoFormProps) {
   const [state, action, isPending] = useActionState(
     updateProfileAdditionalInfo,
     initialState,
   );
+  const router = useRouter();
 
-  // Auth context
-  const {
-    user,
-    isLoading,
-    hasProfile,
-    rate,
-    commencement,
-    experience,
-    contactMethods,
-    paymentMethods,
-    settlementMethods,
-    budget,
-    industries,
-    terms,
-  } = useDashboard();
+  // Extract data from props
+  const profile = initialProfile;
 
   const form = useForm<ProfileAdditionalInfoUpdateInput>({
     resolver: zodResolver(profileAdditionalInfoUpdateSchema),
@@ -126,44 +119,31 @@ export default function AdditionalInfoForm() {
     watch,
   } = form;
 
-  // Update form values when auth data loads
+  // Update form values when initial data is available
   useEffect(() => {
-    if (!isLoading && hasProfile) {
-      form.reset({
-        rate: rate || null,
-        commencement: commencement || '',
-        experience: experience || null,
-        contactMethods: contactMethods || [],
-        paymentMethods: paymentMethods || [],
-        settlementMethods: settlementMethods || [],
-        budget: budget || '',
-        industries: industries || [],
-        terms: terms || '',
-      });
+    if (profile) {
+      const resetData = {
+        rate: profile.rate || null,
+        commencement: profile.commencement || '',
+        experience: profile.experience || null,
+        contactMethods: profile.contactMethods || [],
+        paymentMethods: profile.paymentMethods || [],
+        settlementMethods: profile.settlementMethods || [],
+        budget: profile.budget || '',
+        industries: profile.industries || [],
+        terms: profile.terms || '',
+      };
+      form.reset(resetData);
     }
-  }, [
-    hasProfile,
-    isLoading,
-    rate,
-    commencement,
-    experience,
-    contactMethods,
-    paymentMethods,
-    settlementMethods,
-    budget,
-    industries,
-    terms,
-    form,
-  ]);
+  }, [profile, form]);
 
   // Handle successful form submission
   useEffect(() => {
     if (state.success) {
-      console.log(
-        'Additional info updated successfully - layout will refresh with new data',
-      );
+      // Refresh the page to get updated data
+      router.refresh();
     }
-  }, [state.success]);
+  }, [state.success, router]);
 
   // Form submission handler using utility function
   const handleFormSubmit = (formData: FormData) => {
@@ -176,25 +156,15 @@ export default function AdditionalInfoForm() {
       jsonFields: [
         'contactMethods',
         'paymentMethods',
-          'settlementMethods',
-          'industries',
-        ], // Arrays that need JSON.stringify
-        skipEmpty: true, // Skip null/undefined/empty values
-      });
+        'settlementMethods',
+        'industries',
+      ], // Arrays that need JSON.stringify
+      skipEmpty: true, // Skip null/undefined/empty values
+    });
 
     // Call server action
     action(formData);
   };
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className='flex items-center justify-center p-8 border rounded-lg'>
-        <Loader2 className='w-6 h-6 animate-spin' />
-        <span className='ml-2'>Loading...</span>
-      </div>
-    );
-  }
 
   return (
     <Form {...form}>

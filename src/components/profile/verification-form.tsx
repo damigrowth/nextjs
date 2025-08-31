@@ -30,6 +30,8 @@ import {
 } from '@/lib/validations/profile';
 import { submitVerificationRequest } from '@/actions/profiles/verification';
 import { FormButton } from '../shared';
+import { AuthUser, ProfileWithRelations } from '@/lib/types/auth';
+import { useRouter } from 'next/navigation';
 
 const initialState = {
   success: false,
@@ -47,26 +49,32 @@ type VerificationStatus = {
 } | null;
 
 type VerificationFormProps = {
+  initialUser: AuthUser | null;
+  initialProfile: ProfileWithRelations | null;
   verificationData: VerificationStatus;
 };
 
 export default function VerificationForm({
+  initialUser,
+  initialProfile,
   verificationData,
 }: VerificationFormProps) {
   const [state, action, isPending] = useActionState(
     submitVerificationRequest,
     initialState,
   );
+  const router = useRouter();
 
-  const form = useForm({
+  const form = useForm<VerificationInput>({
     resolver: zodResolver(verificationFormSchema),
     defaultValues: {
-      afm: verificationData?.afm || '',
-      name: verificationData?.name || '',
-      address: verificationData?.address || '',
-      phone: verificationData?.phone || '',
+      afm: '',
+      name: '',
+      address: '',
+      phone: '',
     },
-    mode: 'onChange', // Real-time validation
+    mode: 'onChange',
+    reValidateMode: 'onChange',
   });
 
   const {
@@ -74,14 +82,26 @@ export default function VerificationForm({
     getValues,
   } = form;
 
+  // Update form values when verification data is available
+  useEffect(() => {
+    if (verificationData) {
+      const resetData = {
+        afm: verificationData.afm || '',
+        name: verificationData.name || '',
+        address: verificationData.address || '',
+        phone: verificationData.phone || '',
+      };
+      form.reset(resetData);
+    }
+  }, [verificationData, form]);
+
   // Handle successful form submission
   useEffect(() => {
     if (state.success) {
-      console.log('Verification form submitted successfully');
-      // Optionally reload the page to get fresh data
-      // window.location.reload();
+      // Refresh the page to get updated data
+      router.refresh();
     }
-  }, [state.success]);
+  }, [state.success, router]);
 
   // Form submission handler
   const handleFormSubmit = (formData: FormData) => {

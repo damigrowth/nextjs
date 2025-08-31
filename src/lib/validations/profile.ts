@@ -517,6 +517,20 @@ export const profileAdditionalInfoUpdateSchema = z.object({
   terms: z.string().optional().or(z.literal('')),
 });
 
+// Profile presentation update schema for presentation info form
+export const profilePresentationUpdateSchema = z.object({
+  phone: z.string().optional().or(z.literal('')),
+  website: z.string().url().or(z.literal('')).optional(),
+  viber: z.string().optional().or(z.literal('')),
+  whatsapp: z.string().optional().or(z.literal('')),
+  visibility: z.object({
+    email: z.boolean(),
+    phone: z.boolean(),
+    address: z.boolean(),
+  }).optional(),
+  socials: socialMediaSchema.optional(),
+});
+
 // Main onboarding form schema - bio, category, subcategory, coverage are required, image is optional for client validation
 export const onboardingFormSchema = z.object({
   image: imageSchema, // Optional for client-side validation, required on server
@@ -559,4 +573,7 @@ export type ProfileBasicInfoUpdateInput = z.infer<
 >;
 export type ProfileAdditionalInfoUpdateInput = z.infer<
   typeof profileAdditionalInfoUpdateSchema
+>;
+export type ProfilePresentationUpdateInput = z.infer<
+  typeof profilePresentationUpdateSchema
 >;

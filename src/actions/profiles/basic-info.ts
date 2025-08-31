@@ -14,6 +14,7 @@ import {
 import { getFormString, getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { sanitizeCloudinaryResource } from '@/lib/utils/cloudinary';
 
 /**
  * Server action wrapper for useActionState
@@ -86,6 +87,9 @@ export async function updateProfileBasicInfo(
 
     const data = validationResult.data;
 
+    // 5.5. Sanitize image resource before saving to database
+    const sanitizedImage = sanitizeCloudinaryResource(data.image);
+
     // 6. Check if profile exists - we only update, never create
     const existingProfile = await prisma.profile.findUnique({
       where: { uid: user.id },
@@ -110,7 +114,7 @@ export async function updateProfileBasicInfo(
         speciality: data.speciality,
         skills: data.skills || [],
         coverage: data.coverage as Prisma.JsonValue,
-        image: data.image as Prisma.JsonValue,
+        image: sanitizedImage as Prisma.JsonValue,
         updatedAt: new Date(),
       },
     });
@@ -121,7 +125,7 @@ export async function updateProfileBasicInfo(
         await auth.api.updateUser({
           headers: await headers(),
           body: {
-            image: data.image ? JSON.stringify(data.image) : null,
+            image: sanitizedImage ? JSON.stringify(sanitizedImage) : null,
           },
         });
       } catch (authError) {
@@ -130,7 +134,7 @@ export async function updateProfileBasicInfo(
         await prisma.user.update({
           where: { id: user.id },
           data: {
-            image: data.image ? JSON.stringify(data.image) : null,
+            image: sanitizedImage ? JSON.stringify(sanitizedImage) : null,
           },
         });
       }

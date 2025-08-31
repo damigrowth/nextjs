@@ -30,12 +30,11 @@ import { billingSchema, type BillingInput } from '@/lib/validations/profile';
 import { updateProfileBilling } from '@/actions/profiles/billing';
 
 // Utility for form data population
-import { populateFormData } from '@/lib/utils/form';
-
-// Auth provider
-import { useDashboard } from '../providers';
+import { populateFormData, parseJSONValue } from '@/lib/utils/form';
 
 import { FormButton } from '../shared';
+import { AuthUser, ProfileWithRelations } from '@/lib/types/auth';
+import { useRouter } from 'next/navigation';
 
 type BillingFormData = BillingInput;
 
@@ -44,7 +43,15 @@ const initialState = {
   message: '',
 };
 
-export default function BillingForm() {
+interface BillingFormProps {
+  initialUser: AuthUser | null;
+  initialProfile: ProfileWithRelations | null;
+}
+
+export default function BillingForm({
+  initialUser,
+  initialProfile,
+}: BillingFormProps) {
   const [state, action, isPending] = useActionState(
     updateProfileBilling,
     initialState,
@@ -52,9 +59,10 @@ export default function BillingForm() {
 
   // Track if user has made any actual changes
   const [hasUserInteracted, setHasUserInteracted] = React.useState(false);
+  const router = useRouter();
 
-  // Get current user data
-  const { user, isLoading, hasProfile, billing } = useDashboard();
+  // Extract data from props
+  const profile = initialProfile;
 
   const form = useForm<BillingFormData>({
     resolver: zodResolver(billingSchema),
@@ -68,33 +76,45 @@ export default function BillingForm() {
       address: '',
     },
     mode: 'onChange',
+    reValidateMode: 'onChange',
   });
 
-  // Update form values when user data is loaded
+  // Update form values when initial data is available
   useEffect(() => {
-    if (!isLoading && hasProfile && billing) {
-      form.reset({
-        receipt: billing.receipt || false,
-        invoice: billing.invoice || false,
-        afm: billing.afm || '',
-        doy: billing.doy || '',
-        name: billing.name || '',
-        profession: billing.profession || '',
-        address: billing.address || '',
+    if (profile?.billing) {
+      const billingData = parseJSONValue(profile.billing, {
+        receipt: false,
+        invoice: false,
+        afm: '',
+        doy: '',
+        name: '',
+        profession: '',
+        address: '',
       });
+      
+      const resetData = {
+        receipt: billingData.receipt || false,
+        invoice: billingData.invoice || false,
+        afm: billingData.afm || '',
+        doy: billingData.doy || '',
+        name: billingData.name || '',
+        profession: billingData.profession || '',
+        address: billingData.address || '',
+      };
+      
+      form.reset(resetData);
       // User has existing billing data, so they can submit
       setHasUserInteracted(true);
     }
-  }, [hasProfile, isLoading, billing, form]);
+  }, [profile, form]);
 
   // Handle successful form submission
   useEffect(() => {
     if (state.success) {
-      console.log(
-        'Billing updated successfully - layout will refresh with new data',
-      );
+      // Refresh the page to get updated data
+      router.refresh();
     }
-  }, [state.success]);
+  }, [state.success, router]);
 
   const {
     handleSubmit,
@@ -107,13 +127,6 @@ export default function BillingForm() {
   const watchedReceipt = watch('receipt');
   const watchedInvoice = watch('invoice');
   const isInvoiceSelected = watchedInvoice === true;
-
-  // Debug logging
-  console.log('Watched values:', {
-    watchedReceipt,
-    watchedInvoice,
-    isInvoiceSelected,
-  });
 
   // Handle form submission
   const handleFormSubmit = (formData: FormData) => {
@@ -130,15 +143,6 @@ export default function BillingForm() {
     action(formData);
   };
 
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className='flex items-center justify-center p-8 border rounded-lg'>
-        <Loader2 className='w-6 h-6 animate-spin' />
-        <span className='ml-2'>Φόρτωση...</span>
-      </div>
-    );
-  }
 
   return (
     <Form {...form}>

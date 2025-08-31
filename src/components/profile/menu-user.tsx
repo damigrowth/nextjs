@@ -39,6 +39,7 @@ import { Skeleton } from '../ui/skeleton';
 import { MessagesMenu, SavedMenu } from '../dashboard';
 import UserImage from './user-image';
 import { useSession } from '@/lib/auth/client';
+import { capitalizeFirstLetter } from '@/lib/utils/validation';
 
 // Icon mapping function
 const getMenuIcon = (iconName: string) => {
@@ -58,15 +59,16 @@ const getMenuIcon = (iconName: string) => {
 export default function UserMenu({ isMobile }: UserMenuProps) {
   const router = useRouter();
   const { data: session, isPending } = useSession();
-  
+
   // Derive auth states from session data
   const user = session?.user;
   const isAuthenticated = !!user;
-  const isConfirmed = user?.emailVerified || false;
-  const needsEmailVerification = user && !user.emailVerified;
-  const needsOnboarding = user?.step === 'ONBOARDING' && (user?.role === 'freelancer' || user?.role === 'company');
+  // const isConfirmed = user?.emailVerified || false;
+  // const needsEmailVerification = user && !user.emailVerified;
+  // const needsOnboarding = user?.step === 'ONBOARDING' && (user?.role === 'freelancer' || user?.role === 'company');
   const hasAccess = user?.step === 'DASHBOARD' || user?.role === 'admin';
-  const isProfessional = user?.role === 'freelancer' || user?.role === 'company';
+  const isProfessional =
+    user?.role === 'freelancer' || user?.role === 'company';
   const hasProfile = isProfessional && user?.step === 'DASHBOARD';
 
   const handleLogout = async () => {
@@ -77,6 +79,8 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
       window.location.href = '/';
     }
   };
+
+  console.log('user', user);
 
   // Show loading state
   if (isPending) {
@@ -105,7 +109,14 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
       ];
     } else {
       // Normal menu for completed users
-      const allNav = hasAccess ? hasAccessUserMenuNav : noAccessUserMenuNav;
+      // Simple users (role: 'user') should get limited menu even if step is DASHBOARD
+      // Only admin and professional users with DASHBOARD step get full access
+      const shouldHaveFullAccess =
+        user?.role === 'admin' ||
+        (isProfessional && user?.step === 'DASHBOARD');
+      const allNav = shouldHaveFullAccess
+        ? hasAccessUserMenuNav
+        : noAccessUserMenuNav;
       const userProfilePath = `/profile/${user?.username}`;
 
       modifiedNav = allNav
@@ -137,17 +148,16 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
               className='p-0 h-auto w-auto hover:bg-transparent focus:ring-0 focus:ring-offset-0 focus:outline-none focus-visible:ring-0'
             >
               <UserImage
-                firstName={user?.firstName || ''}
-                lastName={user?.lastName || ''}
-                displayName={user?.displayName || ''}
+                displayName={user?.displayName || user?.username || ''}
                 hideDisplayName
                 image={
                   user?.image
                     ? (() => {
                         try {
-                          const imageData = typeof user.image === 'string' 
-                            ? JSON.parse(user.image) 
-                            : user.image;
+                          const imageData =
+                            typeof user.image === 'string'
+                              ? JSON.parse(user.image)
+                              : user.image;
                           return getOptimizedCloudinaryUrl(imageData, {
                             width: 80,
                             height: 80,
@@ -159,8 +169,8 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
                       })()
                     : null
                 }
-                width={40}
-                height={40}
+                width={37}
+                height={37}
               />
             </Button>
           </DropdownMenuTrigger>
@@ -168,10 +178,12 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
             <DropdownMenuLabel className='font-normal'>
               <div className='flex flex-col space-y-1'>
                 <p className='text-sm font-medium leading-none'>
-                  {user?.displayName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'User'}
+                  {isProfessional
+                    ? user?.displayName
+                    : capitalizeFirstLetter(user?.username)}
                 </p>
                 <p className='text-xs leading-none text-muted-foreground'>
-                  {user?.username ? `@${user.username}` : user?.email || ''}
+                  {isProfessional ? `@${user.username}` : user?.email}
                 </p>
               </div>
             </DropdownMenuLabel>
