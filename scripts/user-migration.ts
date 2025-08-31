@@ -1,0 +1,393 @@
+/**
+ * USER MIGRATION SCRIPT - Strapi to Better-Auth
+ * 
+ * Migrates users from DigitalOcean PostgreSQL (Strapi) to Neon PostgreSQL (Better-Auth)
+ * 
+ * FIELD MAPPING:
+ * 
+ * Strapi up_users → Better-Auth users + accounts
+ * ├── id (int) → Generate new CUID for users.id
+ * ├── username → users.username
+ * ├── email → users.email (unique)
+ * ├── provider → accounts.providerId
+ * ├── password → accounts.password (bcrypt hash for local users)
+ * ├── confirmed → users.confirmed + users.emailVerified
+ * ├── blocked → users.blocked
+ * ├── created_at → users.createdAt
+ * ├── updated_at → users.updatedAt
+ * ├── display_name → users.displayName
+ * ├── first_name → users.firstName
+ * └── last_name → users.lastName
+ * 
+ * NOTE: Profiles will be created later based on username
+ * 
+ * MIGRATION STRATEGY:
+ * 1. Local users (provider='local'): Create User + Account with password
+ * 2. Google users (provider='google'): Create User + Account without password
+ * 3. Map user data to User table only (no profiles yet)
+ * 4. Handle role assignment based on existing data patterns
+ */
+
+import { PrismaClient as SourcePrismaClient } from '@prisma/client';
+import { PrismaClient as TargetPrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
+
+// Types for source database (Strapi)
+interface StrapiUser {
+  id: number;
+  username: string | null;
+  email: string | null;
+  provider: string | null;
+  password: string | null;
+  reset_password_token: string | null;
+  confirmation_token: string | null;
+  confirmed: boolean | null;
+  blocked: boolean | null;
+  created_at: Date | null;
+  updated_at: Date | null;
+  created_by_id: number | null;
+  updated_by_id: number | null;
+  display_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  phone: bigint | null;
+  address: string | null;
+  consent: boolean | null;
+}
+
+// Database connections
+const sourceDb = new SourcePrismaClient({
+  datasources: {
+    db: {
+      url: process.env.SOURCE_DATABASE_URL // DigitalOcean PostgreSQL
+    }
+  }
+});
+
+const targetDb = new TargetPrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL // Neon PostgreSQL
+    }
+  }
+});
+
+// Migration statistics
+interface MigrationStats {
+  totalUsers: number;
+  localUsers: number;
+  googleUsers: number;
+  migratedSuccessfully: number;
+  errors: string[];
+  skipped: string[];
+}
+
+// Helper function to get user role from Strapi
+async function getUserRole(userId: number): Promise<string> {
+  try {
+    const userRole = await sourceDb.$queryRaw<{role_type: string}[]>`
+      SELECT r.type as role_type
+      FROM up_users_role_links url
+      JOIN up_roles r ON url.role_id = r.id
+      WHERE url.user_id = ${userId}
+      LIMIT 1
+    `;
+
+    if (userRole.length === 0) {
+      console.log(`⚠️ No role found for user ID ${userId}, defaulting to 'user'`);
+      return 'user';
+    }
+
+    const strapiRole = userRole[0].role_type;
+    
+    // Map Strapi roles to Better-Auth roles
+    switch(strapiRole.toLowerCase()) {
+      case 'freelancer':
+        return 'freelancer';
+      case 'company':
+        return 'company';
+      case 'employer':
+        return 'company'; // Map employer to company
+      case 'authenticated':
+      case 'public':
+      default:
+        return 'user';
+    }
+  } catch (error) {
+    console.error(`Error getting role for user ${userId}:`, error);
+    return 'user'; // Default fallback
+  }
+}
+
+// Helper function to determine user step
+function determineUserStep(user: StrapiUser): string {
+  if (user.confirmed) {
+    return 'DASHBOARD'; // Users that were confirmed in Strapi go to dashboard
+  }
+  return 'EMAIL_VERIFICATION';
+}
+
+// Helper function to validate bcrypt hash
+function isBcryptHash(password: string): boolean {
+  return password.startsWith('$2a$') || password.startsWith('$2b$') || password.startsWith('$2y$');
+}
+
+// Main migration function
+async function migrateUsers(): Promise<MigrationStats> {
+  const stats: MigrationStats = {
+    totalUsers: 0,
+    localUsers: 0,
+    googleUsers: 0,
+    migratedSuccessfully: 0,
+    errors: [],
+    skipped: []
+  };
+
+  try {
+    console.log('🚀 Starting user migration from Strapi to Better-Auth...');
+    console.log('📊 Connecting to databases...');
+
+    // Test connections
+    await sourceDb.$connect();
+    await targetDb.$connect();
+    
+    console.log('✅ Database connections established');
+
+    // Fetch all users from Strapi
+    console.log('📥 Fetching users from Strapi database...');
+    
+    // Query the Strapi up_users table directly using raw SQL
+    const strapiUsers = await sourceDb.$queryRaw<StrapiUser[]>`
+      SELECT * FROM up_users ORDER BY created_at ASC
+    `;
+
+    stats.totalUsers = strapiUsers.length;
+    console.log(`📊 Found ${stats.totalUsers} users to migrate`);
+
+    // Process each user
+    for (let i = 0; i < strapiUsers.length; i++) {
+      const strapiUser = strapiUsers[i];
+      const progress = `[${i + 1}/${stats.totalUsers}]`;
+      
+      try {
+        console.log(`${progress} Processing user: ${strapiUser.email}`);
+
+        // Skip users without email
+        if (!strapiUser.email) {
+          stats.skipped.push(`User ID ${strapiUser.id}: No email address`);
+          console.log(`⚠️ ${progress} Skipped - No email address`);
+          continue;
+        }
+
+        // Check if user already exists in target database
+        const existingUser = await targetDb.user.findUnique({
+          where: { email: strapiUser.email }
+        });
+
+        if (existingUser) {
+          stats.skipped.push(`User ${strapiUser.email}: Already exists`);
+          console.log(`⚠️ ${progress} Skipped - Already exists`);
+          continue;
+        }
+
+        // Let Prisma generate the CUID automatically
+        
+        // Determine provider type
+        const isLocalUser = strapiUser.provider === 'local';
+        const isGoogleUser = strapiUser.provider === 'google';
+        
+        if (isLocalUser) stats.localUsers++;
+        if (isGoogleUser) stats.googleUsers++;
+
+        // Get the user's role from Strapi
+        const userRole = await getUserRole(strapiUser.id);
+
+        // Prepare user data (let Prisma generate the ID)
+        const userData = {
+          email: strapiUser.email,
+          emailVerified: strapiUser.confirmed || false,
+          name: strapiUser.display_name || 
+                (strapiUser.first_name && strapiUser.last_name ? 
+                 `${strapiUser.first_name} ${strapiUser.last_name}` : null),
+          createdAt: strapiUser.created_at || new Date(),
+          updatedAt: strapiUser.updated_at || new Date(),
+          step: determineUserStep(strapiUser),
+          confirmed: strapiUser.confirmed || false,
+          blocked: strapiUser.blocked || false,
+          username: strapiUser.username,
+          displayName: strapiUser.display_name,
+          firstName: strapiUser.first_name,
+          lastName: strapiUser.last_name,
+          role: userRole
+        };
+
+        // Create user in transaction
+        await targetDb.$transaction(async (tx) => {
+          // Create user
+          const newUser = await tx.user.create({
+            data: userData
+          });
+
+          // Create account for authentication
+          const accountData = {
+            userId: newUser.id,
+            accountId: `${strapiUser.provider}_${strapiUser.id}`, // Unique identifier
+            providerId: strapiUser.provider === 'local' ? 'credential' : 'google',
+            createdAt: strapiUser.created_at || new Date(),
+            updatedAt: strapiUser.updated_at || new Date()
+          };
+
+          // Add password for local users
+          if (isLocalUser && strapiUser.password) {
+            if (isBcryptHash(strapiUser.password)) {
+              accountData.password = strapiUser.password; // Keep existing bcrypt hash
+            } else {
+              // If somehow password is not bcrypt, hash it
+              accountData.password = await bcrypt.hash(strapiUser.password, 12);
+              console.log(`⚠️ ${progress} Password was not bcrypt, re-hashed`);
+            }
+          }
+
+          await tx.account.create({
+            data: accountData
+          });
+        });
+
+        stats.migratedSuccessfully++;
+        console.log(`✅ ${progress} Successfully migrated ${isLocalUser ? 'local' : 'Google'} user (${userRole})`);
+
+      } catch (error) {
+        const errorMsg = `User ${strapiUser.email}: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        stats.errors.push(errorMsg);
+        console.error(`❌ ${progress} Error:`, error);
+      }
+    }
+
+    // Print migration summary
+    console.log('\n📊 MIGRATION SUMMARY');
+    console.log('===================');
+    console.log(`Total users processed: ${stats.totalUsers}`);
+    console.log(`Local users (with passwords): ${stats.localUsers}`);
+    console.log(`Google OAuth users: ${stats.googleUsers}`);
+    console.log(`Successfully migrated: ${stats.migratedSuccessfully}`);
+    console.log(`Skipped: ${stats.skipped.length}`);
+    console.log(`Errors: ${stats.errors.length}`);
+    
+    if (stats.skipped.length > 0) {
+      console.log('\n⚠️ SKIPPED USERS:');
+      stats.skipped.forEach(msg => console.log(`  - ${msg}`));
+    }
+    
+    if (stats.errors.length > 0) {
+      console.log('\n❌ ERRORS:');
+      stats.errors.forEach(msg => console.log(`  - ${msg}`));
+    }
+
+    console.log('\n🎉 Migration completed!');
+    
+    return stats;
+
+  } catch (error) {
+    console.error('💥 Fatal migration error:', error);
+    throw error;
+  } finally {
+    await sourceDb.$disconnect();
+    await targetDb.$disconnect();
+    console.log('🔌 Database connections closed');
+  }
+}
+
+// Test function to verify a migrated user can log in
+async function testUserLogin(email: string, password?: string): Promise<boolean> {
+  try {
+    console.log(`🧪 Testing login for user: ${email}`);
+    
+    const user = await targetDb.user.findUnique({
+      where: { email },
+      include: { accounts: true }
+    });
+
+    if (!user) {
+      console.log('❌ User not found');
+      return false;
+    }
+
+    const account = user.accounts.find(acc => acc.providerId === 'credential');
+    
+    if (account && password) {
+      // Test password verification
+      const isValid = await bcrypt.compare(password, account.password || '');
+      console.log(`🔐 Password validation: ${isValid ? 'PASS' : 'FAIL'}`);
+      return isValid;
+    } else if (user.accounts.some(acc => acc.providerId === 'google')) {
+      console.log('✅ Google OAuth user found');
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error('❌ Login test error:', error);
+    return false;
+  }
+}
+
+// Rollback function in case of issues
+async function rollbackMigration(): Promise<void> {
+  console.log('🔄 Starting rollback...');
+  
+  try {
+    await targetDb.$connect();
+    
+    // Delete all accounts first (due to foreign key constraints)
+    await targetDb.account.deleteMany({});
+    console.log('✅ Deleted all accounts');
+    
+    // Delete all profiles
+    await targetDb.profile.deleteMany({});
+    console.log('✅ Deleted all profiles');
+    
+    // Delete all users
+    await targetDb.user.deleteMany({});
+    console.log('✅ Deleted all users');
+    
+    console.log('🎉 Rollback completed successfully');
+  } catch (error) {
+    console.error('❌ Rollback error:', error);
+    throw error;
+  } finally {
+    await targetDb.$disconnect();
+  }
+}
+
+// Main execution
+async function main() {
+  const args = process.argv.slice(2);
+  
+  if (args[0] === 'rollback') {
+    await rollbackMigration();
+    return;
+  }
+  
+  if (args[0] === 'test' && args[1]) {
+    await testUserLogin(args[1], args[2]);
+    return;
+  }
+  
+  // Run the migration
+  const stats = await migrateUsers();
+  
+  // Exit with appropriate code
+  process.exit(stats.errors.length > 0 ? 1 : 0);
+}
+
+// Handle errors
+process.on('unhandledRejection', (error) => {
+  console.error('💥 Unhandled rejection:', error);
+  process.exit(1);
+});
+
+if (require.main === module) {
+  main().catch(console.error);
+}
+
+export { migrateUsers, testUserLogin, rollbackMigration };
