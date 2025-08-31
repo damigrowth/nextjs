@@ -174,3 +174,82 @@ export interface FilterOption {
   type: 'select' | 'checkbox' | 'date' | 'range';
   options?: { value: string; label: string }[];
 }
+
+// Media Upload Components
+export interface MediaUploadProps {
+  value: import('./cloudinary').CloudinaryResource | import('./cloudinary').CloudinaryResource[] | null;
+  onChange: (
+    resources: import('./cloudinary').CloudinaryResource | import('./cloudinary').CloudinaryResource[] | null,
+  ) => void;
+  uploadPreset?: string;
+  multiple?: boolean;
+  folder?: string;
+  maxFiles?: number;
+  maxFileSize?: number;
+  allowedFormats?: string[];
+  className?: string;
+  placeholder?: string;
+  error?: string | import('react-hook-form').FieldError | import('react-hook-form').Merge<import('react-hook-form').FieldError, import('react-hook-form').FieldErrorsImpl<any>>;
+  type?: 'image' | 'auto';
+  signed?: boolean;
+  signatureEndpoint?: string;
+}
+
+export interface MediaUploadRef {
+  uploadFiles: () => Promise<void>;
+  hasFiles: () => boolean;
+  clearQueue: () => void;
+}
+
+export interface ProfileImageUploadProps {
+  resource: import('../utils/media').CloudinaryResourceOrPending | null;
+  queuedFile: import('../utils/media').QueuedFile | null;
+  onFileSelect: (files: FileList) => void;
+  onRemove: () => void;
+  isUploading: boolean;
+  error: string | null;
+  maxFileSize: number;
+  formats: string[];
+  className?: string;
+}
+
+export interface GalleryUploadProps {
+  resources: import('../utils/media').CloudinaryResourceOrPending[];
+  queuedFiles: import('../utils/media').QueuedFile[];
+  onFilesSelected: (files: FileList) => void;
+  onRemoveResource: (publicId: string) => void;
+  onRemoveFromQueue: (fileId: string) => void;
+  onReorderResources: (resources: import('../utils/media').CloudinaryResourceOrPending[]) => void;
+  isUploading: boolean;
+  error: string | null;
+  maxFiles: number;
+  maxFileSize: number;
+  formats: string[];
+  canAddMore: boolean;
+  className?: string;
+  type: 'image' | 'auto';
+}
+
+export interface ResourcePreviewProps {
+  resource: import('../utils/media').CloudinaryResourceOrPending;
+  index: number;
+  onRemove: (publicId: string) => void;
+  isDragging?: boolean;
+  dragHandleProps?: any;
+  width?: number;
+  height?: number;
+}
+
+export interface UploadDropzoneProps {
+  onFilesSelected: (files: FileList) => void;
+  canAddMore: boolean;
+  isUploading: boolean;
+  totalFiles: number;
+  queuedFiles: import('../utils/media').QueuedFile[];
+  maxFiles: number;
+  maxFileSize: number;
+  formats: string[];
+  error: string | null;
+  type: 'image' | 'auto';
+  multiple: boolean;
+}

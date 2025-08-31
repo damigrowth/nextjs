@@ -36,12 +36,20 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { getOptimizedCloudinaryUrl } from '@/lib/utils/media';
-import { useDashboard } from '../providers/dashboard-provider';
+import { useSession } from '@/lib/auth/client';
+import { capitalizeFirstLetter } from '@/lib/utils/validation';
 
 export default function DashboardSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
-  const { hasRole, displayName, email, image, isProfessional } = useDashboard();
+  const { data: session } = useSession();
+
+  // Derive auth states from session data - same logic as UserMenu
+  const user = session?.user;
+  const isProfessional =
+    user?.role === 'freelancer' || user?.role === 'company';
+  const shouldHaveFullAccess =
+    user?.role === 'admin' || (isProfessional && user?.step === 'DASHBOARD');
 
   // Group 1: Main Navigation (always visible)
   const navMain = [
@@ -122,18 +130,30 @@ export default function DashboardSidebar({
   ];
 
   const userData = {
-    name: displayName || 'User',
-    email: email || '',
-    avatar:
-      typeof image === 'string'
-        ? image
-        : image
-          ? getOptimizedCloudinaryUrl(image, {
-              width: 32,
-              height: 32,
-              crop: 'fill',
-            })
-          : '/avatars/default.jpg',
+    name: isProfessional
+      ? user?.displayName
+      : capitalizeFirstLetter(user?.username || 'User'),
+    email: user?.email || '',
+    avatar: user?.image
+      ? typeof user.image === 'string'
+        ? (() => {
+            try {
+              const imageData = JSON.parse(user.image);
+              return getOptimizedCloudinaryUrl(imageData, {
+                width: 32,
+                height: 32,
+                crop: 'fill',
+              });
+            } catch {
+              return '/avatars/default.jpg';
+            }
+          })()
+        : getOptimizedCloudinaryUrl(user.image, {
+            width: 32,
+            height: 32,
+            crop: 'fill',
+          })
+      : '/avatars/default.jpg',
   };
 
   return (
