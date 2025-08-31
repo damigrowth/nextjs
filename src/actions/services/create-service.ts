@@ -14,6 +14,7 @@ import {
 import { extractFormData } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { sanitizeCloudinaryResources } from '@/lib/utils/cloudinary';
 
 /**
  * Server action for creating a new service using the multi-step form data
@@ -170,6 +171,9 @@ async function createServiceInternal(
 
     const data = validationResult.data;
 
+    // 6.5. Sanitize media resources before saving to database
+    const sanitizedMedia = sanitizeCloudinaryResources(data.media || []);
+
     // 7. Type configuration is already in the correct Boolean structure from form
     const typeConfig = data.type;
 
@@ -200,6 +204,7 @@ async function createServiceInternal(
             location: null,
             addons: (data.addons || []) as Prisma.JsonValue[],
             faq: (data.faq || []) as Prisma.JsonValue[],
+            media: sanitizedMedia as Prisma.JsonValue,
             status: status,
             featured: false,
             profile: {
@@ -237,6 +242,7 @@ async function createServiceInternal(
           location: null,
           addons: (data.addons || []) as Prisma.JsonValue[],
           faq: (data.faq || []) as Prisma.JsonValue[],
+          media: sanitizedMedia as Prisma.JsonValue,
           status: status,
           featured: false,
           profile: {
@@ -246,9 +252,7 @@ async function createServiceInternal(
       });
     }
 
-    // 10. TODO: Handle media upload if provided
-    // Note: Media handling would go here when implementing file uploads
-    // For now, we skip media processing
+    // 10. Media handling - now properly sanitizes pending resources before database storage
 
     // 11. Revalidate cached data
     revalidateTag(`user-${user.id}`);
