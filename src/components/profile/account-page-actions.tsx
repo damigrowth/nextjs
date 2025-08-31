@@ -6,8 +6,13 @@ import { DeleteAccountForm } from '@/components';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Key, Trash2 } from 'lucide-react';
+import { AuthUser } from '@/lib/types/auth';
 
-export function AccountPageActions() {
+interface AccountPageActionsProps {
+  user: AuthUser | null;
+}
+
+export function AccountPageActions({ user }: AccountPageActionsProps) {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
@@ -45,6 +50,7 @@ export function AccountPageActions() {
           </DialogTrigger>
           <DialogContent className='sm:max-w-md'>
             <DeleteAccountForm
+              user={user}
               onSuccess={() => setDeleteAccountOpen(false)}
               onCancel={() => setDeleteAccountOpen(false)}
             />

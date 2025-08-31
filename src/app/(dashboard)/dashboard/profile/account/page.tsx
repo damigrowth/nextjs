@@ -25,7 +25,7 @@ export default async function AccountPage() {
       <AccountForm initialUser={user} />
 
       {/* Account Actions */}
-      <AccountPageActions />
+      <AccountPageActions user={user} />
     </div>
   );
 }
