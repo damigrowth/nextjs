@@ -21,6 +21,9 @@ model Service {
   addons Json[] // title, description, price
   faq    Json[] // question, answer
 
+  // Media
+  media Json? // service media/images
+
   // Misc
   location String?
   featured Boolean @default(false)
