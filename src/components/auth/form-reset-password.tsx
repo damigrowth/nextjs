@@ -194,7 +194,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token }) => {
             <AlertCircle className='h-4 w-4' />
             <AlertDescription>
               {state.message}
-              {state.error?.includes('λήξει') && (
+              {state.message?.includes('λήξει') && (
                 <div className='mt-2'>
                   <LinkNP
                     href='/forgot-password'

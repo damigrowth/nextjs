@@ -4,6 +4,7 @@ import { nextCookies } from 'better-auth/next-js';
 import { admin, apiKey } from 'better-auth/plugins';
 import { PrismaClient, User } from '@prisma/client';
 import { sendAuthEmail } from '@/lib/email';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -20,6 +21,22 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
+    // Custom password verification to handle Strapi bcrypt hashes
+    password: {
+      hash: async (password: string) => {
+        // Use bcrypt for new passwords with higher rounds for security
+        return await bcrypt.hash(password, 12);
+      },
+      verify: async (data: { password: string; hash: string }) => {
+        try {
+          // Support both new hashes (12 rounds) and migrated Strapi hashes (10 rounds)
+          return await bcrypt.compare(data.password, data.hash);
+        } catch (error) {
+          console.error('Password verification error:', error);
+          return false;
+        }
+      }
+    },
     sendResetPassword: async ({ user, url, token }, request) => {
       try {
         if (!user.email) {

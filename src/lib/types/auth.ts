@@ -186,8 +186,8 @@ export interface AuthContextType {
 export interface DashboardContextType {
   // Raw objects
   profile: ProfileWithRelations | null;
-  user: User | null;
-  
+  user: AuthUser | null;
+
   // Flattened user fields for easy access
   id: string | null;
   email: string | null;
@@ -199,7 +199,7 @@ export interface DashboardContextType {
   confirmed: boolean;
   blocked: boolean;
   banned: boolean;
-  
+
   // Flattened profile fields for easy access
   profileId: string | null;
   tagline: string | null;
@@ -224,7 +224,7 @@ export interface DashboardContextType {
   reviewCount: number;
   published: boolean;
   isActive: boolean;
-  
+
   // Additional profile fields
   commencement: string | null;
   contactMethods: string[] | null;
@@ -234,18 +234,18 @@ export interface DashboardContextType {
   industries: string[] | null;
   terms: string | null;
   billing: any;
-  
+
   // Presentation fields
   visibility: any;
   socials: any;
   viber: string | null;
   whatsapp: string | null;
-  
+
   // Relations
   services: Service[];
   reviewsReceived: Review[];
   chatMemberships: ChatMember[];
-  
+
   // Computed auth status
   isAuthenticated: boolean;
   isConfirmed: boolean;
@@ -253,17 +253,17 @@ export interface DashboardContextType {
   needsOnboarding: boolean;
   hasAccess: boolean;
   canAccessDashboard: boolean;
-  
+
   // Role checks
   isAdmin: boolean;
   isProfessional: boolean;
   isSimpleUser: boolean;
   isFreelancer: boolean;
   isCompany: boolean;
-  
+
   // Profile status
   hasProfile: boolean;
-  
+
   // Actions
   updateProfile: (profile: ProfileWithRelations) => void;
   refreshProfile: () => Promise<void>;

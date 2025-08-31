@@ -19,13 +19,24 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { login } from '@/actions/auth/login';
 import { loginSchema, type LoginInput } from '@/lib/validations/auth';
-import { authClient } from '@/lib/auth/client';
+import { authClient, useSession } from '@/lib/auth/client';
+import { AuthUser } from '@/lib/types/auth';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { FormButton } from '../shared';
 import { Separator } from '../ui/separator';
 import GoogleLoginButton from './button-login-goolge';
 
-const initialState = {
+type LoginState = {
+  success: boolean;
+  message: string;
+  data?: {
+    user: AuthUser;
+    redirectPath: string;
+  };
+  errors?: Record<string, string[]>;
+};
+
+const initialState: LoginState = {
   success: false,
   message: '',
 };
@@ -33,8 +44,12 @@ const initialState = {
 const LoginForm: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [state, action, isPending] = useActionState(login, initialState);
-  
+  const [state, action, isPending] = useActionState<LoginState, FormData>(
+    login,
+    initialState,
+  );
+  const { refetch } = useSession();
+
   // Check for success messages from URL params
   const message = searchParams?.get('message');
   const showPasswordResetSuccess = message === 'password-reset-success';
@@ -48,27 +63,43 @@ const LoginForm: React.FC = () => {
     mode: 'onChange',
   });
 
-  // Handle successful login and redirect
+  // Handle successful login and redirect - same pattern as profile forms
   useEffect(() => {
     if (state.success) {
-      const checkSessionAndRedirect = async () => {
+      const handleSuccessfulLogin = async () => {
         try {
-          const session = await authClient.getSession();
-          const redirectPath =
-            session?.data?.user?.role === 'admin' ? '/admin' : '/dashboard';
+          // First refresh to update server components and clear any cached data
+          router.refresh();
 
-          setTimeout(() => {
-            router.push(redirectPath);
-          }, 1000);
+          // Force Better Auth session refetch to clear client-side cache
+          await refetch();
+
+          // Small delay to ensure both refresh and session update complete
+          await new Promise((resolve) => setTimeout(resolve, 200));
+
+          // Get the redirect path from the server response or fallback to session check
+          let redirectPath = '/dashboard';
+
+          if (state.data?.redirectPath) {
+            redirectPath = state.data.redirectPath;
+          } else {
+            // Fallback: check session for redirect path (fresh session data)
+            const session = await authClient.getSession();
+            redirectPath =
+              session?.data?.user?.role === 'admin' ? '/admin' : '/dashboard';
+          }
+
+          // Navigate to the appropriate path
+          router.push(redirectPath);
         } catch (error) {
-          console.error('Session check error:', error);
+          console.error('Login redirect error:', error);
           router.push('/dashboard');
         }
       };
 
-      checkSessionAndRedirect();
+      handleSuccessfulLogin();
     }
-  }, [state.success, router]);
+  }, [state.success, state.data, router]);
 
   // Handle form submission
   const handleFormSubmit = (formData: FormData) => {
@@ -161,7 +192,8 @@ const LoginForm: React.FC = () => {
             <Alert className='border-green-200 bg-green-50 text-green-800 mb-4'>
               <CheckCircle className='h-4 w-4' />
               <AlertDescription>
-                Ο κωδικός σου επαναφέρθηκε επιτυχώς! Μπορείς τώρα να συνδεθείς με τον νέο σου κωδικό.
+                Ο κωδικός σου επαναφέρθηκε επιτυχώς! Μπορείς τώρα να συνδεθείς
+                με τον νέο σου κωδικό.
               </AlertDescription>
             </Alert>
           )}

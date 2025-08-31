@@ -15,12 +15,20 @@ const prisma = new PrismaClient();
 /**
  * Check if user is authenticated and return user/session data
  */
-export async function getSession(): Promise<
+/**
+ * Check if user is authenticated and return user/session data
+ */
+export async function getSession(options: { revalidate?: boolean } = {}): Promise<
   ActionResult<{ user: AuthUser | null; session: AuthSession | null }>
 > {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
+      ...(options.revalidate && {
+        query: {
+          disableCookieCache: true,
+        },
+      }),
     });
 
     // console.log('getSession - session found: =>>>>>>>>>>>>>>>', session);
@@ -111,7 +119,7 @@ async function _getProfileForUser(userId: string): Promise<Profile | null> {
  * Get current authenticated user with complete profile
  * Uses Better Auth cookie caching + selective profile caching
  */
-export async function getCurrentUser(): Promise<
+export async function getCurrentUser(options: { revalidate?: boolean } = {}): Promise<
   ActionResult<{
     user: AuthUser | null;
     profile: Profile | null;
@@ -119,8 +127,8 @@ export async function getCurrentUser(): Promise<
   }>
 > {
   try {
-    // Get session (not cached - uses Better Auth cookie cache if enabled)
-    const sessionResult = await getSession();
+    // Get session (optionally revalidate cache for fresh data)
+    const sessionResult = await getSession(options);
 
     if (!sessionResult.success) {
       return {

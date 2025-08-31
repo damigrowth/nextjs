@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { loginSchema } from '@/lib/validations/auth';
-import { ActionResult, ActionResponse } from '@/lib/types/api';
+import { ActionResult, ActionResponse, ServerActionResponse } from '@/lib/types/api';
 import { LoginInput } from '@/lib/validations/auth';
 import { AuthUser } from '@/lib/types/auth';
 import { headers } from 'next/headers';
@@ -17,7 +17,7 @@ const prisma = new PrismaClient();
 export async function login(
   prevState: ActionResponse | null,
   formData: FormData,
-): Promise<ActionResponse> {
+): Promise<ActionResponse & { data?: { user: AuthUser; redirectPath: string } }> {
   let user: AuthUser;
 
   try {
@@ -85,21 +85,29 @@ export async function login(
     return handleBetterAuthError(error);
   }
 
-  // Handle redirects outside try/catch
-  if (!user.emailVerified) {
-    redirect('/register/success');
-  }
+  // Return success with redirect path instead of redirecting
+  let redirectPath = '/dashboard'; // default
 
-  // Redirect based on user step and role
-  if (user.step === 'ONBOARDING') {
-    redirect('/onboarding');
+  if (!user.emailVerified) {
+    redirectPath = '/register/success';
+  } else if (user.step === 'ONBOARDING') {
+    redirectPath = '/onboarding';
   } else if (user.step === 'DASHBOARD') {
     if (user.role === 'admin') {
-      redirect('/admin');
+      redirectPath = '/admin';
     } else {
-      redirect('/dashboard');
+      redirectPath = '/dashboard';
     }
   } else {
-    redirect('/register/success');
+    redirectPath = '/register/success';
   }
+
+  return {
+    success: true,
+    message: 'Επιτυχής σύνδεση',
+    data: {
+      user,
+      redirectPath,
+    },
+  };
 }

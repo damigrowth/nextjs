@@ -36,7 +36,7 @@ export default async function RegisterPage(): Promise<JSX.Element> {
   await redirectOnboardingUsers();
 
   return (
-    <section className='py-16 bg-gray-50 min-h-screen'>
+    <section className='mt-20 pt-20 pb-40 bg-gray-50'>
       <div className='container mx-auto px-4'>
         {/* Title Section */}
         <div className='flex justify-center mb-15'>
