@@ -502,6 +502,277 @@ export const getStrapiImageUrl = (imageData: any, size = 'thumbnail'): string | 
 };
 
 // =============================================
+// MEDIA UPLOAD HELPER UTILITIES
+// =============================================
+
+export interface QueuedFile {
+  id: string;
+  file: File;
+  preview: string;
+  name: string;
+  size: number;
+  type: string;
+  isUploaded?: boolean;
+  cloudinaryResource?: CloudinaryResource;
+  error?: string;
+}
+
+export interface PendingCloudinaryResource extends CloudinaryResource {
+  _pending: boolean;
+  resource_type: 'image' | 'video' | 'raw';
+}
+
+export type CloudinaryResourceOrPending = CloudinaryResource | PendingCloudinaryResource;
+
+export interface FileValidationOptions {
+  allowedTypes: MediaType[];
+  maxSizeMB: number;
+  isProfileImage: boolean;
+}
+
+/**
+ * Generate unique file ID for duplicate detection
+ */
+export const generateFileId = (file: File): string => {
+  return `${file.name}-${file.size}-${file.lastModified}`;
+};
+
+/**
+ * Create a pending CloudinaryResource from a queued file
+ */
+export const createPendingResource = (file: QueuedFile): PendingCloudinaryResource => {
+  return {
+    public_id: `pending_${file.id}`,
+    secure_url: file.preview,
+    original_filename: file.file.name,
+    bytes: file.size,
+    format: file.type.split('/')[1] || 'unknown',
+    resource_type: file.type.startsWith('image/')
+      ? 'image'
+      : file.type.startsWith('video/')
+        ? 'video'
+        : file.type.startsWith('audio/')
+          ? 'audio'
+          : 'auto',
+    width: 0,
+    height: 0,
+    created_at: new Date().toISOString(),
+    _pending: true,
+  } as PendingCloudinaryResource;
+};
+
+/**
+ * Detect media type from CloudinaryResource or PendingResource
+ */
+export const detectMediaType = (resource: CloudinaryResourceOrPending): MediaType => {
+  if (!resource) return 'image';
+  
+  // For pending resources, use the resource_type we set
+  if (isPendingResource(resource)) {
+    if (resource.resource_type === 'video') return 'video';
+    if (resource.resource_type === 'audio') return 'audio';
+    return 'image';
+  }
+  
+  // For uploaded resources, use format detection
+  if (resource.resource_type === 'video') return 'video';
+  if (resource.resource_type === 'raw') {
+    // Check format for raw resources that might be audio
+    const format = resource.format?.toLowerCase();
+    if (format && ['mp3', 'wav', 'ogg', 'aac', 'webm'].includes(format)) {
+      return 'audio';
+    }
+  }
+  
+  return 'image';
+};
+
+/**
+ * Check if resource is a pending resource
+ */
+export const isPendingResource = (resource: CloudinaryResourceOrPending): resource is PendingCloudinaryResource => {
+  return (resource as PendingCloudinaryResource)._pending === true || 
+         resource.public_id?.startsWith('pending_') === true;
+};
+
+/**
+ * Check if file already exists (duplicate detection)
+ */
+export const isFileExists = (
+  file: File,
+  queuedFiles: QueuedFile[],
+  resources: CloudinaryResourceOrPending[]
+): boolean => {
+  const fileId = generateFileId(file);
+  const existsInQueue = queuedFiles.some((qf) => qf.id === fileId);
+  const existsInResources = resources.some(
+    (r) => r.original_filename === file.name && r.bytes === file.size,
+  );
+  return existsInQueue || existsInResources;
+};
+
+/**
+ * Process selected files into QueuedFile objects
+ */
+export const processSelectedFiles = (
+  files: FileList,
+  existingQueuedFiles: QueuedFile[],
+  existingResources: CloudinaryResourceOrPending[],
+  options: {
+    allowedTypes: MediaType[];
+    maxSizeMB: number;
+    isProfileImage: boolean;
+    maxFiles: number;
+    multiple: boolean;
+  }
+): { newFiles: QueuedFile[]; error: string | null } => {
+  const newFiles: QueuedFile[] = [];
+  let error: string | null = null;
+
+  Array.from(files).forEach((file) => {
+    // Check for duplicates
+    if (isFileExists(file, existingQueuedFiles, existingResources)) {
+      return; // Skip duplicates silently
+    }
+
+    // Validate file
+    const validation = validateFile(file, {
+      allowedTypes: options.allowedTypes,
+      maxSizeMB: options.maxSizeMB,
+      isProfileImage: options.isProfileImage,
+    });
+
+    if (!validation.isValid) {
+      error = validation.error || 'Invalid file';
+      return;
+    }
+
+    // Create preview URL
+    const preview = URL.createObjectURL(file);
+
+    const queuedFile: QueuedFile = {
+      id: generateFileId(file),
+      file,
+      preview,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      isUploaded: false,
+    };
+
+    newFiles.push(queuedFile);
+  });
+
+  // Respect maxFiles limit
+  const filesToAdd = options.multiple 
+    ? newFiles.slice(0, Math.max(0, options.maxFiles - (existingQueuedFiles.length + existingResources.length)))
+    : newFiles.slice(0, 1);
+
+  return { newFiles: filesToAdd, error };
+};
+
+/**
+ * Clean up preview URLs for removed files
+ */
+export const cleanupPreviewUrls = (files: QueuedFile[]): void => {
+  files.forEach((file) => {
+    if (file.preview && file.preview.startsWith('blob:')) {
+      URL.revokeObjectURL(file.preview);
+    }
+  });
+};
+
+/**
+ * Filter out pending resources from array
+ */
+export const filterPendingResources = (resources: CloudinaryResourceOrPending[]): CloudinaryResource[] => {
+  return resources.filter((r) => !isPendingResource(r)) as CloudinaryResource[];
+};
+
+/**
+ * Generate upload form data for Cloudinary
+ */
+export const generateUploadFormData = async (
+  file: File,
+  options: {
+    uploadPreset: string;
+    folder: string;
+    signed: boolean;
+    signatureEndpoint?: string;
+  }
+): Promise<FormData> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', options.uploadPreset);
+  formData.append('folder', options.folder);
+
+  if (options.signed && options.signatureEndpoint) {
+    const timestamp = Math.round(new Date().getTime() / 1000);
+    const paramsToSign = {
+      timestamp,
+      upload_preset: options.uploadPreset,
+      folder: options.folder,
+    };
+
+    const signatureResponse = await fetch(options.signatureEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paramsToSign }),
+    });
+
+    if (!signatureResponse.ok) {
+      throw new Error('Failed to get upload signature');
+    }
+
+    const signatureData = await signatureResponse.json();
+    formData.append('timestamp', timestamp.toString());
+    formData.append('signature', signatureData.signature);
+    
+    if (process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY) {
+      formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY);
+    }
+  }
+
+  return formData;
+};
+
+/**
+ * Upload file to Cloudinary
+ */
+export const uploadFileToCloudinary = async (
+  file: File,
+  options: {
+    uploadPreset: string;
+    folder: string;
+    signed: boolean;
+    signatureEndpoint?: string;
+    resourceType: 'auto' | 'image' | 'video';
+  }
+): Promise<CloudinaryResource> => {
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  if (!cloudName) {
+    throw new Error('Cloudinary cloud name not configured');
+  }
+
+  const formData = await generateUploadFormData(file, options);
+  const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${options.resourceType}/upload`;
+
+  const response = await fetch(uploadUrl, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.error?.message || `Upload failed for ${file.name}`,
+    );
+  }
+
+  return await response.json();
+};
+
+// =============================================
 // EXPORTS
 // =============================================
 
@@ -526,6 +797,18 @@ export default {
   
   // Helper utilities
   formatFileSize,
+  
+  // Upload helpers
+  generateFileId,
+  createPendingResource,
+  detectMediaType,
+  isPendingResource,
+  isFileExists,
+  processSelectedFiles,
+  cleanupPreviewUrls,
+  filterPendingResources,
+  generateUploadFormData,
+  uploadFileToCloudinary,
   
   // Legacy support
   getStrapiMediaType,

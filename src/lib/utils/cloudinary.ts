@@ -3,6 +3,8 @@
  * Helper functions for Cloudinary integration
  */
 
+import { CloudinaryResource } from '@/lib/types/cloudinary';
+
 /**
  * Build Cloudinary URL with transformations
  */
@@ -123,4 +125,75 @@ export function getUploadWidgetConfig(options?: {
     multiple: (options?.maxFiles || 1) > 1,
     resourceType: 'auto'
   };
+}
+
+/**
+ * PENDING RESOURCE UTILITIES
+ * Helper functions for handling pending (not yet uploaded) resources
+ */
+
+/**
+ * Check if a Cloudinary resource is pending (not yet uploaded)
+ */
+export function isPendingResource(resource: CloudinaryResource): boolean {
+  return (
+    ('_pending' in resource && (resource as any)._pending) ||
+    resource.public_id?.startsWith('pending_') ||
+    false
+  );
+}
+
+/**
+ * Filter out pending resources from a single resource or null
+ */
+export function filterPendingResource(
+  resource: CloudinaryResource | null
+): CloudinaryResource | null {
+  if (!resource) return null;
+  return isPendingResource(resource) ? null : resource;
+}
+
+/**
+ * Filter out pending resources from an array of resources
+ */
+export function filterPendingResources(
+  resources: CloudinaryResource[]
+): CloudinaryResource[] {
+  return resources.filter(resource => !isPendingResource(resource));
+}
+
+/**
+ * Sanitize Cloudinary resources for database storage
+ * Removes pending resources and the _pending flag from uploaded resources
+ */
+export function sanitizeCloudinaryResource(
+  resource: CloudinaryResource | null
+): CloudinaryResource | null {
+  if (!resource) {
+    return null;
+  }
+  
+  const isPending = isPendingResource(resource);
+  
+  if (isPending) {
+    return null;
+  }
+  
+  // Remove _pending flag if it exists
+  const { _pending, ...sanitized } = resource as any;
+  return sanitized as CloudinaryResource;
+}
+
+/**
+ * Sanitize array of Cloudinary resources for database storage
+ * Removes pending resources and the _pending flag from uploaded resources
+ */
+export function sanitizeCloudinaryResources(
+  resources: CloudinaryResource[]
+): CloudinaryResource[] {
+  return filterPendingResources(resources).map(resource => {
+    // Remove _pending flag if it exists
+    const { _pending, ...sanitized } = resource as any;
+    return sanitized as CloudinaryResource;
+  });
 }
