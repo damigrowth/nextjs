@@ -519,7 +519,6 @@ export interface QueuedFile {
 
 export interface PendingCloudinaryResource extends CloudinaryResource {
   _pending: boolean;
-  resource_type: 'image' | 'video' | 'raw';
 }
 
 export type CloudinaryResourceOrPending = CloudinaryResource | PendingCloudinaryResource;
