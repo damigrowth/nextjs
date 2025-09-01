@@ -11,6 +11,6 @@ export * from './profile';
 export * from './services';
 export * from './shared'; // includes LinkNP
 export * from './shared/layout';
-export * from './providers';
+// export * from './providers';
 export * from './guards';
 export * from './dashboard';
