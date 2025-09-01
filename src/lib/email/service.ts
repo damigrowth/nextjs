@@ -6,8 +6,7 @@
  */
 
 import { EMAIL_TEMPLATES } from '@/constants/email/templates';
-import { User } from '@prisma/client';
-import { EmailTemplateKey, EmailTemplate } from '@/lib/types/email';
+import { EmailTemplateKey, EmailTemplate, EmailUser, EmailResult, EmailOptions } from '@/lib/types/email';
 
 // Base64 encode for URL-safe JWT
 function base64urlEncode(input: string | ArrayBuffer): string {
@@ -215,28 +214,6 @@ async function sendGmailEmail(mailOptions: {
   }
 }
 
-// Types for email service
-interface EmailOptions {
-  to: string | string[];
-  from: string;
-  replyTo?: string;
-  subject: string;
-  html: string;
-  text?: string;
-}
-
-interface EmailResult {
-  messageId: string;
-  accepted: string[];
-  rejected: string[];
-}
-
-// interface AuthUser {
-//   email: string;
-//   id?: string;
-//   name?: string;
-//   [key: string]: any;
-// }
 
 /**
  * Main email sending function
@@ -265,7 +242,7 @@ export async function sendEmail(
 /**
  * Get email template by type
  */
-export function getEmailTemplate(type: string, user: User, url?: string) {
+export function getEmailTemplate(type: string, user: EmailUser, url?: string) {
   const template = EMAIL_TEMPLATES[type];
   if (!template) {
     throw new Error(`Template type "${type}" not found.`);
@@ -285,7 +262,7 @@ export function getEmailTemplate(type: string, user: User, url?: string) {
  */
 export async function sendAuthEmail(
   type: string,
-  user: User,
+  user: EmailUser,
   url?: string,
 ): Promise<EmailResult> {
   const emailData = getEmailTemplate(type, user, url);
@@ -327,13 +304,19 @@ export async function sendTemplateEmail(
     to,
     from: options?.from || template.from,
     replyTo: options?.replyTo || template.replyTo || undefined,
-    subject: typeof template.subject === 'function' ? template.subject(data) : template.subject,
-    html: typeof template.html === 'function' ? template.html(data) : template.html,
+    subject:
+      typeof template.subject === 'function'
+        ? template.subject(data)
+        : template.subject,
+    html:
+      typeof template.html === 'function' ? template.html(data) : template.html,
   };
 
   try {
     const info = await sendEmail(emailData);
-    console.log(`Template email sent successfully: ${templateKey} to ${Array.isArray(to) ? to.join(', ') : to}`);
+    console.log(
+      `Template email sent successfully: ${templateKey} to ${Array.isArray(to) ? to.join(', ') : to}`,
+    );
 
     return {
       messageId: info.messageId,
@@ -373,4 +356,4 @@ export async function testEmailConnection(): Promise<{
 }
 
 // Export types for use in other modules
-export type { EmailOptions, EmailResult, User };
+export type { EmailOptions, EmailResult, EmailUser };

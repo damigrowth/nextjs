@@ -1,11 +1,12 @@
 /**
  * Email Integration for Better Auth
- * 
+ *
  * Simplified functions for Better Auth integration.
  * These can be called from auth configuration or client-side code.
  */
 
-import { sendAuthEmail, type AuthUser } from './service';
+import { sendAuthEmail } from './service';
+import { EmailUser } from '@/lib/types/email';
 
 /**
  * Send verification email for Better Auth
@@ -13,31 +14,24 @@ import { sendAuthEmail, type AuthUser } from './service';
 export async function sendVerificationEmail(
   userEmail: string,
   userName?: string,
-  verificationUrl?: string
+  verificationUrl?: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const user: AuthUser = {
-      id: 'temp-id',
+    const user: EmailUser = {
       email: userEmail,
-      name: userName || 'User',
-      emailVerified: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      role: 'user',
-      step: 'EMAIL_VERIFICATION',
-      confirmed: false,
-      blocked: false,
-      banned: false,
     };
 
     await sendAuthEmail('VERIFICATION', user, verificationUrl);
-    
+
     return { success: true };
   } catch (error) {
     console.error(`Failed to send verification email to ${userEmail}:`, error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to send verification email' 
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to send verification email',
     };
   }
 }
@@ -47,31 +41,22 @@ export async function sendVerificationEmail(
  */
 export async function sendWelcomeEmail(
   userEmail: string,
-  userName?: string
+  userName?: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const user: AuthUser = {
-      id: 'temp-id',
+    const user: EmailUser = {
       email: userEmail,
-      name: userName || 'User',
-      emailVerified: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      role: 'user',
-      step: 'EMAIL_VERIFICATION',
-      confirmed: false,
-      blocked: false,
-      banned: false,
     };
 
     await sendAuthEmail('WELCOME', user);
-    
+
     return { success: true };
   } catch (error) {
     console.error(`Failed to send welcome email to ${userEmail}:`, error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to send welcome email' 
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'Failed to send welcome email',
     };
   }
 }
@@ -82,31 +67,27 @@ export async function sendWelcomeEmail(
 export async function sendPasswordResetEmail(
   userEmail: string,
   userName?: string,
-  resetUrl?: string
+  resetUrl?: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const user: AuthUser = {
-      id: 'temp-id',
+    const user: EmailUser = {
       email: userEmail,
-      name: userName || 'User',
-      emailVerified: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      role: 'user',
-      step: 'EMAIL_VERIFICATION',
-      confirmed: false,
-      blocked: false,
-      banned: false,
     };
 
     await sendAuthEmail('PASSWORD_RESET', user, resetUrl);
-    
+
     return { success: true };
   } catch (error) {
-    console.error(`Failed to send password reset email to ${userEmail}:`, error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to send password reset email' 
+    console.error(
+      `Failed to send password reset email to ${userEmail}:`,
+      error,
+    );
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to send password reset email',
     };
   }
 }
@@ -118,31 +99,27 @@ export async function sendAuthEmailGeneric(
   templateType: string,
   userEmail: string,
   userName?: string,
-  actionUrl?: string
+  actionUrl?: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const user: AuthUser = {
-      id: 'temp-id',
+    const user: EmailUser = {
       email: userEmail,
-      name: userName || 'User',
-      emailVerified: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      role: 'user',
-      step: 'EMAIL_VERIFICATION',
-      confirmed: false,
-      blocked: false,
-      banned: false,
     };
 
     await sendAuthEmail(templateType, user, actionUrl);
-    
+
     return { success: true };
   } catch (error) {
-    console.error(`Failed to send ${templateType} email to ${userEmail}:`, error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : `Failed to send ${templateType} email` 
+    console.error(
+      `Failed to send ${templateType} email to ${userEmail}:`,
+      error,
+    );
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : `Failed to send ${templateType} email`,
     };
   }
 }
