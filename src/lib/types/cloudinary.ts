@@ -11,7 +11,7 @@ export interface CloudinaryResource {
   secure_url: string;
   width?: number;
   height?: number;
-  resource_type: 'image' | 'video' | 'raw';
+  resource_type: 'image' | 'video' | 'raw' | 'audio' | 'auto';
   format?: string;
   bytes?: number;
   url?: string;
@@ -108,6 +108,6 @@ export function isCloudinaryResource(obj: any): obj is CloudinaryResource {
     typeof obj.public_id === 'string' &&
     typeof obj.secure_url === 'string' &&
     typeof obj.resource_type === 'string' &&
-    ['image', 'video', 'raw'].includes(obj.resource_type)
+    ['image', 'video', 'raw', 'audio', 'auto'].includes(obj.resource_type)
   );
 }
