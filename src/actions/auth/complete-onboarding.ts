@@ -11,7 +11,10 @@ import { onboardingFormSchemaWithMedia } from '@/lib/validations';
 import { getFormString, getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
-import { sanitizeCloudinaryResource, sanitizeCloudinaryResources } from '@/lib/utils/cloudinary';
+import {
+  sanitizeCloudinaryResource,
+  sanitizeCloudinaryResources,
+} from '@/lib/utils/cloudinary';
 
 /**
  * Complete onboarding action wrapper for useActionState
@@ -85,7 +88,11 @@ export async function completeOnboarding(
     const data = validationResult.data;
 
     // Sanitize Cloudinary resources before saving to database
-    const sanitizedImage = sanitizeCloudinaryResource(data.image);
+    const sanitizedImage =
+      typeof data.image === 'string'
+        ? null
+        : sanitizeCloudinaryResource(data.image);
+
     const sanitizedPortfolio = sanitizeCloudinaryResources(data.portfolio);
 
     // Create or update profile with onboarding data
@@ -96,7 +103,7 @@ export async function completeOnboarding(
         category: data.category,
         subcategory: data.subcategory,
         coverage: data.coverage as Prisma.JsonValue,
-        image: sanitizedImage as Prisma.JsonValue,
+        ...(sanitizedImage && { image: sanitizedImage as Prisma.JsonValue }),
         portfolio: sanitizedPortfolio as Prisma.JsonValue,
         published: user.role !== 'user',
         isActive: true,
@@ -106,7 +113,7 @@ export async function completeOnboarding(
         category: data.category,
         subcategory: data.subcategory,
         coverage: data.coverage as Prisma.JsonValue,
-        image: sanitizedImage as Prisma.JsonValue,
+        ...(sanitizedImage && { image: sanitizedImage as Prisma.JsonValue }),
         portfolio: sanitizedPortfolio as Prisma.JsonValue,
         published: user.role !== 'user',
         isActive: true,
@@ -122,17 +129,20 @@ export async function completeOnboarding(
         headers: await headers(),
         body: {
           step: 'DASHBOARD',
-          image: sanitizedImage ? JSON.stringify(sanitizedImage) : null,
+          // image: sanitizedImage ? JSON.stringify(sanitizedImage) : null,
         },
       });
     } catch (authError) {
-      console.warn('Failed to update user via Better Auth, falling back to Prisma:', authError);
+      console.warn(
+        'Failed to update user via Better Auth, falling back to Prisma:',
+        authError,
+      );
       // Fallback to direct Prisma update if Better Auth fails
       await prisma.user.update({
         where: { id: user.id },
         data: {
           step: 'DASHBOARD',
-          image: sanitizedImage ? JSON.stringify(sanitizedImage) : null,
+          // image: sanitizedImage ? JSON.stringify(sanitizedImage) : null,
         },
       });
     }

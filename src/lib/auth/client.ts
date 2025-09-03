@@ -39,6 +39,32 @@ export const { useSession, signIn, signOut, signUp } = authClient;
 export const getSession = authClient.getSession;
 export const updateUser = authClient.updateUser;
 
+// Get session with fresh data from database (bypassing cookie cache)
+export const getSessionFresh = () =>
+  authClient.getSession({
+    query: { disableCookieCache: true },
+  });
+
+// Fresh session getter - uses fresh data for recent users, cached for established users
+export const getFreshSession = async (currentSession?: any) => {
+  const user = currentSession?.user;
+
+  // For recently registered users (< 10 minutes), use fresh data from database
+  const isRecentUser =
+    user?.createdAt &&
+    new Date().getTime() - new Date(user.createdAt).getTime() < 10 * 60 * 1000;
+
+  if (isRecentUser) {
+    // console.log('Recent user detected - fetching fresh session data');
+    return await getSessionFresh();
+  } else {
+    // console.log('Established user - using cached session data');
+    return currentSession
+      ? { data: currentSession }
+      : await authClient.getSession();
+  }
+};
+
 // Email integration functions (can be used in auth flows)
 export {
   sendVerificationEmail,

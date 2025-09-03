@@ -31,12 +31,16 @@ export async function register(
       };
     }
 
-    // Determine user role
-    const authType = getFormString(formData, 'authType');
-    const role = getFormString(formData, 'role');
+    // Determine user role and type from the new string-based authType
+    const authType = getFormString(formData, 'authType'); // 'user' or 'pro'
+    const role = getFormString(formData, 'role'); // 'freelancer' or 'company'
+    
     let userRole = 'user';
-    if (authType === '2') {
-      userRole = role === '2' ? 'freelancer' : 'company';
+    let userType = 'user';
+    
+    if (authType === 'pro') {
+      userType = 'pro';
+      userRole = role || 'freelancer'; // Default to freelancer if role not specified
     }
 
     // Get displayName - only for professionals, undefined for regular users
@@ -62,6 +66,9 @@ export async function register(
 
     const data = validatedFields.data;
 
+    // Determine callback URL based on user type
+    const callbackURL = userType === 'user' ? '/dashboard' : '/dashboard'; // Both go to dashboard, pro users will be redirected to onboarding by requireOnboardingComplete()
+
     // Use Better Auth to create user
     const result = await auth.api.signUpEmail({
       body: {
@@ -70,7 +77,10 @@ export async function register(
         username: data.username,
         name: data.displayName,
         displayName: data.displayName,
-        role: data.role,
+        role: userRole,
+        type: userType,
+        provider: 'email', // Email/password registration
+        callbackURL, // Redirect based on user type after email verification
       },
     });
 

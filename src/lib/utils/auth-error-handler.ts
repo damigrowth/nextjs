@@ -22,7 +22,7 @@ export function handleAuthError(error: any): {
   shouldRedirect: boolean;
   redirectTo?: string;
 } {
-  console.log('Auth Error Details:', error);
+  // console.log('Auth Error Details:', error);
 
   // Extract error details from various error formats
   let errorCode: string = '';
@@ -68,7 +68,7 @@ export function handleAuthError(error: any): {
     errorMessage = error.message;
   }
 
-  console.log('Parsed Error:', { errorCode, errorMessage, statusCode });
+  // console.log('Parsed Error:', { errorCode, errorMessage, statusCode });
 
   // Determine error type and appropriate response
   switch (errorCode) {
@@ -107,8 +107,10 @@ export function handleAuthError(error: any): {
       // Check if error message contains known patterns
       const lowerMessage = errorMessage.toLowerCase();
 
-      if (lowerMessage.includes('email not verified') || 
-          lowerMessage.includes('email is not confirmed')) {
+      if (
+        lowerMessage.includes('email not verified') ||
+        lowerMessage.includes('email is not confirmed')
+      ) {
         return {
           message: AppError.translate('EMAIL_NOT_VERIFIED'),
           isEmailVerificationError: true,
@@ -117,8 +119,10 @@ export function handleAuthError(error: any): {
         };
       }
 
-      if (lowerMessage.includes('invalid') && 
-          (lowerMessage.includes('password') || lowerMessage.includes('email'))) {
+      if (
+        lowerMessage.includes('invalid') &&
+        (lowerMessage.includes('password') || lowerMessage.includes('email'))
+      ) {
         return {
           message: AppError.translate('INVALID_EMAIL_OR_PASSWORD'),
           isEmailVerificationError: false,
@@ -126,8 +130,10 @@ export function handleAuthError(error: any): {
         };
       }
 
-      if (lowerMessage.includes('not found') || 
-          lowerMessage.includes('does not exist')) {
+      if (
+        lowerMessage.includes('not found') ||
+        lowerMessage.includes('does not exist')
+      ) {
         return {
           message: AppError.translate('ACCOUNT_NOT_FOUND'),
           isEmailVerificationError: false,
@@ -137,12 +143,13 @@ export function handleAuthError(error: any): {
 
       // Translate known error messages
       const translatedMessage = AppError.translate(errorMessage);
-      
+
       // Return translated message or fallback
       return {
-        message: translatedMessage !== errorMessage 
-          ? translatedMessage 
-          : 'Λάθος στοιχεία σύνδεσης. Παρακαλώ δοκιμάστε ξανά.',
+        message:
+          translatedMessage !== errorMessage
+            ? translatedMessage
+            : 'Λάθος στοιχεία σύνδεσης. Παρακαλώ δοκιμάστε ξανά.',
         isEmailVerificationError: false,
         shouldRedirect: false,
       };
@@ -157,7 +164,7 @@ export function isAuthSuccess(response: any): boolean {
   if (response?.error) {
     return false;
   }
-  
+
   // If there's a responseText with error information, it's not successful
   if (response?.responseText) {
     try {
@@ -170,17 +177,17 @@ export function isAuthSuccess(response: any): boolean {
       return false;
     }
   }
-  
+
   // If response status indicates an error, it's not successful
   if (response?.response && !response.response.ok) {
     return false;
   }
-  
+
   // If we have a status code indicating error, it's not successful
   if (response?.status && response.status >= 400) {
     return false;
   }
-  
+
   // For Better Auth, successful responses typically don't have error fields
   // and may have data or be undefined/null for some operations
   return true;
@@ -194,38 +201,46 @@ export function isEmailVerificationError(response: any): boolean {
   if (response?.error) {
     const errorCode = response.error.code;
     const errorMessage = response.error.message?.toLowerCase() || '';
-    
-    return errorCode === 'EMAIL_NOT_VERIFIED' || 
-           errorMessage.includes('email not verified') ||
-           errorMessage.includes('email is not confirmed');
+
+    return (
+      errorCode === 'EMAIL_NOT_VERIFIED' ||
+      errorMessage.includes('email not verified') ||
+      errorMessage.includes('email is not confirmed')
+    );
   }
-  
+
   // Check responseText
   if (response?.responseText) {
     try {
       const parsed = JSON.parse(response.responseText);
       const errorCode = parsed.code;
       const errorMessage = parsed.message?.toLowerCase() || '';
-      
-      return errorCode === 'EMAIL_NOT_VERIFIED' || 
-             errorMessage.includes('email not verified') ||
-             errorMessage.includes('email is not confirmed');
+
+      return (
+        errorCode === 'EMAIL_NOT_VERIFIED' ||
+        errorMessage.includes('email not verified') ||
+        errorMessage.includes('email is not confirmed')
+      );
     } catch (e) {
       const responseText = response.responseText.toLowerCase();
-      return responseText.includes('email not verified') ||
-             responseText.includes('email is not confirmed');
+      return (
+        responseText.includes('email not verified') ||
+        responseText.includes('email is not confirmed')
+      );
     }
   }
-  
+
   // Check direct error properties
   if (response?.code) {
     const errorCode = response.code;
     const errorMessage = response.message?.toLowerCase() || '';
-    
-    return errorCode === 'EMAIL_NOT_VERIFIED' || 
-           errorMessage.includes('email not verified') ||
-           errorMessage.includes('email is not confirmed');
+
+    return (
+      errorCode === 'EMAIL_NOT_VERIFIED' ||
+      errorMessage.includes('email not verified') ||
+      errorMessage.includes('email is not confirmed')
+    );
   }
-  
+
   return false;
 }

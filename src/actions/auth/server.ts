@@ -16,9 +16,47 @@ const prisma = new PrismaClient();
  * Check if user is authenticated and return user/session data
  */
 /**
+ * Fresh server-side session getter - uses fresh data for recent users, cached for established users
+ */
+export async function getFreshServerSession(): Promise<
+  ActionResult<{ user: AuthUser | null; session: AuthSession | null }>
+> {
+  try {
+    // First get cached session
+    const cachedResult = await getSession();
+    
+    if (!cachedResult.success) {
+      return cachedResult;
+    }
+
+    const user = cachedResult.data.user;
+    
+    // For recently registered users (< 10 minutes), get fresh data
+    const isRecentUser = user?.createdAt && 
+      new Date().getTime() - new Date(user.createdAt).getTime() < 10 * 60 * 1000;
+    
+    if (isRecentUser) {
+      console.log('Recent user detected - fetching fresh server session');
+      return await getSession({ revalidate: true });
+    } else {
+      console.log('Established user - using cached server session');
+      return cachedResult;
+    }
+  } catch (error) {
+    console.error('Fresh server session error:', error);
+    return {
+      success: false,
+      error: 'Failed to get fresh server session',
+    };
+  }
+}
+
+/**
  * Check if user is authenticated and return user/session data
  */
-export async function getSession(options: { revalidate?: boolean } = {}): Promise<
+export async function getSession(
+  options: { revalidate?: boolean } = {},
+): Promise<
   ActionResult<{ user: AuthUser | null; session: AuthSession | null }>
 > {
   try {
@@ -94,7 +132,7 @@ export async function getSession(options: { revalidate?: boolean } = {}): Promis
  * Require authentication - throws if not authenticated
  */
 export async function requireAuth(redirectTo = '/login') {
-  const sessionResult = await getSession();
+  const sessionResult = await getSession({ revalidate: true });
 
   if (!sessionResult.success || !sessionResult.data.session) {
     // console.log('Authentication required - redirecting to:', redirectTo);
@@ -119,7 +157,9 @@ async function _getProfileForUser(userId: string): Promise<Profile | null> {
  * Get current authenticated user with complete profile
  * Uses Better Auth cookie caching + selective profile caching
  */
-export async function getCurrentUser(options: { revalidate?: boolean } = {}): Promise<
+export async function getCurrentUser(
+  options: { revalidate?: boolean } = {},
+): Promise<
   ActionResult<{
     user: AuthUser | null;
     profile: Profile | null;
@@ -145,12 +185,16 @@ export async function getCurrentUser(options: { revalidate?: boolean } = {}): Pr
     // Only cache profile data if user exists
     if (user?.id) {
       // Cache only the profile fetch, not the session
+      // Use shorter cache time for recently registered users
+      const isRecentUser = user.createdAt && 
+        new Date().getTime() - new Date(user.createdAt).getTime() < 10 * 60 * 1000; // 10 minutes
+      
       const getCachedProfile = unstable_cache(
         _getProfileForUser,
         [`user-profile-${user.id}`],
         {
           tags: [`user-${user.id}`, `profile-${user.id}`, 'profiles'],
-          revalidate: 300, // 5 minutes cache
+          revalidate: isRecentUser ? 60 : 300, // 1 minute for new users, 5 minutes for established users
         },
       );
 
@@ -280,19 +324,53 @@ export async function requireAdmin(): Promise<AuthUser> {
 }
 
 export async function requireOnboardingComplete(onboardingUrl = '/onboarding') {
-  const session = await requireAuth();
+  // Get cached session first
+  let sessionResult = await getSession();
+  
+  if (!sessionResult.success || !sessionResult.data.session) {
+    redirect('/login');
+  }
 
-  // Skip onboarding check for admin and simple users
-  if (session?.user?.role === 'admin' || session?.user?.role === 'user') {
+  let session = sessionResult.data.session;
+  let user = session?.user;
+
+  // Time-based revalidation: revalidate for users created in the last 10 minutes
+  // This ensures fresh registrations get updated data while keeping cache benefits for established users
+  const shouldRevalidateByTime = user?.createdAt && 
+    new Date().getTime() - new Date(user.createdAt).getTime() < 10 * 60 * 1000; // 10 minutes
+
+  if (shouldRevalidateByTime) {
+    console.log('Revalidating session for recently registered user');
+    const freshResult = await getSession({ revalidate: true });
+    
+    if (freshResult.success && freshResult.data.session) {
+      session = freshResult.data.session;
+      user = session.user;
+    }
+  }
+
+  // Check if this is a Google OAuth user who needs role/type assignment
+  if (
+    user?.provider === 'google' &&
+    user?.step === 'OAUTH_SETUP' &&
+    !user?.confirmed
+  ) {
+    redirect('/oauth-setup');
+  }
+
+  // Skip onboarding check for admin users
+  if (user?.role === 'admin') {
     return session;
   }
 
-  // Only check onboarding for professional users
-  if (
-    session?.user?.step === 'ONBOARDING' &&
-    (session?.user?.role === 'freelancer' || session?.user?.role === 'company')
-  ) {
-    console.log('Onboarding required - redirecting to:', onboardingUrl);
+  // Skip onboarding check for simple users (type 'user')
+  if (user?.type === 'user') {
+    return session;
+  }
+
+  // Check onboarding for pro users (type 'pro')
+  if (user?.type === 'pro' && user?.step === 'ONBOARDING') {
+    console.log('Pro user onboarding required - redirecting to:', onboardingUrl);
     redirect(onboardingUrl);
   }
 
@@ -311,10 +389,10 @@ export async function requireRoleRedirect(
   const roleArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
 
   if (!roleArray.includes(session?.user?.role || '')) {
-    console.log(
-      `Role '${session?.user?.role}' not in allowed roles:`,
-      roleArray,
-    );
+    // console.log(
+    //   `Role '${session?.user?.role}' not in allowed roles:`,
+    //   roleArray,
+    // );
     redirect(redirectTo);
   }
 
@@ -330,10 +408,10 @@ export async function requireEmailVerified(
   const session = await requireAuth();
 
   if (!session?.user?.emailVerified) {
-    console.log(
-      'Email verification required - redirecting to:',
-      verificationUrl,
-    );
+    // console.log(
+    //   'Email verification required - redirecting to:',
+    //   verificationUrl,
+    // );
     redirect(verificationUrl);
   }
 
@@ -349,7 +427,7 @@ export async function requireProfileComplete(
   const session = await requireAuth();
 
   if (!session?.user?.confirmed) {
-    console.log('Profile completion required - redirecting to:', profileUrl);
+    // console.log('Profile completion required - redirecting to:', profileUrl);
     redirect(profileUrl);
   }
 
@@ -371,10 +449,10 @@ export async function redirectOnboardingUsers(onboardingUrl = '/onboarding') {
   if (session && session.user?.step === 'ONBOARDING') {
     // Only redirect professional users to onboarding
     if (session.user.role === 'freelancer' || session.user.role === 'company') {
-      console.log(
-        'Redirecting ONBOARDING user from auth page to:',
-        onboardingUrl,
-      );
+      // console.log(
+      //   'Redirecting ONBOARDING user from auth page to:',
+      //   onboardingUrl,
+      // );
       redirect(onboardingUrl);
     }
   }
@@ -397,8 +475,49 @@ export async function redirectCompletedUsers(dashboardUrl = '/dashboard') {
   if (session && session.user?.step === 'DASHBOARD') {
     // Redirect admin users to admin panel, others to dashboard
     const redirectUrl = session.user.role === 'admin' ? '/admin' : dashboardUrl;
-    console.log('Redirecting completed user from auth page to:', redirectUrl);
+    // console.log('Redirecting completed user from auth page to:', redirectUrl);
     redirect(redirectUrl);
+  }
+
+  return session;
+}
+
+/**
+ * Redirect OAuth users who need role assignment to the setup page
+ */
+export async function redirectOAuthUsersToSetup() {
+  // First check with cache
+  const sessionResult = await getSession();
+
+  if (!sessionResult.success) {
+    return null;
+  }
+
+  const session = sessionResult.data.session;
+  const user = session?.user;
+
+  // If user looks like they need OAuth setup, double-check with fresh data
+  if (
+    user?.provider === 'google' &&
+    user?.step === 'OAUTH_SETUP' &&
+    !user?.confirmed
+  ) {
+    // Get fresh data to confirm this is really a Google OAuth user needing setup
+    const freshSessionResult = await getSession({ revalidate: true });
+    const freshSession = freshSessionResult.data?.session;
+    const freshUser = freshSession?.user;
+
+    // Only redirect if fresh data confirms they need OAuth setup
+    if (
+      freshUser?.provider === 'google' &&
+      freshUser?.step === 'OAUTH_SETUP' &&
+      !freshUser?.confirmed
+    ) {
+      // console.log('Redirecting Google OAuth user to setup');
+      redirect('/oauth-setup');
+    }
+
+    return freshSession;
   }
 
   return session;
