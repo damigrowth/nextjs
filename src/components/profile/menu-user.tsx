@@ -11,7 +11,7 @@ import {
 
 import { signOut } from '@/lib/auth/client';
 import { UserMenuProps, MenuItem } from '@/types/components';
-import { getOptimizedCloudinaryUrl } from '@/lib/utils/media';
+import { getUserProfileImageUrl } from '@/lib/utils/media';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -38,7 +38,7 @@ import {
 import { Skeleton } from '../ui/skeleton';
 import { MessagesMenu, SavedMenu } from '../dashboard';
 import UserImage from './user-image';
-import { useSession } from '@/lib/auth/client';
+import { useFreshSession } from '@/lib/hooks/useFreshSession';
 import { capitalizeFirstLetter } from '@/lib/utils/validation';
 
 // Icon mapping function
@@ -58,18 +58,23 @@ const getMenuIcon = (iconName: string) => {
 
 export default function UserMenu({ isMobile }: UserMenuProps) {
   const router = useRouter();
-  const { data: session, isPending } = useSession();
+  const { data: session, isPending } = useFreshSession();
 
-  // Derive auth states from session data
+  // Use fresh session user data (fresh for recent users, cached for established users)
   const user = session?.user;
+  // console.log('MENU USER - FRESH SESSION', user);
+
   const isAuthenticated = !!user;
   // const isConfirmed = user?.emailVerified || false;
   // const needsEmailVerification = user && !user.emailVerified;
-  // const needsOnboarding = user?.step === 'ONBOARDING' && (user?.role === 'freelancer' || user?.role === 'company');
+  const needsOAuth = user?.step === 'OAUTH_SETUP';
+  const needsOnboarding = user?.step === 'ONBOARDING';
   const hasAccess = user?.step === 'DASHBOARD' || user?.role === 'admin';
   const isProfessional =
     user?.role === 'freelancer' || user?.role === 'company';
-  const hasProfile = isProfessional && user?.step === 'DASHBOARD';
+  const isProfessionalType = user?.type === 'pro';
+  const hasProfile =
+    (isProfessional || isProfessionalType) && user?.step === 'DASHBOARD';
 
   const handleLogout = async () => {
     try {
@@ -79,8 +84,6 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
       window.location.href = '/';
     }
   };
-
-  console.log('user', user);
 
   // Show loading state
   if (isPending) {
@@ -97,9 +100,15 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
   if (isAuthenticated) {
     let modifiedNav: MenuItem[] = [];
 
-    if (isProfessional && !hasProfile) {
-      // Only show logout for professional users without profile (still in onboarding)
+    if (needsOnboarding || needsOAuth) {
+      // Show onboarding link and logout for users who need to complete onboarding
       modifiedNav = [
+        {
+          id: 89,
+          name: 'Ολοκλήρωση Εγγραφής',
+          path: '/onboarding',
+          icon: 'flaticon-document',
+        },
         {
           id: 90,
           name: 'Αποσύνδεση',
@@ -150,25 +159,11 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
               <UserImage
                 displayName={user?.displayName || user?.username || ''}
                 hideDisplayName
-                image={
-                  user?.image
-                    ? (() => {
-                        try {
-                          const imageData =
-                            typeof user.image === 'string'
-                              ? JSON.parse(user.image)
-                              : user.image;
-                          return getOptimizedCloudinaryUrl(imageData, {
-                            width: 80,
-                            height: 80,
-                            crop: 'fill',
-                          });
-                        } catch {
-                          return null;
-                        }
-                      })()
-                    : null
-                }
+                image={getUserProfileImageUrl(user?.image, {
+                  width: 80,
+                  height: 80,
+                  crop: 'fill',
+                })}
                 width={37}
                 height={37}
               />
@@ -180,7 +175,9 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
                 <p className='text-sm font-medium leading-none'>
                   {isProfessional
                     ? user?.displayName
-                    : capitalizeFirstLetter(user?.username)}
+                    : user?.username
+                      ? capitalizeFirstLetter(user.username)
+                      : user?.name || user?.email}
                 </p>
                 <p className='text-xs leading-none text-muted-foreground'>
                   {isProfessional ? `@${user.username}` : user?.email}

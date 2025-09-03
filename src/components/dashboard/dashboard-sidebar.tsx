@@ -35,21 +35,20 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { getOptimizedCloudinaryUrl } from '@/lib/utils/media';
+import { getUserProfileImageUrl } from '@/lib/utils/media';
 import { useSession } from '@/lib/auth/client';
 import { capitalizeFirstLetter } from '@/lib/utils/validation';
+import { useFreshSession } from '@/lib/hooks/useFreshSession';
 
 export default function DashboardSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session } = useSession();
+  const { data: session } = useFreshSession();
 
-  // Derive auth states from session data - same logic as UserMenu
+  // Use fresh session user data (fresh for recent users, cached for established users)
   const user = session?.user;
   const isProfessional =
     user?.role === 'freelancer' || user?.role === 'company';
-  const shouldHaveFullAccess =
-    user?.role === 'admin' || (isProfessional && user?.step === 'DASHBOARD');
 
   // Group 1: Main Navigation (always visible)
   const navMain = [
@@ -134,26 +133,12 @@ export default function DashboardSidebar({
       ? user?.displayName
       : capitalizeFirstLetter(user?.username || 'User'),
     email: user?.email || '',
-    avatar: user?.image
-      ? typeof user.image === 'string'
-        ? (() => {
-            try {
-              const imageData = JSON.parse(user.image);
-              return getOptimizedCloudinaryUrl(imageData, {
-                width: 32,
-                height: 32,
-                crop: 'fill',
-              });
-            } catch {
-              return '/avatars/default.jpg';
-            }
-          })()
-        : getOptimizedCloudinaryUrl(user.image, {
-            width: 32,
-            height: 32,
-            crop: 'fill',
-          })
-      : '/avatars/default.jpg',
+    avatar:
+      getUserProfileImageUrl(user?.image, {
+        width: 32,
+        height: 32,
+        crop: 'fill',
+      }) || '/avatars/default.jpg',
   };
 
   return (
