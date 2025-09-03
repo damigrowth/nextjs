@@ -15,7 +15,7 @@ export const auth = betterAuth({
   session: {
     cookieCache: {
       enabled: true,
-      maxAge: 5 * 60, // Cache session data for 5 minutes in signed cookies
+      maxAge: 2 * 60, // Cache session data for 2 minutes in signed cookies for faster updates
     },
   },
   emailAndPassword: {
@@ -35,7 +35,7 @@ export const auth = betterAuth({
           console.error('Password verification error:', error);
           return false;
         }
-      }
+      },
     },
     sendResetPassword: async ({ user, url, token }, request) => {
       try {
@@ -77,12 +77,44 @@ export const auth = betterAuth({
       enabled: !!(
         process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
       ),
+      mapProfileToUser: (profile) => {
+        // console.log('Google profile:', profile);
+        // Available Google profile properties:
+        // profile.sub - unique Google user ID
+        // profile.name - full name (e.g. "John Doe")
+        // profile.given_name - first name
+        // profile.family_name - last name
+        // profile.picture - profile picture URL
+        // profile.email - email address
+        // profile.email_verified - boolean for email verification
+        // profile.locale - user's locale (e.g. "en", "el")
+        // profile.hd - hosted domain (for Google Workspace users)
+
+        return {
+          firstName: profile.given_name,
+          lastName: profile.family_name,
+          name: profile.name, // Full name as fallback
+          image: profile.picture,
+          emailVerified: true, // OAuth providers have verified emails
+          provider: 'google', // Set provider for Google OAuth users
+          // Extract username and displayName from Google profile for better defaults
+          username: profile.email ? profile.email.split('@')[0] : null, // Use email prefix as username suggestion
+          displayName:
+            profile.name ||
+            `${profile.given_name || ''} ${profile.family_name || ''}`.trim() ||
+            null,
+          // Type and role will be set in OAuth setup page based on user selection
+          // Note: profile.email is automatically mapped by Better Auth
+        };
+      },
     },
   },
   user: {
     additionalFields: {
+      type: { type: 'string', defaultValue: 'user' }, // 'user', 'pro' - for registration flow
       role: { type: 'string', defaultValue: 'user' }, // user, freelancer, company, admin
-      step: { type: 'string', defaultValue: 'EMAIL_VERIFICATION' },
+      step: { type: 'string', defaultValue: 'EMAIL_VERIFICATION' }, // EMAIL_VERIFICATION, OAUTH_SETUP, ONBOARDING, DASHBOARD
+      provider: { type: 'string', defaultValue: 'email' }, // 'email', 'google', 'github', etc.
       username: { type: 'string', required: false }, // Keep in user for auth
       displayName: { type: 'string', required: false }, // Keep in user for auth
       firstName: { type: 'string', required: false }, // Keep in user for menu/auth
@@ -96,64 +128,105 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (user, context) => {
-          // console.log('User creation before hook - user data:', user);
-          // console.log(
-          //   'User creation before hook - context body:',
-          //   context.body,
-          // );
+          // console.log('CREATING USER:', user);
+          // console.log('CREATING USER CONTEXT:', context);
+          // console.log('CREATING USER CONTEXT BODY:', context.body);
 
-          // Get the role from the request body and set it in the user data
+          // Get the role and type from the request body, default to 'user'
           const requestRole = context.body?.role || 'user';
+          const requestType = context.body?.type || 'user';
 
-          const updatedUser = {
-            ...user,
-            role: requestRole, // Override the role with the one from the request
-          };
+          // For OAuth users, provider comes from the user data (mapProfileToUser)
+          // For email/password users, provider comes from request body
+          const requestProvider =
+            (user as any).provider || context.body?.provider || 'email';
 
-          // console.log('Updated user with role:', updatedUser.role);
+          // console.log('DETECTED PROVIDER:', requestProvider);
 
-          return { data: updatedUser };
-        },
-        after: async (user) => {
-          // console.log('User created - Full user object:', user);
-
-          // Set initial step based on role
-          await prisma.user.update({
-            where: { id: user.id },
+          return {
             data: {
-              step: 'EMAIL_VERIFICATION',
-              confirmed: false,
+              ...user,
+              role: requestRole,
+              type: requestType,
+              provider: requestProvider,
             },
-          });
+          };
+        },
+        after: async (user, context) => {
+          // console.log('CREATED USER', user);
+          // console.log('CREATED USER CONTEXT', context.body);
+
+          // Cast to any to access additional fields that Better Auth might not have in its types
+          const userWithFields = user as any;
+          const provider = userWithFields.provider || 'email';
+
+          if (provider === 'google') {
+            // OAuth Flow: Google Auth → OAuth Setup → Dashboard (user) or Onboarding (pro)
+            await prisma.user.update({
+              where: { id: user.id },
+              data: {
+                step: 'OAUTH_SETUP', // OAuth users go to setup page first
+                confirmed: true, // OAuth users are pre-confirmed
+                emailVerified: true, // OAuth providers have verified emails
+              },
+            });
+          } else {
+            // Email Flow: Register → Email Verification → Dashboard (user) or Onboarding (pro)
+            await prisma.user.update({
+              where: { id: user.id },
+              data: {
+                step: 'EMAIL_VERIFICATION',
+                confirmed: true, // Email/password users start as confirmed
+              },
+            });
+          }
         },
       },
       update: {
-        after: async (user) => {
+        after: async (user, context) => {
+          // console.log('UPDATING USER', user);
+          // console.log('UPDATING USER CONTEXT', context.body);
+
           // Cast to any to access additional fields that Better Auth might not have in its types
           const userWithFields = user as any;
 
-          // Handle email verification completion
+          // Handle role updates for pro users during onboarding
+          if (
+            userWithFields.step === 'ONBOARDING' &&
+            userWithFields.type === 'pro' &&
+            context.body?.role &&
+            context.body.role !== userWithFields.role
+          ) {
+            // Update role for pro users (both email and OAuth)
+            await prisma.user.update({
+              where: { id: userWithFields.id },
+              data: {
+                role: context.body.role,
+              },
+            });
+          }
+
+          // Handle email verification completion for email/password users only
           if (
             userWithFields.emailVerified &&
-            userWithFields.step === 'EMAIL_VERIFICATION'
+            userWithFields.step === 'EMAIL_VERIFICATION' &&
+            userWithFields.provider === 'email'
           ) {
-            // console.log('Email verification completed for user:', {
+            // console.log('Email verification completed for email user:', {
             //   id: userWithFields.id,
             //   email: userWithFields.email,
+            //   type: userWithFields.type,
             //   role: userWithFields.role,
             // });
 
-            // Update user step after email verification
-            if (
-              userWithFields.role === 'user' ||
-              userWithFields.role === 'admin'
-            ) {
-              // Simple users and admins go directly to dashboard
+            // Email verification completed - transition to next step based on user type
+            // Flow: Email Confirmation → Dashboard (user) or Onboarding (pro)
+            if (userWithFields.type === 'user') {
+              // Simple users: Register → Email Confirmation → Dashboard
               await prisma.user.update({
                 where: { id: userWithFields.id },
                 data: {
                   step: 'DASHBOARD',
-                  confirmed: true,
                 },
               });
 
@@ -162,27 +235,14 @@ export const auth = betterAuth({
               } catch (error) {
                 console.error('Failed to send welcome email:', error);
               }
-            } else {
-              // Professional users (freelancer/company) go to onboarding
-              // console.log('Setting professional user step to ONBOARDING:', {
-              //   userId: userWithFields.id,
-              //   role: userWithFields.role,
-              //   currentStep: userWithFields.step,
-              // });
-
-              const updatedUser = await prisma.user.update({
+            } else if (userWithFields.type === 'pro') {
+              // Pro users: Register → Email Confirmation → Onboarding → Dashboard
+              await prisma.user.update({
                 where: { id: userWithFields.id },
                 data: {
                   step: 'ONBOARDING',
-                  confirmed: true,
                 },
               });
-
-              // console.log('User step updated successfully:', {
-              // userId: updatedUser.id,
-              // newStep: updatedUser.step,
-              //   role: updatedUser.role,
-              // });
             }
           }
         },
