@@ -2,7 +2,7 @@ import { EmailTemplate, ContactEmailData } from '@/lib/types/email';
 
 // Contact form email templates
 export const CONTACT_ADMIN: EmailTemplate = {
-  from: 'noreply@doulitsa.gr',
+  from: 'Doulitsa <contact@doulitsa.gr>',
   replyTo: null, // Will be set dynamically to user's email
   subject: (data: ContactEmailData) => `Νέα Φόρμα Επικοινωνίας! - ${data.email}`,
   html: (data: ContactEmailData) => `<!DOCTYPE html>
@@ -22,7 +22,7 @@ export const CONTACT_ADMIN: EmailTemplate = {
                             <table role="presentation" style="width: 100%; border-collapse: collapse;">
                                 <tr>
                                     <td style="padding: 0 0 0px 0; color: #153643;">
-                                        <h1 style="font-size: 24px; text-align: center; margin: 0 0 10px 0; font-family: Arial, sans-serif;">Νέα Φόρμα Επικοινωνίας!</h1>
+                                        <h1 style="font-size: 24px; text-align: center; margin: 0 0 10px 0; font-family: Arial, sans-serif; color: #5bbb7b;">Νέα Φόρμα Επικοινωνίας!</h1>
                                     </td>
                                 </tr>
                             </table>
@@ -89,7 +89,7 @@ export const CONTACT_ADMIN: EmailTemplate = {
 };
 
 export const CONTACT_CONFIRMATION: EmailTemplate = {
-  from: '"Doulitsa" <contact@doulitsa.gr>',
+  from: 'Doulitsa <contact@doulitsa.gr>',
   replyTo: 'contact@doulitsa.gr',
   subject: (data: ContactEmailData) => `Λάβαμε το μήνυμα σου!`,
   html: (data: ContactEmailData) => `<!DOCTYPE html>
@@ -109,7 +109,7 @@ export const CONTACT_CONFIRMATION: EmailTemplate = {
                             <table role="presentation" style="width: 100%; border-collapse: collapse;">
                                 <tr>
                                     <td style="color: #153643; text-align: center;">
-                                        <h1 style="font-size: 24px; margin: 0 0 30px 0; font-family: Arial, sans-serif;">Λάβαμε το μήνυμα σου ${data.name}!</h1>
+                                        <h1 style="font-size: 24px; margin: 0 0 30px 0; font-family: Arial, sans-serif; color: #5bbb7b;">Λάβαμε το μήνυμα σου ${data.name}!</h1>
                                         <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;">Σε ευχαριστούμε που επικοινώνησες μαζί μας! </p>
                                         <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;">Η ομάδα μας θα δει το αίτημά σου και εάν χρειαστεί θα επικοινωνήσει μαζί σου.</p>
                                     </td>

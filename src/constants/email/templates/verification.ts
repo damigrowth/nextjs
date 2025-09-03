@@ -22,10 +22,16 @@ export const VERIFICATION: EmailTemplate = {
                 <table role="presentation" style="width: 100%; border-collapse: collapse;">
                   <tr>
                     <td style="color: #153643; text-align: center;">
-                      <h1 style="font-size: 24px; margin: 0 0 30px 0; font-family: Arial, sans-serif;">Επιβεβαίωση Λογαριασμού</h1>
-                      <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;"> Καλώς ήρθατε στην πλατφόρμα επαγγελματιών Doulitsa! Σας ευχαριστούμε που εγγραφήκατε. Για να ενεργοποιήσετε τον λογαριασμό σας, παρακαλούμε πατήστε στον παρακάτω σύνδεσμο: </p>
+                      <h1 style="font-size: 24px; margin: 0 0 30px 0; font-family: Arial, sans-serif; color: #5bbb7b;">Επιβεβαίωση Λογαριασμού</h1>
+                      <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;">
+                        Καλώς ήρθες στην πλατφόρμα επαγγελματιών Doulitsa! Σε ευχαριστούμε που εγγράφηκες. Για να ενεργοποιήσεις τον λογαριασμό σου, παρακαλώ πάτησε στον παρακάτω σύνδεσμο:
+                      </p>
                       <a href="${url}" style="background: #5bbb7b; color: #ffffff; text-decoration: none; padding: 16px 30px; border-radius: 4px; display: inline-block; margin: 20px 0; font-weight: 700;"> Επιβεβαίωση Λογαριασμού </a>
-                      <p style="margin: 20px 0 0 0; font-size: 14px; line-height: 24px; font-family: Arial, sans-serif;"> Αν δεν πραγματοποιήσατε εσείς αυτή την εγγραφή, μπορείτε να αγνοήσετε αυτό το μήνυμα. Αν έχετε οποιαδήποτε απορία, είμαστε στη διάθεσή σας!<br /><br /> Με εκτίμηση,<br /> Η ομάδα Doulitsa </p>
+                      <p style="margin: 20px 0 0 0; font-size: 14px; line-height: 24px; font-family: Arial, sans-serif;">
+                        Αν δεν πραγματοποίησες εσύ αυτή την εγγραφή, μπορείς να αγνοήσεις αυτό το μήνυμα. Αν έχεις οποιαδήποτε απορία, είμαστε στη διάθεσή σου!<br /><br />
+                        Με εκτίμηση,<br />
+                        Η ομάδα Doulitsa
+                      </p>
                     </td>
                   </tr>
                 </table>

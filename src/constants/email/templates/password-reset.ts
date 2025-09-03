@@ -1,7 +1,7 @@
 import { EmailTemplate } from '@/lib/types/email';
 
 export const PASSWORD_RESET: EmailTemplate = {
-  from: 'Doulitsa <noreply@doulitsa.gr>',
+  from: 'Doulitsa <contact@doulitsa.gr>',
   replyTo: 'contact@doulitsa.gr',
   subject: 'Επαναφορά Κωδικού - Doulitsa',
   html: (user: any, url?: string) => `
@@ -22,26 +22,26 @@ export const PASSWORD_RESET: EmailTemplate = {
                 <table role="presentation" style="width: 100%; border-collapse: collapse;">
                   <tr>
                     <td style="color: #153643; text-align: center;">
-                      <h1 style="font-size: 24px; margin: 0 0 30px 0; font-family: Arial, sans-serif; color: #dc2626;">Επαναφορά Κωδικού</h1>
+                      <h1 style="font-size: 24px; margin: 0 0 30px 0; font-family: Arial, sans-serif; color: #5bbb7b;">Επαναφορά Κωδικού</h1>
                       <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;">
-                        Γεια σας ${user.name || 'φίλε'},
+                        Γεια σου ${user.name || 'φίλε'},
                       </p>
                       <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;">
-                        Λάβαμε αίτημα για επαναφορά του κωδικού σας. Κάντε κλικ στον παρακάτω σύνδεσμο για να δημιουργήσετε νέο κωδικό:
+                        Λάβαμε αίτημα για επαναφορά του κωδικού σου. Κάνε κλικ στον παρακάτω σύνδεσμο για να δημιουργήσεις νέο κωδικό:
                       </p>
-                      <a href="${url}" style="background: #dc2626; color: #ffffff; text-decoration: none; padding: 16px 30px; border-radius: 4px; display: inline-block; margin: 20px 0; font-weight: 700;">
+                      <a href="${url}" style="background: #5bbb7b; color: #ffffff; text-decoration: none; padding: 16px 30px; border-radius: 4px; display: inline-block; margin: 20px 0; font-weight: 700;">
                         Επαναφορά Κωδικού
                       </a>
                       <p style="margin: 20px 0 0 0; font-size: 14px; line-height: 24px; font-family: Arial, sans-serif;">
-                        Αν δεν μπορείτε να κάνετε κλικ στο κουμπί, αντιγράψτε και επικολλήστε αυτό το link στον browser σας:
+                        Αν δεν μπορείς να κάνεις κλικ στο κουμπί, αντίγραψε και επικόλλησε αυτό το link στον browser σου:
                       </p>
                       <p style="word-break: break-all; color: #6b7280; font-family: monospace; font-size: 12px; margin: 10px 0;">${url}</p>
-                      <p style="color: #dc2626; font-weight: bold; margin: 20px 0 0 0; font-size: 14px;">
+                      <p style="color: #dc2626; margin: 20px 0 0 0; font-size: 14px;">
                         Αυτός ο σύνδεσμος θα λήξει σε 1 ώρα.
                       </p>
                       <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
                       <p style="color: #6b7280; font-size: 14px; margin: 0;">
-                        Αν δεν ζητήσατε επαναφορά κωδικού, μπορείτε να αγνοήσετε αυτό το email.
+                        Αν δεν ζήτησες επαναφορά κωδικού, μπορείς να αγνοήσεις αυτό το email.
                       </p>
                     </td>
                   </tr>
