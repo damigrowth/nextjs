@@ -5,6 +5,7 @@ import { Meta } from '@/lib/seo/Meta';
 import {
   redirectOnboardingUsers,
   redirectCompletedUsers,
+  redirectOAuthUsersToSetup,
 } from '@/actions/auth/server';
 import {
   AuthTypeOptions,
@@ -35,6 +36,9 @@ export default async function RegisterPage(): Promise<JSX.Element> {
   // Server-side auth check - redirect ONBOARDING users to /onboarding
   await redirectOnboardingUsers();
 
+  // Server-side auth check - redirect OAuth users who need role setup
+  await redirectOAuthUsersToSetup();
+
   return (
     <section className='mt-20 pt-20 pb-40 bg-gray-50'>
       <div className='container mx-auto px-4'>
@@ -42,7 +46,9 @@ export default async function RegisterPage(): Promise<JSX.Element> {
         <div className='flex justify-center mb-15'>
           <div className='lg:w-1/2 text-center'>
             <div className='relative mb-15 lg:mb-8'>
-              <h2 className='mb-2'>Εγγραφή</h2>
+              <h2 className='text-2xl lg:text-3xl font-medium text-gray-900 mb-2'>
+                Εγγραφή
+              </h2>
               <p className='text-gray-700 font-sans'>
                 Δημιουργία νέου λογαριασμού με λίγα μόνο βήματα
               </p>

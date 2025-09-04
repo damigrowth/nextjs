@@ -6,6 +6,7 @@ import { FormForgotPassword } from '@/components/auth';
 import {
   redirectCompletedUsers,
   redirectOnboardingUsers,
+  redirectOAuthUsersToSetup,
 } from '@/actions/auth/server';
 
 export const dynamic = 'force-dynamic';
@@ -30,8 +31,11 @@ export default async function ForgotPasswordPage(): Promise<JSX.Element> {
   // Server-side auth check - redirect ONBOARDING users to /onboarding
   await redirectOnboardingUsers();
 
+  // Server-side auth check - redirect OAuth users who need role setup
+  await redirectOAuthUsersToSetup();
+
   return (
-    <section className='py-16 bg-gray-50 min-h-screen'>
+    <section className='mt-20 pt-20 pb-40 bg-gray-50'>
       <div className='container mx-auto px-4'>
         {/* Title Section */}
         <div className='flex justify-center mb-15'>
@@ -56,7 +60,8 @@ export default async function ForgotPasswordPage(): Promise<JSX.Element> {
                   Επαναφορά κωδικού πρόσβασης
                 </h4>
                 <p className='text-gray-600'>
-                  Θα σου στείλουμε έναν σύνδεσμο για να δημιουργήσεις νέο κωδικό.
+                  Θα σου στείλουμε έναν σύνδεσμο για να δημιουργήσεις νέο
+                  κωδικό.
                 </p>
               </div>
               <FormForgotPassword />

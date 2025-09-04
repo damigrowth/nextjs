@@ -18,12 +18,12 @@ export async function generateMetadata() {
 
 export default function page() {
   return (
-    <section className='py-16'>
+    <section className='mt-20 pt-20 pb-40 bg-gray-50'>
       <div className='container mx-auto px-4'>
         <div className='flex justify-center'>
           <div className='w-full max-w-lg'>
             <div className='relative bg-white p-12 sm:p-8 shadow-lg rounded-xl text-center border border-gray-300'>
-              <h2 className='text-2xl font-semibold mb-6 text-foreground'>
+              <h2 className='text-2xl lg:text-3xl font-medium text-gray-900 mb-2'>
                 Σχεδόν Έτοιμοι!{' '}
               </h2>
               <p className='text-xl mb-4 text-muted-foreground'>

@@ -8,6 +8,7 @@ import { FormAuthLogin } from '@/components/auth';
 import {
   redirectCompletedUsers,
   redirectOnboardingUsers,
+  redirectOAuthUsersToSetup,
 } from '@/actions/auth/server';
 
 export const dynamic = 'force-dynamic';
@@ -31,6 +32,9 @@ export default async function LoginPage(): Promise<JSX.Element> {
 
   // Server-side auth check - redirect ONBOARDING users to /onboarding
   await redirectOnboardingUsers();
+
+  // Server-side auth check - redirect OAuth users who need role setup
+  await redirectOAuthUsersToSetup();
 
   const isUnderMaintenance = false;
 

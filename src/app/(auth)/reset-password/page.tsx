@@ -7,6 +7,7 @@ import { FormResetPassword } from '@/components/auth';
 import {
   redirectCompletedUsers,
   redirectOnboardingUsers,
+  redirectOAuthUsersToSetup,
 } from '@/actions/auth/server';
 
 export const dynamic = 'force-dynamic';
@@ -28,12 +29,17 @@ interface ResetPasswordPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps): Promise<JSX.Element> {
+export default async function ResetPasswordPage({
+  searchParams,
+}: ResetPasswordPageProps): Promise<JSX.Element> {
   // Server-side auth check - redirect authenticated users to their dashboard
   await redirectCompletedUsers();
 
   // Server-side auth check - redirect ONBOARDING users to /onboarding
   await redirectOnboardingUsers();
+
+  // Server-side auth check - redirect OAuth users who need role setup
+  await redirectOAuthUsersToSetup();
 
   // Get token from search params
   const params = await searchParams;
@@ -45,7 +51,7 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
   }
 
   return (
-    <section className='py-16 bg-gray-50 min-h-screen'>
+    <section className='mt-20 pt-20 pb-40 bg-gray-50'>
       <div className='container mx-auto px-4'>
         {/* Title Section */}
         <div className='flex justify-center mb-15'>

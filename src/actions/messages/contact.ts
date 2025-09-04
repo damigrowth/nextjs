@@ -3,7 +3,10 @@
 import { revalidateTag } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { ActionResponse } from '@/lib/types/api';
-import { contactSchema, type ContactFormValues } from '@/lib/validations/contact';
+import {
+  contactSchema,
+  type ContactFormValues,
+} from '@/lib/validations/contact';
 import { getFormString } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { sendTemplateEmail } from '@/lib/email/service';
@@ -42,19 +45,22 @@ export async function submitContactForm(
 
     // 3. Validate ReCAPTCHA if token provided
     if (captchaToken) {
-      const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+      const recaptchaResponse = await fetch(
+        'https://www.google.com/recaptcha/api/siteverify',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            secret: process.env.RECAPTCHA_SECRET_KEY || '',
+            response: captchaToken,
+          }),
         },
-        body: new URLSearchParams({
-          secret: process.env.RECAPTCHA_SECRET_KEY || '',
-          response: captchaToken,
-        }),
-      });
+      );
 
       const recaptchaData = await recaptchaResponse.json();
-      
+
       if (!recaptchaData.success) {
         return {
           success: false,
@@ -87,24 +93,15 @@ export async function submitContactForm(
       };
 
       // Send admin notification email
-      await sendTemplateEmail(
-        'CONTACT_ADMIN',
-        adminEmail,
-        emailData,
-        {
-          from: `${data.name} <${data.email}>`,
-          replyTo: data.email,
-        }
-      );
+      await sendTemplateEmail('CONTACT_ADMIN', adminEmail, emailData, {
+        from: `${data.name} <${data.email}>`,
+        replyTo: data.email,
+      });
 
       // Send confirmation email to user
-      await sendTemplateEmail(
-        'CONTACT_CONFIRMATION',
-        data.email,
-        emailData
-      );
+      await sendTemplateEmail('CONTACT_CONFIRMATION', data.email, emailData);
 
-      console.log(`Contact form emails sent successfully for contact ID: ${contact.id}`);
+      // console.log(`Contact form emails sent successfully for contact ID: ${contact.id}`);
     } catch (emailError) {
       console.error('Failed to send contact form emails:', emailError);
       // Don't fail the entire action if email fails - contact is still saved
@@ -115,14 +112,16 @@ export async function submitContactForm(
 
     return {
       success: true,
-      message: 'Το μήνυμα σας στάλθηκε επιτυχώς! Θα επικοινωνήσουμε σύντομα μαζί σας.',
+      message:
+        'Το μήνυμα σας στάλθηκε επιτυχώς! Θα επικοινωνήσουμε σύντομα μαζί σας.',
     };
   } catch (error: any) {
     console.error('Contact form submission error:', error);
-    
+
     return {
       success: false,
-      message: 'Παρουσιάστηκε σφάλμα κατά την αποστολή του μηνύματος. Παρακαλώ δοκιμάστε ξανά.',
+      message:
+        'Παρουσιάστηκε σφάλμα κατά την αποστολή του μηνύματος. Παρακαλώ δοκιμάστε ξανά.',
     };
   }
 }
