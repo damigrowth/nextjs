@@ -458,6 +458,50 @@ export const convertImageData = (imageData: any): CloudinaryResource | null => {
   return null;
 };
 
+/**
+ * Get user profile image URL - handles both Google OAuth images and Cloudinary resources
+ * @param userImage - Image data from user object (can be string URL or JSON string or object)
+ * @param options - Transformation options for Cloudinary images
+ * @returns Optimized image URL or null
+ */
+export const getUserProfileImageUrl = (
+  userImage: string | CloudinaryResource | null | undefined,
+  options: {
+    width?: number;
+    height?: number;
+    quality?: number;
+    format?: 'webp' | 'avif' | 'jpg' | 'png';
+    crop?: 'fill' | 'fit' | 'scale' | 'crop';
+  } = {}
+): string | null => {
+  if (!userImage) return null;
+
+  // If it's a string, it could be either a direct URL (Google) or JSON (Cloudinary)
+  if (typeof userImage === 'string') {
+    try {
+      // Try parsing as JSON first (Cloudinary format)
+      const cloudinaryData = JSON.parse(userImage);
+      if (cloudinaryData && typeof cloudinaryData === 'object' && cloudinaryData.secure_url) {
+        return getOptimizedCloudinaryUrl(cloudinaryData, options);
+      }
+    } catch {
+      // If JSON parsing fails, treat as direct URL (Google OAuth)
+      // Check if it looks like a URL
+      if (userImage.startsWith('http://') || userImage.startsWith('https://')) {
+        return userImage;
+      }
+    }
+  }
+
+  // If it's already an object (CloudinaryResource), use it directly
+  if (typeof userImage === 'object' && userImage.secure_url) {
+    return getOptimizedCloudinaryUrl(userImage, options);
+  }
+
+  return null;
+};
+
+
 // =============================================
 // LEGACY SUPPORT (STRAPI)
 // =============================================
@@ -793,6 +837,7 @@ export default {
   getOptimizedCloudinaryUrl,
   getResourceDisplayName,
   convertImageData,
+  getUserProfileImageUrl,
   
   // Helper utilities
   formatFileSize,

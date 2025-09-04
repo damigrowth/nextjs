@@ -1,7 +1,7 @@
 import { EmailTemplate } from '@/lib/types/email';
 
 export const WELCOME: EmailTemplate = {
-  from: 'Doulitsa <noreply@doulitsa.gr>',
+  from: 'Doulitsa <contact@doulitsa.gr>',
   replyTo: 'contact@doulitsa.gr',
   subject: 'Καλώς ήρθατε στη Doulitsa!',
   html: (user: any) => `

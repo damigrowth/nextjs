@@ -6,7 +6,13 @@
  */
 
 import { EMAIL_TEMPLATES } from '@/constants/email/templates';
-import { EmailTemplateKey, EmailTemplate, EmailUser, EmailResult, EmailOptions } from '@/lib/types/email';
+import {
+  EmailTemplateKey,
+  EmailTemplate,
+  EmailUser,
+  EmailResult,
+  EmailOptions,
+} from '@/lib/types/email';
 
 // Base64 encode for URL-safe JWT
 function base64urlEncode(input: string | ArrayBuffer): string {
@@ -214,7 +220,6 @@ async function sendGmailEmail(mailOptions: {
   }
 }
 
-
 /**
  * Main email sending function
  */
@@ -269,7 +274,7 @@ export async function sendAuthEmail(
 
   try {
     const info = await sendEmail(emailData);
-    console.log(`Email sent successfully: ${type} to ${user.email}`);
+    // console.log(`Email sent successfully: ${type} to ${user.email}`);
 
     return {
       messageId: info.messageId,
@@ -314,9 +319,9 @@ export async function sendTemplateEmail(
 
   try {
     const info = await sendEmail(emailData);
-    console.log(
-      `Template email sent successfully: ${templateKey} to ${Array.isArray(to) ? to.join(', ') : to}`,
-    );
+    // console.log(
+    //   `Template email sent successfully: ${templateKey} to ${Array.isArray(to) ? to.join(', ') : to}`,
+    // );
 
     return {
       messageId: info.messageId,
