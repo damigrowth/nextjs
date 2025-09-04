@@ -177,9 +177,9 @@ export interface FilterOption {
 
 // Media Upload Components
 export interface MediaUploadProps {
-  value: import('./cloudinary').CloudinaryResource | import('./cloudinary').CloudinaryResource[] | null;
+  value: import('./cloudinary').CloudinaryResource | import('./cloudinary').CloudinaryResource[] | string | null;
   onChange: (
-    resources: import('./cloudinary').CloudinaryResource | import('./cloudinary').CloudinaryResource[] | null,
+    resources: import('./cloudinary').CloudinaryResource | import('./cloudinary').CloudinaryResource[] | string | null,
   ) => void;
   uploadPreset?: string;
   multiple?: boolean;
@@ -202,7 +202,7 @@ export interface MediaUploadRef {
 }
 
 export interface ProfileImageUploadProps {
-  resource: import('../utils/media').CloudinaryResourceOrPending | null;
+  resource: import('../utils/media').CloudinaryResourceOrPending | string | null;
   queuedFile: import('../utils/media').QueuedFile | null;
   onFileSelect: (files: FileList) => void;
   onRemove: () => void;

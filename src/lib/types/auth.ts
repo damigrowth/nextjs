@@ -46,11 +46,16 @@ export type AuthSessionData = {
  * Type definitions
  */
 export type UserRole = 'user' | 'freelancer' | 'company' | 'admin';
-export type AuthStep = 'EMAIL_VERIFICATION' | 'ONBOARDING' | 'DASHBOARD';
+export type AuthStep =
+  | 'EMAIL_VERIFICATION'
+  | 'OAUTH_SETUP'
+  | 'ONBOARDING'
+  | 'DASHBOARD';
+export type AuthProvider = 'email' | 'google' | 'github'; // Add more providers as needed
 
 // Auth form UI types
-export type AuthType = 0 | 1 | 2; // 0 = no selection, 1 = user, 2 = professional
-export type ProRole = 2 | 3 | null; // 2 = freelancer, 3 = company, null = not selected
+export type AuthType = '' | 'user' | 'pro'; // '' = no selection, 'user' = user, 'pro' = professional
+export type ProRole = 'freelancer' | 'company' | null; // freelancer, company, null = not selected
 export type ConsentType = boolean | string[];
 
 /**

@@ -18,6 +18,7 @@ export const userRoleSchema = z.enum([
 ]);
 export const authStepSchema = z.enum([
   'EMAIL_VERIFICATION',
+  'OAUTH_SETUP',
   'ONBOARDING',
   'DASHBOARD',
 ]);
@@ -48,24 +49,6 @@ export const simpleLoginSchema = z.object({
 // REGISTRATION SCHEMAS
 // =============================================
 
-// Base registration schema
-export const registerBaseSchema = z.object({
-  email: z.string().min(1, 'Το email είναι υποχρεωτικό').email('Μη έγκυρο email'),
-  username: z.string().min(4, 'Το όνομα χρήστη είναι πολύ μικρό').max(25),
-  password: z.string().min(6, 'Ο κωδικός είναι πολύ μικρός').max(50),
-  consent: z.boolean().refine((val) => val === true, {
-    message: 'Πρέπει να αποδεχτείτε τους όρους και προϋποθέσεις',
-  }),
-});
-
-// Professional registration schema
-export const registerProfessionalSchema = z.object({
-  displayName: z.string().min(3, 'Το όνομα εμφάνισης είναι πολύ μικρό').max(25),
-  role: z.number().refine((val) => !isNaN(val) && val > 0, {
-    message: 'Επιλέξτε τύπο λογαριασμού',
-  }),
-});
-
 // Combined registration schema
 export const registerSchema = z.object({
   email: emailSchema,
@@ -75,7 +58,10 @@ export const registerSchema = z.object({
     .string()
     .min(3, 'Το όνομα χρήστη πρέπει να έχει τουλάχιστον 3 χαρακτήρες')
     .optional(),
-  displayName: z.string().min(1, 'Το όνομα εμφάνισης είναι υποχρεωτικό').optional(),
+  displayName: z
+    .string()
+    .min(1, 'Το όνομα εμφάνισης είναι υποχρεωτικό')
+    .optional(),
   consent: z.boolean().optional(),
 });
 
@@ -89,18 +75,19 @@ export const registrationFormSchema = z
       .max(100, 'Ο κωδικός είναι πολύ μεγάλος'),
     username: z.string().optional(),
     displayName: z.string().optional(),
-    authType: z.number().min(1, 'Επιλέξτε τύπο λογαριασμού').max(2),
-    role: z.union([z.literal(2), z.literal(3)]).optional(),
+    authType: z.union([z.literal(''), z.literal('user'), z.literal('pro')]),
+    role: z.union([z.literal('freelancer'), z.literal('company')]).optional(),
     consent: z
       .array(z.string())
       .min(1, 'Πρέπει να αποδεχτείς τους όρους χρήσης'),
   })
   .refine(
     (data) => {
-      // If authType is 2 (professional), role is required
-      if (data.authType === 2 && !data.role) {
+      // If authType is 'pro' (professional), role is required
+      if (data.authType === 'pro' && !data.role) {
         return false;
       }
+      // If authType is empty, it means no selection yet (form won't submit anyway due to form validation)
       return true;
     },
     {
@@ -153,11 +140,6 @@ export const resetPasswordSchema = z.object({
 // TOKEN & VERIFICATION SCHEMAS
 // =============================================
 
-// Email confirmation schema
-export const confirmRegistrationSchema = z.object({
-  token: z.string().min(1, 'Το token είναι υποχρεωτικό'),
-});
-
 // Account update schema
 export const accountUpdateSchema = z.object({
   displayName: z
@@ -166,16 +148,13 @@ export const accountUpdateSchema = z.object({
     .max(50, 'Το όνομα εμφάνισης δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες'),
 });
 
-// Onboarding step update
-export const updateOnboardingStepSchema = z.object({
-  step: authStepSchema,
-});
-
 // Delete account schema
 export const deleteAccountSchema = z
   .object({
     username: z.string().min(1, 'Το όνομα χρήστη είναι υποχρεωτικό'),
-    confirmUsername: z.string().min(1, 'Η επιβεβαίωση ονόματος χρήστη είναι υποχρεωτική'),
+    confirmUsername: z
+      .string()
+      .min(1, 'Η επιβεβαίωση ονόματος χρήστη είναι υποχρεωτική'),
   })
   .refine((data) => data.username === data.confirmUsername, {
     message: 'Η επιβεβαίωση ονόματος χρήστη δεν ταιριάζει',
@@ -183,38 +162,11 @@ export const deleteAccountSchema = z
   });
 
 // =============================================
-// SESSION SCHEMAS (Better Auth)
-// =============================================
-
-export const sessionSchema = z.object({
-  id: z.string().cuid('Invalid ID format'),
-  userId: z.string().cuid('Invalid ID format'),
-  expiresAt: z.date(),
-  token: z.string().min(1),
-  ipAddress: z.string().optional(),
-  userAgent: z.string().optional(),
-});
-
-export const accountSchema = z.object({
-  id: z.string().cuid('Invalid ID format'),
-  accountId: z.string().min(1),
-  providerId: z.string().min(1),
-  userId: z.string().cuid('Invalid ID format'),
-  accessToken: z.string().optional(),
-  refreshToken: z.string().optional(),
-  idToken: z.string().optional(),
-  accessTokenExpiresAt: z.date().optional(),
-  refreshTokenExpiresAt: z.date().optional(),
-  scope: z.string().optional(),
-  password: z.string().optional(),
-});
-
-// =============================================
 // TYPE EXPORTS
 // =============================================
 
 export type LoginInput = z.infer<typeof loginSchema>;
-export type SimpleLoginInput = z.infer<typeof simpleLoginSchema>;
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type RegistrationFormInput = z.infer<typeof registrationFormSchema>;
 export type PasswordChangeInput = z.infer<typeof passwordChangeSchema>;
@@ -222,49 +174,3 @@ export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export type AccountUpdateInput = z.infer<typeof accountUpdateSchema>;
 export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>;
-
-// =============================================
-// VALIDATION HELPERS
-// =============================================
-
-/**
- * Validate if a role can create profiles
- */
-export function canCreateProfile(role: string): boolean {
-  return role === 'freelancer' || role === 'company';
-}
-
-/**
- * Validate if a role is professional
- */
-export function isProfessionalRole(role: string): boolean {
-  return role === 'freelancer' || role === 'company';
-}
-
-/**
- * Validate if a role has admin privileges
- */
-export function isAdminRole(role: string): boolean {
-  return role === 'admin';
-}
-
-/**
- * Get required fields for auth step
- */
-export function getRequiredFieldsForStep(step: string, role: string): string[] {
-  const baseFields = ['email', 'emailVerified'];
-
-  switch (step) {
-    case 'EMAIL_VERIFICATION':
-      return baseFields;
-    case 'ONBOARDING':
-      if (isProfessionalRole(role)) {
-        return [...baseFields, 'username', 'displayName'];
-      }
-      return baseFields;
-    case 'DASHBOARD':
-      return [...baseFields, 'confirmed'];
-    default:
-      return baseFields;
-  }
-}

@@ -41,3 +41,17 @@ model Verification {
 
   @@map("verification")
 }
+
+// Temporary storage for OAuth registration preferences across devices
+model PendingRegistration {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  authType    Int      // 1 = simple, 2 = professional
+  role        Int?     // 2 = freelancer, 3 = company (only for professional)
+  username    String?  // Preferred username
+  displayName String?  // Preferred display name (for professionals)
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime // Auto-expire after 24 hours
+
+  @@map("pending_registrations")
+}

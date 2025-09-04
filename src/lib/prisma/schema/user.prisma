@@ -16,7 +16,9 @@ model User {
   banExpires    DateTime?
   banReason     String?
   banned        Boolean       @default(false)
+  type          String        @default("user") // 'user', 'pro' - for registration flow UI starts as ''
   role          String        @default("user")
+  provider      String        @default("email") // email or google
   accounts      Account[]
   media         Media[]
   messagesRead  MessageRead[]

@@ -465,7 +465,11 @@ export const cloudinaryResourceSchema = z.object({
   format: z.string().optional(),
 });
 
-export const imageSchema = cloudinaryResourceSchema.nullable();
+export const imageSchema = z.union([
+  cloudinaryResourceSchema,
+  z.string().url(), // Allow string URLs for Google/external images
+  z.null()
+]);
 
 // Category/Subcategory selection for onboarding - now accepts ID strings
 export const categorySchema = z.string().min(1, 'Κατηγορία είναι υποχρεωτική');
