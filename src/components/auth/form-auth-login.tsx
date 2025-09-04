@@ -108,31 +108,14 @@ const LoginForm: React.FC = () => {
   };
 
   const handleGoogleSignIn = async (): Promise<void> => {
-    // TODO: Implement Google sign-in when ready
-    console.log('Google sign-in not implemented yet');
-    return;
-
-    // try {
-    //   const response = await authClient.signIn.social({
-    //     provider: 'google',
-    //     callbackURL: '/dashboard',
-    //   });
-
-    //   console.log('Google Sign-in Response:', response);
-
-    //   // Handle successful Google sign-in
-    //   if (response?.data?.user) {
-    //     const session = await authClient.getSession();
-    //     const redirectPath =
-    //       session?.data?.user?.role === 'admin' ? '/admin' : '/dashboard';
-
-    //     setTimeout(() => {
-    //       router.push(redirectPath);
-    //     }, 1000);
-    //   }
-    // } catch (error) {
-    //   console.error('Google Sign-in Error:', error);
-    // }
+    try {
+      await authClient.signIn.social({
+        provider: 'google',
+        callbackURL: '/dashboard',
+      });
+    } catch (error) {
+      console.error('Google Sign-in Error:', error);
+    }
   };
 
   return (

@@ -62,6 +62,9 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
     // Convert value to array for consistent handling (memoized)
     const resources = useMemo((): CloudinaryResourceOrPending[] => {
       if (!value) return [];
+      if (typeof value === 'string') {
+        return []; // String URLs are handled separately, don't treat as resources
+      }
       return Array.isArray(value) ? value : [value];
     }, [value]);
 
@@ -313,10 +316,10 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
     const profileData = useMemo(() => {
       if (multiple) return null;
       return {
-        resource: resources[0] || null,
+        resource: typeof value === 'string' ? value : resources[0] || null,
         queuedFile: queuedFiles[0] || null,
       };
-    }, [multiple, resources, queuedFiles]);
+    }, [multiple, value, resources, queuedFiles]);
 
     // Profile Image Mode (single file)
     if (!multiple) {
@@ -328,6 +331,9 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
           onRemove={() => {
             if (queuedFiles.length > 0) {
               handleRemoveFromQueue(queuedFiles[0].id);
+            } else if (typeof value === 'string') {
+              // Remove string URL by setting to null
+              onChange(null);
             } else if (resources.length > 0) {
               handleRemoveResource(resources[0].public_id || '');
             }

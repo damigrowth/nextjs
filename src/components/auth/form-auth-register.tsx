@@ -110,7 +110,7 @@ export default function RegisterForm() {
     setValue('role', role || undefined);
 
     // Reset form when auth type changes
-    if (type > 0) {
+    if (type !== '') {
       form.reset({
         email: '',
         password: '',
@@ -127,9 +127,9 @@ export default function RegisterForm() {
   useEffect(() => {
     const hash = window.location.hash;
     if (hash === '#user') {
-      setAuthType(1);
+      setAuthType('user');
     } else if (hash === '#pro') {
-      setAuthType(2);
+      setAuthType('pro');
     }
   }, []); // Empty dependency array - only run once on mount
 
@@ -145,12 +145,12 @@ export default function RegisterForm() {
 
     const authType = watch('authType');
     if (authType) {
-      formData.set('authType', authType.toString());
+      formData.set('authType', authType);
     }
 
     const role = watch('role');
     if (role) {
-      formData.set('role', role.toString());
+      formData.set('role', role);
     }
 
     // Call the server action directly (no await)
@@ -159,25 +159,20 @@ export default function RegisterForm() {
 
   const handleGoogleSignUp = async () => {
     try {
-      if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
-        setError('root', {
-          message: 'Google OAuth δεν είναι διαθέσιμο αυτή τη στιγμή.',
-        });
-        return;
+      // Pass auth type through URL parameters instead of sessionStorage
+      // This works across devices and browsers
+      const callbackParams = new URLSearchParams({
+        type: type,
+      });
+
+      if (type === 'pro' && role) {
+        callbackParams.set('role', role);
       }
 
-      // Determine callback URL based on current auth type
-      const userRole =
-        watchedAuthType === 2
-          ? watchedRole === 2
-            ? 'freelancer'
-            : 'company'
-          : 'user';
-      const callbackURL = userRole === 'user' ? '/dashboard' : '/onboarding';
-
+      // Better Auth OAuth flow with type parameters in callback URL
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL,
+        callbackURL: `/oauth-setup?${callbackParams.toString()}`,
       });
     } catch (error: any) {
       console.error('Google sign up error:', error);
@@ -187,8 +182,8 @@ export default function RegisterForm() {
     }
   };
 
-  // Only show form when auth type is selected
-  if (watchedAuthType === 0) {
+  // Use store type instead of watched form value for more reliable rendering
+  if (type === '') {
     return null;
   }
 
@@ -196,7 +191,7 @@ export default function RegisterForm() {
     <Form {...form}>
       <form action={handleFormSubmit} className='space-y-4'>
         {/* Professional Role Selection */}
-        {watchedAuthType === 2 && (
+        {type === 'pro' && (
           <FormField
             control={form.control}
             name='role'
@@ -205,11 +200,11 @@ export default function RegisterForm() {
                 <FormLabel>Τύπος Επαγγελματία</FormLabel>
                 <FormControl>
                   <RadioGroup
-                    value={field.value?.toString()}
+                    value={field.value || ''}
                     onValueChange={(value) => {
-                      const numValue = parseInt(value) as ProRole;
-                      field.onChange(numValue);
-                      setAuthRole(numValue);
+                      const roleValue = value as ProRole;
+                      field.onChange(roleValue);
+                      setAuthRole(roleValue);
                     }}
                     className='flex flex-col space-y-2 pb-2'
                   >
@@ -219,7 +214,7 @@ export default function RegisterForm() {
                         className='flex items-center space-x-2'
                       >
                         <RadioGroupItem
-                          value={roleOption.value.toString()}
+                          value={roleOption.value || ''}
                           id={`role-${roleOption.value}`}
                         />
                         <Label htmlFor={`role-${roleOption.value}`}>
@@ -236,7 +231,7 @@ export default function RegisterForm() {
         )}
 
         {/* Display Name - only for professionals */}
-        {watchedAuthType === 2 && (
+        {type === 'pro' && (
           <FormField
             control={form.control}
             name='displayName'
@@ -401,7 +396,7 @@ export default function RegisterForm() {
           />
           {/* Google Sign Up */}
           <div className='text-center'>
-            <p className='text-gray-600'>ή</p>
+            <p className='text-gray-600 mb-3'>ή</p>
             <GoogleLoginButton
               onClick={handleGoogleSignUp}
               disabled={isPending}

@@ -67,12 +67,13 @@ export function NavUser({
     };
     return iconMap[iconName] || <User className='w-4 h-4' />;
   };
-  
+
   // Derive auth states from session data - same logic as UserMenu
   const sessionUser = session?.user;
-  const isProfessional = sessionUser?.role === 'freelancer' || sessionUser?.role === 'company';
+  const isProfessional =
+    sessionUser?.role === 'freelancer' || sessionUser?.role === 'company';
   const hasProfile = isProfessional && sessionUser?.step === 'DASHBOARD';
-  
+
   // Get menu items - same logic as UserMenu
   const getMenuItems = () => {
     if (isProfessional && !hasProfile) {
@@ -89,18 +90,21 @@ export function NavUser({
       // Normal menu for completed users
       // Simple users (role: 'user') should get limited menu even if step is DASHBOARD
       // Only admin and professional users with DASHBOARD step get full access
-      const shouldHaveFullAccess = 
-        sessionUser?.role === 'admin' || 
+      const shouldHaveFullAccess =
+        sessionUser?.role === 'admin' ||
         (isProfessional && sessionUser?.step === 'DASHBOARD');
-      
-      const allNav = shouldHaveFullAccess ? hasAccessUserMenuNav : noAccessUserMenuNav;
+
+      const allNav = shouldHaveFullAccess
+        ? hasAccessUserMenuNav
+        : noAccessUserMenuNav;
       const userProfilePath = `/profile/${sessionUser?.username}`;
 
       return allNav
         .map((item) => {
           if (item.path === '/profile') {
-            return sessionUser?.step === 'DASHBOARD' || sessionUser?.role === 'admin' 
-              ? { ...item, path: userProfilePath } 
+            return sessionUser?.step === 'DASHBOARD' ||
+              sessionUser?.role === 'admin'
+              ? { ...item, path: userProfilePath }
               : null;
           }
           return item;
@@ -120,8 +124,6 @@ export function NavUser({
       window.location.href = '/';
     }
   };
-
-  console.log(user);
 
   return (
     <SidebarMenu>
@@ -170,9 +172,9 @@ export function NavUser({
               {menuItems.map((item, index) => {
                 if (item.path === '/logout') {
                   return (
-                    <DropdownMenuItem 
-                      key={`nav-user-${item.id}-${index}`} 
-                      className='cursor-pointer' 
+                    <DropdownMenuItem
+                      key={`nav-user-${item.id}-${index}`}
+                      className='cursor-pointer'
                       onClick={handleLogout}
                     >
                       {getMenuIcon(item.icon)}
@@ -182,7 +184,10 @@ export function NavUser({
                 }
 
                 return (
-                  <DropdownMenuItem key={`nav-user-${item.id}-${index}`} asChild>
+                  <DropdownMenuItem
+                    key={`nav-user-${item.id}-${index}`}
+                    asChild
+                  >
                     <a href={item.path} className='cursor-pointer'>
                       {getMenuIcon(item.icon)}
                       {item.name}

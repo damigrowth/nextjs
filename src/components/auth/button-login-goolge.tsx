@@ -1,67 +1,35 @@
 'use client';
 
 import React from 'react';
-import { UserRole } from '@/lib/types';
+import { authClient } from '@/lib/auth/client';
 import { FormButton } from '../shared';
 
 interface GoogleLoginButtonProps {
-  accountType?: number;
-  role?: UserRole;
-  displayName?: string;
   children?: React.ReactNode;
   disabled?: boolean;
   className?: string;
   onClick?: () => void | Promise<void>;
+  callbackURL?: string;
 }
 
 const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
-  accountType,
-  role,
-  displayName,
   children,
   disabled,
   className = '',
   onClick,
+  callbackURL = '/dashboard',
 }) => {
-  const handleGoogleLogin = () => {
+  const handleGoogleAuth = async () => {
     if (disabled) return;
-
-    // Use your existing Strapi Google OAuth endpoint
-    const baseUrl = 'https://api.doulitsa.gr';
-    let googleAuthUrl = `${baseUrl}/api/connect/google`;
-
-    // Add account type and other parameters as query params for our custom flow
-    const params = new URLSearchParams();
-
-    if (accountType) {
-      params.append('accountType', accountType.toString());
+    
+    try {
+      await authClient.signIn.social({
+        provider: 'google',
+        callbackURL,
+      });
+    } catch (error) {
+      console.error('Google authentication error:', error);
     }
-
-    if (role && accountType === 2) {
-      params.append('role', role.toString());
-    }
-
-    if (displayName && accountType === 2) {
-      params.append('displayName', displayName);
-    }
-
-    if (params.toString()) {
-      googleAuthUrl += `?${params.toString()}`;
-    }
-
-    // Store account type in sessionStorage for the callback handler
-    if (accountType) {
-      sessionStorage.setItem(
-        'google_oauth_account_type',
-        accountType.toString(),
-      );
-      if (role) sessionStorage.setItem('google_oauth_role', role.toString());
-      if (displayName)
-        sessionStorage.setItem('google_oauth_display_name', displayName);
-    }
-
-    // Redirect to Google OAuth
-    window.location.href = googleAuthUrl;
   };
 
   // Google icon component
@@ -89,7 +57,7 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
   return (
     <FormButton
       text={children?.toString() || 'Συνέχεια με Google'}
-      onClick={onClick || handleGoogleLogin}
+      onClick={onClick || handleGoogleAuth}
       disabled={disabled}
       variant='black'
       customIcon={GoogleIcon}

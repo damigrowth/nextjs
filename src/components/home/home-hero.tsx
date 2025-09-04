@@ -62,7 +62,7 @@ function HeroSearchBar({
 }) {
   const handleSearch = (query: string) => {
     // Handle search functionality here
-    console.log('Search query:', query);
+    // console.log('Search query:', query);
     // You can implement navigation or search logic here
   };
 

@@ -19,10 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Icons (lucide-react only)
-import {
-  AlertCircle,
-  CheckCircle,
-} from 'lucide-react';
+import { AlertCircle, CheckCircle } from 'lucide-react';
 
 // Custom components
 import { FormButton } from '@/components/shared';
@@ -62,7 +59,7 @@ export default function ContactForm({ formData, siteKey }: ContactFormProps) {
     submitContactForm,
     initialState,
   );
-  
+
   const [captcha, setCaptcha] = React.useState<string | null>(null);
 
   const form = useForm<ContactFormValues>({
@@ -84,7 +81,7 @@ export default function ContactForm({ formData, siteKey }: ContactFormProps) {
   // Handle successful form submission
   useEffect(() => {
     if (state.success) {
-      console.log('Contact form submitted successfully');
+      // console.log('Contact form submitted successfully');
       // Reset form on successful submission
       reset();
     }
@@ -125,9 +122,7 @@ export default function ContactForm({ formData, siteKey }: ContactFormProps) {
               name='name'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    {formData.nameLabel}
-                  </FormLabel>
+                  <FormLabel>{formData.nameLabel}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder={formData.namePlaceholder}
@@ -146,9 +141,7 @@ export default function ContactForm({ formData, siteKey }: ContactFormProps) {
               name='email'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    {formData.emailLabel}
-                  </FormLabel>
+                  <FormLabel>{formData.emailLabel}</FormLabel>
                   <FormControl>
                     <Input
                       type='email'
@@ -169,9 +162,7 @@ export default function ContactForm({ formData, siteKey }: ContactFormProps) {
             name='message'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  {formData.messageLabel}
-                </FormLabel>
+                <FormLabel>{formData.messageLabel}</FormLabel>
                 <FormControl>
                   <Textarea
                     rows={6}
@@ -202,12 +193,7 @@ export default function ContactForm({ formData, siteKey }: ContactFormProps) {
           )}
 
           {/* ReCAPTCHA */}
-          {siteKey && (
-            <ReCAPTCHA 
-              sitekey={siteKey} 
-              onChange={setCaptcha} 
-            />
-          )}
+          {siteKey && <ReCAPTCHA sitekey={siteKey} onChange={setCaptcha} />}
 
           {/* Submit Button */}
           <FormButton

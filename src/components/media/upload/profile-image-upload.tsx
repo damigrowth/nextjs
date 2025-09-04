@@ -47,6 +47,18 @@ const ProfileImageUpload = memo<ProfileImageUploadProps>(({
     }
     
     if (resource) {
+      // Handle string URL (like Google images)
+      if (typeof resource === 'string') {
+        return (
+          <img
+            src={resource}
+            alt="Profile image"
+            className="w-[71px] h-[71px] rounded-lg object-cover border-2 border-gray-200"
+          />
+        );
+      }
+      
+      // Handle CloudinaryResource objects
       const isPending = isPendingResource(resource);
       
       return isPending || !resource.public_id ? (

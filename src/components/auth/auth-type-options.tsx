@@ -7,13 +7,13 @@ import { FormButton } from '../shared';
 export default function AuthTypeOptions(): JSX.Element | null {
   const { type, setAuthType } = useAuthStore();
 
-  if (type > 0) {
+  if (type !== '') {
     return (
       <>
         {/* Previous Step Button - positioned first */}
         <FormButton
           text='Προηγούμενο Βήμα'
-          onClick={() => setAuthType(0)}
+          onClick={() => setAuthType('')}
           variant='outline'
           icon='arrow-left'
           iconPosition='left'
@@ -21,19 +21,19 @@ export default function AuthTypeOptions(): JSX.Element | null {
         />
       </>
     );
-  } else if (type === 0) {
+  } else if (type === '') {
     return (
       <div>
         <FormButton
           text='Εγγραφή ως Απλό Προφίλ'
-          onClick={() => setAuthType(1)}
+          onClick={() => setAuthType('user')}
           type='button'
           variant='default'
           className='mr-5 mb-6'
         />
         <FormButton
           text='Επαγγελματικό Προφίλ'
-          onClick={() => setAuthType(2)}
+          onClick={() => setAuthType('pro')}
           type='button'
           variant='default'
           className='mr-5 mb-6'
