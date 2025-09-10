@@ -86,7 +86,7 @@ export async function updateProfilePortfolio(
       where: { uid: user.id },
       data: {
         portfolio: sanitizedPortfolio?.length
-          ? JSON.stringify(sanitizedPortfolio)
+          ? sanitizedPortfolio as any
           : Prisma.DbNull,
         updatedAt: new Date(),
       },

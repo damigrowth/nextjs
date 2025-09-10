@@ -60,7 +60,8 @@ export async function updateProfilePresentation(
     }
 
     // 4. Validate with Zod schema
-    const validationResult = profilePresentationUpdateSchema.safeParse(extractedData);
+    const validationResult =
+      profilePresentationUpdateSchema.safeParse(extractedData);
     if (!validationResult.success) {
       return createValidationErrorResponse(
         validationResult.error,
@@ -91,8 +92,12 @@ export async function updateProfilePresentation(
         website: data.website || null,
         viber: data.viber || null,
         whatsapp: data.whatsapp || null,
-        visibility: data.visibility ? JSON.stringify(data.visibility) : JSON.stringify({ email: true, phone: true, address: true }),
-        socials: data.socials ? JSON.stringify(data.socials) : Prisma.DbNull,
+        visibility: data.visibility || {
+          email: true,
+          phone: true,
+          address: true,
+        },
+        socials: data.socials ? data.socials : Prisma.DbNull,
         updatedAt: new Date(),
       },
     });
@@ -154,23 +159,9 @@ export async function getProfilePresentation(): Promise<
       };
     }
 
-    // 3. Parse JSON fields safely
-    let visibility = null;
-    let socials = null;
-
-    try {
-      visibility = profile.visibility
-        ? JSON.parse(profile.visibility as string)
-        : null;
-    } catch (e) {
-      console.warn('Failed to parse visibility JSON:', e);
-    }
-
-    try {
-      socials = profile.socials ? JSON.parse(profile.socials as string) : null;
-    } catch (e) {
-      console.warn('Failed to parse socials JSON:', e);
-    }
+    // 3. Use JSON fields directly (no parsing needed since we fixed storage)
+    const visibility = profile.visibility || null;
+    const socials = profile.socials || null;
 
     return {
       success: true,

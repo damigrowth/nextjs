@@ -14,7 +14,7 @@ import {
 import { getFormString, getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
-import { sanitizeCloudinaryResource } from '@/lib/utils/cloudinary';
+import { processImageForDatabase } from '@/lib/utils/cloudinary';
 
 /**
  * Server action wrapper for useActionState
@@ -44,7 +44,6 @@ export async function updateProfileBasicInfo(
     const category = getFormString(formData, 'category');
     const subcategory = getFormString(formData, 'subcategory');
     const speciality = getFormString(formData, 'speciality');
-
 
     // Parse JSON fields with proper error handling
     const imageData = getFormJSON<any>(formData, 'image', null);
@@ -87,8 +86,8 @@ export async function updateProfileBasicInfo(
 
     const data = validationResult.data;
 
-    // 5.5. Sanitize image resource before saving to database
-    const sanitizedImage = sanitizeCloudinaryResource(data.image);
+    // 5.5. Process image data - convert CloudinaryResource to URL string for database storage
+    const processedImage = processImageForDatabase(data.image);
 
     // 6. Check if profile exists - we only update, never create
     const existingProfile = await prisma.profile.findUnique({
@@ -103,7 +102,7 @@ export async function updateProfileBasicInfo(
       };
     }
 
-    // 7. Update profile with proper JSON handling
+    // 7. Update profile with string URL for image field
     await prisma.profile.update({
       where: { uid: user.id },
       data: {
@@ -114,7 +113,7 @@ export async function updateProfileBasicInfo(
         speciality: data.speciality,
         skills: data.skills || [],
         coverage: data.coverage as Prisma.JsonValue,
-        image: sanitizedImage as Prisma.JsonValue,
+        image: processedImage, // Now a string URL
         updatedAt: new Date(),
       },
     });
@@ -125,16 +124,19 @@ export async function updateProfileBasicInfo(
         await auth.api.updateUser({
           headers: await headers(),
           body: {
-            image: sanitizedImage ? JSON.stringify(sanitizedImage) : null,
+            image: processedImage, // Send URL string directly
           },
         });
       } catch (authError) {
-        console.warn('Failed to update user via Better Auth, falling back to Prisma:', authError);
+        console.warn(
+          'Failed to update user via Better Auth, falling back to Prisma:',
+          authError,
+        );
         // Fallback to direct Prisma update if Better Auth fails
         await prisma.user.update({
           where: { id: user.id },
           data: {
-            image: sanitizedImage ? JSON.stringify(sanitizedImage) : null,
+            image: processedImage, // Send URL string directly
           },
         });
       }

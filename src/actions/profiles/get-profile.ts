@@ -17,7 +17,7 @@ async function _getProfileByUserId(userId: string): Promise<Profile | null> {
         where: { status: 'published' },
         orderBy: { createdAt: 'desc' },
       },
-      reviewsReceived: {
+      reviews: {
         include: {
           author: {
             select: {
@@ -86,7 +86,7 @@ export async function getPublicProfileByUsername(
           where: { status: 'published' },
           orderBy: { createdAt: 'desc' },
         },
-        reviewsReceived: {
+        reviews: {
           where: { published: true }, // Only show published reviews
           include: {
             author: {

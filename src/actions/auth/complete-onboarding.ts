@@ -12,7 +12,7 @@ import { getFormString, getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
 import {
-  sanitizeCloudinaryResource,
+  processImageForDatabase,
   sanitizeCloudinaryResources,
 } from '@/lib/utils/cloudinary';
 
@@ -87,12 +87,8 @@ export async function completeOnboarding(
 
     const data = validationResult.data;
 
-    // Sanitize Cloudinary resources before saving to database
-    const sanitizedImage =
-      typeof data.image === 'string'
-        ? null
-        : sanitizeCloudinaryResource(data.image);
-
+    // Process image and portfolio data for database storage
+    const processedImage = processImageForDatabase(data.image);
     const sanitizedPortfolio = sanitizeCloudinaryResources(data.portfolio);
 
     // Create or update profile with onboarding data
@@ -103,7 +99,7 @@ export async function completeOnboarding(
         category: data.category,
         subcategory: data.subcategory,
         coverage: data.coverage as Prisma.JsonValue,
-        ...(sanitizedImage && { image: sanitizedImage as Prisma.JsonValue }),
+        ...(processedImage && { image: processedImage }), // Only include if image exists
         portfolio: sanitizedPortfolio as Prisma.JsonValue,
         published: user.role !== 'user',
         isActive: true,
@@ -113,7 +109,7 @@ export async function completeOnboarding(
         category: data.category,
         subcategory: data.subcategory,
         coverage: data.coverage as Prisma.JsonValue,
-        ...(sanitizedImage && { image: sanitizedImage as Prisma.JsonValue }),
+        ...(processedImage && { image: processedImage }), // Only include if image exists
         portfolio: sanitizedPortfolio as Prisma.JsonValue,
         published: user.role !== 'user',
         isActive: true,
@@ -129,7 +125,7 @@ export async function completeOnboarding(
         headers: await headers(),
         body: {
           step: 'DASHBOARD',
-          // image: sanitizedImage ? JSON.stringify(sanitizedImage) : null,
+          ...(processedImage && { image: processedImage }), // Only sync if image exists
         },
       });
     } catch (authError) {
@@ -142,7 +138,7 @@ export async function completeOnboarding(
         where: { id: user.id },
         data: {
           step: 'DASHBOARD',
-          // image: sanitizedImage ? JSON.stringify(sanitizedImage) : null,
+          ...(processedImage && { image: processedImage }), // Only update if image exists
         },
       });
     }
