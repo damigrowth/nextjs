@@ -16,6 +16,16 @@ module.exports = {
         '3xl': '1600px',
         '4xl': '1700px',
       },
+      fontSize: {
+        '3sm': ['0.813rem', { lineHeight: '1.25rem' }], // 13px
+        '2sm': ['0.875rem', { lineHeight: '1.25rem' }], // 14px
+        sm: ['0.938rem', { lineHeight: '1.25rem' }], // 15px instead of default 14px
+      },
+      spacing: {
+        'tag-y': '0.2rem', // 3.2px
+        'tag-x': '0.6rem', // 9.6px
+        '1': '1px', // 1px for mb-1
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
@@ -44,7 +54,10 @@ module.exports = {
         fourth: 'hsl(var(--fourth))',
         fifth: 'hsl(var(--fifth))',
         sixth: 'hsl(var(--sixth))',
-        orangy: 'hsl(var(--orangy))',
+        orangy: {
+          DEFAULT: 'hsl(var(--orangy))',
+          foreground: 'hsl(var(--orangy-foreground))',
+        },
         yellowish: 'hsl(var(--yellowish))',
         bluey: 'hsl(var(--bluey))',
         'yellow-light': 'hsl(var(--yellow-light))',
