@@ -105,54 +105,17 @@ export const profileImageSchema = z
   .optional();
 
 // Coverage/Location validation for professionals
+// Now uses ID-based structure for better normalization
 export const coverageSchema = z.object({
   online: z.boolean(),
   onbase: z.boolean(),
   onsite: z.boolean(),
   address: z.string().optional(),
-  area: z
-    .object({
-      id: z.string(),
-      name: z.string(),
-    })
-    .nullable()
-    .optional(),
-  county: z
-    .object({
-      id: z.string(),
-      name: z.string(),
-    })
-    .nullable()
-    .optional(),
-  zipcode: z
-    .object({
-      id: z.string(),
-      name: z.string(),
-    })
-    .nullable()
-    .optional(),
-  counties: z
-    .array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-      }),
-    )
-    .optional(),
-  areas: z
-    .array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        county: z
-          .object({
-            id: z.string(),
-            name: z.string(),
-          })
-          .optional(),
-      }),
-    )
-    .optional(),
+  area: z.string().nullable().optional(), // Single area ID
+  county: z.string().nullable().optional(), // Single county ID
+  zipcode: z.string().nullable().optional(), // Single zipcode ID
+  counties: z.array(z.string()).optional(), // Array of county IDs
+  areas: z.array(z.string()).optional(), // Array of area IDs
 });
 
 // =============================================
@@ -219,113 +182,73 @@ export const additionalProfileInfoSchema = z.object({
 
 export const socialMediaSchema = z.object({
   facebook: z
-    .object({
-      url: z
-        .string()
-        .url('Enter a valid Facebook link')
-        .regex(
-          /^https?:\/\/(www\.)?facebook\.com\/.*$/,
-          'Invalid Facebook link',
-        )
-        .optional()
-        .nullable()
-        .or(z.literal('')),
-    })
+    .string()
+    .url('Enter a valid Facebook link')
+    .regex(
+      /^https?:\/\/(www\.)?facebook\.com\/.*$/,
+      'Invalid Facebook link',
+    )
     .optional()
-    .nullable(),
+    .nullable()
+    .or(z.literal('')),
   linkedin: z
-    .object({
-      url: z
-        .string()
-        .url('Enter a valid LinkedIn link')
-        .regex(
-          /^https?:\/\/(www\.)?linkedin\.com\/.*$/,
-          'Invalid LinkedIn link',
-        )
-        .optional()
-        .nullable()
-        .or(z.literal('')),
-    })
+    .string()
+    .url('Enter a valid LinkedIn link')
+    .regex(
+      /^https?:\/\/(www\.)?linkedin\.com\/.*$/,
+      'Invalid LinkedIn link',
+    )
     .optional()
-    .nullable(),
+    .nullable()
+    .or(z.literal('')),
   x: z
-    .object({
-      url: z
-        .string()
-        .url('Enter a valid X link')
-        .regex(/^https?:\/\/(www\.)?(twitter|x)\.com\/.*$/, 'Invalid X link')
-        .optional()
-        .nullable()
-        .or(z.literal('')),
-    })
+    .string()
+    .url('Enter a valid X link')
+    .regex(/^https?:\/\/(www\.)?(twitter|x)\.com\/.*$/, 'Invalid X link')
     .optional()
-    .nullable(),
+    .nullable()
+    .or(z.literal('')),
   youtube: z
-    .object({
-      url: z
-        .string()
-        .url('Enter a valid YouTube link')
-        .regex(/^https?:\/\/(www\.)?youtube\.com\/.*$/, 'Invalid YouTube link')
-        .optional()
-        .nullable()
-        .or(z.literal('')),
-    })
+    .string()
+    .url('Enter a valid YouTube link')
+    .regex(/^https?:\/\/(www\.)?youtube\.com\/.*$/, 'Invalid YouTube link')
     .optional()
-    .nullable(),
+    .nullable()
+    .or(z.literal('')),
   github: z
-    .object({
-      url: z
-        .string()
-        .url('Enter a valid GitHub link')
-        .regex(/^https?:\/\/(www\.)?github\.com\/.*$/, 'Invalid GitHub link')
-        .optional()
-        .nullable()
-        .or(z.literal('')),
-    })
+    .string()
+    .url('Enter a valid GitHub link')
+    .regex(/^https?:\/\/(www\.)?github\.com\/.*$/, 'Invalid GitHub link')
     .optional()
-    .nullable(),
+    .nullable()
+    .or(z.literal('')),
   instagram: z
-    .object({
-      url: z
-        .string()
-        .url('Enter a valid Instagram link')
-        .regex(
-          /^https?:\/\/(www\.)?instagram\.com\/.*$/,
-          'Invalid Instagram link',
-        )
-        .optional()
-        .nullable()
-        .or(z.literal('')),
-    })
+    .string()
+    .url('Enter a valid Instagram link')
+    .regex(
+      /^https?:\/\/(www\.)?instagram\.com\/.*$/,
+      'Invalid Instagram link',
+    )
     .optional()
-    .nullable(),
+    .nullable()
+    .or(z.literal('')),
   behance: z
-    .object({
-      url: z
-        .string()
-        .url('Enter a valid Behance link')
-        .regex(/^https?:\/\/(www\.)?behance\.net\/.*$/, 'Invalid Behance link')
-        .optional()
-        .nullable()
-        .or(z.literal('')),
-    })
+    .string()
+    .url('Enter a valid Behance link')
+    .regex(/^https?:\/\/(www\.)?behance\.net\/.*$/, 'Invalid Behance link')
     .optional()
-    .nullable(),
+    .nullable()
+    .or(z.literal('')),
   dribbble: z
-    .object({
-      url: z
-        .string()
-        .url('Enter a valid Dribbble link')
-        .regex(
-          /^https?:\/\/(www\.)?dribbble\.com\/.*$/,
-          'Invalid Dribbble link',
-        )
-        .optional()
-        .nullable()
-        .or(z.literal('')),
-    })
+    .string()
+    .url('Enter a valid Dribbble link')
+    .regex(
+      /^https?:\/\/(www\.)?dribbble\.com\/.*$/,
+      'Invalid Dribbble link',
+    )
     .optional()
-    .nullable(),
+    .nullable()
+    .or(z.literal('')),
 });
 
 // =============================================
