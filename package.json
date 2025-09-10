@@ -137,6 +137,7 @@
     "next": "^15.4.4",
     "prettier": "^3.5.3",
     "prisma": "^6.15.0",
+    "prisma-json-types-generator": "^3.6.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "tailwindcss": "^3",
