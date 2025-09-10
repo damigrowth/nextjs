@@ -47,34 +47,9 @@ export interface ContactEmailData {
 }
 
 // Template keys for type safety
-export type EmailTemplateKey = 
+export type EmailTemplateKey =
   | 'VERIFICATION'
   | 'WELCOME'
   | 'PASSWORD_RESET'
   | 'CONTACT_ADMIN'
   | 'CONTACT_CONFIRMATION';
-
-// You can add more template data types here as you create them
-export interface FormEmailData {
-  name: string;
-  email: string;
-  message: string;
-  [key: string]: any; // Allow additional fields for different forms
-}
-
-// Example for future templates
-export interface NewsletterEmailData {
-  name: string;
-  email: string;
-  unsubscribeUrl: string;
-}
-
-export interface ServiceRequestEmailData {
-  name: string;
-  email: string;
-  phone?: string;
-  serviceType: string;
-  description: string;
-  budget?: string;
-  timeline?: string;
-}
