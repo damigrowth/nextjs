@@ -35,17 +35,15 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { getUserProfileImageUrl } from '@/lib/utils/media';
 import { useSession } from '@/lib/auth/client';
 import { capitalizeFirstLetter } from '@/lib/utils/validation';
-import { useFreshSession } from '@/lib/hooks/useFreshSession';
 
 export default function DashboardSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session } = useFreshSession();
+  const { data: session } = useSession();
 
-  // Use fresh session user data (fresh for recent users, cached for established users)
+  // Use Better Auth session data
   const user = session?.user;
   const isProfessional =
     user?.role === 'freelancer' || user?.role === 'company';
@@ -133,12 +131,7 @@ export default function DashboardSidebar({
       ? user?.displayName
       : capitalizeFirstLetter(user?.username || 'User'),
     email: user?.email || '',
-    avatar:
-      getUserProfileImageUrl(user?.image, {
-        width: 32,
-        height: 32,
-        crop: 'fill',
-      }) || '/avatars/default.jpg',
+    avatar: user?.image || '/avatars/default.jpg',
   };
 
   return (

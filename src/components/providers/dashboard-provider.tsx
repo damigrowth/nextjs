@@ -203,8 +203,8 @@
 
 //     // Relations
 //     services: hasProfile && profile?.services ? profile.services : [],
-//     reviewsReceived:
-//       hasProfile && profile?.reviewsReceived ? profile.reviewsReceived : [],
+//     reviews:
+//       hasProfile && profile?.reviews ? profile.reviews : [],
 //     chatMemberships:
 //       hasProfile && profile?.chatMemberships ? profile.chatMemberships : [],
 

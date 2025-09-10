@@ -156,10 +156,10 @@ export function MultiSelect({
           </button>
         )}
       </div>
-      <div className='relative mt-2'>
+      <div className='relative'>
         <CommandList>
           {open && availableOptions.length > 0 && !isMaxReached ? (
-            <div className='absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in'>
+            <div className='absolute top-2 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in'>
               <CommandGroup className='h-full overflow-auto max-h-64'>
                 {availableOptions.map((option) => (
                   <CommandItem

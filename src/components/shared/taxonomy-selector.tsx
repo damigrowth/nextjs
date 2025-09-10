@@ -25,14 +25,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
-
-interface TaxonomyItem {
-  id: string;
-  label: string;
-  slug?: string;
-  description?: string;
-  children?: TaxonomyItem[];
-}
+import type { DatasetItem } from '@/lib/types/datasets';
 
 interface TaxonomyPath {
   category: string;
@@ -44,7 +37,7 @@ interface TaxonomyPath {
 }
 
 interface TaxonomySelectorProps {
-  taxonomies: TaxonomyItem[];
+  taxonomies: DatasetItem[];
   value?: TaxonomyPath | null;
   onValueChange?: (value: TaxonomyPath | null) => void;
   placeholder?: string;

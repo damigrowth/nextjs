@@ -97,7 +97,7 @@
 
 //   // Relations
 //   services: [],
-//   reviewsReceived: [],
+//   reviews: [],
 //   chatMemberships: [],
 
 //   // State management
@@ -237,7 +237,7 @@
 //               whatsapp: profileData.whatsapp,
 //               // Relations
 //               services: profileData.services || [],
-//               reviewsReceived: profileData.reviewsReceived || [],
+//               reviews: profileData.reviews || [],
 //               chatMemberships: profileData.chatMemberships || [],
 //             }
 //           : {}),

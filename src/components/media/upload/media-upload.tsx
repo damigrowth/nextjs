@@ -45,7 +45,7 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
       folder = 'uploads',
       maxFiles = 10,
       maxFileSize = 15000000, // 15MB
-      allowedFormats = ['jpg', 'jpeg', 'png', 'webp', 'mp4', 'mov'],
+      allowedFormats = ['jpg', 'jpeg', 'png', 'webp', 'mp4', 'webm', 'mp3', 'ogg', 'wav'],
       className = '',
       placeholder = 'Ανεβάστε αρχεία',
       error,
@@ -62,10 +62,24 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
     // Convert value to array for consistent handling (memoized)
     const resources = useMemo((): CloudinaryResourceOrPending[] => {
       if (!value) return [];
+
+      // Handle JSON string (serialized array)
       if (typeof value === 'string') {
-        return []; // String URLs are handled separately, don't treat as resources
+        try {
+          const parsed = JSON.parse(value);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
+          // If it's not an array, treat as single URL string
+          return [];
+        } catch {
+          // If parsing fails, treat as single URL string
+          return [];
+        }
       }
-      return Array.isArray(value) ? value : [value];
+
+      const result = Array.isArray(value) ? value : [value];
+      return result;
     }, [value]);
 
     // For image-only uploads, restrict formats (memoized)

@@ -32,7 +32,7 @@ function StaticHeroContent() {
     <div className='[contain:layout_style]'>
       {/* Service Directory Badge */}
       <Link href='/categories' className='inline-block mb-4'>
-        <Badge className='bg-[#198754] text-primary-foreground hover:bg-secondary rounded-full px-3 py-1 text-[13px] font-medium transition-colors cursor-pointer'>
+        <Badge className='bg-[#198754] text-primary-foreground hover:bg-secondary rounded-full px-3 py-1 text-3sm font-medium transition-colors cursor-pointer'>
           Κατάλογος Υπηρεσιών
         </Badge>
       </Link>
@@ -93,17 +93,17 @@ function PopularSearches({ subcategories }: { subcategories: any[] }) {
   return (
     <>
       {/* Equivalent to: dark-color ff-heading mt30 mb15 */}
-      <p className='font-sans mt-[30px] mb-[15px] text-[#6c757d]'>
+      <p className='font-sans mt-7 mb-4 text-gray-600'>
         Δημοφιλείς Αναζητήσεις
       </p>
 
       {/* Equivalent to: home9-tags at-home12 d-md-flex align-items-center */}
-      <div className='flex flex-wrap gap-[0.6rem] md:flex md:items-center'>
+      <div className='flex flex-wrap gap-2 md:flex md:items-center'>
         {displaySearches.map((sub, index) => (
           <Link href={`/ipiresies/${sub.slug}`} key={index}>
             <Badge
               variant='outline'
-              className='no-underline inline-block font-sans font-normal text-[12px] leading-[24px] py-[3px] px-[18px] rounded-[60px] border border-[#7d7d7d] bg-white text-dark transition-colors duration-200 ease-in-out hover:bg-[rgb(226,255,235)] cursor-pointer'
+              className='no-underline inline-block font-sans font-normal text-sm leading-6 py-1.5 px-6 rounded-full border border-gray-medium bg-white text-dark transition-colors duration-200 ease-in-out hover:bg-green-light/50 cursor-pointer'
             >
               {sub.label}
             </Badge>
@@ -142,10 +142,10 @@ function HeroImages() {
             <Star className='h-6 w-6 text-dark/50' />
           </span>
           <div className='pl-5'>
-            <h6 className='mb-[1px] font-semibold text-base text-gray-800'>
+            <h6 className='mb-1 font-semibold text-base text-gray-800'>
               Κριτικές 5*
             </h6>
-            <p className='mb-0 text-[13px] text-gray-600'>TOP επαγγελματίες</p>
+            <p className='mb-0 text-3sm text-gray-600'>TOP επαγγελματίες</p>
           </div>
         </div>
 
@@ -155,12 +155,10 @@ function HeroImages() {
             <Rocket className='h-6 w-6 text-white/50' />
           </span>
           <div className='pl-5'>
-            <h6 className='mb-[1px] font-semibold text-base text-gray-900'>
+            <h6 className='mb-1 font-semibold text-base text-gray-900'>
               100+ νέες
             </h6>
-            <p className='mb-0 text-[13px] text-gray-800'>
-              Διαθέσιμες Υπηρεσίες
-            </p>
+            <p className='mb-0 text-3sm text-gray-800'>Διαθέσιμες Υπηρεσίες</p>
           </div>
         </div>
       </div>
@@ -175,7 +173,7 @@ function HeroImages() {
           loading='lazy'
           quality={75}
           decoding='async'
-          className='w-[80px] h-auto animate-bounce-y-reverse'
+          className='w-20 h-auto animate-bounce-y-reverse'
         />
       </div>
     </div>
@@ -220,7 +218,7 @@ export default function HeroHome({ categories = [] }: Props) {
             <div className='mt-8'>
               <Suspense
                 fallback={
-                  <div className='h-[120px] flex items-center'>
+                  <div className='h-32 flex items-center'>
                     <div
                       className='inline-block w-4 h-4 mr-2 border-2 border-current border-r-transparent rounded-full animate-spin'
                       role='status'

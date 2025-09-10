@@ -31,7 +31,7 @@ const ResourcePreview = memo<ResourcePreviewProps>(({
             alt={resource.original_filename || 'Uploaded image'}
             className="object-cover w-full h-full"
           />
-        ) : resource.public_id ? (
+        ) : resource.public_id && resource.resource_type === 'image' ? (
           <CldImage
             width={width}
             height={height}
@@ -41,7 +41,7 @@ const ResourcePreview = memo<ResourcePreviewProps>(({
           />
         ) : (
           <img
-            src={resource.secure_url}
+            src={resource.secure_url || resource.url}
             alt={resource.original_filename || 'Uploaded image'}
             className="object-cover w-full h-full"
           />
@@ -57,8 +57,8 @@ const ResourcePreview = memo<ResourcePreviewProps>(({
               playsInline
             >
               <source
-                src={resource.secure_url}
-                type={`video/${resource.format}` || 'video/mp4'}
+                src={resource.secure_url || resource.url}
+                type={resource.format ? `video/${resource.format}` : 'video/mp4'}
               />
               <span className="text-white">
                 Video cannot be played
@@ -87,8 +87,8 @@ const ResourcePreview = memo<ResourcePreviewProps>(({
                 preload="metadata"
               >
                 <source
-                  src={resource.secure_url}
-                  type={`audio/${resource.format}` || 'audio/mpeg'}
+                  src={resource.secure_url || resource.url}
+                  type={resource.format ? `audio/${resource.format}` : 'audio/mpeg'}
                 />
                 Your browser does not support audio playback.
               </audio>

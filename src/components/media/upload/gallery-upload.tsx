@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import {
   DndContext,
@@ -34,8 +34,22 @@ interface SortableResourceProps {
   onRemove: (publicId: string) => void;
 }
 
+// Helper function to generate stable IDs
+const generateStableId = (resource: CloudinaryResourceOrPending, index: number): string => {
+  if (resource.public_id) {
+    return resource.public_id;
+  }
+  // For pending resources, use a combination of properties that won't change
+  if (isPendingResource(resource)) {
+    return `pending-${resource._pending}-${index}`;
+  }
+  return `resource-${index}`;
+};
+
 const SortableResource = memo<SortableResourceProps>(
   ({ resource, index, onRemove }) => {
+    const stableId = generateStableId(resource, index);
+    
     const {
       attributes,
       listeners,
@@ -44,7 +58,7 @@ const SortableResource = memo<SortableResourceProps>(
       transition,
       isDragging,
     } = useSortable({
-      id: resource.public_id || `resource-${index}`,
+      id: stableId,
     });
 
     const style = {
@@ -106,6 +120,13 @@ const GalleryUpload = memo<GalleryUploadProps>(
     className = '',
     type,
   }) => {
+    // Client-side rendering protection for drag and drop
+    const [isMounted, setIsMounted] = useState(false);
+    
+    useEffect(() => {
+      setIsMounted(true);
+    }, []);
+    
     const sensors = useSensors(
       useSensor(PointerSensor, {
         activationConstraint: {
@@ -123,14 +144,10 @@ const GalleryUpload = memo<GalleryUploadProps>(
 
         if (over && active.id !== over.id) {
           const oldIndex = resources.findIndex(
-            (item) =>
-              (item.public_id || `resource-${resources.indexOf(item)}`) ===
-              active.id,
+            (item, index) => generateStableId(item, index) === active.id,
           );
           const newIndex = resources.findIndex(
-            (item) =>
-              (item.public_id || `resource-${resources.indexOf(item)}`) ===
-              over.id,
+            (item, index) => generateStableId(item, index) === over.id,
           );
 
           if (oldIndex !== -1 && newIndex !== -1) {
@@ -164,9 +181,9 @@ const GalleryUpload = memo<GalleryUploadProps>(
 
     const totalFiles = resources.length + queuedFiles.length;
 
-    // Generate sortable IDs for resources
-    const resourceIds = resources.map(
-      (resource, index) => resource.public_id || `resource-${index}`,
+    // Generate stable sortable IDs for resources
+    const resourceIds = resources.map((resource, index) => 
+      generateStableId(resource, index)
     );
 
     return (
@@ -246,7 +263,7 @@ const GalleryUpload = memo<GalleryUploadProps>(
                 </p>
                 <p className='text-xs mb-0 text-gray-600'>
                   Μέχρι <span className='font-semibold'>{maxFiles}</span> αρχεία
-                  βίντεο / ήχου
+                  (εικόνες, βίντεο, ήχος)
                 </p>
                 <p className='text-xs mb-0 text-gray-500'>
                   Υποστηριζόμενοι τύποι: {formats.join(', ')}
@@ -265,25 +282,42 @@ const GalleryUpload = memo<GalleryUploadProps>(
                   className='flex flex-wrap justify-center gap-4 w-fit place-self-center mt-6'
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <SortableContext
-                      items={resourceIds}
-                      strategy={verticalListSortingStrategy}
-                    >
+                  {!isMounted ? (
+                    // Server-side rendering fallback without drag and drop
+                    <div className='flex flex-wrap justify-center gap-4'>
                       {resources.map((resource, index) => (
-                        <SortableResource
-                          key={resource.public_id || `resource-${index}`}
-                          resource={resource}
-                          index={index}
-                          onRemove={handleRemove}
-                        />
+                        <div key={generateStableId(resource, index)}>
+                          <ResourcePreview
+                            resource={resource}
+                            index={index}
+                            onRemove={handleRemove}
+                            isDragging={false}
+                          />
+                        </div>
                       ))}
-                    </SortableContext>
-                  </DndContext>
+                    </div>
+                  ) : (
+                    // Client-side rendering with drag and drop
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={resourceIds}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {resources.map((resource, index) => (
+                          <SortableResource
+                            key={generateStableId(resource, index)}
+                            resource={resource}
+                            index={index}
+                            onRemove={handleRemove}
+                          />
+                        ))}
+                      </SortableContext>
+                    </DndContext>
+                  )}
                 </div>
               )}
             </div>

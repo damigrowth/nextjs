@@ -75,7 +75,7 @@ function CategoryCard({ category }: { category: ServiceTaxonomy }) {
 
   return (
     <div className='bg-transparent rounded-xl mb-1 mt-5 py-10 px-8 pb-8 relative transition-all duration-300 ease-in-out group'>
-      <div className='text-center'>
+      <div className='text-left'>
         <Link href={`/categories/${slug}`} className='inline-block'>
           <div className='relative inline-block text-4xl text-primary z-10 mb-5 transition-all duration-300 ease-in-out before:content-[""] before:bg-orangy before:rounded-full before:absolute before:-bottom-2.5 before:-right-5 before:h-10 before:w-10 before:-z-10 before:transition-all before:duration-300 before:ease-in-out group-hover:before:bg-sixth'>
             {getCategoryIcon(slug)}
@@ -84,7 +84,7 @@ function CategoryCard({ category }: { category: ServiceTaxonomy }) {
       </div>
 
       <div className='mt-5'>
-        <h4 className='text-sm mb-1 font-bold leading-6 text-center'>
+        <h4 className='text-sm mb-1 font-bold leading-6 text-left'>
           <Link
             href={`/categories/${slug}`}
             className='text-gray-900 hover:text-third transition-colors'
@@ -93,7 +93,7 @@ function CategoryCard({ category }: { category: ServiceTaxonomy }) {
           </Link>
         </h4>
 
-        <p className='mb-0 text-sm text-gray-600 text-center'>
+        <p className='mb-0 text-sm text-gray-600 text-left'>
           {children.slice(0, 3).map((sub, i, array) => (
             <span key={i}>
               <Link

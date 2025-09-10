@@ -106,14 +106,14 @@ export default function TestimonialsHome({
             </div>
 
             <div className='flex flex-wrap'>
-              <div className='w-full sm:w-1/2 lg:w-1/3 mb-6'>
+              <div className='w-full sm:w-1/2 lg:w-1/3 mb-6 pr-8'>
                 <StatItem
                   value='4.9/5'
                   description='Οι top επαγγελματίες έχουν λάβει τις καλύτερες αξιολογήσεις'
                 />
               </div>
 
-              <div className='w-full sm:w-1/2 lg:w-1/3 mb-6'>
+              <div className='w-full sm:w-1/2 lg:w-1/3 mb-6 pr-8'>
                 <StatItem
                   value='99'
                   suffix='% εγγύηση'
@@ -121,7 +121,7 @@ export default function TestimonialsHome({
                 />
               </div>
 
-              <div className='w-full sm:w-1/2 lg:w-1/3 mb-6'>
+              <div className='w-full sm:w-1/2 lg:w-1/3 mb-6 pr-8'>
                 <div className='transition-all duration-400 ease-in-out'>
                   <div className='mb-4'>
                     <h3 className='text-dark font-bold text-2xl leading-10 mb-2'>
