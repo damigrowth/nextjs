@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/actions/auth/server';
-import OAuthSetupForm from '@/components/auth/oauth-setup-form';
 import { Meta } from '@/lib/seo/Meta';
+import OAuthSetupForm from '@/components/forms/auth/form-oauth-setup';
 
 export const dynamic = 'force-dynamic';
 

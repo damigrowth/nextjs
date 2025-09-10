@@ -1,6 +1,5 @@
-import PresentationInfoForm from '@/components/profile/presentation-info-form';
-import PortfolioForm from '@/components/profile/portfolio-form';
 import { getCurrentUser } from '@/actions/auth/server';
+import { PortfolioForm, PresentationInfoForm } from '@/components';
 import { redirect } from 'next/navigation';
 
 export default async function PresentationPage() {
@@ -33,7 +32,11 @@ export default async function PresentationPage() {
       {/* Presentation Info Form - Phone, Website, Visibility, Socials */}
       <PresentationInfoForm initialUser={user} initialProfile={profile} />
       {/* Portfolio Form - Media Upload */}
-      <PortfolioForm initialUser={user} initialProfile={profile} />
+      <PortfolioForm
+        initialUser={user}
+        initialProfile={profile}
+        showHeading={false}
+      />
     </div>
   );
 }

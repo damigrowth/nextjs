@@ -4,7 +4,7 @@ import LinkNP from '@/components/link';
 
 import { Meta } from '@/lib/seo/Meta';
 
-import { FormAuthLogin } from '@/components/auth';
+import { FormAuthLogin } from '@/components';
 import {
   redirectCompletedUsers,
   redirectOnboardingUsers,

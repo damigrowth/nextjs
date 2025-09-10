@@ -11,7 +11,7 @@ import {
   AuthTypeOptions,
   FormAuthRegister,
   HeadingFormRegister,
-} from '@/components/auth';
+} from '@/components';
 import { JSX } from 'react';
 
 export const dynamic = 'force-dynamic';

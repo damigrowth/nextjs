@@ -1,6 +1,5 @@
-import { AccountForm } from '@/components';
-import { AccountPageActions } from '@/components/profile/account-page-actions';
 import { getCurrentUser } from '@/actions/auth/server';
+import { AccountForm, AccountPageActions } from '@/components';
 import { redirect } from 'next/navigation';
 
 export default async function AccountPage() {

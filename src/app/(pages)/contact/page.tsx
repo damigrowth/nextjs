@@ -1,8 +1,8 @@
 import React from 'react';
 import { FaqSection, HeroBanner } from '@/components/shared';
-import { ContactForm } from '@/components/forms';
 import { data } from '@/constants/datasets/contact';
 import { Phone, Mail } from 'lucide-react';
+import { ContactForm } from '@/components/forms';
 
 export default function ContactPage() {
   const { contact, faq } = data;

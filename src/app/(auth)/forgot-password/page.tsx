@@ -2,12 +2,12 @@ import { JSX } from 'react';
 import { Metadata } from 'next';
 
 import { Meta } from '@/lib/seo/Meta';
-import { FormForgotPassword } from '@/components/auth';
 import {
   redirectCompletedUsers,
   redirectOnboardingUsers,
   redirectOAuthUsersToSetup,
 } from '@/actions/auth/server';
+import { FormForgotPassword } from '@/components';
 
 export const dynamic = 'force-dynamic';
 

@@ -3,12 +3,12 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { Meta } from '@/lib/seo/Meta';
-import { FormResetPassword } from '@/components/auth';
 import {
   redirectCompletedUsers,
   redirectOnboardingUsers,
   redirectOAuthUsersToSetup,
 } from '@/actions/auth/server';
+import { FormResetPassword } from '@/components';
 
 export const dynamic = 'force-dynamic';
 
