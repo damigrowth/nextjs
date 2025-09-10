@@ -11,7 +11,6 @@ import {
 
 import { signOut } from '@/lib/auth/client';
 import { UserMenuProps, MenuItem } from '@/types/components';
-import { getUserProfileImageUrl } from '@/lib/utils/media';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -38,7 +37,7 @@ import {
 import { Skeleton } from '../ui/skeleton';
 import { MessagesMenu, SavedMenu } from '../dashboard';
 import UserImage from './user-image';
-import { useFreshSession } from '@/lib/hooks/useFreshSession';
+import { useSession } from '@/lib/auth/client';
 import { capitalizeFirstLetter } from '@/lib/utils/validation';
 
 // Icon mapping function
@@ -58,11 +57,15 @@ const getMenuIcon = (iconName: string) => {
 
 export default function UserMenu({ isMobile }: UserMenuProps) {
   const router = useRouter();
-  const { data: session, isPending } = useFreshSession();
+  const { data: session, isPending } = useSession();
 
-  // Use fresh session user data (fresh for recent users, cached for established users)
+  // Use Better Auth session data
   const user = session?.user;
-  // console.log('MENU USER - FRESH SESSION', user);
+  // TODO: Check if user authentication correctly sets and update the image when onboarding and signing up and that the image is synced correctly (cache synced) -
+  // TODO: Also check my scripts, when i update the profile it also need to update the duplicate fields of user, so if i update the profile    with image then it needs to update the user image as well, find the fields that are in both models in   @src\lib\prisma\schema\user.prisma and update the @scripts\profile-migration.ts
+
+  // console.log('MENU USER - BETTER AUTH SESSION', session);
+  // console.log('MENU USER - BETTER AUTH USER', user);
 
   const isAuthenticated = !!user;
   // const isConfirmed = user?.emailVerified || false;
@@ -145,7 +148,7 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
             <div className='flex justify-center items-center'>
               <SavedMenu />
             </div>
-            <div className='flex justify-center items-center pr-3'>
+            <div className='flex justify-center items-center pr-1'>
               <MessagesMenu />
             </div>
           </>
@@ -159,13 +162,9 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
               <UserImage
                 displayName={user?.displayName || user?.username || ''}
                 hideDisplayName
-                image={getUserProfileImageUrl(user?.image, {
-                  width: 80,
-                  height: 80,
-                  crop: 'fill',
-                })}
-                width={37}
-                height={37}
+                image={user?.image}
+                width={30}
+                height={30}
               />
             </Button>
           </DropdownMenuTrigger>

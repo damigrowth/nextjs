@@ -1,17 +1,17 @@
 // Profile Components
-export { default as AccountForm } from './account-form';
-export { default as BasicInfoForm } from './basic-info-form';
-export { default as AdditionalInfoForm } from './additional-info-form';
-export { default as PresentationInfoForm } from './presentation-info-form';
-export { default as PortfolioForm } from './portfolio-form';
-export { default as VerificationForm } from './verification-form';
-export { default as BillingForm } from './billing-form';
-export { default as DocumentsInterface } from './documents-interface';
-export { default as ChangePasswordForm } from './change-password-form';
-export { default as DeleteAccountForm } from './delete-account-form';
-export { default as ProfileSidebar } from './profile-sidebar';
-export { default as VerificationStatus } from './verification-status';
+export { default as ProfileMeta } from './profile-meta';
+export { default as ProfileMetrics } from './profile-metrics';
+export { default as ProfileBio } from './profile-bio';
+export { default as ProfileFeatures } from './profile-features';
+export { default as ProfileIndustries } from './profile-industries';
+export { default as ProfilePortfolio } from './profile-portfolio';
+export { default as ProfileTerms } from './profile-terms';
+export { default as ProfileInfo } from './profile-info';
+export { default as ProfileSkills } from './profile-skills';
+export { default as ProfileBreadcrumb } from './profile-breadcrumb';
+export { default as ContactReveal } from './contact-reveal';
+
+// User Components
 export { default as UserImage } from './user-image';
-export { default as OnboardingForm } from './form-onboarding';
 export { default as MenuUserLink } from './menu-user-link';
 export { default as MenuUser } from './menu-user';
