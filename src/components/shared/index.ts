@@ -19,4 +19,7 @@ export { default as BannerCookies } from './banner-cookies';
 export { default as RatingDisplay } from './rating-display';
 export { default as TaxonomySelector } from './taxonomy-selector';
 export { default as SaveButton } from './save-button';
+export { default as BreadcrumbButtons } from './breadcrumb-buttons';
+export { default as MediaCarousel } from './media-carousel';
+export { default as TaxonomyTabs } from './taxonomy-tabs';
 export * from './layout';
