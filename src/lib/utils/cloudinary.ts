@@ -3,6 +3,7 @@
  * Helper functions for Cloudinary integration
  */
 
+import { JsonValue } from '@prisma/client/runtime/library';
 import { CloudinaryResource } from '@/lib/types/cloudinary';
 
 /**
@@ -165,12 +166,18 @@ export function filterPendingResources(
 /**
  * Sanitize Cloudinary resources for database storage
  * Removes pending resources and the _pending flag from uploaded resources
+ * Now supports both CloudinaryResource objects and string URLs
  */
 export function sanitizeCloudinaryResource(
-  resource: CloudinaryResource | null
-): CloudinaryResource | null {
+  resource: CloudinaryResource | string | null
+): CloudinaryResource | string | null {
   if (!resource) {
     return null;
+  }
+  
+  // If it's a string URL, return as-is (already clean)
+  if (typeof resource === 'string') {
+    return resource;
   }
   
   const isPending = isPendingResource(resource);
@@ -196,4 +203,94 @@ export function sanitizeCloudinaryResources(
     const { _pending, ...sanitized } = resource as any;
     return sanitized as CloudinaryResource;
   });
+}
+
+/**
+ * IMAGE DATABASE UTILITIES
+ * Helper functions for handling images in database storage
+ */
+
+/**
+ * Process image data for database storage
+ * Converts CloudinaryResource objects to URL strings for consistency
+ * Supports both migrated users (string URLs) and new uploads (CloudinaryResource objects)
+ */
+export function processImageForDatabase(imageData: any): string | null {
+  if (!imageData) return null;
+
+  // If it's already a string URL, return as-is
+  if (typeof imageData === 'string') {
+    return imageData;
+  }
+
+  // If it's a CloudinaryResource object, extract the secure_url
+  if (typeof imageData === 'object' && imageData.secure_url) {
+    return imageData.secure_url;
+  }
+
+  return null;
+}
+
+/**
+ * Get image URL from either CloudinaryResource object or string URL
+ * Handles both formats for backward compatibility in components
+ */
+export function getImageUrl(image: CloudinaryResource | string | null): string | null {
+  if (!image) return null;
+
+  // If it's a string URL, return as-is
+  if (typeof image === 'string') {
+    return image;
+  }
+
+  // If it's a CloudinaryResource object, return secure_url
+  if (typeof image === 'object' && image.secure_url) {
+    return image.secure_url;
+  }
+
+  return null;
+}
+
+/**
+ * Check if an image value is a string URL
+ */
+export function isImageUrl(image: any): image is string {
+  return typeof image === 'string' && image.length > 0;
+}
+
+/**
+ * Check if an image value is a CloudinaryResource object
+ */
+export function isCloudinaryResource(image: any): image is CloudinaryResource {
+  return typeof image === 'object' && image !== null && 'secure_url' in image;
+}
+
+/**
+ * Get image display properties for components
+ * Returns consistent format regardless of input type
+ */
+export function getImageDisplayProps(image: CloudinaryResource | string | null): {
+  url: string | null;
+  alt?: string;
+  width?: number;
+  height?: number;
+} {
+  if (!image) {
+    return { url: null };
+  }
+
+  if (typeof image === 'string') {
+    return { url: image };
+  }
+
+  if (typeof image === 'object' && image.secure_url) {
+    return {
+      url: image.secure_url,
+      alt: image.metadata?.alternative_text || image.original_filename,
+      width: image.width,
+      height: image.height,
+    };
+  }
+
+  return { url: null };
 }

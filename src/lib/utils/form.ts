@@ -271,20 +271,18 @@ export function parseVisibilityJSON(value: JsonValue | null | undefined): Profil
 
 /**
  * Parse socials JSON with proper type safety for form input
- * Returns objects with url properties for form fields, even if empty
+ * Now returns simple strings to match new schema format
  */
 export function parseSocialsJSON(value: JsonValue | null | undefined): SocialMediaInput {
-  // For form inputs, we always need objects with url properties
-  const defaultPlatform = { url: '' };
   const defaultSocials = {
-    facebook: defaultPlatform,
-    instagram: defaultPlatform,
-    linkedin: defaultPlatform,
-    x: defaultPlatform,
-    youtube: defaultPlatform,
-    github: defaultPlatform,
-    behance: defaultPlatform,
-    dribbble: defaultPlatform,
+    facebook: '',
+    instagram: '',
+    linkedin: '',
+    x: '',
+    youtube: '',
+    github: '',
+    behance: '',
+    dribbble: '',
   };
   
   if (!value) {
@@ -297,14 +295,14 @@ export function parseSocialsJSON(value: JsonValue | null | undefined): SocialMed
       const parsed = JSON.parse(value);
       if (typeof parsed === 'object' && parsed !== null) {
         return {
-          facebook: parseSocialPlatform(parsed.facebook, defaultPlatform),
-          instagram: parseSocialPlatform(parsed.instagram, defaultPlatform),
-          linkedin: parseSocialPlatform(parsed.linkedin, defaultPlatform),
-          x: parseSocialPlatform(parsed.x, defaultPlatform),
-          youtube: parseSocialPlatform(parsed.youtube, defaultPlatform),
-          github: parseSocialPlatform(parsed.github, defaultPlatform),
-          behance: parseSocialPlatform(parsed.behance, defaultPlatform),
-          dribbble: parseSocialPlatform(parsed.dribbble, defaultPlatform),
+          facebook: parseSocialPlatformString(parsed.facebook),
+          instagram: parseSocialPlatformString(parsed.instagram),
+          linkedin: parseSocialPlatformString(parsed.linkedin),
+          x: parseSocialPlatformString(parsed.x || parsed.twitter), // Handle twitter -> x migration
+          youtube: parseSocialPlatformString(parsed.youtube),
+          github: parseSocialPlatformString(parsed.github),
+          behance: parseSocialPlatformString(parsed.behance),
+          dribbble: parseSocialPlatformString(parsed.dribbble),
         };
       }
     } catch (e) {
@@ -322,30 +320,66 @@ export function parseSocialsJSON(value: JsonValue | null | undefined): SocialMed
   const obj = value as Record<string, unknown>;
   
   return {
-    facebook: parseSocialPlatform(obj.facebook, defaultPlatform),
-    instagram: parseSocialPlatform(obj.instagram, defaultPlatform),
-    linkedin: parseSocialPlatform(obj.linkedin, defaultPlatform),
-    x: parseSocialPlatform(obj.x, defaultPlatform),
-    youtube: parseSocialPlatform(obj.youtube, defaultPlatform),
-    github: parseSocialPlatform(obj.github, defaultPlatform),
-    behance: parseSocialPlatform(obj.behance, defaultPlatform),
-    dribbble: parseSocialPlatform(obj.dribbble, defaultPlatform),
+    facebook: parseSocialPlatformString(obj.facebook),
+    instagram: parseSocialPlatformString(obj.instagram),
+    linkedin: parseSocialPlatformString(obj.linkedin),
+    x: parseSocialPlatformString(obj.x || obj.twitter), // Handle twitter -> x migration
+    youtube: parseSocialPlatformString(obj.youtube),
+    github: parseSocialPlatformString(obj.github),
+    behance: parseSocialPlatformString(obj.behance),
+    dribbble: parseSocialPlatformString(obj.dribbble),
   };
 }
 
 /**
+ * Helper function to parse individual social platform data as string
+ * Handles both old object format and new string format
+ */
+function parseSocialPlatformString(value: unknown): string {
+  // Handle null/undefined
+  if (!value) {
+    return '';
+  }
+  
+  // Handle new string format (direct URL)
+  if (typeof value === 'string') {
+    return value;
+  }
+  
+  // Handle old object format
+  if (typeof value === 'object' && value !== null) {
+    const obj = value as Record<string, unknown>;
+    return typeof obj.url === 'string' ? obj.url : '';
+  }
+  
+  return '';
+}
+
+/**
  * Helper function to parse individual social platform data
- * Always returns an object with url property for form compatibility
+ * Always returns an object with url property for form compatibility (legacy)
+ * Now handles both old object format and new string format
  */
 function parseSocialPlatform(value: unknown, defaultValue: { url: string }): { url: string } {
-  if (!value || typeof value !== 'object' || value === null) {
+  // Handle null/undefined
+  if (!value) {
     return defaultValue;
   }
   
-  const obj = value as Record<string, unknown>;
-  return {
-    url: typeof obj.url === 'string' ? obj.url : defaultValue.url,
-  };
+  // Handle new string format (direct URL)
+  if (typeof value === 'string') {
+    return { url: value };
+  }
+  
+  // Handle old object format
+  if (typeof value === 'object' && value !== null) {
+    const obj = value as Record<string, unknown>;
+    return {
+      url: typeof obj.url === 'string' ? obj.url : defaultValue.url,
+    };
+  }
+  
+  return defaultValue;
 }
 
 /**
@@ -375,17 +409,18 @@ export function parsePortfolioJSON(value: JsonValue | null | undefined): any[] {
 
 /**
  * Parse coverage JSON with proper type safety
+ * Now uses ID-based structure for locations
  */
 export function parseCoverageJSON(value: JsonValue | null | undefined): {
   online: boolean;
   onbase: boolean;
   onsite: boolean;
   address?: string;
-  area?: { id: string; name: string; } | null;
-  county?: { id: string; name: string; } | null;
-  zipcode?: { id: string; name: string; } | null;
-  counties?: { id: string; name: string; }[];
-  areas?: { id: string; name: string; county?: { id: string; name: string; }; }[];
+  area?: string | null;
+  county?: string | null;
+  zipcode?: string | null;
+  counties?: string[];
+  areas?: string[];
 } {
   const defaultValue = {
     online: false,
@@ -413,11 +448,13 @@ export function parseCoverageJSON(value: JsonValue | null | undefined): {
           onbase: typeof parsed.onbase === 'boolean' ? parsed.onbase : defaultValue.onbase,
           onsite: typeof parsed.onsite === 'boolean' ? parsed.onsite : defaultValue.onsite,
           address: typeof parsed.address === 'string' ? parsed.address : defaultValue.address,
-          area: parsed.area || defaultValue.area,
-          county: parsed.county || defaultValue.county,
-          zipcode: parsed.zipcode || defaultValue.zipcode,
-          counties: Array.isArray(parsed.counties) ? parsed.counties : defaultValue.counties,
-          areas: Array.isArray(parsed.areas) ? parsed.areas : defaultValue.areas,
+          // Handle both old object format and new ID format for backward compatibility
+          area: parseLocationId(parsed.area) || defaultValue.area,
+          county: parseLocationId(parsed.county) || defaultValue.county,
+          zipcode: parseLocationId(parsed.zipcode) || defaultValue.zipcode,
+          // Handle both old array of objects and new array of IDs
+          counties: parseLocationIds(parsed.counties) || defaultValue.counties,
+          areas: parseLocationIds(parsed.areas) || defaultValue.areas,
         };
       }
     } catch (e) {
@@ -439,10 +476,61 @@ export function parseCoverageJSON(value: JsonValue | null | undefined): {
     onbase: typeof obj.onbase === 'boolean' ? obj.onbase : defaultValue.onbase,
     onsite: typeof obj.onsite === 'boolean' ? obj.onsite : defaultValue.onsite,
     address: typeof obj.address === 'string' ? obj.address : defaultValue.address,
-    area: obj.area || defaultValue.area,
-    county: obj.county || defaultValue.county,
-    zipcode: obj.zipcode || defaultValue.zipcode,
-    counties: Array.isArray(obj.counties) ? obj.counties : defaultValue.counties,
-    areas: Array.isArray(obj.areas) ? obj.areas : defaultValue.areas,
+    // Handle both old object format and new ID format for backward compatibility
+    area: parseLocationId(obj.area) || defaultValue.area,
+    county: parseLocationId(obj.county) || defaultValue.county,
+    zipcode: parseLocationId(obj.zipcode) || defaultValue.zipcode,
+    // Handle both old array of objects and new array of IDs
+    counties: parseLocationIds(obj.counties) || defaultValue.counties,
+    areas: parseLocationIds(obj.areas) || defaultValue.areas,
   };
+}
+
+/**
+ * Helper to parse a location field that can be either an object with id or a string ID
+ * For backward compatibility with existing data
+ */
+function parseLocationId(value: unknown): string | null {
+  if (!value) return null;
+  
+  // New format: direct string ID
+  if (typeof value === 'string') {
+    return value;
+  }
+  
+  // Old format: object with id property
+  if (typeof value === 'object' && value !== null) {
+    const obj = value as Record<string, unknown>;
+    return typeof obj.id === 'string' ? obj.id : null;
+  }
+  
+  return null;
+}
+
+/**
+ * Helper to parse location arrays that can be either arrays of objects or arrays of string IDs
+ * For backward compatibility with existing data
+ */
+function parseLocationIds(value: unknown): string[] {
+  if (!value || !Array.isArray(value)) return [];
+  
+  return value.map(item => {
+    // New format: direct string ID
+    if (typeof item === 'string') {
+      // Filter out zipcode values that are numeric strings (like '30015')
+      // These should not be in areas/counties arrays
+      if (/^\d{5}$/.test(item)) {
+        return null;
+      }
+      return item;
+    }
+    
+    // Old format: object with id property
+    if (typeof item === 'object' && item !== null) {
+      const obj = item as Record<string, unknown>;
+      return typeof obj.id === 'string' ? obj.id : null;
+    }
+    
+    return null;
+  }).filter((id): id is string => id !== null);
 }

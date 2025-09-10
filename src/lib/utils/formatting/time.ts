@@ -1,7 +1,10 @@
 import { format, register } from 'timeago.js';
 
+// Define the locale function type
+type LocaleFunc = (number: number, index: number) => [string, string];
+
 // Greek locale configuration
-register('el', (number, index) => {
+const greekLocale: LocaleFunc = (number: number, index: number) => {
   return [
     ['μόλις τώρα', 'σε λίγο'],
     ['πριν %s δευτερόλεπτα', 'σε %s δευτερόλεπτα'],
@@ -18,14 +21,17 @@ register('el', (number, index) => {
     ['πριν 1 χρόνο', 'σε 1 χρόνο'],
     ['πριν %s χρόνια', 'σε %s χρόνια'],
   ][index];
-});
+};
+
+// Register Greek locale
+register('el', greekLocale);
 
 /**
  * Formats a date to relative time in Greek
- * @param {string|Date} date - The date to format
- * @returns {string} Formatted relative time string in Greek
+ * @param date - The date to format
+ * @returns Formatted relative time string in Greek
  */
-export const timeAgo = (date) => {
+export const timeAgo = (date: string | Date | null | undefined): string => {
   if (!date) return '';
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -35,21 +41,19 @@ export const timeAgo = (date) => {
     return format(dateObj, 'el');
   } catch (error) {
     console.error('Error formatting Greek time:', error);
-
     return '';
   }
 };
 
 /**
  * Gets only the date part from a date string for comparison purposes
- * @param {string} dateString - ISO date string
- * @returns {string} Date in YYYY-MM-DD format for easy comparison
+ * @param dateString - ISO date string
+ * @returns Date in YYYY-MM-DD format for easy comparison
  */
-export const getDatePart = (dateString) => {
+export const getDatePart = (dateString: string | null | undefined): string => {
   if (!dateString) return '';
   try {
     const date = new Date(dateString);
-
     return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD
   } catch (error) {
     return '';
@@ -58,10 +62,10 @@ export const getDatePart = (dateString) => {
 
 /**
  * Formats a date string to display time for today's messages, day and month for this year, or day/month/year for previous years
- * @param {string} dateString - ISO date string to format
- * @returns {string} Formatted time for today, day and month for this year, or day/month/year for previous years
+ * @param dateString - ISO date string to format
+ * @returns Formatted time for today, day and month for this year, or day/month/year for previous years
  */
-export const formatMessageTime = (dateString) => {
+export const formatMessageTime = (dateString: string | null | undefined): string => {
   if (!dateString) return '';
   try {
     const messageDate = new Date(dateString);
@@ -70,9 +74,7 @@ export const formatMessageTime = (dateString) => {
 
     // Get hours and minutes
     const hours = messageDate.getHours();
-
     const minutes = messageDate.getMinutes().toString().padStart(2, '0');
-
     const timeStr = `${hours}:${minutes}`;
 
     const today = new Date();
@@ -91,22 +93,19 @@ export const formatMessageTime = (dateString) => {
       return timeStr;
     } else if (isThisYear) {
       // For messages from this year, show day and month
-      const options = {
+      const options: Intl.DateTimeFormatOptions = {
         day: 'numeric',
         month: 'long',
       };
 
       const dateFormatter = new Intl.DateTimeFormat('el-GR', options);
-
       const formattedDate = dateFormatter.format(messageDate);
 
       return `${formattedDate} - ${timeStr}`;
     } else {
       // For messages from previous years, show day/month/year
       const day = messageDate.getDate().toString().padStart(2, '0');
-
       const month = (messageDate.getMonth() + 1).toString().padStart(2, '0');
-
       const year = messageDate.getFullYear();
 
       return `${day}/${month}/${year} - ${timeStr}`;
@@ -122,10 +121,10 @@ export const formatMessageTime = (dateString) => {
  * - This year: DD/M
  * - Previous years: DD/MM/YYYY
  *
- * @param {string} dateString - ISO date string to format
- * @returns {string} Formatted date in compact format
+ * @param dateString - ISO date string to format
+ * @returns Formatted date in compact format
  */
-export const formatCompactMessageTime = (dateString) => {
+export const formatCompactMessageTime = (dateString: string | null | undefined): string => {
   if (!dateString) return '';
   try {
     const messageDate = new Date(dateString);
@@ -134,9 +133,7 @@ export const formatCompactMessageTime = (dateString) => {
 
     // Get hours and minutes
     const hours = messageDate.getHours();
-
     const minutes = messageDate.getMinutes().toString().padStart(2, '0');
-
     const timeStr = `${hours}:${minutes}`;
 
     const today = new Date();
@@ -156,16 +153,13 @@ export const formatCompactMessageTime = (dateString) => {
     } else if (isThisYear) {
       // For messages from this year, show day and month in compact format DD/M
       const day = messageDate.getDate();
-
       const month = messageDate.getMonth() + 1;
 
       return `${day}/${month}`;
     } else {
       // For messages from previous years, show day/month/year
       const day = messageDate.getDate().toString().padStart(2, '0');
-
       const month = (messageDate.getMonth() + 1).toString().padStart(2, '0');
-
       const year = messageDate.getFullYear();
 
       return `${day}/${month}/${year}`;

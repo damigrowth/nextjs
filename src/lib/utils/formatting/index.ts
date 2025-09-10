@@ -4,6 +4,6 @@
  */
 
 export * from './date';
-export * from './description';
 export * from './rating';
 export * from './time';
+export * from './format-bio';

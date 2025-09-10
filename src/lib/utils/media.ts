@@ -49,25 +49,18 @@ export const SUPPORTED_FORMATS = {
     displayFormats: ['JPEG', 'PNG', 'GIF', 'WebP', 'AVIF', 'SVG', 'TIFF', 'ICO']
   },
   
-  // Video formats
+  // Video formats - web-compatible only
   video: {
     mimeTypes: [
       'video/mp4',
       'video/webm',
-      'video/ogg',
-      'video/quicktime', // MOV files
-      'video/mov',
-      'video/x-quicktime',
-      'video/mpeg',
-      'video/x-ms-wmv',
-      'video/x-msvideo', // AVI
-      'video/avi'
+      'video/ogg'
     ],
-    extensions: ['mp4', 'webm', 'ogg', 'mov', 'mpeg', 'mpg', 'wmv', 'avi'],
-    displayFormats: ['MP4', 'WebM', 'OGG', 'MOV', 'MPEG', 'WMV', 'AVI']
+    extensions: ['mp4', 'webm', 'ogg'],
+    displayFormats: ['MP4', 'WebM', 'OGG']
   },
   
-  // Audio formats
+  // Audio formats - web-compatible only
   audio: {
     mimeTypes: [
       'audio/mp3',
@@ -75,11 +68,10 @@ export const SUPPORTED_FORMATS = {
       'audio/wav',
       'audio/wave',
       'audio/ogg',
-      'audio/aac',
       'audio/webm'
     ],
-    extensions: ['mp3', 'wav', 'ogg', 'aac', 'webm'],
-    displayFormats: ['MP3', 'WAV', 'OGG', 'AAC', 'WebM']
+    extensions: ['mp3', 'wav', 'ogg', 'webm'],
+    displayFormats: ['MP3', 'WAV', 'OGG', 'WebM']
   }
 };
 
@@ -476,20 +468,22 @@ export const getUserProfileImageUrl = (
 ): string | null => {
   if (!userImage) return null;
 
-  // If it's a string, it could be either a direct URL (Google) or JSON (Cloudinary)
+  // If it's a string URL (new format), return as-is
   if (typeof userImage === 'string') {
+    // Check if it looks like a URL
+    if (userImage.startsWith('http://') || userImage.startsWith('https://')) {
+      return userImage;
+    }
+
+    // Legacy fallback: try parsing as JSON (for backward compatibility during migration)
     try {
-      // Try parsing as JSON first (Cloudinary format)
       const cloudinaryData = JSON.parse(userImage);
       if (cloudinaryData && typeof cloudinaryData === 'object' && cloudinaryData.secure_url) {
         return getOptimizedCloudinaryUrl(cloudinaryData, options);
       }
     } catch {
-      // If JSON parsing fails, treat as direct URL (Google OAuth)
-      // Check if it looks like a URL
-      if (userImage.startsWith('http://') || userImage.startsWith('https://')) {
-        return userImage;
-      }
+      // If it's not a valid URL or JSON, return null
+      return null;
     }
   }
 
@@ -619,10 +613,11 @@ export const detectMediaType = (resource: CloudinaryResourceOrPending): MediaTyp
   
   // For uploaded resources, use format detection
   if (resource.resource_type === 'video') return 'video';
+  if (resource.resource_type === 'audio') return 'audio';
   if (resource.resource_type === 'raw') {
     // Check format for raw resources that might be audio
     const format = resource.format?.toLowerCase();
-    if (format && ['mp3', 'wav', 'ogg', 'aac', 'webm'].includes(format)) {
+    if (format && ['mp3', 'wav', 'ogg', 'webm'].includes(format)) {
       return 'audio';
     }
   }
