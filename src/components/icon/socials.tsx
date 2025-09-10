@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  IconLinkedinIn,
-  IconFacebookF,
-  IconTwitter,
-  IconInstagram,
-} from '@/components/icon/fa';
+import { Icon } from '@/components/icon/brands';
 
 export default function Socials() {
   return (
@@ -15,18 +10,18 @@ export default function Socials() {
         target='_blank'
         rel='noopener'
       >
-        <IconLinkedinIn className='inline-block' />
+        <Icon name='linkedin' size={18} className='inline-block' />
       </a>
       <h5 className='text-white text-xl font-medium mt-2'>Βρες μας στο Linkedin </h5>
       <div className='social-style1 flex space-x-3 mt-3'>
         {/* <a className='text-white hover:text-green-400 transition-colors'>
-          <IconFacebookF className="text-lg" />
+          <Icon name="facebook" size={18} />
         </a>
         <a className='text-white hover:text-green-400 transition-colors'>
-          <IconTwitter className="text-lg" />
+          <Icon name="twitter" size={18} />
         </a>
         <a className='text-white hover:text-green-400 transition-colors'>
-          <IconInstagram className="text-lg" />
+          <Icon name="instagram" size={18} />
         </a> */}
       </div>
     </div>
