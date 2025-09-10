@@ -3,8 +3,7 @@
  * All component prop and interface types
  */
 
-import { ReactNode } from 'react';
-import { AuthUser } from './auth';
+import { DatasetItem } from './datasets';
 
 // Navigation and Menu types
 export interface MenuItem {
@@ -30,156 +29,19 @@ export interface UserMenuLinkProps {
   item: MenuItem;
 }
 
-export interface MobileMenuContainerProps {
-  children: ReactNode;
-}
-
-export interface NavMenuMobileProps {
-  header?: {
-    data?: {
-      attributes?: {
-        categories?: {
-          data?: Array<{
-            attributes: {
-              label: string;
-              slug: string;
-            };
-          }>;
-        };
-      };
-    };
-  };
-}
-
-// User Interface Components
-export interface UserImageProps {
-  name?: string;
-  displayName?: string;
-  hideDisplayName?: boolean;
-  image?: string;
-  width?: number;
-  height?: number;
-  profile?: {
-    firstName?: string;
-    lastName?: string;
-  };
-}
-
-export interface FreelancerData {
-  isAuthenticated: boolean;
-  isConfirmed: boolean;
-  username?: string;
-  displayName?: string;
-  name?: string;
-  image?: string;
-  hasAccess: boolean;
-  isLoading: boolean;
-  profile?: {
-    firstName?: string;
-    lastName?: string;
-  };
-}
-
-// Form Components
-export interface FormProps {
-  className?: string;
-  onSubmit?: (data: any) => void;
-  isLoading?: boolean;
-  children?: ReactNode;
-}
-
-export interface FormFieldProps {
-  name: string;
-  label: string;
-  type?: 'text' | 'email' | 'password' | 'textarea' | 'select' | 'checkbox';
-  placeholder?: string;
-  required?: boolean;
-  error?: string;
-  disabled?: boolean;
-  children?: ReactNode;
-}
-
-export interface FormErrorProps {
-  message?: string;
-  errors?: string[];
-}
-
-export interface FormSuccessProps {
-  message?: string;
-}
-
-// Layout Components
-export interface HeaderProps {
-  user?: AuthUser;
-  className?: string;
-}
-
-export interface FooterProps {
-  className?: string;
-}
-
-export interface SidebarProps {
-  user?: AuthUser;
-  isOpen?: boolean;
-  onToggle?: () => void;
-}
-
-// Auth Components
-export interface LoginFormProps {
-  redirectTo?: string;
-  className?: string;
-}
-
-export interface RegisterFormProps {
-  redirectTo?: string;
-  className?: string;
-}
-
-// Auth Form Data Types
-export interface LoginFormData {
-  email: string;
-  password: string;
-}
-
-export interface RegisterFormData {
-  email: string;
-  username: string;
-  password: string;
-  displayName: string;
-}
-
-// Auth Form State Types
-export interface LoginFormState {
-  errors: Record<string, string[]>;
-  message: string | null;
-  success: boolean;
-  isEmailVerificationError: boolean;
-}
-
-export interface RegisterFormState {
-  errors: Record<string, string[]>;
-  message: string | null;
-  success: boolean;
-}
-
-export interface FilterProps<T = any> {
-  filters: T;
-  onFiltersChange: (filters: T) => void;
-  options: FilterOption[];
-}
-
-export interface FilterOption {
-  key: string;
-  label: string;
-  type: 'select' | 'checkbox' | 'date' | 'range';
-  options?: { value: string; label: string }[];
-}
-
 // Media Upload Components
 export interface MediaUploadProps {
-  value: import('./cloudinary').CloudinaryResource | import('./cloudinary').CloudinaryResource[] | string | null;
+  value:
+    | import('./cloudinary').CloudinaryResource
+    | import('./cloudinary').CloudinaryResource[]
+    | string
+    | null;
   onChange: (
-    resources: import('./cloudinary').CloudinaryResource | import('./cloudinary').CloudinaryResource[] | string | null,
+    resources:
+      | import('./cloudinary').CloudinaryResource
+      | import('./cloudinary').CloudinaryResource[]
+      | string
+      | null,
   ) => void;
   uploadPreset?: string;
   multiple?: boolean;
@@ -189,7 +51,13 @@ export interface MediaUploadProps {
   allowedFormats?: string[];
   className?: string;
   placeholder?: string;
-  error?: string | import('react-hook-form').FieldError | import('react-hook-form').Merge<import('react-hook-form').FieldError, import('react-hook-form').FieldErrorsImpl<any>>;
+  error?:
+    | string
+    | import('react-hook-form').FieldError
+    | import('react-hook-form').Merge<
+        import('react-hook-form').FieldError,
+        import('react-hook-form').FieldErrorsImpl<any>
+      >;
   type?: 'image' | 'auto';
   signed?: boolean;
   signatureEndpoint?: string;
@@ -202,7 +70,10 @@ export interface MediaUploadRef {
 }
 
 export interface ProfileImageUploadProps {
-  resource: import('../utils/media').CloudinaryResourceOrPending | string | null;
+  resource:
+    | import('../utils/media').CloudinaryResourceOrPending
+    | string
+    | null;
   queuedFile: import('../utils/media').QueuedFile | null;
   onFileSelect: (files: FileList) => void;
   onRemove: () => void;
@@ -219,7 +90,9 @@ export interface GalleryUploadProps {
   onFilesSelected: (files: FileList) => void;
   onRemoveResource: (publicId: string) => void;
   onRemoveFromQueue: (fileId: string) => void;
-  onReorderResources: (resources: import('../utils/media').CloudinaryResourceOrPending[]) => void;
+  onReorderResources: (
+    resources: import('../utils/media').CloudinaryResourceOrPending[],
+  ) => void;
   isUploading: boolean;
   error: string | null;
   maxFiles: number;
@@ -240,16 +113,115 @@ export interface ResourcePreviewProps {
   height?: number;
 }
 
-export interface UploadDropzoneProps {
-  onFilesSelected: (files: FileList) => void;
-  canAddMore: boolean;
-  isUploading: boolean;
-  totalFiles: number;
-  queuedFiles: import('../utils/media').QueuedFile[];
-  maxFiles: number;
-  maxFileSize: number;
-  formats: string[];
-  error: string | null;
-  type: 'image' | 'auto';
-  multiple: boolean;
+export interface ProfileInfoProps {
+  rate?: number;
+  coverage?: PrismaJson.Coverage;
+  commencement?: string;
+  website?: string;
+  phone?: string;
+  viber?: string;
+  whatsapp?: string;
+  email?: string;
+  visibility?: PrismaJson.VisibilitySettings;
+  isOwner?: boolean;
+}
+
+// Profile meta component props
+export interface ProfileMetaProps {
+  displayName: string;
+  firstName?: string;
+  lastName?: string;
+  tagline?: string;
+  image?: PrismaJson.CloudinaryResource | string;
+  rating: number;
+  reviewCount: number;
+  verified: boolean;
+  top?: boolean;
+  coverage?: PrismaJson.Coverage;
+  visibility?: PrismaJson.VisibilitySettings;
+  socials?: PrismaJson.SocialMedia;
+}
+
+export interface MetricCardProps {
+  icon: React.ReactNode;
+  title: string;
+  value?: string | number;
+  isFullWidth?: boolean;
+}
+
+// Profile metrics component props
+export interface ProfileMetricsProps {
+  subcategory?: DatasetItem;
+  servicesCount?: number;
+  commencement?: string;
+  experience?: number;
+}
+
+export interface ProfileRatingProps {
+  totalReviews: number;
+  rating: number;
+  clickable?: boolean;
+}
+
+// Skills component props
+export interface ProfileSkillsProps {
+  skills: DatasetItem[]; // Array of skill IDs
+  speciality?: string; // Speciality ID
+}
+
+// Features component props
+export interface ProfileFeaturesProps {
+  contactMethods?: string[];
+  paymentMethods?: string[];
+  settlementMethods?: string[];
+  size?: string;
+  budget?: string;
+  industries?: string[];
+  // Resolved data from taxonomies
+  contactMethodsData?: DatasetItem[];
+  paymentMethodsData?: DatasetItem[];
+  settlementMethodsData?: DatasetItem[];
+  industriesData?: DatasetItem[];
+}
+
+export interface TaxonomyTab {
+  id: string;
+  slug: string;
+  label: string;
+  plural?: string;
+  [key: string]: any; // Allow additional properties
+}
+
+export interface TaxonomyTabsProps {
+  items: TaxonomyTab[];
+  basePath: string;
+  allItemsLabel: string;
+  activeItemSlug?: string;
+  usePluralLabels?: boolean;
+  className?: string;
+}
+
+export interface BreadcrumbButtonsProps {
+  subjectTitle: string;
+  id: string;
+  savedStatus?: boolean;
+  saveType?: string; // This matches the flexible role system
+  hideSaveButton?: boolean;
+  isAuthenticated?: boolean;
+}
+
+export type ProfileBreadcrumbProfileData = {
+  id: string;
+  username: string;
+  displayName: string;
+  role: string; // This matches the Prisma schema where role is String
+};
+
+export interface ProfileBreadcrumbProps {
+  profile: ProfileBreadcrumbProfileData;
+  category?: DatasetItem;
+  subcategory?: DatasetItem;
+  savedStatus?: boolean;
+  hideSaveButton?: boolean;
+  isAuthenticated?: boolean;
 }
