@@ -13,15 +13,19 @@ model Service {
   // Pricing
   fixed            Boolean
   price            Int?    @default(0)
+  /// [ServiceType]
   type             Json // Boolean fields: online, presence, oneoff, onbase, subscription, onsite
   subscriptionType String? // month or year
   duration         Int?    @default(0) // days for duration
 
   // Features
+  /// [ServiceAddon]
   addons Json[] // title, description, price
+  /// [ServiceFAQ]
   faq    Json[] // question, answer
 
   // Media
+  /// [CloudinaryResource]
   media Json? // service media/images
 
   // Misc

@@ -12,7 +12,7 @@ model User {
   displayName   String? // Keep in user for auth purposes
   firstName     String? // Keep in user for menu/auth purposes
   lastName      String? // Keep in user for menu/auth purposes
-  image         Json? // Profile image CloudinaryResource - synced from profile
+  image         String? // Profile image URL - synced from profile
   banExpires    DateTime?
   banReason     String?
   banned        Boolean       @default(false)
@@ -51,15 +51,20 @@ model Profile {
   displayName String? // Duplicated from User for profile purposes
   firstName   String? // Moved from User
   lastName    String? // Moved from User
+  email       String? // Duplicated from User for profile purposes
   phone       String? // Moved from User
+  /// [Coverage]
   coverage    Json? // Coverage options and location data
 
   // Media fields for onboarding form
-  image     Json? // Profile image CloudinaryResource
+  image     String? // Profile image URL
+  /// [Portfolio]
   portfolio Json? // Portfolio media CloudinaryResource array
 
   // Presentation fields
+  /// [VisibilitySettings]
   visibility Json? // Visibility settings {email, phone, address}
+  /// [SocialMedia]
   socials    Json? // Social media links {facebook, instagram, linkedin, x, youtube, github, behance, dribbble}
   viber      String? // Viber contact
   whatsapp   String? // WhatsApp contact
@@ -74,6 +79,7 @@ model Profile {
   budget            String?
   industries        String[]
   terms             String?
+  /// [BillingInfo]
   billing           Json? // Billing information {receipt: boolean, invoice: boolean, afm: string, doy: string, name: string, profession: string, address: string}
 
   // Rate limiting fields
@@ -83,6 +89,9 @@ model Profile {
   featured        Boolean              @default(false)
   rating          Float                @default(0)
   reviewCount     Int                  @default(0)
+  /// [StarBreakdown]
+  stars           Json? // Rating star breakdown {1: 5, 2: 10, 3: 15, 4: 20, 5: 50}
+  top             Boolean              @default(false) // Top level freelancer flag
   published       Boolean              @default(false)
   isActive        Boolean              @default(false)
   createdAt       DateTime             @default(now())
@@ -91,7 +100,7 @@ model Profile {
   chatsCreated    Chat[]
   messagesSent    Message[]
   user            User                 @relation(fields: [uid], references: [id], onDelete: Cascade)
-  reviewsReceived Review[]             @relation("ReviewReceiver")
+  reviews         Review[]             @relation("ReviewReceiver")
   services        Service[]
   verification    ProfileVerification?
 
