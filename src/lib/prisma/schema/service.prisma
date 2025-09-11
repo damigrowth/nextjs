@@ -25,7 +25,7 @@ model Service {
   faq    Json[] // question, answer
 
   // Media
-  /// [CloudinaryResource]
+  /// [Media]
   media Json? // service media/images
 
   // Misc
@@ -36,7 +36,7 @@ model Service {
   rating      Float @default(0)
   reviewCount Int   @default(0)
 
-  status    String  @default("draft") // draft, pending, published, rejected
+  status    String   @default("draft") // draft, pending, published, rejected
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   reviews   Review[]
