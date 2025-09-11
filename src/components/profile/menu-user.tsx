@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import LinkNP from '@/components/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import {
   hasAccessUserMenuNav,
   noAccessUserMenuNav,
 } from '@/constants/datasets/dashboard';
 
-import { signOut, authClient } from '@/lib/auth/client';
+import { signOut } from '@/lib/auth/client';
 import { UserMenuProps, MenuItem } from '@/types/components';
 import { Button } from '@/components/ui/button';
 import {
@@ -57,36 +57,15 @@ const getMenuIcon = (iconName: string) => {
 
 export default function UserMenu({ isMobile }: UserMenuProps) {
   const router = useRouter();
-  const pathname = usePathname();
   const { data: session, isPending } = useSession();
-  const [freshSession, setFreshSession] = useState(session);
 
-  // Fetch fresh session on mount and route changes to handle Better Auth issue #3608
-  useEffect(() => {
-    const fetchFreshSession = async () => {
-      try {
-        const result = await authClient.getSession({
-          query: { disableCookieCache: true }
-        });
-        setFreshSession(result.data);
-      } catch (error) {
-        console.error('Failed to fetch fresh session:', error);
-        // Fallback to regular session if fresh fetch fails
-        setFreshSession(session);
-      }
-    };
-    
-    fetchFreshSession();
-  }, [pathname, session]);
-
-  // Use freshSession instead of session for authentication checks
-  const user = freshSession?.user;
+  // Use Better Auth session data
+  const user = session?.user;
   // TODO: Check if user authentication correctly sets and update the image when onboarding and signing up and that the image is synced correctly (cache synced) -
   // TODO: Also check my scripts, when i update the profile it also need to update the duplicate fields of user, so if i update the profile    with image then it needs to update the user image as well, find the fields that are in both models in   @src\lib\prisma\schema\user.prisma and update the @scripts\profile-migration.ts
 
-  console.log('MENU USER - BETTER AUTH SESSION', session);
-  console.log('MENU USER - FRESH SESSION', freshSession);
-  console.log('MENU USER - BETTER AUTH USER', user);
+  // console.log('MENU USER - BETTER AUTH SESSION', session);
+  // console.log('MENU USER - BETTER AUTH USER', user);
 
   const isAuthenticated = !!user;
   // const isConfirmed = user?.emailVerified || false;
