@@ -5,7 +5,6 @@
 
 // Re-export all domain-specific types
 export * from './auth';
-export * from './user';
 export * from './api';
 export * from './components';
 export * from './email';
