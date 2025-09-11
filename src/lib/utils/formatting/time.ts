@@ -5,7 +5,7 @@ type LocaleFunc = (number: number, index: number) => [string, string];
 
 // Greek locale configuration
 const greekLocale: LocaleFunc = (number: number, index: number) => {
-  return [
+  const locales: [string, string][] = [
     ['μόλις τώρα', 'σε λίγο'],
     ['πριν %s δευτερόλεπτα', 'σε %s δευτερόλεπτα'],
     ['πριν 1 λεπτό', 'σε 1 λεπτό'],
@@ -20,7 +20,8 @@ const greekLocale: LocaleFunc = (number: number, index: number) => {
     ['πριν %s μήνες', 'σε %s μήνες'],
     ['πριν 1 χρόνο', 'σε 1 χρόνο'],
     ['πριν %s χρόνια', 'σε %s χρόνια'],
-  ][index];
+  ];
+  return locales[index];
 };
 
 // Register Greek locale
