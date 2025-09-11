@@ -59,9 +59,9 @@ export default function TaxonomySelector({
     'category' | 'subcategory' | 'subdivision'
   >('category');
   const [selectedCategory, setSelectedCategory] =
-    React.useState<TaxonomyItem | null>(null);
+    React.useState<DatasetItem | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] =
-    React.useState<TaxonomyItem | null>(null);
+    React.useState<DatasetItem | null>(null);
 
   // Initialize selected items from value
   React.useEffect(() => {
@@ -101,7 +101,7 @@ export default function TaxonomySelector({
     );
   }, [displayItems, searchValue]);
 
-  const handleSelect = (item: TaxonomyItem) => {
+  const handleSelect = (item: DatasetItem) => {
     if (currentLevel === 'category') {
       setSelectedCategory(item);
       setSelectedSubcategory(null);
