@@ -6,8 +6,26 @@ import {
 } from 'better-auth/client/plugins';
 import type { auth } from '@/lib/auth/config';
 
+// Dynamic baseURL for Vercel deployments
+const getBaseURL = () => {
+  // Priority: Custom env var > Vercel URL > localhost
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+  
+  // In browser, use current origin for Vercel preview deployments
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  
+  // Fallback for SSR
+  return process.env.VERCEL_URL 
+    ? `https://${process.env.VERCEL_URL}`
+    : 'http://localhost:3000';
+};
+
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  baseURL: getBaseURL(),
   fetchOptions: {
     onError: (ctx) => {
       // console.log('Auth Client Error Context:', ctx);

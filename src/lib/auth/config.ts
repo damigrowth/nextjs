@@ -9,6 +9,15 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 export const auth = betterAuth({
+  // Base URL and trusted origins for Vercel deployment compatibility
+  baseURL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  trustedOrigins: [
+    'http://localhost:3000',
+    'https://*.vercel.app', // Support Vercel preview deployments
+    'https://doulitsa.gr', // Production domain
+    'https://www.doulitsa.gr', // Production www domain
+    ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []), // Dynamic Vercel URL
+  ],
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
   }),
