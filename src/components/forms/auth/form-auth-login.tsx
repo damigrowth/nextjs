@@ -71,11 +71,16 @@ const LoginForm: React.FC = () => {
           // First refresh to update server components and clear any cached data
           router.refresh();
 
-          // Force Better Auth session refetch to clear client-side cache
+          // Force Better Auth session refetch with cache bypass to handle issue #3608
           await refetch();
+          
+          // Also fetch fresh session with disableCookieCache to ensure immediate update
+          await authClient.getSession({ 
+            query: { disableCookieCache: true }
+          });
 
           // Small delay to ensure both refresh and session update complete
-          await new Promise((resolve) => setTimeout(resolve, 200));
+          await new Promise((resolve) => setTimeout(resolve, 300));
 
           // Get the redirect path from the server response or fallback to session check
           let redirectPath = '/dashboard';
