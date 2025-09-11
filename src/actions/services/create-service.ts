@@ -83,12 +83,14 @@ async function createServiceInternal(
     if (status === 'draft') {
       const now = new Date();
       const cooldownPeriod = 30 * 1000; // 30 seconds in milliseconds
-      
+
       if (profile.lastServiceDraft) {
         const lastDraftDate = new Date(profile.lastServiceDraft);
         const timeSinceLastDraft = now.getTime() - lastDraftDate.getTime();
         if (timeSinceLastDraft < cooldownPeriod) {
-          const remainingTime = Math.ceil((cooldownPeriod - timeSinceLastDraft) / 1000);
+          const remainingTime = Math.ceil(
+            (cooldownPeriod - timeSinceLastDraft) / 1000,
+          );
           return {
             success: false,
             message: `Μπορείτε να αποθηκεύσετε προσχέδιο ξανά σε ${remainingTime} δευτερόλεπτα.`,
@@ -144,7 +146,9 @@ async function createServiceInternal(
     }
 
     // 5. Validate form data with appropriate Zod schema
-    const validationSchema = isDraft ? createServiceDraftSchema : createServiceSchema;
+    const validationSchema = isDraft
+      ? createServiceDraftSchema
+      : createServiceSchema;
     const validationResult = validationSchema.safeParse({
       type: extractedData.type,
       subscriptionType: extractedData.subscriptionType || undefined,
@@ -191,20 +195,20 @@ async function createServiceInternal(
             tags: data.tags || [],
             price: data.price || 0,
             fixed: data.fixed ?? true,
-            type: (data.type || {
+            type: data.type || {
               presence: false,
               online: false,
               oneoff: false,
               onbase: false,
               subscription: false,
               onsite: false,
-            }) as Prisma.JsonValue,
+            },
             subscriptionType: data.subscriptionType || null,
             duration: data.duration || 0,
             location: null,
-            addons: (data.addons || []) as Prisma.JsonValue[],
-            faq: (data.faq || []) as Prisma.JsonValue[],
-            media: sanitizedMedia as Prisma.JsonValue,
+            addons: data.addons || [],
+            faq: data.faq || [],
+            media: sanitizedMedia,
             status: status,
             featured: false,
             profile: {
@@ -229,20 +233,20 @@ async function createServiceInternal(
           tags: data.tags || [],
           price: data.price || 0,
           fixed: data.fixed ?? true,
-          type: (data.type || {
+          type: data.type || {
             presence: false,
             online: false,
             oneoff: false,
             onbase: false,
             subscription: false,
             onsite: false,
-          }) as Prisma.JsonValue,
+          },
           subscriptionType: data.subscriptionType || null,
           duration: data.duration || 0,
           location: null,
-          addons: (data.addons || []) as Prisma.JsonValue[],
-          faq: (data.faq || []) as Prisma.JsonValue[],
-          media: sanitizedMedia as Prisma.JsonValue,
+          addons: data.addons || [],
+          faq: data.faq || [],
+          media: sanitizedMedia,
           status: status,
           featured: false,
           profile: {

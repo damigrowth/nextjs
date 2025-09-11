@@ -5,10 +5,7 @@ import { prisma } from '@/lib/prisma/client';
 import { ActionResult, ActionResponse } from '@/lib/types/api';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
 import { Prisma } from '@prisma/client';
-import {
-  billingSchema,
-  type BillingInput,
-} from '@/lib/validations/profile';
+import { billingSchema, type BillingInput } from '@/lib/validations/profile';
 import { getFormString, getFormBoolean } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
@@ -92,7 +89,7 @@ export async function updateProfileBilling(
     await prisma.profile.update({
       where: { uid: user.id },
       data: {
-        billing: billingData as Prisma.JsonValue,
+        billing: billingData,
         updatedAt: new Date(),
       },
     });

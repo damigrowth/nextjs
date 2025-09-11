@@ -112,7 +112,7 @@ export async function updateProfileBasicInfo(
         subcategory: data.subcategory,
         speciality: data.speciality,
         skills: data.skills || [],
-        coverage: data.coverage as Prisma.JsonValue,
+        coverage: data.coverage,
         image: processedImage, // Now a string URL
         updatedAt: new Date(),
       },

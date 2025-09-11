@@ -101,6 +101,7 @@ export const serviceFaqSchema = z.object({
 
 // Array schemas for JSON[] fields
 export const portfolioSchema = z.array(cloudinaryResourceSchema);
+export const mediaSchema = z.array(cloudinaryResourceSchema);
 
 // 2. Expose the inferred types to Prisma
 declare global {
@@ -117,5 +118,6 @@ declare global {
 
     // Array types (for Json[] fields, prisma-json-types-generator handles these automatically)
     type Portfolio = z.infer<typeof portfolioSchema>;
+    type Media = z.infer<typeof mediaSchema>;
   }
 }

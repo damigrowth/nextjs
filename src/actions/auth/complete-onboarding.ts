@@ -98,9 +98,9 @@ export async function completeOnboarding(
         bio: data.bio,
         category: data.category,
         subcategory: data.subcategory,
-        coverage: data.coverage as Prisma.JsonValue,
+        coverage: data.coverage,
         ...(processedImage && { image: processedImage }), // Only include if image exists
-        portfolio: sanitizedPortfolio as Prisma.JsonValue,
+        portfolio: sanitizedPortfolio,
         published: user.role !== 'user',
         isActive: true,
       },
@@ -108,9 +108,9 @@ export async function completeOnboarding(
         bio: data.bio,
         category: data.category,
         subcategory: data.subcategory,
-        coverage: data.coverage as Prisma.JsonValue,
+        coverage: data.coverage,
         ...(processedImage && { image: processedImage }), // Only include if image exists
-        portfolio: sanitizedPortfolio as Prisma.JsonValue,
+        portfolio: sanitizedPortfolio,
         published: user.role !== 'user',
         isActive: true,
         user: {
