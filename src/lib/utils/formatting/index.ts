@@ -6,4 +6,4 @@
 export * from './date';
 export * from './rating';
 export * from './time';
-export * from './format-bio';
+export * from './text';
