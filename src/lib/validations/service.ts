@@ -5,37 +5,75 @@
 
 import { z } from 'zod';
 import { paginationSchema } from './shared';
+import {
+  serviceAddonSchema,
+  serviceFaqSchema,
+  serviceTypeSchema,
+  cloudinaryResourceSchema,
+} from '@/lib/prisma/json-types';
+import { SubscriptionType, Status } from '@prisma/client';
 
 // =============================================
 // SERVICE ADDON & FAQ SCHEMAS
 // =============================================
 
-export const serviceAddonSchema = z.object({
+// Import schemas from JSON types - these match Prisma JSON field definitions
+// Using imported schemas: serviceAddonSchema, serviceFaqSchema, serviceTypeSchema, cloudinaryResourceSchema
+
+// Add validation refinements for form-specific requirements
+export const formServiceAddonSchema = serviceAddonSchema.extend({
   title: z
     .string()
     .min(
       5,
-      'Ο τίτλος της επιπλέον υπηρεσίας πρέπει να είναι τουλάχιστον 5 χαρακτήρες',
-    ),
+      'Ο τίτλος της extra υπηρεσίας πρέπει να είναι τουλάχιστον 5 χαρακτήρες',
+    )
+    .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
   description: z
     .string()
     .min(
       10,
-      'Η περιγραφή της επιπλέον υπηρεσίας πρέπει να είναι τουλάχιστον 10 χαρακτήρες',
-    ),
+      'Η περιγραφή της extra υπηρεσίας πρέπει να είναι τουλάχιστον 10 χαρακτήρες',
+    )
+    .max(500, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 500 χαρακτήρες'),
   price: z
     .number()
     .min(5, 'Η ελάχιστη τιμή είναι 5€')
-    .max(10000, 'Η μέγιστη τιμή είναι 10.000€'),
+    .max(5000, 'Η μέγιστη τιμή είναι 5.000€'),
 });
 
-export const serviceFaqSchema = z.object({
+export const formServiceFaqSchema = serviceFaqSchema.extend({
   question: z
     .string()
-    .min(10, 'Η ερώτηση πρέπει να είναι τουλάχιστον 10 χαρακτήρες'),
+    .min(10, 'Η ερώτηση πρέπει να είναι τουλάχιστον 10 χαρακτήρες')
+    .max(200, 'Η ερώτηση δεν μπορεί να ξεπερνά τους 200 χαρακτήρες'),
   answer: z
     .string()
-    .min(2, 'Η απάντηση πρέπει να είναι τουλάχιστον 2 χαρακτήρες'),
+    .min(2, 'Η απάντηση πρέπει να είναι τουλάχιστον 2 χαρακτήρες')
+    .max(1000, 'Η απάντηση δεν μπορεί να ξεπερνά τους 1000 χαρακτήρες'),
+});
+
+// Draft versions with relaxed validation
+export const draftServiceAddonSchema = serviceAddonSchema.extend({
+  title: z
+    .string()
+    .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
+  description: z
+    .string()
+    .max(500, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 500 χαρακτήρες'),
+  price: z
+    .number()
+    .min(0, 'Η τιμή δεν μπορεί να είναι αρνητική')
+    .max(5000, 'Η τιμή δεν μπορεί να ξεπερνά τα 5.000€'),
+});
+
+export const draftServiceFaqSchema = serviceFaqSchema.extend({
+  question: z
+    .string()
+    .max(200, 'Η ερώτηση δεν μπορεί να ξεπερνά τους 200 χαρακτήρες'),
+  answer: z
+    .string()
+    .max(1000, 'Η απάντηση δεν μπορεί να ξεπερνά τους 1000 χαρακτήρες'),
 });
 
 // =============================================
@@ -92,19 +130,62 @@ export const serviceEditSchema = z.object({
       message: 'Η τιμή πρέπει να είναι 0 ή τουλάχιστον 10€',
     })
     .optional(),
-  status: z.string().optional(),
+  status: z.nativeEnum(Status).optional(),
   category: serviceTaxonomySchema,
   subcategory: serviceTaxonomySchema,
   subdivision: serviceTaxonomySchema,
   tags: z.array(serviceTagSchema).optional(),
   addons: z
-    .array(serviceAddonSchema)
+    .array(formServiceAddonSchema)
     .max(3, 'Μέγιστος αριθμός επιπλέον υπηρεσιών: 3')
-    .optional(),
+    .optional()
+    .refine(
+      (addons) => {
+        if (!addons || addons.length === 0) return true;
+        const titles = addons.map((addon) => addon.title.toLowerCase().trim());
+        return titles.length === new Set(titles).size;
+      },
+      {
+        message: 'Οι τίτλοι των επιπλέον υπηρεσιών πρέπει να είναι μοναδικοί',
+      },
+    )
+    .refine(
+      (addons) => {
+        if (!addons || addons.length === 0) return true;
+        const descriptions = addons.map((addon) =>
+          addon.description.toLowerCase().trim(),
+        );
+        return descriptions.length === new Set(descriptions).size;
+      },
+      {
+        message:
+          'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
+      },
+    ),
   faq: z
-    .array(serviceFaqSchema)
+    .array(formServiceFaqSchema)
     .max(5, 'Μέγιστος αριθμός ερωτήσεων: 5')
-    .optional(),
+    .optional()
+    .refine(
+      (faqs) => {
+        if (!faqs || faqs.length === 0) return true;
+        const questions = faqs.map((faq) => faq.question.toLowerCase().trim());
+        return questions.length === new Set(questions).size;
+      },
+      {
+        message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
+      },
+    )
+    .refine(
+      (faqs) => {
+        if (!faqs || faqs.length === 0) return true;
+        const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
+        return answers.length === new Set(answers).size;
+      },
+      {
+        message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
+      },
+    ),
 });
 
 export const serviceQuerySchema = z
@@ -162,14 +243,7 @@ export const serviceMediaSchema = z.object({
 // SERVICE STATUS SCHEMAS
 // =============================================
 
-export const serviceStatusSchema = z.enum([
-  'draft',
-  'pending_review',
-  'published',
-  'paused',
-  'rejected',
-  'archived',
-]);
+export const serviceStatusSchema = z.nativeEnum(Status);
 
 export const updateServiceStatusSchema = z.object({
   status: serviceStatusSchema,
@@ -210,14 +284,8 @@ export const serviceReportSchema = z.object({
 // MULTI-STEP SERVICE CREATION SCHEMAS
 // =============================================
 
-export const serviceTypeConfigSchema = z.object({
-  presence: z.boolean(),
-  online: z.boolean(),
-  oneoff: z.boolean(),
-  onbase: z.boolean(),
-  subscription: z.boolean(),
-  onsite: z.boolean(),
-});
+// Use the imported serviceTypeSchema from JSON types
+export const serviceTypeConfigSchema = serviceTypeSchema;
 
 // Step 1: Service Type Schema
 export const presenceOnlineSchema = z.object({
@@ -260,9 +328,7 @@ export const oneoffSubscriptionSchema = z
         message: 'Επιλέξτε τύπο παράδοσης για online υπηρεσίες',
       },
     ),
-    subscriptionType: z
-      .enum(['month', 'year', 'per_case', 'per_hour', 'per_session'])
-      .optional(),
+    subscriptionType: z.nativeEnum(SubscriptionType).optional(),
   })
   .refine(
     (data) => {
@@ -279,85 +345,138 @@ export const oneoffSubscriptionSchema = z
   );
 
 // Step 3: Service Details Schema
-export const serviceDetailsSchema = z.object({
-  title: z
-    .string()
-    .min(10, 'Ο τίτλος πρέπει να είναι τουλάχιστον 10 χαρακτήρες')
-    .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
-  description: z
-    .string()
-    .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
-    .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες'),
-  category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
-  subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
-  subdivision: z.string().min(1, 'Η υποδιαίρεση είναι υποχρεωτική'),
-  tags: z
-    .array(z.string().min(1, 'Απαιτείται έγκυρη ετικέτα'))
-    .min(1, 'Επιλέξτε τουλάχιστον μία ετικέτα')
-    .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες'),
-  price: z
-    .number()
-    .int()
-    .min(1, 'Η τιμή πρέπει να είναι τουλάχιστον 1€')
-    .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€'),
-  fixed: z.boolean().default(true),
-  duration: z
-    .number()
-    .int()
-    .min(1, 'Η διάρκεια πρέπει να είναι τουλάχιστον 1 ημέρα')
-    .max(365, 'Η διάρκεια δεν μπορεί να ξεπερνά τις 365 ημέρες')
-    .optional(),
-});
+export const serviceDetailsSchema = z
+  .object({
+    title: z
+      .string()
+      .min(10, 'Ο τίτλος πρέπει να είναι τουλάχιστον 10 χαρακτήρες')
+      .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
+    description: z
+      .string()
+      .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
+      .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες'),
+    category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
+    subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
+    subdivision: z.string().min(1, 'Η υποδιαίρεση είναι υποχρεωτική'),
+    tags: z
+      .array(z.string().min(1, 'Απαιτείται έγκυρη ετικέτα'))
+      .min(1, 'Επιλέξτε τουλάχιστον μία ετικέτα')
+      .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες'),
+    price: z
+      .number()
+      .int()
+      .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
+      .optional(),
+    fixed: z.boolean().default(true),
+    duration: z
+      .number()
+      .int()
+      .min(1, 'Η διάρκεια πρέπει να είναι τουλάχιστον 1 ημέρα')
+      .max(365, 'Η διάρκεια δεν μπορεί να ξεπερνά τις 365 ημέρες')
+      .optional(),
+    type: serviceTypeConfigSchema.optional(),
+  })
+  .refine(
+    (data) => {
+      // Price is required when fixed is true (default state, showing price)
+      if (data.fixed && (!data.price || data.price === 0)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Η τιμή είναι υποχρεωτική',
+      path: ['price'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Price must be at least 5€ when fixed is true (showing price)
+      if (data.fixed && data.price !== undefined && data.price < 5) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Η τιμή πρέπει να είναι τουλάχιστον 5€',
+      path: ['price'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Duration is required for oneoff services
+      if (data.type?.oneoff && (!data.duration || data.duration === 0)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Ο χρόνος παράδοσης είναι υποχρεωτικός για one-off υπηρεσίες',
+      path: ['duration'],
+    },
+  );
 
 // Step 4: Addons and FAQ Schema (optional)
 export const addonsAndFaqSchema = z.object({
   addons: z
-    .array(
-      z.object({
-        title: z
-          .string()
-          .min(1, 'Ο τίτλος της επιπλέον υπηρεσίας είναι υποχρεωτικός')
-          .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
-        description: z
-          .string()
-          .min(1, 'Η περιγραφή της επιπλέον υπηρεσίας είναι υποχρεωτική')
-          .max(500, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 500 χαρακτήρες'),
-        price: z
-          .number()
-          .int()
-          .min(
-            1,
-            'Η τιμή της επιπλέον υπηρεσίας πρέπει να είναι τουλάχιστον 1€',
-          )
-          .max(
-            5000,
-            'Η τιμή της επιπλέον υπηρεσίας δεν μπορεί να ξεπερνά τα 5.000€',
-          ),
-      }),
+    .array(formServiceAddonSchema)
+    .max(3, 'Μπορείτε να προσθέσετε έως 3 extra υπηρεσίες')
+    .optional()
+    .default([])
+    .refine(
+      (addons) => {
+        if (!addons || addons.length === 0) return true;
+        const titles = addons.map((addon) => addon.title.toLowerCase().trim());
+        return titles.length === new Set(titles).size;
+      },
+      {
+        message: 'Οι τίτλοι των επιπλέον υπηρεσιών πρέπει να είναι μοναδικοί',
+      },
     )
-    .max(3, 'Μπορείτε να προσθέσετε έως 3 επιπλέον υπηρεσίες')
-    .optional(),
+    .refine(
+      (addons) => {
+        if (!addons || addons.length === 0) return true;
+        const descriptions = addons.map((addon) =>
+          addon.description.toLowerCase().trim(),
+        );
+        return descriptions.length === new Set(descriptions).size;
+      },
+      {
+        message:
+          'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
+      },
+    ),
   faq: z
-    .array(
-      z.object({
-        question: z
-          .string()
-          .min(1, 'Η ερώτηση είναι υποχρεωτική')
-          .max(200, 'Η ερώτηση δεν μπορεί να ξεπερνά τους 200 χαρακτήρες'),
-        answer: z
-          .string()
-          .min(1, 'Η απάντηση είναι υποχρεωτική')
-          .max(1000, 'Η απάντηση δεν μπορεί να ξεπερνά τους 1000 χαρακτήρες'),
-      }),
-    )
+    .array(formServiceFaqSchema)
     .max(5, 'Μπορείτε να προσθέσετε έως 5 συχνές ερωτήσεις')
-    .optional(),
-});
+    .optional()
+    .default([])
+    .refine(
+      (faqs) => {
+        if (!faqs || faqs.length === 0) return true;
+        const questions = faqs.map((faq) => faq.question.toLowerCase().trim());
+        return questions.length === new Set(questions).size;
+      },
+      {
+        message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
+      },
+    )
+    .refine(
+      (faqs) => {
+        if (!faqs || faqs.length === 0) return true;
+        const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
+        return answers.length === new Set(answers).size;
+      },
+      {
+        message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
+      },
+    ),
+}).passthrough();
 
 // Step 5: Media Schema (optional)
 export const serviceMediaUploadSchema = z.object({
   media: z
-    .array(z.any())
+    .array(cloudinaryResourceSchema)
     .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία πολυμέσων')
     .optional(),
 });
@@ -371,9 +490,7 @@ export const createServiceSchema = z
     type: serviceTypeConfigSchema,
 
     // Subscription period (only for subscription services)
-    subscriptionType: z
-      .enum(['month', 'year', 'per_case', 'per_hour', 'per_session'])
-      .optional(),
+    subscriptionType: z.nativeEnum(SubscriptionType).optional(),
 
     // Step 3 data
     title: z
@@ -394,9 +511,9 @@ export const createServiceSchema = z
     price: z
       .number()
       .int()
-      .min(1, 'Η τιμή πρέπει να είναι τουλάχιστον 1€')
-      .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€'),
-    fixed: z.boolean(),
+      .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
+      .optional(),
+    fixed: z.boolean().default(true),
     duration: z
       .number()
       .int()
@@ -406,48 +523,62 @@ export const createServiceSchema = z
 
     // Step 4 data
     addons: z
-      .array(
-        z.object({
-          title: z
-            .string()
-            .min(1, 'Ο τίτλος της επιπλέον υπηρεσίας είναι υποχρεωτικός')
-            .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
-          description: z
-            .string()
-            .min(1, 'Η περιγραφή της επιπλέον υπηρεσίας είναι υποχρεωτική')
-            .max(500, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 500 χαρακτήρες'),
-          price: z
-            .number()
-            .int()
-            .min(
-              1,
-              'Η τιμή της επιπλέον υπηρεσίας πρέπει να είναι τουλάχιστον 1€',
-            )
-            .max(
-              5000,
-              'Η τιμή της επιπλέον υπηρεσίας δεν μπορεί να ξεπερνά τα 5.000€',
-            ),
-        }),
+      .array(formServiceAddonSchema)
+      .optional()
+      .refine(
+        (addons) => {
+          if (!addons || addons.length === 0) return true;
+          const titles = addons.map((addon) =>
+            addon.title.toLowerCase().trim(),
+          );
+          return titles.length === new Set(titles).size;
+        },
+        {
+          message: 'Οι τίτλοι των επιπλέον υπηρεσιών πρέπει να είναι μοναδικοί',
+        },
       )
-      .optional(),
+      .refine(
+        (addons) => {
+          if (!addons || addons.length === 0) return true;
+          const descriptions = addons.map((addon) =>
+            addon.description.toLowerCase().trim(),
+          );
+          return descriptions.length === new Set(descriptions).size;
+        },
+        {
+          message:
+            'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
+        },
+      ),
     faq: z
-      .array(
-        z.object({
-          question: z
-            .string()
-            .min(1, 'Η ερώτηση είναι υποχρεωτική')
-            .max(200, 'Η ερώτηση δεν μπορεί να ξεπερνά τους 200 χαρακτήρες'),
-          answer: z
-            .string()
-            .min(1, 'Η απάντηση είναι υποχρεωτική')
-            .max(1000, 'Η απάντηση δεν μπορεί να ξεπερνά τους 1000 χαρακτήρες'),
-        }),
+      .array(formServiceFaqSchema)
+      .optional()
+      .refine(
+        (faqs) => {
+          if (!faqs || faqs.length === 0) return true;
+          const questions = faqs.map((faq) =>
+            faq.question.toLowerCase().trim(),
+          );
+          return questions.length === new Set(questions).size;
+        },
+        {
+          message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
+        },
       )
-      .optional(),
+      .refine(
+        (faqs) => {
+          if (!faqs || faqs.length === 0) return true;
+          const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
+          return answers.length === new Set(answers).size;
+        },
+        {
+          message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
+        },
+      ),
 
     // Step 5 data
     media: z
-      .array(z.any())
+      .array(cloudinaryResourceSchema)
       .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
       .optional(),
   })
@@ -499,7 +630,46 @@ export const createServiceSchema = z
     },
     {
       message: 'Επιλέξτε περίοδο συνδρομής',
-      path: ['subscription'],
+      path: ['subscriptionType'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Price is required when fixed is true (default state, showing price)
+      if (data.fixed && (!data.price || data.price === 0)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Η τιμή είναι υποχρεωτική',
+      path: ['price'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Price must be at least 5€ when fixed is true (showing price)
+      if (data.fixed && data.price !== undefined && data.price < 5) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Η τιμή πρέπει να είναι τουλάχιστον 5€',
+      path: ['price'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Duration is required for oneoff services
+      if (data.type?.oneoff && (!data.duration || data.duration === 0)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Ο χρόνος παράδοσης είναι υποχρεωτικός για one-off υπηρεσίες',
+      path: ['duration'],
     },
   );
 
@@ -543,42 +713,62 @@ export const createServiceDraftSchema = z.object({
     .max(365, 'Η διάρκεια δεν μπορεί να ξεπερνά τις 365 ημέρες')
     .optional(),
 
-  // Addons and FAQ (optional)
+  // Addons and FAQ (optional) - using draft schemas with relaxed validation
   addons: z
-    .array(
-      z.object({
-        title: z
-          .string()
-          .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
-        description: z
-          .string()
-          .max(500, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 500 χαρακτήρες'),
-        price: z
-          .number()
-          .int()
-          .min(0, 'Η τιμή δεν μπορεί να είναι αρνητική')
-          .max(5000, 'Η τιμή δεν μπορεί να ξεπερνά τα 5.000€'),
-      }),
+    .array(draftServiceAddonSchema)
+    .max(3, 'Μπορείτε να προσθέσετε έως 3 extra υπηρεσίες')
+    .optional()
+    .refine(
+      (addons) => {
+        if (!addons || addons.length === 0) return true;
+        const titles = addons.map((addon) => addon.title.toLowerCase().trim());
+        return titles.length === new Set(titles).size;
+      },
+      {
+        message: 'Οι τίτλοι των επιπλέον υπηρεσιών πρέπει να είναι μοναδικοί',
+      },
     )
-    .max(3, 'Μπορείτε να προσθέσετε έως 3 επιπλέον υπηρεσίες')
-    .optional(),
+    .refine(
+      (addons) => {
+        if (!addons || addons.length === 0) return true;
+        const descriptions = addons.map((addon) =>
+          addon.description.toLowerCase().trim(),
+        );
+        return descriptions.length === new Set(descriptions).size;
+      },
+      {
+        message:
+          'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
+      },
+    ),
   faq: z
-    .array(
-      z.object({
-        question: z
-          .string()
-          .max(200, 'Η ερώτηση δεν μπορεί να ξεπερνά τους 200 χαρακτήρες'),
-        answer: z
-          .string()
-          .max(1000, 'Η απάντηση δεν μπορεί να ξεπερνά τους 1000 χαρακτήρες'),
-      }),
-    )
+    .array(draftServiceFaqSchema)
     .max(5, 'Μπορείτε να προσθέσετε έως 5 συχνές ερωτήσεις')
-    .optional(),
+    .optional()
+    .refine(
+      (faqs) => {
+        if (!faqs || faqs.length === 0) return true;
+        const questions = faqs.map((faq) => faq.question.toLowerCase().trim());
+        return questions.length === new Set(questions).size;
+      },
+      {
+        message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
+      },
+    )
+    .refine(
+      (faqs) => {
+        if (!faqs || faqs.length === 0) return true;
+        const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
+        return answers.length === new Set(answers).size;
+      },
+      {
+        message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
+      },
+    ),
 
   // Media (optional)
   media: z
-    .array(z.any())
+    .array(cloudinaryResourceSchema)
     .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
     .optional(),
 });
@@ -589,8 +779,8 @@ export const createServiceDraftSchema = z.object({
 
 export type ServiceEditInput = z.infer<typeof serviceEditSchema>;
 export type ServiceQueryInput = z.infer<typeof serviceQuerySchema>;
-export type ServiceAddonInput = z.infer<typeof serviceAddonSchema>;
-export type ServiceFaqInput = z.infer<typeof serviceFaqSchema>;
+export type ServiceAddonInput = z.infer<typeof formServiceAddonSchema>;
+export type ServiceFaqInput = z.infer<typeof formServiceFaqSchema>;
 export type ServicePackageInput = z.infer<typeof servicePackageSchema>;
 export type ServiceMediaInput = z.infer<typeof serviceMediaSchema>;
 export type ServiceReportInput = z.infer<typeof serviceReportSchema>;
