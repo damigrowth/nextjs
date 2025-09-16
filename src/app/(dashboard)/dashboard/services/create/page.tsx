@@ -11,12 +11,12 @@ export default async function CreateServicePage() {
     redirect('/login');
   }
 
-  const { user } = userResult.data;
+  const { user, profile } = userResult.data;
 
   // Check if user can create services (only professionals)
   if (user.role !== 'freelancer' && user.role !== 'company') {
     redirect('/dashboard');
   }
 
-  return <FormCreateService initialUser={user} />;
+  return <FormCreateService initialUser={user} initialProfile={profile} />;
 }
