@@ -26,6 +26,7 @@ import {
 import { NavMain } from './dashboard-nav-main';
 import { NavSecondary } from './dashboard-nav-secondary';
 import { NavUser } from './dashboard-nav-user';
+import { NavServices } from './dashboard-nav-services';
 import {
   Sidebar,
   SidebarContent,
@@ -78,31 +79,7 @@ export default function DashboardSidebar({
     },
   ];
 
-  // Group 2: Services (professionals only)
-  const servicesGroup = isProfessional
-    ? [
-        {
-          title: 'Διαχείριση Υπηρεσιών',
-          url: '/dashboard/services',
-          icon: Package,
-          items: [
-            {
-              title: 'Διαχείριση Υπηρεσιών',
-              url: '/dashboard/services',
-            },
-            {
-              title: 'Προσθήκη Υπηρεσίας',
-              url: '/dashboard/services/create',
-            },
-          ],
-        },
-        {
-          title: 'Προσθήκη Υπηρεσίας',
-          url: '/dashboard/services/create',
-          icon: Plus,
-        },
-      ]
-    : [];
+  // Group 2: Services (professionals only) - now handled by NavServices component
 
   // Group 3: Account Management
   const accountGroup = [
@@ -168,8 +145,20 @@ export default function DashboardSidebar({
         <NavMain items={navMain} />
 
         {/* Group 2: Services (if professional) */}
-        {isProfessional && servicesGroup.length > 0 && (
-          <NavMain items={servicesGroup} label='Υπηρεσίες' />
+        {isProfessional && (
+          <div className="space-y-2">
+            <div className="px-2 py-1.5">
+              <h4 className="text-xs font-medium text-sidebar-foreground/70 uppercase tracking-wider">
+                Υπηρεσίες
+              </h4>
+            </div>
+            <NavServices />
+            <NavMain items={[{
+              title: 'Προσθήκη Υπηρεσίας',
+              url: '/dashboard/services/create',
+              icon: Plus,
+            }]} />
+          </div>
         )}
 
         {/* Group 3: Account Management */}
