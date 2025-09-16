@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import LinkNP from '@/components/link';
 import { useRouter } from 'next/navigation';
 
@@ -58,6 +58,12 @@ const getMenuIcon = (iconName: string) => {
 export default function UserMenu({ isMobile }: UserMenuProps) {
   const router = useRouter();
   const { data: session, isPending } = useSession();
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Prevent hydration mismatch by only rendering after client-side hydration
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // Use Better Auth session data
   const user = session?.user;
@@ -88,8 +94,8 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
     }
   };
 
-  // Show loading state
-  if (isPending) {
+  // Show loading state during hydration or while session is pending
+  if (!isHydrated || isPending) {
     return !isMobile ? (
       <div className='flex items-center space-x-2'>
         <Skeleton className='w-10 h-10 rounded-xl' />

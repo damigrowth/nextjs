@@ -1,6 +1,7 @@
 import React from 'react';
 import { MessageCircle, CreditCard, Shield, Users, Wallet } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import IconBox from '@/components/shared/icon-box';
 
 type ProfileFeaturesProps = {
   budget?: string | null;
@@ -73,29 +74,24 @@ export default function ProfileFeatures({
     <section className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 py-5'>
       {visibleFeatures.map((feature) => (
         <div key={feature.id}>
-          <div className='flex items-start gap-4'>
-            <div className='flex-shrink-0'>
-              <div className='relative inline-block text-2xl text-primary z-10 transition-all duration-300 ease-in-out before:content-[""] before:bg-orangy before:rounded-full before:absolute before:-bottom-1 before:-right-2 before:h-8 before:w-8 before:-z-10 before:transition-all before:duration-300 before:ease-in-out hover:before:bg-sixth'>
-                <feature.Icon className='h-10 w-10' />
-              </div>
-            </div>
-            <div className='flex-1 min-w-0'>
-              <h5 className='text-sm font-bold text-foreground mb-3'>
-                {feature.title}
-              </h5>
-              <div className='flex flex-wrap'>
+          <IconBox
+            icon={<feature.Icon className='h-10 w-10' />}
+            title={feature.title}
+            titleClassName='mb-3'
+            value={
+              <div className='flex flex-wrap gap-1.5'>
                 {feature.items.map((item, index) => (
                   <Badge
                     key={index}
                     variant='outline'
-                    className='inline-block text-2sm font-medium mb-1 mr-1 py-1 px-2.5 text-center bg-muted text-muted-foreground border-none rounded-xl'
+                    className='inline-block text-2sm font-medium py-1 px-2.5 text-center bg-muted text-muted-foreground border-none rounded-xl'
                   >
                     {item}
                   </Badge>
                 ))}
               </div>
-            </div>
-          </div>
+            }
+          />
         </div>
       ))}
     </section>

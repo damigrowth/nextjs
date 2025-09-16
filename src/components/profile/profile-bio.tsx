@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatBio } from '@/lib/utils/formatting';
+import { formatText } from '@/lib/utils/formatting';
 import React from 'react';
 
 type ProfileBioProps = {
@@ -11,7 +11,7 @@ export default function ProfileBio({ bio }: ProfileBioProps) {
     return null;
   }
 
-  const formattedBio = formatBio(bio);
+  const formattedBio = formatText(bio);
 
   return (
     <section>
