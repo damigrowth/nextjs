@@ -16,7 +16,7 @@ export default function ProfileIndustries({
   return (
     <section className='py-5'>
       <h6 className='font-bold text-foreground mb-5'>Κύριοι Κλάδοι Πελατών</h6>
-      <ul className='flex flex-wrap justify-start pt-2 m-0 p-0'>
+      <ul className='flex flex-wrap justify-start pt-2 m-0 p-0 gap-1.5'>
         {industries.map((industry, index) => (
           <li key={index} className='list-none'>
             <Badge

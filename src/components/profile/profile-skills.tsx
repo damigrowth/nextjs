@@ -31,7 +31,7 @@ export default function ProfileSkills({
           {speciality && (
             <Badge
               variant='outline'
-              className='inline-block text-sm font-semibold mb-1 mr-1 py-2 px-2 text-center border border-third rounded-xl bg-third/20 text-third'
+              className='inline-block text-sm font-semibold mb-1.5 mr-1.5 py-2 px-2 text-center border border-third rounded-xl bg-third/20 text-third'
             >
               {speciality}
             </Badge>
@@ -42,7 +42,7 @@ export default function ProfileSkills({
             <Badge
               key={index}
               variant='outline'
-              className='inline-block text-sm font-semibold mb-1 mr-1 py-2 px-2 text-center border border-muted-foreground rounded-xl text-muted-foreground'
+              className='inline-block text-sm font-semibold mb-1.5 mr-1.5 py-2 px-2 text-center border border-muted-foreground rounded-xl text-muted-foreground'
             >
               {skill.label}
             </Badge>
