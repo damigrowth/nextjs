@@ -225,3 +225,15 @@ export interface ProfileBreadcrumbProps {
   hideSaveButton?: boolean;
   isAuthenticated?: boolean;
 }
+
+// Service Card Component Types
+export type ServiceCardData = Pick<
+  import('@prisma/client').Service,
+  'id' | 'title' | 'category' | 'price' | 'rating' | 'reviewCount' | 'slug'
+> & {
+  media: PrismaJson.Media;
+  profile: Pick<
+    import('@prisma/client').Profile,
+    'id' | 'username' | 'displayName' | 'image'
+  >;
+};
