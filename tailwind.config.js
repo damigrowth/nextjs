@@ -20,11 +20,13 @@ module.exports = {
         '3sm': ['0.813rem', { lineHeight: '1.25rem' }], // 13px
         '2sm': ['0.875rem', { lineHeight: '1.25rem' }], // 14px
         sm: ['0.938rem', { lineHeight: '1.25rem' }], // 15px instead of default 14px
+        xl2: ['1.406rem', { lineHeight: '1.75rem' }], // 22.5px
       },
       spacing: {
         'tag-y': '0.2rem', // 3.2px
         'tag-x': '0.6rem', // 9.6px
-        '1': '1px', // 1px for mb-1
+        1: '1px', // 1px for mb-1
+        4.5: '1.125rem', // 18px
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -45,6 +47,7 @@ module.exports = {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
+          dark: 'hsl(var(--primary-dark))',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',

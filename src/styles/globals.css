@@ -270,6 +270,7 @@
     --popover-foreground: 0 0% 3.9%; /* HEX: #0a0a0a */
     --primary: 163.64 42% 21%; /* HEX: #1f4c40 */
     --primary-foreground: 0 0% 98%; /* HEX: #fafafa */
+    --primary-dark: 163.64 41.51% 20.78%; /* HEX: #1f4b3f */
     --secondary: 139.99 41% 55%; /* HEX: #5dbb7d */
     --secondary-foreground: 0 0% 98%; /* HEX: #fafafa */
     --third: 152.18 68.75% 31.37%; /* HEX: #198754 */
@@ -325,6 +326,7 @@
     --popover-foreground: 0 0% 98%; /* HEX: #fafafa */
     --primary: 149 44% 55%; /* HEX: #5abf8b */
     --primary-foreground: 0 0% 98%; /* HEX: #fafafa */
+    --primary-dark: 163.64 41.51% 20.78%; /* HEX: #1f4b3f */
     --secondary: 0 0% 14.9%; /* HEX: #262626 */
     --secondary-foreground: 0 0% 98%; /* HEX: #fafafa */
     --third: 152.18 68.75% 31.37%; /* HEX: #198754 */
