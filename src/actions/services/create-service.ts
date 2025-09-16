@@ -3,6 +3,12 @@
 import { revalidateTag } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { ActionResponse } from '@/lib/types/api';
+
+// Service creation specific response type
+interface ServiceActionResponse extends ActionResponse {
+  serviceId?: number;
+  serviceTitle?: string;
+}
 import { requireAuth } from '@/actions/auth/server';
 import { getProfileByUserId } from '@/actions/profiles/get-profile';
 import { Prisma } from '@prisma/client';
@@ -15,15 +21,16 @@ import { extractFormData } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
 import { sanitizeCloudinaryResources } from '@/lib/utils/cloudinary';
+import { generateServiceSlug } from '@/lib/utils/text';
 
 /**
  * Server action for creating a new service using the multi-step form data
  * Follows SERVER_ACTIONS_PATTERNS.md template
  */
 export async function createServiceAction(
-  prevState: ActionResponse | null,
+  prevState: ServiceActionResponse | null,
   formData: FormData,
-): Promise<ActionResponse> {
+): Promise<ServiceActionResponse> {
   return createServiceInternal(prevState, formData, 'pending');
 }
 
@@ -31,9 +38,9 @@ export async function createServiceAction(
  * Server action for saving service as draft
  */
 export async function saveServiceAsDraftAction(
-  prevState: ActionResponse | null,
+  prevState: ServiceActionResponse | null,
   formData: FormData,
-): Promise<ActionResponse> {
+): Promise<ServiceActionResponse> {
   return createServiceInternal(prevState, formData, 'draft');
 }
 
@@ -41,10 +48,10 @@ export async function saveServiceAsDraftAction(
  * Internal function to handle service creation with status
  */
 async function createServiceInternal(
-  prevState: ActionResponse | null,
+  prevState: ServiceActionResponse | null,
   formData: FormData,
   status: 'draft' | 'pending' = 'draft',
-): Promise<ActionResponse> {
+): Promise<ServiceActionResponse> {
   try {
     // 1. Get authenticated session
     const session = await requireAuth();
@@ -130,7 +137,7 @@ async function createServiceInternal(
         addons: { type: 'json', required: false, defaultValue: [] },
         faq: { type: 'json', required: false, defaultValue: [] },
         media: { type: 'json', required: false, defaultValue: [] },
-        price: { type: 'int', required: !isDraft, defaultValue: 0 },
+        price: { type: 'int', required: false, defaultValue: 0 },
         duration: { type: 'int', required: false, defaultValue: 0 },
         fixed: { type: 'boolean', required: false, defaultValue: true },
       },
@@ -181,12 +188,16 @@ async function createServiceInternal(
     // 7. Type configuration is already in the correct Boolean structure from form
     const typeConfig = data.type;
 
-    // 9. Create service in database and update profile if draft
+    // 9. Create service in database - let Prisma auto-generate ID, then create slug
+    let createdService: { id: number; title: string } | undefined;
+
     if (status === 'draft') {
-      // Use transaction to create service and update lastServiceDraft atomically
-      await prisma.$transaction([
-        prisma.service.create({
+      // Use transaction to create service with slug and update lastServiceDraft atomically
+      await prisma.$transaction(async (tx) => {
+        // Step 1: Create service without slug (auto-increment ID)
+        const createdService = await tx.service.create({
           data: {
+            pid: profile.id,
             title: data.title || '',
             description: data.description || '',
             category: data.category || '',
@@ -205,55 +216,74 @@ async function createServiceInternal(
             },
             subscriptionType: data.subscriptionType || null,
             duration: data.duration || 0,
-            location: null,
             addons: data.addons || [],
             faq: data.faq || [],
             media: sanitizedMedia,
             status: status,
             featured: false,
-            profile: {
-              connect: { id: profile.id },
-            },
           },
-        }),
-        prisma.profile.update({
+          select: { id: true },
+        });
+
+        // Step 2: Generate slug with the auto-generated ID and update service
+        const slug = generateServiceSlug(data.title || 'untitled', createdService.id.toString());
+        await tx.service.update({
+          where: { id: createdService.id },
+          data: { slug },
+        });
+
+        // Step 3: Update profile's lastServiceDraft
+        await tx.profile.update({
           where: { id: profile.id },
           data: { lastServiceDraft: new Date() },
-        }),
-      ]);
-    } else {
-      // Regular service creation (non-draft)
-      await prisma.service.create({
-        data: {
-          title: data.title || '',
-          description: data.description || '',
-          category: data.category || '',
-          subcategory: data.subcategory || '',
-          subdivision: data.subdivision || '',
-          tags: data.tags || [],
-          price: data.price || 0,
-          fixed: data.fixed ?? true,
-          type: data.type || {
-            presence: false,
-            online: false,
-            oneoff: false,
-            onbase: false,
-            subscription: false,
-            onsite: false,
-          },
-          subscriptionType: data.subscriptionType || null,
-          duration: data.duration || 0,
-          location: null,
-          addons: data.addons || [],
-          faq: data.faq || [],
-          media: sanitizedMedia,
-          status: status,
-          featured: false,
-          profile: {
-            connect: { id: profile.id },
-          },
-        },
+        });
       });
+    } else {
+      // Regular service creation (non-draft) with slug generation
+      createdService = await prisma.$transaction(async (tx) => {
+        // Step 1: Create service without slug (auto-increment ID)
+        const service = await tx.service.create({
+          data: {
+            pid: profile.id,
+            title: data.title || '',
+            description: data.description || '',
+            category: data.category || '',
+            subcategory: data.subcategory || '',
+            subdivision: data.subdivision || '',
+            tags: data.tags || [],
+            price: data.price || 0,
+            fixed: data.fixed ?? true,
+            type: data.type || {
+              presence: false,
+              online: false,
+              oneoff: false,
+              onbase: false,
+              subscription: false,
+              onsite: false,
+            },
+            subscriptionType: data.subscriptionType || null,
+            duration: data.duration || 0,
+            addons: data.addons || [],
+            faq: data.faq || [],
+            media: sanitizedMedia,
+            status: status,
+            featured: false,
+          },
+          select: { id: true, title: true },
+        });
+
+        // Step 2: Generate slug with the auto-generated ID and update service
+        const slug = generateServiceSlug(data.title || 'untitled', service.id.toString());
+        await tx.service.update({
+          where: { id: service.id },
+          data: { slug },
+        });
+
+        return service;
+      });
+
+      // Store the created service for returning in response
+      // Now we have access to createdService outside the transaction
     }
 
     // 10. Media handling - now properly sanitizes pending resources before database storage
@@ -274,6 +304,8 @@ async function createServiceInternal(
       return {
         success: true,
         message: 'Η υπηρεσία υποβλήθηκε για έγκριση επιτυχώς!',
+        serviceId: createdService!.id,
+        serviceTitle: createdService!.title,
       };
     }
   } catch (error: any) {
