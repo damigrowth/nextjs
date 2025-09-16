@@ -1,10 +1,26 @@
 'use server';
 
 import { unstable_cache } from 'next/cache';
-import { PrismaClient, Profile } from '@prisma/client';
+import { prisma } from '@/lib/prisma/client';
+import { Profile } from '@prisma/client';
 import { ActionResult } from '@/lib/types/api';
-
-const prisma = new PrismaClient();
+import type { BreadcrumbSegment } from '@/components/shared/dynamic-breadcrumb';
+import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
+import { skills } from '@/constants/datasets/skills';
+import {
+  contactMethodsOptions,
+  paymentMethodsOptions,
+  settlementMethodsOptions,
+  budgetOptions,
+  sizeOptions,
+} from '@/constants/datasets/options';
+import { industriesOptions } from '@/constants/datasets/industries';
+import { locationOptions } from '@/constants/datasets/locations';
+import {
+  findById,
+  transformCoverageWithLocationNames,
+  getDefaultCoverage,
+} from '@/lib/utils/datasets';
 
 /**
  * Internal function to fetch profile data (uncached)
@@ -114,4 +130,272 @@ export async function getPublicProfileByUsername(
       error: 'Failed to get public profile',
     };
   }
+}
+
+/**
+ * Complete profile data with resolved taxonomy and options
+ */
+export interface ProfilePageData {
+  profile: NonNullable<Awaited<ReturnType<typeof getProfileByUsername>>>;
+  category?: ReturnType<typeof findById>;
+  subcategory?: ReturnType<typeof findById>;
+  speciality?: ReturnType<typeof findById>;
+  featuredCategories: typeof proTaxonomies;
+  skillsData: ReturnType<typeof findById>[];
+  specialityData?: ReturnType<typeof findById>;
+  contactMethodsData: ReturnType<typeof findById>[];
+  paymentMethodsData: ReturnType<typeof findById>[];
+  settlementMethodsData: ReturnType<typeof findById>[];
+  budgetData?: ReturnType<typeof findById>;
+  sizeData?: ReturnType<typeof findById>;
+  industriesData: ReturnType<typeof findById>[];
+  coverage: ReturnType<typeof transformCoverageWithLocationNames>;
+  visibility: PrismaJson.VisibilitySettings;
+  socials: PrismaJson.SocialMedia;
+  calculatedExperience: number;
+  breadcrumbSegments: BreadcrumbSegment[];
+  breadcrumbButtons: {
+    subjectTitle: string;
+    id: string;
+    savedStatus: boolean;
+    saveType: string;
+    hideSaveButton: boolean;
+    isAuthenticated: boolean;
+  };
+}
+
+/**
+ * Retrieves a profile by username with associated user data
+ * Uses Prisma client with proper type inference from schema
+ */
+async function getProfileByUsername(username: string) {
+  try {
+    const result = await prisma.profile.findFirst({
+      where: {
+        username,
+        published: true,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            role: true,
+            confirmed: true,
+            blocked: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return result;
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    return null;
+  }
+}
+
+/**
+ * Retrieves complete profile data with resolved taxonomy information
+ * Validates user permissions and resolves category/subcategory data
+ */
+export async function getProfilePageData(
+  username: string
+): Promise<ActionResult<ProfilePageData>> {
+  try {
+    const profile = await getProfileByUsername(username);
+
+    // Early validation with proper null checks
+    if (!profile || profile.user.blocked || !profile.user.confirmed) {
+      return {
+        success: false,
+        error: 'Profile not available',
+      };
+    }
+
+    // Simple role validation
+    if (!['freelancer', 'company'].includes(profile.user.role)) {
+      return {
+        success: false,
+        error: 'Invalid profile type',
+      };
+    }
+
+    // Use proTaxonomies for all profiles, filtering by type based on user role
+    const category = profile.category
+      ? findById(proTaxonomies, profile.category)
+      : null;
+
+    const subcategory =
+      profile.subcategory && category?.children
+        ? findById(category.children, profile.subcategory)
+        : null;
+
+    const speciality = profile.speciality
+      ? findById(proTaxonomies, profile.speciality)
+      : null;
+
+    const featuredCategories = proTaxonomies.slice(0, 8);
+
+    // Use proTaxonomies for skills resolution - skills are in the same taxonomy
+    const skillsData = profile.skills
+      .map((skillId) => findById(skills, skillId))
+      .filter((skill) => skill !== null);
+
+    const specialityData = findById(skills, profile.speciality);
+
+    // Resolve dataset options for features
+    const contactMethodsData = profile.contactMethods
+      .map((methodId) => findById(contactMethodsOptions, methodId))
+      .filter((method) => method !== null);
+
+    const paymentMethodsData = profile.paymentMethods
+      .map((methodId) => findById(paymentMethodsOptions, methodId))
+      .filter((method) => method !== null);
+
+    const settlementMethodsData = profile.settlementMethods
+      .map((methodId) => findById(settlementMethodsOptions, methodId))
+      .filter((method) => method !== null);
+
+    const budgetData = profile.budget
+      ? findById(budgetOptions, profile.budget)
+      : null;
+
+    const sizeData = profile.size ? findById(sizeOptions, profile.size) : null;
+
+    const industriesData = profile.industries
+      .map((industryId) => findById(industriesOptions, industryId))
+      .filter((industry) => industry !== null);
+
+    // Transform coverage data by resolving all location IDs to names
+    const rawCoverage = profile.coverage || getDefaultCoverage();
+    const coverage = transformCoverageWithLocationNames(
+      rawCoverage,
+      locationOptions,
+    );
+
+    const visibility = profile.visibility || {
+      email: true,
+      phone: true,
+      address: true,
+    };
+    
+    const socials = profile.socials || {};
+
+    // Use the profile.experience field directly as it's already stored as an integer
+    const calculatedExperience = profile.experience || 0;
+
+    // Build breadcrumb segments (taxonomies only)
+    const breadcrumbSegments: BreadcrumbSegment[] = [
+      { label: 'Αρχική', href: '/' },
+      {
+        label: profile.user.role === 'company' ? 'Επιχειρήσεις' : 'Επαγγελματίες',
+        href: profile.user.role === 'company' ? '/companies' : '/pros',
+      },
+    ];
+
+    if (category) {
+      breadcrumbSegments.push({
+        label: category.plural || category.label,
+        href: `/${profile.user.role === 'company' ? 'companies' : 'pros'}/${category.slug}`,
+      });
+    }
+
+    if (subcategory) {
+      breadcrumbSegments.push({
+        label: subcategory.plural || subcategory.label,
+        href: `/${profile.user.role === 'company' ? 'companies' : 'pros'}/${category?.slug}/${subcategory.slug}`,
+        isCurrentPage: true,
+      });
+    } else if (category) {
+      // If no subcategory, mark category as current page
+      breadcrumbSegments[breadcrumbSegments.length - 1].isCurrentPage = true;
+    }
+
+    // Prepare breadcrumb buttons config
+    const breadcrumbButtons = {
+      subjectTitle: profile.displayName || '',
+      id: profile.id,
+      savedStatus: false, // TODO: Get actual saved status
+      saveType: profile.user.role === 'company' ? 'company' : 'freelancer',
+      hideSaveButton: false,
+      isAuthenticated: true, // TODO: Get actual auth status
+    };
+
+    return {
+      success: true,
+      data: {
+        profile,
+        category: category || undefined,
+        subcategory: subcategory || undefined,
+        speciality: speciality || undefined,
+        featuredCategories,
+        skillsData,
+        specialityData,
+        contactMethodsData,
+        paymentMethodsData,
+        settlementMethodsData,
+        budgetData: budgetData || undefined,
+        sizeData: sizeData || undefined,
+        industriesData,
+        coverage,
+        visibility,
+        socials,
+        calculatedExperience,
+        breadcrumbSegments,
+        breadcrumbButtons,
+      },
+    };
+  } catch (error) {
+    console.error('Error getting profile data:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch profile data',
+    };
+  }
+}
+
+/**
+ * Generates metadata for the profile page
+ * Creates dynamic title, description, and OpenGraph data based on profile
+ */
+export async function getProfileMetadata(username: string) {
+  const result = await getProfilePageData(username);
+
+  // Type-safe early return for not found profiles
+  if (!result.success || !result.data) {
+    return {
+      title: 'Profile Not Found',
+      description: 'The requested profile could not be found.',
+    };
+  }
+
+  const { profile, category } = result.data;
+
+  // Simple role label
+  const roleLabel =
+    profile.user.role === 'freelancer'
+      ? 'Επαγγελματίας'
+      : profile.user.role === 'company'
+        ? 'Επιχείρηση'
+        : 'Χρήστης';
+
+  // Type-safe image for OpenGraph - now handles both string URLs and CloudinaryResource objects
+  const imageUrls: string[] = profile.image
+    ? typeof profile.image === 'string'
+      ? [profile.image]
+      : (profile.image as any)?.secure_url
+        ? [(profile.image as any).secure_url]
+        : []
+    : [];
+
+  return {
+    title: `${profile.displayName || profile.username || 'Unknown'} - ${roleLabel}${category ? ` | ${category.label}` : ''}`,
+    description: `${profile.tagline || `${roleLabel} profile για τον/την ${profile.displayName || profile.username}`}${category ? ` στην κατηγορία ${category.label}` : ''}.`,
+    openGraph: {
+      title: profile.displayName || profile.username || 'Unknown Profile',
+      description: profile.tagline || `${roleLabel} profile`,
+      images: imageUrls,
+    },
+  };
 }
