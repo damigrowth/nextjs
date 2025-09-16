@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma/client';
 import type { ActionResult } from '@/lib/types/api';
 
 export interface RecentService {
-  id: string;
+  id: number;
   title: string;
 }
 
@@ -47,15 +47,9 @@ export async function getRecentServices(): Promise<
       take: 5,
     });
 
-    // Transform data to match RecentService interface
-    const transformedServices: RecentService[] = services.map(service => ({
-      id: service.id.toString(),
-      title: service.title,
-    }));
-
     return {
       success: true,
-      data: transformedServices,
+      data: services,
     };
   } catch (error) {
     console.error('Get recent services error:', error);
