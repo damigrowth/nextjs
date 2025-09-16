@@ -18,6 +18,7 @@ import {
   TestimonialsHome,
 } from '@/components';
 import { Meta } from '@/lib/seo/Meta';
+import { getFeaturedServices } from '@/actions/services/get-services';
 
 // import { getData } from '@/lib/client/operations';
 // import { HOME_PAGE } from '@/lib/graphql/queries/main/page';
@@ -52,27 +53,12 @@ export async function generateStaticParams() {
 }
 
 export default async function HomePage({ searchParams }) {
-  // const params = await searchParams;
+  // Fetch featured services at build time for static generation
+  const featuredServicesResult = await getFeaturedServices();
 
-  // const homeData = await getData(
-  //   HOME_PAGE,
-  //   {
-  //     servicesPage: 1,
-  //     servicesPageSize: 4,
-  //     freelancersPage: 1,
-  //     freelancersPageSize: 4,
-  //   },
-  //   'HOME_PAGE',
-  //   ['home-page'],
-  // );
-
-  // const {
-  //   categories = { data: [] },
-  //   services = { data: [], meta: { pagination: {} } },
-  //   freelancers = { data: [], meta: { pagination: {} } },
-  //   topServiceSubcategories = [],
-  //   topFreelancerSubcategories = [],
-  // } = homeData || {};
+  const featuredServices = featuredServicesResult.success
+    ? featuredServicesResult.data
+    : [];
 
   return (
     <>
@@ -80,7 +66,7 @@ export default async function HomePage({ searchParams }) {
       <HeroHome />
       <CategoriesHome />
       <FeaturesHome />
-      <ServicesHome />
+      <ServicesHome initialServices={featuredServices} />
       <FreelancersHome />
       <TestimonialsHome />
       <TaxonomiesHome />
