@@ -1,6 +1,24 @@
+enum SubscriptionType {
+  month
+  year
+  per_case
+  per_hour
+  per_session
+}
+
+enum Status {
+  draft
+  pending
+  published
+  rejected
+  approved
+  inactive
+}
+
 model Service {
-  id          String @id @default(cuid())
+  id          Int     @id @default(autoincrement())
   pid         String
+  slug        String? @unique
   title       String
   description String
 
@@ -12,11 +30,11 @@ model Service {
 
   // Pricing
   fixed            Boolean
-  price            Int?    @default(0)
+  price            Int?              @default(0)
   /// [ServiceType]
   type             Json // Boolean fields: online, presence, oneoff, onbase, subscription, onsite
-  subscriptionType String? // month or year
-  duration         Int?    @default(0) // days for duration
+  subscriptionType SubscriptionType?
+  duration         Int?              @default(0) // days for duration
 
   // Features
   /// [ServiceAddon]
@@ -29,14 +47,13 @@ model Service {
   media Json? // service media/images
 
   // Misc
-  location String?
   featured Boolean @default(false)
 
   // Reviews and Rating
   rating      Float @default(0)
   reviewCount Int   @default(0)
 
-  status    String   @default("draft") // draft, pending, published, rejected
+  status    Status   @default(draft)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   reviews   Review[]

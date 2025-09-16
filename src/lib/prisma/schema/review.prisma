@@ -3,7 +3,7 @@ model Review {
   rating    Int
   comment   String?
   published Boolean  @default(true)
-  sid       String?
+  sid       Int?     // Changed from String? to Int? to match Service.id
   pid       String
   authorId  String
   createdAt DateTime @default(now())
