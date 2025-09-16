@@ -11,7 +11,16 @@ import { Building, Home, AlertCircle } from 'lucide-react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import type { CreateServiceInput } from '@/lib/validations/service';
 
-export default function OnsiteOnbaseStep() {
+interface OnsiteOnbaseStepProps {
+  disabledOptions?: {
+    presence?: boolean;
+    online?: boolean;
+    onsite?: boolean;
+    onbase?: boolean;
+  };
+}
+
+export default function OnsiteOnbaseStep({ disabledOptions }: OnsiteOnbaseStepProps) {
   const form = useFormContext<CreateServiceInput>();
   const { setValue, formState } = form;
 
@@ -49,19 +58,25 @@ export default function OnsiteOnbaseStep() {
       <div className='grid md:grid-cols-2 gap-6'>
         {/* Own Space Option */}
         <Card
-          className={`p-6 cursor-pointer border-2 transition-all duration-200 hover:shadow-md ${
-            selectedLocation === 'onbase'
-              ? 'border-green-500 bg-green-50 shadow-md'
-              : 'border-gray-200 hover:border-gray-300'
+          className={`p-6 border-2 transition-all duration-200 ${
+            disabledOptions?.onbase
+              ? 'opacity-50 cursor-not-allowed border-gray-100 bg-gray-50'
+              : `cursor-pointer hover:shadow-md ${
+                  selectedLocation === 'onbase'
+                    ? 'border-green-500 bg-green-50 shadow-md'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`
           }`}
-          onClick={() => handleSelection('onbase')}
+          onClick={() => !disabledOptions?.onbase && handleSelection('onbase')}
         >
           <div className='flex flex-col items-center text-center space-y-4'>
             <div
               className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                selectedLocation === 'onbase'
-                  ? 'bg-green-100 text-green-600'
-                  : 'bg-gray-100 text-gray-600'
+                disabledOptions?.onbase
+                  ? 'bg-gray-100 text-gray-400'
+                  : selectedLocation === 'onbase'
+                    ? 'bg-green-100 text-green-600'
+                    : 'bg-gray-100 text-gray-600'
               }`}
             >
               <Building className='w-8 h-8' />
@@ -70,31 +85,36 @@ export default function OnsiteOnbaseStep() {
             <div>
               <h3
                 className={`text-lg font-semibold ${
-                  selectedLocation === 'onbase'
-                    ? 'text-green-900'
-                    : 'text-gray-900'
+                  disabledOptions?.onbase
+                    ? 'text-gray-400'
+                    : selectedLocation === 'onbase'
+                      ? 'text-green-900'
+                      : 'text-gray-900'
                 }`}
               >
                 Στον χώρο μου
               </h3>
               <p
                 className={`text-sm mt-2 ${
-                  selectedLocation === 'onbase'
-                    ? 'text-green-700'
-                    : 'text-gray-600'
+                  disabledOptions?.onbase
+                    ? 'text-gray-400'
+                    : selectedLocation === 'onbase'
+                      ? 'text-green-700'
+                      : 'text-gray-600'
                 }`}
               >
-                Ο πελάτης έρχεται στον χώρο σας (γραφείο, κατάστημα, εργαστήριο,
-                κτλ.)
+                Ο πελάτης έρχεται στον χώρο σας (γραφείο, κατάστημα, εργαστήριο, κτλ.)
               </p>
             </div>
 
             {/* Features List */}
             <div
               className={`text-xs space-y-1 ${
-                selectedLocation === 'onbase'
-                  ? 'text-green-600'
-                  : 'text-gray-500'
+                disabledOptions?.onbase
+                  ? 'text-gray-400'
+                  : selectedLocation === 'onbase'
+                    ? 'text-green-600'
+                    : 'text-gray-500'
               }`}
             >
               <div>✓ Ελεγχόμενο περιβάλλον</div>
@@ -102,7 +122,7 @@ export default function OnsiteOnbaseStep() {
               <div>✓ Χαμηλότερο κόστος μετακίνησης</div>
             </div>
 
-            {selectedLocation === 'onbase' && (
+            {selectedLocation === 'onbase' && !disabledOptions?.onbase && (
               <div className='flex items-center text-green-600 text-sm font-medium'>
                 <span>Επιλεγμένο</span>
               </div>
@@ -112,19 +132,25 @@ export default function OnsiteOnbaseStep() {
 
         {/* Client Space Option */}
         <Card
-          className={`p-6 cursor-pointer border-2 transition-all duration-200 hover:shadow-md ${
-            selectedLocation === 'onsite'
-              ? 'border-green-500 bg-green-50 shadow-md'
-              : 'border-gray-200 hover:border-gray-300'
+          className={`p-6 border-2 transition-all duration-200 ${
+            disabledOptions?.onsite
+              ? 'opacity-50 cursor-not-allowed border-gray-100 bg-gray-50'
+              : `cursor-pointer hover:shadow-md ${
+                  selectedLocation === 'onsite'
+                    ? 'border-green-500 bg-green-50 shadow-md'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`
           }`}
-          onClick={() => handleSelection('onsite')}
+          onClick={() => !disabledOptions?.onsite && handleSelection('onsite')}
         >
           <div className='flex flex-col items-center text-center space-y-4'>
             <div
               className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                selectedLocation === 'onsite'
-                  ? 'bg-green-100 text-green-600'
-                  : 'bg-gray-100 text-gray-600'
+                disabledOptions?.onsite
+                  ? 'bg-gray-100 text-gray-400'
+                  : selectedLocation === 'onsite'
+                    ? 'bg-green-100 text-green-600'
+                    : 'bg-gray-100 text-gray-600'
               }`}
             >
               <Home className='w-8 h-8' />
@@ -133,31 +159,36 @@ export default function OnsiteOnbaseStep() {
             <div>
               <h3
                 className={`text-lg font-semibold ${
-                  selectedLocation === 'onsite'
-                    ? 'text-green-900'
-                    : 'text-gray-900'
+                  disabledOptions?.onsite
+                    ? 'text-gray-400'
+                    : selectedLocation === 'onsite'
+                      ? 'text-green-900'
+                      : 'text-gray-900'
                 }`}
               >
                 Στον χώρο του πελάτη
               </h3>
               <p
                 className={`text-sm mt-2 ${
-                  selectedLocation === 'onsite'
-                    ? 'text-green-700'
-                    : 'text-gray-600'
+                  disabledOptions?.onsite
+                    ? 'text-gray-400'
+                    : selectedLocation === 'onsite'
+                      ? 'text-green-700'
+                      : 'text-gray-600'
                 }`}
               >
-                Επισκέπτεστε τον πελάτη στον χώρο του (σπίτι, γραφείο,
-                επιχείρηση)
+                Επισκέπτεστε τον πελάτη στον χώρο του (σπίτι, γραφείο, επιχείρηση)
               </p>
             </div>
 
             {/* Features List */}
             <div
               className={`text-xs space-y-1 ${
-                selectedLocation === 'onsite'
-                  ? 'text-green-600'
-                  : 'text-gray-500'
+                disabledOptions?.onsite
+                  ? 'text-gray-400'
+                  : selectedLocation === 'onsite'
+                    ? 'text-green-600'
+                    : 'text-gray-500'
               }`}
             >
               <div>✓ Ευκολία για τον πελάτη</div>
@@ -165,7 +196,7 @@ export default function OnsiteOnbaseStep() {
               <div>✓ Υψηλότερες τιμές</div>
             </div>
 
-            {selectedLocation === 'onsite' && (
+            {selectedLocation === 'onsite' && !disabledOptions?.onsite && (
               <div className='flex items-center text-green-600 text-sm font-medium'>
                 <span>Επιλεγμένο</span>
               </div>
@@ -173,6 +204,28 @@ export default function OnsiteOnbaseStep() {
           </div>
         </Card>
       </div>
+
+      {/* Disabled Options Notices */}
+      {(disabledOptions?.onbase || disabledOptions?.onsite) && (
+        <div className="mt-4 space-y-2">
+          {disabledOptions?.onbase && (
+            <Alert className="border-orange-200 bg-orange-50">
+              <AlertCircle className="h-4 w-4 text-orange-600" />
+              <AlertDescription className="text-orange-800">
+                Δεν μπορείτε να επιλέξετε "Στον χώρο μου" γιατί δεν έχετε συμπληρώσει το αντίστοιχο πεδίο στη Διαχείριση Προφίλ.
+              </AlertDescription>
+            </Alert>
+          )}
+          {disabledOptions?.onsite && (
+            <Alert className="border-orange-200 bg-orange-50">
+              <AlertCircle className="h-4 w-4 text-orange-600" />
+              <AlertDescription className="text-orange-800">
+                Δεν μπορείτε να επιλέξετε "Στον χώρο του πελάτη" γιατί δεν έχετε συμπληρώσει το αντίστοιχο πεδίο στη Διαχείριση Προφίλ.
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+      )}
     </>
   );
 }

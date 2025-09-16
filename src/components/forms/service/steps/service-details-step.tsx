@@ -48,12 +48,14 @@ import { TaxonomySelector } from '@/components/shared';
 
 export default function ServiceDetailsStep() {
   const form = useFormContext<CreateServiceInput>();
-  const { setValue, watch, formState } = form;
+  const { setValue, watch, formState, clearErrors, trigger } = form;
 
   // Use watch for reactive form field watching
   const watchedCategory = watch('category');
   const watchedSubcategory = watch('subcategory');
   const watchedSubdivision = watch('subdivision');
+  const watchedFixed = watch('fixed');
+  const watchedType = watch('type');
 
   // Get filtered data based on selections
   const selectedCategoryData = findById(serviceTaxonomies, watchedCategory);
@@ -119,232 +121,249 @@ export default function ServiceDetailsStep() {
   };
 
   return (
-    <>
-      <div className='space-y-6'>
-        {/* Title */}
-        <FormField
-          control={form.control}
-          name='title'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Τίτλος υπηρεσίας*</FormLabel>
-              <p className='text-sm text-gray-600'>
-                Ένας σαφής και περιγραφικός τίτλος
-              </p>
-              <FormControl>
-                <Input
-                  placeholder='π.χ. Δημιουργία λογοτύπου και ταυτότητας επιχείρησης'
-                  maxLength={100}
-                  {...field}
-                  onChange={(e) => {
-                    const value = e.target.value.slice(0, 100);
-                    field.onChange(value);
-                  }}
-                />
-              </FormControl>
-              <div className='text-sm text-gray-500'>
-                {field.value?.length || 0}/100 χαρακτήρες
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Description */}
-        <FormField
-          control={form.control}
-          name='description'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Περιγραφή υπηρεσίας*</FormLabel>
-              <p className='text-sm text-gray-600'>
-                Αναλυτική περιγραφή τουλάχιστον 80 χαρακτήρων
-              </p>
-              <FormControl>
-                <Textarea
-                  placeholder='Περιγράψτε την υπηρεσία σας αναλυτικά...'
-                  className='min-h-[120px]'
-                  rows={5}
-                  maxLength={5000}
-                  {...field}
-                  onChange={(e) => {
-                    const value = e.target.value.slice(0, 5000);
-                    field.onChange(value);
-                  }}
-                />
-              </FormControl>
-              <div className='text-sm text-gray-500'>
-                {field.value?.length || 0}/5000 χαρακτήρες
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Taxonomy Selection - Combined Category/Subcategory/Subdivision */}
-        <div className='space-y-2'>
-          <label className='text-sm font-medium text-gray-900'>
-            Κατηγορία Υπηρεσίας*
-          </label>
-          <p className='text-sm text-gray-600'>
-            Επιλέξτε την κατηγορία, υποκατηγορία και υποδιαίρεση της υπηρεσίας
-          </p>
-          <TaxonomySelector
-            taxonomies={serviceTaxonomies}
-            value={
-              watchedCategory
-                ? {
-                    category: watchedCategory,
-                    subcategory: watchedSubcategory || '',
-                    subdivision: watchedSubdivision || '',
-                    categoryLabel: findById(serviceTaxonomies, watchedCategory)
-                      ?.label,
-                    subcategoryLabel: watchedSubcategory
-                      ? findById(subcategories, watchedSubcategory)?.label
-                      : undefined,
-                    subdivisionLabel: watchedSubdivision
-                      ? findById(subdivisions, watchedSubdivision)?.label
-                      : undefined,
-                  }
-                : null
-            }
-            onValueChange={(value) => {
-              if (value) {
-                setValue('category', value.category, { shouldValidate: true });
-                setValue('subcategory', value.subcategory, {
-                  shouldValidate: true,
-                });
-                setValue('subdivision', value.subdivision, {
-                  shouldValidate: true,
-                });
-                // Clear tags when taxonomy changes
-                setValue('tags', [], { shouldValidate: true });
-              } else {
-                setValue('category', '', { shouldValidate: true });
-                setValue('subcategory', '', { shouldValidate: true });
-                setValue('subdivision', '', { shouldValidate: true });
-                setValue('tags', [], { shouldValidate: true });
-              }
-            }}
-            placeholder='Επιλέξτε κατηγορία υπηρεσίας...'
-          />
-          {/* Show validation errors */}
-          {formState.errors.category && (
-            <p className='text-sm font-medium text-destructive'>
-              {formState.errors.category.message}
+    <div className='space-y-6 w-full'>
+      {/* Title */}
+      <FormField
+        control={form.control}
+        name='title'
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Τίτλος υπηρεσίας*</FormLabel>
+            <p className='text-sm text-gray-600'>
+              Ένας σαφής και περιγραφικός τίτλος
             </p>
-          )}
-          {formState.errors.subcategory && (
-            <p className='text-sm font-medium text-destructive'>
-              {formState.errors.subcategory.message}
-            </p>
-          )}
-          {formState.errors.subdivision && (
-            <p className='text-sm font-medium text-destructive'>
-              {formState.errors.subdivision.message}
-            </p>
-          )}
-        </div>
-
-        {/* Tags - Multi-select from category subcategories and subdivisions */}
-        {watchedCategory && availableTags.length > 0 ? (
-          <FormField
-            control={form.control}
-            name='tags'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Ετικέτες*</FormLabel>
-                <p className='text-sm text-gray-600'>
-                  Επιλέξτε έως 10 ετικέτες για την υπηρεσία σας
-                </p>
-                <div className='text-sm text-gray-500'>
-                  Επιλεγμένες: {field.value?.length || 0}/10
-                </div>
-                <FormControl>
-                  <MultiSelect
-                    options={availableTags}
-                    selected={field.value || []}
-                    onChange={field.onChange}
-                    placeholder='Επιλέξτε ετικέτες...'
-                    maxItems={10}
-                    showClearAll={true}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        ) : (
-          watchedCategory &&
-          availableTags.length === 0 && (
-            <div className='space-y-2'>
-              <label className='text-sm font-medium text-gray-900'>
-                Ετικέτες
-              </label>
-              <div className='p-4 text-center text-gray-500 bg-gray-50 rounded-md'>
-                Δεν υπάρχουν διαθέσιμες ετικέτες για αυτήν την κατηγορία
-              </div>
+            <FormControl>
+              <Input
+                placeholder='π.χ. Δημιουργία λογοτύπου και ταυτότητας επιχείρησης'
+                maxLength={100}
+                {...field}
+                onChange={(e) => {
+                  const value = e.target.value.slice(0, 100);
+                  field.onChange(value);
+                }}
+              />
+            </FormControl>
+            <div className='text-sm text-gray-500'>
+              {field.value?.length || 0}/100 χαρακτήρες
             </div>
-          )
+            <FormMessage />
+          </FormItem>
         )}
+      />
 
-        {/* Price and Fixed Price Toggle */}
-        <div className='grid md:grid-cols-2 gap-4'>
-          <FormField
-            control={form.control}
-            name='price'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Τιμή*</FormLabel>
-                <p className='text-sm text-gray-600'>Τιμή σε ευρώ</p>
-                <FormControl>
-                  <Currency
-                    currency='€'
-                    position='right'
-                    placeholder='π.χ. 50'
-                    min={1}
-                    max={10000}
-                    allowDecimals={false}
-                    value={field.value || 0}
-                    onValueChange={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      {/* Description */}
+      <FormField
+        control={form.control}
+        name='description'
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Περιγραφή υπηρεσίας*</FormLabel>
+            <p className='text-sm text-gray-600'>
+              Αναλυτική περιγραφή τουλάχιστον 80 χαρακτήρων
+            </p>
+            <FormControl>
+              <Textarea
+                placeholder='Περιγράψτε την υπηρεσία σας αναλυτικά...'
+                className='min-h-[120px]'
+                rows={5}
+                maxLength={5000}
+                {...field}
+                onChange={(e) => {
+                  const value = e.target.value.slice(0, 5000);
+                  field.onChange(value);
+                }}
+              />
+            </FormControl>
+            <div className='text-sm text-gray-500'>
+              {field.value?.length || 0}/5000 χαρακτήρες
+            </div>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-          <FormField
-            control={form.control}
-            name='fixed'
-            render={({ field }) => (
-              <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
-                <div className='space-y-0.5'>
-                  <FormLabel>Σταθερή τιμή</FormLabel>
-                  <div className='text-xs text-muted-foreground'>
-                    Η τιμή είναι σταθερή και όχι εκτιμώμενη
-                  </div>
+      {/* Taxonomy Selection - Combined Category/Subcategory/Subdivision */}
+      <div className='space-y-2'>
+        <label className='text-sm font-medium text-gray-900'>
+          Κατηγορία Υπηρεσίας*
+        </label>
+        <p className='text-sm text-gray-600'>
+          Επιλέξτε την κατηγορία, υποκατηγορία και υποδιαίρεση της υπηρεσίας
+        </p>
+        <TaxonomySelector
+          taxonomies={serviceTaxonomies}
+          value={
+            watchedCategory
+              ? {
+                  category: watchedCategory,
+                  subcategory: watchedSubcategory || '',
+                  subdivision: watchedSubdivision || '',
+                  categoryLabel: findById(serviceTaxonomies, watchedCategory)
+                    ?.label,
+                  subcategoryLabel: watchedSubcategory
+                    ? findById(subcategories, watchedSubcategory)?.label
+                    : undefined,
+                  subdivisionLabel: watchedSubdivision
+                    ? findById(subdivisions, watchedSubdivision)?.label
+                    : undefined,
+                }
+              : null
+          }
+          onValueChange={(value) => {
+            if (value) {
+              setValue('category', value.category, { shouldValidate: true });
+              setValue('subcategory', value.subcategory, {
+                shouldValidate: true,
+              });
+              setValue('subdivision', value.subdivision, {
+                shouldValidate: true,
+              });
+              // Clear tags when taxonomy changes
+              setValue('tags', [], { shouldValidate: true });
+            } else {
+              setValue('category', '', { shouldValidate: true });
+              setValue('subcategory', '', { shouldValidate: true });
+              setValue('subdivision', '', { shouldValidate: true });
+              setValue('tags', [], { shouldValidate: true });
+            }
+          }}
+          placeholder='Επιλέξτε κατηγορία υπηρεσίας...'
+        />
+        {/* Show validation errors */}
+        {formState.errors.category && (
+          <p className='text-sm font-medium text-destructive'>
+            {formState.errors.category.message}
+          </p>
+        )}
+        {formState.errors.subcategory && (
+          <p className='text-sm font-medium text-destructive'>
+            {formState.errors.subcategory.message}
+          </p>
+        )}
+        {formState.errors.subdivision && (
+          <p className='text-sm font-medium text-destructive'>
+            {formState.errors.subdivision.message}
+          </p>
+        )}
+      </div>
+
+      {/* Tags - Multi-select from category subcategories and subdivisions */}
+      {watchedCategory && availableTags.length > 0 ? (
+        <FormField
+          control={form.control}
+          name='tags'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Ετικέτες*</FormLabel>
+              <p className='text-sm text-gray-600'>
+                Επιλέξτε έως 10 ετικέτες για την υπηρεσία σας
+              </p>
+              <div className='text-sm text-gray-500'>
+                Επιλεγμένες: {field.value?.length || 0}/10
+              </div>
+              <FormControl>
+                <MultiSelect
+                  options={availableTags}
+                  selected={field.value || []}
+                  onChange={field.onChange}
+                  placeholder='Επιλέξτε ετικέτες...'
+                  maxItems={10}
+                  showClearAll={true}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      ) : (
+        watchedCategory &&
+        availableTags.length === 0 && (
+          <div className='space-y-2'>
+            <label className='text-sm font-medium text-gray-900'>
+              Ετικέτες
+            </label>
+            <div className='p-4 text-center text-gray-500 bg-gray-50 rounded-md'>
+              Δεν υπάρχουν διαθέσιμες ετικέτες για αυτήν την κατηγορία
+            </div>
+          </div>
+        )
+      )}
+
+      {/* Price and Fixed Price Toggle */}
+      <div className='grid md:grid-cols-2 gap-4'>
+        <FormField
+          control={form.control}
+          name='price'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Τιμή{watchedFixed ? '*' : ''}</FormLabel>
+              <p className='text-sm text-gray-600'>
+                {watchedFixed ? 'Τιμή σε ευρώ' : 'Χωρίς εμφάνιση τιμής'}
+              </p>
+              <FormControl>
+                <Currency
+                  currency='€'
+                  position='right'
+                  placeholder={watchedFixed ? 'π.χ. 50' : 'Τιμή κρυφή'}
+                  min={1}
+                  max={10000}
+                  allowDecimals={false}
+                  value={field.value || 0}
+                  onValueChange={field.onChange}
+                  disabled={!watchedFixed}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name='fixed'
+          render={({ field }) => (
+            <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+              <div className='space-y-0.5'>
+                <FormLabel>Χωρίς εμφάνιση τιμής</FormLabel>
+                <div className='text-xs text-muted-foreground'>
+                  Η τιμή δεν θα εμφανίζεται στο κοινό
                 </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </div>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={!field.value}
+                  onCheckedChange={async (checked) => {
+                    field.onChange(!checked);
+                    // Handle price field when toggling fixed
+                    if (checked) {
+                      // When switch is ON (checked=true), fixed becomes false, price is not required, set to 0
+                      setValue('price', 0, { shouldValidate: false });
+                      clearErrors('price');
+                    } else {
+                      // When switch is OFF (checked=false), fixed becomes true, price is required
+                      // Don't automatically change the price, let user set it
+                      clearErrors('price');
+                    }
+                    // Re-trigger validation for the price field
+                    await trigger('price');
+                  }}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      </div>
 
-        {/* Duration */}
+      {/* Duration - Only show for oneoff services */}
+      {watchedType?.oneoff && (
         <FormField
           control={form.control}
           name='duration'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Διάρκεια εκτέλεσης</FormLabel>
+              <FormLabel>Χρόνος Παράδοσης*</FormLabel>
               <p className='text-sm text-gray-600'>
-                Εκτιμώμενη διάρκεια σε ημέρες (προαιρετικό)
+                Εκτιμώμενος χρόνος παράδοσης σε ημέρες
               </p>
               <FormControl>
                 <Input
@@ -366,7 +385,8 @@ export default function ServiceDetailsStep() {
             </FormItem>
           )}
         />
-      </div>
-    </>
+      )}
+
+    </div>
   );
 }

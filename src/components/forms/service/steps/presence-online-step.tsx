@@ -12,7 +12,16 @@ import { MapPin, Globe, AlertCircle } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 import type { CreateServiceInput } from '@/lib/validations/service';
 
-export default function PresenceOnlineStep() {
+interface PresenceOnlineStepProps {
+  disabledOptions?: {
+    presence?: boolean;
+    online?: boolean;
+    onsite?: boolean;
+    onbase?: boolean;
+  };
+}
+
+export default function PresenceOnlineStep({ disabledOptions }: PresenceOnlineStepProps) {
   const form = useFormContext<CreateServiceInput>();
   const { setValue, formState } = form;
 
@@ -53,19 +62,25 @@ export default function PresenceOnlineStep() {
       <div className='grid md:grid-cols-2 gap-6'>
         {/* Physical Presence Option */}
         <Card
-          className={`p-6 cursor-pointer border-2 transition-all duration-200 hover:shadow-md ${
-            selectedType === 'presence'
-              ? 'border-green-500 bg-green-50 shadow-md'
-              : 'border-gray-200 hover:border-gray-300'
+          className={`p-6 border-2 transition-all duration-200 ${
+            disabledOptions?.presence
+              ? 'opacity-50 cursor-not-allowed border-gray-100 bg-gray-50'
+              : `cursor-pointer hover:shadow-md ${
+                  selectedType === 'presence'
+                    ? 'border-green-500 bg-green-50 shadow-md'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`
           }`}
-          onClick={() => handleSelection('presence')}
+          onClick={() => !disabledOptions?.presence && handleSelection('presence')}
         >
           <div className='flex flex-col items-center text-center space-y-4'>
             <div
               className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                selectedType === 'presence'
-                  ? 'bg-green-100 text-green-600'
-                  : 'bg-gray-100 text-gray-600'
+                disabledOptions?.presence
+                  ? 'bg-gray-100 text-gray-400'
+                  : selectedType === 'presence'
+                    ? 'bg-green-100 text-green-600'
+                    : 'bg-gray-100 text-gray-600'
               }`}
             >
               <MapPin className='w-8 h-8' />
@@ -74,18 +89,22 @@ export default function PresenceOnlineStep() {
             <div>
               <h3
                 className={`text-lg font-semibold ${
-                  selectedType === 'presence'
-                    ? 'text-green-900'
-                    : 'text-gray-900'
+                  disabledOptions?.presence
+                    ? 'text-gray-400'
+                    : selectedType === 'presence'
+                      ? 'text-green-900'
+                      : 'text-gray-900'
                 }`}
               >
                 Φυσική παρουσία
               </h3>
               <p
                 className={`text-sm mt-2 ${
-                  selectedType === 'presence'
-                    ? 'text-green-700'
-                    : 'text-gray-600'
+                  disabledOptions?.presence
+                    ? 'text-gray-400'
+                    : selectedType === 'presence'
+                      ? 'text-green-700'
+                      : 'text-gray-600'
                 }`}
               >
                 Παρέχω την υπηρεσία με φυσική παρουσία
@@ -95,7 +114,11 @@ export default function PresenceOnlineStep() {
             {/* Features List */}
             <div
               className={`text-xs space-y-1 ${
-                selectedType === 'presence' ? 'text-green-600' : 'text-gray-500'
+                disabledOptions?.presence
+                  ? 'text-gray-400'
+                  : selectedType === 'presence'
+                    ? 'text-green-600'
+                    : 'text-gray-500'
               }`}
             >
               <div>✓ Άμεση επικοινωνία</div>
@@ -103,7 +126,7 @@ export default function PresenceOnlineStep() {
               <div>✓ Επιτόπια εργασία</div>
             </div>
 
-            {selectedType === 'presence' && (
+            {selectedType === 'presence' && !disabledOptions?.presence && (
               <div className='flex items-center text-green-600 text-sm font-medium'>
                 <span>Επιλεγμένο</span>
               </div>
@@ -113,19 +136,25 @@ export default function PresenceOnlineStep() {
 
         {/* Online Service Option */}
         <Card
-          className={`p-6 cursor-pointer border-2 transition-all duration-200 hover:shadow-md ${
-            selectedType === 'online'
-              ? 'border-green-500 bg-green-50 shadow-md'
-              : 'border-gray-200 hover:border-gray-300'
+          className={`p-6 border-2 transition-all duration-200 ${
+            disabledOptions?.online
+              ? 'opacity-50 cursor-not-allowed border-gray-100 bg-gray-50'
+              : `cursor-pointer hover:shadow-md ${
+                  selectedType === 'online'
+                    ? 'border-green-500 bg-green-50 shadow-md'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`
           }`}
-          onClick={() => handleSelection('online')}
+          onClick={() => !disabledOptions?.online && handleSelection('online')}
         >
           <div className='flex flex-col items-center text-center space-y-4'>
             <div
               className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                selectedType === 'online'
-                  ? 'bg-green-100 text-green-600'
-                  : 'bg-gray-100 text-gray-600'
+                disabledOptions?.online
+                  ? 'bg-gray-100 text-gray-400'
+                  : selectedType === 'online'
+                    ? 'bg-green-100 text-green-600'
+                    : 'bg-gray-100 text-gray-600'
               }`}
             >
               <Globe className='w-8 h-8' />
@@ -134,14 +163,22 @@ export default function PresenceOnlineStep() {
             <div>
               <h3
                 className={`text-lg font-semibold ${
-                  selectedType === 'online' ? 'text-green-900' : 'text-gray-900'
+                  disabledOptions?.online
+                    ? 'text-gray-400'
+                    : selectedType === 'online'
+                      ? 'text-green-900'
+                      : 'text-gray-900'
                 }`}
               >
                 Online/Απομακρυσμένα
               </h3>
               <p
                 className={`text-sm mt-2 ${
-                  selectedType === 'online' ? 'text-green-700' : 'text-gray-600'
+                  disabledOptions?.online
+                    ? 'text-gray-400'
+                    : selectedType === 'online'
+                      ? 'text-green-700'
+                      : 'text-gray-600'
                 }`}
               >
                 Παρέχω την υπηρεσία online ή απομακρυσμένα
@@ -151,7 +188,11 @@ export default function PresenceOnlineStep() {
             {/* Features List */}
             <div
               className={`text-xs space-y-1 ${
-                selectedType === 'online' ? 'text-green-600' : 'text-gray-500'
+                disabledOptions?.online
+                  ? 'text-gray-400'
+                  : selectedType === 'online'
+                    ? 'text-green-600'
+                    : 'text-gray-500'
               }`}
             >
               <div>✓ Ευελιξία τοποθεσίας</div>
@@ -159,7 +200,7 @@ export default function PresenceOnlineStep() {
               <div>✓ Ψηφιακή παράδοση</div>
             </div>
 
-            {selectedType === 'online' && (
+            {selectedType === 'online' && !disabledOptions?.online && (
               <div className='flex items-center text-green-600 text-sm font-medium'>
                 <span>Επιλεγμένο</span>
               </div>
@@ -167,6 +208,28 @@ export default function PresenceOnlineStep() {
           </div>
         </Card>
       </div>
+
+      {/* Disabled Options Notices */}
+      {(disabledOptions?.presence || disabledOptions?.online) && (
+        <div className="mt-4 space-y-2">
+          {disabledOptions?.presence && (
+            <Alert className="border-orange-200 bg-orange-50">
+              <AlertCircle className="h-4 w-4 text-orange-600" />
+              <AlertDescription className="text-orange-800">
+                Δεν μπορείτε να επιλέξετε "Φυσική παρουσία" γιατί δεν έχετε επιλέξει το Προσφέρω τις υπηρεσίες "Στον χώρο μου" ή "Στον χώρο του πελάτη" στη Διαχείριση Προφίλ.
+              </AlertDescription>
+            </Alert>
+          )}
+          {disabledOptions?.online && (
+            <Alert className="border-orange-200 bg-orange-50">
+              <AlertCircle className="h-4 w-4 text-orange-600" />
+              <AlertDescription className="text-orange-800">
+                Δεν μπορείτε να επιλέξετε "Online" γιατί δεν έχετε συμπληρώσει το αντίστοιχο πεδίο στη Διαχείριση Προφίλ.
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+      )}
     </>
   );
 }
