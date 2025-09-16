@@ -60,7 +60,7 @@ const topIconSizeClasses = {
 function getUserInitials(
   displayName?: string,
   firstName?: string,
-  lastName?: string
+  lastName?: string,
 ): string {
   if (displayName) {
     const parts = displayName.trim().split(' ');
@@ -69,13 +69,13 @@ function getUserInitials(
     }
     return displayName.substring(0, 2).toUpperCase();
   }
-  
+
   const initials = [firstName, lastName]
     .filter(Boolean)
-    .map(name => name![0])
+    .map((name) => name![0])
     .join('')
     .toUpperCase();
-    
+
   return initials || '?';
 }
 
@@ -95,40 +95,45 @@ export default function UserAvatar({
   const borderClass = showBorder ? borderClasses[size] : '';
   const fallbackSizeClass = fallbackSizeClasses[size];
   const topIconSizeClass = topIconSizeClasses[size];
-  
+
   // Extract image URL from CloudinaryResource or use string directly
-  const imageUrl = typeof image === 'object' && image?.secure_url 
-    ? image.secure_url 
-    : typeof image === 'string' 
-    ? image 
-    : undefined;
-    
-  const initials = fallback || getUserInitials(displayName, firstName, lastName);
-  const altText = displayName || `${firstName || ''} ${lastName || ''}`.trim() || 'User avatar';
+  const imageUrl =
+    typeof image === 'object' && image?.secure_url
+      ? image.secure_url
+      : typeof image === 'string'
+        ? image
+        : undefined;
+
+  const initials =
+    fallback || getUserInitials(displayName, firstName, lastName);
+  const altText =
+    displayName ||
+    `${firstName || ''} ${lastName || ''}`.trim() ||
+    'User avatar';
 
   return (
     <div className='relative'>
-      <Avatar className={cn(
-        sizeClass,
-        borderClass,
-        'border-background shadow-lg',
-        className
-      )}>
-        {imageUrl && (
-          <AvatarImage
-            src={imageUrl}
-            alt={altText}
-            className='object-cover'
-          />
+      <Avatar
+        className={cn(
+          sizeClass,
+          borderClass,
+          'border-background shadow-lg rounded-3xl',
+          className,
         )}
-        <AvatarFallback className={cn(
-          fallbackSizeClass,
-          'font-semibold bg-primary text-primary-foreground'
-        )}>
+      >
+        {imageUrl && (
+          <AvatarImage src={imageUrl} alt={altText} className='object-cover' />
+        )}
+        <AvatarFallback
+          className={cn(
+            fallbackSizeClass,
+            'font-semibold bg-primary text-primary-foreground',
+          )}
+        >
           {initials}
         </AvatarFallback>
       </Avatar>
-      
+
       {top && (
         <div className='absolute -top-1 -right-1 bg-yellow-500 rounded-full p-1 border-2 border-background'>
           {topIcon || <Shield className={cn(topIconSizeClass, 'text-white')} />}

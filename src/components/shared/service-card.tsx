@@ -1,56 +1,26 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 
 import MediaDisplay from '@/components/ui/media-display';
 import SaveButton from './save-button';
 import RatingDisplay from './rating-display';
+import type { ServiceCardData } from '@/lib/types/components';
 
 interface ServiceCardProps {
-  service: {
-    id: string;
-    title: string;
-    category: string;
-    slug: string;
-    price?: number;
-    rating: number;
-    reviewCount: number;
-    media: Array<{
-      id: string;
-      url: string;
-      type: 'image' | 'video';
-      alt?: string;
-    }>;
-    profile: {
-      id: string;
-      displayName: string;
-      username: string;
-      avatar?: string;
-    };
-  };
+  service: ServiceCardData;
   onSave?: (serviceId: string) => void;
   isSaved?: boolean;
 }
 
-export default function ServiceCard({
+export default function dServiceCard({
   service,
   onSave,
   isSaved = false,
 }: ServiceCardProps) {
   const handleSaveClick = () => {
     onSave?.(service.id);
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
   };
 
   return (
@@ -60,7 +30,7 @@ export default function ServiceCard({
         <div className='relative aspect-video bg-gray-100'>
           <MediaDisplay
             media={service.media}
-            className='w-full h-full rounded-t-lg object-cover'
+            className='w-full h-full rounded-t-lg'
             aspectRatio='video'
             showControls={false}
           />
@@ -80,25 +50,27 @@ export default function ServiceCard({
             {service.category}
           </p>
 
-          {/* Title - Truncated to 2 lines */}
-          <h3 className='font-semibold text-dark mb-3 leading-tight text-base'>
-            <Link
-              href={`/services/${service.slug}`}
-              className='hover:text-third transition-colors'
-            >
-              <span
-                className='line-clamp-2'
-                style={{
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                }}
+          {/* Title - Fixed height for consistency */}
+          <div className='h-12 mb-3'>
+            <h3 className='font-semibold text-dark leading-tight text-base'>
+              <Link
+                href={`/s/${service.slug}`}
+                className='hover:text-third transition-colors'
               >
-                {service.title}
-              </span>
-            </Link>
-          </h3>
+                <span
+                  className='line-clamp-2'
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {service.title}
+                </span>
+              </Link>
+            </h3>
+          </div>
 
           {/* Rating */}
           <RatingDisplay
@@ -113,15 +85,14 @@ export default function ServiceCard({
             <div className='flex items-center gap-3'>
               {/* Profile Info */}
               <div className='flex items-center gap-2 flex-1'>
-                <Avatar className='h-6 w-6'>
-                  <AvatarImage
-                    src={service.profile.avatar}
-                    alt={service.profile.displayName}
-                  />
-                  <AvatarFallback className='text-xs bg-gray-100'>
-                    {getInitials(service.profile.displayName)}
-                  </AvatarFallback>
-                </Avatar>
+                {service.profile.image && (
+                  <Avatar className='h-6 w-6'>
+                    <AvatarImage
+                      src={service.profile.image}
+                      alt={service.profile.displayName}
+                    />
+                  </Avatar>
+                )}
                 <Link
                   href={`/profile/${service.profile.username}`}
                   className='text-sm text-body hover:text-third transition-colors'

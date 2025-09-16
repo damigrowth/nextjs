@@ -47,23 +47,20 @@ export default function RatingDisplay({
   
   return (
     <div className={`flex items-center gap-2 text-sm ${className}`}>
-      {/* Stars */}
-      <div className='flex items-center gap-1'>
-        {[...Array(5)].map((_, i) => (
-          <Star
-            key={i}
-            className={`${starSize} ${
-              i < Math.floor(rating)
-                ? 'fill-yellow-400 text-yellow-400'
-                : 'fill-muted-foreground/20 text-muted-foreground/20'
-            }`}
-          />
-        ))}
+      {/* Single Star with percentage fill */}
+      <div className="relative">
+        <Star className={`${starSize} text-gray-300`} />
+        <div 
+          className="absolute inset-0 overflow-hidden"
+          style={{ width: `${(rating / 5) * 100}%` }}
+        >
+          <Star className={`${starSize} text-yellow-400 fill-current`} />
+        </div>
       </div>
       
       {/* Rating number */}
       {showRating && reviewCount > 0 && (
-        <span className='text-foreground font-medium'>{rating}</span>
+        <span className='text-foreground font-medium'>{rating.toFixed(1)}</span>
       )}
       
       {/* Review count */}
