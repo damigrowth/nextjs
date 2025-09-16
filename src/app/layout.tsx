@@ -46,10 +46,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <GoogleTagManager gtmId='GTM-KR7N94L4' />
         <GoogleAnalytics gaId={gaId} />
         {/* Cloudinary Upload Widget */}
-        <Script
+        {/* <Script
           src='https://upload-widget.cloudinary.com/global/all.js'
           strategy='beforeInteractive'
-        />
+        /> */}
         {/* <PathChecker excludes={'/admin'}>
           <CookiesBanner_D />
         </PathChecker> */}
