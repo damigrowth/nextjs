@@ -51,7 +51,7 @@ import {
 
 // Icons
 import {
-  CheckCircle,
+  Check,
   AlertCircle,
   MapPin,
   Globe,
@@ -92,7 +92,9 @@ import {
   AddonsFaqStep,
   MediaStep,
 } from './steps';
+import ServiceSuccess from './service-success';
 import { AuthUser } from '@/lib/types/auth';
+import { Profile } from '@prisma/client';
 
 const STEPS = [
   {
@@ -113,20 +115,26 @@ const STEPS = [
   },
   {
     id: 4,
-    title: 'Επιπλέον υπηρεσίες & FAQ',
-    description:
-      'Προσθέστε επιπλέον υπηρεσίες και συχνές ερωτήσεις (προαιρετικό)',
+    title: 'Extra υπηρεσίες & FAQ',
+    description: 'Προσθέστε extra υπηρεσίες και συχνές ερωτήσεις (προαιρετικό)',
   },
   {
     id: 5,
     title: 'Πολυμέσα',
     description: 'Ανεβάστε εικόνες ή βίντεο για την υπηρεσία σας (προαιρετικό)',
   },
+  {
+    id: 6,
+    title: 'Ολοκλήρωση',
+    description: 'Η υπηρεσία δημιουργήθηκε επιτυχώς',
+  },
 ];
 
 const initialState = {
   success: false,
   message: '',
+  serviceId: undefined,
+  serviceTitle: undefined,
 };
 
 // Step validation schemas
@@ -150,6 +158,7 @@ const STEP_FIELDS: Record<number, (keyof CreateServiceInput)[]> = {
     'tags',
     'price',
     'fixed',
+    'duration',
   ],
   4: ['addons', 'faq'],
   5: ['media'],
@@ -157,10 +166,12 @@ const STEP_FIELDS: Record<number, (keyof CreateServiceInput)[]> = {
 
 interface CreateServiceFormProps {
   initialUser: AuthUser | null;
+  initialProfile: Profile | null; // Profile type with coverage data
 }
 
 export default function CreateServiceForm({
   initialUser,
+  initialProfile,
 }: CreateServiceFormProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -170,6 +181,12 @@ export default function CreateServiceForm({
   // Alert dialog states
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
+
+  // Success state
+  const [serviceCreated, setServiceCreated] = useState<{
+    id: string | number;
+    title: string;
+  } | null>(null);
 
   // Media upload ref
   const mediaRef = useRef<any>(null);
@@ -226,6 +243,19 @@ export default function CreateServiceForm({
     watch,
   } = form;
 
+  const { coverage } = initialProfile || {};
+
+  // Calculate disabled options based on coverage
+  const disabledOptions = {
+    // Step 1: presence/online options
+    presence: !coverage?.onsite && !coverage?.onbase, // Disable presence if both onsite and onbase are false
+    online: !coverage?.online, // Disable online if coverage.online is false
+
+    // Step 2a: onsite/onbase options (for presence services)
+    onsite: !coverage?.onsite, // Disable onsite if coverage.onsite is false
+    onbase: !coverage?.onbase, // Disable onbase if coverage.onbase is false
+  };
+
   // Step navigation helpers
   const isStepCompleted = (step: number): boolean => {
     return completedSteps.includes(step);
@@ -259,6 +289,9 @@ export default function CreateServiceForm({
 
       case 3:
         const formValues = getValues();
+        const isPriceValid = formValues.fixed ? (formValues.price && formValues.price > 0) : true;
+        const isDurationValid = !formValues.type?.oneoff || (formValues.duration && formValues.duration > 0);
+
         return !!(
           formValues.title &&
           formValues.title.length >= 10 &&
@@ -269,12 +302,13 @@ export default function CreateServiceForm({
           formValues.subdivision &&
           formValues.tags &&
           formValues.tags.length > 0 &&
-          formValues.price &&
-          formValues.price > 0
+          isPriceValid &&
+          isDurationValid
         );
 
       case 4:
       case 5:
+        // Steps 4 and 5 are optional
         return true;
 
       default:
@@ -283,6 +317,41 @@ export default function CreateServiceForm({
   };
 
   const validateCurrentStep = async (): Promise<boolean> => {
+    // For step 4, validate addons and faq if they have content
+    if (currentStep === 4) {
+      const formValues = getValues();
+      const hasAddons = formValues.addons && formValues.addons.length > 0;
+      const hasFaq = formValues.faq && formValues.faq.length > 0;
+
+      // If no content, allow progression
+      if (!hasAddons && !hasFaq) {
+        return true;
+      }
+
+      // Validate using React Hook Form trigger to ensure field-level validation
+      const isValid = await form.trigger(['addons', 'faq']);
+
+      if (!isValid) {
+        return false;
+      }
+
+      // Additional schema validation
+      try {
+        const stepSchema =
+          STEP_SCHEMAS[currentStep as keyof typeof STEP_SCHEMAS];
+        stepSchema.parse(formValues);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    // For step 5 (media), always allow progression
+    if (currentStep === 5) {
+      return true;
+    }
+
+    // For other steps, validate using schema
     const stepSchema = STEP_SCHEMAS[currentStep as keyof typeof STEP_SCHEMAS];
     const formValues = getValues();
 
@@ -312,6 +381,7 @@ export default function CreateServiceForm({
 
   const goNext = async () => {
     const isValid = await validateCurrentStep();
+
     if (isValid) {
       const { type, subscriptionType } = getValues();
 
@@ -373,7 +443,7 @@ export default function CreateServiceForm({
   const getStep2Component = () => {
     const typeValues = watch('type');
     if (typeValues?.presence) {
-      return <OnsiteOnbaseStep />;
+      return <OnsiteOnbaseStep disabledOptions={disabledOptions} />;
     }
     if (typeValues?.online) {
       return <OneoffSubscriptionStep />;
@@ -388,7 +458,7 @@ export default function CreateServiceForm({
 
   const currentStepInfo = STEPS.find((step) => step.id === currentStep);
   const progress = (currentStep / STEPS.length) * 100;
-  const isLastStep = currentStep === STEPS.length;
+  const isLastStep = currentStep === 5; // Step 5 is the last actionable step, step 6 is just success display
 
   // Form submission handler
   const handleFormSubmit = (formData: FormData) => {
@@ -469,15 +539,27 @@ export default function CreateServiceForm({
 
   // Handle successful form submission
   useEffect(() => {
-    if (state.success && state.message) {
+    if (
+      state.success &&
+      state.message &&
+      state.serviceId &&
+      state.serviceTitle
+    ) {
+      // Only proceed to step 6 if we have both ID and title from server
+      setServiceCreated({
+        id: state.serviceId,
+        title: state.serviceTitle,
+      });
+
+      // Move to completion step
+      setCurrentStep(6);
+      setCompletedSteps([1, 2, 3, 4, 5, 6]);
+
       toast.success(state.message);
-      form.reset();
-      setCurrentStep(1);
-      setCompletedSteps([]);
     } else if (state.message && !state.success) {
       toast.error(state.message);
     }
-  }, [state.success, state.message]);
+  }, [state.success, state.message, state.serviceId, state.serviceTitle]);
 
   // Handle draft save response
   useEffect(() => {
@@ -517,9 +599,22 @@ export default function CreateServiceForm({
   }
 
   const renderStepContent = () => {
+    // Show loading state when form is being submitted
+    if (currentStep === 5 && (isPending || isPendingTransition)) {
+      return (
+        <div className='flex flex-col items-center justify-center py-12 space-y-4 w-full'>
+          <div className='animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent'></div>
+          <p className='text-lg font-medium text-gray-700'>
+            Δημιουργία υπηρεσίας...
+          </p>
+          <p className='text-sm text-gray-500'>Παρακαλώ περιμένετε</p>
+        </div>
+      );
+    }
+
     switch (currentStep) {
       case 1:
-        return <PresenceOnlineStep />;
+        return <PresenceOnlineStep disabledOptions={disabledOptions} />;
       case 2:
         return getStep2Component();
       case 3:
@@ -528,6 +623,18 @@ export default function CreateServiceForm({
         return <AddonsFaqStep />;
       case 5:
         return <MediaStep user={user} />;
+      case 6:
+        return serviceCreated ? (
+          <ServiceSuccess id={serviceCreated.id} title={serviceCreated.title} />
+        ) : (
+          <div className='flex flex-col items-center justify-center py-12 space-y-4'>
+            <div className='animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent'></div>
+            <p className='text-lg font-medium text-gray-700'>
+              Δημιουργία υπηρεσίας...
+            </p>
+            <p className='text-sm text-gray-500'>Παρακαλώ περιμένετε</p>
+          </div>
+        );
       default:
         return null;
     }
@@ -536,16 +643,20 @@ export default function CreateServiceForm({
   return (
     <Form {...form}>
       <TooltipProvider>
-        <div className='max-w-4xl mx-auto p-6'>
+        <div className='max-w-5xl w-full mx-auto space-y-6 p-2 pr-0'>
           {/* Progress Header */}
-          <div className='mb-8'>
+          <div className='w-full mb-8'>
             <div className='flex items-center justify-between mb-4'>
               <div>
                 <h1 className='text-2xl font-bold text-gray-900'>
-                  Δημιουργία Υπηρεσίας
+                  {currentStep === 6
+                    ? 'Επιτυχής δημιουργία υπηρεσίας!'
+                    : 'Δημιουργία Υπηρεσίας'}
                 </h1>
                 <p className='text-gray-600 mt-1'>
-                  Με αυτήν τη φόρμα μπορείτε να προσθέσετε νέες υπηρεσίες.
+                  {currentStep === 6
+                    ? 'Η υπηρεσία δημιουργήθηκε επιτυχώς.'
+                    : 'Με αυτήν τη φόρμα μπορείτε να προσθέσετε νέες υπηρεσίες.'}
                 </p>
               </div>
               <div className='flex items-center space-x-3'>
@@ -563,7 +674,7 @@ export default function CreateServiceForm({
                             variant='ghost'
                             size='sm'
                             className='h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50'
-                            disabled={isLoading}
+                            disabled={isLoading || currentStep === 6}
                           >
                             <RotateCcw className='h-4 w-4' />
                           </Button>
@@ -605,12 +716,13 @@ export default function CreateServiceForm({
                             variant='ghost'
                             size='sm'
                             className={`h-8 w-8 p-0 ${
-                              currentStep >= 3
+                              currentStep >= 3 && currentStep !== 6
                                 ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
                                 : 'text-gray-400 cursor-not-allowed'
                             }`}
                             disabled={
                               currentStep < 3 ||
+                              currentStep === 6 ||
                               isDraftPending ||
                               isPendingTransition ||
                               isLoading
@@ -670,8 +782,15 @@ export default function CreateServiceForm({
                   </AlertDialog>
                 </div>
 
-                <Badge variant='outline' className='text-sm'>
-                  Βήμα {currentStep} από {STEPS.length}
+                <Badge
+                  variant='outline'
+                  className={`text-sm ${currentStep === 6 ? 'bg-green-100 border-green-300 text-green-700' : ''}`}
+                >
+                  {currentStep === 6
+                    ? 'Ολοκληρώθηκε'
+                    : currentStep === 5 && (isPending || isPendingTransition)
+                      ? 'Ολοκλήρωση...'
+                      : `Βήμα ${currentStep} από ${STEPS.length}`}
                 </Badge>
               </div>
             </div>
@@ -680,18 +799,26 @@ export default function CreateServiceForm({
             <div className='space-y-2'>
               <div className='flex justify-between text-sm text-gray-500'>
                 <span>Πρόοδος</span>
-                <span>{Math.round(progress)}%</span>
+                <span className='transition-all duration-300'>
+                  {currentStep === 6 ? '100' : Math.round(progress)}%
+                </span>
               </div>
-              <Progress value={progress} className='h-2' />
+              <Progress
+                value={currentStep === 6 ? 100 : progress}
+                className={`h-2 transition-all duration-700 ${currentStep === 6 ? 'bg-green-100' : ''}`}
+              />
             </div>
 
             {/* Steps Navigation */}
             <div className='flex items-center justify-between mt-6 space-x-2'>
               {STEPS.map((step) => {
                 const isActive = currentStep === step.id;
-                const isCompleted = isStepCompleted(step.id);
+                const isCompleted =
+                  currentStep === 6 || isStepCompleted(step.id);
                 const isAccessible =
-                  step.id <= currentStep || isStepCompleted(step.id);
+                  currentStep === 6 ||
+                  step.id <= currentStep ||
+                  isStepCompleted(step.id);
 
                 return (
                   <div
@@ -702,15 +829,15 @@ export default function CreateServiceForm({
                         : isCompleted
                           ? 'bg-secondary/10 border-2 border-secondary/30'
                           : 'bg-muted border-2 border-border'
-                    } ${!isAccessible ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    } ${!isAccessible || currentStep === 6 ? 'opacity-50 cursor-not-allowed' : ''}`}
                     onClick={() => {
-                      if (isAccessible) {
+                      if (isAccessible && currentStep !== 6) {
                         goToStep(step.id);
                       }
                     }}
                   >
                     <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
                         isActive
                           ? 'bg-primary text-primary-foreground'
                           : isCompleted
@@ -719,7 +846,7 @@ export default function CreateServiceForm({
                       }`}
                     >
                       {isCompleted ? (
-                        <CheckCircle className='w-4 h-4' />
+                        <Check className='w-3 h-3' />
                       ) : (
                         <span>{step.id}</span>
                       )}
@@ -745,62 +872,77 @@ export default function CreateServiceForm({
 
           {/* Current Step Content */}
           <Card>
-            <CardHeader>
-              <CardTitle className='flex items-center space-x-2'>
-                {currentStep === 1 && <Globe className='w-5 h-5' />}
-                {currentStep === 2 && watch('type')?.presence && (
-                  <MapPin className='w-5 h-5' />
-                )}
-                {currentStep === 2 && watch('type')?.online && (
-                  <Globe className='w-5 h-5' />
-                )}
-                {currentStep === 3 && <Building className='w-5 h-5' />}
-                {(currentStep === 4 || currentStep === 5) && (
-                  <Home className='w-5 h-5' />
-                )}
-                <span>{currentStepInfo?.title}</span>
-              </CardTitle>
-              <CardDescription>{currentStepInfo?.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className='space-y-6'>
-                {renderStepContent()}
-                {/* Step Navigation */}
-                <div className='flex justify-between items-center mt-6 pt-6 border-t'>
-                  <FormButton
-                    type='button'
-                    variant='outline'
-                    text='Προηγουμένο'
-                    onClick={goBack}
-                    disabled={currentStep === 1}
-                  />
-                  <div className='flex gap-3'>
-                    {isLastStep ? (
-                      <FormButton
-                        type='button'
-                        text='Δημιουργία υπηρεσίας'
-                        loading={isPending || isPendingTransition}
-                        disabled={
-                          isPending ||
-                          isPendingTransition ||
-                          !isCurrentStepValid() ||
-                          isDraftPending
-                        }
-                        onClick={() => {
-                          startTransition(() => {
-                            const formData = new FormData();
-                            handleFormSubmit(formData);
-                          });
-                        }}
-                      />
-                    ) : (
-                      <FormButton
-                        type='button'
-                        text='Επόμενο'
-                        onClick={goNext}
-                        disabled={isPending || !isCurrentStepValid()}
-                      />
+            {currentStep !== 6 &&
+              !(currentStep === 5 && (isPending || isPendingTransition)) && (
+                <CardHeader>
+                  <CardTitle className='flex items-center space-x-2'>
+                    {currentStep === 1 && <Globe className='w-5 h-5' />}
+                    {currentStep === 2 && watch('type')?.presence && (
+                      <MapPin className='w-5 h-5' />
                     )}
+                    {currentStep === 2 && watch('type')?.online && (
+                      <Globe className='w-5 h-5' />
+                    )}
+                    {currentStep === 3 && <Building className='w-5 h-5' />}
+                    {(currentStep === 4 || currentStep === 5) && (
+                      <Home className='w-5 h-5' />
+                    )}
+                    <span>{currentStepInfo?.title}</span>
+                  </CardTitle>
+                  <CardDescription>
+                    {currentStepInfo?.description}
+                  </CardDescription>
+                </CardHeader>
+              )}
+            <CardContent>
+              <div className='transition-all duration-500 ease-in-out'>
+                <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
+                  <div className='space-y-6'>
+                    {renderStepContent()}
+                    {/* Step Navigation - Hide on completion step and loading state */}
+                    {currentStep !== 6 &&
+                      !(
+                        currentStep === 5 &&
+                        (isPending || isPendingTransition)
+                      ) && (
+                        <div className='flex justify-between items-center mt-6 pt-6 border-t'>
+                          <FormButton
+                            type='button'
+                            variant='outline'
+                            text='Προηγουμένο'
+                            onClick={goBack}
+                            disabled={currentStep === 1}
+                          />
+                          <div className='flex gap-3'>
+                            {isLastStep ? (
+                              <FormButton
+                                type='button'
+                                text='Δημιουργία υπηρεσίας'
+                                loading={isPending || isPendingTransition}
+                                disabled={
+                                  isPending ||
+                                  isPendingTransition ||
+                                  !isCurrentStepValid() ||
+                                  isDraftPending
+                                }
+                                onClick={() => {
+                                  startTransition(() => {
+                                    const formData = new FormData();
+                                    handleFormSubmit(formData);
+                                  });
+                                }}
+                              />
+                            ) : (
+                              <FormButton
+                                type='button'
+                                text='Επόμενο'
+                                onClick={goNext}
+                                disabled={isPending || !isCurrentStepValid()}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>
