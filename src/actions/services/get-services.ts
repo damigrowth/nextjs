@@ -1,52 +1,195 @@
-// 'use server';
+'use server';
 
-// import { auth } from '@/lib/auth';
-// import { prisma } from '@/lib/prisma/client';
-// import { headers } from 'next/headers';
+import { prisma } from '@/lib/prisma/client';
+import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { findById } from '@/lib/utils/datasets';
+import type { ActionResult } from '@/lib/types/api';
+import type { ServiceCardData } from '@/lib/types/components';
+import type {
+  ServiceWithProfile,
+  ServicePaginationResponse,
+} from '@/lib/types/services';
+import { Prisma } from '@prisma/client';
 
-// type ActionResult<T = any> = {
-//   success: boolean;
-//   data?: T;
-//   error?: string;
-// };
+// Transform service to component-ready format
+function transformServiceForComponent(
+  service: ServiceWithProfile,
+): ServiceCardData {
+  // Resolve category label for display
+  const categoryTaxonomy = findById(serviceTaxonomies, service.category);
 
-// export type ServiceWithDetails = {
-//   id: string;
-//   title: string;
-//   description: string;
-//   price: number;
-//   category: string;
-//   subcategory: string | null;
-//   tags: string | null;
-//   pricingType: string | null;
-//   duration: string | null;
-//   location: string | null;
-//   published: boolean;
-//   featured: boolean;
-//   rating: number;
-//   reviewCount: number;
-//   createdAt: Date;
-//   updatedAt: Date;
-//   profile: {
-//     id: string;
-//     username: string | null;
-//     displayName: string | null;
-//     firstName: string | null;
-//     lastName: string | null;
-//     rating: number;
-//     reviewCount: number;
-//     verified: boolean;
-//     image: {
-//       url: string;
-//       alt: string | null;
-//     } | null;
-//   };
-//   media: {
-//     id: string;
-//     url: string;
-//     alt: string | null;
-//   }[];
-// };
+  return {
+    id: service.id,
+    title: service.title,
+    category: categoryTaxonomy?.label,
+    slug: service.slug, // Using ID as slug for now
+    price: service.price,
+    rating: service.rating,
+    reviewCount: service.reviewCount,
+    media: service.media, // Use media directly from Prisma JSON type
+    profile: {
+      id: service.profile.id,
+      displayName: service.profile.displayName,
+      username: service.profile.username,
+      image: service.profile.image,
+    },
+  };
+}
+
+// Get 8 services for home page static generation
+export async function getFeaturedServices(): Promise<
+  ActionResult<ServiceCardData[]>
+> {
+  try {
+    // Define the include object for reuse and type safety
+    const includeProfile = {
+      profile: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+          firstName: true,
+          lastName: true,
+          rating: true,
+          reviewCount: true,
+          verified: true,
+          image: true,
+        },
+      },
+    } as const;
+
+    // Get 8 services with fallback strategy
+    let services = await prisma.service.findMany({
+      where: {
+        status: 'published',
+        featured: true,
+      },
+      include: includeProfile,
+      orderBy: [
+        { rating: 'desc' },
+        { reviewCount: 'desc' },
+        { updatedAt: 'desc' },
+      ],
+      take: 8,
+    });
+
+    // If no featured services, get any published services
+    if (services.length < 8) {
+      const additionalServices = await prisma.service.findMany({
+        where: {
+          status: 'published',
+          featured: false,
+        },
+        include: includeProfile,
+        orderBy: [
+          { rating: 'desc' },
+          { reviewCount: 'desc' },
+          { updatedAt: 'desc' },
+        ],
+        take: 8 - services.length,
+      });
+
+      services = [...services, ...additionalServices];
+    }
+
+    const transformedServices = services.map(transformServiceForComponent);
+
+    return {
+      success: true,
+      data: transformedServices,
+    };
+  } catch (error) {
+    console.error('Get services error:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch services',
+    };
+  }
+}
+
+// Get services with pagination for client-side pagination
+export async function getServicesWithPagination(options?: {
+  page?: number;
+  limit?: number;
+  category?: string;
+  excludeFeatured?: boolean;
+}): Promise<ActionResult<ServicePaginationResponse>> {
+  try {
+    const {
+      page = 1,
+      limit = 4,
+      category,
+      excludeFeatured = false,
+    } = options || {};
+
+    const offset = (page - 1) * limit;
+
+    // Define the include object for reuse and type safety
+    const includeProfile = {
+      profile: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+          firstName: true,
+          lastName: true,
+          rating: true,
+          reviewCount: true,
+          verified: true,
+          image: true,
+        },
+      },
+    } as const;
+
+    // Build where clause with proper typing
+    const where: Prisma.ServiceWhereInput = {
+      status: 'published',
+    };
+
+    if (category && category !== 'all') {
+      where.category = category;
+    }
+
+    if (excludeFeatured) {
+      where.featured = false;
+    }
+
+    // Get services with count
+    const [services, total] = await Promise.all([
+      prisma.service.findMany({
+        where,
+        include: includeProfile,
+        orderBy: [
+          { featured: 'desc' },
+          { rating: 'desc' },
+          { reviewCount: 'desc' },
+          { updatedAt: 'desc' },
+        ],
+        take: limit,
+        skip: offset,
+      }),
+      prisma.service.count({ where }),
+    ]);
+
+    const transformedServices = services.map(transformServiceForComponent);
+    const hasMore = offset + services.length < total;
+
+    return {
+      success: true,
+      data: {
+        services: transformedServices,
+        total,
+        hasMore,
+      },
+    };
+  } catch (error) {
+    console.error('Get services with pagination error:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch services',
+    };
+  }
+}
 
 // // Get user's own services
 // export async function getMyServices(): Promise<
