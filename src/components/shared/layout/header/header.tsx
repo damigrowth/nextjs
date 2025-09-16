@@ -24,7 +24,7 @@ export default function Header() {
 
   return (
     <header
-      className={`h-20 w-full z-50 transition-all duration-300 ease-in-out bg-white ${pathname === '/' ? 'fixed top-0 bg-transparent border-b border-white/10' : 'relative bg-white border-b border-gray-200 shadow-sm -mb-20'}
+      className={`h-20 w-full z-50 bg-white ${pathname === '/' ? 'fixed top-0 bg-transparent border-b border-white/10' : 'relative bg-white border-b border-gray-200 shadow-sm -mb-20'}
         py-2
       `}
     >

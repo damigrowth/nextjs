@@ -28,7 +28,7 @@ export default function Body({ children }: BodyProps) {
       path === '/register/success' ||
       path == '/email-confirmation' ||
       path === '/login'
-        ? 'bgc-thm4 mm-wrapper mm-wrapper--position-left-front'
+        ? ''
         : '';
 
     if (!mounted) {
