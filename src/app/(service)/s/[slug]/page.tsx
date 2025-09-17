@@ -1,6 +1,7 @@
 import React, { JSX } from 'react';
 import { notFound } from 'next/navigation';
 import { getServicePageData, getServiceMetadata } from '@/actions/services';
+import { prisma } from '@/lib/prisma/client';
 import { TaxonomyTabs, DynamicBreadcrumb } from '@/components';
 import { Card, CardContent } from '@/components/ui/card';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -15,10 +16,29 @@ import {
   ProfileTerms,
 } from '@/components';
 
+// ISR configuration
+export const revalidate = 3600; // Revalidate every hour
+export const dynamicParams = true; // Allow new services to be generated on-demand
+
 interface ServicePageProps {
   params: Promise<{
     slug: string;
   }>;
+}
+
+// Generate static params for all published services
+export async function generateStaticParams() {
+  const services = await prisma.service.findMany({
+    where: {
+      status: 'published',
+      slug: { not: null } // Ensure slug exists
+    },
+    select: { slug: true }
+  });
+
+  return services.map(service => ({
+    slug: service.slug!
+  }));
 }
 
 export default async function ServicePage({
