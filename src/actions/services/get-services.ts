@@ -36,9 +36,20 @@ function transformServiceForComponent(
   };
 }
 
-// Get 8 services for home page static generation
+// Define types for processed home page data
+export interface FeaturedServicesData {
+  mainCategories: Array<{
+    id: string;
+    label: string;
+    slug: string;
+  }>;
+  servicesByCategory: Record<string, ServiceCardData[]>;
+  allServices: ServiceCardData[];
+}
+
+// Get featured services with pre-processed category grouping for static generation
 export async function getFeaturedServices(): Promise<
-  ActionResult<ServiceCardData[]>
+  ActionResult<FeaturedServicesData>
 > {
   try {
     // Define the include object for reuse and type safety
@@ -58,11 +69,21 @@ export async function getFeaturedServices(): Promise<
       },
     } as const;
 
-    // Get 8 services with fallback strategy
+    // Get 8 services with media and reviews - fallback strategy
     let services = await prisma.service.findMany({
       where: {
         status: 'published',
         featured: true,
+        // Only get services with media
+        NOT: {
+          media: {
+            equals: Prisma.JsonNull,
+          },
+        },
+        // Only get services with reviews (reviewCount > 0)
+        reviewCount: {
+          gt: 0,
+        },
       },
       include: includeProfile,
       orderBy: [
@@ -73,12 +94,22 @@ export async function getFeaturedServices(): Promise<
       take: 8,
     });
 
-    // If no featured services, get any published services
+    // If not enough featured services with media/reviews, get any published services with media/reviews
     if (services.length < 8) {
       const additionalServices = await prisma.service.findMany({
         where: {
           status: 'published',
           featured: false,
+          // Only get services with media
+          NOT: {
+            media: {
+              equals: Prisma.JsonNull,
+            },
+          },
+          // Only get services with reviews
+          reviewCount: {
+            gt: 0,
+          },
         },
         include: includeProfile,
         orderBy: [
@@ -92,14 +123,70 @@ export async function getFeaturedServices(): Promise<
       services = [...services, ...additionalServices];
     }
 
+    // Final fallback: If still not enough, get any services with media (even without reviews)
+    if (services.length < 8) {
+      const finalFallback = await prisma.service.findMany({
+        where: {
+          status: 'published',
+          id: {
+            notIn: services.map(s => s.id), // Exclude already fetched services
+          },
+          // Only require media for final fallback
+          NOT: {
+            media: {
+              equals: Prisma.JsonNull,
+            },
+          },
+        },
+        include: includeProfile,
+        orderBy: [
+          { rating: 'desc' },
+          { reviewCount: 'desc' },
+          { updatedAt: 'desc' },
+        ],
+        take: 8 - services.length,
+      });
+
+      services = [...services, ...finalFallback];
+    }
+
     const transformedServices = services.map(transformServiceForComponent);
+
+    // Prepare categories for tabs (server-side computation)
+    const mainCategories = [
+      { id: 'all', label: 'Όλες', slug: 'all' },
+      ...serviceTaxonomies.slice(0, 6).map((cat) => ({
+        id: cat.id,
+        label: cat.label,
+        slug: cat.slug,
+      })),
+    ];
+
+    // Group services by category (server-side computation)
+    const servicesByCategory: Record<string, ServiceCardData[]> = {
+      all: transformedServices,
+    };
+
+    // Group services for each main category
+    mainCategories.slice(1).forEach((category) => {
+      servicesByCategory[category.id] = transformedServices.filter((service) => {
+        const serviceCat = serviceTaxonomies.find(
+          (cat) => cat.label === service.category,
+        );
+        return serviceCat?.id === category.id;
+      });
+    });
 
     return {
       success: true,
-      data: transformedServices,
+      data: {
+        mainCategories,
+        servicesByCategory,
+        allServices: transformedServices,
+      },
     };
   } catch (error) {
-    console.error('Get services error:', error);
+    console.error('Get featured services error:', error);
     return {
       success: false,
       error: 'Failed to fetch services',
