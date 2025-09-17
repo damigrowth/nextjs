@@ -1,8 +1,6 @@
 import React from 'react';
 import { FileText, Clock, Briefcase } from 'lucide-react';
-import type {
-  ProfileMetricsProps,
-} from '@/lib/types/components';
+import type { ProfileMetricsProps } from '@/lib/types/components';
 import IconBox from '@/components/shared/icon-box';
 
 /**
@@ -27,7 +25,7 @@ export default function ProfileMetrics({
     <section className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6'>
       {/* Subcategory - spans full width on small screens, 2 cols on larger screens */}
       {subcategory && (
-        <div className='col-span-full sm:col-span-2'>
+        <div>
           <IconBox
             icon={<FileText className='h-10 w-10' />}
             title={subcategory.label}
@@ -36,8 +34,8 @@ export default function ProfileMetrics({
       )}
 
       {/* Services Count */}
-      {servicesCount && servicesCount > 0 && (
-        <div className='col-span-1'>
+      {servicesCount > 0 && (
+        <div>
           <IconBox
             icon={<Briefcase className='h-10 w-10' />}
             title='Υπηρεσίες'
@@ -48,7 +46,7 @@ export default function ProfileMetrics({
 
       {/* Years of Experience */}
       {commencement && experience && (
-        <div className='col-span-1'>
+        <div>
           <IconBox
             icon={<Clock className='h-10 w-10' />}
             title='Έτη Εμπειρίας'
