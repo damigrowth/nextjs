@@ -25,7 +25,7 @@ import { getHomePageData } from '@/actions/home/get-home-data';
 // import HomeSchema from 'oldcode/utils/Seo/Schema/HomeSchema';
 
 export const dynamic = 'force-static'; // Generate at build time
-export const revalidate = 900; // Revalidate every 15 minutes (public content only)
+export const revalidate = 3600; // Revalidate every hour (public content only)
 export const fetchCache = 'force-cache';
 
 export async function generateMetadata() {
