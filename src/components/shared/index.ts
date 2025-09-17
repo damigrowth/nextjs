@@ -31,4 +31,5 @@ export { AddonFields } from './addon-fields';
 export { FaqFields } from './faq-fields';
 export { default as ProfileBadges } from './profile-badges';
 export { NotFoundPage, createNotFoundMetadata } from './not-found-page';
+export { ErrorPage } from './error-page';
 export * from './layout';
