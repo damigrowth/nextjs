@@ -16,6 +16,7 @@ interface MediaDisplayProps {
   className?: string;
   aspectRatio?: 'square' | 'video' | 'portrait';
   showControls?: boolean;
+  showAudio?: boolean;
 }
 
 export default function MediaDisplay({
@@ -23,6 +24,7 @@ export default function MediaDisplay({
   className = '',
   aspectRatio = 'video',
   showControls = true,
+  showAudio = false,
 }: MediaDisplayProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -71,7 +73,7 @@ export default function MediaDisplay({
 
     if (!mediaUrl) {
       return (
-        <div className='flex h-full w-full items-center justify-center bg-gray-100'>
+        <div className='absolute inset-0 bg-gray-100 flex items-center justify-center'>
           <p className='text-gray-500'>Media unavailable</p>
         </div>
       );
@@ -80,7 +82,7 @@ export default function MediaDisplay({
     switch (item.resource_type) {
       case 'video':
         return (
-          <div className='relative h-full w-full'>
+          <>
             <video
               ref={videoRef}
               src={mediaUrl}
@@ -118,105 +120,118 @@ export default function MediaDisplay({
                 </button>
               </div>
             )}
-          </div>
+          </>
         );
 
       case 'audio':
         return (
-          <div className='flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-gray-700'>
-            <div className='mb-4 rounded-full bg-white/10 p-4 backdrop-blur-sm'>
-              <Music className='h-12 w-12 text-white' />
+          <>
+            <div className='absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-700' />
+            <div className='absolute inset-0 flex flex-col items-center justify-center'>
+              <div className='mb-4 rounded-full bg-white/10 p-4 backdrop-blur-sm'>
+                <Music className='h-12 w-12 text-white' />
+              </div>
+              <audio
+                ref={audioRef}
+                src={mediaUrl}
+                className='hidden'
+                onEnded={() => setIsPlaying(false)}
+                muted={isMuted}
+              />
+              <div className='flex flex-col items-center gap-2'>
+                <h4 className='text-center text-sm font-medium text-white'>
+                  {item.original_filename || 'Audio File'}
+                </h4>
+                {showControls && (
+                  <div className='flex items-center gap-2 rounded-full bg-black/50 px-4 py-2 backdrop-blur-sm'>
+                    <button
+                      onClick={togglePlayPause}
+                      className='rounded-full p-2 text-white transition-colors hover:bg-white/20'
+                      aria-label={isPlaying ? 'Pause' : 'Play'}
+                    >
+                      {isPlaying ? (
+                        <Pause className='h-4 w-4' />
+                      ) : (
+                        <Play className='h-4 w-4' />
+                      )}
+                    </button>
+                    <button
+                      onClick={toggleMute}
+                      className='rounded-full p-2 text-white transition-colors hover:bg-white/20'
+                      aria-label={isMuted ? 'Unmute' : 'Mute'}
+                    >
+                      {isMuted ? (
+                        <VolumeX className='h-4 w-4' />
+                      ) : (
+                        <Volume2 className='h-4 w-4' />
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-            <audio
-              ref={audioRef}
-              src={mediaUrl}
-              className='hidden'
-              onEnded={() => setIsPlaying(false)}
-              muted={isMuted}
-            />
-            <div className='flex flex-col items-center gap-2'>
-              <h4 className='text-center text-sm font-medium text-white'>
-                {item.original_filename || 'Audio File'}
-              </h4>
-              {showControls && (
-                <div className='flex items-center gap-2 rounded-full bg-black/50 px-4 py-2 backdrop-blur-sm'>
-                  <button
-                    onClick={togglePlayPause}
-                    className='rounded-full p-2 text-white transition-colors hover:bg-white/20'
-                    aria-label={isPlaying ? 'Pause' : 'Play'}
-                  >
-                    {isPlaying ? (
-                      <Pause className='h-4 w-4' />
-                    ) : (
-                      <Play className='h-4 w-4' />
-                    )}
-                  </button>
-                  <button
-                    onClick={toggleMute}
-                    className='rounded-full p-2 text-white transition-colors hover:bg-white/20'
-                    aria-label={isMuted ? 'Unmute' : 'Mute'}
-                  >
-                    {isMuted ? (
-                      <VolumeX className='h-4 w-4' />
-                    ) : (
-                      <Volume2 className='h-4 w-4' />
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+          </>
         );
 
       case 'image':
       default:
         return (
-          <div className='relative h-full w-full'>
-            <Image
-              src={mediaUrl}
-              alt={item.original_filename || 'Service media'}
-              fill
-              className='object-cover'
-              sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
-            />
-          </div>
+          <Image
+            src={mediaUrl}
+            alt={item.original_filename || 'Service media'}
+            fill
+            className='object-cover'
+            sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+          />
         );
     }
   };
 
-  if (!media || media.length === 0) {
+  // Main container with consistent dimensions
+  const containerClass = `relative ${className}`;
+
+  // Filter media based on showAudio prop
+  const filteredMedia = media?.filter(item => {
+    if (item.resource_type === 'audio') {
+      return showAudio; // Only include audio if showAudio is true
+    }
+    return item.resource_type === 'image' || item.resource_type === 'video';
+  }) || [];
+
+  if (!media || media.length === 0 || filteredMedia.length === 0) {
     return (
       <div
-        className={`bg-gray-100 flex items-center justify-center h-full w-full ${className}`}
+        className={`${containerClass} bg-gray-100 flex items-center justify-center`}
       >
         <span className='text-gray-500'>No media available</span>
       </div>
     );
   }
 
-  if (media.length === 1) {
-    const item = media[0];
-
-    return (
-      <div className={`relative overflow-hidden h-full w-full ${className}`}>
-        {renderMediaContent(item)}
-      </div>
-    );
+  if (filteredMedia.length === 1) {
+    const item = filteredMedia[0];
+    return <div className={containerClass}>{renderMediaContent(item)}</div>;
   }
 
   return (
-    <div className={`relative h-full w-full ${className}`}>
-      <Carousel className='w-full h-full'>
-        <CarouselContent className='h-full'>
-          {media.map((item, index) => (
-            <CarouselItem key={`${item.public_id}-${index}`} className='h-full'>
-              <div className='relative w-full h-full'>
-                {renderMediaContent(item)}
-              </div>
+    <div
+      className={containerClass}
+      onTouchStart={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+      onTouchEnd={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
+      style={{ touchAction: 'pan-x' }}
+    >
+      <Carousel className='h-full'>
+        <CarouselContent className='h-full' containerClassName='h-full'>
+          {filteredMedia.map((item, index) => (
+            <CarouselItem key={`${item.public_id}-${index}`}>
+              <div className='relative h-full'>{renderMediaContent(item)}</div>
             </CarouselItem>
           ))}
         </CarouselContent>
-        {showControls && media.length > 1 && (
+        {showControls && filteredMedia.length > 1 && (
           <>
             <CarouselPrevious className='absolute left-2 top-1/2 -translate-y-1/2' />
             <CarouselNext className='absolute right-2 top-1/2 -translate-y-1/2' />
