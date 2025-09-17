@@ -23,7 +23,7 @@ export interface VerifiedBadgeProps {
 
 const sizeClasses = {
   sm: 'h-4 w-4',
-  md: 'h-5 w-5', 
+  md: 'h-5 w-5',
   lg: 'h-6 w-6',
   xl: 'h-7 w-7',
 };
@@ -42,25 +42,23 @@ export default function VerifiedBadge({
   const iconSizeClass = sizeClasses[size];
 
   return (
-    <TooltipProvider>
-      <div id={id} className={className}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="mb-0 inline-flex">
-              <CheckCircle 
-                className={cn(
-                  iconSizeClass,
-                  'text-green-600 fill-green-600/20 align-middle',
-                  className
-                )} 
-              />
-            </div>
-          </TooltipTrigger>
-          <TooltipContent side="top">
-            <p>{tooltipText}</p>
-          </TooltipContent>
-        </Tooltip>
-      </div>
-    </TooltipProvider>
+    <div id={id} className={className}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className='mb-0 inline-flex'>
+            <CheckCircle
+              className={cn(
+                iconSizeClass,
+                'text-green-600 fill-green-600/20 align-middle',
+                className,
+              )}
+            />
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side='top'>
+          <p>{tooltipText}</p>
+        </TooltipContent>
+      </Tooltip>
+    </div>
   );
 }
