@@ -1,6 +1,7 @@
 import React, { JSX } from 'react';
 import { notFound } from 'next/navigation';
 import { getProfilePageData, getProfileMetadata } from '@/actions/profiles/get-profile';
+import { prisma } from '@/lib/prisma/client';
 import {
   ProfileBio,
   ProfileFeatures,
@@ -9,16 +10,40 @@ import {
   ProfileMeta,
   ProfileMetrics,
   ProfilePortfolio,
+  ProfileServices,
   ProfileSkills,
   ProfileTerms,
   TaxonomyTabs,
   DynamicBreadcrumb,
 } from '@/components';
 
+// ISR configuration
+export const revalidate = 3600; // Revalidate every hour
+export const dynamicParams = true; // Allow new profiles to be generated on-demand
+
 interface ProfilePageProps {
   params: Promise<{
     username: string;
   }>;
+}
+
+// Generate static params for all published profiles
+export async function generateStaticParams() {
+  const profiles = await prisma.profile.findMany({
+    where: {
+      published: true,
+      username: { not: null }, // Ensure username exists
+      user: {
+        blocked: false,
+        confirmed: true
+      }
+    },
+    select: { username: true }
+  });
+
+  return profiles.map(profile => ({
+    username: profile.username!
+  }));
 }
 
 // With prisma-json-types-generator, JSON fields are already properly typed
@@ -111,7 +136,7 @@ export default async function ProfilePage({
               {/* Profile Metrics */}
               <ProfileMetrics
                 subcategory={subcategory}
-                servicesCount={undefined} // TODO: Get actual services count - set to undefined to hide for now
+                servicesCount={result.data.servicesCount}
                 commencement={profile.commencement}
                 experience={calculatedExperience}
               />
@@ -133,6 +158,15 @@ export default async function ProfilePage({
                 industries={industriesData.map((industry) => industry.label)}
               />
               <ProfilePortfolio portfolio={profile.portfolio} />
+
+              {/* Profile Services */}
+              {result.data.services && result.data.services.length > 0 && (
+                <ProfileServices
+                  services={result.data.services}
+                  profileUsername={profile.username}
+                />
+              )}
+
               <ProfileTerms terms={profile.terms} />
 
               {/* Mobile Sidebar - Skills shown on mobile */}
