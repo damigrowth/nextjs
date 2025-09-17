@@ -1,40 +1,21 @@
 import React from 'react';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { CategoryTabs } from './category-tabs';
 import { ServicesCarouselWrapper } from './services-carousel-wrapper';
-import type { ServiceCardData } from '@/actions/services/get-services';
+import { ServiceCardData } from '@/lib/types';
 
 interface ServicesHomeProps {
-  initialServices: ServiceCardData[];
+  mainCategories: Array<{
+    id: string;
+    label: string;
+    slug: string;
+  }>;
+  servicesByCategory: Record<string, ServiceCardData[]>;
 }
 
-export default function ServicesHome({ initialServices }: ServicesHomeProps) {
-  // Get main categories for tabs - server-side computation
-  const mainCategories = [
-    { id: 'all', label: 'Όλες', slug: 'all' },
-    ...serviceTaxonomies.slice(0, 6).map((cat) => ({
-      id: cat.id,
-      label: cat.label,
-      slug: cat.slug,
-    })),
-  ];
-
-  // Create service groups by category for server-side rendering
-  const servicesByCategory = {
-    all: initialServices,
-    ...Object.fromEntries(
-      mainCategories.slice(1).map((category) => [
-        category.id,
-        initialServices.filter((service) => {
-          const serviceCat = serviceTaxonomies.find(
-            (cat) => cat.label === service.category,
-          );
-          return serviceCat?.id === category.id;
-        }),
-      ]),
-    ),
-  };
-
+export default function ServicesHome({
+  mainCategories,
+  servicesByCategory,
+}: ServicesHomeProps) {
   return (
     <section className='py-16 bg-orangy'>
       <div className='container mx-auto px-6'>
