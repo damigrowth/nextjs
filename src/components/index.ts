@@ -8,8 +8,8 @@ export * from './forms';
 export * from './admin';
 export * from './home';
 export * from './profile';
+export * from './service';
 export * from './shared'; // includes LinkNP
 export * from './shared/layout';
-// export * from './providers';
 export * from './guards';
 export * from './dashboard';
