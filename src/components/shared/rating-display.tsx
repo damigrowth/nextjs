@@ -1,5 +1,6 @@
 import React from 'react';
 import { Star } from 'lucide-react';
+import { clsx } from 'clsx';
 
 export interface RatingDisplayProps {
   /** The rating value (0-5) */
@@ -26,7 +27,7 @@ const sizeClasses = {
   lg: 'h-5 w-5',
 };
 
-const defaultReviewCountFormatter = (count: number) => 
+const defaultReviewCountFormatter = (count: number) =>
   `(${count} ${count === 1 ? 'αξιολόγηση' : 'αξιολογήσεις'})`;
 
 export default function RatingDisplay({
@@ -36,33 +37,33 @@ export default function RatingDisplay({
   showRating = true,
   showReviewCount = true,
   reviewCountFormatter = defaultReviewCountFormatter,
-  className = '',
+  className = 'text-sm',
   showEmpty = false,
 }: RatingDisplayProps) {
   const starSize = sizeClasses[size];
-  
+
   if (reviewCount === 0 && !showEmpty) {
-    return <div className={`h-6 ${className}`}></div>;
+    return <div className={clsx('h-6', className)}></div>;
   }
-  
+
   return (
-    <div className={`flex items-center gap-2 text-sm ${className}`}>
+    <div className={clsx('flex items-center gap-2', className)}>
       {/* Single Star with percentage fill */}
-      <div className="relative">
+      <div className='relative'>
         <Star className={`${starSize} text-gray-300`} />
-        <div 
-          className="absolute inset-0 overflow-hidden"
+        <div
+          className='absolute inset-0 overflow-hidden'
           style={{ width: `${(rating / 5) * 100}%` }}
         >
           <Star className={`${starSize} text-yellow-400 fill-current`} />
         </div>
       </div>
-      
+
       {/* Rating number */}
       {showRating && reviewCount > 0 && (
         <span className='text-foreground font-medium'>{rating.toFixed(1)}</span>
       )}
-      
+
       {/* Review count */}
       {showReviewCount && reviewCount > 0 && (
         <span className='text-muted-foreground'>
