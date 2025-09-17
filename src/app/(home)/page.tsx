@@ -11,14 +11,14 @@
 import {
   CategoriesHome,
   FeaturesHome,
-  FreelancersHome,
+  ProfilesHome,
   HeroHome,
   ServicesHome,
   TaxonomiesHome,
   TestimonialsHome,
 } from '@/components';
 import { Meta } from '@/lib/seo/Meta';
-import { getFeaturedServices } from '@/actions/services/get-services';
+import { getHomePageData } from '@/actions/home/get-home-data';
 
 // import { getData } from '@/lib/client/operations';
 // import { HOME_PAGE } from '@/lib/graphql/queries/main/page';
@@ -52,13 +52,22 @@ export async function generateStaticParams() {
   return [];
 }
 
-export default async function HomePage({ searchParams }) {
-  // Fetch featured services at build time for static generation
-  const featuredServicesResult = await getFeaturedServices();
+export default async function HomePage() {
+  // Fetch both services and profiles data in a single API call
+  const homeDataResult = await getHomePageData();
 
-  const featuredServices = featuredServicesResult.success
-    ? featuredServicesResult.data
-    : [];
+  // Extract the pre-processed data or provide fallback
+  const homeData =
+    homeDataResult.success && homeDataResult.data
+      ? homeDataResult.data
+      : {
+          services: {
+            mainCategories: [{ id: 'all', label: 'Όλες', slug: 'all' }],
+            servicesByCategory: { all: [] },
+            allServices: [],
+          },
+          profiles: [],
+        };
 
   return (
     <>
@@ -66,8 +75,11 @@ export default async function HomePage({ searchParams }) {
       <HeroHome />
       <CategoriesHome />
       <FeaturesHome />
-      <ServicesHome initialServices={featuredServices} />
-      <FreelancersHome />
+      <ServicesHome
+        mainCategories={homeData.services.mainCategories}
+        servicesByCategory={homeData.services.servicesByCategory}
+      />
+      <ProfilesHome profiles={homeData.profiles} />
       <TestimonialsHome />
       <TaxonomiesHome />
 
