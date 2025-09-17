@@ -1,0 +1,67 @@
+import React from 'react';
+import { ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface ServiceCategoryDisplayProps {
+  categoryLabels: {
+    category: string;
+    subcategory: string;
+    subdivision: string;
+  };
+  className?: string;
+  compact?: boolean;
+}
+
+export default function ServiceCategoryDisplay({
+  categoryLabels,
+  className,
+  compact = false,
+}: ServiceCategoryDisplayProps) {
+  const { category, subcategory, subdivision } = categoryLabels;
+
+  // Build hierarchy array, filtering out empty values
+  const hierarchy = [category, subcategory, subdivision].filter(
+    (item) => item && item.trim() !== '',
+  );
+
+  if (hierarchy.length === 0) {
+    return (
+      <span className={cn('text-gray-500 text-sm italic', className)}>
+        Χωρίς κατηγορία
+      </span>
+    );
+  }
+
+  if (compact) {
+    // Compact mode: show all categories separated by dashes
+    return (
+      <div className={cn('text-2sm text-gray-600', className)}>
+        {hierarchy.join(' - ')}
+      </div>
+    );
+  }
+
+  // Full breadcrumb display
+  return (
+    <div className={cn('flex items-center gap-1 text-sm', className)}>
+      {hierarchy.map((item, index) => (
+        <React.Fragment key={index}>
+          <span
+            className={cn(
+              'truncate',
+              index === hierarchy.length - 1
+                ? 'text-gray-900 font-medium'
+                : 'text-gray-600',
+            )}
+            title={item}
+          >
+            {item}
+          </span>
+          {index < hierarchy.length - 1 && (
+            <ChevronRight className='w-3 h-3 text-gray-400 flex-shrink-0' />
+          )}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
