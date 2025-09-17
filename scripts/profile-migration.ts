@@ -1006,6 +1006,7 @@ async function migrateProfiles(updateExisting: boolean = false): Promise<Migrati
           displayName: freelancer.display_name,
           firstName: freelancer.first_name,
           lastName: freelancer.last_name,
+          email: originalUser.email, // Duplicated from User for profile purposes
 
           // Profile-specific info
           tagline: freelancer.tagline,
@@ -1097,6 +1098,7 @@ async function migrateProfiles(updateExisting: boolean = false): Promise<Migrati
                 displayName: profileData.displayName,
                 firstName: profileData.firstName,
                 lastName: profileData.lastName,
+                email: profileData.email,
                 tagline: profileData.tagline,
                 bio: profileData.bio,
                 website: profileData.website,
