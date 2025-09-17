@@ -22,6 +22,7 @@ import {
   PathChecker,
 } from '@/components/shared/layout/wrapper';
 import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -33,27 +34,29 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang='el'>
       <Body>
-        <PathChecker excludes={['/dashboard', '/admin']}>
-          <Header />
-        </PathChecker>
-        <main>
-          <Notifications>{children}</Notifications>
-        </main>
-        <PathChecker excludes={['/dashboard', '/admin']}>
-          <Footer />
-        </PathChecker>
-        <BottomToTop_D />
-        <GoogleTagManager gtmId='GTM-KR7N94L4' />
-        <GoogleAnalytics gaId={gaId} />
-        {/* Cloudinary Upload Widget */}
-        {/* <Script
-          src='https://upload-widget.cloudinary.com/global/all.js'
-          strategy='beforeInteractive'
-        /> */}
-        {/* <PathChecker excludes={'/admin'}>
-          <CookiesBanner_D />
-        </PathChecker> */}
-        <Toaster />
+        <TooltipProvider delayDuration={0}>
+          <PathChecker excludes={['/dashboard', '/admin']}>
+            <Header />
+          </PathChecker>
+          <main>
+            <Notifications>{children}</Notifications>
+          </main>
+          <PathChecker excludes={['/dashboard', '/admin']}>
+            <Footer />
+          </PathChecker>
+          <BottomToTop_D />
+          <GoogleTagManager gtmId='GTM-KR7N94L4' />
+          <GoogleAnalytics gaId={gaId} />
+          {/* Cloudinary Upload Widget */}
+          {/* <Script
+            src='https://upload-widget.cloudinary.com/global/all.js'
+            strategy='beforeInteractive'
+          /> */}
+          {/* <PathChecker excludes={'/admin'}>
+            <CookiesBanner_D />
+          </PathChecker> */}
+          <Toaster />
+        </TooltipProvider>
       </Body>
     </html>
   );
