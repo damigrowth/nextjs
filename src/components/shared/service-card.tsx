@@ -4,24 +4,14 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 
 import MediaDisplay from '@/components/ui/media-display';
-import SaveButton from './save-button';
 import RatingDisplay from './rating-display';
-import type { ServiceCardData } from '@/lib/types/components';
+import { ServiceCardData } from '@/lib/types';
 
 interface ServiceCardProps {
   service: ServiceCardData;
-  onSave?: (serviceId: string) => void;
-  isSaved?: boolean;
 }
 
-export default function dServiceCard({
-  service,
-  onSave,
-  isSaved = false,
-}: ServiceCardProps) {
-  const handleSaveClick = () => {
-    onSave?.(service.id);
-  };
+export default function ServiceCard({ service }: ServiceCardProps) {
 
   return (
     <Card className='group cursor-pointer overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 rounded-lg bg-white'>
@@ -32,14 +22,8 @@ export default function dServiceCard({
             media={service.media}
             className='w-full h-full rounded-t-lg'
             aspectRatio='video'
-            showControls={false}
-          />
-
-          {/* Save Button */}
-          <SaveButton
-            isSaved={isSaved}
-            onSave={handleSaveClick}
-            className='absolute top-3 right-3'
+            showControls={true}
+            showAudio={false}
           />
         </div>
 
