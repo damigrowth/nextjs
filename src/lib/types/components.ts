@@ -203,7 +203,7 @@ export interface TaxonomyTabsProps {
 
 export interface BreadcrumbButtonsProps {
   subjectTitle: string;
-  id: string;
+  id: string | number;
   savedStatus?: boolean;
   saveType?: string; // This matches the flexible role system
   hideSaveButton?: boolean;
@@ -237,3 +237,23 @@ export type ServiceCardData = Pick<
     'id' | 'username' | 'displayName' | 'image'
   >;
 };
+
+// Profile Card Component Types
+export type ProfileCardData = Pick<
+  import('@prisma/client').Profile,
+  | 'id'
+  | 'username'
+  | 'displayName'
+  | 'tagline'
+  | 'subcategory'
+  | 'speciality'
+  | 'rating'
+  | 'reviewCount'
+  | 'verified'
+  | 'image'
+  | 'top'
+>;
+
+export interface ProfileCardProps {
+  profile: ProfileCardData;
+}
