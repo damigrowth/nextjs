@@ -367,7 +367,7 @@ export const serviceDetailsSchema = z
       .int()
       .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
       .optional(),
-    fixed: z.boolean().default(true),
+    fixed: z.boolean(),
     duration: z
       .number()
       .int()
@@ -513,7 +513,7 @@ export const createServiceSchema = z
       .int()
       .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
       .optional(),
-    fixed: z.boolean().default(true),
+    fixed: z.boolean(),
     duration: z
       .number()
       .int()
