@@ -4,8 +4,10 @@ import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { Profile } from '@prisma/client';
 import { ActionResult } from '@/lib/types/api';
+import type { ServiceCardData } from '@/lib/types/components';
 import type { BreadcrumbSegment } from '@/components/shared/dynamic-breadcrumb';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
+import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { skills } from '@/constants/datasets/skills';
 import {
   contactMethodsOptions,
@@ -133,6 +135,30 @@ export async function getPublicProfileByUsername(
 }
 
 /**
+ * Transform a service for use in ServiceCard component
+ */
+function transformProfileService(service: any): ServiceCardData {
+  const categoryTaxonomy = findById(serviceTaxonomies, service.category);
+
+  return {
+    id: service.id,
+    title: service.title,
+    category: categoryTaxonomy?.label || service.category,
+    slug: service.slug,
+    price: service.price,
+    rating: service.rating,
+    reviewCount: service.reviewCount,
+    media: service.media,
+    profile: {
+      id: service.pid,
+      displayName: service.profile.displayName,
+      username: service.profile.username,
+      image: service.profile.image,
+    },
+  };
+}
+
+/**
  * Complete profile data with resolved taxonomy and options
  */
 export interface ProfilePageData {
@@ -153,6 +179,8 @@ export interface ProfilePageData {
   visibility: PrismaJson.VisibilitySettings;
   socials: PrismaJson.SocialMedia;
   calculatedExperience: number;
+  services: ServiceCardData[]; // All services for the profile
+  servicesCount: number; // Total count for display
   breadcrumbSegments: BreadcrumbSegment[];
   breadcrumbButtons: {
     subjectTitle: string;
@@ -194,6 +222,7 @@ async function getProfileByUsername(username: string) {
     return null;
   }
 }
+
 
 /**
  * Retrieves complete profile data with resolved taxonomy information
@@ -312,6 +341,28 @@ export async function getProfilePageData(
       breadcrumbSegments[breadcrumbSegments.length - 1].isCurrentPage = true;
     }
 
+    // Fetch services for this profile
+    const services = await prisma.service.findMany({
+      where: {
+        pid: profile.id,
+        status: 'published'
+      },
+      include: {
+        profile: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            image: true,
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    // Transform services for component use
+    const transformedServices = services.map(transformProfileService);
+
     // Prepare breadcrumb buttons config
     const breadcrumbButtons = {
       subjectTitle: profile.displayName || '',
@@ -339,6 +390,8 @@ export async function getProfilePageData(
         sizeData: sizeData || undefined,
         industriesData,
         coverage,
+        services: transformedServices,
+        servicesCount: services.length,
         visibility,
         socials,
         calculatedExperience,
