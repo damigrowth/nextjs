@@ -130,7 +130,7 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
           { reviewCount: 'desc' },
           { updatedAt: 'desc' },
         ],
-        take: 8,
+        take: 16,
       }),
 
       // Fetch featured profiles
@@ -156,7 +156,7 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
           { reviewCount: 'desc' },
           { updatedAt: 'desc' },
         ],
-        take: 8,
+        take: 16,
       }),
     ]);
 
