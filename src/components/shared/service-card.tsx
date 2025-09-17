@@ -9,9 +9,13 @@ import { ServiceCardData } from '@/lib/types';
 
 interface ServiceCardProps {
   service: ServiceCardData;
+  showProfile?: boolean; // New prop to control profile section visibility
 }
 
-export default function ServiceCard({ service }: ServiceCardProps) {
+export default function ServiceCard({
+  service,
+  showProfile = true
+}: ServiceCardProps) {
 
   return (
     <Card className='group cursor-pointer overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 rounded-lg bg-white'>
@@ -63,39 +67,43 @@ export default function ServiceCard({ service }: ServiceCardProps) {
             className='mb-4'
           />
 
-          {/* Separator Line */}
-          <div className='border-t border-gray-200 pt-3 mt-auto'>
-            {/* Profile and Price */}
-            <div className='flex items-center gap-3'>
-              {/* Profile Info */}
-              <div className='flex items-center gap-2 flex-1'>
-                {service.profile.image && (
-                  <Avatar className='h-6 w-6'>
-                    <AvatarImage
-                      src={service.profile.image}
-                      alt={service.profile.displayName}
-                    />
-                  </Avatar>
+          {/* Separator Line - Only show if showProfile is true or if there's a price */}
+          {(showProfile || (service.price && service.price > 0)) && (
+            <div className='border-t border-gray-200 pt-3 mt-auto'>
+              {/* Profile and Price */}
+              <div className='flex items-center gap-3'>
+                {/* Profile Info - Only show if showProfile is true */}
+                {showProfile && (
+                  <div className='flex items-center gap-2 flex-1'>
+                    {service.profile.image && (
+                      <Avatar className='h-6 w-6'>
+                        <AvatarImage
+                          src={service.profile.image}
+                          alt={service.profile.displayName}
+                        />
+                      </Avatar>
+                    )}
+                    <Link
+                      href={`/profile/${service.profile.username}`}
+                      className='text-sm text-body hover:text-third transition-colors'
+                    >
+                      {service.profile.displayName}
+                    </Link>
+                  </div>
                 )}
-                <Link
-                  href={`/profile/${service.profile.username}`}
-                  className='text-sm text-body hover:text-third transition-colors'
-                >
-                  {service.profile.displayName}
-                </Link>
-              </div>
 
-              {/* Price */}
-              {service.price && service.price > 0 && (
-                <div className='text-base'>
-                  <span className='font-normal text-body'>από </span>
-                  <span className='font-semibold text-dark'>
-                    {service.price}€
-                  </span>
-                </div>
-              )}
+                {/* Price */}
+                {service.price && service.price > 0 && (
+                  <div className={`text-base ${!showProfile ? 'w-full text-right' : ''}`}>
+                    <span className='font-normal text-body'>από </span>
+                    <span className='font-semibold text-dark'>
+                      {service.price}€
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </CardContent>
       </div>
     </Card>
