@@ -8,8 +8,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SaveButton from './save-button';
 import RatingDisplay from './rating-display';
 
-interface FreelancerCardProps {
-  freelancer: {
+interface ProfileCardProps {
+  profile: {
     id: string;
     displayName: string;
     username: string;
@@ -20,15 +20,15 @@ interface FreelancerCardProps {
     reviewCount: number;
     verified?: boolean;
   };
-  onSave?: (freelancerId: string) => void;
+  onSave?: (profileId: string) => void;
   isSaved?: boolean;
 }
 
-export default function FreelancerCard({
-  freelancer,
+export default function ProfileCard({
+  profile,
   onSave,
   isSaved = false,
-}: FreelancerCardProps) {
+}: ProfileCardProps) {
   const {
     id,
     displayName,
@@ -39,7 +39,7 @@ export default function FreelancerCard({
     rating,
     reviewCount,
     verified = false,
-  } = freelancer;
+  } = profile;
 
   const getInitials = (name: string) => {
     return name
