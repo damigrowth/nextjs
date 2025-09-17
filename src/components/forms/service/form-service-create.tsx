@@ -289,8 +289,12 @@ export default function CreateServiceForm({
 
       case 3:
         const formValues = getValues();
-        const isPriceValid = formValues.fixed ? (formValues.price && formValues.price > 0) : true;
-        const isDurationValid = !formValues.type?.oneoff || (formValues.duration && formValues.duration > 0);
+        const isPriceValid = formValues.fixed
+          ? formValues.price && formValues.price > 0
+          : true;
+        const isDurationValid =
+          !formValues.type?.oneoff ||
+          (formValues.duration && formValues.duration > 0);
 
         return !!(
           formValues.title &&
@@ -642,314 +646,311 @@ export default function CreateServiceForm({
 
   return (
     <Form {...form}>
-      <TooltipProvider>
-        <div className='max-w-5xl w-full mx-auto space-y-6 p-2 pr-0'>
-          {/* Progress Header */}
-          <div className='w-full mb-8'>
-            <div className='flex items-center justify-between mb-4'>
-              <div>
-                <h1 className='text-2xl font-bold text-gray-900'>
-                  {currentStep === 6
-                    ? 'Επιτυχής δημιουργία υπηρεσίας!'
-                    : 'Δημιουργία Υπηρεσίας'}
-                </h1>
-                <p className='text-gray-600 mt-1'>
-                  {currentStep === 6
-                    ? 'Η υπηρεσία δημιουργήθηκε επιτυχώς.'
-                    : 'Με αυτήν τη φόρμα μπορείτε να προσθέσετε νέες υπηρεσίες.'}
-                </p>
-              </div>
-              <div className='flex items-center space-x-3'>
-                {/* Action Icons */}
-                <div className='flex items-center space-x-2'>
-                  {/* Clear Form Button */}
-                  <AlertDialog
-                    open={showResetDialog}
-                    onOpenChange={setShowResetDialog}
-                  >
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant='ghost'
-                            size='sm'
-                            className='h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50'
-                            disabled={isLoading || currentStep === 6}
-                          >
-                            <RotateCcw className='h-4 w-4' />
-                          </Button>
-                        </AlertDialogTrigger>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Καθαρισμός φόρμας</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Καθαρισμός φόρμας</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Θέλετε να καθαρίσετε όλα τα δεδομένα της φόρμας; Αυτή
-                          η ενέργεια δεν μπορεί να αναιρεθεί.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Ακύρωση</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleClearForm}
-                          className='bg-red-600 hover:bg-red-700'
+      <div className='max-w-5xl w-full mx-auto space-y-6 p-2 pr-0'>
+        {/* Progress Header */}
+        <div className='w-full mb-8'>
+          <div className='flex items-center justify-between mb-4'>
+            <div>
+              <h1 className='text-2xl font-bold text-gray-900'>
+                {currentStep === 6
+                  ? 'Επιτυχής δημιουργία υπηρεσίας!'
+                  : 'Δημιουργία Υπηρεσίας'}
+              </h1>
+              <p className='text-gray-600 mt-1'>
+                {currentStep === 6
+                  ? 'Η υπηρεσία δημιουργήθηκε επιτυχώς.'
+                  : 'Με αυτήν τη φόρμα μπορείτε να προσθέσετε νέες υπηρεσίες.'}
+              </p>
+            </div>
+            <div className='flex items-center space-x-3'>
+              {/* Action Icons */}
+              <div className='flex items-center space-x-2'>
+                {/* Clear Form Button */}
+                <AlertDialog
+                  open={showResetDialog}
+                  onOpenChange={setShowResetDialog}
+                >
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          className='h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50'
+                          disabled={isLoading || currentStep === 6}
                         >
-                          Καθαρισμός
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                          <RotateCcw className='h-4 w-4' />
+                        </Button>
+                      </AlertDialogTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Καθαρισμός φόρμας</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Καθαρισμός φόρμας</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Θέλετε να καθαρίσετε όλα τα δεδομένα της φόρμας; Αυτή η
+                        ενέργεια δεν μπορεί να αναιρεθεί.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Ακύρωση</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleClearForm}
+                        className='bg-red-600 hover:bg-red-700'
+                      >
+                        Καθαρισμός
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
 
-                  {/* Save as Draft Button */}
-                  <AlertDialog
-                    open={showDraftDialog}
-                    onOpenChange={setShowDraftDialog}
-                  >
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant='ghost'
-                            size='sm'
-                            className={`h-8 w-8 p-0 ${
-                              currentStep >= 3 && currentStep !== 6
-                                ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
-                                : 'text-gray-400 cursor-not-allowed'
-                            }`}
-                            disabled={
-                              currentStep < 3 ||
-                              currentStep === 6 ||
-                              isDraftPending ||
-                              isPendingTransition ||
-                              isLoading
-                            }
-                          >
-                            {isDraftPending || isPendingTransition ? (
-                              <div className='animate-spin h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full' />
-                            ) : (
-                              <Save className='h-4 w-4' />
-                            )}
-                          </Button>
-                        </AlertDialogTrigger>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>
-                          {currentStep >= 3
-                            ? 'Αποθήκευση ως προσχέδιο'
-                            : 'Διαθέσιμο από το βήμα 3'}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Αποθήκευση ως προσχέδιο
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Θέλετε να αποθηκεύσετε την υπηρεσία ως προσχέδιο;
-                          Μπορείτε να την επεξεργαστείτε αργότερα.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel
-                          disabled={isDraftPending || isPendingTransition}
-                        >
-                          Ακύρωση
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleConfirmDraft();
-                          }}
-                          disabled={isDraftPending || isPendingTransition}
-                          className='bg-green-600 hover:bg-green-700 disabled:opacity-50'
+                {/* Save as Draft Button */}
+                <AlertDialog
+                  open={showDraftDialog}
+                  onOpenChange={setShowDraftDialog}
+                >
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          className={`h-8 w-8 p-0 ${
+                            currentStep >= 3 && currentStep !== 6
+                              ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
+                              : 'text-gray-400 cursor-not-allowed'
+                          }`}
+                          disabled={
+                            currentStep < 3 ||
+                            currentStep === 6 ||
+                            isDraftPending ||
+                            isPendingTransition ||
+                            isLoading
+                          }
                         >
                           {isDraftPending || isPendingTransition ? (
-                            <>
-                              <div className='animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2' />
-                              Αποθήκευση...
-                            </>
+                            <div className='animate-spin h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full' />
                           ) : (
-                            'Αποθήκευση'
+                            <Save className='h-4 w-4' />
                           )}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-
-                <Badge
-                  variant='outline'
-                  className={`text-sm ${currentStep === 6 ? 'bg-green-100 border-green-300 text-green-700' : ''}`}
-                >
-                  {currentStep === 6
-                    ? 'Ολοκληρώθηκε'
-                    : currentStep === 5 && (isPending || isPendingTransition)
-                      ? 'Ολοκλήρωση...'
-                      : `Βήμα ${currentStep} από ${STEPS.length}`}
-                </Badge>
-              </div>
-            </div>
-
-            {/* Progress Bar */}
-            <div className='space-y-2'>
-              <div className='flex justify-between text-sm text-gray-500'>
-                <span>Πρόοδος</span>
-                <span className='transition-all duration-300'>
-                  {currentStep === 6 ? '100' : Math.round(progress)}%
-                </span>
-              </div>
-              <Progress
-                value={currentStep === 6 ? 100 : progress}
-                className={`h-2 transition-all duration-700 ${currentStep === 6 ? 'bg-green-100' : ''}`}
-              />
-            </div>
-
-            {/* Steps Navigation */}
-            <div className='flex items-center justify-between mt-6 space-x-2'>
-              {STEPS.map((step) => {
-                const isActive = currentStep === step.id;
-                const isCompleted =
-                  currentStep === 6 || isStepCompleted(step.id);
-                const isAccessible =
-                  currentStep === 6 ||
-                  step.id <= currentStep ||
-                  isStepCompleted(step.id);
-
-                return (
-                  <div
-                    key={step.id}
-                    className={`flex-1 flex items-center space-x-2 p-2 rounded-lg cursor-pointer transition-colors ${
-                      isActive
-                        ? 'bg-primary/10 border-2 border-primary/30'
-                        : isCompleted
-                          ? 'bg-secondary/10 border-2 border-secondary/30'
-                          : 'bg-muted border-2 border-border'
-                    } ${!isAccessible || currentStep === 6 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    onClick={() => {
-                      if (isAccessible && currentStep !== 6) {
-                        goToStep(step.id);
-                      }
-                    }}
-                  >
-                    <div
-                      className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
-                        isActive
-                          ? 'bg-primary text-primary-foreground'
-                          : isCompleted
-                            ? 'bg-secondary text-secondary-foreground'
-                            : 'bg-muted-foreground text-muted'
-                      }`}
-                    >
-                      {isCompleted ? (
-                        <Check className='w-3 h-3' />
-                      ) : (
-                        <span>{step.id}</span>
-                      )}
-                    </div>
-                    <div className='flex-1 min-w-0'>
-                      <div
-                        className={`text-xs font-medium truncate ${
-                          isActive
-                            ? 'text-primary'
-                            : isCompleted
-                              ? 'text-secondary'
-                              : 'text-muted-foreground'
-                        }`}
+                        </Button>
+                      </AlertDialogTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        {currentStep >= 3
+                          ? 'Αποθήκευση ως προσχέδιο'
+                          : 'Διαθέσιμο από το βήμα 3'}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Αποθήκευση ως προσχέδιο
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Θέλετε να αποθηκεύσετε την υπηρεσία ως προσχέδιο;
+                        Μπορείτε να την επεξεργαστείτε αργότερα.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel
+                        disabled={isDraftPending || isPendingTransition}
                       >
-                        {step.title}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+                        Ακύρωση
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleConfirmDraft();
+                        }}
+                        disabled={isDraftPending || isPendingTransition}
+                        className='bg-green-600 hover:bg-green-700 disabled:opacity-50'
+                      >
+                        {isDraftPending || isPendingTransition ? (
+                          <>
+                            <div className='animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2' />
+                            Αποθήκευση...
+                          </>
+                        ) : (
+                          'Αποθήκευση'
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+
+              <Badge
+                variant='outline'
+                className={`text-sm ${currentStep === 6 ? 'bg-green-100 border-green-300 text-green-700' : ''}`}
+              >
+                {currentStep === 6
+                  ? 'Ολοκληρώθηκε'
+                  : currentStep === 5 && (isPending || isPendingTransition)
+                    ? 'Ολοκλήρωση...'
+                    : `Βήμα ${currentStep} από ${STEPS.length}`}
+              </Badge>
             </div>
           </div>
 
-          {/* Current Step Content */}
-          <Card>
-            {currentStep !== 6 &&
-              !(currentStep === 5 && (isPending || isPendingTransition)) && (
-                <CardHeader>
-                  <CardTitle className='flex items-center space-x-2'>
-                    {currentStep === 1 && <Globe className='w-5 h-5' />}
-                    {currentStep === 2 && watch('type')?.presence && (
-                      <MapPin className='w-5 h-5' />
+          {/* Progress Bar */}
+          <div className='space-y-2'>
+            <div className='flex justify-between text-sm text-gray-500'>
+              <span>Πρόοδος</span>
+              <span className='transition-all duration-300'>
+                {currentStep === 6 ? '100' : Math.round(progress)}%
+              </span>
+            </div>
+            <Progress
+              value={currentStep === 6 ? 100 : progress}
+              className={`h-2 transition-all duration-700 ${currentStep === 6 ? 'bg-green-100' : ''}`}
+            />
+          </div>
+
+          {/* Steps Navigation */}
+          <div className='flex items-center justify-between mt-6 space-x-2'>
+            {STEPS.map((step) => {
+              const isActive = currentStep === step.id;
+              const isCompleted = currentStep === 6 || isStepCompleted(step.id);
+              const isAccessible =
+                currentStep === 6 ||
+                step.id <= currentStep ||
+                isStepCompleted(step.id);
+
+              return (
+                <div
+                  key={step.id}
+                  className={`flex-1 flex items-center space-x-2 p-2 rounded-lg cursor-pointer transition-colors ${
+                    isActive
+                      ? 'bg-primary/10 border-2 border-primary/30'
+                      : isCompleted
+                        ? 'bg-secondary/10 border-2 border-secondary/30'
+                        : 'bg-muted border-2 border-border'
+                  } ${!isAccessible || currentStep === 6 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  onClick={() => {
+                    if (isAccessible && currentStep !== 6) {
+                      goToStep(step.id);
+                    }
+                  }}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : isCompleted
+                          ? 'bg-secondary text-secondary-foreground'
+                          : 'bg-muted-foreground text-muted'
+                    }`}
+                  >
+                    {isCompleted ? (
+                      <Check className='w-3 h-3' />
+                    ) : (
+                      <span>{step.id}</span>
                     )}
-                    {currentStep === 2 && watch('type')?.online && (
-                      <Globe className='w-5 h-5' />
-                    )}
-                    {currentStep === 3 && <Building className='w-5 h-5' />}
-                    {(currentStep === 4 || currentStep === 5) && (
-                      <Home className='w-5 h-5' />
-                    )}
-                    <span>{currentStepInfo?.title}</span>
-                  </CardTitle>
-                  <CardDescription>
-                    {currentStepInfo?.description}
-                  </CardDescription>
-                </CardHeader>
-              )}
-            <CardContent>
-              <div className='transition-all duration-500 ease-in-out'>
-                <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
-                  <div className='space-y-6'>
-                    {renderStepContent()}
-                    {/* Step Navigation - Hide on completion step and loading state */}
-                    {currentStep !== 6 &&
-                      !(
-                        currentStep === 5 &&
-                        (isPending || isPendingTransition)
-                      ) && (
-                        <div className='flex justify-between items-center mt-6 pt-6 border-t'>
-                          <FormButton
-                            type='button'
-                            variant='outline'
-                            text='Προηγουμένο'
-                            onClick={goBack}
-                            disabled={currentStep === 1}
-                          />
-                          <div className='flex gap-3'>
-                            {isLastStep ? (
-                              <FormButton
-                                type='button'
-                                text='Δημιουργία υπηρεσίας'
-                                loading={isPending || isPendingTransition}
-                                disabled={
-                                  isPending ||
-                                  isPendingTransition ||
-                                  !isCurrentStepValid() ||
-                                  isDraftPending
-                                }
-                                onClick={() => {
-                                  startTransition(() => {
-                                    const formData = new FormData();
-                                    handleFormSubmit(formData);
-                                  });
-                                }}
-                              />
-                            ) : (
-                              <FormButton
-                                type='button'
-                                text='Επόμενο'
-                                onClick={goNext}
-                                disabled={isPending || !isCurrentStepValid()}
-                              />
-                            )}
-                          </div>
-                        </div>
-                      )}
+                  </div>
+                  <div className='flex-1 min-w-0'>
+                    <div
+                      className={`text-xs font-medium truncate ${
+                        isActive
+                          ? 'text-primary'
+                          : isCompleted
+                            ? 'text-secondary'
+                            : 'text-muted-foreground'
+                      }`}
+                    >
+                      {step.title}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              );
+            })}
+          </div>
         </div>
-      </TooltipProvider>
+
+        {/* Current Step Content */}
+        <Card>
+          {currentStep !== 6 &&
+            !(currentStep === 5 && (isPending || isPendingTransition)) && (
+              <CardHeader>
+                <CardTitle className='flex items-center space-x-2'>
+                  {currentStep === 1 && <Globe className='w-5 h-5' />}
+                  {currentStep === 2 && watch('type')?.presence && (
+                    <MapPin className='w-5 h-5' />
+                  )}
+                  {currentStep === 2 && watch('type')?.online && (
+                    <Globe className='w-5 h-5' />
+                  )}
+                  {currentStep === 3 && <Building className='w-5 h-5' />}
+                  {(currentStep === 4 || currentStep === 5) && (
+                    <Home className='w-5 h-5' />
+                  )}
+                  <span>{currentStepInfo?.title}</span>
+                </CardTitle>
+                <CardDescription>
+                  {currentStepInfo?.description}
+                </CardDescription>
+              </CardHeader>
+            )}
+          <CardContent>
+            <div className='transition-all duration-500 ease-in-out'>
+              <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
+                <div className='space-y-6'>
+                  {renderStepContent()}
+                  {/* Step Navigation - Hide on completion step and loading state */}
+                  {currentStep !== 6 &&
+                    !(
+                      currentStep === 5 &&
+                      (isPending || isPendingTransition)
+                    ) && (
+                      <div className='flex justify-between items-center mt-6 pt-6 border-t'>
+                        <FormButton
+                          type='button'
+                          variant='outline'
+                          text='Προηγουμένο'
+                          onClick={goBack}
+                          disabled={currentStep === 1}
+                        />
+                        <div className='flex gap-3'>
+                          {isLastStep ? (
+                            <FormButton
+                              type='button'
+                              text='Δημιουργία υπηρεσίας'
+                              loading={isPending || isPendingTransition}
+                              disabled={
+                                isPending ||
+                                isPendingTransition ||
+                                !isCurrentStepValid() ||
+                                isDraftPending
+                              }
+                              onClick={() => {
+                                startTransition(() => {
+                                  const formData = new FormData();
+                                  handleFormSubmit(formData);
+                                });
+                              }}
+                            />
+                          ) : (
+                            <FormButton
+                              type='button'
+                              text='Επόμενο'
+                              onClick={goNext}
+                              disabled={isPending || !isCurrentStepValid()}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    )}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </Form>
   );
 }
