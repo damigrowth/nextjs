@@ -231,3 +231,41 @@ export const serviceTimeOptions = [
     label: 'Μέχρι 30 ημέρες',
   },
 ];
+
+export const archiveSortOptions = [
+  {
+    id: 'default',
+    label: 'Προεπιλογή',
+    slug: 'default',
+  },
+  {
+    id: 'recent',
+    label: 'Πιο Πρόσφατα',
+    slug: 'recent',
+  },
+  {
+    id: 'oldest',
+    label: 'Πιο παλιά',
+    slug: 'oldest',
+  },
+  {
+    id: 'price_asc',
+    label: 'Αύξουσα αμοιβή',
+    slug: 'price-asc',
+  },
+  {
+    id: 'price_desc',
+    label: 'Φθίνουσα αμοιβή',
+    slug: 'price-desc',
+  },
+  {
+    id: 'rating_high',
+    label: 'Υψηλότερη βαθμολογία',
+    slug: 'rating-high',
+  },
+  {
+    id: 'rating_low',
+    label: 'Χαμηλότερη βαθμολογία',
+    slug: 'rating-low',
+  },
+];
