@@ -51,6 +51,71 @@ export function findByField<T extends DatasetItem>(
 }
 
 /**
+ * Find location by slug - searches in counties and areas, not zipcodes
+ */
+export function findLocationBySlug(
+  locations: any[],
+  slug: string,
+): any | undefined {
+  for (const county of locations) {
+    // Check county slug
+    if (county.slug === slug) {
+      return county;
+    }
+
+    // Check area slugs within this county
+    if (county.children) {
+      for (const area of county.children) {
+        if (area.slug === slug) {
+          return area;
+        }
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Find location by name (for backward compatibility)
+ */
+export function findLocationByName(
+  locations: any[],
+  name: string,
+): any | undefined {
+  for (const county of locations) {
+    // Check county name
+    if (county.name === name) {
+      return county;
+    }
+
+    // Check area names within this county
+    if (county.children) {
+      for (const area of county.children) {
+        if (area.name === name) {
+          return area;
+        }
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Find location by slug or name (with fallback for backward compatibility)
+ */
+export function findLocationBySlugOrName(
+  locations: any[],
+  slugOrName: string,
+): any | undefined {
+  // Try finding by slug first
+  const bySlug = findLocationBySlug(locations, slugOrName);
+  if (bySlug) return bySlug;
+
+  // Fallback to finding by name
+  return findLocationByName(locations, slugOrName);
+}
+
+/**
  * Find item by slug in a flat or nested dataset
  */
 export function findBySlug<T extends DatasetItem>(
@@ -386,6 +451,47 @@ export function filterSubcategoriesByUserType<
   return filterByField(subcategories, 'type', userRole);
 }
 
+/**
+ * Resolve taxonomy hierarchy labels from IDs
+ * Safely navigates through hierarchical taxonomy structure to resolve labels
+ * @param taxonomy - The hierarchical taxonomy dataset
+ * @param categoryId - ID of the category (top level)
+ * @param subcategoryId - ID of the subcategory (second level)
+ * @param subdivisionId - ID of the subdivision (third level)
+ * @returns Object with resolved labels for each level
+ */
+export function resolveTaxonomyHierarchy<T extends DatasetItem>(
+  taxonomy: T[],
+  categoryId?: string | null,
+  subcategoryId?: string | null,
+  subdivisionId?: string | null,
+): {
+  category: string;
+  subcategory: string;
+  subdivision: string;
+} {
+  // Find category first (top level)
+  const categoryTaxonomy = categoryId ? findById(taxonomy, categoryId) : null;
+
+  // Find subcategory within the category's children
+  const subcategoryTaxonomy =
+    categoryTaxonomy?.children && subcategoryId
+      ? categoryTaxonomy.children.find((sub: any) => sub.id === subcategoryId)
+      : null;
+
+  // Find subdivision within the subcategory's children
+  const subdivisionTaxonomy =
+    subcategoryTaxonomy?.children && subdivisionId
+      ? subcategoryTaxonomy.children.find((div: any) => div.id === subdivisionId)
+      : null;
+
+  return {
+    category: categoryTaxonomy?.label || '',
+    subcategory: subcategoryTaxonomy?.label || '',
+    subdivision: subdivisionTaxonomy?.label || '',
+  };
+}
+
 // =============================================================================
 // LOCATION-SPECIFIC UTILITIES
 // =============================================================================
@@ -430,6 +536,54 @@ export function getLocationName<T extends DatasetItem>(
   }
 
   return null;
+}
+
+/**
+ * Find location name by ID within a specific county context
+ * This is used when we know the county and want to find an area or zipcode within it
+ * @param locationOptions - The hierarchical location dataset
+ * @param locationId - The ID to search for
+ * @param countyId - The county context to search within
+ * @returns The name of the location or null if not found
+ */
+export function getLocationNameInContext<T extends DatasetItem>(
+  locationOptions: T[],
+  locationId: string | null | undefined,
+  countyId: string | null | undefined,
+): string | null {
+  if (!locationId) {
+    return null;
+  }
+
+  // If no county context, fall back to global search
+  if (!countyId) {
+    return getLocationName(locationOptions, locationId);
+  }
+
+  // Find the county first
+  const county = locationOptions.find((c) => c.id === countyId);
+  if (!county) {
+    return getLocationName(locationOptions, locationId);
+  }
+
+  // Search zipcodes first within this county's areas (prioritize deepest level)
+  for (const area of county.children || []) {
+    const zipcode = (area as any).children?.find(
+      (z: any) => z.id === locationId,
+    );
+    if (zipcode) {
+      return zipcode.name;
+    }
+  }
+
+  // Then search areas within this county
+  const area = county.children?.find((a: any) => a.id === locationId);
+  if (area) {
+    return area.name;
+  }
+
+  // If not found in context, fall back to global search
+  return getLocationName(locationOptions, locationId);
 }
 
 // =============================================================================
@@ -551,15 +705,15 @@ export function transformCoverageWithLocationNames<T extends DatasetItem>(
     onbase: Boolean(rawCoverage.onbase),
     onsite: Boolean(rawCoverage.onsite),
     address: rawCoverage.address,
-    // Transform single location fields
-    area: rawCoverage.area
-      ? getLocationName(locationOptions, rawCoverage.area)
-      : null,
+    // Transform single location fields with context awareness
     county: rawCoverage.county
       ? getLocationName(locationOptions, rawCoverage.county)
       : null,
+    area: rawCoverage.area
+      ? getLocationNameInContext(locationOptions, rawCoverage.area, rawCoverage.county)
+      : null,
     zipcode: rawCoverage.zipcode
-      ? getLocationName(locationOptions, rawCoverage.zipcode)
+      ? getLocationNameInContext(locationOptions, rawCoverage.zipcode, rawCoverage.county)
       : null,
     // Transform location arrays
     counties: transformLocationIdsToNames(
@@ -670,3 +824,161 @@ export function getDefaultCoverage(): CoverageWithNames {
     areas: [],
   };
 }
+
+// =============================================================================
+// TAXONOMY ARCHIVE UTILITIES
+// =============================================================================
+
+/**
+ * Get all valid taxonomy paths for static generation
+ * Generates all possible combinations of category/subcategory/subdivision
+ * @param taxonomy - The hierarchical taxonomy dataset
+ * @returns Array of path objects for Next.js generateStaticParams
+ */
+export function getAllTaxonomyPaths<T extends DatasetItem>(
+  taxonomy: T[],
+): Array<{ category?: string; subcategory?: string; subdivision?: string }> {
+  const paths: Array<{ category?: string; subcategory?: string; subdivision?: string }> = [];
+
+  taxonomy.forEach((category) => {
+    // Add category level path
+    paths.push({ category: category.slug });
+
+    // Add subcategory level paths
+    category.children?.forEach((subcategory: any) => {
+      paths.push({
+        category: category.slug,
+        subcategory: subcategory.slug,
+      });
+
+      // Add subdivision level paths
+      subcategory.children?.forEach((subdivision: any) => {
+        paths.push({
+          category: category.slug,
+          subcategory: subcategory.slug,
+          subdivision: subdivision.slug,
+        });
+      });
+    });
+  });
+
+  return paths;
+}
+
+/**
+ * Find taxonomy items within parent context for accurate slug resolution
+ * @param taxonomy - The hierarchical taxonomy dataset
+ * @param categorySlug - Optional category slug
+ * @param subcategorySlug - Optional subcategory slug
+ * @param subdivisionSlug - Optional subdivision slug
+ * @returns Object with resolved taxonomy items at each level
+ */
+export function findTaxonomyBySlugInContext<T extends DatasetItem>(
+  taxonomy: T[],
+  categorySlug?: string,
+  subcategorySlug?: string,
+  subdivisionSlug?: string,
+): {
+  category?: T;
+  subcategory?: T;
+  subdivision?: T;
+} | null {
+  if (!categorySlug) {
+    return null;
+  }
+
+  // Find category
+  const category = taxonomy.find((c) => c.slug === categorySlug);
+  if (!category) {
+    return null;
+  }
+
+  // Return just category if no subcategory requested
+  if (!subcategorySlug) {
+    return { category };
+  }
+
+  // Find subcategory within category
+  const subcategory = category.children?.find(
+    (s: any) => s.slug === subcategorySlug,
+  ) as T | undefined;
+  if (!subcategory) {
+    return null;
+  }
+
+  // Return category and subcategory if no subdivision requested
+  if (!subdivisionSlug) {
+    return { category, subcategory };
+  }
+
+  // Find subdivision within subcategory
+  const subdivision = (subcategory as any).children?.find(
+    (d: any) => d.slug === subdivisionSlug,
+  ) as T | undefined;
+  if (!subdivision) {
+    return null;
+  }
+
+  return { category, subcategory, subdivision };
+}
+
+/**
+ * Generate breadcrumb segments from taxonomy slugs
+ * @param taxonomy - The hierarchical taxonomy dataset
+ * @param categorySlug - Optional category slug
+ * @param subcategorySlug - Optional subcategory slug
+ * @param subdivisionSlug - Optional subdivision slug
+ * @returns Array of breadcrumb segments with labels and hrefs
+ */
+export function getTaxonomyBreadcrumbs<T extends DatasetItem>(
+  taxonomy: T[],
+  categorySlug?: string,
+  subcategorySlug?: string,
+  subdivisionSlug?: string,
+): Array<{ label: string; href?: string }> {
+  const breadcrumbs: Array<{ label: string; href?: string }> = [
+    { label: 'Αρχική', href: '/' },
+    { label: 'Υπηρεσίες', href: '/services' },
+  ];
+
+  if (!categorySlug) {
+    return breadcrumbs;
+  }
+
+  const taxonomyContext = findTaxonomyBySlugInContext(
+    taxonomy,
+    categorySlug,
+    subcategorySlug,
+    subdivisionSlug,
+  );
+
+  if (!taxonomyContext) {
+    return breadcrumbs;
+  }
+
+  // Add category breadcrumb
+  if (taxonomyContext.category) {
+    breadcrumbs.push({
+      label: taxonomyContext.category.label || taxonomyContext.category.name || '',
+      href: subdivisionSlug || subcategorySlug ? `/services/${categorySlug}` : undefined,
+    });
+  }
+
+  // Add subcategory breadcrumb
+  if (taxonomyContext.subcategory) {
+    breadcrumbs.push({
+      label: taxonomyContext.subcategory.label || taxonomyContext.subcategory.name || '',
+      href: subdivisionSlug ? `/services/${categorySlug}/${subcategorySlug}` : undefined,
+    });
+  }
+
+  // Add subdivision breadcrumb
+  if (taxonomyContext.subdivision) {
+    breadcrumbs.push({
+      label: taxonomyContext.subdivision.label || taxonomyContext.subdivision.name || '',
+    });
+  }
+
+  return breadcrumbs;
+}
+

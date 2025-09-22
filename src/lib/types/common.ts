@@ -83,5 +83,33 @@ export function isValidSubscriptionType(value: unknown): value is SubscriptionTy
   return Object.values(SubscriptionType).includes(value as SubscriptionType);
 }
 
+/**
+ * Archive sort options for service and profile listings
+ */
+export type ArchiveSortBy =
+  | 'default'
+  | 'recent'
+  | 'oldest'
+  | 'price_asc'
+  | 'price_desc'
+  | 'rating_high'
+  | 'rating_low';
+
+/**
+ * Type guard to check if a value is a valid ArchiveSortBy
+ */
+export function isValidArchiveSortBy(value: unknown): value is ArchiveSortBy {
+  const validSortOptions: ArchiveSortBy[] = [
+    'default',
+    'recent',
+    'oldest',
+    'price_asc',
+    'price_desc',
+    'rating_high',
+    'rating_low',
+  ];
+  return validSortOptions.includes(value as ArchiveSortBy);
+}
+
 // Re-export Prisma-generated enums for convenience
 export { SubscriptionType, Status };

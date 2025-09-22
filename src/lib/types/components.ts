@@ -229,7 +229,7 @@ export interface ProfileBreadcrumbProps {
 // Service Card Component Types
 export type ServiceCardData = Pick<
   import('@prisma/client').Service,
-  'id' | 'title' | 'category' | 'price' | 'rating' | 'reviewCount' | 'slug'
+  'id' | 'title' | 'category' | 'price' | 'rating' | 'reviewCount' | 'slug' | 'type'
 > & {
   media: PrismaJson.Media;
   profile: Pick<
@@ -257,3 +257,27 @@ export type ProfileCardData = Pick<
 export interface ProfileCardProps {
   profile: ProfileCardData;
 }
+
+// Archive Component Types for Archives Feature
+
+// Archive Profile Card Component Types
+export type ArchiveProfileCardData = Pick<
+  import('@prisma/client').Profile,
+  'id' | 'username' | 'displayName' | 'rating' | 'reviewCount' | 'verified' | 'featured' | 'top' | 'rate' | 'coverage'
+> & Pick<
+  import('@prisma/client').User,
+  'role'
+>;
+
+// Archive Service Card Component Types
+export type ArchiveServiceCardData = Pick<
+  import('@prisma/client').Service,
+  'id' | 'title' | 'slug' | 'price' | 'rating' | 'reviewCount' | 'media' | 'type'
+> & {
+  categoryLabels: {
+    category: string;
+    subcategory: string;
+    subdivision: string;
+  };
+  profile: Pick<import('@prisma/client').Profile, 'id' | 'displayName' | 'username' | 'image' | 'coverage' | 'verified' | 'top'>;
+};
