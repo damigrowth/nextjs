@@ -188,7 +188,7 @@ export default function ServiceDetailsStep() {
           Κατηγορία Υπηρεσίας*
         </label>
         <p className='text-sm text-gray-600'>
-          Επιλέξτε την κατηγορία, υποκατηγορία και υποδιαίρεση της υπηρεσίας
+          Επιλέξτε τις κατηγορίες της υπηρεσίας
         </p>
         <TaxonomySelector
           taxonomies={serviceTaxonomies}
@@ -386,7 +386,6 @@ export default function ServiceDetailsStep() {
           )}
         />
       )}
-
     </div>
   );
 }

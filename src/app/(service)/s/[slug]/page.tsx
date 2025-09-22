@@ -31,13 +31,13 @@ export async function generateStaticParams() {
   const services = await prisma.service.findMany({
     where: {
       status: 'published',
-      slug: { not: null } // Ensure slug exists
+      slug: { not: null }, // Ensure slug exists
     },
-    select: { slug: true }
+    select: { slug: true },
   });
 
-  return services.map(service => ({
-    slug: service.slug!
+  return services.map((service) => ({
+    slug: service.slug!,
   }));
 }
 

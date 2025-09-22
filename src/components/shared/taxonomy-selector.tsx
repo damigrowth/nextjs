@@ -43,6 +43,7 @@ interface TaxonomySelectorProps {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  textSize?: 'sm' | 'xs' | 'default';
 }
 
 export default function TaxonomySelector({
@@ -52,6 +53,7 @@ export default function TaxonomySelector({
   placeholder = 'Επιλέξτε κατηγορία...',
   disabled = false,
   className,
+  textSize = 'default',
 }: TaxonomySelectorProps) {
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState('');
@@ -63,7 +65,7 @@ export default function TaxonomySelector({
   const [selectedSubcategory, setSelectedSubcategory] =
     React.useState<DatasetItem | null>(null);
 
-  // Initialize selected items from value
+  // Initialize selected items from value and set appropriate level
   React.useEffect(() => {
     if (value?.category) {
       const category = taxonomies.find((cat) => cat.id === value.category);
@@ -74,10 +76,24 @@ export default function TaxonomySelector({
           (sub) => sub.id === value.subcategory,
         );
         setSelectedSubcategory(subcategory || null);
+
+        if (value.subdivision && subcategory) {
+          // We have a subdivision selected, so we're at subdivision level
+          setCurrentLevel('subdivision');
+        } else {
+          // We have a subcategory but no subdivision, so we're at subcategory level
+          setCurrentLevel('subcategory');
+        }
+      } else {
+        // We have a category but no subcategory, so we're at category level
+        setSelectedSubcategory(null);
+        setCurrentLevel('category');
       }
     } else {
+      // No selection, start at category level
       setSelectedCategory(null);
       setSelectedSubcategory(null);
+      setCurrentLevel('category');
     }
   }, [value, taxonomies]);
 
@@ -203,6 +219,30 @@ export default function TaxonomySelector({
     }
   };
 
+  const getTextSizeClasses = () => {
+    switch (textSize) {
+      case 'xs':
+        return 'text-xs';
+      case 'sm':
+        return 'text-sm';
+      case 'default':
+      default:
+        return '';
+    }
+  };
+
+  const isCurrentlySelected = (item: DatasetItem) => {
+    if (currentLevel === 'category') {
+      return value?.category === item.id;
+    } else if (currentLevel === 'subcategory') {
+      return value?.subcategory === item.id;
+    } else if (currentLevel === 'subdivision') {
+      return value?.subdivision === item.id;
+    }
+    return false;
+  };
+
+
   return (
     <div className={cn('relative', className)}>
       <div className='relative'>
@@ -217,7 +257,7 @@ export default function TaxonomySelector({
               <div className='flex flex-wrap gap-1 flex-1 pr-8'>
                 {value && value.category ? (
                   <div className='flex flex-wrap gap-1 items-center'>
-                    <Badge variant='default' className='hover:bg-primary/90'>
+                    <Badge variant='default' className={cn('hover:bg-primary/90', getTextSizeClasses())}>
                       {value.categoryLabel}
                     </Badge>
                     {value.subcategoryLabel && (
@@ -225,7 +265,7 @@ export default function TaxonomySelector({
                         <ChevronRight className='h-3 w-3 text-muted-foreground' />
                         <Badge
                           variant='default'
-                          className='hover:bg-primary/90'
+                          className={cn('hover:bg-primary/90', getTextSizeClasses())}
                         >
                           {value.subcategoryLabel}
                         </Badge>
@@ -236,7 +276,7 @@ export default function TaxonomySelector({
                         <ChevronRight className='h-3 w-3 text-muted-foreground' />
                         <Badge
                           variant='default'
-                          className='hover:bg-primary/90'
+                          className={cn('hover:bg-primary/90', getTextSizeClasses())}
                         >
                           {value.subdivisionLabel}
                         </Badge>
@@ -278,23 +318,34 @@ export default function TaxonomySelector({
               <CommandList>
                 <CommandEmpty>Δεν βρέθηκαν αποτελέσματα.</CommandEmpty>
                 <CommandGroup>
-                  {filteredItems.map((item) => (
-                    <CommandItem
-                      key={item.id}
-                      value={item.label}
-                      onSelect={() => handleSelect(item)}
-                      className='flex items-center justify-between cursor-pointer'
-                    >
-                      <div className='flex items-center gap-2'>
-                        <span>{item.label}</span>
-                      </div>
-                      {item.children && item.children.length > 0 && (
-                        <span className='text-muted-foreground text-xs'>
-                          {item.children.length} επιλογές
-                        </span>
-                      )}
-                    </CommandItem>
-                  ))}
+                  {filteredItems.map((item) => {
+                    const isSelected = isCurrentlySelected(item);
+                    return (
+                      <CommandItem
+                        key={item.id}
+                        value={item.label}
+                        onSelect={() => handleSelect(item)}
+                        className={cn(
+                          'flex items-center justify-between cursor-pointer',
+                          isSelected
+                            ? 'bg-primary text-primary-foreground data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground'
+                            : 'hover:bg-accent hover:text-accent-foreground'
+                        )}
+                      >
+                        <div className='flex items-center gap-2'>
+                          <span>{item.label}</span>
+                        </div>
+                        {item.children && item.children.length > 0 && (
+                          <span className={cn(
+                            'text-xs',
+                            isSelected ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                          )}>
+                            {item.children.length} επιλογές
+                          </span>
+                        )}
+                      </CommandItem>
+                    );
+                  })}
                 </CommandGroup>
               </CommandList>
             </Command>
