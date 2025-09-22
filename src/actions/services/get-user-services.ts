@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-import { findById } from '@/lib/utils/datasets';
+import { findById, resolveTaxonomyHierarchy } from '@/lib/utils/datasets';
 import type { ActionResult } from '@/lib/types/api';
 import type { Prisma, Status } from '@prisma/client';
 
@@ -16,13 +16,12 @@ import type {
 
 // Transform service for table display
 function transformServiceForTable(service: any): UserServiceTableData {
-  // Find category labels from taxonomies
-  const categoryTaxonomy = findById(serviceTaxonomies, service.category);
-  const subcategoryTaxonomy = categoryTaxonomy?.children?.find(
-    (sub: any) => sub.id === service.subcategory,
-  );
-  const subdivisionTaxonomy = subcategoryTaxonomy?.children?.find(
-    (div: any) => div.id === service.subdivision,
+  // Resolve category labels using the reusable utility
+  const categoryLabels = resolveTaxonomyHierarchy(
+    serviceTaxonomies,
+    service.category,
+    service.subcategory,
+    service.subdivision,
   );
 
   return {
@@ -33,11 +32,7 @@ function transformServiceForTable(service: any): UserServiceTableData {
     category: service.category,
     subcategory: service.subcategory,
     subdivision: service.subdivision,
-    categoryLabels: {
-      category: categoryTaxonomy?.label || service.category,
-      subcategory: subcategoryTaxonomy?.label || service.subcategory,
-      subdivision: subdivisionTaxonomy?.label || service.subdivision,
-    },
+    categoryLabels,
     media: service.media,
     createdAt: service.createdAt,
     updatedAt: service.updatedAt,

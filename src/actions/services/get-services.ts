@@ -1,15 +1,55 @@
 'use server';
 
+import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-import { findById } from '@/lib/utils/datasets';
+import {
+  findById,
+  transformCoverageWithLocationNames,
+  getLocationNameInContext,
+  resolveTaxonomyHierarchy,
+  findLocationBySlugOrName,
+  findBySlug,
+  getTaxonomyBreadcrumbs,
+  findTaxonomyBySlugInContext,
+} from '@/lib/utils/datasets';
+import { locationOptions } from '@/constants/datasets/locations';
+import type { DatasetItem } from '@/lib/types/datasets';
+import { isValidArchiveSortBy } from '@/lib/types/common';
 import type { ActionResult } from '@/lib/types/api';
-import type { ServiceCardData } from '@/lib/types/components';
+import type {
+  ServiceCardData,
+  ArchiveServiceCardData,
+} from '@/lib/types/components';
 import type {
   ServiceWithProfile,
   ServicePaginationResponse,
 } from '@/lib/types/services';
-import { Prisma } from '@prisma/client';
+import type { ArchiveSortBy } from '@/lib/types/common';
+import { Prisma, Service, Profile } from '@prisma/client';
+
+// Filter types for service archives
+export type ServiceFilters = Partial<
+  Pick<Service, 'category' | 'subcategory' | 'subdivision' | 'status'>
+> & {
+  county?: string; // Single county selection for coverage filtering (from profile.coverage.county or profile.coverage.counties)
+  online?: boolean; // Service.type.online (JSON field)
+  page?: number;
+  limit?: number;
+  sortBy?: ArchiveSortBy;
+};
+
+// Helper function to resolve category labels using the reusable utility
+function resolveCategoryLabels(
+  service: Pick<Service, 'category' | 'subcategory' | 'subdivision'>,
+) {
+  return resolveTaxonomyHierarchy(
+    serviceTaxonomies,
+    service.category,
+    service.subcategory,
+    service.subdivision,
+  );
+}
 
 // Transform service to component-ready format
 function transformServiceForComponent(
@@ -27,6 +67,7 @@ function transformServiceForComponent(
     rating: service.rating,
     reviewCount: service.reviewCount,
     media: service.media, // Use media directly from Prisma JSON type
+    type: service.type, // Service type JSON object
     profile: {
       id: service.profile.id,
       displayName: service.profile.displayName,
@@ -129,7 +170,7 @@ export async function getFeaturedServices(): Promise<
         where: {
           status: 'published',
           id: {
-            notIn: services.map(s => s.id), // Exclude already fetched services
+            notIn: services.map((s) => s.id), // Exclude already fetched services
           },
           // Only require media for final fallback
           NOT: {
@@ -169,12 +210,14 @@ export async function getFeaturedServices(): Promise<
 
     // Group services for each main category
     mainCategories.slice(1).forEach((category) => {
-      servicesByCategory[category.id] = transformedServices.filter((service) => {
-        const serviceCat = serviceTaxonomies.find(
-          (cat) => cat.label === service.category,
-        );
-        return serviceCat?.id === category.id;
-      });
+      servicesByCategory[category.id] = transformedServices.filter(
+        (service) => {
+          const serviceCat = serviceTaxonomies.find(
+            (cat) => cat.label === service.category,
+          );
+          return serviceCat?.id === category.id;
+        },
+      );
     });
 
     return {
@@ -278,277 +321,690 @@ export async function getServicesWithPagination(options?: {
   }
 }
 
-// // Get user's own services
-// export async function getMyServices(): Promise<
-//   ActionResult<ServiceWithDetails[]>
-// > {
-//   try {
-//     // Check authentication
-//     const session = await auth.api.getSession({
-//       headers: await headers(),
-//     });
+/**
+ * Get services by filters with coverage filtering
+ */
+export async function getServicesByFilters(filters: ServiceFilters): Promise<
+  ActionResult<{
+    services: ArchiveServiceCardData[];
+    total: number;
+    hasMore: boolean;
+  }>
+> {
+  try {
+    const page = filters.page || 1;
+    const limit = filters.limit || 20;
+    const offset = (page - 1) * limit;
 
-//     if (!session?.user) {
-//       return { success: false, error: 'Authentication required' };
-//     }
+    // Build where clause
+    const whereClause: any = {
+      status: filters.status || 'published',
+    };
 
-//     // Get user profile
-//     const profile = await prisma.profile.findUnique({
-//       where: { uid: session.user.id },
-//     });
+    // Add category filters
+    if (filters.category) {
+      whereClause.category = filters.category;
+    }
+    if (filters.subcategory) {
+      whereClause.subcategory = filters.subcategory;
+    }
+    if (filters.subdivision) {
+      whereClause.subdivision = filters.subdivision;
+    }
 
-//     if (!profile) {
-//       return { success: false, error: 'Profile not found' };
-//     }
+    // Handle combined online and county filters
+    if (filters.online !== undefined && filters.county) {
+      // Both online and county filters: show online services OR county-based services
+      const countyOption = findLocationBySlugOrName(
+        locationOptions,
+        filters.county,
+      );
+      const countyId = countyOption?.id;
 
-//     // Get user's services
-//     const services = await prisma.service.findMany({
-//       where: { pid: profile.id },
-//       include: {
-//         profile: {
-//           select: {
-//             id: true,
-//             username: true,
-//             displayName: true,
-//             firstName: true,
-//             lastName: true,
-//             rating: true,
-//             reviewCount: true,
-//             verified: true,
-//             image: {
-//               select: {
-//                 url: true,
-//                 alt: true,
-//               },
-//             },
-//           },
-//         },
-//         media: {
-//           select: {
-//             id: true,
-//             url: true,
-//             alt: true,
-//           },
-//         },
-//       },
-//       orderBy: { updatedAt: 'desc' },
-//     });
+      if (countyId) {
+        whereClause.OR = [
+          // Online services
+          {
+            type: {
+              path: ['online'],
+              equals: true,
+            },
+          },
+          // County-based services (onbase OR onsite) - check both county and counties array
+          {
+            AND: [
+              {
+                OR: [
+                  // Single county match
+                  {
+                    profile: {
+                      coverage: {
+                        path: ['county'],
+                        equals: countyId,
+                      },
+                    },
+                  },
+                  // Counties array match
+                  {
+                    profile: {
+                      coverage: {
+                        path: ['counties'],
+                        array_contains: countyId,
+                      },
+                    },
+                  },
+                ],
+              },
+              {
+                OR: [
+                  {
+                    type: {
+                      path: ['onbase'],
+                      equals: true,
+                    },
+                  },
+                  {
+                    type: {
+                      path: ['onsite'],
+                      equals: true,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ];
+      }
+    } else if (filters.online !== undefined) {
+      // Only online filter
+      whereClause.type = {
+        path: ['online'],
+        equals: filters.online,
+      };
+    } else if (filters.county) {
+      // Only county filter - support both slugs and names
+      const countyOption = findLocationBySlugOrName(
+        locationOptions,
+        filters.county,
+      );
+      const countyId = countyOption?.id;
 
-//     return {
-//       success: true,
-//       data: services,
-//     };
-//   } catch (error) {
-//     console.error('Get my services error:', error);
-//     return {
-//       success: false,
-//       error: 'Failed to fetch services',
-//     };
-//   }
-// }
+      if (countyId) {
+        whereClause.AND = [
+          {
+            OR: [
+              // Single county match
+              {
+                profile: {
+                  coverage: {
+                    path: ['county'],
+                    equals: countyId,
+                  },
+                },
+              },
+              // Counties array match
+              {
+                profile: {
+                  coverage: {
+                    path: ['counties'],
+                    array_contains: countyId,
+                  },
+                },
+              },
+            ],
+          },
+          {
+            OR: [
+              {
+                type: {
+                  path: ['onbase'],
+                  equals: true,
+                },
+              },
+              {
+                type: {
+                  path: ['onsite'],
+                  equals: true,
+                },
+              },
+            ],
+          },
+        ];
+      }
+    }
 
-// // Get published services (public)
-// export async function getPublishedServices(options?: {
-//   category?: string;
-//   search?: string;
-//   limit?: number;
-//   offset?: number;
-//   featured?: boolean;
-// }): Promise<ActionResult<{ services: ServiceWithDetails[]; total: number }>> {
-//   try {
-//     const {
-//       category,
-//       search,
-//       limit = 12,
-//       offset = 0,
-//       featured,
-//     } = options || {};
+    // Build order by clause based on sortBy
+    let orderBy: any[] = [];
+    switch (filters.sortBy) {
+      case 'recent':
+        orderBy = [{ updatedAt: 'desc' }];
+        break;
+      case 'oldest':
+        orderBy = [{ updatedAt: 'asc' }];
+        break;
+      case 'price_asc':
+        orderBy = [{ price: 'asc' }];
+        break;
+      case 'price_desc':
+        orderBy = [{ price: 'desc' }];
+        break;
+      case 'rating_high':
+        orderBy = [{ rating: 'desc' }, { reviewCount: 'desc' }];
+        break;
+      case 'rating_low':
+        orderBy = [{ rating: 'asc' }, { reviewCount: 'asc' }];
+        break;
+      case 'default':
+      default:
+        // Default sort: featured first, then by rating and date, with media nulls last
+        orderBy = [
+          { featured: 'desc' },
+          { rating: 'desc' },
+          { reviewCount: 'desc' },
+          {
+            media: {
+              sort: 'desc',
+              nulls: 'last',
+            },
+          },
+          { updatedAt: 'desc' },
+        ];
+        break;
+    }
 
-//     // Build where clause
-//     const where: any = {
-//       published: true,
-//     };
+    // Execute queries in parallel
+    const [services, total] = await Promise.all([
+      prisma.service.findMany({
+        where: whereClause,
+        include: {
+          profile: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              image: true,
+              coverage: true,
+              verified: true,
+              top: true,
+            },
+          },
+        },
+        orderBy,
+        skip: offset,
+        take: limit,
+      }),
+      prisma.service.count({
+        where: whereClause,
+      }),
+    ]);
 
-//     if (category) {
-//       where.category = category;
-//     }
+    // Transform services to archive card data
+    const transformedServices: ArchiveServiceCardData[] = services.map(
+      (service) => ({
+        id: service.id,
+        title: service.title,
+        slug: service.slug,
+        price: service.price,
+        rating: service.rating,
+        reviewCount: service.reviewCount,
+        media: service.media,
+        type: service.type,
+        categoryLabels: resolveCategoryLabels(service),
+        profile: {
+          id: service.profile.id,
+          displayName: service.profile.displayName,
+          username: service.profile.username,
+          image: service.profile.image,
+          coverage: transformCoverageWithLocationNames(
+            service.profile.coverage,
+            locationOptions,
+          ),
+          verified: service.profile.verified,
+          top: service.profile.top,
+        },
+      }),
+    );
 
-//     if (featured !== undefined) {
-//       where.featured = featured;
-//     }
+    const hasMore = total > offset + limit;
 
-//     if (search) {
-//       where.OR = [
-//         { title: { contains: search, mode: 'insensitive' } },
-//         { description: { contains: search, mode: 'insensitive' } },
-//         { tags: { contains: search, mode: 'insensitive' } },
-//       ];
-//     }
+    return {
+      success: true,
+      data: {
+        services: transformedServices,
+        total,
+        hasMore,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching services:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch services',
+    };
+  }
+}
 
-//     // Get services with count
-//     const [services, total] = await Promise.all([
-//       prisma.service.findMany({
-//         where,
-//         include: {
-//           profile: {
-//             select: {
-//               id: true,
-//               username: true,
-//               displayName: true,
-//               firstName: true,
-//               lastName: true,
-//               rating: true,
-//               reviewCount: true,
-//               verified: true,
-//               image: {
-//                 select: {
-//                   url: true,
-//                   alt: true,
-//                 },
-//               },
-//             },
-//           },
-//           media: {
-//             select: {
-//               id: true,
-//               url: true,
-//               alt: true,
-//             },
-//             take: 3, // Limit media per service for performance
-//           },
-//         },
-//         orderBy: [
-//           { featured: 'desc' },
-//           { rating: 'desc' },
-//           { updatedAt: 'desc' },
-//         ],
-//         take: limit,
-//         skip: offset,
-//       }),
-//       prisma.service.count({ where }),
-//     ]);
+/**
+ * Get total count of services matching filters (cached)
+ */
+export async function getServicesCount(
+  filters: ServiceFilters,
+): Promise<ActionResult<number>> {
+  try {
+    const getCachedCount = unstable_cache(
+      async () => {
+        const whereClause: any = {
+          status: filters.status || 'published',
+        };
 
-//     return {
-//       success: true,
-//       data: { services, total },
-//     };
-//   } catch (error) {
-//     console.error('Get published services error:', error);
-//     return {
-//       success: false,
-//       error: 'Failed to fetch services',
-//     };
-//   }
-// }
+        if (filters.category) {
+          whereClause.category = filters.category;
+        }
+        if (filters.subcategory) {
+          whereClause.subcategory = filters.subcategory;
+        }
+        if (filters.subdivision) {
+          whereClause.subdivision = filters.subdivision;
+        }
 
-// // Get single service by ID
-// export async function getService(
-//   serviceId: string,
-// ): Promise<ActionResult<ServiceWithDetails>> {
-//   try {
-//     const service = await prisma.service.findUnique({
-//       where: { id: serviceId },
-//       include: {
-//         profile: {
-//           select: {
-//             id: true,
-//             username: true,
-//             displayName: true,
-//             firstName: true,
-//             lastName: true,
-//             rating: true,
-//             reviewCount: true,
-//             verified: true,
-//             image: {
-//               select: {
-//                 url: true,
-//                 alt: true,
-//               },
-//             },
-//           },
-//         },
-//         media: {
-//           select: {
-//             id: true,
-//             url: true,
-//             alt: true,
-//           },
-//         },
-//       },
-//     });
+        return await prisma.service.count({
+          where: whereClause,
+        });
+      },
+      [`services-count-${JSON.stringify(filters)}`],
+      {
+        tags: ['services', 'services-count'],
+        revalidate: 300, // 5 minutes cache
+      },
+    );
 
-//     if (!service || !service.published) {
-//       return { success: false, error: 'Service not found' };
-//     }
+    const count = await getCachedCount();
 
-//     return {
-//       success: true,
-//       data: service,
-//     };
-//   } catch (error) {
-//     console.error('Get service error:', error);
-//     return {
-//       success: false,
-//       error: 'Failed to fetch service',
-//     };
-//   }
-// }
+    return {
+      success: true,
+      data: count,
+    };
+  } catch (error) {
+    console.error('Error counting services:', error);
+    return {
+      success: false,
+      error: 'Failed to count services',
+    };
+  }
+}
 
-// // Get services by profile username
-// export async function getServicesByProfile(
-//   username: string,
-// ): Promise<ActionResult<ServiceWithDetails[]>> {
-//   try {
-//     const services = await prisma.service.findMany({
-//       where: {
-//         published: true,
-//         profile: {
-//           username: username,
-//         },
-//       },
-//       include: {
-//         profile: {
-//           select: {
-//             id: true,
-//             username: true,
-//             displayName: true,
-//             firstName: true,
-//             lastName: true,
-//             rating: true,
-//             reviewCount: true,
-//             verified: true,
-//             image: {
-//               select: {
-//                 url: true,
-//                 alt: true,
-//               },
-//             },
-//           },
-//         },
-//         media: {
-//           select: {
-//             id: true,
-//             url: true,
-//             alt: true,
-//           },
-//         },
-//       },
-//       orderBy: [
-//         { featured: 'desc' },
-//         { rating: 'desc' },
-//         { updatedAt: 'desc' },
-//       ],
-//     });
+/**
+ * Get all unique service taxonomy paths (category/subcategory/subdivision) for static generation
+ * Returns slug combinations that are actually used by published services
+ */
+export async function getServiceTaxonomyPaths(): Promise<
+  ActionResult<
+    Array<{
+      category?: string;
+      subcategory?: string;
+      subdivision?: string;
+    }>
+  >
+> {
+  try {
+    const getCachedPaths = unstable_cache(
+      async () => {
+        // Get all unique combinations of category, subcategory, and subdivision
+        const taxonomyGroups = await prisma.service.groupBy({
+          by: ['category', 'subcategory', 'subdivision'],
+          where: {
+            status: 'published',
+          },
+          _count: {
+            _all: true,
+          },
+        });
 
-//     return {
-//       success: true,
-//       data: services,
-//     };
-//   } catch (error) {
-//     console.error('Get services by profile error:', error);
-//     return {
-//       success: false,
-//       error: 'Failed to fetch services',
-//     };
-//   }
-// }
+        // Sort by count (most popular first)
+        const sortedGroups = taxonomyGroups.sort(
+          (a, b) => b._count._all - a._count._all,
+        );
+
+        // Convert IDs to slugs using the taxonomy data
+        const paths: Array<{
+          category?: string;
+          subcategory?: string;
+          subdivision?: string;
+          count: number;
+        }> = [];
+
+        for (const group of sortedGroups) {
+          const categoryData = group.category
+            ? findById(serviceTaxonomies, group.category)
+            : null;
+
+          if (!categoryData) continue; // Skip if category not found
+
+          let subcategoryData = null;
+          let subdivisionData = null;
+
+          // Find subcategory within the category's children
+          if (group.subcategory && categoryData.children) {
+            subcategoryData = findById(
+              categoryData.children,
+              group.subcategory,
+            );
+          }
+
+          // Find subdivision within the subcategory's children
+          if (group.subdivision && subcategoryData?.children) {
+            subdivisionData = findById(
+              subcategoryData.children,
+              group.subdivision,
+            );
+          }
+
+          // Add the path with slugs
+          paths.push({
+            category: categoryData.slug,
+            subcategory: subcategoryData?.slug,
+            subdivision: subdivisionData?.slug,
+            count: group._count._all,
+          });
+        }
+
+        // Sort by count (most popular first) and remove count from final result
+        return paths
+          .sort((a, b) => b.count - a.count)
+          .map(({ count, ...path }) => path);
+      },
+      ['service-taxonomy-paths'],
+      {
+        tags: ['services', 'categories', 'taxonomy-paths'],
+        revalidate: 3600, // 1 hour cache
+      },
+    );
+
+    const paths = await getCachedPaths();
+
+    return {
+      success: true,
+      data: paths,
+    };
+  } catch (error) {
+    console.error('Error fetching service taxonomy paths:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch service taxonomy paths',
+    };
+  }
+}
+
+/**
+ * Comprehensive service archive page data fetcher
+ * Handles main services page, category, subcategory, and subdivision pages with all transformations
+ */
+export async function getServiceArchivePageData(params: {
+  categorySlug?: string; // Optional for main services page
+  subcategorySlug?: string;
+  subdivisionSlug?: string;
+  searchParams: {
+    county?: string;
+    περιοχή?: string;
+    online?: string;
+    sortBy?: string;
+    page?: string;
+  };
+}): Promise<ActionResult<{
+  services: ArchiveServiceCardData[];
+  total: number;
+  hasMore: boolean;
+  taxonomyData: {
+    categories: DatasetItem[];
+    currentCategory?: DatasetItem;
+    currentSubcategory?: DatasetItem;
+    currentSubdivision?: DatasetItem;
+    subcategories?: DatasetItem[];
+    subdivisions?: DatasetItem[];
+  };
+  breadcrumbData: {
+    segments: Array<{
+      label: string;
+      href?: string;
+    }>;
+  };
+  counties: Array<{
+    id: string;
+    label: string;
+    name: string;
+    slug: string;
+  }>;
+  filters: ServiceFilters;
+}>> {
+  try {
+    const { categorySlug, subcategorySlug, subdivisionSlug, searchParams } = params;
+
+    // Find taxonomy items by slugs
+    let taxonomyContext: {
+      category?: DatasetItem;
+      subcategory?: DatasetItem;
+      subdivision?: DatasetItem;
+    } = {};
+
+    if (categorySlug) {
+      if (subdivisionSlug && subcategorySlug) {
+        // Subdivision page
+        taxonomyContext = findTaxonomyBySlugInContext(
+          serviceTaxonomies,
+          categorySlug,
+          subcategorySlug,
+          subdivisionSlug
+        ) || {};
+      } else if (subcategorySlug) {
+        // Subcategory page
+        taxonomyContext = findTaxonomyBySlugInContext(
+          serviceTaxonomies,
+          categorySlug,
+          subcategorySlug
+        ) || {};
+      } else {
+        // Category page
+        const category = findBySlug(serviceTaxonomies, categorySlug);
+        if (category) {
+          taxonomyContext = { category };
+        }
+      }
+
+      // Validate that required taxonomy items were found
+      if (!taxonomyContext.category) {
+        return {
+          success: false,
+          error: 'Category not found',
+        };
+      }
+      if (subcategorySlug && !taxonomyContext.subcategory) {
+        return {
+          success: false,
+          error: 'Subcategory not found',
+        };
+      }
+      if (subdivisionSlug && !taxonomyContext.subdivision) {
+        return {
+          success: false,
+          error: 'Subdivision not found',
+        };
+      }
+    }
+    // If no categorySlug, this is the main services page, taxonomyContext remains empty
+
+    const { category, subcategory, subdivision } = taxonomyContext;
+
+    // Validate pagination and filters
+    const page = parseInt(searchParams.page || '1');
+    const limit = 20;
+
+    // Validate sortBy parameter using the existing validation function
+    const sortBy = searchParams.sortBy && isValidArchiveSortBy(searchParams.sortBy)
+      ? searchParams.sortBy
+      : 'default';
+
+    // Build filters from search params and route params
+    const filters: ServiceFilters = {
+      status: 'published',
+      ...(category && { category: category.id }),
+      ...(subcategory && { subcategory: subcategory.id }),
+      ...(subdivision && { subdivision: subdivision.id }),
+      county: searchParams.county || searchParams.περιοχή,
+      online: (searchParams.online === 'true' || searchParams.online === '') ? true : undefined,
+      sortBy,
+      page,
+      limit,
+    };
+
+    // Fetch services and taxonomy paths in parallel
+    const [servicesResult, taxonomyPathsResult] = await Promise.all([
+      getServicesByFilters(filters),
+      getServiceTaxonomyPaths()
+    ]);
+
+    if (!servicesResult.success) {
+      return {
+        success: false,
+        error: 'Failed to fetch services',
+      };
+    }
+
+    const { services, total, hasMore } = servicesResult.data;
+
+    // Prepare county options
+    const counties = locationOptions.map(location => ({
+      id: location.id,
+      label: location.name,
+      name: location.name,
+      slug: location.slug,
+    }));
+
+    // Generate breadcrumbs
+    const breadcrumbData = {
+      segments: categorySlug
+        ? getTaxonomyBreadcrumbs(
+            serviceTaxonomies,
+            categorySlug,
+            subcategorySlug,
+            subdivisionSlug
+          )
+        : [{ label: 'Αρχική', href: '/' }, { label: 'Υπηρεσίες' }] // Main services page breadcrumbs
+    };
+
+    // Get filtered subcategories and subdivisions based on available services
+    // Only return taxonomies that have actual services - no fallbacks
+    let filteredSubcategories: DatasetItem[] | undefined;
+    let filteredSubdivisions: DatasetItem[] | undefined;
+
+    if (taxonomyPathsResult.success && taxonomyPathsResult.data) {
+      const taxonomyPaths = taxonomyPathsResult.data;
+
+      // Always provide filtered subcategories for current category (for navigation)
+      if (category) {
+        const availableSubcategories = new Set<string>();
+        taxonomyPaths
+          .filter(path => path.category === category.slug && path.subcategory)
+          .forEach(path => {
+            if (path.subcategory) {
+              availableSubcategories.add(path.subcategory);
+            }
+          });
+
+        const subcategoriesWithServices = (category.children || [])
+          .filter(subcat => availableSubcategories.has(subcat.slug))
+          .map(subcat => {
+            // For each subcategory, also filter its subdivisions
+            if (subcat.children && subcat.children.length > 0) {
+              const availableSubdivisions = new Set<string>();
+              taxonomyPaths
+                .filter(path =>
+                  path.category === category.slug &&
+                  path.subcategory === subcat.slug &&
+                  path.subdivision
+                )
+                .forEach(path => {
+                  if (path.subdivision) {
+                    availableSubdivisions.add(path.subdivision);
+                  }
+                });
+
+              return {
+                ...subcat,
+                children: subcat.children.filter(subdiv =>
+                  availableSubdivisions.has(subdiv.slug)
+                )
+              };
+            }
+            return subcat;
+          });
+
+        filteredSubcategories = subcategoriesWithServices;
+      }
+
+      // Always provide filtered subdivisions for current subcategory (for navigation)
+      if (subcategory) {
+        const availableSubdivisions = new Set<string>();
+        taxonomyPaths
+          .filter(path =>
+            path.category === category?.slug &&
+            path.subcategory === subcategory.slug &&
+            path.subdivision
+          )
+          .forEach(path => {
+            if (path.subdivision) {
+              availableSubdivisions.add(path.subdivision);
+            }
+          });
+
+        const subdivisionsWithServices = (subcategory.children || [])
+          .filter(subdiv => availableSubdivisions.has(subdiv.slug));
+
+        filteredSubdivisions = subdivisionsWithServices;
+      }
+    }
+
+    // Get available categories that have services for featured categories
+    const availableCategories = new Set<string>();
+    if (taxonomyPathsResult.success && taxonomyPathsResult.data) {
+      taxonomyPathsResult.data.forEach(path => {
+        if (path.category) {
+          availableCategories.add(path.category);
+        }
+      });
+    }
+
+    // Filter categories to only show those with services
+    const categories = serviceTaxonomies
+      .filter(cat => availableCategories.has(cat.slug))
+      .slice(0, 10);
+
+    // Prepare taxonomy data - always include filtered arrays (empty if no matches)
+    const taxonomyData = {
+      categories,
+      currentCategory: category,
+      currentSubcategory: subcategory,
+      currentSubdivision: subdivision,
+      subcategories: filteredSubcategories || [],
+      subdivisions: filteredSubdivisions || [],
+    };
+
+    return {
+      success: true,
+      data: {
+        services,
+        total,
+        hasMore,
+        taxonomyData,
+        breadcrumbData,
+        counties,
+        filters,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching service archive page data:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch service archive page data',
+    };
+  }
+}
