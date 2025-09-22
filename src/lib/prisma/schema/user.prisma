@@ -107,6 +107,8 @@ model Profile {
   @@index([uid])
   @@index([published, featured])
   @@index([verified, rating])
+  @@index([category, subcategory])
+  @@index([published, featured, verified])
   @@map("profiles")
 }
 

@@ -62,5 +62,7 @@ model Service {
   @@index([pid])
   @@index([status, featured])
   @@index([category])
+  @@index([subcategory, subdivision])
+  @@index([price, fixed])
   @@map("services")
 }
