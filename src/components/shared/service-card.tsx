@@ -14,8 +14,13 @@ interface ServiceCardProps {
 
 export default function ServiceCard({
   service,
-  showProfile = true
+  showProfile = true,
 }: ServiceCardProps) {
+  // Service type declarations
+  const serviceType = service.type;
+  const isOnline = serviceType?.online;
+  const isOnbase = serviceType?.onbase;
+  const isOnsite = serviceType?.onsite;
 
   return (
     <Card className='group cursor-pointer overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 rounded-lg bg-white'>
@@ -94,7 +99,9 @@ export default function ServiceCard({
 
                 {/* Price */}
                 {service.price && service.price > 0 && (
-                  <div className={`text-base ${!showProfile ? 'w-full text-right' : ''}`}>
+                  <div
+                    className={`text-base ${!showProfile ? 'w-full text-right' : ''}`}
+                  >
                     <span className='font-normal text-body'>από </span>
                     <span className='font-semibold text-dark'>
                       {service.price}€

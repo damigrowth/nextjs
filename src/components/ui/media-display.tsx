@@ -37,7 +37,7 @@ export default function MediaDisplay({
   };
 
   const togglePlayPause = () => {
-    if (media.length === 0) return;
+    if (!media || media.length === 0) return;
 
     const currentMedia = media[0];
 
