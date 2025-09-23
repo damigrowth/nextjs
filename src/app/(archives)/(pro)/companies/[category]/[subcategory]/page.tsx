@@ -1,15 +1,7 @@
-import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { unstable_cache } from 'next/cache';
-
-import { getProfilesByFilters, getPopularProfileCategories } from '@/actions/profiles/get-profiles';
-import { ArchiveLayout } from '@/components/archives/archive-layout';
-import { ArchiveProfileCard } from '@/components/archives/archive-profile-card';
-import { transformCoverageWithLocationNames } from '@/lib/utils/datasets';
-import { findById, findBySlug } from '@/lib/utils/datasets';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
-import type { ProfileFilters } from '@/actions/profiles/get-profiles';
+import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
+import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -22,65 +14,71 @@ interface CompaniesSubcategoryPageProps {
   }>;
   searchParams: Promise<{
     county?: string;
+    περιοχή?: string; // Greek parameter for county
     online?: string;
     sortBy?: string;
     page?: string;
   }>;
 }
 
-// Generate static params for popular category/subcategory combinations
 export async function generateStaticParams() {
-  // Get popular categories first, then expand with subcategories
-  const getCachedCombinations = unstable_cache(
-    async () => {
-      const categoriesResult = await getPopularProfileCategories();
-      if (!categoriesResult.success) return [];
+  try {
+    // Use the new taxonomy paths function
+    const { getProTaxonomyPaths } = await import(
+      '@/actions/profiles/get-profiles'
+    );
+    const result = await getProTaxonomyPaths('company');
 
-      const combinations: { category: string; subcategory: string }[] = [];
+    if (!result.success || !result.data) {
+      return [];
+    }
 
-      // Generate combinations from taxonomy data
-      proTaxonomies.forEach(category => {
-        if (category.children) {
-          category.children.forEach(subcategory => {
-            combinations.push({
-              category: category.slug,
-              subcategory: subcategory.slug,
-            });
-          });
-        }
-      });
-
-      return combinations.slice(0, 50); // Limit to 50 most popular combinations
-    },
-    ['company-archive-subcategories'],
-    { revalidate: 3600, tags: ['profiles', 'categories', 'subcategories'] }
-  );
-
-  return await getCachedCombinations();
+    // Generate static params for all category/subcategory combinations
+    return result.data
+      .filter((path) => path.category && path.subcategory)
+      .map((path) => ({
+        category: path.category,
+        subcategory: path.subcategory,
+      }));
+  } catch (error) {
+    console.error(
+      'Error generating static params for companies subcategory:',
+      error,
+    );
+    return [];
+  }
 }
 
-// Generate metadata
-export async function generateMetadata({ params }: CompaniesSubcategoryPageProps): Promise<Metadata> {
-  const { category, subcategory } = await params;
+export async function generateMetadata({
+  params,
+}: CompaniesSubcategoryPageProps): Promise<Metadata> {
+  const { category: categorySlug, subcategory: subcategorySlug } = await params;
 
-  const categoryData = findBySlug(proTaxonomies, category);
-  if (!categoryData) {
+  // Get taxonomy data using the server action
+  const result = await getProfileArchivePageData({
+    archiveType: 'companies',
+    categorySlug: categorySlug,
+    subcategorySlug: subcategorySlug,
+    searchParams: {},
+  });
+
+  if (
+    !result.success ||
+    !result.data.taxonomyData.currentCategory ||
+    !result.data.taxonomyData.currentSubcategory
+  ) {
     return {
-      title: 'Category Not Found | Doulitsa',
-      description: 'The requested company category was not found.',
+      title: 'Υποκατηγορία δεν βρέθηκε | Doulitsa',
+      description: 'Η ζητούμενη υποκατηγορία δεν βρέθηκε.',
     };
   }
 
-  const subcategoryData = categoryData.children?.find(sub => sub.slug === subcategory);
-  if (!subcategoryData) {
-    return {
-      title: 'Subcategory Not Found | Doulitsa',
-      description: 'The requested company subcategory was not found.',
-    };
-  }
-
-  const title = `${subcategoryData.name} Companies in ${categoryData.name} | Doulitsa`;
-  const description = `Find verified ${subcategoryData.name.toLowerCase()} companies specializing in ${categoryData.name.toLowerCase()} in Greece. Browse professional services, ratings, and coverage areas.`;
+  const { currentCategory: category, currentSubcategory: subcategory } =
+    result.data.taxonomyData;
+  const title = `${subcategory.label} - ${category.label} | Doulitsa`;
+  const description =
+    subcategory.description ||
+    `Βρείτε τις καλύτερες επιχειρήσεις ${subcategory.label.toLowerCase()} στην κατηγορία ${category.label.toLowerCase()} σε όλη την Ελλάδα.`;
 
   return {
     title,
@@ -89,125 +87,65 @@ export async function generateMetadata({ params }: CompaniesSubcategoryPageProps
       title,
       description,
       type: 'website',
-      url: `/companies/${category}/${subcategory}`,
-    },
-    robots: {
-      index: true,
-      follow: true,
     },
   };
 }
 
-export default async function CompaniesSubcategoryPage({ params, searchParams }: CompaniesSubcategoryPageProps) {
-  const { category, subcategory } = await params;
-  const resolvedSearchParams = await searchParams;
+export default async function CompaniesSubcategoryPage({
+  params,
+  searchParams,
+}: CompaniesSubcategoryPageProps) {
+  const { category: categorySlug, subcategory: subcategorySlug } = await params;
+  const searchParams_ = await searchParams;
 
-  // Validate category and subcategory
-  const categoryData = findBySlug(proTaxonomies, category);
-  if (!categoryData) {
-    notFound();
-  }
-
-  const subcategoryData = categoryData.children?.find(sub => sub.slug === subcategory);
-  if (!subcategoryData) {
-    notFound();
-  }
-
-  // Parse search parameters
-  const filters: ProfileFilters = {
-    category: categoryData.id,
-    subcategory: subcategoryData.id,
-    role: 'company',
-    county: resolvedSearchParams.county,
-    online: resolvedSearchParams.online === 'true',
-    sortBy: resolvedSearchParams.sortBy as ProfileFilters['sortBy'] || 'default',
-    page: parseInt(resolvedSearchParams.page || '1'),
-    limit: 20,
-  };
-
-  // Fetch data with caching
-  const getCachedProfiles = unstable_cache(
-    async (filters: ProfileFilters) => {
-      return await getProfilesByFilters(filters);
-    },
-    [`companies-subcategory-${category}-${subcategory}`],
-    { revalidate: 1800, tags: ['profiles', 'companies', category, subcategory] }
-  );
-
-  const result = await getCachedProfiles(filters);
+  // Use the comprehensive archive function
+  const result = await getProfileArchivePageData({
+    archiveType: 'companies',
+    categorySlug: categorySlug,
+    subcategorySlug: subcategorySlug,
+    searchParams: searchParams_,
+  });
 
   if (!result.success) {
-    throw new Error('Failed to load companies');
+    if (result.error?.includes('not found')) {
+      notFound();
+    }
+    throw new Error(result.error || 'Failed to fetch profiles');
   }
 
-  const { profiles, total, hasMore } = result.data;
-
-  // Transform coverage data for each profile
-  const profilesWithCoverage = profiles.map(profile => ({
-    profile,
-    coverage: transformCoverageWithLocationNames(profile.coverage),
-  }));
-
-  // Prepare taxonomy data
-  const taxonomyData = {
-    featuredCategories: proTaxonomies.slice(0, 8),
-    currentCategory: categoryData,
-    currentSubcategory: subcategoryData,
-  };
-
-  // Prepare breadcrumb data
-  const breadcrumbData = {
-    segments: [
-      { label: 'Home', href: '/' },
-      { label: 'Companies', href: '/companies' },
-      { label: categoryData.name, href: `/companies/${category}` },
-      { label: subcategoryData.name, href: `/companies/${category}/${subcategory}` },
-    ],
-  };
+  const { profiles, total, taxonomyData, breadcrumbData, counties, filters } =
+    result.data;
 
   return (
     <ArchiveLayout
-      archiveType="companies"
-      category={category}
-      subcategory={subcategory}
+      archiveType='companies'
+      category={categorySlug}
+      subcategory={subcategorySlug}
       initialFilters={filters}
       taxonomyData={taxonomyData}
       breadcrumbData={breadcrumbData}
+      counties={counties}
+      basePath={`/companies/${categorySlug}/${subcategorySlug}`}
+      total={total}
+      limit={20}
     >
-      <div className="space-y-6">
-        {/* Results Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {subcategoryData.name} Companies
-            </h1>
-            <p className="text-gray-600 mt-1">
-              Specializing in {categoryData.name} • {total} {total === 1 ? 'company' : 'companies'} found
+      <div className='space-y-6'>
+        {profiles.length === 0 ? (
+          <div className='text-center py-12'>
+            <h3 className='text-lg font-medium text-gray-900 mb-2'>
+              Δεν βρέθηκαν επιχειρήσεις στην υποκατηγορία "
+              {taxonomyData.currentSubcategory?.label}"
+            </h3>
+            <p className='text-gray-600'>
+              Δοκιμάστε να αλλάξετε τα φίλτρα αναζήτησης ή επιλέξτε μια άλλη
+              κατηγορία
             </p>
           </div>
-        </div>
-
-        {/* Results List */}
-        <Suspense fallback={<div className="animate-pulse">Loading companies...</div>}>
-          <div className="space-y-4">
-            {profilesWithCoverage.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-gray-400 text-lg mb-2">No companies found</div>
-                <p className="text-gray-600">
-                  Try adjusting your filters or search in a different subcategory.
-                </p>
-              </div>
-            ) : (
-              profilesWithCoverage.map(({ profile, coverage }) => (
-                <ArchiveProfileCard
-                  key={profile.id}
-                  profile={profile}
-                  coverage={coverage}
-                />
-              ))
-            )}
-          </div>
-        </Suspense>
+        ) : (
+          profiles.map((profile) => (
+            <ArchiveProfileCard key={profile.id} profile={profile} />
+          ))
+        )}
       </div>
     </ArchiveLayout>
   );

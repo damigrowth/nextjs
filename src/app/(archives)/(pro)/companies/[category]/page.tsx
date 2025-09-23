@@ -1,62 +1,80 @@
-import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { unstable_cache } from 'next/cache';
-
-import { getProfilesByFilters, getPopularProfileCategories } from '@/actions/profiles/get-profiles';
-import { ArchiveLayout } from '@/components/archives/archive-layout';
-import { ArchiveProfileCard } from '@/components/archives/archive-profile-card';
-import { transformCoverageWithLocationNames } from '@/lib/utils/datasets';
-import { findById, findBySlug } from '@/lib/utils/datasets';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
-import type { ProfileFilters } from '@/actions/profiles/get-profiles';
+import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
+import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
 export const dynamicParams = true;
 
 interface CompaniesCategoryPageProps {
-  params: Promise<{ category: string }>;
+  params: Promise<{
+    category: string;
+  }>;
   searchParams: Promise<{
     county?: string;
+    περιοχή?: string; // Greek parameter for county
     online?: string;
     sortBy?: string;
     page?: string;
   }>;
 }
 
-// Generate static params for popular categories
 export async function generateStaticParams() {
-  const getCachedCategories = unstable_cache(
-    async () => {
-      const result = await getPopularProfileCategories();
-      return result.success ? result.data : [];
-    },
-    ['company-archive-categories'],
-    { revalidate: 3600, tags: ['profiles', 'categories'] }
-  );
+  try {
+    // Use the new taxonomy paths function
+    const { getProTaxonomyPaths } = await import(
+      '@/actions/profiles/get-profiles'
+    );
+    const result = await getProTaxonomyPaths('company');
 
-  const categories = await getCachedCategories();
+    if (!result.success || !result.data) {
+      return [];
+    }
 
-  return categories.map((category) => ({
-    category: category,
-  }));
+    // Generate static params for all unique categories that have profiles
+    const uniqueCategories = [
+      ...new Set(
+        result.data
+          .filter((path) => path.category)
+          .map((path) => path.category),
+      ),
+    ];
+
+    return uniqueCategories.map((category) => ({
+      category: category,
+    }));
+  } catch (error) {
+    console.error(
+      'Error generating static params for companies category:',
+      error,
+    );
+    return [];
+  }
 }
 
-// Generate metadata
-export async function generateMetadata({ params }: CompaniesCategoryPageProps): Promise<Metadata> {
-  const { category } = await params;
-  const categoryData = findBySlug(proTaxonomies, category);
+export async function generateMetadata({
+  params,
+}: CompaniesCategoryPageProps): Promise<Metadata> {
+  const { category: categorySlug } = await params;
 
-  if (!categoryData) {
+  // Get taxonomy data using the server action
+  const result = await getProfileArchivePageData({
+    archiveType: 'companies',
+    categorySlug: categorySlug,
+    searchParams: {},
+  });
+
+  if (!result.success || !result.data.taxonomyData.currentCategory) {
     return {
-      title: 'Category Not Found | Doulitsa',
-      description: 'The requested company category was not found.',
+      title: 'Κατηγορία δεν βρέθηκε | Doulitsa',
+      description: 'Η ζητούμενη κατηγορία δεν βρέθηκε.',
     };
   }
 
-  const title = `${categoryData.name} Companies | Doulitsa`;
-  const description = `Find verified ${categoryData.name.toLowerCase()} companies in Greece. Browse professional services, ratings, and coverage areas.`;
+  const category = result.data.taxonomyData.currentCategory;
+  const title = `${category.label} - Επιχειρήσεις | Doulitsa`;
+  const description = `Βρείτε τις καλύτερες επιχειρήσεις ${category.label.toLowerCase()} σε όλη την Ελλάδα. Πιστοποιημένες επιχειρήσεις με αξιολογήσεις.`;
 
   return {
     title,
@@ -65,117 +83,63 @@ export async function generateMetadata({ params }: CompaniesCategoryPageProps): 
       title,
       description,
       type: 'website',
-      url: `/companies/${category}`,
-    },
-    robots: {
-      index: true,
-      follow: true,
     },
   };
 }
 
-export default async function CompaniesCategoryPage({ params, searchParams }: CompaniesCategoryPageProps) {
-  const { category } = await params;
-  const resolvedSearchParams = await searchParams;
+export default async function CompaniesCategoryPage({
+  params,
+  searchParams,
+}: CompaniesCategoryPageProps) {
+  const { category: categorySlug } = await params;
+  const searchParams_ = await searchParams;
 
-  // Validate category
-  const categoryData = findBySlug(proTaxonomies, category);
-  if (!categoryData) {
-    notFound();
-  }
-
-  // Parse search parameters
-  const filters: ProfileFilters = {
-    category: categoryData.id,
-    role: 'company',
-    county: resolvedSearchParams.county,
-    online: resolvedSearchParams.online === 'true',
-    sortBy: resolvedSearchParams.sortBy as ProfileFilters['sortBy'] || 'default',
-    page: parseInt(resolvedSearchParams.page || '1'),
-    limit: 20,
-  };
-
-  // Fetch data with caching
-  const getCachedProfiles = unstable_cache(
-    async (filters: ProfileFilters) => {
-      return await getProfilesByFilters(filters);
-    },
-    [`companies-category-${category}`],
-    { revalidate: 1800, tags: ['profiles', 'companies', category] }
-  );
-
-  const result = await getCachedProfiles(filters);
+  // Use the comprehensive archive function
+  const result = await getProfileArchivePageData({
+    archiveType: 'companies',
+    categorySlug: categorySlug,
+    searchParams: searchParams_,
+  });
 
   if (!result.success) {
-    throw new Error('Failed to load companies');
+    if (result.error === 'Category not found') {
+      notFound();
+    }
+    throw new Error(result.error || 'Failed to fetch profiles');
   }
 
-  const { profiles, total, hasMore } = result.data;
-
-  // Transform coverage data for each profile
-  const profilesWithCoverage = profiles.map(profile => ({
-    profile,
-    coverage: transformCoverageWithLocationNames(profile.coverage),
-  }));
-
-  // Prepare taxonomy data
-  const taxonomyData = {
-    featuredCategories: proTaxonomies.slice(0, 8),
-    currentCategory: categoryData,
-    currentSubcategory: undefined,
-  };
-
-  // Prepare breadcrumb data
-  const breadcrumbData = {
-    segments: [
-      { label: 'Home', href: '/' },
-      { label: 'Companies', href: '/companies' },
-      { label: categoryData.name, href: `/companies/${category}` },
-    ],
-  };
+  const { profiles, total, taxonomyData, breadcrumbData, counties, filters } =
+    result.data;
 
   return (
     <ArchiveLayout
-      archiveType="companies"
-      category={category}
+      archiveType='companies'
+      category={categorySlug}
       initialFilters={filters}
       taxonomyData={taxonomyData}
       breadcrumbData={breadcrumbData}
+      counties={counties}
+      basePath={`/companies/${categorySlug}`}
+      total={total}
+      limit={20}
     >
-      <div className="space-y-6">
-        {/* Results Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {categoryData.name} Companies
-            </h1>
-            <p className="text-gray-600 mt-1">
-              {total} {total === 1 ? 'company' : 'companies'} found
+      <div className='space-y-6'>
+        {profiles.length === 0 ? (
+          <div className='text-center py-12'>
+            <h3 className='text-lg font-medium text-gray-900 mb-2'>
+              Δεν βρέθηκαν επιχειρήσεις στην κατηγορία "
+              {taxonomyData.currentCategory?.label}"
+            </h3>
+            <p className='text-gray-600'>
+              Δοκιμάστε να αλλάξετε τα φίλτρα αναζήτησης ή επιλέξτε μια άλλη
+              κατηγορία
             </p>
           </div>
-        </div>
-
-        {/* Results List */}
-        <Suspense fallback={<div className="animate-pulse">Loading companies...</div>}>
-          <div className="space-y-4">
-            {profilesWithCoverage.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-gray-400 text-lg mb-2">No companies found</div>
-                <p className="text-gray-600">
-                  Try adjusting your filters or search in a different category.
-                </p>
-              </div>
-            ) : (
-              profilesWithCoverage.map(({ profile, coverage }) => (
-                <ArchiveProfileCard
-                  key={profile.id}
-                  profile={profile}
-                  coverage={coverage}
-                />
-              ))
-            )}
-          </div>
-        </Suspense>
+        ) : (
+          profiles.map((profile) => (
+            <ArchiveProfileCard key={profile.id} profile={profile} />
+          ))
+        )}
       </div>
     </ArchiveLayout>
   );

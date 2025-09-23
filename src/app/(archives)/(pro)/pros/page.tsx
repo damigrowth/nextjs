@@ -1,11 +1,6 @@
 import { Metadata } from 'next';
-import { Suspense } from 'react';
 import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
-import { getProfilesByFilters, getPopularProfileCategories } from '@/actions/profiles/get-profiles';
-import { transformCoverageWithLocationNames } from '@/lib/utils/datasets';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
-import { locationOptions } from '@/constants/datasets/locations';
-import { findById } from '@/lib/utils/datasets';
+import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -14,6 +9,7 @@ export const dynamicParams = true;
 interface ProsPageProps {
   searchParams: Promise<{
     county?: string;
+    περιοχή?: string; // Greek parameter for county
     online?: string;
     sortBy?: string;
     page?: string;
@@ -21,27 +17,13 @@ interface ProsPageProps {
 }
 
 export async function generateStaticParams() {
-  try {
-    const result = await getPopularProfileCategories();
-
-    if (!result.success || !result.data) {
-      return [];
-    }
-
-    // Generate static params for popular categories
-    return result.data.slice(0, 10).map((categoryId) => {
-      const category = findById(proTaxonomies, categoryId);
-      return {
-        category: category?.slug || categoryId,
-      };
-    });
-  } catch (error) {
-    console.error('Error generating static params:', error);
-    return [];
-  }
+  // Return empty array for the base /pros route (no dynamic params needed)
+  return [];
 }
 
-export async function generateMetadata({ searchParams }: ProsPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  searchParams,
+}: ProsPageProps): Promise<Metadata> {
   const params = await searchParams;
   const filters = {
     role: 'freelancer' as const,
@@ -51,7 +33,8 @@ export async function generateMetadata({ searchParams }: ProsPageProps): Promise
   };
 
   let title = 'Επαγγελματίες | Doulitsa';
-  let description = 'Βρείτε επαγγελματίες σε όλη την Ελλάδα. Ελεύθεροι επαγγελματίες με πιστοποιημένες υπηρεσίες και αξιολογήσεις.';
+  let description =
+    'Βρείτε επαγγελματίες σε όλη την Ελλάδα. Ελεύθεροι επαγγελματίες με πιστοποιημένες υπηρεσίες και αξιολογήσεις.';
 
   if (filters.county) {
     title = `Επαγγελματίες στην ${filters.county} | Doulitsa`;
@@ -60,7 +43,8 @@ export async function generateMetadata({ searchParams }: ProsPageProps): Promise
 
   if (filters.online) {
     title = 'Online Επαγγελματίες | Doulitsa';
-    description = 'Βρείτε επαγγελματίες που προσφέρουν online υπηρεσίες σε όλη την Ελλάδα.';
+    description =
+      'Βρείτε επαγγελματίες που προσφέρουν online υπηρεσίες σε όλη την Ελλάδα.';
   }
 
   return {
@@ -75,78 +59,46 @@ export async function generateMetadata({ searchParams }: ProsPageProps): Promise
 }
 
 export default async function ProsPage({ searchParams }: ProsPageProps) {
-  const params = await searchParams;
-  const page = parseInt(params.page || '1');
-  const limit = 20;
+  const searchParams_ = await searchParams;
 
-  // Build filters from search params
-  const filters = {
-    role: 'freelancer' as const,
-    published: true,
-    county: params.county,
-    online: params.online === 'true' ? true : undefined,
-    sortBy: params.sortBy || 'default',
-    page,
-    limit,
-  };
+  // Use the comprehensive archive function
+  const result = await getProfileArchivePageData({
+    archiveType: 'pros',
+    searchParams: searchParams_,
+  });
 
-  // Fetch profiles
-  const profilesResult = await getProfilesByFilters(filters);
-
-  if (!profilesResult.success) {
-    throw new Error('Failed to fetch profiles');
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to fetch profiles');
   }
 
-  const { profiles, total, hasMore } = profilesResult.data;
-
-  // Get county options for filters (top level counties)
-  const counties = locationOptions.filter(location => !location.parent);
-
-  // Prepare taxonomy data
-  const taxonomyData = {
-    featuredCategories: proTaxonomies.slice(0, 10), // Top 10 categories
-  };
-
-  // Prepare breadcrumb data
-  const breadcrumbData = {
-    segments: [
-      { label: 'Αρχική', href: '/' },
-      { label: 'Επαγγελματίες' }
-    ]
-  };
+  const { profiles, total, taxonomyData, breadcrumbData, counties, filters } =
+    result.data;
 
   return (
     <ArchiveLayout
-      archiveType="pros"
+      archiveType='pros'
       initialFilters={filters}
       taxonomyData={taxonomyData}
       breadcrumbData={breadcrumbData}
       counties={counties}
-      basePath="/pros"
+      basePath='/pros'
       total={total}
-      limit={limit}
+      limit={20}
     >
-      <div className="space-y-6">
+      <div className='space-y-6'>
         {profiles.length === 0 ? (
-          <div className="text-center py-12">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <div className='text-center py-12'>
+            <h3 className='text-lg font-medium text-gray-900 mb-2'>
               Δεν βρέθηκαν επαγγελματίες
             </h3>
-            <p className="text-gray-600">
+            <p className='text-gray-600'>
               Δοκιμάστε να αλλάξετε τα φίλτρα αναζήτησης
             </p>
           </div>
         ) : (
-          profiles.map((profile) => {
-            const coverage = transformCoverageWithLocationNames(profile.coverage || {}, locationOptions);
-            return (
-              <ArchiveProfileCard
-                key={profile.id}
-                profile={profile}
-                coverage={coverage}
-              />
-            );
-          })
+          profiles.map((profile) => (
+            <ArchiveProfileCard key={profile.id} profile={profile} />
+          ))
         )}
       </div>
     </ArchiveLayout>
