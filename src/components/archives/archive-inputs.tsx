@@ -241,7 +241,7 @@ export function CategoryDropdown({
     ? categories.find((c) => c.id === value || c.slug === value)
     : null;
 
-  const displayValue = selectedCategory?.label || allLabel;
+  const displayValue = selectedCategory?.plural || selectedCategory?.label || allLabel;
 
   return (
     <div className={`${fullWidth ? 'min-w-48' : ''} ${className || ''}`}>
@@ -288,7 +288,7 @@ export function CategoryDropdown({
                           : 'mr-2 h-4 w-4 opacity-0'
                       }
                     />
-                    {category.label}
+                    {category.plural || category.label}
                   </CommandItem>
                 ))}
               </CommandGroup>
@@ -333,7 +333,7 @@ export function SubcategoryDropdown({
     ? subcategories.find((c) => c.id === value || c.slug === value)
     : null;
 
-  const displayValue = selectedSubcategory?.label || allLabel;
+  const displayValue = selectedSubcategory?.plural || selectedSubcategory?.label || allLabel;
 
   return (
     <div className={`${fullWidth ? 'min-w-48' : ''} ${className || ''}`}>
@@ -381,7 +381,7 @@ export function SubcategoryDropdown({
                           : 'mr-2 h-4 w-4 opacity-0'
                       }
                     />
-                    {subcategory.label}
+                    {subcategory.plural || subcategory.label}
                   </CommandItem>
                 ))}
               </CommandGroup>

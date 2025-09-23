@@ -8,3 +8,6 @@ export { ArchivePagination } from './archive-pagination';
 export { InfiniteScroll, useInfiniteScroll } from './infinite-scroll';
 export { CoverageDisplay } from './coverage-display';
 export { OnlineToggle, CountiesDropdown, SortDropdown } from './archive-inputs';
+export { ArchiveBanner } from './archive-banner';
+export { SubdivisionsCarousel } from './subdivisions-carousel';
+export { CategoriesGrid } from './categories-grid';

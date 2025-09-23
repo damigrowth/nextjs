@@ -15,7 +15,7 @@ import clsx from 'clsx';
 
 interface ArchiveLayoutProps {
   children: ReactNode;
-  archiveType: 'pros' | 'companies' | 'services';
+  archiveType: 'pros' | 'companies' | 'services' | 'categories';
   category?: string;
   subcategory?: string;
   subdivision?: string; // For services
@@ -115,24 +115,118 @@ export function ArchiveLayout({
     }
   };
 
-  // Determine archive type for sidebar
-  const sidebarArchiveType =
-    archiveType === 'pros' || archiveType === 'companies'
-      ? 'profiles'
-      : 'services';
+  // Archive configuration constants and functions
+  const getArchiveConfig = () => {
+    switch (archiveType) {
+      case 'pros':
+        return {
+          basePath: 'pros',
+          allItemsLabel: 'Όλοι οι Επαγγελματίες',
+          usePluralLabels: true,
+          sidebarType: 'profiles' as const,
+        };
+      case 'companies':
+        return {
+          basePath: 'companies',
+          allItemsLabel: 'Όλες οι Εταιρείες',
+          usePluralLabels: true,
+          sidebarType: 'profiles' as const,
+        };
+      case 'services':
+        return {
+          basePath: 'services',
+          allItemsLabel: 'Όλες οι Υπηρεσίες',
+          usePluralLabels: false,
+          sidebarType: 'services' as const,
+        };
+      default:
+        return {
+          basePath: 'services',
+          allItemsLabel: 'Όλα τα Στοιχεία',
+          usePluralLabels: false,
+          sidebarType: 'services' as const,
+        };
+    }
+  };
+
+  const archiveConfig = getArchiveConfig();
+
+  // Filter categories to ensure required properties for TaxonomyTabs
+  const validCategories = taxonomyData.categories.filter(
+    (category): category is DatasetItem & { slug: string; label: string } =>
+      Boolean(category.slug && category.label),
+  );
+
+  // Generate banner title based on current taxonomy hierarchy
+  const getBannerTitle = (): string => {
+    const { currentSubdivision, currentSubcategory, currentCategory } =
+      taxonomyData;
+
+    if (currentSubdivision) {
+      // Services subdivision page: "Subdivision - Subcategory"
+      const subdivisionLabel =
+        currentSubdivision.plural || currentSubdivision.label;
+      const subcategoryLabel =
+        currentSubcategory?.plural || currentSubcategory?.label;
+      return `${subdivisionLabel} - ${subcategoryLabel}`;
+    }
+
+    if (currentSubcategory) {
+      // Subcategory page: just use subcategory name (no category since we removed it from URLs)
+      const subcategoryLabel =
+        currentSubcategory.plural || currentSubcategory.label;
+      return subcategoryLabel;
+    }
+
+    if (currentCategory) {
+      // Category page: use plural for profiles, regular label for services
+      return archiveConfig.usePluralLabels
+        ? currentCategory.plural || currentCategory.label
+        : currentCategory.label;
+    }
+
+    // Main archive page: use the configured all items label
+    return archiveConfig.allItemsLabel;
+  };
+
+  // Generate banner subtitle based on taxonomy or default messages
+  const getBannerSubtitle = (): string => {
+    const { currentSubdivision, currentSubcategory, currentCategory } =
+      taxonomyData;
+
+    // Use taxonomy description if available (subdivision > subcategory > category)
+    const taxonomyDescription =
+      currentSubdivision?.description ||
+      currentSubcategory?.description ||
+      currentCategory?.description;
+
+    if (taxonomyDescription) {
+      return taxonomyDescription;
+    }
+
+    // Fallback to default archive descriptions
+    switch (archiveType) {
+      case 'pros':
+        return 'Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές.';
+      case 'companies':
+        return 'Βρες τις Καλύτερες Επιχειρήσεις, δες αξιολογήσεις και τιμές.';
+      case 'services':
+        return 'Ανακάλυψε τις καλύτερες υπηρεσίες για οποιαδήποτε ανάγκη, από τους καλύτερους επαγγελματίες.';
+      default:
+        return 'Ανακάλυψε τις καλύτερες υπηρεσίες και επαγγελματίες.';
+    }
+  };
 
   return (
     <div className={clsx(className, 'py-20')}>
       {/* Category Navigation Tabs */}
-      {archiveType === 'services' && (
-        <TaxonomyTabs
-          items={taxonomyData.categories}
-          basePath='services'
-          allItemsLabel='Όλες οι Υπηρεσίες'
-          activeItemSlug={taxonomyData.currentCategory?.slug}
-          usePluralLabels={false}
-        />
-      )}
+      <TaxonomyTabs
+        items={validCategories}
+        basePath={archiveConfig.basePath}
+        allItemsLabel={archiveConfig.allItemsLabel}
+        activeItemSlug={taxonomyData.currentCategory?.slug}
+        usePluralLabels={archiveConfig.usePluralLabels}
+      />
 
       {/* Breadcrumb Navigation */}
       {breadcrumbData && (
@@ -142,26 +236,8 @@ export function ArchiveLayout({
         />
       )}
 
-      {/* Archive Banner - Services only */}
-      {archiveType === 'services' && (
-        <ArchiveBanner
-          title={
-            taxonomyData.currentSubdivision
-              ? `${taxonomyData.currentSubdivision.label} - ${taxonomyData.currentSubcategory?.label}`
-              : taxonomyData.currentSubcategory
-              ? `${taxonomyData.currentSubcategory.label} - ${taxonomyData.currentCategory?.label}`
-              : taxonomyData.currentCategory
-              ? taxonomyData.currentCategory.label
-              : 'Όλες οι Υπηρεσίες'
-          }
-          subtitle={
-            taxonomyData.currentSubdivision?.description ||
-            taxonomyData.currentSubcategory?.description ||
-            taxonomyData.currentCategory?.description ||
-            'Ανακάλυψε τις καλύτερες υπηρεσίες για οποιαδήποτε ανάγκη, από τους καλύτερους επαγγελματίες.'
-          }
-        />
-      )}
+      {/* Archive Banner */}
+      <ArchiveBanner title={getBannerTitle()} subtitle={getBannerSubtitle()} />
 
       {/* Archive Content */}
       <section>
@@ -171,7 +247,7 @@ export function ArchiveLayout({
             <ArchiveSidebar
               filters={filters}
               onFiltersChange={handleFiltersUpdate}
-              archiveType={sidebarArchiveType}
+              archiveType={archiveConfig.sidebarType}
               categories={taxonomyData.categories}
               counties={counties}
               subcategories={taxonomyData.subcategories}

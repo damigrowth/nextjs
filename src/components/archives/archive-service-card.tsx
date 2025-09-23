@@ -2,15 +2,12 @@
 
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
-import MediaCarousel from '@/components/shared/media-carousel';
-import RatingDisplay from '@/components/shared/rating-display';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { CoverageDisplay } from './coverage-display';
-import ServiceCategoryDisplay from '@/components/dashboard/services/service-category-display';
+import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
 import type { ArchiveServiceCardData } from '@/lib/types/components';
 import { cn } from '@/lib/utils';
-import { ProfileBadges } from '../shared';
-import { Separator } from '../ui/separator';
+import { MediaCarousel, ProfileBadges, RatingDisplay } from '../shared';
+import { CoverageDisplay } from './coverage-display';
 
 interface ArchiveServiceCardProps {
   service: ArchiveServiceCardData;
@@ -55,7 +52,7 @@ export function ArchiveServiceCard({
             </Link>
 
             {/* Category Display */}
-            <ServiceCategoryDisplay
+            <TaxonomiesDisplay
               categoryLabels={{
                 category: service.categoryLabels.category,
                 subcategory: service.categoryLabels.subcategory,

@@ -1,149 +1,188 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
-import RatingDisplay from '@/components/shared/rating-display';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { CoverageDisplay } from './coverage-display';
-import ProfileBadges from '@/components/shared/profile-badges';
 import type { ArchiveProfileCardData } from '@/lib/types/components';
-import type { transformCoverageWithLocationNames } from '@/lib/utils/datasets';
 import { cn } from '@/lib/utils';
+import {
+  UserAvatar,
+  ProfileBadges,
+  RatingDisplay,
+  TaxonomiesDisplay,
+} from '../shared';
 
 interface ArchiveProfileCardProps {
   profile: ArchiveProfileCardData;
-  coverage: ReturnType<typeof transformCoverageWithLocationNames>;
   className?: string;
 }
 
 export function ArchiveProfileCard({
   profile,
-  coverage,
-  className
+  className,
 }: ArchiveProfileCardProps) {
   // Format rate display
   const formatRate = (rate: number | null) => {
-    if (!rate) return 'Τιμή κατόπιν συνεννόησης';
-    return `€${rate}/ώρα`;
+    if (!rate) return '';
+    return `€${rate}`;
   };
 
-  // Get profile initials for avatar fallback
-  const profileInitials = profile.displayName
-    .split(' ')
-    .map(name => name.charAt(0))
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-
   return (
-    <Card className={cn("hover:shadow-md transition-shadow duration-200", className)}>
-      <CardContent className="p-6">
+    <Card
+      className={cn(
+        'hover:shadow-md transition-shadow duration-200 overflow-hidden',
+        className,
+      )}
+    >
+      <div className='flex flex-col md:flex-row h-full md:h-52'>
+        {/* Avatar Section */}
         <Link
           href={`/profile/${profile.username}`}
-          className="block"
+          className='group w-full md:w-48 flex-shrink-0 relative overflow-hidden flex md:items-center md:justify-center pl-5 md:pl-0 bg-gray-50 bg-cover bg-center bg-no-repeat min-h-28'
+          style={{
+            backgroundImage: `${profile.image ? `url(${profile.image})` : ''}`,
+          }}
         >
-          {/* Mobile Layout - Stacked */}
-          <div className="flex flex-col gap-4 md:hidden">
-            {/* Profile Image */}
-            <div className="flex justify-center">
-              <Avatar className="h-20 w-20">
-                <AvatarImage
-                  src={profile.image as string}
-                  alt={profile.displayName}
-                />
-                <AvatarFallback className="text-lg">
-                  {profileInitials}
-                </AvatarFallback>
-              </Avatar>
-            </div>
+          {/* Grayscale and transparency overlay */}
+          {profile.image && (
+            <div className='absolute inset-0 bg-white bg-opacity-70 saturate-[.3] backdrop-blur-sm group-hover:saturate-[.6]'></div>
+          )}
 
-            {/* Content */}
-            <div className="text-center space-y-3">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {profile.displayName}
-                </h3>
-
-                <ProfileBadges
-                  verified={profile.verified}
-                  topLevel={profile.top}
-                  className="justify-center mb-3"
-                />
-
-                <RatingDisplay
-                  rating={profile.rating}
-                  reviewCount={profile.reviewCount}
-                  size="sm"
-                  className="justify-center mb-3"
-                />
-              </div>
-
-              <CoverageDisplay
-                coverage={coverage}
-                variant="compact"
-                className="text-sm"
-              />
-
-              {/* Rate */}
-              <div className="pt-3 border-t border-gray-100">
-                <div className="text-lg font-bold text-primary-600">
-                  {formatRate(profile.rate)}
-                </div>
-              </div>
-            </div>
+          {/* Avatar on top */}
+          <div className='relative z-10 flex items-center justify-center'>
+            <UserAvatar
+              displayName={profile.displayName}
+              image={profile.image}
+              top={profile.top}
+              size='xl'
+              className='h-20 w-20'
+            />
           </div>
 
-          {/* Desktop Layout - Horizontal */}
-          <div className="hidden md:flex gap-6">
-            {/* Profile Image Section */}
-            <div className="flex-shrink-0">
-              <Avatar className="h-24 w-24">
-                <AvatarImage
-                  src={profile.image as string}
-                  alt={profile.displayName}
-                />
-                <AvatarFallback className="text-xl">
-                  {profileInitials}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-
-            {/* Content Section */}
-            <div className="flex-1 min-w-0 space-y-3">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {profile.displayName}
-                </h3>
-
-                <ProfileBadges
-                  verified={profile.verified}
-                  topLevel={profile.top}
-                  className="mb-3"
-                />
-
-                <RatingDisplay
-                  rating={profile.rating}
-                  reviewCount={profile.reviewCount}
-                  size="sm"
-                  className="mb-3"
-                />
-              </div>
-
-              <CoverageDisplay
-                coverage={coverage}
-                variant="compact"
-              />
-            </div>
-
-            {/* Rate Section */}
-            <div className="flex-shrink-0 flex flex-col justify-center text-right">
-              <div className="text-lg font-bold text-primary-600">
-                {formatRate(profile.rate)}
-              </div>
-            </div>
-          </div>
+          {/* Hover effect - increase saturation and slightly darken */}
+          {/* <div className='absolute inset-0 bg-primary/0 group-hover:bg-primary/[.02] transition-all duration-200 z-5'></div> */}
         </Link>
-      </CardContent>
+
+        {/* Content Section */}
+        <div className='flex-1 px-6 pt-4 pb-3 flex flex-col justify-between min-w-0'>
+          <div className='space-y-2'>
+            <Link href={`/profile/${profile.username}`} className='block'>
+              <div className='flex items-center gap-2 mb-1'>
+                <h3 className='text-lg font-semibold text-gray-900 line-clamp-2 hover:text-third transition-colors mb-0'>
+                  {profile.displayName}
+                </h3>
+                <ProfileBadges
+                  verified={profile.verified}
+                  topLevel={profile.top}
+                />
+              </div>
+            </Link>
+
+            {/* Subcategory and Tagline Row */}
+            <div className='flex items-center gap-2 text-sm text-gray-600'>
+              {profile.categoryLabels?.subcategory && (
+                <TaxonomiesDisplay
+                  categoryLabels={{
+                    category: '',
+                    subcategory: profile.categoryLabels.subcategory,
+                  }}
+                  compact
+                  className='text-sm'
+                />
+              )}
+              {profile.categoryLabels?.subcategory && profile.tagline && (
+                <span>•</span>
+              )}
+              {profile.tagline && (
+                <span className='line-clamp-1'>{profile.tagline}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Profile and Price Section */}
+          <div className='mt-3'>
+            <div className='flex items-center gap-3'>
+              {profile.reviewCount > 0 && (
+                <RatingDisplay
+                  rating={profile.rating}
+                  reviewCount={profile.reviewCount}
+                  size='sm'
+                  className='text-sm'
+                />
+              )}
+
+              <CoverageDisplay
+                online={profile.coverage?.online}
+                onbase={profile.coverage?.onbase}
+                onsite={profile.coverage?.onsite}
+                area={profile.coverage?.area}
+                areas={profile.coverage?.areas}
+                county={profile.coverage?.county}
+                counties={profile.coverage?.counties}
+                variant='compact'
+                className='text-sm'
+              />
+            </div>
+
+            {/* Bottom section - only show if there are skills/speciality or rate */}
+            {(profile.skillsData.length > 0 ||
+              profile.specialityData ||
+              (profile.rate != null && profile.rate > 0)) && (
+              <div className='flex items-center gap-3 border-t border-gray-200 mt-3 pt-3'>
+                {/* Skills and Speciality */}
+                <div className='flex-1'>
+                  {(profile.skillsData.length > 0 || profile.specialityData) &&
+                    (() => {
+                      // Filter out speciality from skills to avoid duplication
+                      const filteredSkills = profile.skillsData.filter(
+                        (skill) =>
+                          skill.label !== profile.specialityData?.label,
+                      );
+
+                      return (
+                        <div className='flex items-center gap-2 flex-wrap'>
+                          {profile.specialityData && (
+                            <Badge
+                              variant='muted'
+                              className='bg-third/10 text-primary/80 border-primary/20 hover:bg-blue-100 hover:bg-third/10'
+                            >
+                              {profile.specialityData.label}
+                            </Badge>
+                          )}
+                          {filteredSkills.length > 0 && (
+                            <>
+                              {filteredSkills.slice(0, 2).map((skill) => (
+                                <Badge key={skill.id} variant='muted'>
+                                  {skill.label}
+                                </Badge>
+                              ))}
+                              {filteredSkills.length > 2 && (
+                                <Badge variant='muted'>
+                                  +{filteredSkills.length - 2}
+                                </Badge>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      );
+                    })()}
+                </div>
+
+                {/* Rate */}
+                {profile.rate != null && profile.rate > 0 && (
+                  <div>
+                    <span className='font-normal text-body'>από </span>
+                    <span className='font-semibold text-dark text-lg'>
+                      {formatRate(profile.rate)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </Card>
   );
 }

@@ -1,22 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  ChevronDown,
-  ChevronUp,
-  Globe,
-  Building,
-  Car,
-  MapPin,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import type { transformCoverageWithLocationNames } from '@/lib/utils/datasets';
 import { cn } from '@/lib/utils';
 
 interface CoverageDisplayProps {
@@ -67,9 +57,9 @@ export function CoverageDisplay({
     if (onsite && counties?.length > 0) {
       // Show counties for onsite
       const displayCounties = counties.slice(0, 3);
-      const hasMore = counties.length > 3;
+      const hasMoreCounties = counties.length > 3;
 
-      if (hasMore) {
+      if (hasMoreCounties) {
         return `Εξυπηρετεί: ${displayCounties.join(', ')} (+${counties.length - 3})`;
       } else {
         return `Εξυπηρετεί: ${displayCounties.join(', ')}`;
@@ -80,7 +70,7 @@ export function CoverageDisplay({
   };
 
   const coverageText = getCoverageText();
-  const showExpandButton = onsite && counties?.length > 3;
+  const showExpandButton = onsite && areas && areas.length > 0;
 
   if (!coverageText) {
     return null;
@@ -92,33 +82,23 @@ export function CoverageDisplay({
       <div className='text-sm text-gray-600'>
         {showExpandButton ? (
           <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-            <div className='flex items-center gap-1'>
-              <span>{coverageText}</span>
+            <div className='flex items-center gap-1.5'>
+              <MapPin className='w-4 h-4' />
               <CollapsibleTrigger asChild>
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  className='h-auto p-1 text-gray-600 hover:text-gray-900'
-                >
+                <button className='text-left hover:text-gray-900 transition-colors cursor-pointer'>
+                  <span>Εξυπηρετεί: {counties?.join(', ')}</span>
                   {isExpanded ? (
-                    <ChevronUp className='w-4 h-4' />
+                    <ChevronUp className='w-4 h-4 inline ml-1' />
                   ) : (
-                    <ChevronDown className='w-4 h-4' />
+                    <ChevronDown className='w-4 h-4 inline ml-1' />
                   )}
-                </Button>
+                </button>
               </CollapsibleTrigger>
             </div>
 
             <CollapsibleContent className='mt-2'>
-              <div className='text-sm text-gray-600'>
-                <span>Εξυπηρετεί: {counties?.join(', ')}</span>
-                {areas && areas.length > 0 && (
-                  <div className='mt-1 pl-4 text-xs text-gray-500'>
-                    <div>
-                      <strong>Περιοχές:</strong> {areas.join(', ')}
-                    </div>
-                  </div>
-                )}
+              <div className='pl-6 text-xs text-gray-500'>
+                <span>{areas?.join(', ')}</span>
               </div>
             </CollapsibleContent>
           </Collapsible>

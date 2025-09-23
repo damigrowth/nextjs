@@ -42,18 +42,27 @@ export function ArchiveSidebarFilters({
 
   // Parse current path to get taxonomy from route
   const pathSegments = pathname.split('/').filter(Boolean);
-  const baseArchivePath = archiveType === 'services' ? '/services' :
+  const baseArchivePath = archiveType === 'services' ? '/ipiresies' :
                          archiveType === 'profiles' ? '/pros' : '/companies';
 
-  // Get current category/subcategory/subdivision from path
-  const currentCategorySlug = pathSegments[1]; // After services/pros/companies
-  const currentSubcategorySlug = pathSegments[2];
-  const currentSubdivisionSlug = pathSegments[3];
+  // Get current subcategory/subdivision from path (no category level)
+  const currentSubcategorySlug = pathSegments[1]; // After ipiresies/pros/companies
+  const currentSubdivisionSlug = pathSegments[2];
 
-  // Find current category object from slug
-  const currentCategory = categories.find(cat => cat.slug === currentCategorySlug);
-  const currentSubcategory = currentCategory?.children?.find(sub => sub.slug === currentSubcategorySlug);
-  const currentSubdivision = currentSubcategory?.children?.find(div => div.slug === currentSubdivisionSlug);
+  // Find current subcategory and subdivision from available filtered lists
+  const currentSubcategory = subcategories?.find(sub => sub.slug === currentSubcategorySlug);
+  const currentSubdivision = subdivisions?.find(div => div.slug === currentSubdivisionSlug);
+
+  // Find parent category for the current subcategory (needed for some operations)
+  let currentCategory = null;
+  if (currentSubcategory) {
+    for (const category of categories) {
+      if (category.children?.some(sub => sub.id === currentSubcategory.id)) {
+        currentCategory = category;
+        break;
+      }
+    }
+  }
 
   // Use only filtered subcategories and subdivisions from server action
   const availableSubcategories = subcategories || [];
@@ -84,51 +93,45 @@ export function ArchiveSidebarFilters({
     onFiltersChange(newFilters);
   };
 
-  // Handle category change
+  // Handle category change - now redirects to main services page
   const handleCategoryChange = (categoryId: string) => {
     if (!categoryId) {
       router.push(buildUrl(baseArchivePath));
       return;
     }
 
-    const category = categories.find(cat => cat.id === categoryId);
-    if (!category) return;
-
-    const path = `${baseArchivePath}/${category.slug}`;
-    router.push(buildUrl(path));
+    // Since we removed categories from URLs, redirect to main page
+    router.push(buildUrl(baseArchivePath));
   };
 
   // Handle subcategory change
   const handleSubcategoryChange = (subcategoryId: string) => {
-    if (!currentCategory) return;
-
     if (!subcategoryId) {
-      const path = `${baseArchivePath}/${currentCategory.slug}`;
-      router.push(buildUrl(path));
+      router.push(buildUrl(baseArchivePath));
       return;
     }
 
-    const subcategory = currentCategory.children?.find(sub => sub.id === subcategoryId);
+    const subcategory = availableSubcategories.find(sub => sub.id === subcategoryId);
     if (!subcategory) return;
 
-    const path = `${baseArchivePath}/${currentCategory.slug}/${subcategory.slug}`;
+    const path = `${baseArchivePath}/${subcategory.slug}`;
     router.push(buildUrl(path));
   };
 
   // Handle subdivision change
   const handleSubdivisionChange = (subdivisionId: string) => {
-    if (!currentCategory || !currentSubcategory) return;
+    if (!currentSubcategory) return;
 
     if (!subdivisionId) {
-      const path = `${baseArchivePath}/${currentCategory.slug}/${currentSubcategory.slug}`;
+      const path = `${baseArchivePath}/${currentSubcategory.slug}`;
       router.push(buildUrl(path));
       return;
     }
 
-    const subdivision = currentSubcategory.children?.find(div => div.id === subdivisionId);
+    const subdivision = availableSubdivisions.find(div => div.id === subdivisionId);
     if (!subdivision) return;
 
-    const path = `${baseArchivePath}/${currentCategory.slug}/${currentSubcategory.slug}/${subdivision.slug}`;
+    const path = `${baseArchivePath}/${currentSubcategory.slug}/${subdivision.slug}`;
     router.push(buildUrl(path));
   };
 
@@ -142,10 +145,10 @@ export function ArchiveSidebarFilters({
   const buildUrl = (path: string) => {
     const params = new URLSearchParams();
 
-    // Only copy non-taxonomy params
+    // Only copy non-taxonomy and non-system params
     searchParams.forEach((value, key) => {
-      // Skip taxonomy params that are now in the route
-      if (key !== 'category' && key !== 'subcategory' && key !== 'subdivision') {
+      // Skip taxonomy params that are now in the route and system filters that are handled internally
+      if (key !== 'category' && key !== 'subcategory' && key !== 'subdivision' && key !== 'role' && key !== 'published') {
         params.append(key, value);
       }
     });
@@ -175,43 +178,49 @@ export function ArchiveSidebarFilters({
   return (
     <>
       <div className='space-y-6'>
-        {/* Category Selection */}
-        <div className='space-y-3'>
-          <Label className='text-sm font-medium'>Κατηγορία</Label>
-          <CategoryDropdown
-            value={currentCategory?.id}
-            onValueChange={handleCategoryChange}
-            categories={categories}
-            placeholder='Όλες οι κατηγορίες'
-            allLabel='Όλες οι κατηγορίες'
-          />
-        </div>
+        {/* Category Selection - Only for pros and companies, not services */}
+        {archiveType === 'profiles' && (
+          <div className='space-y-3'>
+            <Label className='text-sm font-medium'>Κατηγορία</Label>
+            <CategoryDropdown
+              value={currentCategory?.id}
+              onValueChange={handleCategoryChange}
+              categories={categories}
+              placeholder='Όλες οι κατηγορίες'
+              allLabel='Όλες οι κατηγορίες'
+            />
+          </div>
+        )}
 
         {/* Subcategory Selection */}
         <div className='space-y-3'>
-          <Label className='text-sm font-medium'>Υποκατηγορία</Label>
+          <Label className='text-sm font-medium'>
+            {archiveType === 'services' ? 'Κατηγορία' : 'Υποκατηγορία'}
+          </Label>
           <SubcategoryDropdown
             value={currentSubcategory?.id}
             onValueChange={handleSubcategoryChange}
             subcategories={availableSubcategories}
-            disabled={!currentCategory}
-            placeholder='Όλες οι υποκατηγορίες'
-            allLabel='Όλες οι υποκατηγορίες'
+            disabled={archiveType === 'profiles' ? !currentCategory : false}
+            placeholder={archiveType === 'services' ? 'Όλες οι κατηγορίες' : 'Όλες οι υποκατηγορίες'}
+            allLabel={archiveType === 'services' ? 'Όλες οι κατηγορίες' : 'Όλες οι υποκατηγορίες'}
           />
         </div>
 
-        {/* Subdivision Selection */}
-        <div className='space-y-3'>
-          <Label className='text-sm font-medium'>Τομέας</Label>
-          <SubdivisionDropdown
-            value={currentSubdivision?.id}
-            onValueChange={handleSubdivisionChange}
-            subdivisions={availableSubdivisions}
-            disabled={!currentSubcategory}
-            placeholder='Όλοι οι τομείς'
-            allLabel='Όλοι οι τομείς'
-          />
-        </div>
+        {/* Subdivision Selection - Services only */}
+        {archiveType === 'services' && (
+          <div className='space-y-3'>
+            <Label className='text-sm font-medium'>Υποκατηγορία</Label>
+            <SubdivisionDropdown
+              value={currentSubdivision?.id}
+              onValueChange={handleSubdivisionChange}
+              subdivisions={availableSubdivisions}
+              disabled={!currentSubcategory}
+              placeholder='Όλες οι υποκατηγορίες'
+              allLabel='Όλες οι υποκατηγορίες'
+            />
+          </div>
+        )}
 
         <Separator />
 
