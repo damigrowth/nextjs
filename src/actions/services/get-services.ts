@@ -12,6 +12,8 @@ import {
   findBySlug,
   getTaxonomyBreadcrumbs,
   findTaxonomyBySlugInContext,
+  findTaxonomyBySubcategorySlug,
+  getBreadcrumbsForNewRoutes,
 } from '@/lib/utils/datasets';
 import { locationOptions } from '@/constants/datasets/locations';
 import type { DatasetItem } from '@/lib/types/datasets';
@@ -779,58 +781,48 @@ export async function getServiceArchivePageData(params: {
   try {
     const { categorySlug, subcategorySlug, subdivisionSlug, searchParams } = params;
 
-    // Find taxonomy items by slugs
+    // Find taxonomy items by slugs (no category slug required)
     let taxonomyContext: {
       category?: DatasetItem;
       subcategory?: DatasetItem;
       subdivision?: DatasetItem;
     } = {};
 
-    if (categorySlug) {
-      if (subdivisionSlug && subcategorySlug) {
-        // Subdivision page
-        taxonomyContext = findTaxonomyBySlugInContext(
-          serviceTaxonomies,
-          categorySlug,
-          subcategorySlug,
-          subdivisionSlug
-        ) || {};
-      } else if (subcategorySlug) {
-        // Subcategory page
-        taxonomyContext = findTaxonomyBySlugInContext(
-          serviceTaxonomies,
-          categorySlug,
-          subcategorySlug
-        ) || {};
-      } else {
-        // Category page
-        const category = findBySlug(serviceTaxonomies, categorySlug);
-        if (category) {
-          taxonomyContext = { category };
-        }
+    if (subcategorySlug) {
+      // Use new utility to find by subcategory (no category required)
+      const result = findTaxonomyBySubcategorySlug(
+        serviceTaxonomies,
+        subcategorySlug,
+        subdivisionSlug
+      );
+
+      if (!result) {
+        return {
+          success: false,
+          error: subdivisionSlug ? 'Subdivision not found' : 'Subcategory not found',
+        };
       }
 
-      // Validate that required taxonomy items were found
-      if (!taxonomyContext.category) {
+      taxonomyContext = {
+        category: result.category,
+        subcategory: result.subcategory,
+        subdivision: result.subdivision,
+      };
+    } else if (categorySlug) {
+      // Find category by slug when only categorySlug is provided
+      const category = findBySlug(serviceTaxonomies, categorySlug);
+      if (!category) {
         return {
           success: false,
           error: 'Category not found',
         };
       }
-      if (subcategorySlug && !taxonomyContext.subcategory) {
-        return {
-          success: false,
-          error: 'Subcategory not found',
-        };
-      }
-      if (subdivisionSlug && !taxonomyContext.subdivision) {
-        return {
-          success: false,
-          error: 'Subdivision not found',
-        };
-      }
+
+      taxonomyContext = {
+        category,
+      };
     }
-    // If no categorySlug, this is the main services page, taxonomyContext remains empty
+    // If no subcategorySlug or categorySlug, this is the main services page, taxonomyContext remains empty
 
     const { category, subcategory, subdivision } = taxonomyContext;
 
@@ -879,16 +871,17 @@ export async function getServiceArchivePageData(params: {
       slug: location.slug,
     }));
 
-    // Generate breadcrumbs
+    // Generate breadcrumbs using new route structure (no category)
     const breadcrumbData = {
-      segments: categorySlug
-        ? getTaxonomyBreadcrumbs(
-            serviceTaxonomies,
-            categorySlug,
-            subcategorySlug,
-            subdivisionSlug
-          )
-        : [{ label: 'Αρχική', href: '/' }, { label: 'Υπηρεσίες' }] // Main services page breadcrumbs
+      segments: getBreadcrumbsForNewRoutes(
+        serviceTaxonomies,
+        subcategorySlug,
+        subdivisionSlug,
+        {
+          basePath: '/ipiresies',
+          baseLabel: 'Υπηρεσίες'
+        }
+      )
     };
 
     // Get filtered subcategories and subdivisions based on available services
@@ -899,54 +892,57 @@ export async function getServiceArchivePageData(params: {
     if (taxonomyPathsResult.success && taxonomyPathsResult.data) {
       const taxonomyPaths = taxonomyPathsResult.data;
 
-      // Always provide filtered subcategories for current category (for navigation)
-      if (category) {
-        const availableSubcategories = new Set<string>();
-        taxonomyPaths
-          .filter(path => path.category === category.slug && path.subcategory)
-          .forEach(path => {
-            if (path.subcategory) {
-              availableSubcategories.add(path.subcategory);
-            }
-          });
+      // Get all available subcategories from all categories that have services
+      const availableSubcategories = new Set<string>();
+      taxonomyPaths
+        .filter(path => path.subcategory)
+        .forEach(path => {
+          if (path.subcategory) {
+            availableSubcategories.add(path.subcategory);
+          }
+        });
 
-        const subcategoriesWithServices = (category.children || [])
-          .filter(subcat => availableSubcategories.has(subcat.slug))
-          .map(subcat => {
-            // For each subcategory, also filter its subdivisions
-            if (subcat.children && subcat.children.length > 0) {
-              const availableSubdivisions = new Set<string>();
-              taxonomyPaths
-                .filter(path =>
-                  path.category === category.slug &&
-                  path.subcategory === subcat.slug &&
-                  path.subdivision
-                )
-                .forEach(path => {
-                  if (path.subdivision) {
-                    availableSubdivisions.add(path.subdivision);
-                  }
+      // Build a flat list of all subcategories that have services
+      const allSubcategoriesWithServices: DatasetItem[] = [];
+      serviceTaxonomies.forEach(category => {
+        if (category.children) {
+          category.children.forEach(subcat => {
+            if (availableSubcategories.has(subcat.slug)) {
+              // For each subcategory, also filter its subdivisions
+              if (subcat.children && subcat.children.length > 0) {
+                const availableSubdivisions = new Set<string>();
+                taxonomyPaths
+                  .filter(path =>
+                    path.subcategory === subcat.slug &&
+                    path.subdivision
+                  )
+                  .forEach(path => {
+                    if (path.subdivision) {
+                      availableSubdivisions.add(path.subdivision);
+                    }
+                  });
+
+                allSubcategoriesWithServices.push({
+                  ...subcat,
+                  children: subcat.children.filter(subdiv =>
+                    availableSubdivisions.has(subdiv.slug)
+                  )
                 });
-
-              return {
-                ...subcat,
-                children: subcat.children.filter(subdiv =>
-                  availableSubdivisions.has(subdiv.slug)
-                )
-              };
+              } else {
+                allSubcategoriesWithServices.push(subcat);
+              }
             }
-            return subcat;
           });
+        }
+      });
 
-        filteredSubcategories = subcategoriesWithServices;
-      }
+      filteredSubcategories = allSubcategoriesWithServices;
 
       // Always provide filtered subdivisions for current subcategory (for navigation)
       if (subcategory) {
         const availableSubdivisions = new Set<string>();
         taxonomyPaths
           .filter(path =>
-            path.category === category?.slug &&
             path.subcategory === subcategory.slug &&
             path.subdivision
           )

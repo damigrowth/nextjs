@@ -276,21 +276,21 @@ export async function getServicePageData(
     if (category) {
       breadcrumbSegments.push({
         label: category.label,
-        href: `/services/${category.slug}`,
+        href: `/ipiresies/${category.slug}`,
       });
     }
 
     if (subcategory) {
       breadcrumbSegments.push({
         label: subcategory.label,
-        href: `/services/${category?.slug}/${subcategory.slug}`,
+        href: `/ipiresies/${category?.slug}/${subcategory.slug}`,
       });
     }
 
     if (subdivision) {
       breadcrumbSegments.push({
         label: subdivision.label,
-        href: `/services/${category?.slug}/${subcategory?.slug}/${subdivision.slug}`,
+        href: `/ipiresies/${category?.slug}/${subcategory?.slug}/${subdivision.slug}`,
         isCurrentPage: true, // Mark last taxonomy as current page
       });
     } else if (subcategory) {

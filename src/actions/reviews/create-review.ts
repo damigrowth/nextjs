@@ -152,7 +152,7 @@
 //     // Revalidate relevant pages
 //     revalidatePath(`/profile/${targetProfile.username}`);
 //     if (validatedData.serviceId) {
-//       revalidatePath(`/services/${validatedData.serviceId}`);
+//       revalidatePath(`/ipiresies/${validatedData.serviceId}`);
 //     }
 
 //     return {
