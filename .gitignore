@@ -69,3 +69,5 @@ public/css/animate.css
 docs
 legacy
 *.md
+/src/components/features/home/old
+/.claude

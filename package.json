@@ -8,6 +8,10 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
+    "analyze": "ANALYZE=true yarn build",
+    "analyze:server": "BUNDLE_ANALYZE=server yarn build",
+    "analyze:browser": "BUNDLE_ANALYZE=browser yarn build",
+    "build:analyze": "yarn analyze",
     "db:pull": "npx prisma db pull --schema=./src/lib/prisma/schema/",
     "db:push": "npx prisma db push --schema=./src/lib/prisma/schema/",
     "db:migrate": "npx prisma migrate dev --schema=./src/lib/prisma/schema/",
@@ -42,7 +46,8 @@
     "debug:images:freelancer": "tsx scripts/debug-profile-images.ts --freelancer-id",
     "debug:description": "tsx scripts/debug-description.ts",
     "compare:descriptions": "tsx scripts/compare-descriptions.ts",
-    "debug:coverage": "tsx scripts/debug-coverage-relations.ts"
+    "debug:coverage": "tsx scripts/debug-coverage-relations.ts",
+    "locations:add-slugs": "tsx scripts/add-location-slugs.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -123,6 +128,8 @@
     "@babel/plugin-syntax-import-assertions": "^7.27.1",
     "@babel/plugin-syntax-jsx": "^7.27.1",
     "@babel/preset-env": "^7.27.2",
+    "@next/bundle-analyzer": "^15.3.3",
+    "@sentry/nextjs": "9",
     "@stylistic/eslint-plugin-js": "^4.4.0",
     "@types/bcrypt": "^6.0.0",
     "@types/node": "^24.0.12",
@@ -152,5 +159,6 @@
   },
   "prisma": {
     "schema": "./src/lib/prisma/schema/"
-  }
+  },
+  "packageManager": "yarn@4.1.0+sha512.5b7bc055cad63273dda27df1570a5d2eb4a9f03b35b394d3d55393c2a5560a17f5cef30944b11d6a48bcbcfc1c3a26d618aae77044774c529ba36cb771ad5b0f"
 }
