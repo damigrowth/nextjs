@@ -184,7 +184,7 @@ export default function NavMenu({ isMobile = false, onClose }: NavMenuProps) {
                             <div key={subcategory.id} className='space-y-2'>
                               <NavigationMenuLink asChild>
                                 <Link
-                                  href={`/categories/${category.slug}/${subcategory.slug}`}
+                                  href={`/ipiresies/${subcategory.slug}`}
                                   className='block font-medium text-sm hover:text-primary transition-colors'
                                 >
                                   {subcategory.label}
@@ -199,7 +199,7 @@ export default function NavMenu({ isMobile = false, onClose }: NavMenuProps) {
                                       asChild
                                     >
                                       <Link
-                                        href={`/categories/${category.slug}/${subcategory.slug}/${subdivision.slug}`}
+                                        href={`/ipiresies/${subcategory.slug}/${subdivision.slug}`}
                                         className='block text-xs text-muted-foreground hover:text-foreground transition-colors'
                                       >
                                         {subdivision.label}

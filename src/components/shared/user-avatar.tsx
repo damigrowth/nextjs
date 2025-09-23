@@ -117,7 +117,7 @@ export default function UserAvatar({
         className={cn(
           sizeClass,
           borderClass,
-          'border-background shadow-lg rounded-3xl',
+          'border-background shadow-lg rounded-3xl bg-white',
           className,
         )}
       >
@@ -127,7 +127,7 @@ export default function UserAvatar({
         <AvatarFallback
           className={cn(
             fallbackSizeClass,
-            'font-semibold bg-primary text-primary-foreground',
+            'font-semibold bg-primary text-primary-foreground rounded-3xl',
           )}
         >
           {initials}

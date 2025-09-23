@@ -49,7 +49,12 @@ export default function MediaCarousel({
   // Handle null or undefined media - show placeholder
   if (!media || media.length === 0) {
     return (
-      <div className={cn('w-full h-full bg-gray-100 flex items-center justify-center', className)}>
+      <div
+        className={cn(
+          'w-full h-full bg-gray-100 flex items-center justify-center',
+          className,
+        )}
+      >
         <ImageIcon className='w-12 h-12 text-gray-400' />
       </div>
     );
@@ -91,7 +96,9 @@ export default function MediaCarousel({
     api?.scrollTo(index);
   };
 
-  const togglePlayPause = () => {
+  const togglePlayPause = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     const currentMedia = filteredMedia[current];
 
     if (currentMedia.resource_type === 'video' && videoRef.current) {
@@ -111,7 +118,9 @@ export default function MediaCarousel({
     }
   };
 
-  const toggleMute = () => {
+  const toggleMute = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (videoRef.current) {
       videoRef.current.muted = !videoRef.current.muted;
     }
@@ -169,6 +178,10 @@ export default function MediaCarousel({
                 className={cn(
                   'absolute flex items-center gap-2 rounded-full bg-black/50 backdrop-blur-sm bottom-4 left-1/2 -translate-x-1/2 px-4 py-2',
                 )}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
               >
                 <button
                   onClick={togglePlayPause}

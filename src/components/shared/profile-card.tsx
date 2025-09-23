@@ -3,10 +3,10 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import RatingDisplay from './rating-display';
-import ProfileBadges from './profile-badges';
 import { ProfileCardProps } from '@/lib/types';
 import { formatInitials } from '@/lib/utils/format';
+import ProfileBadges from './profile-badges';
+import RatingDisplay from './rating-display';
 
 export default function ProfileCard({ profile }: ProfileCardProps) {
   const {

@@ -3,10 +3,7 @@ import Image from 'next/image';
 import { Home, MapPin } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import type { ProfileMetaProps } from '@/lib/types/components';
-import RatingDisplay from '@/components/shared/rating-display';
-import VerifiedBadge from '@/components/shared/verified-badge';
-import SocialLinks from '@/components/shared/social-links';
-import UserAvatar from '@/components/shared/user-avatar';
+
 import {
   getCoverageAddress,
   getCoverageCountiesString,
@@ -14,6 +11,9 @@ import {
   hasOnbaseCoverage,
   hasOnsiteCoverage,
 } from '@/lib/utils/datasets';
+import { RatingDisplay, UserAvatar } from '../shared';
+import VerifiedBadge from '../shared/verified-badge';
+import SocialLinks from '../shared/social-links';
 
 /**
  * Modern ProfileMeta Component

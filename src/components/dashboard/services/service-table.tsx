@@ -15,7 +15,7 @@ import { formatDate } from '@/lib/utils/date';
 import { Status } from '@prisma/client';
 import TableMedia from '@/components/shared/table-media';
 import ServiceStatusBadge from './service-status-badge';
-import ServiceCategoryDisplay from './service-category-display';
+import TaxonomiesDisplay from '../../shared/taxonomies-display';
 import ServiceTableHeaderSort from './service-table-header-sort';
 import type {
   UserServiceTableData,
@@ -156,7 +156,7 @@ export default function ServiceTable({
 
               {/* Category Column */}
               <TableCell>
-                <ServiceCategoryDisplay
+                <TaxonomiesDisplay
                   categoryLabels={service.categoryLabels}
                   compact
                 />

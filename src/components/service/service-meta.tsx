@@ -1,7 +1,6 @@
 import React from 'react';
-import UserImage from '@/components/profile/user-image';
-import RatingDisplay from '@/components/shared/rating-display';
-import { ProfileBadges } from '../shared';
+import { ProfileBadges, RatingDisplay } from '../shared';
+import { UserImage } from '../profile';
 
 interface ServiceMetaProps {
   title: string;

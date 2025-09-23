@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { CheckCircle } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import {
   Tooltip,
   TooltipTrigger,
@@ -37,7 +37,7 @@ export function VerifiedBadge({ verified }: { verified?: boolean }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <CheckCircle className='h-5 w-5 text-green-600 cursor-pointer' />
+        <ShieldCheck className='h-6 w-6 text-white fill-secondary cursor-pointer' />
       </TooltipTrigger>
       <TooltipContent>
         <p>Πιστοποιημένο Προφίλ</p>
