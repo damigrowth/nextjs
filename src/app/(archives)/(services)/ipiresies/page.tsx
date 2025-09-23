@@ -44,7 +44,7 @@ export default async function ServicesPage({
       taxonomyData={taxonomyData}
       breadcrumbData={breadcrumbData}
       counties={counties}
-      basePath='/services'
+      basePath='/ipiresies'
       total={total}
       limit={20}
     >
