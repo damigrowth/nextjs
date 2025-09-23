@@ -145,6 +145,7 @@ function transformProfileService(service: any): ServiceCardData {
     title: service.title,
     category: categoryTaxonomy?.label || service.category,
     slug: service.slug,
+    type: service.type,
     price: service.price,
     rating: service.rating,
     reviewCount: service.reviewCount,
