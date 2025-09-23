@@ -119,7 +119,7 @@ export default async function ServicesSubcategoryPage({
       taxonomyData={taxonomyData}
       breadcrumbData={breadcrumbData}
       counties={counties}
-      basePath={`/ipiresies/${categorySlug}/${subcategorySlug}`}
+      basePath={`/ipiresies/${subcategorySlug}`}
       total={total}
       limit={20}
     >
