@@ -42,27 +42,45 @@ export function ArchiveSidebarFilters({
 
   // Parse current path to get taxonomy from route
   const pathSegments = pathname.split('/').filter(Boolean);
-  const baseArchivePath = archiveType === 'services' ? '/ipiresies' :
-                         archiveType === 'profiles' ? '/pros' : '/companies';
 
-  // Get current subcategory/subdivision from path (no category level)
-  const currentSubcategorySlug = pathSegments[1]; // After ipiresies/pros/companies
-  const currentSubdivisionSlug = pathSegments[2];
-
-  // Find current subcategory and subdivision from available filtered lists
-  const currentSubcategory = subcategories?.find(sub => sub.slug === currentSubcategorySlug);
-  const currentSubdivision = subdivisions?.find(div => div.slug === currentSubdivisionSlug);
-
-  // Find parent category for the current subcategory (needed for some operations)
-  let currentCategory = null;
-  if (currentSubcategory) {
-    for (const category of categories) {
-      if (category.children?.some(sub => sub.id === currentSubcategory.id)) {
-        currentCategory = category;
-        break;
-      }
+  // Determine base path from current pathname (since both pros and companies use archiveType='profiles')
+  let baseArchivePath;
+  if (archiveType === 'services') {
+    baseArchivePath = '/ipiresies';
+  } else if (archiveType === 'profiles') {
+    // Check if we're in pros or companies based on current pathname
+    if (pathname.startsWith('/companies')) {
+      baseArchivePath = '/companies';
+    } else {
+      baseArchivePath = '/pros';
     }
+  } else {
+    // Fallback (shouldn't happen)
+    baseArchivePath = '/' + pathSegments[0];
   }
+
+  // Get current category/subcategory/subdivision from path based on archive type
+  let currentCategorySlug, currentSubcategorySlug, currentSubdivisionSlug;
+
+  if (archiveType === 'services') {
+    // Services: /ipiresies/[subcategory]/[subdivision] (no category level)
+    currentSubcategorySlug = pathSegments[1];
+    currentSubdivisionSlug = pathSegments[2];
+  } else {
+    // Pros/Companies: /pros/[category]/[subcategory] or /companies/[category]/[subcategory]
+    currentCategorySlug = pathSegments[1];
+    currentSubcategorySlug = pathSegments[2];
+  }
+
+  // Find current category, subcategory and subdivision from available lists
+  const currentCategory = currentCategorySlug ?
+    categories.find(cat => cat.slug === currentCategorySlug) : null;
+
+  const currentSubcategory = currentSubcategorySlug ?
+    subcategories?.find(sub => sub.slug === currentSubcategorySlug) : null;
+
+  const currentSubdivision = currentSubdivisionSlug ?
+    subdivisions?.find(div => div.slug === currentSubdivisionSlug) : null;
 
   // Use only filtered subcategories and subdivisions from server action
   const availableSubcategories = subcategories || [];
@@ -93,28 +111,52 @@ export function ArchiveSidebarFilters({
     onFiltersChange(newFilters);
   };
 
-  // Handle category change - now redirects to main services page
+  // Handle category change - navigate to category route for profiles
   const handleCategoryChange = (categoryId: string) => {
     if (!categoryId) {
       router.push(buildUrl(baseArchivePath));
       return;
     }
 
-    // Since we removed categories from URLs, redirect to main page
-    router.push(buildUrl(baseArchivePath));
+    // For services, we removed categories from URLs, so redirect to main page
+    if (archiveType === 'services') {
+      router.push(buildUrl(baseArchivePath));
+      return;
+    }
+
+    // For profiles (pros/companies), navigate to category-specific route
+    const category = categories.find(cat => cat.id === categoryId);
+    if (!category) return;
+
+    const path = `${baseArchivePath}/${category.slug}`;
+    router.push(buildUrl(path));
   };
 
   // Handle subcategory change
   const handleSubcategoryChange = (subcategoryId: string) => {
     if (!subcategoryId) {
-      router.push(buildUrl(baseArchivePath));
+      // For pros/companies, go back to category page if we have a current category
+      if (archiveType === 'profiles' && currentCategory) {
+        router.push(buildUrl(`${baseArchivePath}/${currentCategory.slug}`));
+      } else {
+        router.push(buildUrl(baseArchivePath));
+      }
       return;
     }
 
     const subcategory = availableSubcategories.find(sub => sub.id === subcategoryId);
     if (!subcategory) return;
 
-    const path = `${baseArchivePath}/${subcategory.slug}`;
+    let path;
+    if (archiveType === 'services') {
+      // Services: /ipiresies/[subcategory]
+      path = `${baseArchivePath}/${subcategory.slug}`;
+    } else {
+      // Pros/Companies: /pros/[category]/[subcategory] or /companies/[category]/[subcategory]
+      if (!currentCategory) return; // Need category for pros/companies
+      path = `${baseArchivePath}/${currentCategory.slug}/${subcategory.slug}`;
+    }
+
     router.push(buildUrl(path));
   };
 
@@ -157,11 +199,17 @@ export function ArchiveSidebarFilters({
     return queryString ? `${path}?${queryString}` : path;
   };
 
-  // Only count filters that represent actual user selections
+  // Only count filters that represent actual user selections from search params
   const activeFilterCount = Object.entries(filters).filter(([key, value]) => {
     // System/navigation filters - not user-applied
-    const systemFilters = ['page', 'limit', 'status', 'archiveType'];
+    const systemFilters = ['page', 'limit', 'status', 'archiveType', 'role', 'published'];
     if (systemFilters.includes(key)) {
+      return false;
+    }
+
+    // Taxonomy filters from route - not user-applied search param filters
+    const taxonomyFilters = ['category', 'subcategory', 'subdivision'];
+    if (taxonomyFilters.includes(key)) {
       return false;
     }
 
@@ -171,7 +219,7 @@ export function ArchiveSidebarFilters({
       return false;
     }
 
-    // Only count meaningful user selections
+    // Only count meaningful user selections from search params
     return true;
   }).length;
 
