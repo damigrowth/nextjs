@@ -191,6 +191,35 @@ export function filterByField<T extends DatasetItem>(
 }
 
 /**
+ * Filter hierarchical taxonomy by type (recursively filters children)
+ * Used for filtering pro taxonomies by freelancer/company type
+ */
+export function filterTaxonomyByType<T extends DatasetItem & { type?: string }>(
+  taxonomies: T[],
+  targetType: string,
+): T[] {
+  return taxonomies.map(category => {
+    if (!category.children) {
+      return category;
+    }
+
+    // Filter subcategories to only include those matching the target type
+    const filteredChildren = category.children.filter((subcategory: any) => {
+      // If subcategory doesn't have a type field, include it for both types
+      return !subcategory.type || subcategory.type === targetType;
+    });
+
+    return {
+      ...category,
+      children: filteredChildren
+    } as T;
+  }).filter(category => {
+    // Only include categories that have at least one matching subcategory
+    return !category.children || category.children.length > 0;
+  });
+}
+
+/**
  * Create a flat map from hierarchical dataset for efficient lookups
  */
 export function createFlatMap<T extends DatasetItem>(
@@ -935,10 +964,19 @@ export function getTaxonomyBreadcrumbs<T extends DatasetItem>(
   categorySlug?: string,
   subcategorySlug?: string,
   subdivisionSlug?: string,
+  options?: {
+    basePath?: string;
+    baseLabel?: string;
+    usePlural?: boolean;
+  },
 ): Array<{ label: string; href?: string }> {
+  const basePath = options?.basePath || '/services';
+  const baseLabel = options?.baseLabel || 'Υπηρεσίες';
+  const usePlural = options?.usePlural || false;
+
   const breadcrumbs: Array<{ label: string; href?: string }> = [
     { label: 'Αρχική', href: '/' },
-    { label: 'Υπηρεσίες', href: '/services' },
+    { label: baseLabel, href: basePath },
   ];
 
   if (!categorySlug) {
@@ -958,24 +996,201 @@ export function getTaxonomyBreadcrumbs<T extends DatasetItem>(
 
   // Add category breadcrumb
   if (taxonomyContext.category) {
+    const categoryLabel = usePlural
+      ? (taxonomyContext.category.plural || taxonomyContext.category.label || taxonomyContext.category.name || '')
+      : (taxonomyContext.category.label || taxonomyContext.category.name || '');
+
     breadcrumbs.push({
-      label: taxonomyContext.category.label || taxonomyContext.category.name || '',
-      href: subdivisionSlug || subcategorySlug ? `/services/${categorySlug}` : undefined,
+      label: categoryLabel,
+      href: subdivisionSlug || subcategorySlug ? `${basePath}/${categorySlug}` : undefined,
     });
   }
 
   // Add subcategory breadcrumb
   if (taxonomyContext.subcategory) {
+    const subcategoryLabel = usePlural
+      ? (taxonomyContext.subcategory.plural || taxonomyContext.subcategory.label || taxonomyContext.subcategory.name || '')
+      : (taxonomyContext.subcategory.label || taxonomyContext.subcategory.name || '');
+
     breadcrumbs.push({
-      label: taxonomyContext.subcategory.label || taxonomyContext.subcategory.name || '',
-      href: subdivisionSlug ? `/services/${categorySlug}/${subcategorySlug}` : undefined,
+      label: subcategoryLabel,
+      href: subdivisionSlug ? `${basePath}/${categorySlug}/${subcategorySlug}` : undefined,
     });
   }
 
   // Add subdivision breadcrumb
   if (taxonomyContext.subdivision) {
+    const subdivisionLabel = usePlural
+      ? (taxonomyContext.subdivision.plural || taxonomyContext.subdivision.label || taxonomyContext.subdivision.name || '')
+      : (taxonomyContext.subdivision.label || taxonomyContext.subdivision.name || '');
+
     breadcrumbs.push({
-      label: taxonomyContext.subdivision.label || taxonomyContext.subdivision.name || '',
+      label: subdivisionLabel,
+    });
+  }
+
+  return breadcrumbs;
+}
+
+/**
+ * Find subcategory by slug across all categories (for new route structure without category)
+ * @param taxonomy - The hierarchical taxonomy dataset
+ * @param subcategorySlug - Subcategory slug to find
+ * @returns Object with the found subcategory and its parent category, or null if not found
+ */
+export function findSubcategoryBySlug<T extends DatasetItem>(
+  taxonomy: T[],
+  subcategorySlug: string,
+): { category: T; subcategory: T } | null {
+  for (const category of taxonomy) {
+    if (category.children) {
+      const subcategory = category.children.find((sub: any) => sub.slug === subcategorySlug) as T | undefined;
+      if (subcategory) {
+        return { category, subcategory };
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Find subdivision by slug across all categories and subcategories (for new route structure)
+ * @param taxonomy - The hierarchical taxonomy dataset
+ * @param subdivisionSlug - Subdivision slug to find
+ * @returns Object with the found subdivision and its parent category/subcategory, or null if not found
+ */
+export function findSubdivisionBySlug<T extends DatasetItem>(
+  taxonomy: T[],
+  subdivisionSlug: string,
+): { category: T; subcategory: T; subdivision: T } | null {
+  for (const category of taxonomy) {
+    if (category.children) {
+      for (const subcategory of category.children as T[]) {
+        if ((subcategory as any).children) {
+          const subdivision = (subcategory as any).children.find((div: any) => div.slug === subdivisionSlug) as T | undefined;
+          if (subdivision) {
+            return { category, subcategory, subdivision };
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Find taxonomy context by subcategory and optional subdivision (no category required)
+ * @param taxonomy - The hierarchical taxonomy dataset
+ * @param subcategorySlug - Subcategory slug
+ * @param subdivisionSlug - Optional subdivision slug
+ * @returns Object with resolved taxonomy items at each level
+ */
+export function findTaxonomyBySubcategorySlug<T extends DatasetItem>(
+  taxonomy: T[],
+  subcategorySlug: string,
+  subdivisionSlug?: string,
+): {
+  category: T;
+  subcategory: T;
+  subdivision?: T;
+} | null {
+  const subcategoryResult = findSubcategoryBySlug(taxonomy, subcategorySlug);
+  if (!subcategoryResult) {
+    return null;
+  }
+
+  const { category, subcategory } = subcategoryResult;
+
+  // If no subdivision requested, return category and subcategory
+  if (!subdivisionSlug) {
+    return { category, subcategory };
+  }
+
+  // Find subdivision within the found subcategory
+  const subdivision = (subcategory as any).children?.find(
+    (div: any) => div.slug === subdivisionSlug,
+  ) as T | undefined;
+
+  if (!subdivision) {
+    return null;
+  }
+
+  return { category, subcategory, subdivision };
+}
+
+/**
+ * Generate breadcrumb segments for new route structure (no category in URL)
+ * @param taxonomy - The hierarchical taxonomy dataset
+ * @param subcategorySlug - Subcategory slug
+ * @param subdivisionSlug - Optional subdivision slug
+ * @param options - Options for customizing breadcrumbs
+ * @returns Array of breadcrumb segments with labels and hrefs
+ */
+export function getBreadcrumbsForNewRoutes<T extends DatasetItem>(
+  taxonomy: T[],
+  subcategorySlug?: string,
+  subdivisionSlug?: string,
+  options?: {
+    basePath?: string;
+    baseLabel?: string;
+    usePlural?: boolean;
+  },
+): Array<{ label: string; href?: string }> {
+  const basePath = options?.basePath || '/ipiresies';
+  const baseLabel = options?.baseLabel || 'Υπηρεσίες';
+  const usePlural = options?.usePlural || false;
+
+  const breadcrumbs: Array<{ label: string; href?: string }> = [
+    { label: 'Αρχική', href: '/' },
+    { label: baseLabel, href: basePath },
+  ];
+
+  if (!subcategorySlug) {
+    return breadcrumbs;
+  }
+
+  const taxonomyContext = findTaxonomyBySubcategorySlug(
+    taxonomy,
+    subcategorySlug,
+    subdivisionSlug,
+  );
+
+  if (!taxonomyContext) {
+    return breadcrumbs;
+  }
+
+  // Add category breadcrumb (links to categories page)
+  if (taxonomyContext.category) {
+    const categoryLabel = usePlural
+      ? (taxonomyContext.category.plural || taxonomyContext.category.label || taxonomyContext.category.name || '')
+      : (taxonomyContext.category.label || taxonomyContext.category.name || '');
+
+    breadcrumbs.push({
+      label: categoryLabel,
+      href: `/categories/${taxonomyContext.category.slug}`,
+    });
+  }
+
+  // Add subcategory breadcrumb
+  if (taxonomyContext.subcategory) {
+    const subcategoryLabel = usePlural
+      ? (taxonomyContext.subcategory.plural || taxonomyContext.subcategory.label || taxonomyContext.subcategory.name || '')
+      : (taxonomyContext.subcategory.label || taxonomyContext.subcategory.name || '');
+
+    breadcrumbs.push({
+      label: subcategoryLabel,
+      href: subdivisionSlug ? `${basePath}/${subcategorySlug}` : undefined,
+    });
+  }
+
+  // Add subdivision breadcrumb
+  if (taxonomyContext.subdivision) {
+    const subdivisionLabel = usePlural
+      ? (taxonomyContext.subdivision.plural || taxonomyContext.subdivision.label || taxonomyContext.subdivision.name || '')
+      : (taxonomyContext.subdivision.label || taxonomyContext.subdivision.name || '');
+
+    breadcrumbs.push({
+      label: subdivisionLabel,
     });
   }
 

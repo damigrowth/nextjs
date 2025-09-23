@@ -263,11 +263,18 @@ export interface ProfileCardProps {
 // Archive Profile Card Component Types
 export type ArchiveProfileCardData = Pick<
   import('@prisma/client').Profile,
-  'id' | 'username' | 'displayName' | 'rating' | 'reviewCount' | 'verified' | 'featured' | 'top' | 'rate' | 'coverage'
+  'id' | 'username' | 'displayName' | 'rating' | 'reviewCount' | 'verified' | 'featured' | 'top' | 'rate' | 'coverage' | 'image' | 'category' | 'subcategory' | 'tagline' | 'skills' | 'speciality'
 > & Pick<
   import('@prisma/client').User,
   'role'
->;
+> & {
+  categoryLabels?: {
+    category: string;
+    subcategory: string;
+  };
+  skillsData: DatasetItem[];
+  specialityData?: DatasetItem | null;
+};
 
 // Archive Service Card Component Types
 export type ArchiveServiceCardData = Pick<
@@ -281,3 +288,51 @@ export type ArchiveServiceCardData = Pick<
   };
   profile: Pick<import('@prisma/client').Profile, 'id' | 'displayName' | 'username' | 'image' | 'coverage' | 'verified' | 'top'>;
 };
+
+// Profile filter types for archives
+export type ProfileFilters = Partial<Pick<
+  import('@prisma/client').Profile,
+  'category' | 'subcategory' | 'published'
+>> & Partial<Pick<
+  import('@prisma/client').User,
+  'role' // for 'freelancer' | 'company' types
+>> & {
+  county?: string;      // Single county selection for coverage filtering
+  online?: boolean;     // Coverage.online field
+  page?: number;
+  limit?: number;
+  sortBy?: 'default' | 'recent' | 'oldest' | 'price_asc' | 'price_desc' | 'rating_high' | 'rating_low';
+};
+
+// Enhanced filter types for comprehensive profile archives
+export type ProfileArchiveFilters = ProfileFilters & {
+  category?: string;
+  subcategory?: string;
+};
+
+// Interface for comprehensive profile archive data
+export interface ProfileArchivePageData {
+  profiles: Array<ArchiveProfileCardData & {
+    transformedCoverage: any; // Pre-transformed coverage data
+  }>;
+  total: number;
+  hasMore: boolean;
+  taxonomyData: {
+    categories: DatasetItem[];
+    currentCategory?: DatasetItem;
+    currentSubcategory?: DatasetItem;
+    subcategories?: DatasetItem[];
+  };
+  breadcrumbData: {
+    segments: Array<{
+      label: string;
+      href?: string;
+    }>;
+  };
+  counties: Array<{
+    id: string;
+    label: string;
+    slug: string;
+  }>;
+  filters: ProfileArchiveFilters;
+}

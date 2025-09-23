@@ -56,6 +56,8 @@ export function useArchiveFilters({ initialFilters = {}, basePath }: UseArchiveF
         if (key === 'category' || key === 'subcategory' || key === 'subdivision') return;
         // Skip status and limit as they're internal state
         if (key === 'status' || key === 'limit') return;
+        // Skip role and published as they're handled internally by archive type
+        if (key === 'role' || key === 'published') return;
 
         if (key === 'online') {
           // Mark that we need to add online parameter later
@@ -134,12 +136,11 @@ export function useArchiveFilters({ initialFilters = {}, basePath }: UseArchiveF
     updateURL(clearedFilters);
   }, [filters.category, filters.subcategory, filters.subdivision, updateURL]);
 
-  // Get active filter count (excluding page and default sort)
+  // Get active filter count (excluding page, default sort, and taxonomy from route)
   const getActiveFilterCount = useCallback(() => {
     let count = 0;
-    if (filters.category) count++;
-    if (filters.subcategory) count++;
-    if (filters.subdivision) count++;
+    // Don't count taxonomy filters as they come from the route path, not user selection
+    // Only count actual user-applied filters from query params
     if (filters.county) count++;
     if (filters.online) count++;
     if (filters.sortBy && filters.sortBy !== 'default') count++;
