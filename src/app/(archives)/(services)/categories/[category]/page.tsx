@@ -165,6 +165,7 @@ export default async function CategoryPage({
             archiveTaxonomyData.currentCategory.description ||
             `Ανακάλυψε όλες τις υπηρεσίες στην κατηγορία ${archiveTaxonomyData.currentCategory.label.toLowerCase()} από τους καλύτερους επαγγελματίες.`
           }
+          image={archiveTaxonomyData.currentCategory.image}
         />
 
         {/* Page Content */}
