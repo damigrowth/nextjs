@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Card,
   CardContent,
@@ -40,8 +41,20 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
         {categories.map((category) => (
           <Card
             key={category.id}
-            className='h-full hover:shadow-lg transition-shadow'
+            className='h-full hover:shadow-lg transition-shadow overflow-hidden'
           >
+            {/* Category Image */}
+            {category.image && (
+              <div className='relative w-full h-48 bg-gray-100'>
+                <Image
+                  src={category.image.secure_url}
+                  alt={category.label}
+                  fill
+                  className='object-cover'
+                  sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+                />
+              </div>
+            )}
             <CardHeader className='pb-0'>
               <div className='flex items-start space-x-3'>
                 <div className='flex-1 min-w-0'>
