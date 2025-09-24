@@ -25,12 +25,14 @@ export interface CategoryWithSubcategories {
   description?: string;
   icon?: string;
   href: string;
+  image?: PrismaJson.CloudinaryResource;
   subcategories: Array<{
     id: string;
     label: string;
     slug: string;
     count: number;
     href: string;
+    image?: PrismaJson.CloudinaryResource;
   }>;
 }
 
@@ -242,6 +244,7 @@ export async function getCategoriesPageData(options?: {
                   slug: subcategory.slug,
                   description: subcategory.description,
                   // icon: subcategory.icon,
+                  image: subcategory.image as PrismaJson.CloudinaryResource | undefined,
                   href: `/ipiresies/${subcategory.slug}`,
                   subcategories: subdivisionsWithServices, // These are actually subdivisions
                 };
@@ -270,6 +273,7 @@ export async function getCategoriesPageData(options?: {
                     label: subcategory.label,
                     slug: subcategory.slug,
                     count: serviceCount,
+                    image: subcategory.image as PrismaJson.CloudinaryResource | undefined,
                     href: `/ipiresies/${subcategory.slug}`,
                   };
                 })
@@ -282,6 +286,7 @@ export async function getCategoriesPageData(options?: {
                 slug: category.slug,
                 description: category.description,
                 icon: category.icon,
+                image: category.image as PrismaJson.CloudinaryResource | undefined,
                 href: `/categories/${category.slug}`,
                 subcategories: subcategoriesWithServices,
               };
