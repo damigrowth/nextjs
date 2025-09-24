@@ -26,10 +26,14 @@ export function ArchiveServiceCard({
       )}
     >
       <div className='flex flex-col md:flex-row h-full md:h-52'>
-        {/* Media Section */}
+        {/* Media Section - Shows first on mobile, second on desktop */}
         <Link
           href={`/s/${service.slug}`}
-          className='w-full md:w-96 flex-shrink-0 relative overflow-hidden'
+          className={
+            !service.media || service.media.length === 0
+              ? 'md:hidden aspect-video'
+              : 'w-full md:w-96 flex-shrink-0 relative overflow-hidden md:order-2'
+          }
         >
           <MediaCarousel
             media={service.media}
@@ -42,8 +46,8 @@ export function ArchiveServiceCard({
           />
         </Link>
 
-        {/* Content Section */}
-        <div className='flex-1 px-6 pt-4 pb-3 flex flex-col justify-between min-w-0'>
+        {/* Content Section - Shows second on mobile, first on desktop */}
+        <div className='flex-1 px-6 pt-4 pb-3 flex flex-col justify-between min-w-0 md:order-1'>
           <div className='space-y-2'>
             <Link href={`/s/${service.slug}`} className='block'>
               <h3 className='text-lg font-semibold text-gray-900 line-clamp-2 hover:text-third transition-colors mb-0'>
