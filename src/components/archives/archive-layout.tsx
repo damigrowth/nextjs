@@ -134,14 +134,14 @@ export function ArchiveLayout({
         };
       case 'services':
         return {
-          basePath: 'services',
+          basePath: 'categories',
           allItemsLabel: 'Όλες οι Υπηρεσίες',
           usePluralLabels: false,
           sidebarType: 'services' as const,
         };
       default:
         return {
-          basePath: 'services',
+          basePath: 'categories',
           allItemsLabel: 'Όλα τα Στοιχεία',
           usePluralLabels: false,
           sidebarType: 'services' as const,
