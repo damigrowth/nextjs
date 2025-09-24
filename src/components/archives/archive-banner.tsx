@@ -7,12 +7,17 @@ interface ArchiveBannerProps {
   title: string;
   subtitle: string;
   className?: string;
+  image?: {
+    secure_url: string;
+    original_filename?: string;
+  };
 }
 
 export function ArchiveBanner({
   title,
   subtitle,
   className,
+  image,
 }: ArchiveBannerProps) {
   return (
     <section className={cn('py-4 container mx-auto', className)}>
@@ -37,12 +42,15 @@ export function ArchiveBanner({
           priority
         />
         <Image
-          alt='vector'
+          alt={image?.original_filename || 'Service category'}
           width={320}
           height={180}
-          className='absolute rounded-lg h-45 right-12pc w-80 hidden lg:block z-0'
+          className='absolute rounded-lg h-45 right-12pc w-80 hidden lg:block z-0 object-cover'
           style={{ right: '12%' }}
-          src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071394/Static/vector-service-v1_p6jy69.webp'
+          src={
+            image?.secure_url ||
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071394/Static/vector-service-v1_p6jy69.webp'
+          }
           priority
         />
         <div className='container mx-auto px-4 relative z-20'>
