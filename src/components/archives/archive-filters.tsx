@@ -53,14 +53,14 @@ export function ArchiveFilters({
   return (
     <div
       className={cn(
-        'flex items-center bg-white border-b border-gray-200 h-16',
+        'flex items-center bg-white border-b border-gray-200 py-4',
         className,
       )}
     >
       <div className='container mx-auto px-4'>
-        <div className='flex items-center justify-between h-full gap-4'>
+        <div className='flex flex-wrap items-center justify-between h-full gap-4'>
           {/* Left side: All Filters, Online Toggle, Counties */}
-          <div className='flex items-center gap-6'>
+          <div className='flex flex-wrap items-center gap-6'>
             {/* All Filters Button/Trigger */}
             {filterTrigger || (
               <SheetTrigger asChild>
@@ -84,7 +84,7 @@ export function ArchiveFilters({
             )}
             {/* Online Toggle */}
             <OnlineToggle
-              id="online-filter"
+              id='online-filter'
               checked={filters.online || false}
               onCheckedChange={handleOnlineToggle}
             />
@@ -109,8 +109,8 @@ export function ArchiveFilters({
               value={filters.sortBy}
               onValueChange={handleSortChange}
               fullWidth={false}
-              className="w-32"
-              searchPlaceholder="Αναζήτηση..."
+              className='w-32'
+              searchPlaceholder='Αναζήτηση...'
             />
           </div>
         </div>
