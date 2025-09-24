@@ -217,6 +217,29 @@ export function ArchiveLayout({
     }
   };
 
+  // Generate banner image based on current taxonomy hierarchy
+  const getBannerImage = () => {
+    const { currentSubdivision, currentSubcategory, currentCategory } =
+      taxonomyData;
+
+    // Priority: subdivision > subcategory > category
+    // Use the most specific image available
+    if (currentSubdivision?.image) {
+      return currentSubdivision.image;
+    }
+
+    if (currentSubcategory?.image) {
+      return currentSubcategory.image;
+    }
+
+    if (currentCategory?.image) {
+      return currentCategory.image;
+    }
+
+    // No taxonomy image available, use default
+    return undefined;
+  };
+
   return (
     <div className={clsx(className, 'py-20')}>
       {/* Category Navigation Tabs */}
@@ -237,7 +260,11 @@ export function ArchiveLayout({
       )}
 
       {/* Archive Banner */}
-      <ArchiveBanner title={getBannerTitle()} subtitle={getBannerSubtitle()} />
+      <ArchiveBanner
+        title={getBannerTitle()}
+        subtitle={getBannerSubtitle()}
+        image={getBannerImage()}
+      />
 
       {/* Archive Content */}
       <section>
