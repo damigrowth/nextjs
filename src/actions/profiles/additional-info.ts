@@ -76,6 +76,10 @@ export async function updateProfileAdditionalInfo(
         id: true,
         uid: true,
         username: true,
+        services: {
+          where: { status: 'published' },
+          select: { slug: true },
+        },
       },
     });
 
@@ -120,6 +124,13 @@ export async function updateProfileAdditionalInfo(
     if (existingProfile.username) {
       revalidatePath(`/profile/${existingProfile.username}`);
     }
+
+    // Revalidate all service pages that belong to this profile
+    existingProfile.services.forEach(service => {
+      if (service.slug) {
+        revalidatePath(`/s/${service.slug}`);
+      }
+    });
 
     return {
       success: true,
