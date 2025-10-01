@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidateTag, revalidatePath } from 'next/cache';
+import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
 import { prisma } from '@/lib/prisma/client';
 import { ActionResult, ActionResponse } from '@/lib/types/api';
 import { requireAuth } from '@/actions/auth/server';
@@ -56,7 +57,25 @@ export async function updateAccount(
     const data = validationResult.data;
 
     // 4. Database & API operations
-    await prisma.profile.updateMany({
+    // First get the profile to have all the data for cache invalidation
+    const profile = await prisma.profile.findUnique({
+      where: { uid: user.id },
+      select: {
+        id: true,
+        uid: true,
+        username: true,
+      },
+    });
+
+    if (!profile) {
+      return {
+        success: false,
+        message: 'Το προφίλ δεν βρέθηκε.',
+      };
+    }
+
+    // Update the profile
+    await prisma.profile.update({
       where: { uid: user.id },
       data: {
         displayName: data.displayName,
@@ -88,13 +107,23 @@ export async function updateAccount(
       },
     });
 
-    // 6. Revalidate cached data (this forces fresh fetch on next request)
-    revalidateTag(`user-${user.id}`);
-    revalidateTag(`profile-${user.id}`);
-    revalidateTag('profiles');
-    
-    // Also revalidate the page itself
+    // 6. Revalidate cached data with consistent tags
+    const profileTags = getProfileTags(profile);
+    profileTags.forEach(tag => revalidateTag(tag));
+
+    // Also revalidate user-specific tags
+    revalidateTag(CACHE_TAGS.user.byId(user.id));
+    revalidateTag(CACHE_TAGS.user.services(user.id));
+
+    // Revalidate profile services (they show displayName)
+    revalidateTag(CACHE_TAGS.profile.services(profile.id));
+    revalidateTag(CACHE_TAGS.service.byProfile(profile.id));
+
+    // Revalidate specific pages
     revalidatePath('/dashboard/profile/account');
+    if (profile.username) {
+      revalidatePath(`/profile/${profile.username}`);
+    }
 
     return {
       success: true,
