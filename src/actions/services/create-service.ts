@@ -1,8 +1,9 @@
 'use server';
 
-import { revalidateTag } from 'next/cache';
+import { revalidateTag, revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { ActionResponse } from '@/lib/types/api';
+import { CACHE_TAGS, getServiceTags } from '@/lib/cache';
 
 // Service creation specific response type
 interface ServiceActionResponse extends ActionResponse {
@@ -288,11 +289,45 @@ async function createServiceInternal(
 
     // 10. Media handling - now properly sanitizes pending resources before database storage
 
-    // 11. Revalidate cached data
-    revalidateTag(`user-${user.id}`);
-    revalidateTag(`profile-${user.id}`);
-    revalidateTag('services');
-    revalidateTag(`user-services-${user.id}`);
+    // 11. Revalidate cached data with consistent tags
+    // For draft services, only revalidate user/profile data
+    if (status === 'draft') {
+      revalidateTag(CACHE_TAGS.user.byId(user.id));
+      revalidateTag(CACHE_TAGS.profile.byId(profile.id));
+      revalidateTag(CACHE_TAGS.user.services(user.id));
+      revalidateTag(CACHE_TAGS.profile.services(profile.id));
+    } else if (createdService) {
+      // For published services, get service data for comprehensive invalidation
+      const serviceForTags = await prisma.service.findUnique({
+        where: { id: createdService.id },
+        select: {
+          id: true,
+          slug: true,
+          pid: true,
+          category: true,
+        },
+      });
+
+      if (serviceForTags) {
+        // Revalidate service-specific tags
+        const serviceTags = getServiceTags(serviceForTags);
+        serviceTags.forEach(tag => revalidateTag(tag));
+
+        // Revalidate profile tags
+        revalidateTag(CACHE_TAGS.profile.byId(profile.id));
+        revalidateTag(CACHE_TAGS.user.byId(user.id));
+        revalidateTag(CACHE_TAGS.user.services(user.id));
+        revalidateTag(CACHE_TAGS.profile.services(profile.id));
+
+        // Revalidate specific pages
+        if (serviceForTags.slug) {
+          revalidatePath(`/s/${serviceForTags.slug}`);
+        }
+        if (profile.username) {
+          revalidatePath(`/profile/${profile.username}`);
+        }
+      }
+    }
 
     // 12. Success response - let client handle navigation
     if (status === 'draft') {

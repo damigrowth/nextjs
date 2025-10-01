@@ -1,6 +1,7 @@
 'use server';
 
-import { revalidateTag } from 'next/cache';
+import { revalidateTag, revalidatePath } from 'next/cache';
+import { CACHE_TAGS, getServiceTags } from '@/lib/cache';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
@@ -95,12 +96,42 @@ export async function updateServiceAction(
         media: (validData.media || []) as any,
         updatedAt: new Date(),
       },
+      include: {
+        profile: {
+          select: {
+            username: true,
+          },
+        },
+      },
     });
 
-    // Revalidate cached data
-    revalidateTag(`user-services-${session.user.id}`);
-    revalidateTag(`service-${serviceId}`);
-    revalidateTag('services');
+    // Revalidate cached data with consistent tags
+    const serviceTags = getServiceTags({
+      id: updatedService.id,
+      slug: updatedService.slug,
+      pid: updatedService.pid,
+      category: updatedService.category,
+    });
+
+    // Revalidate all service-related tags
+    serviceTags.forEach(tag => revalidateTag(tag));
+
+    // Also revalidate profile-related tags
+    revalidateTag(CACHE_TAGS.profile.byId(profile.id));
+    revalidateTag(CACHE_TAGS.user.services(session.user.id));
+
+    if (profile.username) {
+      revalidateTag(CACHE_TAGS.profile.byUsername(profile.username));
+      revalidateTag(CACHE_TAGS.profile.page(profile.username));
+    }
+
+    // Revalidate specific pages
+    if (updatedService.slug) {
+      revalidatePath(`/s/${updatedService.slug}`);
+    }
+    if (updatedService.profile?.username) {
+      revalidatePath(`/profile/${updatedService.profile.username}`);
+    }
 
     return {
       success: true,
