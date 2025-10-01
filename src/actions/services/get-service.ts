@@ -1,6 +1,8 @@
 'use server';
 
 import { auth } from '@/lib/auth';
+import { CACHE_TAGS } from '@/lib/cache';
+import { unstable_cache } from 'next/cache';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
@@ -198,9 +200,9 @@ function resolveProfileSubcategory(profile: ServiceProfileFields) {
 }
 
 /**
- * Get complete service page data with all resolved information
+ * Internal function to fetch service page data (uncached)
  */
-export async function getServicePageData(
+async function _getServicePageData(
   slug: string,
 ): Promise<ActionResult<ServicePageData>> {
   try {
@@ -270,35 +272,28 @@ export async function getServicePageData(
     // Build breadcrumb segments (taxonomies only)
     const breadcrumbSegments: BreadcrumbSegment[] = [
       { label: 'Αρχική', href: '/' },
-      { label: 'Υπηρεσίες', href: '/services' },
+      { label: 'Υπηρεσίες', href: '/ipiresies' },
     ];
 
     if (category) {
       breadcrumbSegments.push({
         label: category.label,
-        href: `/ipiresies/${category.slug}`,
+        href: `/categories/${category.slug}`,
       });
     }
 
     if (subcategory) {
       breadcrumbSegments.push({
         label: subcategory.label,
-        href: `/ipiresies/${category?.slug}/${subcategory.slug}`,
+        href: `/ipiresies/${subcategory.slug}`,
       });
     }
 
     if (subdivision) {
       breadcrumbSegments.push({
         label: subdivision.label,
-        href: `/ipiresies/${category?.slug}/${subcategory?.slug}/${subdivision.slug}`,
-        isCurrentPage: true, // Mark last taxonomy as current page
+        href: `/ipiresies/${subcategory?.slug}/${subdivision.slug}`,
       });
-    } else if (subcategory) {
-      // If no subdivision, mark subcategory as current
-      breadcrumbSegments[breadcrumbSegments.length - 1].isCurrentPage = true;
-    } else if (category) {
-      // If only category exists, mark it as current
-      breadcrumbSegments[breadcrumbSegments.length - 1].isCurrentPage = true;
     }
 
     // Transform profile data - resolve IDs to actual dataset objects
@@ -364,6 +359,27 @@ export async function getServicePageData(
       error: 'Failed to fetch service data',
     };
   }
+}
+
+/**
+ * Cached version of getServicePageData with ISR + tag-based revalidation
+ * Uses consistent cache tags for proper invalidation
+ */
+export async function getServicePageData(slug: string): Promise<ActionResult<ServicePageData>> {
+  const getCached = unstable_cache(
+    _getServicePageData,
+    ['service-page', slug],
+    {
+      tags: [
+        CACHE_TAGS.service.bySlug(slug),
+        CACHE_TAGS.service.page(slug),
+        CACHE_TAGS.collections.services,
+      ],
+      revalidate: 300, // 5 minutes, matching ISR
+    }
+  );
+
+  return getCached(slug);
 }
 
 /**

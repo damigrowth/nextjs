@@ -2,6 +2,7 @@
 
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
+import { CACHE_TAGS } from '@/lib/cache';
 import { Profile } from '@prisma/client';
 import { ActionResult } from '@/lib/types/api';
 import type { ServiceCardData } from '@/lib/types/components';
@@ -226,10 +227,9 @@ async function getProfileByUsername(username: string) {
 
 
 /**
- * Retrieves complete profile data with resolved taxonomy information
- * Validates user permissions and resolves category/subcategory data
+ * Internal function to fetch profile page data (uncached)
  */
-export async function getProfilePageData(
+async function _getProfilePageData(
   username: string
 ): Promise<ActionResult<ProfilePageData>> {
   try {
@@ -335,11 +335,7 @@ export async function getProfilePageData(
       breadcrumbSegments.push({
         label: subcategory.plural || subcategory.label,
         href: `/${profile.user.role === 'company' ? 'companies' : 'pros'}/${category?.slug}/${subcategory.slug}`,
-        isCurrentPage: true,
       });
-    } else if (category) {
-      // If no subcategory, mark category as current page
-      breadcrumbSegments[breadcrumbSegments.length - 1].isCurrentPage = true;
     }
 
     // Fetch services for this profile
@@ -407,6 +403,27 @@ export async function getProfilePageData(
       error: 'Failed to fetch profile data',
     };
   }
+}
+
+/**
+ * Cached version of getProfilePageData with ISR + tag-based revalidation
+ * Uses consistent cache tags for proper invalidation
+ */
+export async function getProfilePageData(username: string): Promise<ActionResult<ProfilePageData>> {
+  const getCached = unstable_cache(
+    _getProfilePageData,
+    ['profile-page', username],
+    {
+      tags: [
+        CACHE_TAGS.profile.byUsername(username),
+        CACHE_TAGS.profile.page(username),
+        CACHE_TAGS.collections.profiles,
+      ],
+      revalidate: 300, // 5 minutes, matching ISR
+    }
+  );
+
+  return getCached(username);
 }
 
 /**
