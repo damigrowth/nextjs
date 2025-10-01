@@ -133,8 +133,8 @@ export function getProfileTags(profile: {
   id: string;
   uid: string;
   username?: string | null;
-}): string[] {
-  const tags = [
+}): (string | `profile:username:${string}` | `profile:page:${string}`)[] {
+  const tags: (string | `profile:username:${string}` | `profile:page:${string}`)[] = [
     CACHE_TAGS.profile.byId(profile.id),
     CACHE_TAGS.profile.byUserId(profile.uid),
     CACHE_TAGS.user.profile(profile.uid),
@@ -157,8 +157,8 @@ export function getServiceTags(service: {
   slug?: string | null;
   pid: string;
   category?: string | null;
-}): string[] {
-  const tags = [
+}): (string | `service:slug:${string}` | `page:service:${string}` | `services:category:${string}`)[] {
+  const tags: (string | `service:slug:${string}` | `page:service:${string}` | `services:category:${string}`)[] = [
     CACHE_TAGS.service.byId(service.id),
     CACHE_TAGS.service.byProfile(service.pid),
     CACHE_TAGS.profile.services(service.pid),
