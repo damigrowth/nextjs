@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidateTag } from 'next/cache';
+import { revalidateTag, revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { ActionResponse, ActionResult } from '@/lib/types/api';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
@@ -12,6 +12,7 @@ import {
 import { extractFormData } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
 
 /**
  * Server action to update profile presentation info
@@ -71,9 +72,14 @@ export async function updateProfilePresentation(
 
     const data = validationResult.data;
 
-    // 5. Check if profile exists
+    // 5. Check if profile exists and get data for cache invalidation
     const existingProfile = await prisma.profile.findUnique({
       where: { uid: user.id },
+      select: {
+        id: true,
+        uid: true,
+        username: true,
+      },
     });
 
     if (!existingProfile) {
@@ -102,11 +108,23 @@ export async function updateProfilePresentation(
       },
     });
 
-    // 7. Revalidate cached data
-    revalidateTag(`user-${user.id}`);
-    revalidateTag(`profile-${user.id}`);
-    revalidateTag('auth-data');
-    revalidateTag('profiles');
+    // 7. Revalidate cached data with consistent tags
+    const profileTags = getProfileTags(existingProfile);
+    profileTags.forEach(tag => revalidateTag(tag));
+
+    // Also revalidate user-specific tags
+    revalidateTag(CACHE_TAGS.user.byId(user.id));
+    revalidateTag(CACHE_TAGS.user.services(user.id));
+
+    // Revalidate profile services (they show profile data)
+    revalidateTag(CACHE_TAGS.profile.services(existingProfile.id));
+    revalidateTag(CACHE_TAGS.service.byProfile(existingProfile.id));
+
+    // Revalidate specific pages
+    revalidatePath('/dashboard/profile/presentation');
+    if (existingProfile.username) {
+      revalidatePath(`/profile/${existingProfile.username}`);
+    }
 
     return {
       success: true,

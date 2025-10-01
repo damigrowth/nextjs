@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidateTag, unstable_cache } from 'next/cache';
+import { revalidateTag, revalidatePath, unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { ActionResponse } from '@/lib/types/api';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
@@ -11,6 +11,7 @@ import {
 import { extractFormData } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
 
 /**
  * Server action for submitting verification form
@@ -64,10 +65,14 @@ export async function submitVerificationRequest(
 
     const data = validationResult.data;
 
-    // 5. Check if user has a profile
+    // 5. Check if user has a profile and get data for cache invalidation
     const profile = await prisma.profile.findUnique({
       where: { uid: user.id },
-      select: { id: true },
+      select: {
+        id: true,
+        uid: true,
+        username: true,
+      },
     });
 
     if (!profile) {
@@ -97,11 +102,22 @@ export async function submitVerificationRequest(
         },
       });
 
-      // 7. Revalidate cached data
-      revalidateTag(`user-${user.id}`);
-      revalidateTag(`profile-${user.id}`);
-      revalidateTag(`verification-${user.id}`);
-      revalidateTag('auth-data');
+      // 7. Revalidate cached data with consistent tags
+      const profileTags = getProfileTags(profile);
+      profileTags.forEach(tag => revalidateTag(tag));
+
+      // Also revalidate user-specific tags
+      revalidateTag(CACHE_TAGS.user.byId(user.id));
+      revalidateTag(CACHE_TAGS.user.services(user.id));
+
+      // Revalidate verification-specific tags
+      revalidateTag(CACHE_TAGS.verification.byUserId(user.id));
+
+      // Revalidate specific pages
+      revalidatePath('/dashboard/profile/verification');
+      if (profile.username) {
+        revalidatePath(`/profile/${profile.username}`);
+      }
 
       return {
         success: true,
@@ -122,11 +138,22 @@ export async function submitVerificationRequest(
         },
       });
 
-      // 7. Revalidate cached data
-      revalidateTag(`user-${user.id}`);
-      revalidateTag(`profile-${user.id}`);
-      revalidateTag(`verification-${user.id}`);
-      revalidateTag('auth-data');
+      // 7. Revalidate cached data with consistent tags
+      const profileTags = getProfileTags(profile);
+      profileTags.forEach(tag => revalidateTag(tag));
+
+      // Also revalidate user-specific tags
+      revalidateTag(CACHE_TAGS.user.byId(user.id));
+      revalidateTag(CACHE_TAGS.user.services(user.id));
+
+      // Revalidate verification-specific tags
+      revalidateTag(CACHE_TAGS.verification.byUserId(user.id));
+
+      // Revalidate specific pages
+      revalidatePath('/dashboard/profile/verification');
+      if (profile.username) {
+        revalidatePath(`/profile/${profile.username}`);
+      }
 
       return {
         success: true,
