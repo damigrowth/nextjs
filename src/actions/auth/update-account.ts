@@ -64,6 +64,10 @@ export async function updateAccount(
         id: true,
         uid: true,
         username: true,
+        services: {
+          where: { status: 'published' },
+          select: { slug: true },
+        },
       },
     });
 
@@ -124,6 +128,13 @@ export async function updateAccount(
     if (profile.username) {
       revalidatePath(`/profile/${profile.username}`);
     }
+
+    // Revalidate all service pages that belong to this profile
+    profile.services.forEach(service => {
+      if (service.slug) {
+        revalidatePath(`/s/${service.slug}`);
+      }
+    });
 
     return {
       success: true,
