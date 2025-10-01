@@ -17,8 +17,8 @@ import {
   DynamicBreadcrumb,
 } from '@/components';
 
-// ISR configuration
-export const revalidate = 3600; // Revalidate every hour
+// ISR configuration with shorter interval + tag-based revalidation
+export const revalidate = 300; // Revalidate every 5 minutes (backup for tag-based)
 export const dynamicParams = true; // Allow new profiles to be generated on-demand
 
 interface ProfilePageProps {
