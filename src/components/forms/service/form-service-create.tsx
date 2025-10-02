@@ -191,6 +191,9 @@ export default function CreateServiceForm({
   // Media upload ref
   const mediaRef = useRef<any>(null);
 
+  // Loading state for async preparation phase
+  const [isPreparingSubmit, setIsPreparingSubmit] = useState(false);
+
   // Transition for manual server action calls
   const [isPendingTransition, startTransition] = useTransition();
 
@@ -464,16 +467,17 @@ export default function CreateServiceForm({
   const progress = (currentStep / STEPS.length) * 100;
   const isLastStep = currentStep === 5; // Step 5 is the last actionable step, step 6 is just success display
 
-  // Form submission handler
-  const handleFormSubmit = (formData: FormData) => {
-    // Handle media uploads if needed (sync operation)
+  // Form submission handler - prepare data but don't call action
+  const prepareFormData = async () => {
+    // Handle media uploads if needed (async operation - wait for completion)
     if (mediaRef.current?.hasFiles()) {
-      mediaRef.current.uploadFiles();
+      await mediaRef.current.uploadFiles();
     }
 
     // Get all form values and populate FormData using ENHANCED utility
     const allValues = getValues();
 
+    const formData = new FormData();
     populateFormData(formData, allValues, {
       stringFields: [
         'title',
@@ -489,19 +493,19 @@ export default function CreateServiceForm({
       skipEmpty: true,
     });
 
-    // Call server action directly (no await)
-    action(formData);
+    return formData;
   };
 
-  const handleSaveAsDraft = (formData: FormData) => {
-    // Handle media uploads if needed (sync operation)
+  const prepareDraftData = async () => {
+    // Handle media uploads if needed (async operation - wait for completion)
     if (mediaRef.current?.hasFiles()) {
-      mediaRef.current.uploadFiles();
+      await mediaRef.current.uploadFiles();
     }
 
     // Get all form values and populate FormData using ENHANCED utility
     const allValues = getValues();
 
+    const formData = new FormData();
     populateFormData(formData, allValues, {
       stringFields: [
         'title',
@@ -517,8 +521,7 @@ export default function CreateServiceForm({
       skipEmpty: true,
     });
 
-    // Call draft action directly (no await)
-    draftAction(formData);
+    return formData;
   };
 
   const handleClearForm = () => {
@@ -533,11 +536,11 @@ export default function CreateServiceForm({
     }
   };
 
-  const handleConfirmDraft = () => {
+  const handleConfirmDraft = async () => {
     // Keep dialog open, start the save process
+    const formData = await prepareDraftData();
     startTransition(() => {
-      const formData = new FormData();
-      handleSaveAsDraft(formData);
+      draftAction(formData);
     });
   };
 
@@ -563,6 +566,7 @@ export default function CreateServiceForm({
     } else if (state.message && !state.success) {
       toast.error(state.message);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.success, state.message, state.serviceId, state.serviceTitle]);
 
   // Handle draft save response
@@ -603,13 +607,18 @@ export default function CreateServiceForm({
   }
 
   const renderStepContent = () => {
-    // Show loading state when form is being submitted
-    if (currentStep === 5 && (isPending || isPendingTransition)) {
+    // Show loading state when form is being submitted or preparing
+    if (
+      currentStep === 5 &&
+      (isPending || isPendingTransition || isPreparingSubmit)
+    ) {
       return (
         <div className='flex flex-col items-center justify-center py-12 space-y-4 w-full'>
           <div className='animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent'></div>
           <p className='text-lg font-medium text-gray-700'>
-            Δημιουργία υπηρεσίας...
+            {isPreparingSubmit
+              ? 'Μεταφόρτωση πολυμέσων...'
+              : 'Δημιουργία υπηρεσίας...'}
           </p>
           <p className='text-sm text-gray-500'>Παρακαλώ περιμένετε</p>
         </div>
@@ -626,7 +635,9 @@ export default function CreateServiceForm({
       case 4:
         return <AddonsFaqStep />;
       case 5:
-        return <MediaStep user={user} />;
+        return (
+          <MediaStep user={user} profile={initialProfile} mediaRef={mediaRef} />
+        );
       case 6:
         return serviceCreated ? (
           <ServiceSuccess id={serviceCreated.id} title={serviceCreated.title} />
@@ -791,7 +802,8 @@ export default function CreateServiceForm({
               >
                 {currentStep === 6
                   ? 'Ολοκληρώθηκε'
-                  : currentStep === 5 && (isPending || isPendingTransition)
+                  : currentStep === 5 &&
+                      (isPending || isPendingTransition || isPreparingSubmit)
                     ? 'Ολοκλήρωση...'
                     : `Βήμα ${currentStep} από ${STEPS.length}`}
               </Badge>
@@ -875,7 +887,10 @@ export default function CreateServiceForm({
         {/* Current Step Content */}
         <Card>
           {currentStep !== 6 &&
-            !(currentStep === 5 && (isPending || isPendingTransition)) && (
+            !(
+              currentStep === 5 &&
+              (isPending || isPendingTransition || isPreparingSubmit)
+            ) && (
               <CardHeader>
                 <CardTitle className='flex items-center space-x-2'>
                   {currentStep === 1 && <Globe className='w-5 h-5' />}
@@ -905,7 +920,7 @@ export default function CreateServiceForm({
                   {currentStep !== 6 &&
                     !(
                       currentStep === 5 &&
-                      (isPending || isPendingTransition)
+                      (isPending || isPendingTransition || isPreparingSubmit)
                     ) && (
                       <div className='flex justify-between items-center mt-6 pt-6 border-t'>
                         <FormButton
@@ -920,18 +935,28 @@ export default function CreateServiceForm({
                             <FormButton
                               type='button'
                               text='Δημιουργία υπηρεσίας'
-                              loading={isPending || isPendingTransition}
+                              loading={
+                                isPending ||
+                                isPendingTransition ||
+                                isPreparingSubmit
+                              }
                               disabled={
                                 isPending ||
                                 isPendingTransition ||
+                                isPreparingSubmit ||
                                 !isCurrentStepValid() ||
                                 isDraftPending
                               }
-                              onClick={() => {
-                                startTransition(() => {
-                                  const formData = new FormData();
-                                  handleFormSubmit(formData);
-                                });
+                              onClick={async () => {
+                                setIsPreparingSubmit(true);
+                                try {
+                                  const formData = await prepareFormData();
+                                  startTransition(() => {
+                                    action(formData);
+                                  });
+                                } finally {
+                                  setIsPreparingSubmit(false);
+                                }
                               }}
                             />
                           ) : (

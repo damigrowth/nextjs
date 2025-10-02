@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 // Standard shadcn/ui imports
 import {
@@ -22,15 +22,18 @@ import { Upload, Image, Video, AlertCircle } from 'lucide-react';
 // Types
 import type { CreateServiceInput } from '@/lib/validations/service';
 import type { AuthUser } from '@/lib/types/auth';
+import type { Profile } from '@prisma/client';
 
 // Form context
 import { useFormContext } from 'react-hook-form';
 
 interface MediaStepProps {
   user: AuthUser | null;
+  profile: Profile | null;
+  mediaRef?: React.RefObject<any>;
 }
 
-export default function MediaStep({ user }: MediaStepProps) {
+export default function MediaStep({ user, profile, mediaRef }: MediaStepProps) {
   const form = useFormContext<CreateServiceInput>();
 
   return (
@@ -41,11 +44,12 @@ export default function MediaStep({ user }: MediaStepProps) {
         <FormItem>
           <FormControl>
             <MediaUpload
+              ref={mediaRef}
               value={field.value || []}
               onChange={field.onChange}
               uploadPreset='doulitsa_new'
               multiple={true}
-              folder={`services/${user?.username}/media`}
+              folder={`users/${profile?.username}/services/media`}
               maxFileSize={50000000} // 50MB
               maxFiles={10}
               allowedFormats={[
