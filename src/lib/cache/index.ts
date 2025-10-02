@@ -54,6 +54,15 @@ export const CACHE_TAGS = {
   archive: {
     profiles: (filters: string) => `archive:profiles:${filters}` as const,
     services: (filters: string) => `archive:services:${filters}` as const,
+    servicesFiltered: 'archive:services:filtered' as const,
+    all: 'archive:all' as const,
+  },
+
+  // Search-related tags
+  search: {
+    results: (term: string) => `search:results:${term}` as const,
+    taxonomies: 'search:taxonomies' as const,
+    all: 'search:all' as const,
   },
 } as const;
 

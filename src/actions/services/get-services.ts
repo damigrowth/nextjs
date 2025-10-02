@@ -16,6 +16,8 @@ import {
   getBreadcrumbsForNewRoutes,
 } from '@/lib/utils/datasets';
 import { locationOptions } from '@/constants/datasets/locations';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
+import { CACHE_TAGS } from '@/lib/cache';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { isValidArchiveSortBy } from '@/lib/types/common';
 import type { ActionResult } from '@/lib/types/api';
@@ -36,6 +38,7 @@ export type ServiceFilters = Partial<
 > & {
   county?: string; // Single county selection for coverage filtering (from profile.coverage.county or profile.coverage.counties)
   online?: boolean; // Service.type.online (JSON field)
+  search?: string; // Search query for title and description
   page?: number;
   limit?: number;
   sortBy?: ArchiveSortBy;
@@ -324,9 +327,9 @@ export async function getServicesWithPagination(options?: {
 }
 
 /**
- * Get services by filters with coverage filtering
+ * Internal function to get services by filters (uncached)
  */
-export async function getServicesByFilters(filters: ServiceFilters): Promise<
+async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
   ActionResult<{
     services: ArchiveServiceCardData[];
     total: number;
@@ -352,6 +355,43 @@ export async function getServicesByFilters(filters: ServiceFilters): Promise<
     }
     if (filters.subdivision) {
       whereClause.subdivision = filters.subdivision;
+    }
+
+    // Add search filter for title and description
+    if (filters.search) {
+      const searchTerm = filters.search.trim();
+      if (searchTerm.length >= 2) {
+        // Normalize search term to handle Greek accents (ά → α, etc.)
+        const normalizedSearch = normalizeTerm(searchTerm);
+
+        whereClause.OR = whereClause.OR || [];
+        const searchConditions = [
+          {
+            title: {
+              contains: normalizedSearch,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            description: {
+              contains: normalizedSearch,
+              mode: 'insensitive' as const,
+            },
+          },
+        ];
+
+        // If there's already an OR clause (from filters), combine them with AND
+        if (whereClause.OR.length > 0) {
+          const existingOR = whereClause.OR;
+          whereClause.AND = whereClause.AND || [];
+          whereClause.AND.push({
+            OR: searchConditions,
+          });
+          whereClause.OR = existingOR;
+        } else {
+          whereClause.OR = searchConditions;
+        }
+      }
     }
 
     // Handle combined online and county filters
@@ -587,6 +627,50 @@ export async function getServicesByFilters(filters: ServiceFilters): Promise<
 }
 
 /**
+ * Get services by filters with coverage filtering (cached)
+ * Caches results for 5 minutes based on filter combination
+ */
+export async function getServicesByFilters(filters: ServiceFilters): Promise<
+  ActionResult<{
+    services: ArchiveServiceCardData[];
+    total: number;
+    hasMore: boolean;
+  }>
+> {
+  // Generate cache key from filters (excluding page for better cache reuse)
+  const cacheKeyData = {
+    status: filters.status || 'published',
+    category: filters.category,
+    subcategory: filters.subcategory,
+    subdivision: filters.subdivision,
+    county: filters.county,
+    online: filters.online,
+    search: filters.search ? normalizeTerm(filters.search.trim()) : undefined,
+    sortBy: filters.sortBy,
+    page: filters.page || 1,
+    limit: filters.limit || 20,
+  };
+
+  const cacheKey = `services-filters-${JSON.stringify(cacheKeyData)}`;
+
+  const getCachedServices = unstable_cache(
+    () => getServicesByFiltersInternal(filters),
+    [cacheKey],
+    {
+      revalidate: 300, // 5 minutes
+      tags: [
+        CACHE_TAGS.collections.services,
+        CACHE_TAGS.archive.servicesFiltered,
+        CACHE_TAGS.archive.all,
+        ...(filters.search ? [CACHE_TAGS.search.all] : []),
+      ],
+    },
+  );
+
+  return getCachedServices();
+}
+
+/**
  * Get total count of services matching filters (cached)
  */
 export async function getServicesCount(
@@ -751,6 +835,7 @@ export async function getServiceArchivePageData(params: {
     online?: string;
     sortBy?: string;
     page?: string;
+    search?: string;
   };
 }): Promise<ActionResult<{
   services: ArchiveServiceCardData[];
@@ -843,6 +928,7 @@ export async function getServiceArchivePageData(params: {
       ...(subdivision && { subdivision: subdivision.id }),
       county: searchParams.county || searchParams.περιοχή,
       online: (searchParams.online === 'true' || searchParams.online === '') ? true : undefined,
+      search: searchParams.search,
       sortBy,
       page,
       limit,

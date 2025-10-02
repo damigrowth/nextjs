@@ -12,6 +12,7 @@ interface ServicesPageProps {
     online?: string;
     sortBy?: string;
     page?: string;
+    search?: string; // Search query parameter
   }>;
 }
 

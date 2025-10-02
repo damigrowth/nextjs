@@ -319,6 +319,14 @@ async function createServiceInternal(
         revalidateTag(CACHE_TAGS.user.services(user.id));
         revalidateTag(CACHE_TAGS.profile.services(profile.id));
 
+        // Revalidate search caches (new service added)
+        revalidateTag(CACHE_TAGS.search.all);
+        revalidateTag(CACHE_TAGS.search.taxonomies);
+
+        // Revalidate archive caches (new service affects listings)
+        revalidateTag(CACHE_TAGS.archive.all);
+        revalidateTag(CACHE_TAGS.archive.servicesFiltered);
+
         // Revalidate specific pages
         if (serviceForTags.slug) {
           revalidatePath(`/s/${serviceForTags.slug}`);

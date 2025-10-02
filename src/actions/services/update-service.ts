@@ -120,6 +120,14 @@ export async function updateServiceAction(
     revalidateTag(CACHE_TAGS.profile.byId(profile.id));
     revalidateTag(CACHE_TAGS.user.services(session.user.id));
 
+    // Revalidate search caches (service updated - title/description/taxonomy may have changed)
+    revalidateTag(CACHE_TAGS.search.all);
+    revalidateTag(CACHE_TAGS.search.taxonomies);
+
+    // Revalidate archive caches (service update affects listings)
+    revalidateTag(CACHE_TAGS.archive.all);
+    revalidateTag(CACHE_TAGS.archive.servicesFiltered);
+
     if (profile.username) {
       revalidateTag(CACHE_TAGS.profile.byUsername(profile.username));
       revalidateTag(CACHE_TAGS.profile.page(profile.username));
