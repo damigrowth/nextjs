@@ -795,3 +795,21 @@ export type ServiceMediaUploadInput = z.infer<typeof serviceMediaUploadSchema>;
 export type CreateServiceInput = z.infer<typeof createServiceSchema>;
 export type CreateServiceDraftInput = z.infer<typeof createServiceDraftSchema>;
 export type ServiceTypeConfig = z.infer<typeof serviceTypeConfigSchema>;
+
+// =============================================
+// SERVICE UPDATE SCHEMAS
+// =============================================
+
+// Update service media only
+export const updateServiceMediaSchema = z.object({
+  media: z
+    .array(cloudinaryResourceSchema)
+    .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
+    .optional(),
+});
+
+// Update service info (everything except media)
+export const updateServiceInfoSchema = createServiceSchema.omit({ media: true }).partial();
+
+export type UpdateServiceMediaInput = z.infer<typeof updateServiceMediaSchema>;
+export type UpdateServiceInfoInput = z.infer<typeof updateServiceInfoSchema>;

@@ -35,7 +35,7 @@ import { populateFormData } from '@/lib/utils/form';
 
 // Validation schema and server action
 import { z } from 'zod';
-import { updateServiceAction } from '@/actions/services/update-service';
+import { updateServiceMedia } from '@/actions/services/update-service';
 import { cloudinaryResourceSchema } from '@/lib/prisma/json-types';
 import { AuthUser } from '@/lib/types/auth';
 
@@ -77,7 +77,7 @@ export default function FormServiceEditMedia({
 }: FormServiceEditMediaProps) {
   const [state, action, isPending] = useActionState(
     async (prevState: any, formData: FormData) => {
-      return updateServiceAction(Number(service.id), formData);
+      return updateServiceMedia(Number(service.id), formData);
     },
     initialState,
   );
