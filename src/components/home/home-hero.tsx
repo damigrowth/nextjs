@@ -7,25 +7,6 @@ import { Star, Rocket } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { HomeSearch } from './home-search';
 
-type Category = {
-  attributes: {
-    label: string;
-    slug: string;
-    subcategories: {
-      data: {
-        attributes: {
-          label: string;
-          slug: string;
-        };
-      }[];
-    };
-  };
-};
-
-type Props = {
-  categories?: Category[];
-};
-
 // Static content that renders immediately for better LCP
 function StaticHeroContent() {
   return (
@@ -53,42 +34,26 @@ function StaticHeroContent() {
 }
 
 // Search Bar Component using the new HomeSearch UI component
-function HeroSearchBar({
-  categories,
-  subcategories,
-}: {
-  categories: Category[];
-  subcategories: any[];
-}) {
-  const handleSearch = (query: string) => {
-    // Handle search functionality here
-    // console.log('Search query:', query);
-    // You can implement navigation or search logic here
-  };
-
+function HeroSearchBar() {
   return (
     <HomeSearch
-      onSearch={handleSearch}
       placeholder='Τι ψάχνεις;'
       buttonText='Αναζήτηση'
     />
   );
 }
 
-// Popular Searches Component - Equivalent to: dark-color ff-heading mt30 mb15 + home9-tags at-home12 d-md-flex align-items-center
-function PopularSearches({ subcategories }: { subcategories: any[] }) {
-  // Use dummy data when no real data is available
-  const dummySearches = [
-    { label: 'Ανάπτυξη Ιστοσελίδων', slug: 'anaptyxi-istoselida' },
-    { label: 'Γραφιστικά', slug: 'grafistika' },
-    { label: 'Μετάφραση', slug: 'metafrase' },
-    { label: 'Social Media', slug: 'social-media' },
-    { label: 'Καθαρισμός', slug: 'katharismos' },
-    { label: 'Φωτογραφία', slug: 'fotografa' },
+// Popular Searches Component - Static links to popular subcategories
+function PopularSearches() {
+  // Static popular search links
+  const popularSearches = [
+    { label: 'Βίντεο', slug: 'video' },
+    { label: 'Εκτυπώσεις', slug: 'ektuposeis' },
+    { label: 'Ήχος', slug: 'ixos' },
+    { label: 'Μεταφράσεις', slug: 'metafraseis' },
+    { label: 'Συγγραφή', slug: 'sugrafi' },
+    { label: 'Σχεδιασμός', slug: 'sxediasmos' },
   ];
-
-  const displaySearches =
-    subcategories.length > 0 ? subcategories : dummySearches;
 
   return (
     <>
@@ -99,7 +64,7 @@ function PopularSearches({ subcategories }: { subcategories: any[] }) {
 
       {/* Equivalent to: home9-tags at-home12 d-md-flex align-items-center */}
       <div className='flex flex-wrap gap-2 md:flex md:items-center'>
-        {displaySearches.map((sub, index) => (
+        {popularSearches.map((sub, index) => (
           <Link href={`/ipiresies/${sub.slug}`} key={index}>
             <Badge
               variant='outline'
@@ -181,33 +146,16 @@ function HeroImages() {
 }
 
 // Dynamic content component
-function DynamicHeroContent({ categories }: { categories: Category[] }) {
-  let subcategories: any[] = [];
-
-  if (categories && categories.length > 0) {
-    categories.forEach((cat) => {
-      if (cat.attributes && cat.attributes.subcategories) {
-        cat.attributes.subcategories.data.forEach((sub) => {
-          subcategories.push({
-            label: sub.attributes.label,
-            slug: sub.attributes.slug,
-            categorySlug: cat.attributes.slug,
-          });
-        });
-      }
-    });
-    subcategories = subcategories.slice(0, 6);
-  }
-
+function DynamicHeroContent() {
   return (
     <>
-      <HeroSearchBar categories={categories} subcategories={subcategories} />
-      <PopularSearches subcategories={subcategories} />
+      <HeroSearchBar />
+      <PopularSearches />
     </>
   );
 }
 
-export default function HeroHome({ categories = [] }: Props) {
+export default function HeroHome() {
   return (
     <section className='overflow-visible bg-orangy bg-gradient-to-t from-white to-yellowish contain-layout mt-10 lg:mt-20'>
       <div className='container mx-auto mt-24 mb-52 pl-6'>
@@ -227,7 +175,7 @@ export default function HeroHome({ categories = [] }: Props) {
                   </div>
                 }
               >
-                <DynamicHeroContent categories={categories} />
+                <DynamicHeroContent />
               </Suspense>
             </div>
           </div>
