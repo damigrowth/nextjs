@@ -10,6 +10,7 @@ import {
   paginationSchema,
   fileUploadSchema,
 } from './shared';
+import { cloudinaryResourceSchema } from '@/lib/prisma/json-types';
 
 // =============================================
 // PROFILE CRUD SCHEMAS
@@ -252,6 +253,23 @@ export const socialMediaSchema = z.object({
 });
 
 // =============================================
+// PORTFOLIO MEDIA SCHEMAS
+// =============================================
+
+/**
+ * Portfolio media validation schema
+ * Used for both client-side and server-side validation
+ */
+export const updateProfilePortfolioSchema = z.object({
+  portfolio: z
+    .array(cloudinaryResourceSchema)
+    .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
+    .optional(),
+});
+
+export type UpdateProfilePortfolioInput = z.infer<typeof updateProfilePortfolioSchema>;
+
+// =============================================
 // PRESENTATION SCHEMA
 // =============================================
 
@@ -292,7 +310,11 @@ export const presentationSchema = z.object({
       phone: true,
       address: true,
     }),
-  portfolio: z.array(z.any()).optional().nullable(),
+  portfolio: z
+    .array(cloudinaryResourceSchema)
+    .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
+    .optional()
+    .nullable(),
 });
 
 // =============================================
@@ -379,14 +401,7 @@ export const verificationFormSchema = z.object({
     .regex(/^69\d{8}$/, 'Το τηλέφωνο πρέπει να ξεκινάει με 69 και να έχει 10 ψηφία'),
 });
 
-export const cloudinaryResourceSchema = z.object({
-  public_id: z.string(),
-  secure_url: z.string(),
-  width: z.number().optional(),
-  height: z.number().optional(),
-  resource_type: z.enum(['image', 'video', 'raw']),
-  format: z.string().optional(),
-});
+// Removed duplicate cloudinaryResourceSchema - now imported from @/lib/prisma/json-types
 
 export const imageSchema = z.union([
   cloudinaryResourceSchema,
@@ -468,7 +483,10 @@ export const onboardingFormSchema = z.object({
     .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες.')
     .max(5000, 'Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες.'),
   coverage: coverageSchema, // Required
-  portfolio: z.array(cloudinaryResourceSchema).optional(), // Optional - Cloudinary resources
+  portfolio: z
+    .array(cloudinaryResourceSchema)
+    .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
+    .optional(), // Optional - Cloudinary resources with max validation
 });
 
 // Extended onboarding schema with media handling

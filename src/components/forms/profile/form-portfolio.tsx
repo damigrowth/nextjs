@@ -31,20 +31,17 @@ import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { populateFormData, parseJSONValue } from '@/lib/utils/form';
 
 // Validation schema and server action
-import { z } from 'zod';
 import { updateProfilePortfolio } from '@/actions/profiles/portfolio';
-import { cloudinaryResourceSchema } from '@/lib/prisma/json-types';
+import {
+  updateProfilePortfolioSchema,
+  type UpdateProfilePortfolioInput
+} from '@/lib/validations/profile';
 import { FormButton } from '../../shared';
 import { AuthUser, ProfileWithRelations } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';
 import { Profile } from '@prisma/client';
 
-// Create a schema for portfolio only
-const portfolioSchema = z.object({
-  portfolio: z.array(cloudinaryResourceSchema).optional(),
-});
-
-type PortfolioInput = z.infer<typeof portfolioSchema>;
+type PortfolioInput = UpdateProfilePortfolioInput;
 
 const initialState = {
   success: false,
@@ -71,16 +68,13 @@ export default function PortfolioForm({
   const [isPendingTransition, startTransition] = useTransition();
   const router = useRouter();
 
-  // Extract data from props
-  const profile = initialProfile;
-
   // Media upload refs
   const mediaRef = useRef<any>(null);
 
   const form = useForm<PortfolioInput>({
-    resolver: zodResolver(portfolioSchema),
+    resolver: zodResolver(updateProfilePortfolioSchema),
     defaultValues: {
-      portfolio: profile?.portfolio || [],
+      portfolio: initialProfile?.portfolio || [],
     },
     mode: 'onChange',
   });
@@ -92,12 +86,12 @@ export default function PortfolioForm({
 
   // Update form values when initial data is available
   useEffect(() => {
-    if (profile?.portfolio) {
+    if (initialProfile?.portfolio) {
       form.reset({
-        portfolio: profile.portfolio,
+        portfolio: initialProfile.portfolio,
       });
     }
-  }, [profile, form]);
+  }, [initialProfile, form]);
 
   // Handle successful form submission
   useEffect(() => {
@@ -157,7 +151,7 @@ export default function PortfolioForm({
         }}
         className='space-y-6 p-6 border rounded-lg'
       >
-        <h3 className='text-lg font-medium'>Χαρτοφυλάκιο</h3>
+        <h3 className='text-lg font-medium'>Δείγμα Εργασιών</h3>
 
         {/* Portfolio Upload */}
         <FormField
@@ -167,7 +161,7 @@ export default function PortfolioForm({
             <FormItem>
               {showHeading && (
                 <>
-                  <FormLabel>Χαρτοφυλάκιο</FormLabel>
+                  <FormLabel>Δείγμα Εργασιών</FormLabel>
                   <p className='text-sm text-muted-foreground'>
                     Προσθέστε έργα από το χαρτοφυλάκιό σας
                   </p>

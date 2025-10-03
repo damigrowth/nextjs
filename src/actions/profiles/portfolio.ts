@@ -5,17 +5,12 @@ import { prisma } from '@/lib/prisma/client';
 import { ActionResponse } from '@/lib/types/api';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
 import { Prisma } from '@prisma/client';
-import { z } from 'zod';
 import { extractFormData } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
 import { sanitizeCloudinaryResources } from '@/lib/utils/cloudinary';
 import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
-
-// Portfolio-only validation schema
-const portfolioSchema = z.object({
-  portfolio: z.array(z.any()).optional(),
-});
+import { updateProfilePortfolioSchema } from '@/lib/validations/profile';
 
 /**
  * Server action to update portfolio only
@@ -54,7 +49,7 @@ export async function updateProfilePortfolio(
     }
 
     // 4. Validate with Zod schema
-    const validationResult = portfolioSchema.safeParse(extractedData);
+    const validationResult = updateProfilePortfolioSchema.safeParse(extractedData);
     if (!validationResult.success) {
       return createValidationErrorResponse(
         validationResult.error,
@@ -96,7 +91,7 @@ export async function updateProfilePortfolio(
       where: { uid: user.id },
       data: {
         portfolio: sanitizedPortfolio?.length
-          ? sanitizedPortfolio as any
+          ? (sanitizedPortfolio as any)
           : Prisma.DbNull,
         updatedAt: new Date(),
       },
@@ -104,7 +99,7 @@ export async function updateProfilePortfolio(
 
     // 7. Revalidate cached data with consistent tags
     const profileTags = getProfileTags(existingProfile);
-    profileTags.forEach(tag => revalidateTag(tag));
+    profileTags.forEach((tag) => revalidateTag(tag));
 
     // Also revalidate user-specific tags
     revalidateTag(CACHE_TAGS.user.byId(user.id));
@@ -115,13 +110,13 @@ export async function updateProfilePortfolio(
     revalidateTag(CACHE_TAGS.service.byProfile(existingProfile.id));
 
     // Revalidate specific pages
-    revalidatePath('/dashboard/profile/portfolio');
+    revalidatePath('/dashboard/profile/presentation');
     if (existingProfile.username) {
       revalidatePath(`/profile/${existingProfile.username}`);
     }
 
     // Revalidate all service pages that belong to this profile
-    existingProfile.services.forEach(service => {
+    existingProfile.services.forEach((service) => {
       if (service.slug) {
         revalidatePath(`/s/${service.slug}`);
       }
@@ -129,7 +124,7 @@ export async function updateProfilePortfolio(
 
     return {
       success: true,
-      message: 'Το χαρτοφυλάκιο ενημερώθηκε επιτυχώς!',
+      message: 'Το δείγμα εργασιών ενημερώθηκε επιτυχώς!',
     };
   } catch (error: any) {
     // 8. Comprehensive error handling
