@@ -34,17 +34,14 @@ import { AlertCircle, CheckCircle } from 'lucide-react';
 import { populateFormData } from '@/lib/utils/form';
 
 // Validation schema and server action
-import { z } from 'zod';
 import { updateServiceMedia } from '@/actions/services/update-service';
-import { cloudinaryResourceSchema } from '@/lib/prisma/json-types';
+import {
+  updateServiceMediaSchema,
+  type UpdateServiceMediaInput
+} from '@/lib/validations/service';
 import { AuthUser } from '@/lib/types/auth';
 
-// Create a schema for media only
-const serviceMediaSchema = z.object({
-  media: z.array(cloudinaryResourceSchema).optional(),
-});
-
-type ServiceMediaInput = z.infer<typeof serviceMediaSchema>;
+type ServiceMediaInput = UpdateServiceMediaInput;
 
 const initialState = {
   success: false,
@@ -90,7 +87,7 @@ export default function FormServiceEditMedia({
   const mediaRef = useRef<any>(null);
 
   const form = useForm<ServiceMediaInput>({
-    resolver: zodResolver(serviceMediaSchema),
+    resolver: zodResolver(updateServiceMediaSchema),
     defaultValues: {
       media: service?.media || [],
     },
