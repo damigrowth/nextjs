@@ -76,7 +76,7 @@ export default async function ServicePage({
       {/* Category Navigation Tabs */}
       <TaxonomyTabs
         items={featuredCategories}
-        basePath='services'
+        basePath='categories'
         allItemsLabel='Όλες οι Υπηρεσίες'
         activeItemSlug={category?.slug}
         usePluralLabels={false}
