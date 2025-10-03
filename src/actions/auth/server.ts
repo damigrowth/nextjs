@@ -352,8 +352,7 @@ export async function requireOnboardingComplete(onboardingUrl = '/onboarding') {
   // Check if this is a Google OAuth user who needs role/type assignment
   if (
     user?.provider === 'google' &&
-    user?.step === 'OAUTH_SETUP' &&
-    !user?.confirmed
+    user?.step === 'OAUTH_SETUP'
   ) {
     redirect('/oauth-setup');
   }
@@ -499,8 +498,7 @@ export async function redirectOAuthUsersToSetup() {
   // If user looks like they need OAuth setup, double-check with fresh data
   if (
     user?.provider === 'google' &&
-    user?.step === 'OAUTH_SETUP' &&
-    !user?.confirmed
+    user?.step === 'OAUTH_SETUP'
   ) {
     // Get fresh data to confirm this is really a Google OAuth user needing setup
     const freshSessionResult = await getSession({ revalidate: true });
@@ -510,8 +508,7 @@ export async function redirectOAuthUsersToSetup() {
     // Only redirect if fresh data confirms they need OAuth setup
     if (
       freshUser?.provider === 'google' &&
-      freshUser?.step === 'OAUTH_SETUP' &&
-      !freshUser?.confirmed
+      freshUser?.step === 'OAUTH_SETUP'
     ) {
       // console.log('Redirecting Google OAuth user to setup');
       redirect('/oauth-setup');

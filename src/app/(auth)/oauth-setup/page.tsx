@@ -38,8 +38,7 @@ export default async function OAuthSetupPage({ searchParams }: PageProps) {
   // Check if this is a Google OAuth user who needs setup
   const needsSetup =
     user.provider === 'google' &&
-    user.step === 'OAUTH_SETUP' &&
-    !user.confirmed;
+    user.step === 'OAUTH_SETUP';
 
   if (!needsSetup) {
     // User doesn't need setup, redirect to appropriate page based on type and step
