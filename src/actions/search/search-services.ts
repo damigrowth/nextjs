@@ -48,6 +48,7 @@ const getPublishedServiceTaxonomies = unstable_cache(
 
 /**
  * Internal search function (uncached)
+ * @param searchTerm - Normalized term for both taxonomy and service search (accents removed)
  */
 async function performSearch(
   searchTerm: string,
@@ -134,19 +135,19 @@ async function performSearch(
     const taxonomyMatches = [...sortedSubdivisions, ...sortedSubcategories];
     const limitedTaxonomies = taxonomyMatches.slice(0, 5);
 
-    // Search services by title and description
+    // Search services by title and description using normalized fields for accent-insensitive search
     const services = await prisma.service.findMany({
       where: {
         status: 'published',
         OR: [
           {
-            title: {
+            titleNormalized: {
               contains: searchTerm,
               mode: 'insensitive',
             },
           },
           {
-            description: {
+            descriptionNormalized: {
               contains: searchTerm,
               mode: 'insensitive',
             },
@@ -159,7 +160,10 @@ async function performSearch(
         slug: true,
         category: true,
       },
-      orderBy: [{ rating: 'desc' }, { reviewCount: 'desc' }],
+      orderBy: [
+        { rating: 'desc' },
+        { reviewCount: 'desc' },
+      ],
       take: 5,
     });
 
@@ -246,16 +250,16 @@ export async function searchServiceSuggestions(
     };
   }
 
-  // Normalize search term to handle Greek accents (ά → α, etc.)
-  const searchTerm = normalizeTerm(query.trim());
+  // Normalize search term for both taxonomy and service search (accents removed)
+  const normalizedTerm = normalizeTerm(query.trim());
 
   // Cache search results per normalized search term
   const getCachedSearch = unstable_cache(
-    () => performSearch(searchTerm),
-    [`search-${searchTerm}`],
+    () => performSearch(normalizedTerm),
+    [`search-${normalizedTerm}`],
     {
       revalidate: 300, // 5 minutes
-      tags: [CACHE_TAGS.search.results(searchTerm), CACHE_TAGS.collections.services, CACHE_TAGS.search.all],
+      tags: [CACHE_TAGS.search.results(normalizedTerm), CACHE_TAGS.collections.services, CACHE_TAGS.search.all],
     },
   );
 

@@ -357,7 +357,8 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
       whereClause.subdivision = filters.subdivision;
     }
 
-    // Add search filter for title and description
+    // Add search filter for title and description using normalized fields
+    // This provides accent-insensitive search for Greek text
     if (filters.search) {
       const searchTerm = filters.search.trim();
       if (searchTerm.length >= 2) {
@@ -367,13 +368,13 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
         whereClause.OR = whereClause.OR || [];
         const searchConditions = [
           {
-            title: {
+            titleNormalized: {
               contains: normalizedSearch,
               mode: 'insensitive' as const,
             },
           },
           {
-            description: {
+            descriptionNormalized: {
               contains: normalizedSearch,
               mode: 'insensitive' as const,
             },
