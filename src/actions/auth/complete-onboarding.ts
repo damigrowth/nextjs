@@ -103,6 +103,10 @@ export async function completeOnboarding(
         portfolio: sanitizedPortfolio,
         published: user.role !== 'user',
         isActive: true,
+        // Sync user fields to profile
+        username: user.username,
+        displayName: user.displayName,
+        email: user.email,
       },
       create: {
         bio: data.bio,
@@ -113,6 +117,10 @@ export async function completeOnboarding(
         portfolio: sanitizedPortfolio,
         published: user.role !== 'user',
         isActive: true,
+        // Sync user fields to profile
+        username: user.username,
+        displayName: user.displayName,
+        email: user.email,
         user: {
           connect: { id: user.id },
         },
