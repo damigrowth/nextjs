@@ -62,6 +62,7 @@ import { useRouter } from 'next/navigation';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import { locationOptions } from '@/constants/datasets/locations';
 import { formatInput } from '@/lib/utils/validation/formats';
+import { populateFormData } from '@/lib/utils/form';
 import {
   findById,
   findBySlug,
@@ -312,31 +313,14 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
         await portfolioRef.current.uploadFiles();
       }
 
-      // Get all form values and add them to FormData
-      const formValues = getValues();
+      // Get all form values and populate FormData using centralized utility
+      const allValues = getValues();
 
-      // Add all form fields to FormData
-      const fields = {
-        // Basic string fields
-        bio: formValues.bio,
-        category: formValues.category,
-        subcategory: formValues.subcategory,
-        // JSON fields (will be stringified)
-        image: formValues.image,
-        portfolio: formValues.portfolio,
-        coverage: formValues.coverage,
-      };
-
-      Object.entries(fields).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          // JSON fields need to be stringified
-          if (['image', 'portfolio', 'coverage'].includes(key)) {
-            formData.set(key, JSON.stringify(value));
-          } else {
-            // String fields can be added directly
-            formData.set(key, value as string);
-          }
-        }
+      // Use centralized populateFormData utility (same as portfolio form)
+      populateFormData(formData, allValues, {
+        stringFields: ['bio', 'category', 'subcategory'],
+        jsonFields: ['image', 'portfolio', 'coverage'],
+        skipEmpty: true,
       });
 
       // Call the server action with startTransition
