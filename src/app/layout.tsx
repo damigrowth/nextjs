@@ -23,6 +23,7 @@ import {
 } from '@/components/shared/layout/wrapper';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { PreviewUrlHandler } from '@/components/auth/preview-url-handler';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang='el'>
       <Body>
         <TooltipProvider delayDuration={0}>
+          <PreviewUrlHandler />
           <PathChecker excludes={['/dashboard', '/admin']}>
             <Header />
           </PathChecker>
