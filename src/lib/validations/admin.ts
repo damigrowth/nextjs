@@ -202,6 +202,35 @@ export const revokeUserSessionsSchema = z.object({
 });
 
 // =============================================
+// USER EDITING FORM SCHEMAS
+// =============================================
+
+export const updateUserBasicInfoSchema = z.object({
+  userId: z.string().min(1, 'User ID is required'),
+  name: z.string().min(1, 'Name is required').max(100).optional(),
+  email: emailSchema.optional(),
+  username: z.string().min(3, 'Username must be at least 3 characters').optional().or(z.literal('')),
+  displayName: z.string().min(1).max(100).optional().or(z.literal('')),
+  firstName: z.string().min(1).max(100).optional().or(z.literal('')),
+  lastName: z.string().min(1).max(100).optional().or(z.literal('')),
+});
+
+export const updateUserStatusSchema = z.object({
+  userId: z.string().min(1, 'User ID is required'),
+  role: userRoleSchema.optional(),
+  type: z.enum(['user', 'pro']).optional(),
+  step: authStepSchema.optional(),
+  emailVerified: z.boolean().optional(),
+  confirmed: z.boolean().optional(),
+  blocked: z.boolean().optional(),
+});
+
+export const updateUserImageSchema = z.object({
+  userId: z.string().min(1, 'User ID is required'),
+  image: z.string().url().nullable(),
+});
+
+// =============================================
 // ADMIN API KEY SCHEMAS (extracted from admin actions)
 // =============================================
 
@@ -302,3 +331,125 @@ export function validateBanDuration(durationInDays: number): boolean {
 export function banDurationToSeconds(days: number): number {
   return days * 24 * 60 * 60;
 }
+
+// =============================================
+// ADMIN PROFILE MANAGEMENT SCHEMAS
+// =============================================
+
+export const adminListProfilesSchema = z.object({
+  searchQuery: z.string().optional(),
+  type: z.enum(['all', 'freelancer', 'company']).optional(),
+  category: z.string().optional(),
+  subcategory: z.string().optional(),
+  published: z.enum(['all', 'published', 'draft']).optional(),
+  verified: z.enum(['all', 'verified', 'unverified']).optional(),
+  featured: z.enum(['all', 'featured', 'not-featured']).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(10),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+  sortBy: z
+    .enum(['createdAt', 'rating', 'reviewCount', 'updatedAt'])
+    .optional()
+    .default('createdAt'),
+  sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
+});
+
+export const adminUpdateProfileSchema = z.object({
+  profileId: z.string().min(1, 'Profile ID is required'),
+  // Basic info
+  displayName: z.string().min(1).max(100).optional(),
+  firstName: z.string().min(1).max(100).optional(),
+  lastName: z.string().min(1).max(100).optional(),
+  bio: z.string().max(1000).optional(),
+  tagline: z.string().max(200).optional(),
+  website: z.string().url().optional().or(z.literal('')),
+  phone: z.string().optional(),
+
+  // Professional
+  type: z.string().optional(),
+  category: z.string().optional(),
+  subcategory: z.string().optional(),
+  skills: z.array(z.string()).optional(),
+  speciality: z.string().optional(),
+  rate: z.number().int().min(0).optional(),
+  experience: z.number().int().min(0).max(100).optional(),
+  size: z.string().optional(),
+  commencement: z.string().optional(),
+  budget: z.string().optional(),
+  industries: z.array(z.string()).optional(),
+  terms: z.string().optional(),
+
+  // Contact
+  contactMethods: z.array(z.string()).optional(),
+  paymentMethods: z.array(z.string()).optional(),
+  settlementMethods: z.array(z.string()).optional(),
+  viber: z.string().optional(),
+  whatsapp: z.string().optional(),
+
+  // Settings
+  visibility: z.record(z.string(), z.boolean()).optional(),
+  socials: z.record(z.string(), z.string()).optional(),
+
+  // Status flags (admin only)
+  published: z.boolean().optional(),
+  featured: z.boolean().optional(),
+  verified: z.boolean().optional(),
+  top: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+});
+
+export const adminToggleProfileSchema = z.object({
+  profileId: z.string().min(1, 'Profile ID is required'),
+});
+
+export const adminDeleteProfileSchema = z.object({
+  profileId: z.string().min(1, 'Profile ID is required'),
+});
+
+export const adminUpdateVerificationSchema = z.object({
+  profileId: z.string().min(1, 'Profile ID is required'),
+  status: z.enum(['PENDING', 'APPROVED', 'REJECTED']),
+  notes: z.string().max(1000).optional(),
+});
+
+export const editProfileFormSchema = z.object({
+  // Basic tab
+  displayName: z.string().min(1, 'Display name is required').max(100),
+  firstName: z.string().min(1).max(100).optional(),
+  lastName: z.string().min(1).max(100).optional(),
+  bio: z.string().max(1000).optional(),
+  tagline: z.string().max(200).optional(),
+  website: z.string().url('Invalid URL').optional().or(z.literal('')),
+
+  // Professional tab
+  type: z.string().optional(),
+  category: z.string().optional(),
+  subcategory: z.string().optional(),
+  skills: z.array(z.string()).optional(),
+  speciality: z.string().optional(),
+  rate: z.coerce.number().int().min(0).optional(),
+  experience: z.coerce.number().int().min(0).max(100).optional(),
+
+  // Contact tab
+  phone: z.string().optional(),
+  viber: z.string().optional(),
+  whatsapp: z.string().optional(),
+  contactMethods: z.array(z.string()).optional(),
+
+  // Status flags
+  published: z.boolean().optional(),
+  featured: z.boolean().optional(),
+  verified: z.boolean().optional(),
+});
+
+// =============================================
+// PROFILE TYPE EXPORTS
+// =============================================
+
+export type AdminListProfilesInput = z.infer<typeof adminListProfilesSchema>;
+export type AdminUpdateProfileInput = z.infer<typeof adminUpdateProfileSchema>;
+export type AdminToggleProfileInput = z.infer<typeof adminToggleProfileSchema>;
+export type AdminDeleteProfileInput = z.infer<typeof adminDeleteProfileSchema>;
+export type AdminUpdateVerificationInput = z.infer<
+  typeof adminUpdateVerificationSchema
+>;
+export type EditProfileFormInput = z.infer<typeof editProfileFormSchema>;

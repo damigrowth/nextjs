@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Star, Globe } from 'lucide-react';
 import {
   Tooltip,
   TooltipTrigger,
@@ -10,20 +10,26 @@ import {
 interface ProfileBadgesProps {
   verified?: boolean;
   topLevel?: boolean;
+  featured?: boolean;
+  published?: boolean;
   className?: string;
 }
 
 export default function ProfileBadges({
   verified = false,
   topLevel = false,
+  featured = false,
+  published = false,
   className = '',
 }: ProfileBadgesProps) {
-  if (!verified && !topLevel) {
+  if (!verified && !topLevel && !featured && !published) {
     return null;
   }
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
+      <PublishedBadge published={published} />
+      <FeaturedBadge featured={featured} />
       <VerifiedBadge verified={verified} />
       <TopLevelBadge topLevel={topLevel} />
     </div>
@@ -62,6 +68,36 @@ export function TopLevelBadge({ topLevel }: { topLevel?: boolean }) {
       </TooltipTrigger>
       <TooltipContent>
         <p>Έχει λάβει εξαιρετικές αξιολογήσεις</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+export function FeaturedBadge({ featured }: { featured?: boolean }) {
+  if (!featured) return null;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Star className='h-5 w-5 text-yellow-500 fill-yellow-500 cursor-pointer' />
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Featured</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+export function PublishedBadge({ published }: { published?: boolean }) {
+  if (!published) return null;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Globe className='h-5 w-5 text-green-600 cursor-pointer' />
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Δημοσιευμένο</p>
       </TooltipContent>
     </Tooltip>
   );
