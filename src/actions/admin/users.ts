@@ -62,6 +62,51 @@ async function getAdminSession() {
 }
 
 // Admin Actions using correct Better Auth API methods
+export async function getUser(userId: string) {
+  try {
+    await getAdminSession();
+
+    const { prisma } = await import('@/lib/prisma/client');
+
+    // Fetch user with related data
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        profile: {
+          include: {
+            _count: {
+              select: {
+                services: true,
+                reviews: true,
+              },
+            },
+          },
+        },
+        accounts: true,
+        sessions: true,
+      },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        error: 'User not found',
+      };
+    }
+
+    return {
+      success: true,
+      data: user,
+    };
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch user',
+    };
+  }
+}
+
 export async function listUsers(
   params: Partial<z.infer<typeof adminListUsersSchema>> = {},
 ) {
@@ -448,6 +493,256 @@ export async function setUserPassword(
       success: false,
       error:
         error instanceof Error ? error.message : 'Failed to set user password',
+    };
+  }
+}
+
+// =============================================
+// PRISMA-BASED USER UPDATE ACTIONS
+// =============================================
+
+/**
+ * Update user basic information via Prisma
+ * Fields: name, email, username, displayName, firstName, lastName
+ */
+export async function updateUserBasicInfo(data: {
+  userId: string;
+  name?: string;
+  email?: string;
+  username?: string;
+  displayName?: string;
+  firstName?: string;
+  lastName?: string;
+}) {
+  try {
+    await getAdminSession();
+
+    const { prisma } = await import('@/lib/prisma/client');
+
+    // Build update object with only provided fields
+    const updateData: any = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.email !== undefined) updateData.email = data.email;
+    if (data.username !== undefined) updateData.username = data.username;
+    if (data.displayName !== undefined) updateData.displayName = data.displayName;
+    if (data.firstName !== undefined) updateData.firstName = data.firstName;
+    if (data.lastName !== undefined) updateData.lastName = data.lastName;
+
+    const user = await prisma.user.update({
+      where: { id: data.userId },
+      data: updateData,
+    });
+
+    return {
+      success: true,
+      data: user,
+    };
+  } catch (error) {
+    console.error('Error updating user basic info:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update user basic info',
+    };
+  }
+}
+
+/**
+ * Update user status fields via Prisma
+ * Fields: confirmed, blocked, emailVerified, step
+ */
+export async function updateUserStatus(data: {
+  userId: string;
+  confirmed?: boolean;
+  blocked?: boolean;
+  emailVerified?: boolean;
+  step?: string;
+}) {
+  try {
+    await getAdminSession();
+
+    const { prisma } = await import('@/lib/prisma/client');
+
+    // Build update object with only provided fields
+    const updateData: any = {};
+    if (data.confirmed !== undefined) updateData.confirmed = data.confirmed;
+    if (data.blocked !== undefined) updateData.blocked = data.blocked;
+    if (data.emailVerified !== undefined) updateData.emailVerified = data.emailVerified;
+    if (data.step !== undefined) updateData.step = data.step;
+
+    const user = await prisma.user.update({
+      where: { id: data.userId },
+      data: updateData,
+    });
+
+    return {
+      success: true,
+      data: user,
+    };
+  } catch (error) {
+    console.error('Error updating user status:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update user status',
+    };
+  }
+}
+
+/**
+ * Update user ban status with reason and expiry via Prisma
+ * This complements Better Auth's banUser API
+ */
+export async function updateUserBanStatus(data: {
+  userId: string;
+  banned: boolean;
+  banReason?: string | null;
+  banExpires?: Date | null;
+}) {
+  try {
+    await getAdminSession();
+
+    const { prisma } = await import('@/lib/prisma/client');
+
+    const user = await prisma.user.update({
+      where: { id: data.userId },
+      data: {
+        banned: data.banned,
+        banReason: data.banReason,
+        banExpires: data.banExpires,
+      },
+    });
+
+    return {
+      success: true,
+      data: user,
+    };
+  } catch (error) {
+    console.error('Error updating user ban status:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update user ban status',
+    };
+  }
+}
+
+/**
+ * Update user image via Prisma
+ */
+export async function updateUserImage(data: {
+  userId: string;
+  image: string | null;
+}) {
+  try {
+    await getAdminSession();
+
+    const { prisma } = await import('@/lib/prisma/client');
+
+    const user = await prisma.user.update({
+      where: { id: data.userId },
+      data: { image: data.image },
+    });
+
+    return {
+      success: true,
+      data: user,
+    };
+  } catch (error) {
+    console.error('Error updating user image:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update user image',
+    };
+  }
+}
+
+/**
+ * Block/unblock user via Prisma
+ */
+export async function toggleUserBlock(data: {
+  userId: string;
+  blocked: boolean;
+}) {
+  try {
+    await getAdminSession();
+
+    const { prisma } = await import('@/lib/prisma/client');
+
+    const user = await prisma.user.update({
+      where: { id: data.userId },
+      data: { blocked: data.blocked },
+    });
+
+    return {
+      success: true,
+      data: user,
+      message: data.blocked ? 'User blocked successfully' : 'User unblocked successfully',
+    };
+  } catch (error) {
+    console.error('Error toggling user block status:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to toggle user block status',
+    };
+  }
+}
+
+/**
+ * Confirm/unconfirm user via Prisma
+ */
+export async function toggleUserConfirmation(data: {
+  userId: string;
+  confirmed: boolean;
+}) {
+  try {
+    await getAdminSession();
+
+    const { prisma } = await import('@/lib/prisma/client');
+
+    const user = await prisma.user.update({
+      where: { id: data.userId },
+      data: { confirmed: data.confirmed },
+    });
+
+    return {
+      success: true,
+      data: user,
+      message: data.confirmed ? 'User confirmed successfully' : 'User unconfirmed successfully',
+    };
+  } catch (error) {
+    console.error('Error toggling user confirmation:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to toggle user confirmation',
+    };
+  }
+}
+
+/**
+ * Update user journey step via Prisma
+ */
+export async function updateUserJourneyStep(data: {
+  userId: string;
+  step: string;
+}) {
+  try {
+    await getAdminSession();
+
+    const { prisma } = await import('@/lib/prisma/client');
+
+    const user = await prisma.user.update({
+      where: { id: data.userId },
+      data: { step: data.step },
+    });
+
+    return {
+      success: true,
+      data: user,
+      message: `User step updated to ${data.step}`,
+    };
+  } catch (error) {
+    console.error('Error updating user journey step:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update user journey step',
     };
   }
 }

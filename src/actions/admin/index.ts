@@ -5,3 +5,4 @@
 
 export * from './api-keys';
 export * from './users';
+export * from './profiles';
