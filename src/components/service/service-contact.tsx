@@ -47,7 +47,7 @@ export default function ServiceContact({
     return Math.max(0, years);
   };
 
-  const type = profile.type === 'freelancer' ? 'Εππαγγελματίας' : 'Εταιρία';
+  const type = profile.type === 'freelancer' ? 'Επαγγελματίας' : 'Επιχείρηση';
   const yearsOfExperience = getYearsOfExperience();
   const displayNameValue = displayName || '';
   const usernameValue = username || '';

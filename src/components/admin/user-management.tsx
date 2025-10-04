@@ -730,8 +730,8 @@ export function UserManagement() {
               <SelectContent>
                 <SelectItem value='all'>All Roles</SelectItem>
                 <SelectItem value='user'>User</SelectItem>
-                <SelectItem value='freelancer'>Freelancer</SelectItem>
-                <SelectItem value='company'>Company</SelectItem>
+                <SelectItem value='freelancer'>Επαγγελματίας</SelectItem>
+                <SelectItem value='company'>Επιχείρηση</SelectItem>
                 <SelectItem value='admin'>Admin</SelectItem>
               </SelectContent>
             </Select>

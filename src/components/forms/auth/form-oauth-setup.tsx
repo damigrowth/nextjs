@@ -35,12 +35,12 @@ import { useAuthStore } from '@/lib/stores/authStore';
 const roleOptions = [
   {
     value: 'freelancer',
-    label: 'Freelancer',
+    label: 'Επαγγελματίας',
     description: 'Ανεξάρτητος επαγγελματίας',
   },
   {
     value: 'company',
-    label: 'Εταιρία',
+    label: 'Επιχείρηση',
     description: 'Επιχείρηση/Οργανισμός',
   },
 ];

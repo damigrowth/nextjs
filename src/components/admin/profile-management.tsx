@@ -416,8 +416,8 @@ export function ProfileManagement() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='all'>All Types</SelectItem>
-                  <SelectItem value='freelancer'>Freelancer</SelectItem>
-                  <SelectItem value='company'>Company</SelectItem>
+                  <SelectItem value='freelancer'>Επαγγελματίας</SelectItem>
+                  <SelectItem value='company'>Επιχείρηση</SelectItem>
                 </SelectContent>
               </Select>
             </div>
