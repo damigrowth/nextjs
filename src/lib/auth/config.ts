@@ -10,7 +10,10 @@ const prisma = new PrismaClient();
 
 export const auth = betterAuth({
   // Base URL and trusted origins for Vercel deployment compatibility
-  baseURL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  // Use VERCEL_URL for dynamic preview deployments (server-side), fallback to env or localhost
+  baseURL: process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   trustedOrigins: [
     'http://localhost:3000',
     'https://*.vercel.app', // Support Vercel preview deployments

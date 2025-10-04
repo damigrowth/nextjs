@@ -25,7 +25,6 @@ import { AlertCircle, CheckCircle } from 'lucide-react';
 import { FormButton } from '../../shared';
 import { Separator } from '../../ui/separator';
 import GoogleLoginButton from './button-login-goolge';
-import { savePreviewUrl, getOAuthCallbackUrl } from '@/lib/auth/preview-url';
 
 type LoginState = {
   success: boolean;
@@ -54,11 +53,6 @@ const LoginForm: React.FC = () => {
   // Check for success messages from URL params
   const message = searchParams?.get('message');
   const showPasswordResetSuccess = message === 'password-reset-success';
-
-  // Save preview deployment URL for OAuth redirects (runs once on mount)
-  useEffect(() => {
-    savePreviewUrl();
-  }, []);
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -115,12 +109,9 @@ const LoginForm: React.FC = () => {
 
   const handleGoogleSignIn = async (): Promise<void> => {
     try {
-      // Get the appropriate callback URL (preview URL if on preview, production otherwise)
-      const callbackURL = getOAuthCallbackUrl('/dashboard');
-
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL,
+        callbackURL: '/dashboard',
       });
     } catch (error) {
       console.error('Google Sign-in Error:', error);
