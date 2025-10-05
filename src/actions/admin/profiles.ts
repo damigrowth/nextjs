@@ -407,8 +407,10 @@ export async function toggleVerified(params: AdminToggleProfileInput) {
 
     const currentProfile = await prisma.profile.findUnique({
       where: { id: validatedParams.profileId },
-      select: { verified: true },
-      include: { verification: true },
+      select: {
+        verified: true,
+        verification: true,
+      },
     });
 
     if (!currentProfile) {

@@ -23,28 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ProfileBadges } from '@/components/shared';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  MoreHorizontal,
-  ArrowUpDown,
-  Edit,
-  Eye,
-  Star,
-  Trash2,
-  CheckCircle2,
-  XCircle,
-  Award,
-  BriefcaseIcon,
-  Copy,
-  Check,
-} from 'lucide-react';
+import { ArrowUpDown, Edit, Star, Copy, Check } from 'lucide-react';
 import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { useState } from 'react';
@@ -114,11 +93,6 @@ interface AdminProfilesDataTableProps {
   loading?: boolean;
   selectedIds?: string[];
   onSelectionChange?: (ids: string[]) => void;
-  onViewServices?: (profile: Profile) => void;
-  onTogglePublished?: (profileId: string) => void;
-  onToggleFeatured?: (profileId: string) => void;
-  onToggleVerified?: (profileId: string) => void;
-  onDeleteProfile?: (profile: Profile) => void;
 }
 
 export function AdminProfilesDataTable({
@@ -126,11 +100,6 @@ export function AdminProfilesDataTable({
   loading = false,
   selectedIds = [],
   onSelectionChange,
-  onViewServices,
-  onTogglePublished,
-  onToggleFeatured,
-  onToggleVerified,
-  onDeleteProfile,
 }: AdminProfilesDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
@@ -187,8 +156,11 @@ export function AdminProfilesDataTable({
       header: ({ table }) => (
         <Checkbox
           checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
+            table.getIsAllPageRowsSelected()
+              ? true
+              : table.getIsSomePageRowsSelected()
+                ? 'indeterminate'
+                : false
           }
           onCheckedChange={(value) => {
             table.toggleAllPageRowsSelected(!!value);
@@ -401,57 +373,18 @@ export function AdminProfilesDataTable({
         const profile = row.original;
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Open menu</span>
-                <MoreHorizontal className='h-4 w-4' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem asChild>
-                <Link href={`/admin/profiles/${profile.id}`}>
-                  <Edit className='mr-2 h-4 w-4' />
-                  Edit Profile
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onViewServices?.(profile)}>
-                <BriefcaseIcon className='mr-2 h-4 w-4' />
-                View Services ({profile._count.services})
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => onTogglePublished?.(profile.id)}>
-                {profile.published ? (
-                  <>
-                    <XCircle className='mr-2 h-4 w-4' />
-                    Unpublish
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className='mr-2 h-4 w-4' />
-                    Publish
-                  </>
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onToggleFeatured?.(profile.id)}>
-                <Star className='mr-2 h-4 w-4' />
-                {profile.featured ? 'Unfeature' : 'Feature'}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onToggleVerified?.(profile.id)}>
-                <CheckCircle2 className='mr-2 h-4 w-4' />
-                {profile.verified ? 'Unverify' : 'Verify'}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => onDeleteProfile?.(profile)}
-                className='text-destructive'
-              >
-                <Trash2 className='mr-2 h-4 w-4' />
-                Delete Profile
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className='flex items-center justify-end'>
+            <Button
+              variant='ghost'
+              size='icon'
+              className='h-8 w-8'
+              asChild
+            >
+              <Link href={`/admin/profiles/${profile.id}`}>
+                <Edit className='w-4 h-4' />
+              </Link>
+            </Button>
+          </div>
         );
       },
     },

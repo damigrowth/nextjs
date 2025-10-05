@@ -73,6 +73,7 @@ interface Profile {
   createdAt: Date;
   updatedAt: Date;
   user: {
+    id: string;
     email: string;
     name: string | null;
     role: string;
@@ -333,23 +334,39 @@ export function ProfileManagement() {
             <Users className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
-            <div className='text-2xl font-bold'>{stats.total}</div>
-            <p className='text-xs text-muted-foreground'>
-              All professional profiles
-            </p>
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Total</span>
+                <span className='text-lg font-semibold'>{stats.total}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Published</span>
+                <span className='text-lg font-semibold'>{stats.published}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Draft</span>
+                <span className='text-lg font-semibold'>{stats.total - stats.published}</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Published</CardTitle>
-            <UserCheck className='h-4 w-4 text-muted-foreground' />
+            <CardTitle className='text-sm font-medium'>Verification</CardTitle>
+            <CheckCircle2 className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
-            <div className='text-2xl font-bold'>{stats.published}</div>
-            <p className='text-xs text-muted-foreground'>
-              Live on the platform
-            </p>
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Verified</span>
+                <span className='text-lg font-semibold'>{stats.verified}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Unverified</span>
+                <span className='text-lg font-semibold'>{stats.total - stats.verified}</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -359,57 +376,63 @@ export function ProfileManagement() {
             <Star className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
-            <div className='text-2xl font-bold'>{stats.featured}</div>
-            <p className='text-xs text-muted-foreground'>
-              Premium placement
-            </p>
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Featured</span>
+                <span className='text-lg font-semibold'>{stats.featured}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Regular</span>
+                <span className='text-lg font-semibold'>{stats.total - stats.featured}</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Verified</CardTitle>
-            <CheckCircle2 className='h-4 w-4 text-muted-foreground' />
+            <CardTitle className='text-sm font-medium'>Ratings</CardTitle>
+            <Award className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
-            <div className='text-2xl font-bold'>{stats.verified}</div>
-            <p className='text-xs text-muted-foreground'>
-              Identity confirmed
-            </p>
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Top Rated</span>
+                <span className='text-lg font-semibold'>-</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Average</span>
+                <span className='text-lg font-semibold'>-</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters */}
+      {/* Data Table */}
       <Card>
         <CardHeader>
-          <CardTitle className='flex items-center'>
-            <Filter className='mr-2 h-4 w-4' />
-            Filters
-          </CardTitle>
+          <CardTitle>Profiles ({total})</CardTitle>
           <CardDescription>
-            Filter and search through profiles
+            Manage freelancer and company profiles
           </CardDescription>
         </CardHeader>
-        <CardContent className='space-y-4'>
-          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-            {/* Search */}
-            <div className='space-y-2'>
-              <label className='text-sm font-medium'>Search</label>
+        <CardContent>
+          {/* Filters */}
+          <div className='mb-4 space-y-4'>
+            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+              {/* Search */}
               <div className='relative'>
-                <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+                <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
                 <Input
                   placeholder='Search profiles...'
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className='pl-8'
+                  className='pl-9'
                 />
               </div>
-            </div>
 
-            {/* Type Filter */}
-            <div className='space-y-2'>
-              <label className='text-sm font-medium'>Type</label>
+              {/* Type Filter */}
               <Select value={typeFilter} onValueChange={setTypeFilter}>
                 <SelectTrigger>
                   <SelectValue placeholder='All types' />
@@ -420,11 +443,8 @@ export function ProfileManagement() {
                   <SelectItem value='company'>Επιχείρηση</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
 
-            {/* Published Filter */}
-            <div className='space-y-2'>
-              <label className='text-sm font-medium'>Status</label>
+              {/* Published Filter */}
               <Select
                 value={publishedFilter}
                 onValueChange={setPublishedFilter}
@@ -438,11 +458,8 @@ export function ProfileManagement() {
                   <SelectItem value='draft'>Draft</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
 
-            {/* Verified Filter */}
-            <div className='space-y-2'>
-              <label className='text-sm font-medium'>Verification</label>
+              {/* Verified Filter */}
               <Select
                 value={verifiedFilter}
                 onValueChange={setVerifiedFilter}
@@ -456,11 +473,8 @@ export function ProfileManagement() {
                   <SelectItem value='unverified'>Unverified</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
 
-            {/* Featured Filter */}
-            <div className='space-y-2'>
-              <label className='text-sm font-medium'>Featured</label>
+              {/* Featured Filter */}
               <Select
                 value={featuredFilter}
                 onValueChange={setFeaturedFilter}
@@ -474,56 +488,44 @@ export function ProfileManagement() {
                   <SelectItem value='not-featured'>Not Featured</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
 
-            {/* Category Filter */}
-            <div className='space-y-2'>
-              <label className='text-sm font-medium'>Category</label>
+              {/* Category Filter */}
               <Input
                 placeholder='Filter by category...'
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
               />
             </div>
+
+            {/* Clear Filters */}
+            {(searchQuery ||
+              typeFilter !== 'all' ||
+              publishedFilter !== 'all' ||
+              verifiedFilter !== 'all' ||
+              featuredFilter !== 'all' ||
+              categoryFilter) && (
+              <Button
+                variant='ghost'
+                size='sm'
+                onClick={() => {
+                  setSearchQuery('');
+                  setTypeFilter('all');
+                  setPublishedFilter('all');
+                  setVerifiedFilter('all');
+                  setFeaturedFilter('all');
+                  setCategoryFilter('');
+                }}
+              >
+                Clear All Filters
+              </Button>
+            )}
           </div>
 
-          {/* Clear Filters */}
-          {(searchQuery ||
-            typeFilter !== 'all' ||
-            publishedFilter !== 'all' ||
-            verifiedFilter !== 'all' ||
-            featuredFilter !== 'all' ||
-            categoryFilter) && (
-            <Button
-              variant='ghost'
-              onClick={() => {
-                setSearchQuery('');
-                setTypeFilter('all');
-                setPublishedFilter('all');
-                setVerifiedFilter('all');
-                setFeaturedFilter('all');
-                setCategoryFilter('');
-              }}
-            >
-              Clear All Filters
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Data Table */}
-      <Card>
-        <CardContent className='p-6'>
           <AdminProfilesDataTable
             data={profiles}
             loading={loading}
             selectedIds={selectedIds}
             onSelectionChange={setSelectedIds}
-            onViewServices={handleViewServices}
-            onTogglePublished={handleTogglePublished}
-            onToggleFeatured={handleToggleFeatured}
-            onToggleVerified={handleToggleVerified}
-            onDeleteProfile={handleDeleteProfile}
           />
 
           {/* Pagination */}
