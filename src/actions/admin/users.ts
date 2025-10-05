@@ -746,3 +746,113 @@ export async function updateUserJourneyStep(data: {
     };
   }
 }
+
+/**
+ * Get user statistics for admin dashboard
+ */
+export async function getUserStats() {
+  try {
+    await getAdminSession();
+
+    const { prisma } = await import('@/lib/prisma/client');
+
+    // Get counts in parallel
+    const [
+      total,
+      activeUsers,
+      bannedUsers,
+      blockedUsers,
+      unverifiedUsers,
+      // Step counts
+      emailVerificationStep,
+      oauthSetupStep,
+      onboardingStep,
+      dashboardStep,
+      // Provider counts
+      emailProvider,
+      googleProvider,
+      // Type counts
+      simpleUsers,
+      proUsers,
+    ] = await Promise.all([
+      prisma.user.count(),
+      prisma.user.count({
+        where: {
+          banned: false,
+          blocked: false,
+          emailVerified: true,
+          confirmed: true,
+        },
+      }),
+      prisma.user.count({
+        where: { banned: true },
+      }),
+      prisma.user.count({
+        where: { blocked: true },
+      }),
+      prisma.user.count({
+        where: {
+          emailVerified: false,
+        },
+      }),
+      // Step counts
+      prisma.user.count({
+        where: { step: 'EMAIL_VERIFICATION' },
+      }),
+      prisma.user.count({
+        where: { step: 'OAUTH_SETUP' },
+      }),
+      prisma.user.count({
+        where: { step: 'ONBOARDING' },
+      }),
+      prisma.user.count({
+        where: { step: 'DASHBOARD' },
+      }),
+      // Provider counts
+      prisma.user.count({
+        where: { provider: 'email' },
+      }),
+      prisma.user.count({
+        where: { provider: 'google' },
+      }),
+      // Type counts
+      prisma.user.count({
+        where: { type: 'user' },
+      }),
+      prisma.user.count({
+        where: { type: 'pro' },
+      }),
+    ]);
+
+    return {
+      success: true,
+      data: {
+        total,
+        active: activeUsers,
+        banned: bannedUsers,
+        blocked: blockedUsers,
+        unverified: unverifiedUsers,
+        byStep: {
+          EMAIL_VERIFICATION: emailVerificationStep,
+          OAUTH_SETUP: oauthSetupStep,
+          ONBOARDING: onboardingStep,
+          DASHBOARD: dashboardStep,
+        },
+        byProvider: {
+          email: emailProvider,
+          google: googleProvider,
+        },
+        byType: {
+          simple: simpleUsers,
+          pro: proUsers,
+        },
+      },
+    };
+  } catch (error) {
+    console.error('Error getting user stats:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to get user stats',
+    };
+  }
+}

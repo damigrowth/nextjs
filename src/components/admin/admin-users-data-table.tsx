@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import {
   ColumnDef,
   flexRender,
@@ -8,7 +9,6 @@ import {
   useReactTable,
   getSortedRowModel,
   SortingState,
-  Row,
 } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,26 +21,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  MoreHorizontal,
-  ArrowUpDown,
-  Edit,
-  Shield,
-  Ban,
-  UnlockKeyhole,
-  Trash2,
-  Eye,
-  LogOut,
-  Key,
-} from 'lucide-react';
+import { ArrowUpDown, Edit } from 'lucide-react';
+import { formatDate, formatTime } from '@/lib/utils/date';
 
 interface User {
   id: string;
@@ -65,14 +47,6 @@ interface AdminUsersDataTableProps {
   loading?: boolean;
   selectedIds?: string[];
   onSelectionChange?: (ids: string[]) => void;
-  onEditUser?: (user: User) => void;
-  onSetPassword?: (user: User) => void;
-  onViewSessions?: (user: User) => void;
-  onImpersonateUser?: (userId: string) => void;
-  onToggleRole?: (userId: string, currentRole: string) => void;
-  onBanUser?: (user: User) => void;
-  onUnbanUser?: (userId: string) => void;
-  onDeleteUser?: (user: User) => void;
 }
 
 export function AdminUsersDataTable({
@@ -80,14 +54,6 @@ export function AdminUsersDataTable({
   loading = false,
   selectedIds = [],
   onSelectionChange,
-  onEditUser,
-  onSetPassword,
-  onViewSessions,
-  onImpersonateUser,
-  onToggleRole,
-  onBanUser,
-  onUnbanUser,
-  onDeleteUser,
 }: AdminUsersDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
@@ -240,9 +206,35 @@ export function AdminUsersDataTable({
         const date = row.getValue('createdAt') as Date;
         return (
           <div className='space-y-1'>
-            <div className='text-sm'>{new Date(date).toLocaleDateString()}</div>
+            <div className='text-sm'>{formatDate(date)}</div>
             <div className='text-xs text-muted-foreground'>
-              {new Date(date).toLocaleTimeString()}
+              {formatTime(date)}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'updatedAt',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant='ghost'
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            className='h-auto p-0'
+          >
+            Updated
+            <ArrowUpDown className='ml-2 h-4 w-4' />
+          </Button>
+        );
+      },
+      cell: ({ row }) => {
+        const date = row.getValue('updatedAt') as Date;
+        return (
+          <div className='space-y-1'>
+            <div className='text-sm'>{formatDate(date)}</div>
+            <div className='text-xs text-muted-foreground'>
+              {formatTime(date)}
             </div>
           </div>
         );
@@ -255,59 +247,18 @@ export function AdminUsersDataTable({
         const user = row.original;
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Open menu</span>
-                <MoreHorizontal className='h-4 w-4' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => onEditUser?.(user)}>
-                <Edit className='mr-2 h-4 w-4' />
-                Edit User
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onSetPassword?.(user)}>
-                <Key className='mr-2 h-4 w-4' />
-                Set Password
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onViewSessions?.(user)}>
-                <Eye className='mr-2 h-4 w-4' />
-                View Sessions
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onImpersonateUser?.(user.id)}>
-                <LogOut className='mr-2 h-4 w-4' />
-                Impersonate
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => onToggleRole?.(user.id, user.role)}
-              >
-                <Shield className='mr-2 h-4 w-4' />
-                {user.role === 'admin' ? 'Remove Admin' : 'Make Admin'}
-              </DropdownMenuItem>
-              {user.banned ? (
-                <DropdownMenuItem onClick={() => onUnbanUser?.(user.id)}>
-                  <UnlockKeyhole className='mr-2 h-4 w-4' />
-                  Unban User
-                </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem onClick={() => onBanUser?.(user)}>
-                  <Ban className='mr-2 h-4 w-4' />
-                  Ban User
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => onDeleteUser?.(user)}
-                className='text-destructive'
-              >
-                <Trash2 className='mr-2 h-4 w-4' />
-                Delete User
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className='flex items-center justify-end'>
+            <Button
+              variant='ghost'
+              size='icon'
+              className='h-8 w-8'
+              asChild
+            >
+              <Link href={`/admin/users/${user.id}`}>
+                <Edit className='w-4 h-4' />
+              </Link>
+            </Button>
+          </div>
         );
       },
     },

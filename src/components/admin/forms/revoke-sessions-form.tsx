@@ -38,7 +38,7 @@ export function RevokeSessionsForm({ user }: RevokeSessionsFormProps) {
       });
 
       if (result.success) {
-        toast.success(result.message || 'All user sessions have been revoked successfully');
+        toast.success('All user sessions have been revoked successfully');
         router.refresh();
       } else {
         toast.error(result.error || 'Failed to revoke sessions');

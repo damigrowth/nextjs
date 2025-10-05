@@ -14,14 +14,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -38,14 +30,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
   Form,
   FormControl,
   FormDescription,
@@ -60,22 +44,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import {
-  MoreHorizontal,
   UserPlus,
-  Shield,
-  Ban,
-  UnlockKeyhole,
-  Trash2,
-  Eye,
-  LogOut,
-  Edit,
-  Key,
   Search,
   Filter,
   RefreshCw,
-  Download,
-  Upload,
+  Users,
+  UserCheck,
+  Ban,
+  Shield,
+  AlertCircle,
 } from 'lucide-react';
+import { AdminUsersDataTable } from './admin-users-data-table';
 
 import {
   createUserFormSchema,
@@ -103,6 +82,7 @@ import {
   revokeAllUserSessions,
   setUserPassword,
   updateUser,
+  getUserStats,
 } from '@/actions/admin/users';
 
 interface User {
@@ -130,10 +110,53 @@ interface UserListResponse {
   offset?: number;
 }
 
+interface UserStatsResponse {
+  total: number;
+  active: number;
+  banned: number;
+  blocked: number;
+  unverified: number;
+  byStep: {
+    EMAIL_VERIFICATION: number;
+    OAUTH_SETUP: number;
+    ONBOARDING: number;
+    DASHBOARD: number;
+  };
+  byProvider: {
+    email: number;
+    google: number;
+  };
+  byType: {
+    simple: number;
+    pro: number;
+  };
+}
+
 export function UserManagement() {
   // State management
   const [users, setUsers] = useState<User[]>([]);
   const [total, setTotal] = useState(0);
+  const [stats, setStats] = useState<UserStatsResponse>({
+    total: 0,
+    active: 0,
+    banned: 0,
+    blocked: 0,
+    unverified: 0,
+    byStep: {
+      EMAIL_VERIFICATION: 0,
+      OAUTH_SETUP: 0,
+      ONBOARDING: 0,
+      DASHBOARD: 0,
+    },
+    byProvider: {
+      email: 0,
+      google: 0,
+    },
+    byType: {
+      simple: 0,
+      pro: 0,
+    },
+  });
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
@@ -239,9 +262,25 @@ export function UserManagement() {
     }
   };
 
+  const loadStats = async () => {
+    try {
+      const result = await getUserStats();
+
+      if (result.success && result.data) {
+        setStats(result.data);
+      }
+    } catch (error) {
+      console.error('Error loading user stats:', error);
+    }
+  };
+
   useEffect(() => {
     loadUsers();
   }, [currentPage, searchQuery, roleFilter, statusFilter]);
+
+  useEffect(() => {
+    loadStats();
+  }, []);
 
   // Form handlers
   const handleCreateUser = async (data: CreateUserFormInput) => {
@@ -459,72 +498,6 @@ export function UserManagement() {
     }
   };
 
-  // Helper functions
-  const getRoleBadgeVariant = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'destructive';
-      case 'freelancer':
-        return 'default';
-      case 'company':
-        return 'secondary';
-      default:
-        return 'outline';
-    }
-  };
-
-  const getStatusBadge = (user: User) => {
-    if (user.banned) {
-      return <Badge variant='destructive'>Banned</Badge>;
-    }
-    if (user.blocked) {
-      return <Badge variant='destructive'>Blocked</Badge>;
-    }
-    if (!user.emailVerified) {
-      return <Badge variant='secondary'>Unverified</Badge>;
-    }
-    if (!user.confirmed) {
-      return <Badge variant='outline'>Pending</Badge>;
-    }
-    return <Badge variant='default'>Active</Badge>;
-  };
-
-  const openEditDialog = (user: User) => {
-    setSelectedUser(user);
-    editUserForm.reset({
-      name: user.name || '',
-      email: user.email,
-      displayName: user.displayName || '',
-      username: user.username || '',
-      role: user.role as any,
-      confirmed: user.confirmed,
-      blocked: user.blocked,
-      emailVerified: !!user.emailVerified,
-    });
-    setEditUserOpen(true);
-  };
-
-  const openBanDialog = (user: User) => {
-    setSelectedUser(user);
-    banUserForm.reset({
-      userId: user.id,
-      banReason: '',
-      banDuration: 7,
-      isPermanent: false,
-    });
-    setBanUserOpen(true);
-  };
-
-  const openSetPasswordDialog = (user: User) => {
-    setSelectedUser(user);
-    setPasswordForm.reset({
-      userId: user.id,
-      newPassword: '',
-      confirmPassword: '',
-      sendNotification: true,
-    });
-    setSetPasswordOpen(true);
-  };
 
   const totalPages = Math.ceil(total / pageSize);
 
@@ -533,7 +506,7 @@ export function UserManagement() {
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
-          <h2 className='text-2xl font-bold tracking-tight'>User Management</h2>
+          <h2 className='text-2xl font-bold tracking-tight'>Users</h2>
           <p className='text-muted-foreground'>
             Manage users, roles, and permissions with Better Auth
           </p>
@@ -702,16 +675,120 @@ export function UserManagement() {
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Stats Cards */}
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+        {/* Total Users Card */}
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Total Users</CardTitle>
+            <Users className='h-4 w-4 text-muted-foreground' />
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Total</span>
+                <span className='text-lg font-semibold'>{stats.total}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Simple</span>
+                <span className='text-lg font-semibold'>{stats.byType.simple}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Professional</span>
+                <span className='text-lg font-semibold'>{stats.byType.pro}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Auth Providers Card */}
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Providers</CardTitle>
+            <UserCheck className='h-4 w-4 text-muted-foreground' />
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Email/Password</span>
+                <span className='text-lg font-semibold'>{stats.byProvider.email}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Google OAuth</span>
+                <span className='text-lg font-semibold'>{stats.byProvider.google}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Journey Steps Card */}
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Journey Steps</CardTitle>
+            <Shield className='h-4 w-4 text-muted-foreground' />
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Email Verification</span>
+                <span className='text-lg font-semibold'>{stats.byStep.EMAIL_VERIFICATION}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>OAuth Setup</span>
+                <span className='text-lg font-semibold'>{stats.byStep.OAUTH_SETUP}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Onboarding</span>
+                <span className='text-lg font-semibold'>{stats.byStep.ONBOARDING}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Active</span>
+                <span className='text-lg font-semibold'>{stats.byStep.DASHBOARD}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* User Status Card */}
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Status</CardTitle>
+            <AlertCircle className='h-4 w-4 text-muted-foreground' />
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Active</span>
+                <span className='text-lg font-semibold text-green-600'>{stats.active}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Unverified</span>
+                <span className='text-lg font-semibold text-yellow-600'>{stats.unverified}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Banned</span>
+                <span className='text-lg font-semibold text-red-600'>{stats.banned}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-base text-muted-foreground'>Blocked</span>
+                <span className='text-lg font-semibold text-red-600'>{stats.blocked}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Users Table */}
       <Card>
         <CardHeader>
-          <CardTitle className='flex items-center'>
-            <Filter className='mr-2 h-4 w-4' />
-            Filters & Search
-          </CardTitle>
+          <CardTitle>Users ({total})</CardTitle>
+          <CardDescription>
+            Manage user accounts, roles, and access permissions
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className='flex items-center space-x-4'>
+          {/* Filters */}
+          <div className='mb-4 flex items-center space-x-4'>
             <div className='flex-1'>
               <div className='relative'>
                 <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
@@ -748,161 +825,11 @@ export function UserManagement() {
               </SelectContent>
             </Select>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Users Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Users ({total})</CardTitle>
-          <CardDescription>
-            Manage user accounts, roles, and access permissions
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Step</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className='text-right'>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className='text-center py-8'>
-                    <div className='flex items-center justify-center'>
-                      <RefreshCw className='mr-2 h-4 w-4 animate-spin' />
-                      Loading users...
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : users.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className='text-center py-8'>
-                    <div className='text-muted-foreground'>
-                      No users found matching your criteria
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div>
-                        <div className='font-medium'>
-                          {user.name || 'No name'}
-                        </div>
-                        <div className='text-sm text-muted-foreground'>
-                          {user.email}
-                        </div>
-                        {user.displayName && (
-                          <div className='text-xs text-muted-foreground'>
-                            @{user.displayName}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getRoleBadgeVariant(user.role)}>
-                        {user.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{getStatusBadge(user)}</TableCell>
-                    <TableCell>
-                      <Badge variant='outline'>{user.step}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className='text-sm'>
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </div>
-                    </TableCell>
-                    <TableCell className='text-right'>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant='ghost' className='h-8 w-8 p-0'>
-                            <span className='sr-only'>Open menu</span>
-                            <MoreHorizontal className='h-4 w-4' />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align='end'>
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={() => openEditDialog(user)}
-                          >
-                            <Edit className='mr-2 h-4 w-4' />
-                            Edit User
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => openSetPasswordDialog(user)}
-                          >
-                            <Key className='mr-2 h-4 w-4' />
-                            Set Password
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleViewSessions(user)}
-                          >
-                            <Eye className='mr-2 h-4 w-4' />
-                            View Sessions
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleImpersonateUser(user.id)}
-                          >
-                            <LogOut className='mr-2 h-4 w-4' />
-                            Impersonate
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() =>
-                              setUserRole({
-                                userId: user.id,
-                                role: user.role === 'admin' ? 'user' : 'admin',
-                              })
-                            }
-                          >
-                            <Shield className='mr-2 h-4 w-4' />
-                            {user.role === 'admin'
-                              ? 'Remove Admin'
-                              : 'Make Admin'}
-                          </DropdownMenuItem>
-                          {user.banned ? (
-                            <DropdownMenuItem
-                              onClick={() => handleUnbanUser(user.id)}
-                            >
-                              <UnlockKeyhole className='mr-2 h-4 w-4' />
-                              Unban User
-                            </DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem
-                              onClick={() => openBanDialog(user)}
-                            >
-                              <Ban className='mr-2 h-4 w-4' />
-                              Ban User
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setDeleteUserOpen(true);
-                            }}
-                            className='text-destructive'
-                          >
-                            <Trash2 className='mr-2 h-4 w-4' />
-                            Delete User
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <AdminUsersDataTable
+            data={users}
+            loading={loading}
+          />
         </CardContent>
       </Card>
 
