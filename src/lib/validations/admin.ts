@@ -453,3 +453,101 @@ export type AdminUpdateVerificationInput = z.infer<
   typeof adminUpdateVerificationSchema
 >;
 export type EditProfileFormInput = z.infer<typeof editProfileFormSchema>;
+
+// =============================================
+// ADMIN SERVICE MANAGEMENT SCHEMAS
+// =============================================
+
+export const adminListServicesSchema = z.object({
+  searchQuery: z.string().optional(),
+  status: z.enum(['all', 'draft', 'pending', 'published', 'rejected', 'approved', 'inactive']).optional(),
+  category: z.string().optional(),
+  subcategory: z.string().optional(),
+  subdivision: z.string().optional(),
+  featured: z.enum(['all', 'featured', 'not-featured']).optional(),
+  profileId: z.string().optional(), // Filter by profile
+  limit: z.coerce.number().int().min(1).max(100).optional().default(10),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+  sortBy: z
+    .enum(['createdAt', 'rating', 'reviewCount', 'updatedAt', 'price'])
+    .optional()
+    .default('createdAt'),
+  sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
+});
+
+export const adminUpdateServiceSchema = z.object({
+  serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
+  // Basic info
+  title: z.string().min(1).max(200).optional(),
+  description: z.string().min(1).optional(),
+
+  // Taxonomies
+  category: z.string().optional(),
+  subcategory: z.string().optional(),
+  subdivision: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+
+  // Pricing
+  fixed: z.boolean().optional(),
+  price: z.number().int().min(0).optional(),
+  type: z.record(z.string(), z.boolean()).optional(), // online, presence, onsite, etc.
+  subscriptionType: z.enum(['month', 'year', 'per_case', 'per_hour', 'per_session']).optional().nullable(),
+  duration: z.number().int().min(0).optional(),
+
+  // Features
+  addons: z.array(z.record(z.string(), z.any())).optional(),
+  faq: z.array(z.record(z.string(), z.any())).optional(),
+
+  // Media
+  media: z.record(z.string(), z.any()).optional().nullable(),
+
+  // Status flags (admin only)
+  status: z.enum(['draft', 'pending', 'published', 'rejected', 'approved', 'inactive']).optional(),
+  featured: z.boolean().optional(),
+});
+
+export const adminToggleServiceSchema = z.object({
+  serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
+});
+
+export const adminUpdateServiceStatusSchema = z.object({
+  serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
+  status: z.enum(['draft', 'pending', 'published', 'rejected', 'approved', 'inactive']),
+  rejectionReason: z.string().max(500).optional(),
+});
+
+export const adminDeleteServiceSchema = z.object({
+  serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
+});
+
+export const editServiceFormSchema = z.object({
+  // Basic tab
+  title: z.string().min(1, 'Title is required').max(200),
+  description: z.string().min(1, 'Description is required'),
+
+  // Category tab
+  category: z.string().min(1, 'Category is required'),
+  subcategory: z.string().min(1, 'Subcategory is required'),
+  subdivision: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+
+  // Pricing tab
+  fixed: z.boolean(),
+  price: z.coerce.number().int().min(0),
+  duration: z.coerce.number().int().min(0).optional(),
+
+  // Status flags
+  status: z.enum(['draft', 'pending', 'published', 'rejected', 'approved', 'inactive']).optional(),
+  featured: z.boolean().optional(),
+});
+
+// =============================================
+// SERVICE TYPE EXPORTS
+// =============================================
+
+export type AdminListServicesInput = z.infer<typeof adminListServicesSchema>;
+export type AdminUpdateServiceInput = z.infer<typeof adminUpdateServiceSchema>;
+export type AdminToggleServiceInput = z.infer<typeof adminToggleServiceSchema>;
+export type AdminUpdateServiceStatusInput = z.infer<typeof adminUpdateServiceStatusSchema>;
+export type AdminDeleteServiceInput = z.infer<typeof adminDeleteServiceSchema>;
+export type EditServiceFormInput = z.infer<typeof editServiceFormSchema>;
