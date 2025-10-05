@@ -72,13 +72,31 @@ export function NavUser({
   const sessionUser = session?.user;
   const isProfessional =
     sessionUser?.role === 'freelancer' || sessionUser?.role === 'company';
+  const isProfessionalType = sessionUser?.type === 'pro';
   const hasProfile = isProfessional && sessionUser?.step === 'DASHBOARD';
+  const needsOAuth = sessionUser?.step === 'OAUTH_SETUP';
+  const needsOnboarding = sessionUser?.step === 'ONBOARDING';
 
   // Get menu items - same logic as UserMenu
   const getMenuItems = () => {
-    if (isProfessional && !hasProfile) {
-      // Only show logout for professional users without profile (still in onboarding)
+    if (needsOnboarding || needsOAuth) {
+      // Show appropriate completion link based on user state
+      let completionPath = '/onboarding';
+
+      if (needsOAuth) {
+        // For OAuth setup, direct to oauth-setup page with appropriate type parameter
+        completionPath = isProfessionalType || sessionUser?.type === 'pro'
+          ? '/oauth-setup?type=pro'
+          : '/oauth-setup';
+      }
+
       return [
+        {
+          id: 89,
+          name: 'Ολοκλήρωση Εγγραφής',
+          path: completionPath,
+          icon: 'flaticon-document',
+        },
         {
           id: 90,
           name: 'Αποσύνδεση',

@@ -110,12 +110,21 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
     let modifiedNav: MenuItem[] = [];
 
     if (needsOnboarding || needsOAuth) {
-      // Show onboarding link and logout for users who need to complete onboarding
+      // Show appropriate completion link based on user state
+      let completionPath = '/onboarding';
+
+      if (needsOAuth) {
+        // For OAuth setup, direct to oauth-setup page with appropriate type parameter
+        completionPath = isProfessionalType || user?.type === 'pro'
+          ? '/oauth-setup?type=pro'
+          : '/oauth-setup';
+      }
+
       modifiedNav = [
         {
           id: 89,
           name: 'Ολοκλήρωση Εγγραφής',
-          path: '/onboarding',
+          path: completionPath,
           icon: 'flaticon-document',
         },
         {
