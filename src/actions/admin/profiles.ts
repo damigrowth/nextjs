@@ -60,6 +60,7 @@ export async function listProfiles(
       published,
       verified,
       featured,
+      status,
       limit,
       offset,
       sortBy,
@@ -107,6 +108,15 @@ export async function listProfiles(
     // Featured filter
     if (featured && featured !== 'all') {
       where.featured = featured === 'featured';
+    }
+
+    // Status filter (featured or top)
+    if (status && status !== 'all') {
+      if (status === 'featured') {
+        where.featured = true;
+      } else if (status === 'top') {
+        where.top = true;
+      }
     }
 
     // Execute query
@@ -605,11 +615,15 @@ export async function getProfileStats() {
   try {
     await getAdminSession();
 
-    const [total, published, featured, verified] = await Promise.all([
+    const [total, published, featured, verified, unverified, top, professional, company] = await Promise.all([
       prisma.profile.count(),
       prisma.profile.count({ where: { published: true } }),
       prisma.profile.count({ where: { featured: true } }),
       prisma.profile.count({ where: { verified: true } }),
+      prisma.profile.count({ where: { verified: false } }),
+      prisma.profile.count({ where: { top: true } }),
+      prisma.profile.count({ where: { type: 'freelancer' } }),
+      prisma.profile.count({ where: { type: 'company' } }),
     ]);
 
     return {
@@ -619,6 +633,10 @@ export async function getProfileStats() {
         published,
         featured,
         verified,
+        unverified,
+        top,
+        professional,
+        company,
       },
     };
   } catch (error) {

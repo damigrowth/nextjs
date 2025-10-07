@@ -1,14 +1,79 @@
-import { ProfileManagement } from '@/components/admin/profile-management';
+import { Suspense } from 'react';
+import {
+  AdminProfilesFilters,
+  AdminProfilesTableSkeleton,
+  AdminProfilesStats,
+  AdminProfilesTableSection,
+  SiteHeader,
+} from '@/components/admin';
+import { Button } from '@/components/ui/button';
+import { RefreshCw, UserPlus } from 'lucide-react';
+import Link from 'next/link';
 
-// Force dynamic rendering for admin pages
+interface ProfilesPageProps {
+  searchParams: Promise<{
+    page?: string;
+    limit?: string;
+    search?: string;
+    type?: string;
+    published?: string;
+    verified?: string;
+    featured?: string;
+    status?: string;
+    category?: string;
+    sortBy?: string;
+    sortOrder?: string;
+  }>;
+}
+
 export const dynamic = 'force-dynamic';
 
-export default function AdminProfilesPage() {
+export default async function ProfilesPage({
+  searchParams,
+}: ProfilesPageProps) {
+  // Await searchParams
+  const params = await searchParams;
+
   return (
-    <div className='flex flex-col gap-4 py-4 md:gap-6 md:py-6'>
-      <div className='px-4 lg:px-6'>
-        <ProfileManagement />
+    <>
+      <SiteHeader
+        title='Profiles'
+        actions={
+          <>
+            <Button variant='outline' size='md'>
+              <RefreshCw className='h-4 w-4' />
+              Refresh
+            </Button>
+            <Button variant='default' size='md' asChild>
+              <Link href='/admin/profiles/create'>
+                <UserPlus className='h-4 w-4' />
+                Create Profile
+              </Link>
+            </Button>
+          </>
+        }
+      />
+      <div className='flex flex-col gap-4 pb-6 pt-4 md:gap-6'>
+        <div className='px-4 lg:px-6'>
+          <div className='space-y-6'>
+            {/* Stats Cards */}
+            <div className='grid gap-4 md:grid-cols-3'>
+              <AdminProfilesStats />
+            </div>
+
+            {/* Filters */}
+            <AdminProfilesFilters />
+
+            {/* Profiles Table */}
+            <Suspense
+              key={JSON.stringify(params)}
+              fallback={<AdminProfilesTableSkeleton />}
+            >
+              <AdminProfilesTableSection searchParams={params} />
+            </Suspense>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
