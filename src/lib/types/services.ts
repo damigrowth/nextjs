@@ -95,3 +95,35 @@ export interface UserServiceStats {
   published: number;
   rejected: number;
 }
+
+// Admin services table type with all necessary relations
+export type AdminServiceWithRelations = Prisma.ServiceGetPayload<{
+  include: {
+    profile: {
+      select: {
+        id: true;
+        displayName: true;
+        username: true;
+        image: true;
+        user: {
+          select: {
+            email: true;
+            name: true;
+            role: true;
+          };
+        };
+      };
+    };
+    _count: {
+      select: {
+        reviews: true;
+      };
+    };
+  };
+}> & {
+  categoryLabels?: {
+    category: string;
+    subcategory: string;
+    subdivision: string;
+  };
+};
