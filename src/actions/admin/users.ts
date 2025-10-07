@@ -108,39 +108,113 @@ export async function getUser(userId: string) {
 }
 
 export async function listUsers(
-  params: Partial<z.infer<typeof adminListUsersSchema>> = {},
+  params: Partial<z.infer<typeof adminListUsersSchema>> & {
+    type?: string;
+    provider?: string;
+    step?: string;
+    status?: string;
+    role?: string;
+  } = {},
 ) {
   try {
     await getAdminSession();
 
-    const validatedParams = adminListUsersSchema.parse(params);
+    const { prisma } = await import('@/lib/prisma/client');
 
-    // Transform our schema to Better Auth compatible query format
-    const betterAuthQuery = {
-      limit: validatedParams.limit || 10,
-      offset: validatedParams.offset || 0,
-      sortBy: validatedParams.sortBy || 'createdAt',
-      sortDirection: validatedParams.sortDirection || ('desc' as const),
-      searchField: validatedParams.searchField,
-      searchValue: validatedParams.searchValue,
-      // Map our filter operators to Better Auth compatible ones
-      filterField: validatedParams.filterField,
-      filterValue: validatedParams.filterValue,
-      filterOperator:
-        validatedParams.filterOperator === 'starts_with'
-          ? ('contains' as const)
-          : (validatedParams.filterOperator as any),
-    };
+    // Build where clause for filters
+    const where: any = {};
 
-    // Use the correct Better Auth admin listUsers method
-    const result = await auth.api.listUsers({
-      query: betterAuthQuery,
-      headers: await headers(),
+    // Search filter
+    if (params.searchValue) {
+      const searchField = params.searchField || 'email';
+      const searchOperator = params.searchOperator || 'contains';
+
+      if (searchOperator === 'contains') {
+        where[searchField] = { contains: params.searchValue, mode: 'insensitive' };
+      } else if (searchOperator === 'starts_with') {
+        where[searchField] = { startsWith: params.searchValue, mode: 'insensitive' };
+      } else if (searchOperator === 'ends_with') {
+        where[searchField] = { endsWith: params.searchValue, mode: 'insensitive' };
+      }
+    }
+
+    // Type filter (simple/pro)
+    if (params.type && params.type !== 'all') {
+      where.type = params.type;
+    }
+
+    // Provider filter (email/google)
+    if (params.provider && params.provider !== 'all') {
+      where.provider = params.provider;
+    }
+
+    // Step filter (EMAIL_VERIFICATION/OAUTH_SETUP/ONBOARDING/DASHBOARD)
+    if (params.step && params.step !== 'all') {
+      where.step = params.step;
+    }
+
+    // Status filter (verified/unverified/banned/blocked)
+    if (params.status && params.status !== 'all') {
+      if (params.status === 'verified') {
+        where.emailVerified = true;
+      } else if (params.status === 'unverified') {
+        where.emailVerified = false;
+      } else if (params.status === 'banned') {
+        where.banned = true;
+      } else if (params.status === 'blocked') {
+        where.blocked = true;
+      }
+    }
+
+    // Role filter (user/freelancer/company/admin)
+    if (params.role && params.role !== 'all') {
+      where.role = params.role;
+    }
+
+    const limit = params.limit || 10;
+    const offset = params.offset || 0;
+    const sortBy = params.sortBy || 'createdAt';
+    const sortDirection = params.sortDirection || 'desc';
+
+    // Get total count
+    const total = await prisma.user.count({ where });
+
+    // Get users with pagination and sorting
+    const users = await prisma.user.findMany({
+      where,
+      take: limit,
+      skip: offset,
+      orderBy: { [sortBy]: sortDirection },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        username: true,
+        displayName: true,
+        firstName: true,
+        lastName: true,
+        image: true,
+        emailVerified: true,
+        confirmed: true,
+        blocked: true,
+        banned: true,
+        banExpires: true,
+        banReason: true,
+        type: true,
+        role: true,
+        provider: true,
+        step: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     return {
       success: true,
-      data: result,
+      data: {
+        users,
+        total,
+      },
     };
   } catch (error) {
     console.error('Error listing users:', error);
