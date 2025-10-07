@@ -7,12 +7,10 @@ import { ActionResult, ActionResponse, ServerActionResponse } from '@/lib/types/
 import { LoginInput } from '@/lib/validations/auth';
 import { AuthUser } from '@/lib/types/auth';
 import { headers } from 'next/headers';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma/client';
 import { getFormString } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
-
-const prisma = new PrismaClient();
 
 export async function login(
   prevState: ActionResponse | null,

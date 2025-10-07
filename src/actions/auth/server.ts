@@ -5,12 +5,11 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { ActionResult } from '@/lib/types/api';
 import { AuthUser, AuthSession } from '@/lib/types/auth';
-import { PrismaClient, Profile } from '@prisma/client';
+import { Profile } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import { getProfileByUserId } from '@/actions/profiles/get-profile';
 import { Session } from 'better-auth';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma/client';
 
 /**
  * Check if user is authenticated and return user/session data

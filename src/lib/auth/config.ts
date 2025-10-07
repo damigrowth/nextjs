@@ -2,11 +2,10 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { nextCookies } from 'better-auth/next-js';
 import { admin, apiKey } from 'better-auth/plugins';
-import { PrismaClient, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { sendAuthEmail } from '@/lib/email';
 import bcrypt from 'bcrypt';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma/client';
 
 export const auth = betterAuth({
   // Base URL and trusted origins for Vercel deployment compatibility
