@@ -24,52 +24,10 @@ import type {
   AdminServiceSortField,
   SortOrder,
 } from './admin-service-table-header-sort';
-
-interface Service {
-  id: number;
-  pid: string;
-  slug: string | null;
-  title: string;
-  description: string;
-  category: string;
-  subcategory: string;
-  subdivision: string;
-  tags: string[];
-  fixed: boolean;
-  price: number | null;
-  type: any;
-  subscriptionType: string | null;
-  duration: number | null;
-  featured: boolean;
-  rating: number;
-  reviewCount: number;
-  status: string;
-  createdAt: Date;
-  updatedAt: Date;
-  media: any;
-  categoryLabels: {
-    category: string;
-    subcategory: string;
-    subdivision: string;
-  };
-  profile: {
-    id: string;
-    displayName: string | null;
-    username: string | null;
-    image: string | null;
-    user: {
-      email: string;
-      name: string | null;
-      role: string;
-    };
-  };
-  _count: {
-    reviews: number;
-  };
-}
+import type { AdminServiceWithRelations } from '@/lib/types/services';
 
 interface AdminServicesTableProps {
-  services: Service[];
+  services: AdminServiceWithRelations[];
   currentSort: {
     field: AdminServiceSortField;
     order: SortOrder;

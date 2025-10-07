@@ -41,6 +41,7 @@ import {
   FileCheck,
 } from 'lucide-react';
 
+import type { AdminServiceWithRelations } from '@/lib/types/services';
 import {
   listServices,
   getService,
@@ -55,51 +56,8 @@ import {
 import { AdminServicesDataTable } from './admin-services-data-table';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 
-interface Service {
-  id: number;
-  pid: string;
-  slug: string | null;
-  title: string;
-  description: string;
-  category: string;
-  subcategory: string;
-  subdivision: string;
-  tags: string[];
-  fixed: boolean;
-  price: number | null;
-  type: any;
-  subscriptionType: string | null;
-  duration: number | null;
-  addons: any[];
-  faq: any[];
-  media: any;
-  featured: boolean;
-  rating: number;
-  reviewCount: number;
-  status: string;
-  createdAt: Date;
-  updatedAt: Date;
-  profile: {
-    id: string;
-    displayName: string | null;
-    type: string | null;
-    username: string | null;
-    category: string | null;
-    subcategory: string | null;
-    image: string | null;
-    user: {
-      email: string;
-      name: string | null;
-      role: string;
-    };
-  };
-  _count: {
-    reviews: number;
-  };
-}
-
 interface ServiceListResponse {
-  services: Service[];
+  services: AdminServiceWithRelations[];
   total: number;
   limit?: number;
   offset?: number;
@@ -119,7 +77,7 @@ interface ServiceStatsResponse {
 
 export function ServiceManagement() {
   // State management
-  const [services, setServices] = useState<Service[]>([]);
+  const [services, setServices] = useState<AdminServiceWithRelations[]>([]);
   const [total, setTotal] = useState(0);
   const [stats, setStats] = useState<ServiceStatsResponse>({
     total: 0,
@@ -143,7 +101,7 @@ export function ServiceManagement() {
   // Dialog states
   const [deleteServiceOpen, setDeleteServiceOpen] = useState(false);
   const [statusUpdateOpen, setStatusUpdateOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [selectedService, setSelectedService] = useState<AdminServiceWithRelations | null>(null);
   const [selectedStatus, setSelectedStatus] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
 
@@ -246,7 +204,7 @@ export function ServiceManagement() {
     }
   };
 
-  const handleUpdateStatus = (service: Service, status: string) => {
+  const handleUpdateStatus = (service: AdminServiceWithRelations, status: string) => {
     setSelectedService(service);
     setSelectedStatus(status);
     setRejectionReason('');
@@ -280,7 +238,7 @@ export function ServiceManagement() {
     }
   };
 
-  const handleDeleteService = (service: Service) => {
+  const handleDeleteService = (service: AdminServiceWithRelations) => {
     setSelectedService(service);
     setDeleteServiceOpen(true);
   };

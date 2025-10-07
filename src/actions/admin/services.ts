@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma/client';
 import { z } from 'zod';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { tags } from '@/constants/datasets/tags';
 
 import {
   adminListServicesSchema,
@@ -58,6 +59,9 @@ export async function listServices(
       subdivision,
       featured,
       profileId,
+      type,
+      pricing,
+      subscriptionType,
       limit,
       offset,
       sortBy,
@@ -96,6 +100,26 @@ export async function listServices(
       where.featured = true;
     } else if (featured === 'not-featured') {
       where.featured = false;
+    }
+
+    // Type filter (presence/online/onbase/onsite/oneoff/subscription)
+    if (type && type !== 'all') {
+      where.type = {
+        path: [type],
+        equals: true,
+      };
+    }
+
+    // Pricing filter (fixed/not-fixed)
+    if (pricing === 'fixed') {
+      where.fixed = true;
+    } else if (pricing === 'not-fixed') {
+      where.fixed = false;
+    }
+
+    // Subscription type filter
+    if (subscriptionType && subscriptionType !== 'all') {
+      where.subscriptionType = subscriptionType;
     }
 
     // Profile filter
@@ -162,13 +186,19 @@ export async function listServices(
       };
     });
 
+    // Calculate page and totalPages
+    const page = Math.floor(offset / limit) + 1;
+    const totalPages = Math.ceil(total / limit);
+
     return {
       success: true,
       data: {
         services: servicesWithLabels,
         total,
+        page,
         limit,
         offset,
+        totalPages,
       },
     };
   } catch (error) {
@@ -548,17 +578,138 @@ export async function getServiceStats() {
       prisma.service.count({ where: { featured: true } }),
     ]);
 
-    // Get category breakdown
-    const servicesByCategory = await prisma.service.groupBy({
-      by: ['category'],
-      _count: true,
-      orderBy: {
-        _count: {
-          category: 'desc',
-        },
-      },
-      take: 10,
+    // Get taxonomy breakdowns
+    const [servicesByCategory, servicesBySubcategory, servicesBySubdivision] =
+      await Promise.all([
+        prisma.service.groupBy({
+          by: ['category'],
+          _count: true,
+          orderBy: {
+            _count: {
+              category: 'desc',
+            },
+          },
+          take: 1,
+        }),
+        prisma.service.groupBy({
+          by: ['subcategory'],
+          _count: true,
+          orderBy: {
+            _count: {
+              subcategory: 'desc',
+            },
+          },
+          take: 1,
+        }),
+        prisma.service.groupBy({
+          by: ['subdivision'],
+          _count: true,
+          orderBy: {
+            _count: {
+              subdivision: 'desc',
+            },
+          },
+          take: 1,
+        }),
+      ]);
+
+    // Get service types, tags, and pricing data (need to query JSON field)
+    const allServices = await prisma.service.findMany({
+      select: { type: true, tags: true, fixed: true, subscriptionType: true, duration: true, price: true },
     });
+
+    // Count service types by checking boolean flags
+    const serviceTypes = {
+      presence: 0,
+      online: 0,
+      oneoff: 0,
+      onbase: 0,
+      subscription: 0,
+      onsite: 0,
+    };
+
+    // Count tags
+    const tagCounts: Record<string, number> = {};
+
+    // Pricing statistics
+    let fixedCount = 0;
+    let notFixedCount = 0;
+    const subscriptionTypeCounts = {
+      month: 0,
+      year: 0,
+      per_case: 0,
+      per_hour: 0,
+      per_session: 0,
+    };
+    let totalDuration = 0;
+    let durationCount = 0;
+    let totalPrice = 0;
+    let priceCount = 0;
+
+    allServices.forEach((service) => {
+      const type = service.type as any;
+      if (type?.presence) serviceTypes.presence++;
+      if (type?.online) serviceTypes.online++;
+      if (type?.oneoff) serviceTypes.oneoff++;
+      if (type?.onbase) serviceTypes.onbase++;
+      if (type?.subscription) serviceTypes.subscription++;
+      if (type?.onsite) serviceTypes.onsite++;
+
+      // Count tags
+      service.tags.forEach((tag) => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
+
+      // Count pricing data
+      if (service.fixed) {
+        fixedCount++;
+      } else {
+        notFixedCount++;
+      }
+      if (service.subscriptionType) {
+        subscriptionTypeCounts[service.subscriptionType]++;
+      }
+      if (service.duration && service.duration > 0) {
+        totalDuration += service.duration;
+        durationCount++;
+      }
+      if (service.price && service.price > 0) {
+        totalPrice += service.price;
+        priceCount++;
+      }
+    });
+
+    // Calculate averages
+    const averageDuration = durationCount > 0 ? Math.round(totalDuration / durationCount) : 0;
+    const averagePrice = priceCount > 0 ? Math.round(totalPrice / priceCount) : 0;
+
+    // Get top tag
+    const topTagEntry = Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0];
+    const topTagRaw = topTagEntry ? { name: topTagEntry[0], count: topTagEntry[1] } : null;
+
+    // Resolve taxonomy labels
+    const categoryData = servicesByCategory[0]
+      ? serviceTaxonomies.find((cat) => cat.id === servicesByCategory[0].category)
+      : null;
+    const subcategoryData = servicesBySubcategory[0]
+      ? serviceTaxonomies
+          .flatMap((cat) => cat.children || [])
+          .find((sub) => sub.id === servicesBySubcategory[0].subcategory)
+      : null;
+    const subdivisionData = servicesBySubdivision[0]
+      ? serviceTaxonomies
+          .flatMap((cat) => cat.children || [])
+          .flatMap((sub: any) => sub.children || [])
+          .find((div: any) => div.id === servicesBySubdivision[0].subdivision)
+      : null;
+
+    // Resolve tag label
+    const topTagData = topTagRaw
+      ? tags.find((tag) => tag.id === topTagRaw.name || tag.slug === topTagRaw.name)
+      : null;
+    const topTag = topTagData
+      ? { name: topTagData.label, count: topTagRaw.count }
+      : topTagRaw;
 
     return {
       success: true,
@@ -571,10 +722,35 @@ export async function getServiceStats() {
         approved,
         inactive,
         featured,
-        byCategory: servicesByCategory.map((cat) => ({
-          category: cat.category,
-          count: cat._count,
-        })),
+        topCategory: servicesByCategory[0]
+          ? {
+              name: categoryData?.label || servicesByCategory[0].category,
+              count: servicesByCategory[0]._count,
+            }
+          : null,
+        topSubcategory: servicesBySubcategory[0]
+          ? {
+              name:
+                subcategoryData?.label || servicesBySubcategory[0].subcategory,
+              count: servicesBySubcategory[0]._count,
+            }
+          : null,
+        topSubdivision: servicesBySubdivision[0]
+          ? {
+              name:
+                subdivisionData?.label || servicesBySubdivision[0].subdivision,
+              count: servicesBySubdivision[0]._count,
+            }
+          : null,
+        topTag,
+        serviceTypes,
+        pricing: {
+          fixed: fixedCount,
+          notFixed: notFixedCount,
+          subscriptionTypes: subscriptionTypeCounts,
+          averageDuration,
+          averagePrice,
+        },
       },
     };
   } catch (error) {
