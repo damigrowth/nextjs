@@ -344,6 +344,7 @@ export const adminListProfilesSchema = z.object({
   published: z.enum(['all', 'published', 'draft']).optional(),
   verified: z.enum(['all', 'verified', 'unverified']).optional(),
   featured: z.enum(['all', 'featured', 'not-featured']).optional(),
+  status: z.enum(['all', 'featured', 'top']).optional(),
   limit: z.coerce.number().int().min(1).max(100).optional().default(10),
   offset: z.coerce.number().int().min(0).optional().default(0),
   sortBy: z
@@ -465,6 +466,9 @@ export const adminListServicesSchema = z.object({
   subcategory: z.string().optional(),
   subdivision: z.string().optional(),
   featured: z.enum(['all', 'featured', 'not-featured']).optional(),
+  type: z.enum(['all', 'presence', 'onbase', 'onsite', 'online', 'oneoff', 'subscription']).optional(),
+  pricing: z.enum(['all', 'fixed', 'not-fixed']).optional(),
+  subscriptionType: z.enum(['all', 'month', 'year', 'per_case', 'per_hour', 'per_session']).optional(),
   profileId: z.string().optional(), // Filter by profile
   limit: z.coerce.number().int().min(1).max(100).optional().default(10),
   offset: z.coerce.number().int().min(0).optional().default(0),
@@ -551,3 +555,63 @@ export type AdminToggleServiceInput = z.infer<typeof adminToggleServiceSchema>;
 export type AdminUpdateServiceStatusInput = z.infer<typeof adminUpdateServiceStatusSchema>;
 export type AdminDeleteServiceInput = z.infer<typeof adminDeleteServiceSchema>;
 export type EditServiceFormInput = z.infer<typeof editServiceFormSchema>;
+
+// =============================================
+// ADMIN VERIFICATION MANAGEMENT SCHEMAS
+// =============================================
+
+export const adminListVerificationsSchema = z.object({
+  searchQuery: z.string().optional(), // Search AFM or business name
+  status: z.enum(['all', 'PENDING', 'APPROVED', 'REJECTED']).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(10),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+  sortBy: z
+    .enum(['createdAt', 'updatedAt', 'status'])
+    .optional()
+    .default('createdAt'),
+  sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
+});
+
+export const adminUpdateVerificationStatusSchema = z.object({
+  verificationId: z.string().min(1, 'Verification ID is required'),
+  status: z.enum(['APPROVED', 'REJECTED']),
+  notes: z.string().max(1000).optional(),
+});
+
+export const adminDeleteVerificationSchema = z.object({
+  verificationId: z.string().min(1, 'Verification ID is required'),
+});
+
+// Form schemas for dialogs
+export const approveVerificationFormSchema = z.object({
+  verificationId: z.string().min(1),
+  notes: z.string().max(1000).optional(),
+});
+
+export const rejectVerificationFormSchema = z.object({
+  verificationId: z.string().min(1),
+  reason: z
+    .string()
+    .min(1, 'Rejection reason is required')
+    .max(1000, 'Reason is too long'),
+});
+
+// =============================================
+// VERIFICATION TYPE EXPORTS
+// =============================================
+
+export type AdminListVerificationsInput = z.infer<
+  typeof adminListVerificationsSchema
+>;
+export type AdminUpdateVerificationStatusInput = z.infer<
+  typeof adminUpdateVerificationStatusSchema
+>;
+export type AdminDeleteVerificationInput = z.infer<
+  typeof adminDeleteVerificationSchema
+>;
+export type ApproveVerificationFormInput = z.infer<
+  typeof approveVerificationFormSchema
+>;
+export type RejectVerificationFormInput = z.infer<
+  typeof rejectVerificationFormSchema
+>;

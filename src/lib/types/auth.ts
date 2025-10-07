@@ -50,3 +50,39 @@ export type ProfileWithRelations = import('@prisma/client').Profile & {
   chatMemberships?: import('@prisma/client').ChatMember[];
   portfolio?: PrismaJson.CloudinaryResource[];
 };
+
+/**
+ * Admin user table type
+ * Uses Prisma User type directly - Better Auth returns standard User objects
+ */
+export type AdminUserForTable = import('@prisma/client').User;
+
+/**
+ * Admin profile table type with relations
+ */
+export type AdminProfileWithRelations = import('@prisma/client').Prisma.ProfileGetPayload<{
+  include: {
+    user: {
+      select: {
+        id: true;
+        email: true;
+        role: true;
+        banned: true;
+        blocked: true;
+        name: true;
+      };
+    };
+    verification: true;
+    _count: {
+      select: {
+        services: true;
+        reviews: true;
+      };
+    };
+  };
+}> & {
+  categoryLabels?: {
+    category: string;
+    subcategory: string;
+  };
+};
