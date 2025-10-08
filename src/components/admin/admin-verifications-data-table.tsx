@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ColumnDef,
   flexRender,
@@ -21,31 +22,20 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   ArrowUpDown,
-  MoreVertical,
-  Eye,
-  CheckCircle,
-  XCircle,
-  Trash2,
+  Edit,
   Copy,
   Check,
 } from 'lucide-react';
-import { formatDate } from '@/lib/utils/date';
+import { formatDate, formatTime } from '@/lib/utils/date';
 import { cn } from '@/lib/utils';
 
 interface VerificationProfile {
   id: string;
   displayName: string;
-  avatar: string | null;
+  image: string | null;
   type: string;
   user: {
     id: string;
@@ -118,6 +108,7 @@ export function AdminVerificationsDataTable({
   onReject,
   onDelete,
 }: AdminVerificationsDataTableProps) {
+  const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
   // Helper function for status badge
@@ -128,10 +119,18 @@ export function AdminVerificationsDataTable({
       case 'REJECTED':
         return 'destructive' as const; // Red
       case 'PENDING':
-        return 'secondary' as const; // Yellow/Gray
+        return 'outline' as const; // Orange (will be styled)
       default:
         return 'outline' as const;
     }
+  };
+
+  // Helper function for status badge className
+  const getStatusBadgeClassName = (status: string) => {
+    if (status === 'PENDING') {
+      return 'border-yellow-500 text-yellow-600 bg-yellow-50';
+    }
+    return '';
   };
 
   // Column definitions
@@ -141,8 +140,11 @@ export function AdminVerificationsDataTable({
       header: ({ table }) => (
         <Checkbox
           checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
+            table.getIsAllPageRowsSelected()
+              ? true
+              : table.getIsSomePageRowsSelected()
+                ? 'indeterminate'
+                : false
           }
           onCheckedChange={(value) =>
             table.toggleAllPageRowsSelected(!!value)
@@ -185,7 +187,10 @@ export function AdminVerificationsDataTable({
       cell: ({ row }) => {
         const status = row.original.status;
         return (
-          <Badge variant={getStatusBadgeVariant(status)}>
+          <Badge
+            variant={getStatusBadgeVariant(status)}
+            className={getStatusBadgeClassName(status)}
+          >
             {status}
           </Badge>
         );
@@ -223,12 +228,12 @@ export function AdminVerificationsDataTable({
         const profile = verification.profile;
         return (
           <Link
-            href={`/admin/profiles?id=${verification.pid}`}
+            href={`/admin/profiles/${verification.pid}`}
             className='hover:underline'
           >
             <div className='flex items-center gap-2'>
               <Avatar className='h-8 w-8'>
-                <AvatarImage src={profile.avatar || undefined} />
+                <AvatarImage src={profile.image || undefined} />
                 <AvatarFallback>
                   {profile.displayName?.[0]?.toUpperCase() || 'U'}
                 </AvatarFallback>
@@ -237,9 +242,6 @@ export function AdminVerificationsDataTable({
                 <p className='font-medium truncate text-sm'>
                   {profile.displayName}
                 </p>
-                <Badge variant='outline' className='text-xs'>
-                  {profile.type}
-                </Badge>
               </div>
             </div>
           </Link>
@@ -254,7 +256,7 @@ export function AdminVerificationsDataTable({
         const user = verification.profile.user;
         return (
           <Link
-            href={`/admin/users?id=${verification.uid}`}
+            href={`/admin/users/${verification.uid}`}
             className='hover:underline'
           >
             <CopyableText text={user.email} className='text-sm' />
@@ -278,7 +280,12 @@ export function AdminVerificationsDataTable({
       },
       cell: ({ row }) => {
         const date = row.getValue('createdAt') as Date;
-        return <div className='text-sm'>{formatDate(date)}</div>;
+        return (
+          <div className='text-sm text-muted-foreground'>
+            <div>{formatDate(date)}</div>
+            <div className='text-xs'>{formatTime(date)}</div>
+          </div>
+        );
       },
     },
     {
@@ -286,46 +293,16 @@ export function AdminVerificationsDataTable({
       enableHiding: false,
       cell: ({ row }) => {
         const verification = row.original;
-        const isPending = verification.status === 'PENDING';
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Open menu</span>
-                <MoreVertical className='h-4 w-4' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <DropdownMenuItem onClick={() => onView?.(verification)}>
-                <Eye className='mr-2 h-4 w-4' />
-                View Details
-              </DropdownMenuItem>
-
-              {isPending && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => onApprove?.(verification)}>
-                    <CheckCircle className='mr-2 h-4 w-4 text-green-600' />
-                    Approve
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onReject?.(verification)}>
-                    <XCircle className='mr-2 h-4 w-4 text-red-600' />
-                    Reject
-                  </DropdownMenuItem>
-                </>
-              )}
-
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => onDelete?.(verification)}
-                className='text-destructive focus:text-destructive'
-              >
-                <Trash2 className='mr-2 h-4 w-4' />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant='ghost'
+            size='icon'
+            onClick={() => router.push(`/admin/verifications/${verification.id}`)}
+          >
+            <Edit className='h-4 w-4' />
+            <span className='sr-only'>Edit</span>
+          </Button>
         );
       },
     },
@@ -390,6 +367,19 @@ export function AdminVerificationsDataTable({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
+                className='cursor-pointer hover:bg-muted/50'
+                onClick={(e) => {
+                  // Don't navigate if clicking on actions dropdown or checkbox
+                  const target = e.target as HTMLElement;
+                  if (
+                    target.closest('button') ||
+                    target.closest('[role="checkbox"]') ||
+                    target.closest('a')
+                  ) {
+                    return;
+                  }
+                  router.push(`/admin/verifications/${row.original.id}`);
+                }}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

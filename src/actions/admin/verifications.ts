@@ -78,7 +78,7 @@ export async function listVerifications(
             select: {
               id: true,
               displayName: true,
-              avatar: true,
+              image: true,
               type: true,
               user: {
                 select: {

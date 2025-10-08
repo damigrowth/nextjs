@@ -68,7 +68,7 @@ import { formatDate } from '@/lib/utils/date';
 interface VerificationProfile {
   id: string;
   displayName: string;
-  avatar: string | null;
+  image: string | null;
   type: string;
   user: {
     id: string;
@@ -549,7 +549,7 @@ export function VerificationManagement() {
                     <Avatar>
                       <AvatarImage
                         src={
-                          selectedVerification.profile.avatar || undefined
+                          selectedVerification.profile.image || undefined
                         }
                       />
                       <AvatarFallback>

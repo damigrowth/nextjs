@@ -574,7 +574,7 @@ export const adminListVerificationsSchema = z.object({
 
 export const adminUpdateVerificationStatusSchema = z.object({
   verificationId: z.string().min(1, 'Verification ID is required'),
-  status: z.enum(['APPROVED', 'REJECTED']),
+  status: z.enum(['PENDING', 'APPROVED', 'REJECTED']),
   notes: z.string().max(1000).optional(),
 });
 
