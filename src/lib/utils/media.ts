@@ -603,25 +603,36 @@ export const createPendingResource = (file: QueuedFile): PendingCloudinaryResour
  */
 export const detectMediaType = (resource: CloudinaryResourceOrPending): MediaType => {
   if (!resource) return 'image';
-  
+
   // For pending resources, use the resource_type we set
   if (isPendingResource(resource)) {
     if (resource.resource_type === 'video') return 'video';
     if (resource.resource_type === 'audio') return 'audio';
     return 'image';
   }
-  
-  // For uploaded resources, use format detection
-  if (resource.resource_type === 'video') return 'video';
+
+  // Check format first for audio files (handles incorrectly classified files)
+  const format = resource.format?.toLowerCase();
+  if (format && ['mp3', 'wav', 'ogg', 'mpeg'].includes(format)) {
+    return 'audio';
+  }
+
+  // For uploaded resources, use resource_type
   if (resource.resource_type === 'audio') return 'audio';
+  if (resource.resource_type === 'video') {
+    // Double-check for audio files misclassified as video
+    if (format && ['mp3', 'wav', 'ogg', 'mpeg'].includes(format)) {
+      return 'audio';
+    }
+    return 'video';
+  }
   if (resource.resource_type === 'raw') {
     // Check format for raw resources that might be audio
-    const format = resource.format?.toLowerCase();
-    if (format && ['mp3', 'wav', 'ogg', 'webm'].includes(format)) {
+    if (format && ['mp3', 'wav', 'ogg', 'webm', 'mpeg'].includes(format)) {
       return 'audio';
     }
   }
-  
+
   return 'image';
 };
 
@@ -792,8 +803,21 @@ export const uploadFileToCloudinary = async (
     throw new Error('Cloudinary cloud name not configured');
   }
 
+  // Detect actual media type for proper Cloudinary classification
+  const mediaType = getMediaType(file);
+
+  // For audio files, use 'video' endpoint as Cloudinary handles audio as video resource type
+  // But we'll fix the resource_type in the response
+  let actualResourceType = options.resourceType;
+  const isAudioFile = mediaType === 'audio';
+
+  if (isAudioFile && actualResourceType === 'auto') {
+    // Use 'video' endpoint for audio files as Cloudinary classifies them as video
+    actualResourceType = 'video';
+  }
+
   const formData = await generateUploadFormData(file, options);
-  const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${options.resourceType}/upload`;
+  const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${actualResourceType}/upload`;
 
   const response = await fetch(uploadUrl, {
     method: 'POST',
@@ -807,7 +831,14 @@ export const uploadFileToCloudinary = async (
     );
   }
 
-  return await response.json();
+  const cloudinaryResource = await response.json();
+
+  // Fix resource_type for audio files
+  if (isAudioFile && cloudinaryResource.resource_type === 'video') {
+    cloudinaryResource.resource_type = 'audio';
+  }
+
+  return cloudinaryResource;
 };
 
 // =============================================

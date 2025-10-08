@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +26,8 @@ interface MultiSelectProps {
   maxItems?: number;
   className?: string;
   showClearAll?: boolean;
+  enablePortal?: boolean;
+  disabled?: boolean;
 }
 
 export function MultiSelect({
@@ -35,10 +38,14 @@ export function MultiSelect({
   maxItems,
   className,
   showClearAll = true,
+  enablePortal = false,
+  disabled = false,
 }: MultiSelectProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
+  const [dropdownPosition, setDropdownPosition] = React.useState({ top: 0, left: 0, width: 0 });
 
   const selectedOptions = React.useMemo(
     () => options.filter((option) => selected.includes(option.value)),
@@ -97,12 +104,56 @@ export function MultiSelect({
 
   const isMaxReached = maxItems ? selected.length >= maxItems : false;
 
+  // Update dropdown position when opening (only for portal mode)
+  React.useEffect(() => {
+    if (enablePortal && open && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, [open, enablePortal]);
+
+  // Render dropdown content for portal mode
+  const portalDropdownContent = enablePortal && open && availableOptions.length > 0 && !isMaxReached && typeof window !== 'undefined' ? (
+    <div
+      style={{
+        position: 'absolute',
+        top: `${dropdownPosition.top}px`,
+        left: `${dropdownPosition.left}px`,
+        width: `${dropdownPosition.width}px`,
+        zIndex: 9999,
+      }}
+      className='rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in'
+    >
+      <CommandList>
+        <CommandGroup className='h-full overflow-auto max-h-64'>
+          {availableOptions.map((option) => (
+            <CommandItem
+              key={option.value}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onSelect={() => handleSelect(option.value)}
+              className='cursor-pointer'
+            >
+              {option.label}
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </CommandList>
+    </div>
+  ) : null;
+
   return (
     <Command
       onKeyDown={handleKeyDown}
       className={`overflow-visible bg-transparent ${className || ''}`}
     >
-      <div className='group relative flex items-center rounded-md border border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring'>
+      <div ref={containerRef} className='group relative flex items-center rounded-md border border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring'>
         <div className='flex flex-wrap gap-1 flex-1 pr-8'>
           {selectedOptions.map((option) => (
             <Badge
@@ -137,7 +188,7 @@ export function MultiSelect({
             placeholder={
               isMaxReached ? `Maximum ${maxItems} items` : placeholder
             }
-            disabled={isMaxReached}
+            disabled={isMaxReached || disabled}
             className='ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
           />
         </div>
@@ -156,29 +207,34 @@ export function MultiSelect({
           </button>
         )}
       </div>
-      <div className='relative'>
-        <CommandList>
+      {/* Normal dropdown (not using portal) */}
+      {!enablePortal && (
+        <div className='relative mt-2'>
           {open && availableOptions.length > 0 && !isMaxReached ? (
-            <div className='absolute top-2 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in'>
-              <CommandGroup className='h-full overflow-auto max-h-64'>
-                {availableOptions.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                    onSelect={() => handleSelect(option.value)}
-                    className='cursor-pointer'
-                  >
-                    {option.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+            <div className='absolute top-0 left-0 z-50 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in'>
+              <CommandList>
+                <CommandGroup className='h-full overflow-auto max-h-64'>
+                  {availableOptions.map((option) => (
+                    <CommandItem
+                      key={option.value}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onSelect={() => handleSelect(option.value)}
+                      className='cursor-pointer'
+                    >
+                      {option.label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
             </div>
           ) : null}
-        </CommandList>
-      </div>
+        </div>
+      )}
+      {/* Portal dropdown */}
+      {enablePortal && typeof window !== 'undefined' && portalDropdownContent && createPortal(portalDropdownContent, document.body)}
     </Command>
   );
 }

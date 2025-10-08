@@ -1,6 +1,7 @@
 import React from 'react';
 import { AudioGallery, MediaCarousel } from '@/components';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { detectMediaType } from '@/lib/utils/media';
 
 interface MediaGalleryProps {
   media: PrismaJson.CloudinaryResource[] | null;
@@ -19,9 +20,9 @@ export default function MediaGallery({
     return null;
   }
 
-  // Separate audio files from visual media
-  const audioFiles = media.filter((item) => item.resource_type === 'audio');
-  const visualMedia = media.filter((item) => item.resource_type !== 'audio');
+  // Separate audio files from visual media using detectMediaType
+  const audioFiles = media.filter((item) => detectMediaType(item) === 'audio');
+  const visualMedia = media.filter((item) => detectMediaType(item) !== 'audio');
 
   return (
     <section className={`space-y-8 ${className || ''}`}>

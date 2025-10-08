@@ -412,35 +412,10 @@ export const adminUpdateVerificationSchema = z.object({
   notes: z.string().max(1000).optional(),
 });
 
-export const editProfileFormSchema = z.object({
-  // Basic tab
-  displayName: z.string().min(1, 'Display name is required').max(100),
-  firstName: z.string().min(1).max(100).optional(),
-  lastName: z.string().min(1).max(100).optional(),
-  bio: z.string().max(1000).optional(),
-  tagline: z.string().max(200).optional(),
-  website: z.string().url('Invalid URL').optional().or(z.literal('')),
-
-  // Professional tab
-  type: z.string().optional(),
-  category: z.string().optional(),
-  subcategory: z.string().optional(),
-  skills: z.array(z.string()).optional(),
-  speciality: z.string().optional(),
-  rate: z.coerce.number().int().min(0).optional(),
-  experience: z.coerce.number().int().min(0).max(100).optional(),
-
-  // Contact tab
-  phone: z.string().optional(),
-  viber: z.string().optional(),
-  whatsapp: z.string().optional(),
-  contactMethods: z.array(z.string()).optional(),
-
-  // Status flags
-  published: z.boolean().optional(),
-  featured: z.boolean().optional(),
-  verified: z.boolean().optional(),
-});
+// Note: Admin profile forms use the same validation schemas as dashboard
+// Import from '@/lib/validations/profile' instead of defining duplicates here
+// Available schemas: profileBasicInfoUpdateSchema, additionalProfileInfoSchema,
+// presentationSchema, updateProfilePortfolioSchema, billingSchema
 
 // =============================================
 // PROFILE TYPE EXPORTS
@@ -453,7 +428,6 @@ export type AdminDeleteProfileInput = z.infer<typeof adminDeleteProfileSchema>;
 export type AdminUpdateVerificationInput = z.infer<
   typeof adminUpdateVerificationSchema
 >;
-export type EditProfileFormInput = z.infer<typeof editProfileFormSchema>;
 
 // =============================================
 // ADMIN SERVICE MANAGEMENT SCHEMAS
@@ -503,7 +477,7 @@ export const adminUpdateServiceSchema = z.object({
   faq: z.array(z.record(z.string(), z.any())).optional(),
 
   // Media
-  media: z.record(z.string(), z.any()).optional().nullable(),
+  media: z.array(z.record(z.string(), z.any())).optional().nullable(),
 
   // Status flags (admin only)
   status: z.enum(['draft', 'pending', 'published', 'rejected', 'approved', 'inactive']).optional(),
@@ -524,26 +498,9 @@ export const adminDeleteServiceSchema = z.object({
   serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
 });
 
-export const editServiceFormSchema = z.object({
-  // Basic tab
-  title: z.string().min(1, 'Title is required').max(200),
-  description: z.string().min(1, 'Description is required'),
-
-  // Category tab
-  category: z.string().min(1, 'Category is required'),
-  subcategory: z.string().min(1, 'Subcategory is required'),
-  subdivision: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-
-  // Pricing tab
-  fixed: z.boolean(),
-  price: z.coerce.number().int().min(0),
-  duration: z.coerce.number().int().min(0).optional(),
-
-  // Status flags
-  status: z.enum(['draft', 'pending', 'published', 'rejected', 'approved', 'inactive']).optional(),
-  featured: z.boolean().optional(),
-});
+// Note: Admin service forms should use the same validation schemas as dashboard
+// Import from '@/lib/validations/service' instead of defining duplicates
+// Available schemas: serviceEditSchema, formServiceAddonSchema, formServiceFaqSchema, etc.
 
 // =============================================
 // SERVICE TYPE EXPORTS
@@ -554,7 +511,6 @@ export type AdminUpdateServiceInput = z.infer<typeof adminUpdateServiceSchema>;
 export type AdminToggleServiceInput = z.infer<typeof adminToggleServiceSchema>;
 export type AdminUpdateServiceStatusInput = z.infer<typeof adminUpdateServiceStatusSchema>;
 export type AdminDeleteServiceInput = z.infer<typeof adminDeleteServiceSchema>;
-export type EditServiceFormInput = z.infer<typeof editServiceFormSchema>;
 
 // =============================================
 // ADMIN VERIFICATION MANAGEMENT SCHEMAS

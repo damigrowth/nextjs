@@ -72,7 +72,7 @@ interface ServiceStatsResponse {
   approved: number;
   inactive: number;
   featured: number;
-  byCategory: Array<{ category: string; count: number }>;
+  byCategory?: Array<{ category: string; count: number }>;
 }
 
 export function ServiceManagement() {
@@ -461,11 +461,8 @@ export function ServiceManagement() {
             </div>
           ) : (
             <AdminServicesDataTable
-              services={services}
-              onTogglePublished={handleTogglePublished}
-              onToggleFeatured={handleToggleFeatured}
-              onUpdateStatus={handleUpdateStatus}
-              onDelete={handleDeleteService}
+              data={services}
+              loading={loading}
             />
           )}
 

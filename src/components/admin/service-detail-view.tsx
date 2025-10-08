@@ -167,26 +167,9 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
 
   return (
     <div className='space-y-6'>
-      {/* Header */}
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-4'>
-          <Button variant='ghost' size='icon' asChild>
-            <Link href='/admin/services'>
-              <ArrowLeft className='h-4 w-4' />
-            </Link>
-          </Button>
-          <div>
-            <h1 className='text-2xl font-bold tracking-tight'>
-              Service Details
-            </h1>
-            <p className='text-muted-foreground'>
-              Manage service information and status
-            </p>
-          </div>
-        </div>
-
-        <div className='flex items-center gap-2'>
-          <Button variant='outline' onClick={handleTogglePublished}>
+      {/* Action Buttons */}
+      <div className='flex items-center justify-end gap-2'>
+        <Button variant='outline' onClick={handleTogglePublished}>
             {service.status === 'published' ? (
               <>
                 <XCircle className='mr-2 h-4 w-4' />
@@ -205,11 +188,10 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
             />
             {service.featured ? 'Unfeature' : 'Feature'}
           </Button>
-          <Button variant='destructive' onClick={() => setDeleteDialogOpen(true)}>
-            <Trash2 className='mr-2 h-4 w-4' />
-            Delete
-          </Button>
-        </div>
+        <Button variant='destructive' onClick={() => setDeleteDialogOpen(true)}>
+          <Trash2 className='mr-2 h-4 w-4' />
+          Delete
+        </Button>
       </div>
 
       {/* Service Overview */}

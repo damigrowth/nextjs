@@ -1,19 +1,52 @@
-import { redirect } from 'next/navigation';
+import { getCurrentUser } from '@/actions/auth/server';
 import { getService } from '@/actions/admin/services';
-import { ServiceDetailView } from '@/components/admin/service-detail-view';
+import { redirect, notFound } from 'next/navigation';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Eye, ExternalLink } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { formatDate } from '@/lib/utils/date';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import {
+  EditServiceBasicForm,
+  EditServiceTaxonomyForm,
+  EditServicePricingForm,
+  EditServiceSettingsForm,
+  EditServiceAddonsForm,
+  EditServiceFaqForm,
+  EditServiceMediaForm,
+} from '@/components/admin/forms';
+import { SiteHeader } from '@/components/admin';
+import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 
 // Force dynamic rendering for admin pages
 export const dynamic = 'force-dynamic';
 
-interface ServiceDetailPageProps {
-  params: Promise<{
-    id: string;
-  }>;
+interface PageProps {
+  params: Promise<{ id: string }>;
 }
 
-export default async function ServiceDetailPage({
-  params,
-}: ServiceDetailPageProps) {
+export default async function AdminServiceDetailPage({ params }: PageProps) {
+  // Verify admin authentication
+  const userResult = await getCurrentUser({ revalidate: true });
+
+  if (!userResult.success || !userResult.data.user) {
+    redirect('/login');
+  }
+
+  const { user: currentUser } = userResult.data;
+
+  if (currentUser.role !== 'admin') {
+    redirect('/dashboard');
+  }
+
+  // Get service ID from params
   const { id } = await params;
   const serviceId = parseInt(id);
 
@@ -21,17 +54,410 @@ export default async function ServiceDetailPage({
     redirect('/admin/services');
   }
 
-  const result = await getService(serviceId);
+  // Fetch the service
+  const serviceResult = await getService(serviceId);
 
-  if (!result.success || !result.data) {
-    redirect('/admin/services');
+  if (!serviceResult.success || !serviceResult.data) {
+    notFound();
   }
 
+  const service = serviceResult.data as any;
+
+  // Resolve taxonomy labels
+  const categoryData = serviceTaxonomies.find((cat) => cat.id === service.category);
+  const subcategoryData = categoryData?.children?.find(
+    (sub) => sub.id === service.subcategory,
+  );
+  const subdivisionData = subcategoryData?.children?.find(
+    (div) => div.id === service.subdivision,
+  );
+
+  const categoryLabel = categoryData?.label || service.category;
+  const subcategoryLabel = subcategoryData?.label || service.subcategory;
+  const subdivisionLabel = subdivisionData?.label || service.subdivision;
+
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+      draft: 'outline',
+      pending: 'secondary',
+      published: 'default',
+      approved: 'default',
+      rejected: 'destructive',
+      inactive: 'outline',
+    };
+    return variants[status] || 'outline';
+  };
+
   return (
-    <div className='flex flex-col gap-4 py-4 md:gap-6 md:py-6'>
-      <div className='px-4 lg:px-6'>
-        <ServiceDetailView service={result.data} />
+    <>
+      <SiteHeader
+        title={service.title || 'Service Details'}
+        actions={
+          <>
+            <Button variant='ghost' size='sm' asChild>
+              <Link href='/admin/services'>
+                <ArrowLeft className='h-4 w-4' />
+                Services
+              </Link>
+            </Button>
+            <Button variant='outline' size='sm' asChild>
+              <Link href={`/admin/profiles/${service.profile.id}`}>
+                <ExternalLink className='h-4 w-4' />
+                Profile
+              </Link>
+            </Button>
+            <Button variant='outline' size='sm' asChild>
+              <Link
+                href={`/s/${service.slug}`}
+                target='_blank'
+              >
+                <Eye className='h-4 w-4' />
+                Public View
+              </Link>
+            </Button>
+          </>
+        }
+      />
+      <div className='flex flex-col gap-4 pb-6 pt-4 md:gap-6'>
+        <div className='px-4 lg:px-6'>
+          <div className='space-y-6 pb-16'>
+            {/* Service Overview - 4 Tables */}
+            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+              {/* Service Information */}
+              <Card>
+                <CardHeader className='pb-3'>
+                  <CardTitle className='text-sm'>Service Information</CardTitle>
+                </CardHeader>
+                <CardContent className='p-0'>
+                  <div className='divide-y'>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Service ID
+                      </span>
+                      <span className='text-xs font-mono'>{service.id}</span>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Category
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {categoryLabel}
+                      </span>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Subcategory
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {subcategoryLabel}
+                      </span>
+                    </div>
+                    {service.subdivision && (
+                      <div className='flex items-center justify-between px-6 py-2'>
+                        <span className='text-xs text-muted-foreground'>
+                          Subdivision
+                        </span>
+                        <span className='text-xs font-medium'>
+                          {subdivisionLabel}
+                        </span>
+                      </div>
+                    )}
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>Tags</span>
+                      <span className='text-xs font-medium'>
+                        {service.tags?.length || 0}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Status & Flags */}
+              <Card>
+                <CardHeader className='pb-3'>
+                  <CardTitle className='text-sm'>Status & Flags</CardTitle>
+                </CardHeader>
+                <CardContent className='p-0'>
+                  <div className='divide-y'>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Status
+                      </span>
+                      <Badge variant={getStatusBadge(service.status)} className='text-xs h-5'>
+                        {service.status}
+                      </Badge>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Featured
+                      </span>
+                      <Badge
+                        variant={service.featured ? 'default' : 'outline'}
+                        className='text-xs h-5'
+                      >
+                        {service.featured ? 'Yes' : 'No'}
+                      </Badge>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Fixed Price
+                      </span>
+                      <Badge
+                        variant={service.fixed ? 'default' : 'outline'}
+                        className='text-xs h-5'
+                      >
+                        {service.fixed ? 'Yes' : 'No'}
+                      </Badge>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Rating
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {service.rating?.toFixed(1) || 'N/A'} ⭐
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Pricing & Duration */}
+              <Card>
+                <CardHeader className='pb-3'>
+                  <CardTitle className='text-sm'>Pricing & Duration</CardTitle>
+                </CardHeader>
+                <CardContent className='p-0'>
+                  <div className='divide-y'>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Price
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {service.fixed ? `€${service.price}` : 'Hidden'}
+                      </span>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Duration
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {service.duration ? `${service.duration} days` : 'N/A'}
+                      </span>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Subscription
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {service.subscriptionType || 'None'}
+                      </span>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Addons
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {service.addons?.length || 0}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Activity & Stats */}
+              <Card>
+                <CardHeader className='pb-3'>
+                  <CardTitle className='text-sm'>Activity & Stats</CardTitle>
+                </CardHeader>
+                <CardContent className='p-0'>
+                  <div className='divide-y'>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Reviews
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {service._count?.reviews || 0}
+                      </span>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        FAQ Items
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {service.faq?.length || 0}
+                      </span>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Created
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {formatDate(service.createdAt)}
+                      </span>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Updated
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {formatDate(service.updatedAt)}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Service Management Forms - LAST SECTION */}
+            <div className='space-y-6'>
+              <div>
+                <h2 className='text-2xl font-bold'>Service Management</h2>
+                <p className='text-muted-foreground'>
+                  Edit service information, taxonomy, pricing, and status settings
+                </p>
+              </div>
+
+              <Accordion type='multiple' className='w-full'>
+                <AccordionItem value='basic-info'>
+                  <AccordionTrigger>
+                    <div className='flex flex-col items-start text-left'>
+                      <span className='font-semibold'>Basic Information</span>
+                      <span className='text-sm font-normal text-muted-foreground'>
+                        Update service title and description
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <Card>
+                      <CardContent className='pt-6'>
+                        <EditServiceBasicForm service={service} />
+                      </CardContent>
+                    </Card>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value='taxonomy'>
+                  <AccordionTrigger>
+                    <div className='flex flex-col items-start text-left'>
+                      <span className='font-semibold'>
+                        Taxonomy & Tags
+                      </span>
+                      <span className='text-sm font-normal text-muted-foreground'>
+                        Manage category, subcategory, subdivision, and tags
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <Card>
+                      <CardContent className='pt-6'>
+                        <EditServiceTaxonomyForm service={service} />
+                      </CardContent>
+                    </Card>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value='pricing'>
+                  <AccordionTrigger>
+                    <div className='flex flex-col items-start text-left'>
+                      <span className='font-semibold'>Pricing & Duration</span>
+                      <span className='text-sm font-normal text-muted-foreground'>
+                        Update price, fixed pricing, duration, and subscription type
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <Card>
+                      <CardContent className='pt-6'>
+                        <EditServicePricingForm service={service} />
+                      </CardContent>
+                    </Card>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value='settings'>
+                  <AccordionTrigger>
+                    <div className='flex flex-col items-start text-left'>
+                      <span className='font-semibold'>
+                        Status & Settings
+                      </span>
+                      <span className='text-sm font-normal text-muted-foreground'>
+                        Manage service status, published state, and featured flag
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <Card>
+                      <CardContent className='pt-6'>
+                        <EditServiceSettingsForm service={service} />
+                      </CardContent>
+                    </Card>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value='addons'>
+                  <AccordionTrigger>
+                    <div className='flex flex-col items-start text-left'>
+                      <span className='font-semibold'>
+                        Extra Services (Addons)
+                      </span>
+                      <span className='text-sm font-normal text-muted-foreground'>
+                        Manage additional services and pricing
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <Card>
+                      <CardContent className='pt-6'>
+                        <EditServiceAddonsForm service={service} />
+                      </CardContent>
+                    </Card>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value='faq'>
+                  <AccordionTrigger>
+                    <div className='flex flex-col items-start text-left'>
+                      <span className='font-semibold'>
+                        Frequently Asked Questions
+                      </span>
+                      <span className='text-sm font-normal text-muted-foreground'>
+                        Manage service FAQ section
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <Card>
+                      <CardContent className='pt-6'>
+                        <EditServiceFaqForm service={service} />
+                      </CardContent>
+                    </Card>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value='media'>
+                  <AccordionTrigger>
+                    <div className='flex flex-col items-start text-left'>
+                      <span className='font-semibold'>
+                        Media & Images
+                      </span>
+                      <span className='text-sm font-normal text-muted-foreground'>
+                        Manage service photos and videos
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <Card>
+                      <CardContent className='pt-6'>
+                        <EditServiceMediaForm service={service} />
+                      </CardContent>
+                    </Card>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

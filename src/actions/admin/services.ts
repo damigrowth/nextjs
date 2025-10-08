@@ -5,6 +5,8 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma/client';
 import { z } from 'zod';
+import { revalidateTag, revalidatePath } from 'next/cache';
+import { CACHE_TAGS, getServiceTags } from '@/lib/cache';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { tags } from '@/constants/datasets/tags';
 
@@ -20,6 +22,8 @@ import {
   type AdminUpdateServiceStatusInput,
   type AdminDeleteServiceInput,
 } from '@/lib/validations/admin';
+import { updateServiceMediaSchema, type UpdateServiceMediaInput } from '@/lib/validations/service';
+import type { ActionResult } from '@/lib/types/common';
 
 // Helper function to get authenticated admin session
 async function getAdminSession() {
@@ -39,6 +43,60 @@ async function getAdminSession() {
   }
 
   return session;
+}
+
+/**
+ * Invalidate all caches related to a service update
+ */
+async function invalidateServiceCaches(params: {
+  serviceId: number;
+  slug: string | null;
+  pid: number;
+  category: string;
+  userId: string;
+  profileId: number;
+  profileUsername: string | null;
+}) {
+  const { serviceId, slug, pid, category, userId, profileId, profileUsername } =
+    params;
+
+  // Revalidate service-specific tags
+  const serviceTags = getServiceTags({
+    id: serviceId,
+    slug,
+    pid: String(pid),
+    category,
+  });
+  serviceTags.forEach((tag) => revalidateTag(tag));
+
+  // Revalidate profile-related tags
+  revalidateTag(CACHE_TAGS.profile.byId(String(profileId)));
+  revalidateTag(CACHE_TAGS.user.services(userId));
+
+  if (profileUsername) {
+    revalidateTag(CACHE_TAGS.profile.byUsername(profileUsername));
+    revalidateTag(CACHE_TAGS.profile.page(profileUsername));
+  }
+
+  // Revalidate search caches (service data may affect search results)
+  revalidateTag(CACHE_TAGS.search.all);
+  revalidateTag(CACHE_TAGS.search.taxonomies);
+
+  // Revalidate archive caches (service update affects listings)
+  revalidateTag(CACHE_TAGS.archive.all);
+  revalidateTag(CACHE_TAGS.archive.servicesFiltered);
+
+  // Revalidate admin paths
+  revalidatePath('/admin/services');
+  revalidatePath(`/admin/services/${serviceId}`);
+
+  // Revalidate specific pages
+  if (slug) {
+    revalidatePath(`/s/${slug}`);
+  }
+  if (profileUsername) {
+    revalidatePath(`/profile/${profileUsername}`);
+  }
 }
 
 /**
@@ -326,9 +384,22 @@ export async function updateService(params: AdminUpdateServiceInput) {
           select: {
             displayName: true,
             username: true,
+            uid: true,
+            id: true,
           },
         },
       },
+    });
+
+    // Invalidate caches
+    await invalidateServiceCaches({
+      serviceId: updatedService.id,
+      slug: updatedService.slug,
+      pid: Number(updatedService.pid),
+      category: updatedService.category,
+      userId: updatedService.profile.uid,
+      profileId: Number(updatedService.profile.id),
+      profileUsername: updatedService.profile.username,
     });
 
     return {
@@ -348,6 +419,88 @@ export async function updateService(params: AdminUpdateServiceInput) {
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update service',
+    };
+  }
+}
+
+/**
+ * Update service media (admin version)
+ */
+export async function updateServiceMedia(
+  serviceId: number,
+  formData: FormData,
+): Promise<ActionResult<{ message: string }>> {
+  try {
+    await getAdminSession();
+
+    // Check if service exists
+    const existingService = await prisma.service.findUnique({
+      where: { id: serviceId },
+      include: {
+        profile: {
+          select: {
+            id: true,
+            username: true,
+            uid: true,
+          },
+        },
+      },
+    });
+
+    if (!existingService) {
+      return { success: false, error: 'Service not found' };
+    }
+
+    // Parse and validate media data
+    const rawData: UpdateServiceMediaInput = {
+      media: formData.has('media')
+        ? JSON.parse(formData.get('media') as string)
+        : undefined,
+    };
+
+    const validationResult = updateServiceMediaSchema.safeParse(rawData);
+
+    if (!validationResult.success) {
+      console.error('Media validation errors:', validationResult.error);
+      return {
+        success: false,
+        error:
+          'Validation failed: ' +
+          validationResult.error.issues.map((e) => e.message).join(', '),
+      };
+    }
+
+    const validData = validationResult.data;
+
+    // Update service media
+    const updatedService = await prisma.service.update({
+      where: { id: serviceId },
+      data: {
+        media: validData.media as any,
+        updatedAt: new Date(),
+      },
+    });
+
+    // Invalidate caches
+    await invalidateServiceCaches({
+      serviceId: updatedService.id,
+      slug: updatedService.slug,
+      pid: updatedService.pid,
+      category: updatedService.category,
+      userId: existingService.profile.uid,
+      profileId: existingService.profile.id,
+      profileUsername: existingService.profile.username,
+    });
+
+    return {
+      success: true,
+      data: { message: 'Service media updated successfully' },
+    };
+  } catch (error) {
+    console.error('Error updating service media:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update service media',
     };
   }
 }
@@ -377,9 +530,29 @@ export async function togglePublished(params: AdminToggleServiceInput) {
     // Toggle between published and draft
     const newStatus = service.status === 'published' ? 'draft' : 'published';
 
-    await prisma.service.update({
+    const updatedService = await prisma.service.update({
       where: { id: serviceId },
       data: { status: newStatus },
+      include: {
+        profile: {
+          select: {
+            uid: true,
+            id: true,
+            username: true,
+          },
+        },
+      },
+    });
+
+    // Invalidate caches
+    await invalidateServiceCaches({
+      serviceId: updatedService.id,
+      slug: updatedService.slug,
+      pid: Number(updatedService.pid),
+      category: updatedService.category,
+      userId: updatedService.profile.uid,
+      profileId: Number(updatedService.profile.id),
+      profileUsername: updatedService.profile.username,
     });
 
     return {
@@ -425,9 +598,29 @@ export async function toggleFeatured(params: AdminToggleServiceInput) {
       };
     }
 
-    await prisma.service.update({
+    const updatedService = await prisma.service.update({
       where: { id: serviceId },
       data: { featured: !service.featured },
+      include: {
+        profile: {
+          select: {
+            uid: true,
+            id: true,
+            username: true,
+          },
+        },
+      },
+    });
+
+    // Invalidate caches
+    await invalidateServiceCaches({
+      serviceId: updatedService.id,
+      slug: updatedService.slug,
+      pid: Number(updatedService.pid),
+      category: updatedService.category,
+      userId: updatedService.profile.uid,
+      profileId: Number(updatedService.profile.id),
+      profileUsername: updatedService.profile.username,
     });
 
     return {
@@ -475,13 +668,33 @@ export async function updateServiceStatus(
     }
 
     // Update status
-    await prisma.service.update({
+    const updatedService = await prisma.service.update({
       where: { id: serviceId },
       data: {
         status,
         // Store rejection reason in a metadata field if needed
         // This assumes you might add a metadata or notes field to the Service model
       },
+      include: {
+        profile: {
+          select: {
+            uid: true,
+            id: true,
+            username: true,
+          },
+        },
+      },
+    });
+
+    // Invalidate caches
+    await invalidateServiceCaches({
+      serviceId: updatedService.id,
+      slug: updatedService.slug,
+      pid: Number(updatedService.pid),
+      category: updatedService.category,
+      userId: updatedService.profile.uid,
+      profileId: Number(updatedService.profile.id),
+      profileUsername: updatedService.profile.username,
     });
 
     return {
@@ -517,6 +730,15 @@ export async function deleteService(params: AdminDeleteServiceInput) {
 
     const service = await prisma.service.findUnique({
       where: { id: serviceId },
+      include: {
+        profile: {
+          select: {
+            uid: true,
+            id: true,
+            username: true,
+          },
+        },
+      },
     });
 
     if (!service) {
@@ -525,6 +747,17 @@ export async function deleteService(params: AdminDeleteServiceInput) {
         error: 'Service not found',
       };
     }
+
+    // Invalidate caches before deletion
+    await invalidateServiceCaches({
+      serviceId: service.id,
+      slug: service.slug,
+      pid: Number(service.pid),
+      category: service.category,
+      userId: service.profile.uid,
+      profileId: Number(service.profile.id),
+      profileUsername: service.profile.username,
+    });
 
     // Delete service (cascade will handle reviews)
     await prisma.service.delete({
