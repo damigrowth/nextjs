@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,16 +16,17 @@ import {
 } from '@/components/ui/form';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { updateService } from '@/actions/admin/services';
+import { updateServiceTaxonomyAction } from '@/actions/admin/services';
 import { TaxonomySelector } from '@/components/shared';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { findById } from '@/lib/utils/datasets';
 import { useMemo } from 'react';
-import { serviceEditSchema } from '@/lib/validations/service';
+import { createServiceSchema } from '@/lib/validations/service';
+import { populateFormData } from '@/lib/utils/form';
 
-// Use only taxonomy fields from dashboard schema
-const editServiceTaxonomySchema = serviceEditSchema.pick({
+// Use dashboard service schema - pick only taxonomy fields
+const editServiceTaxonomySchema = createServiceSchema.pick({
   category: true,
   subcategory: true,
   subdivision: true,
@@ -46,7 +47,7 @@ interface EditServiceTaxonomyFormProps {
 
 export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [state, formAction, isPending] = useActionState(updateServiceTaxonomyAction, null);
 
   const form = useForm<EditServiceTaxonomyFormValues>({
     resolver: zodResolver(editServiceTaxonomySchema),
@@ -59,10 +60,12 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
     },
   });
 
+  // Watch form values (plain strings after using createServiceSchema)
   const watchedCategory = form.watch('category');
   const watchedSubcategory = form.watch('subcategory');
   const watchedSubdivision = form.watch('subdivision');
 
+  // Find taxonomy data
   const selectedCategoryData = findById(serviceTaxonomies, watchedCategory);
   const subcategories = selectedCategoryData?.children || [];
   const selectedSubcategoryData = findById(subcategories, watchedSubcategory);
@@ -100,30 +103,38 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
     return tags;
   }, [watchedCategory, selectedCategoryData, subcategories]);
 
-  const onSubmit = async (data: EditServiceTaxonomyFormValues) => {
-    startTransition(async () => {
-      try {
-        const result = await updateService({
-          serviceId: service.id,
-          ...data,
-        });
+  // Handle state changes from server action
+  useEffect(() => {
+    if (state?.success) {
+      toast.success('Service taxonomy updated successfully');
+      router.refresh();
+      // Reset form dirty state after successful update
+      form.reset(form.getValues());
+    } else if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state, router, form]);
 
-        if (result.success) {
-          toast.success('Service taxonomy updated successfully');
-          form.reset(data); // Reset form with new values to clear isDirty state
-          router.refresh();
-        } else {
-          toast.error(result.error || 'Failed to update service');
-        }
-      } catch (error) {
-        toast.error('An error occurred while updating the service');
-      }
+  const handleFormSubmit = (formData: FormData) => {
+    const allValues = form.getValues();
+    const payload = {
+      serviceId: service.id.toString(),
+      category: allValues.category,
+      subcategory: allValues.subcategory,
+      subdivision: allValues.subdivision,
+      tags: JSON.stringify(allValues.tags),
+    };
+
+    populateFormData(formData, payload, {
+      stringFields: ['serviceId', 'category', 'subcategory', 'subdivision', 'tags'],
     });
+
+    formAction(formData);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+      <form action={handleFormSubmit} className='space-y-4'>
         <div className='space-y-2'>
           <label className='text-sm font-medium'>Service Category</label>
           <TaxonomySelector
@@ -146,19 +157,40 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
             }
             onValueChange={(value) => {
               if (value) {
-                form.setValue('category', value.category, { shouldValidate: true });
+                form.setValue('category', value.category, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
                 form.setValue('subcategory', value.subcategory, {
+                  shouldDirty: true,
                   shouldValidate: true,
                 });
                 form.setValue('subdivision', value.subdivision, {
+                  shouldDirty: true,
                   shouldValidate: true,
                 });
-                form.setValue('tags', [], { shouldValidate: true });
+                // Clear tags when taxonomy changes
+                form.setValue('tags', [], {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
               } else {
-                form.setValue('category', '', { shouldValidate: true });
-                form.setValue('subcategory', '', { shouldValidate: true });
-                form.setValue('subdivision', '', { shouldValidate: true });
-                form.setValue('tags', [], { shouldValidate: true });
+                form.setValue('category', '', {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+                form.setValue('subcategory', '', {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+                form.setValue('subdivision', '', {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+                form.setValue('tags', [], {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
               }
             }}
             placeholder='Select service category...'

@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useActionState, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { updateUserStatusSchema } from '@/lib/validations/admin';
-import { updateUserStatus, setUserRole } from '@/actions/admin';
+import { updateUserStatusAction } from '@/actions/admin';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -37,8 +37,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { populateFormData } from '@/lib/utils/form';
 
-type FormData = z.infer<typeof updateUserStatusSchema>;
+type EditUserStatusFormValues = z.infer<typeof updateUserStatusSchema>;
 
 interface EditUserStatusFormProps {
   user: {
@@ -54,12 +55,13 @@ interface EditUserStatusFormProps {
 
 export function EditUserStatusForm({ user }: EditUserStatusFormProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, formAction, isPending] = useActionState(updateUserStatusAction, null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [pendingData, setPendingData] = useState<FormData | null>(null);
+  const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
 
-  const form = useForm<FormData>({
+  const form = useForm<EditUserStatusFormValues>({
     resolver: zodResolver(updateUserStatusSchema),
+    mode: 'onChange',
     defaultValues: {
       userId: user.id,
       role: user.role as any,
@@ -71,72 +73,76 @@ export function EditUserStatusForm({ user }: EditUserStatusFormProps) {
     },
   });
 
-  async function handleSubmit(data: FormData) {
+  useEffect(() => {
+    if (state?.success) {
+      toast.success('User status updated successfully');
+      router.refresh();
+      form.reset(form.getValues());
+    } else if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state, router, form]);
+
+  const handleFormSubmit = (formData: FormData) => {
+    const allValues = form.getValues();
+
     // Check if critical fields are being changed
     const criticalChange =
-      data.role !== user.role ||
-      data.blocked !== user.blocked ||
-      data.step !== user.step;
+      allValues.role !== user.role ||
+      allValues.blocked !== user.blocked ||
+      allValues.step !== user.step;
 
     if (criticalChange) {
-      setPendingData(data);
+      const newFormData = new FormData();
+      const payload = {
+        userId: user.id,
+        role: allValues.role,
+        type: allValues.type,
+        step: allValues.step,
+        emailVerified: allValues.emailVerified?.toString(),
+        confirmed: allValues.confirmed?.toString(),
+        blocked: allValues.blocked?.toString(),
+      };
+
+      populateFormData(newFormData, payload, {
+        stringFields: ['userId', 'role', 'type', 'step', 'emailVerified', 'confirmed', 'blocked'],
+      });
+
+      setPendingFormData(newFormData);
       setShowConfirmDialog(true);
       return;
     }
 
-    await performUpdate(data);
-  }
+    // No critical changes, proceed directly
+    const payload = {
+      userId: user.id,
+      role: allValues.role,
+      type: allValues.type,
+      step: allValues.step,
+      emailVerified: allValues.emailVerified?.toString(),
+      confirmed: allValues.confirmed?.toString(),
+      blocked: allValues.blocked?.toString(),
+    };
 
-  async function performUpdate(data: FormData) {
-    setIsLoading(true);
+    populateFormData(formData, payload, {
+      stringFields: ['userId', 'role', 'type', 'step', 'emailVerified', 'confirmed', 'blocked'],
+    });
 
-    try {
-      // Update role separately if changed
-      if (data.role && data.role !== user.role) {
-        const roleResult = await setUserRole({
-          userId: data.userId,
-          role: data.role,
-        });
+    formAction(formData);
+  };
 
-        if (!roleResult.success) {
-          toast.error(roleResult.error || 'Failed to update role');
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      // Update other status fields
-      const statusData = {
-        userId: data.userId,
-        type: data.type,
-        step: data.step,
-        emailVerified: data.emailVerified,
-        confirmed: data.confirmed,
-        blocked: data.blocked,
-      };
-
-      const result = await updateUserStatus(statusData);
-
-      if (result.success) {
-        toast.success('User status updated successfully');
-        router.refresh();
-      } else {
-        toast.error(result.error || 'Failed to update user status');
-      }
-    } catch (error) {
-      console.error('Error updating user status:', error);
-      toast.error('An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
+  const handleConfirmChanges = () => {
+    if (pendingFormData) {
+      formAction(pendingFormData);
       setShowConfirmDialog(false);
-      setPendingData(null);
+      setPendingFormData(null);
     }
-  }
+  };
 
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-4'>
+        <form action={handleFormSubmit} className='space-y-4'>
           <div className='grid gap-4 md:grid-cols-2'>
             <FormField
               control={form.control}
@@ -300,12 +306,12 @@ export function EditUserStatusForm({ user }: EditUserStatusFormProps) {
               type='button'
               variant='outline'
               onClick={() => form.reset()}
-              disabled={isLoading}
+              disabled={isPending}
             >
               Reset
             </Button>
-            <Button type='submit' disabled={isLoading}>
-              {isLoading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+            <Button type='submit' disabled={isPending || !form.formState.isDirty}>
+              {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
               Save Changes
             </Button>
           </div>
@@ -324,9 +330,7 @@ export function EditUserStatusForm({ user }: EditUserStatusFormProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => pendingData && performUpdate(pendingData)}
-            >
+            <AlertDialogAction onClick={handleConfirmChanges}>
               Confirm Changes
             </AlertDialogAction>
           </AlertDialogFooter>

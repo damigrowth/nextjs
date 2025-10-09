@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { updateUserImage } from '@/actions/admin';
+import { useEffect, useActionState, useState } from 'react';
+import { updateUserImageAction } from '@/actions/admin';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { Loader2, Upload, X, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { populateFormData } from '@/lib/utils/form';
 
 interface EditUserImageFormProps {
   user: {
@@ -19,63 +20,58 @@ interface EditUserImageFormProps {
 
 export function EditUserImageForm({ user }: EditUserImageFormProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, formAction, isPending] = useActionState(updateUserImageAction, null);
   const [currentImage, setCurrentImage] = useState<string | null>(user.image || null);
   const [imageUrl, setImageUrl] = useState('');
 
-  async function handleImageUpdate() {
+  useEffect(() => {
+    if (state?.success) {
+      const message = state.data?.image ? 'Profile image updated successfully' : 'Profile image removed successfully';
+      toast.success(message);
+      router.refresh();
+      if (state.data?.image) {
+        setCurrentImage(state.data.image as string);
+        setImageUrl('');
+      } else {
+        setCurrentImage(null);
+      }
+    } else if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state, router]);
+
+  const handleImageUpdate = () => {
     if (!imageUrl.trim()) {
       toast.error('Please enter an image URL');
       return;
     }
 
-    setIsLoading(true);
+    const newFormData = new FormData();
+    const payload = {
+      userId: user.id,
+      image: imageUrl.trim(),
+    };
 
-    try {
-      const result = await updateUserImage({
-        userId: user.id,
-        image: imageUrl.trim(),
-      });
+    populateFormData(newFormData, payload, {
+      stringFields: ['userId', 'image'],
+    });
 
-      if (result.success) {
-        setCurrentImage(imageUrl.trim());
-        setImageUrl('');
-        toast.success('Profile image updated successfully');
-        router.refresh();
-      } else {
-        toast.error(result.error || 'Failed to update image');
-      }
-    } catch (error) {
-      console.error('Error updating image:', error);
-      toast.error('An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  }
+    formAction(newFormData);
+  };
 
-  async function handleRemoveImage() {
-    setIsLoading(true);
+  const handleRemoveImage = () => {
+    const newFormData = new FormData();
+    const payload = {
+      userId: user.id,
+      image: '',
+    };
 
-    try {
-      const result = await updateUserImage({
-        userId: user.id,
-        image: null,
-      });
+    populateFormData(newFormData, payload, {
+      stringFields: ['userId', 'image'],
+    });
 
-      if (result.success) {
-        setCurrentImage(null);
-        toast.success('Profile image removed successfully');
-        router.refresh();
-      } else {
-        toast.error(result.error || 'Failed to remove image');
-      }
-    } catch (error) {
-      console.error('Error removing image:', error);
-      toast.error('An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  }
+    formAction(newFormData);
+  };
 
   return (
     <div className='space-y-6'>
@@ -106,9 +102,9 @@ export function EditUserImageForm({ user }: EditUserImageFormProps) {
               variant='destructive'
               size='sm'
               onClick={handleRemoveImage}
-              disabled={isLoading}
+              disabled={isPending}
             >
-              {isLoading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+              {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
               <X className='mr-2 h-4 w-4' />
               Remove
             </Button>
@@ -135,7 +131,7 @@ export function EditUserImageForm({ user }: EditUserImageFormProps) {
             placeholder='https://example.com/image.jpg'
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
-            disabled={isLoading}
+            disabled={isPending}
           />
           <p className='text-xs text-muted-foreground'>
             Enter a direct URL to an image (must be publicly accessible)
@@ -145,9 +141,9 @@ export function EditUserImageForm({ user }: EditUserImageFormProps) {
         <Button
           type='button'
           onClick={handleImageUpdate}
-          disabled={isLoading || !imageUrl.trim()}
+          disabled={isPending || !imageUrl.trim()}
         >
-          {isLoading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+          {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
           <Upload className='mr-2 h-4 w-4' />
           {currentImage ? 'Update Image' : 'Set Image'}
         </Button>

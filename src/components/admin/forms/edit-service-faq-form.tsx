@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,11 +10,12 @@ import { Form } from '@/components/ui/form';
 import { FaqFields } from '@/components/shared/faq-fields';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { updateService } from '@/actions/admin/services';
-import { serviceEditSchema } from '@/lib/validations/service';
+import { updateServiceFaqAction } from '@/actions/admin/services';
+import { populateFormData } from '@/lib/utils/form';
+import { createServiceSchema } from '@/lib/validations/service';
 
-// Use the FAQ schema from dashboard with all validations (includes uniqueness checks)
-const editServiceFaqSchema = serviceEditSchema.pick({
+// Use dashboard service schema - pick only faq field with all validations
+const editServiceFaqSchema = createServiceSchema.pick({
   faq: true,
 });
 
@@ -32,7 +33,7 @@ interface EditServiceFaqFormProps {
 
 export function EditServiceFaqForm({ service }: EditServiceFaqFormProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [state, formAction, isPending] = useActionState(updateServiceFaqAction, null);
 
   const form = useForm<EditServiceFaqFormValues>({
     resolver: zodResolver(editServiceFaqSchema),
@@ -42,31 +43,34 @@ export function EditServiceFaqForm({ service }: EditServiceFaqFormProps) {
     },
   });
 
-  const onSubmit = async (data: EditServiceFaqFormValues) => {
-    startTransition(async () => {
-      try {
-        const result = await updateService({
-          serviceId: service.id,
-          faq: data.faq,
-        });
+  useEffect(() => {
+    if (state?.success) {
+      toast.success('Service FAQ updated successfully');
+      router.refresh();
+      form.reset(form.getValues());
+    } else if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state, router, form]);
 
-        if (result.success) {
-          toast.success('Service FAQ updated successfully');
-          form.reset(data);
-          router.refresh();
-        } else {
-          toast.error(result.error || 'Failed to update service');
-        }
-      } catch (error) {
-        toast.error('An error occurred while updating the service');
-      }
+  const handleFormSubmit = (formData: FormData) => {
+    const allValues = form.getValues();
+    const payload = {
+      serviceId: service.id.toString(),
+      faq: JSON.stringify(allValues.faq),
+    };
+
+    populateFormData(formData, payload, {
+      stringFields: ['serviceId', 'faq'],
     });
+
+    formAction(formData);
   };
 
   return (
     <FormProvider {...form}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+        <form action={handleFormSubmit} className='space-y-4'>
           <FaqFields control={form.control} name='faq' maxFaq={5} />
 
           <div className='flex justify-end space-x-2'>

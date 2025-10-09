@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useActionState, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, XCircle, RotateCcw } from 'lucide-react';
@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { updateVerificationStatus } from '@/actions/admin/verifications';
+import { updateVerificationStatusAction } from '@/actions/admin/verifications';
 import { toast } from 'sonner';
 
 interface AdminVerificationActionsProps {
@@ -32,78 +32,75 @@ export function AdminVerificationActions({
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showRevertDialog, setShowRevertDialog] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleApprove = async () => {
-    setIsLoading(true);
-    try {
-      const result = await updateVerificationStatus({
-        verificationId,
-        status: 'APPROVED',
-      });
+  // Three separate action states for approve, reject, and revert
+  const [approveState, approveAction, approvePending] = useActionState(
+    updateVerificationStatusAction,
+    null,
+  );
+  const [rejectState, rejectAction, rejectPending] = useActionState(
+    updateVerificationStatusAction,
+    null,
+  );
+  const [revertState, revertAction, revertPending] = useActionState(
+    updateVerificationStatusAction,
+    null,
+  );
 
-      if (result.success) {
-        toast.success('Verification approved successfully');
-        router.push('/admin/verifications');
-        router.refresh();
-      } else {
-        toast.error(result.error || 'Failed to approve verification');
-      }
-    } catch (error) {
-      toast.error('An error occurred while approving the verification');
-      console.error('Approve error:', error);
-    } finally {
-      setIsLoading(false);
+  // Handle approve state changes
+  useEffect(() => {
+    if (approveState?.success) {
+      toast.success('Verification approved successfully');
       setShowApproveDialog(false);
+      router.push('/admin/verifications');
+      router.refresh();
+    } else if (approveState?.error) {
+      toast.error(approveState.error);
     }
-  };
+  }, [approveState, router]);
 
-  const handleReject = async () => {
-    setIsLoading(true);
-    try {
-      const result = await updateVerificationStatus({
-        verificationId,
-        status: 'REJECTED',
-      });
-
-      if (result.success) {
-        toast.success('Verification rejected successfully');
-        router.push('/admin/verifications');
-        router.refresh();
-      } else {
-        toast.error(result.error || 'Failed to reject verification');
-      }
-    } catch (error) {
-      toast.error('An error occurred while rejecting the verification');
-      console.error('Reject error:', error);
-    } finally {
-      setIsLoading(false);
+  // Handle reject state changes
+  useEffect(() => {
+    if (rejectState?.success) {
+      toast.success('Verification rejected successfully');
       setShowRejectDialog(false);
+      router.push('/admin/verifications');
+      router.refresh();
+    } else if (rejectState?.error) {
+      toast.error(rejectState.error);
     }
-  };
+  }, [rejectState, router]);
 
-  const handleRevertToPending = async () => {
-    setIsLoading(true);
-    try {
-      const result = await updateVerificationStatus({
-        verificationId,
-        status: 'PENDING',
-      });
-
-      if (result.success) {
-        toast.success('Verification reverted to pending');
-        router.refresh();
-      } else {
-        toast.error(result.error || 'Failed to revert verification');
-      }
-    } catch (error) {
-      toast.error('An error occurred while reverting the verification');
-      console.error('Revert error:', error);
-    } finally {
-      setIsLoading(false);
+  // Handle revert state changes
+  useEffect(() => {
+    if (revertState?.success) {
+      toast.success('Verification reverted to pending');
       setShowRevertDialog(false);
+      router.refresh();
+    } else if (revertState?.error) {
+      toast.error(revertState.error);
     }
+  }, [revertState, router]);
+
+  const handleApprove = (formData: FormData) => {
+    formData.set('verificationId', verificationId);
+    formData.set('status', 'APPROVED');
+    approveAction(formData);
   };
+
+  const handleReject = (formData: FormData) => {
+    formData.set('verificationId', verificationId);
+    formData.set('status', 'REJECTED');
+    rejectAction(formData);
+  };
+
+  const handleRevert = (formData: FormData) => {
+    formData.set('verificationId', verificationId);
+    formData.set('status', 'PENDING');
+    revertAction(formData);
+  };
+
+  const isLoading = approvePending || rejectPending || revertPending;
 
   return (
     <>
@@ -111,7 +108,10 @@ export function AdminVerificationActions({
         {/* PENDING: Show Approve and Reject */}
         {currentStatus === 'PENDING' && (
           <>
-            <Button onClick={() => setShowApproveDialog(true)} disabled={isLoading}>
+            <Button
+              onClick={() => setShowApproveDialog(true)}
+              disabled={isLoading}
+            >
               <CheckCircle2 className='mr-2 h-4 w-4' />
               Approve Verification
             </Button>
@@ -151,7 +151,10 @@ export function AdminVerificationActions({
         {/* REJECTED: Show Approve and Revert to Pending */}
         {currentStatus === 'REJECTED' && (
           <>
-            <Button onClick={() => setShowApproveDialog(true)} disabled={isLoading}>
+            <Button
+              onClick={() => setShowApproveDialog(true)}
+              disabled={isLoading}
+            >
               <CheckCircle2 className='mr-2 h-4 w-4' />
               Approve Verification
             </Button>
@@ -174,15 +177,19 @@ export function AdminVerificationActions({
             <AlertDialogTitle>Approve Verification</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to approve the verification for{' '}
-              <span className='font-semibold'>{profileName}</span>? This will mark the
-              profile as verified.
+              <span className='font-semibold'>{profileName}</span>? This will
+              mark the profile as verified.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleApprove} disabled={isLoading}>
-              {isLoading ? 'Approving...' : 'Approve'}
-            </AlertDialogAction>
+            <AlertDialogCancel disabled={approvePending}>
+              Cancel
+            </AlertDialogCancel>
+            <form action={handleApprove}>
+              <AlertDialogAction type='submit' disabled={approvePending}>
+                {approvePending ? 'Approving...' : 'Approve'}
+              </AlertDialogAction>
+            </form>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -194,19 +201,23 @@ export function AdminVerificationActions({
             <AlertDialogTitle>Reject Verification</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to reject the verification for{' '}
-              <span className='font-semibold'>{profileName}</span>? This action cannot be
-              undone.
+              <span className='font-semibold'>{profileName}</span>? This action
+              cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleReject}
-              disabled={isLoading}
-              className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
-            >
-              {isLoading ? 'Rejecting...' : 'Reject'}
-            </AlertDialogAction>
+            <AlertDialogCancel disabled={rejectPending}>
+              Cancel
+            </AlertDialogCancel>
+            <form action={handleReject}>
+              <AlertDialogAction
+                type='submit'
+                disabled={rejectPending}
+                className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+              >
+                {rejectPending ? 'Rejecting...' : 'Reject'}
+              </AlertDialogAction>
+            </form>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -218,14 +229,19 @@ export function AdminVerificationActions({
             <AlertDialogTitle>Revert to Pending</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to revert the verification for{' '}
-              <span className='font-semibold'>{profileName}</span> back to pending status?
+              <span className='font-semibold'>{profileName}</span> back to
+              pending status?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleRevertToPending} disabled={isLoading}>
-              {isLoading ? 'Reverting...' : 'Revert to Pending'}
-            </AlertDialogAction>
+            <AlertDialogCancel disabled={revertPending}>
+              Cancel
+            </AlertDialogCancel>
+            <form action={handleRevert}>
+              <AlertDialogAction type='submit' disabled={revertPending}>
+                {revertPending ? 'Reverting...' : 'Revert to Pending'}
+              </AlertDialogAction>
+            </form>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,12 +17,13 @@ import {
 } from '@/components/ui/form';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { updateService } from '@/actions/admin/services';
-import { serviceEditSchema } from '@/lib/validations/service';
+import { updateServiceBasicAction } from '@/actions/admin/services';
+import { createServiceSchema } from '@/lib/validations/service';
+import { populateFormData } from '@/lib/utils/form';
 import { z } from 'zod';
 
-// Use only title and description from dashboard schema
-const editServiceBasicSchema = serviceEditSchema.pick({
+// Use dashboard service schema - pick only basic fields
+const editServiceBasicSchema = createServiceSchema.pick({
   title: true,
   description: true,
 });
@@ -39,7 +40,7 @@ interface EditServiceBasicFormProps {
 
 export function EditServiceBasicForm({ service }: EditServiceBasicFormProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [state, formAction, isPending] = useActionState(updateServiceBasicAction, null);
 
   const form = useForm<EditServiceBasicFormValues>({
     resolver: zodResolver(editServiceBasicSchema),
@@ -50,30 +51,35 @@ export function EditServiceBasicForm({ service }: EditServiceBasicFormProps) {
     },
   });
 
-  const onSubmit = async (data: EditServiceBasicFormValues) => {
-    startTransition(async () => {
-      try {
-        const result = await updateService({
-          serviceId: service.id,
-          ...data,
-        });
+  // Handle state changes from server action
+  useEffect(() => {
+    if (state?.success) {
+      toast.success('Service updated successfully');
+      router.refresh();
+      form.reset(form.getValues());
+    } else if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state, router, form]);
 
-        if (result.success) {
-          toast.success('Service updated successfully');
-          form.reset(data); // Reset form with new values to clear isDirty state
-          router.refresh();
-        } else {
-          toast.error(result.error || 'Failed to update service');
-        }
-      } catch (error) {
-        toast.error('An error occurred while updating the service');
-      }
+  const handleFormSubmit = (formData: FormData) => {
+    const allValues = form.getValues();
+    const payload = {
+      serviceId: service.id.toString(),
+      title: allValues.title,
+      description: allValues.description,
+    };
+
+    populateFormData(formData, payload, {
+      stringFields: ['serviceId', 'title', 'description'],
     });
+
+    formAction(formData);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+      <form action={handleFormSubmit} className='space-y-4'>
         <FormField
           control={form.control}
           name='title'

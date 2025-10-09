@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,7 +24,8 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { updateServiceStatus, togglePublished, toggleFeatured } from '@/actions/admin/services';
+import { updateServiceSettingsAction } from '@/actions/admin/services';
+import { populateFormData } from '@/lib/utils/form';
 import { Switch } from '@/components/ui/switch';
 
 const editServiceSettingsSchema = z.object({
@@ -44,7 +45,7 @@ interface EditServiceSettingsFormProps {
 
 export function EditServiceSettingsForm({ service }: EditServiceSettingsFormProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [state, formAction, isPending] = useActionState(updateServiceSettingsAction, null);
 
   const form = useForm<EditServiceSettingsFormValues>({
     resolver: zodResolver(editServiceSettingsSchema),
@@ -55,46 +56,34 @@ export function EditServiceSettingsForm({ service }: EditServiceSettingsFormProp
     },
   });
 
-  const onSubmit = async (data: EditServiceSettingsFormValues) => {
-    startTransition(async () => {
-      try {
-        // Update status if changed
-        if (data.status !== service.status) {
-          const statusResult = await updateServiceStatus({
-            serviceId: service.id,
-            status: data.status,
-          });
+  useEffect(() => {
+    if (state?.success) {
+      toast.success('Service settings updated successfully');
+      router.refresh();
+      form.reset(form.getValues());
+    } else if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state, router, form]);
 
-          if (!statusResult.success) {
-            toast.error(statusResult.error || 'Failed to update status');
-            return;
-          }
-        }
+  const handleFormSubmit = (formData: FormData) => {
+    const allValues = form.getValues();
+    const payload = {
+      serviceId: service.id.toString(),
+      status: allValues.status,
+      featured: allValues.featured.toString(),
+    };
 
-        // Update featured if changed
-        if (data.featured !== service.featured) {
-          const featuredResult = await toggleFeatured({
-            serviceId: service.id,
-          });
-
-          if (!featuredResult.success) {
-            toast.error(featuredResult.error || 'Failed to update featured status');
-            return;
-          }
-        }
-
-        toast.success('Service settings updated successfully');
-        form.reset(data); // Reset form with new values to clear isDirty state
-        router.refresh();
-      } catch (error) {
-        toast.error('An error occurred while updating the service');
-      }
+    populateFormData(formData, payload, {
+      stringFields: ['serviceId', 'status', 'featured'],
     });
+
+    formAction(formData);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+      <form action={handleFormSubmit} className='space-y-4'>
         <FormField
           control={form.control}
           name='status'

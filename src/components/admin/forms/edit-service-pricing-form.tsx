@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,14 +25,17 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { updateService } from '@/actions/admin/services';
+import { updateServicePricingAction } from '@/actions/admin/services';
+import { populateFormData } from '@/lib/utils/form';
+import { createServiceSchema } from '@/lib/validations/service';
 import { Currency } from '@/components/ui/currency';
 
-const editServicePricingSchema = z.object({
-  price: z.number().min(0, 'Price must be a positive number'),
-  fixed: z.boolean(),
-  duration: z.number().min(0, 'Duration must be a positive number'),
-  subscriptionType: z.enum(['month', 'year', 'per_case', 'per_hour', 'per_session']).optional(),
+// Use dashboard service schema - pick only pricing fields
+const editServicePricingSchema = createServiceSchema.pick({
+  price: true,
+  fixed: true,
+  duration: true,
+  subscriptionType: true,
 });
 
 type EditServicePricingFormValues = z.infer<typeof editServicePricingSchema>;
@@ -49,7 +52,7 @@ interface EditServicePricingFormProps {
 
 export function EditServicePricingForm({ service }: EditServicePricingFormProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [state, formAction, isPending] = useActionState(updateServicePricingAction, null);
 
   const form = useForm<EditServicePricingFormValues>({
     resolver: zodResolver(editServicePricingSchema),
@@ -64,30 +67,36 @@ export function EditServicePricingForm({ service }: EditServicePricingFormProps)
 
   const watchFixed = form.watch('fixed');
 
-  const onSubmit = async (data: EditServicePricingFormValues) => {
-    startTransition(async () => {
-      try {
-        const result = await updateService({
-          serviceId: service.id,
-          ...data,
-        });
+  useEffect(() => {
+    if (state?.success) {
+      toast.success('Service pricing updated successfully');
+      router.refresh();
+      form.reset(form.getValues());
+    } else if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state, router, form]);
 
-        if (result.success) {
-          toast.success('Service pricing updated successfully');
-          form.reset(data); // Reset form with new values to clear isDirty state
-          router.refresh();
-        } else {
-          toast.error(result.error || 'Failed to update service');
-        }
-      } catch (error) {
-        toast.error('An error occurred while updating the service');
-      }
+  const handleFormSubmit = (formData: FormData) => {
+    const allValues = form.getValues();
+    const payload = {
+      serviceId: service.id.toString(),
+      price: allValues.price.toString(),
+      fixed: allValues.fixed.toString(),
+      duration: allValues.duration.toString(),
+      subscriptionType: allValues.subscriptionType || '',
+    };
+
+    populateFormData(formData, payload, {
+      stringFields: ['serviceId', 'price', 'fixed', 'duration', 'subscriptionType'],
     });
+
+    formAction(formData);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+      <form action={handleFormSubmit} className='space-y-4'>
         <div className='grid md:grid-cols-2 gap-4'>
           <FormField
             control={form.control}

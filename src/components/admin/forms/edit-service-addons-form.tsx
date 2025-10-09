@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,11 +10,12 @@ import { Form } from '@/components/ui/form';
 import { AddonFields } from '@/components/shared/addon-fields';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { updateService } from '@/actions/admin/services';
-import { serviceEditSchema } from '@/lib/validations/service';
+import { updateServiceAddonsAction } from '@/actions/admin/services';
+import { populateFormData } from '@/lib/utils/form';
+import { createServiceSchema } from '@/lib/validations/service';
 
-// Use the addons schema from dashboard with all validations (includes uniqueness checks)
-const editServiceAddonsSchema = serviceEditSchema.pick({
+// Use dashboard service schema - pick only addons field with all validations
+const editServiceAddonsSchema = createServiceSchema.pick({
   addons: true,
 });
 
@@ -33,7 +34,7 @@ interface EditServiceAddonsFormProps {
 
 export function EditServiceAddonsForm({ service }: EditServiceAddonsFormProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [state, formAction, isPending] = useActionState(updateServiceAddonsAction, null);
 
   const form = useForm<EditServiceAddonsFormValues>({
     resolver: zodResolver(editServiceAddonsSchema),
@@ -43,31 +44,34 @@ export function EditServiceAddonsForm({ service }: EditServiceAddonsFormProps) {
     },
   });
 
-  const onSubmit = async (data: EditServiceAddonsFormValues) => {
-    startTransition(async () => {
-      try {
-        const result = await updateService({
-          serviceId: service.id,
-          addons: data.addons,
-        });
+  useEffect(() => {
+    if (state?.success) {
+      toast.success('Service addons updated successfully');
+      router.refresh();
+      form.reset(form.getValues());
+    } else if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state, router, form]);
 
-        if (result.success) {
-          toast.success('Service addons updated successfully');
-          form.reset(data);
-          router.refresh();
-        } else {
-          toast.error(result.error || 'Failed to update service');
-        }
-      } catch (error) {
-        toast.error('An error occurred while updating the service');
-      }
+  const handleFormSubmit = (formData: FormData) => {
+    const allValues = form.getValues();
+    const payload = {
+      serviceId: service.id.toString(),
+      addons: JSON.stringify(allValues.addons),
+    };
+
+    populateFormData(formData, payload, {
+      stringFields: ['serviceId', 'addons'],
     });
+
+    formAction(formData);
   };
 
   return (
     <FormProvider {...form}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+        <form action={handleFormSubmit} className='space-y-4'>
           <AddonFields control={form.control} name='addons' maxAddons={3} />
 
           <div className='flex justify-end space-x-2'>

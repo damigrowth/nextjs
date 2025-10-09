@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useActionState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { updateUserBasicInfoSchema } from '@/lib/validations/admin';
-import { updateUserBasicInfo } from '@/actions/admin';
+import { updateUserBasicInfoAction } from '@/actions/admin';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -19,8 +19,11 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { populateFormData } from '@/lib/utils/form';
 
-type FormData = z.infer<typeof updateUserBasicInfoSchema>;
+// Form schema without userId (passed separately)
+const editUserBasicFormSchema = updateUserBasicInfoSchema.omit({ userId: true });
+type EditUserBasicFormValues = z.infer<typeof editUserBasicFormSchema>;
 
 interface EditUserBasicFormProps {
   user: {
@@ -36,12 +39,12 @@ interface EditUserBasicFormProps {
 
 export function EditUserBasicForm({ user }: EditUserBasicFormProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, formAction, isPending] = useActionState(updateUserBasicInfoAction, null);
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(updateUserBasicInfoSchema),
+  const form = useForm<EditUserBasicFormValues>({
+    resolver: zodResolver(editUserBasicFormSchema),
+    mode: 'onChange',
     defaultValues: {
-      userId: user.id,
       name: user.name || '',
       email: user.email,
       username: user.username || '',
@@ -51,29 +54,38 @@ export function EditUserBasicForm({ user }: EditUserBasicFormProps) {
     },
   });
 
-  async function onSubmit(data: FormData) {
-    setIsLoading(true);
-
-    try {
-      const result = await updateUserBasicInfo(data);
-
-      if (result.success) {
-        toast.success('User information updated successfully');
-        router.refresh();
-      } else {
-        toast.error(result.error || 'Failed to update user information');
-      }
-    } catch (error) {
-      console.error('Error updating user:', error);
-      toast.error('An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    if (state?.success) {
+      toast.success('User information updated successfully');
+      router.refresh();
+      form.reset(form.getValues());
+    } else if (state?.error) {
+      toast.error(state.error);
     }
-  }
+  }, [state, router, form]);
+
+  const handleFormSubmit = (formData: FormData) => {
+    const allValues = form.getValues();
+    const payload = {
+      userId: user.id,
+      name: allValues.name,
+      email: allValues.email,
+      username: allValues.username,
+      displayName: allValues.displayName,
+      firstName: allValues.firstName,
+      lastName: allValues.lastName,
+    };
+
+    populateFormData(formData, payload, {
+      stringFields: ['userId', 'name', 'email', 'username', 'displayName', 'firstName', 'lastName'],
+    });
+
+    formAction(formData);
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+      <form action={handleFormSubmit} className='space-y-4'>
         <div className='grid gap-4 md:grid-cols-2'>
           <FormField
             control={form.control}
@@ -165,12 +177,12 @@ export function EditUserBasicForm({ user }: EditUserBasicFormProps) {
             type='button'
             variant='outline'
             onClick={() => form.reset()}
-            disabled={isLoading}
+            disabled={isPending}
           >
             Reset
           </Button>
-          <Button type='submit' disabled={isLoading}>
-            {isLoading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+          <Button type='submit' disabled={isPending || !form.formState.isDirty}>
+            {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
             Save Changes
           </Button>
         </div>

@@ -117,10 +117,18 @@ describe('EditServiceBasicForm', () => {
     });
   });
 
-  it('calls updateService with correct data on submit', async () => {
+  it('calls updateServiceBasicAction with correct data on submit', async () => {
     const user = userEvent.setup();
-    const mockUpdateService = vi.mocked(serviceActions.updateService);
-    mockUpdateService.mockResolvedValue({ success: true });
+    const mockUpdateServiceBasicAction = vi.mocked(serviceActions.updateServiceBasicAction);
+    mockUpdateServiceBasicAction.mockResolvedValue({
+      success: true,
+      data: {
+        id: 1,
+        title: 'Updated Service Title',
+        description: 'This is a test service description that is long enough to pass validation requirements.',
+        profile: { id: '1', displayName: 'Test', username: 'test', uid: '1' }
+      } as any
+    });
 
     render(<EditServiceBasicForm service={mockService} />);
 
@@ -132,18 +140,22 @@ describe('EditServiceBasicForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(mockUpdateService).toHaveBeenCalledWith({
-        serviceId: 1,
-        title: 'Updated Service Title',
-        description: 'This is a test service description that is long enough to pass validation requirements.',
-      });
+      expect(mockUpdateServiceBasicAction).toHaveBeenCalled();
     });
   });
 
   it('shows success toast and refreshes router on successful update', async () => {
     const user = userEvent.setup();
-    const mockUpdateService = vi.mocked(serviceActions.updateService);
-    mockUpdateService.mockResolvedValue({ success: true });
+    const mockUpdateServiceBasicAction = vi.mocked(serviceActions.updateServiceBasicAction);
+    mockUpdateServiceBasicAction.mockResolvedValue({
+      success: true,
+      data: {
+        id: 1,
+        title: 'Updated Service Title',
+        description: 'This is a test service description that is long enough to pass validation requirements.',
+        profile: { id: '1', displayName: 'Test', username: 'test', uid: '1' }
+      } as any
+    });
 
     const { toast } = await import('sonner');
 
@@ -164,8 +176,8 @@ describe('EditServiceBasicForm', () => {
 
   it('shows error toast on failed update', async () => {
     const user = userEvent.setup();
-    const mockUpdateService = vi.mocked(serviceActions.updateService);
-    mockUpdateService.mockResolvedValue({
+    const mockUpdateServiceBasicAction = vi.mocked(serviceActions.updateServiceBasicAction);
+    mockUpdateServiceBasicAction.mockResolvedValue({
       success: false,
       error: 'Failed to update service'
     });

@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useActionState, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { banUserFormSchema } from '@/lib/validations/admin';
-import { updateUserBanStatus, banUser, unbanUser } from '@/actions/admin';
+import { updateUserBanAction } from '@/actions/admin';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -34,8 +34,9 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { formatDateTime } from '@/lib/utils/date';
+import { populateFormData } from '@/lib/utils/form';
 
-type FormData = z.infer<typeof banUserFormSchema>;
+type EditUserBanFormValues = z.infer<typeof banUserFormSchema>;
 
 interface EditUserBanFormProps {
   user: {
@@ -48,12 +49,14 @@ interface EditUserBanFormProps {
 
 export function EditUserBanForm({ user }: EditUserBanFormProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, formAction, isPending] = useActionState(updateUserBanAction, null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [pendingData, setPendingData] = useState<FormData | null>(null);
+  const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
+  const [pendingData, setPendingData] = useState<EditUserBanFormValues | null>(null);
 
-  const form = useForm<FormData>({
+  const form = useForm<EditUserBanFormValues>({
     resolver: zodResolver(banUserFormSchema),
+    mode: 'onChange',
     defaultValues: {
       userId: user.id,
       banReason: user.banReason || '',
@@ -64,71 +67,68 @@ export function EditUserBanForm({ user }: EditUserBanFormProps) {
 
   const isPermanent = form.watch('isPermanent');
 
-  async function onSubmit(data: FormData) {
-    setPendingData(data);
+  useEffect(() => {
+    if (state?.success) {
+      const message = user.banned ? 'User unbanned successfully' : 'User banned successfully';
+      toast.success(message);
+      router.refresh();
+      form.reset(form.getValues());
+    } else if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state, router, form, user.banned]);
+
+  const handleFormSubmit = (formData: FormData) => {
+    const allValues = form.getValues();
+
+    // Calculate ban expiry date
+    const banExpires = allValues.isPermanent
+      ? null
+      : new Date(
+          Date.now() + (allValues.banDuration || 30) * 24 * 60 * 60 * 1000
+        );
+
+    const newFormData = new FormData();
+    const payload = {
+      userId: user.id,
+      banned: 'true',
+      banReason: allValues.banReason,
+      banExpires: banExpires?.toISOString() || '',
+    };
+
+    populateFormData(newFormData, payload, {
+      stringFields: ['userId', 'banned', 'banReason', 'banExpires'],
+    });
+
+    setPendingFormData(newFormData);
+    setPendingData(allValues);
     setShowConfirmDialog(true);
-  }
+  };
 
-  async function performBan() {
-    if (!pendingData) return;
-
-    setIsLoading(true);
-
-    try {
-      // Calculate ban expiry date
-      const banExpires = pendingData.isPermanent
-        ? null
-        : new Date(
-            Date.now() + (pendingData.banDuration || 30) * 24 * 60 * 60 * 1000
-          );
-
-      const result = await updateUserBanStatus({
-        userId: pendingData.userId,
-        banned: true,
-        banReason: pendingData.banReason,
-        banExpires,
-      });
-
-      if (result.success) {
-        toast.success('User banned successfully');
-        router.refresh();
-      } else {
-        toast.error(result.error || 'Failed to ban user');
-      }
-    } catch (error) {
-      console.error('Error banning user:', error);
-      toast.error('An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
+  const handleConfirmBan = () => {
+    if (pendingFormData) {
+      formAction(pendingFormData);
       setShowConfirmDialog(false);
+      setPendingFormData(null);
       setPendingData(null);
     }
-  }
+  };
 
-  async function handleUnban() {
-    setIsLoading(true);
+  const handleUnban = () => {
+    const newFormData = new FormData();
+    const payload = {
+      userId: user.id,
+      banned: 'false',
+      banReason: '',
+      banExpires: '',
+    };
 
-    try {
-      const result = await updateUserBanStatus({
-        userId: user.id,
-        banned: false,
-        banReason: null,
-        banExpires: null,
-      });
+    populateFormData(newFormData, payload, {
+      stringFields: ['userId', 'banned', 'banReason', 'banExpires'],
+    });
 
-      if (result.success) {
-        toast.success('User unbanned successfully');
-        router.refresh();
-      } else {
-        toast.error(result.error || 'Failed to unban user');
-      }
-    } catch (error) {
-      console.error('Error unbanning user:', error);
-      toast.error('An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  }
+    formAction(newFormData);
+  };
 
   return (
     <>
@@ -164,10 +164,10 @@ export function EditUserBanForm({ user }: EditUserBanFormProps) {
             <Button
               variant='outline'
               onClick={handleUnban}
-              disabled={isLoading}
+              disabled={isPending}
               className='w-full'
             >
-              {isLoading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+              {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
               Unban User
             </Button>
           </div>
@@ -176,7 +176,7 @@ export function EditUserBanForm({ user }: EditUserBanFormProps) {
         {/* Ban User Form */}
         {!user.banned && (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+            <form action={handleFormSubmit} className='space-y-4'>
               <FormField
                 control={form.control}
                 name='banReason'
@@ -252,16 +252,16 @@ export function EditUserBanForm({ user }: EditUserBanFormProps) {
                   type='button'
                   variant='outline'
                   onClick={() => form.reset()}
-                  disabled={isLoading}
+                  disabled={isPending}
                 >
                   Reset
                 </Button>
                 <Button
                   type='submit'
                   variant='destructive'
-                  disabled={isLoading}
+                  disabled={isPending || !form.formState.isDirty}
                 >
-                  {isLoading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+                  {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
                   <AlertTriangle className='mr-2 h-4 w-4' />
                   Ban User
                 </Button>
@@ -292,7 +292,7 @@ export function EditUserBanForm({ user }: EditUserBanFormProps) {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={performBan}
+              onClick={handleConfirmBan}
               className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
             >
               Confirm Ban
