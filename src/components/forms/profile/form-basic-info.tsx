@@ -37,12 +37,10 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from 'sonner';
 
 // Icons
 import {
-  CheckCircle,
-  AlertCircle,
   Loader2,
   Check,
   ChevronsUpDown,
@@ -73,8 +71,9 @@ import {
   coverageSchema,
 } from '@/lib/validations/profile';
 
-// Import server action
+// Import server actions
 import { updateProfileBasicInfo } from '@/actions/profiles/basic-info';
+import { updateProfileBasicInfoAdmin } from '@/actions/admin/profiles/basic-info';
 import { FormButton } from '../../shared';
 import { useSession } from '@/lib/auth/client';
 import { AuthUser } from '@/lib/types/auth';
@@ -89,14 +88,21 @@ const initialState = {
 interface BasicInfoFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null;
+  adminMode?: boolean;
+  hideCard?: boolean;
 }
 
 export default function BasicInfoForm({
   initialUser,
   initialProfile,
+  adminMode = false,
+  hideCard = false,
 }: BasicInfoFormProps) {
+  // Select the appropriate action based on admin mode
+  const actionToUse = adminMode ? updateProfileBasicInfoAdmin : updateProfileBasicInfo;
+
   const [state, action, isPending] = useActionState(
-    updateProfileBasicInfo,
+    actionToUse,
     initialState,
   );
 
@@ -171,14 +177,19 @@ export default function BasicInfoForm({
   // Handle successful form submission - refresh session and page to get updated data
   useEffect(() => {
     if (state.success) {
+      // Show success toast
+      toast.success(state.message || 'Profile updated successfully');
       // Reset loading states
       setIsUploading(false);
       // Refresh the session data to update the menu component with new image
       refetch();
       // Force a fresh server-side render to get the updated session data
       router.refresh();
+    } else if (state.message && !state.success) {
+      // Show error toast
+      toast.error(state.message);
     }
-  }, [state.success, refetch, router]);
+  }, [state.success, state.message, refetch, router]);
 
   // Reset loading states when form submission completes (success or failure)
   useEffect(() => {
@@ -299,6 +310,11 @@ export default function BasicInfoForm({
         skipEmpty: true,
       });
 
+      // Add profileId when in admin mode
+      if (adminMode && initialProfile?.id) {
+        formData.set('profileId', initialProfile.id);
+      }
+
       // Call the server action with populated FormData using startTransition
       startTransition(() => {
         action(formData);
@@ -320,7 +336,7 @@ export default function BasicInfoForm({
           const formData = new FormData(e.currentTarget);
           handleFormAction(formData);
         }}
-        className='space-y-6 p-6 border rounded-lg'
+        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
       >
         {/* Profile Image */}
         <FormField
@@ -1134,22 +1150,6 @@ export default function BasicInfoForm({
               />
             </div>
           </div>
-        )}
-
-        {/* Error Display */}
-        {state.message && !state.success && (
-          <Alert variant='destructive'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Success Display */}
-        {state.message && state.success && (
-          <Alert className='border-green-200 bg-green-50 text-green-800'>
-            <CheckCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
         )}
 
         {/* Debug Info */}

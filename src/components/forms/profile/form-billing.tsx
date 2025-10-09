@@ -18,16 +18,17 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from 'sonner';
 
 // Icons
-import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 // Import validation schema
 import { billingSchema, type BillingInput } from '@/lib/validations/profile';
 
-// Import server action (we'll create this next)
+// Import server actions
 import { updateProfileBilling } from '@/actions/profiles/billing';
+import { updateProfileBillingAdmin } from '@/actions/admin/profiles/billing';
 
 // Utility for form data population
 import { populateFormData, parseJSONValue } from '@/lib/utils/form';
@@ -47,16 +48,22 @@ const initialState = {
 interface BillingFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null;
+  adminMode?: boolean;
+  hideCard?: boolean;
 }
 
 export default function BillingForm({
   initialUser,
   initialProfile,
+  adminMode = false,
+  hideCard = false,
 }: BillingFormProps) {
-  const [state, action, isPending] = useActionState(
-    updateProfileBilling,
-    initialState,
-  );
+  // Select the appropriate action based on admin mode
+  const actionToUse = adminMode
+    ? updateProfileBillingAdmin
+    : updateProfileBilling;
+
+  const [state, action, isPending] = useActionState(actionToUse, initialState);
 
   // Track if user has made any actual changes
   const [hasUserInteracted, setHasUserInteracted] = React.useState(false);
@@ -110,10 +117,15 @@ export default function BillingForm({
   // Handle successful form submission
   useEffect(() => {
     if (state.success) {
+      // Show success toast
+      toast.success(state.message || 'Profile updated successfully');
       // Refresh the page to get updated data
       router.refresh();
+    } else if (state.message && !state.success) {
+      // Show error toast
+      toast.error(state.message);
     }
-  }, [state.success, router]);
+  }, [state.success, state.message, router]);
 
   const {
     handleSubmit,
@@ -138,6 +150,11 @@ export default function BillingForm({
       skipEmpty: false, // Keep all fields for billing data
     });
 
+    // Add profileId when in admin mode
+    if (adminMode && initialProfile?.id) {
+      formData.set('profileId', initialProfile.id);
+    }
+
     // Call the server action
     action(formData);
   };
@@ -146,7 +163,7 @@ export default function BillingForm({
     <Form {...form}>
       <form
         action={handleFormSubmit}
-        className='space-y-6 p-6 border rounded-lg'
+        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
       >
         {/* Billing Type Selection */}
         <div className='space-y-4'>
@@ -314,22 +331,6 @@ export default function BillingForm({
               )}
             />
           </div>
-        )}
-
-        {/* Error Display */}
-        {state.message && !state.success && (
-          <Alert variant='destructive'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Success Display */}
-        {state.message && state.success && (
-          <Alert className='border-green-200 bg-green-50 text-green-800'>
-            <CheckCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
         )}
 
         <div className='flex justify-end space-x-4'>

@@ -19,22 +19,23 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from 'sonner';
 
 // Custom components
 import { MediaUpload } from '@/components/media';
 
 // Icons (lucide-react only)
-import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 // Auth and utilities
 import { populateFormData, parseJSONValue } from '@/lib/utils/form';
 
-// Validation schema and server action
+// Validation schema and server actions
 import { updateProfilePortfolio } from '@/actions/profiles/portfolio';
+import { updateProfilePortfolioAdmin } from '@/actions/admin/profiles/portfolio';
 import {
   updateProfilePortfolioSchema,
-  type UpdateProfilePortfolioInput
+  type UpdateProfilePortfolioInput,
 } from '@/lib/validations/profile';
 import { FormButton } from '../../shared';
 import { AuthUser, ProfileWithRelations } from '@/lib/types/auth';
@@ -52,17 +53,23 @@ interface PortfolioFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null;
   showHeading?: boolean;
+  adminMode?: boolean;
+  hideCard?: boolean;
 }
 
 export default function PortfolioForm({
   initialUser,
   initialProfile,
   showHeading = true,
+  adminMode = false,
+  hideCard = false,
 }: PortfolioFormProps) {
-  const [state, action, isPending] = useActionState(
-    updateProfilePortfolio,
-    initialState,
-  );
+  // Select the appropriate action based on admin mode
+  const actionToUse = adminMode
+    ? updateProfilePortfolioAdmin
+    : updateProfilePortfolio;
+
+  const [state, action, isPending] = useActionState(actionToUse, initialState);
 
   const [isUploading, setIsUploading] = useState(false);
   const [isPendingTransition, startTransition] = useTransition();
@@ -96,10 +103,15 @@ export default function PortfolioForm({
   // Handle successful form submission
   useEffect(() => {
     if (state.success) {
+      // Show success toast
+      toast.success(state.message || 'Profile updated successfully');
       // Refresh the page to get updated data
       router.refresh();
+    } else if (state.message && !state.success) {
+      // Show error toast
+      toast.error(state.message);
     }
-  }, [state.success, router]);
+  }, [state.success, state.message, router]);
 
   // Clear upload state when both action states complete (success or failure)
   const isAnyPending = isPending || isPendingTransition;
@@ -130,6 +142,11 @@ export default function PortfolioForm({
         skipEmpty: true,
       });
 
+      // Add profileId when in admin mode
+      if (adminMode && initialProfile?.id) {
+        formData.set('profileId', initialProfile.id);
+      }
+
       // Call server action using startTransition
       startTransition(() => {
         action(formData);
@@ -149,9 +166,9 @@ export default function PortfolioForm({
           const formData = new FormData(e.currentTarget);
           handleFormSubmit(formData);
         }}
-        className='space-y-6 p-6 border rounded-lg'
+        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
       >
-        <h3 className='text-lg font-medium'>Δείγμα Εργασιών</h3>
+        {!hideCard && <h3 className='text-lg font-medium'>Δείγμα Εργασιών</h3>}
 
         {/* Portfolio Upload */}
         <FormField
@@ -198,22 +215,6 @@ export default function PortfolioForm({
             </FormItem>
           )}
         />
-
-        {/* Error Display */}
-        {state.message && !state.success && (
-          <Alert variant='destructive'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Success Display */}
-        {state.message && state.success && (
-          <Alert className='border-green-200 bg-green-50 text-green-800'>
-            <CheckCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
 
         {/* Submit Button */}
         <div className='flex justify-end space-x-4'>

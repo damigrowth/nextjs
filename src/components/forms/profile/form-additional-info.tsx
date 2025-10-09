@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from 'sonner';
 import {
   Popover,
   PopoverContent,
@@ -39,8 +39,6 @@ import YearPicker from '@/components/ui/year-picker';
 
 // Icons (lucide-react only)
 import {
-  AlertCircle,
-  CheckCircle,
   Loader2,
   Check,
   ChevronsUpDown,
@@ -63,12 +61,13 @@ import {
 } from '@/constants/datasets/options';
 import { industriesOptions as industriesDataset } from '@/constants/datasets/industries';
 
-// Validation schema and server action
+// Validation schema and server actions
 import {
   profileAdditionalInfoUpdateSchema,
   type ProfileAdditionalInfoUpdateInput,
 } from '@/lib/validations/profile';
 import { updateProfileAdditionalInfo } from '@/actions/profiles/additional-info';
+import { updateProfileAdditionalInfoAdmin } from '@/actions/admin/profiles/additional-info';
 import { FormButton } from '../../shared';
 import { AuthUser, ProfileWithRelations } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';
@@ -82,14 +81,21 @@ const initialState = {
 interface AdditionalInfoFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null;
+  adminMode?: boolean;
+  hideCard?: boolean;
 }
 
 export default function AdditionalInfoForm({
   initialUser,
   initialProfile,
+  adminMode = false,
+  hideCard = false,
 }: AdditionalInfoFormProps) {
+  // Select the appropriate action based on admin mode
+  const actionToUse = adminMode ? updateProfileAdditionalInfoAdmin : updateProfileAdditionalInfo;
+
   const [state, action, isPending] = useActionState(
-    updateProfileAdditionalInfo,
+    actionToUse,
     initialState,
   );
   const router = useRouter();
@@ -141,10 +147,15 @@ export default function AdditionalInfoForm({
   // Handle successful form submission
   useEffect(() => {
     if (state.success) {
+      // Show success toast
+      toast.success(state.message || 'Profile updated successfully');
       // Refresh the page to get updated data
       router.refresh();
+    } else if (state.message && !state.success) {
+      // Show error toast
+      toast.error(state.message);
     }
-  }, [state.success, router]);
+  }, [state.success, state.message, router]);
 
   // Form submission handler using utility function
   const handleFormSubmit = (formData: FormData) => {
@@ -163,6 +174,11 @@ export default function AdditionalInfoForm({
       skipEmpty: true, // Skip null/undefined/empty values
     });
 
+    // Add profileId when in admin mode
+    if (adminMode && initialProfile?.id) {
+      formData.set('profileId', initialProfile.id);
+    }
+
     // Call server action
     action(formData);
   };
@@ -171,7 +187,7 @@ export default function AdditionalInfoForm({
     <Form {...form}>
       <form
         action={handleFormSubmit}
-        className='space-y-6 p-6 border rounded-lg'
+        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
       >
         {/* Row 1: Commencement and Rate */}
         <div className='grid grid-cols-1 md:grid-cols-6 gap-6'>
@@ -491,22 +507,6 @@ export default function AdditionalInfoForm({
             </FormItem>
           )}
         />
-
-        {/* Error Display */}
-        {state.message && !state.success && (
-          <Alert variant='destructive'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Success Display */}
-        {state.message && state.success && (
-          <Alert className='border-green-200 bg-green-50 text-green-800'>
-            <CheckCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
 
         {/* Submit Button */}
         <div className='flex justify-end space-x-4'>

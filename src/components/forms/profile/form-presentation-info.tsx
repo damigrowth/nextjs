@@ -15,29 +15,23 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from 'sonner';
 
 // Icons (lucide-react + brands)
-import {
-  AlertCircle,
-  CheckCircle,
-  Loader2,
-  Phone,
-  Globe,
-  MessageCircle,
-} from 'lucide-react';
+import { Loader2, Phone, Globe, MessageCircle } from 'lucide-react';
 import { Icon } from '@/components/icon/brands';
 
 // Auth and utilities
 import { formatInput } from '@/lib/utils/validation/formats';
 import { populateFormData, parseVisibilityJSON } from '@/lib/utils/form';
 
-// Validation schema and server action
+// Validation schema and server actions
 import {
   profilePresentationUpdateSchema,
   type ProfilePresentationUpdateInput,
 } from '@/lib/validations/profile';
 import { updateProfilePresentation } from '@/actions/profiles/presentation';
+import { updateProfilePresentationAdmin } from '@/actions/admin/profiles/presentation';
 import { FormButton } from '../../shared';
 import { AuthUser, ProfileWithRelations } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';
@@ -70,16 +64,22 @@ const initialSocials = {
 interface PresentationInfoFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null;
+  adminMode?: boolean;
+  hideCard?: boolean;
 }
 
 export default function PresentationInfoForm({
   initialUser,
   initialProfile,
+  adminMode = false,
+  hideCard = false,
 }: PresentationInfoFormProps) {
-  const [state, action, isPending] = useActionState(
-    updateProfilePresentation,
-    initialState,
-  );
+  // Select the appropriate action based on admin mode
+  const actionToUse = adminMode
+    ? updateProfilePresentationAdmin
+    : updateProfilePresentation;
+
+  const [state, action, isPending] = useActionState(actionToUse, initialState);
 
   const router = useRouter();
 
@@ -128,10 +128,15 @@ export default function PresentationInfoForm({
   // Handle successful form submission
   useEffect(() => {
     if (state.success) {
+      // Show success toast
+      toast.success(state.message || 'Profile updated successfully');
       // Refresh the page to get updated data
       router.refresh();
+    } else if (state.message && !state.success) {
+      // Show error toast
+      toast.error(state.message);
     }
-  }, [state.success, router]);
+  }, [state.success, state.message, router]);
 
   // Form submission handler using utility function
   const handleFormSubmit = (formData: FormData) => {
@@ -144,6 +149,11 @@ export default function PresentationInfoForm({
       skipEmpty: true, // Skip null/undefined/empty values
     });
 
+    // Add profileId when in admin mode
+    if (adminMode && initialProfile?.id) {
+      formData.set('profileId', initialProfile.id);
+    }
+
     // Call server action
     action(formData);
   };
@@ -152,7 +162,7 @@ export default function PresentationInfoForm({
     <Form {...form}>
       <form
         action={handleFormSubmit}
-        className='space-y-6 p-6 border rounded-lg'
+        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
       >
         {/* Contact Fields - All in one row */}
         <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
@@ -502,22 +512,6 @@ export default function PresentationInfoForm({
             />
           </div>
         </div>
-
-        {/* Error Display */}
-        {state.message && !state.success && (
-          <Alert variant='destructive'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Success Display */}
-        {state.message && state.success && (
-          <Alert className='border-green-200 bg-green-50 text-green-800'>
-            <CheckCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
 
         {/* Submit Button */}
         <div className='flex justify-end space-x-4'>
