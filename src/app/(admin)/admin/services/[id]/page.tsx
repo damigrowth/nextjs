@@ -8,12 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils/date';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-import {
   EditServiceBasicForm,
   EditServiceTaxonomyForm,
   EditServicePricingForm,
@@ -64,7 +58,9 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
   const service = serviceResult.data as any;
 
   // Resolve taxonomy labels
-  const categoryData = serviceTaxonomies.find((cat) => cat.id === service.category);
+  const categoryData = serviceTaxonomies.find(
+    (cat) => cat.id === service.category,
+  );
   const subcategoryData = categoryData?.children?.find(
     (sub) => sub.id === service.subcategory,
   );
@@ -77,7 +73,10 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
   const subdivisionLabel = subdivisionData?.label || service.subdivision;
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+    const variants: Record<
+      string,
+      'default' | 'secondary' | 'destructive' | 'outline'
+    > = {
       draft: 'outline',
       pending: 'secondary',
       published: 'default',
@@ -107,10 +106,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
               </Link>
             </Button>
             <Button variant='outline' size='sm' asChild>
-              <Link
-                href={`/s/${service.slug}`}
-                target='_blank'
-              >
+              <Link href={`/s/${service.slug}`} target='_blank'>
                 <Eye className='h-4 w-4' />
                 Public View
               </Link>
@@ -163,7 +159,9 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                       </div>
                     )}
                     <div className='flex items-center justify-between px-6 py-2'>
-                      <span className='text-xs text-muted-foreground'>Tags</span>
+                      <span className='text-xs text-muted-foreground'>
+                        Tags
+                      </span>
                       <span className='text-xs font-medium'>
                         {service.tags?.length || 0}
                       </span>
@@ -183,7 +181,10 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                       <span className='text-xs text-muted-foreground'>
                         Status
                       </span>
-                      <Badge variant={getStatusBadge(service.status)} className='text-xs h-5'>
+                      <Badge
+                        variant={getStatusBadge(service.status)}
+                        className='text-xs h-5'
+                      >
                         {service.status}
                       </Badge>
                     </div>
@@ -311,149 +312,105 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
             {/* Service Management Forms - LAST SECTION */}
             <div className='space-y-6'>
               <div>
-                <h2 className='text-2xl font-bold'>Service Management</h2>
+                <h2>Service Management</h2>
                 <p className='text-muted-foreground'>
-                  Edit service information, taxonomy, pricing, and status settings
+                  Edit service information, taxonomy, pricing, and status
+                  settings
                 </p>
               </div>
 
-              <Accordion type='multiple' className='w-full'>
-                <AccordionItem value='basic-info'>
-                  <AccordionTrigger>
-                    <div className='flex flex-col items-start text-left'>
-                      <span className='font-semibold'>Basic Information</span>
-                      <span className='text-sm font-normal text-muted-foreground'>
-                        Update service title and description
-                      </span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <Card>
-                      <CardContent className='pt-6'>
-                        <EditServiceBasicForm service={service} />
-                      </CardContent>
-                    </Card>
-                  </AccordionContent>
-                </AccordionItem>
+              <div className='space-y-6'>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>Basic Information</CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Update service title and description
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <EditServiceBasicForm service={service} />
+                  </CardContent>
+                </Card>
 
-                <AccordionItem value='taxonomy'>
-                  <AccordionTrigger>
-                    <div className='flex flex-col items-start text-left'>
-                      <span className='font-semibold'>
-                        Taxonomy & Tags
-                      </span>
-                      <span className='text-sm font-normal text-muted-foreground'>
-                        Manage category, subcategory, subdivision, and tags
-                      </span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <Card>
-                      <CardContent className='pt-6'>
-                        <EditServiceTaxonomyForm service={service} />
-                      </CardContent>
-                    </Card>
-                  </AccordionContent>
-                </AccordionItem>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>Taxonomy & Tags</CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Manage category, subcategory, subdivision, and tags
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <EditServiceTaxonomyForm service={service} />
+                  </CardContent>
+                </Card>
 
-                <AccordionItem value='pricing'>
-                  <AccordionTrigger>
-                    <div className='flex flex-col items-start text-left'>
-                      <span className='font-semibold'>Pricing & Duration</span>
-                      <span className='text-sm font-normal text-muted-foreground'>
-                        Update price, fixed pricing, duration, and subscription type
-                      </span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <Card>
-                      <CardContent className='pt-6'>
-                        <EditServicePricingForm service={service} />
-                      </CardContent>
-                    </Card>
-                  </AccordionContent>
-                </AccordionItem>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>
+                      Pricing & Duration
+                    </CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Update price, fixed pricing, duration, and subscription
+                      type
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <EditServicePricingForm service={service} />
+                  </CardContent>
+                </Card>
 
-                <AccordionItem value='settings'>
-                  <AccordionTrigger>
-                    <div className='flex flex-col items-start text-left'>
-                      <span className='font-semibold'>
-                        Status & Settings
-                      </span>
-                      <span className='text-sm font-normal text-muted-foreground'>
-                        Manage service status, published state, and featured flag
-                      </span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <Card>
-                      <CardContent className='pt-6'>
-                        <EditServiceSettingsForm service={service} />
-                      </CardContent>
-                    </Card>
-                  </AccordionContent>
-                </AccordionItem>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>Status & Settings</CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Manage service status, published state, and featured flag
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <EditServiceSettingsForm service={service} />
+                  </CardContent>
+                </Card>
 
-                <AccordionItem value='addons'>
-                  <AccordionTrigger>
-                    <div className='flex flex-col items-start text-left'>
-                      <span className='font-semibold'>
-                        Extra Services (Addons)
-                      </span>
-                      <span className='text-sm font-normal text-muted-foreground'>
-                        Manage additional services and pricing
-                      </span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <Card>
-                      <CardContent className='pt-6'>
-                        <EditServiceAddonsForm service={service} />
-                      </CardContent>
-                    </Card>
-                  </AccordionContent>
-                </AccordionItem>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>
+                      Extra Services (Addons)
+                    </CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Manage additional services and pricing
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <EditServiceAddonsForm service={service} />
+                  </CardContent>
+                </Card>
 
-                <AccordionItem value='faq'>
-                  <AccordionTrigger>
-                    <div className='flex flex-col items-start text-left'>
-                      <span className='font-semibold'>
-                        Frequently Asked Questions
-                      </span>
-                      <span className='text-sm font-normal text-muted-foreground'>
-                        Manage service FAQ section
-                      </span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <Card>
-                      <CardContent className='pt-6'>
-                        <EditServiceFaqForm service={service} />
-                      </CardContent>
-                    </Card>
-                  </AccordionContent>
-                </AccordionItem>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>
+                      Frequently Asked Questions
+                    </CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Manage service FAQ section
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <EditServiceFaqForm service={service} />
+                  </CardContent>
+                </Card>
 
-                <AccordionItem value='media'>
-                  <AccordionTrigger>
-                    <div className='flex flex-col items-start text-left'>
-                      <span className='font-semibold'>
-                        Media & Images
-                      </span>
-                      <span className='text-sm font-normal text-muted-foreground'>
-                        Manage service photos and videos
-                      </span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <Card>
-                      <CardContent className='pt-6'>
-                        <EditServiceMediaForm service={service} />
-                      </CardContent>
-                    </Card>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>Media & Images</CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Manage service photos and videos
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <EditServiceMediaForm service={service} />
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </div>

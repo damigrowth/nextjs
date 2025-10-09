@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import {
   AdminUsersFilters,
   AdminUsersTableSkeleton,
-  AdminUsersStats,
   AdminUsersTableSection,
   SiteHeader,
 } from '@/components/admin';
@@ -50,11 +49,6 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
       <div className='flex flex-col gap-4 pb-6 pt-4 md:gap-6'>
         <div className='px-4 lg:px-6'>
           <div className='space-y-6'>
-            {/* Stats Cards */}
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-              <AdminUsersStats />
-            </div>
-
             {/* Filters */}
             <AdminUsersFilters />
 

@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import {
   AdminProfilesFilters,
   AdminProfilesTableSkeleton,
-  AdminProfilesStats,
   AdminProfilesTableSection,
   SiteHeader,
 } from '@/components/admin';
@@ -56,11 +55,6 @@ export default async function ProfilesPage({
       <div className='flex flex-col gap-4 pb-6 pt-4 md:gap-6'>
         <div className='px-4 lg:px-6'>
           <div className='space-y-6'>
-            {/* Stats Cards */}
-            <div className='grid gap-4 md:grid-cols-3'>
-              <AdminProfilesStats />
-            </div>
-
             {/* Filters */}
             <AdminProfilesFilters />
 
