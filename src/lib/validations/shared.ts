@@ -10,46 +10,56 @@ import { z } from 'zod';
 // =============================================
 
 export const idSchema = z.string().cuid('Invalid ID format');
-export const emailSchema = z.string().email('Invalid email format');
-export const phoneSchema = z.string().regex(/^\+?[\d\s\-\(\)]+$/, 'Invalid phone format').optional();
+export const emailSchema = z.email('Invalid email format');
+export const phoneSchema = z
+  .string()
+  .regex(/^\+?[\d\s\-\(\)]+$/, 'Invalid phone format')
+  .optional();
 export const urlSchema = z.string().url('Invalid URL format');
-export const passwordSchema = z.string().min(8, 'Password must be at least 8 characters');
+export const passwordSchema = z
+  .string()
+  .min(8, 'Password must be at least 8 characters');
 
 // Pagination schema
 export const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
   sort: z.string().optional(),
-  order: z.enum(['asc', 'desc']).default('desc')
+  order: z.enum(['asc', 'desc']).default('desc'),
 });
 
 // Search schema
-export const searchSchema = z.object({
-  q: z.string().optional(),
-  search: z.string().optional(),
-}).merge(paginationSchema);
+export const searchSchema = z
+  .object({
+    q: z.string().optional(),
+    search: z.string().optional(),
+  })
+  .merge(paginationSchema);
 
 // File upload schema
-export const fileUploadSchema = z.object({
-  name: z.string(),
-  size: z.number(),
-  type: z.string(),
-  lastModified: z.number(),
-}).refine(
-  (file) => file.size <= 3 * 1024 * 1024, // 3MB
-  'File size must be less than 3MB',
-).refine(
-  (file) => ['image/jpeg', 'image/png', 'image/webp'].includes(file.type),
-  'Only JPEG, PNG, WebP files are allowed',
-);
+export const fileUploadSchema = z
+  .object({
+    name: z.string(),
+    size: z.number(),
+    type: z.string(),
+    lastModified: z.number(),
+  })
+  .refine(
+    (file) => file.size <= 3 * 1024 * 1024, // 3MB
+    'File size must be less than 3MB',
+  )
+  .refine(
+    (file) => ['image/jpeg', 'image/png', 'image/webp'].includes(file.type),
+    'Only JPEG, PNG, WebP files are allowed',
+  );
 
 // Parameter schemas
 export const idParamSchema = z.object({
-  id: idSchema
+  id: idSchema,
 });
 
 export const slugParamSchema = z.object({
-  slug: z.string().min(1, 'Slug is required')
+  slug: z.string().min(1, 'Slug is required'),
 });
 
 // Contact form schema
@@ -67,7 +77,7 @@ export const emailSendSchema = z.object({
   replyTo: emailSchema.optional(),
   subject: z.string().min(1, 'Subject is required'),
   html: z.string().min(1, 'HTML content is required'),
-  text: z.string().optional()
+  text: z.string().optional(),
 });
 
 // Validation patterns

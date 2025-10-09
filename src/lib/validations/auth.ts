@@ -144,7 +144,7 @@ export const resetPasswordSchema = z.object({
 export const accountUpdateSchema = z.object({
   displayName: z
     .string()
-    .min(2, 'Το όνομα εμφάνισης πρέπει να έχει τουλάχιστον 2 χαρακτήρες')
+    .min(5, 'Το όνομα εμφάνισης πρέπει να έχει τουλάχιστον 5 χαρακτήρες')
     .max(50, 'Το όνομα εμφάνισης δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες'),
 });
 

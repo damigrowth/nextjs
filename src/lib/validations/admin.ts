@@ -11,7 +11,10 @@ import {
   authStepSchema,
   emailSchema,
   passwordSchema,
+  registerSchema,
+  accountUpdateSchema,
 } from '../validations';
+import { createServiceSchema } from './service';
 
 // =============================================
 // ADMIN USER MANAGEMENT SCHEMAS
@@ -35,32 +38,30 @@ export const adminListUsersSchema = z.object({
   filterValue: z.string().optional(),
 });
 
-export const adminCreateUserSchema = z.object({
+// Extend registerSchema from auth.ts with admin-specific fields
+export const adminCreateUserSchema = registerSchema.extend({
   name: z.string().min(1, 'Name is required').max(100),
-  email: emailSchema,
-  password: passwordSchema,
-  role: userRoleSchema.default('user'), // This will be handled after Better Auth user creation
-  displayName: z.string().min(1).optional(),
-  username: z
-    .string()
-    .min(3, 'Username must be at least 3 characters')
-    .optional(),
   emailVerified: z.boolean().optional().default(true), // Admin-created users are pre-verified
   confirmed: z.boolean().optional().default(true), // Admin-created users are pre-confirmed
 });
 
-export const adminUpdateUserSchema = z.object({
-  userId: z.string().min(1, 'User ID is required'),
-  name: z.string().min(1).max(100).optional(),
-  email: emailSchema.optional(),
-  displayName: z.string().min(1).optional(),
-  username: z.string().min(3).optional(),
-  role: userRoleSchema.optional(), // Add role field to update schema
-  confirmed: z.boolean().optional(),
-  blocked: z.boolean().optional(),
-  step: authStepSchema.optional(),
-  emailVerified: z.boolean().optional(),
-});
+// General admin update schema - extends accountUpdateSchema from auth.ts
+export const adminUpdateUserSchema = accountUpdateSchema
+  .partial() // Make all fields optional for partial updates
+  .extend({
+    userId: z.string().min(1, 'User ID is required'),
+    name: z.string().min(1).max(100).optional(),
+    email: emailSchema.optional(),
+    username: z.string().min(5).optional(),
+    firstName: z.string().min(1).max(100).optional(),
+    lastName: z.string().min(1).max(100).optional(),
+    role: userRoleSchema.optional(),
+    type: z.enum(['user', 'pro']).optional(),
+    confirmed: z.boolean().optional(),
+    blocked: z.boolean().optional(),
+    step: authStepSchema.optional(),
+    emailVerified: z.boolean().optional(),
+  });
 
 export const adminSetRoleSchema = z.object({
   userId: z.string().min(1, 'User ID is required'),
@@ -119,47 +120,8 @@ export const adminBulkActionSchema = z.object({
 });
 
 // =============================================
-// ADMIN STATISTICS SCHEMAS
-// =============================================
-
-export const adminUserStatsSchema = z.object({
-  period: z.enum(['day', 'week', 'month', 'year']).default('month'),
-  startDate: z.coerce.date().optional(),
-  endDate: z.coerce.date().optional(),
-});
-
-// =============================================
 // FORM VALIDATION SCHEMAS (for React Hook Form)
 // =============================================
-
-export const createUserFormSchema = z
-  .object({
-    name: z.string().min(1, 'Name is required').max(100),
-    email: emailSchema,
-    password: passwordSchema,
-    confirmPassword: z.string().min(1, 'Please confirm your password'),
-    role: userRoleSchema,
-    sendWelcomeEmail: z.boolean(),
-    autoVerify: z.boolean(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  });
-
-export const editUserFormSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100).optional(),
-  email: emailSchema.optional(),
-  displayName: z.string().min(1).optional(),
-  username: z
-    .string()
-    .min(3, 'Username must be at least 3 characters')
-    .optional(),
-  role: userRoleSchema.optional(),
-  confirmed: z.boolean().optional(),
-  blocked: z.boolean().optional(),
-  emailVerified: z.boolean().optional(),
-});
 
 export const banUserFormSchema = z
   .object({
@@ -181,18 +143,6 @@ export const banUserFormSchema = z
     },
   );
 
-export const setPasswordFormSchema = z
-  .object({
-    userId: z.string().min(1),
-    newPassword: passwordSchema,
-    confirmPassword: z.string().min(1, 'Please confirm the new password'),
-    sendNotification: z.boolean(),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  });
-
 export const revokeSessionSchema = z.object({
   sessionToken: z.string().min(1, 'Session token is required'),
 });
@@ -202,32 +152,29 @@ export const revokeUserSessionsSchema = z.object({
 });
 
 // =============================================
-// USER EDITING FORM SCHEMAS
+// USER EDITING FORM SCHEMAS (extend from adminUpdateUserSchema)
 // =============================================
 
-export const updateUserBasicInfoSchema = z.object({
-  userId: z.string().min(1, 'User ID is required'),
-  name: z.string().min(1, 'Name is required').max(100).optional(),
-  email: emailSchema.optional(),
-  username: z.string().min(3, 'Username must be at least 3 characters').optional().or(z.literal('')),
-  displayName: z.string().min(1).max(100).optional().or(z.literal('')),
-  firstName: z.string().min(1).max(100).optional().or(z.literal('')),
-  lastName: z.string().min(1).max(100).optional().or(z.literal('')),
+// Update user basic info - pick specific fields from general schema
+export const updateUserBasicInfoSchema = adminUpdateUserSchema.pick({
+  userId: true,
+  name: true,
+  email: true,
+  username: true,
+  displayName: true,
+  firstName: true,
+  lastName: true,
 });
 
-export const updateUserStatusSchema = z.object({
-  userId: z.string().min(1, 'User ID is required'),
-  role: userRoleSchema.optional(),
-  type: z.enum(['user', 'pro']).optional(),
-  step: authStepSchema.optional(),
-  emailVerified: z.boolean().optional(),
-  confirmed: z.boolean().optional(),
-  blocked: z.boolean().optional(),
-});
-
-export const updateUserImageSchema = z.object({
-  userId: z.string().min(1, 'User ID is required'),
-  image: z.string().url().nullable(),
+// Update user status - pick status-related fields from general schema
+export const updateUserStatusSchema = adminUpdateUserSchema.pick({
+  userId: true,
+  role: true,
+  type: true,
+  step: true,
+  emailVerified: true,
+  confirmed: true,
+  blocked: true,
 });
 
 // =============================================
@@ -253,84 +200,6 @@ export const updateAdminApiKeySchema = z.object({
   name: z.string().optional(),
   enabled: z.boolean().optional(),
 });
-
-// =============================================
-// TYPE EXPORTS
-// =============================================
-
-export type AdminListUsersInput = z.infer<typeof adminListUsersSchema>;
-export type AdminCreateUserInput = z.infer<typeof adminCreateUserSchema>;
-export type AdminUpdateUserInput = z.infer<typeof adminUpdateUserSchema>;
-export type AdminSetRoleInput = z.infer<typeof adminSetRoleSchema>;
-export type AdminSetPasswordInput = z.infer<typeof adminSetPasswordSchema>;
-export type AdminBanUserInput = z.infer<typeof adminBanUserSchema>;
-export type AdminUnbanUserInput = z.infer<typeof adminUnbanUserSchema>;
-export type AdminRemoveUserInput = z.infer<typeof adminRemoveUserSchema>;
-export type AdminImpersonateUserInput = z.infer<
-  typeof adminImpersonateUserSchema
->;
-
-export type AdminListUserSessionsInput = z.infer<
-  typeof adminListUserSessionsSchema
->;
-export type AdminRevokeSessionInput = z.infer<typeof adminRevokeSessionSchema>;
-export type AdminRevokeUserSessionsInput = z.infer<
-  typeof adminRevokeUserSessionsSchema
->;
-
-export type AdminBulkActionInput = z.infer<typeof adminBulkActionSchema>;
-export type AdminUserStatsInput = z.infer<typeof adminUserStatsSchema>;
-
-// Form types
-export type CreateUserFormInput = z.infer<typeof createUserFormSchema>;
-export type EditUserFormInput = z.infer<typeof editUserFormSchema>;
-export type BanUserFormInput = z.infer<typeof banUserFormSchema>;
-export type SetPasswordFormInput = z.infer<typeof setPasswordFormSchema>;
-
-// =============================================
-// VALIDATION HELPERS
-// =============================================
-
-/**
- * Check if a role can be assigned by the current admin
- */
-export function canAssignRole(
-  currentAdminRole: string,
-  targetRole: string,
-): boolean {
-  // Only admins can assign admin role
-  if (targetRole === 'admin') {
-    return currentAdminRole === 'admin';
-  }
-
-  // Admins can assign any role
-  return currentAdminRole === 'admin';
-}
-
-/**
- * Get allowed roles for user creation/editing
- */
-export function getAllowedRoles(currentAdminRole: string): string[] {
-  if (currentAdminRole === 'admin') {
-    return ['user', 'freelancer', 'company', 'admin'];
-  }
-
-  return ['user', 'freelancer', 'company'];
-}
-
-/**
- * Validate ban duration
- */
-export function validateBanDuration(durationInDays: number): boolean {
-  return durationInDays > 0 && durationInDays <= 3650; // Max 10 years
-}
-
-/**
- * Convert ban duration from days to seconds (for Better Auth)
- */
-export function banDurationToSeconds(days: number): number {
-  return days * 24 * 60 * 60;
-}
 
 // =============================================
 // ADMIN PROFILE MANAGEMENT SCHEMAS
@@ -435,14 +304,36 @@ export type AdminUpdateVerificationInput = z.infer<
 
 export const adminListServicesSchema = z.object({
   searchQuery: z.string().optional(),
-  status: z.enum(['all', 'draft', 'pending', 'published', 'rejected', 'approved', 'inactive']).optional(),
+  status: z
+    .enum([
+      'all',
+      'draft',
+      'pending',
+      'published',
+      'rejected',
+      'approved',
+      'inactive',
+    ])
+    .optional(),
   category: z.string().optional(),
   subcategory: z.string().optional(),
   subdivision: z.string().optional(),
   featured: z.enum(['all', 'featured', 'not-featured']).optional(),
-  type: z.enum(['all', 'presence', 'onbase', 'onsite', 'online', 'oneoff', 'subscription']).optional(),
+  type: z
+    .enum([
+      'all',
+      'presence',
+      'onbase',
+      'onsite',
+      'online',
+      'oneoff',
+      'subscription',
+    ])
+    .optional(),
   pricing: z.enum(['all', 'fixed', 'not-fixed']).optional(),
-  subscriptionType: z.enum(['all', 'month', 'year', 'per_case', 'per_hour', 'per_session']).optional(),
+  subscriptionType: z
+    .enum(['all', 'month', 'year', 'per_case', 'per_hour', 'per_session'])
+    .optional(),
   profileId: z.string().optional(), // Filter by profile
   limit: z.coerce.number().int().min(1).max(100).optional().default(10),
   offset: z.coerce.number().int().min(0).optional().default(0),
@@ -453,36 +344,26 @@ export const adminListServicesSchema = z.object({
   sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
 });
 
-export const adminUpdateServiceSchema = z.object({
-  serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
-  // Basic info
-  title: z.string().min(1).max(200).optional(),
-  description: z.string().min(1).optional(),
-
-  // Taxonomies
-  category: z.string().optional(),
-  subcategory: z.string().optional(),
-  subdivision: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-
-  // Pricing
-  fixed: z.boolean().optional(),
-  price: z.number().int().min(0).optional(),
-  type: z.record(z.string(), z.boolean()).optional(), // online, presence, onsite, etc.
-  subscriptionType: z.enum(['month', 'year', 'per_case', 'per_hour', 'per_session']).optional().nullable(),
-  duration: z.number().int().min(0).optional(),
-
-  // Features
-  addons: z.array(z.record(z.string(), z.any())).optional(),
-  faq: z.array(z.record(z.string(), z.any())).optional(),
-
-  // Media
-  media: z.array(z.record(z.string(), z.any())).optional().nullable(),
-
-  // Status flags (admin only)
-  status: z.enum(['draft', 'pending', 'published', 'rejected', 'approved', 'inactive']).optional(),
-  featured: z.boolean().optional(),
-});
+// Admin update service schema - extends dashboard schema with admin-only fields
+export const adminUpdateServiceSchema = createServiceSchema
+  .partial() // Make all dashboard fields optional for partial updates
+  .extend({
+    serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
+    // Admin-only fields
+    status: z
+      .enum([
+        'draft',
+        'pending',
+        'published',
+        'rejected',
+        'approved',
+        'inactive',
+      ])
+      .optional(),
+    featured: z.boolean().optional(),
+    // Media (not in dashboard schema)
+    media: z.array(z.record(z.string(), z.any())).optional().nullable(),
+  });
 
 export const adminToggleServiceSchema = z.object({
   serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
@@ -490,7 +371,14 @@ export const adminToggleServiceSchema = z.object({
 
 export const adminUpdateServiceStatusSchema = z.object({
   serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
-  status: z.enum(['draft', 'pending', 'published', 'rejected', 'approved', 'inactive']),
+  status: z.enum([
+    'draft',
+    'pending',
+    'published',
+    'rejected',
+    'approved',
+    'inactive',
+  ]),
   rejectionReason: z.string().max(500).optional(),
 });
 
@@ -509,7 +397,9 @@ export const adminDeleteServiceSchema = z.object({
 export type AdminListServicesInput = z.infer<typeof adminListServicesSchema>;
 export type AdminUpdateServiceInput = z.infer<typeof adminUpdateServiceSchema>;
 export type AdminToggleServiceInput = z.infer<typeof adminToggleServiceSchema>;
-export type AdminUpdateServiceStatusInput = z.infer<typeof adminUpdateServiceStatusSchema>;
+export type AdminUpdateServiceStatusInput = z.infer<
+  typeof adminUpdateServiceStatusSchema
+>;
 export type AdminDeleteServiceInput = z.infer<typeof adminDeleteServiceSchema>;
 
 // =============================================
