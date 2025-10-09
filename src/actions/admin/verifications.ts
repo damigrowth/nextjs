@@ -197,7 +197,7 @@ export async function updateVerificationStatus(
       },
     });
 
-    // If approved, also update the profile's verified status
+    // Update profile's verified status based on verification status
     if (status === 'APPROVED') {
       await prisma.profile.update({
         where: { id: verification.pid },
@@ -205,10 +205,8 @@ export async function updateVerificationStatus(
           verified: true,
         },
       });
-    }
-
-    // If rejected, ensure profile is not verified
-    if (status === 'REJECTED') {
+    } else if (status === 'REJECTED' || status === 'PENDING') {
+      // If rejected or pending, ensure profile is not verified
       await prisma.profile.update({
         where: { id: verification.pid },
         data: {
@@ -321,6 +319,57 @@ export async function getVerificationStats() {
         error instanceof Error
           ? error.message
           : 'Failed to fetch verification stats',
+    };
+  }
+}
+
+/**
+ * Update verification status - FormData version for useActionState
+ */
+export async function updateVerificationStatusAction(
+  prevState: { success: boolean; error?: string } | null,
+  formData: FormData,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const verificationId = formData.get('verificationId');
+    const status = formData.get('status');
+    const notes = formData.get('notes');
+
+    if (!verificationId || !status) {
+      return {
+        success: false,
+        error: 'Verification ID and status are required',
+      };
+    }
+
+    // Parse and validate
+    const rawData = {
+      verificationId: verificationId as string,
+      status: status as string,
+      notes: notes ? (notes as string) : undefined,
+    };
+
+    const validationResult =
+      adminUpdateVerificationStatusSchema.safeParse(rawData);
+
+    if (!validationResult.success) {
+      return {
+        success: false,
+        error:
+          'Validation failed: ' +
+          validationResult.error.issues.map((e) => e.message).join(', '),
+      };
+    }
+
+    const result = await updateVerificationStatus(validationResult.data);
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to update verification status',
     };
   }
 }

@@ -31,10 +31,13 @@ import {
   adminSetPasswordSchema,
   revokeSessionSchema,
   revokeUserSessionsSchema,
+  updateUserBasicInfoSchema,
+  updateUserStatusSchema,
 } from '@/lib/validations/admin';
 
 // Import types from centralized validation schemas
 import type { CreateUserInput, UpdateUserInput } from '@/lib/validations';
+import type { ActionResult } from '@/lib/types/api';
 
 // Helper function to get authenticated admin session with API key validation
 async function getAdminSession() {
@@ -927,6 +930,217 @@ export async function getUserStats() {
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to get user stats',
+    };
+  }
+}
+
+// =============================================
+// FORMDATA WRAPPER ACTIONS FOR USEACTIONSTATE
+// =============================================
+
+/**
+ * Update user basic info - FormData version for useActionState
+ */
+export async function updateUserBasicInfoAction(
+  prevState: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    const userId = formData.get('userId');
+
+    if (!userId) {
+      return {
+        success: false,
+        error: 'User ID is required',
+      };
+    }
+
+    // Parse FormData
+    const rawData = {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      username: formData.get('username') as string,
+      displayName: formData.get('displayName') as string,
+      firstName: formData.get('firstName') as string,
+      lastName: formData.get('lastName') as string,
+    };
+
+    // Validate using imported schema (omit userId as it's passed separately)
+    const validationResult = updateUserBasicInfoSchema.omit({ userId: true }).safeParse(rawData);
+
+    if (!validationResult.success) {
+      console.error('User basic info validation errors:', validationResult.error);
+      return {
+        success: false,
+        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+      };
+    }
+
+    const result = await updateUserBasicInfo({
+      userId: userId as string,
+      ...validationResult.data,
+    });
+
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update user basic info',
+    };
+  }
+}
+
+/**
+ * Update user status - FormData version for useActionState
+ */
+export async function updateUserStatusAction(
+  prevState: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    const userId = formData.get('userId');
+
+    if (!userId) {
+      return {
+        success: false,
+        error: 'User ID is required',
+      };
+    }
+
+    // Parse FormData
+    const rawData = {
+      role: formData.get('role') as string,
+      type: formData.get('type') as string,
+      step: formData.get('step') as string,
+      emailVerified: formData.get('emailVerified') === 'true',
+      confirmed: formData.get('confirmed') === 'true',
+      blocked: formData.get('blocked') === 'true',
+    };
+
+    // Validate using imported schema (omit userId as it's passed separately)
+    const validationResult = updateUserStatusSchema.omit({ userId: true }).safeParse(rawData);
+
+    if (!validationResult.success) {
+      console.error('User status validation errors:', validationResult.error);
+      return {
+        success: false,
+        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+      };
+    }
+
+    // Handle role separately if provided (Better Auth API requirement)
+    if (validationResult.data.role) {
+      const roleResult = await setUserRole({
+        userId: userId as string,
+        role: validationResult.data.role as any,
+      });
+
+      if (!roleResult.success) {
+        return roleResult;
+      }
+    }
+
+    // Update other status fields (excluding role which was handled above)
+    const { role, ...statusData } = validationResult.data;
+    const result = await updateUserStatus({
+      userId: userId as string,
+      ...statusData,
+    });
+
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update user status',
+    };
+  }
+}
+
+/**
+ * Update user ban status - FormData version for useActionState
+ */
+export async function updateUserBanAction(
+  prevState: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    const userId = formData.get('userId');
+
+    if (!userId) {
+      return {
+        success: false,
+        error: 'User ID is required',
+      };
+    }
+
+    // Parse FormData
+    const banned = formData.get('banned') === 'true';
+    const rawData: any = {
+      banReason: formData.get('banReason') as string,
+    };
+
+    // Validate ban reason
+    if (banned && !rawData.banReason) {
+      return {
+        success: false,
+        error: 'Ban reason is required when banning a user',
+      };
+    }
+
+    // Calculate ban expiry
+    let banExpires: Date | null = null;
+    const isPermanent = formData.get('isPermanent') === 'true';
+    const banDuration = formData.get('banDuration');
+
+    if (banned && !isPermanent && banDuration) {
+      banExpires = new Date(Date.now() + Number(banDuration) * 24 * 60 * 60 * 1000);
+    }
+
+    const result = await updateUserBanStatus({
+      userId: userId as string,
+      banned,
+      banReason: rawData.banReason || null,
+      banExpires,
+    });
+
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update user ban status',
+    };
+  }
+}
+
+/**
+ * Update user image - FormData version for useActionState
+ */
+export async function updateUserImageAction(
+  prevState: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    const userId = formData.get('userId');
+
+    if (!userId) {
+      return {
+        success: false,
+        error: 'User ID is required',
+      };
+    }
+
+    const image = formData.get('image') as string | null;
+
+    const result = await updateUserImage({
+      userId: userId as string,
+      image,
+    });
+
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update user image',
     };
   }
 }

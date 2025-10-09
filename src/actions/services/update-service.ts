@@ -23,10 +23,10 @@ import {
 async function invalidateServiceCaches(params: {
   serviceId: number;
   slug: string | null;
-  pid: number;
+  pid: string;
   category: string;
   userId: string;
-  profileId: number;
+  profileId: string;
   profileUsername: string | null;
 }) {
   const { serviceId, slug, pid, category, userId, profileId, profileUsername } =
@@ -36,7 +36,7 @@ async function invalidateServiceCaches(params: {
   const serviceTags = getServiceTags({
     id: serviceId,
     slug,
-    pid: String(pid),
+    pid,
     category,
   });
   serviceTags.forEach((tag) => revalidateTag(tag));
@@ -148,10 +148,10 @@ export async function updateServiceMedia(
     await invalidateServiceCaches({
       serviceId: updatedService.id,
       slug: updatedService.slug,
-      pid: Number(updatedService.pid),
+      pid: updatedService.pid,
       category: updatedService.category,
       userId: session.user.id,
-      profileId: Number(profile.id),
+      profileId: profile.id,
       profileUsername: updatedService.profile?.username || null,
     });
 
@@ -310,10 +310,10 @@ export async function updateServiceInfo(
     await invalidateServiceCaches({
       serviceId: updatedService.id,
       slug: updatedService.slug,
-      pid: Number(updatedService.pid),
+      pid: updatedService.pid,
       category: updatedService.category,
       userId: session.user.id,
-      profileId: Number(profile.id),
+      profileId: profile.id,
       profileUsername: updatedService.profile?.username || null,
     });
 

@@ -22,8 +22,12 @@ import {
   type AdminUpdateServiceStatusInput,
   type AdminDeleteServiceInput,
 } from '@/lib/validations/admin';
-import { updateServiceMediaSchema, type UpdateServiceMediaInput } from '@/lib/validations/service';
-import type { ActionResult } from '@/lib/types/common';
+import {
+  updateServiceMediaSchema,
+  createServiceSchema,
+  type UpdateServiceMediaInput
+} from '@/lib/validations/service';
+import type { ActionResult } from '@/lib/types/api';
 
 // Helper function to get authenticated admin session
 async function getAdminSession() {
@@ -51,10 +55,10 @@ async function getAdminSession() {
 async function invalidateServiceCaches(params: {
   serviceId: number;
   slug: string | null;
-  pid: number;
+  pid: string;
   category: string;
   userId: string;
-  profileId: number;
+  profileId: string;
   profileUsername: string | null;
 }) {
   const { serviceId, slug, pid, category, userId, profileId, profileUsername } =
@@ -395,10 +399,10 @@ export async function updateService(params: AdminUpdateServiceInput) {
     await invalidateServiceCaches({
       serviceId: updatedService.id,
       slug: updatedService.slug,
-      pid: Number(updatedService.pid),
+      pid: updatedService.pid,
       category: updatedService.category,
       userId: updatedService.profile.uid,
-      profileId: Number(updatedService.profile.id),
+      profileId: updatedService.profile.id,
       profileUsername: updatedService.profile.username,
     });
 
@@ -419,6 +423,332 @@ export async function updateService(params: AdminUpdateServiceInput) {
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update service',
+    };
+  }
+}
+
+/**
+ * Update service taxonomy - FormData version for useActionState
+ */
+export async function updateServiceTaxonomyAction(
+  prevState: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    const serviceId = formData.get('serviceId');
+
+    if (!serviceId) {
+      return {
+        success: false,
+        error: 'Service ID is required',
+      };
+    }
+
+    // Parse FormData
+    const rawData = {
+      category: formData.get('category') as string,
+      subcategory: formData.get('subcategory') as string,
+      subdivision: formData.get('subdivision') as string,
+      tags: formData.get('tags') ? JSON.parse(formData.get('tags') as string) : [],
+    };
+
+    // Validate using dashboard schema
+    const taxonomySchema = createServiceSchema.pick({
+      category: true,
+      subcategory: true,
+      subdivision: true,
+      tags: true,
+    });
+
+    const validationResult = taxonomySchema.safeParse(rawData);
+
+    if (!validationResult.success) {
+      console.error('Taxonomy validation errors:', validationResult.error);
+      return {
+        success: false,
+        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+      };
+    }
+
+    const result = await updateService({
+      serviceId: Number(serviceId),
+      ...validationResult.data,
+    });
+
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update service taxonomy',
+    };
+  }
+}
+
+/**
+ * Update service basic info - FormData version for useActionState
+ */
+export async function updateServiceBasicAction(
+  prevState: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    const serviceId = formData.get('serviceId');
+
+    if (!serviceId) {
+      return {
+        success: false,
+        error: 'Service ID is required',
+      };
+    }
+
+    // Parse FormData
+    const rawData = {
+      title: formData.get('title') as string,
+      description: formData.get('description') as string,
+    };
+
+    // Validate using dashboard schema
+    const basicSchema = createServiceSchema.pick({
+      title: true,
+      description: true,
+    });
+
+    const validationResult = basicSchema.safeParse(rawData);
+
+    if (!validationResult.success) {
+      console.error('Basic info validation errors:', validationResult.error);
+      return {
+        success: false,
+        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+      };
+    }
+
+    const result = await updateService({
+      serviceId: Number(serviceId),
+      ...validationResult.data,
+    });
+
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update service basic info',
+    };
+  }
+}
+
+/**
+ * Update service pricing - FormData version for useActionState
+ */
+export async function updateServicePricingAction(
+  prevState: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    const serviceId = formData.get('serviceId');
+
+    if (!serviceId) {
+      return {
+        success: false,
+        error: 'Service ID is required',
+      };
+    }
+
+    // Parse FormData
+    const rawData: any = {
+      price: formData.get('price') ? Number(formData.get('price')) : undefined,
+      fixed: formData.get('fixed') === 'true',
+      duration: formData.get('duration') ? Number(formData.get('duration')) : undefined,
+    };
+
+    // Add subscriptionType if present
+    if (formData.get('subscriptionType')) {
+      rawData.subscriptionType = formData.get('subscriptionType');
+    }
+
+    // Validate using dashboard schema
+    const pricingSchema = createServiceSchema.pick({
+      price: true,
+      fixed: true,
+      duration: true,
+      subscriptionType: true,
+    });
+
+    const validationResult = pricingSchema.safeParse(rawData);
+
+    if (!validationResult.success) {
+      console.error('Pricing validation errors:', validationResult.error);
+      return {
+        success: false,
+        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+      };
+    }
+
+    const result = await updateService({
+      serviceId: Number(serviceId),
+      ...validationResult.data,
+    });
+
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update service pricing',
+    };
+  }
+}
+
+/**
+ * Update service settings - FormData version for useActionState
+ */
+export async function updateServiceSettingsAction(
+  prevState: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    const serviceId = formData.get('serviceId');
+
+    if (!serviceId) {
+      return {
+        success: false,
+        error: 'Service ID is required',
+      };
+    }
+
+    // Parse FormData
+    const rawData = {
+      status: formData.get('status') as any,
+      featured: formData.get('featured') === 'true',
+    };
+
+    // Validate using admin schema (status and featured are admin-only fields)
+    const settingsSchema = adminUpdateServiceSchema.pick({
+      status: true,
+      featured: true,
+    });
+
+    const validationResult = settingsSchema.safeParse(rawData);
+
+    if (!validationResult.success) {
+      console.error('Settings validation errors:', validationResult.error);
+      return {
+        success: false,
+        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+      };
+    }
+
+    const result = await updateService({
+      serviceId: Number(serviceId),
+      ...validationResult.data,
+    });
+
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update service settings',
+    };
+  }
+}
+
+/**
+ * Update service addons - FormData version for useActionState
+ */
+export async function updateServiceAddonsAction(
+  prevState: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    const serviceId = formData.get('serviceId');
+
+    if (!serviceId) {
+      return {
+        success: false,
+        error: 'Service ID is required',
+      };
+    }
+
+    // Parse FormData
+    const rawData = {
+      addons: formData.get('addons') ? JSON.parse(formData.get('addons') as string) : [],
+    };
+
+    // Validate using dashboard schema
+    const addonsSchema = createServiceSchema.pick({
+      addons: true,
+    });
+
+    const validationResult = addonsSchema.safeParse(rawData);
+
+    if (!validationResult.success) {
+      console.error('Addons validation errors:', validationResult.error);
+      return {
+        success: false,
+        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+      };
+    }
+
+    const result = await updateService({
+      serviceId: Number(serviceId),
+      ...validationResult.data,
+    });
+
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update service addons',
+    };
+  }
+}
+
+/**
+ * Update service FAQ - FormData version for useActionState
+ */
+export async function updateServiceFaqAction(
+  prevState: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    const serviceId = formData.get('serviceId');
+
+    if (!serviceId) {
+      return {
+        success: false,
+        error: 'Service ID is required',
+      };
+    }
+
+    // Parse FormData
+    const rawData = {
+      faq: formData.get('faq') ? JSON.parse(formData.get('faq') as string) : [],
+    };
+
+    // Validate using dashboard schema
+    const faqSchema = createServiceSchema.pick({
+      faq: true,
+    });
+
+    const validationResult = faqSchema.safeParse(rawData);
+
+    if (!validationResult.success) {
+      console.error('FAQ validation errors:', validationResult.error);
+      return {
+        success: false,
+        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+      };
+    }
+
+    const result = await updateService({
+      serviceId: Number(serviceId),
+      ...validationResult.data,
+    });
+
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update service FAQ',
     };
   }
 }
@@ -548,10 +878,10 @@ export async function togglePublished(params: AdminToggleServiceInput) {
     await invalidateServiceCaches({
       serviceId: updatedService.id,
       slug: updatedService.slug,
-      pid: Number(updatedService.pid),
+      pid: updatedService.pid,
       category: updatedService.category,
       userId: updatedService.profile.uid,
-      profileId: Number(updatedService.profile.id),
+      profileId: updatedService.profile.id,
       profileUsername: updatedService.profile.username,
     });
 
@@ -616,10 +946,10 @@ export async function toggleFeatured(params: AdminToggleServiceInput) {
     await invalidateServiceCaches({
       serviceId: updatedService.id,
       slug: updatedService.slug,
-      pid: Number(updatedService.pid),
+      pid: updatedService.pid,
       category: updatedService.category,
       userId: updatedService.profile.uid,
-      profileId: Number(updatedService.profile.id),
+      profileId: updatedService.profile.id,
       profileUsername: updatedService.profile.username,
     });
 
@@ -690,10 +1020,10 @@ export async function updateServiceStatus(
     await invalidateServiceCaches({
       serviceId: updatedService.id,
       slug: updatedService.slug,
-      pid: Number(updatedService.pid),
+      pid: updatedService.pid,
       category: updatedService.category,
       userId: updatedService.profile.uid,
-      profileId: Number(updatedService.profile.id),
+      profileId: updatedService.profile.id,
       profileUsername: updatedService.profile.username,
     });
 
@@ -752,10 +1082,10 @@ export async function deleteService(params: AdminDeleteServiceInput) {
     await invalidateServiceCaches({
       serviceId: service.id,
       slug: service.slug,
-      pid: Number(service.pid),
+      pid: service.pid,
       category: service.category,
       userId: service.profile.uid,
-      profileId: Number(service.profile.id),
+      profileId: service.profile.id,
       profileUsername: service.profile.username,
     });
 
