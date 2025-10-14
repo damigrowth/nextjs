@@ -1,48 +1,112 @@
+// Generated on 2025-10-13T11:46:20.898Z
+// All data is sorted alphabetically by label
+// Flat list of tags
+
 export const tags = [
   {
-    id: '1304',
-    slug: 'seo-audit',
-    label: 'SEO Audit',
+    id: '23',
+    slug: '2d-animation',
+    label: '2D Animation',
   },
   {
-    id: '1305',
-    slug: 'dok',
-    label: 'Δοκ',
+    id: '24',
+    slug: '3d-animation',
+    label: '3D Animation',
   },
   {
-    id: '1306',
-    slug: 'anakataskeui-istoselidon',
-    label: 'Ανακατασκευή Ιστοσελίδων',
+    id: '25',
+    slug: '3d-cad',
+    label: '3D CAD',
   },
   {
-    id: '1307',
-    slug: 'redesign-website',
-    label: 'Redesign website',
+    id: '26',
+    slug: '3d-rendering',
+    label: '3D Rendering',
   },
   {
-    id: '1308',
-    slug: 'wordpress-service',
-    label: 'WordPress Service',
+    id: '28',
+    slug: '3ds-max',
+    label: '3ds Max',
   },
   {
-    id: '195',
-    slug: 'gps',
-    label: 'GPS',
+    id: '27',
+    slug: '3d-ektuposi',
+    label: '3D Εκτύπωση',
   },
   {
-    id: '375',
-    slug: 'ux',
-    label: 'UX',
+    id: '29',
+    slug: 'actionscript',
+    label: 'ActionScript',
   },
   {
-    id: '1281',
-    slug: 'psifiaki-texni',
-    label: 'Ψηφιακή Τέχνη',
+    id: '31',
+    slug: 'activecampaign',
+    label: 'ActiveCampaign',
   },
   {
-    id: '1282',
-    slug: 'psifiakos-sxediasmos',
-    label: 'Ψηφιακός Σχεδιασμός',
+    id: '30',
+    slug: 'active-directory',
+    label: 'Active Directory',
+  },
+  {
+    id: '32',
+    slug: 'adobe-flash',
+    label: 'Adobe Flash',
+  },
+  {
+    id: '33',
+    slug: 'adobe-illustrator',
+    label: 'Adobe Illustrator',
+  },
+  {
+    id: '34',
+    slug: 'adobe-indesign',
+    label: 'Adobe InDesign',
+  },
+  {
+    id: '35',
+    slug: 'adobe-lightroom',
+    label: 'Adobe Lightroom',
+  },
+  {
+    id: '36',
+    slug: 'adobe-photoshop',
+    label: 'Adobe Photoshop',
+  },
+  {
+    id: '37',
+    slug: 'adobe-premiere-pro',
+    label: 'Adobe Premiere Pro',
+  },
+  {
+    id: '38',
+    slug: 'affiliate-marketing',
+    label: 'Affiliate Marketing',
+  },
+  {
+    id: '39',
+    slug: 'after-effects',
+    label: 'After Effects',
+  },
+  {
+    id: '40',
+    slug: 'agile-diaxeirisi-ergon',
+    label: 'Agile Διαχείριση Έργων',
+  },
+  {
+    id: '41',
+    slug: 'ai',
+    label: 'AI',
+  },
+  {
+    id: '44',
+    slug: 'ai-design',
+    label: 'AI Design',
+  },
+  {
+    id: '45',
+    slug: 'ajax',
+    label: 'AJAX',
   },
   {
     id: '46',
@@ -135,11 +199,6 @@ export const tags = [
     label: 'Apple Safari',
   },
   {
-    id: '64',
-    slug: 'ar-vr-3d-antikeimena',
-    label: 'AR / VR 3D Αντικείμενα',
-  },
-  {
     id: '65',
     slug: 'arduino',
     label: 'Arduino',
@@ -150,124 +209,14 @@ export const tags = [
     label: 'Articulate Storyline',
   },
   {
-    id: '22',
-    slug: 'net',
-    label: '.NET',
-  },
-  {
-    id: '23',
-    slug: '2d-animation',
-    label: '2D Animation',
-  },
-  {
-    id: '24',
-    slug: '3d-animation',
-    label: '3D Animation',
-  },
-  {
-    id: '25',
-    slug: '3d-cad',
-    label: '3D CAD',
-  },
-  {
-    id: '26',
-    slug: '3d-rendering',
-    label: '3D Rendering',
-  },
-  {
-    id: '27',
-    slug: '3d-ektuposi',
-    label: '3D Εκτύπωση',
-  },
-  {
-    id: '28',
-    slug: '3ds-max',
-    label: '3ds Max',
-  },
-  {
-    id: '29',
-    slug: 'actionscript',
-    label: 'ActionScript',
-  },
-  {
-    id: '30',
-    slug: 'active-directory',
-    label: 'Active Directory',
-  },
-  {
-    id: '31',
-    slug: 'activecampaign',
-    label: 'ActiveCampaign',
-  },
-  {
-    id: '32',
-    slug: 'adobe-flash',
-    label: 'Adobe Flash',
-  },
-  {
-    id: '33',
-    slug: 'adobe-illustrator',
-    label: 'Adobe Illustrator',
-  },
-  {
-    id: '34',
-    slug: 'adobe-indesign',
-    label: 'Adobe InDesign',
-  },
-  {
-    id: '35',
-    slug: 'adobe-lightroom',
-    label: 'Adobe Lightroom',
-  },
-  {
-    id: '36',
-    slug: 'adobe-photoshop',
-    label: 'Adobe Photoshop',
-  },
-  {
-    id: '37',
-    slug: 'adobe-premiere-pro',
-    label: 'Adobe Premiere Pro',
-  },
-  {
-    id: '38',
-    slug: 'affiliate-marketing',
-    label: 'Affiliate Marketing',
-  },
-  {
-    id: '39',
-    slug: 'after-effects',
-    label: 'After Effects',
-  },
-  {
-    id: '40',
-    slug: 'agile-diaxeirisi-ergon',
-    label: 'Agile Διαχείριση Έργων',
-  },
-  {
-    id: '41',
-    slug: 'ai',
-    label: 'AI',
-  },
-  {
     id: '42',
     slug: 'artificial-intelligence',
     label: 'Artificial Intelligence',
   },
   {
-    id: '43',
-    slug: 'texniti-noimosuni',
-    label: 'Τεχνητή Νοημοσύνη',
-  },
-  {
-    id: '44',
-    slug: 'ai-design',
-    label: 'AI Design',
-  },
-  {
-    id: '45',
-    slug: 'ajax',
-    label: 'AJAX',
+    id: '64',
+    slug: 'ar-vr-3d-antikeimena',
+    label: 'AR / VR 3D Αντικείμενα',
   },
   {
     id: '67',
@@ -295,6 +244,11 @@ export const tags = [
     label: 'Atlassian Jira',
   },
   {
+    id: '738',
+    slug: 'audiovisual',
+    label: 'Audiovisual',
+  },
+  {
     id: '72',
     slug: 'autocad',
     label: 'AutoCAD',
@@ -308,31 +262,6 @@ export const tags = [
     id: '74',
     slug: 'autodesk-fusion-360',
     label: 'Autodesk Fusion 360',
-  },
-  {
-    id: '1283',
-    slug: 'psuxagogia-ekdiloseon',
-    label: 'Ψυχαγωγία Εκδηλώσεων',
-  },
-  {
-    id: '1295',
-    slug: 'plugin-development',
-    label: 'plugin development',
-  },
-  {
-    id: '1296',
-    slug: 'wordpress-plugin-development',
-    label: 'Wordpress Plugin Development',
-  },
-  {
-    id: '1297',
-    slug: 'wordpress-plugin',
-    label: 'Wordpress Plugin',
-  },
-  {
-    id: '1298',
-    slug: 'react-plugin-development',
-    label: 'React Plugin Development',
   },
   {
     id: '75',
@@ -460,11 +389,6 @@ export const tags = [
     label: 'Chatbot',
   },
   {
-    id: '100',
-    slug: 'gemini-ai',
-    label: 'Gemini AI',
-  },
-  {
     id: '101',
     slug: 'chatgpt',
     label: 'ChatGPT',
@@ -505,19 +429,24 @@ export const tags = [
     label: 'Codeigniter',
   },
   {
+    id: '981',
+    slug: 'coding',
+    label: 'Coding',
+  },
+  {
     id: '109',
     slug: 'copywriting',
     label: 'Copywriting',
   },
   {
-    id: '110',
-    slug: 'core-php',
-    label: 'Core PHP',
-  },
-  {
     id: '111',
     slug: 'corel-draw',
     label: 'Corel Draw',
+  },
+  {
+    id: '110',
+    slug: 'core-php',
+    label: 'Core PHP',
   },
   {
     id: '112',
@@ -563,6 +492,26 @@ export const tags = [
     id: '120',
     slug: 'dart',
     label: 'Dart',
+  },
+  {
+    id: '420',
+    slug: 'data-analysis',
+    label: 'Data Analysis',
+  },
+  {
+    id: '571',
+    slug: 'database-management',
+    label: 'Database Management',
+  },
+  {
+    id: '690',
+    slug: 'data-mining',
+    label: 'Data Mining',
+  },
+  {
+    id: '691',
+    slug: 'data-scraping',
+    label: 'Data Scraping',
   },
   {
     id: '121',
@@ -635,14 +584,14 @@ export const tags = [
     label: 'Docker Compose',
   },
   {
-    id: '135',
-    slug: 'drone-video',
-    label: 'Drone Video',
-  },
-  {
     id: '136',
     slug: 'drones',
     label: 'Drones',
+  },
+  {
+    id: '135',
+    slug: 'drone-video',
+    label: 'Drone Video',
   },
   {
     id: '137',
@@ -745,11 +694,6 @@ export const tags = [
     label: 'Facebook API',
   },
   {
-    id: '236',
-    slug: 'lua',
-    label: 'Lua',
-  },
-  {
     id: '157',
     slug: 'facebook-marketing',
     label: 'Facebook Marketing',
@@ -818,6 +762,11 @@ export const tags = [
     id: '170',
     slug: 'fusion-360',
     label: 'Fusion 360',
+  },
+  {
+    id: '100',
+    slug: 'gemini-ai',
+    label: 'Gemini AI',
   },
   {
     id: '171',
@@ -940,6 +889,11 @@ export const tags = [
     label: 'Google Shopping',
   },
   {
+    id: '195',
+    slug: 'gps',
+    label: 'GPS',
+  },
+  {
     id: '196',
     slug: 'gpt',
     label: 'GPT',
@@ -1055,11 +1009,6 @@ export const tags = [
     label: 'Java',
   },
   {
-    id: '219',
-    slug: 'java-spring',
-    label: 'Java Spring',
-  },
-  {
     id: '220',
     slug: 'javafx',
     label: 'JavaFX',
@@ -1068,6 +1017,11 @@ export const tags = [
     id: '221',
     slug: 'javascript',
     label: 'JavaScript',
+  },
+  {
+    id: '219',
+    slug: 'java-spring',
+    label: 'Java Spring',
   },
   {
     id: '222',
@@ -1125,6 +1079,16 @@ export const tags = [
     label: 'Leads',
   },
   {
+    id: '1015',
+    slug: 'life-coaching',
+    label: 'Life Coaching',
+  },
+  {
+    id: '1167',
+    slug: 'lighting-design',
+    label: 'Lighting Design',
+  },
+  {
     id: '233',
     slug: 'link-building',
     label: 'Link Building',
@@ -1140,14 +1104,19 @@ export const tags = [
     label: 'Linux',
   },
   {
-    id: '237',
-    slug: 'mac-os',
-    label: 'Mac OS',
+    id: '236',
+    slug: 'lua',
+    label: 'Lua',
   },
   {
     id: '238',
     slug: 'machine-learning',
     label: 'Machine Learning',
+  },
+  {
+    id: '237',
+    slug: 'mac-os',
+    label: 'Mac OS',
   },
   {
     id: '239',
@@ -1325,6 +1294,11 @@ export const tags = [
     label: 'Nest.js',
   },
   {
+    id: '22',
+    slug: 'net',
+    label: '.NET',
+  },
+  {
     id: '274',
     slug: 'newsletters',
     label: 'Newsletters',
@@ -1430,9 +1404,19 @@ export const tags = [
     label: 'Perl',
   },
   {
+    id: '1016',
+    slug: 'personal-development',
+    label: 'Personal Development',
+  },
+  {
     id: '295',
     slug: 'phonegap',
     label: 'PhoneGap',
+  },
+  {
+    id: '1301',
+    slug: 'photography',
+    label: 'Photography',
   },
   {
     id: '296',
@@ -1470,6 +1454,11 @@ export const tags = [
     label: 'Plesk',
   },
   {
+    id: '1295',
+    slug: 'plugin-development',
+    label: 'plugin development',
+  },
+  {
     id: '303',
     slug: 'podcast',
     label: 'Podcast',
@@ -1480,6 +1469,11 @@ export const tags = [
     label: 'PostgreSQL',
   },
   {
+    id: '307',
+    slug: 'powerapps',
+    label: 'PowerApps',
+  },
+  {
     id: '305',
     slug: 'power-automate',
     label: 'Power Automate',
@@ -1488,11 +1482,6 @@ export const tags = [
     id: '306',
     slug: 'power-bi',
     label: 'Power BI',
-  },
-  {
-    id: '307',
-    slug: 'powerapps',
-    label: 'PowerApps',
   },
   {
     id: '308',
@@ -1508,6 +1497,11 @@ export const tags = [
     id: '310',
     slug: 'prezi',
     label: 'Prezi',
+  },
+  {
+    id: '577',
+    slug: 'project-management',
+    label: 'Project Management',
   },
   {
     id: '311',
@@ -1535,19 +1529,9 @@ export const tags = [
     label: 'QlikView',
   },
   {
-    id: '316',
-    slug: 'r-programming-language',
-    label: 'R Programming Language',
-  },
-  {
     id: '317',
     slug: 'raspberry-pi',
     label: 'Raspberry Pi',
-  },
-  {
-    id: '318',
-    slug: 'react-native',
-    label: 'React Native',
   },
   {
     id: '319',
@@ -1558,6 +1542,21 @@ export const tags = [
     id: '320',
     slug: 'reactjs-framework',
     label: 'React.js Framework',
+  },
+  {
+    id: '318',
+    slug: 'react-native',
+    label: 'React Native',
+  },
+  {
+    id: '1298',
+    slug: 'react-plugin-development',
+    label: 'React Plugin Development',
+  },
+  {
+    id: '1307',
+    slug: 'redesign-website',
+    label: 'Redesign website',
   },
   {
     id: '321',
@@ -1578,6 +1577,11 @@ export const tags = [
     id: '324',
     slug: 'restful-api',
     label: 'RESTful API',
+  },
+  {
+    id: '316',
+    slug: 'r-programming-language',
+    label: 'R Programming Language',
   },
   {
     id: '325',
@@ -1630,6 +1634,16 @@ export const tags = [
     label: 'Scrapy',
   },
   {
+    id: '1081',
+    slug: 'script-writing',
+    label: 'Script Writing',
+  },
+  {
+    id: '338',
+    slug: 'search-engine-marketing',
+    label: 'Search Engine Marketing',
+  },
+  {
     id: '335',
     slug: 'selenium',
     label: 'Selenium',
@@ -1645,14 +1659,14 @@ export const tags = [
     label: 'SEM',
   },
   {
-    id: '338',
-    slug: 'search-engine-marketing',
-    label: 'Search Engine Marketing',
-  },
-  {
     id: '339',
     slug: 'seo',
     label: 'SEO',
+  },
+  {
+    id: '1304',
+    slug: 'seo-audit',
+    label: 'SEO Audit',
   },
   {
     id: '340',
@@ -1735,6 +1749,16 @@ export const tags = [
     label: 'Stripe',
   },
   {
+    id: '1054',
+    slug: 'structural-engineering',
+    label: 'Structural Engineering',
+  },
+  {
+    id: '1241',
+    slug: 'support',
+    label: 'Support',
+  },
+  {
     id: '356',
     slug: 'swift',
     label: 'Swift',
@@ -1753,6 +1777,11 @@ export const tags = [
     id: '359',
     slug: 'tailwind-css',
     label: 'Tailwind CSS',
+  },
+  {
+    id: '1182',
+    slug: 'technical-support',
+    label: 'Technical Support',
   },
   {
     id: '360',
@@ -1830,6 +1859,11 @@ export const tags = [
     label: 'User Interface',
   },
   {
+    id: '375',
+    slug: 'ux',
+    label: 'UX',
+  },
+  {
     id: '376',
     slug: 'vbnet',
     label: 'VB.NET',
@@ -1838,6 +1872,26 @@ export const tags = [
     id: '377',
     slug: 'verilog-vhdl',
     label: 'Verilog / VHDL',
+  },
+  {
+    id: '704',
+    slug: 'video',
+    label: 'Video',
+  },
+  {
+    id: '558',
+    slug: 'video-ads',
+    label: 'Video Ads',
+  },
+  {
+    id: '1033',
+    slug: 'video-broadcasting',
+    label: 'Video Broadcasting',
+  },
+  {
+    id: '1034',
+    slug: 'video-streaming',
+    label: 'Video Streaming',
   },
   {
     id: '378',
@@ -1875,19 +1929,24 @@ export const tags = [
     label: 'Vue.js Framework',
   },
   {
-    id: '385',
-    slug: 'web-scraping',
-    label: 'Web Scraping',
-  },
-  {
     id: '386',
     slug: 'web3js',
     label: 'Web3.js',
   },
   {
+    id: '441',
+    slug: 'web-development',
+    label: 'Web Development',
+  },
+  {
     id: '387',
     slug: 'webflow',
     label: 'Webflow',
+  },
+  {
+    id: '385',
+    slug: 'web-scraping',
+    label: 'Web Scraping',
   },
   {
     id: '388',
@@ -1938,6 +1997,21 @@ export const tags = [
     id: '397',
     slug: 'wordpress',
     label: 'WordPress',
+  },
+  {
+    id: '1297',
+    slug: 'wordpress-plugin',
+    label: 'Wordpress Plugin',
+  },
+  {
+    id: '1296',
+    slug: 'wordpress-plugin-development',
+    label: 'Wordpress Plugin Development',
+  },
+  {
+    id: '1308',
+    slug: 'wordpress-service',
+    label: 'WordPress Service',
   },
   {
     id: '398',
@@ -2035,6 +2109,11 @@ export const tags = [
     label: 'Ανακαίνιση',
   },
   {
+    id: '1306',
+    slug: 'anakataskeui-istoselidon',
+    label: 'Ανακατασκευή Ιστοσελίδων',
+  },
+  {
     id: '417',
     slug: 'anaktisi',
     label: 'Ανάκτηση',
@@ -2048,11 +2127,6 @@ export const tags = [
     id: '419',
     slug: 'analusi-dedomenon',
     label: 'Ανάλυση Δεδομένων',
-  },
-  {
-    id: '420',
-    slug: 'data-analysis',
-    label: 'Data Analysis',
   },
   {
     id: '421',
@@ -2155,11 +2229,6 @@ export const tags = [
     label: 'Ανάπτυξη Ιστοσελίδων',
   },
   {
-    id: '441',
-    slug: 'web-development',
-    label: 'Web Development',
-  },
-  {
     id: '442',
     slug: 'anaptuxi-kinoumenon-vinteo',
     label: 'Ανάπτυξη Κινούμενων Βίντεο',
@@ -2238,11 +2307,6 @@ export const tags = [
     id: '457',
     slug: 'apeikonisi',
     label: 'Απεικόνιση',
-  },
-  {
-    id: '458',
-    slug: 'kinezika',
-    label: 'Κινέζικα',
   },
   {
     id: '459',
@@ -2455,14 +2519,14 @@ export const tags = [
     label: 'Βίζα / Μετανάστευση',
   },
   {
-    id: '501',
-    slug: 'vinteo-epexigisis',
-    label: 'Βίντεο Επεξήγησης',
-  },
-  {
     id: '502',
     slug: 'vinteografisi',
     label: 'Βιντεογράφηση',
+  },
+  {
+    id: '501',
+    slug: 'vinteo-epexigisis',
+    label: 'Βίντεο Επεξήγησης',
   },
   {
     id: '503',
@@ -2740,11 +2804,6 @@ export const tags = [
     label: 'Διαφημίσεις Βίντεο',
   },
   {
-    id: '558',
-    slug: 'video-ads',
-    label: 'Video Ads',
-  },
-  {
     id: '559',
     slug: 'diafimisi',
     label: 'Διαφήμιση',
@@ -2805,11 +2864,6 @@ export const tags = [
     label: 'Διαχείριση Βάσεων Δεδομένων',
   },
   {
-    id: '571',
-    slug: 'database-management',
-    label: 'Database Management',
-  },
-  {
     id: '572',
     slug: 'diaxeirisi-dedomenon',
     label: 'Διαχείριση Δεδομένων',
@@ -2833,11 +2887,6 @@ export const tags = [
     id: '576',
     slug: 'diaxeirisi-ergon',
     label: 'Διαχείριση Έργων',
-  },
-  {
-    id: '577',
-    slug: 'project-management',
-    label: 'Project Management',
   },
   {
     id: '578',
@@ -2975,11 +3024,6 @@ export const tags = [
     label: 'Δίκαιο Ακινήτων',
   },
   {
-    id: '605',
-    slug: 'stegastiko-dikaio',
-    label: 'Στεγαστικό Δίκαιο',
-  },
-  {
     id: '606',
     slug: 'dikaio-pneumatikis-idioktisias',
     label: 'Δίκαιο Πνευματικής Ιδιοκτησίας',
@@ -3000,6 +3044,16 @@ export const tags = [
     label: 'Διοικητική Υποστήριξη',
   },
   {
+    id: '1248',
+    slug: 'dioikitiko-dikaio',
+    label: 'Διοικητικό Δίκαιο',
+  },
+  {
+    id: '1305',
+    slug: 'dok',
+    label: 'Δοκ',
+  },
+  {
     id: '610',
     slug: 'dokimes-kiniton-efarmogon',
     label: 'Δοκιμές Κινητών Εφαρμογών',
@@ -3010,11 +3064,6 @@ export const tags = [
     label: 'Δοκιμές Ποιότητας και Αξιοπιστίας',
   },
   {
-    id: '612',
-    slug: 'dokimi-poiotikos-elegxos',
-    label: 'Δοκιμή / Ποιοτικός Έλεγχος',
-  },
-  {
     id: '613',
     slug: 'dokimi-istoselidas',
     label: 'Δοκιμή Ιστοσελίδας',
@@ -3023,6 +3072,11 @@ export const tags = [
     id: '614',
     slug: 'dokimi-logismikou',
     label: 'Δοκιμή Λογισμικού',
+  },
+  {
+    id: '612',
+    slug: 'dokimi-poiotikos-elegxos',
+    label: 'Δοκιμή / Ποιοτικός Έλεγχος',
   },
   {
     id: '615',
@@ -3145,11 +3199,6 @@ export const tags = [
     label: 'Εκπαίδευση',
   },
   {
-    id: '639',
-    slug: 'ekpaideusi-didaskalia',
-    label: 'Εκπαίδευση & Διδασκαλία',
-  },
-  {
     id: '640',
     slug: 'ekpaideusi-montessori',
     label: 'Εκπαίδευση Montessori',
@@ -3188,6 +3237,11 @@ export const tags = [
     id: '647',
     slug: 'ekpaideusi-diaxeirisis-xronou',
     label: 'Εκπαίδευση Διαχείρισης Χρόνου',
+  },
+  {
+    id: '639',
+    slug: 'ekpaideusi-didaskalia',
+    label: 'Εκπαίδευση & Διδασκαλία',
   },
   {
     id: '648',
@@ -3400,16 +3454,6 @@ export const tags = [
     label: 'Εξεύρεση',
   },
   {
-    id: '690',
-    slug: 'data-mining',
-    label: 'Data Mining',
-  },
-  {
-    id: '691',
-    slug: 'data-scraping',
-    label: 'Data Scraping',
-  },
-  {
     id: '692',
     slug: 'extension-vlefaridon',
     label: 'Εξτένσιον Βλεφαρίδων',
@@ -3468,11 +3512,6 @@ export const tags = [
     id: '703',
     slug: 'epexergasia-vinteo',
     label: 'Επεξεργασία Βίντεο',
-  },
-  {
-    id: '704',
-    slug: 'video',
-    label: 'Video',
   },
   {
     id: '705',
@@ -3638,11 +3677,6 @@ export const tags = [
     id: '737',
     slug: 'ereuna-agoras',
     label: 'Έρευνα Αγοράς',
-  },
-  {
-    id: '738',
-    slug: 'audiovisual',
-    label: 'Audiovisual',
   },
   {
     id: '739',
@@ -3955,6 +3989,11 @@ export const tags = [
     label: 'Κέντρο Τηλεφωνικής Εξυπηρέτησης',
   },
   {
+    id: '458',
+    slug: 'kinezika',
+    label: 'Κινέζικα',
+  },
+  {
     id: '801',
     slug: 'kinimatografisi',
     label: 'Κινηματογράφηση',
@@ -4048,6 +4087,11 @@ export const tags = [
     id: '819',
     slug: 'logismiko-erp',
     label: 'Λογισμικό ERP',
+  },
+  {
+    id: '1188',
+    slug: 'logistika-vivlia',
+    label: 'Λογιστικά Βιβλία',
   },
   {
     id: '820',
@@ -4230,11 +4274,6 @@ export const tags = [
     label: 'Μαθήματα Πληροφορικής',
   },
   {
-    id: '909',
-    slug: 'nomikes-upiresies',
-    label: 'Νομικές Υπηρεσίες',
-  },
-  {
     id: '856',
     slug: 'mathimata-polemikon-texnon',
     label: 'Μαθήματα Πολεμικών Τεχνών',
@@ -4363,6 +4402,11 @@ export const tags = [
     id: '881',
     slug: 'metagennitiki-frontida',
     label: 'Μεταγεννητική Φροντίδα',
+  },
+  {
+    id: '1222',
+    slug: 'metakomisi',
+    label: 'Μετακόμιση',
   },
   {
     id: '882',
@@ -4498,6 +4542,11 @@ export const tags = [
     id: '908',
     slug: 'nomikes-sumvoules',
     label: 'Νομικές Συμβουλές',
+  },
+  {
+    id: '909',
+    slug: 'nomikes-upiresies',
+    label: 'Νομικές Υπηρεσίες',
   },
   {
     id: '910',
@@ -4855,11 +4904,6 @@ export const tags = [
     label: 'Προγραμματισμός',
   },
   {
-    id: '981',
-    slug: 'coding',
-    label: 'Coding',
-  },
-  {
     id: '982',
     slug: 'programmatismos-c',
     label: 'Προγραμματισμός C',
@@ -5025,16 +5069,6 @@ export const tags = [
     label: 'Προσωπική Ανάπτυξη',
   },
   {
-    id: '1015',
-    slug: 'life-coaching',
-    label: 'Life Coaching',
-  },
-  {
-    id: '1016',
-    slug: 'personal-development',
-    label: 'Personal Development',
-  },
-  {
     id: '1017',
     slug: 'prosopiki-kathodigisi',
     label: 'Προσωπική Καθοδήγηση',
@@ -5113,16 +5147,6 @@ export const tags = [
     id: '1032',
     slug: 'reflexologia',
     label: 'Ρεφλεξολογία',
-  },
-  {
-    id: '1033',
-    slug: 'video-broadcasting',
-    label: 'Video Broadcasting',
-  },
-  {
-    id: '1034',
-    slug: 'video-streaming',
-    label: 'Video Streaming',
   },
   {
     id: '1035',
@@ -5220,11 +5244,6 @@ export const tags = [
     label: 'Στατική Μηχανική',
   },
   {
-    id: '1054',
-    slug: 'structural-engineering',
-    label: 'Structural Engineering',
-  },
-  {
     id: '1055',
     slug: 'statistika',
     label: 'Στατιστικά',
@@ -5238,6 +5257,11 @@ export const tags = [
     id: '1057',
     slug: 'steganopoiisi',
     label: 'Στεγανοποίηση',
+  },
+  {
+    id: '605',
+    slug: 'stegastiko-dikaio',
+    label: 'Στεγαστικό Δίκαιο',
   },
   {
     id: '1058',
@@ -5353,11 +5377,6 @@ export const tags = [
     id: '1080',
     slug: 'sugrafi-senariou',
     label: 'Συγγραφή Σεναρίου',
-  },
-  {
-    id: '1081',
-    slug: 'script-writing',
-    label: 'Script Writing',
   },
   {
     id: '1082',
@@ -5785,11 +5804,6 @@ export const tags = [
     label: 'Σχεδιασμός Φωτισμού',
   },
   {
-    id: '1167',
-    slug: 'lighting-design',
-    label: 'Lighting Design',
-  },
-  {
     id: '1168',
     slug: 'sxediasmos-xartikon',
     label: 'Σχεδιασμός Χαρτικών',
@@ -5845,6 +5859,11 @@ export const tags = [
     label: 'Τέχνες & Χειροτεχνίες',
   },
   {
+    id: '43',
+    slug: 'texniti-noimosuni',
+    label: 'Τεχνητή Νοημοσύνη',
+  },
+  {
     id: '1179',
     slug: 'texniki-sugrafi',
     label: 'Τεχνική Συγγραφή',
@@ -5858,11 +5877,6 @@ export const tags = [
     id: '1181',
     slug: 'texniki-upostirixi',
     label: 'Τεχνική Υποστήριξη',
-  },
-  {
-    id: '1182',
-    slug: 'technical-support',
-    label: 'Technical Support',
   },
   {
     id: '1183',
@@ -5888,11 +5902,6 @@ export const tags = [
     id: '1187',
     slug: 'tirisi-vivlion',
     label: 'Τήρηση Βιβλίων',
-  },
-  {
-    id: '1188',
-    slug: 'logistika-vivlia',
-    label: 'Λογιστικά Βιβλία',
   },
   {
     id: '1189',
@@ -6060,11 +6069,6 @@ export const tags = [
     label: 'Υπηρεσίες Μετακόμισης',
   },
   {
-    id: '1222',
-    slug: 'metakomisi',
-    label: 'Μετακόμιση',
-  },
-  {
     id: '1223',
     slug: 'upiresies-misthodosias',
     label: 'Υπηρεσίες Μισθοδοσίας',
@@ -6115,6 +6119,11 @@ export const tags = [
     label: 'Υπολογιστικό Νέφος',
   },
   {
+    id: '1238',
+    slug: 'upostirixi',
+    label: 'Υποστήριξη',
+  },
+  {
     id: '1233',
     slug: 'upostirixi-ekdiloseon-epi-topou',
     label: 'Υποστήριξη Εκδηλώσεων Επί Τόπου',
@@ -6140,11 +6149,6 @@ export const tags = [
     label: 'Υποστήριξη Πελατών',
   },
   {
-    id: '1238',
-    slug: 'upostirixi',
-    label: 'Υποστήριξη',
-  },
-  {
     id: '1239',
     slug: 'upostirixi-proionton',
     label: 'Υποστήριξη Προϊόντων',
@@ -6153,11 +6157,6 @@ export const tags = [
     id: '1240',
     slug: 'upostirixi-sustimatos-ticketing',
     label: 'Υποστήριξη Συστήματος Ticketing',
-  },
-  {
-    id: '1241',
-    slug: 'support',
-    label: 'Support',
   },
   {
     id: '1242',
@@ -6188,11 +6187,6 @@ export const tags = [
     id: '1247',
     slug: 'forologiko-dikaio',
     label: 'Φορολογικό Δίκαιο',
-  },
-  {
-    id: '1248',
-    slug: 'dioikitiko-dikaio',
-    label: 'Διοικητικό Δίκαιο',
   },
   {
     id: '1249',
@@ -6355,8 +6349,18 @@ export const tags = [
     label: 'Χτένισμα',
   },
   {
-    id: '1301',
-    slug: 'photography',
-    label: 'Photography',
+    id: '1281',
+    slug: 'psifiaki-texni',
+    label: 'Ψηφιακή Τέχνη',
+  },
+  {
+    id: '1282',
+    slug: 'psifiakos-sxediasmos',
+    label: 'Ψηφιακός Σχεδιασμός',
+  },
+  {
+    id: '1283',
+    slug: 'psuxagogia-ekdiloseon',
+    label: 'Ψυχαγωγία Εκδηλώσεων',
   },
 ];
