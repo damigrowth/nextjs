@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 interface UsersPageProps {
   searchParams: Promise<{
     page?: string;
@@ -20,8 +22,6 @@ interface UsersPageProps {
     sortOrder?: string;
   }>;
 }
-
-export const dynamic = 'force-dynamic';
 
 export default async function UsersPage({ searchParams }: UsersPageProps) {
   // Await searchParams

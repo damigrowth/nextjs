@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { SiteHeader, AdminVerificationActions } from '@/components/admin';
 import { formatDate, formatTime } from '@/lib/utils/date';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }

@@ -19,7 +19,6 @@ import {
 import { SiteHeader } from '@/components/admin';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 
-// Force dynamic rendering for admin pages
 export const dynamic = 'force-dynamic';
 
 interface PageProps {

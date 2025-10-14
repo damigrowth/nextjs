@@ -15,6 +15,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { SiteHeader } from '@/components/admin';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }

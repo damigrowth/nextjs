@@ -25,32 +25,10 @@ import {
 import { CarouselPagination } from '@/components/ui/carousel-pagination';
 import { SectionHeader } from '@/components/ui/section-header';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-
-type ServiceTaxonomy = {
-  id: string;
-  label: string;
-  slug: string;
-  description: string;
-  icon: string;
-  featured: string;
-  children: {
-    id: string;
-    label: string;
-    slug: string;
-    description: string;
-    children?: {
-      id: string;
-      label: string;
-      slug: string;
-      description: string;
-    }[];
-    child_count: number;
-  }[];
-  child_count: number;
-};
+import { DatasetItem } from '@/lib/types/datasets';
 
 type Props = {
-  categories?: ServiceTaxonomy[];
+  categories?: DatasetItem[];
 };
 
 function getCategoryIcon(slug: string) {
@@ -70,7 +48,7 @@ function getCategoryIcon(slug: string) {
   return iconMap[slug] || <Star size={32} />;
 }
 
-function CategoryCard({ category }: { category: ServiceTaxonomy }) {
+function CategoryCard({ category }: { category: DatasetItem }) {
   const { label, slug, children } = category;
 
   return (

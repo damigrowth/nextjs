@@ -9,6 +9,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 interface VerificationsPageProps {
   searchParams: Promise<{
     page?: string;
@@ -19,8 +21,6 @@ interface VerificationsPageProps {
     sortOrder?: string;
   }>;
 }
-
-export const dynamic = 'force-dynamic';
 
 export default async function AdminVerificationsPage({
   searchParams,
