@@ -20,7 +20,10 @@ export interface TaxonomyFormWrapperProps<TFormData> {
   /**
    * Server action function
    */
-  action: (prevState: ActionResult | null, formData: FormData) => Promise<ActionResult>;
+  action: (
+    prevState: ActionResult | null,
+    formData: FormData,
+  ) => Promise<ActionResult>;
 
   /**
    * Default values for the form
@@ -89,7 +92,7 @@ export function TaxonomyFormWrapper<TFormData extends Record<string, any>>({
   const form = useForm<TFormData>({
     resolver: zodResolver(schema),
     mode: 'onChange',
-    defaultValues,
+    defaultValues: defaultValues as any,
   });
 
   // Handle state changes from server action

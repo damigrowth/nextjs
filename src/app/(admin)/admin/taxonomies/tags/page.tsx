@@ -6,6 +6,8 @@ import {
   AdminTagsTableSkeleton,
 } from '@/components/admin';
 
+export const dynamic = 'force-dynamic';
+
 const config: TaxonomyListPageConfig = {
   title: 'Tags',
   createPath: '/admin/taxonomies/tags/create',

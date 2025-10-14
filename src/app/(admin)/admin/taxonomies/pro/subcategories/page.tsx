@@ -6,6 +6,8 @@ import {
   AdminProSubcategoriesTableSkeleton,
 } from '@/components/admin';
 
+export const dynamic = 'force-dynamic';
+
 interface ProSubcategoriesPageProps {
   searchParams: Promise<{
     page?: string;

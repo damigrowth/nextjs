@@ -1,5 +1,10 @@
-import { TaxonomyCreatePage, CreateServiceTaxonomyForm } from '@/components/admin';
+import {
+  TaxonomyCreatePage,
+  CreateServiceTaxonomyForm,
+} from '@/components/admin';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+
+export const dynamic = 'force-dynamic';
 
 export default function CreateSubcategoryPage() {
   return (
@@ -9,7 +14,10 @@ export default function CreateSubcategoryPage() {
       backLabel='Back to Subcategories'
       description='Add a new subcategory under an existing category'
     >
-      <CreateServiceTaxonomyForm level='subcategory' existingItems={serviceTaxonomies} />
+      <CreateServiceTaxonomyForm
+        level='subcategory'
+        existingItems={serviceTaxonomies}
+      />
     </TaxonomyCreatePage>
   );
 }

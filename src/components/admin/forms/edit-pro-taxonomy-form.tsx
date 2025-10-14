@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useWatch } from 'react-hook-form';
 
 interface EditProTaxonomyFormProps {
   taxonomy: {
@@ -73,8 +74,12 @@ export function EditProTaxonomyForm({
       ]}
     >
       {(form, isPending) => {
-        const { handleLabelChange, handleSlugRegenerate } = useSlugHandlers(form, 'plural');
-        const pluralValue = useWatch({ control: form.control, name: 'plural' }) || '';
+        const { handleLabelChange, handleSlugRegenerate } = useSlugHandlers(
+          form,
+          'plural',
+        );
+        const pluralValue =
+          useWatch({ control: form.control, name: 'plural' }) || '';
 
         return (
           <>

@@ -2,6 +2,8 @@ import { TaxonomyCreatePage } from '@/components/admin';
 import { CreateTagForm } from '@/components/admin/forms/create-tag-form';
 import { tags } from '@/constants/datasets/tags';
 
+export const dynamic = 'force-dynamic';
+
 export default function CreateTagPage() {
   return (
     <TaxonomyCreatePage

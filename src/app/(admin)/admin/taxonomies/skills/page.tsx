@@ -6,6 +6,8 @@ import {
   AdminSkillsTableSkeleton,
 } from '@/components/admin';
 
+export const dynamic = 'force-dynamic';
+
 const config: TaxonomyListPageConfig = {
   title: 'Skills',
   createPath: '/admin/taxonomies/skills/create',

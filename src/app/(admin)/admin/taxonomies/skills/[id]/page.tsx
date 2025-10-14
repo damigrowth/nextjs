@@ -3,13 +3,17 @@ import { EditSkillForm } from '@/components/admin/forms/edit-skill-form';
 import { skills } from '@/constants/datasets/skills';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 
+export const dynamic = 'force-dynamic';
+
 interface SkillDetailPageProps {
   params: Promise<{
     id: string;
   }>;
 }
 
-export default async function SkillDetailPage({ params }: SkillDetailPageProps) {
+export default async function SkillDetailPage({
+  params,
+}: SkillDetailPageProps) {
   const { id } = await params;
 
   return (
@@ -22,7 +26,13 @@ export default async function SkillDetailPage({ params }: SkillDetailPageProps) 
       description='Update skill label, slug, and description'
       customFindItem={(items, id) => items.find((s) => s.id === id)}
     >
-      {(skill) => <EditSkillForm skill={skill} existingItems={skills} categories={proTaxonomies} />}
+      {(skill) => (
+        <EditSkillForm
+          skill={skill}
+          existingItems={skills}
+          categories={proTaxonomies}
+        />
+      )}
     </TaxonomyEditPage>
   );
 }

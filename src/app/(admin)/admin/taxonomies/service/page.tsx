@@ -9,6 +9,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 interface ServiceTaxonomiesPageProps {
   searchParams: Promise<{
     page?: string;
@@ -21,7 +23,9 @@ interface ServiceTaxonomiesPageProps {
   }>;
 }
 
-export default async function ServiceTaxonomiesPage({ searchParams }: ServiceTaxonomiesPageProps) {
+export default async function ServiceTaxonomiesPage({
+  searchParams,
+}: ServiceTaxonomiesPageProps) {
   const params = await searchParams;
 
   return (

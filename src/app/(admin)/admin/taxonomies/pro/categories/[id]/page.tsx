@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import { findById } from '@/lib/utils/datasets';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }

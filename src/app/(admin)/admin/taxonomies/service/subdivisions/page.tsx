@@ -6,6 +6,8 @@ import {
   AdminSubdivisionsTableSkeleton,
 } from '@/components/admin';
 
+export const dynamic = 'force-dynamic';
+
 interface SubdivisionsPageProps {
   searchParams: Promise<{
     page?: string;

@@ -1,6 +1,8 @@
 import { TaxonomyCreatePage, CreateProTaxonomyForm } from '@/components/admin';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 
+export const dynamic = 'force-dynamic';
+
 export default function CreateProCategoryPage() {
   return (
     <TaxonomyCreatePage

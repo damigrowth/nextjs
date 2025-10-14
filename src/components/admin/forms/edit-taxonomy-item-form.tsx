@@ -37,29 +37,30 @@ import { useSlugHandlers } from './use-slug-handlers';
 type EditTaxonomyItemFormValues = z.infer<typeof updateServiceTaxonomySchema>;
 
 interface EditTaxonomyItemFormProps {
-  taxonomy: {
-    id: string;
-    label: string;
-    slug: string;
-    description: string;
+  taxonomy: Pick<
+    DatasetItem,
+    'id' | 'label' | 'slug' | 'description' | 'icon' | 'image'
+  > & {
     level: 'category' | 'subcategory' | 'subdivision';
     parentId?: string;
     parentLabel?: string;
     featured?: boolean;
-    icon?: string;
-    image?: {
-      secure_url?: string;
-      url?: string;
-    };
+    hasImage?: boolean;
   };
   existingItems: DatasetItem[];
 }
 
-export function EditTaxonomyItemForm({ taxonomy, existingItems }: EditTaxonomyItemFormProps) {
+export function EditTaxonomyItemForm({
+  taxonomy,
+  existingItems,
+}: EditTaxonomyItemFormProps) {
   const router = useRouter();
-  const [state, formAction, isPending] = useActionState(updateServiceTaxonomyAction, null);
+  const [state, formAction, isPending] = useActionState(
+    updateServiceTaxonomyAction,
+    null,
+  );
   const [imagePreview, setImagePreview] = useState(
-    taxonomy.image?.secure_url || taxonomy.image?.url || ''
+    taxonomy.image?.secure_url || taxonomy.image?.url || '',
   );
 
   const form = useForm<EditTaxonomyItemFormValues>({
@@ -108,7 +109,16 @@ export function EditTaxonomyItemForm({ taxonomy, existingItems }: EditTaxonomyIt
     const allValues = form.getValues();
 
     populateFormData(formData, allValues, {
-      stringFields: ['id', 'label', 'slug', 'description', 'level', 'parentId', 'icon', 'imageUrl'],
+      stringFields: [
+        'id',
+        'label',
+        'slug',
+        'description',
+        'level',
+        'parentId',
+        'icon',
+        'imageUrl',
+      ],
       booleanFields: ['featured'],
     });
 
@@ -178,7 +188,9 @@ export function EditTaxonomyItemForm({ taxonomy, existingItems }: EditTaxonomyIt
                   <FormItem>
                     <FormLabel>Featured</FormLabel>
                     <Select
-                      onValueChange={(value) => field.onChange(value === 'true')}
+                      onValueChange={(value) =>
+                        field.onChange(value === 'true')
+                      }
                       defaultValue={field.value ? 'true' : 'false'}
                     >
                       <FormControl>
@@ -191,7 +203,9 @@ export function EditTaxonomyItemForm({ taxonomy, existingItems }: EditTaxonomyIt
                         <SelectItem value='false'>No</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormDescription>Only categories can be featured</FormDescription>
+                    <FormDescription>
+                      Only categories can be featured
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -240,10 +254,7 @@ export function EditTaxonomyItemForm({ taxonomy, existingItems }: EditTaxonomyIt
             <FormItem>
               <FormLabel>Image URL</FormLabel>
               <FormControl>
-                <Input
-                  placeholder='https://example.com/image.jpg'
-                  {...field}
-                />
+                <Input placeholder='https://example.com/image.jpg' {...field} />
               </FormControl>
               <FormDescription>
                 Enter the full URL of the image (Cloudinary or other CDN)

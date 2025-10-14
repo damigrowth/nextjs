@@ -6,6 +6,8 @@ import {
   AdminSubcategoriesTableSkeleton,
 } from '@/components/admin';
 
+export const dynamic = 'force-dynamic';
+
 const config: TaxonomyListPageConfig = {
   title: 'Service Subcategories',
   createPath: '/admin/taxonomies/service/subcategories/create',
@@ -26,7 +28,9 @@ interface SubcategoriesPageProps {
   }>;
 }
 
-export default async function SubcategoriesPage({ searchParams }: SubcategoriesPageProps) {
+export default async function SubcategoriesPage({
+  searchParams,
+}: SubcategoriesPageProps) {
   const params = await searchParams;
   return <TaxonomyListPage config={config} searchParams={params} />;
 }

@@ -6,6 +6,8 @@ import {
   AdminCategoriesTableSkeleton,
 } from '@/components/admin';
 
+export const dynamic = 'force-dynamic';
+
 const config: TaxonomyListPageConfig = {
   title: 'Service Categories',
   createPath: '/admin/taxonomies/service/categories/create',
@@ -26,7 +28,9 @@ interface CategoriesPageProps {
   }>;
 }
 
-export default async function CategoriesPage({ searchParams }: CategoriesPageProps) {
+export default async function CategoriesPage({
+  searchParams,
+}: CategoriesPageProps) {
   const params = await searchParams;
   return <TaxonomyListPage config={config} searchParams={params} />;
 }

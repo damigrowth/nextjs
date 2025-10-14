@@ -1,6 +1,8 @@
 import { TaxonomyCreatePage, CreateServiceTaxonomyForm } from '@/components/admin';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 
+export const dynamic = 'force-dynamic';
+
 export default function CreateCategoryPage() {
   return (
     <TaxonomyCreatePage

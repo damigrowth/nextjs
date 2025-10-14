@@ -10,34 +10,28 @@ import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { DatasetItem } from '@/lib/types/datasets';
 import { findById, getItemPath } from '@/lib/utils/datasets';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-interface FlatTaxonomy {
-  id: string;
-  label: string;
-  slug: string;
-  description: string;
+interface FlatTaxonomy
+  extends Required<Pick<DatasetItem, 'id' | 'label' | 'slug' | 'description'>>,
+    Pick<DatasetItem, 'icon' | 'featured' | 'image'> {
   level: 'category' | 'subcategory' | 'subdivision';
   parentId?: string;
   parentLabel?: string;
-  featured?: boolean;
-  icon?: string;
-  image?: {
-    secure_url?: string;
-    url?: string;
-  };
   hasImage: boolean;
 }
 
 // Function to find taxonomy by ID and determine its level using dataset utilities
 function findTaxonomyById(id: string): FlatTaxonomy | null {
-  const item = findById(serviceTaxonomies, id);
+  const item = findById(serviceTaxonomies as DatasetItem[], id);
   if (!item) return null;
 
   // Get the path to determine level and parent
-  const path = getItemPath(serviceTaxonomies, id);
+  const path = getItemPath(serviceTaxonomies as DatasetItem[], id);
 
   let level: 'category' | 'subcategory' | 'subdivision';
   let parentId: string | undefined;
@@ -70,7 +64,9 @@ function findTaxonomyById(id: string): FlatTaxonomy | null {
   };
 }
 
-export default async function AdminServiceTaxonomyEditPage({ params }: PageProps) {
+export default async function AdminServiceTaxonomyEditPage({
+  params,
+}: PageProps) {
   const { id } = await params;
   const taxonomy = findTaxonomyById(id);
 
@@ -79,7 +75,7 @@ export default async function AdminServiceTaxonomyEditPage({ params }: PageProps
   }
 
   const getLevelBadgeVariant = (
-    level: string
+    level: string,
   ): 'default' | 'secondary' | 'outline' => {
     switch (level) {
       case 'category':
@@ -119,12 +115,8 @@ export default async function AdminServiceTaxonomyEditPage({ params }: PageProps
                 <CardContent className='p-0'>
                   <div className='divide-y'>
                     <div className='flex items-center justify-between px-6 py-2'>
-                      <span className='text-xs text-muted-foreground'>
-                        ID
-                      </span>
-                      <span className='text-xs font-mono'>
-                        {taxonomy.id}
-                      </span>
+                      <span className='text-xs text-muted-foreground'>ID</span>
+                      <span className='text-xs font-mono'>{taxonomy.id}</span>
                     </div>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
@@ -188,7 +180,9 @@ export default async function AdminServiceTaxonomyEditPage({ params }: PageProps
                           Featured
                         </span>
                         <Badge
-                          variant={taxonomy.featured === true ? 'default' : 'outline'}
+                          variant={
+                            taxonomy.featured === true ? 'default' : 'outline'
+                          }
                         >
                           {taxonomy.featured === true ? 'Yes' : 'No'}
                         </Badge>
@@ -226,7 +220,10 @@ export default async function AdminServiceTaxonomyEditPage({ params }: PageProps
                 </p>
               </CardHeader>
               <CardContent>
-                <EditTaxonomyItemForm taxonomy={taxonomy} />
+                <EditTaxonomyItemForm
+                  taxonomy={taxonomy}
+                  existingItems={serviceTaxonomies}
+                />
               </CardContent>
             </Card>
           </div>

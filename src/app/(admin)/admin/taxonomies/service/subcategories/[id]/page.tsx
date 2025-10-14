@@ -7,6 +7,9 @@ import { SiteHeader } from '@/components/admin';
 import { EditTaxonomyItemForm } from '@/components/admin/forms';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { findById, getItemPath } from '@/lib/utils/datasets';
+import { DatasetItem } from '@/lib/types/datasets';
+
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -14,8 +17,8 @@ interface PageProps {
 
 export default async function EditSubcategoryPage({ params }: PageProps) {
   const { id } = await params;
-  const taxonomy = findById(serviceTaxonomies, id);
-  const path = getItemPath(serviceTaxonomies, id);
+  const taxonomy = findById(serviceTaxonomies as DatasetItem[], id);
+  const path = getItemPath(serviceTaxonomies as DatasetItem[], id);
 
   // Subcategories have exactly 2 levels (category > subcategory)
   if (!taxonomy || path.length !== 2) {

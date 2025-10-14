@@ -3,6 +3,8 @@ import { CreateSkillForm } from '@/components/admin/forms/create-skill-form';
 import { skills } from '@/constants/datasets/skills';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 
+export const dynamic = 'force-dynamic';
+
 export default function CreateSkillPage() {
   return (
     <TaxonomyCreatePage

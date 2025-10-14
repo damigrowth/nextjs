@@ -1,6 +1,8 @@
 import { TaxonomyCreatePage, CreateProTaxonomyForm } from '@/components/admin';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 
+export const dynamic = 'force-dynamic';
+
 export default function CreateProSubcategoryPage() {
   return (
     <TaxonomyCreatePage
@@ -9,7 +11,10 @@ export default function CreateProSubcategoryPage() {
       backLabel='Back to Subcategories'
       description='Add a new subcategory under an existing professional category'
     >
-      <CreateProTaxonomyForm level='subcategory' existingItems={proTaxonomies} />
+      <CreateProTaxonomyForm
+        level='subcategory'
+        existingItems={proTaxonomies}
+      />
     </TaxonomyCreatePage>
   );
 }
