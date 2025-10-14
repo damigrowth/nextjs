@@ -7,31 +7,11 @@ import {
   createAdminApiKeySchema,
   updateAdminApiKeySchema,
 } from '@/lib/validations/admin';
+import { getAdminSession } from './helpers';
 
 // Environment admin API keys (fallback for initial access)
 const ADMIN_API_KEYS =
   process.env.ADMIN_API_KEYS?.split(',').filter(Boolean) || [];
-
-// Helper function to get authenticated admin session
-async function getAdminSession() {
-  const headersList = await headers();
-  const session = await auth.api.getSession({
-    headers: headersList,
-  });
-
-  if (!session?.user) {
-    throw new Error('Authentication required');
-  }
-
-  // Check if user has admin role
-  const isAdmin = session.user.role === 'admin';
-
-  if (!isAdmin) {
-    throw new Error('Admin access required');
-  }
-
-  return session;
-}
 
 /**
  * Validate an admin API key (environment or database)
