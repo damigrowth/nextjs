@@ -11,3 +11,22 @@ export { EditServiceSettingsForm } from './edit-service-settings-form';
 export { EditServiceAddonsForm } from './edit-service-addons-form';
 export { EditServiceFaqForm } from './edit-service-faq-form';
 export { EditServiceMediaForm } from './edit-service-media-form';
+
+// Taxonomy forms
+export { CreateServiceTaxonomyForm } from './create-service-taxonomy-form';
+export { EditTaxonomyItemForm } from './edit-taxonomy-item-form';
+export { CreateProTaxonomyForm } from './create-pro-taxonomy-form';
+export { EditProTaxonomyForm } from './edit-pro-taxonomy-form';
+
+// Form utilities
+export { TaxonomyFormWrapper } from './taxonomy-form-wrapper';
+export { FieldGrid } from './field-grid';
+export * from './taxonomy-form-fields';
+
+// Tag forms
+export { CreateTagForm } from './create-tag-form';
+export { EditTagForm } from './edit-tag-form';
+
+// Skill forms
+export { CreateSkillForm } from './create-skill-form';
+export { EditSkillForm } from './edit-skill-form';

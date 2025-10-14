@@ -1197,3 +1197,97 @@ export function getBreadcrumbsForNewRoutes<T extends DatasetItem>(
   return breadcrumbs;
 }
 
+// =============================================================================
+// UPDATE UTILITIES
+// =============================================================================
+
+/**
+ * Update an item in a hierarchical dataset by ID
+ * Creates a new copy of the dataset with the updated item
+ * @param dataset - The hierarchical dataset
+ * @param itemId - ID of the item to update
+ * @param updates - Partial updates to apply to the item
+ * @returns New dataset with the updated item
+ */
+export function updateItemInDataset<T extends DatasetItem>(
+  dataset: T[],
+  itemId: string,
+  updates: Partial<T>,
+): T[] {
+  return dataset.map((item) => {
+    // If this is the item to update
+    if (item.id === itemId) {
+      return { ...item, ...updates };
+    }
+
+    // If item has children, recursively update
+    if (item.children && item.children.length > 0) {
+      return {
+        ...item,
+        children: updateItemInDataset(item.children as T[], itemId, updates),
+      };
+    }
+
+    return item;
+  });
+}
+
+// =============================================================================
+// PRO TAXONOMY SPECIFIC UTILITIES
+// =============================================================================
+
+/**
+ * Find pro subcategory by slug across all categories
+ * @param taxonomy - The hierarchical pro taxonomy dataset
+ * @param subcategorySlug - Subcategory slug to find
+ * @returns Object with the found subcategory and its parent category, or null if not found
+ */
+export function findProSubcategoryBySlug<T extends DatasetItem>(
+  taxonomy: T[],
+  subcategorySlug: string,
+): { category: T; subcategory: T } | null {
+  for (const category of taxonomy) {
+    if (category.children) {
+      const subcategory = category.children.find((sub: any) => sub.slug === subcategorySlug) as T | undefined;
+      if (subcategory) {
+        return { category, subcategory };
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Update a pro taxonomy item by ID and level (category or subcategory only)
+ * @param taxonomy - The pro taxonomy dataset
+ * @param itemId - ID of the item to update
+ * @param level - Level of the item ('category' or 'subcategory')
+ * @param updates - Object with fields to update
+ * @returns Updated taxonomy array
+ */
+export function updateProTaxonomyItemByLevel<T extends DatasetItem>(
+  taxonomy: T[],
+  itemId: string,
+  level: 'category' | 'subcategory',
+  updates: Record<string, any>
+): T[] {
+  return taxonomy.map((category) => {
+    if (level === 'category' && category.id === itemId) {
+      return { ...category, ...updates } as T;
+    }
+
+    if (category.children && level === 'subcategory') {
+      const updatedChildren = category.children.map((subcategory: any) => {
+        if (subcategory.id === itemId) {
+          return { ...subcategory, ...updates };
+        }
+        return subcategory;
+      });
+
+      return { ...category, children: updatedChildren } as T;
+    }
+
+    return category;
+  }) as T[];
+}
+

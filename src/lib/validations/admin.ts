@@ -41,8 +41,8 @@ export const adminListUsersSchema = z.object({
 // Extend registerSchema from auth.ts with admin-specific fields
 export const adminCreateUserSchema = registerSchema.extend({
   name: z.string().min(1, 'Name is required').max(100),
-  emailVerified: z.boolean().optional().default(true), // Admin-created users are pre-verified
-  confirmed: z.boolean().optional().default(true), // Admin-created users are pre-confirmed
+  emailVerified: z.coerce.boolean().optional().default(true), // Admin-created users are pre-verified
+  confirmed: z.coerce.boolean().optional().default(true), // Admin-created users are pre-confirmed
 });
 
 // General admin update schema - extends accountUpdateSchema from auth.ts
@@ -57,10 +57,10 @@ export const adminUpdateUserSchema = accountUpdateSchema
     lastName: z.string().min(1).max(100).optional(),
     role: userRoleSchema.optional(),
     type: z.enum(['user', 'pro']).optional(),
-    confirmed: z.boolean().optional(),
-    blocked: z.boolean().optional(),
+    confirmed: z.coerce.boolean().optional(),
+    blocked: z.coerce.boolean().optional(),
     step: authStepSchema.optional(),
-    emailVerified: z.boolean().optional(),
+    emailVerified: z.coerce.boolean().optional(),
   });
 
 export const adminSetRoleSchema = z.object({
@@ -128,7 +128,7 @@ export const banUserFormSchema = z
     userId: z.string().min(1),
     banReason: z.string().min(1, 'Please provide a ban reason').max(500),
     banDuration: z.number().int().min(1).max(365).optional(), // in days
-    isPermanent: z.boolean(),
+    isPermanent: z.coerce.boolean(),
   })
   .refine(
     (data) => {
@@ -198,7 +198,7 @@ export const createAdminApiKeySchema = z.object({
 
 export const updateAdminApiKeySchema = z.object({
   name: z.string().optional(),
-  enabled: z.boolean().optional(),
+  enabled: z.coerce.boolean().optional(),
 });
 
 // =============================================
@@ -256,15 +256,15 @@ export const adminUpdateProfileSchema = z.object({
   whatsapp: z.string().optional(),
 
   // Settings
-  visibility: z.record(z.string(), z.boolean()).optional(),
+  visibility: z.record(z.string(), z.coerce.boolean()).optional(),
   socials: z.record(z.string(), z.string()).optional(),
 
   // Status flags (admin only)
-  published: z.boolean().optional(),
-  featured: z.boolean().optional(),
-  verified: z.boolean().optional(),
-  top: z.boolean().optional(),
-  isActive: z.boolean().optional(),
+  published: z.coerce.boolean().optional(),
+  featured: z.coerce.boolean().optional(),
+  verified: z.coerce.boolean().optional(),
+  top: z.coerce.boolean().optional(),
+  isActive: z.coerce.boolean().optional(),
 });
 
 export const adminToggleProfileSchema = z.object({
@@ -360,7 +360,7 @@ export const adminUpdateServiceSchema = createServiceSchema
         'inactive',
       ])
       .optional(),
-    featured: z.boolean().optional(),
+    featured: z.coerce.boolean().optional(),
     // Media (not in dashboard schema)
     media: z.array(z.record(z.string(), z.any())).optional().nullable(),
   });
@@ -461,3 +461,122 @@ export type ApproveVerificationFormInput = z.infer<
 export type RejectVerificationFormInput = z.infer<
   typeof rejectVerificationFormSchema
 >;
+
+// =============================================
+// ADMIN TAXONOMY MANAGEMENT SCHEMAS
+// =============================================
+
+export const createServiceTaxonomySchema = z.object({
+  label: z.string().min(1, 'Label is required').max(255),
+  slug: z.string().min(1, 'Slug is required').max(255)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only'),
+  description: z.string().max(1000).optional(),
+  level: z.enum(['category', 'subcategory', 'subdivision']),
+  parentId: z.string().optional(),
+  featured: z.coerce.boolean().optional(),
+  icon: z.string().optional(),
+  imageUrl: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
+});
+
+export type CreateServiceTaxonomyInput = z.infer<typeof createServiceTaxonomySchema>;
+
+export const updateServiceTaxonomySchema = z.object({
+  id: z.string().min(1, 'ID is required'),
+  label: z.string().min(1, 'Label is required').max(255),
+  slug: z.string().min(1, 'Slug is required').max(255)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only'),
+  description: z.string().max(1000).optional(),
+  level: z.enum(['category', 'subcategory', 'subdivision']),
+  parentId: z.string().optional(),
+  featured: z.coerce.boolean().optional(),
+  icon: z.string().optional(),
+  imageUrl: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
+});
+
+export type UpdateServiceTaxonomyInput = z.infer<typeof updateServiceTaxonomySchema>;
+
+// =============================================
+// PRO TAXONOMY SCHEMAS
+// =============================================
+
+export const createProTaxonomySchema = z.object({
+  label: z.string().min(1, 'Label is required').max(255),
+  slug: z.string().min(1, 'Slug is required').max(255)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only'),
+  plural: z.string().min(1, 'Plural is required').max(255),
+  description: z.string().max(1000).default(''),
+  level: z.enum(['category', 'subcategory']),
+  parentId: z.string().optional(),
+  type: z.enum(['freelancer', 'company']).optional(),
+});
+
+export const updateProTaxonomySchema = z.object({
+  id: z.string().min(1, 'ID is required'),
+  label: z.string().min(1, 'Label is required').max(255),
+  slug: z.string().min(1, 'Slug is required').max(255)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only'),
+  plural: z.string().min(1, 'Plural is required').max(255),
+  description: z.string().max(1000).default(''),
+  level: z.enum(['category', 'subcategory']),
+  parentId: z.string().optional(),
+  type: z.enum(['freelancer', 'company']).optional(),
+});
+
+export type CreateProTaxonomyInput = z.infer<typeof createProTaxonomySchema>;
+export type UpdateProTaxonomyInput = z.infer<typeof updateProTaxonomySchema>;
+
+// =============================================
+// TAG SCHEMAS
+// =============================================
+
+export const createTagSchema = z.object({
+  label: z.string().min(1, 'Label is required').max(255),
+  slug: z.string().min(1, 'Slug is required').max(255)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only'),
+});
+
+export type CreateTagInput = z.infer<typeof createTagSchema>;
+
+export const updateTagSchema = z.object({
+  id: z.string().min(1, 'ID is required'),
+  label: z.string().min(1, 'Label is required').max(255),
+  slug: z.string().min(1, 'Slug is required').max(255)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only'),
+});
+
+export type UpdateTagInput = z.infer<typeof updateTagSchema>;
+
+export const deleteTagSchema = z.object({
+  id: z.string().min(1, 'ID is required'),
+});
+
+export type DeleteTagInput = z.infer<typeof deleteTagSchema>;
+
+// =============================================
+// SKILL SCHEMAS
+// =============================================
+
+export const createSkillSchema = z.object({
+  label: z.string().min(1, 'Label is required').max(255),
+  slug: z.string().min(1, 'Slug is required').max(255)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only'),
+  category: z.string().optional(),
+});
+
+export type CreateSkillInput = z.infer<typeof createSkillSchema>;
+
+export const updateSkillSchema = z.object({
+  id: z.string().min(1, 'ID is required'),
+  label: z.string().min(1, 'Label is required').max(255),
+  slug: z.string().min(1, 'Slug is required').max(255)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase with hyphens only'),
+  category: z.string().optional(),
+});
+
+export type UpdateSkillInput = z.infer<typeof updateSkillSchema>;
+
+export const deleteSkillSchema = z.object({
+  id: z.string().min(1, 'ID is required'),
+});
+
+export type DeleteSkillInput = z.infer<typeof deleteSkillSchema>;

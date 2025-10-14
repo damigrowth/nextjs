@@ -47,6 +47,7 @@ export interface ServerActionResponse<T = any> {
 export interface ActionResult<T = any> {
   success: boolean;
   data?: T;
+  message?: string;
   error?: string;
   fieldErrors?: Record<string, string[]>;
 }

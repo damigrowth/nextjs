@@ -16,6 +16,10 @@ const badgeVariants = cva(
           'border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80',
         outline: 'text-foreground',
         muted: 'bg-muted text-muted-foreground',
+        warning:
+          'border-yellow-200 bg-yellow-50 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 [&>svg]:text-yellow-600 dark:[&>svg]:text-yellow-400',
+        orange:
+          'border-orange-200 bg-orange-50 text-orange-800 dark:border-orange-800 dark:bg-orange-900/20 dark:text-orange-400 [&>svg]:text-orange-600 dark:[&>svg]:text-orange-400',
       },
     },
     defaultVariants: {

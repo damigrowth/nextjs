@@ -56,7 +56,7 @@ export default function AdminTablePagination({
         <span className='text-sm text-gray-600'>Show:</span>
         <Select value={currentLimit.toString()} onValueChange={updateLimit}>
           <SelectTrigger className='w-[140px]'>
-            <SelectValue />
+            <SelectValue placeholder={`${currentLimit} per page`} />
           </SelectTrigger>
           <SelectContent>
             {pageSizeOptions.map((size) => (
