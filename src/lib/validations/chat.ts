@@ -21,10 +21,12 @@ export const updateChatSchema = z.object({
   published: z.boolean().optional(),
 });
 
-export const chatQuerySchema = z.object({
-  search: z.string().optional(),
-  published: z.coerce.boolean().optional(),
-}).merge(paginationSchema);
+export const chatQuerySchema = z
+  .object({
+    search: z.string().optional(),
+    published: z.boolean().optional(),
+  })
+  .merge(paginationSchema);
 
 // =============================================
 // MESSAGE SCHEMAS
@@ -42,13 +44,15 @@ export const updateMessageSchema = z.object({
   published: z.boolean().optional(),
 });
 
-export const messageQuerySchema = z.object({
-  chatId: z.string().optional(),
-  authorId: z.string().optional(),
-  read: z.coerce.boolean().optional(),
-  published: z.coerce.boolean().optional(),
-  search: z.string().optional()
-}).merge(paginationSchema);
+export const messageQuerySchema = z
+  .object({
+    chatId: z.string().optional(),
+    authorId: z.string().optional(),
+    read: z.boolean().optional(),
+    published: z.boolean().optional(),
+    search: z.string().optional(),
+  })
+  .merge(paginationSchema);
 
 // =============================================
 // MESSAGE STATUS SCHEMAS
@@ -85,7 +89,10 @@ export const createMessageWithAttachmentsSchema = z.object({
   content: z.string().min(1, 'Message content is required').max(1000),
   chatId: idSchema,
   authorId: idSchema,
-  attachments: z.array(messageAttachmentSchema).max(5, 'Maximum 5 attachments per message').optional(),
+  attachments: z
+    .array(messageAttachmentSchema)
+    .max(5, 'Maximum 5 attachments per message')
+    .optional(),
 });
 
 // =============================================
@@ -147,7 +154,7 @@ export const reportChatSchema = z.object({
     'inappropriate_content',
     'fake_profile',
     'scam',
-    'other'
+    'other',
   ]),
   description: z.string().min(10, 'Please provide more details').max(500),
   reporterEmail: z.string().email().optional(),
@@ -163,14 +170,16 @@ export const blockChatParticipantSchema = z.object({
 // CHAT SEARCH & FILTER SCHEMAS
 // =============================================
 
-export const chatSearchSchema = z.object({
-  query: z.string().min(1, 'Search query is required'),
-  chatId: idSchema.optional(), // Search within specific chat
-  authorId: idSchema.optional(), // Search messages from specific author
-  dateFrom: z.date().optional(),
-  dateTo: z.date().optional(),
-  messageType: z.enum(['text', 'image', 'file', 'all']).default('all'),
-}).merge(paginationSchema);
+export const chatSearchSchema = z
+  .object({
+    query: z.string().min(1, 'Search query is required'),
+    chatId: idSchema.optional(), // Search within specific chat
+    authorId: idSchema.optional(), // Search messages from specific author
+    dateFrom: z.date().optional(),
+    dateTo: z.date().optional(),
+    messageType: z.enum(['text', 'image', 'file', 'all']).default('all'),
+  })
+  .merge(paginationSchema);
 
 // =============================================
 // TYPE EXPORTS
@@ -186,12 +195,20 @@ export type MarkMessageReadInput = z.infer<typeof markMessageReadSchema>;
 export type MarkChatReadInput = z.infer<typeof markChatReadSchema>;
 export type GetUnreadCountInput = z.infer<typeof getUnreadCountSchema>;
 export type MessageAttachmentInput = z.infer<typeof messageAttachmentSchema>;
-export type CreateMessageWithAttachmentsInput = z.infer<typeof createMessageWithAttachmentsSchema>;
+export type CreateMessageWithAttachmentsInput = z.infer<
+  typeof createMessageWithAttachmentsSchema
+>;
 export type AddChatParticipantInput = z.infer<typeof addChatParticipantSchema>;
-export type RemoveChatParticipantInput = z.infer<typeof removeChatParticipantSchema>;
-export type UpdateChatParticipantInput = z.infer<typeof updateChatParticipantSchema>;
+export type RemoveChatParticipantInput = z.infer<
+  typeof removeChatParticipantSchema
+>;
+export type UpdateChatParticipantInput = z.infer<
+  typeof updateChatParticipantSchema
+>;
 export type ChatSettingsInput = z.infer<typeof chatSettingsSchema>;
 export type UpdateChatSettingsInput = z.infer<typeof updateChatSettingsSchema>;
 export type ReportChatInput = z.infer<typeof reportChatSchema>;
-export type BlockChatParticipantInput = z.infer<typeof blockChatParticipantSchema>;
+export type BlockChatParticipantInput = z.infer<
+  typeof blockChatParticipantSchema
+>;
 export type ChatSearchInput = z.infer<typeof chatSearchSchema>;

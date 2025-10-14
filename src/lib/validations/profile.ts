@@ -63,9 +63,9 @@ export const profileQuerySchema = z
   .object({
     search: z.string().optional(),
     type: z.string().optional(),
-    verified: z.coerce.boolean().optional(),
-    featured: z.coerce.boolean().optional(),
-    published: z.coerce.boolean().optional(),
+    verified: z.boolean().optional(),
+    featured: z.boolean().optional(),
+    published: z.boolean().optional(),
     minRate: z.coerce.number().min(0).optional(),
     maxRate: z.coerce.number().min(0).optional(),
     city: z.string().optional(),
@@ -185,20 +185,14 @@ export const socialMediaSchema = z.object({
   facebook: z
     .string()
     .url('Enter a valid Facebook link')
-    .regex(
-      /^https?:\/\/(www\.)?facebook\.com\/.*$/,
-      'Invalid Facebook link',
-    )
+    .regex(/^https?:\/\/(www\.)?facebook\.com\/.*$/, 'Invalid Facebook link')
     .optional()
     .nullable()
     .or(z.literal('')),
   linkedin: z
     .string()
     .url('Enter a valid LinkedIn link')
-    .regex(
-      /^https?:\/\/(www\.)?linkedin\.com\/.*$/,
-      'Invalid LinkedIn link',
-    )
+    .regex(/^https?:\/\/(www\.)?linkedin\.com\/.*$/, 'Invalid LinkedIn link')
     .optional()
     .nullable()
     .or(z.literal('')),
@@ -226,10 +220,7 @@ export const socialMediaSchema = z.object({
   instagram: z
     .string()
     .url('Enter a valid Instagram link')
-    .regex(
-      /^https?:\/\/(www\.)?instagram\.com\/.*$/,
-      'Invalid Instagram link',
-    )
+    .regex(/^https?:\/\/(www\.)?instagram\.com\/.*$/, 'Invalid Instagram link')
     .optional()
     .nullable()
     .or(z.literal('')),
@@ -243,10 +234,7 @@ export const socialMediaSchema = z.object({
   dribbble: z
     .string()
     .url('Enter a valid Dribbble link')
-    .regex(
-      /^https?:\/\/(www\.)?dribbble\.com\/.*$/,
-      'Invalid Dribbble link',
-    )
+    .regex(/^https?:\/\/(www\.)?dribbble\.com\/.*$/, 'Invalid Dribbble link')
     .optional()
     .nullable()
     .or(z.literal('')),
@@ -267,7 +255,9 @@ export const updateProfilePortfolioSchema = z.object({
     .optional(),
 });
 
-export type UpdateProfilePortfolioInput = z.infer<typeof updateProfilePortfolioSchema>;
+export type UpdateProfilePortfolioInput = z.infer<
+  typeof updateProfilePortfolioSchema
+>;
 
 // =============================================
 // PRESENTATION SCHEMA
@@ -398,7 +388,10 @@ export const verificationFormSchema = z.object({
     .string()
     .min(10, 'Το τηλέφωνο πρέπει να έχει 10 ψηφία')
     .max(10, 'Το τηλέφωνο πρέπει να έχει 10 ψηφία')
-    .regex(/^69\d{8}$/, 'Το τηλέφωνο πρέπει να ξεκινάει με 69 και να έχει 10 ψηφία'),
+    .regex(
+      /^69\d{8}$/,
+      'Το τηλέφωνο πρέπει να ξεκινάει με 69 και να έχει 10 ψηφία',
+    ),
 });
 
 // Removed duplicate cloudinaryResourceSchema - now imported from @/lib/prisma/json-types
@@ -406,7 +399,7 @@ export const verificationFormSchema = z.object({
 export const imageSchema = z.union([
   cloudinaryResourceSchema,
   z.string().url(), // Allow string URLs for Google/external images
-  z.null()
+  z.null(),
 ]);
 
 // Category/Subcategory selection for onboarding - now accepts ID strings
@@ -455,7 +448,10 @@ export const profileAdditionalInfoUpdateSchema = z.object({
   paymentMethods: z.array(z.string()).optional(),
   settlementMethods: z.array(z.string()).optional(),
   budget: z.string().optional().or(z.literal('')),
-  industries: z.array(z.string()).max(10, 'Maximum 10 industries allowed').optional(),
+  industries: z
+    .array(z.string())
+    .max(10, 'Maximum 10 industries allowed')
+    .optional(),
   terms: z.string().optional().or(z.literal('')),
 });
 
@@ -465,11 +461,13 @@ export const profilePresentationUpdateSchema = z.object({
   website: z.string().url().or(z.literal('')).optional(),
   viber: z.string().optional().or(z.literal('')),
   whatsapp: z.string().optional().or(z.literal('')),
-  visibility: z.object({
-    email: z.boolean(),
-    phone: z.boolean(),
-    address: z.boolean(),
-  }).optional(),
+  visibility: z
+    .object({
+      email: z.boolean(),
+      phone: z.boolean(),
+      address: z.boolean(),
+    })
+    .optional(),
   socials: socialMediaSchema.optional(),
 });
 

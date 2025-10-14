@@ -16,13 +16,19 @@ export const createUserSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
   name: z.string().min(1, 'Name is required').optional(),
   role: userRoleSchema.default('user'),
-  username: z.string().min(3, 'Username must be at least 3 characters').optional(),
+  username: z
+    .string()
+    .min(3, 'Username must be at least 3 characters')
+    .optional(),
   displayName: z.string().min(1, 'Display name is required').optional(),
 });
 
 export const updateUserSchema = z.object({
   name: z.string().min(1).optional(),
-  username: z.string().min(3, 'Username must be at least 3 characters').optional(),
+  username: z
+    .string()
+    .min(3, 'Username must be at least 3 characters')
+    .optional(),
   displayName: z.string().min(1).optional(),
   role: userRoleSchema.optional(),
   step: authStepSchema.optional(),
@@ -34,14 +40,16 @@ export const updateUserSchema = z.object({
   emailVerified: z.boolean().optional(),
 });
 
-export const userQuerySchema = z.object({
-  search: z.string().optional(),
-  role: userRoleSchema.optional(),
-  step: authStepSchema.optional(),
-  confirmed: z.coerce.boolean().optional(),
-  blocked: z.coerce.boolean().optional(),
-  banned: z.coerce.boolean().optional(),
-}).merge(paginationSchema);
+export const userQuerySchema = z
+  .object({
+    search: z.string().optional(),
+    role: userRoleSchema.optional(),
+    step: authStepSchema.optional(),
+    confirmed: z.boolean().optional(),
+    blocked: z.boolean().optional(),
+    banned: z.boolean().optional(),
+  })
+  .merge(paginationSchema);
 
 // =============================================
 // USER MANAGEMENT SCHEMAS
@@ -79,24 +87,28 @@ export const setUserPasswordSchema = z.object({
 export const userPreferencesSchema = z.object({
   theme: z.enum(['light', 'dark', 'system']).default('system'),
   language: z.string().default('en'),
-  notifications: z.object({
-    email: z.boolean().default(true),
-    push: z.boolean().default(true),
-    sms: z.boolean().default(false),
-  }).default({
-    email: true,
-    push: true,
-    sms: false,
-  }),
-  privacy: z.object({
-    profileVisible: z.boolean().default(true),
-    showEmail: z.boolean().default(false),
-    showPhone: z.boolean().default(false),
-  }).default({
-    profileVisible: true,
-    showEmail: false,
-    showPhone: false,
-  }),
+  notifications: z
+    .object({
+      email: z.boolean().default(true),
+      push: z.boolean().default(true),
+      sms: z.boolean().default(false),
+    })
+    .default({
+      email: true,
+      push: true,
+      sms: false,
+    }),
+  privacy: z
+    .object({
+      profileVisible: z.boolean().default(true),
+      showEmail: z.boolean().default(false),
+      showPhone: z.boolean().default(false),
+    })
+    .default({
+      profileVisible: true,
+      showEmail: false,
+      showPhone: false,
+    }),
 });
 
 // =============================================

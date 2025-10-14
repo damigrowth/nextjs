@@ -135,10 +135,7 @@ export const serviceEditSchema = z.object({
   category: serviceTaxonomySchema,
   subcategory: serviceTaxonomySchema,
   subdivision: serviceTaxonomySchema,
-  tags: z.union([
-    z.array(serviceTagSchema),
-    z.array(z.string())
-  ]).optional(),
+  tags: z.union([z.array(serviceTagSchema), z.array(z.string())]).optional(),
   addons: z
     .array(formServiceAddonSchema)
     .max(3, 'Μέγιστος αριθμός επιπλέον υπηρεσιών: 3')
@@ -162,7 +159,8 @@ export const serviceEditSchema = z.object({
           indices.forEach((index) => {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: 'Οι τίτλοι των επιπλέον υπηρεσιών πρέπει να είναι μοναδικοί',
+              message:
+                'Οι τίτλοι των επιπλέον υπηρεσιών πρέπει να είναι μοναδικοί',
               path: [index, 'title'],
             });
           });
@@ -170,7 +168,9 @@ export const serviceEditSchema = z.object({
       });
 
       // Check for duplicate descriptions
-      const descriptions = addons.map((addon) => addon.description.toLowerCase().trim());
+      const descriptions = addons.map((addon) =>
+        addon.description.toLowerCase().trim(),
+      );
       const descriptionIndexMap = new Map<string, number[]>();
 
       descriptions.forEach((description, index) => {
@@ -185,7 +185,8 @@ export const serviceEditSchema = z.object({
           indices.forEach((index) => {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: 'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
+              message:
+                'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
               path: [index, 'description'],
             });
           });
@@ -256,8 +257,8 @@ export const serviceQuerySchema = z
     maxPrice: z.coerce.number().min(0).optional(),
     pricingType: z.string().optional(),
     location: z.string().optional(),
-    published: z.coerce.boolean().optional(),
-    featured: z.coerce.boolean().optional(),
+    published: z.boolean().optional(),
+    featured: z.boolean().optional(),
   })
   .merge(paginationSchema);
 
@@ -476,61 +477,67 @@ export const serviceDetailsSchema = z
   );
 
 // Step 4: Addons and FAQ Schema (optional)
-export const addonsAndFaqSchema = z.object({
-  addons: z
-    .array(formServiceAddonSchema)
-    .max(3, 'Μπορείτε να προσθέσετε έως 3 extra υπηρεσίες')
-    .optional()
-    .default([])
-    .refine(
-      (addons) => {
-        if (!addons || addons.length === 0) return true;
-        const titles = addons.map((addon) => addon.title.toLowerCase().trim());
-        return titles.length === new Set(titles).size;
-      },
-      {
-        message: 'Οι τίτλοι των επιπλέον υπηρεσιών πρέπει να είναι μοναδικοί',
-      },
-    )
-    .refine(
-      (addons) => {
-        if (!addons || addons.length === 0) return true;
-        const descriptions = addons.map((addon) =>
-          addon.description.toLowerCase().trim(),
-        );
-        return descriptions.length === new Set(descriptions).size;
-      },
-      {
-        message:
-          'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
-      },
-    ),
-  faq: z
-    .array(formServiceFaqSchema)
-    .max(5, 'Μπορείτε να προσθέσετε έως 5 συχνές ερωτήσεις')
-    .optional()
-    .default([])
-    .refine(
-      (faqs) => {
-        if (!faqs || faqs.length === 0) return true;
-        const questions = faqs.map((faq) => faq.question.toLowerCase().trim());
-        return questions.length === new Set(questions).size;
-      },
-      {
-        message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
-      },
-    )
-    .refine(
-      (faqs) => {
-        if (!faqs || faqs.length === 0) return true;
-        const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
-        return answers.length === new Set(answers).size;
-      },
-      {
-        message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
-      },
-    ),
-}).passthrough();
+export const addonsAndFaqSchema = z
+  .object({
+    addons: z
+      .array(formServiceAddonSchema)
+      .max(3, 'Μπορείτε να προσθέσετε έως 3 extra υπηρεσίες')
+      .optional()
+      .default([])
+      .refine(
+        (addons) => {
+          if (!addons || addons.length === 0) return true;
+          const titles = addons.map((addon) =>
+            addon.title.toLowerCase().trim(),
+          );
+          return titles.length === new Set(titles).size;
+        },
+        {
+          message: 'Οι τίτλοι των επιπλέον υπηρεσιών πρέπει να είναι μοναδικοί',
+        },
+      )
+      .refine(
+        (addons) => {
+          if (!addons || addons.length === 0) return true;
+          const descriptions = addons.map((addon) =>
+            addon.description.toLowerCase().trim(),
+          );
+          return descriptions.length === new Set(descriptions).size;
+        },
+        {
+          message:
+            'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
+        },
+      ),
+    faq: z
+      .array(formServiceFaqSchema)
+      .max(5, 'Μπορείτε να προσθέσετε έως 5 συχνές ερωτήσεις')
+      .optional()
+      .default([])
+      .refine(
+        (faqs) => {
+          if (!faqs || faqs.length === 0) return true;
+          const questions = faqs.map((faq) =>
+            faq.question.toLowerCase().trim(),
+          );
+          return questions.length === new Set(questions).size;
+        },
+        {
+          message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
+        },
+      )
+      .refine(
+        (faqs) => {
+          if (!faqs || faqs.length === 0) return true;
+          const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
+          return answers.length === new Set(answers).size;
+        },
+        {
+          message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
+        },
+      ),
+  })
+  .passthrough();
 
 // Step 5: Media Schema (optional)
 export const serviceMediaUploadSchema = z.object({
@@ -868,7 +875,9 @@ export const updateServiceMediaSchema = z.object({
 });
 
 // Update service info (everything except media)
-export const updateServiceInfoSchema = createServiceSchema.omit({ media: true }).partial();
+export const updateServiceInfoSchema = createServiceSchema
+  .omit({ media: true })
+  .partial();
 
 export type UpdateServiceMediaInput = z.infer<typeof updateServiceMediaSchema>;
 export type UpdateServiceInfoInput = z.infer<typeof updateServiceInfoSchema>;
