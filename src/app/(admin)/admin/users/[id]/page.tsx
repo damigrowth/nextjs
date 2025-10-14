@@ -468,7 +468,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
             </div>
 
             {/* User Management Forms - LAST SECTION */}
-            <div className='space-y-6'>
+            <div className='mx-auto w-full max-w-5xl px-4 lg:px-6 space-y-6'>
               <div>
                 <h2>User Management</h2>
                 <p className='text-muted-foreground'>

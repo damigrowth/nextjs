@@ -38,31 +38,7 @@ import {
 // Import types from centralized validation schemas
 import type { CreateUserInput, UpdateUserInput } from '@/lib/validations';
 import type { ActionResult } from '@/lib/types/api';
-
-// Helper function to get authenticated admin session with API key validation
-async function getAdminSession() {
-  const headersList = await headers();
-  const session = await auth.api.getSession({
-    headers: headersList,
-  });
-
-  if (!session?.user) {
-    redirect('/login');
-  }
-
-  // Check if user has admin role
-  const isAdmin = session.user.role === 'admin';
-
-  if (!isAdmin) {
-    throw new Error('Unauthorized: Admin role required');
-  }
-
-  // Additional API key validation could be added here if needed
-  // For now, we rely on the AdminGuard component to validate API keys client-side
-  // and the server-side session management to ensure secure access
-
-  return session;
-}
+import { getAdminSession } from './helpers';
 
 // Admin Actions using correct Better Auth API methods
 export async function getUser(userId: string) {
