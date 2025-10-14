@@ -4,12 +4,7 @@ import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SiteHeader, AdminVerificationActions } from '@/components/admin';
 import { formatDate, formatTime } from '@/lib/utils/date';
@@ -39,7 +34,9 @@ function getStatusBadgeClassName(status: string) {
   return '';
 }
 
-export default async function AdminVerificationDetailPage({ params }: PageProps) {
+export default async function AdminVerificationDetailPage({
+  params,
+}: PageProps) {
   // Verify admin authentication
   const userResult = await getCurrentUser({ revalidate: true });
 
@@ -78,7 +75,10 @@ export default async function AdminVerificationDetailPage({ params }: PageProps)
               </Link>
             </Button>
             <Button variant='outline' size='sm' asChild>
-              <Link href={`/admin/profiles/${verification.pid}`} target='_blank'>
+              <Link
+                href={`/admin/profiles/${verification.pid}`}
+                target='_blank'
+              >
                 <ExternalLink className='h-4 w-4' />
                 View Profile
               </Link>
@@ -93,7 +93,7 @@ export default async function AdminVerificationDetailPage({ params }: PageProps)
         }
       />
       <div className='flex flex-col gap-4 pb-6 pt-4 md:gap-6'>
-        <div className='px-4 lg:px-6'>
+        <div className='mx-auto w-full max-w-5xl px-4 lg:px-6'>
           <div className='space-y-6'>
             {/* Verification Details Card */}
             <Card>
@@ -105,11 +105,15 @@ export default async function AdminVerificationDetailPage({ params }: PageProps)
                   {/* Left Column */}
                   <div className='space-y-4'>
                     <div>
-                      <span className='text-sm text-muted-foreground'>Status</span>
+                      <span className='text-sm text-muted-foreground'>
+                        Status
+                      </span>
                       <div className='mt-1'>
                         <Badge
                           variant={getStatusBadgeVariant(verification.status)}
-                          className={getStatusBadgeClassName(verification.status)}
+                          className={getStatusBadgeClassName(
+                            verification.status,
+                          )}
                         >
                           {verification.status}
                         </Badge>
@@ -117,41 +121,62 @@ export default async function AdminVerificationDetailPage({ params }: PageProps)
                     </div>
                     <div>
                       <span className='text-sm text-muted-foreground'>AFM</span>
-                      <p className='text-sm font-medium mt-1'>{verification.afm || '—'}</p>
+                      <p className='text-sm font-medium mt-1'>
+                        {verification.afm || '—'}
+                      </p>
                     </div>
                     <div>
-                      <span className='text-sm text-muted-foreground'>Business Name</span>
-                      <p className='text-sm font-medium mt-1'>{verification.name || '—'}</p>
+                      <span className='text-sm text-muted-foreground'>
+                        Business Name
+                      </span>
+                      <p className='text-sm font-medium mt-1'>
+                        {verification.name || '—'}
+                      </p>
                     </div>
                     <div>
-                      <span className='text-sm text-muted-foreground'>Phone</span>
-                      <p className='text-sm font-medium mt-1'>{verification.phone || '—'}</p>
+                      <span className='text-sm text-muted-foreground'>
+                        Phone
+                      </span>
+                      <p className='text-sm font-medium mt-1'>
+                        {verification.phone || '—'}
+                      </p>
                     </div>
                   </div>
 
                   {/* Right Column */}
                   <div className='space-y-4'>
                     <div>
-                      <span className='text-sm text-muted-foreground'>Address</span>
-                      <p className='text-sm font-medium mt-1'>{verification.address || '—'}</p>
-                    </div>
-                    <div>
-                      <span className='text-sm text-muted-foreground'>Created</span>
+                      <span className='text-sm text-muted-foreground'>
+                        Address
+                      </span>
                       <p className='text-sm font-medium mt-1'>
-                        {formatDate(verification.createdAt)} at {formatTime(verification.createdAt)}
+                        {verification.address || '—'}
                       </p>
                     </div>
                     <div>
-                      <span className='text-sm text-muted-foreground'>Updated</span>
+                      <span className='text-sm text-muted-foreground'>
+                        Created
+                      </span>
                       <p className='text-sm font-medium mt-1'>
-                        {formatDate(verification.updatedAt)} at {formatTime(verification.updatedAt)}
+                        {formatDate(verification.createdAt)} at{' '}
+                        {formatTime(verification.createdAt)}
                       </p>
                     </div>
                     <div>
-                      <span className='text-sm text-muted-foreground'>Profile</span>
+                      <span className='text-sm text-muted-foreground'>
+                        Updated
+                      </span>
                       <p className='text-sm font-medium mt-1'>
-                        {verification.profile.displayName || 'Unnamed Profile'}
-                        {' '}
+                        {formatDate(verification.updatedAt)} at{' '}
+                        {formatTime(verification.updatedAt)}
+                      </p>
+                    </div>
+                    <div>
+                      <span className='text-sm text-muted-foreground'>
+                        Profile
+                      </span>
+                      <p className='text-sm font-medium mt-1'>
+                        {verification.profile.displayName || 'Unnamed Profile'}{' '}
                         <span className='text-muted-foreground'>
                           ({verification.profile.user.email})
                         </span>
@@ -165,7 +190,9 @@ export default async function AdminVerificationDetailPage({ params }: PageProps)
             {/* Action Buttons */}
             <AdminVerificationActions
               verificationId={verification.id}
-              profileName={verification.profile.displayName || 'Unnamed Profile'}
+              profileName={
+                verification.profile.displayName || 'Unnamed Profile'
+              }
               currentStatus={verification.status}
             />
           </div>

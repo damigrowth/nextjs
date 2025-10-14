@@ -104,17 +104,10 @@ export function AdminVerificationActions({
 
   return (
     <>
-      <div className='flex gap-3'>
+      <div className='flex justify-end gap-3'>
         {/* PENDING: Show Approve and Reject */}
         {currentStatus === 'PENDING' && (
           <>
-            <Button
-              onClick={() => setShowApproveDialog(true)}
-              disabled={isLoading}
-            >
-              <CheckCircle2 className='mr-2 h-4 w-4' />
-              Approve Verification
-            </Button>
             <Button
               variant='destructive'
               onClick={() => setShowRejectDialog(true)}
@@ -122,6 +115,13 @@ export function AdminVerificationActions({
             >
               <XCircle className='mr-2 h-4 w-4' />
               Reject Verification
+            </Button>
+            <Button
+              onClick={() => setShowApproveDialog(true)}
+              disabled={isLoading}
+            >
+              <CheckCircle2 className='mr-2 h-4 w-4' />
+              Approve Verification
             </Button>
           </>
         )}
@@ -152,19 +152,19 @@ export function AdminVerificationActions({
         {currentStatus === 'REJECTED' && (
           <>
             <Button
-              onClick={() => setShowApproveDialog(true)}
-              disabled={isLoading}
-            >
-              <CheckCircle2 className='mr-2 h-4 w-4' />
-              Approve Verification
-            </Button>
-            <Button
               variant='outline'
               onClick={() => setShowRevertDialog(true)}
               disabled={isLoading}
             >
               <RotateCcw className='mr-2 h-4 w-4' />
               Revert to Pending
+            </Button>
+            <Button
+              onClick={() => setShowApproveDialog(true)}
+              disabled={isLoading}
+            >
+              <CheckCircle2 className='mr-2 h-4 w-4' />
+              Approve Verification
             </Button>
           </>
         )}
