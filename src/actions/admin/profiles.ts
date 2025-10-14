@@ -20,26 +20,7 @@ import {
   type AdminDeleteProfileInput,
   type AdminUpdateVerificationInput,
 } from '@/lib/validations/admin';
-
-// Helper function to get authenticated admin session
-async function getAdminSession() {
-  const headersList = await headers();
-  const session = await auth.api.getSession({
-    headers: headersList,
-  });
-
-  if (!session?.user) {
-    redirect('/login');
-  }
-
-  const isAdmin = session.user.role === 'admin';
-
-  if (!isAdmin) {
-    throw new Error('Unauthorized: Admin role required');
-  }
-
-  return session;
-}
+import { getAdminSession } from './helpers';
 
 /**
  * List profiles with filters and pagination
