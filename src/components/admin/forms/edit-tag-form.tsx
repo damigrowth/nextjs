@@ -1,0 +1,59 @@
+'use client';
+
+import { updateTagSchema, type UpdateTagInput } from '@/lib/validations/admin';
+import { updateTagAction } from '@/actions/admin/tags';
+import type { DatasetItem } from '@/lib/types/datasets';
+import { TaxonomyFormWrapper } from './taxonomy-form-wrapper';
+import { LabelField, SlugField } from './taxonomy-form-fields';
+import { useSlugHandlers } from './use-slug-handlers';
+
+interface EditTagFormProps {
+  tag: {
+    id: string;
+    label: string;
+    slug: string;
+  };
+  existingItems: DatasetItem[];
+}
+
+export function EditTagForm({ tag, existingItems }: EditTagFormProps) {
+  return (
+    <TaxonomyFormWrapper<UpdateTagInput>
+      schema={updateTagSchema}
+      action={updateTagAction}
+      defaultValues={{
+        id: tag.id,
+        label: tag.label,
+        slug: tag.slug,
+      }}
+      successMessage='Tag updated successfully'
+      isEdit={true}
+      stringFields={['id', 'label', 'slug']}
+    >
+      {(form, isPending) => {
+        const { handleLabelChange, handleSlugRegenerate } = useSlugHandlers(form);
+
+        return (
+          <>
+            <LabelField
+              form={form}
+              isPending={isPending}
+              onLabelChange={handleLabelChange}
+              placeholder='Enter tag label'
+              description='The display name for this tag'
+            />
+
+            <SlugField
+              form={form}
+              isPending={isPending}
+              placeholder='tag-slug'
+              description='The URL-friendly identifier for this tag'
+              existingItems={existingItems}
+              onRegenerate={handleSlugRegenerate}
+            />
+          </>
+        );
+      }}
+    </TaxonomyFormWrapper>
+  );
+}
