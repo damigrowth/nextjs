@@ -114,8 +114,8 @@ function CategoryCard({ category }: { category: ServiceTaxonomy }) {
 export default function CategoriesHome({ categories = [] }: Props) {
   const featuredCategories =
     categories.length > 0
-      ? categories.filter((cat) => cat.featured === 't').slice(0, 8)
-      : serviceTaxonomies.filter((cat) => cat.featured === 't').slice(0, 8);
+      ? categories.filter((cat) => cat.featured === true).slice(0, 8)
+      : serviceTaxonomies.filter((cat) => cat.featured === true).slice(0, 8);
 
   const displayCategories = featuredCategories;
 

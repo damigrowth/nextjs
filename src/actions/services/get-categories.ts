@@ -1,11 +1,14 @@
 'use server';
 
 import { unstable_cache } from 'next/cache';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { serviceTaxonomies as importedServiceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { getServiceTaxonomyPaths } from './get-services';
 import { findBySlug, findById } from '@/lib/utils/datasets';
 import type { ActionResult } from '@/lib/types/api';
 import type { DatasetItem } from '@/lib/types/datasets';
+
+// Cast to proper type to allow optional image fields at all levels
+const serviceTaxonomies = importedServiceTaxonomies as DatasetItem[];
 
 // Types for categories page data
 export interface SubdivisionWithCount {

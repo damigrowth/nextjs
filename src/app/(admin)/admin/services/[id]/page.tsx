@@ -310,7 +310,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
             </div>
 
             {/* Service Management Forms - LAST SECTION */}
-            <div className='space-y-6'>
+            <div className='mx-auto w-full max-w-5xl px-4 lg:px-6 space-y-6'>
               <div>
                 <h2>Service Management</h2>
                 <p className='text-muted-foreground'>
