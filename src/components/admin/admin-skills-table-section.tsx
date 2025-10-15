@@ -1,4 +1,4 @@
-import { skills } from '@/constants/datasets/skills';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 import { AdminSkillsDataTable } from './admin-skills-data-table';
 import {
   processTableData,
@@ -14,6 +14,9 @@ interface AdminSkillsTableSectionProps {
 }
 
 export async function AdminSkillsTableSection({ searchParams }: AdminSkillsTableSectionProps) {
+  // Get skills including staged changes
+  const skills = await getTaxonomyWithStaging('skills');
+
   const categoryFilter = (skill: any, params: BaseSearchParams) => {
     const { category } = params;
     if (!category || category === 'all') return true;

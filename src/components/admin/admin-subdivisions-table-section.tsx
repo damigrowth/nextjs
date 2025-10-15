@@ -1,4 +1,4 @@
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 import { AdminSubdivisionsDataTable } from './admin-subdivisions-data-table';
 import type { DatasetItem } from '@/lib/types/datasets';
 import {
@@ -24,7 +24,8 @@ interface AdminSubdivisionsTableSectionProps {
 export async function AdminSubdivisionsTableSection({
   searchParams,
 }: AdminSubdivisionsTableSectionProps) {
-  // Flatten subdivisions from all categories and subcategories
+  // Flatten subdivisions from all categories and subcategories (including staged changes)
+  const serviceTaxonomies = await getTaxonomyWithStaging('service');
   const subdivisions: SubdivisionItem[] = [];
   serviceTaxonomies.forEach((category) => {
     category.children?.forEach((subcategory) => {

@@ -1,4 +1,4 @@
-import { tags } from '@/constants/datasets/tags';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 import { AdminTagsDataTable } from './admin-tags-data-table';
 import {
   processTableData,
@@ -13,6 +13,9 @@ interface AdminTagsTableSectionProps {
 }
 
 export async function AdminTagsTableSection({ searchParams }: AdminTagsTableSectionProps) {
+  // Get tags including staged changes
+  const tags = await getTaxonomyWithStaging('tags');
+
   const { paginatedData, totalPages, currentPage, currentLimit } = processTableData({
     data: tags,
     searchParams,

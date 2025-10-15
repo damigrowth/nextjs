@@ -1,5 +1,5 @@
 import { AdminProSubcategoriesDataTable } from './admin-pro-subcategories-data-table';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 import {
   processTableData,
   TableSectionWrapper,
@@ -25,7 +25,8 @@ interface ProSubcategory {
 export async function AdminProSubcategoriesTableSection({
   searchParams,
 }: ProSubcategoriesTableSectionProps) {
-  // Flatten subcategories with parent info
+  // Flatten subcategories with parent info (including staged changes)
+  const proTaxonomies = await getTaxonomyWithStaging('pro');
   const subcategories: ProSubcategory[] = [];
   proTaxonomies.forEach((category) => {
     category.children?.forEach((sub) => {

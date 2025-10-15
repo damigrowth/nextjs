@@ -1,5 +1,5 @@
 import { AdminSubcategoriesDataTable } from './admin-subcategories-data-table';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 import { DatasetItem } from '@/lib/types/datasets';
 import {
   processTableData,
@@ -22,7 +22,8 @@ interface SubcategoryItem extends DatasetItem {
 export async function AdminSubcategoriesTableSection({
   searchParams,
 }: AdminSubcategoriesTableSectionProps) {
-  // Flatten subcategories with parent category info
+  // Flatten subcategories with parent category info (including staged changes)
+  const serviceTaxonomies = await getTaxonomyWithStaging('service');
   const subcategories: SubcategoryItem[] = [];
   serviceTaxonomies.forEach((category) => {
     category.children?.forEach((subcategory) => {

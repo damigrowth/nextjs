@@ -1,5 +1,5 @@
 import { AdminProCategoriesDataTable } from './admin-pro-categories-data-table';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 import {
   processTableData,
   TableSectionWrapper,
@@ -14,7 +14,8 @@ interface ProCategoriesTableSectionProps {
 export async function AdminProCategoriesTableSection({
   searchParams,
 }: ProCategoriesTableSectionProps) {
-  // Map categories with child count
+  // Map categories with child count (including staged changes)
+  const proTaxonomies = await getTaxonomyWithStaging('pro');
   const categories = proTaxonomies.map((cat) => ({
     id: cat.id,
     label: cat.label,
