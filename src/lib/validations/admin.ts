@@ -15,6 +15,7 @@ import {
   accountUpdateSchema,
 } from '../validations';
 import { createServiceSchema } from './service';
+import { cloudinaryResourceSchema } from '../prisma/json-types';
 
 // =============================================
 // ADMIN USER MANAGEMENT SCHEMAS
@@ -481,11 +482,7 @@ export const createServiceTaxonomySchema = z.object({
   parentId: z.string().optional(),
   featured: z.boolean().optional(),
   icon: z.string().optional(),
-  imageUrl: z
-    .string()
-    .url('Please enter a valid URL')
-    .optional()
-    .or(z.literal('')),
+  image: cloudinaryResourceSchema.nullable().optional(),
 });
 
 export type CreateServiceTaxonomyInput = z.infer<
@@ -508,11 +505,7 @@ export const updateServiceTaxonomySchema = z.object({
   parentId: z.string().optional(),
   featured: z.boolean().optional(),
   icon: z.string().optional(),
-  imageUrl: z
-    .string()
-    .url('Please enter a valid URL')
-    .optional()
-    .or(z.literal('')),
+  image: cloudinaryResourceSchema.nullable().optional(),
 });
 
 export type UpdateServiceTaxonomyInput = z.infer<
