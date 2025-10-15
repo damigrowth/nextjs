@@ -12,12 +12,13 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { GitCommit } from 'lucide-react';
+import type { GitStatusResponse } from '@/lib/types/github';
 
 interface CommitFormProps {
   onCommit: (message: string) => Promise<void>;
   isCommitting: boolean;
   branch: string;
-  modifiedFiles?: Array<{ file: string; status: string }>;
+  modifiedFiles?: GitStatusResponse['data']['modifiedFiles'];
 }
 
 export function CommitForm({
