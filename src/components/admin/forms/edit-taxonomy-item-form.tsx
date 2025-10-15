@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useActionState, useState } from 'react';
+import { useEffect, useActionState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -29,10 +29,11 @@ import {
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { LabelField, SlugField } from './taxonomy-form-fields';
 import { useSlugHandlers } from './use-slug-handlers';
+import { CloudinaryMediaPicker } from '@/components/media/cloudinary-media-picker';
+import type { CloudinaryResource } from '@/lib/types/cloudinary';
 
 type EditTaxonomyItemFormValues = z.infer<typeof updateServiceTaxonomySchema>;
 
@@ -59,9 +60,6 @@ export function EditTaxonomyItemForm({
     updateServiceTaxonomyAction,
     null,
   );
-  const [imagePreview, setImagePreview] = useState(
-    taxonomy.image?.secure_url || taxonomy.image?.url || '',
-  );
 
   const form = useForm<EditTaxonomyItemFormValues>({
     resolver: zodResolver(updateServiceTaxonomySchema),
@@ -75,22 +73,12 @@ export function EditTaxonomyItemForm({
       parentId: taxonomy.parentId || '',
       featured: taxonomy.featured || false,
       icon: taxonomy.icon || '',
-      imageUrl: taxonomy.image?.secure_url || taxonomy.image?.url || '',
+      image: taxonomy.image || null,
     },
   });
 
-  // Watch the imageUrl and label fields for changes using useWatch
-  const imageUrl = useWatch({ control: form.control, name: 'imageUrl' });
+  // Watch the label field for changes using useWatch
   const labelValue = useWatch({ control: form.control, name: 'label' });
-
-  // Update image preview when imageUrl changes
-  useEffect(() => {
-    if (imageUrl && imageUrl.trim() !== '') {
-      setImagePreview(imageUrl);
-    } else {
-      setImagePreview('');
-    }
-  }, [imageUrl]);
 
   useEffect(() => {
     if (state?.success) {
@@ -117,9 +105,9 @@ export function EditTaxonomyItemForm({
         'level',
         'parentId',
         'icon',
-        'imageUrl',
       ],
       booleanFields: ['featured'],
+      jsonFields: ['image'],
     });
 
     formAction(formData);
@@ -249,31 +237,20 @@ export function EditTaxonomyItemForm({
 
         <FormField
           control={form.control}
-          name='imageUrl'
+          name='image'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image URL</FormLabel>
+              <FormLabel>Image</FormLabel>
               <FormControl>
-                <Input placeholder='https://example.com/image.jpg' {...field} />
+                <CloudinaryMediaPicker
+                  value={field.value}
+                  onChange={field.onChange}
+                />
               </FormControl>
               <FormDescription>
-                Enter the full URL of the image (Cloudinary or other CDN)
+                Browse and select an image from your Cloudinary Media Library
               </FormDescription>
               <FormMessage />
-              {imagePreview && (
-                <div className='mt-4 border rounded-lg p-4 bg-muted/50'>
-                  <p className='text-sm font-medium mb-2'>Image Preview:</p>
-                  <div className='relative w-full h-48 rounded-md overflow-hidden bg-gray-100'>
-                    <Image
-                      src={imagePreview}
-                      alt='Preview'
-                      fill
-                      className='object-contain'
-                      onError={() => setImagePreview('')}
-                    />
-                  </div>
-                </div>
-              )}
             </FormItem>
           )}
         />
