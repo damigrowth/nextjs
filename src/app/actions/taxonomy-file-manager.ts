@@ -7,6 +7,46 @@ import { formatTaxonomyFile } from './shared-file-formatter';
  */
 export type TaxonomyType = 'service' | 'pro' | 'tags' | 'skills';
 
+/**
+ * Normalize property order for consistent file formatting
+ * Ensures properties appear in the same order as the dataset structure
+ */
+function normalizeItemProperties(item: any): any {
+  // Create a new object with properties in the correct order
+  const normalized: any = {
+    id: item.id,
+    label: item.label,
+    slug: item.slug,
+  };
+
+  // Add optional properties in order
+  if (item.description !== undefined) {
+    normalized.description = item.description;
+  }
+
+  // Normalize image properties if present
+  if (item.image) {
+    normalized.image = {
+      public_id: item.image.public_id,
+      secure_url: item.image.secure_url,
+      width: item.image.width,
+      height: item.image.height,
+      resource_type: item.image.resource_type,
+      format: item.image.format,
+      bytes: item.image.bytes,
+      url: item.image.url,
+      original_filename: item.image.original_filename,
+    };
+  }
+
+  // Add children if present (recursively normalize)
+  if (item.children && item.children.length > 0) {
+    normalized.children = item.children.map(normalizeItemProperties);
+  }
+
+  return normalized;
+}
+
 interface TaxonomyConfig {
   filePath: string;
   exportName: string;
@@ -64,13 +104,36 @@ function getConfig(type: TaxonomyType): TaxonomyConfig {
 }
 
 /**
- * Read a taxonomy file from disk
+ * Read a taxonomy file from GitHub API (or disk for local dev)
  */
 export async function readTaxonomyFile(type: TaxonomyType): Promise<string> {
   const config = getConfig(type);
-  const filePath = path.join(process.cwd(), config.filePath);
-  const content = await fs.readFile(filePath, 'utf-8');
-  return content;
+
+  // Use GitHub API for reading taxonomy files
+  try {
+    const { getGitHubClient, REPO_CONFIG } = await import('@/lib/github/client');
+    const octokit = getGitHubClient();
+    const { owner, repo, defaultBranch } = REPO_CONFIG;
+
+    const response = await octokit.rest.repos.getContent({
+      owner,
+      repo,
+      path: config.filePath,
+      ref: defaultBranch,
+    });
+
+    if ('content' in response.data && response.data.type === 'file') {
+      // Decode base64 content
+      const content = Buffer.from(response.data.content, 'base64').toString('utf-8');
+      return content;
+    }
+
+    throw new Error(`Failed to read ${config.filePath}: Not a file`);
+  } catch (error) {
+    throw new Error(
+      `Failed to read ${type} taxonomy file: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 }
 
 /**
@@ -190,4 +253,112 @@ export function updateTaxonomyInFileContent(
   }
 
   return updatedContent;
+}
+
+/**
+ * Apply staged changes to file content preserving formatting
+ * Parses the data, applies changes, then regenerates WITHOUT any formatting/prettifying
+ */
+export async function applyStagedChangesToFileContent(
+  content: string,
+  changes: Array<{
+    operation: 'create' | 'update' | 'delete';
+    taxonomyType: string;
+    targetId?: string;
+    itemId?: string;
+    data: any;
+    level?: string;
+    parentId?: string;
+  }>
+): Promise<string> {
+  const taxonomyType = changes[0]?.taxonomyType as TaxonomyType;
+  if (!taxonomyType) {
+    throw new Error('Cannot determine taxonomy type from changes');
+  }
+
+  // Parse current data
+  const currentData = parseTaxonomyFile(taxonomyType, content);
+
+  // Apply changes to the data structure
+  let updatedData = [...currentData];
+
+  for (const change of changes) {
+    switch (change.operation) {
+      case 'create':
+        if (change.level === 'subcategory' && change.parentId) {
+          // Add subcategory under parent category
+          updatedData = updatedData.map((cat) =>
+            cat.id === change.parentId
+              ? { ...cat, children: [...(cat.children || []), change.data] }
+              : cat,
+          );
+        } else if (change.level === 'subdivision' && change.parentId) {
+          // Add subdivision under parent subcategory
+          updatedData = updatedData.map((cat) => ({
+            ...cat,
+            children: cat.children?.map((sub) =>
+              sub.id === change.parentId
+                ? { ...sub, children: [...(sub.children || []), change.data] }
+                : sub,
+            ),
+          }));
+        } else {
+          // Category or flat taxonomy - add to root
+          updatedData.push(change.data);
+        }
+        break;
+
+      case 'update': {
+        const targetId = change.targetId || change.itemId;
+        if (!targetId) break;
+
+        updatedData = updatedData.map((cat) => {
+          if (cat.id === targetId) {
+            return normalizeItemProperties({ ...cat, ...change.data });
+          }
+          if (cat.children) {
+            return {
+              ...cat,
+              children: cat.children.map((sub: any) => {
+                if (sub.id === targetId) {
+                  return normalizeItemProperties({ ...sub, ...change.data });
+                }
+                if (sub.children) {
+                  return {
+                    ...sub,
+                    children: sub.children.map((div: any) =>
+                      div.id === targetId ? normalizeItemProperties({ ...div, ...change.data }) : div,
+                    ),
+                  };
+                }
+                return sub;
+              }),
+            };
+          }
+          return cat;
+        });
+        break;
+      }
+
+      case 'delete': {
+        const targetId = change.targetId || change.itemId;
+        if (!targetId) break;
+
+        updatedData = updatedData.filter((cat) => cat.id !== targetId);
+        updatedData = updatedData.map((cat) => ({
+          ...cat,
+          children: cat.children
+            ?.filter((sub) => sub.id !== targetId)
+            .map((sub) => ({
+              ...sub,
+              children: sub.children?.filter((div) => div.id !== targetId),
+            })),
+        }));
+        break;
+      }
+    }
+  }
+
+  // Generate new content using Prettier for consistent formatting
+  return generateTaxonomyFileContent(taxonomyType, updatedData);
 }
