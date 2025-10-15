@@ -1,113 +1,191 @@
 'use server';
 
-import { execSync } from 'child_process';
+import {
+  getGitHubClient,
+  REPO_CONFIG,
+  DATASET_FILES,
+  validateRepoConfig,
+} from '@/lib/github/client';
+import {
+  getCurrentBranch,
+  getFileContent,
+  detectFileChanges,
+  getCommitDiff,
+  createCommit,
+  getLatestCommitSha,
+  getRecentCommits as fetchRecentCommits,
+  getCommitsAhead,
+} from '@/actions/github/operations';
 import { getAdminSession } from './helpers';
-
-// Dataset files that can be managed through admin
-const DATASET_FILES = [
-  'src/constants/datasets/service-taxonomies.ts',
-  'src/constants/datasets/pro-taxonomies.ts',
-  'src/constants/datasets/skills.ts',
-  'src/constants/datasets/tags.ts',
-];
+import type {
+  GitStatusResponse,
+  CommitResponse,
+  PushResponse,
+  RecentCommitsResponse,
+  UndoCommitResponse,
+} from '@/lib/types/github';
 
 /**
- * Get current Git status and uncommitted changes for dataset files only
+ * Get current Git status and uncommitted staged changes for dataset files
+ * Uses staging table from database instead of local filesystem
  */
-export async function getGitStatus() {
+export async function getGitStatus(): Promise<GitStatusResponse> {
   try {
     await getAdminSession();
+    validateRepoConfig();
 
-    const cwd = process.cwd();
+    const octokit = getGitHubClient();
+    const { defaultBranch, comparisonBranch } = REPO_CONFIG;
 
-    // Get status of all modified files
-    const fullStatus = execSync('git status --porcelain', {
-      cwd,
-      encoding: 'utf-8',
-    });
+    // Use defaultBranch as current working branch
+    const currentBranch = defaultBranch;
 
-    // Get current branch
-    const branch = execSync('git rev-parse --abbrev-ref HEAD', {
-      cwd,
-      encoding: 'utf-8',
-    }).trim();
+    // Verify branch exists on remote
+    await getCurrentBranch(octokit, currentBranch);
 
-    // Parse all modified files
-    const allModifiedFiles = fullStatus
-      .split('\n')
-      .filter((line) => line.trim())
-      .map((line) => {
-        // Git status format: XY filename
-        // X = status in index, Y = status in working tree
-        const statusCode = line.substring(0, 2).trim();
-        const filePath = line.substring(3).trim();
+    // Get staged changes from database
+    const { getStagedChanges } = await import('./taxonomy-staging');
+    const { readTaxonomyFile, applyStagedChangesToFileContent } = await import('@/app/actions/taxonomy-file-manager');
 
-        // Map status codes to readable names
-        let status = 'Modified';
-        if (statusCode.includes('M')) status = 'Modified';
-        else if (statusCode.includes('A')) status = 'Added';
-        else if (statusCode.includes('D')) status = 'Deleted';
-        else if (statusCode.includes('R')) status = 'Renamed';
-        else if (statusCode.includes('?')) status = 'Untracked';
+    const stagedChanges = await getStagedChanges();
 
-        return { status, file: filePath, statusCode };
-      });
+    // Group staged changes by taxonomy type
+    const changesByType = new Map<string, typeof stagedChanges>();
+    for (const change of stagedChanges) {
+      const existing = changesByType.get(change.taxonomyType) || [];
+      existing.push(change);
+      changesByType.set(change.taxonomyType, existing);
+    }
 
-    // Filter to only include dataset files
-    const datasetModifiedFiles = allModifiedFiles.filter((file) =>
-      DATASET_FILES.some((datasetFile) => file.file === datasetFile)
-    );
+    // Generate modified file content with staged changes applied surgically
+    const localFiles = new Map<string, string>();
 
-    // Get diff for all modified dataset files
-    const datasetDiffs: Record<string, string> = {};
-    for (const file of datasetModifiedFiles) {
-      if (file.statusCode !== '??') { // Skip untracked files for diff
-        try {
-          const diff = execSync(`git diff ${file.file}`, {
-            cwd,
-            encoding: 'utf-8',
-          });
-          datasetDiffs[file.file] = diff;
-        } catch (error) {
-          console.warn(`[GIT_STATUS] Could not get diff for ${file.file}:`, error);
-          datasetDiffs[file.file] = '';
+    for (const [taxonomyType, changes] of changesByType) {
+      try {
+        // Read current state from GitHub
+        const currentContent = await readTaxonomyFile(taxonomyType as any);
+
+        // Apply staged changes surgically (preserves formatting)
+        const newContent = await applyStagedChangesToFileContent(currentContent, changes);
+
+        // Map to corresponding file path
+        const filePathMap: Record<string, string> = {
+          'service': 'src/constants/datasets/service-taxonomies.ts',
+          'pro': 'src/constants/datasets/pro-taxonomies.ts',
+          'tags': 'src/constants/datasets/tags.ts',
+          'skills': 'src/constants/datasets/skills.ts',
+        };
+
+        const filePath = filePathMap[taxonomyType];
+        if (filePath) {
+          localFiles.set(filePath, newContent);
         }
+      } catch (error) {
+        console.warn(
+          `[GIT_STATUS] Could not process staged changes for ${taxonomyType}:`,
+          error,
+        );
       }
     }
 
-    // Check if any dataset files have changes
-    const hasDatasetChanges = datasetModifiedFiles.length > 0;
+    // Detect changes by comparing with remote
+    const modifiedFiles = await detectFileChanges(
+      octokit,
+      localFiles,
+      currentBranch,
+    );
+
+    // Generate actual diffs using diff library
+    const datasetDiffs: Record<string, string> = {};
+    const { structuredPatch } = await import('diff');
+
+    for (const { file } of modifiedFiles) {
+      try {
+        const remoteFile = await getFileContent(octokit, file, currentBranch);
+        const remoteContent = remoteFile.content
+          ? Buffer.from(remoteFile.content, 'base64').toString('utf-8')
+          : '';
+        const localContent = localFiles.get(file) || '';
+
+        // Generate structured patch (similar to git diff)
+        const patch = structuredPatch(
+          file,
+          file,
+          remoteContent,
+          localContent,
+          'Remote',
+          'Local'
+        );
+
+        // Convert to unified diff format
+        let unifiedDiff = `--- ${patch.oldFileName}\n+++ ${patch.newFileName}\n`;
+
+        for (const hunk of patch.hunks) {
+          unifiedDiff += `@@ -${hunk.oldStart},${hunk.oldLines} +${hunk.newStart},${hunk.newLines} @@\n`;
+          unifiedDiff += hunk.lines.join('\n') + '\n';
+        }
+
+        datasetDiffs[file] = unifiedDiff;
+      } catch (error) {
+        console.warn(
+          `[GIT_STATUS] Could not generate diff for ${file}:`,
+          error,
+        );
+        datasetDiffs[file] = 'Unable to generate diff';
+      }
+    }
+
+    // Check how many commits ahead of comparison branch
+    // For datasets branch: compare with stack-migration (now) or main (after migration)
+    let aheadBy = 0;
+    try {
+      const comparison = await getCommitDiff(
+        octokit,
+        comparisonBranch,
+        currentBranch,
+      );
+      aheadBy = comparison.ahead_by;
+    } catch (error) {
+      console.warn(
+        `[GIT_STATUS] Could not compare ${currentBranch} with ${comparisonBranch}:`,
+        error,
+      );
+      // Branch comparison might fail if branch doesn't exist on remote yet
+    }
 
     return {
       success: true,
       data: {
-        status: fullStatus,
-        branch,
+        branch: currentBranch,
+        hasDatasetChanges: modifiedFiles.length > 0,
+        modifiedFiles,
         datasetDiffs,
-        hasDatasetChanges,
-        modifiedFiles: datasetModifiedFiles,
-        allModifiedCount: allModifiedFiles.length,
-        datasetModifiedCount: datasetModifiedFiles.length,
+        datasetModifiedCount: modifiedFiles.length,
+        ahead_by: aheadBy,
       },
     };
   } catch (error) {
     console.error('[GIT_STATUS] Error:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to get Git status',
+      error:
+        error instanceof Error ? error.message : 'Failed to get Git status',
     };
   }
 }
 
 /**
  * Commit dataset changes with a descriptive message
- * Commits all modified dataset files (taxonomies, skills, tags, etc.)
+ * Creates a commit via GitHub API with all modified dataset files
  */
-export async function commitDatasetChanges(message: string) {
+export async function commitDatasetChanges(
+  message: string,
+): Promise<CommitResponse> {
   try {
     await getAdminSession();
+    validateRepoConfig();
 
-    const cwd = process.cwd();
+    const octokit = getGitHubClient();
 
     // Get current status to see which dataset files are modified
     const statusResult = await getGitStatus();
@@ -115,231 +193,454 @@ export async function commitDatasetChanges(message: string) {
       throw new Error('Failed to get Git status');
     }
 
-    const modifiedDatasetFiles = statusResult.data.modifiedFiles;
+    const modifiedFiles = statusResult.data.modifiedFiles;
 
-    if (modifiedDatasetFiles.length === 0) {
+    if (modifiedFiles.length === 0) {
       return {
         success: false,
         error: 'No dataset files to commit',
       };
     }
 
-    // Add all modified dataset files
-    for (const file of modifiedDatasetFiles) {
-      execSync(`git add ${file.file}`, { cwd });
-      console.log(`[GIT_COMMIT] Added file: ${file.file}`);
+    const branch = statusResult.data.branch;
+
+    // Get staged changes and apply them surgically to preserve formatting
+    const { getStagedChanges, clearStagedChanges } = await import('./taxonomy-staging');
+    const { readTaxonomyFile, applyStagedChangesToFileContent } = await import('@/app/actions/taxonomy-file-manager');
+
+    const stagedChanges = await getStagedChanges();
+
+    // Group by taxonomy type and generate final content
+    const changesByType = new Map<string, typeof stagedChanges>();
+    for (const change of stagedChanges) {
+      const existing = changesByType.get(change.taxonomyType) || [];
+      existing.push(change);
+      changesByType.set(change.taxonomyType, existing);
     }
 
-    // Create commit
-    execSync(`git commit -m "${message.replace(/"/g, '\\"')}"`, {
-      cwd,
-      encoding: 'utf-8',
-    });
+    const filesToCommit: Array<{ path: string; content: string }> = [];
 
-    // Get commit hash
-    const commitHash = execSync('git rev-parse HEAD', {
-      cwd,
-      encoding: 'utf-8',
-    }).trim();
+    for (const [taxonomyType, changes] of changesByType) {
+      try {
+        // Read current state from GitHub
+        const currentContent = await readTaxonomyFile(taxonomyType as any);
 
-    console.log('[GIT_COMMIT] Created commit:', commitHash);
-    console.log('[GIT_COMMIT] Committed files:', modifiedDatasetFiles.map(f => f.file).join(', '));
+        // Apply staged changes surgically (preserves formatting)
+        const newContent = await applyStagedChangesToFileContent(currentContent, changes);
+
+        // Map to file path
+        const filePathMap: Record<string, string> = {
+          'service': 'src/constants/datasets/service-taxonomies.ts',
+          'pro': 'src/constants/datasets/pro-taxonomies.ts',
+          'tags': 'src/constants/datasets/tags.ts',
+          'skills': 'src/constants/datasets/skills.ts',
+        };
+
+        const filePath = filePathMap[taxonomyType];
+        if (filePath) {
+          filesToCommit.push({
+            path: filePath,
+            content: newContent,
+          });
+        }
+      } catch (error) {
+        console.error(`[GIT_COMMIT] Error processing ${taxonomyType}:`, error);
+        throw new Error(`Failed to process ${taxonomyType} staged changes`);
+      }
+    }
+
+    if (filesToCommit.length === 0) {
+      return {
+        success: false,
+        error: 'No files to commit after processing staged changes',
+      };
+    }
+
+    // Get latest commit SHA for parent
+    const parentSha = await getLatestCommitSha(octokit, branch);
+
+    // Create commit with all files
+    const commitSha = await createCommit(
+      octokit,
+      branch,
+      message,
+      filesToCommit,
+      parentSha,
+    );
+
+    // Clear staged changes after successful commit
+    await clearStagedChanges();
+
+    const { owner, repo } = REPO_CONFIG;
+    const commitUrl = `https://github.com/${owner}/${repo}/commit/${commitSha}`;
 
     return {
       success: true,
       data: {
-        commitHash,
+        commitSha,
         message,
-        filesCommitted: modifiedDatasetFiles.map(f => f.file),
+        filesCommitted: filesToCommit.map((f) => f.path),
+        commitUrl,
       },
     };
   } catch (error) {
     console.error('[GIT_COMMIT] Error:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to commit changes',
+      error:
+        error instanceof Error ? error.message : 'Failed to commit changes',
     };
   }
 }
 
 /**
  * Push commits to remote branch
+ * Note: With GitHub API, commits are created directly on remote,
+ * so this function mainly serves to maintain API compatibility
+ * and can provide status information
  */
-export async function pushToRemote(branch?: string) {
+export async function pushToRemote(branch?: string): Promise<PushResponse> {
   try {
     await getAdminSession();
+    validateRepoConfig();
 
-    const cwd = process.cwd();
+    const octokit = getGitHubClient();
+    const { defaultBranch } = REPO_CONFIG;
 
-    // Get current branch if not specified
-    const targetBranch =
-      branch ||
-      execSync('git rev-parse --abbrev-ref HEAD', {
-        cwd,
-        encoding: 'utf-8',
-      }).trim();
+    // Use provided branch or default branch
+    const currentBranch = branch || defaultBranch;
 
-    // Push to remote
-    execSync(`git push origin ${targetBranch}`, {
-      cwd,
-      encoding: 'utf-8',
-    });
+    // Verify branch exists
+    await getCurrentBranch(octokit, currentBranch);
 
-    console.log('[GIT_PUSH] Pushed to origin/' + targetBranch);
+    // With GitHub API, commits are already on remote
+    // This is a compatibility function that confirms the state
+
+    // Get recent commits count
+    const commitsResult = await getRecentCommits(10);
+    const commitCount = commitsResult.data?.commits.length || 0;
 
     return {
       success: true,
       data: {
-        branch: targetBranch,
+        branch: currentBranch,
+        commitCount,
       },
     };
   } catch (error) {
     console.error('[GIT_PUSH] Error:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to push to remote',
-    };
-  }
-}
-
-/**
- * Rollback the last commit (soft reset)
- */
-export async function rollbackLastCommit() {
-  try {
-    await getAdminSession();
-
-    const cwd = process.cwd();
-
-    // Get the last commit message for reference
-    const lastCommitMessage = execSync('git log -1 --pretty=%B', {
-      cwd,
-      encoding: 'utf-8',
-    }).trim();
-
-    // Soft reset to previous commit (keeps changes in working directory)
-    execSync('git reset --soft HEAD~1', { cwd });
-
-    console.log('[GIT_ROLLBACK] Rolled back commit:', lastCommitMessage);
-
-    return {
-      success: true,
-      data: {
-        rolledBackMessage: lastCommitMessage,
-      },
-    };
-  } catch (error) {
-    console.error('[GIT_ROLLBACK] Error:', error);
-    return {
-      success: false,
       error:
-        error instanceof Error ? error.message : 'Failed to rollback commit',
+        error instanceof Error ? error.message : 'Failed to push to remote',
     };
   }
 }
 
 /**
- * Get count of unpushed commits
+ * Get recent commits ahead of comparison branch (for datasets branch)
+ * Shows commits on datasets branch that are ahead of comparison branch (stack-migration or main)
+ * For Vercel compatibility: uses GitHub API only, no local git commands
  */
-export async function getUnpushedCommitsCount() {
+export async function getRecentCommits(
+  limit: number = 10,
+  branch?: string,
+): Promise<RecentCommitsResponse> {
   try {
     await getAdminSession();
+    validateRepoConfig();
 
-    const cwd = process.cwd();
+    const octokit = getGitHubClient();
+    const { defaultBranch, comparisonBranch } = REPO_CONFIG;
 
-    // Get current branch
-    const branch = execSync('git rev-parse --abbrev-ref HEAD', {
-      cwd,
-      encoding: 'utf-8',
-    }).trim();
+    // Use provided branch or detect from Vercel environment
+    let currentBranch = branch || process.env.VERCEL_GIT_COMMIT_REF || defaultBranch;
 
-    // Count commits ahead of remote
-    const count = execSync(
-      `git rev-list --count origin/${branch}..HEAD`,
-      {
-        cwd,
-        encoding: 'utf-8',
-      }
-    ).trim();
-
-    return {
-      success: true,
-      data: {
-        count: parseInt(count, 10) || 0,
-      },
-    };
-  } catch (error) {
-    console.error('[GIT_COUNT] Error:', error);
-    // Return 0 if there's an error (e.g., remote branch doesn't exist)
-    return {
-      success: true,
-      data: {
-        count: 0,
-      },
-    };
-  }
-}
-
-/**
- * Get unpushed commits (commits that haven't been pushed to remote)
- */
-export async function getRecentCommits(limit: number = 10) {
-  try {
-    await getAdminSession();
-
-    const cwd = process.cwd();
-
-    // Get current branch
-    const branch = execSync('git rev-parse --abbrev-ref HEAD', {
-      cwd,
-      encoding: 'utf-8',
-    }).trim();
-
-    // Get unpushed commits (commits ahead of remote)
-    const log = execSync(
-      `git log origin/${branch}..HEAD --pretty=format:"%H|||%h|||%an|||%ai|||%s"`,
-      {
-        cwd,
-        encoding: 'utf-8',
-      }
-    );
-
-    // If no unpushed commits, return empty array
-    if (!log.trim()) {
-      return {
-        success: true,
-        data: {
-          commits: [],
-        },
-      };
+    // Always compare with comparison branch to show dataset-specific commits
+    let commits;
+    try {
+      // Get commits ahead of comparison branch (commits that would be pushed/merged)
+      commits = await getCommitsAhead(octokit, comparisonBranch, currentBranch);
+      commits = commits.slice(0, limit);
+    } catch (error) {
+      console.warn(
+        `[GIT_LOG] Could not compare ${currentBranch} with ${comparisonBranch}:`,
+        error,
+      );
+      // Fallback: show recent commits on current branch
+      commits = await fetchRecentCommits(octokit, currentBranch, limit);
     }
 
-    // Parse commits (each line is a delimited string)
-    const commits = log
-      .split('\n')
-      .filter((line) => line.trim())
-      .map((line) => {
-        const [hash, shortHash, author, date, message] = line.split('|||');
-        return {
-          hash: hash || '',
-          shortHash: shortHash || '',
-          author: author || '',
-          date: date || '',
-          message: message || '',
-        };
-      });
+    // Format commits for UI and sort by date (latest first)
+    const formattedCommits = commits
+      .map((commit) => ({
+        hash: commit.sha,
+        shortHash: commit.sha.substring(0, 7),
+        author: commit.commit.author.name,
+        date: new Date(commit.commit.author.date).toLocaleString(),
+        timestamp: new Date(commit.commit.author.date).getTime(),
+        message: commit.commit.message.split('\n')[0], // First line only
+        url: commit.html_url,
+      }))
+      .sort((a, b) => b.timestamp - a.timestamp) // Latest first
+      .map(({ timestamp, ...commit }) => commit); // Remove timestamp from final output
 
     return {
       success: true,
       data: {
-        commits,
+        commits: formattedCommits,
       },
     };
   } catch (error) {
     console.error('[GIT_LOG] Error:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to get commit log',
+      error:
+        error instanceof Error ? error.message : 'Failed to get commit log',
+    };
+  }
+}
+
+/**
+ * Discard all staged changes (pending changes in database)
+ */
+export async function discardStagedChanges(): Promise<{
+  success: boolean;
+  message?: string;
+  error?: string;
+}> {
+  try {
+    await getAdminSession();
+
+    const { clearStagedChanges } = await import('./taxonomy-staging');
+    const count = await clearStagedChanges();
+
+    return {
+      success: true,
+      message: `Discarded ${count} staged change${count === 1 ? '' : 's'}`,
+    };
+  } catch (error) {
+    console.error('[DISCARD_STAGED] Error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to discard staged changes',
+    };
+  }
+}
+
+/**
+ * Revert commits by creating a new commit that undoes changes
+ * @param commitHashes - Array of commit SHAs to revert (newest to oldest)
+ */
+export async function revertCommits(
+  commitHashes: string[],
+): Promise<CommitResponse> {
+  try {
+    await getAdminSession();
+    validateRepoConfig();
+
+    if (!commitHashes || commitHashes.length === 0) {
+      throw new Error('No commits specified to revert');
+    }
+
+    const octokit = getGitHubClient();
+    const { defaultBranch, owner, repo } = REPO_CONFIG;
+
+    // For each commit, get the files it changed
+    const filesToRevert = new Set<string>();
+    const commitMessages: string[] = [];
+
+    for (const commitHash of commitHashes) {
+      try {
+        const commit = await octokit.repos.getCommit({
+          owner,
+          repo,
+          ref: commitHash,
+        });
+
+        commitMessages.push(commit.data.commit.message.split('\n')[0]);
+
+        // Track which files were changed
+        if (commit.data.files) {
+          commit.data.files.forEach((file) => {
+            filesToRevert.add(file.filename);
+          });
+        }
+      } catch (error) {
+        console.warn(`[REVERT_COMMITS] Could not fetch commit ${commitHash}:`, error);
+      }
+    }
+
+    if (filesToRevert.size === 0) {
+      throw new Error('No files found to revert');
+    }
+
+    // Get the parent of the oldest commit to revert (the state before changes)
+    const oldestCommit = commitHashes[commitHashes.length - 1];
+    const oldestCommitData = await octokit.repos.getCommit({
+      owner,
+      repo,
+      ref: oldestCommit,
+    });
+
+    const parentSha = oldestCommitData.data.parents[0]?.sha;
+    if (!parentSha) {
+      throw new Error('Could not find parent commit to revert to');
+    }
+
+    // Get file contents from the parent commit
+    const filesToCommit: Array<{ path: string; content: string }> = [];
+
+    for (const filePath of filesToRevert) {
+      try {
+        const fileData = await getFileContent(octokit, filePath, parentSha);
+        // getFileContent returns an object, extract content
+        const content =
+          typeof fileData === 'string' ? fileData : fileData.content;
+        filesToCommit.push({
+          path: filePath,
+          content: content,
+        });
+      } catch (error) {
+        console.warn(
+          `[REVERT_COMMITS] Could not get content for ${filePath}:`,
+          error,
+        );
+      }
+    }
+
+    if (filesToCommit.length === 0) {
+      throw new Error('No file contents retrieved for revert');
+    }
+
+    // Get current branch HEAD to use as parent for revert commit
+    const currentBranchHead = await getLatestCommitSha(octokit, defaultBranch);
+
+    // Create revert commit
+    const revertMessage = `Revert: ${commitMessages.join(', ')}\n\nReverted commits:\n${commitHashes.map((hash) => `- ${hash.substring(0, 7)}`).join('\n')}`;
+
+    const newCommitSha = await createCommit(
+      octokit,
+      defaultBranch,
+      revertMessage,
+      filesToCommit,
+      currentBranchHead,
+    );
+
+    // Construct commit URL
+    const commitUrl = `https://github.com/${owner}/${repo}/commit/${newCommitSha}`;
+
+    return {
+      success: true,
+      data: {
+        commitSha: newCommitSha,
+        message: revertMessage,
+        filesCommitted: filesToCommit.map((f) => f.path),
+        commitUrl,
+      },
+    };
+  } catch (error) {
+    console.error('[REVERT_COMMITS] Error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'Failed to revert commits',
+    };
+  }
+}
+
+/**
+ * Undo the last commit by resetting the branch HEAD to its parent
+ * Similar to GitHub Desktop's "Undo Commit" or `git reset --hard HEAD~1`
+ *
+ * WARNING: This is a destructive operation that rewrites history.
+ * It will trigger a Vercel deployment if the branch is connected.
+ *
+ * @param count - Number of commits to undo (default: 1)
+ * @returns Information about the undone commit(s) for potential recovery
+ */
+export async function undoLastCommit(count: number = 1): Promise<UndoCommitResponse> {
+  try {
+    await getAdminSession();
+    validateRepoConfig();
+
+    if (count < 1 || count > 10) {
+      throw new Error('Count must be between 1 and 10');
+    }
+
+    const octokit = getGitHubClient();
+    const { defaultBranch, owner, repo } = REPO_CONFIG;
+
+    // Get current HEAD commit
+    const currentRef = await octokit.git.getRef({
+      owner,
+      repo,
+      ref: `heads/${defaultBranch}`,
+    });
+
+    const currentSha = currentRef.data.object.sha;
+
+    // Get the commits we're about to undo (for logging and recovery)
+    const undoneCommits = [];
+    let targetSha = currentSha;
+
+    for (let i = 0; i < count; i++) {
+      const commit = await octokit.repos.getCommit({
+        owner,
+        repo,
+        ref: targetSha,
+      });
+
+      undoneCommits.push({
+        sha: commit.data.sha,
+        shortSha: commit.data.sha.substring(0, 7),
+        message: commit.data.commit.message.split('\n')[0],
+        author: commit.data.commit.author.name || 'Unknown',
+        date: new Date(commit.data.commit.author.date).toLocaleString(),
+      });
+
+      // Get parent for next iteration
+      const parentSha = commit.data.parents[0]?.sha;
+      if (!parentSha) {
+        throw new Error(`Cannot undo commit ${commit.data.sha}: no parent commit found (initial commit?)`);
+      }
+
+      targetSha = parentSha;
+    }
+
+    // targetSha now points to the commit we want to reset to
+    const newHeadSha = targetSha;
+
+    // Update the branch reference to point to the new HEAD
+    // This is equivalent to `git reset --hard HEAD~${count}`
+    await octokit.git.updateRef({
+      owner,
+      repo,
+      ref: `heads/${defaultBranch}`,
+      sha: newHeadSha,
+      force: true, // Required to move the ref backward
+    });
+
+    const newHeadUrl = `https://github.com/${owner}/${repo}/commit/${newHeadSha}`;
+
+    return {
+      success: true,
+      data: {
+        branch: defaultBranch,
+        undoneCommits,
+        newHeadSha,
+        newHeadUrl,
+      },
+    };
+  } catch (error) {
+    console.error('[UNDO_COMMIT] Error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'Failed to undo commit',
     };
   }
 }

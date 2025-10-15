@@ -18,12 +18,23 @@ export function createFormDataAction<TInput, TOutput>(
     formData: FormData
   ): Promise<ActionResult<TOutput>> {
     try {
-      // Extract all FormData entries and convert boolean strings properly
+      // Extract all FormData entries and convert boolean strings and JSON strings properly
       const rawData = Object.fromEntries(
         Array.from(formData.entries()).map(([key, value]) => {
           // Convert "true"/"false" strings to actual booleans
           if (value === 'true') return [key, true];
           if (value === 'false') return [key, false];
+
+          // Try to parse JSON strings (for objects and arrays)
+          if (typeof value === 'string' && (value.startsWith('{') || value.startsWith('['))) {
+            try {
+              return [key, JSON.parse(value)];
+            } catch {
+              // If parsing fails, return original string
+              return [key, value];
+            }
+          }
+
           return [key, value];
         })
       );
