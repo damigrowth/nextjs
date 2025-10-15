@@ -1,10 +1,13 @@
 import { TaxonomyCreatePage } from '@/components/admin';
 import { CreateTagForm } from '@/components/admin/forms/create-tag-form';
-import { tags } from '@/constants/datasets/tags';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 
 export const dynamic = 'force-dynamic';
 
-export default function CreateTagPage() {
+export default async function CreateTagPage() {
+  // Fetch taxonomy data with staged changes applied
+  const tags = await getTaxonomyWithStaging('tags');
+
   return (
     <TaxonomyCreatePage
       title='Create Tag'

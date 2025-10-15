@@ -1,11 +1,14 @@
 import { TaxonomyCreatePage } from '@/components/admin';
 import { CreateSkillForm } from '@/components/admin/forms/create-skill-form';
-import { skills } from '@/constants/datasets/skills';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 
 export const dynamic = 'force-dynamic';
 
-export default function CreateSkillPage() {
+export default async function CreateSkillPage() {
+  // Fetch taxonomy data with staged changes applied
+  const skills = await getTaxonomyWithStaging('skills');
+  const proTaxonomies = await getTaxonomyWithStaging('pro');
+
   return (
     <TaxonomyCreatePage
       title='Create Skill'

@@ -1,7 +1,6 @@
 import { TaxonomyEditPage } from '@/components/admin';
 import { EditSkillForm } from '@/components/admin/forms/edit-skill-form';
-import { skills } from '@/constants/datasets/skills';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +14,9 @@ export default async function SkillDetailPage({
   params,
 }: SkillDetailPageProps) {
   const { id } = await params;
+  // Get skills and pro taxonomies including staged changes
+  const skills = await getTaxonomyWithStaging('skills');
+  const proTaxonomies = await getTaxonomyWithStaging('pro');
 
   return (
     <TaxonomyEditPage

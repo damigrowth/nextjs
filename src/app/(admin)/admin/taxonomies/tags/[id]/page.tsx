@@ -1,6 +1,6 @@
 import { TaxonomyEditPage } from '@/components/admin';
 import { EditTagForm } from '@/components/admin/forms/edit-tag-form';
-import { tags } from '@/constants/datasets/tags';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +12,8 @@ interface TagDetailPageProps {
 
 export default async function TagDetailPage({ params }: TagDetailPageProps) {
   const { id } = await params;
+  // Get tags including staged changes
+  const tags = await getTaxonomyWithStaging('tags');
 
   return (
     <TaxonomyEditPage
