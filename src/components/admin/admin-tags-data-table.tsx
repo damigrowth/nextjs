@@ -3,27 +3,32 @@
 import React from 'react';
 import { AdminDataTable } from './admin-data-table';
 import { columnRenderers } from './table-columns/column-renderers';
-
-interface TagItem {
-  id: string;
-  slug: string;
-  label: string;
-}
+import { DatasetItem } from '@/lib/types/datasets';
 
 interface AdminTagsDataTableProps {
-  data: TagItem[];
+  data: DatasetItem[];
   loading?: boolean;
 }
 
-export function AdminTagsDataTable({ data, loading = false }: AdminTagsDataTableProps) {
+export function AdminTagsDataTable({
+  data,
+  loading = false,
+}: AdminTagsDataTableProps) {
   const basePath = '/admin/taxonomies/tags';
 
   const columns = [
-    columnRenderers.id<TagItem>(),
-    columnRenderers.label<TagItem>(basePath),
-    columnRenderers.slug<TagItem>(),
-    columnRenderers.actionsIcon<TagItem>(basePath),
+    columnRenderers.id<DatasetItem>(),
+    columnRenderers.label<DatasetItem>(basePath),
+    columnRenderers.slug<DatasetItem>(),
+    columnRenderers.actionsIcon<DatasetItem>(basePath),
   ];
 
-  return <AdminDataTable data={data} columns={columns} loading={loading} basePath={basePath} />;
+  return (
+    <AdminDataTable
+      data={data}
+      columns={columns}
+      loading={loading}
+      basePath={basePath}
+    />
+  );
 }

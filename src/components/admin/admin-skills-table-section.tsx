@@ -13,7 +13,9 @@ interface AdminSkillsTableSectionProps {
   searchParams: BaseSearchParams;
 }
 
-export async function AdminSkillsTableSection({ searchParams }: AdminSkillsTableSectionProps) {
+export async function AdminSkillsTableSection({
+  searchParams,
+}: AdminSkillsTableSectionProps) {
   // Get skills including staged changes
   const skills = await getTaxonomyWithStaging('skills');
 
@@ -24,13 +26,14 @@ export async function AdminSkillsTableSection({ searchParams }: AdminSkillsTable
     return skill.category === category;
   };
 
-  const { paginatedData, totalPages, currentPage, currentLimit } = processTableData({
-    data: skills,
-    searchParams,
-    basePath: '/admin/taxonomies/skills',
-    filterFn: combineFilters(standardSearchFilter, categoryFilter),
-    sortFn: standardSortFn,
-  });
+  const { paginatedData, totalPages, currentPage, currentLimit } =
+    processTableData({
+      data: skills,
+      searchParams,
+      basePath: '/admin/taxonomies/skills',
+      filterFn: combineFilters(standardSearchFilter, categoryFilter),
+      sortFn: standardSortFn,
+    });
 
   return (
     <TableSectionWrapper

@@ -9,11 +9,7 @@ import { useSlugHandlers } from './use-slug-handlers';
 import type { UseFormReturn } from 'react-hook-form';
 
 interface EditTagFormProps {
-  tag: {
-    id: string;
-    label: string;
-    slug: string;
-  };
+  tag: DatasetItem;
   existingItems: DatasetItem[];
 }
 

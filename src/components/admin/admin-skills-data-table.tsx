@@ -4,29 +4,33 @@ import React from 'react';
 import { AdminDataTable } from './admin-data-table';
 import { columnRenderers } from './table-columns/column-renderers';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
-
-interface SkillItem {
-  id: string;
-  slug: string;
-  label: string;
-  category?: string;
-}
+import { DatasetItem } from '@/lib/types/datasets';
 
 interface AdminSkillsDataTableProps {
-  data: SkillItem[];
+  data: DatasetItem[];
   loading?: boolean;
 }
 
-export function AdminSkillsDataTable({ data, loading = false }: AdminSkillsDataTableProps) {
+export function AdminSkillsDataTable({
+  data,
+  loading = false,
+}: AdminSkillsDataTableProps) {
   const basePath = '/admin/taxonomies/skills';
 
   const columns = [
-    columnRenderers.id<SkillItem>(),
-    columnRenderers.label<SkillItem>(basePath),
-    columnRenderers.slug<SkillItem>(),
-    columnRenderers.categoryLookup<SkillItem>('category', proTaxonomies),
-    columnRenderers.actionsIcon<SkillItem>(basePath),
+    columnRenderers.id<DatasetItem>(),
+    columnRenderers.label<DatasetItem>(basePath),
+    columnRenderers.slug<DatasetItem>(),
+    columnRenderers.categoryLookup<DatasetItem>('category', proTaxonomies),
+    columnRenderers.actionsIcon<DatasetItem>(basePath),
   ];
 
-  return <AdminDataTable data={data} columns={columns} loading={loading} basePath={basePath} />;
+  return (
+    <AdminDataTable
+      data={data}
+      columns={columns}
+      loading={loading}
+      basePath={basePath}
+    />
+  );
 }

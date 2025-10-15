@@ -1,6 +1,9 @@
 'use client';
 
-import { updateSkillSchema, type UpdateSkillInput } from '@/lib/validations/admin';
+import {
+  updateSkillSchema,
+  type UpdateSkillInput,
+} from '@/lib/validations/admin';
 import { updateSkillAction } from '@/actions/admin/skills';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { TaxonomyFormWrapper } from './taxonomy-form-wrapper';
@@ -9,12 +12,7 @@ import { useSlugHandlers } from './use-slug-handlers';
 import type { UseFormReturn } from 'react-hook-form';
 
 interface EditSkillFormProps {
-  skill: {
-    id: string;
-    label: string;
-    slug: string;
-    category?: string;
-  };
+  skill: DatasetItem;
   existingItems: DatasetItem[];
   categories: DatasetItem[];
 }
@@ -63,7 +61,11 @@ function EditSkillFormFields({
   );
 }
 
-export function EditSkillForm({ skill, existingItems, categories }: EditSkillFormProps) {
+export function EditSkillForm({
+  skill,
+  existingItems,
+  categories,
+}: EditSkillFormProps) {
   return (
     <TaxonomyFormWrapper<UpdateSkillInput>
       schema={updateSkillSchema}
