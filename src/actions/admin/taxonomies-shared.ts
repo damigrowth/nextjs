@@ -59,6 +59,46 @@ function findDuplicateSlug(
 }
 
 /**
+ * Normalize property order for consistent file formatting
+ * Ensures properties appear in the same order as the dataset structure
+ */
+function normalizeItemProperties(item: DatasetItem): DatasetItem {
+  // Create a new object with properties in the correct order
+  const normalized: DatasetItem = {
+    id: item.id,
+    label: item.label,
+    slug: item.slug,
+  };
+
+  // Add optional properties in order
+  if (item.description !== undefined) {
+    normalized.description = item.description;
+  }
+
+  // Normalize image properties if present
+  if (item.image) {
+    normalized.image = {
+      public_id: item.image.public_id,
+      secure_url: item.image.secure_url,
+      width: item.image.width,
+      height: item.image.height,
+      resource_type: item.image.resource_type,
+      format: item.image.format,
+      bytes: item.image.bytes,
+      url: item.image.url,
+      original_filename: item.image.original_filename,
+    };
+  }
+
+  // Add children if present (recursively normalize)
+  if (item.children && item.children.length > 0) {
+    normalized.children = item.children.map(normalizeItemProperties);
+  }
+
+  return normalized;
+}
+
+/**
  * Handle errors
  */
 function handleError(error: unknown): ActionResult {
@@ -91,41 +131,53 @@ function handleError(error: unknown): ActionResult {
 
 /**
  * Create a new item
+ * Stages the change in database for Git commit workflow
  */
 export async function createItem(
   config: TaxonomyConfig,
-  data: Omit<DatasetItem, 'id'>
+  data: Omit<DatasetItem, 'id'>,
+  hierarchyInfo?: {
+    level?: 'category' | 'subcategory' | 'subdivision';
+    parentId?: string;
+  }
 ): Promise<ActionResult<{ backupPath: string; id: string }>> {
   try {
-    await getAdminSession();
+    const session = await getAdminSession();
 
     const result = await withLock(`${config.type}-create`, async () => {
       console.log(`[${config.type.toUpperCase()}_CREATE] Starting: ${data.slug}`);
 
-      const backupPath = await backupTaxonomyFile(config.type);
-      const fileContent = await readTaxonomyFile(config.type);
-      const currentItems = parseTaxonomyFile(config.type, fileContent) as DatasetItem[];
+      // Read current state INCLUDING staged changes to avoid duplicate IDs
+      const { getTaxonomyWithStaging } = await import('./get-taxonomy-with-staging');
+      const currentItems = await getTaxonomyWithStaging(config.type as any) as DatasetItem[];
 
       // Generate unique slug if conflicts exist
       const uniqueSlug = generateUniqueSlug(data.slug!, currentItems);
 
       const newId = getNextId(currentItems);
       const newItem = { id: newId, ...data, slug: uniqueSlug };
-      const updatedItems = [...currentItems, newItem];
 
-      const newContent = await generateTaxonomyFileContent(config.type, updatedItems);
-      await writeTaxonomyFile(config.type, newContent);
+      // Normalize property order before staging
+      const normalizedItem = normalizeItemProperties(newItem);
 
-      revalidatePath(config.basePath, 'page');
+      // Stage the change in database WITH hierarchy info
+      const { createStagedChange } = await import('./taxonomy-staging');
+      await createStagedChange(
+        config.type as any,
+        'create',
+        normalizedItem,
+        undefined, // itemId not needed for creates
+        hierarchyInfo, // Pass hierarchy info (level and parentId)
+      );
 
-      console.log(`[${config.type.toUpperCase()}_CREATE] Completed: ${newId} with slug: ${uniqueSlug}`);
+      console.log(`[${config.type.toUpperCase()}_CREATE] Staged for commit: ${newId} with slug: ${uniqueSlug}${hierarchyInfo ? ` under parent ${hierarchyInfo.parentId}` : ''}`);
 
-      return { backupPath, id: newId };
+      return { backupPath: 'staged', id: newId };
     });
 
     return {
       success: true,
-      message: `${config.typeName.charAt(0).toUpperCase() + config.typeName.slice(1)} operation completed successfully`,
+      message: `${config.typeName.charAt(0).toUpperCase() + config.typeName.slice(1)} staged successfully. Go to /admin/git to commit.`,
       data: result,
     };
   } catch (error) {
@@ -135,20 +187,21 @@ export async function createItem(
 
 /**
  * Update an existing item
+ * Stages the change in database for Git commit workflow
  */
 export async function updateItem(
   config: TaxonomyConfig,
   data: DatasetItem
 ): Promise<ActionResult<{ backupPath: string }>> {
   try {
-    await getAdminSession();
+    const session = await getAdminSession();
 
     const result = await withLock(`${config.type}-update`, async () => {
       console.log(`[${config.type.toUpperCase()}_UPDATE] Starting: ${data.id}`);
 
-      const backupPath = await backupTaxonomyFile(config.type);
-      const fileContent = await readTaxonomyFile(config.type);
-      const currentItems = parseTaxonomyFile(config.type, fileContent) as DatasetItem[];
+      // Read current state INCLUDING staged changes for accurate validation
+      const { getTaxonomyWithStaging } = await import('./get-taxonomy-with-staging');
+      const currentItems = await getTaxonomyWithStaging(config.type as any) as DatasetItem[];
 
       const itemIndex = currentItems.findIndex((item) => item.id === data.id);
       if (itemIndex === -1) {
@@ -158,23 +211,26 @@ export async function updateItem(
       // Generate unique slug if conflicts exist (excluding current item)
       const uniqueSlug = generateUniqueSlug(data.slug!, currentItems, data.id);
 
-      const updatedItems = [...currentItems];
-      updatedItems[itemIndex] = { ...data, slug: uniqueSlug };
+      // Normalize property order before staging
+      const normalizedData = normalizeItemProperties({ ...data, slug: uniqueSlug });
 
-      const newContent = await generateTaxonomyFileContent(config.type, updatedItems);
-      await writeTaxonomyFile(config.type, newContent);
+      // Stage the change in database
+      const { createStagedChange } = await import('./taxonomy-staging');
+      await createStagedChange(
+        config.type as any,
+        'update',
+        normalizedData,
+        data.id,
+      );
 
-      revalidatePath(config.basePath, 'page');
-      revalidatePath(`${config.basePath}/${data.id}`, 'page');
+      console.log(`[${config.type.toUpperCase()}_UPDATE] Staged for commit: ${data.id} with slug: ${uniqueSlug}`);
 
-      console.log(`[${config.type.toUpperCase()}_UPDATE] Completed: ${data.id} with slug: ${uniqueSlug}`);
-
-      return { backupPath };
+      return { backupPath: 'staged' };
     });
 
     return {
       success: true,
-      message: `${config.typeName.charAt(0).toUpperCase() + config.typeName.slice(1)} operation completed successfully`,
+      message: `${config.typeName.charAt(0).toUpperCase() + config.typeName.slice(1)} staged successfully. Go to /admin/git to commit.`,
       data: result,
     };
   } catch (error) {
@@ -184,18 +240,19 @@ export async function updateItem(
 
 /**
  * Delete an item
+ * Stages the deletion in database for Git commit workflow
  */
 export async function deleteItem(
   config: TaxonomyConfig,
   id: string
 ): Promise<ActionResult<{ backupPath: string }>> {
   try {
-    await getAdminSession();
+    const session = await getAdminSession();
 
     const result = await withLock(`${config.type}-delete`, async () => {
       console.log(`[${config.type.toUpperCase()}_DELETE] Starting: ${id}`);
 
-      const backupPath = await backupTaxonomyFile(config.type);
+      // Read current state from GitHub API
       const fileContent = await readTaxonomyFile(config.type);
       const currentItems = parseTaxonomyFile(config.type, fileContent) as DatasetItem[];
 
@@ -204,21 +261,23 @@ export async function deleteItem(
         throw new Error(`${config.typeName.charAt(0).toUpperCase() + config.typeName.slice(1)} with ID "${id}" not found`);
       }
 
-      const updatedItems = currentItems.filter((item) => item.id !== id);
+      // Stage the deletion in database
+      const { createStagedChange } = await import('./taxonomy-staging');
+      await createStagedChange(
+        config.type as any,
+        'delete',
+        itemExists, // Store the item data for potential rollback
+        id,
+      );
 
-      const newContent = await generateTaxonomyFileContent(config.type, updatedItems);
-      await writeTaxonomyFile(config.type, newContent);
+      console.log(`[${config.type.toUpperCase()}_DELETE] Staged for commit: ${id}`);
 
-      revalidatePath(config.basePath, 'page');
-
-      console.log(`[${config.type.toUpperCase()}_DELETE] Completed: ${id}`);
-
-      return { backupPath };
+      return { backupPath: 'staged' };
     });
 
     return {
       success: true,
-      message: `${config.typeName.charAt(0).toUpperCase() + config.typeName.slice(1)} operation completed successfully`,
+      message: `${config.typeName.charAt(0).toUpperCase() + config.typeName.slice(1)} deletion staged successfully. Go to /admin/git to commit.`,
       data: result,
     };
   } catch (error) {
@@ -358,6 +417,7 @@ function updateHierarchicalItemById(
 
 /**
  * Update a hierarchical item
+ * Stages the change in database for Git commit workflow
  */
 export async function updateHierarchicalItem(
   config: TaxonomyConfig,
@@ -369,47 +429,46 @@ export async function updateHierarchicalItem(
   }
 ): Promise<ActionResult<{ backupPath: string }>> {
   try {
-    await getAdminSession();
+    const session = await getAdminSession();
 
     const result = await withLock(`${config.type}-update`, async () => {
       console.log(`[${config.type.toUpperCase()}_UPDATE] Starting update for ${data.level} ID: ${data.id}`);
 
-      const backupPath = await backupTaxonomyFile(config.type);
-      const fileContent = await readTaxonomyFile(config.type);
-      const currentItems = parseTaxonomyFile(config.type, fileContent) as DatasetItem[];
+      // Read current state INCLUDING staged changes for accurate validation
+      const { getTaxonomyWithStaging } = await import('./get-taxonomy-with-staging');
+      const currentItems = await getTaxonomyWithStaging(config.type as any) as DatasetItem[];
+
+      // Find the existing item
+      const existingItem = findHierarchicalItemById(currentItems, data.id);
+      if (!existingItem) {
+        throw new Error(`${config.typeName.charAt(0).toUpperCase() + config.typeName.slice(1)} with ID "${data.id}" not found`);
+      }
 
       // Generate unique slug if slug is being updated (excluding current item)
       const updatesWithUniqueSlug = data.updates.slug
         ? { ...data.updates, slug: generateUniqueSlug(data.updates.slug, currentItems, data.id) }
         : data.updates;
 
-      const updatedItems = updateHierarchicalItemById(
-        currentItems,
+      // Merge updates with existing item
+      const updatedItem = { ...existingItem, ...updatesWithUniqueSlug };
+
+      // Stage the change in database
+      const { createStagedChange } = await import('./taxonomy-staging');
+      await createStagedChange(
+        config.type as any,
+        'update',
+        updatedItem,
         data.id,
-        data.level,
-        updatesWithUniqueSlug
       );
 
-      const newContent = await generateTaxonomyFileContent(config.type, updatedItems);
-      await writeTaxonomyFile(config.type, newContent);
+      console.log(`[${config.type.toUpperCase()}_UPDATE] Staged for commit: ${data.id}`);
 
-      // Revalidate base path
-      revalidatePath(config.basePath, 'page');
-      revalidatePath(`${config.basePath}/${data.id}`, 'page');
-
-      // Revalidate additional paths if provided
-      if (data.revalidatePaths) {
-        data.revalidatePaths.forEach(path => revalidatePath(path, 'page'));
-      }
-
-      console.log(`[${config.type.toUpperCase()}_UPDATE] Update completed successfully for ID: ${data.id}`);
-
-      return { backupPath };
+      return { backupPath: 'staged' };
     });
 
     return {
       success: true,
-      message: `${config.typeName.charAt(0).toUpperCase() + config.typeName.slice(1)} operation completed successfully`,
+      message: `${config.typeName.charAt(0).toUpperCase() + config.typeName.slice(1)} staged successfully. Go to /admin/git to commit.`,
       data: result,
     };
   } catch (error) {
@@ -420,6 +479,7 @@ export async function updateHierarchicalItem(
 
 /**
  * Create a hierarchical item
+ * Stages the change in database for Git commit workflow
  */
 export async function createHierarchicalItem(
   config: TaxonomyConfig,
@@ -432,14 +492,14 @@ export async function createHierarchicalItem(
   }
 ): Promise<ActionResult<{ backupPath: string; id: string }>> {
   try {
-    await getAdminSession();
+    const session = await getAdminSession();
 
     const result = await withLock(`${config.type}-create`, async () => {
       console.log(`[${config.type.toUpperCase()}_CREATE] Starting creation for ${data.level}: ${data.item.slug}`);
 
-      const backupPath = await backupTaxonomyFile(config.type);
-      const fileContent = await readTaxonomyFile(config.type);
-      const currentItems = parseTaxonomyFile(config.type, fileContent) as DatasetItem[];
+      // Read current state INCLUDING staged changes to avoid duplicate IDs
+      const { getTaxonomyWithStaging } = await import('./get-taxonomy-with-staging');
+      const currentItems = await getTaxonomyWithStaging(config.type as any) as DatasetItem[];
 
       // Generate unique slug if conflicts exist
       const uniqueSlug = generateUniqueSlug(data.item.slug!, currentItems);
@@ -454,30 +514,25 @@ export async function createHierarchicalItem(
       }
 
       const newItem = { id: newId, ...data.item, slug: uniqueSlug };
-      const updatedItems = addHierarchicalItemById(
-        currentItems,
+
+      // Stage the change in database with hierarchy info
+      const { createStagedChange } = await import('./taxonomy-staging');
+      await createStagedChange(
+        config.type as any,
+        'create',
         newItem,
-        data.level,
-        data.parentId
+        undefined,
+        { level: data.level, parentId: data.parentId }
       );
 
-      const newContent = await generateTaxonomyFileContent(config.type, updatedItems);
-      await writeTaxonomyFile(config.type, newContent);
+      console.log(`[${config.type.toUpperCase()}_CREATE] Staged for commit: ${newId} (${data.level}) with slug: ${uniqueSlug}`);
 
-      revalidatePath(config.basePath, 'page');
-
-      if (data.revalidatePaths) {
-        data.revalidatePaths.forEach(path => revalidatePath(path, 'page'));
-      }
-
-      console.log(`[${config.type.toUpperCase()}_CREATE] Creation completed successfully for ID: ${newId} with slug: ${uniqueSlug}`);
-
-      return { backupPath, id: newId };
+      return { backupPath: 'staged', id: newId };
     });
 
     return {
       success: true,
-      message: `${config.typeName.charAt(0).toUpperCase() + config.typeName.slice(1)} operation completed successfully`,
+      message: `${config.typeName.charAt(0).toUpperCase() + config.typeName.slice(1)} staged successfully. Go to /admin/git to commit.`,
       data: result,
     };
   } catch (error) {

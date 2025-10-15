@@ -3,6 +3,7 @@
 import { createServiceTaxonomySchema, updateServiceTaxonomySchema } from '@/lib/validations/admin';
 import type { DatasetItem } from '@/lib/types/datasets';
 import type { ActionResult } from '@/lib/types/api';
+import type { CloudinaryResource } from '@/lib/types/cloudinary';
 import {
   TaxonomyConfig,
   createHierarchicalItem,
@@ -26,7 +27,7 @@ export async function createServiceTaxonomy(data: {
   parentId?: string;
   featured?: boolean;
   icon?: string;
-  imageUrl?: string;
+  image?: CloudinaryResource | null;
 }): Promise<ActionResult<{ backupPath: string; id: string }>> {
   const newItem: Omit<DatasetItem, 'id'> = {
     label: data.label,
@@ -41,12 +42,9 @@ export async function createServiceTaxonomy(data: {
     newItem.icon = data.icon || '';
   }
 
-  // Add image if provided
-  if (data.imageUrl) {
-    newItem.image = {
-      secure_url: data.imageUrl,
-      url: data.imageUrl,
-    };
+  // Add image if provided (full CloudinaryResource object)
+  if (data.image) {
+    newItem.image = data.image;
   }
 
   const revalidatePaths = [
@@ -82,7 +80,7 @@ export async function updateServiceTaxonomy(data: {
   parentId?: string;
   featured?: boolean;
   icon?: string;
-  imageUrl?: string;
+  image?: CloudinaryResource | null;
 }): Promise<ActionResult<{ backupPath: string }>> {
   const updates: Record<string, any> = {
     label: data.label,
@@ -97,16 +95,9 @@ export async function updateServiceTaxonomy(data: {
     if (data.icon !== undefined) updates.icon = data.icon || '';
   }
 
-  // Allow empty string to clear image
-  if (data.imageUrl !== undefined) {
-    if (data.imageUrl) {
-      updates.image = {
-        secure_url: data.imageUrl,
-        url: data.imageUrl,
-      };
-    } else {
-      updates.image = undefined;
-    }
+  // Handle CloudinaryResource object - allow null to clear image
+  if (data.image !== undefined) {
+    updates.image = data.image || undefined;
   }
 
   const revalidatePaths = [
