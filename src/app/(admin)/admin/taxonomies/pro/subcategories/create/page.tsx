@@ -1,9 +1,12 @@
 import { TaxonomyCreatePage, CreateProTaxonomyForm } from '@/components/admin';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 
 export const dynamic = 'force-dynamic';
 
-export default function CreateProSubcategoryPage() {
+export default async function CreateProSubcategoryPage() {
+  // Fetch taxonomy data with staged changes applied
+  const proTaxonomies = await getTaxonomyWithStaging('pro');
+
   return (
     <TaxonomyCreatePage
       title='Create Professional Subcategory'

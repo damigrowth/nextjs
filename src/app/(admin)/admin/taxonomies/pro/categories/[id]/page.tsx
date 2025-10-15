@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { SiteHeader, EditProTaxonomyForm } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 import { findById } from '@/lib/utils/datasets';
 
 export const dynamic = 'force-dynamic';
@@ -15,6 +15,8 @@ interface PageProps {
 
 export default async function EditProCategoryPage({ params }: PageProps) {
   const { id } = await params;
+  // Get taxonomies including staged changes
+  const proTaxonomies = await getTaxonomyWithStaging('pro');
   const taxonomy = findById(proTaxonomies, id);
 
   // Verify it's a top-level category
