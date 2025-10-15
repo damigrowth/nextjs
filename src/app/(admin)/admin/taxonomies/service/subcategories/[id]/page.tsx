@@ -5,7 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SiteHeader } from '@/components/admin';
 import { EditTaxonomyItemForm } from '@/components/admin/forms';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 import { findById, getItemPath } from '@/lib/utils/datasets';
 import { DatasetItem } from '@/lib/types/datasets';
 
@@ -17,6 +17,8 @@ interface PageProps {
 
 export default async function EditSubcategoryPage({ params }: PageProps) {
   const { id } = await params;
+  // Get taxonomies including staged changes
+  const serviceTaxonomies = await getTaxonomyWithStaging('service');
   const taxonomy = findById(serviceTaxonomies as DatasetItem[], id);
   const path = getItemPath(serviceTaxonomies as DatasetItem[], id);
 

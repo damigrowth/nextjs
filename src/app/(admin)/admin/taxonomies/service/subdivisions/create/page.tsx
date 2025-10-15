@@ -2,11 +2,14 @@ import {
   TaxonomyCreatePage,
   CreateServiceTaxonomyForm,
 } from '@/components/admin';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 
 export const dynamic = 'force-dynamic';
 
-export default function CreateSubdivisionPage() {
+export default async function CreateSubdivisionPage() {
+  // Fetch taxonomy data with staged changes applied
+  const serviceTaxonomies = await getTaxonomyWithStaging('service');
+
   return (
     <TaxonomyCreatePage
       title='Create Subdivision'
