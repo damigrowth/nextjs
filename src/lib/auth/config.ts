@@ -28,6 +28,7 @@ export const auth = betterAuth({
       enabled: true,
       maxAge: 2 * 60, // Cache session data for 2 minutes in signed cookies for faster updates
     },
+    freshAge: 60 * 60 * 24, // 1 day - sessions are considered "fresh" for 24 hours (needed for deleteUser)
   },
   emailAndPassword: {
     enabled: true,
@@ -133,6 +134,15 @@ export const auth = betterAuth({
       image: { type: 'string', required: false }, // Profile image JSON string synced from profile
       confirmed: { type: 'boolean', defaultValue: false },
       blocked: { type: 'boolean', defaultValue: false },
+    },
+    deleteUser: {
+      enabled: true,
+      beforeDelete: async (user) => {
+        // Delete Better Auth verification tokens (no relation to User, must delete manually)
+        await prisma.verification.deleteMany({
+          where: { identifier: user.email },
+        });
+      },
     },
   },
   databaseHooks: {

@@ -106,8 +106,12 @@ export default function DeleteAccountForm({
           );
         }
 
-        // Account deleted successfully - redirect will be handled by server action
+        // Account deleted successfully
         onSuccess?.();
+
+        // Hard redirect to home page
+        // Better Auth's deleteUser API has already invalidated all sessions
+        window.location.href = '/';
       } catch (error: any) {
         console.error('Delete account error:', error);
         setSubmitError(
