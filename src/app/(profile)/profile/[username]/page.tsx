@@ -1,6 +1,7 @@
 import React, { JSX } from 'react';
 import { notFound } from 'next/navigation';
 import { getProfilePageData, getProfileMetadata } from '@/actions/profiles/get-profile';
+import { getSession } from '@/actions/auth/server';
 import { prisma } from '@/lib/prisma/client';
 import {
   ProfileBio,
@@ -88,6 +89,11 @@ export default async function ProfilePage({
     breadcrumbSegments,
     breadcrumbButtons,
   } = result.data;
+
+  // Get current user session for chat functionality
+  const sessionResult = await getSession();
+  const currentUserId = sessionResult.success ? sessionResult.data.user?.id : null;
+  const isOwner = currentUserId === profile.uid;
 
   const image = profile.image;
 
@@ -182,7 +188,10 @@ export default async function ProfilePage({
                     whatsapp={profile.whatsapp}
                     email={profile.email || profile.user.email}
                     visibility={visibility}
-                    isOwner={false}
+                    isOwner={isOwner}
+                    profileUserId={profile.uid}
+                    profileDisplayName={profile.displayName || ''}
+                    currentUserId={currentUserId}
                   />
 
                   {(skillsData.length > 0 || speciality) && (
@@ -211,7 +220,10 @@ export default async function ProfilePage({
                 whatsapp={profile.whatsapp}
                 email={profile.email || profile.user.email}
                 visibility={visibility}
-                isOwner={false}
+                isOwner={isOwner}
+                profileUserId={profile.uid}
+                profileDisplayName={profile.displayName || ''}
+                currentUserId={currentUserId}
               />
 
               {(skillsData.length > 0 || speciality) && (

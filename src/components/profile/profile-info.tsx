@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  ArrowRight,
   MapPin,
   Headphones,
   Calendar,
@@ -9,11 +8,11 @@ import {
   MessageCircle,
   Mail,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { ProfileInfoProps } from '@/lib/types/components';
 import ContactReveal from './contact-reveal';
+import { StartChatDialog } from '@/components/messages/start-chat-dialog';
 
 /**
  * Modern ProfileInfo Component
@@ -31,6 +30,9 @@ export default function ProfileInfo({
   email,
   visibility,
   isOwner,
+  profileUserId,
+  profileDisplayName,
+  currentUserId,
 }: ProfileInfoProps) {
   // Format website URL by removing protocol
   const formattedWebsite = website ? website.replace(/^https?:\/\//, '') : null;
@@ -188,20 +190,13 @@ export default function ProfileInfo({
         </div>
 
         {/* Contact Button - only show if not owner */}
-        {!isOwner && (
+        {!isOwner && profileUserId && profileDisplayName && (
           <div className='pt-6'>
-            <form>
-              <Button
-                className='w-full'
-                size='lg'
-                type='button'
-                disabled
-                title='Επικοινωνία - Σύντομα διαθέσιμο'
-              >
-                Επικοινωνία
-                <ArrowRight className='h-4 w-4' />
-              </Button>
-            </form>
+            <StartChatDialog
+              recipientId={profileUserId}
+              recipientName={profileDisplayName}
+              currentUserId={currentUserId}
+            />
           </div>
         )}
       </CardContent>

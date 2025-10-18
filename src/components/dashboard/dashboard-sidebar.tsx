@@ -55,7 +55,6 @@ export default function DashboardSidebar({
       title: 'Πίνακας Ελέγχου',
       url: '/dashboard',
       icon: Home,
-      isActive: true,
     },
     {
       title: 'Μηνύματα',
@@ -154,7 +153,7 @@ export default function DashboardSidebar({
             </div>
             <NavServices />
             <NavMain items={[{
-              title: 'Προσθήκη Υπηρεσίας',
+              title: 'Δημιουργία Υπηρεσίας',
               url: '/dashboard/services/create',
               icon: Plus,
             }]} />

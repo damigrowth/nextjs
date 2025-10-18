@@ -44,7 +44,10 @@ export function NavMain({
       {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
       <SidebarMenu>
         {items.map((item) => {
-          const isActiveItem = pathname === item.url || item.isActive;
+          // Exact match for root dashboard, startsWith for sub-routes
+          const isActiveItem = item.url === '/dashboard'
+            ? pathname === '/dashboard'
+            : pathname.startsWith(item.url);
 
           return (
             <Collapsible key={item.title} asChild defaultOpen={isActiveItem}>
