@@ -32,6 +32,8 @@ module.exports = {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        'bubble-left': '16px 16px 16px 4px',
+        'bubble-right': '16px 16px 4px 16px',
       },
       colors: {
         background: 'hsl(var(--background))',
