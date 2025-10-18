@@ -205,7 +205,6 @@ export async function getProfile(profileId: string) {
           select: {
             services: true,
             reviews: true,
-            chatsCreated: true,
           },
         },
       },
@@ -550,7 +549,6 @@ export async function deleteProfile(params: AdminDeleteProfileInput) {
           select: {
             services: true,
             reviews: true,
-            chatsCreated: true,
           },
         },
       },
@@ -575,7 +573,6 @@ export async function deleteProfile(params: AdminDeleteProfileInput) {
         cascadeInfo: {
           services: profile._count.services,
           reviews: profile._count.reviews,
-          chats: profile._count.chatsCreated,
         },
       },
     };
