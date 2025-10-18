@@ -12,7 +12,7 @@ import { paginationSchema, idSchema } from './shared';
 
 export const createChatSchema = z.object({
   name: z.string().max(100).optional(),
-  participantProfileId: z.string().min(1, 'Participant profile ID is required'),
+  participantUid: z.string().min(1, 'Participant user ID is required'),
   published: z.boolean().default(true),
 });
 
@@ -35,7 +35,7 @@ export const chatQuerySchema = z
 export const createMessageSchema = z.object({
   content: z.string().min(1, 'Message content is required').max(1000),
   chatId: idSchema,
-  authorId: idSchema, // Profile ID of author
+  authorUid: idSchema, // User ID of author
   published: z.boolean().default(true),
 });
 
@@ -47,7 +47,7 @@ export const updateMessageSchema = z.object({
 export const messageQuerySchema = z
   .object({
     chatId: z.string().optional(),
-    authorId: z.string().optional(),
+    authorUid: z.string().optional(),
     read: z.boolean().optional(),
     published: z.boolean().optional(),
     search: z.string().optional(),
@@ -88,7 +88,7 @@ export const messageAttachmentSchema = z.object({
 export const createMessageWithAttachmentsSchema = z.object({
   content: z.string().min(1, 'Message content is required').max(1000),
   chatId: idSchema,
-  authorId: idSchema,
+  authorUid: idSchema,
   attachments: z
     .array(messageAttachmentSchema)
     .max(5, 'Maximum 5 attachments per message')
@@ -101,18 +101,18 @@ export const createMessageWithAttachmentsSchema = z.object({
 
 export const addChatParticipantSchema = z.object({
   chatId: idSchema,
-  profileId: idSchema,
+  uid: idSchema,
   role: z.enum(['member', 'admin', 'moderator']).default('member'),
 });
 
 export const removeChatParticipantSchema = z.object({
   chatId: idSchema,
-  profileId: idSchema,
+  uid: idSchema,
 });
 
 export const updateChatParticipantSchema = z.object({
   chatId: idSchema,
-  profileId: idSchema,
+  uid: idSchema,
   role: z.enum(['member', 'admin', 'moderator']).optional(),
   muted: z.boolean().optional(),
   blocked: z.boolean().optional(),
@@ -162,7 +162,7 @@ export const reportChatSchema = z.object({
 
 export const blockChatParticipantSchema = z.object({
   chatId: idSchema,
-  profileId: idSchema,
+  uid: idSchema,
   reason: z.string().max(200).optional(),
 });
 
@@ -174,7 +174,7 @@ export const chatSearchSchema = z
   .object({
     query: z.string().min(1, 'Search query is required'),
     chatId: idSchema.optional(), // Search within specific chat
-    authorId: idSchema.optional(), // Search messages from specific author
+    authorUid: idSchema.optional(), // Search messages from specific author
     dateFrom: z.date().optional(),
     dateTo: z.date().optional(),
     messageType: z.enum(['text', 'image', 'file', 'all']).default('all'),

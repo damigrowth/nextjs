@@ -4,27 +4,34 @@ model Chat {
   published     Boolean      @default(true)
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
-  creatorId     String
+  creatorUid    String
   lastMessageId String?      @unique
+  lastActivity  DateTime     @default(now())
   members       ChatMember[]
-  creator       Profile      @relation(fields: [creatorId], references: [id])
+  creator       User         @relation(fields: [creatorUid], references: [id])
   lastMessage   Message?     @relation("ChatLastMessage", fields: [lastMessageId], references: [id])
   messages      Message[]    @relation("ChatMessages")
 
-  @@index([creatorId])
+  @@index([creatorUid])
   @@index([published, createdAt])
   @@index([lastMessageId])
+  @@index([lastActivity])
   @@map("chats")
 }
 
 model ChatMember {
-  chatId    String
-  profileId String
-  chat      Chat    @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  chatId   String
+  uid      String
+  joinedAt DateTime @default(now())
+  lastSeen DateTime @default(now())
+  muted    Boolean  @default(false)
+  online   Boolean  @default(false)
+  chat     Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [uid], references: [id], onDelete: Cascade)
 
-  @@id([chatId, profileId])
-  @@index([profileId])
+  @@id([chatId, uid])
+  @@index([uid])
+  @@index([online, lastSeen])
   @@map("chat_members")
 }
 
@@ -35,15 +42,26 @@ model Message {
   published     Boolean       @default(true)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
-  authorId      String
+  authorUid     String
   chatId        String
+  deleted       Boolean       @default(false)
+  deletedAt     DateTime?
+  deletedBy     String?
+  edited        Boolean       @default(false)
+  editedAt      DateTime?
+  replyToId     String?
   lastMessageOf Chat?         @relation("ChatLastMessage")
   readBy        MessageRead[]
-  author        Profile       @relation(fields: [authorId], references: [id])
+  author        User          @relation("MessageAuthor", fields: [authorUid], references: [id])
   chat          Chat          @relation("ChatMessages", fields: [chatId], references: [id], onDelete: Cascade)
+  deletedByUser User?         @relation("MessageDeletedBy", fields: [deletedBy], references: [id])
+  replyTo       Message?      @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies       Message[]     @relation("MessageReplies")
 
-  @@index([authorId])
+  @@index([authorUid])
   @@index([chatId, createdAt])
+  @@index([deleted, createdAt])
+  @@index([replyToId])
   @@map("messages")
 }
 
@@ -57,4 +75,20 @@ model MessageRead {
   @@id([messageId, uid])
   @@index([uid])
   @@map("message_reads")
+}
+
+model BlockedUser {
+  id        String   @id @default(cuid())
+  blockerId String
+  blockedId String
+  reason    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  blocker   User     @relation("UserBlocks", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked   User     @relation("BlockedBy", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+  @@index([blockedId])
+  @@map("blocked_users")
 }
