@@ -77,19 +77,15 @@ export function useChatSubscription({
             id: newMessage.id,
             content: newMessage.content,
             createdAt: new Date(`${newMessage.createdAt}Z`),
-            updatedAt: new Date(`${newMessage.updatedAt}Z`),
+            authorUid: newMessage.authorUid,
             isOwn: newMessage.authorUid === currentUserId,
             isRead: false, // Will be updated by read receipts
-            author: {
-              id: newMessage.authorUid,
-              displayName: '', // Will be fetched or updated
-              image: null,
-            },
             edited: newMessage.edited || false,
             editedAt: newMessage.editedAt
               ? new Date(`${newMessage.editedAt}Z`)
               : null,
             deleted: newMessage.deleted || false,
+            replyToId: newMessage.replyToId || null,
             replyTo: null, // Will be populated if needed
           };
 
@@ -109,7 +105,6 @@ export function useChatSubscription({
                     ? new Date(`${updatedMessage.editedAt}Z`)
                     : null,
                   deleted: updatedMessage.deleted || false,
-                  updatedAt: new Date(`${updatedMessage.updatedAt}Z`),
                 }
               : m
           )
