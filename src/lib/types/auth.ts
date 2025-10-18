@@ -47,7 +47,6 @@ export type ConsentType = boolean | string[];
 export type ProfileWithRelations = import('@prisma/client').Profile & {
   services?: import('@prisma/client').Service[];
   reviews?: import('@prisma/client').Review[];
-  chatMemberships?: import('@prisma/client').ChatMember[];
   portfolio?: PrismaJson.CloudinaryResource[];
 };
 

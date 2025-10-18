@@ -71,7 +71,9 @@ export const formatMessageTime = (dateString: string | null | undefined): string
   try {
     const messageDate = new Date(dateString);
 
-    if (isNaN(messageDate.getTime())) return '';
+    if (isNaN(messageDate.getTime())) {
+      return '';
+    }
 
     // Get hours and minutes
     const hours = messageDate.getHours();
@@ -80,11 +82,10 @@ export const formatMessageTime = (dateString: string | null | undefined): string
 
     const today = new Date();
 
-    // Check if the message is from today
-    const isToday =
-      messageDate.getDate() === today.getDate() &&
-      messageDate.getMonth() === today.getMonth() &&
-      messageDate.getFullYear() === today.getFullYear();
+    // Check if the message is from today (using local date comparison)
+    const messageDateStr = messageDate.toLocaleDateString();
+    const todayDateStr = today.toLocaleDateString();
+    const isToday = messageDateStr === todayDateStr;
 
     // Check if the message is from the current year
     const isThisYear = messageDate.getFullYear() === today.getFullYear();

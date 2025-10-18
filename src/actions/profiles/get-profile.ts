@@ -48,11 +48,6 @@ async function _getProfileByUserId(userId: string): Promise<Profile | null> {
         orderBy: { createdAt: 'desc' },
         take: 10,
       },
-      chatMemberships: {
-        include: {
-          chat: true,
-        },
-      },
     },
   });
 }
