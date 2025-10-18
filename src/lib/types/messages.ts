@@ -103,4 +103,5 @@ export interface ChatHeaderUser {
   image: string | null;
   username: string | null;
   online: boolean;
+  phone: string | null; // From User.profile.phone
 }

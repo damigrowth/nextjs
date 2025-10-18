@@ -61,6 +61,11 @@ export default async function MessagesPage({
             lastName: true,
             image: true,
             username: true,
+            profile: {
+              select: {
+                phone: true,
+              },
+            },
           },
         },
       },
@@ -75,6 +80,7 @@ export default async function MessagesPage({
         image: otherMember.user.image,
         username: otherMember.user.username,
         online: otherMember.online,
+        phone: otherMember.user.profile?.phone || null,
       };
     }
   }
