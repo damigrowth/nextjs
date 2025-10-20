@@ -1,4 +1,5 @@
 import { DashboardLayout } from '@/components';
+import { Toaster } from '@/components/ui/sonner';
 import React from 'react';
 
 export const dynamic = 'force-dynamic';
@@ -10,5 +11,10 @@ export default async function layout({
 }: {
   children: React.ReactNode;
 }) {
-  return <DashboardLayout>{children}</DashboardLayout>;
+  return (
+    <>
+      <DashboardLayout>{children}</DashboardLayout>
+      <Toaster />
+    </>
+  );
 }
