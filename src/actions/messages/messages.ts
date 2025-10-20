@@ -86,7 +86,8 @@ export async function getMessages(
 export async function sendMessage(
   chatId: string,
   content: string,
-  authorUid: string
+  authorUid: string,
+  replyToId?: string
 ): Promise<ChatMessageItem> {
   try {
     // Verify user is a member of the chat
@@ -103,6 +104,17 @@ export async function sendMessage(
       throw new Error('User is not a member of this chat');
     }
 
+    // If replying, verify the parent message exists in the same chat
+    if (replyToId) {
+      const parentMessage = await prisma.message.findUnique({
+        where: { id: replyToId },
+      });
+
+      if (!parentMessage || parentMessage.chatId !== chatId) {
+        throw new Error('Invalid reply target');
+      }
+    }
+
     // Create the message and update chat in a transaction
     const message = await prisma.$transaction(async (tx) => {
       // Create message
@@ -111,6 +123,7 @@ export async function sendMessage(
           content: content.trim(),
           chatId: chatId,
           authorUid: authorUid,
+          ...(replyToId && { replyToId }),
         },
         include: {
           author: {
