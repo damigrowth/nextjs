@@ -50,6 +50,8 @@ model Message {
   edited        Boolean       @default(false)
   editedAt      DateTime?
   replyToId     String?
+  /// [MessageReactions]
+  reactions     Json?
   lastMessageOf Chat?         @relation("ChatLastMessage")
   readBy        MessageRead[]
   author        User          @relation("MessageAuthor", fields: [authorUid], references: [id])

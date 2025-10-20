@@ -99,6 +99,20 @@ export const serviceFaqSchema = z.object({
   answer: z.string(),
 });
 
+// Message reactions schema
+export const messageReactionsSchema = z.record(z.string(), z.array(z.string()));
+
+// Message reaction item (for UI display)
+export const messageReactionSchema = z.object({
+  emoji: z.string(),
+  userIds: z.array(z.string()),
+  count: z.number(),
+  hasReacted: z.boolean(),
+});
+
+// Infer the MessageReaction type
+export type MessageReaction = z.infer<typeof messageReactionSchema>;
+
 // Array schemas for JSON[] fields
 export const portfolioSchema = z.array(cloudinaryResourceSchema);
 export const mediaSchema = z.array(cloudinaryResourceSchema);
@@ -115,6 +129,7 @@ declare global {
     type ServiceType = z.infer<typeof serviceTypeSchema>;
     type ServiceAddon = z.infer<typeof serviceAddonSchema>;
     type ServiceFAQ = z.infer<typeof serviceFaqSchema>;
+    type MessageReactions = z.infer<typeof messageReactionsSchema>;
 
     // Array types (for Json[] fields, prisma-json-types-generator handles these automatically)
     type Portfolio = z.infer<typeof portfolioSchema>;

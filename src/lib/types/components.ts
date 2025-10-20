@@ -123,10 +123,8 @@ export interface ProfileInfoProps {
   whatsapp?: string;
   email?: string;
   visibility?: PrismaJson.VisibilitySettings;
-  isOwner?: boolean;
   profileUserId?: string;
   profileDisplayName?: string;
-  currentUserId?: string | null;
 }
 
 // Profile meta component props

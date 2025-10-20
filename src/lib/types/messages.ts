@@ -5,6 +5,10 @@ import {
   MessageRead,
   User,
 } from '@prisma/client';
+import type { MessageReaction } from '@/lib/prisma/json-types';
+
+// Re-export MessageReaction for external use
+export type { MessageReaction };
 
 // ============================================================================
 // Chat Types
@@ -70,8 +74,10 @@ export interface ChatMessageItem {
     // For displaying quoted message
     id: string;
     content: string;
-    authorName: string;
+    author: Pick<User, 'displayName' | 'firstName' | 'lastName'> | null;
   } | null;
+  reactions: MessageReaction[]; // Transformed reactions for display
+  author: Pick<User, 'id' | 'displayName' | 'firstName' | 'lastName' | 'image'> | null;
 }
 
 // ============================================================================
