@@ -8,7 +8,6 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ChatListItem as ChatListItemType } from '@/lib/types/messages';
 import { getInitials, formatCompactMessageTime } from '@/lib/utils/messages';
@@ -32,11 +31,11 @@ export function ChatListItem({ chat }: ChatListItemProps) {
     <button
       onClick={handleClick}
       className={cn(
-        'relative flex w-full items-start gap-3 rounded-lg p-3 text-left transition-colors hover:bg-accent',
-        isSelected && 'bg-accent'
+        'relative flex w-full items-start gap-3 rounded-lg p-3 text-left transition-colors hover:bg-accent overflow-hidden',
+        isSelected && 'bg-accent',
       )}
     >
-      <div className='relative'>
+      <div className='relative self-center shrink-0'>
         <Avatar className='h-8 w-8'>
           <AvatarImage src={chat.avatar || undefined} alt={chat.name} />
           <AvatarFallback>{initials}</AvatarFallback>
@@ -46,7 +45,7 @@ export function ChatListItem({ chat }: ChatListItemProps) {
         )}
       </div>
 
-      <div className='min-w-0 flex-1'>
+      <div className='flex-1 min-w-0 overflow-hidden'>
         <div className='flex items-center justify-between gap-2'>
           <span className='truncate font-medium text-2sm'>{chat.name}</span>
           <span className='shrink-0 text-xs text-muted-foreground'>
@@ -54,12 +53,11 @@ export function ChatListItem({ chat }: ChatListItemProps) {
           </span>
         </div>
         <div className='flex items-center gap-2'>
-          <Check className='h-3 w-3 shrink-0 text-muted-foreground' />
-          <p className='truncate text-2sm text-muted-foreground'>
+          <p className='flex-1 min-w-0 text-2sm text-muted-foreground line-clamp-1 overflow-hidden text-ellipsis'>
             {chat.lastMessage || 'No messages yet'}
           </p>
           {chat.unread > 0 && (
-            <Badge className='ml-auto shrink-0 rounded-full text-xs h-5 w-5 p-0 flex items-center justify-center bg-third hover:bg-secondary'>
+            <Badge className='shrink-0 rounded-full text-xs h-5 w-5 p-0 flex items-center justify-center bg-third hover:bg-secondary'>
               {chat.unread}
             </Badge>
           )}

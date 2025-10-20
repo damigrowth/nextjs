@@ -6,6 +6,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -25,41 +26,73 @@ import {
 } from '@/components/ui/alert-dialog';
 import { MoreVertical } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
+import { blockUser } from '@/actions/messages/blocking';
+import { deleteChat } from '@/actions/messages/chats';
 
 interface HeaderActionsProps {
+  chatId: string;
   userId: string;
+  currentUserId: string;
   username: string | null;
   displayName: string;
   profileUrl: string;
 }
 
 export function HeaderActions({
+  chatId,
   userId,
+  currentUserId,
   username,
   displayName,
   profileUrl,
 }: HeaderActionsProps) {
+  const router = useRouter();
   const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isBlockLoading, setIsBlockLoading] = useState(false);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const handleBlockClick = () => {
     setIsBlockDialogOpen(true);
   };
 
-  const handleBlockConfirm = () => {
-    // TODO: Implement block functionality - create BlockedUser record
-    console.log('Block user:', userId);
-    setIsBlockDialogOpen(false);
+  const handleBlockConfirm = async () => {
+    setIsBlockLoading(true);
+    try {
+      await blockUser(currentUserId, userId);
+      toast.success(`${displayName} has been blocked`);
+      setIsBlockDialogOpen(false);
+      // Redirect to messages list
+      router.push('/dashboard/messages');
+      router.refresh();
+    } catch (error) {
+      console.error('Failed to block user:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to block user');
+    } finally {
+      setIsBlockLoading(false);
+    }
   };
 
   const handleDeleteClick = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    // TODO: Implement delete conversation functionality - delete chat and messages
-    console.log('Delete conversation with:', userId);
-    setIsDeleteDialogOpen(false);
+  const handleDeleteConfirm = async () => {
+    setIsDeleteLoading(true);
+    try {
+      await deleteChat(chatId, currentUserId);
+      toast.success('Conversation deleted');
+      setIsDeleteDialogOpen(false);
+      // Redirect to messages list
+      router.push('/dashboard/messages');
+      router.refresh();
+    } catch (error) {
+      console.error('Failed to delete conversation:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to delete conversation');
+    } finally {
+      setIsDeleteLoading(false);
+    }
   };
 
   return (
@@ -102,12 +135,16 @@ export function HeaderActions({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isBlockLoading}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleBlockConfirm}
+              onClick={(e) => {
+                e.preventDefault();
+                handleBlockConfirm();
+              }}
+              disabled={isBlockLoading}
               className='bg-dark text-white hover:bg-dark/90'
             >
-              Block
+              {isBlockLoading ? 'Blocking...' : 'Block'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -127,12 +164,16 @@ export function HeaderActions({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleteLoading}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDeleteConfirm}
+              onClick={(e) => {
+                e.preventDefault();
+                handleDeleteConfirm();
+              }}
+              disabled={isDeleteLoading}
               className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
             >
-              Delete
+              {isDeleteLoading ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

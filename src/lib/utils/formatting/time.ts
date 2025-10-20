@@ -62,9 +62,9 @@ export const getDatePart = (dateString: string | null | undefined): string => {
 };
 
 /**
- * Formats a date string to display time for today's messages, day and month for this year, or day/month/year for previous years
+ * Formats a date string to display time only (HH:MM format)
  * @param dateString - ISO date string to format
- * @returns Formatted time for today, day and month for this year, or day/month/year for previous years
+ * @returns Formatted time in HH:MM format
  */
 export const formatMessageTime = (dateString: string | null | undefined): string => {
   if (!dateString) return '';
@@ -78,40 +78,8 @@ export const formatMessageTime = (dateString: string | null | undefined): string
     // Get hours and minutes
     const hours = messageDate.getHours();
     const minutes = messageDate.getMinutes().toString().padStart(2, '0');
-    const timeStr = `${hours}:${minutes}`;
 
-    const today = new Date();
-
-    // Check if the message is from today (using local date comparison)
-    const messageDateStr = messageDate.toLocaleDateString();
-    const todayDateStr = today.toLocaleDateString();
-    const isToday = messageDateStr === todayDateStr;
-
-    // Check if the message is from the current year
-    const isThisYear = messageDate.getFullYear() === today.getFullYear();
-
-    if (isToday) {
-      // For today's messages, just show the time
-      return timeStr;
-    } else if (isThisYear) {
-      // For messages from this year, show day and month
-      const options: Intl.DateTimeFormatOptions = {
-        day: 'numeric',
-        month: 'long',
-      };
-
-      const dateFormatter = new Intl.DateTimeFormat('el-GR', options);
-      const formattedDate = dateFormatter.format(messageDate);
-
-      return `${formattedDate} - ${timeStr}`;
-    } else {
-      // For messages from previous years, show day/month/year
-      const day = messageDate.getDate().toString().padStart(2, '0');
-      const month = (messageDate.getMonth() + 1).toString().padStart(2, '0');
-      const year = messageDate.getFullYear();
-
-      return `${day}/${month}/${year} - ${timeStr}`;
-    }
+    return `${hours}:${minutes}`;
   } catch (error) {
     return '';
   }

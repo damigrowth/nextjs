@@ -5,20 +5,112 @@
 
 'use client';
 
-import { RefObject } from 'react';
+import { RefObject, useState, useEffect, useRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { Check, CheckCheck } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { MessageActions } from './message-actions';
+import { MessageDeleteDialog } from './message-delete-dialog';
+import { MessageReplyQuote } from './message-reply-quote';
+import { ReactionPicker } from './reaction-picker';
 import { ChatMessageItem } from '@/lib/types/messages';
+import { ReplyToMessage, EditingMessage } from './message-input';
 import { formatMessageTime, formatChatDateDivider } from '@/lib/utils/messages';
+import { toast } from 'sonner';
+import { toggleReaction } from '@/actions/messages/reactions';
 
 interface ChatMessagesProps {
   messages: ChatMessageItem[];
   scrollRef?: RefObject<HTMLDivElement>;
+  currentUserId: string;
+  onReply?: (replyTo: ReplyToMessage) => void;
+  onEdit?: (editing: EditingMessage) => void;
+  loadTriggerRef?: RefObject<HTMLDivElement>;
+  isLoadingOlder?: boolean;
+  hasMore?: boolean;
 }
 
-export function ChatMessages({ messages, scrollRef }: ChatMessagesProps) {
+export function ChatMessages({
+  messages,
+  scrollRef,
+  currentUserId,
+  onReply,
+  onEdit,
+  loadTriggerRef,
+  isLoadingOlder,
+  hasMore,
+}: ChatMessagesProps) {
+  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(
+    null,
+  );
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleReply = (message: ChatMessageItem) => {
+    if (onReply) {
+      onReply({
+        id: message.id,
+        content: message.content,
+        authorName:
+          message.author?.displayName ||
+          message.author?.firstName ||
+          message.author?.lastName ||
+          'Unknown User',
+        isOwn: message.isOwn,
+      });
+    }
+  };
+
+  const handleEdit = (message: ChatMessageItem) => {
+    if (onEdit) {
+      onEdit({
+        id: message.id,
+        content: message.content,
+      });
+    }
+  };
+
+  const handleCopyMessage = async (content: string) => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(content);
+        toast.success('Message copied to clipboard');
+      } else {
+        // Fallback for non-HTTPS or older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = content;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          // @ts-ignore - execCommand is deprecated but needed as fallback
+          document.execCommand('copy');
+          toast.success('Message copied to clipboard');
+        } catch (err) {
+          toast.error('Failed to copy message');
+        }
+        document.body.removeChild(textArea);
+      }
+    } catch (error) {
+      console.error('Failed to copy message:', error);
+      toast.error('Failed to copy message');
+    }
+  };
+
+  const handleToggleReaction = async (messageId: string, emoji: string) => {
+    try {
+      await toggleReaction(messageId, currentUserId, emoji);
+    } catch (error) {
+      console.error('Failed to toggle reaction:', error);
+      toast.error('Failed to add reaction');
+    }
+  };
+
   const shouldShowDateDivider = (index: number) => {
     if (index === 0) return true;
     const currentMessage = messages[index];
@@ -61,12 +153,16 @@ export function ChatMessages({ messages, scrollRef }: ChatMessagesProps) {
     const isLastInGroup =
       !nextMessage || nextMessage.isOwn !== currentMessage.isOwn;
 
-    const groupPosition = `${isFirstInGroup ? 'first' : ''}${isLastInGroup ? 'last' : ''}` || 'middle';
+    const groupPosition =
+      `${isFirstInGroup ? 'first' : ''}${isLastInGroup ? 'last' : ''}` ||
+      'middle';
 
     switch (groupPosition) {
       case 'firstlast':
         // Single message
-        return currentMessage.isOwn ? 'rounded-bubble-right' : 'rounded-bubble-left';
+        return currentMessage.isOwn
+          ? 'rounded-bubble-right'
+          : 'rounded-bubble-left';
 
       case 'first':
         // First in group
@@ -92,6 +188,18 @@ export function ChatMessages({ messages, scrollRef }: ChatMessagesProps) {
   return (
     <ScrollArea className='flex-1 p-4' ref={scrollRef}>
       <div>
+        {/* Load trigger for infinite scroll */}
+        {hasMore && (
+          <div ref={loadTriggerRef} className='flex justify-center py-4'>
+            {isLoadingOlder && (
+              <div className='flex items-center gap-2 text-muted-foreground text-sm'>
+                <Loader2 className='h-4 w-4 animate-spin' />
+                <span>Loading older messages...</span>
+              </div>
+            )}
+          </div>
+        )}
+
         {messages.map((message, index) => (
           <div key={message.id}>
             {shouldShowDateDivider(index) && (
@@ -108,78 +216,131 @@ export function ChatMessages({ messages, scrollRef }: ChatMessagesProps) {
                 getMessageSpacing(index),
               )}
             >
-              {message.isOwn && (
+              {message.isOwn && !message.deleted && (
                 <MessageActions
                   messageId={message.id}
                   isOwn={true}
                   align='end'
+                  onEdit={() => handleEdit(message)}
+                  onDelete={() => setDeletingMessageId(message.id)}
+                  onCopy={() => handleCopyMessage(message.content)}
+                  onReply={() => handleReply(message)}
+                  messageContent={message.content}
                 />
               )}
 
-              <div
-                className={cn(
-                  'relative max-w-[40%] px-4 py-2',
-                  message.isOwn
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-primary/10',
-                  getMessageRadius(index),
-                )}
-              >
-                {message.deleted ? (
-                  <p className='text-sm leading-relaxed italic opacity-60'>
-                    This message was deleted
-                  </p>
-                ) : (
-                  <>
-                    <p
-                      className={cn(
-                        'text-sm leading-relaxed',
-                        message.isOwn && 'text-primary-foreground',
-                      )}
-                    >
-                      {message.content}
-                      {message.edited && (
-                        <span className='text-xs opacity-60 ml-1'>(edited)</span>
-                      )}
-                    </p>
-                  </>
-                )}
-                <div
-                  className={cn(
-                    'mt-1 flex items-center gap-1',
-                    message.isOwn ? 'justify-end' : 'justify-start',
-                  )}
-                >
-                  <span className='text-xs opacity-70'>
-                    {formatMessageTime(
-                      message.createdAt instanceof Date
-                        ? message.createdAt.toISOString()
-                        : message.createdAt
-                    )}
-                  </span>
+              {
+                <>
+                  {/* Reaction picker for own messages (left side) */}
                   {message.isOwn && !message.deleted && (
-                    <>
-                      {message.isRead ? (
-                        <CheckCheck className='h-3 w-3 opacity-70' />
-                      ) : (
-                        <Check className='h-3 w-3 opacity-70' />
-                      )}
-                    </>
+                    <ReactionPicker
+                      currentReaction={
+                        message.reactions.find((r) => r.hasReacted)?.emoji ||
+                        null
+                      }
+                      onSelectEmoji={(emoji) =>
+                        handleToggleReaction(message.id, emoji)
+                      }
+                      isOwnMessage={true}
+                    />
                   )}
-                </div>
-              </div>
 
-              {!message.isOwn && (
+                  <div
+                    className={cn(
+                      'relative max-w-[40%] px-4 py-2',
+                      message.isOwn
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-primary/10',
+                      getMessageRadius(index),
+                    )}
+                  >
+                    {message.deleted ? (
+                      <p className='text-sm leading-relaxed italic opacity-60 text-primary-foreground'>
+                        This message was deleted
+                      </p>
+                    ) : (
+                      <>
+                        {message.replyTo && (
+                          <MessageReplyQuote
+                            authorName={
+                              message.replyTo.author?.displayName ||
+                              message.replyTo.author?.firstName ||
+                              message.replyTo.author?.lastName ||
+                              'Unknown User'
+                            }
+                            content={message.replyTo.content}
+                            isOwnMessage={message.isOwn}
+                          />
+                        )}
+                        <p
+                          className={cn(
+                            'text-sm leading-relaxed',
+                            message.isOwn
+                              ? 'text-primary-foreground text-right'
+                              : 'text-left',
+                          )}
+                        >
+                          {message.content}
+                        </p>
+                        <div
+                          className={cn(
+                            'mt-1 flex items-center gap-1',
+                            message.isOwn ? 'justify-end' : 'justify-start',
+                          )}
+                        >
+                          {message.edited && (
+                            <span className='text-xs opacity-60'>(edited)</span>
+                          )}
+                          <span className='text-xs opacity-70'>
+                            {formatMessageTime(
+                              message.createdAt instanceof Date
+                                ? message.createdAt.toISOString()
+                                : message.createdAt,
+                            )}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Reaction picker for other messages (right side) */}
+                  {!message.isOwn && !message.deleted && (
+                    <ReactionPicker
+                      currentReaction={
+                        message.reactions.find((r) => r.hasReacted)?.emoji ||
+                        null
+                      }
+                      onSelectEmoji={(emoji) =>
+                        handleToggleReaction(message.id, emoji)
+                      }
+                      isOwnMessage={false}
+                    />
+                  )}
+                </>
+              }
+
+              {!message.isOwn && !message.deleted && (
                 <MessageActions
                   messageId={message.id}
                   isOwn={false}
                   align='start'
+                  onReply={() => handleReply(message)}
+                  onCopy={() => handleCopyMessage(message.content)}
+                  messageContent={message.content}
                 />
               )}
             </div>
           </div>
         ))}
+        {/* Invisible element to scroll to */}
+        <div ref={messagesEndRef} />
       </div>
+      <MessageDeleteDialog
+        messageId={deletingMessageId || ''}
+        userId={currentUserId}
+        open={!!deletingMessageId}
+        onOpenChange={(open) => !open && setDeletingMessageId(null)}
+      />
     </ScrollArea>
   );
 }

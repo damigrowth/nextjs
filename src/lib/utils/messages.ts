@@ -3,6 +3,7 @@ import {
   ChatListItem,
   MessageWithRelations,
   ChatMessageItem,
+  MessageReaction,
 } from '@/lib/types/messages';
 import { formatInitials } from '@/lib/utils/format';
 import {
@@ -69,7 +70,22 @@ export function transformMessageForChat(
       id: message.replyTo.id,
       content: message.replyTo.content,
       authorName,
+      author: message.replyTo.author,
     };
+  }
+
+  // Transform reactions from JSON to MessageReaction[]
+  const reactions: MessageReaction[] = [];
+  if (message.reactions) {
+    const reactionsJson = message.reactions as Record<string, string[]>;
+    for (const [emoji, userIds] of Object.entries(reactionsJson)) {
+      reactions.push({
+        emoji,
+        userIds,
+        count: userIds.length,
+        hasReacted: userIds.includes(currentUserId),
+      });
+    }
   }
 
   return {
@@ -84,6 +100,8 @@ export function transformMessageForChat(
     isRead,
     replyToId: message.replyToId,
     replyTo,
+    reactions,
+    author: message.author,
   };
 }
 

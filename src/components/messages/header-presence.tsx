@@ -49,5 +49,11 @@ export function HeaderPresence({
     }
   }, [presenceMap, user.userId]);
 
-  return <ChatHeader user={userWithPresence} />;
+  return (
+    <ChatHeader
+      chatId={chatId}
+      currentUserId={currentUserId}
+      user={userWithPresence}
+    />
+  );
 }

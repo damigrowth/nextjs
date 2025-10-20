@@ -12,10 +12,12 @@ import { ChatHeaderUser } from '@/lib/types/messages';
 import { getInitials, getProfileUrl } from '@/lib/utils/messages';
 
 interface ChatHeaderProps {
+  chatId: string;
+  currentUserId: string;
   user: ChatHeaderUser;
 }
 
-export function ChatHeader({ user }: ChatHeaderProps) {
+export function ChatHeader({ chatId, currentUserId, user }: ChatHeaderProps) {
   const displayName =
     user.displayName || user.firstName || user.lastName || 'Unknown User';
   const initials = getInitials(
@@ -53,7 +55,9 @@ export function ChatHeader({ user }: ChatHeaderProps) {
           </Link>
         )}
         <HeaderActions
+          chatId={chatId}
           userId={user.userId}
+          currentUserId={currentUserId}
           username={user.username}
           displayName={displayName}
           profileUrl={profileUrl}

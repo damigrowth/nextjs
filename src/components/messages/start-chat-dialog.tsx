@@ -1,44 +1,66 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Loader2, MessageCircle, Plane, Send } from 'lucide-react';
+import { Loader2, MessageCircle, Send } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { getOrCreateChat, sendMessage } from '@/actions/messages';
+import { useSession } from '@/lib/auth/client';
 
 interface StartChatDialogProps {
   recipientId: string;
   recipientName: string;
-  currentUserId: string | null;
+  initialMessage?: string;
+  customTrigger?: string;
+  currentUserId?: string; // Optional: can be passed from server component
 }
 
 export function StartChatDialog({
   recipientId,
   recipientName,
-  currentUserId,
+  initialMessage,
+  customTrigger,
+  currentUserId: propCurrentUserId,
 }: StartChatDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Load initial message when dialog opens
+  useEffect(() => {
+    if (open && initialMessage) {
+      setMessage(initialMessage);
+    }
+  }, [open, initialMessage]);
+
+  // Get session from better-auth client
+  const { data: session, isPending } = useSession();
+
+  // Use prop if provided, otherwise get from session
+  const currentUserId = propCurrentUserId || session?.user?.id;
+
   // Check if user is logged in
   const isLoggedIn = !!currentUserId;
+
+  // Don't show button if viewing own profile
+  if (currentUserId === recipientId) {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Double-check that we have currentUserId
     if (!currentUserId) {
       toast.error('Πρέπει να συνδεθείτε πρώτα');
       return;
@@ -73,12 +95,29 @@ export function StartChatDialog({
     }
   };
 
+  // Show loading state if session is still loading and no prop provided
+  const isButtonLoading = !propCurrentUserId && isPending;
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className='w-full' size='lg' type='button'>
-          Επικοινωνία
-          <MessageCircle className='h-4 w-4' />
+        <Button
+          className='w-full'
+          size='lg'
+          type='button'
+          disabled={isButtonLoading}
+        >
+          {isButtonLoading ? (
+            <>
+              <Loader2 className='h-4 w-4 animate-spin' />
+              Φόρτωση...
+            </>
+          ) : (
+            <>
+              {customTrigger || 'Επικοινωνία'}
+              {!customTrigger && <MessageCircle className='h-4 w-4' />}
+            </>
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent className='sm:max-w-md'>

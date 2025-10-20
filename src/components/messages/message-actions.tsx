@@ -19,25 +19,41 @@ interface MessageActionsProps {
   messageId: string;
   isOwn: boolean;
   align?: 'start' | 'end';
+  messageContent: string;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onCopy?: () => void;
+  onReply?: () => void;
+  onForward?: () => void;
 }
 
-export function MessageActions({ messageId, isOwn, align = 'end' }: MessageActionsProps) {
+export function MessageActions({
+  messageId,
+  isOwn,
+  align = 'end',
+  messageContent,
+  onEdit,
+  onDelete,
+  onCopy,
+  onReply,
+  onForward,
+}: MessageActionsProps) {
   const handleMenuAction = (action: string) => {
     switch (action) {
       case 'reply':
-        console.log('Reply to message:', messageId);
+        onReply?.();
         break;
       case 'edit':
-        console.log('Edit message:', messageId);
+        onEdit?.();
         break;
       case 'copy':
-        console.log('Copy message:', messageId);
+        onCopy?.();
         break;
       case 'forward':
-        console.log('Forward message:', messageId);
+        onForward?.();
         break;
       case 'delete':
-        console.log('Delete message:', messageId);
+        onDelete?.();
         break;
       default:
         console.log('Unknown action:', action);
