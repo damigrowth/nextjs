@@ -219,9 +219,6 @@ export interface ProfileBreadcrumbProps {
   profile: ProfileBreadcrumbProfileData;
   category?: DatasetItem;
   subcategory?: DatasetItem;
-  savedStatus?: boolean;
-  hideSaveButton?: boolean;
-  isAuthenticated?: boolean;
 }
 
 // Service Card Component Types

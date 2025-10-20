@@ -16,9 +16,6 @@ export default function ProfileBreadcrumb({
   profile,
   category,
   subcategory,
-  savedStatus,
-  hideSaveButton,
-  isAuthenticated,
 }: ProfileBreadcrumbProps) {
   const parentSlug = profile.role === 'company' ? 'companies' : 'pros';
 
@@ -85,10 +82,7 @@ export default function ProfileBreadcrumb({
               <BreadcrumbButtons
                 subjectTitle={profile.displayName}
                 id={profile.id}
-                savedStatus={savedStatus}
-                saveType={profile.role === 'company' ? 'company' : 'freelancer'}
-                hideSaveButton={hideSaveButton}
-                isAuthenticated={isAuthenticated}
+                saveType='profile'
               />
             </div>
           </div>
