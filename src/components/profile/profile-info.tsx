@@ -29,10 +29,8 @@ export default function ProfileInfo({
   whatsapp,
   email,
   visibility,
-  isOwner,
   profileUserId,
   profileDisplayName,
-  currentUserId,
 }: ProfileInfoProps) {
   // Format website URL by removing protocol
   const formattedWebsite = website ? website.replace(/^https?:\/\//, '') : null;
@@ -189,13 +187,12 @@ export default function ProfileInfo({
           )}
         </div>
 
-        {/* Contact Button - only show if not owner */}
-        {!isOwner && profileUserId && profileDisplayName && (
+        {/* Contact Button */}
+        {profileUserId && profileDisplayName && (
           <div className='pt-6'>
             <StartChatDialog
               recipientId={profileUserId}
               recipientName={profileDisplayName}
-              currentUserId={currentUserId}
             />
           </div>
         )}

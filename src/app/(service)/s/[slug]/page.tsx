@@ -148,6 +148,9 @@ export default async function ServicePage({
                 addons={service.addons || []}
                 isOwner={false} // TODO: Check if current user is the owner
                 compact={false}
+                profileUserId={service.profile.uid}
+                profileDisplayName={service.profile.displayName || ''}
+                serviceTitle={service.title}
               />
 
               {/* Service FAQ */}
@@ -165,6 +168,9 @@ export default async function ServicePage({
                 addons={service.addons || []}
                 isOwner={false} // TODO: Check if current user is the owner
                 compact={true}
+                profileUserId={service.profile.uid}
+                profileDisplayName={service.profile.displayName || ''}
+                serviceTitle={service.title}
               />
 
               {/* Contact Card */}

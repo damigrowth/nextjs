@@ -11,6 +11,9 @@ interface ServiceOrderFixedProps {
   addons: PrismaJson.ServiceAddon[];
   isOwner: boolean;
   compact?: boolean;
+  profileUserId: string;
+  profileDisplayName: string;
+  serviceTitle: string;
 }
 
 export default function ServiceOrderFixed({
@@ -18,6 +21,9 @@ export default function ServiceOrderFixed({
   addons,
   isOwner,
   compact = false,
+  profileUserId,
+  profileDisplayName,
+  serviceTitle,
 }: ServiceOrderFixedProps) {
   return (
     <Card className='mb-6'>
@@ -31,7 +37,13 @@ export default function ServiceOrderFixed({
         )}
 
         {/* Buy Button */}
-        <ServiceBuy price={price} isOwner={isOwner} />
+        <ServiceBuy
+          price={price}
+          isOwner={isOwner}
+          profileUserId={profileUserId}
+          profileDisplayName={profileDisplayName}
+          serviceTitle={serviceTitle}
+        />
       </CardContent>
     </Card>
   );

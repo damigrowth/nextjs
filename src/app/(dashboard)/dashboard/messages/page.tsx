@@ -1,7 +1,6 @@
 import { ChatSidebar } from '@/components/messages/chat-sidebar';
 import { HeaderPresence } from '@/components/messages/header-presence';
 import { MessagesContainer } from '@/components/messages/messages-container';
-import { MessageInput } from '@/components/messages/message-input';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { getChats, getMessages } from '@/actions/messages';
@@ -104,7 +103,6 @@ export default async function MessagesPage({
               currentUserId={session.user.id}
               initialMessages={messages}
             />
-            <MessageInput chatId={selectedChatId} currentUserId={session.user.id} />
           </div>
         ) : (
           <div className='flex h-full items-center justify-center'>
