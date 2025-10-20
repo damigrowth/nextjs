@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Heart, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toggleSave } from '@/actions/saved';
+import { useSession } from '@/lib/auth/client';
 
 interface SaveButtonProps {
   itemType: 'service' | 'profile';
@@ -25,6 +26,7 @@ export default function SaveButton({
 }: SaveButtonProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [isSaved, setIsSaved] = useState(initialSaved);
   const [isPending, startTransition] = useTransition();
 
@@ -38,6 +40,12 @@ export default function SaveButton({
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Check if user is authenticated
+    if (!session?.user) {
+      router.push('/login');
+      return;
+    }
 
     // Optimistic update
     const previousState = isSaved;
