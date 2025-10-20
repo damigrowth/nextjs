@@ -102,6 +102,7 @@ export async function getServiceBySlug(
       include: {
         profile: {
           select: {
+            uid: true,
             firstName: true,
             lastName: true,
             displayName: true,
