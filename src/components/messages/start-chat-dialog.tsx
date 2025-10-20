@@ -6,6 +6,7 @@ import { Loader2, MessageCircle, Send } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -120,12 +121,21 @@ export function StartChatDialog({
           )}
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-md'>
+      <DialogContent className='sm:max-w-base'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
-            <MessageCircle className='h-5 w-5 text-primary' />
-            {isLoggedIn ? `Νέο Μήνυμα προς ${recipientName}` : 'Επικοινωνία'}
+            {isLoggedIn ? (
+              <MessageCircle className='h-5 w-5 text-primary' />
+            ) : null}
+            {isLoggedIn
+              ? `Νέο Μήνυμα προς ${recipientName}`
+              : 'Για να επικοινωνήσεις πρέπει να έχεις λογαριασμό'}
           </DialogTitle>
+          <DialogDescription className='sr-only'>
+            {isLoggedIn
+              ? `Στείλτε μήνυμα στον χρήστη ${recipientName}`
+              : 'Συνδεθείτε ή εγγραφείτε για να στείλετε μήνυμα'}
+          </DialogDescription>
         </DialogHeader>
         {isLoggedIn ? (
           <form onSubmit={handleSubmit} className='space-y-4'>
@@ -166,17 +176,15 @@ export function StartChatDialog({
           </form>
         ) : (
           <div className='space-y-4'>
-            <p className='text-sm text-muted-foreground text-center py-4'>
-              Συνδέσου ή δημιούργησε λογαριασμό για να στείλεις μήνυμα
-            </p>
             <div className='flex gap-2 justify-center'>
               <Button
                 type='button'
                 variant='outline'
                 onClick={() => {
                   setOpen(false);
-                  router.push('/auth/login');
+                  router.push('/login');
                 }}
+                className='rounded-full'
               >
                 Σύνδεση
               </Button>
@@ -184,8 +192,9 @@ export function StartChatDialog({
                 type='button'
                 onClick={() => {
                   setOpen(false);
-                  router.push('/auth/register');
+                  router.push('/register');
                 }}
+                className='rounded-full'
               >
                 Εγγραφή
               </Button>

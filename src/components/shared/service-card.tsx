@@ -5,16 +5,19 @@ import { Card, CardContent } from '@/components/ui/card';
 
 import MediaDisplay from '@/components/ui/media-display';
 import RatingDisplay from './rating-display';
+import SaveButton from './save-button';
 import { ServiceCardData } from '@/lib/types';
 
 interface ServiceCardProps {
   service: ServiceCardData;
   showProfile?: boolean; // New prop to control profile section visibility
+  isSaved?: boolean;
 }
 
 export default function ServiceCard({
   service,
   showProfile = true,
+  isSaved = false,
 }: ServiceCardProps) {
   // Service type declarations
   const serviceType = service.type;
@@ -25,6 +28,15 @@ export default function ServiceCard({
   return (
     <Card className='group cursor-pointer overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 rounded-lg bg-white'>
       <div className='relative'>
+        {/* Save Button - Show on hover or if saved */}
+        <div className='absolute top-4 right-4 z-10'>
+          <SaveButton
+            itemType="service"
+            itemId={service.id}
+            initialSaved={isSaved}
+          />
+        </div>
+
         {/* Media Section */}
         <div className='relative aspect-video bg-gray-100'>
           <MediaDisplay

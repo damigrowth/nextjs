@@ -10,11 +10,13 @@ interface ServicesHomeProps {
     slug: string;
   }>;
   servicesByCategory: Record<string, ServiceCardData[]>;
+  savedServiceIds?: number[];
 }
 
 export default function ServicesHome({
   mainCategories,
   servicesByCategory,
+  savedServiceIds,
 }: ServicesHomeProps) {
   return (
     <section className='py-16 bg-orangy'>
@@ -36,7 +38,10 @@ export default function ServicesHome({
         </div>
 
         {/* Services Carousel */}
-        <ServicesCarouselWrapper servicesByCategory={servicesByCategory} />
+        <ServicesCarouselWrapper
+          servicesByCategory={servicesByCategory}
+          savedServiceIds={savedServiceIds}
+        />
       </div>
     </section>
   );

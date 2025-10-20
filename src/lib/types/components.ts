@@ -205,10 +205,7 @@ export interface TaxonomyTabsProps {
 export interface BreadcrumbButtonsProps {
   subjectTitle: string;
   id: string | number;
-  savedStatus?: boolean;
-  saveType?: string; // This matches the flexible role system
-  hideSaveButton?: boolean;
-  isAuthenticated?: boolean;
+  saveType?: string;
 }
 
 export type ProfileBreadcrumbProfileData = {
@@ -257,6 +254,7 @@ export type ProfileCardData = Pick<
 
 export interface ProfileCardProps {
   profile: ProfileCardData;
+  isSaved?: boolean;
 }
 
 // Archive Component Types for Archives Feature

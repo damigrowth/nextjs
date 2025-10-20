@@ -14,9 +14,12 @@ import { ProfileCardData } from '@/lib/types';
 
 interface ProfilesHomeProps {
   profiles: ProfileCardData[];
+  savedProfileIds?: string[];
 }
 
-export default function ProfilesHome({ profiles }: ProfilesHomeProps) {
+export default function ProfilesHome({ profiles, savedProfileIds }: ProfilesHomeProps) {
+  // Convert array to Set for O(1) lookups
+  const savedIdsSet = savedProfileIds ? new Set(savedProfileIds) : new Set<string>();
   return (
     <section className='py-16 bg-dark'>
       <div className='container mx-auto px-6'>
@@ -63,7 +66,11 @@ export default function ProfilesHome({ profiles }: ProfilesHomeProps) {
                     {profiles
                       .slice(slideIndex * 4, (slideIndex + 1) * 4)
                       .map((profile) => (
-                        <ProfileCard key={profile.id} profile={profile} />
+                        <ProfileCard
+                          key={profile.id}
+                          profile={profile}
+                          isSaved={savedIdsSet.has(profile.id)}
+                        />
                       ))}
                   </div>
                 </CarouselItem>

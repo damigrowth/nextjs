@@ -21,7 +21,6 @@ import {
   Notifications,
   PathChecker,
 } from '@/components/shared/layout/wrapper';
-import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 interface RootLayoutProps {
@@ -55,7 +54,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
           {/* <PathChecker excludes={'/admin'}>
             <CookiesBanner_D />
           </PathChecker> */}
-          <Toaster />
         </TooltipProvider>
       </Body>
     </html>

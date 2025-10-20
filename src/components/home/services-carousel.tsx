@@ -13,12 +13,17 @@ import { ServiceCardData } from '@/lib/types';
 interface ServicesCarouselProps {
   services: ServiceCardData[];
   activeCategory?: string;
+  savedServiceIds?: number[];
 }
 
 export function ServicesCarousel({
   services,
   activeCategory = 'all',
+  savedServiceIds,
 }: ServicesCarouselProps) {
+  // Convert array to Set for O(1) lookups
+  const savedIdsSet = savedServiceIds ? new Set(savedServiceIds) : new Set<number>();
+
   // Filter services based on active category (if provided)
   const displayServices = services;
 
@@ -53,6 +58,7 @@ export function ServicesCarousel({
                     <ServiceCard
                       key={service.id}
                       service={service}
+                      isSaved={savedIdsSet.has(service.id)}
                     />
                   ))}
               </div>

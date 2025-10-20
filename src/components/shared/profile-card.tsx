@@ -7,9 +7,11 @@ import { ProfileCardProps } from '@/lib/types';
 import { formatInitials } from '@/lib/utils/format';
 import ProfileBadges from './profile-badges';
 import RatingDisplay from './rating-display';
+import SaveButton from './save-button';
 
-export default function ProfileCard({ profile }: ProfileCardProps) {
+export default function ProfileCard({ profile, isSaved = false }: ProfileCardProps) {
   const {
+    id,
     displayName,
     username,
     image,
@@ -24,6 +26,15 @@ export default function ProfileCard({ profile }: ProfileCardProps) {
 
   return (
     <div className='group relative bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:border-gray-300'>
+      {/* Save Button - Show on hover or if saved */}
+      <div className='absolute top-4 right-4 z-10'>
+        <SaveButton
+          itemType="profile"
+          itemId={id}
+          initialSaved={isSaved}
+        />
+      </div>
+
       {/* Avatar Section */}
       <div className='flex flex-col items-center text-center'>
         <div className='relative mb-4'>

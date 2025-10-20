@@ -75,10 +75,7 @@ export interface ServicePageData {
   breadcrumbButtons: {
     subjectTitle: string;
     id: number;
-    savedStatus: boolean;
     saveType: string;
-    hideSaveButton: boolean;
-    isAuthenticated: boolean;
   };
   // Transformed profile data for ServiceAbout component
   budgetData?: ReturnType<typeof findById>;
@@ -329,10 +326,7 @@ async function _getServicePageData(
     const breadcrumbButtons = {
       subjectTitle: service.title,
       id: service.id,
-      savedStatus: false, // TODO: Get actual saved status
       saveType: 'service',
-      hideSaveButton: false,
-      isAuthenticated: true, // TODO: Get actual auth status
     };
 
     return {

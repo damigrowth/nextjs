@@ -11,11 +11,11 @@
 import {
   CategoriesHome,
   FeaturesHome,
-  ProfilesHome,
   HeroHome,
-  ServicesHome,
   TaxonomiesHome,
   TestimonialsHome,
+  ServicesHomeWrapper,
+  ProfilesHomeWrapper,
 } from '@/components';
 import { Meta } from '@/lib/seo/Meta';
 import { getHomePageData } from '@/actions/home/get-home-data';
@@ -75,11 +75,11 @@ export default async function HomePage() {
       <HeroHome />
       <CategoriesHome />
       <FeaturesHome />
-      <ServicesHome
+      <ServicesHomeWrapper
         mainCategories={homeData.services.mainCategories}
         servicesByCategory={homeData.services.servicesByCategory}
       />
-      <ProfilesHome profiles={homeData.profiles} />
+      <ProfilesHomeWrapper profiles={homeData.profiles} />
       <TestimonialsHome />
       <TaxonomiesHome />
 

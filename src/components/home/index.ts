@@ -8,3 +8,7 @@ export { default as ProfilesHome } from './home-profiles';
 export { default as TaxonomiesHome } from './home-taxonomies';
 export { default as TestimonialsHome } from './home-testimonials';
 export { HomeSearch } from './home-search';
+
+// Client-side wrappers for personalized content
+export { ServicesHomeWrapper } from './services-home-wrapper';
+export { ProfilesHomeWrapper } from './profiles-home-wrapper';

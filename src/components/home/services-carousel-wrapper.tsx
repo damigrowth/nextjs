@@ -6,10 +6,12 @@ import { useHomeFeaturedServicesStore } from '@/lib/stores/use-home-featured-ser
 
 interface ServicesCarouselWrapperProps {
   servicesByCategory: Record<string, ServiceCardData[]>;
+  savedServiceIds?: number[];
 }
 
 export function ServicesCarouselWrapper({
   servicesByCategory,
+  savedServiceIds,
 }: ServicesCarouselWrapperProps) {
   const { activeCategory } = useHomeFeaturedServicesStore();
 
@@ -20,6 +22,7 @@ export function ServicesCarouselWrapper({
       key={activeCategory} // Force re-render when category changes
       services={currentServices}
       activeCategory={activeCategory}
+      savedServiceIds={savedServiceIds}
     />
   );
 }

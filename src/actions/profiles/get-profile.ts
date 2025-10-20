@@ -182,10 +182,7 @@ export interface ProfilePageData {
   breadcrumbButtons: {
     subjectTitle: string;
     id: string;
-    savedStatus: boolean;
     saveType: string;
-    hideSaveButton: boolean;
-    isAuthenticated: boolean;
   };
 }
 
@@ -359,10 +356,7 @@ async function _getProfilePageData(
     const breadcrumbButtons = {
       subjectTitle: profile.displayName || '',
       id: profile.id,
-      savedStatus: false, // TODO: Get actual saved status
-      saveType: profile.user.role === 'company' ? 'company' : 'freelancer',
-      hideSaveButton: false,
-      isAuthenticated: true, // TODO: Get actual auth status
+      saveType: 'profile',
     };
 
     return {
