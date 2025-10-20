@@ -28,6 +28,7 @@ import type { BreadcrumbSegment } from '@/components/shared/dynamic-breadcrumb';
 // Define the selected profile fields for the service page
 export type ServiceProfileFields = Pick<
   Profile,
+  | 'uid'
   | 'firstName'
   | 'lastName'
   | 'displayName'
