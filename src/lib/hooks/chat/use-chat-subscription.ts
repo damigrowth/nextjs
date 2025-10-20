@@ -72,6 +72,12 @@ export function useChatSubscription({
             return prev;
           }
 
+          // Find replyTo message if this is a reply
+          let replyToMessage = null;
+          if (newMessage.replyToId) {
+            replyToMessage = prev.find((m) => m.id === newMessage.replyToId) || null;
+          }
+
           // Transform to ChatMessageItem format
           const message: ChatMessageItem = {
             id: newMessage.id,
@@ -86,28 +92,45 @@ export function useChatSubscription({
               : null,
             deleted: newMessage.deleted || false,
             replyToId: newMessage.replyToId || null,
-            replyTo: null, // Will be populated if needed
+            replyTo: replyToMessage,
+            reactions: [], // Will be updated when reactions are added
+            author: null, // Will be populated if needed
           };
 
           return [...prev, message];
         });
       },
-      // On message update (edit/delete)
+      // On message update (edit/delete/reactions)
       (updatedMessage) => {
         setMessages((prev) =>
-          prev.map((m) =>
-            m.id === updatedMessage.id
-              ? {
-                  ...m,
-                  content: updatedMessage.content,
-                  edited: updatedMessage.edited || false,
-                  editedAt: updatedMessage.editedAt
-                    ? new Date(`${updatedMessage.editedAt}Z`)
-                    : null,
-                  deleted: updatedMessage.deleted || false,
-                }
-              : m
-          )
+          prev.map((m) => {
+            if (m.id !== updatedMessage.id) return m;
+
+            // Transform reactions if present
+            const reactions = [];
+            if (updatedMessage.reactions) {
+              const reactionsJson = updatedMessage.reactions as Record<string, string[]>;
+              for (const [emoji, userIds] of Object.entries(reactionsJson)) {
+                reactions.push({
+                  emoji,
+                  userIds,
+                  count: userIds.length,
+                  hasReacted: userIds.includes(currentUserId),
+                });
+              }
+            }
+
+            return {
+              ...m,
+              content: updatedMessage.content,
+              edited: updatedMessage.edited || false,
+              editedAt: updatedMessage.editedAt
+                ? new Date(`${updatedMessage.editedAt}Z`)
+                : null,
+              deleted: updatedMessage.deleted || false,
+              reactions,
+            };
+          })
         );
       },
       // On message delete

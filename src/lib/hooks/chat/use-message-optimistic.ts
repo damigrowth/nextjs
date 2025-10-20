@@ -29,7 +29,7 @@ export function useMessageOptimistic({
   >([]);
 
   const sendOptimisticMessage = useCallback(
-    async (content: string) => {
+    async (content: string, replyToId?: string) => {
       // Create optimistic message
       const tempId = `temp-${Date.now()}`;
       const optimisticMsg: OptimisticMessage = {
@@ -42,8 +42,10 @@ export function useMessageOptimistic({
         edited: false,
         editedAt: null,
         deleted: false,
-        replyToId: null,
-        replyTo: null,
+        replyToId: replyToId || null,
+        replyTo: null, // Will be populated by real-time subscription
+        reactions: [], // No reactions on new messages
+        author: null, // Will be populated by real-time subscription
         optimistic: true,
         sending: true,
       };
@@ -53,7 +55,7 @@ export function useMessageOptimistic({
 
       try {
         // Send to server
-        await sendMessage(chatId, content, currentUserId);
+        await sendMessage(chatId, content, currentUserId, replyToId);
 
         // Mark as sent
         setOptimisticMessages((prev) =>
