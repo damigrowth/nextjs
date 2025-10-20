@@ -31,6 +31,8 @@ model User {
   sessions        Session[]
   blockedUsers    BlockedUser[] @relation("UserBlocks")
   blockedByUsers  BlockedUser[] @relation("BlockedBy")
+  savedServices   SavedService[]
+  savedProfiles   SavedProfile[]
 
   @@index([role])
   @@index([step])
@@ -106,6 +108,7 @@ model Profile {
   reviews         Review[]             @relation("ReviewReceiver")
   services        Service[]
   verification    ProfileVerification?
+  savedBy         SavedProfile[]
 
   @@index([uid])
   @@index([published, featured])

@@ -60,6 +60,7 @@ model Service {
   updatedAt DateTime @updatedAt
   reviews   Review[]
   profile   Profile  @relation(fields: [pid], references: [id], onDelete: Cascade)
+  savedBy   SavedService[]
 
   @@index([pid])
   @@index([status, featured])

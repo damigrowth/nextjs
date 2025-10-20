@@ -1,0 +1,32 @@
+// SAVED ITEMS MODELS
+// Relational tables for user-saved services and profiles
+
+model SavedService {
+  id        String   @id @default(cuid())
+  userId    String
+  serviceId Int
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, serviceId])
+  @@index([userId])
+  @@index([serviceId])
+  @@map("saved_services")
+}
+
+model SavedProfile {
+  id        String   @id @default(cuid())
+  userId    String
+  profileId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, profileId])
+  @@index([userId])
+  @@index([profileId])
+  @@map("saved_profiles")
+}
