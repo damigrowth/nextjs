@@ -4,7 +4,6 @@ export { createServiceAction } from './create-service';
 export {
   getServiceBySlug,
   getServicePageData,
-  getServiceMetadata,
   type ServicePageData,
   type ServiceWithFullProfile,
 } from './get-service';
