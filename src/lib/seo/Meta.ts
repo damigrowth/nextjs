@@ -3,12 +3,24 @@
 import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 
-import { fetchEntity } from './fetchEntity';
-import { formatTemplate } from './formatTemplate';
-import { MetaData } from './MetaData';
+import { fetchEntity } from './fetch-entity';
+import { formatTemplate } from './format-template';
+import { MetaData } from './metadata';
+
+/**
+ * Entity type for SEO metadata generation
+ */
+type EntityType =
+  | 'service'
+  | 'profile'
+  | 'serviceCategory'
+  | 'serviceSubcategory'
+  | 'serviceSubdivision'
+  | 'proCategory'
+  | 'proSubcategory';
 
 interface MetaParams {
-  type?: string;
+  type?: EntityType;
   params?: any;
   titleTemplate: string;
   descriptionTemplate: string;
