@@ -1,6 +1,7 @@
 import React, { JSX } from 'react';
 import { notFound } from 'next/navigation';
-import { getProfilePageData, getProfileMetadata } from '@/actions/profiles/get-profile';
+import { getProfilePageData } from '@/actions/profiles/get-profile';
+import { getProfileMetadata } from '@/lib/seo/pages';
 import { prisma } from '@/lib/prisma/client';
 import {
   ProfileBio,
@@ -27,6 +28,15 @@ interface ProfilePageProps {
   }>;
 }
 
+/**
+ * Generates Next.js metadata for SEO optimization
+ * Creates dynamic title, description, and OpenGraph data based on profile
+ */
+export async function generateMetadata({ params }: ProfilePageProps) {
+  const { username } = await params;
+  return getProfileMetadata(username);
+}
+
 // Generate static params for all published profiles
 export async function generateStaticParams() {
   const profiles = await prisma.profile.findMany({
@@ -35,20 +45,19 @@ export async function generateStaticParams() {
       username: { not: null }, // Ensure username exists
       user: {
         blocked: false,
-        confirmed: true
-      }
+        confirmed: true,
+      },
     },
-    select: { username: true }
+    select: { username: true },
   });
 
-  return profiles.map(profile => ({
-    username: profile.username!
+  return profiles.map((profile) => ({
+    username: profile.username!,
   }));
 }
 
 // With prisma-json-types-generator, JSON fields are already properly typed
 // We can use the PrismaJson namespace types directly
-
 
 /**
  * Main profile page component
@@ -233,15 +242,4 @@ export default async function ProfilePage({
       </section>
     </div>
   );
-}
-
-/**
- * Generates Next.js metadata for SEO optimization
- * Creates dynamic title, description, and OpenGraph data based on profile
- */
-export async function generateMetadata({
-  params,
-}: ProfilePageProps) {
-  const { username } = await params;
-  return getProfileMetadata(username);
 }

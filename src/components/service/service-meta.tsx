@@ -31,9 +31,9 @@ export default function ServiceMeta({
     <div className='w-full mb-8 pb-8 border-b border-gray-200'>
       <div className='relative'>
         {/* Service Title */}
-        <h2 className='text-xl2 font-bold text-gray-900 leading-tight mb-6'>
+        <h1 className='text-xl2 font-bold text-gray-900 leading-tight mb-6'>
           {title}
-        </h2>
+        </h1>
 
         {/* Meta Information */}
         <div className='flex flex-wrap items-center gap-4'>

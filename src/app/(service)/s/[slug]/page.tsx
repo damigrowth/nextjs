@@ -1,6 +1,7 @@
 import React, { JSX } from 'react';
 import { notFound } from 'next/navigation';
-import { getServicePageData, getServiceMetadata } from '@/actions/services';
+import { getServicePageData } from '@/actions/services';
+import { getServiceMetadata } from '@/lib/seo/pages';
 import { prisma } from '@/lib/prisma/client';
 import { TaxonomyTabs, DynamicBreadcrumb } from '@/components';
 import { Card, CardContent } from '@/components/ui/card';
@@ -24,6 +25,15 @@ interface ServicePageProps {
   params: Promise<{
     slug: string;
   }>;
+}
+
+/**
+ * Generates Next.js metadata for SEO optimization
+ * Creates dynamic title, description, and OpenGraph data based on service
+ */
+export async function generateMetadata({ params }: ServicePageProps) {
+  const { slug } = await params;
+  return getServiceMetadata(slug);
 }
 
 // Generate static params for all published services
@@ -184,10 +194,4 @@ export default async function ServicePage({
       </section>
     </div>
   );
-}
-
-// Metadata generation
-export async function generateMetadata({ params }: ServicePageProps) {
-  const { slug } = await params;
-  return getServiceMetadata(slug);
 }

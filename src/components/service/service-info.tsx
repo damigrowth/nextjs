@@ -37,7 +37,11 @@ export default function ServiceInfo({
           <IconBox
             icon={<FileText className='h-10 w-10' />}
             title={subdivision?.label || ''}
-            value={subcategory?.label}
+            value={
+              <h2 className='text-sm font-normal text-muted-foreground mb-0'>
+                {subcategory?.label}
+              </h2>
+            }
           />
         </div>
       )}

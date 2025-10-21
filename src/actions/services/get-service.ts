@@ -362,7 +362,9 @@ async function _getServicePageData(
  * Cached version of getServicePageData with ISR + tag-based revalidation
  * Uses consistent cache tags for proper invalidation
  */
-export async function getServicePageData(slug: string): Promise<ActionResult<ServicePageData>> {
+export async function getServicePageData(
+  slug: string,
+): Promise<ActionResult<ServicePageData>> {
   const getCached = unstable_cache(
     _getServicePageData,
     ['service-page', slug],
@@ -373,40 +375,12 @@ export async function getServicePageData(slug: string): Promise<ActionResult<Ser
         CACHE_TAGS.collections.services,
       ],
       revalidate: 300, // 5 minutes, matching ISR
-    }
+    },
   );
 
   return getCached(slug);
 }
 
-/**
- * Generate metadata for service page
- */
-export async function getServiceMetadata(slug: string) {
-  const result = await getServicePageData(slug);
-
-  if (!result.success || !result.data) {
-    return {
-      title: 'Υπηρεσία Δεν Βρέθηκε',
-      description: 'Η ζητούμενη υπηρεσία δεν μπόρεσε να βρεθεί.',
-    };
-  }
-
-  const { service, category } = result.data;
-
-  return {
-    title: `${service.title} - ${service.profile.displayName}${category ? ` | ${category.label}` : ''}`,
-    description: service.description.substring(0, 160),
-    openGraph: {
-      title: service.title,
-      description: service.description,
-      images:
-        service.media && (service.media as any).images?.length > 0
-          ? [(service.media as any).images[0].secure_url]
-          : [],
-    },
-  };
-}
 
 /**
  * Get a service by ID for editing (user must own the service)
