@@ -5,6 +5,7 @@ import {
   getServiceArchivePageData,
   getServiceTaxonomyPaths,
 } from '@/actions/services/get-services';
+import { getServiceSubdivisionMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -23,6 +24,14 @@ interface SubdivisionPageProps {
     sortBy?: string;
     page?: string;
   }>;
+}
+
+export async function generateMetadata({
+  params,
+}: SubdivisionPageProps): Promise<Metadata> {
+  const { subcategory: subcategorySlug, subdivision: subdivisionSlug } =
+    await params;
+  return getServiceSubdivisionMetadata(subcategorySlug, subdivisionSlug);
 }
 
 export async function generateStaticParams() {
@@ -45,56 +54,6 @@ export async function generateStaticParams() {
     console.error('Error generating static params for subdivision:', error);
     return [];
   }
-}
-
-export async function generateMetadata({
-  params,
-}: SubdivisionPageProps): Promise<Metadata> {
-  const {
-    category: categorySlug,
-    subcategory: subcategorySlug,
-    subdivision: subdivisionSlug,
-  } = await params;
-
-  // Get taxonomy data using the server action
-  const result = await getServiceArchivePageData({
-    categorySlug,
-    subcategorySlug,
-    subdivisionSlug,
-    searchParams: {},
-  });
-
-  if (
-    !result.success ||
-    !result.data.taxonomyData.currentCategory ||
-    !result.data.taxonomyData.currentSubcategory ||
-    !result.data.taxonomyData.currentSubdivision
-  ) {
-    return {
-      title: 'Υποδιαίρεση δε βρέθηκε | Doulitsa',
-      description: 'Η υποδιαίρεση που αναζητάτε δεν υπάρχει.',
-    };
-  }
-
-  const {
-    currentCategory: category,
-    currentSubcategory: subcategory,
-    currentSubdivision: subdivision,
-  } = result.data.taxonomyData;
-  const title = `${subdivision.label} - ${subcategory.label} - ${category.label} | Doulitsa`;
-  const description =
-    subdivision.description ||
-    `Βρες τις καλύτερες υπηρεσίες ${subdivision.label.toLowerCase()} στην κατηγορία ${subcategory.label.toLowerCase()} από επαγγελματίες στην Ελλάδα.`;
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-    },
-  };
 }
 
 export default async function ServicesSubdivisionPage({

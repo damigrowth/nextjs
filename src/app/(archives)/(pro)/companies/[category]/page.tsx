@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
 import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
+import { getCompanyCategoryMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -57,34 +58,7 @@ export async function generateMetadata({
   params,
 }: CompaniesCategoryPageProps): Promise<Metadata> {
   const { category: categorySlug } = await params;
-
-  // Get taxonomy data using the server action
-  const result = await getProfileArchivePageData({
-    archiveType: 'companies',
-    categorySlug: categorySlug,
-    searchParams: {},
-  });
-
-  if (!result.success || !result.data.taxonomyData.currentCategory) {
-    return {
-      title: 'Κατηγορία δεν βρέθηκε | Doulitsa',
-      description: 'Η ζητούμενη κατηγορία δεν βρέθηκε.',
-    };
-  }
-
-  const category = result.data.taxonomyData.currentCategory;
-  const title = `${category.label} - Επιχειρήσεις | Doulitsa`;
-  const description = `Βρείτε τις καλύτερες επιχειρήσεις ${category.label.toLowerCase()} σε όλη την Ελλάδα. Πιστοποιημένες επιχειρήσεις με αξιολογήσεις.`;
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-    },
-  };
+  return getCompanyCategoryMetadata(categorySlug);
 }
 
 export default async function CompaniesCategoryPage({

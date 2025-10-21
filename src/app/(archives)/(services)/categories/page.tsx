@@ -4,10 +4,15 @@ import { TaxonomyTabs, DynamicBreadcrumb } from '@/components/shared';
 import { ArchiveBanner } from '@/components/archives/archive-banner';
 import { SubdivisionsCarousel } from '@/components/archives/subdivisions-carousel';
 import { CategoriesGrid } from '@/components/archives/categories-grid';
+import { getCategoriesMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
 export const dynamicParams = true;
+
+export async function generateMetadata() {
+  return getCategoriesMetadata();
+}
 
 export async function generateStaticParams() {
   // Return empty array for the base /categories route (no dynamic params needed)

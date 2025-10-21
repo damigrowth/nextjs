@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
 import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
+import { getProCategoryMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -18,6 +19,13 @@ interface ProsCategoryPageProps {
     sortBy?: string;
     page?: string;
   }>;
+}
+
+export async function generateMetadata({
+  params,
+}: ProsCategoryPageProps): Promise<Metadata> {
+  const { category: categorySlug } = await params;
+  return getProCategoryMetadata(categorySlug);
 }
 
 export async function generateStaticParams() {
@@ -48,42 +56,6 @@ export async function generateStaticParams() {
     console.error('Error generating static params for pros category:', error);
     return [];
   }
-}
-
-export async function generateMetadata({
-  params,
-}: ProsCategoryPageProps): Promise<Metadata> {
-  const { category: categorySlug } = await params;
-
-  // Get taxonomy data using the server action
-  const result = await getProfileArchivePageData({
-    archiveType: 'pros',
-    categorySlug: categorySlug,
-    searchParams: {},
-  });
-
-  if (!result.success || !result.data.taxonomyData.currentCategory) {
-    return {
-      title: 'Κατηγορία δεν βρέθηκε | Doulitsa',
-      description: 'Η ζητούμενη κατηγορία δεν βρέθηκε.',
-    };
-  }
-
-  const category = result.data.taxonomyData.currentCategory;
-  const title = `${category.label} - Επαγγελματίες | Doulitsa`;
-  const description =
-    category.description ||
-    `Βρείτε τους καλύτερους επαγγελματίες ${category.label.toLowerCase()} σε όλη την Ελλάδα. Πιστοποιημένοι επαγγελματίες με αξιολογήσεις.`;
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-    },
-  };
 }
 
 export default async function ProsCategoryPage({

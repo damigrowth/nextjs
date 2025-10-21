@@ -6,6 +6,7 @@ import { TaxonomyTabs, DynamicBreadcrumb } from '@/components/shared';
 import { ArchiveBanner } from '@/components/archives/archive-banner';
 import { SubdivisionsCarousel } from '@/components/archives/subdivisions-carousel';
 import { CategoriesGrid } from '@/components/archives/categories-grid';
+import { getCategoryMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -22,6 +23,13 @@ interface CategoryPageProps {
     sortBy?: string;
     page?: string;
   }>;
+}
+
+export async function generateMetadata({
+  params,
+}: CategoryPageProps): Promise<Metadata> {
+  const { category: categorySlug } = await params;
+  return getCategoryMetadata(categorySlug);
 }
 
 export async function generateStaticParams() {
@@ -51,41 +59,6 @@ export async function generateStaticParams() {
     console.error('Error generating static params for category:', error);
     return [];
   }
-}
-
-export async function generateMetadata({
-  params,
-}: CategoryPageProps): Promise<Metadata> {
-  const { category: categorySlug } = await params;
-
-  // Get taxonomy data using the server action
-  const result = await getServiceArchivePageData({
-    categorySlug,
-    searchParams: {},
-  });
-
-  if (!result.success || !result.data.taxonomyData.currentCategory) {
-    return {
-      title: 'Κατηγορία δε βρέθηκε | Doulitsa',
-      description: 'Η κατηγορία που αναζητάτε δεν υπάρχει.',
-    };
-  }
-
-  const { currentCategory: category } = result.data.taxonomyData;
-  const title = `${category.label} - Κατηγορίες Υπηρεσιών | Doulitsa`;
-  const description =
-    category.description ||
-    `Ανακάλυψε όλες τις υπηρεσίες στην κατηγορία ${category.label.toLowerCase()} από τους καλύτερους επαγγελματίες στην Ελλάδα.`;
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-    },
-  };
 }
 
 export default async function CategoryPage({

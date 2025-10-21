@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
 import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
+import { getCompaniesMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -21,41 +22,8 @@ export async function generateStaticParams() {
   return [];
 }
 
-export async function generateMetadata({
-  searchParams,
-}: CompaniesPageProps): Promise<Metadata> {
-  const params = await searchParams;
-  const filters = {
-    role: 'company' as const,
-    county: params.county,
-    online: params.online === 'true',
-    sortBy: params.sortBy,
-  };
-
-  let title = 'Επιχειρήσεις | Doulitsa';
-  let description =
-    'Βρείτε επιχειρήσεις σε όλη την Ελλάδα. Πιστοποιημένες επιχειρήσεις με αξιολογήσεις και υπηρεσίες.';
-
-  if (filters.county) {
-    title = `Επιχειρήσεις στην ${filters.county} | Doulitsa`;
-    description = `Βρείτε επιχειρήσεις στην ${filters.county}. Πιστοποιημένες επιχειρήσεις με υπηρεσίες.`;
-  }
-
-  if (filters.online) {
-    title = 'Online Επιχειρήσεις | Doulitsa';
-    description =
-      'Βρείτε επιχειρήσεις που προσφέρουν online υπηρεσίες σε όλη την Ελλάδα.';
-  }
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-    },
-  };
+export async function generateMetadata() {
+  return getCompaniesMetadata();
 }
 
 export default async function CompaniesPage({

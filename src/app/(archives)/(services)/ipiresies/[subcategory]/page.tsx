@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArchiveLayout, ArchiveServiceCard } from '@/components/archives';
 import { getServiceArchivePageData } from '@/actions/services/get-services';
+import { getServiceSubcategoryMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -19,6 +20,13 @@ interface SubcategoryPageProps {
     sortBy?: string;
     page?: string;
   }>;
+}
+
+export async function generateMetadata({
+  params,
+}: SubcategoryPageProps): Promise<Metadata> {
+  const { subcategory: subcategorySlug } = await params;
+  return getServiceSubcategoryMetadata(subcategorySlug);
 }
 
 export async function generateStaticParams() {
@@ -43,47 +51,6 @@ export async function generateStaticParams() {
     console.error('Error generating static params for subcategory:', error);
     return [];
   }
-}
-
-export async function generateMetadata({
-  params,
-}: SubcategoryPageProps): Promise<Metadata> {
-  const { category: categorySlug, subcategory: subcategorySlug } = await params;
-
-  // Get taxonomy data using the server action
-  const result = await getServiceArchivePageData({
-    categorySlug,
-    subcategorySlug,
-    searchParams: {},
-  });
-
-  if (
-    !result.success ||
-    !result.data.taxonomyData.currentCategory ||
-    !result.data.taxonomyData.currentSubcategory
-  ) {
-    return {
-      title: 'Υποκατηγορία δε βρέθηκε | Doulitsa',
-      description: 'Η υποκατηγορία που αναζητάτε δεν υπάρχει.',
-    };
-  }
-
-  const { currentCategory: category, currentSubcategory: subcategory } =
-    result.data.taxonomyData;
-  const title = `${subcategory.label} - ${category.label} | Doulitsa`;
-  const description =
-    subcategory.description ||
-    `Βρες τις καλύτερες υπηρεσίες ${subcategory.label.toLowerCase()} στην κατηγορία ${category.label.toLowerCase()} από επαγγελματίες στην Ελλάδα.`;
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-    },
-  };
 }
 
 export default async function ServicesSubcategoryPage({

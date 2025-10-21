@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
 import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
+import { getCompanySubcategoryMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -53,42 +54,7 @@ export async function generateMetadata({
   params,
 }: CompaniesSubcategoryPageProps): Promise<Metadata> {
   const { category: categorySlug, subcategory: subcategorySlug } = await params;
-
-  // Get taxonomy data using the server action
-  const result = await getProfileArchivePageData({
-    archiveType: 'companies',
-    categorySlug: categorySlug,
-    subcategorySlug: subcategorySlug,
-    searchParams: {},
-  });
-
-  if (
-    !result.success ||
-    !result.data.taxonomyData.currentCategory ||
-    !result.data.taxonomyData.currentSubcategory
-  ) {
-    return {
-      title: 'Υποκατηγορία δεν βρέθηκε | Doulitsa',
-      description: 'Η ζητούμενη υποκατηγορία δεν βρέθηκε.',
-    };
-  }
-
-  const { currentCategory: category, currentSubcategory: subcategory } =
-    result.data.taxonomyData;
-  const title = `${subcategory.label} - ${category.label} | Doulitsa`;
-  const description =
-    subcategory.description ||
-    `Βρείτε τις καλύτερες επιχειρήσεις ${subcategory.label.toLowerCase()} στην κατηγορία ${category.label.toLowerCase()} σε όλη την Ελλάδα.`;
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-    },
-  };
+  return getCompanySubcategoryMetadata(categorySlug, subcategorySlug);
 }
 
 export default async function CompaniesSubcategoryPage({

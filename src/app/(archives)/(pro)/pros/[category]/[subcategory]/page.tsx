@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
 import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
+import { getProSubcategoryMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -19,6 +20,13 @@ interface ProsSubcategoryPageProps {
     sortBy?: string;
     page?: string;
   }>;
+}
+
+export async function generateMetadata({
+  params,
+}: ProsSubcategoryPageProps): Promise<Metadata> {
+  const { category: categorySlug, subcategory: subcategorySlug } = await params;
+  return getProSubcategoryMetadata(categorySlug, subcategorySlug);
 }
 
 export async function generateStaticParams() {
@@ -47,48 +55,6 @@ export async function generateStaticParams() {
     );
     return [];
   }
-}
-
-export async function generateMetadata({
-  params,
-}: ProsSubcategoryPageProps): Promise<Metadata> {
-  const { category: categorySlug, subcategory: subcategorySlug } = await params;
-
-  // Get taxonomy data using the server action
-  const result = await getProfileArchivePageData({
-    archiveType: 'pros',
-    categorySlug: categorySlug,
-    subcategorySlug: subcategorySlug,
-    searchParams: {},
-  });
-
-  if (
-    !result.success ||
-    !result.data.taxonomyData.currentCategory ||
-    !result.data.taxonomyData.currentSubcategory
-  ) {
-    return {
-      title: 'Υποκατηγορία δεν βρέθηκε | Doulitsa',
-      description: 'Η ζητούμενη υποκατηγορία δεν βρέθηκε.',
-    };
-  }
-
-  const { currentCategory: category, currentSubcategory: subcategory } =
-    result.data.taxonomyData;
-  const title = `${subcategory.label} - ${category.label} | Doulitsa`;
-  const description =
-    subcategory.description ||
-    `Βρείτε τους καλύτερους επαγγελματίες ${subcategory.label.toLowerCase()} στην κατηγορία ${category.label.toLowerCase()} σε όλη την Ελλάδα.`;
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-    },
-  };
 }
 
 export default async function ProsSubcategoryPage({

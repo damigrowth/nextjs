@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
 import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
+import { getProsMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -21,41 +22,8 @@ export async function generateStaticParams() {
   return [];
 }
 
-export async function generateMetadata({
-  searchParams,
-}: ProsPageProps): Promise<Metadata> {
-  const params = await searchParams;
-  const filters = {
-    role: 'freelancer' as const,
-    county: params.county,
-    online: params.online === 'true',
-    sortBy: params.sortBy,
-  };
-
-  let title = 'Επαγγελματίες | Doulitsa';
-  let description =
-    'Βρείτε επαγγελματίες σε όλη την Ελλάδα. Ελεύθεροι επαγγελματίες με πιστοποιημένες υπηρεσίες και αξιολογήσεις.';
-
-  if (filters.county) {
-    title = `Επαγγελματίες στην ${filters.county} | Doulitsa`;
-    description = `Βρείτε επαγγελματίες στην ${filters.county}. Ελεύθεροι επαγγελματίες με πιστοποιημένες υπηρεσίες.`;
-  }
-
-  if (filters.online) {
-    title = 'Online Επαγγελματίες | Doulitsa';
-    description =
-      'Βρείτε επαγγελματίες που προσφέρουν online υπηρεσίες σε όλη την Ελλάδα.';
-  }
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-    },
-  };
+export async function generateMetadata() {
+  return getProsMetadata();
 }
 
 export default async function ProsPage({ searchParams }: ProsPageProps) {

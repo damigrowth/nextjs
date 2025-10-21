@@ -1,9 +1,14 @@
 import { ArchiveLayout, ArchiveServiceCard } from '@/components/archives';
 import { getServiceArchivePageData } from '@/actions/services/get-services';
+import { getServicesMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
 export const dynamicParams = true;
+
+export async function generateMetadata() {
+  return getServicesMetadata();
+}
 
 interface ServicesPageProps {
   searchParams: Promise<{
