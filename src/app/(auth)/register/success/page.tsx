@@ -1,19 +1,11 @@
-import { Meta } from '@/lib/seo/Meta';
+import { getRegisterSuccessMetadata } from '@/lib/seo/pages';
 
 export const dynamic = 'force-static';
 export const revalidate = false;
 
 // Static SEO
 export async function generateMetadata() {
-  const { meta } = await Meta({
-    titleTemplate: 'Επιβεβαίωση Εγγραφής - Doulitsa',
-    descriptionTemplate:
-      'Η εγγραφή σας ολοκληρώθηκε επιτυχώς! Παρακαλώ ελέγξτε το email σας για να επιβεβαιώσετε τον λογαριασμό σας.',
-    size: 160,
-    url: '/register/success',
-  });
-
-  return meta;
+  return getRegisterSuccessMetadata();
 }
 
 export default function page() {

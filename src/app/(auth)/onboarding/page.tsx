@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { Meta } from '@/lib/seo/Meta';
+import { getOnboardingMetadata } from '@/lib/seo/pages';
 import { getCurrentUser } from '@/actions/auth/server';
 import { OnboardingForm } from '@/components';
 
@@ -7,15 +7,7 @@ export const dynamic = 'force-dynamic';
 
 // Static SEO
 export async function generateMetadata() {
-  const { meta } = await Meta({
-    titleTemplate: 'Ολοκλήρωση Εγγραφής - Doulitsa',
-    descriptionTemplate:
-      'Ολοκληρώστε την εγγραφή σας στην Doulitsa συμπληρώνοντας το προφίλ σας.',
-    size: 160,
-    url: '/onboarding',
-  });
-
-  return meta;
+  return getOnboardingMetadata();
 }
 
 export default async function page() {

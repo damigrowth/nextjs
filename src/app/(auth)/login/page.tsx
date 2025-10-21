@@ -2,7 +2,7 @@ import { JSX } from 'react';
 import { Metadata } from 'next';
 import LinkNP from '@/components/link';
 
-import { Meta } from '@/lib/seo/Meta';
+import { getLoginMetadata } from '@/lib/seo/pages';
 
 import { FormAuthLogin } from '@/components';
 import {
@@ -15,15 +15,7 @@ export const dynamic = 'force-dynamic';
 
 // Static SEO
 export async function generateMetadata(): Promise<Metadata> {
-  const { meta } = await Meta({
-    titleTemplate: 'Είσοδος - Doulitsa',
-    descriptionTemplate:
-      'Συνδέσου στον λογαριασμό σου για να αποκτήσεις πρόσβαση στις υπηρεσίες της Doulitsa.',
-    size: 160,
-    url: '/login',
-  });
-
-  return meta;
+  return getLoginMetadata();
 }
 
 export default async function LoginPage(): Promise<JSX.Element> {

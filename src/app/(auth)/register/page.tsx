@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import LinkNP from '@/components/link';
 
-import { Meta } from '@/lib/seo/Meta';
+import { getRegisterMetadata } from '@/lib/seo/pages';
 import {
   redirectOnboardingUsers,
   redirectCompletedUsers,
@@ -18,15 +18,7 @@ export const dynamic = 'force-dynamic';
 
 // Static SEO
 export async function generateMetadata(): Promise<Metadata> {
-  const { meta } = await Meta({
-    titleTemplate: 'Εγγραφή - Doulitsa',
-    descriptionTemplate:
-      'Δημιούργησε τον λογαριασμό σου στην Doulitsa και ξεκίνησε να προσφέρεις ή να αναζητάς υπηρεσίες.',
-    size: 160,
-    url: '/register',
-  });
-
-  return meta;
+  return getRegisterMetadata();
 }
 
 export default async function RegisterPage(): Promise<JSX.Element> {

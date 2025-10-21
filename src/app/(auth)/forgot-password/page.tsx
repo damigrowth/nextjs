@@ -1,7 +1,7 @@
 import { JSX } from 'react';
 import { Metadata } from 'next';
 
-import { Meta } from '@/lib/seo/Meta';
+import { getForgotPasswordMetadata } from '@/lib/seo/pages';
 import {
   redirectCompletedUsers,
   redirectOnboardingUsers,
@@ -13,15 +13,7 @@ export const dynamic = 'force-dynamic';
 
 // Static SEO
 export async function generateMetadata(): Promise<Metadata> {
-  const { meta } = await Meta({
-    titleTemplate: 'Ανάκτηση Κωδικού - Doulitsa',
-    descriptionTemplate:
-      'Ξέχασες τον κωδικό σου; Ακολούθησε τα βήματα για να επαναφέρεις την πρόσβαση στον λογαριασμό σου.',
-    size: 160,
-    url: '/forgot-password',
-  });
-
-  return meta;
+  return getForgotPasswordMetadata();
 }
 
 export default async function ForgotPasswordPage(): Promise<JSX.Element> {

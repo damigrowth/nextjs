@@ -1,22 +1,14 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/actions/auth/server';
-import { Meta } from '@/lib/seo/Meta';
+import { getOAuthSetupMetadata } from '@/lib/seo/pages';
 import OAuthSetupForm from '@/components/forms/auth/form-oauth-setup';
 
 export const dynamic = 'force-dynamic';
 
 // Static SEO
 export async function generateMetadata(): Promise<Metadata> {
-  const { meta } = await Meta({
-    titleTemplate: 'Ολοκλήρωση Εγγραφής - Doulitsa',
-    descriptionTemplate:
-      'Ολοκληρώστε την εγγραφή σας συμπληρώνοντας τα στοιχεία σας.',
-    size: 160,
-    url: '/oauth-setup',
-  });
-
-  return meta;
+  return getOAuthSetupMetadata();
 }
 
 interface PageProps {
@@ -36,9 +28,7 @@ export default async function OAuthSetupPage({ searchParams }: PageProps) {
   // console.log('OAUTH-SETUP PAGE - SERVER SIDE USER', user);
 
   // Check if this is a Google OAuth user who needs setup
-  const needsSetup =
-    user.provider === 'google' &&
-    user.step === 'OAUTH_SETUP';
+  const needsSetup = user.provider === 'google' && user.step === 'OAUTH_SETUP';
 
   if (!needsSetup) {
     // User doesn't need setup, redirect to appropriate page based on type and step

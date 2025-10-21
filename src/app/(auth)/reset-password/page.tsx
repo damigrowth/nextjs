@@ -2,7 +2,7 @@ import { JSX } from 'react';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { Meta } from '@/lib/seo/Meta';
+import { getResetPasswordMetadata } from '@/lib/seo/pages';
 import {
   redirectCompletedUsers,
   redirectOnboardingUsers,
@@ -14,15 +14,7 @@ export const dynamic = 'force-dynamic';
 
 // Static SEO
 export async function generateMetadata(): Promise<Metadata> {
-  const { meta } = await Meta({
-    titleTemplate: 'Επαναφορά Κωδικού - Doulitsa',
-    descriptionTemplate:
-      'Δημιούργησε νέο κωδικό πρόσβασης για τον λογαριασμό σου στην Doulitsa.',
-    size: 160,
-    url: '/reset-password',
-  });
-
-  return meta;
+  return getResetPasswordMetadata();
 }
 
 interface ResetPasswordPageProps {
