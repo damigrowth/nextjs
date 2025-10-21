@@ -1,10 +1,15 @@
 import React from 'react';
+import { getPrivacyMetadata } from '@/lib/seo/pages';
+
+export async function generateMetadata() {
+  return getPrivacyMetadata();
+}
 
 export default function PrivacyPage() {
   return (
     <div className='mt-10 lg:mt-20 flex flex-col w-full'>
       <section className='mx-auto max-w-2xl py-12 px-5'>
-        <h2>Ι. Πολιτική απορρήτου</h2>
+        <h1>Πολιτική απορρήτου</h1>
         <p>
           <span>
             1. Ο υπεύθυνος επεξεργασίας δεδομένων προσωπικού χαρακτήρα, ήτοι ο

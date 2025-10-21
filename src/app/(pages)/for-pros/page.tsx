@@ -7,7 +7,12 @@ import {
   FeaturesRow,
 } from '@/components/shared';
 import { data } from '@/constants/datasets/for-pros';
+import { getForProsMetadata } from '@/lib/seo/pages';
 import React from 'react';
+
+export async function generateMetadata() {
+  return getForProsMetadata();
+}
 
 export default function ForProsPage() {
   return (

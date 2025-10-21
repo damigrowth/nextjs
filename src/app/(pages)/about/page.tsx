@@ -9,7 +9,12 @@ import {
   FaqSection,
 } from '@/components/shared';
 import { data } from '@/constants/datasets/about';
+import { getAboutMetadata } from '@/lib/seo/pages';
 import React from 'react';
+
+export async function generateMetadata() {
+  return getAboutMetadata();
+}
 
 export default function AboutPage() {
   return (

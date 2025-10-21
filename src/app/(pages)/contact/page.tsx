@@ -3,6 +3,11 @@ import { FaqSection, HeroBanner } from '@/components/shared';
 import { data } from '@/constants/datasets/contact';
 import { Phone, Mail } from 'lucide-react';
 import { ContactForm } from '@/components/forms';
+import { getContactMetadata } from '@/lib/seo/pages';
+
+export async function generateMetadata() {
+  return getContactMetadata();
+}
 
 export default function ContactPage() {
   const { contact, faq } = data;

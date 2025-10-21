@@ -1,6 +1,11 @@
 import React from 'react';
 import { FaqSection } from '@/components';
 import { data } from '@/constants/datasets/faq';
+import { getFaqMetadata } from '@/lib/seo/pages';
+
+export async function generateMetadata() {
+  return getFaqMetadata();
+}
 
 export default function FaqPage() {
   return (
@@ -9,7 +14,7 @@ export default function FaqPage() {
         {/* Header */}
         <div className='mx-auto max-w-2xl text-center mb-12'>
           <div className='space-y-2'>
-            <h2 className='title text-2xl font-bold'>{data.title}</h2>
+            <h1 className='title text-2xl font-bold'>{data.title}</h1>
             <p className='paragraph text-sm text-body mt-2'>
               {data.description}
             </p>

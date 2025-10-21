@@ -108,9 +108,9 @@ export default function HeroBanner({
           className={`container mx-auto px-4 relative z-10 ${contentClassName}`}
         >
           <div className='w-full xl:w-5/12 max-w-xl'>
-            <h2 className='text-white text-2xl md:text-4xl font-bold mb-4 md:mb-6'>
+            <h1 className='text-white text-2xl md:text-4xl font-bold mb-4 md:mb-6'>
               {data.title}
-            </h2>
+            </h1>
             <p className='text-white mb-8 text-base md:text-lg opacity-90'>
               {data.description}
             </p>

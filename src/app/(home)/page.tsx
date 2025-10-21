@@ -17,7 +17,7 @@ import {
   ServicesHomeWrapper,
   ProfilesHomeWrapper,
 } from '@/components';
-import { Meta } from '@/lib/seo/Meta';
+import { getHomeMetadata } from '@/lib/seo/pages';
 import { getHomePageData } from '@/actions/home/get-home-data';
 
 // import { getData } from '@/lib/client/operations';
@@ -29,23 +29,7 @@ export const revalidate = 3600; // Revalidate every hour (public content only)
 export const fetchCache = 'force-cache';
 
 export async function generateMetadata() {
-  // Temporarily simplified to isolate the RangeError
-  return {
-    title: 'Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη',
-    description:
-      'Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.',
-  };
-
-  // Original code (commented out to isolate issue):
-  // const { meta } = await Meta({
-  //   titleTemplate:
-  //     'Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη',
-  //   descriptionTemplate:
-  //     'Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.',
-  //   size: 160,
-  //   url: '/',
-  // });
-  // return meta;
+  return getHomeMetadata();
 }
 
 export async function generateStaticParams() {
