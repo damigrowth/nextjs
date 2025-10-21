@@ -3,6 +3,9 @@ import { VerificationStatus } from '@/components';
 import { getVerificationStatus } from '@/actions/profiles/verification';
 import { getCurrentUser } from '@/actions/auth/server';
 import { redirect } from 'next/navigation';
+import { getDashboardMetadata } from '@/lib/seo/pages';
+
+export const metadata = getDashboardMetadata('Πιστοποίηση');
 
 export default async function VerificationPage() {
   // Fetch current user and profile data server-side

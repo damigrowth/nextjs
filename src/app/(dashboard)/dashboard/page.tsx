@@ -1,9 +1,8 @@
 import { requireOnboardingComplete } from '@/actions/auth/server';
 import { DashboardContent } from '@/components';
+import { getDashboardMetadata } from '@/lib/seo/pages';
 
-export const metadata = {
-  title: 'Πίνακας Ελέγχου',
-};
+export const metadata = getDashboardMetadata('Πίνακας Ελέγχου');
 
 export const dynamic = 'force-dynamic';
 

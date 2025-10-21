@@ -1,6 +1,9 @@
 import { getCurrentUser } from '@/actions/auth/server';
 import { AccountForm, AccountPageActions } from '@/components';
 import { redirect } from 'next/navigation';
+import { getDashboardMetadata } from '@/lib/seo/pages';
+
+export const metadata = getDashboardMetadata('Λογαριασμός');
 
 export default async function AccountPage() {
   // Fetch current user data server-side with fresh session data

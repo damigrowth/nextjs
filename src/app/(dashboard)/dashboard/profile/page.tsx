@@ -1,3 +1,7 @@
+import { getDashboardMetadata } from '@/lib/seo/pages';
+
+export const metadata = getDashboardMetadata('Διαχείριση');
+
 export default function EditProfilePage() {
   return (
     <div className='space-y-6'>

@@ -1,6 +1,9 @@
 import { BillingForm } from '@/components';
 import { getCurrentUser } from '@/actions/auth/server';
 import { redirect } from 'next/navigation';
+import { getDashboardMetadata } from '@/lib/seo/pages';
+
+export const metadata = getDashboardMetadata('Στοιχεία Τιμολόγησης');
 
 export default async function BillingPage() {
   // Fetch current user and profile data server-side

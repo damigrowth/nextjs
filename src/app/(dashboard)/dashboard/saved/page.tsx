@@ -6,6 +6,9 @@ import ServiceCard from '@/components/shared/service-card';
 import ProfileCard from '@/components/shared/profile-card';
 import SavedPagination from '@/components/dashboard/saved/saved-pagination';
 import { Heart } from 'lucide-react';
+import { getDashboardMetadata } from '@/lib/seo/pages';
+
+export const metadata = getDashboardMetadata('Αποθηκευμένα');
 
 interface SavedPageProps {
   searchParams: Promise<{

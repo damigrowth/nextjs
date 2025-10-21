@@ -1,6 +1,9 @@
 import { AdditionalInfoForm } from '@/components';
 import { getCurrentUser } from '@/actions/auth/server';
 import { redirect } from 'next/navigation';
+import { getDashboardMetadata } from '@/lib/seo/pages';
+
+export const metadata = getDashboardMetadata('Πρόσθετα Στοιχεία');
 
 export default async function AdditionalPage() {
   // Fetch current user and profile data server-side

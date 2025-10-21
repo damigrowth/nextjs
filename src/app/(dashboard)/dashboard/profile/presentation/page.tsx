@@ -1,6 +1,9 @@
 import { getCurrentUser } from '@/actions/auth/server';
 import { PortfolioForm, PresentationInfoForm } from '@/components';
 import { redirect } from 'next/navigation';
+import { getDashboardMetadata } from '@/lib/seo/pages';
+
+export const metadata = getDashboardMetadata('Παρουσίαση');
 
 export default async function PresentationPage() {
   // Fetch current user and profile data server-side

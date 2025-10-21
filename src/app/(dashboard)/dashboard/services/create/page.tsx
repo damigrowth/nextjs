@@ -2,6 +2,9 @@ import { FormCreateService } from '@/components';
 import { getCurrentUser } from '@/actions/auth/server';
 import { redirect } from 'next/navigation';
 import React from 'react';
+import { getDashboardMetadata } from '@/lib/seo/pages';
+
+export const metadata = getDashboardMetadata('Δημιουργία Υπηρεσίας');
 
 export default async function CreateServicePage() {
   // Fetch current user server-side

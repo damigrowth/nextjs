@@ -7,6 +7,9 @@ import { getChats, getMessages } from '@/actions/messages';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma/client';
 import type { ChatHeaderUser } from '@/lib/types/messages';
+import { getDashboardMetadata } from '@/lib/seo/pages';
+
+export const metadata = getDashboardMetadata('Μηνύματα');
 
 export default async function MessagesPage({
   searchParams,

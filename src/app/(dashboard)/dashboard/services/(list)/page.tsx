@@ -17,6 +17,9 @@ import type {
   ServiceSortField,
   SortOrder,
 } from '@/lib/types/services';
+import { getDashboardMetadata } from '@/lib/seo/pages';
+
+export const metadata = getDashboardMetadata('Διαχείριση Υπηρεσιών');
 
 interface ServicesPageProps {
   searchParams: Promise<{

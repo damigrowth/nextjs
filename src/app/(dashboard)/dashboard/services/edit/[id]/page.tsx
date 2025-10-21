@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { StatusLabels, StatusColors } from '@/lib/types/common';
+import { getDashboardMetadata } from '@/lib/seo/pages';
+
+export const metadata = getDashboardMetadata('Επεξεργασία Υπηρεσίας');
 
 interface EditServicePageProps {
   params: Promise<{

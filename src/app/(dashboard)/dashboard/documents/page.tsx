@@ -1,4 +1,7 @@
 import { DocumentsInterface } from '@/components';
+import { getDashboardMetadata } from '@/lib/seo/pages';
+
+export const metadata = getDashboardMetadata('Παραστατικά');
 
 export default function DocumentsPage() {
   return (
