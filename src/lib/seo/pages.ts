@@ -1,6 +1,6 @@
 'use server';
 
-import { Meta } from './meta';
+import { Meta } from '@/lib/seo/meta';
 
 /**
  * Service page metadata generation
