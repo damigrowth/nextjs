@@ -234,7 +234,8 @@ export async function getOAuthSetupMetadata() {
  */
 export async function getHomeMetadata() {
   const { meta } = await Meta({
-    titleTemplate: 'Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη',
+    titleTemplate:
+      'Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη',
     descriptionTemplate:
       'Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα. Από ψηφιακές υπηρεσίες έως τεχνικές εργασίες, έχουμε ό,τι χρειάζεσαι.',
     size: 160,
@@ -306,9 +307,7 @@ export async function getServicesMetadata() {
 /**
  * Service subcategory archive page metadata generation
  */
-export async function getServiceSubcategoryMetadata(
-  subcategorySlug: string,
-) {
+export async function getServiceSubcategoryMetadata(subcategorySlug: string) {
   const { meta } = await Meta({
     type: 'serviceSubcategory',
     params: { subcategorySlug },
