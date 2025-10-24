@@ -26,17 +26,18 @@ export default function ServiceCard({
   const isOnsite = serviceType?.onsite;
 
   return (
-    <Card className='group cursor-pointer overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 rounded-lg bg-white'>
-      <div className='relative'>
-        {/* Save Button - Show on hover or if saved */}
-        <div className='absolute top-4 right-4 z-10'>
-          <SaveButton
-            itemType="service"
-            itemId={service.id}
-            initialSaved={isSaved}
-          />
-        </div>
+    <Card className='group overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 rounded-lg bg-white relative'>
+      {/* Save Button - Positioned absolutely over card */}
+      <div className='absolute top-4 right-4 z-20'>
+        <SaveButton
+          itemType='service'
+          itemId={service.id}
+          initialSaved={isSaved}
+        />
+      </div>
 
+      {/* Main card content - Link to service */}
+      <Link href={`/s/${service.slug}`} className='block'>
         {/* Media Section */}
         <div className='relative aspect-video bg-gray-100'>
           <MediaDisplay
@@ -57,23 +58,18 @@ export default function ServiceCard({
 
           {/* Title - Fixed height for consistency */}
           <div className='h-12 mb-3'>
-            <h3 className='font-semibold text-dark leading-tight text-base'>
-              <Link
-                href={`/s/${service.slug}`}
-                className='hover:text-third transition-colors'
+            <h3 className='font-semibold text-dark leading-tight text-base hover:text-third transition-colors'>
+              <span
+                className='line-clamp-2'
+                style={{
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
               >
-                <span
-                  className='line-clamp-2'
-                  style={{
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {service.title}
-                </span>
-              </Link>
+                {service.title}
+              </span>
             </h3>
           </div>
 
@@ -81,50 +77,50 @@ export default function ServiceCard({
           <RatingDisplay
             rating={service.rating}
             reviewCount={service.reviewCount}
-            className='mb-4'
           />
-
-          {/* Separator Line - Only show if showProfile is true or if there's a price */}
-          {(showProfile || (service.price && service.price > 0)) && (
-            <div className='border-t border-gray-200 pt-3 mt-auto'>
-              {/* Profile and Price */}
-              <div className='flex items-center gap-3'>
-                {/* Profile Info - Only show if showProfile is true */}
-                {showProfile && (
-                  <div className='flex items-center gap-2 flex-1'>
-                    {service.profile.image && (
-                      <Avatar className='h-6 w-6'>
-                        <AvatarImage
-                          src={service.profile.image}
-                          alt={service.profile.displayName}
-                        />
-                      </Avatar>
-                    )}
-                    <Link
-                      href={`/profile/${service.profile.username}`}
-                      className='text-sm text-body hover:text-third transition-colors'
-                    >
-                      {service.profile.displayName}
-                    </Link>
-                  </div>
-                )}
-
-                {/* Price */}
-                {service.price && service.price > 0 && (
-                  <div
-                    className={`text-base ${!showProfile ? 'w-full text-right' : ''}`}
-                  >
-                    <span className='font-normal text-body'>από </span>
-                    <span className='font-semibold text-dark'>
-                      {service.price}€
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </CardContent>
-      </div>
+      </Link>
+
+      {/* Footer section - Outside main link */}
+      {(showProfile || (service.price && service.price > 0)) && (
+        <CardContent className='p-4 pt-0'>
+          <div className='border-t border-gray-200 pt-3'>
+            <div className='flex justify-between gap-3'>
+              {/* Profile Info - Separate link */}
+              {showProfile && (
+                <Link
+                  href={`/profile/${service.profile.username}`}
+                  className='flex items-center gap-2 w-fit group/profile z-10'
+                >
+                  {service.profile.image && (
+                    <Avatar className='h-6 w-6'>
+                      <AvatarImage
+                        src={service.profile.image}
+                        alt={service.profile.displayName}
+                      />
+                    </Avatar>
+                  )}
+                  <span className='text-sm text-body group-hover/profile:text-third transition-colors'>
+                    {service.profile.displayName}
+                  </span>
+                </Link>
+              )}
+
+              {/* Price - Only show if price > 0 */}
+              {service.price && service.price > 0 && (
+                <div
+                  className={`text-base ${!showProfile ? 'w-full text-right' : ''}`}
+                >
+                  <span className='font-normal text-body'>από </span>
+                  <span className='font-semibold text-dark'>
+                    {service.price}€
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      )}
     </Card>
   );
 }
