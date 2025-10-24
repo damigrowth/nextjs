@@ -5,6 +5,7 @@ import { ArchiveFilters } from './archive-filters';
 import { ArchiveSidebar } from './archive-sidebar';
 import { ArchivePagination } from './archive-pagination';
 import { ArchiveBanner } from './archive-banner';
+import { SubdivisionsCarousel } from './subdivisions-carousel';
 import { TaxonomyTabs, DynamicBreadcrumb } from '@/components';
 
 import type { DatasetItem } from '@/lib/types/datasets';
@@ -48,6 +49,15 @@ interface ArchiveLayoutProps {
   onLimitChange?: (limit: number) => void;
   showResultsPerPage?: boolean;
   isLoading?: boolean;
+  availableSubdivisions?: Array<{
+    id: string;
+    label: string;
+    slug: string;
+    categorySlug: string;
+    subcategorySlug: string;
+    count: number;
+    href: string;
+  }>;
 }
 
 export function ArchiveLayout({
@@ -69,6 +79,7 @@ export function ArchiveLayout({
   onLimitChange,
   showResultsPerPage = true,
   isLoading = false,
+  availableSubdivisions,
 }: ArchiveLayoutProps) {
   // Initialize filters with route params
   const routeFilters: FilterState = {
@@ -318,6 +329,16 @@ export function ArchiveLayout({
                 </div>
               </div>
             </div>
+
+            {/* Subdivisions Carousel - only for services archive */}
+            {availableSubdivisions && availableSubdivisions.length > 0 && (
+              <div className='container mx-auto px-4 pt-6'>
+                <SubdivisionsCarousel
+                  subdivisions={availableSubdivisions}
+                  hideTitle={true}
+                />
+              </div>
+            )}
 
             {/* Main Content */}
             <div className='container mx-auto px-4 py-6'>

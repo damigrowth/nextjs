@@ -281,6 +281,10 @@ export type ArchiveServiceCardData = Pick<
     category: string;
     subcategory: string;
     subdivision: string;
+    categorySlug?: string;
+    subcategorySlug?: string;
+    subdivisionSlug?: string;
+    subdivisionId?: string;
   };
   profile: Pick<import('@prisma/client').Profile, 'id' | 'displayName' | 'username' | 'image' | 'coverage' | 'verified' | 'top'>;
 };

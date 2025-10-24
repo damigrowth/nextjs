@@ -498,6 +498,10 @@ export function resolveTaxonomyHierarchy<T extends DatasetItem>(
   category: string;
   subcategory: string;
   subdivision: string;
+  categorySlug?: string;
+  subcategorySlug?: string;
+  subdivisionSlug?: string;
+  subdivisionId?: string;
 } {
   // Find category first (top level)
   const categoryTaxonomy = categoryId ? findById(taxonomy, categoryId) : null;
@@ -518,6 +522,10 @@ export function resolveTaxonomyHierarchy<T extends DatasetItem>(
     category: categoryTaxonomy?.label || '',
     subcategory: subcategoryTaxonomy?.label || '',
     subdivision: subdivisionTaxonomy?.label || '',
+    categorySlug: categoryTaxonomy?.slug,
+    subcategorySlug: subcategoryTaxonomy?.slug,
+    subdivisionSlug: subdivisionTaxonomy?.slug,
+    subdivisionId: subdivisionTaxonomy?.id,
   };
 }
 

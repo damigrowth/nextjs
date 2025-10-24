@@ -40,7 +40,7 @@ export default async function ServicesPage({
     throw new Error(result.error || 'Failed to fetch services');
   }
 
-  const { services, total, taxonomyData, breadcrumbData, counties, filters } =
+  const { services, total, taxonomyData, breadcrumbData, counties, filters, availableSubdivisions } =
     result.data;
 
   return (
@@ -53,6 +53,7 @@ export default async function ServicesPage({
       basePath='/ipiresies'
       total={total}
       limit={20}
+      availableSubdivisions={availableSubdivisions}
     >
       <div className='space-y-6'>
         {services.length === 0 ? (

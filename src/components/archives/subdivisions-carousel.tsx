@@ -11,10 +11,12 @@ import type { SubdivisionWithCount } from '@/actions/services/get-categories';
 
 interface SubdivisionsCarouselProps {
   subdivisions: SubdivisionWithCount[];
+  hideTitle?: boolean;
 }
 
 export function SubdivisionsCarousel({
   subdivisions,
+  hideTitle = false,
 }: SubdivisionsCarouselProps) {
   if (subdivisions.length === 0) {
     return null;
@@ -22,11 +24,13 @@ export function SubdivisionsCarousel({
 
   return (
     <section>
-      <div className='mb-6'>
-        <h2 className='text-2xl font-bold text-gray-900 mb-2'>
-          Πιο δημοφιλείς εργασίες
-        </h2>
-      </div>
+      {!hideTitle && (
+        <div className='mb-6'>
+          <h2 className='text-2xl font-bold text-gray-900 mb-2'>
+            Πιο δημοφιλείς εργασίες
+          </h2>
+        </div>
+      )}
 
       <Carousel
         opts={{
