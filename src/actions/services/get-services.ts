@@ -3,6 +3,7 @@
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { tags } from '@/constants/datasets/tags';
 import {
   findById,
   transformCoverageWithLocationNames,
@@ -14,6 +15,7 @@ import {
   findTaxonomyBySlugInContext,
   findTaxonomyBySubcategorySlug,
   getBreadcrumbsForNewRoutes,
+  findSubdivisionBySlug,
 } from '@/lib/utils/datasets';
 import { locationOptions } from '@/constants/datasets/locations';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
@@ -357,7 +359,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
       whereClause.subdivision = filters.subdivision;
     }
 
-    // Add search filter for title and description using normalized fields
+    // Add search filter for title, description, and tags using normalized fields
     // This provides accent-insensitive search for Greek text
     if (filters.search) {
       const searchTerm = filters.search.trim();
@@ -365,8 +367,16 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
         // Normalize search term to handle Greek accents (ά → α, etc.)
         const normalizedSearch = normalizeTerm(searchTerm);
 
+        // Find matching tags by searching in tag labels
+        const matchingTags = tags.filter(tag => {
+          const normalizedLabel = normalizeTerm(tag.label);
+          return normalizedLabel.toLowerCase().includes(normalizedSearch.toLowerCase());
+        });
+        const matchingTagIds = matchingTags.map(tag => tag.id);
+
         whereClause.OR = whereClause.OR || [];
         const searchConditions = [
+          // Search in normalized fields (for services with proper normalized data)
           {
             titleNormalized: {
               contains: normalizedSearch,
@@ -379,7 +389,29 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
               mode: 'insensitive' as const,
             },
           },
+          // Fallback: Also search in original fields for services without normalized data
+          {
+            title: {
+              contains: searchTerm,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            description: {
+              contains: searchTerm,
+              mode: 'insensitive' as const,
+            },
+          },
         ];
+
+        // Add tag search condition if matching tags found
+        if (matchingTagIds.length > 0) {
+          searchConditions.push({
+            tags: {
+              hasSome: matchingTagIds,
+            },
+          });
+        }
 
         // If there's already an OR clause (from filters), combine them with AND
         if (whereClause.OR.length > 0) {
@@ -730,6 +762,7 @@ export async function getServiceTaxonomyPaths(): Promise<
       category?: string;
       subcategory?: string;
       subdivision?: string;
+      count: number;
     }>
   >
 > {
@@ -795,10 +828,8 @@ export async function getServiceTaxonomyPaths(): Promise<
           });
         }
 
-        // Sort by count (most popular first) and remove count from final result
-        return paths
-          .sort((a, b) => b.count - a.count)
-          .map(({ count, ...path }) => path);
+        // Sort by count (most popular first) and return with counts
+        return paths.sort((a, b) => b.count - a.count);
       },
       ['service-taxonomy-paths'],
       {
@@ -863,6 +894,15 @@ export async function getServiceArchivePageData(params: {
     slug: string;
   }>;
   filters: ServiceFilters;
+  availableSubdivisions: Array<{
+    id: string;
+    label: string;
+    slug: string;
+    categorySlug: string;
+    subcategorySlug: string;
+    count: number;
+    href: string;
+  }>;
 }>> {
   try {
     const { categorySlug, subcategorySlug, subdivisionSlug, searchParams } = params;
@@ -935,11 +975,11 @@ export async function getServiceArchivePageData(params: {
       limit,
     };
 
-    // Fetch services and taxonomy paths in parallel
-    const [servicesResult, taxonomyPathsResult] = await Promise.all([
-      getServicesByFilters(filters),
-      getServiceTaxonomyPaths()
-    ]);
+    // Fetch taxonomy paths first (should be cached)
+    const taxonomyPathsResult = await getServiceTaxonomyPaths();
+
+    // Then fetch services
+    const servicesResult = await getServicesByFilters(filters);
 
     if (!servicesResult.success) {
       return {
@@ -1061,6 +1101,102 @@ export async function getServiceArchivePageData(params: {
       .filter(cat => availableCategories.has(cat.slug))
       .slice(0, 10);
 
+    // Get subdivisions for carousel based on current route context
+    let availableSubdivisions: Array<{
+      id: string;
+      label: string;
+      slug: string;
+      categorySlug: string;
+      subcategorySlug: string;
+      count: number;
+      href: string;
+    }> = [];
+
+    if (subdivision) {
+      // On subdivision route: show all subdivisions from the same subcategory (excluding current)
+      // Only show subdivisions that have published services, sorted by service count
+      if (subcategory?.children && taxonomyPathsResult.success && taxonomyPathsResult.data) {
+        // Count services per subdivision using the count from taxonomyPathsResult
+        const subdivisionServiceCounts = new Map<string, number>();
+        taxonomyPathsResult.data.forEach(path => {
+          if (path.subcategory === subcategory.slug && path.subdivision) {
+            const currentCount = subdivisionServiceCounts.get(path.subdivision) || 0;
+            subdivisionServiceCounts.set(path.subdivision, currentCount + path.count);
+          }
+        });
+
+        availableSubdivisions = subcategory.children
+          .filter((div: any) =>
+            div.slug !== subdivision.slug && // Exclude current subdivision
+            subdivisionServiceCounts.has(div.slug) // Only include subdivisions with services
+          )
+          .map((div: any) => ({
+            id: div.id,
+            label: div.label,
+            slug: div.slug,
+            categorySlug: category?.slug || '',
+            subcategorySlug: subcategory?.slug || '',
+            count: subdivisionServiceCounts.get(div.slug) || 0,
+            href: `/ipiresies/${subcategory.slug}/${div.slug}`,
+          }))
+          .sort((a, b) => b.count - a.count) // Sort by service count descending
+          .slice(0, 5); // Limit to top 5 subdivisions
+      }
+    } else {
+      // On /ipiresies or /ipiresies/[subcategory]: show subdivisions from all matching services
+      // Use taxonomyPathsResult for accurate counts across all services (not just current page)
+      if (taxonomyPathsResult.success && taxonomyPathsResult.data) {
+        const subdivisionDataMap: Record<string, {
+          id: string;
+          label: string;
+          categorySlug: string;
+          subcategorySlug: string;
+          count: number;
+        }> = {};
+
+        // Count services per subdivision from taxonomyPathsResult using actual counts
+        taxonomyPathsResult.data.forEach(path => {
+          // If we're on a subcategory route, only count subdivisions from that subcategory
+          if (subcategory && path.subcategory !== subcategory.slug) {
+            return;
+          }
+
+          if (path.subdivision) {
+            if (!subdivisionDataMap[path.subdivision]) {
+              // Need to find subdivision details from taxonomy
+              const result = findSubdivisionBySlug(categories, path.subdivision);
+
+              if (result) {
+                subdivisionDataMap[path.subdivision] = {
+                  id: result.subdivision.id,
+                  label: result.subdivision.label,
+                  categorySlug: path.category || '',
+                  subcategorySlug: path.subcategory || '',
+                  count: path.count,
+                };
+              }
+            } else {
+              subdivisionDataMap[path.subdivision].count += path.count;
+            }
+          }
+        });
+
+        // Build subdivisions array for carousel, sorted by count
+        availableSubdivisions = Object.entries(subdivisionDataMap)
+          .map(([subdivisionSlug, data]) => ({
+            id: data.id,
+            label: data.label,
+            slug: subdivisionSlug,
+            categorySlug: data.categorySlug,
+            subcategorySlug: data.subcategorySlug,
+            count: data.count,
+            href: `/ipiresies/${data.subcategorySlug}/${subdivisionSlug}`,
+          }))
+          .sort((a, b) => b.count - a.count) // Sort by service count descending
+          .slice(0, 5); // Limit to top 5 subdivisions
+      }
+    }
+
     // Prepare taxonomy data - always include filtered arrays (empty if no matches)
     const taxonomyData = {
       categories,
@@ -1081,6 +1217,7 @@ export async function getServiceArchivePageData(params: {
         breadcrumbData,
         counties,
         filters,
+        availableSubdivisions,
       },
     };
   } catch (error) {

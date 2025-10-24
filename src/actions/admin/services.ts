@@ -9,6 +9,7 @@ import { revalidateTag, revalidatePath } from 'next/cache';
 import { CACHE_TAGS, getServiceTags } from '@/lib/cache';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { tags } from '@/constants/datasets/tags';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 
 import {
   adminListServicesSchema,
@@ -351,11 +352,10 @@ export async function updateService(params: AdminUpdateServiceInput) {
     // Update normalized fields if title or description changed
     const normalizedUpdates: any = {};
     if (updateData.title) {
-      normalizedUpdates.titleNormalized = updateData.title.toLowerCase();
+      normalizedUpdates.titleNormalized = normalizeTerm(updateData.title);
     }
     if (updateData.description) {
-      normalizedUpdates.descriptionNormalized =
-        updateData.description.toLowerCase();
+      normalizedUpdates.descriptionNormalized = normalizeTerm(updateData.description);
     }
 
     const updatedService = await prisma.service.update({

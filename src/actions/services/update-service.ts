@@ -12,6 +12,7 @@ import {
   type UpdateServiceMediaInput,
   type UpdateServiceInfoInput,
 } from '@/lib/validations/service';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 
 // =============================================
 // SHARED UTILITIES
@@ -273,7 +274,15 @@ export async function updateServiceInfo(
     for (const [key, value] of Object.entries(validData)) {
       switch (key) {
         case 'title':
+          updateData.title = value;
+          updateData.titleNormalized = normalizeTerm(value as string);
+          break;
+
         case 'description':
+          updateData.description = value;
+          updateData.descriptionNormalized = normalizeTerm(value as string);
+          break;
+
         case 'category':
         case 'subcategory':
         case 'subdivision':

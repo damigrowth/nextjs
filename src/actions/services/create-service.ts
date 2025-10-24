@@ -23,6 +23,7 @@ import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
 import { sanitizeCloudinaryResources } from '@/lib/utils/cloudinary';
 import { generateServiceSlug } from '@/lib/utils/text';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 
 /**
  * Server action for creating a new service using the multi-step form data
@@ -196,11 +197,16 @@ async function createServiceInternal(
       // Use transaction to create service with slug and update lastServiceDraft atomically
       await prisma.$transaction(async (tx) => {
         // Step 1: Create service without slug (auto-increment ID)
+        const title = data.title || '';
+        const description = data.description || '';
+
         const createdService = await tx.service.create({
           data: {
             pid: profile.id,
-            title: data.title || '',
-            description: data.description || '',
+            title: title,
+            titleNormalized: normalizeTerm(title),
+            description: description,
+            descriptionNormalized: normalizeTerm(description),
             category: data.category || '',
             subcategory: data.subcategory || '',
             subdivision: data.subdivision || '',
@@ -243,11 +249,16 @@ async function createServiceInternal(
       // Regular service creation (non-draft) with slug generation
       createdService = await prisma.$transaction(async (tx) => {
         // Step 1: Create service without slug (auto-increment ID)
+        const title = data.title || '';
+        const description = data.description || '';
+
         const service = await tx.service.create({
           data: {
             pid: profile.id,
-            title: data.title || '',
-            description: data.description || '',
+            title: title,
+            titleNormalized: normalizeTerm(title),
+            description: description,
+            descriptionNormalized: normalizeTerm(description),
             category: data.category || '',
             subcategory: data.subcategory || '',
             subdivision: data.subdivision || '',
