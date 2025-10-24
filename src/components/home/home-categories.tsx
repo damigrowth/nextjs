@@ -25,7 +25,7 @@ import {
 import { CarouselPagination } from '@/components/ui/carousel-pagination';
 import { SectionHeader } from '@/components/ui/section-header';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-import { DatasetItem } from '@/lib/types/datasets';
+import type { DatasetItem } from '@/lib/types/datasets';
 
 type Props = {
   categories?: DatasetItem[];
@@ -49,7 +49,7 @@ function getCategoryIcon(slug: string) {
 }
 
 function CategoryCard({ category }: { category: DatasetItem }) {
-  const { label, slug, children } = category;
+  const { label, slug, subcategories } = category;
 
   return (
     <div className='bg-transparent rounded-xl mb-1 mt-5 py-10 px-8 pb-8 relative transition-all duration-300 ease-in-out group'>
@@ -72,15 +72,15 @@ function CategoryCard({ category }: { category: DatasetItem }) {
         </h4>
 
         <p className='mb-0 text-sm text-gray-600 text-left'>
-          {children.slice(0, 3).map((sub, i, array) => (
-            <span key={i}>
+          {(subcategories || []).map((sub, i, array) => (
+            <span key={sub.id}>
               <Link
                 href={`/ipiresies/${sub.slug}`}
                 className='hover:text-third transition-colors'
               >
                 {sub.label}
               </Link>
-              {i < array.length - 1 && i < 2 ? ', ' : ''}
+              {i < array.length - 1 ? ', ' : ''}
             </span>
           ))}
         </p>
@@ -90,12 +90,25 @@ function CategoryCard({ category }: { category: DatasetItem }) {
 }
 
 export default function CategoriesHome({ categories = [] }: Props) {
-  const featuredCategories =
-    categories.length > 0
-      ? categories.filter((cat) => cat.featured === true).slice(0, 8)
-      : serviceTaxonomies.filter((cat) => cat.featured === true).slice(0, 8);
-
-  const displayCategories = featuredCategories;
+  // Use provided categories with subcategories or fallback to featured categories from static data
+  const displayCategories = categories.length > 0
+    ? categories
+    : serviceTaxonomies
+        .filter((cat) => cat.featured === true)
+        .slice(0, 8)
+        .map((cat) => ({
+          id: cat.id,
+          label: cat.label,
+          slug: cat.slug,
+          icon: cat.icon,
+          featured: cat.featured,
+          subcategories: (cat.children || []).slice(0, 3).map(sub => ({
+            id: sub.id,
+            label: sub.label,
+            slug: sub.slug,
+            count: 0,
+          })),
+        }));
 
   return (
     <section className='pt-5 pb-24'>

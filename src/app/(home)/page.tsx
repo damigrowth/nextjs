@@ -51,13 +51,15 @@ export default async function HomePage() {
             allServices: [],
           },
           profiles: [],
+          popularSubcategories: [],
+          categoriesWithSubcategories: [],
         };
 
   return (
     <>
       {/* <HomeSchema /> */}
-      <HeroHome />
-      <CategoriesHome />
+      <HeroHome popularSubcategories={homeData.popularSubcategories} />
+      <CategoriesHome categories={homeData.categoriesWithSubcategories} />
       <FeaturesHome />
       <ServicesHomeWrapper
         mainCategories={homeData.services.mainCategories}

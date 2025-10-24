@@ -8,6 +8,7 @@ import { findById } from '@/lib/utils/datasets';
 import type { ActionResult } from '@/lib/types/api';
 import type { ServiceCardData, ProfileCardData } from '@/lib/types/components';
 import type { ServiceWithProfile } from '@/lib/types/services';
+import type { DatasetItem } from '@/lib/types/datasets';
 import { Prisma } from '@prisma/client';
 
 // Transform service to component-ready format
@@ -78,6 +79,8 @@ export interface FeaturedServicesData {
 export interface HomePageData {
   services: FeaturedServicesData;
   profiles: ProfileCardData[];
+  popularSubcategories: DatasetItem[]; // DatasetItem with count property
+  categoriesWithSubcategories: DatasetItem[]; // DatasetItem with subcategories array
 }
 
 // Get both featured services and profiles in a single API call
@@ -111,8 +114,8 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
       },
     } as const;
 
-    // Parallel fetch of services and profiles
-    const [servicesResult, profilesResult] = await Promise.all([
+    // Parallel fetch of services, profiles, and subcategory counts
+    const [servicesResult, profilesResult, subcategoryCounts] = await Promise.all([
       // Fetch featured services
       prisma.service.findMany({
         where: {
@@ -159,6 +162,18 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
         ],
         take: 16,
       }),
+
+      // Fetch subcategory counts for popular searches and categories
+      prisma.service.groupBy({
+        by: ['subcategory'],
+        where: {
+          status: 'published',
+          subcategory: { not: '' },
+        },
+        _count: {
+          _all: true,
+        },
+      }),
     ]);
 
     // Transform services data
@@ -198,11 +213,69 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
     // Transform profiles data
     const transformedProfiles = profilesResult.map(transformProfileForComponent);
 
+    // Process subcategory counts for popular searches
+    const subcategoryCountMap: Record<string, number> = {};
+    subcategoryCounts.forEach((group) => {
+      if (group.subcategory) {
+        subcategoryCountMap[group.subcategory] = group._count._all;
+      }
+    });
+
+    // Get popular subcategories (top 8 by service count)
+    const popularSubcategories: DatasetItem[] = [];
+
+    for (const category of serviceTaxonomies) {
+      if (category.children) {
+        for (const subcategory of category.children) {
+          const count = subcategoryCountMap[subcategory.id] || 0;
+          if (count > 0) {
+            popularSubcategories.push({
+              ...subcategory,
+              count, // Add count property (allowed by [key: string]: any)
+            });
+          }
+        }
+      }
+    }
+
+    // Sort by count descending and take top 8
+    popularSubcategories.sort((a, b) => (b.count || 0) - (a.count || 0));
+    const topPopularSubcategories = popularSubcategories.slice(0, 8);
+
+    // Get categories with their top subcategories (only featured categories)
+    const categoriesWithSubcategories: DatasetItem[] = serviceTaxonomies
+      .filter((category) => category.featured === true)
+      .slice(0, 8)
+      .map((category) => {
+        // Get subcategories with service counts for this category
+        const subcategoriesWithCounts = (category.children || [])
+          .map((subcategory) => {
+            const count = subcategoryCountMap[subcategory.id] || 0;
+            if (count === 0) return null;
+
+            return {
+              ...subcategory,
+              count, // Add count property
+            };
+          })
+          .filter((sub): sub is NonNullable<typeof sub> => sub !== null)
+          .sort((a, b) => (b.count || 0) - (a.count || 0))
+          .slice(0, 3); // Top 3 subcategories per category
+
+        return {
+          ...category,
+          subcategories: subcategoriesWithCounts, // Override children with filtered subcategories
+        };
+      })
+      .filter((cat) => (cat.subcategories?.length || 0) > 0); // Only categories with subcategories
+
     return {
       success: true,
       data: {
         services: servicesData,
         profiles: transformedProfiles,
+        popularSubcategories: topPopularSubcategories,
+        categoriesWithSubcategories,
       },
     };
   } catch (error) {
