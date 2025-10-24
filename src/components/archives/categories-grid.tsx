@@ -55,7 +55,7 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
                 />
               </div>
             )}
-            <CardHeader className='pb-0'>
+            <CardHeader className='pb-0 '>
               <div className='flex items-start space-x-3'>
                 <div className='flex-1 min-w-0'>
                   <CardTitle className='text-lg mb-2'>
@@ -75,7 +75,7 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
               </div>
             </CardHeader>
             <CardContent className='pt-0'>
-              <Separator className='my-4' />
+              <Separator className='my-6' />
               {category.subcategories.length > 0 && (
                 <div className='space-y-2'>
                   {category.subcategories.slice(0, 6).map((subcategory) => (

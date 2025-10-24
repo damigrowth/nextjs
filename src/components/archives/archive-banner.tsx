@@ -45,7 +45,7 @@ export function ArchiveBanner({
           alt={image?.original_filename || 'Service category'}
           width={320}
           height={180}
-          className='absolute rounded-lg h-45 right-12pc w-80 hidden lg:block z-0 object-cover'
+          className='absolute rounded-3xl h-45 right-12pc w-80 hidden lg:block z-0 object-cover'
           style={{ right: '12%' }}
           src={
             image?.secure_url ||
