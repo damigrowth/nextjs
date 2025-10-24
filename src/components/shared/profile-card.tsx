@@ -37,14 +37,14 @@ export default function ProfileCard({ profile, isSaved = false }: ProfileCardPro
 
       {/* Avatar Section */}
       <div className='flex flex-col items-center text-center'>
-        <div className='relative mb-4'>
-          <Avatar className='h-20 w-20 rounded-2xl'>
+        <Link href={`/profile/${username}`} className='relative mb-4'>
+          <Avatar className='h-20 w-20 rounded-2xl cursor-pointer hover:opacity-90 transition-opacity'>
             <AvatarImage src={image} alt={displayName} />
             <AvatarFallback className='text-lg font-bold bg-gradient-to-br from-blue-100 to-purple-100 text-gray-700'>
               {formatInitials(undefined, undefined, displayName)}
             </AvatarFallback>
           </Avatar>
-        </div>
+        </Link>
 
         {/* Name and Verification */}
         <div className='flex items-center justify-center gap-2 mb-1'>
