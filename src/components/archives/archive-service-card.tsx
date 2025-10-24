@@ -96,19 +96,21 @@ export function ArchiveServiceCard({
             <div className='flex items-center gap-3 border-t border-gray-200 mt-3 pt-3'>
               {/* Profile Info */}
               <div className='flex items-center gap-2 flex-1'>
-                {service.profile.image && (
-                  <Avatar className='h-8 w-8 rounded-lg'>
-                    <AvatarImage
-                      src={service.profile.image as string}
-                      alt={service.profile.displayName}
-                    />
-                  </Avatar>
-                )}
                 <Link
                   href={`/profile/${service.profile.username}`}
-                  className='text-sm text-body hover:text-third transition-colors'
+                  className='flex items-center gap-2 group'
                 >
-                  {service.profile.displayName}
+                  {service.profile.image && (
+                    <Avatar className='h-8 w-8 rounded-lg cursor-pointer'>
+                      <AvatarImage
+                        src={service.profile.image as string}
+                        alt={service.profile.displayName}
+                      />
+                    </Avatar>
+                  )}
+                  <span className='text-sm text-body group-hover:text-third transition-colors'>
+                    {service.profile.displayName}
+                  </span>
                 </Link>
                 <ProfileBadges
                   verified={service.profile.verified}
