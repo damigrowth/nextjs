@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Star, Rocket } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { HomeSearch } from './home-search';
+import type { DatasetItem } from '@/lib/types/datasets';
 
 // Static content that renders immediately for better LCP
 function StaticHeroContent() {
@@ -43,17 +44,15 @@ function HeroSearchBar() {
   );
 }
 
-// Popular Searches Component - Static links to popular subcategories
-function PopularSearches() {
-  // Static popular search links
-  const popularSearches = [
-    { label: 'Βίντεο', slug: 'video' },
-    { label: 'Εκτυπώσεις', slug: 'ektuposeis' },
-    { label: 'Ήχος', slug: 'ixos' },
-    { label: 'Μεταφράσεις', slug: 'metafraseis' },
-    { label: 'Συγγραφή', slug: 'sugrafi' },
-    { label: 'Σχεδιασμός', slug: 'sxediasmos' },
-  ];
+// Popular Searches Component - Dynamic links to popular subcategories
+function PopularSearches({ subcategories }: { subcategories: DatasetItem[] }) {
+  // Show up to 6 popular subcategories
+  const displaySubcategories = subcategories.slice(0, 6);
+
+  // Fallback if no subcategories available
+  if (displaySubcategories.length === 0) {
+    return null;
+  }
 
   return (
     <>
@@ -64,8 +63,8 @@ function PopularSearches() {
 
       {/* Equivalent to: home9-tags at-home12 d-md-flex align-items-center */}
       <div className='flex flex-wrap gap-2 md:flex md:items-center'>
-        {popularSearches.map((sub, index) => (
-          <Link href={`/ipiresies/${sub.slug}`} key={index}>
+        {displaySubcategories.map((sub) => (
+          <Link href={`/ipiresies/${sub.slug}`} key={sub.id}>
             <Badge
               variant='outline'
               className='no-underline inline-block font-sans font-normal text-sm leading-6 py-1.5 px-6 rounded-full border border-gray-medium bg-white text-dark transition-colors duration-200 ease-in-out hover:bg-green-light/50 cursor-pointer'
@@ -146,16 +145,20 @@ function HeroImages() {
 }
 
 // Dynamic content component
-function DynamicHeroContent() {
+function DynamicHeroContent({ subcategories }: { subcategories: DatasetItem[] }) {
   return (
     <>
       <HeroSearchBar />
-      <PopularSearches />
+      <PopularSearches subcategories={subcategories} />
     </>
   );
 }
 
-export default function HeroHome() {
+type HeroHomeProps = {
+  popularSubcategories?: DatasetItem[];
+};
+
+export default function HeroHome({ popularSubcategories = [] }: HeroHomeProps) {
   return (
     <section className='overflow-visible bg-orangy bg-gradient-to-t from-white to-yellowish contain-layout mt-10 lg:mt-20'>
       <div className='container mx-auto mt-24 mb-52 pl-6'>
@@ -175,7 +178,7 @@ export default function HeroHome() {
                   </div>
                 }
               >
-                <DynamicHeroContent />
+                <DynamicHeroContent subcategories={popularSubcategories} />
               </Suspense>
             </div>
           </div>
