@@ -83,11 +83,14 @@ const HomeSearch = React.forwardRef<HTMLFormElement, HomeSearchProps>(
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (query.trim()) {
-        // Navigate to services page with search query
-        router.push(`/ipiresies?search=${encodeURIComponent(query.trim())}`);
-        setIsDropdownOpen(false);
+      // Navigate to services page with or without search query
+      const trimmedQuery = query.trim();
+      if (trimmedQuery) {
+        router.push(`/ipiresies?search=${encodeURIComponent(trimmedQuery)}`);
+      } else {
+        router.push('/ipiresies');
       }
+      setIsDropdownOpen(false);
     };
 
     // Handle suggestion selection

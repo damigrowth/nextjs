@@ -1,9 +1,10 @@
 'use client';
 
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import {
   Popover,
   PopoverContent,
@@ -19,6 +20,49 @@ import {
 } from '@/components/ui/command';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { archiveSortOptions } from '@/constants/datasets/options';
+
+interface SearchInputProps {
+  value: string | undefined;
+  onValueChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+}
+
+export function SearchInput({
+  value,
+  onValueChange,
+  placeholder = 'Αναζήτηση...',
+  className,
+}: SearchInputProps) {
+  const handleClear = () => {
+    onValueChange('');
+  };
+
+  return (
+    <div className={`relative ${className || ''}`}>
+      <Search
+        className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-500'
+        size={16}
+      />
+      <Input
+        type='text'
+        value={value || ''}
+        onChange={(e) => onValueChange(e.target.value)}
+        placeholder={placeholder}
+        className='pl-9 pr-9'
+      />
+      {value && (
+        <button
+          type='button'
+          onClick={handleClear}
+          className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600'
+        >
+          <X size={16} />
+        </button>
+      )}
+    </div>
+  );
+}
 
 interface OnlineToggleProps {
   id: string;
@@ -37,15 +81,8 @@ export function OnlineToggle({
 }: OnlineToggleProps) {
   return (
     <div className={`flex items-center gap-2 ${className || ''}`}>
-      <Switch
-        id={id}
-        checked={checked}
-        onCheckedChange={onCheckedChange}
-      />
-      <Label
-        htmlFor={id}
-        className="text-sm font-medium cursor-pointer"
-      >
+      <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
+      <Label htmlFor={id} className='text-sm font-medium cursor-pointer'>
         {label}
       </Label>
     </div>
@@ -80,9 +117,10 @@ export function CountiesDropdown({
   };
 
   // Find county by slug or name for backward compatibility
-  const selectedCounty = value && value !== 'all'
-    ? counties.find((c) => c.slug === value || c.name === value)
-    : null;
+  const selectedCounty =
+    value && value !== 'all'
+      ? counties.find((c) => c.slug === value || c.name === value)
+      : null;
 
   const displayValue = selectedCounty?.name || allLabel;
 
@@ -91,27 +129,27 @@ export function CountiesDropdown({
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
-            role="combobox"
+            variant='outline'
+            role='combobox'
             className={`${fullWidth ? 'w-full' : ''} justify-between`}
           >
             {displayValue}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0">
+        <PopoverContent className='w-full p-0'>
           <Command>
             <CommandInput placeholder={searchPlaceholder} />
             <CommandList>
               <CommandEmpty>{emptyMessage}</CommandEmpty>
               <CommandGroup>
                 <CommandItem
-                  key="all"
+                  key='all'
                   onSelect={() => handleValueChange('all')}
                 >
                   <Check
                     className={
-                      (!value || value === '' || value === 'all')
+                      !value || value === '' || value === 'all'
                         ? 'mr-2 h-4 w-4 opacity-100'
                         : 'mr-2 h-4 w-4 opacity-0'
                     }
@@ -122,11 +160,14 @@ export function CountiesDropdown({
                   <CommandItem
                     key={county.id}
                     value={county.name}
-                    onSelect={() => handleValueChange(county.slug || county.name)}
+                    onSelect={() =>
+                      handleValueChange(county.slug || county.name)
+                    }
                   >
                     <Check
                       className={
-                        (value && (value === county.slug || value === county.name))
+                        value &&
+                        (value === county.slug || value === county.name)
                           ? 'mr-2 h-4 w-4 opacity-100'
                           : 'mr-2 h-4 w-4 opacity-0'
                       }
@@ -162,24 +203,27 @@ export function SortDropdown({
   className,
   fullWidth = true,
 }: SortDropdownProps) {
-  const displayValue = value && value !== 'default'
-    ? archiveSortOptions.find((option) => option.id === value)?.label || placeholder
-    : archiveSortOptions.find((option) => option.id === 'default')?.label || placeholder;
+  const displayValue =
+    value && value !== 'default'
+      ? archiveSortOptions.find((option) => option.id === value)?.label ||
+        placeholder
+      : archiveSortOptions.find((option) => option.id === 'default')?.label ||
+        placeholder;
 
   return (
     <div className={`${fullWidth ? 'min-w-48' : ''} ${className || ''}`}>
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
-            role="combobox"
+            variant='outline'
+            role='combobox'
             className={`${fullWidth ? 'w-full' : ''} justify-between`}
           >
             {displayValue}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0">
+        <PopoverContent className='w-full p-0'>
           <Command>
             <CommandInput placeholder={searchPlaceholder} />
             <CommandList>
@@ -237,38 +281,40 @@ export function CategoryDropdown({
     onValueChange(selectedValue === 'all' ? '' : selectedValue);
   };
 
-  const selectedCategory = value && value !== 'all'
-    ? categories.find((c) => c.id === value || c.slug === value)
-    : null;
+  const selectedCategory =
+    value && value !== 'all'
+      ? categories.find((c) => c.id === value || c.slug === value)
+      : null;
 
-  const displayValue = selectedCategory?.plural || selectedCategory?.label || allLabel;
+  const displayValue =
+    selectedCategory?.plural || selectedCategory?.label || allLabel;
 
   return (
     <div className={`${fullWidth ? 'min-w-48' : ''} ${className || ''}`}>
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
-            role="combobox"
+            variant='outline'
+            role='combobox'
             className={`${fullWidth ? 'w-full' : ''} justify-between`}
           >
             {displayValue}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0">
+        <PopoverContent className='w-full p-0'>
           <Command>
             <CommandInput placeholder={searchPlaceholder} />
             <CommandList>
               <CommandEmpty>{emptyMessage}</CommandEmpty>
               <CommandGroup>
                 <CommandItem
-                  key="all"
+                  key='all'
                   onSelect={() => handleValueChange('all')}
                 >
                   <Check
                     className={
-                      (!value || value === '' || value === 'all')
+                      !value || value === '' || value === 'all'
                         ? 'mr-2 h-4 w-4 opacity-100'
                         : 'mr-2 h-4 w-4 opacity-0'
                     }
@@ -283,7 +329,7 @@ export function CategoryDropdown({
                   >
                     <Check
                       className={
-                        (value && value === category.id)
+                        value && value === category.id
                           ? 'mr-2 h-4 w-4 opacity-100'
                           : 'mr-2 h-4 w-4 opacity-0'
                       }
@@ -329,39 +375,41 @@ export function SubcategoryDropdown({
     onValueChange(selectedValue === 'all' ? '' : selectedValue);
   };
 
-  const selectedSubcategory = value && value !== 'all'
-    ? subcategories.find((c) => c.id === value || c.slug === value)
-    : null;
+  const selectedSubcategory =
+    value && value !== 'all'
+      ? subcategories.find((c) => c.id === value || c.slug === value)
+      : null;
 
-  const displayValue = selectedSubcategory?.plural || selectedSubcategory?.label || allLabel;
+  const displayValue =
+    selectedSubcategory?.plural || selectedSubcategory?.label || allLabel;
 
   return (
     <div className={`${fullWidth ? 'min-w-48' : ''} ${className || ''}`}>
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
-            role="combobox"
+            variant='outline'
+            role='combobox'
             disabled={disabled}
             className={`${fullWidth ? 'w-full' : ''} justify-between`}
           >
             {displayValue}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0">
+        <PopoverContent className='w-full p-0'>
           <Command>
             <CommandInput placeholder={searchPlaceholder} />
             <CommandList>
               <CommandEmpty>{emptyMessage}</CommandEmpty>
               <CommandGroup>
                 <CommandItem
-                  key="all"
+                  key='all'
                   onSelect={() => handleValueChange('all')}
                 >
                   <Check
                     className={
-                      (!value || value === '' || value === 'all')
+                      !value || value === '' || value === 'all'
                         ? 'mr-2 h-4 w-4 opacity-100'
                         : 'mr-2 h-4 w-4 opacity-0'
                     }
@@ -376,7 +424,7 @@ export function SubcategoryDropdown({
                   >
                     <Check
                       className={
-                        (value && value === subcategory.id)
+                        value && value === subcategory.id
                           ? 'mr-2 h-4 w-4 opacity-100'
                           : 'mr-2 h-4 w-4 opacity-0'
                       }
@@ -422,9 +470,10 @@ export function SubdivisionDropdown({
     onValueChange(selectedValue === 'all' ? '' : selectedValue);
   };
 
-  const selectedSubdivision = value && value !== 'all'
-    ? subdivisions.find((c) => c.id === value || c.slug === value)
-    : null;
+  const selectedSubdivision =
+    value && value !== 'all'
+      ? subdivisions.find((c) => c.id === value || c.slug === value)
+      : null;
 
   const displayValue = selectedSubdivision?.label || allLabel;
 
@@ -433,28 +482,28 @@ export function SubdivisionDropdown({
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
-            role="combobox"
+            variant='outline'
+            role='combobox'
             disabled={disabled}
             className={`${fullWidth ? 'w-full' : ''} justify-between`}
           >
             {displayValue}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0">
+        <PopoverContent className='w-full p-0'>
           <Command>
             <CommandInput placeholder={searchPlaceholder} />
             <CommandList>
               <CommandEmpty>{emptyMessage}</CommandEmpty>
               <CommandGroup>
                 <CommandItem
-                  key="all"
+                  key='all'
                   onSelect={() => handleValueChange('all')}
                 >
                   <Check
                     className={
-                      (!value || value === '' || value === 'all')
+                      !value || value === '' || value === 'all'
                         ? 'mr-2 h-4 w-4 opacity-100'
                         : 'mr-2 h-4 w-4 opacity-0'
                     }
@@ -469,7 +518,7 @@ export function SubdivisionDropdown({
                   >
                     <Check
                       className={
-                        (value && value === subdivision.id)
+                        value && value === subdivision.id
                           ? 'mr-2 h-4 w-4 opacity-100'
                           : 'mr-2 h-4 w-4 opacity-0'
                       }

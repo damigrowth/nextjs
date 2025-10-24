@@ -4,12 +4,18 @@ import { Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SheetTrigger } from '@/components/ui/sheet';
-import { OnlineToggle, CountiesDropdown, SortDropdown } from './archive-inputs';
+import {
+  SearchInput,
+  OnlineToggle,
+  CountiesDropdown,
+  SortDropdown,
+} from './archive-inputs';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { cn } from '@/lib/utils';
 
 interface ArchiveFiltersProps {
   filters: {
+    search?: string;
     online?: boolean;
     county?: string;
     sortBy?: string;
@@ -29,6 +35,13 @@ export function ArchiveFilters({
   activeFilterCount = 0,
   filterTrigger,
 }: ArchiveFiltersProps) {
+  const handleSearchChange = (value: string) => {
+    onFiltersChange({
+      ...filters,
+      search: value || undefined,
+    });
+  };
+
   const handleOnlineToggle = (checked: boolean) => {
     onFiltersChange({
       ...filters,
@@ -59,7 +72,7 @@ export function ArchiveFilters({
     >
       <div className='container mx-auto px-4'>
         <div className='flex flex-wrap items-center justify-between h-full gap-4'>
-          {/* Left side: All Filters, Online Toggle, Counties */}
+          {/* Left side: All Filters, Search, Online Toggle, Counties */}
           <div className='flex flex-wrap items-center gap-6'>
             {/* All Filters Button/Trigger */}
             {filterTrigger || (
@@ -82,6 +95,13 @@ export function ArchiveFilters({
                 </Button>
               </SheetTrigger>
             )}
+            {/* Search Input */}
+            <SearchInput
+              value={filters.search}
+              onValueChange={handleSearchChange}
+              placeholder='Αναζήτηση...'
+              className='min-w-56'
+            />
             {/* Online Toggle */}
             <OnlineToggle
               id='online-filter'
