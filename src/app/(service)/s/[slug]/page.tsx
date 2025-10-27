@@ -1,8 +1,7 @@
-import React, { JSX } from 'react';
+import type { JSX } from 'react';
 import { notFound } from 'next/navigation';
 import { getServicePageData } from '@/actions/services';
 import { getServiceMetadata } from '@/lib/seo/pages';
-import { prisma } from '@/lib/prisma/client';
 import { TaxonomyTabs, DynamicBreadcrumb } from '@/components';
 import { Card, CardContent } from '@/components/ui/card';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -15,6 +14,7 @@ import {
   ServiceOrderFixed,
   ServiceFAQ,
   ProfileTerms,
+  ServiceRelated,
 } from '@/components';
 
 // ISR configuration with shorter interval + tag-based revalidation
@@ -38,17 +38,23 @@ export async function generateMetadata({ params }: ServicePageProps) {
 
 // Generate static params for all published services
 export async function generateStaticParams() {
-  const services = await prisma.service.findMany({
-    where: {
-      status: 'published',
-      slug: { not: null }, // Ensure slug exists
-    },
-    select: { slug: true },
-  });
+  try {
+    const { prisma } = await import('@/lib/prisma/client');
+    const services = await prisma.service.findMany({
+      where: {
+        status: 'published',
+        slug: { not: null }, // Ensure slug exists
+      },
+      select: { slug: true },
+    });
 
-  return services.map((service) => ({
-    slug: service.slug!,
-  }));
+    return services.map((service) => ({
+      slug: service.slug!,
+    }));
+  } catch (error) {
+    console.error('Error generating static params for services:', error);
+    return [];
+  }
 }
 
 export default async function ServicePage({
@@ -79,6 +85,7 @@ export default async function ServicePage({
     paymentMethodsData,
     settlementMethodsData,
     tagsData,
+    relatedServices,
   } = result.data;
 
   return (
@@ -100,7 +107,7 @@ export default async function ServicePage({
       />
 
       {/* Service Content */}
-      <section className='pt-4 pb-20'>
+      <section className='pt-4'>
         <div className='container mx-auto px-4'>
           <div className='relative grid grid-cols-1 lg:grid-cols-3 gap-28'>
             {/* Main Content */}
@@ -192,6 +199,12 @@ export default async function ServicePage({
           </div>
         </div>
       </section>
+
+      {/* Related Services Section */}
+      <ServiceRelated
+        services={relatedServices}
+        categoryLabel={category?.label}
+      />
     </div>
   );
 }

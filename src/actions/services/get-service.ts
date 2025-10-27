@@ -24,6 +24,7 @@ import { tags } from '@/constants/datasets/tags';
 import type { ActionResult } from '@/lib/types/api';
 import type { Service, Profile } from '@prisma/client';
 import type { BreadcrumbSegment } from '@/components/shared/dynamic-breadcrumb';
+import type { ServiceCardData } from '@/lib/types/components';
 
 // Define the selected profile fields for the service page
 export type ServiceProfileFields = Pick<
@@ -85,6 +86,8 @@ export interface ServicePageData {
   settlementMethodsData: Array<ReturnType<typeof findById>>;
   // Transformed tags data
   tagsData: Array<ReturnType<typeof findById>>;
+  // Related services from the same category
+  relatedServices: ServiceCardData[];
 }
 
 /**
@@ -329,6 +332,70 @@ async function _getServicePageData(
       saveType: 'service',
     };
 
+    // Fetch related services from the same category (6 random services)
+    const relatedServicesRaw = await prisma.service.findMany({
+      where: {
+        status: 'published',
+        category: service.category, // Same category
+        id: {
+          not: service.id, // Exclude current service
+        },
+        NOT: {
+          media: {
+            equals: null,
+          },
+        },
+      },
+      include: {
+        profile: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            image: true,
+          },
+        },
+      },
+      orderBy: [
+        { rating: 'desc' },
+        { reviewCount: 'desc' },
+        { updatedAt: 'desc' },
+      ],
+      take: 12, // Fetch 12 and randomize to get 6
+    });
+
+    // Shuffle and take 5 for randomization
+    const shuffled = relatedServicesRaw.sort(() => Math.random() - 0.5);
+    const relatedServicesSubset = shuffled.slice(0, 5);
+
+    // Transform to ServiceCardData format
+    const relatedServices: ServiceCardData[] = relatedServicesSubset.map(
+      (relatedService) => {
+        const categoryTaxonomy = findById(
+          serviceTaxonomies,
+          relatedService.category,
+        );
+
+        return {
+          id: relatedService.id,
+          title: relatedService.title,
+          category: categoryTaxonomy?.label,
+          slug: relatedService.slug,
+          price: relatedService.price,
+          rating: relatedService.rating,
+          reviewCount: relatedService.reviewCount,
+          media: relatedService.media,
+          type: relatedService.type,
+          profile: {
+            id: relatedService.profile.id,
+            displayName: relatedService.profile.displayName,
+            username: relatedService.profile.username,
+            image: relatedService.profile.image,
+          },
+        };
+      },
+    );
+
     return {
       success: true,
       data: {
@@ -347,6 +414,7 @@ async function _getServicePageData(
         paymentMethodsData,
         settlementMethodsData,
         tagsData,
+        relatedServices,
       },
     };
   } catch (error) {
