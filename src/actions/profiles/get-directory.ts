@@ -100,7 +100,7 @@ export async function getDirectoryPageData(): Promise<
               type: (subcategory.type || 'freelancer') as
                 | 'freelancer'
                 | 'company',
-              href: `/dir/${subcategory.slug}`,
+              href: `/dir/${category.slug}/${subcategory.slug}`,
             });
           }
         }
@@ -130,7 +130,7 @@ export async function getDirectoryPageData(): Promise<
                   image: subcategory.image as
                     | PrismaJson.CloudinaryResource
                     | undefined,
-                  href: `/dir/${subcategory.slug}`,
+                  href: `/dir/${category.slug}/${subcategory.slug}`,
                 };
               })
               .filter(Boolean)
@@ -149,7 +149,7 @@ export async function getDirectoryPageData(): Promise<
               image: category.image as
                 | PrismaJson.CloudinaryResource
                 | undefined,
-              href: `/directory/${category.slug}`,
+              href: `/dir/${category.slug}`,
               subcategories: subcategoriesWithProfiles,
             };
           })
