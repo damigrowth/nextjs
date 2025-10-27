@@ -19,8 +19,7 @@ export async function GET() {
       `${baseUrl}/profile/sitemap.xml`,
       `${baseUrl}/categories/sitemap.xml`,
       `${baseUrl}/ipiresies/sitemap.xml`,
-      `${baseUrl}/pros/sitemap.xml`,
-      `${baseUrl}/companies/sitemap.xml`,
+      `${baseUrl}/dir/sitemap.xml`,
     ];
 
     const sitemapIndexXML: string = buildSitemapIndex(sitemaps);
