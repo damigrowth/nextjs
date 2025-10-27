@@ -21,6 +21,7 @@ import { isValidArchiveSortBy } from '@/lib/types/common';
 import type { ActionResult } from '@/lib/types/api';
 import type { ArchiveProfileCardData } from '@/lib/types/components';
 import type { ArchiveSortBy } from '@/lib/types/common';
+import type { FilterState } from '@/lib/hooks/archives/use-archive-filters';
 import { Prisma, Profile, User } from '@prisma/client';
 
 // Filter types for profile archives
@@ -419,7 +420,7 @@ export async function getProfileArchivePageData(params: {
       name: string;
       slug: string;
     }>;
-    filters: ProfileFilters;
+    filters: FilterState;
   }>
 > {
   try {
@@ -478,6 +479,7 @@ export async function getProfileArchivePageData(params: {
             category,
             subcategory: allMatchingSubcategories[0],
           };
+          // Store all matching IDs for the database query (handles duplicate slugs)
           allSubcategoryIds = allMatchingSubcategories.map((sub) => sub.id);
         } else {
           // Fallback to original single-match logic if no matches found
@@ -487,6 +489,11 @@ export async function getProfileArchivePageData(params: {
               categorySlug,
               subcategorySlug,
             ) || {};
+
+          // If fallback found a subcategory, use its single ID
+          if (taxonomyContext.subcategory) {
+            allSubcategoryIds = [taxonomyContext.subcategory.id];
+          }
         }
       } else {
         // Category page
@@ -650,6 +657,16 @@ export async function getProfileArchivePageData(params: {
       subcategories: filteredSubcategories || [],
     };
 
+    // Create UI-friendly filters (with slugs, not IDs or arrays)
+    const uiFilters = {
+      category: categorySlug,
+      subcategory: subcategorySlug,
+      county: searchParams.county || searchParams.περιοχή,
+      online: searchParams.online === 'true' || searchParams.online === '' ? true : undefined,
+      sortBy,
+      type: searchParams.type,
+    };
+
     return {
       success: true,
       data: {
@@ -659,7 +676,7 @@ export async function getProfileArchivePageData(params: {
         taxonomyData,
         breadcrumbData,
         counties,
-        filters,
+        filters: uiFilters,
       },
     };
   } catch (error) {
