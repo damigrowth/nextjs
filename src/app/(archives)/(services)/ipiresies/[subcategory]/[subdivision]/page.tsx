@@ -1,10 +1,7 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArchiveLayout, ArchiveServiceCard } from '@/components/archives';
-import {
-  getServiceArchivePageData,
-  getServiceTaxonomyPaths,
-} from '@/actions/services/get-services';
+import { getServiceArchivePageData } from '@/actions/services/get-services';
 import { getServiceSubdivisionMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
@@ -36,6 +33,9 @@ export async function generateMetadata({
 
 export async function generateStaticParams() {
   try {
+    const { getServiceTaxonomyPaths } = await import(
+      '@/actions/services/get-services'
+    );
     const result = await getServiceTaxonomyPaths();
 
     if (!result.success || !result.data) {

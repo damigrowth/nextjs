@@ -736,6 +736,22 @@ export function transformCoverageWithLocationNames<T extends DatasetItem>(
   rawCoverage: any,
   locationOptions: T[],
 ): CoverageWithNames {
+  // Handle null or undefined coverage data
+  if (!rawCoverage) {
+    return {
+      online: false,
+      onbase: false,
+      onsite: false,
+      address: null,
+      county: null,
+      area: null,
+      zipcode: null,
+      counties: [],
+      areas: [],
+      zipcodes: [],
+    };
+  }
+
   // Ensure required boolean fields have defaults
   const coverage: CoverageWithNames = {
     online: Boolean(rawCoverage.online),

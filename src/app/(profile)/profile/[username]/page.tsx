@@ -1,8 +1,7 @@
-import React, { JSX } from 'react';
+import type { JSX } from 'react';
 import { notFound } from 'next/navigation';
 import { getProfilePageData } from '@/actions/profiles/get-profile';
 import { getProfileMetadata } from '@/lib/seo/pages';
-import { prisma } from '@/lib/prisma/client';
 import {
   ProfileBio,
   ProfileFeatures,
@@ -39,21 +38,27 @@ export async function generateMetadata({ params }: ProfilePageProps) {
 
 // Generate static params for all published profiles
 export async function generateStaticParams() {
-  const profiles = await prisma.profile.findMany({
-    where: {
-      published: true,
-      username: { not: null }, // Ensure username exists
-      user: {
-        blocked: false,
-        confirmed: true,
+  try {
+    const { prisma } = await import('@/lib/prisma/client');
+    const profiles = await prisma.profile.findMany({
+      where: {
+        published: true,
+        username: { not: null }, // Ensure username exists
+        user: {
+          blocked: false,
+          confirmed: true,
+        },
       },
-    },
-    select: { username: true },
-  });
+      select: { username: true },
+    });
 
-  return profiles.map((profile) => ({
-    username: profile.username!,
-  }));
+    return profiles.map((profile) => ({
+      username: profile.username!,
+    }));
+  } catch (error) {
+    console.error('Error generating static params for profiles:', error);
+    return [];
+  }
 }
 
 // With prisma-json-types-generator, JSON fields are already properly typed
