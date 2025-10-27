@@ -12,7 +12,7 @@ export interface FilterState {
   sortBy?: string;
   page?: number;
   limit?: number;
-  type?: 'freelancers' | 'companies';
+  type?: 'pros' | 'companies';
 }
 
 interface UseArchiveFiltersProps {
@@ -43,7 +43,7 @@ export function useArchiveFilters({ initialFilters = {}, basePath }: UseArchiveF
     if (searchParams.get('limit')) urlFilters.limit = parseInt(searchParams.get('limit')!);
 
     const typeParam = searchParams.get('type');
-    if (typeParam === 'freelancers' || typeParam === 'companies') {
+    if (typeParam === 'pros' || typeParam === 'companies') {
       urlFilters.type = typeParam;
     }
 

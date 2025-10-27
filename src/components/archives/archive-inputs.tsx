@@ -547,7 +547,7 @@ interface TypeDropdownProps {
 
 const typeOptions = [
   { id: 'all', label: 'Όλοι' },
-  { id: 'freelancers', label: 'Μόνο Επαγγελματίες' },
+  { id: 'pros', label: 'Μόνο Επαγγελματίες' },
   { id: 'companies', label: 'Μόνο Επιχειρήσεις' },
 ];
 

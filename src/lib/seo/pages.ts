@@ -398,7 +398,7 @@ export async function getProsMetadata() {
     descriptionTemplate:
       'Βρες τους Καλύτερους Επαγγελματίες, δες τις υπηρεσίες τους, αξιολογήσεις και τιμές.',
     size: 150,
-    url: '/pros',
+    url: '/dir?type=pros',
   });
 
   return meta;
@@ -413,7 +413,7 @@ export async function getCompaniesMetadata() {
     descriptionTemplate:
       'Βρες τις Καλύτερες Επιχειρήσεις, δες τις υπηρεσίες τους, αξιολογήσεις και τιμές.',
     size: 150,
-    url: '/companies',
+    url: '/dir?type=companies',
   });
 
   return meta;
@@ -430,7 +430,7 @@ export async function getProCategoryMetadata(categorySlug: string) {
     descriptionTemplate:
       'Βρες τους Καλύτερους Επαγγελματίες, δες τις υπηρεσίες τους, αξιολογήσεις και τιμές. %arcCategoryPlural%',
     size: 200,
-    url: `/pros/${categorySlug}`,
+    url: `/dir/${categorySlug}?type=pros`,
   });
   return meta;
 }
@@ -449,7 +449,7 @@ export async function getProSubcategoryMetadata(
     descriptionTemplate:
       'Βρες τους Καλύτερους Επαγγελματίες, δες τις υπηρεσίες τους, αξιολογήσεις και τιμές. %arcCategoryPlural%',
     size: 200,
-    url: `/pros/${categorySlug}/${subcategorySlug}`,
+    url: `/dir/${categorySlug}/${subcategorySlug}?type=pros`,
   });
   return meta;
 }
@@ -465,7 +465,7 @@ export async function getCompanyCategoryMetadata(categorySlug: string) {
     descriptionTemplate:
       'Βρες τις Καλύτερες Επιχειρήσεις, δες τις υπηρεσίες τους, αξιολογήσεις και τιμές. %arcCategoryPlural%',
     size: 200,
-    url: `/companies/${categorySlug}`,
+    url: `/dir/${categorySlug}?type=companies`,
   });
   return meta;
 }
@@ -484,7 +484,7 @@ export async function getCompanySubcategoryMetadata(
     descriptionTemplate:
       'Βρες τις Καλύτερες Επιχειρήσεις, δες τις υπηρεσίες τους, αξιολογήσεις και τιμές.  %arcCategoryPlural%',
     size: 200,
-    url: `/companies/${categorySlug}/${subcategorySlug}`,
+    url: `/dir/${categorySlug}/${subcategorySlug}?type=companies`,
   });
   return meta;
 }

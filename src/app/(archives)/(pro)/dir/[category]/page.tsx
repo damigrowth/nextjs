@@ -18,7 +18,7 @@ interface DirectoryCategoryPageProps {
     online?: string;
     sortBy?: string;
     page?: string;
-    type?: 'freelancers' | 'companies'; // New type filter
+    type?: 'pros' | 'companies'; // Type filter
   }>;
 }
 

@@ -975,6 +975,29 @@ export function findTaxonomyBySlugInContext<T extends DatasetItem>(
 }
 
 /**
+ * Find ALL subcategories matching a slug within a category
+ * Useful for handling duplicate slugs (e.g., gender variants like 'daskaloi')
+ */
+export function findAllSubcategoriesBySlug<T extends DatasetItem>(
+  taxonomy: T[],
+  categorySlug: string,
+  subcategorySlug: string,
+): T[] {
+  // Find category
+  const category = taxonomy.find((c) => c.slug === categorySlug);
+  if (!category || !category.children) {
+    return [];
+  }
+
+  // Find ALL subcategories with matching slug
+  const matchingSubcategories = category.children.filter(
+    (s: any) => s.slug === subcategorySlug,
+  ) as T[];
+
+  return matchingSubcategories;
+}
+
+/**
  * Generate breadcrumb segments from taxonomy slugs
  * @param taxonomy - The hierarchical taxonomy dataset
  * @param categorySlug - Optional category slug

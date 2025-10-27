@@ -17,7 +17,7 @@ interface FilterState {
   county?: string; // Single county selection
   online?: boolean;
   sortBy?: string; // Sort option selection
-  type?: 'freelancers' | 'companies'; // Profile type filter (directory only)
+  type?: 'pros' | 'companies'; // Profile type filter (directory only)
 }
 
 interface ArchiveSidebarFiltersProps {
@@ -96,11 +96,12 @@ export function ArchiveSidebarFilters({
     const subs = subcategories || [];
 
     // Only apply type filtering for directory archives
+    let filteredSubs = subs;
     if (isDirectory && filters.type) {
-      return subs.filter(sub => {
+      filteredSubs = subs.filter(sub => {
         // Map filter values to dataset type values
         const typeMap = {
-          'freelancers': 'freelancer',
+          'pros': 'freelancer',
           'companies': 'company'
         } as const;
 
@@ -109,7 +110,18 @@ export function ArchiveSidebarFilters({
       });
     }
 
-    return subs;
+    // Deduplicate by slug (keep first occurrence)
+    // This handles cases like 'daskaloi' which has both 'Δασκάλα' and 'Δάσκαλος'
+    const seenSlugs = new Set<string>();
+    const deduplicatedSubs = filteredSubs.filter(sub => {
+      if (seenSlugs.has(sub.slug)) {
+        return false;
+      }
+      seenSlugs.add(sub.slug);
+      return true;
+    });
+
+    return deduplicatedSubs;
   }, [subcategories, isDirectory, filters.type]);
 
   const availableSubdivisions = subdivisions || [];
@@ -121,14 +133,14 @@ export function ArchiveSidebarFilters({
       const subcategoryType = currentSubcategory.type;
 
       return {
-        freelancers: subcategoryType === 'company', // Disable if subcategory is company-only
+        pros: subcategoryType === 'company', // Disable if subcategory is company-only
         companies: subcategoryType === 'freelancer', // Disable if subcategory is freelancer-only
       };
     }
 
     // No restrictions if we're on category level or base directory
     return {
-      freelancers: false,
+      pros: false,
       companies: false,
     };
   }, [isDirectory, currentSubcategory]);
@@ -352,7 +364,7 @@ export function ArchiveSidebarFilters({
               <RadioGroup
                 value={filters.type || 'all'}
                 onValueChange={(value) =>
-                  handleFilterChange('type', value === 'all' ? undefined : value as 'freelancers' | 'companies' | undefined)
+                  handleFilterChange('type', value === 'all' ? undefined : value as 'pros' | 'companies' | undefined)
                 }
               >
                 <div className='flex items-center space-x-2'>
@@ -363,15 +375,15 @@ export function ArchiveSidebarFilters({
                 </div>
                 <div className='flex items-center space-x-2'>
                   <RadioGroupItem
-                    value='freelancers'
-                    id='type-freelancers'
-                    disabled={typeFilterOptions.freelancers}
+                    value='pros'
+                    id='type-pros'
+                    disabled={typeFilterOptions.pros}
                   />
                   <Label
-                    htmlFor='type-freelancers'
+                    htmlFor='type-pros'
                     className={cn(
                       'font-normal',
-                      typeFilterOptions.freelancers ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                      typeFilterOptions.pros ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
                     )}
                   >
                     Μόνο Επαγγελματίες

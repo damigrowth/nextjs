@@ -12,6 +12,7 @@ import {
   getTaxonomyBreadcrumbs,
   findTaxonomyBySlugInContext,
   filterTaxonomyByType,
+  findAllSubcategoriesBySlug,
 } from '@/lib/utils/datasets';
 import { locationOptions } from '@/constants/datasets/locations';
 import { skills } from '@/constants/datasets/skills';
@@ -24,8 +25,9 @@ import { Prisma, Profile, User } from '@prisma/client';
 
 // Filter types for profile archives
 export type ProfileFilters = Partial<
-  Pick<Profile, 'category' | 'subcategory'>
+  Pick<Profile, 'category'>
 > & {
+  subcategory?: string | string[]; // Allow single ID or array of IDs for handling duplicate slugs
   role?: 'freelancer' | 'company';
   published?: boolean;
   county?: string; // Single county selection for coverage filtering (from profile.coverage.county or profile.coverage.counties)
@@ -88,7 +90,10 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
       whereClause.category = filters.category;
     }
     if (filters.subcategory) {
-      whereClause.subcategory = filters.subcategory;
+      // Handle both single ID and array of IDs (for duplicate slug handling)
+      whereClause.subcategory = Array.isArray(filters.subcategory)
+        ? { in: filters.subcategory }
+        : filters.subcategory;
     }
 
     // Handle combined online and county filters
@@ -389,7 +394,7 @@ export async function getProfileArchivePageData(params: {
     online?: string;
     sortBy?: string;
     page?: string;
-    type?: 'freelancers' | 'companies'; // Type filter for directory (plural URL param)
+    type?: 'pros' | 'companies'; // Type filter for directory
   };
 }): Promise<
   ActionResult<{
@@ -433,11 +438,11 @@ export async function getProfileArchivePageData(params: {
 
     // Determine target type based on archive type and search params
     // For 'directory', use the type filter from search params if provided, otherwise show all
-    // Map plural URL params ('freelancers', 'companies') to singular DB values ('freelancer', 'company')
+    // Map URL params ('pros', 'companies') to singular DB values ('freelancer', 'company')
     let targetType: 'freelancer' | 'company' | undefined;
     if (archiveType === 'directory') {
-      // Map plural URL parameter to singular database role value
-      if (searchParams.type === 'freelancers') {
+      // Map URL parameter to singular database role value
+      if (searchParams.type === 'pros') {
         targetType = 'freelancer';
       } else if (searchParams.type === 'companies') {
         targetType = 'company';
@@ -453,15 +458,36 @@ export async function getProfileArchivePageData(params: {
       ? filterTaxonomyByType(proTaxonomies, targetType)
       : proTaxonomies as DatasetItem[]; // For directory with no type filter, use all taxonomies
 
+    // Track all matching subcategory IDs for duplicate slug handling
+    let allSubcategoryIds: string[] | undefined;
+
     if (categorySlug) {
       if (subcategorySlug) {
-        // Subcategory page
-        taxonomyContext =
-          findTaxonomyBySlugInContext(
-            filteredTaxonomies,
-            categorySlug,
-            subcategorySlug,
-          ) || {};
+        // Subcategory page - find ALL subcategories with matching slug
+        const allMatchingSubcategories = findAllSubcategoriesBySlug(
+          filteredTaxonomies,
+          categorySlug,
+          subcategorySlug,
+        );
+
+        if (allMatchingSubcategories.length > 0) {
+          // Use the first subcategory for display purposes (breadcrumbs, metadata)
+          // but collect all IDs for filtering profiles
+          const category = findBySlug(filteredTaxonomies, categorySlug);
+          taxonomyContext = {
+            category,
+            subcategory: allMatchingSubcategories[0],
+          };
+          allSubcategoryIds = allMatchingSubcategories.map((sub) => sub.id);
+        } else {
+          // Fallback to original single-match logic if no matches found
+          taxonomyContext =
+            findTaxonomyBySlugInContext(
+              filteredTaxonomies,
+              categorySlug,
+              subcategorySlug,
+            ) || {};
+        }
       } else {
         // Category page
         const category = findBySlug(filteredTaxonomies, categorySlug);
@@ -503,7 +529,11 @@ export async function getProfileArchivePageData(params: {
       ...(targetType && { role: targetType }), // Only add role filter if targetType is defined
       published: true,
       ...(category && { category: category.id }),
-      ...(subcategory && { subcategory: subcategory.id }),
+      // Use all matching subcategory IDs if available (for duplicate slug handling)
+      // Otherwise use single subcategory ID
+      ...(allSubcategoryIds
+        ? { subcategory: allSubcategoryIds }
+        : subcategory && { subcategory: subcategory.id }),
       county: searchParams.county || searchParams.περιοχή,
       online:
         searchParams.online === 'true' || searchParams.online === ''
@@ -547,7 +577,7 @@ export async function getProfileArchivePageData(params: {
       basePath = '/dir';
     } else {
       baseLabel = archiveType === 'pros' ? 'Επαγγελματίες' : 'Επιχειρήσεις';
-      basePath = archiveType === 'pros' ? '/pros' : '/companies';
+      basePath = archiveType === 'pros' ? '/dir?type=pros' : '/dir?type=companies';
     }
 
     const breadcrumbData = {
