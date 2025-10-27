@@ -82,14 +82,8 @@ export default async function DashboardContent() {
               </Link>
             </Button>
             <Button variant='outline' asChild>
-              <Link href='/pros'>
-                Επαγγελματίες
-                <ArrowRight className='ml-2 h-4 w-4' />
-              </Link>
-            </Button>
-            <Button variant='outline' asChild>
-              <Link href='/companies'>
-                Επιχειρήσεις
+              <Link href='/dir'>
+                Επαγγελματικός Κατάλογος
                 <ArrowRight className='ml-2 h-4 w-4' />
               </Link>
             </Button>

@@ -16,7 +16,7 @@ import clsx from 'clsx';
 
 interface ArchiveLayoutProps {
   children: ReactNode;
-  archiveType: 'pros' | 'companies' | 'services' | 'categories';
+  archiveType: 'pros' | 'companies' | 'directory' | 'services' | 'categories';
   category?: string;
   subcategory?: string;
   subdivision?: string; // For services
@@ -129,6 +129,13 @@ export function ArchiveLayout({
   // Archive configuration constants and functions
   const getArchiveConfig = () => {
     switch (archiveType) {
+      case 'directory':
+        return {
+          basePath: 'dir',
+          allItemsLabel: 'Επαγγελματικός Κατάλογος',
+          usePluralLabels: true,
+          sidebarType: 'profiles' as const,
+        };
       case 'pros':
         return {
           basePath: 'pros',
@@ -217,6 +224,8 @@ export function ArchiveLayout({
 
     // Fallback to default archive descriptions
     switch (archiveType) {
+      case 'directory':
+        return 'Βρες τους Καλύτερους Επαγγελματίες και Επιχειρήσεις, δες αξιολογήσεις και τιμές.';
       case 'pros':
         return 'Βρες τους Καλύτερους Επαγγελματίες, δες αξιολογήσεις και τιμές.';
       case 'companies':
@@ -296,6 +305,8 @@ export function ArchiveLayout({
                 onFiltersChange={handleFiltersUpdate}
                 counties={counties}
                 activeFilterCount={getActiveFilterCount}
+                archiveType={archiveConfig.sidebarType}
+                basePath={basePath}
               />
             </ArchiveSidebar>
 

@@ -11,12 +11,14 @@ import { ServiceCardData } from '@/lib/types';
 interface ServiceCardProps {
   service: ServiceCardData;
   showProfile?: boolean; // New prop to control profile section visibility
+  hideDisplayName?: boolean; // New prop to hide only the display name, keep avatar
   isSaved?: boolean;
 }
 
 export default function ServiceCard({
   service,
   showProfile = true,
+  hideDisplayName = false,
   isSaved = false,
 }: ServiceCardProps) {
   // Service type declarations
@@ -100,9 +102,11 @@ export default function ServiceCard({
                       />
                     </Avatar>
                   )}
-                  <span className='text-sm text-body group-hover/profile:text-third transition-colors'>
-                    {service.profile.displayName}
-                  </span>
+                  {!hideDisplayName && (
+                    <span className='text-sm text-body group-hover/profile:text-third transition-colors'>
+                      {service.profile.displayName}
+                    </span>
+                  )}
                 </Link>
               )}
 

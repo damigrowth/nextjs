@@ -19,12 +19,15 @@ interface ArchiveFiltersProps {
     online?: boolean;
     county?: string;
     sortBy?: string;
+    type?: 'freelancer' | 'company';
   };
   onFiltersChange: (filters: any) => void;
   counties: DatasetItem[];
   className?: string;
   activeFilterCount?: number;
   filterTrigger?: React.ReactNode;
+  archiveType?: 'profiles' | 'services';
+  basePath?: string;
 }
 
 export function ArchiveFilters({
@@ -34,6 +37,8 @@ export function ArchiveFilters({
   className,
   activeFilterCount = 0,
   filterTrigger,
+  archiveType,
+  basePath,
 }: ArchiveFiltersProps) {
   const handleSearchChange = (value: string) => {
     onFiltersChange({
@@ -83,15 +88,11 @@ export function ArchiveFilters({
                 >
                   <Filter className='w-4 h-4' />
                   <span>Όλα τα φίλτρα</span>
-                  {/* TODO: Badge for active filter count - commented out for future use */}
-                  {/* {activeFilterCount > 0 && (
-                    <Badge
-                      variant='destructive'
-                      className='absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs'
-                    >
+                  {activeFilterCount > 0 && (
+                    <span className='absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-medium'>
                       {activeFilterCount}
-                    </Badge>
-                  )} */}
+                    </span>
+                  )}
                 </Button>
               </SheetTrigger>
             )}
