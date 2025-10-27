@@ -12,7 +12,7 @@ import {
   hasOnsiteCoverage,
 } from '@/lib/utils/datasets';
 import { RatingDisplay, UserAvatar } from '../shared';
-import VerifiedBadge from '../shared/verified-badge';
+import { VerifiedBadge } from '../shared/profile-badges';
 import SocialLinks from '../shared/social-links';
 
 /**
@@ -67,6 +67,7 @@ export default function ProfileMeta({
               lastName={lastName}
               image={image}
               top={top}
+              size='2xl'
             />
 
             {/* Profile info */}
@@ -76,7 +77,7 @@ export default function ProfileMeta({
                 <h1 className='text-lg font-medium text-gray-900 truncate mb-1'>
                   {displayName}
                 </h1>
-                <VerifiedBadge verified={verified} size='md' />
+                <VerifiedBadge verified={verified} />
               </div>
 
               {/* Tagline */}
@@ -123,7 +124,7 @@ export default function ProfileMeta({
               {/* Social links */}
               {socials && (
                 <div className='mt-4'>
-                  <SocialLinks socials={socials} debug={true} />
+                  <SocialLinks socials={socials} size='lg' debug={true} />
                 </div>
               )}
             </div>

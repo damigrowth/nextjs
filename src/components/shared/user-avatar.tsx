@@ -15,7 +15,7 @@ export interface UserAvatarProps {
   /** Whether user has top status */
   top?: boolean;
   /** Size variant of the avatar */
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   /** Custom class name */
   className?: string;
   /** Show border */
@@ -31,6 +31,7 @@ const sizeClasses = {
   md: 'h-12 w-12',
   lg: 'h-16 w-16',
   xl: 'h-20 w-20',
+  '2xl': 'h-[120px] w-[120px]',
 };
 
 const borderClasses = {
@@ -38,6 +39,7 @@ const borderClasses = {
   md: 'border-2',
   lg: 'border-4',
   xl: 'border-4',
+  '2xl': 'border-4',
 };
 
 const fallbackSizeClasses = {
@@ -45,6 +47,7 @@ const fallbackSizeClasses = {
   md: 'text-sm',
   lg: 'text-lg',
   xl: 'text-lg',
+  '2xl': 'text-2xl',
 };
 
 const topIconSizeClasses = {
@@ -52,6 +55,7 @@ const topIconSizeClasses = {
   md: 'h-3 w-3',
   lg: 'h-3 w-3',
   xl: 'h-3 w-3',
+  '2xl': 'h-4 w-4',
 };
 
 /**
@@ -117,7 +121,7 @@ export default function UserAvatar({
         className={cn(
           sizeClass,
           borderClass,
-          'border-background shadow-lg rounded-3xl bg-white',
+          'border-background shadow-lg rounded-lg bg-white',
           className,
         )}
       >
@@ -127,7 +131,7 @@ export default function UserAvatar({
         <AvatarFallback
           className={cn(
             fallbackSizeClass,
-            'font-semibold bg-primary text-primary-foreground rounded-3xl',
+            'font-semibold bg-primary text-primary-foreground rounded-lg',
           )}
         >
           {initials}
