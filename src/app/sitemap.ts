@@ -18,8 +18,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'for-pros',
     'categories',
     'ipiresies',
-    'pros',
-    'companies',
+    'directory',
+    'dir',
   ];
 
   const staticUrls: MetadataRoute.Sitemap = staticPaths.map((path) => ({

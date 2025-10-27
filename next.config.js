@@ -58,6 +58,36 @@ const nextConfig = {
         destination: '/login',
         permanent: true,
       },
+      {
+        source: '/pros',
+        destination: '/dir',
+        permanent: true,
+      },
+      {
+        source: '/pros/:category',
+        destination: '/dir/:category',
+        permanent: true,
+      },
+      {
+        source: '/pros/:category/:subcategory',
+        destination: '/dir/:category/:subcategory',
+        permanent: true,
+      },
+      {
+        source: '/companies',
+        destination: '/dir',
+        permanent: true,
+      },
+      {
+        source: '/companies/:category',
+        destination: '/dir/:category',
+        permanent: true,
+      },
+      {
+        source: '/companies/:category/:subcategory',
+        destination: '/dir/:category/:subcategory',
+        permanent: true,
+      },
     ];
   },
 
