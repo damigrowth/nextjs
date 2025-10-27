@@ -5,13 +5,13 @@ export const metadata = createNotFoundMetadata(
   'Η σελίδα που αναζητάτε δεν βρέθηκε.'
 );
 
-export default function ProsNotFound() {
+export default function DirectoryNotFound() {
   return (
     <NotFoundPage
       title="Ουπς! Η σελίδα δεν βρέθηκε"
       description="Η σελίδα που αναζητάτε δεν υπάρχει ή έχει αφαιρεθεί."
-      primaryButtonText="Δες όλους τους επαγγελματίες"
-      primaryButtonHref="/pros"
+      primaryButtonText="Επαγγελματικός Κατάλογος"
+      primaryButtonHref="/dir"
       backButtonText="Πίσω στην Αρχική"
       backButtonHref="/"
     />

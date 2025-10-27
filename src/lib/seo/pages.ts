@@ -274,6 +274,56 @@ export async function getCategoriesMetadata() {
 }
 
 /**
+ * Directory page metadata generation
+ */
+export async function getDirectoryMetadata() {
+  const { meta } = await Meta({
+    titleTemplate: 'Επαγγελματικός Κατάλογος | Doulitsa',
+    descriptionTemplate:
+      'Ανακάλυψε επαγγελματίες και επιχειρήσεις σε όλες τις κατηγορίες. Βρες τον κατάλληλο επαγγελματία για τη δουλειά σου.',
+    size: 150,
+    url: '/directory',
+  });
+
+  return meta;
+}
+
+/**
+ * Directory category page metadata generation
+ */
+export async function getDirectoryCategoryMetadata(categorySlug: string) {
+  const { meta } = await Meta({
+    type: 'proCategory',
+    params: { categorySlug, type: 'freelancer' },
+    titleTemplate: '%arcCategoryPlural% - Επαγγελματικός Κατάλογος',
+    descriptionTemplate:
+      'Βρες τους Καλύτερους Επαγγελματίες και Επιχειρήσεις, δες τις υπηρεσίες τους, αξιολογήσεις και τιμές. %arcCategoryPlural%',
+    size: 200,
+    url: `/dir/${categorySlug}`,
+  });
+  return meta;
+}
+
+/**
+ * Directory subcategory page metadata generation
+ */
+export async function getDirectorySubcategoryMetadata(
+  categorySlug: string,
+  subcategorySlug: string,
+) {
+  const { meta } = await Meta({
+    type: 'proSubcategory',
+    params: { categorySlug, subcategorySlug, type: 'freelancer' },
+    titleTemplate: '%arcSubcategoryPlural% - Επαγγελματικός Κατάλογος',
+    descriptionTemplate:
+      'Βρες τους Καλύτερους Επαγγελματίες και Επιχειρήσεις, δες τις υπηρεσίες τους, αξιολογήσεις και τιμές. %arcCategoryPlural%',
+    size: 200,
+    url: `/dir/${categorySlug}/${subcategorySlug}`,
+  });
+  return meta;
+}
+
+/**
  * Category archive page metadata generation
  */
 export async function getCategoryMetadata(categorySlug: string) {

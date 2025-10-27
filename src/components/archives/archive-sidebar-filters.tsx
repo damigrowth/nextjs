@@ -1,8 +1,10 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { OnlineToggle, CountiesDropdown, CategoryDropdown, SubcategoryDropdown, SubdivisionDropdown } from './archive-inputs';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
@@ -15,6 +17,7 @@ interface FilterState {
   county?: string; // Single county selection
   online?: boolean;
   sortBy?: string; // Sort option selection
+  type?: 'freelancer' | 'company'; // Profile type filter (directory only)
 }
 
 interface ArchiveSidebarFiltersProps {
@@ -43,13 +46,15 @@ export function ArchiveSidebarFilters({
   // Parse current path to get taxonomy from route
   const pathSegments = pathname.split('/').filter(Boolean);
 
-  // Determine base path from current pathname (since both pros and companies use archiveType='profiles')
+  // Determine base path from current pathname
   let baseArchivePath;
   if (archiveType === 'services') {
     baseArchivePath = '/ipiresies';
   } else if (archiveType === 'profiles') {
-    // Check if we're in pros or companies based on current pathname
-    if (pathname.startsWith('/companies')) {
+    // Check if we're in pros, companies, or dir based on current pathname
+    if (pathname.startsWith('/dir')) {
+      baseArchivePath = '/dir';
+    } else if (pathname.startsWith('/companies')) {
       baseArchivePath = '/companies';
     } else {
       baseArchivePath = '/pros';
@@ -59,6 +64,9 @@ export function ArchiveSidebarFilters({
     baseArchivePath = '/' + pathSegments[0];
   }
 
+  // Check if we're in the directory archive
+  const isDirectory = pathname.startsWith('/dir');
+
   // Get current category/subcategory/subdivision from path based on archive type
   let currentCategorySlug, currentSubcategorySlug, currentSubdivisionSlug;
 
@@ -67,7 +75,7 @@ export function ArchiveSidebarFilters({
     currentSubcategorySlug = pathSegments[1];
     currentSubdivisionSlug = pathSegments[2];
   } else {
-    // Pros/Companies: /pros/[category]/[subcategory] or /companies/[category]/[subcategory]
+    // Pros/Companies/Directory: /[base]/[category]/[subcategory]
     currentCategorySlug = pathSegments[1];
     currentSubcategorySlug = pathSegments[2];
   }
@@ -83,8 +91,47 @@ export function ArchiveSidebarFilters({
     subdivisions?.find(div => div.slug === currentSubdivisionSlug) : null;
 
   // Use only filtered subcategories and subdivisions from server action
-  const availableSubcategories = subcategories || [];
+  // For directory archives, filter subcategories by type if a type filter is active
+  const availableSubcategories = useMemo(() => {
+    const subs = subcategories || [];
+
+    // Only apply type filtering for directory archives
+    if (archiveType === 'directory' && filters.type) {
+      return subs.filter(sub => {
+        // Map filter values to dataset type values
+        const typeMap = {
+          'freelancers': 'freelancer',
+          'companies': 'company'
+        } as const;
+
+        const targetType = typeMap[filters.type as keyof typeof typeMap];
+        return sub.type === targetType;
+      });
+    }
+
+    return subs;
+  }, [subcategories, archiveType, filters.type]);
+
   const availableSubdivisions = subdivisions || [];
+
+  // Determine which type options should be disabled based on current subcategory
+  const typeFilterOptions = useMemo(() => {
+    // If we're on a specific subcategory page in directory
+    if (isDirectory && currentSubcategory && 'type' in currentSubcategory) {
+      const subcategoryType = currentSubcategory.type;
+
+      return {
+        freelancers: subcategoryType === 'company', // Disable if subcategory is company-only
+        companies: subcategoryType === 'freelancer', // Disable if subcategory is freelancer-only
+      };
+    }
+
+    // No restrictions if we're on category level or base directory
+    return {
+      freelancers: false,
+      companies: false,
+    };
+  }, [isDirectory, currentSubcategory]);
 
   const handleFilterChange = <K extends keyof FilterState>(
     key: K,
@@ -295,6 +342,61 @@ export function ArchiveSidebarFilters({
             placeholder='Επιλέξτε περιοχή'
           />
         </div>
+
+        {/* Type Filter - Directory only */}
+        {isDirectory && (
+          <>
+            <Separator />
+            <div className='space-y-3'>
+              <Label className='text-sm font-medium'>Τύπος</Label>
+              <RadioGroup
+                value={filters.type || 'all'}
+                onValueChange={(value) =>
+                  handleFilterChange('type', value === 'all' ? undefined : value as 'freelancers' | 'companies' | undefined)
+                }
+              >
+                <div className='flex items-center space-x-2'>
+                  <RadioGroupItem value='all' id='type-all' />
+                  <Label htmlFor='type-all' className='font-normal cursor-pointer'>
+                    Όλοι
+                  </Label>
+                </div>
+                <div className='flex items-center space-x-2'>
+                  <RadioGroupItem
+                    value='freelancers'
+                    id='type-freelancers'
+                    disabled={typeFilterOptions.freelancers}
+                  />
+                  <Label
+                    htmlFor='type-freelancers'
+                    className={cn(
+                      'font-normal',
+                      typeFilterOptions.freelancers ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                    )}
+                  >
+                    Μόνο Επαγγελματίες
+                  </Label>
+                </div>
+                <div className='flex items-center space-x-2'>
+                  <RadioGroupItem
+                    value='companies'
+                    id='type-companies'
+                    disabled={typeFilterOptions.companies}
+                  />
+                  <Label
+                    htmlFor='type-companies'
+                    className={cn(
+                      'font-normal',
+                      typeFilterOptions.companies ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                    )}
+                  >
+                    Μόνο Επιχειρήσεις
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Clear Button */}

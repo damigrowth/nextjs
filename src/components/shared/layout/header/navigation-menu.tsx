@@ -47,8 +47,7 @@ const categoryIconMap: Record<string, React.ComponentType<any>> = {
 
 const regularMenuItems = [
   { href: '/categories', label: 'Υπηρεσίες' },
-  { href: '/pros', label: 'Επαγγελματίες' },
-  { href: '/companies', label: 'Επιχειρήσεις' },
+  { href: '/dir', label: 'Επαγγελματικός Κατάλογος' },
 ];
 
 interface NavMenuProps {

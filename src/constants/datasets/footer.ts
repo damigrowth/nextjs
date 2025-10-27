@@ -42,11 +42,7 @@ export const accountLinks = [
 
 export const proLinks = [
   {
-    label: 'Επαγγελματίες',
-    slug: '/pros',
-  },
-  {
-    label: 'Επιχειρήσεις',
-    slug: '/companies',
+    label: 'Επαγγελματικός Κατάλογος',
+    slug: '/dir',
   },
 ];

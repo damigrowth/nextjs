@@ -377,11 +377,11 @@ export async function getProfilesCount(
 
 /**
  * Comprehensive profile archive page data fetcher
- * Handles main pros/companies pages, category, and subcategory pages with all transformations
+ * Handles main pros/companies/directory pages, category, and subcategory pages with all transformations
  */
 export async function getProfileArchivePageData(params: {
-  archiveType?: 'pros' | 'companies'; // Optional, defaults to 'pros'
-  categorySlug?: string; // Optional for main pros/companies pages
+  archiveType?: 'pros' | 'companies' | 'directory'; // Optional, defaults to 'pros'
+  categorySlug?: string; // Optional for main pages
   subcategorySlug?: string;
   searchParams: {
     county?: string;
@@ -389,6 +389,7 @@ export async function getProfileArchivePageData(params: {
     online?: string;
     sortBy?: string;
     page?: string;
+    type?: 'freelancers' | 'companies'; // Type filter for directory (plural URL param)
   };
 }): Promise<
   ActionResult<{
@@ -430,9 +431,27 @@ export async function getProfileArchivePageData(params: {
       subcategory?: DatasetItem;
     } = {};
 
-    // Filter taxonomies by archive type first
-    const targetType = archiveType === 'pros' ? 'freelancer' : 'company';
-    const filteredTaxonomies = filterTaxonomyByType(proTaxonomies, targetType);
+    // Determine target type based on archive type and search params
+    // For 'directory', use the type filter from search params if provided, otherwise show all
+    // Map plural URL params ('freelancers', 'companies') to singular DB values ('freelancer', 'company')
+    let targetType: 'freelancer' | 'company' | undefined;
+    if (archiveType === 'directory') {
+      // Map plural URL parameter to singular database role value
+      if (searchParams.type === 'freelancers') {
+        targetType = 'freelancer';
+      } else if (searchParams.type === 'companies') {
+        targetType = 'company';
+      } else {
+        targetType = undefined; // Show all when no type filter
+      }
+    } else {
+      targetType = archiveType === 'pros' ? 'freelancer' : 'company';
+    }
+
+    // Filter taxonomies by type if a specific type is targeted
+    const filteredTaxonomies = targetType
+      ? filterTaxonomyByType(proTaxonomies, targetType)
+      : proTaxonomies as DatasetItem[]; // For directory with no type filter, use all taxonomies
 
     if (categorySlug) {
       if (subcategorySlug) {
@@ -481,7 +500,7 @@ export async function getProfileArchivePageData(params: {
 
     // Build filters from search params and route params
     const filters: ProfileFilters = {
-      role: targetType,
+      ...(targetType && { role: targetType }), // Only add role filter if targetType is defined
       published: true,
       ...(category && { category: category.id }),
       ...(subcategory && { subcategory: subcategory.id }),
@@ -496,10 +515,10 @@ export async function getProfileArchivePageData(params: {
     };
 
     // Fetch profiles and taxonomy paths in parallel
-    const roleFilter = filters.role || targetType;
+    // For directory with no type filter, don't pass role to getProTaxonomyPaths
     const [profilesResult, taxonomyPathsResult] = await Promise.all([
       getProfilesByFilters(filters),
-      getProTaxonomyPaths(roleFilter),
+      getProTaxonomyPaths(targetType),
     ]);
 
     if (!profilesResult.success) {
@@ -520,8 +539,17 @@ export async function getProfileArchivePageData(params: {
     }));
 
     // Generate breadcrumbs
-    const baseLabel = archiveType === 'pros' ? 'Επαγγελματίες' : 'Επιχειρήσεις';
-    const basePath = archiveType === 'pros' ? '/pros' : '/companies';
+    let baseLabel: string;
+    let basePath: string;
+
+    if (archiveType === 'directory') {
+      baseLabel = 'Επαγγελματικός Κατάλογος';
+      basePath = '/dir';
+    } else {
+      baseLabel = archiveType === 'pros' ? 'Επαγγελματίες' : 'Επιχειρήσεις';
+      basePath = archiveType === 'pros' ? '/pros' : '/companies';
+    }
+
     const breadcrumbData = {
       segments: categorySlug
         ? getTaxonomyBreadcrumbs(
@@ -535,7 +563,7 @@ export async function getProfileArchivePageData(params: {
               usePlural: true,
             }
           )
-        : [{ label: 'Αρχική', href: '/' }, { label: baseLabel }], // Main pros/companies page breadcrumbs
+        : [{ label: 'Αρχική', href: '/' }, { label: baseLabel }], // Main page breadcrumbs
     };
 
     // Get filtered subcategories based on available profiles
@@ -558,8 +586,9 @@ export async function getProfileArchivePageData(params: {
 
         const subcategoriesWithProfiles = (category.children || []).filter(
           (subcat: any) => {
-            // Filter by type AND availability - only show subcategories that match the type AND have profiles
-            const typeMatches = !subcat.type || subcat.type === targetType;
+            // Filter by type AND availability
+            // For directory with no type filter (targetType is undefined), show all subcategories
+            const typeMatches = !targetType || !subcat.type || subcat.type === targetType;
             const hasProfiles = availableSubcategories.has(subcat.slug);
             return typeMatches && hasProfiles;
           },

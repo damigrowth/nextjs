@@ -1,37 +1,40 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
 import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
-import { getProsMetadata } from '@/lib/seo/pages';
+import { getDirectoryMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
 export const dynamicParams = true;
 
-interface ProsPageProps {
+interface DirectoryPageProps {
   searchParams: Promise<{
     county?: string;
     περιοχή?: string; // Greek parameter for county
     online?: string;
     sortBy?: string;
     page?: string;
+    type?: 'freelancers' | 'companies'; // New type filter
   }>;
 }
 
 export async function generateStaticParams() {
-  // Return empty array for the base /pros route (no dynamic params needed)
+  // Return empty array for the base /dir route (no dynamic params needed)
   return [];
 }
 
 export async function generateMetadata() {
-  return getProsMetadata();
+  return getDirectoryMetadata();
 }
 
-export default async function ProsPage({ searchParams }: ProsPageProps) {
+export default async function DirectoryPage({
+  searchParams,
+}: DirectoryPageProps) {
   const searchParams_ = await searchParams;
 
-  // Use the comprehensive archive function
+  // Use the comprehensive archive function with new 'directory' type
   const result = await getProfileArchivePageData({
-    archiveType: 'pros',
+    archiveType: 'directory',
     searchParams: searchParams_,
   });
 
@@ -44,12 +47,12 @@ export default async function ProsPage({ searchParams }: ProsPageProps) {
 
   return (
     <ArchiveLayout
-      archiveType='pros'
+      archiveType='directory'
       initialFilters={filters}
       taxonomyData={taxonomyData}
       breadcrumbData={breadcrumbData}
       counties={counties}
-      basePath='/pros'
+      basePath='/dir'
       total={total}
       limit={20}
     >

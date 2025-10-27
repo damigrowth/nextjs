@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server';
 
 // Define static routes that should be lowercase
 const STATIC_ROUTES = [
-  '/pros',
-  '/companies',
+  '/dir',
   '/services',
   '/ipiresies',
   '/categories',
@@ -30,6 +29,13 @@ export const withLowercaseRedirect = (next) => {
     // Skip API routes
     if (currentPath.startsWith('/api/')) {
       return next(request, _next);
+    }
+
+    // Redirect old /pros and /companies URLs to /dir
+    if (currentPath.startsWith('/pros') || currentPath.startsWith('/companies')) {
+      const url = request.nextUrl.clone();
+      url.pathname = currentPath.replace(/^\/(pros|companies)/, '/dir');
+      return NextResponse.redirect(url, 301);
     }
 
     // Check if path starts with any static route (case-insensitive)

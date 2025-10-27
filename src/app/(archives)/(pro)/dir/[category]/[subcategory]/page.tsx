@@ -1,14 +1,14 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
 import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
-import { getProSubcategoryMetadata } from '@/lib/seo/pages';
+import { getDirectorySubcategoryMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
 export const dynamicParams = true;
 
-interface ProsSubcategoryPageProps {
+interface DirectorySubcategoryPageProps {
   params: Promise<{
     category: string;
     subcategory: string;
@@ -19,14 +19,15 @@ interface ProsSubcategoryPageProps {
     online?: string;
     sortBy?: string;
     page?: string;
+    type?: 'freelancers' | 'companies'; // New type filter
   }>;
 }
 
 export async function generateMetadata({
   params,
-}: ProsSubcategoryPageProps): Promise<Metadata> {
+}: DirectorySubcategoryPageProps): Promise<Metadata> {
   const { category: categorySlug, subcategory: subcategorySlug } = await params;
-  return getProSubcategoryMetadata(categorySlug, subcategorySlug);
+  return getDirectorySubcategoryMetadata(categorySlug, subcategorySlug);
 }
 
 export async function generateStaticParams() {
@@ -35,7 +36,7 @@ export async function generateStaticParams() {
     const { getProTaxonomyPaths } = await import(
       '@/actions/profiles/get-profiles'
     );
-    const result = await getProTaxonomyPaths('freelancer');
+    const result = await getProTaxonomyPaths();
 
     if (!result.success || !result.data) {
       return [];
@@ -50,23 +51,23 @@ export async function generateStaticParams() {
       }));
   } catch (error) {
     console.error(
-      'Error generating static params for pros subcategory:',
+      'Error generating static params for directory subcategory:',
       error,
     );
     return [];
   }
 }
 
-export default async function ProsSubcategoryPage({
+export default async function DirectorySubcategoryPage({
   params,
   searchParams,
-}: ProsSubcategoryPageProps) {
+}: DirectorySubcategoryPageProps) {
   const { category: categorySlug, subcategory: subcategorySlug } = await params;
   const searchParams_ = await searchParams;
 
   // Use the comprehensive archive function
   const result = await getProfileArchivePageData({
-    archiveType: 'pros',
+    archiveType: 'directory',
     categorySlug: categorySlug,
     subcategorySlug: subcategorySlug,
     searchParams: searchParams_,
@@ -87,14 +88,14 @@ export default async function ProsSubcategoryPage({
 
   return (
     <ArchiveLayout
-      archiveType='pros'
+      archiveType='directory'
       category={categorySlug}
       subcategory={subcategorySlug}
       initialFilters={filters}
       taxonomyData={taxonomyData}
       breadcrumbData={breadcrumbData}
       counties={counties}
-      basePath={`/pros/${categorySlug}/${subcategorySlug}`}
+      basePath={`/dir/${categorySlug}/${subcategorySlug}`}
       total={total}
       limit={20}
     >

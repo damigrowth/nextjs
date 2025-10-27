@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/command';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { archiveSortOptions } from '@/constants/datasets/options';
+import { cn } from '@/lib/utils';
 
 interface SearchInputProps {
   value: string | undefined;
@@ -524,6 +525,82 @@ export function SubdivisionDropdown({
                       }
                     />
                     {subdivision.label}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
+interface TypeDropdownProps {
+  value: string | undefined;
+  onValueChange: (value: string) => void;
+  placeholder?: string;
+  allLabel?: string;
+  className?: string;
+  fullWidth?: boolean;
+}
+
+const typeOptions = [
+  { id: 'all', label: 'Όλοι' },
+  { id: 'freelancers', label: 'Μόνο Επαγγελματίες' },
+  { id: 'companies', label: 'Μόνο Επιχειρήσεις' },
+];
+
+export function TypeDropdown({
+  value,
+  onValueChange,
+  placeholder = 'Τύπος',
+  allLabel = 'Όλοι',
+  className,
+  fullWidth = true,
+}: TypeDropdownProps) {
+  const handleValueChange = (selectedValue: string) => {
+    onValueChange(selectedValue === 'all' ? '' : selectedValue);
+  };
+
+  const selectedType =
+    value && value !== 'all'
+      ? typeOptions.find((t) => t.id === value)
+      : null;
+
+  const displayValue = selectedType?.label || allLabel;
+
+  return (
+    <div className={cn(fullWidth && 'min-w-48', className)}>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant='outline'
+            role='combobox'
+            className={cn(fullWidth && 'w-full', 'justify-between')}
+          >
+            {displayValue}
+            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className='w-full p-0'>
+          <Command>
+            <CommandList>
+              <CommandGroup>
+                {typeOptions.map((option) => (
+                  <CommandItem
+                    key={option.id}
+                    value={option.label}
+                    onSelect={() => handleValueChange(option.id)}
+                  >
+                    <Check
+                      className={
+                        (!value && option.id === 'all') || value === option.id
+                          ? 'mr-2 h-4 w-4 opacity-100'
+                          : 'mr-2 h-4 w-4 opacity-0'
+                      }
+                    />
+                    {option.label}
                   </CommandItem>
                 ))}
               </CommandGroup>

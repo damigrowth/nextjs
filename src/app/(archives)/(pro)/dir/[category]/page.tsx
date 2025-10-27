@@ -1,39 +1,45 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
 import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
-import { getCompanyCategoryMetadata } from '@/lib/seo/pages';
+import { getDirectoryCategoryMetadata } from '@/lib/seo/pages';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
 export const dynamicParams = true;
 
-interface CompaniesCategoryPageProps {
+interface DirectoryCategoryPageProps {
   params: Promise<{
     category: string;
   }>;
   searchParams: Promise<{
     county?: string;
-    περιοχή?: string; // Greek parameter for county
+    περιοχή?: string;
     online?: string;
     sortBy?: string;
     page?: string;
+    type?: 'freelancers' | 'companies'; // New type filter
   }>;
+}
+
+export async function generateMetadata({
+  params,
+}: DirectoryCategoryPageProps): Promise<Metadata> {
+  const params_ = await params;
+  return getDirectoryCategoryMetadata(params_.category);
 }
 
 export async function generateStaticParams() {
   try {
-    // Use the new taxonomy paths function
     const { getProTaxonomyPaths } = await import(
       '@/actions/profiles/get-profiles'
     );
-    const result = await getProTaxonomyPaths('company');
+    const result = await getProTaxonomyPaths();
 
     if (!result.success || !result.data) {
       return [];
     }
 
-    // Generate static params for all unique categories that have profiles
     const uniqueCategories = [
       ...new Set(
         result.data
@@ -47,39 +53,28 @@ export async function generateStaticParams() {
     }));
   } catch (error) {
     console.error(
-      'Error generating static params for companies category:',
+      'Error generating static params for directory category:',
       error,
     );
     return [];
   }
 }
 
-export async function generateMetadata({
-  params,
-}: CompaniesCategoryPageProps): Promise<Metadata> {
-  const { category: categorySlug } = await params;
-  return getCompanyCategoryMetadata(categorySlug);
-}
-
-export default async function CompaniesCategoryPage({
+export default async function DirectoryCategoryPage({
   params,
   searchParams,
-}: CompaniesCategoryPageProps) {
-  const { category: categorySlug } = await params;
+}: DirectoryCategoryPageProps) {
+  const params_ = await params;
   const searchParams_ = await searchParams;
 
-  // Use the comprehensive archive function
   const result = await getProfileArchivePageData({
-    archiveType: 'companies',
-    categorySlug: categorySlug,
+    archiveType: 'directory',
+    categorySlug: params_.category,
     searchParams: searchParams_,
   });
 
   if (!result.success) {
-    if (result.error === 'Category not found') {
-      notFound();
-    }
-    throw new Error(result.error || 'Failed to fetch profiles');
+    notFound();
   }
 
   const { profiles, total, taxonomyData, breadcrumbData, counties, filters } =
@@ -87,13 +82,13 @@ export default async function CompaniesCategoryPage({
 
   return (
     <ArchiveLayout
-      archiveType='companies'
-      category={categorySlug}
+      archiveType='directory'
+      category={params_.category}
       initialFilters={filters}
       taxonomyData={taxonomyData}
       breadcrumbData={breadcrumbData}
       counties={counties}
-      basePath={`/companies/${categorySlug}`}
+      basePath={`/dir/${params_.category}`}
       total={total}
       limit={20}
     >
@@ -101,7 +96,7 @@ export default async function CompaniesCategoryPage({
         {profiles.length === 0 ? (
           <div className='text-center py-12'>
             <h3 className='text-lg font-medium text-gray-900 mb-2'>
-              Δεν βρέθηκαν επιχειρήσεις στην κατηγορία "
+              Δεν βρέθηκαν επαγγελματίες στην κατηγορία "
               {taxonomyData.currentCategory?.label}"
             </h3>
             <p className='text-gray-600'>

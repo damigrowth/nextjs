@@ -12,6 +12,7 @@ export interface FilterState {
   sortBy?: string;
   page?: number;
   limit?: number;
+  type?: 'freelancers' | 'companies';
 }
 
 interface UseArchiveFiltersProps {
@@ -40,6 +41,11 @@ export function useArchiveFilters({ initialFilters = {}, basePath }: UseArchiveF
     if (searchParams.get('sortBy')) urlFilters.sortBy = searchParams.get('sortBy')!;
     if (searchParams.get('page')) urlFilters.page = parseInt(searchParams.get('page')!);
     if (searchParams.get('limit')) urlFilters.limit = parseInt(searchParams.get('limit')!);
+
+    const typeParam = searchParams.get('type');
+    if (typeParam === 'freelancers' || typeParam === 'companies') {
+      urlFilters.type = typeParam;
+    }
 
     return { ...initialFilters, ...urlFilters };
   });
@@ -144,6 +150,7 @@ export function useArchiveFilters({ initialFilters = {}, basePath }: UseArchiveF
     if (filters.county) count++;
     if (filters.online) count++;
     if (filters.sortBy && filters.sortBy !== 'default') count++;
+    if (filters.type) count++;
     return count;
   }, [filters]);
 
@@ -159,6 +166,7 @@ export function useArchiveFilters({ initialFilters = {}, basePath }: UseArchiveF
     if (filters.sortBy) apiFilters.sortBy = filters.sortBy;
     if (filters.page) apiFilters.page = filters.page;
     if (filters.limit) apiFilters.limit = filters.limit;
+    if (filters.type) apiFilters.type = filters.type;
 
     return apiFilters;
   }, [filters]);
