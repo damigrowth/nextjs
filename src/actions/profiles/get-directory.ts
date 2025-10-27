@@ -97,7 +97,9 @@ export async function getDirectoryPageData(): Promise<
               categorySlug: category.slug,
               subcategorySlug: category.slug, // Same as categorySlug for compatibility
               count,
-              type: (subcategory.type || 'freelancer') as 'freelancer' | 'company',
+              type: (subcategory.type || 'freelancer') as
+                | 'freelancer'
+                | 'company',
               href: `/dir/${subcategory.slug}`,
             });
           }
@@ -106,14 +108,6 @@ export async function getDirectoryPageData(): Promise<
         // Sort by count and take top 15
         popularSubcategories.sort((a, b) => b.count - a.count);
         const topPopularSubcategories = popularSubcategories.slice(0, 15);
-
-        // Log the top subcategories with their counts for debugging
-        console.log('Top 15 Popular Pro Subcategories:');
-        topPopularSubcategories.forEach((subcategory, index) => {
-          console.log(
-            `${index + 1}. ${subcategory.label}: ${subcategory.count} profiles`,
-          );
-        });
 
         // Process categories with their subcategories
         const categories: ProCategoryWithSubcategories[] = proTaxonomies

@@ -748,7 +748,6 @@ export function transformCoverageWithLocationNames<T extends DatasetItem>(
       zipcode: null,
       counties: [],
       areas: [],
-      zipcodes: [],
     };
   }
 

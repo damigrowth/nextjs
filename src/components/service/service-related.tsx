@@ -32,7 +32,7 @@ export default function ServiceRelated({
         {/* Services Grid - 5 in a row on desktop, scrollable on mobile */}
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6'>
           {services.map((service) => (
-            <ServiceCard key={service.id} service={service} hideDisplayName={true} />
+            <ServiceCard key={service.id} service={service} />
           ))}
         </div>
       </div>

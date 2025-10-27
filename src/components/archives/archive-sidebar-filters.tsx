@@ -17,7 +17,7 @@ interface FilterState {
   county?: string; // Single county selection
   online?: boolean;
   sortBy?: string; // Sort option selection
-  type?: 'freelancer' | 'company'; // Profile type filter (directory only)
+  type?: 'freelancers' | 'companies'; // Profile type filter (directory only)
 }
 
 interface ArchiveSidebarFiltersProps {
@@ -96,7 +96,7 @@ export function ArchiveSidebarFilters({
     const subs = subcategories || [];
 
     // Only apply type filtering for directory archives
-    if (archiveType === 'directory' && filters.type) {
+    if (isDirectory && filters.type) {
       return subs.filter(sub => {
         // Map filter values to dataset type values
         const typeMap = {
@@ -110,7 +110,7 @@ export function ArchiveSidebarFilters({
     }
 
     return subs;
-  }, [subcategories, archiveType, filters.type]);
+  }, [subcategories, isDirectory, filters.type]);
 
   const availableSubdivisions = subdivisions || [];
 

@@ -19,7 +19,7 @@ interface ArchiveFiltersProps {
     online?: boolean;
     county?: string;
     sortBy?: string;
-    type?: 'freelancer' | 'company';
+    type?: 'freelancers' | 'companies';
   };
   onFiltersChange: (filters: any) => void;
   counties: DatasetItem[];
