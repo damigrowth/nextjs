@@ -5,11 +5,11 @@ import {
   Calendar,
   Globe2,
   Phone,
-  MessageCircle,
   Mail,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Icon } from '@/components/icon/brands';
 import type { ProfileInfoProps } from '@/lib/types/components';
 import ContactReveal from './contact-reveal';
 import { StartChatDialog } from '@/components/messages/start-chat-dialog';
@@ -23,6 +23,7 @@ export default function ProfileInfo({
   rate,
   coverage,
   commencement,
+  experience,
   website,
   phone,
   viber,
@@ -97,17 +98,17 @@ export default function ProfileInfo({
             </div>
           )}
 
-          {/* Commencement Year */}
-          {commencement && (
+          {/* Years of Experience */}
+          {commencement && experience && (
             <div className='flex items-center justify-between py-5 border-b border-border'>
               <div className='flex items-center gap-2'>
                 <Calendar className='h-4 w-4 text-primary' />
                 <span className='text-sm font-medium text-foreground'>
-                  Έτος Έναρξης
+                  Έτη Εμπειρίας
                 </span>
               </div>
               <span className='text-sm text-muted-foreground'>
-                {commencement}
+                {experience} (από {commencement})
               </span>
             </div>
           )}
@@ -152,7 +153,7 @@ export default function ProfileInfo({
                     rel='noopener noreferrer'
                     className='text-[#665CAC] hover:opacity-80 transition-opacity'
                   >
-                    <MessageCircle className='h-4 w-4' />
+                    <Icon name='viber' size={18} color='#665CAC' />
                   </a>
                 )}
                 {whatsapp && (
@@ -163,7 +164,7 @@ export default function ProfileInfo({
                     title={`WhatsApp: ${whatsapp}`}
                     className='text-[#25D366] hover:opacity-80 transition-opacity'
                   >
-                    <MessageCircle className='h-4 w-4' />
+                    <Icon name='whatsapp' size={18} color='#25D366' />
                   </a>
                 )}
 
