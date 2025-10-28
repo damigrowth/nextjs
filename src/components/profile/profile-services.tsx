@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ServiceCard } from '../shared';
+import { ArchiveServiceCard } from '../archives';
 import { Button } from '@/components/ui/button';
 import type { ServiceCardData } from '@/lib/types';
 
@@ -33,9 +33,9 @@ export default function ProfileServices({
         Υπηρεσίες ({services.length})
       </h4>
 
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+      <div className='space-y-6'>
         {visibleServices.map((service) => (
-          <ServiceCard
+          <ArchiveServiceCard
             key={service.id}
             service={service}
             showProfile={false}
