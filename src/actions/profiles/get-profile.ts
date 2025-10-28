@@ -178,6 +178,7 @@ export interface ProfilePageData {
   calculatedExperience: number;
   services: ServiceCardData[]; // All services for the profile
   servicesCount: number; // Total count for display
+  serviceSubdivisionsData: ReturnType<typeof findById>[]; // Unique service subdivisions
   breadcrumbSegments: BreadcrumbSegment[];
   breadcrumbButtons: {
     subjectTitle: string;
@@ -353,6 +354,15 @@ async function _getProfilePageData(
     // Transform services for component use
     const transformedServices = services.map(transformProfileService);
 
+    // Extract unique service subdivisions with labels from all published services
+    const uniqueSubdivisions = Array.from(
+      new Set(services.map(s => s.subdivision))
+    );
+
+    const serviceSubdivisionsData = uniqueSubdivisions
+      .map(subdivisionId => findById(serviceTaxonomies, subdivisionId))
+      .filter(subdivision => subdivision !== null);
+
     // Prepare breadcrumb buttons config
     const breadcrumbButtons = {
       subjectTitle: profile.displayName || '',
@@ -379,6 +389,7 @@ async function _getProfilePageData(
         coverage,
         services: transformedServices,
         servicesCount: services.length,
+        serviceSubdivisionsData,
         visibility,
         socials,
         calculatedExperience,
