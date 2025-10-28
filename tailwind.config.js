@@ -104,6 +104,10 @@ module.exports = {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+        pale: {
+          DEFAULT: 'hsl(var(--pale))',
+          foreground: 'hsl(var(--pale-foreground))',
+        },
       },
       keyframes: {
         'accordion-down': {
