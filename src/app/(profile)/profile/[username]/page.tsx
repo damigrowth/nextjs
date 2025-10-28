@@ -150,9 +150,8 @@ export default async function ProfilePage({
               {/* Profile Metrics */}
               <ProfileMetrics
                 subcategory={subcategory}
-                servicesCount={result.data.servicesCount}
-                commencement={profile.commencement}
-                experience={calculatedExperience}
+                serviceSubdivisions={result.data.serviceSubdivisionsData}
+                categoryIcon={category?.icon}
               />
               <ProfileBio bio={profile.bio} />
               <ProfileFeatures
@@ -190,6 +189,7 @@ export default async function ProfilePage({
                     rate={profile.rate}
                     coverage={coverage}
                     commencement={profile.commencement}
+                    experience={calculatedExperience}
                     website={profile.website}
                     phone={profile.phone}
                     viber={profile.viber}
@@ -220,6 +220,7 @@ export default async function ProfilePage({
                 rate={profile.rate}
                 coverage={coverage}
                 commencement={profile.commencement}
+                experience={calculatedExperience}
                 website={profile.website}
                 phone={profile.phone}
                 viber={profile.viber}
