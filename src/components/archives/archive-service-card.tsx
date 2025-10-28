@@ -5,19 +5,38 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
 import type { ArchiveServiceCardData } from '@/lib/types/components';
+import type { ServiceCardData } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { MediaCarousel, ProfileBadges, RatingDisplay } from '../shared';
 import { CoverageDisplay } from './coverage-display';
 
 interface ArchiveServiceCardProps {
-  service: ArchiveServiceCardData;
+  service: ArchiveServiceCardData | ServiceCardData;
   className?: string;
+  showProfile?: boolean;
 }
 
 export function ArchiveServiceCard({
   service,
   className,
+  showProfile = true,
 }: ArchiveServiceCardProps) {
+  // Check if service has taxonomyLabels (ArchiveServiceCardData) or just category (ServiceCardData)
+  const hasDetailedTaxonomies = 'taxonomyLabels' in service;
+
+  // Show subcategory as the main category and subdivision as the subcategory
+  const categoryLabel = hasDetailedTaxonomies
+    ? service.taxonomyLabels.subcategory
+    : (service as ServiceCardData).category;
+  const subcategoryLabel = hasDetailedTaxonomies
+    ? service.taxonomyLabels.subdivision
+    : '';
+
+  // Check if profile has coverage data (might not exist in ServiceCardData)
+  const profileCoverage = 'coverage' in service.profile ? service.profile.coverage : undefined;
+  const profileVerified = 'verified' in service.profile ? service.profile.verified : false;
+  const profileTop = 'top' in service.profile ? service.profile.top : false;
+
   return (
     <Card
       className={cn(
@@ -57,9 +76,9 @@ export function ArchiveServiceCard({
 
             {/* Category Display */}
             <TaxonomiesDisplay
-              categoryLabels={{
-                category: service.categoryLabels.category,
-                subcategory: service.categoryLabels.subcategory,
+              taxonomyLabels={{
+                category: categoryLabel,
+                subcategory: subcategoryLabel,
                 subdivision: '', // Hide subdivision level for archives
               }}
               compact
@@ -81,42 +100,46 @@ export function ArchiveServiceCard({
 
               {/* <Separator orientation='vertical' className='h-4' /> */}
 
-              <CoverageDisplay
-                online={service.type?.online}
-                onbase={service.type?.onbase}
-                onsite={service.type?.onsite}
-                area={service.profile.coverage?.area}
-                areas={service.profile.coverage?.areas}
-                county={service.profile.coverage?.county}
-                counties={service.profile.coverage?.counties}
-                variant='compact'
-                className='text-sm'
-              />
+              {profileCoverage && (
+                <CoverageDisplay
+                  online={service.type?.online}
+                  onbase={service.type?.onbase}
+                  onsite={service.type?.onsite}
+                  area={profileCoverage?.area}
+                  areas={profileCoverage?.areas}
+                  county={profileCoverage?.county}
+                  counties={profileCoverage?.counties}
+                  variant='compact'
+                  className='text-sm'
+                />
+              )}
             </div>
             <div className='flex items-center gap-3 border-t border-gray-200 mt-3 pt-3'>
               {/* Profile Info */}
-              <div className='flex items-center gap-2 flex-1'>
-                <Link
-                  href={`/profile/${service.profile.username}`}
-                  className='flex items-center gap-2 group'
-                >
-                  {service.profile.image && (
-                    <Avatar className='h-8 w-8 rounded-lg cursor-pointer'>
-                      <AvatarImage
-                        src={service.profile.image as string}
-                        alt={service.profile.displayName}
-                      />
-                    </Avatar>
-                  )}
-                  <span className='text-sm text-body group-hover:text-third transition-colors'>
-                    {service.profile.displayName}
-                  </span>
-                </Link>
-                <ProfileBadges
-                  verified={service.profile.verified}
-                  topLevel={service.profile.top}
-                />
-              </div>
+              {showProfile && (
+                <div className='flex items-center gap-2 flex-1'>
+                  <Link
+                    href={`/profile/${service.profile.username}`}
+                    className='flex items-center gap-2 group'
+                  >
+                    {service.profile.image && (
+                      <Avatar className='h-8 w-8 rounded-lg cursor-pointer'>
+                        <AvatarImage
+                          src={service.profile.image as string}
+                          alt={service.profile.displayName}
+                        />
+                      </Avatar>
+                    )}
+                    <span className='text-sm text-body group-hover:text-third transition-colors'>
+                      {service.profile.displayName}
+                    </span>
+                  </Link>
+                  <ProfileBadges
+                    verified={profileVerified}
+                    topLevel={profileTop}
+                  />
+                </div>
+              )}
 
               {/* Price */}
               {service.price != null && service.price > 0 && (
