@@ -241,6 +241,7 @@
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
+  --pale: oklch(210, 10.34, 22.75%); /* HEX: #343a40 */
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
@@ -281,13 +282,14 @@
     --orangy-foreground: 40.38 85.95% 36.27%; /* HEX: #ac780d */
     --yellowish: 42.86 100% 84.9%; /* HEX: #ffe9b2 */
     --bluey: 169.09 64.71 96.67%; /* HEX: #f1fcfa */
-
     --dark: 0 0% 13.33%; /* HEX: #222222 */
     --body: 210 7.59% 30.98%; /* HEX: #494f55 */
     --muted: 0 0% 96.9%; /* HEX: #f7f7f7 */
     --muted-foreground: 220 9% 46%; /* HEX: #6b7280 */
     --accent: 0 0% 96.9%; /* HEX: #f7f7f7 */
     --accent-foreground: 0 0% 3.9%; /* HEX: #0a0a0a */
+    --pale: 210, 10.34%, 22.75%; /* HEX: #343a40 */
+    --pale-foreground: 0 0% 98%; /* HEX: #fafafa */
     --destructive: 0 84.2% 60.2%; /* HEX: #ef4444 */
     --destructive-foreground: 0 0% 98%; /* HEX: #fafafa */
     --border: 0 0% 91.4%; /* HEX: #e9e9e9 */
@@ -350,6 +352,8 @@
     --muted-foreground: 0 0% 63.9%; /* HEX: #a3a3a3 */
     --accent: 0 0% 14.9%; /* HEX: #262626 */
     --accent-foreground: 0 0% 98%; /* HEX: #fafafa */
+    --pale: 210, 10.34%, 22.75%; /* HEX: #343a40 */
+    --pale-foreground: 0 0% 98%; /* HEX: #fafafa */
     --destructive: 0 62.8% 30.6%; /* HEX: #7f1d1d */
     --destructive-foreground: 0 0% 98%; /* HEX: #fafafa */
     --border: 0 0% 14.9%; /* HEX: #262626 */
