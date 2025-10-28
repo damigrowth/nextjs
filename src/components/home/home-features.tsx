@@ -1,7 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Search, UserCheck, CreditCard, MessageSquare } from 'lucide-react';
+import { Search } from 'lucide-react';
+import {
+  FlaticonCv,
+  FlaticonWebDesign,
+  FlaticonSecure,
+  FlaticonCustomerService,
+} from '@/components/icon/flaticon';
 import { featuresData } from '@/constants/datasets/data';
 
 type FeatureData = {
@@ -14,13 +20,13 @@ type Props = {
   features?: FeatureData[];
 };
 
-// Map FontAwesome icons to Lucide React icons
+// Map icon class names to Flaticon components
 function getFeatureIcon(iconClass: string) {
   const iconMap: { [key: string]: React.ReactNode } = {
-    'flaticon-cv': <Search size={40} />,
-    'flaticon-web-design': <UserCheck size={40} />,
-    'flaticon-secure': <CreditCard size={40} />,
-    'flaticon-customer-service': <MessageSquare size={40} />,
+    'flaticon-cv': <FlaticonCv size={40} />,
+    'flaticon-web-design': <FlaticonWebDesign size={40} />,
+    'flaticon-secure': <FlaticonSecure size={40} />,
+    'flaticon-customer-service': <FlaticonCustomerService size={40} />,
   };
 
   return iconMap[iconClass] || <Search size={40} />;

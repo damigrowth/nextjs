@@ -2,19 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import {
-  Code2,
-  Palette,
-  Megaphone,
-  Languages,
-  Camera,
-  Sparkles,
-  Wrench,
-  GraduationCap,
-  Calendar,
-  Heart,
-  Star,
-} from 'lucide-react';
+import { Star } from 'lucide-react';
 import {
   Carousel,
   CarouselContent,
@@ -25,44 +13,33 @@ import {
 import { CarouselPagination } from '@/components/ui/carousel-pagination';
 import { SectionHeader } from '@/components/ui/section-header';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { getCategoryIcon } from '@/constants/datasets/category-icons';
 import type { DatasetItem } from '@/lib/types/datasets';
 
 type Props = {
   categories?: DatasetItem[];
 };
 
-function getCategoryIcon(slug: string) {
-  const iconMap: { [key: string]: React.ReactNode } = {
-    'dimiourgia-periexomenou': <Palette size={32} />,
-    ekdiloseis: <Calendar size={32} />,
-    'eveksia-frontida': <Heart size={32} />,
-    mathimata: <GraduationCap size={32} />,
-    marketing: <Megaphone size={32} />,
-    pliroforiki: <Code2 size={32} />,
-    metafraseis: <Languages size={32} />,
-    fotografia: <Camera size={32} />,
-    katharismos: <Sparkles size={32} />,
-    sintirise: <Wrench size={32} />,
-  };
-
-  return iconMap[slug] || <Star size={32} />;
+function getCategoryIconComponent(iconKey?: string) {
+  const IconComponent = iconKey ? getCategoryIcon(iconKey) : undefined;
+  return IconComponent ? <IconComponent size={40} /> : <Star size={40} />;
 }
 
 function CategoryCard({ category }: { category: DatasetItem }) {
-  const { label, slug, subcategories } = category;
+  const { label, slug, subcategories, icon } = category;
 
   return (
     <div className='bg-transparent rounded-xl mb-1 mt-5 py-10 px-8 pb-8 relative transition-all duration-300 ease-in-out group'>
       <div className='text-left'>
         <Link href={`/categories/${slug}`} className='inline-block'>
           <div className='relative inline-block text-4xl text-primary z-10 mb-5 transition-all duration-300 ease-in-out before:content-[""] before:bg-orangy before:rounded-full before:absolute before:-bottom-2.5 before:-right-5 before:h-10 before:w-10 before:-z-10 before:transition-all before:duration-300 before:ease-in-out group-hover:before:bg-sixth'>
-            {getCategoryIcon(slug)}
+            {getCategoryIconComponent(icon)}
           </div>
         </Link>
       </div>
 
-      <div className='mt-5'>
-        <h4 className='text-sm mb-1 font-bold leading-6 text-left'>
+      <div className='mt-2'>
+        <h4 className='text-sm mb-1.5 font-bold leading-6 text-left'>
           <Link
             href={`/categories/${slug}`}
             className='text-gray-900 hover:text-third transition-colors'
