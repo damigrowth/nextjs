@@ -51,15 +51,17 @@ export default function ProfileMetrics({
             titleClassName='mb-3'
             value={
               <div className='flex flex-wrap gap-1.5'>
-                {serviceSubdivisions.map((subdivision) => (
-                  <Badge
-                    key={subdivision.id}
-                    variant='outline'
-                    className='inline-block text-2sm font-medium py-1 px-2.5 text-center bg-muted text-muted-foreground border-none rounded-xl'
-                  >
-                    {subdivision.label}
-                  </Badge>
-                ))}
+                {serviceSubdivisions
+                  .filter((subdivision) => subdivision && subdivision.label)
+                  .map((subdivision) => (
+                    <Badge
+                      key={subdivision.id}
+                      variant='outline'
+                      className='inline-block text-2sm font-medium py-1 px-2.5 text-center bg-muted text-muted-foreground border-none rounded-xl'
+                    >
+                      {subdivision.label}
+                    </Badge>
+                  ))}
               </div>
             }
           />
