@@ -18,32 +18,13 @@ import {
 } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { categoryIconMap } from '@/constants/datasets/category-icons';
 import {
   Grid3x3,
   ChevronRight,
   ChevronDown,
-  Palette,
-  Calendar,
-  Heart,
-  Star,
-  Megaphone,
-  Code,
-  Ruler,
-  Headphones,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-// Map category icons to Lucide React icons
-const categoryIconMap: Record<string, React.ComponentType<any>> = {
-  'flaticon-content': Palette,
-  'flaticon-place': Calendar,
-  'flaticon-like': Heart,
-  'flaticon-star': Star,
-  'flaticon-digital-marketing': Megaphone,
-  'flaticon-developer': Code,
-  'flaticon-ruler': Ruler,
-  'flaticon-customer-service': Headphones,
-};
 
 const regularMenuItems = [
   { href: '/categories', label: 'Υπηρεσίες' },
