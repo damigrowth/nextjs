@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -27,8 +28,8 @@ import {
 import { cn } from '@/lib/utils';
 
 const regularMenuItems = [
-  { href: '/categories', label: 'Υπηρεσίες' },
-  { href: '/dir', label: 'Επαγγελματικός Κατάλογος' },
+  { href: '/categories', label: 'Κατάλογος Υπηρεσιών' },
+  { href: '/directory', label: 'Επαγγελματικός Κατάλογος' },
 ];
 
 interface NavMenuProps {
@@ -37,6 +38,7 @@ interface NavMenuProps {
 }
 
 export default function NavMenu({ isMobile = false, onClose }: NavMenuProps) {
+  const pathname = usePathname();
   const [hoveredCategory, setHoveredCategory] = React.useState<string | null>(null);
   const [timeoutId, setTimeoutId] = React.useState<NodeJS.Timeout | null>(null);
   const [categoriesOpen, setCategoriesOpen] = React.useState(false);
@@ -46,6 +48,9 @@ export default function NavMenu({ isMobile = false, onClose }: NavMenuProps) {
       onClose();
     }
   };
+
+  // Check if current route matches navigation items
+  const isInCategories = pathname?.startsWith('/categories');
 
   // Mobile version - simple vertical list
   if (isMobile) {
@@ -97,7 +102,7 @@ export default function NavMenu({ isMobile = false, onClose }: NavMenuProps) {
       <NavigationMenuList>
         {/* Mega Menu Dropdown for Categories */}
         <NavigationMenuItem>
-          <NavigationMenuTrigger className='flex items-center'>
+          <NavigationMenuTrigger variant='pale' className='flex items-center'>
             <Grid3x3 className='h-4 w-4 mr-2' />
             Κατηγορίες
           </NavigationMenuTrigger>
@@ -199,16 +204,22 @@ export default function NavMenu({ isMobile = false, onClose }: NavMenuProps) {
         </NavigationMenuItem>
 
         {/* Regular Menu Items */}
-        {regularMenuItems.map((item) => (
-          <NavigationMenuItem key={item.href}>
-            <NavigationMenuLink
-              asChild
-              className={navigationMenuTriggerStyle()}
-            >
-              <Link href={item.href}>{item.label}</Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-        ))}
+        {regularMenuItems.map((item) => {
+          const isActive = pathname?.startsWith(item.href);
+          return (
+            <NavigationMenuItem key={item.href}>
+              <NavigationMenuLink
+                asChild
+                className={cn(
+                  navigationMenuTriggerStyle({ variant: "pale" }),
+                  isActive && 'bg-pale text-pale-foreground'
+                )}
+              >
+                <Link href={item.href}>{item.label}</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          );
+        })}
       </NavigationMenuList>
     </NavigationMenu>
   );
