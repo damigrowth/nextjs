@@ -11,6 +11,7 @@ export const proTaxonomies = [
     plural: 'Δημιουργία Περιεχομένου',
     description:
       'Επαγγελματίες και επιχειρήσεις που προσφέρουν που προσφέρουν υπηρεσίες δημιουργίας περιεχομένου.',
+    icon: 'flaticon-content',
     children: [
       {
         id: '3371',
@@ -345,6 +346,7 @@ export const proTaxonomies = [
     plural: 'Εκδηλώσεις',
     description:
       'Επαγγελματίες και επιχειρήσεις που προσφέρουν που προσφέρουν υπηρεσίες για την υποστήριξη εκδηλώσεων.',
+    icon: 'flaticon-place',
     children: [
       {
         id: '3408',
@@ -499,6 +501,7 @@ export const proTaxonomies = [
     plural: 'Εκπαίδευση & Διδασκαλία',
     description:
       'Βρείτε δασκάλους, προπονητές και καθηγητές που προσφέρουν μαθήματα για εκμάθηση.',
+    icon: 'flaticon-like',
     children: [
       {
         id: '3423',
@@ -752,6 +755,7 @@ export const proTaxonomies = [
     plural: 'Ευεξία & Φροντίδα',
     description:
       'Επαγγελματίες και επιχειρήσεις που προσφέρουν που προσφέρουν υπηρεσίες ευεξίας και φροντίδας.',
+    icon: 'flaticon-star',
     children: [
       {
         id: '3450',
@@ -1140,6 +1144,7 @@ export const proTaxonomies = [
     plural: 'Μάρκετινγκ',
     description:
       'Επαγγελματίες και επιχειρήσεις που προσφέρουν που προσφέρουν υπηρεσίες Marketing.',
+    icon: 'flaticon-digital-marketing',
     children: [
       {
         id: '3491',
@@ -1285,6 +1290,7 @@ export const proTaxonomies = [
     plural: 'Πληροφορική',
     description:
       'Επαγγελματίες και επιχειρήσεις που προσφέρουν που προσφέρουν υπηρεσίες στον τομέα της πληροφορικής.',
+    icon: 'flaticon-developer',
     children: [
       {
         id: '3506',
@@ -1547,6 +1553,7 @@ export const proTaxonomies = [
     plural: 'Τεχνικά',
     description:
       'Επαγγελματίες και επιχειρήσεις που προσφέρουν που προσφέρουν τεχνικές υπηρεσίες.',
+    icon: 'flaticon-ruler',
     children: [
       {
         id: '3534',
@@ -2763,6 +2770,7 @@ export const proTaxonomies = [
     plural: 'Υποστήριξη',
     description:
       'Επαγγελματίες και επιχειρήσεις που προσφέρουν που προσφέρουν υποστηρικτικές υπηρεσίες.',
+    icon: 'flaticon-customer-service',
     children: [
       {
         id: '3669',

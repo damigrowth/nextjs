@@ -117,6 +117,7 @@ export interface ProfileInfoProps {
   rate?: number;
   coverage?: PrismaJson.Coverage;
   commencement?: string;
+  experience?: number;
   website?: string;
   phone?: string;
   viber?: string;
@@ -153,9 +154,8 @@ export interface MetricCardProps {
 // Profile metrics component props
 export interface ProfileMetricsProps {
   subcategory?: DatasetItem;
-  servicesCount?: number;
-  commencement?: string;
-  experience?: number;
+  serviceSubdivisions?: DatasetItem[];
+  categoryIcon?: string;
 }
 
 export interface ProfileRatingProps {
