@@ -16,8 +16,8 @@ import type {
 
 // Transform service for table display
 function transformServiceForTable(service: any): UserServiceTableData {
-  // Resolve category labels using the reusable utility
-  const categoryLabels = resolveTaxonomyHierarchy(
+  // Resolve taxonomy labels using the reusable utility
+  const taxonomyLabels = resolveTaxonomyHierarchy(
     serviceTaxonomies,
     service.category,
     service.subcategory,
@@ -32,7 +32,7 @@ function transformServiceForTable(service: any): UserServiceTableData {
     category: service.category,
     subcategory: service.subcategory,
     subdivision: service.subdivision,
-    categoryLabels,
+    taxonomyLabels,
     media: service.media,
     createdAt: service.createdAt,
     updatedAt: service.updatedAt,

@@ -157,7 +157,7 @@ export default function ServiceTable({
               {/* Category Column */}
               <TableCell>
                 <TaxonomiesDisplay
-                  categoryLabels={service.categoryLabels}
+                  taxonomyLabels={service.taxonomyLabels}
                   compact
                 />
               </TableCell>

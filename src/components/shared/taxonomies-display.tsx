@@ -3,7 +3,7 @@ import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TaxonomiesDisplayProps {
-  categoryLabels: {
+  taxonomyLabels?: {
     category: string;
     subcategory: string;
     subdivision?: string;
@@ -13,11 +13,20 @@ interface TaxonomiesDisplayProps {
 }
 
 export default function TaxonomiesDisplay({
-  categoryLabels,
+  taxonomyLabels,
   className,
   compact = false,
 }: TaxonomiesDisplayProps) {
-  const { category, subcategory, subdivision } = categoryLabels;
+  // Handle undefined taxonomyLabels
+  if (!taxonomyLabels) {
+    return (
+      <span className={cn('text-gray-500 text-sm italic', className)}>
+        Χωρίς κατηγορία
+      </span>
+    );
+  }
+
+  const { category, subcategory, subdivision } = taxonomyLabels;
 
   // Build hierarchy array, filtering out empty values
   const hierarchy = [category, subcategory, subdivision].filter(

@@ -155,9 +155,9 @@ export function AdminServicesDataTable({
       sortable: true,
       className: 'max-w-[200px]',
       render: (service) =>
-        service.categoryLabels ? (
+        service.taxonomyLabels ? (
           <TaxonomiesDisplay
-            categoryLabels={service.categoryLabels}
+            taxonomyLabels={service.taxonomyLabels}
             compact
           />
         ) : (

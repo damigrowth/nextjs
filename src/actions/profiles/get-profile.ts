@@ -23,6 +23,7 @@ import {
   findById,
   transformCoverageWithLocationNames,
   getDefaultCoverage,
+  resolveTaxonomyHierarchy,
 } from '@/lib/utils/datasets';
 
 /**
@@ -134,12 +135,18 @@ export async function getPublicProfileByUsername(
  * Transform a service for use in ServiceCard component
  */
 function transformProfileService(service: any): ServiceCardData {
-  const categoryTaxonomy = findById(serviceTaxonomies, service.category);
+  // Resolve full taxonomy hierarchy
+  const taxonomyLabels = resolveTaxonomyHierarchy(
+    serviceTaxonomies,
+    service.category,
+    service.subcategory,
+    service.subdivision,
+  );
 
   return {
     id: service.id,
     title: service.title,
-    category: categoryTaxonomy?.label || service.category,
+    taxonomyLabels,
     slug: service.slug,
     type: service.type,
     price: service.price,
@@ -218,12 +225,11 @@ async function getProfileByUsername(username: string) {
   }
 }
 
-
 /**
  * Internal function to fetch profile page data (uncached)
  */
 async function _getProfilePageData(
-  username: string
+  username: string,
 ): Promise<ActionResult<ProfilePageData>> {
   try {
     const profile = await getProfileByUsername(username);
@@ -302,18 +308,20 @@ async function _getProfilePageData(
       phone: true,
       address: true,
     };
-    
+
     const socials = profile.socials || {};
 
     // Use the profile.experience field directly as it's already stored as an integer
     const calculatedExperience = profile.experience || 0;
 
     // Build breadcrumb segments (taxonomies only)
-    const typeParam = profile.user.role === 'company' ? '?type=companies' : '?type=pros';
+    const typeParam =
+      profile.user.role === 'company' ? '?type=companies' : '?type=pros';
     const breadcrumbSegments: BreadcrumbSegment[] = [
       { label: 'Αρχική', href: '/' },
       {
-        label: profile.user.role === 'company' ? 'Επιχειρήσεις' : 'Επαγγελματίες',
+        label:
+          profile.user.role === 'company' ? 'Επιχειρήσεις' : 'Επαγγελματίες',
         href: `/dir${typeParam}`,
       },
     ];
@@ -336,7 +344,7 @@ async function _getProfilePageData(
     const services = await prisma.service.findMany({
       where: {
         pid: profile.id,
-        status: 'published'
+        status: 'published',
       },
       include: {
         profile: {
@@ -345,10 +353,10 @@ async function _getProfilePageData(
             username: true,
             displayName: true,
             image: true,
-          }
-        }
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
     // Transform services for component use
@@ -356,12 +364,12 @@ async function _getProfilePageData(
 
     // Extract unique service subdivisions with labels from all published services
     const uniqueSubdivisions = Array.from(
-      new Set(services.map(s => s.subdivision))
+      new Set(services.map((s) => s.subdivision)),
     );
 
     const serviceSubdivisionsData = uniqueSubdivisions
-      .map(subdivisionId => findById(serviceTaxonomies, subdivisionId))
-      .filter(subdivision => subdivision !== null);
+      .map((subdivisionId) => findById(serviceTaxonomies, subdivisionId))
+      .filter((subdivision) => subdivision !== null);
 
     // Prepare breadcrumb buttons config
     const breadcrumbButtons = {
@@ -410,7 +418,9 @@ async function _getProfilePageData(
  * Cached version of getProfilePageData with ISR + tag-based revalidation
  * Uses consistent cache tags for proper invalidation
  */
-export async function getProfilePageData(username: string): Promise<ActionResult<ProfilePageData>> {
+export async function getProfilePageData(
+  username: string,
+): Promise<ActionResult<ProfilePageData>> {
   const getCached = unstable_cache(
     _getProfilePageData,
     ['profile-page', username],
@@ -421,9 +431,8 @@ export async function getProfilePageData(username: string): Promise<ActionResult
         CACHE_TAGS.collections.profiles,
       ],
       revalidate: 300, // 5 minutes, matching ISR
-    }
+    },
   );
 
   return getCached(username);
 }
-

@@ -81,17 +81,17 @@ export function ArchiveProfileCard({
 
             {/* Subcategory and Tagline Row */}
             <div className='flex items-center gap-2 text-sm text-gray-600'>
-              {profile.categoryLabels?.subcategory && (
+              {profile.taxonomyLabels?.subcategory && (
                 <TaxonomiesDisplay
-                  categoryLabels={{
+                  taxonomyLabels={{
                     category: '',
-                    subcategory: profile.categoryLabels.subcategory,
+                    subcategory: profile.taxonomyLabels.subcategory,
                   }}
                   compact
                   className='text-sm'
                 />
               )}
-              {profile.categoryLabels?.subcategory && profile.tagline && (
+              {profile.taxonomyLabels?.subcategory && profile.tagline && (
                 <span>•</span>
               )}
               {profile.tagline && (

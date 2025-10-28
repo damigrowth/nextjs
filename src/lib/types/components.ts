@@ -224,8 +224,14 @@ export interface ProfileBreadcrumbProps {
 // Service Card Component Types
 export type ServiceCardData = Pick<
   import('@prisma/client').Service,
-  'id' | 'title' | 'category' | 'price' | 'rating' | 'reviewCount' | 'slug' | 'type'
+  'id' | 'title' | 'price' | 'rating' | 'reviewCount' | 'slug' | 'type'
 > & {
+  category?: string; // Kept for backward compatibility
+  taxonomyLabels?: {
+    category: string;
+    subcategory: string;
+    subdivision: string;
+  };
   media: PrismaJson.Media;
   profile: Pick<
     import('@prisma/client').Profile,
@@ -264,7 +270,7 @@ export type ArchiveProfileCardData = Pick<
   import('@prisma/client').User,
   'role'
 > & {
-  categoryLabels?: {
+  taxonomyLabels?: {
     category: string;
     subcategory: string;
   };
@@ -277,7 +283,7 @@ export type ArchiveServiceCardData = Pick<
   import('@prisma/client').Service,
   'id' | 'title' | 'slug' | 'price' | 'rating' | 'reviewCount' | 'media' | 'type'
 > & {
-  categoryLabels: {
+  taxonomyLabels: {
     category: string;
     subcategory: string;
     subdivision: string;

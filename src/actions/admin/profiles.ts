@@ -132,10 +132,10 @@ export async function listProfiles(
       prisma.profile.count({ where }),
     ]);
 
-    // Transform profiles to include category labels
+    // Transform profiles to include taxonomy labels
     const transformedProfiles = profiles.map((profile) => ({
       ...profile,
-      categoryLabels: resolveTaxonomyHierarchy(
+      taxonomyLabels: resolveTaxonomyHierarchy(
         proTaxonomies,
         profile.category,
         profile.subcategory,

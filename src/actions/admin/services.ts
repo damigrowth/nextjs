@@ -209,7 +209,7 @@ export async function listServices(
       skip: offset,
     });
 
-    // Transform services to include categoryLabels for TaxonomiesDisplay
+    // Transform services to include taxonomyLabels for TaxonomiesDisplay
     const servicesWithLabels = services.map((service) => {
       // Find category label by matching id
       const categoryData = serviceTaxonomies.find((cat) => cat.id === service.category);
@@ -222,7 +222,7 @@ export async function listServices(
 
       return {
         ...service,
-        categoryLabels: {
+        taxonomyLabels: {
           category: categoryData?.label || service.category,
           subcategory: subcategoryData?.label || service.subcategory,
           subdivision: subdivisionData?.label || service.subdivision,

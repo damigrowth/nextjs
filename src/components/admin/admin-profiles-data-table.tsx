@@ -130,13 +130,13 @@ export function AdminProfilesDataTable({
       key: 'category',
       header: 'Category',
       render: (profile) => {
-        if (!profile.categoryLabels) {
+        if (!profile.taxonomyLabels) {
           return <span className='text-muted-foreground text-sm'>-</span>;
         }
 
         return (
           <TaxonomiesDisplay
-            categoryLabels={profile.categoryLabels}
+            taxonomyLabels={profile.taxonomyLabels}
             compact
           />
         );

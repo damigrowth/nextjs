@@ -62,7 +62,7 @@ export interface UserServiceTableData {
   category: string;
   subcategory: string;
   subdivision: string;
-  categoryLabels: {
+  taxonomyLabels: {
     category: string;
     subcategory: string;
     subdivision: string;
@@ -121,7 +121,7 @@ export type AdminServiceWithRelations = Prisma.ServiceGetPayload<{
     };
   };
 }> & {
-  categoryLabels?: {
+  taxonomyLabels?: {
     category: string;
     subcategory: string;
     subdivision: string;

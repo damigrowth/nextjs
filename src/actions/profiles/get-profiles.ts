@@ -257,8 +257,8 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
     // Transform profiles to archive card data
     const transformedProfiles: ArchiveProfileCardData[] = profiles.map(
       (profile) => {
-        // Resolve category labels
-        const categoryLabels = resolveCategoryLabels(profile);
+        // Resolve taxonomy labels
+        const taxonomyLabels = resolveCategoryLabels(profile);
 
         // Resolve skills data - map skill IDs to skill objects
         const skillsData = profile.skills
@@ -296,7 +296,7 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
           skills: profile.skills,
           speciality: profile.speciality,
           role: profile.user.role,
-          categoryLabels,
+          taxonomyLabels,
           skillsData,
           specialityData,
         };

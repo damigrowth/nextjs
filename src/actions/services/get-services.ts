@@ -632,7 +632,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
         reviewCount: service.reviewCount,
         media: service.media,
         type: service.type,
-        categoryLabels: resolveCategoryLabels(service),
+        taxonomyLabels: resolveCategoryLabels(service),
         profile: {
           id: service.profile.id,
           displayName: service.profile.displayName,

@@ -80,7 +80,7 @@ export type AdminProfileWithRelations = import('@prisma/client').Prisma.ProfileG
     };
   };
 }> & {
-  categoryLabels?: {
+  taxonomyLabels?: {
     category: string;
     subcategory: string;
   };
