@@ -17,8 +17,13 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { useSession } from '@/lib/auth/client';
+import type { NavigationMenuCategory } from '@/lib/types/components';
 
-export default function Header() {
+interface HeaderProps {
+  navigationData: NavigationMenuCategory[];
+}
+
+export default function Header({ navigationData }: HeaderProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -46,7 +51,7 @@ export default function Header() {
 
             {/* Desktop Navigation - Hidden on mobile */}
             <div className='hidden lg:block'>
-              <NavMenu />
+              <NavMenu navigationData={navigationData} />
             </div>
           </div>
 
@@ -85,6 +90,7 @@ export default function Header() {
                   {/* Mobile Navigation */}
                   <div className='mt-6'>
                     <NavMenu
+                      navigationData={navigationData}
                       isMobile={true}
                       onClose={() => setMobileMenuOpen(false)}
                     />

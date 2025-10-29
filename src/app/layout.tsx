@@ -22,12 +22,16 @@ import {
   PathChecker,
 } from '@/components/shared/layout/wrapper';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { getNavigationMenuData } from '@/actions/services/get-categories';
 
 interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default async function RootLayout({ children }: RootLayoutProps) {
+  // Fetch navigation data at layout level (Server Component)
+  const navDataResult = await getNavigationMenuData();
+  const navigationData = navDataResult.success ? navDataResult.data : [];
   const gaId = process.env.GA_ID;
 
   return (
@@ -35,7 +39,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <Body>
         <TooltipProvider delayDuration={0}>
           <PathChecker excludes={['/dashboard', '/admin']}>
-            <Header />
+            <Header navigationData={navigationData} />
           </PathChecker>
           <main>
             <Notifications>{children}</Notifications>
