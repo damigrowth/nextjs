@@ -992,10 +992,13 @@ export async function getServiceArchivePageData(params: {
       limit,
     };
 
+    // Check if any filters are active
+    const hasActiveFilters = !!(filters.search || filters.county || filters.online !== undefined);
+
     // Fetch taxonomy paths first (should be cached)
     const taxonomyPathsResult = await getServiceTaxonomyPaths();
 
-    // Then fetch services
+    // Fetch services for current page
     const servicesResult = await getServicesByFilters(filters);
 
     if (!servicesResult.success) {
@@ -1006,6 +1009,100 @@ export async function getServiceArchivePageData(params: {
     }
 
     const { services, total, hasMore } = servicesResult.data;
+
+    // When filters are active, fetch subdivision counts for ALL matching services
+    // This is a lightweight groupBy query that only returns subdivision IDs + counts
+    let filteredSubdivisionCounts: Record<string, number> = {};
+    if (hasActiveFilters) {
+      try {
+        const groups = await prisma.service.groupBy({
+          by: ['subdivision'],
+          where: await (async () => {
+            // Reuse the same where clause logic from getServicesByFilters
+            const where: any = { status: 'published' };
+
+            if (category) where.category = category.id;
+            if (subcategory) where.subcategory = subcategory.id;
+            if (subdivision) where.subdivision = subdivision.id;
+
+            // Search filter
+            if (filters.search) {
+              const searchTerm = filters.search.trim();
+              if (searchTerm.length >= 2) {
+                const normalizedSearch = normalizeTerm(searchTerm);
+                const matchingTags = tags.filter((tag) =>
+                  normalizeTerm(tag.label).toLowerCase().includes(normalizedSearch.toLowerCase())
+                );
+                const matchingTagIds = matchingTags.map((tag) => tag.id);
+
+                where.OR = [
+                  { titleNormalized: { contains: normalizedSearch, mode: 'insensitive' } },
+                  { descriptionNormalized: { contains: normalizedSearch, mode: 'insensitive' } },
+                  { title: { contains: searchTerm, mode: 'insensitive' } },
+                  { description: { contains: searchTerm, mode: 'insensitive' } },
+                ];
+
+                if (matchingTagIds.length > 0) {
+                  where.OR.push({ tags: { hasSome: matchingTagIds } });
+                }
+              }
+            }
+
+            // Location filters
+            if (filters.county) {
+              const countyOption = findLocationBySlugOrName(locationOptions, filters.county);
+              const countyId = countyOption?.id;
+
+              if (countyId && filters.online !== undefined) {
+                where.OR = where.OR || [];
+                where.OR.push(
+                  { type: { path: ['online'], equals: true } },
+                  {
+                    AND: [
+                      { profile: { coverage: { path: ['county'], equals: countyId } } },
+                      {
+                        profile: {
+                          OR: [
+                            { coverage: { path: ['onbase'], equals: true } },
+                            { coverage: { path: ['onsite'], equals: true } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    AND: [
+                      { profile: { coverage: { path: ['counties'], array_contains: countyId } } },
+                      { profile: { coverage: { path: ['onsite'], equals: true } } },
+                    ],
+                  }
+                );
+              } else if (countyId) {
+                where.profile = {
+                  OR: [
+                    { coverage: { path: ['county'], equals: countyId } },
+                    { coverage: { path: ['counties'], array_contains: countyId } },
+                  ],
+                };
+              }
+            } else if (filters.online !== undefined) {
+              where.type = { path: ['online'], equals: filters.online };
+            }
+
+            return where;
+          })(),
+          _count: { _all: true },
+        });
+
+        groups.forEach((group) => {
+          if (group.subdivision) {
+            filteredSubdivisionCounts[group.subdivision] = group._count._all;
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching filtered subdivision counts:', error);
+      }
+    }
 
     // Prepare county options
     const counties = locationOptions.map((location) => ({
@@ -1170,8 +1267,14 @@ export async function getServiceArchivePageData(params: {
       }
     } else {
       // On /ipiresies or /ipiresies/[subcategory]: show subdivisions from all matching services
-      // Use taxonomyPathsResult for accurate counts across all services (not just current page)
-      if (taxonomyPathsResult.success && taxonomyPathsResult.data) {
+
+      // Use filtered counts when filters are active, otherwise use cached taxonomy paths
+      const countsToUse = hasActiveFilters && Object.keys(filteredSubdivisionCounts).length > 0
+        ? filteredSubdivisionCounts
+        : null;
+
+      if (countsToUse) {
+        // Build pills from filtered subdivision counts
         const subdivisionDataMap: Record<
           string,
           {
@@ -1183,21 +1286,60 @@ export async function getServiceArchivePageData(params: {
           }
         > = {};
 
-        // Count services per subdivision from taxonomyPathsResult using actual counts
+        Object.entries(countsToUse).forEach(([subdivisionId, count]) => {
+          // subdivisionId is the actual ID, not slug - need to find it in taxonomy
+          for (const category of serviceTaxonomies) {
+            if (!category.children) continue;
+            for (const subcategory of category.children) {
+              if (!subcategory.children) continue;
+              const subdivision = findById(subcategory.children, subdivisionId);
+              if (subdivision) {
+                subdivisionDataMap[subdivision.slug] = {
+                  id: subdivision.id,
+                  label: subdivision.label,
+                  categorySlug: category.slug,
+                  subcategorySlug: subcategory.slug,
+                  count,
+                };
+                break;
+              }
+            }
+          }
+        });
+
+        availableSubdivisions = Object.entries(subdivisionDataMap)
+          .map(([subdivisionSlug, data]) => ({
+            id: data.id,
+            label: data.label,
+            slug: subdivisionSlug,
+            categorySlug: data.categorySlug,
+            subcategorySlug: data.subcategorySlug,
+            count: data.count,
+            href: `/ipiresies/${data.subcategorySlug}/${subdivisionSlug}`,
+          }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
+      } else if (taxonomyPathsResult.success && taxonomyPathsResult.data) {
+        // No filters active: use cached taxonomy paths
+        const subdivisionDataMap: Record<
+          string,
+          {
+            id: string;
+            label: string;
+            categorySlug: string;
+            subcategorySlug: string;
+            count: number;
+          }
+        > = {};
+
         taxonomyPathsResult.data.forEach((path) => {
-          // If we're on a subcategory route, only count subdivisions from that subcategory
           if (subcategory && path.subcategory !== subcategory.slug) {
             return;
           }
 
           if (path.subdivision) {
             if (!subdivisionDataMap[path.subdivision]) {
-              // Need to find subdivision details from taxonomy
-              const result = findSubdivisionBySlug(
-                categories,
-                path.subdivision,
-              );
-
+              const result = findSubdivisionBySlug(categories, path.subdivision);
               if (result) {
                 subdivisionDataMap[path.subdivision] = {
                   id: result.subdivision.id,
@@ -1213,7 +1355,6 @@ export async function getServiceArchivePageData(params: {
           }
         });
 
-        // Build subdivisions array for carousel, sorted by count
         availableSubdivisions = Object.entries(subdivisionDataMap)
           .map(([subdivisionSlug, data]) => ({
             id: data.id,
@@ -1224,8 +1365,8 @@ export async function getServiceArchivePageData(params: {
             count: data.count,
             href: `/ipiresies/${data.subcategorySlug}/${subdivisionSlug}`,
           }))
-          .sort((a, b) => b.count - a.count) // Sort by service count descending
-          .slice(0, 5); // Limit to top 5 subdivisions
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
       }
     }
 
