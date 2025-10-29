@@ -57,7 +57,7 @@ export default function ServiceContact({
       <CardContent className='p-6'>
         {/* Profile Header - matches original wrapper d-flex align-items-center */}
         <div className='flex items-center mb-4'>
-          <div className='mr-5'>
+          <Link href={`/profile/${usernameValue}`} className='mr-5'>
             <UserAvatar
               displayName={displayNameValue}
               firstName={firstName}
@@ -66,21 +66,23 @@ export default function ServiceContact({
               top={false}
               size='xl'
             />
-          </div>
+          </Link>
 
-          <div className='flex-1'>
-            <div className='flex items-center gap-2 mb-1'>
+          <div className='flex-1 min-w-0'>
+            <div className='flex items-start gap-2 mb-1'>
               <Link
                 href={`/profile/${usernameValue}`}
-                className='text-lg font-medium text-gray-900 truncate mb-1'
+                className='text-lg font-medium text-gray-900 line-clamp-2 mb-1'
               >
                 {displayNameValue}
               </Link>
-              <ProfileBadges verified={verified} topLevel={top} />
+              <div className='flex-shrink-0'>
+                <ProfileBadges verified={verified} topLevel={top} />
+              </div>
             </div>
 
             {tagline && (
-              <p className='text-sm text-muted-foreground mb-2'>{tagline}</p>
+              <p className='text-sm text-muted-foreground mb-2 line-clamp-3'>{tagline}</p>
             )}
 
             <RatingDisplay
