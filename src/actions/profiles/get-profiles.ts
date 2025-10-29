@@ -434,6 +434,7 @@ export async function getProfileArchivePageData(params: {
     county?: string;
     περιοχή?: string;
     online?: string;
+    search?: string;
     sortBy?: string;
     page?: string;
     type?: 'pros' | 'companies'; // Type filter for directory
