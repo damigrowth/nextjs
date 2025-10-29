@@ -50,13 +50,13 @@ export function ArchiveProfileCard({
           )}
 
           {/* Avatar on top */}
-          <div className='relative z-10 flex items-center justify-center'>
+          <div className='relative z-10 flex items-center justify-center py-4'>
             <UserAvatar
               displayName={profile.displayName}
               image={profile.image}
               top={profile.top}
               size='xl'
-              className='h-20 w-20'
+              className='h-32 w-32'
             />
           </div>
 
@@ -65,7 +65,7 @@ export function ArchiveProfileCard({
         </Link>
 
         {/* Content Section */}
-        <div className='flex-1 px-6 pt-4 pb-3 flex flex-col justify-between min-w-0'>
+        <div className='flex-1 px-6 py-4 pb-6 flex flex-col justify-between min-w-0'>
           <div className='space-y-2'>
             <Link href={`/profile/${profile.username}`} className='block'>
               <div className='flex items-center gap-2 mb-1'>
