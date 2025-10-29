@@ -34,6 +34,7 @@ export type ProfileFilters = Partial<
   published?: boolean;
   county?: string; // Single county selection for coverage filtering (from profile.coverage.county or profile.coverage.counties)
   online?: boolean; // Profile.coverage.online (JSON field)
+  search?: string; // Search query for displayName, tagline, and bio
   page?: number;
   limit?: number;
   sortBy?: ArchiveSortBy;
@@ -96,6 +97,45 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
       whereClause.subcategory = Array.isArray(filters.subcategory)
         ? { in: filters.subcategory }
         : filters.subcategory;
+    }
+
+    // Add search filter for displayName, tagline, and bio
+    if (filters.search) {
+      const searchTerm = filters.search.trim();
+      if (searchTerm.length >= 2) {
+        const searchConditions = [
+          {
+            displayName: {
+              contains: searchTerm,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            tagline: {
+              contains: searchTerm,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            bio: {
+              contains: searchTerm,
+              mode: 'insensitive' as const,
+            },
+          },
+        ];
+
+        // If there's already an OR clause (from location filters), combine with AND
+        if (whereClause.OR) {
+          const existingOR = whereClause.OR;
+          whereClause.AND = whereClause.AND || [];
+          whereClause.AND.push({
+            OR: searchConditions,
+          });
+          whereClause.OR = existingOR;
+        } else {
+          whereClause.OR = searchConditions;
+        }
+      }
     }
 
     // Handle combined online and county filters
@@ -548,10 +588,18 @@ export async function getProfileArchivePageData(params: {
         searchParams.online === 'true' || searchParams.online === ''
           ? true
           : undefined,
+      search: searchParams.search,
       sortBy,
       page,
       limit,
     };
+
+    // Check if any filters are active
+    const hasActiveFilters = !!(
+      filters.search ||
+      filters.county ||
+      filters.online !== undefined
+    );
 
     // Fetch profiles and taxonomy paths in parallel
     // For directory with no type filter, don't pass role to getProTaxonomyPaths
@@ -568,6 +616,107 @@ export async function getProfileArchivePageData(params: {
     }
 
     const { profiles, total, hasMore } = profilesResult.data;
+
+    // When filters are active, fetch subcategory counts for ALL matching profiles
+    // This is a lightweight groupBy query that only returns subcategory IDs + counts
+    let filteredSubcategoryCounts: Record<string, number> = {};
+    if (hasActiveFilters) {
+      try {
+        const countWhere: any = {
+          published: true,
+        };
+
+        if (targetType) {
+          countWhere.user = {
+            role: targetType,
+            blocked: false,
+            confirmed: true,
+          };
+        } else {
+          countWhere.user = {
+            blocked: false,
+            confirmed: true,
+          };
+        }
+
+        if (category) countWhere.category = category.id;
+        if (allSubcategoryIds) {
+          countWhere.subcategory = Array.isArray(allSubcategoryIds)
+            ? { in: allSubcategoryIds }
+            : allSubcategoryIds;
+        } else if (subcategory) {
+          countWhere.subcategory = subcategory.id;
+        }
+
+        // Location filters
+        if (filters.online !== undefined && filters.county) {
+          const countyOption = findLocationBySlugOrName(locationOptions, filters.county);
+          const countyId = countyOption?.id;
+
+          if (countyId) {
+            countWhere.OR = [
+              { coverage: { path: ['online'], equals: true } },
+              {
+                OR: [
+                  { coverage: { path: ['county'], equals: countyId } },
+                  { coverage: { path: ['counties'], array_contains: countyId } },
+                ],
+              },
+            ];
+          } else if (filters.online !== undefined) {
+            countWhere.coverage = { path: ['online'], equals: filters.online };
+          }
+        } else if (filters.online !== undefined) {
+          countWhere.coverage = { path: ['online'], equals: filters.online };
+        } else if (filters.county) {
+          const countyOption = findLocationBySlugOrName(locationOptions, filters.county);
+          const countyId = countyOption?.id;
+
+          if (countyId) {
+            countWhere.OR = [
+              { coverage: { path: ['county'], equals: countyId } },
+              { coverage: { path: ['counties'], array_contains: countyId } },
+            ];
+          }
+        }
+
+        // Add search filter
+        if (filters.search) {
+          const searchTerm = filters.search.trim();
+          if (searchTerm.length >= 2) {
+            const searchConditions = [
+              { displayName: { contains: searchTerm, mode: 'insensitive' } },
+              { tagline: { contains: searchTerm, mode: 'insensitive' } },
+              { bio: { contains: searchTerm, mode: 'insensitive' } },
+            ];
+
+            // If there's already an OR clause (from location filters), combine with AND
+            if (countWhere.OR) {
+              const existingOR = countWhere.OR;
+              countWhere.AND = countWhere.AND || [];
+              countWhere.AND.push({ OR: searchConditions });
+              countWhere.OR = existingOR;
+            } else {
+              countWhere.OR = searchConditions;
+            }
+          }
+        }
+
+        const groups = await prisma.profile.groupBy({
+          by: ['subcategory'],
+          where: countWhere,
+          _count: { _all: true },
+        });
+
+        groups.forEach((group) => {
+          if (group.subcategory) {
+            filteredSubcategoryCounts[group.subcategory] = group._count._all;
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching filtered subcategory counts:', error);
+      }
+    }
 
     // Prepare county options
     const counties = locationOptions.map((location) => ({
@@ -672,34 +821,75 @@ export async function getProfileArchivePageData(params: {
     // Get available subcategories for carousel (similar to services subdivisions)
     let availableSubcategories: ProSubcategoryWithCount[] | undefined;
 
-    // Fetch directory data to get popular subcategories
-    const directoryDataResult = await getDirectoryPageData();
+    // Use filtered counts when filters are active, otherwise use cached directory data
+    if (hasActiveFilters && Object.keys(filteredSubcategoryCounts).length > 0) {
+      // Build pills from filtered subcategory counts
+      const subcategoryData: ProSubcategoryWithCount[] = [];
 
-    if (directoryDataResult.success && directoryDataResult.data) {
-      const { popularSubcategories } = directoryDataResult.data;
-
-      // Filter subcategories based on current context
-      if (categorySlug) {
-        // On category page, show only subcategories from current category
-        availableSubcategories = popularSubcategories
-          .filter(sub => {
+      Object.entries(filteredSubcategoryCounts).forEach(([subcategoryId, count]) => {
+        // Find subcategory in taxonomy by ID
+        for (const cat of proTaxonomies) {
+          if (!cat.children) continue;
+          const subcat = findById(cat.children, subcategoryId);
+          if (subcat) {
             // Exclude current subcategory if on subcategory page
-            if (subcategorySlug && subcategory) {
-              return sub.categorySlug === categorySlug && sub.slug !== subcategory.slug;
+            if (subcategorySlug && subcategory && subcat.slug === subcategory.slug) {
+              return;
             }
-            return sub.categorySlug === categorySlug;
-          })
-          .slice(0, 15);
-      } else {
-        // On main /dir page, show top 15 across all categories
-        availableSubcategories = popularSubcategories.slice(0, 15);
-      }
 
-      // Filter by type if specified
-      if (targetType) {
-        availableSubcategories = availableSubcategories.filter(
-          sub => sub.type === targetType
-        );
+            // Filter by category if on category page
+            if (categorySlug && cat.slug !== categorySlug) {
+              return;
+            }
+
+            subcategoryData.push({
+              id: subcat.id,
+              label: subcat.plural || subcat.label,
+              slug: subcat.slug,
+              categorySlug: cat.slug,
+              subcategorySlug: cat.slug, // For compatibility
+              count,
+              type: (subcat.type || 'freelancer') as 'freelancer' | 'company',
+              href: `/dir/${cat.slug}/${subcat.slug}`,
+            });
+            break;
+          }
+        }
+      });
+
+      availableSubcategories = subcategoryData
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+    } else {
+      // No filters active: use cached directory data
+      const directoryDataResult = await getDirectoryPageData();
+
+      if (directoryDataResult.success && directoryDataResult.data) {
+        const { popularSubcategories } = directoryDataResult.data;
+
+        // Filter subcategories based on current context
+        if (categorySlug) {
+          // On category page, show only subcategories from current category
+          availableSubcategories = popularSubcategories
+            .filter(sub => {
+              // Exclude current subcategory if on subcategory page
+              if (subcategorySlug && subcategory) {
+                return sub.categorySlug === categorySlug && sub.slug !== subcategory.slug;
+              }
+              return sub.categorySlug === categorySlug;
+            })
+            .slice(0, 5);
+        } else {
+          // On main /dir page, show top 5 across all categories
+          availableSubcategories = popularSubcategories.slice(0, 5);
+        }
+
+        // Filter by type if specified
+        if (targetType) {
+          availableSubcategories = availableSubcategories.filter(
+            sub => sub.type === targetType
+          );
+        }
       }
     }
 
