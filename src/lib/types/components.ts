@@ -29,6 +29,37 @@ export interface UserMenuLinkProps {
   item: MenuItem;
 }
 
+// Header Navigation Menu types (taxonomy-based)
+export interface NavigationMenuSubdivision {
+  id: string;
+  label: string;
+  slug: string;
+  count: number;
+  href: string;
+}
+
+export interface NavigationMenuSubcategory {
+  id: string;
+  label: string;
+  slug: string;
+  count: number;
+  href: string;
+  topSubdivisions: NavigationMenuSubdivision[]; // Top 3 by count
+  totalSubdivisions: number;
+  hasMoreSubdivisions: boolean; // For "Προβολή όλων" button
+}
+
+export interface NavigationMenuCategory {
+  id: string;
+  label: string;
+  slug: string;
+  icon?: string;
+  href: string;
+  subcategories: NavigationMenuSubcategory[]; // Top 6 for mega menu display
+  totalSubcategories: number;
+  hasMoreSubcategories: boolean; // For "Προβολή όλων των Υποκατηγοριών" button
+}
+
 // Media Upload Components
 export interface MediaUploadProps {
   value:
