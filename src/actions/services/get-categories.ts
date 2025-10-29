@@ -244,7 +244,7 @@ export async function getCategoriesPageData(options?: {
                     };
                   })
                   .filter(Boolean)
-                  .sort((a, b) => a!.label.localeCompare(b!.label));
+                  .sort((a, b) => b!.count - a!.count); // Sort by count descending
 
                 // Return subcategory as a "category" with subdivisions as "subcategories"
                 return {
@@ -256,10 +256,11 @@ export async function getCategoriesPageData(options?: {
                   image: subcategory.image as PrismaJson.CloudinaryResource | undefined,
                   href: `/ipiresies/${subcategory.slug}`,
                   subcategories: subdivisionsWithServices, // These are actually subdivisions
+                  totalCount: serviceCount, // Store total count for sorting
                 };
               })
               .filter(Boolean)
-              .sort((a, b) => a!.label.localeCompare(b!.label));
+              .sort((a, b) => b!.totalCount - a!.totalCount); // Sort by total service count descending
           }
         } else {
           // Original logic for main categories page
@@ -287,7 +288,13 @@ export async function getCategoriesPageData(options?: {
                   };
                 })
                 .filter(Boolean)
-                .sort((a, b) => a!.label.localeCompare(b!.label)); // Sort alphabetically
+                .sort((a, b) => b!.count - a!.count); // Sort by count descending
+
+              // Calculate total service count for this category
+              const totalCategoryCount = subcategoriesWithServices.reduce(
+                (sum, sub) => sum + sub!.count,
+                0,
+              );
 
               return {
                 id: category.id,
@@ -298,9 +305,11 @@ export async function getCategoriesPageData(options?: {
                 image: category.image as PrismaJson.CloudinaryResource | undefined,
                 href: `/categories/${category.slug}`,
                 subcategories: subcategoriesWithServices,
+                totalCount: totalCategoryCount, // Store for sorting
               };
             })
-            .filter((cat) => cat.subcategories.length > 0); // Only show categories that have subcategories with services
+            .filter((cat) => cat.subcategories.length > 0) // Only show categories that have subcategories with services
+            .sort((a, b) => b.totalCount - a.totalCount); // Sort category cards by total count descending
         }
 
         return {
