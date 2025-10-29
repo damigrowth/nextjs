@@ -83,7 +83,7 @@ export default async function DirectorySubcategoryPage({
     throw new Error(result.error || 'Failed to fetch profiles');
   }
 
-  const { profiles, total, taxonomyData, breadcrumbData, counties, filters } =
+  const { profiles, total, taxonomyData, breadcrumbData, counties, filters, availableSubcategories } =
     result.data;
 
   return (
@@ -98,6 +98,7 @@ export default async function DirectorySubcategoryPage({
       basePath={`/dir/${categorySlug}/${subcategorySlug}`}
       total={total}
       limit={20}
+      availableSubdivisions={availableSubcategories}
     >
       <div className='space-y-6'>
         {profiles.length === 0 ? (

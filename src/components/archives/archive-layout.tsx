@@ -57,6 +57,7 @@ interface ArchiveLayoutProps {
     subcategorySlug: string;
     count: number;
     href: string;
+    type?: 'freelancer' | 'company'; // Optional for profile subcategories
   }>;
 }
 

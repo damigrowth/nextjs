@@ -77,7 +77,7 @@ export default async function DirectoryCategoryPage({
     notFound();
   }
 
-  const { profiles, total, taxonomyData, breadcrumbData, counties, filters } =
+  const { profiles, total, taxonomyData, breadcrumbData, counties, filters, availableSubcategories } =
     result.data;
 
   return (
@@ -91,6 +91,7 @@ export default async function DirectoryCategoryPage({
       basePath={`/dir/${params_.category}`}
       total={total}
       limit={20}
+      availableSubdivisions={availableSubcategories}
     >
       <div className='space-y-6'>
         {profiles.length === 0 ? (

@@ -23,6 +23,7 @@ import type { ArchiveProfileCardData } from '@/lib/types/components';
 import type { ArchiveSortBy } from '@/lib/types/common';
 import type { FilterState } from '@/lib/hooks/archives/use-archive-filters';
 import { Prisma, Profile, User } from '@prisma/client';
+import { getDirectoryPageData, type ProSubcategoryWithCount } from './get-directory';
 
 // Filter types for profile archives
 export type ProfileFilters = Partial<
@@ -421,6 +422,7 @@ export async function getProfileArchivePageData(params: {
       slug: string;
     }>;
     filters: FilterState;
+    availableSubcategories?: ProSubcategoryWithCount[];
   }>
 > {
   try {
@@ -667,6 +669,40 @@ export async function getProfileArchivePageData(params: {
       type: searchParams.type,
     };
 
+    // Get available subcategories for carousel (similar to services subdivisions)
+    let availableSubcategories: ProSubcategoryWithCount[] | undefined;
+
+    // Fetch directory data to get popular subcategories
+    const directoryDataResult = await getDirectoryPageData();
+
+    if (directoryDataResult.success && directoryDataResult.data) {
+      const { popularSubcategories } = directoryDataResult.data;
+
+      // Filter subcategories based on current context
+      if (categorySlug) {
+        // On category page, show only subcategories from current category
+        availableSubcategories = popularSubcategories
+          .filter(sub => {
+            // Exclude current subcategory if on subcategory page
+            if (subcategorySlug && subcategory) {
+              return sub.categorySlug === categorySlug && sub.slug !== subcategory.slug;
+            }
+            return sub.categorySlug === categorySlug;
+          })
+          .slice(0, 15);
+      } else {
+        // On main /dir page, show top 15 across all categories
+        availableSubcategories = popularSubcategories.slice(0, 15);
+      }
+
+      // Filter by type if specified
+      if (targetType) {
+        availableSubcategories = availableSubcategories.filter(
+          sub => sub.type === targetType
+        );
+      }
+    }
+
     return {
       success: true,
       data: {
@@ -677,6 +713,7 @@ export async function getProfileArchivePageData(params: {
         breadcrumbData,
         counties,
         filters: uiFilters,
+        availableSubcategories,
       },
     };
   } catch (error) {
