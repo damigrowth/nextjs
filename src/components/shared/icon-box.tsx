@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import IconWrapper from './icon-wrapper';
 
 interface IconBoxProps {
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   title: string;
   value?: string | number | React.ReactNode;
   className?: string;
@@ -11,6 +11,7 @@ interface IconBoxProps {
   iconVariant?: 'primary' | 'secondary' | 'accent' | 'muted';
   titleClassName?: string;
   valueClassName?: string;
+  showIcon?: boolean;
 }
 
 export default function IconBox({
@@ -22,16 +23,18 @@ export default function IconBox({
   iconVariant = 'primary',
   titleClassName,
   valueClassName,
+  showIcon = true,
 }: IconBoxProps) {
   return (
     <div className={cn('flex items-start gap-4', className)}>
       {/* Icon with wrapper */}
-      <div className='flex-shrink-0'>
-        <IconWrapper size={iconSize} variant={iconVariant}>
-          {icon}
-        </IconWrapper>
-      </div>
-
+      {showIcon && (
+        <div className='flex-shrink-0'>
+          <IconWrapper size={iconSize} variant={iconVariant}>
+            {icon}
+          </IconWrapper>
+        </div>
+      )}
       {/* Content */}
       <div className='flex-1 min-w-0'>
         <h5
@@ -44,7 +47,10 @@ export default function IconBox({
         </h5>
         {value && (
           <div
-            className={cn('text-sm text-muted-foreground mb-0', valueClassName)}
+            className={cn(
+              'text-sm font-medium text-muted-foreground mb-0',
+              valueClassName,
+            )}
           >
             {value}
           </div>

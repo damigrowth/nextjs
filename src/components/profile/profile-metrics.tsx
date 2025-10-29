@@ -1,10 +1,8 @@
 import React from 'react';
-import { FileText } from 'lucide-react';
 import type { ProfileMetricsProps } from '@/lib/types/components';
 import IconBox from '@/components/shared/icon-box';
 import { FlaticonCategory } from '@/components/icon';
 import { Badge } from '@/components/ui/badge';
-import { getCategoryIcon } from '@/constants/datasets/category-icons';
 
 /**
  * Modern ProfileMetrics Component
@@ -12,32 +10,28 @@ import { getCategoryIcon } from '@/constants/datasets/category-icons';
  */
 
 export default function ProfileMetrics({
+  category,
   subcategory,
   serviceSubdivisions,
-  categoryIcon,
 }: ProfileMetricsProps) {
   const hasAnyMetric =
-    subcategory || (serviceSubdivisions && serviceSubdivisions.length > 0);
+    category ||
+    subcategory ||
+    (serviceSubdivisions && serviceSubdivisions.length > 0);
 
   if (!hasAnyMetric) {
     return null;
   }
 
-  // Get the category icon component, fallback to FileText
-  const CategoryIconComponent = categoryIcon
-    ? getCategoryIcon(categoryIcon)
-    : undefined;
-
-  const SubcategoryIcon = CategoryIconComponent || FileText;
-
   return (
     <section className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6'>
-      {/* Subcategory with category icon */}
-      {subcategory && (
+      {/* Subcategory with category below */}
+      {(category || subcategory) && (
         <div>
           <IconBox
-            icon={<SubcategoryIcon className='h-10 w-10' />}
-            title={subcategory.label}
+            icon={<FlaticonCategory size={40} className='h-10 w-10' />}
+            title={subcategory?.label}
+            value={category?.label}
           />
         </div>
       )}
@@ -46,7 +40,7 @@ export default function ProfileMetrics({
       {serviceSubdivisions && serviceSubdivisions.length > 0 && (
         <div className='sm:col-span-2'>
           <IconBox
-            icon={<FlaticonCategory size={40} className='h-10 w-10' />}
+            showIcon={false}
             title='Υπηρεσίες'
             titleClassName='mb-3'
             value={

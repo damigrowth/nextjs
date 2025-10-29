@@ -149,9 +149,9 @@ export default async function ProfilePage({
 
               {/* Profile Metrics */}
               <ProfileMetrics
+                category={category}
                 subcategory={subcategory}
                 serviceSubdivisions={result.data.serviceSubdivisionsData}
-                categoryIcon={category?.icon}
               />
               <ProfileBio bio={profile.bio} />
               <ProfileFeatures

@@ -184,9 +184,9 @@ export interface MetricCardProps {
 
 // Profile metrics component props
 export interface ProfileMetricsProps {
+  category?: DatasetItem;
   subcategory?: DatasetItem;
   serviceSubdivisions?: DatasetItem[];
-  categoryIcon?: string;
 }
 
 export interface ProfileRatingProps {
