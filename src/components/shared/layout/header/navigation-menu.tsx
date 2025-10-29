@@ -18,14 +18,15 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { categoryIconMap } from '@/constants/datasets/category-icons';
 import {
   Grid3x3,
   ChevronRight,
   ChevronDown,
+  ArrowRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { NavigationMenuCategory } from '@/lib/types/components';
 
 const regularMenuItems = [
   { href: '/categories', label: 'Κατάλογος Υπηρεσιών' },
@@ -33,11 +34,16 @@ const regularMenuItems = [
 ];
 
 interface NavMenuProps {
+  navigationData: NavigationMenuCategory[];
   isMobile?: boolean;
   onClose?: () => void;
 }
 
-export default function NavMenu({ isMobile = false, onClose }: NavMenuProps) {
+export default function NavMenu({
+  navigationData,
+  isMobile = false,
+  onClose,
+}: NavMenuProps) {
   const pathname = usePathname();
   const [hoveredCategory, setHoveredCategory] = React.useState<string | null>(null);
   const [timeoutId, setTimeoutId] = React.useState<NodeJS.Timeout | null>(null);
@@ -48,9 +54,6 @@ export default function NavMenu({ isMobile = false, onClose }: NavMenuProps) {
       onClose();
     }
   };
-
-  // Check if current route matches navigation items
-  const isInCategories = pathname?.startsWith('/categories');
 
   // Mobile version - simple vertical list
   if (isMobile) {
@@ -68,7 +71,7 @@ export default function NavMenu({ isMobile = false, onClose }: NavMenuProps) {
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2 mt-2">
-            {serviceTaxonomies.map((category) => (
+            {navigationData.map((category) => (
               <Link
                 key={category.id}
                 href={`/categories/${category.slug}`}
@@ -125,7 +128,7 @@ export default function NavMenu({ isMobile = false, onClose }: NavMenuProps) {
               {/* Left Panel - Categories List */}
               <div className='w-64 border-r p-2'>
                 <div className='space-y-1'>
-                  {serviceTaxonomies.map((category) => {
+                  {navigationData.map((category) => {
                     const IconComponent =
                       categoryIconMap[category.icon] || Grid3x3;
                     return (
@@ -156,45 +159,65 @@ export default function NavMenu({ isMobile = false, onClose }: NavMenuProps) {
 
               {/* Right Panel - Subcategories */}
               {hoveredCategory && (
-                <div className='w-[600px] p-6'>
-                  {serviceTaxonomies
+                <div className='w-[600px] p-6 relative'>
+                  {navigationData
                     .filter((cat) => cat.id === hoveredCategory)
                     .map((category) => (
                       <div key={category.id}>
-                        <h3 className='mb-4 text-lg font-semibold'>
+                        <h3 className='mb-4 text-lg font-semibold text-primary'>
                           {category.label}
                         </h3>
-                        <div className='grid grid-cols-3 gap-6'>
-                          {category.children?.slice(0, 6).map((subcategory) => (
+                        <div className='grid grid-cols-3 gap-6 pb-12'>
+                          {category.subcategories.map((subcategory) => (
                             <div key={subcategory.id} className='space-y-2'>
                               <NavigationMenuLink asChild>
                                 <Link
-                                  href={`/ipiresies/${subcategory.slug}`}
+                                  href={subcategory.href}
                                   className='block font-medium text-sm hover:text-primary transition-colors'
                                 >
                                   {subcategory.label}
                                 </Link>
                               </NavigationMenuLink>
-                              <div className='space-y-1'>
-                                {subcategory.children
-                                  ?.slice(0, 3)
-                                  .map((subdivision) => (
+                              <div className='space-y-2'>
+                                {subcategory.topSubdivisions.map(
+                                  (subdivision) => (
                                     <NavigationMenuLink
                                       key={subdivision.id}
                                       asChild
                                     >
                                       <Link
-                                        href={`/ipiresies/${subcategory.slug}/${subdivision.slug}`}
-                                        className='block text-xs text-muted-foreground hover:text-foreground transition-colors'
+                                        href={subdivision.href}
+                                        className='block text-sm text-muted-foreground hover:text-foreground transition-colors'
                                       >
                                         {subdivision.label}
                                       </Link>
                                     </NavigationMenuLink>
-                                  ))}
+                                  ),
+                                )}
+                                {subcategory.hasMoreSubdivisions && (
+                                  <Link
+                                    href={subcategory.href}
+                                    className='block text-sm text-primary hover:text-primary/80 font-medium pt-2'
+                                  >
+                                    Προβολή όλων ({subcategory.totalSubdivisions})
+                                  </Link>
+                                )}
                               </div>
                             </div>
                           ))}
                         </div>
+                        {/* Show all subcategories button - bottom right */}
+                        {category.hasMoreSubcategories && (
+                          <div className='absolute bottom-4 right-6'>
+                            <Link
+                              href={category.href}
+                              className='inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors'
+                            >
+                              Προβολή όλων των Υποκατηγοριών
+                              <ArrowRight className='h-4 w-4' />
+                            </Link>
+                          </div>
+                        )}
                       </div>
                     ))}
                 </div>
