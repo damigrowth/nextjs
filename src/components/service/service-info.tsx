@@ -1,7 +1,8 @@
 import React from 'react';
-import { Clock, MapPin, Globe, Users, FileText, Briefcase } from 'lucide-react';
+import { Clock, MapPin, Globe, Users, Briefcase } from 'lucide-react';
 import { DatasetItem } from '@/lib/types/datasets';
 import IconBox from '@/components/shared/icon-box';
+import { FlaticonCategory } from '@/components/icon';
 
 interface ServiceInfoProps {
   coverage: ReturnType<
@@ -35,7 +36,7 @@ export default function ServiceInfo({
       {category && (
         <div className='sm:col-span-1 md:col-span-1'>
           <IconBox
-            icon={<FileText className='h-10 w-10' />}
+            icon={<FlaticonCategory size={40} />}
             title={subdivision?.label || ''}
             value={
               <h2 className='text-sm font-normal text-muted-foreground mb-0'>
