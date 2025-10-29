@@ -6,6 +6,11 @@ import { getServiceTaxonomyPaths } from './get-services';
 import { findBySlug, findById } from '@/lib/utils/datasets';
 import type { ActionResult } from '@/lib/types/api';
 import type { DatasetItem } from '@/lib/types/datasets';
+import type {
+  NavigationMenuCategory,
+  NavigationMenuSubcategory,
+  NavigationMenuSubdivision,
+} from '@/lib/types/components';
 
 // Cast to proper type to allow optional image fields at all levels
 const serviceTaxonomies = importedServiceTaxonomies as DatasetItem[];
@@ -43,6 +48,7 @@ export interface CategoriesPageData {
   subdivisions: SubdivisionWithCount[];
   categories: CategoryWithSubcategories[];
 }
+
 
 /**
  * Get all data needed for the categories page
@@ -325,6 +331,125 @@ export async function getCategoriesPageData(options?: {
     return {
       success: false,
       error: 'Failed to fetch categories page data',
+    };
+  }
+}
+
+/**
+ * Get navigation menu data with service counts
+ * Optimized for header mega menu display
+ * Reuses getServiceTaxonomyPaths() to avoid duplicate queries
+ */
+export async function getNavigationMenuData(): Promise<
+  ActionResult<NavigationMenuCategory[]>
+> {
+  try {
+    const getCachedData = unstable_cache(
+      async () => {
+        // Reuse getServiceTaxonomyPaths - already cached!
+        const taxonomyPathsResult = await getServiceTaxonomyPaths();
+        if (!taxonomyPathsResult.success) {
+          throw new Error('Failed to fetch taxonomy paths');
+        }
+
+        const taxonomyPaths = taxonomyPathsResult.data;
+
+        // Build counts at all three levels
+        const categories = serviceTaxonomies
+          .map((category) => {
+            // Get subcategories for this category with service counts
+            const subcategoriesData = (category.children || [])
+              .map((subcategory) => {
+                // Filter paths for this subcategory
+                const subcategoryPaths = taxonomyPaths.filter(
+                  (p) =>
+                    p.category === category.slug &&
+                    p.subcategory === subcategory.slug,
+                );
+
+                // Skip subcategories with no services
+                if (subcategoryPaths.length === 0) return null;
+
+                // Calculate total service count for this subcategory
+                const totalCount = subcategoryPaths.reduce(
+                  (sum, p) => sum + p.count,
+                  0,
+                );
+
+                // Build subdivision counts map
+                const subdivisionCounts = new Map<string, number>();
+                subcategoryPaths.forEach((path) => {
+                  if (path.subdivision) {
+                    const current = subdivisionCounts.get(path.subdivision) || 0;
+                    subdivisionCounts.set(
+                      path.subdivision,
+                      current + path.count,
+                    );
+                  }
+                });
+
+                // Get top 3 subdivisions by count
+                const subdivisionsWithCounts = (subcategory.children || [])
+                  .map((subdivision) => ({
+                    id: subdivision.id,
+                    label: subdivision.label,
+                    slug: subdivision.slug,
+                    count: subdivisionCounts.get(subdivision.slug) || 0,
+                    href: `/ipiresies/${subcategory.slug}/${subdivision.slug}`,
+                  }))
+                  .filter((s) => s.count > 0)
+                  .sort((a, b) => b.count - a.count); // Sort by count DESC
+
+                return {
+                  id: subcategory.id,
+                  label: subcategory.label,
+                  slug: subcategory.slug,
+                  count: totalCount,
+                  href: `/ipiresies/${subcategory.slug}`,
+                  topSubdivisions: subdivisionsWithCounts.slice(0, 3), // Top 3
+                  totalSubdivisions: subdivisionsWithCounts.length,
+                  hasMoreSubdivisions: subdivisionsWithCounts.length > 3,
+                };
+              })
+              .filter(Boolean)
+              .sort((a, b) => b!.count - a!.count); // Sort by count DESC
+
+            // Skip categories with no subcategories that have services
+            if (subcategoriesData.length === 0) return null;
+
+            return {
+              id: category.id,
+              label: category.label,
+              slug: category.slug,
+              icon: category.icon,
+              href: `/categories/${category.slug}`,
+              subcategories: subcategoriesData.slice(0, 6), // Top 6 for mega menu
+              totalSubcategories: subcategoriesData.length,
+              hasMoreSubcategories: subcategoriesData.length > 6,
+            };
+          })
+          .filter(Boolean) as NavigationMenuCategory[];
+
+        return categories;
+      },
+      ['navigation-menu-data'],
+      {
+        tags: ['services', 'categories', 'navigation-menu'],
+        revalidate: 3600, // 1 hour, same as other taxonomy queries
+      },
+    );
+
+    const data = await getCachedData();
+
+    return {
+      success: true,
+      data,
+    };
+  } catch (error) {
+    console.error('Error fetching navigation menu data:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch navigation menu data',
     };
   }
 }
