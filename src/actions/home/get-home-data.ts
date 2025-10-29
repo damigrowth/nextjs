@@ -10,6 +10,8 @@ import type { ServiceCardData, ProfileCardData } from '@/lib/types/components';
 import type { ServiceWithProfile } from '@/lib/types/services';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { Prisma } from '@prisma/client';
+import { getDirectoryPageData } from '@/actions/profiles/get-directory';
+import { getCategoriesPageData } from '@/actions/services/get-categories';
 
 // Transform service to component-ready format
 function transformServiceForComponent(
@@ -81,6 +83,8 @@ export interface HomePageData {
   profiles: ProfileCardData[];
   popularSubcategories: DatasetItem[]; // DatasetItem with count property
   categoriesWithSubcategories: DatasetItem[]; // DatasetItem with subcategories array
+  proSubcategoriesWithProfiles: DatasetItem[]; // Pro subcategories that have profiles
+  serviceSubcategoriesWithServices: DatasetItem[]; // Service subcategories that have services
 }
 
 // Get both featured services and profiles in a single API call
@@ -114,8 +118,14 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
       },
     } as const;
 
-    // Parallel fetch of services, profiles, and subcategory counts
-    const [servicesResult, profilesResult, subcategoryCounts] = await Promise.all([
+    // Parallel fetch of services, profiles, and taxonomy data from cached functions
+    const [
+      servicesResult,
+      profilesResult,
+      directoryDataResult,
+      categoriesDataResult,
+      subcategoryCounts,
+    ] = await Promise.all([
       // Fetch featured services
       prisma.service.findMany({
         where: {
@@ -163,7 +173,13 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
         take: 16,
       }),
 
-      // Fetch subcategory counts for popular searches and categories
+      // Reuse cached directory page data for pro subcategories
+      getDirectoryPageData(),
+
+      // Reuse cached categories page data for service subdivisions
+      getCategoriesPageData(),
+
+      // Fetch subcategory counts for services (for popular subcategories in hero)
       prisma.service.groupBy({
         by: ['subcategory'],
         where: {
@@ -213,7 +229,16 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
     // Transform profiles data
     const transformedProfiles = profilesResult.map(transformProfileForComponent);
 
-    // Process subcategory counts for popular searches
+    // Extract data from cached functions
+    const directoryData = directoryDataResult.success
+      ? directoryDataResult.data
+      : { popularSubcategories: [], categories: [] };
+
+    const categoriesData = categoriesDataResult.success
+      ? categoriesDataResult.data
+      : { subdivisions: [], categories: [] };
+
+    // Process subcategory counts for services (for popular subcategories in hero)
     const subcategoryCountMap: Record<string, number> = {};
     subcategoryCounts.forEach((group) => {
       if (group.subcategory) {
@@ -269,6 +294,26 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
       })
       .filter((cat) => (cat.subcategories?.length || 0) > 0); // Only categories with subcategories
 
+    // Use cached data from directory and categories pages
+    // Convert to DatasetItem format for home page component compatibility
+    const proSubcategoriesWithProfiles: DatasetItem[] =
+      directoryData.popularSubcategories.map((sub) => ({
+        id: sub.id,
+        label: sub.label,
+        slug: sub.slug,
+        count: sub.count,
+        href: sub.href,
+      }));
+
+    const serviceSubcategoriesWithServices: DatasetItem[] =
+      categoriesData.subdivisions.map((sub) => ({
+        id: sub.id,
+        label: sub.label,
+        slug: sub.slug,
+        count: sub.count,
+        href: sub.href,
+      }));
+
     return {
       success: true,
       data: {
@@ -276,6 +321,8 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
         profiles: transformedProfiles,
         popularSubcategories: topPopularSubcategories,
         categoriesWithSubcategories,
+        proSubcategoriesWithProfiles,
+        serviceSubcategoriesWithServices,
       },
     };
   } catch (error) {
