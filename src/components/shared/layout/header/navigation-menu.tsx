@@ -164,10 +164,13 @@ export default function NavMenu({
                     .filter((cat) => cat.id === hoveredCategory)
                     .map((category) => (
                       <div key={category.id}>
-                        <h3 className='mb-4 text-lg font-semibold text-primary'>
+                        <Link
+                          href={`/categories/${category.slug}`}
+                          className='mb-4 text-lg font-semibold text-primary hover:text-primary/80 transition-colors inline-block'
+                        >
                           {category.label}
-                        </h3>
-                        <div className='grid grid-cols-3 gap-6 pb-12'>
+                        </Link>
+                        <div className='grid grid-cols-3 gap-4 pb-12'>
                           {category.subcategories.map((subcategory) => (
                             <div key={subcategory.id} className='space-y-2'>
                               <NavigationMenuLink asChild>
@@ -189,7 +192,7 @@ export default function NavMenu({
                                         href={subdivision.href}
                                         className='block text-sm text-muted-foreground hover:text-foreground transition-colors'
                                       >
-                                        {subdivision.label}
+                                        - {subdivision.label}
                                       </Link>
                                     </NavigationMenuLink>
                                   ),
