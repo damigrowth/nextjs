@@ -315,28 +315,25 @@ async function _getProfilePageData(
     const calculatedExperience = profile.experience || 0;
 
     // Build breadcrumb segments (taxonomies only)
-    const typeParam =
-      profile.user.role === 'company' ? '?type=companies' : '?type=pros';
     const breadcrumbSegments: BreadcrumbSegment[] = [
       { label: 'Αρχική', href: '/' },
       {
-        label:
-          profile.user.role === 'company' ? 'Επιχειρήσεις' : 'Επαγγελματίες',
-        href: `/dir${typeParam}`,
+        label: 'Επαγγελματικός Κατάλογος',
+        href: '/directory',
       },
     ];
 
     if (category) {
       breadcrumbSegments.push({
         label: category.plural || category.label,
-        href: `/dir/${category.slug}${typeParam}`,
+        href: `/dir/${category.slug}`,
       });
     }
 
     if (subcategory) {
       breadcrumbSegments.push({
         label: subcategory.plural || subcategory.label,
-        href: `/dir/${category?.slug}/${subcategory.slug}${typeParam}`,
+        href: `/dir/${category?.slug}/${subcategory.slug}`,
       });
     }
 
