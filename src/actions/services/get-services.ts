@@ -33,6 +33,7 @@ import type {
 } from '@/lib/types/services';
 import type { ArchiveSortBy } from '@/lib/types/common';
 import { Prisma, Service, Profile } from '@prisma/client';
+import { getCategoriesPageData } from './get-categories';
 
 // Filter types for service archives
 export type ServiceFilters = Partial<
@@ -1268,12 +1269,7 @@ export async function getServiceArchivePageData(params: {
     } else {
       // On /ipiresies or /ipiresies/[subcategory]: show subdivisions from all matching services
 
-      // Use filtered counts when filters are active, otherwise use cached taxonomy paths
-      const countsToUse = hasActiveFilters && Object.keys(filteredSubdivisionCounts).length > 0
-        ? filteredSubdivisionCounts
-        : null;
-
-      if (countsToUse) {
+      if (hasActiveFilters && Object.keys(filteredSubdivisionCounts).length > 0) {
         // Build pills from filtered subdivision counts
         const subdivisionDataMap: Record<
           string,
@@ -1286,7 +1282,7 @@ export async function getServiceArchivePageData(params: {
           }
         > = {};
 
-        Object.entries(countsToUse).forEach(([subdivisionId, count]) => {
+        Object.entries(filteredSubdivisionCounts).forEach(([subdivisionId, count]) => {
           // subdivisionId is the actual ID, not slug - need to find it in taxonomy
           for (const category of serviceTaxonomies) {
             if (!category.children) continue;
@@ -1319,54 +1315,17 @@ export async function getServiceArchivePageData(params: {
           }))
           .sort((a, b) => b.count - a.count)
           .slice(0, 5);
-      } else if (taxonomyPathsResult.success && taxonomyPathsResult.data) {
-        // No filters active: use cached taxonomy paths
-        const subdivisionDataMap: Record<
-          string,
-          {
-            id: string;
-            label: string;
-            categorySlug: string;
-            subcategorySlug: string;
-            count: number;
-          }
-        > = {};
-
-        taxonomyPathsResult.data.forEach((path) => {
-          if (subcategory && path.subcategory !== subcategory.slug) {
-            return;
-          }
-
-          if (path.subdivision) {
-            if (!subdivisionDataMap[path.subdivision]) {
-              const result = findSubdivisionBySlug(categories, path.subdivision);
-              if (result) {
-                subdivisionDataMap[path.subdivision] = {
-                  id: result.subdivision.id,
-                  label: result.subdivision.label,
-                  categorySlug: path.category || '',
-                  subcategorySlug: path.subcategory || '',
-                  count: path.count,
-                };
-              }
-            } else {
-              subdivisionDataMap[path.subdivision].count += path.count;
-            }
-          }
+      } else {
+        // No filters active: use cached function for optimal performance
+        const categoriesDataResult = await getCategoriesPageData({
+          categorySlug: category?.slug,
+          subcategorySlug: subcategory?.slug,
+          limit: 5,
         });
 
-        availableSubdivisions = Object.entries(subdivisionDataMap)
-          .map(([subdivisionSlug, data]) => ({
-            id: data.id,
-            label: data.label,
-            slug: subdivisionSlug,
-            categorySlug: data.categorySlug,
-            subcategorySlug: data.subcategorySlug,
-            count: data.count,
-            href: `/ipiresies/${data.subcategorySlug}/${subdivisionSlug}`,
-          }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 5);
+        if (categoriesDataResult.success && categoriesDataResult.data) {
+          availableSubdivisions = categoriesDataResult.data.popularSubdivisions || [];
+        }
       }
     }
 

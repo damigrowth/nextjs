@@ -863,34 +863,30 @@ export async function getProfileArchivePageData(params: {
         .slice(0, 5);
     } else {
       // No filters active: use cached directory data
-      const directoryDataResult = await getDirectoryPageData();
+      // Pass categorySlug to get category-specific subcategories
+      const directoryDataResult = await getDirectoryPageData({
+        categorySlug: categorySlug,
+      });
 
       if (directoryDataResult.success && directoryDataResult.data) {
         const { popularSubcategories } = directoryDataResult.data;
 
-        // Filter subcategories based on current context
-        if (categorySlug) {
-          // On category page, show only subcategories from current category
-          availableSubcategories = popularSubcategories
-            .filter(sub => {
-              // Exclude current subcategory if on subcategory page
-              if (subcategorySlug && subcategory) {
-                return sub.categorySlug === categorySlug && sub.slug !== subcategory.slug;
-              }
-              return sub.categorySlug === categorySlug;
-            })
-            .slice(0, 5);
-        } else {
-          // On main /dir page, show top 5 across all categories
-          availableSubcategories = popularSubcategories.slice(0, 5);
+        // Exclude current subcategory if on subcategory page
+        let filteredSubcategories = popularSubcategories;
+        if (subcategorySlug && subcategory) {
+          filteredSubcategories = popularSubcategories.filter(
+            sub => sub.slug !== subcategory.slug
+          );
         }
 
         // Filter by type if specified
         if (targetType) {
-          availableSubcategories = availableSubcategories.filter(
+          filteredSubcategories = filteredSubcategories.filter(
             sub => sub.type === targetType
           );
         }
+
+        availableSubcategories = filteredSubcategories.slice(0, 5);
       }
     }
 
