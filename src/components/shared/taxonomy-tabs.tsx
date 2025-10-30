@@ -11,6 +11,7 @@ export default function TaxonomyTabs({
   items,
   basePath,
   allItemsLabel,
+  allItemsHref,
   activeItemSlug,
   usePluralLabels = false,
   className = '',
@@ -25,7 +26,7 @@ export default function TaxonomyTabs({
                 {/* All items link */}
                 <li>
                   <LinkNP
-                    href={`/${basePath}`}
+                    href={allItemsHref || `/${basePath}`}
                     className={`inline-block px-4 py-2 text-body hover:text-primary transition-colors text-sm ${
                       !activeItemSlug ? 'text-primary font-medium' : ''
                     }`}
