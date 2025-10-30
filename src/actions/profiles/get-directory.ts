@@ -49,12 +49,19 @@ export interface DirectoryPageData {
 /**
  * Get all data needed for the directory (professionals) page
  * Shows professional categories with up to 10 most popular subcategories per category
+ *
+ * Supports hierarchical caching (consistent with services pattern):
+ * - Global cache (no params): All subcategories
+ * - Category cache (categorySlug): Subcategories filtered by category
+ * - Subcategory cache (categorySlug + subcategorySlug): Single subcategory (future use)
  */
 export async function getDirectoryPageData(options?: {
   limit?: number; // Optional limit for popular subcategories (default: 15)
+  categorySlug?: string; // Optional filter by specific category for category-specific subcategories
+  subcategorySlug?: string; // Optional filter by specific subcategory (requires categorySlug, future use)
 }): Promise<ActionResult<DirectoryPageData>> {
   try {
-    const { limit = 15 } = options || {};
+    const { limit = 15, categorySlug, subcategorySlug } = options || {};
 
     const getCachedData = unstable_cache(
       async () => {
@@ -62,13 +69,36 @@ export async function getDirectoryPageData(options?: {
         const { prisma } = await import('@/lib/prisma/client');
 
         // Get subcategory counts directly from database
+        // If categorySlug is provided, filter by that category's subcategories only
+        let subcategoryFilter: any = {
+          published: true,
+          subcategory: { not: null }, // Exclude null subcategories
+        };
+
+        // If filtering by category and/or subcategory
+        if (categorySlug) {
+          const targetCategory = proTaxonomies.find(cat => cat.slug === categorySlug);
+          if (targetCategory && targetCategory.children) {
+            // If subcategorySlug provided, filter to single subcategory
+            if (subcategorySlug) {
+              const targetSubcategory = targetCategory.children.find(
+                (sub: any) => sub.slug === subcategorySlug
+              );
+              if (targetSubcategory) {
+                subcategoryFilter.subcategory = targetSubcategory.id;
+              }
+            } else {
+              // Otherwise filter to all subcategories in category
+              const subcategoryIds = targetCategory.children.map((sub: any) => sub.id);
+              subcategoryFilter.subcategory = { in: subcategoryIds };
+            }
+          }
+        }
+
         // Group by subcategory and count the profiles
         const subcategoryGroups = await prisma.profile.groupBy({
           by: ['subcategory'],
-          where: {
-            published: true,
-            subcategory: { not: null }, // Exclude null subcategories
-          },
+          where: subcategoryFilter,
           _count: {
             _all: true,
           },
@@ -82,10 +112,15 @@ export async function getDirectoryPageData(options?: {
           }
         }
 
-        // Process popular pro subcategories for carousel (top 15)
+        // Process popular pro subcategories
         const popularSubcategories: ProSubcategoryWithCount[] = [];
 
-        for (const category of proTaxonomies) {
+        // Determine which categories to iterate
+        const categoriesToProcess = categorySlug
+          ? proTaxonomies.filter(cat => cat.slug === categorySlug)
+          : proTaxonomies;
+
+        for (const category of categoriesToProcess) {
           if (!category.children) continue;
 
           for (const subcategory of category.children) {
@@ -162,9 +197,22 @@ export async function getDirectoryPageData(options?: {
           categories,
         };
       },
-      ['directory-page-data'],
+      // Hierarchical cache keys for optimal cache hit rate (consistent with services)
+      [
+        subcategorySlug && categorySlug
+          ? `directory-page-data-${categorySlug}-${subcategorySlug}`
+          : categorySlug
+            ? `directory-page-data-${categorySlug}`
+            : 'directory-page-data'
+      ],
       {
-        tags: ['profiles', 'directory', 'directory-page'],
+        tags: [
+          'profiles',
+          'directory',
+          'directory-page',
+          ...(categorySlug ? [`category-${categorySlug}`] : []),
+          ...(subcategorySlug ? [`subcategory-${subcategorySlug}`] : []),
+        ],
         revalidate: 3600, // 1 hour cache
       },
     );
