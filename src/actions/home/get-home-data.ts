@@ -173,11 +173,11 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
         take: 16,
       }),
 
-      // Reuse cached directory page data for pro subcategories
-      getDirectoryPageData(),
+      // Reuse cached directory page data for pro subcategories (60 for home page)
+      getDirectoryPageData({ limit: 60 }),
 
-      // Reuse cached categories page data for service subdivisions
-      getCategoriesPageData(),
+      // Reuse cached categories page data for service subdivisions (60 for home page)
+      getCategoriesPageData({ limit: 60 }),
 
       // Fetch subcategory counts for services (for popular subcategories in hero)
       prisma.service.groupBy({
@@ -198,7 +198,7 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
     // Prepare categories for tabs (server-side computation)
     const mainCategories = [
       { id: 'all', label: 'Όλες', slug: 'all' },
-      ...serviceTaxonomies.slice(0, 6).map((cat) => ({
+      ...serviceTaxonomies.map((cat) => ({
         id: cat.id,
         label: cat.label,
         slug: cat.slug,
