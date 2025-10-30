@@ -47,19 +47,26 @@ export interface CategoryWithSubcategories {
 export interface CategoriesPageData {
   subdivisions: SubdivisionWithCount[];
   categories: CategoryWithSubcategories[];
+  popularSubdivisions?: SubdivisionWithCount[]; // Alias for pills (consistent with profiles)
 }
 
 
 /**
  * Get all data needed for the categories page
  * Transforms raw taxonomy data into ready-to-render structures
+ *
+ * Supports hierarchical caching:
+ * - Global cache (no params): All subdivisions
+ * - Category cache (categorySlug): Subdivisions filtered by category
+ * - Subcategory cache (categorySlug + subcategorySlug): Subdivisions filtered by subcategory
  */
 export async function getCategoriesPageData(options?: {
   categorySlug?: string; // Optional filter by specific category
+  subcategorySlug?: string; // Optional filter by specific subcategory (requires categorySlug)
   limit?: number; // Optional limit for subdivisions (default: 15)
 }): Promise<ActionResult<CategoriesPageData>> {
   try {
-    const { categorySlug, limit = 15 } = options || {};
+    const { categorySlug, subcategorySlug, limit = 15 } = options || {};
 
     const getCachedData = unstable_cache(
       async () => {
@@ -73,12 +80,20 @@ export async function getCategoriesPageData(options?: {
           subdivision: { not: '' }, // Exclude empty strings
         };
 
-        // Filter by category if provided
+        // Filter by category and/or subcategory if provided
         if (categorySlug) {
           // Convert slug to ID for database query
           const categoryData = findBySlug(serviceTaxonomies, categorySlug);
           if (categoryData) {
             subdivisionWhere.category = categoryData.id;
+
+            // If subcategory provided, also filter by it
+            if (subcategorySlug && categoryData.children) {
+              const subcategoryData = findBySlug(categoryData.children, subcategorySlug);
+              if (subcategoryData) {
+                subdivisionWhere.subcategory = subcategoryData.id;
+              }
+            }
           }
         }
 
@@ -316,15 +331,24 @@ export async function getCategoriesPageData(options?: {
         return {
           subdivisions,
           categories,
+          popularSubdivisions: subdivisions, // Alias for pills (consistent with profiles)
         };
       },
-      [`categories-page-data${categorySlug ? `-${categorySlug}` : ''}`],
+      // Hierarchical cache keys for optimal cache hit rate
+      [
+        subcategorySlug && categorySlug
+          ? `categories-page-data-${categorySlug}-${subcategorySlug}`
+          : categorySlug
+            ? `categories-page-data-${categorySlug}`
+            : 'categories-page-data'
+      ],
       {
         tags: [
           'services',
           'categories',
           'categories-page',
           ...(categorySlug ? [`category-${categorySlug}`] : []),
+          ...(subcategorySlug ? [`subcategory-${subcategorySlug}`] : []),
         ],
         revalidate: 3600, // 1 hour cache
       },
