@@ -228,6 +228,7 @@ export interface TaxonomyTabsProps {
   items: TaxonomyTab[];
   basePath: string;
   allItemsLabel: string;
+  allItemsHref?: string; // Optional custom href for the first link
   activeItemSlug?: string;
   usePluralLabels?: boolean;
   className?: string;
