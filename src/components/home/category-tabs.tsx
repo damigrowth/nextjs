@@ -17,7 +17,7 @@ export function CategoryTabs({ categories }: CategoryTabsProps) {
   const { activeCategory, setActiveCategory } = useHomeFeaturedServicesStore();
 
   return (
-    <div className='flex flex-wrap gap-2'>
+    <div className='flex flex-wrap gap-2 justify-end w-2/3'>
       {categories.map((category) => (
         <Button
           key={category.id}
