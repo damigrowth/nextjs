@@ -39,7 +39,7 @@ export default function ProfilesHome({ profiles, savedProfileIds }: ProfilesHome
           {/* Right Side - View All Button */}
           <div className='flex-shrink-0'>
             <Link
-              href='/dir'
+              href='/directory'
               className='inline-flex items-center gap-2 text-accent hover:text-secondary hover:text-gray-900 transition-all duration-300 text-sm font-medium'
             >
               Επαγγελματικός Κατάλογος
