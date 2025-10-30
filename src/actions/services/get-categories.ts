@@ -56,9 +56,10 @@ export interface CategoriesPageData {
  */
 export async function getCategoriesPageData(options?: {
   categorySlug?: string; // Optional filter by specific category
+  limit?: number; // Optional limit for subdivisions (default: 15)
 }): Promise<ActionResult<CategoriesPageData>> {
   try {
-    const { categorySlug } = options || {};
+    const { categorySlug, limit = 15 } = options || {};
 
     const getCachedData = unstable_cache(
       async () => {
@@ -200,7 +201,7 @@ export async function getCategoriesPageData(options?: {
           })
           .filter(Boolean)
           .sort((a, b) => b!.count - a!.count) // Sort by count descending
-          .slice(0, 15); // Show top 15 subdivisions
+          .slice(0, limit); // Show top subdivisions (configurable)
 
         // Process categories with filtered subcategories
         let categories: CategoryWithSubcategories[] = [];

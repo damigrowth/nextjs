@@ -50,10 +50,12 @@ export interface DirectoryPageData {
  * Get all data needed for the directory (professionals) page
  * Shows professional categories with up to 10 most popular subcategories per category
  */
-export async function getDirectoryPageData(): Promise<
-  ActionResult<DirectoryPageData>
-> {
+export async function getDirectoryPageData(options?: {
+  limit?: number; // Optional limit for popular subcategories (default: 15)
+}): Promise<ActionResult<DirectoryPageData>> {
   try {
+    const { limit = 15 } = options || {};
+
     const getCachedData = unstable_cache(
       async () => {
         // Import prisma to get profession counts
@@ -105,9 +107,9 @@ export async function getDirectoryPageData(): Promise<
           }
         }
 
-        // Sort by count and take top 15
+        // Sort by count and take top subcategories (configurable)
         popularSubcategories.sort((a, b) => b.count - a.count);
-        const topPopularSubcategories = popularSubcategories.slice(0, 15);
+        const topPopularSubcategories = popularSubcategories.slice(0, limit);
 
         // Process categories with their subcategories
         const categories: ProCategoryWithSubcategories[] = proTaxonomies
