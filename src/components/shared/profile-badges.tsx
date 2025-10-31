@@ -43,7 +43,7 @@ export function VerifiedBadge({ verified }: { verified?: boolean }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <ShieldCheck className='h-6 w-6 text-white fill-secondary cursor-pointer' />
+        <ShieldCheck className='h-6 w-6 text-white fill-primary-dark cursor-pointer' />
       </TooltipTrigger>
       <TooltipContent>
         <p>Πιστοποιημένο Προφίλ</p>
