@@ -17,7 +17,7 @@ export default function ServiceRelated({
   }
 
   return (
-    <section className='py-16 bg-orangy'>
+    <section className='py-16 bg-silver'>
       <div className='container mx-auto px-6'>
         {/* Header Section */}
         <div className='mb-12'>

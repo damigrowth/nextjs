@@ -30,7 +30,9 @@ export function ErrorPage({
   className = '',
 }: ErrorPageProps) {
   return (
-    <div className={`min-h-screen flex justify-center items-center bg-orangy py-20 ${className}`}>
+    <div
+      className={`min-h-screen flex justify-center items-center bg-silver py-20 ${className}`}
+    >
       <div className='container m-auto px-4'>
         <div className='max-w-4xl mx-auto'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 items-center'>
@@ -51,7 +53,10 @@ export function ErrorPage({
               <div className='space-y-4'>
                 <div className='text-6xl lg:text-8xl font-bold text-gray-900'>
                   {errorCode.split('').map((digit, index) => (
-                    <span key={index} className={index === 1 ? 'text-primary' : ''}>
+                    <span
+                      key={index}
+                      className={index === 1 ? 'text-primary' : ''}
+                    >
                       {digit}
                     </span>
                   ))}
@@ -76,10 +81,12 @@ export function ErrorPage({
                     {resetButtonText}
                   </Button>
                 )}
-                <Button asChild size='lg' variant={showResetButton && reset ? 'outline' : 'default'}>
-                  <Link href={primaryButtonHref}>
-                    {primaryButtonText}
-                  </Link>
+                <Button
+                  asChild
+                  size='lg'
+                  variant={showResetButton && reset ? 'outline' : 'default'}
+                >
+                  <Link href={primaryButtonHref}>{primaryButtonText}</Link>
                 </Button>
               </div>
             </div>

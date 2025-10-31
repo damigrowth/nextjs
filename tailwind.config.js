@@ -64,6 +64,7 @@ module.exports = {
           foreground: 'hsl(var(--orangy-foreground))',
         },
         yellowish: 'hsl(var(--yellowish))',
+        silver: 'hsl(var(--silver))',
         bluey: 'hsl(var(--bluey))',
         'yellow-light': 'hsl(var(--yellow-light))',
         'yellow-bright': 'hsl(var(--yellow-bright))',

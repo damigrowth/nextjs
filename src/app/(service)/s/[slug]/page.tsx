@@ -89,7 +89,7 @@ export default async function ServicePage({
   } = result.data;
 
   return (
-    <div className='py-20 bg-orangy'>
+    <div className='py-20 bg-silver'>
       {/* Category Navigation Tabs */}
       <TaxonomyTabs
         items={featuredCategories}
@@ -103,7 +103,7 @@ export default async function ServicePage({
       <DynamicBreadcrumb
         segments={breadcrumbSegments}
         buttons={breadcrumbButtons}
-        className='bg-orangy'
+        className='bg-silver'
       />
 
       {/* Service Content */}

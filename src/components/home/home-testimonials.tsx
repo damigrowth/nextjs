@@ -90,7 +90,7 @@ export default function TestimonialsHome({
   const testimonialsItems = testimonialsProps || testimonials;
 
   return (
-    <section className='relative bg-gradient-to-b from-bluey to-orangy'>
+    <section className='relative bg-gradient-to-b from-bluey to-silver'>
       <div className='container mx-auto px-6 pt-32 pb-16'>
         <div className='flex flex-wrap items-center'>
           {/* Stats Section */}

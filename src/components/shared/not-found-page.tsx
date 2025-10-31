@@ -26,7 +26,9 @@ export function NotFoundPage({
   className = '',
 }: NotFoundPageProps) {
   return (
-    <div className={`min-h-screen flex justify-center items-center bg-orangy py-20 ${className}`}>
+    <div
+      className={`min-h-screen flex justify-center items-center bg-silver py-20 ${className}`}
+    >
       <div className='container m-auto px-4'>
         <div className='max-w-4xl mx-auto'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 items-center'>
@@ -58,13 +60,14 @@ export function NotFoundPage({
 
               <div className='flex flex-col sm:flex-row gap-4 justify-center lg:justify-start'>
                 <Button asChild size='lg'>
-                  <Link href={primaryButtonHref}>
-                    {primaryButtonText}
-                  </Link>
+                  <Link href={primaryButtonHref}>{primaryButtonText}</Link>
                 </Button>
                 {showBackButton && primaryButtonHref !== backButtonHref && (
                   <Button asChild variant='outline' size='lg'>
-                    <Link href={backButtonHref} className='flex items-center gap-2'>
+                    <Link
+                      href={backButtonHref}
+                      className='flex items-center gap-2'
+                    >
                       <ArrowLeft className='w-4 h-4' />
                       {backButtonText}
                     </Link>
@@ -82,7 +85,7 @@ export function NotFoundPage({
 // Helper function to generate metadata for not found pages
 export function createNotFoundMetadata(
   title: string = '404 - Σελίδα δεν βρέθηκε',
-  description: string = 'Η σελίδα που αναζητάτε δεν βρέθηκε.'
+  description: string = 'Η σελίδα που αναζητάτε δεν βρέθηκε.',
 ): Metadata {
   return {
     title,

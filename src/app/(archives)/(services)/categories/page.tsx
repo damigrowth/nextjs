@@ -55,7 +55,7 @@ export default async function CategoriesPage() {
     };
 
     return (
-      <div className='py-20 bg-orangy'>
+      <div className='py-20 bg-silver'>
         {/* Category Navigation Tabs */}
         <TaxonomyTabs
           items={validCategories}

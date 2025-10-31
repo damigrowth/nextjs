@@ -30,7 +30,7 @@ type Props = {
 
 export default function StatsGrid({ data }: Props) {
   return (
-    <section className='bg-orangy overflow-hidden max-w-4xl mx-auto rounded relative'>
+    <section className='bg-silver overflow-hidden max-w-4xl mx-auto rounded relative'>
       {/* Decorative Images */}
       <Image
         height={226}

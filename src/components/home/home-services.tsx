@@ -19,7 +19,7 @@ export default function ServicesHome({
   savedServiceIds,
 }: ServicesHomeProps) {
   return (
-    <section className='py-16 bg-orangy'>
+    <section className='py-16 bg-silver'>
       <div className='container mx-auto px-6'>
         {/* Header Section */}
         <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-12'>

@@ -36,12 +36,7 @@ function StaticHeroContent() {
 
 // Search Bar Component using the new HomeSearch UI component
 function HeroSearchBar() {
-  return (
-    <HomeSearch
-      placeholder='Τι ψάχνεις;'
-      buttonText='Αναζήτηση'
-    />
-  );
+  return <HomeSearch placeholder='Τι ψάχνεις;' buttonText='Αναζήτηση' />;
 }
 
 // Popular Searches Component - Dynamic links to popular subcategories
@@ -145,7 +140,11 @@ function HeroImages() {
 }
 
 // Dynamic content component
-function DynamicHeroContent({ subcategories }: { subcategories: DatasetItem[] }) {
+function DynamicHeroContent({
+  subcategories,
+}: {
+  subcategories: DatasetItem[];
+}) {
   return (
     <>
       <HeroSearchBar />
@@ -160,7 +159,7 @@ type HeroHomeProps = {
 
 export default function HeroHome({ popularSubcategories = [] }: HeroHomeProps) {
   return (
-    <section className='overflow-visible bg-orangy bg-gradient-to-t from-white to-yellowish contain-layout mt-10 lg:mt-20'>
+    <section className='overflow-visible bg-silver bg-gradient-to-t from-white to-silver contain-layout'>
       <div className='container mx-auto mt-24 mb-52 pl-6'>
         <div className='flex flex-wrap overflow-visible'>
           <div className='w-full flex flex-col justify-center xl:w-7/12 xl:pr-6'>
