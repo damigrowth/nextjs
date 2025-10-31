@@ -638,6 +638,7 @@ type CoverageWithNames = {
   zipcode?: string | null;
   counties?: string[]; // Already resolved names
   areas?: string[]; // Already resolved names
+  countyAreasMap?: Array<{ county: string; areas: string[] }>; // Grouped county-area relationships
 };
 
 /**
@@ -721,6 +722,52 @@ export function getAreasString(coverage: CoverageWithNames): string | null {
   return getCoverageAreasString(coverage);
 }
 
+/**
+ * Group coverage areas by county and return structured data for rendering
+ * Works with coverage data that has already been transformed with location names
+ * Example output: [{ county: "Θεσσαλονίκη", areas: ["Επανομή", "Αγία Τριάδα"] }, ...]
+ * @param coverage - Coverage object with resolved county and area names
+ * @returns Array of county objects with their areas, sorted alphabetically
+ */
+export function getCoverageGroupedByCounty(
+  coverage: CoverageWithNames,
+): Array<{ county: string; areas: string[] }> {
+  if (!coverage.onsite) {
+    return [];
+  }
+
+  // If countyAreasMap is already available (from enhanced transformation), use it directly
+  if (coverage.countyAreasMap && coverage.countyAreasMap.length > 0) {
+    return coverage.countyAreasMap;
+  }
+
+  // Fallback: If no countyAreasMap, return counties with all areas
+  if (!coverage.counties || coverage.counties.length === 0) {
+    return [];
+  }
+
+  // Sort counties alphabetically
+  const sortedCounties = [...coverage.counties].sort((a, b) => a.localeCompare(b, 'el'));
+
+  // If no areas, return just counties without areas
+  if (!coverage.areas || coverage.areas.length === 0) {
+    return sortedCounties.map((county) => ({
+      county,
+      areas: [],
+    }));
+  }
+
+  // Sort areas alphabetically
+  const sortedAreas = [...coverage.areas].sort((a, b) => a.localeCompare(b, 'el'));
+
+  // Return all counties with all areas
+  // Note: This is a fallback when county-area relationships aren't preserved
+  return sortedCounties.map((county) => ({
+    county,
+    areas: sortedAreas,
+  }));
+}
+
 // =============================================================================
 // COVERAGE TRANSFORMATION UTILITIES
 // =============================================================================
@@ -751,6 +798,75 @@ export function transformCoverageWithLocationNames<T extends DatasetItem>(
     };
   }
 
+  // Transform county and area names
+  const countyNames = transformLocationIdsToNames(
+    rawCoverage.counties || [],
+    locationOptions,
+  );
+
+  const areaNames = transformAreaIdsToNamesInContext(
+    rawCoverage.areas || [],
+    rawCoverage.counties || [],
+    locationOptions,
+  );
+
+  // Build county-areas map to maintain relationships
+  // For each area ID, find which county it belongs to
+  const countyAreasMap: Array<{ county: string; areas: string[] }> = [];
+
+  if (rawCoverage.counties && rawCoverage.areas && rawCoverage.counties.length > 0) {
+    const countyIds = rawCoverage.counties;
+    const areaIds = rawCoverage.areas;
+
+    // Create a map to group areas by their parent county
+    const areasByCountyId = new Map<string, string[]>();
+
+    // For each area ID, find which county it belongs to
+    for (const areaId of areaIds) {
+      let foundCountyId: string | null = null;
+
+      // Search through all counties in locationOptions to find which one contains this area
+      for (const countyOption of locationOptions) {
+        const area = countyOption.children?.find((a: any) => a.id === areaId);
+        if (area) {
+          foundCountyId = countyOption.id;
+          const areaName = area.name || area.label || '';
+
+          // Only add if this county is in the selected counties
+          if (countyIds.includes(foundCountyId)) {
+            if (!areasByCountyId.has(foundCountyId)) {
+              areasByCountyId.set(foundCountyId, []);
+            }
+            areasByCountyId.get(foundCountyId)!.push(areaName);
+          }
+          break; // Found the county for this area, stop searching
+        }
+      }
+    }
+
+    // Now build the final array with county names and their areas
+    for (const countyId of countyIds) {
+      const county = locationOptions.find((c) => c.id === countyId);
+      if (!county) continue;
+
+      const countyName = county.name || county.label || '';
+      const areasInCounty = areasByCountyId.get(countyId) || [];
+
+      // Sort areas alphabetically
+      areasInCounty.sort((a, b) => a.localeCompare(b, 'el'));
+
+      if (countyName) {
+        countyAreasMap.push({
+          county: countyName,
+          areas: areasInCounty,
+        });
+      }
+    }
+
+    // Sort counties alphabetically
+    countyAreasMap.sort((a, b) => a.county.localeCompare(b.county, 'el'));
+  }
+
   // Ensure required boolean fields have defaults
   const coverage: CoverageWithNames = {
     online: Boolean(rawCoverage.online),
@@ -768,15 +884,10 @@ export function transformCoverageWithLocationNames<T extends DatasetItem>(
       ? getLocationNameInContext(locationOptions, rawCoverage.zipcode, rawCoverage.county)
       : null,
     // Transform location arrays
-    counties: transformLocationIdsToNames(
-      rawCoverage.counties || [],
-      locationOptions,
-    ),
-    areas: transformAreaIdsToNamesInContext(
-      rawCoverage.areas || [],
-      rawCoverage.counties || [],
-      locationOptions,
-    ),
+    counties: countyNames,
+    areas: areaNames,
+    // Add county-areas mapping
+    countyAreasMap: countyAreasMap.length > 0 ? countyAreasMap : undefined,
   };
 
   return coverage;

@@ -624,29 +624,35 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
 
     // Transform services to archive card data
     const transformedServices: ArchiveServiceCardData[] = services.map(
-      (service) => ({
-        id: service.id,
-        title: service.title,
-        slug: service.slug,
-        price: service.price,
-        rating: service.rating,
-        reviewCount: service.reviewCount,
-        media: service.media,
-        type: service.type,
-        taxonomyLabels: resolveCategoryLabels(service),
-        profile: {
-          id: service.profile.id,
-          displayName: service.profile.displayName,
-          username: service.profile.username,
-          image: service.profile.image,
-          coverage: transformCoverageWithLocationNames(
-            service.profile.coverage,
-            locationOptions,
-          ),
-          verified: service.profile.verified,
-          top: service.profile.top,
-        },
-      }),
+      (service) => {
+        // Transform coverage once and extract groupedCoverage
+        const transformedCoverage = transformCoverageWithLocationNames(
+          service.profile.coverage,
+          locationOptions,
+        );
+
+        return {
+          id: service.id,
+          title: service.title,
+          slug: service.slug,
+          price: service.price,
+          rating: service.rating,
+          reviewCount: service.reviewCount,
+          media: service.media,
+          type: service.type,
+          taxonomyLabels: resolveCategoryLabels(service),
+          profile: {
+            id: service.profile.id,
+            displayName: service.profile.displayName,
+            username: service.profile.username,
+            image: service.profile.image,
+            coverage: transformedCoverage,
+            groupedCoverage: transformedCoverage.countyAreasMap || [],
+            verified: service.profile.verified,
+            top: service.profile.top,
+          },
+        };
+      },
     );
 
     const hasMore = total > offset + limit;

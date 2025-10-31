@@ -319,6 +319,9 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
           locationOptions,
         );
 
+        // Extract grouped coverage for serialization
+        const groupedCoverage = transformedCoverage.countyAreasMap || [];
+
         return {
           id: profile.id,
           username: profile.username,
@@ -330,6 +333,7 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
           top: profile.top,
           rate: profile.rate,
           coverage: transformedCoverage, // Replace raw coverage with transformed coverage
+          groupedCoverage, // Add pre-computed grouped coverage
           image: profile.image,
           category: profile.category,
           subcategory: profile.subcategory,

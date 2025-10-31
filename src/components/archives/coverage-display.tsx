@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import {
   Collapsible,
@@ -8,6 +8,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+import SharedCoverageDisplay from '@/components/shared/coverage-display';
 
 interface CoverageDisplayProps {
   variant?: 'compact' | 'full';
@@ -16,11 +17,11 @@ interface CoverageDisplayProps {
   online?: boolean;
   onbase?: boolean;
   onsite?: boolean;
-  // Coverage location data
+  // Coverage location data (for onbase display)
   area?: string | null;
-  areas?: string[];
   county?: string | null;
-  counties?: string[];
+  // Pre-computed grouped coverage from server (required for onsite)
+  groupedCoverage: Array<{ county: string; areas: string[] }>;
 }
 
 export function CoverageDisplay({
@@ -30,9 +31,8 @@ export function CoverageDisplay({
   onbase,
   onsite,
   area,
-  areas,
   county,
-  counties,
+  groupedCoverage,
 }: CoverageDisplayProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -40,6 +40,11 @@ export function CoverageDisplay({
   if (!online && !onbase && !onsite) {
     return null;
   }
+
+  const totalAreas = groupedCoverage.reduce(
+    (sum, item) => sum + item.areas.length,
+    0,
+  );
 
   // Get the coverage text based on type
   const getCoverageText = () => {
@@ -54,23 +59,26 @@ export function CoverageDisplay({
       return `Εξυπηρετεί: ${areaName}${areaName && countyName ? ', ' : ''}${countyName}`;
     }
 
-    if (onsite && counties?.length > 0) {
-      // Show counties for onsite
-      const displayCounties = counties.slice(0, 3);
-      const hasMoreCounties = counties.length > 3;
-
-      if (hasMoreCounties) {
-        return `Εξυπηρετεί: ${displayCounties.join(', ')} (+${counties.length - 3})`;
-      } else {
-        return `Εξυπηρετεί: ${displayCounties.join(', ')}`;
-      }
+    if (onsite && groupedCoverage.length > 0) {
+      // Show counties with grouped format
+      return (
+        <>
+          Εξυπηρετεί:{' '}
+          {groupedCoverage.map((item, index) => (
+            <React.Fragment key={item.county}>
+              {index > 0 && ', '}
+              {item.county}
+            </React.Fragment>
+          ))}
+        </>
+      );
     }
 
     return null;
   };
 
   const coverageText = getCoverageText();
-  const showExpandButton = onsite && areas && areas.length > 0;
+  const showExpandButton = onsite && totalAreas > 0;
 
   if (!coverageText) {
     return null;
@@ -86,7 +94,7 @@ export function CoverageDisplay({
               <MapPin className='w-4 h-4' />
               <CollapsibleTrigger asChild>
                 <button className='text-left hover:text-gray-900 transition-colors cursor-pointer'>
-                  <span>Εξυπηρετεί: {counties?.join(', ')}</span>
+                  <span>{coverageText}</span>
                   {isExpanded ? (
                     <ChevronUp className='w-4 h-4 inline ml-1' />
                   ) : (
@@ -98,7 +106,7 @@ export function CoverageDisplay({
 
             <CollapsibleContent className='mt-2'>
               <div className='pl-6 text-xs text-gray-500'>
-                <span>{areas?.join(', ')}</span>
+                <SharedCoverageDisplay groupedCoverage={groupedCoverage} />
               </div>
             </CollapsibleContent>
           </Collapsible>

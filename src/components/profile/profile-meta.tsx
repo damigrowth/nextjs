@@ -6,14 +6,14 @@ import type { ProfileMetaProps } from '@/lib/types/components';
 
 import {
   getCoverageAddress,
-  getCoverageCountiesString,
-  getCoverageAreasString,
+  getCoverageGroupedByCounty,
   hasOnbaseCoverage,
   hasOnsiteCoverage,
 } from '@/lib/utils/datasets';
 import { RatingDisplay, UserAvatar } from '../shared';
 import { VerifiedBadge } from '../shared/profile-badges';
 import SocialLinks from '../shared/social-links';
+import CoverageDisplay from '../shared/coverage-display';
 
 /**
  * Modern ProfileMeta Component
@@ -34,6 +34,8 @@ export default function ProfileMeta({
   visibility,
   socials,
 }: ProfileMetaProps) {
+  // Get grouped coverage data for display
+  const groupedCoverage = coverage ? getCoverageGroupedByCounty(coverage) : [];
   return (
     <section>
       <Card className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5 border border-border rounded-xl shadow-lg mb-8'>
@@ -107,18 +109,16 @@ export default function ProfileMeta({
                   )}
 
                 {/* Service Areas - onsite coverage */}
-                {coverage && hasOnsiteCoverage(coverage) && (
-                  <div className='flex items-center gap-2 text-muted-foreground'>
-                    <MapPin className='h-4 w-4 flex-shrink-0 text-primary' />
-                    <span>
-                      {getCoverageCountiesString(coverage)}
-                      {getCoverageCountiesString(coverage) &&
-                        getCoverageAreasString(coverage) &&
-                        ' - '}
-                      {getCoverageAreasString(coverage)}
-                    </span>
-                  </div>
-                )}
+                {coverage &&
+                  hasOnsiteCoverage(coverage) &&
+                  groupedCoverage.length > 0 && (
+                    <div className='flex items-center gap-2 text-muted-foreground'>
+                      <MapPin className='h-4 w-4 flex-shrink-0 text-primary' />
+                      <span>
+                        <CoverageDisplay groupedCoverage={groupedCoverage} />
+                      </span>
+                    </div>
+                  )}
               </div>
 
               {/* Social links */}

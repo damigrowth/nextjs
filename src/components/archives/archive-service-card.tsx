@@ -109,6 +109,7 @@ export function ArchiveServiceCard({
                   areas={profileCoverage?.areas}
                   county={profileCoverage?.county}
                   counties={profileCoverage?.counties}
+                  groupedCoverage={service.profile.groupedCoverage}
                   variant='compact'
                   className='text-sm'
                 />

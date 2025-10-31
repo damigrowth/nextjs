@@ -120,6 +120,7 @@ export function ArchiveProfileCard({
                 areas={profile.coverage?.areas}
                 county={profile.coverage?.county}
                 counties={profile.coverage?.counties}
+                groupedCoverage={profile.groupedCoverage}
                 variant='compact'
                 className='text-sm'
               />

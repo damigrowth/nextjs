@@ -1,8 +1,10 @@
 import React from 'react';
 import { Clock, MapPin, Globe, Users, Briefcase } from 'lucide-react';
 import { DatasetItem } from '@/lib/types/datasets';
+import { getCoverageGroupedByCounty } from '@/lib/utils/datasets';
 import IconBox from '@/components/shared/icon-box';
 import { FlaticonCategory } from '@/components/icon';
+import CoverageDisplay from '@/components/shared/coverage-display';
 
 interface ServiceInfoProps {
   coverage: ReturnType<
@@ -28,6 +30,9 @@ export default function ServiceInfo({
   className = '',
 }: ServiceInfoProps) {
   const { online, onbase, onsite, presence, oneoff, subscription } = type || {};
+
+  // Get grouped coverage once at the top
+  const groupedCoverage = getCoverageGroupedByCounty(coverage);
 
   return (
     <div
@@ -105,28 +110,12 @@ export default function ServiceInfo({
       {presence &&
         onsite &&
         coverage.onsite &&
-        ((coverage.counties && coverage.counties.length > 0) ||
-          (coverage.areas && coverage.areas.length > 0)) && (
+        groupedCoverage.length > 0 && (
           <div className='sm:col-span-2 md:col-span-2'>
             <IconBox
               icon={<Users className='h-10 w-10' />}
               title='Περιοχές Εξυπηρέτησης'
-              value={`${
-                coverage.counties && coverage.counties.length > 0
-                  ? coverage.counties.join(', ')
-                  : ''
-              }${
-                coverage.counties &&
-                coverage.counties.length > 0 &&
-                coverage.areas &&
-                coverage.areas.length > 0
-                  ? ' - '
-                  : ''
-              }${
-                coverage.areas && coverage.areas.length > 0
-                  ? coverage.areas.join(', ')
-                  : ''
-              }`}
+              value={<CoverageDisplay groupedCoverage={groupedCoverage} />}
             />
           </div>
         )}
