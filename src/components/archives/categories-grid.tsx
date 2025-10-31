@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import type { CategoryWithSubcategories } from '@/actions/services/get-categories';
 import { Separator } from '../ui/separator';
 
@@ -79,21 +78,13 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
               {category.subcategories.length > 0 && (
                 <div className='space-y-2'>
                   {category.subcategories.slice(0, 6).map((subcategory) => (
-                    <div
-                      key={subcategory.id}
-                      className='flex items-center justify-between'
-                    >
+                    <div key={subcategory.id}>
                       <Link
                         href={subcategory.href}
-                        className='text-sm font-medium text-gray-700 hover:text-primary transition-colors flex-1 truncate'
+                        className='text-sm font-medium text-gray-700 hover:text-primary transition-colors truncate block'
                       >
                         {subcategory.label}
                       </Link>
-                      {subcategory.count > 1 && (
-                        <Badge variant='muted' className='text-xs'>
-                          {subcategory.count}
-                        </Badge>
-                      )}
                     </div>
                   ))}
                   {category.subcategories.length > 6 && (
