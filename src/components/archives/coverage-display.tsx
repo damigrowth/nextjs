@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import SharedCoverageDisplay from '@/components/shared/coverage-display';
 
@@ -89,10 +89,10 @@ export function CoverageDisplay({
       {/* Coverage Text */}
       <div className='text-sm text-gray-600'>
         {showExpandButton ? (
-          <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+          <Popover open={isExpanded} onOpenChange={setIsExpanded}>
             <div className='flex items-center gap-1.5'>
               <MapPin className='w-4 h-4' />
-              <CollapsibleTrigger asChild>
+              <PopoverTrigger asChild>
                 <button className='text-left hover:text-gray-900 transition-colors cursor-pointer'>
                   <span>{coverageText}</span>
                   {isExpanded ? (
@@ -101,15 +101,20 @@ export function CoverageDisplay({
                     <ChevronDown className='w-4 h-4 inline ml-1' />
                   )}
                 </button>
-              </CollapsibleTrigger>
+              </PopoverTrigger>
             </div>
 
-            <CollapsibleContent className='mt-2'>
-              <div className='pl-6 text-xs text-gray-500'>
+            <PopoverContent
+              align='start'
+              side='bottom'
+              sideOffset={8}
+              className='w-80 p-3'
+            >
+              <div className='text-xs text-gray-700'>
                 <SharedCoverageDisplay groupedCoverage={groupedCoverage} />
               </div>
-            </CollapsibleContent>
-          </Collapsible>
+            </PopoverContent>
+          </Popover>
         ) : (
           <div className='flex items-center gap-1.5'>
             <MapPin className='w-4 h-4' />

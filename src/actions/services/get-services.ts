@@ -1000,7 +1000,11 @@ export async function getServiceArchivePageData(params: {
     };
 
     // Check if any filters are active
-    const hasActiveFilters = !!(filters.search || filters.county || filters.online !== undefined);
+    const hasActiveFilters = !!(
+      filters.search ||
+      filters.county ||
+      filters.online !== undefined
+    );
 
     // Fetch taxonomy paths first (should be cached)
     const taxonomyPathsResult = await getServiceTaxonomyPaths();
@@ -1038,15 +1042,29 @@ export async function getServiceArchivePageData(params: {
               if (searchTerm.length >= 2) {
                 const normalizedSearch = normalizeTerm(searchTerm);
                 const matchingTags = tags.filter((tag) =>
-                  normalizeTerm(tag.label).toLowerCase().includes(normalizedSearch.toLowerCase())
+                  normalizeTerm(tag.label)
+                    .toLowerCase()
+                    .includes(normalizedSearch.toLowerCase()),
                 );
                 const matchingTagIds = matchingTags.map((tag) => tag.id);
 
                 where.OR = [
-                  { titleNormalized: { contains: normalizedSearch, mode: 'insensitive' } },
-                  { descriptionNormalized: { contains: normalizedSearch, mode: 'insensitive' } },
+                  {
+                    titleNormalized: {
+                      contains: normalizedSearch,
+                      mode: 'insensitive',
+                    },
+                  },
+                  {
+                    descriptionNormalized: {
+                      contains: normalizedSearch,
+                      mode: 'insensitive',
+                    },
+                  },
                   { title: { contains: searchTerm, mode: 'insensitive' } },
-                  { description: { contains: searchTerm, mode: 'insensitive' } },
+                  {
+                    description: { contains: searchTerm, mode: 'insensitive' },
+                  },
                 ];
 
                 if (matchingTagIds.length > 0) {
@@ -1057,7 +1075,10 @@ export async function getServiceArchivePageData(params: {
 
             // Location filters
             if (filters.county) {
-              const countyOption = findLocationBySlugOrName(locationOptions, filters.county);
+              const countyOption = findLocationBySlugOrName(
+                locationOptions,
+                filters.county,
+              );
               const countyId = countyOption?.id;
 
               if (countyId && filters.online !== undefined) {
@@ -1066,7 +1087,11 @@ export async function getServiceArchivePageData(params: {
                   { type: { path: ['online'], equals: true } },
                   {
                     AND: [
-                      { profile: { coverage: { path: ['county'], equals: countyId } } },
+                      {
+                        profile: {
+                          coverage: { path: ['county'], equals: countyId },
+                        },
+                      },
                       {
                         profile: {
                           OR: [
@@ -1079,16 +1104,32 @@ export async function getServiceArchivePageData(params: {
                   },
                   {
                     AND: [
-                      { profile: { coverage: { path: ['counties'], array_contains: countyId } } },
-                      { profile: { coverage: { path: ['onsite'], equals: true } } },
+                      {
+                        profile: {
+                          coverage: {
+                            path: ['counties'],
+                            array_contains: countyId,
+                          },
+                        },
+                      },
+                      {
+                        profile: {
+                          coverage: { path: ['onsite'], equals: true },
+                        },
+                      },
                     ],
-                  }
+                  },
                 );
               } else if (countyId) {
                 where.profile = {
                   OR: [
                     { coverage: { path: ['county'], equals: countyId } },
-                    { coverage: { path: ['counties'], array_contains: countyId } },
+                    {
+                      coverage: {
+                        path: ['counties'],
+                        array_contains: countyId,
+                      },
+                    },
                   ],
                 };
               }
@@ -1275,7 +1316,10 @@ export async function getServiceArchivePageData(params: {
     } else {
       // On /ipiresies or /ipiresies/[subcategory]: show subdivisions from all matching services
 
-      if (hasActiveFilters && Object.keys(filteredSubdivisionCounts).length > 0) {
+      if (
+        hasActiveFilters &&
+        Object.keys(filteredSubdivisionCounts).length > 0
+      ) {
         // Build pills from filtered subdivision counts
         const subdivisionDataMap: Record<
           string,
@@ -1288,26 +1332,31 @@ export async function getServiceArchivePageData(params: {
           }
         > = {};
 
-        Object.entries(filteredSubdivisionCounts).forEach(([subdivisionId, count]) => {
-          // subdivisionId is the actual ID, not slug - need to find it in taxonomy
-          for (const category of serviceTaxonomies) {
-            if (!category.children) continue;
-            for (const subcategory of category.children) {
-              if (!subcategory.children) continue;
-              const subdivision = findById(subcategory.children, subdivisionId);
-              if (subdivision) {
-                subdivisionDataMap[subdivision.slug] = {
-                  id: subdivision.id,
-                  label: subdivision.label,
-                  categorySlug: category.slug,
-                  subcategorySlug: subcategory.slug,
-                  count,
-                };
-                break;
+        Object.entries(filteredSubdivisionCounts).forEach(
+          ([subdivisionId, count]) => {
+            // subdivisionId is the actual ID, not slug - need to find it in taxonomy
+            for (const category of serviceTaxonomies) {
+              if (!category.children) continue;
+              for (const subcategory of category.children) {
+                if (!subcategory.children) continue;
+                const subdivision = findById(
+                  subcategory.children,
+                  subdivisionId,
+                );
+                if (subdivision) {
+                  subdivisionDataMap[subdivision.slug] = {
+                    id: subdivision.id,
+                    label: subdivision.label,
+                    categorySlug: category.slug,
+                    subcategorySlug: subcategory.slug,
+                    count,
+                  };
+                  break;
+                }
               }
             }
-          }
-        });
+          },
+        );
 
         availableSubdivisions = Object.entries(subdivisionDataMap)
           .map(([subdivisionSlug, data]) => ({
@@ -1330,7 +1379,8 @@ export async function getServiceArchivePageData(params: {
         });
 
         if (categoriesDataResult.success && categoriesDataResult.data) {
-          availableSubdivisions = categoriesDataResult.data.popularSubdivisions || [];
+          availableSubdivisions =
+            categoriesDataResult.data.popularSubdivisions || [];
         }
       }
     }

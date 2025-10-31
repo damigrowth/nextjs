@@ -297,23 +297,44 @@ export interface ProfileCardProps {
 // Archive Profile Card Component Types
 export type ArchiveProfileCardData = Pick<
   import('@prisma/client').Profile,
-  'id' | 'username' | 'displayName' | 'rating' | 'reviewCount' | 'verified' | 'featured' | 'top' | 'rate' | 'coverage' | 'image' | 'category' | 'subcategory' | 'tagline' | 'skills' | 'speciality'
-> & Pick<
-  import('@prisma/client').User,
-  'role'
-> & {
-  taxonomyLabels?: {
-    category: string;
-    subcategory: string;
+  | 'id'
+  | 'username'
+  | 'displayName'
+  | 'rating'
+  | 'reviewCount'
+  | 'verified'
+  | 'featured'
+  | 'top'
+  | 'rate'
+  | 'coverage'
+  | 'image'
+  | 'category'
+  | 'subcategory'
+  | 'tagline'
+  | 'skills'
+  | 'speciality'
+> &
+  Pick<import('@prisma/client').User, 'role'> & {
+    taxonomyLabels?: {
+      category: string;
+      subcategory: string;
+    };
+    skillsData: DatasetItem[];
+    specialityData?: DatasetItem | null;
+    groupedCoverage: Array<{ county: string; areas: string[] }>; // Pre-computed grouped coverage from server
   };
-  skillsData: DatasetItem[];
-  specialityData?: DatasetItem | null;
-};
 
 // Archive Service Card Component Types
 export type ArchiveServiceCardData = Pick<
   import('@prisma/client').Service,
-  'id' | 'title' | 'slug' | 'price' | 'rating' | 'reviewCount' | 'media' | 'type'
+  | 'id'
+  | 'title'
+  | 'slug'
+  | 'price'
+  | 'rating'
+  | 'reviewCount'
+  | 'media'
+  | 'type'
 > & {
   taxonomyLabels: {
     category: string;
@@ -324,23 +345,46 @@ export type ArchiveServiceCardData = Pick<
     subdivisionSlug?: string;
     subdivisionId?: string;
   };
-  profile: Pick<import('@prisma/client').Profile, 'id' | 'displayName' | 'username' | 'image' | 'coverage' | 'verified' | 'top'>;
+  profile: Pick<
+    import('@prisma/client').Profile,
+    | 'id'
+    | 'displayName'
+    | 'username'
+    | 'image'
+    | 'coverage'
+    | 'verified'
+    | 'top'
+  > & {
+    groupedCoverage: Array<{ county: string; areas: string[] }>; // Pre-computed grouped coverage from server
+  };
 };
 
 // Profile filter types for archives
-export type ProfileFilters = Partial<Pick<
-  import('@prisma/client').Profile,
-  'category' | 'subcategory' | 'published'
->> & Partial<Pick<
-  import('@prisma/client').User,
-  'role' // for 'freelancer' | 'company' types
->> & {
-  county?: string;      // Single county selection for coverage filtering
-  online?: boolean;     // Coverage.online field
-  page?: number;
-  limit?: number;
-  sortBy?: 'default' | 'recent' | 'oldest' | 'price_asc' | 'price_desc' | 'rating_high' | 'rating_low';
-};
+export type ProfileFilters = Partial<
+  Pick<
+    import('@prisma/client').Profile,
+    'category' | 'subcategory' | 'published'
+  >
+> &
+  Partial<
+    Pick<
+      import('@prisma/client').User,
+      'role' // for 'freelancer' | 'company' types
+    >
+  > & {
+    county?: string; // Single county selection for coverage filtering
+    online?: boolean; // Coverage.online field
+    page?: number;
+    limit?: number;
+    sortBy?:
+      | 'default'
+      | 'recent'
+      | 'oldest'
+      | 'price_asc'
+      | 'price_desc'
+      | 'rating_high'
+      | 'rating_low';
+  };
 
 // Enhanced filter types for comprehensive profile archives
 export type ProfileArchiveFilters = ProfileFilters & {
@@ -350,9 +394,11 @@ export type ProfileArchiveFilters = ProfileFilters & {
 
 // Interface for comprehensive profile archive data
 export interface ProfileArchivePageData {
-  profiles: Array<ArchiveProfileCardData & {
-    transformedCoverage: any; // Pre-transformed coverage data
-  }>;
+  profiles: Array<
+    ArchiveProfileCardData & {
+      transformedCoverage: any; // Pre-transformed coverage data
+    }
+  >;
   total: number;
   hasMore: boolean;
   taxonomyData: {

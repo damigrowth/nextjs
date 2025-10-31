@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -117,10 +115,8 @@ export function ArchiveProfileCard({
                 onbase={profile.coverage?.onbase}
                 onsite={profile.coverage?.onsite}
                 area={profile.coverage?.area}
-                areas={profile.coverage?.areas}
                 county={profile.coverage?.county}
-                counties={profile.coverage?.counties}
-                groupedCoverage={profile.groupedCoverage}
+                groupedCoverage={profile.groupedCoverage || []}
                 variant='compact'
                 className='text-sm'
               />

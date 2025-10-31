@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -33,9 +31,13 @@ export function ArchiveServiceCard({
     : '';
 
   // Check if profile has coverage data (might not exist in ServiceCardData)
-  const profileCoverage = 'coverage' in service.profile ? service.profile.coverage : undefined;
-  const profileVerified = 'verified' in service.profile ? service.profile.verified : false;
+  const profileCoverage =
+    'coverage' in service.profile ? service.profile.coverage : undefined;
+  const profileVerified =
+    'verified' in service.profile ? service.profile.verified : false;
   const profileTop = 'top' in service.profile ? service.profile.top : false;
+  const profileGroupedCoverage =
+    'groupedCoverage' in service.profile ? service.profile.groupedCoverage : [];
 
   return (
     <Card
@@ -106,10 +108,8 @@ export function ArchiveServiceCard({
                   onbase={service.type?.onbase}
                   onsite={service.type?.onsite}
                   area={profileCoverage?.area}
-                  areas={profileCoverage?.areas}
                   county={profileCoverage?.county}
-                  counties={profileCoverage?.counties}
-                  groupedCoverage={service.profile.groupedCoverage}
+                  groupedCoverage={profileGroupedCoverage}
                   variant='compact'
                   className='text-sm'
                 />
