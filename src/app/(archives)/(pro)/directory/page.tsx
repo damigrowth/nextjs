@@ -1,5 +1,5 @@
 import { getDirectoryPageData } from '@/actions/profiles/get-directory';
-import { DynamicBreadcrumb } from '@/components/shared';
+import { TaxonomyTabs } from '@/components/shared';
 import { ArchiveBanner } from '@/components/archives/archive-banner';
 import { SubdivisionsCarousel } from '@/components/archives/subdivisions-carousel';
 import { CategoriesGrid } from '@/components/archives/categories-grid';
@@ -29,18 +29,24 @@ export default async function DirectoryPage() {
 
     const { popularSubcategories, categories } = directoryDataResult.data;
 
-    // Custom breadcrumb for directory page
-    const directoryBreadcrumb = {
-      segments: [
-        { label: 'Αρχική', href: '/' },
-        { label: 'Επαγγελματικός Κατάλογος' },
-      ],
-    };
+    // Transform categories for TaxonomyTabs
+    const proCategories = categories.map((cat) => ({
+      id: cat.id,
+      label: cat.label,
+      slug: cat.slug,
+    }));
 
     return (
-      <div className='py-20 bg-orangy'>
-        {/* Breadcrumb Navigation */}
-        <DynamicBreadcrumb segments={directoryBreadcrumb.segments} />
+      <div className='py-20 bg-silver'>
+        {/* Pro Category Navigation Tabs */}
+        <TaxonomyTabs
+          items={proCategories}
+          basePath='dir'
+          allItemsLabel='Επαγγελματικός Κατάλογος'
+          allItemsHref='/directory'
+          activeItemSlug={undefined}
+          usePluralLabels={true}
+        />
 
         {/* Archive Banner */}
         <ArchiveBanner

@@ -6,6 +6,7 @@ import {
   TestimonialsHome,
   ServicesHomeWrapper,
   ProfilesHomeWrapper,
+  TaxonomyTabs,
 } from '@/components';
 import { getHomeMetadata } from '@/lib/seo/pages';
 import { getHomePageData } from '@/actions/home/get-home-data';
@@ -45,9 +46,30 @@ export default async function HomePage() {
           serviceSubcategoriesWithServices: [],
         };
 
+  // Get categories for TaxonomyTabs
+  const serviceCategories = homeData.services.mainCategories
+    .filter((cat) => cat.slug !== 'all')
+    .map((cat) => ({
+      id: cat.id,
+      label: cat.label,
+      slug: cat.slug,
+    }));
+
   return (
     <>
       {/* <HomeSchema /> */}
+      {/* Service Categories Navigation Tabs */}
+      <div className='mt-10 lg:mt-20'>
+        <TaxonomyTabs
+          items={serviceCategories}
+          basePath='categories'
+          allItemsLabel='Όλες οι Κατηγορίες'
+          allItemsHref='/categories'
+          activeItemSlug={undefined}
+          usePluralLabels={false}
+        />
+      </div>
+
       <HeroHome popularSubcategories={homeData.popularSubcategories} />
       <CategoriesHome categories={homeData.categoriesWithSubcategories} />
       <FeaturesHome />
