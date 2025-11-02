@@ -251,9 +251,9 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
     );
   }
 
-  // Not authenticated
-  return !isMobile ? (
-    <div className='flex items-center space-x-2'>
+  // Not authenticated - Hide on mobile, show on desktop
+  return (
+    <div className='hidden sm:flex items-center space-x-2'>
       <Button
         asChild
         variant='outline'
@@ -266,14 +266,5 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
         <LinkNP href='/register'>Εγγραφή</LinkNP>
       </Button>
     </div>
-  ) : (
-    <Button
-      asChild
-      variant='ghost'
-      size='default'
-      className='hover:bg-secondary hover:text-secondary-foreground hover:border-secondary rounded-full'
-    >
-      <LinkNP href='/login'>Σύνδεση</LinkNP>
-    </Button>
   );
 }

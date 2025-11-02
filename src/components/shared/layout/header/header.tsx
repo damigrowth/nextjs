@@ -26,15 +26,16 @@ interface HeaderProps {
 export default function Header({ navigationData }: HeaderProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: session } = useSession();
 
   return (
     <header
-      className={`h-20 w-full z-50 bg-white ${pathname === '/' ? 'fixed top-0 bg-transparent border-b border-white/10' : 'relative bg-white border-b border-gray-200 shadow-sm -mb-20'}
+      className={`h-16 md:h-20 w-full z-50 bg-white flex items-center ${pathname === '/' ? 'fixed top-0 bg-transparent border-b border-white/10' : 'relative bg-white border-b border-gray-200 shadow-sm -mb-20'}
         py-2
       `}
     >
       <div className='container mx-auto px-4'>
-        <div className='flex items-center justify-between h-16'>
+        <div className='flex items-center justify-between'>
           {/* Left side - Logo and Desktop Navigation */}
           <div className='flex items-center space-x-8'>
             {/* Logo */}
@@ -72,7 +73,7 @@ export default function Header({ navigationData }: HeaderProps) {
                     <span className='sr-only'>Άνοιγμα μενού</span>
                   </Button>
                 </SheetTrigger>
-                <SheetContent side='left' className='w-[300px]'>
+                <SheetContent side='left' className='w-[300px] flex flex-col'>
                   <SheetHeader className='border-b pb-4'>
                     <SheetTitle asChild>
                       <Link href='/' onClick={() => setMobileMenuOpen(false)}>
@@ -88,7 +89,7 @@ export default function Header({ navigationData }: HeaderProps) {
                   </SheetHeader>
 
                   {/* Mobile Navigation */}
-                  <div className='mt-6'>
+                  <div className='mt-6 flex-1'>
                     <NavMenu
                       navigationData={navigationData}
                       isMobile={true}
@@ -96,10 +97,36 @@ export default function Header({ navigationData }: HeaderProps) {
                     />
                   </div>
 
-                  {/* Mobile Register Button */}
-                  <div className='mt-8 pt-6 border-t'>
-                    {/* <RegisterProButton className="w-full" /> */}
-                  </div>
+                  {/* Mobile Auth Buttons - Only show for non-authenticated users */}
+                  {!session?.user && (
+                    <div className='mt-auto pt-6 border-t space-y-3'>
+                      <Button
+                        asChild
+                        variant='outline'
+                        size='default'
+                        className='w-full rounded-full'
+                      >
+                        <Link
+                          href='/login'
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Σύνδεση
+                        </Link>
+                      </Button>
+                      <Button
+                        asChild
+                        size='default'
+                        className='w-full rounded-full'
+                      >
+                        <Link
+                          href='/register'
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Εγγραφή
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
                 </SheetContent>
               </Sheet>
             </div>

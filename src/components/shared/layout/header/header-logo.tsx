@@ -24,7 +24,7 @@ export default function HeaderLogo() {
         <Image
           width={133}
           height={40}
-          src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo_t9qnum.svg'
+          src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1761929834/Static/doulitsa-logo_mpqr5n.svg'
           alt='Doulitsa Logo'
           unoptimized
           priority
@@ -44,7 +44,7 @@ export default function HeaderLogo() {
     //     <Image
     //       width={133}
     //       height={40}
-    //       src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo_t9qnum.svg'
+    //       src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1761929834/Static/doulitsa-logo_mpqr5n.svg'
     //       alt='Doulitsa Logo'
     //       unoptimized
     //       priority
@@ -61,7 +61,7 @@ export default function HeaderLogo() {
     //     <Image
     //       width={133}
     //       height={40}
-    //       src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo_t9qnum.svg'
+    //       src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1761929834/Static/doulitsa-logo_mpqr5n.svg'
     //       alt='Doulitsa Logo'
     //       unoptimized
     //       priority
