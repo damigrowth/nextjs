@@ -11,7 +11,7 @@ export default function HomeTaxonomies({
   serviceSubcategories,
 }: HomeTaxonomiesProps) {
   return (
-    <section className='pt-16 pb-28 bg-silver'>
+    <section className='pt-8 pb-8 sm:py-12 md:py-16 lg:pb-28 bg-silver'>
       <div className='container mx-auto px-6'>
         {/* Client component with shadcn Tabs - handles state internally */}
         <HomeTaxonomiesTabs

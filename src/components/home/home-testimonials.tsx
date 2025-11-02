@@ -69,11 +69,11 @@ function StatItem({
   return (
     <div className='transition-all duration-400 ease-in-out px-4'>
       <div className='flex items-baseline mb-2'>
-        <span className='text-dark font-bold text-2xl leading-10 font-sans'>
+        <span className='text-dark font-bold text-xl sm:text-2xl leading-8 sm:leading-10 font-sans'>
           {value}
         </span>
         {suffix && (
-          <span className='text-dark font-bold text-2xl leading-10 font-sans ml-1'>
+          <span className='text-dark font-bold text-xl sm:text-2xl leading-8 sm:leading-10 font-sans ml-1'>
             {suffix}
           </span>
         )}
@@ -91,11 +91,11 @@ export default function TestimonialsHome({
 
   return (
     <section className='relative bg-gradient-to-b from-bluey to-silver'>
-      <div className='container mx-auto px-6 pt-32 pb-16'>
+      <div className='container mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16 lg:pt-32'>
         <div className='flex flex-wrap items-center'>
           {/* Stats Section */}
-          <div className='w-full md:w-1/2 lg:w-2/3 mb-8 md:mb-0'>
-            <div className='mb-14'>
+          <div className='w-full md:w-1/2 lg:w-2/3 md:mb-0'>
+            <div className='mb-4 sm:mb-6 md:mb-8'>
               <h2 className='text-xl lg:text-2xl font-bold mb-4 text-dark'>
                 Βρες τους πιο αξιόλογους επαγγελματίες
               </h2>
@@ -105,15 +105,15 @@ export default function TestimonialsHome({
               </p>
             </div>
 
-            <div className='flex flex-wrap'>
-              <div className='w-full sm:w-1/2 lg:w-1/3 mb-6 pr-8'>
+            <div className='flex flex-wrap -mx-2 sm:-mx-4'>
+              <div className='w-full sm:w-1/2 lg:w-1/3 mb-6 px-2 sm:px-4'>
                 <StatItem
                   value='4.9/5'
                   description='Οι top επαγγελματίες έχουν λάβει τις καλύτερες αξιολογήσεις'
                 />
               </div>
 
-              <div className='w-full sm:w-1/2 lg:w-1/3 mb-6 pr-8'>
+              <div className='w-full sm:w-1/2 lg:w-1/3 mb-6 px-2 sm:px-4'>
                 <StatItem
                   value='99'
                   suffix='% εγγύηση'
@@ -121,8 +121,8 @@ export default function TestimonialsHome({
                 />
               </div>
 
-              <div className='w-full sm:w-1/2 lg:w-1/3 mb-6 pr-8'>
-                <div className='transition-all duration-400 ease-in-out'>
+              <div className='w-full sm:w-1/2 lg:w-1/3 mb-6 px-2 sm:px-4'>
+                <div className='transition-all duration-400 ease-in-out px-4'>
                   <div className='mb-4'>
                     <h3 className='text-dark font-bold text-2xl leading-10 mb-2'>
                       Μας προτείνουν
@@ -150,7 +150,7 @@ export default function TestimonialsHome({
                 </CarouselContent>
 
                 {/* Pagination */}
-                <div className='flex justify-center mt-4'>
+                <div className='flex justify-center mt-4 sm:mt-6'>
                   <CarouselPagination
                     slideCount={testimonialsItems.length}
                     className='justify-center'

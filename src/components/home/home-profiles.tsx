@@ -21,10 +21,10 @@ export default function ProfilesHome({ profiles, savedProfileIds }: ProfilesHome
   // Convert array to Set for O(1) lookups
   const savedIdsSet = savedProfileIds ? new Set(savedProfileIds) : new Set<string>();
   return (
-    <section className='py-16 bg-dark'>
-      <div className='container mx-auto px-6'>
+    <section className='py-8 sm:py-12 md:py-16 bg-dark'>
+      <div className='container mx-auto px-4 sm:px-6'>
         {/* Header Section */}
-        <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-12'>
+        <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8 md:mb-12'>
           {/* Left Side - Title & Description */}
           <div className='flex-1 lg:max-w-2xl'>
             <h2 className='text-2xl font-bold text-fourth leading-8 mb-2'>
@@ -57,32 +57,33 @@ export default function ProfilesHome({ profiles, savedProfileIds }: ProfilesHome
             }}
             className='w-full'
           >
-            <CarouselContent>
-              {Array.from({
-                length: Math.ceil(profiles.length / 4),
-              }).map((_, slideIndex) => (
-                <CarouselItem key={slideIndex}>
-                  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-                    {profiles
-                      .slice(slideIndex * 4, (slideIndex + 1) * 4)
-                      .map((profile) => (
-                        <ProfileCard
-                          key={profile.id}
-                          profile={profile}
-                          isSaved={savedIdsSet.has(profile.id)}
-                        />
-                      ))}
-                  </div>
+            <CarouselContent className='-ml-2 sm:-ml-4'>
+              {profiles.map((profile) => (
+                <CarouselItem key={profile.id} className='pl-2 sm:pl-4 basis-full sm:basis-1/2 lg:basis-1/4'>
+                  <ProfileCard
+                    profile={profile}
+                    isSaved={savedIdsSet.has(profile.id)}
+                  />
                 </CarouselItem>
               ))}
             </CarouselContent>
 
+            {/* Navigation Controls - hide on mobile, show on larger screens */}
+            {profiles.length > 1 && (
+              <>
+                <CarouselPrevious className='hidden sm:flex' />
+                <CarouselNext className='hidden sm:flex' />
+              </>
+            )}
+
             {/* Pagination Dots */}
-            <CarouselPagination
-              slideCount={Math.ceil(profiles.length / 4)}
-              variant='light'
-              className='mt-6 justify-center'
-            />
+            {profiles.length > 1 && (
+              <CarouselPagination
+                slideCount={profiles.length}
+                variant='light'
+                className='mt-4 sm:mt-6 justify-center'
+              />
+            )}
           </Carousel>
         </div>
       </div>
