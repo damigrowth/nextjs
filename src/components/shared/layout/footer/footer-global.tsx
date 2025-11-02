@@ -117,7 +117,7 @@ export default async function Footer() {
                   height={45}
                   width={123}
                   className='mb-10 object-contain'
-                  src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750080997/Static/doulitsa-logo_t9qnum.svg'
+                  src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1761929834/Static/doulitsa-logo_mpqr5n.svg'
                   alt='Doulitsa logo'
                 />
               </LinkNP>

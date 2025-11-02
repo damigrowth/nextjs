@@ -34,7 +34,7 @@ export function CarouselPagination({ className, slideCount, variant = 'default' 
   }, [api]);
 
   return (
-    <div className={cn('flex justify-center gap-2', className)}>
+    <div className={cn('flex gap-2 sm:gap-3', className)}>
       {Array.from({ length: slideCount }).map((_, index) => (
         <button
           key={index}
