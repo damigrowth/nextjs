@@ -100,7 +100,7 @@ export function ArchiveProfileCard({
 
           {/* Profile and Price Section */}
           <div className='mt-3'>
-            <div className='flex items-center gap-3'>
+            <div className='flex flex-col md:flex-row md:items-center gap-2 md:gap-3'>
               {profile.reviewCount > 0 && (
                 <RatingDisplay
                   rating={profile.rating}
