@@ -20,14 +20,16 @@ export function ArchiveBanner({
   image,
 }: ArchiveBannerProps) {
   return (
-    <section className={cn('py-4 container mx-auto', className)}>
-      <div className='cta-service-v1 cta-banner archives-banner rounded-2xl relative overflow-hidden flex items-center mx-4 px-4 bg-white'>
+    <section
+      className={cn('py-0 md:py-4 container mx-auto px-4 sm:px-6', className)}
+    >
+      <div className='cta-service-v1 cta-banner archives-banner rounded-2xl relative overflow-hidden flex items-center bg-white'>
         {/* Left top decorative image */}
         <Image
           alt='vector'
           width={198}
           height={226}
-          className='absolute left-0 top-0 z-10'
+          className='absolute -left-20 -top-20 md:-left-10 md:-top-10 lg:left-0 lg:top-0 z-10'
           src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071394/Static/left-top_dnznwz.webp'
           priority
         />
@@ -37,7 +39,7 @@ export function ArchiveBanner({
           alt='vector'
           width={255}
           height={181}
-          className='absolute right-0 bottom-0 z-10'
+          className='absolute -right-20 -bottom-20 md:-right-10 md:-bottom-10 lg:right-0 lg:bottom-0 z-10'
           src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071395/Static/right-bottom_w0dkoq.webp'
           priority
         />
@@ -53,13 +55,13 @@ export function ArchiveBanner({
           }
           priority
         />
-        <div className='container mx-auto px-4 relative z-20'>
+        <div className='relative z-20'>
           <div className='flex justify-between items-center'>
-            <div className='max-w-xl my-10 ml-36'>
-              <h1 className='text-xl lg:text-2xl font-bold text-dark mb-2'>
+            <div className='max-w-xl my-10 ml-4 sm:ml-12 md:ml-24 lg:ml-36'>
+              <h1 className='text-xl sm:text-2xl lg:text-3xl font-bold text-dark mb-2'>
                 {title}
               </h1>
-              <h2 className='text-sm text-dark font-normal mb-0 leading-relaxed'>
+              <h2 className='text-sm sm:text-base text-dark font-normal mb-0 leading-relaxed'>
                 {subtitle}
               </h2>
             </div>
