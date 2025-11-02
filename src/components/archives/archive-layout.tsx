@@ -289,7 +289,7 @@ export function ArchiveLayout({
 
       {/* Archive Content */}
       <section>
-        <div className='container mx-auto px-4'>
+        <div className='container mx-auto px-4 sm:px-6 py-2'>
           <div className='max-w-5xl mx-auto'>
             {/* Filters with integrated sidebar */}
             <ArchiveSidebar
@@ -313,7 +313,7 @@ export function ArchiveLayout({
 
             {/* Results Summary */}
             <div className='bg-white border-b border-gray-200'>
-              <div className='container mx-auto px-4 py-4'>
+              <div className='py-4'>
                 <div className='flex items-center justify-between'>
                   <div className='text-sm text-gray-600'>
                     {total > 0 ? (
@@ -344,7 +344,7 @@ export function ArchiveLayout({
 
             {/* Subdivisions Carousel - only for services archive */}
             {availableSubdivisions && availableSubdivisions.length > 0 && (
-              <div className='container mx-auto px-4 pt-6'>
+              <div className='pt-6'>
                 <SubdivisionsCarousel
                   subdivisions={availableSubdivisions}
                   hideTitle={true}
@@ -353,7 +353,7 @@ export function ArchiveLayout({
             )}
 
             {/* Main Content */}
-            <div className='container mx-auto px-4 py-6'>
+            <div className='py-6'>
               {children}
 
               {/* Pagination */}

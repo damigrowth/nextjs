@@ -133,10 +133,10 @@ export function ArchivePagination({
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-2">
         {/* Results Per Page */}
         {showResultsPerPage && onLimitChange && (
-          <div className="flex items-center gap-2 mr-4">
+          <div className="flex items-center gap-2 sm:mr-4">
             <span className="text-sm text-gray-600 whitespace-nowrap">
               Results per page:
             </span>
@@ -159,61 +159,63 @@ export function ArchivePagination({
           </div>
         )}
 
-        {/* Previous Button */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handlePrevious}
-          disabled={currentPage <= 1 || isLoading}
-          className="flex items-center gap-1"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          <span className="hidden sm:inline">Previous</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          {/* Previous Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePrevious}
+            disabled={currentPage <= 1 || isLoading}
+            className="flex items-center gap-1"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Previous</span>
+          </Button>
 
-        {/* Page Numbers */}
-        <div className="flex items-center gap-1">
-          {pageNumbers.map((page, index) => {
-            if (page === 'ellipsis') {
+          {/* Page Numbers */}
+          <div className="flex items-center gap-2">
+            {pageNumbers.map((page, index) => {
+              if (page === 'ellipsis') {
+                return (
+                  <div
+                    key={`ellipsis-${index}`}
+                    className="flex items-center justify-center w-8 h-8 text-gray-400"
+                  >
+                    <MoreHorizontal className="w-4 h-4" />
+                  </div>
+                );
+              }
+
               return (
-                <div
-                  key={`ellipsis-${index}`}
-                  className="flex items-center justify-center w-8 h-8 text-gray-400"
+                <Button
+                  key={page}
+                  variant={page === currentPage ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handlePageClick(page)}
+                  disabled={isLoading}
+                  className={cn(
+                    "w-8 h-8 p-0",
+                    page === currentPage && "bg-primary text-primary-foreground"
+                  )}
                 >
-                  <MoreHorizontal className="w-4 h-4" />
-                </div>
+                  {page}
+                </Button>
               );
-            }
+            })}
+          </div>
 
-            return (
-              <Button
-                key={page}
-                variant={page === currentPage ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => handlePageClick(page)}
-                disabled={isLoading}
-                className={cn(
-                  "w-8 h-8 p-0",
-                  page === currentPage && "bg-primary text-primary-foreground"
-                )}
-              >
-                {page}
-              </Button>
-            );
-          })}
+          {/* Next Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleNext}
+            disabled={currentPage >= totalPages || isLoading}
+            className="flex items-center gap-1"
+          >
+            <span className="hidden sm:inline">Next</span>
+            <ChevronRight className="w-4 h-4" />
+          </Button>
         </div>
-
-        {/* Next Button */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleNext}
-          disabled={currentPage >= totalPages || isLoading}
-          className="flex items-center gap-1"
-        >
-          <span className="hidden sm:inline">Next</span>
-          <ChevronRight className="w-4 h-4" />
-        </Button>
       </div>
     </div>
   );

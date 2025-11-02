@@ -226,7 +226,7 @@ export function SortDropdown({
         </PopoverTrigger>
         <PopoverContent className='w-full p-0'>
           <Command>
-            <CommandInput placeholder={searchPlaceholder} />
+            {searchPlaceholder && <CommandInput placeholder={searchPlaceholder} />}
             <CommandList>
               <CommandEmpty>{emptyMessage}</CommandEmpty>
               <CommandGroup>
