@@ -17,17 +17,17 @@ export default function TaxonomyTabs({
   className = '',
 }: TaxonomyTabsProps) {
   return (
-    <section className={`overflow-hidden bg-muted ${className}`}>
-      <div className='container mx-auto py-2'>
+    <section className={`overflow-hidden bg-muted border-b border-gray-200 shadow-sm ${className}`}>
+      <div className='container mx-auto p-2'>
         <div className='flex flex-wrap'>
-          <div className='w-full'>
-            <nav>
-              <ul className='mb-0 flex flex-wrap ps-0'>
+          <div className='w-full relative'>
+            <nav className='overflow-x-auto scrollbar-hide'>
+              <ul className='mb-0 flex flex-nowrap ps-0'>
                 {/* All items link */}
-                <li>
+                <li className='flex-shrink-0'>
                   <LinkNP
                     href={allItemsHref || `/${basePath}`}
-                    className={`inline-block px-4 py-2 text-body hover:text-primary transition-colors text-sm ${
+                    className={`inline-block px-4 py-2 text-body hover:text-primary transition-colors text-sm whitespace-nowrap ${
                       !activeItemSlug ? 'text-primary font-medium' : ''
                     }`}
                   >
@@ -42,10 +42,10 @@ export default function TaxonomyTabs({
                     usePluralLabels && item.plural ? item.plural : item.label;
 
                   return (
-                    <li key={item.id}>
+                    <li key={item.id} className='flex-shrink-0'>
                       <LinkNP
                         href={`/${basePath}/${item.slug}`}
-                        className={`inline-block px-4 py-2 text-body hover:text-primary transition-colors text-sm ${
+                        className={`inline-block px-4 py-2 text-body hover:text-primary transition-colors text-sm whitespace-nowrap ${
                           isActive ? 'text-primary font-medium' : ''
                         }`}
                       >
@@ -56,6 +56,8 @@ export default function TaxonomyTabs({
                 })}
               </ul>
             </nav>
+            {/* Fade overlay on right edge */}
+            <div className='absolute top-0 right-0 bottom-0 w-16 bg-gradient-to-l from-muted to-transparent pointer-events-none' />
           </div>
         </div>
       </div>

@@ -46,39 +46,30 @@ export function ServicesCarousel({
         }}
         className='w-full'
       >
-        <CarouselContent className='-ml-4'>
-          {Array.from({
-            length: Math.ceil(displayServices.length / 4),
-          }).map((_, slideIndex) => (
-            <CarouselItem key={slideIndex} className='pl-4'>
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-                {displayServices
-                  .slice(slideIndex * 4, (slideIndex + 1) * 4)
-                  .map((service) => (
-                    <ServiceCard
-                      key={service.id}
-                      service={service}
-                      isSaved={savedIdsSet.has(service.id)}
-                    />
-                  ))}
-              </div>
+        <CarouselContent className='-ml-2 sm:-ml-4'>
+          {displayServices.map((service) => (
+            <CarouselItem key={service.id} className='pl-2 sm:pl-4 basis-full sm:basis-1/2 lg:basis-1/4'>
+              <ServiceCard
+                service={service}
+                isSaved={savedIdsSet.has(service.id)}
+              />
             </CarouselItem>
           ))}
         </CarouselContent>
 
-        {/* Navigation Controls - only show if more than 4 services */}
-        {displayServices.length > 4 && (
+        {/* Navigation Controls - hide on mobile, show on larger screens */}
+        {displayServices.length > 1 && (
           <>
-            <CarouselPrevious />
-            <CarouselNext />
+            <CarouselPrevious className='hidden sm:flex' />
+            <CarouselNext className='hidden sm:flex' />
           </>
         )}
 
-        {/* Pagination Dots - only show if more than 4 services */}
-        {displayServices.length > 4 && (
+        {/* Pagination Dots */}
+        {displayServices.length > 1 && (
           <CarouselPagination
-            slideCount={Math.ceil(displayServices.length / 4)}
-            className='mt-6 justify-center'
+            slideCount={displayServices.length}
+            className='mt-4 sm:mt-6 justify-center'
           />
         )}
       </Carousel>

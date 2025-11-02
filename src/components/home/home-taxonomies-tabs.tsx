@@ -36,15 +36,27 @@ const TaxonomiesGrid = ({
   type: 'pros' | 'ipiresies';
 }) => {
   // Data is already flattened and filtered server-side
-  // Limit to 90 items maximum (15 columns × 6 items each)
   const limitedSubcategories = data.slice(0, 90);
-  const columns = chunk(limitedSubcategories, 6).slice(0, 15);
+
+  // Calculate items per column for 5 columns
+  const itemsPerColumn = Math.ceil(limitedSubcategories.length / 5);
+  const columns = Array.from({ length: 5 }, (_, i) =>
+    limitedSubcategories.slice(i * itemsPerColumn, (i + 1) * itemsPerColumn)
+  );
 
   return (
-    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-10'>
-      {columns.map((column, index) => (
-        <div key={index} className='space-y-0'>
-          <TaxonomyColumn items={column} type={type} />
+    <div className='flex flex-col sm:flex-row gap-x-5'>
+      {columns.map((column, columnIndex) => (
+        <div key={columnIndex} className='flex flex-col flex-1'>
+          {column.map((item) => (
+            <Link
+              key={item.id}
+              href={item.href || `/${type}/${item.slug}`}
+              className='text-sm text-dark hover:text-fourth hover:underline transition-colors leading-10'
+            >
+              {type === 'pros' ? item.plural || item.label : item.label}
+            </Link>
+          ))}
         </div>
       ))}
     </div>
@@ -62,17 +74,17 @@ export default function HomeTaxonomiesTabs({
 }: HomeTaxonomiesTabsProps) {
   return (
     <Tabs defaultValue='services' className='w-full'>
-      <div className='mb-12'>
-        <TabsList className='bg-transparent border-none p-0 h-auto space-x-12'>
+      <div className='mb-8 sm:mb-10 md:mb-12'>
+        <TabsList className='bg-transparent border-none p-0 h-auto flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-8 md:space-x-12  justify-start'>
           <TabsTrigger
             value='services'
-            className='bg-transparent data-[state=active]:bg-transparent border-none p-0 text-xl font-bold data-[state=active]:text-dark text-dark/30 hover:text-dark data-[state=active]:shadow-none transition-colors'
+            className='bg-transparent data-[state=active]:bg-transparent border-none p-0 text-xl font-bold data-[state=active]:text-dark text-dark/30 hover:text-dark data-[state=active]:shadow-none transition-colors w-full sm:w-auto text-left justify-start'
           >
             Κατηγορίες Υπηρεσιών
           </TabsTrigger>
           <TabsTrigger
             value='pros'
-            className='bg-transparent data-[state=active]:bg-transparent border-none p-0 text-xl font-bold data-[state=active]:text-dark text-dark/30 hover:text-dark data-[state=active]:shadow-none transition-colors'
+            className='bg-transparent data-[state=active]:bg-transparent border-none p-0 text-xl font-bold data-[state=active]:text-dark text-dark/30 hover:text-dark data-[state=active]:shadow-none transition-colors w-full sm:w-auto text-left justify-start'
           >
             Κατηγορίες Επαγγελμάτων
           </TabsTrigger>
