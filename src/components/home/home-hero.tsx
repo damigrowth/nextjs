@@ -62,7 +62,7 @@ function PopularSearches({ subcategories }: { subcategories: DatasetItem[] }) {
           <Link href={`/ipiresies/${sub.slug}`} key={sub.id}>
             <Badge
               variant='outline'
-              className='no-underline inline-block font-sans font-normal text-sm leading-6 py-1.5 px-6 rounded-full border border-gray-medium bg-white text-dark transition-colors duration-200 ease-in-out hover:bg-green-light/50 cursor-pointer'
+              className='no-underline inline-block font-sans font-normal text-2xs sm:text-sm leading-5 sm:leading-6 py-1 sm:py-1.5 px-4 sm:px-6 rounded-full border border-gray-medium bg-white text-dark transition-colors duration-200 ease-in-out hover:bg-green-light/50 cursor-pointer'
             >
               {sub.label}
             </Badge>
@@ -160,12 +160,12 @@ type HeroHomeProps = {
 export default function HeroHome({ popularSubcategories = [] }: HeroHomeProps) {
   return (
     <section className='overflow-visible bg-silver bg-gradient-to-t from-white to-silver contain-layout'>
-      <div className='container mx-auto mt-24 mb-52 pl-6'>
+      <div className='container mx-auto pt-4 mt-2 md:mt-12 lg:mt-24 mb-2 sm:mb-12 md:mb-16 lg:mb-28 px-4 sm:px-6'>
         <div className='flex flex-wrap overflow-visible'>
           <div className='w-full flex flex-col justify-center xl:w-7/12 xl:pr-6'>
             <StaticHeroContent />
 
-            <div className='mt-8'>
+            <div className='mt-6 sm:mt-8'>
               <Suspense
                 fallback={
                   <div className='h-32 flex items-center'>
