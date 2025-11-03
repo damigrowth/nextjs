@@ -1,7 +1,12 @@
 'use client';
 
-import { Footer } from '@/components';
+// Import global styles
+import '../styles/critical.css';
+import '../styles/globals.css';
+import '@fortawesome/fontawesome-svg-core/styles.css';
+
 import { ErrorPage } from '@/components/shared/error-page';
+import { Footer, Header } from '@/components/shared/layout';
 
 // Error boundaries must be Client Components
 // global-error must include html and body tags
@@ -15,20 +20,19 @@ export default function GlobalError({
 }) {
   return (
     <html lang='el'>
-      <head>
-        <style>{`
-          @import url('/styles/globals.css');
-        `}</style>
-      </head>
       <body>
-        <ErrorPage
-          error={error}
-          reset={reset}
-          title='Ουπς! Κάτι πήγε πολύ στραβά'
-          description='Παρουσιάστηκε ένα κρίσιμο σφάλμα στην εφαρμογή. Παρακαλούμε δοκιμάστε ξανά ή επικοινωνήστε με την υποστήριξη αν το πρόβλημα επιμένει.'
-          errorCode='500'
-          showResetButton={true}
-        />
+        <Header navigationData={[]} />
+        <main>
+          <ErrorPage
+            error={error}
+            reset={reset}
+            title='Ουπς! Κάτι πήγε πολύ στραβά'
+            description='Παρουσιάστηκε ένα κρίσιμο σφάλμα στην εφαρμογή. Παρακαλούμε δοκιμάστε ξανά ή επικοινωνήστε με την υποστήριξη αν το πρόβλημα επιμένει.'
+            errorCode='500'
+            showResetButton={true}
+          />
+        </main>
+        <Footer />
       </body>
     </html>
   );
