@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useSession } from '@/lib/auth/client';
 import { capitalizeFirstLetter } from '@/lib/utils/validation';
+import FlaticonMenu from '@/components/icon/flaticon/flaticon-menu';
 
 export default function DashboardSidebar({
   ...props
@@ -54,7 +55,7 @@ export default function DashboardSidebar({
     {
       title: 'Πίνακας Ελέγχου',
       url: '/dashboard',
-      icon: Home,
+      icon: FlaticonMenu,
     },
     {
       title: 'Μηνύματα',
@@ -70,11 +71,7 @@ export default function DashboardSidebar({
       title: 'Αξιολογήσεις',
       url: '/dashboard/reviews',
       icon: Star,
-    },
-    {
-      title: 'Παραγγελίες',
-      url: '/dashboard/orders',
-      icon: FileText,
+      isActive: false,
     },
   ];
 
@@ -91,14 +88,9 @@ export default function DashboardSidebar({
 
   const navSecondary = [
     {
-      title: 'Υποστήριξη',
+      title: 'Υποστήριξη / Αναφορά',
       url: '#',
       icon: LifeBuoy,
-    },
-    {
-      title: 'Αναφορά Προβλήματος',
-      url: '#',
-      icon: Send,
     },
   ];
 
@@ -116,7 +108,7 @@ export default function DashboardSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size='lg' asChild>
-              <a href='/dashboard'>
+              <a href='/'>
                 <div className='bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg'>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -132,7 +124,9 @@ export default function DashboardSidebar({
                 </div>
                 <div className='grid flex-1 text-left text-sm leading-tight'>
                   <span className='truncate font-medium'>Doulitsa</span>
-                  <span className='truncate text-xs'>Dashboard</span>
+                  <span className='truncate text-xs flex items-center gap-1'>
+                    <Home className='size-3' />
+                  </span>
                 </div>
               </a>
             </SidebarMenuButton>

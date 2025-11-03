@@ -49,6 +49,8 @@ export function NavMain({
             ? pathname === '/dashboard'
             : pathname.startsWith(item.url);
 
+          const isDisabled = item.isActive === false;
+
           return (
             <Collapsible key={item.title} asChild defaultOpen={isActiveItem}>
               <SidebarMenuItem>
@@ -56,8 +58,10 @@ export function NavMain({
                   asChild
                   tooltip={item.title}
                   isActive={isActiveItem}
+                  disabled={isDisabled}
+                  className={isDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}
                 >
-                  <Link href={item.url}>
+                  <Link href={isDisabled ? '#' : item.url}>
                     <item.icon />
                     <span>{item.title}</span>
                   </Link>
