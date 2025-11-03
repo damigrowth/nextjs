@@ -53,15 +53,20 @@ const profileMenuItems = [
   },
 ];
 
-export default function ProfileSidebar() {
+export default function ProfileSidebar({ userType = 'user' }: { userType?: string }) {
   const pathname = usePathname();
+
+  // Filter menu items based on user type
+  const visibleItems = userType === 'pro'
+    ? profileMenuItems
+    : profileMenuItems.filter(item => item.url === '/dashboard/profile/account');
 
   return (
     <div className='w-64 bg-card'>
       <div className='p-4'>
         <h2 className='text-lg font-semibold mb-4'>Διαχείριση</h2>
         <nav className='space-y-1'>
-          {profileMenuItems.map((item) => {
+          {visibleItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.url;
 
