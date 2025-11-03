@@ -21,21 +21,23 @@ export default function AccountPageActions({ user }: AccountPageActionsProps) {
       <h2 className='text-lg font-semibold'>Ενέργειες Λογαριασμού</h2>
 
       <div className='flex flex-col sm:flex-row gap-4'>
-        {/* Change Password Button */}
-        <Dialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen}>
-          <DialogTrigger asChild>
-            <Button variant='outline' className='flex items-center gap-2'>
-              <Key className='h-4 w-4' />
-              Αλλαγή Κωδικού
-            </Button>
-          </DialogTrigger>
-          <DialogContent className='sm:max-w-md'>
-            <ChangePasswordForm
-              onSuccess={() => setChangePasswordOpen(false)}
-              onCancel={() => setChangePasswordOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
+        {/* Change Password Button - Only for email provider users */}
+        {user?.provider === 'email' && (
+          <Dialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen}>
+            <DialogTrigger asChild>
+              <Button variant='outline' className='flex items-center gap-2'>
+                <Key className='h-4 w-4' />
+                Αλλαγή Κωδικού
+              </Button>
+            </DialogTrigger>
+            <DialogContent className='sm:max-w-md'>
+              <ChangePasswordForm
+                onSuccess={() => setChangePasswordOpen(false)}
+                onCancel={() => setChangePasswordOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
 
         {/* Delete Account Button */}
         <Dialog open={deleteAccountOpen} onOpenChange={setDeleteAccountOpen}>
