@@ -15,3 +15,4 @@ export { default as FlaticonCustomerService } from './flaticon-customer-service'
 export { default as FlaticonCv } from './flaticon-cv';
 export { default as FlaticonWebDesign } from './flaticon-web-design';
 export { default as FlaticonSecure } from './flaticon-secure';
+export { default as FlaticonMenu } from './flaticon-menu';
