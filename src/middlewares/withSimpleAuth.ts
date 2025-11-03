@@ -40,8 +40,8 @@ export const withSimpleAuth = (next: Function) => {
 
         // Protect dashboard and other protected routes
         if (isDashboardPath || isOnboardingPath) {
-          // console.log('No session cookie - redirecting to signin');
-          return NextResponse.redirect(new URL('/auth/signin', request.url));
+          // console.log('No session cookie - redirecting to login');
+          return NextResponse.redirect(new URL('/login', request.url));
         }
 
         return next(request, _next);

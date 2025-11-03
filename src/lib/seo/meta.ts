@@ -1,6 +1,6 @@
 'use server';
 
-import { redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
 import { fetchEntity } from './fetch-entity';
@@ -47,7 +47,7 @@ export async function Meta({
       const { entity } = await fetchEntity(type, params);
 
       if (!entity) {
-        redirect('/not-found');
+        notFound();
       }
 
       const title = formatTemplate(titleTemplate, entity);
@@ -74,7 +74,14 @@ export async function Meta({
       return { meta };
     }
   } catch (error: any) {
-    console.error('Error fetching entity data:', error);
-    redirect('/not-found');
+    // Don't log expected Next.js errors when notFound() is called
+    const isExpectedNotFoundError =
+      error?.digest?.includes('NEXT_REDIRECT') ||
+      error?.digest?.includes('NEXT_HTTP_ERROR_FALLBACK');
+
+    if (!isExpectedNotFoundError) {
+      console.error('Error fetching entity data:', error);
+    }
+    notFound();
   }
 }
