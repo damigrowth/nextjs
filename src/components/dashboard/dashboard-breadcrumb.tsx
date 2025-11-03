@@ -24,6 +24,7 @@ const routeLabels: Record<string, string> = {
   edit: 'Επεξεργασία',
   account: 'Λογαριασμός',
   basic: 'Βασικά στοιχεία',
+  coverage: 'Τρόποι Παροχής',
   additional: 'Πρόσθετα Στοιχεία',
   presentation: 'Παρουσίαση',
   verification: 'Πιστοποίηση',

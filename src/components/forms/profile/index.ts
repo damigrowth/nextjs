@@ -5,6 +5,7 @@ export { default as PresentationInfoForm } from './form-presentation-info';
 export { default as PortfolioForm } from './form-portfolio';
 export { default as VerificationForm } from './form-verification';
 export { default as BillingForm } from './form-billing';
+export { default as CoverageForm } from './form-coverage';
 export { default as ChangePasswordForm } from './form-change-password';
 export { default as DeleteAccountForm } from './form-delete-account';
 export { default as OnboardingForm } from './form-onboarding';
