@@ -3,6 +3,7 @@
 import { ChevronRight, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { type ComponentType } from 'react';
 
 import {
   Collapsible,
@@ -28,7 +29,7 @@ export function NavMain({
   items: {
     title: string;
     url: string;
-    icon: LucideIcon;
+    icon: LucideIcon | ComponentType<any>;
     isActive?: boolean;
     items?: {
       title: string;

@@ -64,6 +64,14 @@ export const CACHE_TAGS = {
     taxonomies: 'search:taxonomies' as const,
     all: 'search:all' as const,
   },
+
+  // Admin-related tags
+  admin: {
+    profiles: 'admin:profiles' as const,
+    services: 'admin:services' as const,
+    verifications: 'admin:verifications' as const,
+    all: 'admin:all' as const,
+  },
 } as const;
 
 /**
