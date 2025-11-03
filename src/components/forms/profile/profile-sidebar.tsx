@@ -12,8 +12,10 @@ import {
   Building,
   Receipt,
   UserCircle,
+  Globe,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 const profileMenuItems = [
   {
@@ -25,6 +27,11 @@ const profileMenuItems = [
     title: 'Βασικά στοιχεία',
     url: '/dashboard/profile/basic',
     icon: User,
+  },
+  {
+    title: 'Τρόποι Παροχής',
+    url: '/dashboard/profile/coverage',
+    icon: Globe,
   },
   {
     title: 'Πρόσθετα Στοιχεία',
@@ -46,11 +53,6 @@ const profileMenuItems = [
     url: '/dashboard/profile/billing',
     icon: Building,
   },
-  {
-    title: 'Παραστατικά',
-    url: '/dashboard/documents',
-    icon: Receipt,
-  },
 ];
 
 export default function ProfileSidebar({ userType = 'user' }: { userType?: string }) {
@@ -62,31 +64,36 @@ export default function ProfileSidebar({ userType = 'user' }: { userType?: strin
     : profileMenuItems.filter(item => item.url === '/dashboard/profile/account');
 
   return (
-    <div className='w-64 bg-card'>
-      <div className='p-4'>
-        <h2 className='text-lg font-semibold mb-4'>Διαχείριση</h2>
-        <nav className='space-y-1'>
-          {visibleItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.url;
+    <div className='bg-card border-b'>
+      <div className='relative'>
+        <ScrollArea className='w-full'>
+          <nav className='flex items-center gap-2 px-6 py-4'>
+            {visibleItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.url;
 
-            return (
-              <Link
-                key={item.url}
-                href={item.url}
-                className={cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
-                  isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-                )}
-              >
-                <Icon className='h-4 w-4' />
-                {item.title}
-              </Link>
-            );
-          })}
-        </nav>
+              return (
+                <Link
+                  key={item.url}
+                  href={item.url}
+                  className={cn(
+                    'flex items-center gap-2 px-4 py-2 rounded-md text-sm transition-colors whitespace-nowrap',
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                  )}
+                >
+                  <Icon className='h-4 w-4' />
+                  {item.title}
+                </Link>
+              );
+            })}
+          </nav>
+          <ScrollBar orientation='horizontal' />
+        </ScrollArea>
+
+        {/* Fade out gradient on the right - only visible on mobile/tablet */}
+        <div className='absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-card to-transparent pointer-events-none lg:hidden' />
       </div>
     </div>
   );

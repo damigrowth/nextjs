@@ -16,17 +16,13 @@ export default async function ProfileLayout({
   // This will be handled in the page.tsx file instead
 
   return (
-    <div className='flex h-full'>
-      {/* Only show sidebar for pro users */}
+    <div className='flex flex-col h-full'>
+      {/* Only show horizontal nav for pro users */}
       {isProUser && <ProfileSidebar userType={user?.type || 'user'} />}
-      <div className={isProUser ? 'flex-1 p-6' : 'w-full'}>
-        {!isProUser ? (
-          <div className='mx-auto w-full max-w-5xl px-4 lg:px-6 py-6'>
-            {children}
-          </div>
-        ) : (
-          children
-        )}
+      <div className='flex-1 p-6 overflow-auto'>
+        <div className='mx-auto w-full max-w-5xl'>
+          {children}
+        </div>
       </div>
     </div>
   );

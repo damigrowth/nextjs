@@ -21,6 +21,7 @@ import {
   Package,
   Info,
   Presentation,
+  Globe,
 } from 'lucide-react';
 
 import { NavMain } from './dashboard-nav-main';
@@ -83,6 +84,36 @@ export default function DashboardSidebar({
       title: 'Διαχείριση',
       url: user?.type === 'pro' ? '/dashboard/profile' : '/dashboard/profile/account',
       icon: Settings,
+      items: user?.type === 'pro' ? [
+        {
+          title: 'Λογαριασμός',
+          url: '/dashboard/profile/account',
+        },
+        {
+          title: 'Βασικά στοιχεία',
+          url: '/dashboard/profile/basic',
+        },
+        {
+          title: 'Τρόποι Παροχής',
+          url: '/dashboard/profile/coverage',
+        },
+        {
+          title: 'Πρόσθετα Στοιχεία',
+          url: '/dashboard/profile/additional',
+        },
+        {
+          title: 'Παρουσίαση',
+          url: '/dashboard/profile/presentation',
+        },
+        {
+          title: 'Πιστοποίηση',
+          url: '/dashboard/profile/verification',
+        },
+        {
+          title: 'Στοιχεία Τιμολόγησης',
+          url: '/dashboard/profile/billing',
+        },
+      ] : undefined,
     },
   ];
 
