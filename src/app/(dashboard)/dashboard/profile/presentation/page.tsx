@@ -1,4 +1,4 @@
-import { getCurrentUser } from '@/actions/auth/server';
+import { getCurrentUser, requireProUser } from '@/actions/auth/server';
 import { PortfolioForm, PresentationInfoForm } from '@/components';
 import { redirect } from 'next/navigation';
 import { getDashboardMetadata } from '@/lib/seo/pages';
@@ -6,6 +6,9 @@ import { getDashboardMetadata } from '@/lib/seo/pages';
 export const metadata = getDashboardMetadata('Παρουσίαση');
 
 export default async function PresentationPage() {
+  // Require pro user type - redirects if type !== 'pro'
+  await requireProUser();
+
   // Fetch current user and profile data server-side
   const userResult = await getCurrentUser();
 

@@ -1,11 +1,14 @@
 import { BasicInfoForm } from '@/components';
-import { getCurrentUser } from '@/actions/auth/server';
+import { getCurrentUser, requireProUser } from '@/actions/auth/server';
 import { redirect } from 'next/navigation';
 import { getDashboardMetadata } from '@/lib/seo/pages';
 
 export const metadata = getDashboardMetadata('Βασικά στοιχεία');
 
 export default async function BasicPage() {
+  // Require pro user type - redirects if type !== 'pro'
+  await requireProUser();
+
   // Fetch current user and profile data server-side
   const userResult = await getCurrentUser({ revalidate: true });
 

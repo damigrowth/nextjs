@@ -518,3 +518,24 @@ export async function redirectOAuthUsersToSetup() {
 
   return session;
 }
+
+/**
+ * Check if user is a pro user (type === 'pro')
+ */
+export async function isProUser(): Promise<boolean> {
+  const result = await getCurrentUser();
+  return result.success && result.data.user?.type === 'pro';
+}
+
+/**
+ * Require pro user type - redirect if user is not pro
+ */
+export async function requireProUser(redirectTo = '/dashboard/profile/account') {
+  const result = await getCurrentUser();
+
+  if (!result.success || result.data.user?.type !== 'pro') {
+    redirect(redirectTo);
+  }
+
+  return result.data;
+}

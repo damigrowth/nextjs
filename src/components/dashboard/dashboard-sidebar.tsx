@@ -81,7 +81,7 @@ export default function DashboardSidebar({
   const accountGroup = [
     {
       title: 'Διαχείριση',
-      url: '/dashboard/profile',
+      url: user?.type === 'pro' ? '/dashboard/profile' : '/dashboard/profile/account',
       icon: Settings,
     },
   ];
@@ -99,7 +99,7 @@ export default function DashboardSidebar({
       ? user?.displayName
       : capitalizeFirstLetter(user?.username || 'User'),
     email: user?.email || '',
-    avatar: user?.image || '/avatars/default.jpg',
+    avatar: user?.image || '',
   };
 
   return (

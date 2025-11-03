@@ -1,8 +1,16 @@
 import { getDashboardMetadata } from '@/lib/seo/pages';
+import { getCurrentUser } from '@/actions/auth/server';
+import { redirect } from 'next/navigation';
 
 export const metadata = getDashboardMetadata('Διαχείριση');
 
-export default function EditProfilePage() {
+export default async function EditProfilePage() {
+  // Redirect simple users to account page
+  const userResult = await getCurrentUser();
+  if (userResult.data?.user?.type === 'user') {
+    redirect('/dashboard/profile/account');
+  }
+
   return (
     <div className='space-y-6'>
       <div>
