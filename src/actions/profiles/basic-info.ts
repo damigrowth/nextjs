@@ -165,7 +165,7 @@ export async function updateProfileBasicInfo(
     revalidateTag(CACHE_TAGS.service.byProfile(existingProfile.id));
 
     // Revalidate specific pages
-    revalidatePath('/dashboard/profile/basic-info');
+    revalidatePath('/dashboard/profile/basic');
     if (existingProfile.username) {
       revalidatePath(`/profile/${existingProfile.username}`);
     }

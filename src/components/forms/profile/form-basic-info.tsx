@@ -40,11 +40,7 @@ import {
 import { toast } from 'sonner';
 
 // Icons
-import {
-  Loader2,
-  Check,
-  ChevronsUpDown,
-} from 'lucide-react';
+import { Loader2, Check, ChevronsUpDown } from 'lucide-react';
 
 // Custom components
 import { MediaUpload } from '@/components/media';
@@ -99,12 +95,11 @@ export default function BasicInfoForm({
   hideCard = false,
 }: BasicInfoFormProps) {
   // Select the appropriate action based on admin mode
-  const actionToUse = adminMode ? updateProfileBasicInfoAdmin : updateProfileBasicInfo;
+  const actionToUse = adminMode
+    ? updateProfileBasicInfoAdmin
+    : updateProfileBasicInfo;
 
-  const [state, action, isPending] = useActionState(
-    actionToUse,
-    initialState,
-  );
+  const [state, action, isPending] = useActionState(actionToUse, initialState);
 
   const [isUploading, setIsUploading] = useState(false);
   const [isPendingTransition, startTransition] = useTransition();
@@ -184,6 +179,7 @@ export default function BasicInfoForm({
       // Refresh the session data to update the menu component with new image
       refetch();
       // Force a fresh server-side render to get the updated session data
+      // This will trigger the profile useEffect to reset the form with new data
       router.refresh();
     } else if (state.message && !state.success) {
       // Show error toast
@@ -354,7 +350,12 @@ export default function BasicInfoForm({
                 <MediaUpload
                   ref={profileImageRef}
                   value={field.value}
-                  onChange={field.onChange}
+                  onChange={(value) => {
+                    setValue('image', value, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                  }}
                   uploadPreset='doulitsa_new'
                   multiple={false}
                   folder={`users/${initialUser?.username}/profile`}

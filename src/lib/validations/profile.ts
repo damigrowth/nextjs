@@ -410,33 +410,27 @@ export const profileBasicInfoUpdateSchema = z.object({
   image: z.any().nullable().optional(),
   tagline: z
     .string()
-    .min(10, 'Το tagline πρέπει να έχει τουλάχιστον 10 χαρακτήρες')
-    .max(100, 'Το tagline δεν μπορεί να υπερβαίνει τους 100 χαρακτήρες')
-    .optional()
-    .or(z.literal('')),
+    .refine(
+      (val) => val === '' || val.length >= 10,
+      'Το tagline πρέπει να έχει τουλάχιστον 10 χαρακτήρες',
+    )
+    .refine(
+      (val) => val.length <= 100,
+      'Το tagline δεν μπορεί να υπερβαίνει τους 100 χαρακτήρες',
+    ),
   bio: z
     .string()
     .min(80, 'Η περιγραφή πρέπει να έχει τουλάχιστον 80 χαρακτήρες')
-    .max(5000, 'Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες')
-    .optional()
-    .or(z.literal('')),
-  category: z
-    .string()
-    .min(1, 'Η κατηγορία είναι υποχρεωτική')
-    .optional()
-    .or(z.literal('')),
-  subcategory: z
-    .string()
-    .min(1, 'Η υποκατηγορία είναι υποχρεωτική')
-    .optional()
-    .or(z.literal('')),
+    .max(5000, 'Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες'),
+  category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
+  subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
   skills: z
     .array(z.string().min(1, 'Skill ID is required'))
-    .min(1, 'Επιλέξτε τουλάχιστον μία δεξιότητα')
     .max(10, 'Μπορείτε να επιλέξετε έως 10 δεξιότητες')
-    .optional(),
+    .optional()
+    .transform((val) => val ?? []),
   speciality: z.string().optional().or(z.literal('')),
-  coverage: coverageSchema.optional(),
+  coverage: coverageSchema,
 });
 
 // Profile additional info update schema for new fields

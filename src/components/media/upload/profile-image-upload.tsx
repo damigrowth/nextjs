@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import { CldImage } from 'next-cloudinary';
-import { Upload, X, Loader2 } from 'lucide-react';
+import { Upload, X, Loader2, ImageOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   isPendingResource,
@@ -45,7 +45,7 @@ const ProfileImageUpload = memo<ProfileImageUploadProps>(({
         />
       );
     }
-    
+
     if (resource) {
       // Handle string URL (like Google images)
       if (typeof resource === 'string') {
@@ -57,10 +57,10 @@ const ProfileImageUpload = memo<ProfileImageUploadProps>(({
           />
         );
       }
-      
+
       // Handle CloudinaryResource objects
       const isPending = isPendingResource(resource);
-      
+
       return isPending || !resource.public_id ? (
         <img
           src={resource.secure_url}
@@ -77,10 +77,10 @@ const ProfileImageUpload = memo<ProfileImageUploadProps>(({
         />
       );
     }
-    
+
     return (
-      <div className="w-[71px] h-[71px] rounded-lg bg-secondary/5 hover:bg-secondary/10 flex items-center justify-center border-2 border-dashed border-primary/60 hover:border-primary/90 transition-colors">
-        <Upload className="w-6 h-6 text-primary/60" />
+      <div className="w-[71px] h-[71px] rounded-lg bg-secondary/5 hover:bg-secondary/10 flex items-center justify-center border-2 border-dashed border-gray-300 hover:border-primary/90 transition-colors">
+        <ImageOff className="w-6 h-6 text-gray-400" />
       </div>
     );
   };
