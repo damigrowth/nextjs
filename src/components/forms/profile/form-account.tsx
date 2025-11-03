@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useActionState, useEffect } from 'react';
+import React, { useActionState, useEffect, useState, useRef, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -21,6 +21,9 @@ import { useSession } from '@/lib/auth/client';
 
 // Icons
 import { AlertCircle, CheckCircle } from 'lucide-react';
+
+// Custom components
+import { MediaUpload } from '@/components/media';
 
 // Validation utilities
 import { formatDisplayName } from '@/lib/utils/validation/formats';
@@ -49,18 +52,26 @@ export default function AccountForm({ initialUser }: AccountFormProps) {
     initialState,
   );
   const router = useRouter();
+  const [isUploading, setIsUploading] = useState(false);
+  const [isPendingTransition, startTransition] = useTransition();
+  const { refetch } = useSession();
+
+  // Ref for media upload
+  const profileImageRef = useRef<any>(null);
 
   const form = useForm<AccountUpdateInput>({
     resolver: zodResolver(accountUpdateSchema),
     defaultValues: {
       displayName: '',
+      image: null,
     },
     mode: 'onChange',
   });
 
   const {
-    formState: { isValid, isDirty },
+    formState: { isValid, isDirty, errors },
     getValues,
+    setValue,
   } = form;
 
   // Update form values when user data is available
@@ -68,33 +79,109 @@ export default function AccountForm({ initialUser }: AccountFormProps) {
     if (initialUser) {
       form.reset({
         displayName: initialUser.displayName || '',
+        image: initialUser.image ? initialUser.image : null,
       });
     }
   }, [initialUser, form]);
 
-  // Handle successful form submission - refresh page to get updated session data
+  // Handle successful form submission - refresh session and page to get updated data
   useEffect(() => {
     if (state.success) {
+      // Reset loading states
+      setIsUploading(false);
+      // Refresh the session data to update the menu component with new image
+      refetch();
+      // Force a fresh server-side render to get the updated session data
       router.refresh();
     }
-  }, [state.success, router]);
+  }, [state.success, refetch, router]);
 
-  // Form submission handler
-  const handleFormSubmit = (formData: FormData) => {
-    const allValues = getValues();
-    populateFormData(formData, allValues, {
-      stringFields: ['displayName'],
-      skipEmpty: false,
-    });
-    action(formData);
+  // Reset loading states when form submission completes (success or failure)
+  useEffect(() => {
+    if (!isPending) {
+      setIsUploading(false);
+    }
+  }, [isPending]);
+
+  // Wrapper action that handles media uploads and data population
+  const handleFormAction = async (formData: FormData) => {
+    setIsUploading(true);
+
+    try {
+      // Check for pending files and upload if needed
+      const hasPendingFiles = profileImageRef.current?.hasFiles();
+
+      if (hasPendingFiles) {
+        await profileImageRef.current.uploadFiles();
+      }
+
+      // Get all form values AFTER upload completion
+      const allValues = getValues();
+
+      populateFormData(formData, allValues, {
+        stringFields: ['displayName'],
+        jsonFields: ['image'],
+        skipEmpty: true,
+      });
+
+      // Call the server action with populated FormData using startTransition
+      startTransition(() => {
+        action(formData);
+      });
+
+      // Note: Don't reset isUploading here, let it be handled by useEffect
+    } catch (error) {
+      console.error('❌ Upload failed:', error);
+      setIsUploading(false);
+      // Don't submit form if upload fails
+    }
   };
 
   return (
     <Form {...form}>
       <form
-        action={handleFormSubmit}
+        onSubmit={(e) => {
+          e.preventDefault();
+          const formData = new FormData(e.currentTarget);
+          handleFormAction(formData);
+        }}
         className='space-y-6 p-6 border rounded-lg'
       >
+        {/* Profile Image - Only for simple users (type='user') */}
+        {initialUser?.type === 'user' && (
+          <FormField
+            control={form.control}
+            name='image'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className='text-sm font-medium text-gray-700'>
+                  Εικόνα Προφίλ*
+                </FormLabel>
+                <p className='text-sm text-gray-600'>
+                  Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο.
+                </p>
+                <FormControl>
+                  <MediaUpload
+                    ref={profileImageRef}
+                    value={field.value}
+                    onChange={field.onChange}
+                    uploadPreset='doulitsa_new'
+                    multiple={false}
+                    folder={`users/${initialUser?.username}/profile`}
+                    maxFileSize={3000000} // 3MB
+                    allowedFormats={['jpg', 'jpeg', 'png', 'webp']}
+                    placeholder='Ανεβάστε εικόνα προφίλ'
+                    type='image'
+                    error={errors.image?.message}
+                    signed={false}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
         <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
           {/* Email - Read Only */}
           <FormItem>
@@ -176,8 +263,14 @@ export default function AccountForm({ initialUser }: AccountFormProps) {
             type='submit'
             text='Αποθήκευση'
             loadingText='Αποθήκευση...'
-            loading={isPending}
-            disabled={isPending || !isValid || !isDirty}
+            loading={isPending || isPendingTransition || isUploading}
+            disabled={
+              isPending ||
+              isPendingTransition ||
+              isUploading ||
+              !isValid ||
+              !isDirty
+            }
           />
         </div>
       </form>

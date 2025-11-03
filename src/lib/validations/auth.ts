@@ -146,6 +146,7 @@ export const accountUpdateSchema = z.object({
     .string()
     .min(5, 'Το όνομα εμφάνισης πρέπει να έχει τουλάχιστον 5 χαρακτήρες')
     .max(50, 'Το όνομα εμφάνισης δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες'),
+  image: z.any().nullable().optional(), // Accepts CloudinaryResource object or string URL
 });
 
 // Delete account schema

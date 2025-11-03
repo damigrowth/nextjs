@@ -15,6 +15,7 @@ import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
+import { processImageForDatabase } from '@/lib/utils/cloudinary';
 
 /**
  * Server action wrapper for useActionState
@@ -34,6 +35,7 @@ export async function updateAccount(
       formData,
       {
         displayName: { type: 'string', required: true },
+        image: { type: 'json', required: false },
       },
     );
 
@@ -56,8 +58,15 @@ export async function updateAccount(
 
     const data = validationResult.data;
 
+    // Process image data - convert CloudinaryResource to URL string for database storage
+    // Only process image for type='user' (simple users), not for type='pro'
+    const processedImage =
+      user.type === 'user' && data.image !== undefined
+        ? processImageForDatabase(data.image)
+        : undefined;
+
     // 4. Database & API operations
-    // First get the profile to have all the data for cache invalidation
+    // Get the profile if it exists (pro users have profiles, simple users don't)
     const profile = await prisma.profile.findUnique({
       where: { uid: user.id },
       select: {
@@ -71,20 +80,26 @@ export async function updateAccount(
       },
     });
 
-    if (!profile) {
-      return {
-        success: false,
-        message: 'Το προφίλ δεν βρέθηκε.',
-      };
-    }
-
-    // Update the profile
-    await prisma.profile.update({
-      where: { uid: user.id },
+    // Update the user - displayName for all, image only for type='user'
+    await prisma.user.update({
+      where: { id: user.id },
       data: {
         displayName: data.displayName,
+        ...(user.type === 'user' && processedImage !== undefined && { image: processedImage }),
       },
     });
+
+    // Update the profile if it exists (only for pro users)
+    // Profile image is NOT updated here - pro users update their image in basic info form
+    if (profile) {
+      await prisma.profile.update({
+        where: { uid: user.id },
+        data: {
+          displayName: data.displayName,
+          // No image update for profile - pro users manage image in basic info
+        },
+      });
+    }
 
     // Update Better Auth user data
     await auth.api.updateUser({
@@ -92,6 +107,7 @@ export async function updateAccount(
       body: {
         displayName: data.displayName,
         name: data.displayName,
+        ...(user.type === 'user' && processedImage !== undefined && { image: processedImage }),
       },
     });
 
@@ -102,7 +118,7 @@ export async function updateAccount(
         disableCookieCache: true,
       },
     });
-    
+
     // Force another session fetch to ensure cache is cleared
     await auth.api.getSession({
       headers: await headers(),
@@ -112,29 +128,34 @@ export async function updateAccount(
     });
 
     // 6. Revalidate cached data with consistent tags
-    const profileTags = getProfileTags(profile);
-    profileTags.forEach(tag => revalidateTag(tag));
-
-    // Also revalidate user-specific tags
+    // Revalidate user-specific tags (for both simple and pro users)
     revalidateTag(CACHE_TAGS.user.byId(user.id));
     revalidateTag(CACHE_TAGS.user.services(user.id));
 
-    // Revalidate profile services (they show displayName)
-    revalidateTag(CACHE_TAGS.profile.services(profile.id));
-    revalidateTag(CACHE_TAGS.service.byProfile(profile.id));
+    // Revalidate profile-specific data only if profile exists (pro users)
+    if (profile) {
+      const profileTags = getProfileTags(profile);
+      profileTags.forEach(tag => revalidateTag(tag));
 
-    // Revalidate specific pages
-    revalidatePath('/dashboard/profile/account');
-    if (profile.username) {
-      revalidatePath(`/profile/${profile.username}`);
+      // Revalidate profile services (they show displayName)
+      revalidateTag(CACHE_TAGS.profile.services(profile.id));
+      revalidateTag(CACHE_TAGS.service.byProfile(profile.id));
+
+      // Revalidate profile page
+      if (profile.username) {
+        revalidatePath(`/profile/${profile.username}`);
+      }
+
+      // Revalidate all service pages that belong to this profile
+      profile.services.forEach(service => {
+        if (service.slug) {
+          revalidatePath(`/s/${service.slug}`);
+        }
+      });
     }
 
-    // Revalidate all service pages that belong to this profile
-    profile.services.forEach(service => {
-      if (service.slug) {
-        revalidatePath(`/s/${service.slug}`);
-      }
-    });
+    // Revalidate account page for all users
+    revalidatePath('/dashboard/profile/account');
 
     return {
       success: true,
