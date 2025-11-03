@@ -48,7 +48,7 @@ export function DashboardBreadcrumb() {
       <BreadcrumbList>
         <BreadcrumbItem className="hidden md:block">
           <BreadcrumbLink href="/">
-            Δουλίτσα
+            Αρχική
           </BreadcrumbLink>
         </BreadcrumbItem>
         {breadcrumbItems.map((item, index) => (
