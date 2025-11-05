@@ -1,6 +1,7 @@
 import React from 'react';
 import { Shield } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
 export interface UserAvatarProps {
@@ -128,13 +129,19 @@ export default function UserAvatar({
         {imageUrl && (
           <AvatarImage src={imageUrl} alt={altText} className='object-cover' />
         )}
-        <AvatarFallback
-          className={cn(
-            fallbackSizeClass,
-            'font-semibold bg-primary text-primary-foreground rounded-lg',
+        <AvatarFallback className='rounded-lg'>
+          {imageUrl ? (
+            <Skeleton className='w-full h-full' />
+          ) : (
+            <div
+              className={cn(
+                fallbackSizeClass,
+                'font-semibold bg-primary text-primary-foreground rounded-lg w-full h-full flex items-center justify-center',
+              )}
+            >
+              {initials}
+            </div>
           )}
-        >
-          {initials}
         </AvatarFallback>
       </Avatar>
 
