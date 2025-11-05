@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 
@@ -14,8 +13,9 @@ interface NavigationButtonProps {
 }
 
 /**
- * Client-side navigation button that uses router.push for reliable navigation
- * Especially useful in error pages to avoid cascading errors
+ * Client-side navigation button that uses window.location for hard navigation
+ * This fully resets the app state, which is essential for error page navigation
+ * to avoid cascading errors and ensure clean page loads
  */
 export function NavigationButton({
   href,
@@ -25,10 +25,9 @@ export function NavigationButton({
   className = '',
   showBackIcon = false,
 }: NavigationButtonProps) {
-  const router = useRouter();
-
   const handleClick = () => {
-    router.push(href);
+    // Use window.location.href for hard navigation to fully reset error state
+    window.location.href = href;
   };
 
   return (
