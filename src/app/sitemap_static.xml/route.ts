@@ -1,10 +1,10 @@
 import type { MetadataRoute } from 'next';
 
 /**
+ * Route handler for /sitemap_static.xml
  * Generates sitemap for static pages
- * All pages are verified to exist in the app structure
  */
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export async function GET() {
   const baseUrl: string = process.env.LIVE_URL || 'https://doulitsa.gr';
 
   const staticPaths: string[] = [
@@ -35,5 +35,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticUrls,
   ];
 
-  return allUrls;
+  // Generate XML
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${allUrls
+  .map(
+    (entry) => `  <url>
+    <loc>${entry.url}</loc>
+    <lastmod>${entry.lastModified instanceof Date ? entry.lastModified.toISOString() : new Date(entry.lastModified!).toISOString()}</lastmod>
+  </url>`,
+  )
+  .join('\n')}
+</urlset>`;
+
+  return new Response(xml, {
+    headers: {
+      'Content-Type': 'application/xml',
+      'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+    },
+  });
 }
