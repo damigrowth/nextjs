@@ -17,9 +17,9 @@ export function CategoryTabs({ categories }: CategoryTabsProps) {
   const { activeCategory, setActiveCategory } = useHomeFeaturedServicesStore();
 
   return (
-    <div className='w-full lg:w-2/3 relative'>
-      <div className='overflow-x-auto scrollbar-hide'>
-        <div className='flex gap-2 justify-start lg:justify-end min-w-max lg:min-w-0'>
+    <div className='w-full lg:w-2/3 relative overflow-x-clip lg:overflow-x-visible'>
+      <div className='overflow-x-auto lg:overflow-x-visible scrollbar-hide'>
+        <div className='flex gap-2 justify-start lg:justify-end min-w-max lg:min-w-0 lg:flex-wrap'>
           {categories.map((category) => (
             <Button
               key={category.id}
@@ -38,7 +38,7 @@ export function CategoryTabs({ categories }: CategoryTabsProps) {
         </div>
       </div>
       {/* Fade overlay on right edge - only on mobile */}
-      <div className='absolute top-0 right-0 bottom-0 w-16 bg-gradient-to-l from-silver to-transparent pointer-events-none lg:hidden' />
+      <div className='absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-silver via-silver/60 to-transparent pointer-events-none lg:hidden' />
     </div>
   );
 }

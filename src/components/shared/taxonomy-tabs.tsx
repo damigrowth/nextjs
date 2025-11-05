@@ -20,7 +20,7 @@ export default function TaxonomyTabs({
     <section className={`overflow-hidden bg-muted border-b border-gray-200 shadow-sm ${className}`}>
       <div className='container mx-auto p-2'>
         <div className='flex flex-wrap'>
-          <div className='w-full relative'>
+          <div className='w-full relative overflow-x-clip'>
             <nav className='overflow-x-auto scrollbar-hide'>
               <ul className='mb-0 flex flex-nowrap ps-0'>
                 {/* All items link */}
@@ -57,7 +57,7 @@ export default function TaxonomyTabs({
               </ul>
             </nav>
             {/* Fade overlay on right edge */}
-            <div className='absolute top-0 right-0 bottom-0 w-16 bg-gradient-to-l from-muted to-transparent pointer-events-none' />
+            <div className='absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-muted via-muted/60 to-transparent pointer-events-none' />
           </div>
         </div>
       </div>

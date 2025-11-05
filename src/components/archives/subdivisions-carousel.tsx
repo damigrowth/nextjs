@@ -32,7 +32,7 @@ export function SubdivisionsCarousel({
         </div>
       )}
 
-      <div className='relative'>
+      <div className='relative overflow-x-clip'>
         <Carousel
           opts={{
             align: 'start',
@@ -63,7 +63,8 @@ export function SubdivisionsCarousel({
           <CarouselPrevious className='hidden md:flex' />
           <CarouselNext className='hidden md:flex' />
         </Carousel>
-        <div className='absolute top-0 right-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent pointer-events-none' />
+        {/* Fade gradient - mobile only */}
+        <div className='absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-silver via-silver/60 to-transparent pointer-events-none' />
       </div>
     </section>
   );

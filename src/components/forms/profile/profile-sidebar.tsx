@@ -65,7 +65,7 @@ export default function ProfileSidebar({ userType = 'user' }: { userType?: strin
 
   return (
     <div className='bg-card border-b'>
-      <div className='relative'>
+      <div className='relative overflow-x-clip lg:overflow-x-visible'>
         <ScrollArea className='w-full'>
           <nav className='flex items-center gap-2 px-6 py-4'>
             {visibleItems.map((item) => {
@@ -93,7 +93,7 @@ export default function ProfileSidebar({ userType = 'user' }: { userType?: strin
         </ScrollArea>
 
         {/* Fade out gradient on the right - only visible on mobile/tablet */}
-        <div className='absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-card to-transparent pointer-events-none lg:hidden' />
+        <div className='absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-card via-card/60 to-transparent pointer-events-none lg:hidden' />
       </div>
     </div>
   );
