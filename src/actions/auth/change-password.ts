@@ -1,5 +1,6 @@
 'use server';
 
+import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';
 import { passwordChangeSchema } from '@/lib/validations/auth';
 import { ActionResponse } from '@/lib/types/api';
@@ -42,6 +43,7 @@ export async function changePassword(
 
     // Use Better Auth to change password
     const result = await auth.api.changePassword({
+      headers: await headers(),
       body: {
         currentPassword: oldPassword,
         newPassword: validatedNewPassword,
