@@ -5,6 +5,7 @@ import { ActionResponse } from '@/lib/types/api';
 import { requireAuth } from './server';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import { Prisma } from '@prisma/client';
 import { CloudinaryResource } from '@/lib/types/cloudinary';
 import { onboardingFormSchemaWithMedia } from '@/lib/validations';
@@ -150,6 +151,9 @@ export async function completeOnboarding(
         },
       });
     }
+
+    // Revalidate dashboard path to ensure fresh data
+    revalidatePath('/dashboard');
 
     return {
       success: true,

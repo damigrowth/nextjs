@@ -17,23 +17,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
+import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { toast } from 'sonner';
-
-// Icons
-import { Check, ChevronsUpDown } from 'lucide-react';
 
 // Custom components
 import { MultiSelect } from '@/components/ui/multi-select';
@@ -119,49 +104,17 @@ export default function CoverageForm({
   // Watch coverage field
   const watchedCoverage = watch('coverage');
 
-  // Pagination state for zipcode list
-  const [displayLimit, setDisplayLimit] = React.useState(20);
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const ITEMS_PER_PAGE = 20;
-
-  // Create flat zipcode list for easy search
+  // Create flat zipcode list for easy search (for LazyCombobox)
   const allZipcodes = React.useMemo(() => {
     const zipcodes = getAllZipcodes(locationOptions);
     return zipcodes.map((zipcode) => ({
-      ...zipcode,
-      searchLabel: `${zipcode.name} - ${zipcode.area.name} - ${zipcode.county.name}`,
+      id: zipcode.id,
+      label: `${zipcode.name} - ${zipcode.area.name} - ${zipcode.county.name}`,
+      name: zipcode.name,
+      area: zipcode.area,
+      county: zipcode.county,
     }));
   }, []);
-
-  // Filter and paginate zipcodes based on search query
-  const displayedZipcodes = React.useMemo(() => {
-    // If searching, filter ALL zipcodes and show first 100 results
-    if (searchQuery.trim()) {
-      const filtered = allZipcodes.filter((zipcode) =>
-        zipcode.searchLabel.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      return filtered.slice(0, 100); // Show more results when searching
-    }
-
-    // If not searching, show paginated list
-    return allZipcodes.slice(0, displayLimit);
-  }, [allZipcodes, displayLimit, searchQuery]);
-
-  // Handle scroll to load more (only when not searching)
-  const handleScroll = React.useCallback(
-    (e: React.UIEvent<HTMLDivElement>) => {
-      if (searchQuery.trim()) return; // Don't paginate during search
-
-      const target = e.currentTarget;
-      const scrolledToBottom =
-        target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
-
-      if (scrolledToBottom && displayLimit < allZipcodes.length) {
-        setDisplayLimit((prev) => Math.min(prev + ITEMS_PER_PAGE, allZipcodes.length));
-      }
-    },
-    [displayLimit, allZipcodes.length, searchQuery]
-  );
 
   // Update form values when profile data is available
   useEffect(() => {
@@ -396,56 +349,28 @@ export default function CoverageForm({
                 <FormLabel className='text-sm font-medium text-gray-700'>
                   Τ.Κ.
                 </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      className='w-full justify-between'
-                    >
-                      {watchedCoverage?.zipcode
-                        ? allZipcodes.find((z) => z.id === watchedCoverage.zipcode)
-                            ?.name || 'Επιλέξτε Τ.Κ...'
-                        : 'Επιλέξτε Τ.Κ...'}
-                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-full p-0'>
-                    <Command shouldFilter={false}>
-                      <CommandInput
-                        placeholder='Αναζήτηση Τ.Κ...'
-                        value={searchQuery}
-                        onValueChange={setSearchQuery}
-                      />
-                      <CommandList onScroll={handleScroll}>
-                        <CommandEmpty>Δεν βρέθηκαν Τ.Κ.</CommandEmpty>
-                        <CommandGroup>
-                          {displayedZipcodes.map((zipcode) => (
-                            <CommandItem
-                              value={zipcode.searchLabel}
-                              key={zipcode.id}
-                              onSelect={() => handleZipcodeChange(zipcode.id)}
-                            >
-                              <Check
-                                className={
-                                  watchedCoverage?.zipcode === zipcode.id
-                                    ? 'mr-2 h-4 w-4 opacity-100'
-                                    : 'mr-2 h-4 w-4 opacity-0'
-                                }
-                              />
-                              {zipcode.searchLabel}
-                            </CommandItem>
-                          ))}
-                          {!searchQuery.trim() && displayLimit < allZipcodes.length && (
-                            <div className='py-2 text-center text-sm text-muted-foreground'>
-                              Κάντε scroll για περισσότερα... ({displayedZipcodes.length}/{allZipcodes.length})
-                            </div>
-                          )}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <LazyCombobox
+                  options={allZipcodes}
+                  value={watchedCoverage?.zipcode || undefined}
+                  onSelect={(zipcode) => handleZipcodeChange(zipcode.id)}
+                  placeholder='Επιλέξτε Τ.Κ...'
+                  searchPlaceholder='Αναζήτηση Τ.Κ...'
+                  emptyMessage='Δεν βρέθηκαν Τ.Κ.'
+                  formatLabel={(option) => (
+                    <>
+                      {option.name}{' '}
+                      <span className='text-gray-500'>
+                        ({option.area.name} - {option.county.name})
+                      </span>
+                    </>
+                  )}
+                  getButtonLabel={(option) => option?.name || 'Επιλέξτε Τ.Κ...'}
+                  initialLimit={20}
+                  loadMoreIncrement={20}
+                  loadMoreThreshold={50}
+                  searchLimit={100}
+                  showProgress={true}
+                />
               </div>
 
               {/* Area Input - Auto-filled from zipcode */}
@@ -600,7 +525,8 @@ export default function CoverageForm({
                                 return (
                                   county?.children?.map((area: any) => ({
                                     value: area.id,
-                                    label: `${area.name} - ${county.name}`,
+                                    label: area.name,
+                                    county: county.name,
                                   })) || []
                                 );
                               },
@@ -613,6 +539,14 @@ export default function CoverageForm({
                               });
                             }}
                             placeholder='Επιλέξτε περιοχές...'
+                            renderLabel={(option) => (
+                              <>
+                                {option.label}{' '}
+                                <span className='text-gray-500'>
+                                  ({option.county})
+                                </span>
+                              </>
+                            )}
                           />
                         ) : (
                           <div className='text-gray-500 bg-gray-50 p-3 rounded-md border'>
