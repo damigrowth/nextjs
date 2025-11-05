@@ -12,7 +12,7 @@ interface ProfileServicesProps {
 
 export default function ProfileServices({
   services,
-  profileUsername
+  profileUsername,
 }: ProfileServicesProps) {
   const [visibleCount, setVisibleCount] = useState(3);
 
@@ -24,11 +24,11 @@ export default function ProfileServices({
   const visibleServices = services.slice(0, visibleCount);
 
   const handleLoadMore = () => {
-    setVisibleCount(prev => Math.min(prev + 3, services.length));
+    setVisibleCount((prev) => Math.min(prev + 3, services.length));
   };
 
   return (
-    <section className='py-5'>
+    <section id='services' className='py-5 scroll-mt-2'>
       <h4 className='font-semibold text-lg text-foreground mb-5'>
         Υπηρεσίες ({services.length})
       </h4>
@@ -45,11 +45,7 @@ export default function ProfileServices({
 
       {hasMore && (
         <div className='mt-6 text-center'>
-          <Button
-            onClick={handleLoadMore}
-            variant='outline'
-            size='lg'
-          >
+          <Button onClick={handleLoadMore} variant='outline' size='lg'>
             Περισσότερες Υπηρεσίες
           </Button>
         </div>

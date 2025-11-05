@@ -2,7 +2,8 @@ import React from 'react';
 import type { ProfileMetricsProps } from '@/lib/types/components';
 import IconBox from '@/components/shared/icon-box';
 import { FlaticonCategory } from '@/components/icon';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '../ui/badge';
+import ProfileSubdivisionsWrapper from './profile-subdivisions-wrapper';
 
 /**
  * Modern ProfileMetrics Component
@@ -38,7 +39,7 @@ export default function ProfileMetrics({
 
       {/* Service Subdivisions with category-specific icon */}
       {serviceSubdivisions && serviceSubdivisions.length > 0 && (
-        <div className='sm:col-span-2'>
+        <ProfileSubdivisionsWrapper>
           <IconBox
             showIcon={false}
             title='Υπηρεσίες'
@@ -51,7 +52,7 @@ export default function ProfileMetrics({
                     <Badge
                       key={subdivision.id}
                       variant='outline'
-                      className='inline-block text-2sm font-medium py-1 px-2.5 text-center bg-muted text-muted-foreground border-none rounded-xl'
+                      className='inline-block text-2sm font-medium py-1 px-2.5 text-center bg-muted text-muted-foreground border-none rounded-xl cursor-pointer'
                     >
                       {subdivision.label}
                     </Badge>
@@ -59,7 +60,7 @@ export default function ProfileMetrics({
               </div>
             }
           />
-        </div>
+        </ProfileSubdivisionsWrapper>
       )}
     </section>
   );
