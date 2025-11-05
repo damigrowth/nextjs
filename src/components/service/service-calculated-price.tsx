@@ -13,10 +13,13 @@ export default function ServiceCalculatedPrice({
   compact = false,
 }: ServiceCalculatedPriceProps) {
   const { order } = useServiceOrderStore();
-  
+
+  // Convert basePrice to number for reliable comparison
+  const basePriceValue = Number(basePrice) || 0;
+
   // Calculate total addon price
   const addonPrice = order.addons.reduce((acc, addon) => acc + addon.price, 0);
-  const totalPrice = basePrice + addonPrice;
+  const totalPrice = basePriceValue + addonPrice;
 
   if (totalPrice <= 0) return null;
 

@@ -22,10 +22,14 @@ export default function ServiceCard({
   isSaved = false,
 }: ServiceCardProps) {
   // Service type declarations
-  const serviceType = service.type;
-  const isOnline = serviceType?.online;
-  const isOnbase = serviceType?.onbase;
-  const isOnsite = serviceType?.onsite;
+  // const serviceType = service.type;
+  // const isOnline = serviceType?.online;
+  // const isOnbase = serviceType?.onbase;
+  // const isOnsite = serviceType?.onsite;
+
+  // Convert price to number for reliable comparison
+  const priceValue = Number(service?.price) || 0;
+  const hasValidPrice = priceValue > 0;
 
   return (
     <Card className='group overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 rounded-lg bg-white relative'>
@@ -84,7 +88,7 @@ export default function ServiceCard({
       </Link>
 
       {/* Footer section - Outside main link */}
-      {(showProfile || (service.price && service.price > 0)) && (
+      {(showProfile || hasValidPrice) && (
         <CardContent className='p-4 pt-0'>
           <div className='border-t border-gray-200 pt-3'>
             <div className='flex justify-between gap-3'>
@@ -111,13 +115,13 @@ export default function ServiceCard({
               )}
 
               {/* Price - Only show if price > 0 */}
-              {service.price && service.price > 0 && (
+              {hasValidPrice && (
                 <div
                   className={`text-base ${!showProfile ? 'w-full text-right' : ''}`}
                 >
                   <span className='font-normal text-body'>από </span>
                   <span className='font-semibold text-dark'>
-                    {service.price}€
+                    {priceValue}€
                   </span>
                 </div>
               )}

@@ -39,6 +39,10 @@ export function ArchiveServiceCard({
   const profileGroupedCoverage =
     'groupedCoverage' in service.profile ? service.profile.groupedCoverage : [];
 
+  // Convert price to number for reliable comparison
+  const priceValue = Number(service?.price) || 0;
+  const hasValidPrice = priceValue > 0;
+
   return (
     <Card
       className={cn(
@@ -143,11 +147,11 @@ export function ArchiveServiceCard({
               )}
 
               {/* Price */}
-              {service.price != null && service.price > 0 && (
+              {hasValidPrice && (
                 <div>
                   <span className='font-normal text-body'>από </span>
                   <span className='font-semibold text-dark text-lg'>
-                    {service.price}€
+                    {priceValue}€
                   </span>
                 </div>
               )}

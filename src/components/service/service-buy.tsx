@@ -21,10 +21,14 @@ export default function ServiceBuy({
 }: ServiceBuyProps) {
   const { order, setOrder, calculateTotal } = useServiceOrderStore();
 
+  // Convert price to number for reliable comparison
+  const priceValue = Number(price) || 0;
+  const hasValidPrice = priceValue > 0;
+
   useEffect(() => {
-    setOrder({ fixed: true, fixedPrice: price });
+    setOrder({ fixed: true, fixedPrice: priceValue });
     calculateTotal();
-  }, [price, setOrder, calculateTotal]);
+  }, [priceValue, setOrder, calculateTotal]);
 
   if (isOwner) {
     return null;
@@ -49,8 +53,7 @@ export default function ServiceBuy({
     return message;
   };
 
-  const buttonText =
-    price === 0 || price === null ? 'Επικοινωνήστε' : `Σύνολο ${order?.total}€`;
+  const buttonText = !hasValidPrice ? 'Επικοινωνήστε' : `Σύνολο ${order?.total}€`;
 
   return (
     <div className='w-full'>
