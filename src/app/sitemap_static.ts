@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * Generates sitemap for static pages and archive index pages
+ * Generates sitemap for static pages
  * All pages are verified to exist in the app structure
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
