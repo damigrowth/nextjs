@@ -5,6 +5,7 @@ import { CACHE_TAGS } from '@/lib/cache';
 import { unstable_cache } from 'next/cache';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
+import { Prisma } from '@prisma/client';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import { locationOptions } from '@/constants/datasets/locations';
@@ -340,11 +341,18 @@ async function _getServicePageData(
         id: {
           not: service.id, // Exclude current service
         },
-        NOT: {
-          media: {
-            equals: null,
+        NOT: [
+          {
+            media: {
+              equals: Prisma.JsonNull,
+            },
           },
-        },
+          {
+            media: {
+              equals: Prisma.DbNull,
+            },
+          },
+        ],
       },
       include: {
         profile: {
