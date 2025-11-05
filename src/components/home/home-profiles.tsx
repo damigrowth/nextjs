@@ -21,7 +21,7 @@ export default function ProfilesHome({ profiles, savedProfileIds }: ProfilesHome
   // Convert array to Set for O(1) lookups
   const savedIdsSet = savedProfileIds ? new Set(savedProfileIds) : new Set<string>();
   return (
-    <section className='py-8 sm:py-12 md:py-16 bg-dark'>
+    <section className='py-8 sm:py-12 md:py-16 bg-dark overflow-hidden'>
       <div className='container mx-auto px-4 sm:px-6'>
         {/* Header Section */}
         <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8 md:mb-12'>
