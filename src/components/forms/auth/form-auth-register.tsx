@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useActionState } from 'react';
+import React, { useEffect, useActionState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -79,6 +79,7 @@ export default function RegisterForm() {
   const { type, role, roles, setAuthRole, setAuthType } = useAuthStore();
   const router = useRouter();
   const [state, action, isPending] = useActionState(register, initialState);
+  const [isTransitionPending, startTransition] = useTransition();
 
   const form = useForm<RegistrationFormInput>({
     resolver: zodResolver(registrationFormSchema),
@@ -91,11 +92,12 @@ export default function RegisterForm() {
       role: role || undefined,
       consent: [],
     },
-    mode: 'onChange',
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
   });
 
   const {
-    formState: { errors, isValid },
+    formState: { errors },
     setValue,
     watch,
     setError,
@@ -104,24 +106,11 @@ export default function RegisterForm() {
   const watchedAuthType = watch('authType');
   const watchedRole = watch('role');
 
-  // Sync with Zustand store and reset form when type changes
+  // Sync with Zustand store - only update authType and role fields
   useEffect(() => {
     setValue('authType', type);
     setValue('role', role || undefined);
-
-    // Reset form when auth type changes
-    if (type !== '') {
-      form.reset({
-        email: '',
-        password: '',
-        username: '',
-        displayName: '',
-        authType: type,
-        role: role || undefined,
-        consent: [],
-      });
-    }
-  }, [type, role, setValue, form]);
+  }, [type, role, setValue]);
 
   // Handle URL hash navigation (only on mount)
   useEffect(() => {
@@ -136,7 +125,14 @@ export default function RegisterForm() {
   // Note: Redirect is now handled server-side in register
 
   // Handle form submission
-  const handleFormSubmit = (formData: FormData) => {
+  const handleFormSubmit = async (formData: FormData) => {
+    // Trigger validation for all fields
+    const isValid = await form.trigger();
+
+    if (!isValid) {
+      return;
+    }
+
     // Serialize complex fields
     const consent = watch('consent');
     if (consent) {
@@ -153,8 +149,10 @@ export default function RegisterForm() {
       formData.set('role', role);
     }
 
-    // Call the server action directly (no await)
-    action(formData);
+    // Call the server action inside a transition
+    startTransition(() => {
+      action(formData);
+    });
   };
 
   const handleGoogleSignUp = async () => {
@@ -197,7 +195,7 @@ export default function RegisterForm() {
             name='role'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Τύπος Επαγγελματία</FormLabel>
+                <FormLabel>Τύπος Λογαριασμού</FormLabel>
                 <FormControl>
                   <RadioGroup
                     value={field.value || ''}
@@ -206,9 +204,10 @@ export default function RegisterForm() {
                       field.onChange(roleValue);
                       setAuthRole(roleValue);
                     }}
-                    className='flex flex-col space-y-2 pb-2'
+                    className='flex flex-col sm:flex-row sm:space-x-6 space-y-2 sm:space-y-0 pb-2'
                   >
-                    {roles.map((roleOption) => (
+                    {/* Reverse order: freelancer first, then company */}
+                    {[...roles].reverse().map((roleOption) => (
                       <div
                         key={roleOption.value}
                         className='flex items-center space-x-2'
@@ -330,7 +329,7 @@ export default function RegisterForm() {
           name='consent'
           render={({ field }) => (
             <FormItem>
-              <div>
+              <div className='pt-3'>
                 {consentOptions.map((option) => (
                   <div key={option.id} className='flex items-center space-x-2'>
                     <Checkbox
@@ -390,8 +389,8 @@ export default function RegisterForm() {
             type='submit'
             text='Δημιουργία Λογαριασμού'
             loadingText='Δημιουργία Λογαριασμού...'
-            loading={isPending}
-            disabled={isPending || !isValid}
+            loading={isPending || isTransitionPending}
+            disabled={isPending || isTransitionPending}
             fullWidth
           />
           {/* Google Sign Up */}
@@ -399,7 +398,7 @@ export default function RegisterForm() {
             <p className='text-gray-600 mb-3'>ή</p>
             <GoogleLoginButton
               onClick={handleGoogleSignUp}
-              disabled={isPending}
+              disabled={isPending || isTransitionPending}
               className='w-full'
             >
               Εγγραφή με Google
