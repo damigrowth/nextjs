@@ -16,6 +16,7 @@ import { Command as CommandPrimitive } from 'cmdk';
 export type Option = {
   value: string;
   label: string;
+  [key: string]: any; // Allow additional properties for custom rendering
 };
 
 interface MultiSelectProps {
@@ -28,6 +29,8 @@ interface MultiSelectProps {
   showClearAll?: boolean;
   enablePortal?: boolean;
   disabled?: boolean;
+  renderLabel?: (option: Option) => React.ReactNode; // For dropdown options
+  renderSelected?: (option: Option) => React.ReactNode; // For selected badges
 }
 
 export function MultiSelect({
@@ -40,6 +43,8 @@ export function MultiSelect({
   showClearAll = true,
   enablePortal = false,
   disabled = false,
+  renderLabel,
+  renderSelected,
 }: MultiSelectProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -140,7 +145,7 @@ export function MultiSelect({
               onSelect={() => handleSelect(option.value)}
               className='cursor-pointer'
             >
-              {option.label}
+              {renderLabel ? renderLabel(option) : option.label}
             </CommandItem>
           ))}
         </CommandGroup>
@@ -161,7 +166,7 @@ export function MultiSelect({
               variant='default'
               className='hover:bg-primary/90'
             >
-              {option.label}
+              {renderSelected ? renderSelected(option) : option.label}
               <button
                 className='ml-1 rounded-full outline-none'
                 onKeyDown={(e) => {
@@ -224,7 +229,7 @@ export function MultiSelect({
                       onSelect={() => handleSelect(option.value)}
                       className='cursor-pointer'
                     >
-                      {option.label}
+                      {renderLabel ? renderLabel(option) : option.label}
                     </CommandItem>
                   ))}
                 </CommandGroup>
