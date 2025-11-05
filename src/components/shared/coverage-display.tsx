@@ -21,7 +21,9 @@ export default function CoverageDisplay({
         <React.Fragment key={item.county}>
           {index > 0 && ' - '}
           <strong>{item.county}</strong>
-          {item.areas.length > 0 && ` (${item.areas.join(', ')})`}
+          {item.areas.length > 0 && (
+            <span className='font-normal'> ({item.areas.join(', ')})</span>
+          )}
         </React.Fragment>
       ))}
     </>
