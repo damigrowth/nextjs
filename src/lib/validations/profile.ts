@@ -107,17 +107,63 @@ export const profileImageSchema = z
 
 // Coverage/Location validation for professionals
 // Now uses ID-based structure for better normalization
-export const coverageSchema = z.object({
-  online: z.boolean(),
-  onbase: z.boolean(),
-  onsite: z.boolean(),
-  address: z.string().optional(),
-  area: z.string().nullable().optional(), // Single area ID
-  county: z.string().nullable().optional(), // Single county ID
-  zipcode: z.string().nullable().optional(), // Single zipcode ID
-  counties: z.array(z.string()).optional(), // Array of county IDs
-  areas: z.array(z.string()).optional(), // Array of area IDs
-});
+export const coverageSchema = z
+  .object({
+    online: z.boolean(),
+    onbase: z.boolean(),
+    onsite: z.boolean(),
+    address: z.string().optional(),
+    area: z.string().nullable().optional(), // Single area ID
+    county: z.string().nullable().optional(), // Single county ID
+    zipcode: z.string().nullable().optional(), // Single zipcode ID
+    counties: z.array(z.string()).optional(), // Array of county IDs
+    areas: z.array(z.string()).optional(), // Array of area IDs
+  })
+  .refine(
+    (data) => {
+      // At least one coverage option must be selected
+      return data.online || data.onbase || data.onsite;
+    },
+    {
+      message: 'Επιλέξτε τουλάχιστον έναν τρόπο εργασίας',
+      path: ['online'], // Show error on first checkbox
+    }
+  )
+  .refine(
+    (data) => {
+      // If onbase is selected, address, zipcode, area, and county are required
+      if (data.onbase) {
+        return (
+          data.address &&
+          data.address.trim() !== '' &&
+          data.zipcode &&
+          data.zipcode.trim() !== '' &&
+          data.area &&
+          data.area.trim() !== '' &&
+          data.county &&
+          data.county.trim() !== ''
+        );
+      }
+      return true;
+    },
+    {
+      message: 'Όλα τα πεδία για "Στον χώρο μου" είναι υποχρεωτικά',
+      path: ['address'],
+    }
+  )
+  .refine(
+    (data) => {
+      // If onsite is selected, counties array must have at least one item
+      if (data.onsite) {
+        return data.counties && data.counties.length > 0;
+      }
+      return true;
+    },
+    {
+      message: 'Επιλέξτε τουλάχιστον έναν νομό για "Στον χώρο του πελάτη"',
+      path: ['counties'],
+    }
+  );
 
 // =============================================
 // BASIC PROFILE INFO SCHEMA

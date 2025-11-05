@@ -47,10 +47,8 @@ export const formatUsername = (str: string): string => {
 };
 
 export const formatDisplayName = (str: string): string => {
-  // Remove numbers and symbols, keep only letters (including Greek), spaces, and basic punctuation
-  let formatted = cutNumbers(str);
-  formatted = cutSymbols(formatted);
-  return formatted;
+  // Only capitalize first letter, no other formatting
+  return capitalizeFirstLetter(str);
 };
 
 export const formatInput = (options: FormatInputOptions): string => {
