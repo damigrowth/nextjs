@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { NavigationButton } from './navigation-button';
 
 interface NotFoundPageProps {
   title?: string;
@@ -59,19 +57,17 @@ export function NotFoundPage({
               </div>
 
               <div className='flex flex-col sm:flex-row gap-4 justify-center lg:justify-start'>
-                <Button asChild size='lg'>
-                  <Link href={primaryButtonHref}>{primaryButtonText}</Link>
-                </Button>
+                <NavigationButton href={primaryButtonHref}>
+                  {primaryButtonText}
+                </NavigationButton>
                 {showBackButton && primaryButtonHref !== backButtonHref && (
-                  <Button asChild variant='outline' size='lg'>
-                    <Link
-                      href={backButtonHref}
-                      className='flex items-center gap-2'
-                    >
-                      <ArrowLeft className='w-4 h-4' />
-                      {backButtonText}
-                    </Link>
-                  </Button>
+                  <NavigationButton
+                    href={backButtonHref}
+                    variant='outline'
+                    showBackIcon
+                  >
+                    {backButtonText}
+                  </NavigationButton>
                 )}
               </div>
             </div>
@@ -85,7 +81,7 @@ export function NotFoundPage({
 // Helper function to generate metadata for not found pages
 export function createNotFoundMetadata(
   title: string = '404 - Σελίδα δεν βρέθηκε',
-  description: string = 'Η σελίδα που αναζητάτε δεν βρέθηκε.',
+  description: string = 'Η σελίδα που αναζητάτε δεν βρέθηκε.'
 ): Metadata {
   return {
     title,

@@ -1,8 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { NavigationButton } from './navigation-button';
 
 interface ErrorPageProps {
   error?: Error & { digest?: string };
@@ -81,13 +81,12 @@ export function ErrorPage({
                     {resetButtonText}
                   </Button>
                 )}
-                <Button
-                  asChild
-                  size='lg'
+                <NavigationButton
+                  href={primaryButtonHref}
                   variant={showResetButton && reset ? 'outline' : 'default'}
                 >
-                  <Link href={primaryButtonHref}>{primaryButtonText}</Link>
-                </Button>
+                  {primaryButtonText}
+                </NavigationButton>
               </div>
             </div>
           </div>
