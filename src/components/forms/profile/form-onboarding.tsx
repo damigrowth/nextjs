@@ -6,6 +6,7 @@ import React, {
   useEffect,
   useState,
   useTransition,
+  useMemo,
 } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,19 +25,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
+import { LazyCombobox } from '@/components/ui/lazy-combobox';
+import { MultiSelect } from '@/components/ui/multi-select';
 import {
   Card,
   CardContent,
@@ -47,16 +37,13 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Icons
-import {
-  CheckCircle,
-  AlertCircle,
-  Loader2,
-  Check,
-  ChevronsUpDown,
-} from 'lucide-react';
+import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 import { useSession } from '@/lib/auth/client';
 import { useRouter } from 'next/navigation';
+
+// Skeleton loader
+import { OnboardingFormSkeleton } from './onboarding-form-skeleton';
 
 // Static constants and dataset utilities
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
@@ -73,6 +60,7 @@ import {
   getAllZipcodes,
   toggleItemInArray,
   resetCoverageDependencies,
+  filterTaxonomyByType,
 } from '@/lib/utils/datasets';
 
 // Zod schemas
@@ -112,6 +100,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
   );
 
   const [isUploading, setIsUploading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [isPendingTransition, startTransition] = useTransition();
 
   // Refs for media upload components
@@ -156,6 +145,44 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
     mode: 'onChange', // Real-time validation
   });
 
+  // Create flattened list of all subcategories with parent category info
+  // Memoized to avoid re-computing on every render - only recalculates when role changes
+  // MUST be called before conditional returns (React Rules of Hooks)
+  const allSubcategories = useMemo(() => {
+    // Use helper utility to filter taxonomies by user role first
+    const filteredTaxonomies = user?.role
+      ? filterTaxonomyByType(proTaxonomies, user.role)
+      : proTaxonomies;
+
+    // Flatten subcategories with parent category reference
+    return filteredTaxonomies.flatMap((category) =>
+      (category.children || []).map((sub) => ({
+        id: sub.id,
+        label: sub.label,
+        categoryId: category.id,
+        categoryLabel: category.label,
+        type: sub.type,
+      })),
+    );
+  }, [user?.role]); // Only recalculate when role changes
+
+  // Create flat zipcode list for LazyCombobox (same as coverage form)
+  const allZipcodes = useMemo(() => {
+    const zipcodes = getAllZipcodes(locationOptions);
+    return zipcodes.map((zipcode) => ({
+      id: zipcode.id,
+      label: `${zipcode.name} - ${zipcode.area.name} - ${zipcode.county.name}`,
+      name: zipcode.name,
+      area: zipcode.area,
+      county: zipcode.county,
+    }));
+  }, []);
+
+  // Prefetch dashboard for instant navigation
+  useEffect(() => {
+    router.prefetch('/dashboard');
+  }, [router]);
+
   // Update form values when user data becomes available
   useEffect(() => {
     if (user && hasExistingImage && !form.getValues('image')) {
@@ -168,23 +195,48 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
     if (state.success) {
       // Clear upload state
       setIsUploading(false);
-      // Refresh the session data to update user step and sync image
-      refetch();
-      // Force server-side render to get updated session data immediately
-      router.refresh();
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 2000);
+      // Show redirecting state
+      setIsRedirecting(true);
+
+      // Sequential flow for reliable session sync
+      const handleRedirect = async () => {
+        // 1. Refresh session to update user.step
+        await refetch();
+
+        // 2. Small delay for Better Auth session propagation
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        // 3. Navigate with router for smoother transition
+        router.push('/dashboard');
+        router.refresh(); // Force refresh to ensure new session data
+      };
+
+      handleRedirect();
     }
   }, [state.success, refetch, router]);
 
-  // Loading state
+  // Loading state - show form skeleton
   if (isLoading) {
+    return <OnboardingFormSkeleton />;
+  }
+
+  // Success state - show success message instead of form
+  if (isRedirecting) {
     return (
       <div className='max-w-4xl mx-auto p-6'>
-        <div className='text-center'>
-          <Loader2 className='w-8 h-8 animate-spin mx-auto mb-2' />
-          <p className='text-gray-600'>Φόρτωση...</p>
+        <div className='text-center space-y-4'>
+          <div className='flex justify-center'>
+            <CheckCircle className='w-16 h-16 text-green-600 mb-2' />
+          </div>
+          <div className='space-y-2'>
+            <h2 className='text-2xl font-semibold text-gray-900'>
+              Επιτυχής Εγγραφή!
+            </h2>
+            <div className='flex items-center gap-2 justify-center text-gray-600'>
+              <Loader2 className='w-5 h-5 animate-spin' />
+              <span>Μετάβαση στον Πίνακα Ελέγχου...</span>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -224,6 +276,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
 
   // 🎯 Watch specific fields for dependent logic
   const watchedCategory = watch('category');
+  const watchedSubcategory = watch('subcategory');
   const watchedCoverage = watch('coverage');
 
   // Helper functions for formatting inputs
@@ -250,18 +303,43 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
     });
   };
 
+  // Zipcode change handler - auto-populates area and county (same as coverage form)
+  const handleZipcodeChange = (zipcodeId: string) => {
+    const selectedZipcode = allZipcodes.find((z) => z.id === zipcodeId);
+
+    if (!selectedZipcode) return;
+
+    const currentCoverage = getValues('coverage');
+    setValue(
+      'coverage',
+      {
+        ...currentCoverage,
+        zipcode: zipcodeId,
+        area: selectedZipcode.area.id,
+        county: selectedZipcode.county.id,
+      },
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
+  };
+
   // Search handlers are no longer needed since we use static data directly in the Combobox components
 
-  // Selection handlers - store only ID values
-  const handleCategorySelect = (selected: any) => {
-    setValue('category', selected.id, {
+  // Consolidated selection handler - sets both category and subcategory
+  const handleSubcategorySelect = (selected: {
+    id: string;
+    label: string;
+    categoryId: string;
+    categoryLabel: string;
+    type: string;
+  }) => {
+    // Set both category and subcategory simultaneously
+    setValue('category', selected.categoryId, {
       shouldDirty: true,
       shouldValidate: true,
     });
-    setValue('subcategory', '', { shouldDirty: true, shouldValidate: true });
-  };
-
-  const handleSubcategorySelect = (selected: any) => {
     setValue('subcategory', selected.id, {
       shouldDirty: true,
       shouldValidate: true,
@@ -323,7 +401,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
         skipEmpty: true,
       });
 
-      // Call the server action with startTransition
+      // Call the server action wrapped in startTransition
       startTransition(() => {
         action(formData);
       });
@@ -379,151 +457,44 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
           )}
         />
 
-        {/* Category/Subcategory */}
-        <div className='space-y-4'>
-          <h3 className='text-lg font-semibold text-gray-900 border-b pb-2'>
-            Κατηγορία & Υποκατηγορία
-          </h3>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <FormField
-              control={control}
-              name='category'
-              render={({ field }) => (
-                <FormItem className='flex flex-col'>
-                  <FormLabel>Κατηγορία*</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant='outline'
-                          role='combobox'
-                          className='w-full justify-between'
-                        >
-                          {field.value
-                            ? findById(proTaxonomies, field.value)?.label
-                            : 'Επιλέξτε κατηγορία...'}
-                          <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className='w-full p-0'>
-                      <Command>
-                        <CommandInput placeholder='Αναζήτηση κατηγορίας...' />
-                        <CommandList>
-                          <CommandEmpty>Δεν βρέθηκαν κατηγορίες.</CommandEmpty>
-                          <CommandGroup>
-                            {proTaxonomies.map((category) => (
-                              <CommandItem
-                                value={category.label}
-                                key={category.id}
-                                onSelect={() => {
-                                  handleCategorySelect(category);
-                                }}
-                              >
-                                <Check
-                                  className={
-                                    field.value === category.id
-                                      ? 'mr-2 h-4 w-4 opacity-100'
-                                      : 'mr-2 h-4 w-4 opacity-0'
-                                  }
-                                />
-                                {category.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={control}
-              name='subcategory'
-              render={({ field }) => (
-                <FormItem className='flex flex-col'>
-                  <FormLabel>Υποκατηγορία*</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant='outline'
-                          role='combobox'
-                          className='w-full justify-between'
-                          disabled={!watchedCategory}
-                        >
-                          {field.value
-                            ? watchedCategory
-                              ? (() => {
-                                  const category = findById(
-                                    proTaxonomies,
-                                    watchedCategory,
-                                  );
-                                  const subcategories =
-                                    category?.children || [];
-                                  return findById(subcategories, field.value)
-                                    ?.label;
-                                })()
-                              : 'Επιλέξτε πρώτα κατηγορία'
-                            : 'Επιλέξτε υποκατηγορία...'}
-                          <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className='w-full p-0'>
-                      <Command>
-                        <CommandInput placeholder='Αναζήτηση υποκατηγορίας...' />
-                        <CommandList>
-                          <CommandEmpty>
-                            Δεν βρέθηκαν υποκατηγορίες.
-                          </CommandEmpty>
-                          <CommandGroup>
-                            {watchedCategory &&
-                              (() => {
-                                const category = findById(
-                                  proTaxonomies,
-                                  watchedCategory,
-                                );
-                                const subcategories = category?.children || [];
-                                return user?.role
-                                  ? filterByField(
-                                      subcategories,
-                                      'type',
-                                      user.role,
-                                    )
-                                  : subcategories;
-                              })().map((subcategory) => (
-                                <CommandItem
-                                  value={subcategory.label}
-                                  key={subcategory.id}
-                                  onSelect={() => {
-                                    handleSubcategorySelect(subcategory);
-                                  }}
-                                >
-                                  <Check
-                                    className={
-                                      field.value === subcategory.id
-                                        ? 'mr-2 h-4 w-4 opacity-100'
-                                        : 'mr-2 h-4 w-4 opacity-0'
-                                    }
-                                  />
-                                  {subcategory.label}
-                                </CommandItem>
-                              ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
+        {/* Consolidated Category/Subcategory Field */}
+        <FormField
+          control={control}
+          name='subcategory'
+          render={({ field }) => (
+            <FormItem className='flex flex-col'>
+              <FormLabel>Κατηγορία*</FormLabel>
+              <FormControl>
+                <LazyCombobox
+                  options={allSubcategories}
+                  value={field.value}
+                  onSelect={handleSubcategorySelect}
+                  placeholder='Επιλέξτε κατηγορία...'
+                  searchPlaceholder='Αναζήτηση κατηγορίας...'
+                  emptyMessage='Δεν βρέθηκαν κατηγορίες.'
+                  formatLabel={(option) => (
+                    <>
+                      {option.label}{' '}
+                      <span className='text-gray-500'>
+                        ({option.categoryLabel})
+                      </span>
+                    </>
+                  )}
+                  getButtonLabel={(option) =>
+                    option
+                      ? `${option.label} (${option.categoryLabel})`
+                      : 'Επιλέξτε κατηγορία...'
+                  }
+                  initialLimit={20}
+                  loadMoreIncrement={20}
+                  searchLimit={100}
+                  showProgress={true}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Bio */}
         <FormField
@@ -616,13 +587,14 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
           )}
         />
 
-        {/* Conditional Onbase Section */}
+        {/* Conditional Onbase Section - Matches coverage form */}
         {watchedCoverage?.onbase && (
           <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md'>
             <h5 className='font-medium text-gray-900'>
               Στοιχεία για τον χώρο σας
             </h5>
             <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+              {/* Address - First field */}
               <FormField
                 control={control}
                 name='coverage.address'
@@ -635,9 +607,9 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
                       <Input
                         type='text'
                         placeholder='Εισάγετε τη διεύθυνσή σας'
-                        className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                         value={field.value || ''}
                         onChange={handleAddressChange}
+                        className='bg-white'
                       />
                     </FormControl>
                     <FormMessage />
@@ -645,408 +617,227 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
                 )}
               />
 
-              {/* County Combobox - First selection */}
-              <div className='space-y-2'>
-                <FormLabel className='text-sm font-medium text-gray-700'>
-                  Νομός
-                </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      className='w-full justify-between'
-                    >
-                      {watchedCoverage?.county
-                        ? locationOptions.find(
-                            (c) => c.id === watchedCoverage.county,
-                          )?.name || 'Επιλέξτε νομό...'
-                        : 'Επιλέξτε νομό...'}
-                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-full p-0'>
-                    <Command>
-                      <CommandInput placeholder='Αναζήτηση νομού...' />
-                      <CommandList>
-                        <CommandEmpty>Δεν βρέθηκαν νομοί.</CommandEmpty>
-                        <CommandGroup>
-                          {locationOptions.map((county) => (
-                            <CommandItem
-                              value={county.name}
-                              key={county.id}
-                              onSelect={() => {
-                                const currentCoverage = getValues('coverage');
-                                setValue(
-                                  'coverage',
-                                  {
-                                    ...currentCoverage,
-                                    county: county.id, // Store only ID
-                                    area: null, // Reset dependent fields
-                                    zipcode: null,
-                                  },
-                                  {
-                                    shouldDirty: true,
-                                    shouldValidate: true,
-                                  },
-                                );
-                              }}
-                            >
-                              <Check
-                                className={
-                                  watchedCoverage?.county === county.id
-                                    ? 'mr-2 h-4 w-4 opacity-100'
-                                    : 'mr-2 h-4 w-4 opacity-0'
-                                }
-                              />
-                              {county.name || county.name}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              {/* Area Combobox - Second selection */}
-              <div className='space-y-2'>
-                <FormLabel className='text-sm font-medium text-gray-700'>
-                  Περιοχή
-                </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      className='w-full justify-between'
-                      disabled={!watchedCoverage?.county}
-                    >
-                      {(() => {
-                        if (!watchedCoverage?.county)
-                          return 'Επιλέξτε πρώτα νομό';
-                        if (!watchedCoverage?.area)
-                          return 'Επιλέξτε περιοχή...';
-                        const county = locationOptions.find(
-                          (c) => c.id === watchedCoverage.county,
-                        );
-                        const area = county?.children?.find(
-                          (a) => a.id === watchedCoverage.area,
-                        );
-                        return area?.name || 'Επιλέξτε περιοχή...';
-                      })()}
-                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-full p-0'>
-                    <Command>
-                      <CommandInput placeholder='Αναζήτηση περιοχής...' />
-                      <CommandList>
-                        <CommandEmpty>Δεν βρέθηκαν περιοχές.</CommandEmpty>
-                        <CommandGroup>
-                          {watchedCoverage?.county &&
-                            (() => {
-                              const selectedCounty = locationOptions.find(
-                                (c) => c.id === watchedCoverage.county,
-                              );
-                              return selectedCounty?.children || [];
-                            })().map((area) => (
-                              <CommandItem
-                                value={area.name || area.name || ''}
-                                key={area.id}
-                                onSelect={() => {
-                                  const currentCoverage = getValues('coverage');
-                                  setValue(
-                                    'coverage',
-                                    {
-                                      ...currentCoverage,
-                                      area: area.id, // Store only ID
-                                      zipcode: null, // Reset dependent field
-                                    },
-                                    {
-                                      shouldDirty: true,
-                                      shouldValidate: true,
-                                    },
-                                  );
-                                }}
-                              >
-                                <Check
-                                  className={
-                                    watchedCoverage?.area === area.id
-                                      ? 'mr-2 h-4 w-4 opacity-100'
-                                      : 'mr-2 h-4 w-4 opacity-0'
-                                  }
-                                />
-                                {area.name || area.name}
-                              </CommandItem>
-                            ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              {/* Zipcode Combobox - Third selection */}
+              {/* Zipcode Combobox - Second field with LazyCombobox */}
               <div className='space-y-2'>
                 <FormLabel className='text-sm font-medium text-gray-700'>
                   Τ.Κ.
                 </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      className='w-full justify-between'
-                      disabled={!watchedCoverage?.area}
-                    >
-                      {(() => {
-                        if (!watchedCoverage?.area)
-                          return 'Επιλέξτε πρώτα περιοχή';
-                        if (!watchedCoverage?.zipcode) return 'Επιλέξτε Τ.Κ...';
-                        const county = locationOptions.find(
-                          (c) => c.id === watchedCoverage.county,
-                        );
-                        const area = county?.children?.find(
-                          (a) => a.id === watchedCoverage.area,
-                        );
-                        const zipcode = area?.children?.find(
-                          (z) => z.id === watchedCoverage.zipcode,
-                        );
-                        return zipcode?.name || 'Επιλέξτε Τ.Κ...';
-                      })()}
-                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-full p-0'>
-                    <Command>
-                      <CommandInput placeholder='Αναζήτηση Τ.Κ...' />
-                      <CommandList>
-                        <CommandEmpty>Δεν βρέθηκαν Τ.Κ.</CommandEmpty>
-                        <CommandGroup>
-                          {watchedCoverage?.area &&
-                            (() => {
-                              const selectedCounty = locationOptions.find(
-                                (c) => c.id === watchedCoverage.county,
-                              );
-                              const selectedArea =
-                                selectedCounty?.children?.find(
-                                  (a) => a.id === watchedCoverage.area,
-                                );
-                              return selectedArea?.children || [];
-                            })().map((zipcode) => (
-                              <CommandItem
-                                value={zipcode.name || zipcode.name || ''}
-                                key={zipcode.id}
-                                onSelect={() => {
-                                  const currentCoverage = getValues('coverage');
-                                  setValue(
-                                    'coverage',
-                                    {
-                                      ...currentCoverage,
-                                      zipcode: zipcode.id, // Store only ID
-                                    },
-                                    {
-                                      shouldDirty: true,
-                                      shouldValidate: true,
-                                    },
-                                  );
-                                }}
-                              >
-                                <Check
-                                  className={
-                                    watchedCoverage?.zipcode === zipcode.id
-                                      ? 'mr-2 h-4 w-4 opacity-100'
-                                      : 'mr-2 h-4 w-4 opacity-0'
-                                  }
-                                />
-                                {zipcode.name || zipcode.name}
-                              </CommandItem>
-                            ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <LazyCombobox
+                  options={allZipcodes}
+                  value={watchedCoverage?.zipcode || undefined}
+                  onSelect={(zipcode) => handleZipcodeChange(zipcode.id)}
+                  placeholder='Επιλέξτε Τ.Κ...'
+                  searchPlaceholder='Αναζήτηση Τ.Κ...'
+                  emptyMessage='Δεν βρέθηκαν Τ.Κ.'
+                  formatLabel={(option) => (
+                    <>
+                      {option.name}{' '}
+                      <span className='text-gray-500'>
+                        ({option.area.name} - {option.county.name})
+                      </span>
+                    </>
+                  )}
+                  getButtonLabel={(option) => option?.name || 'Επιλέξτε Τ.Κ...'}
+                  initialLimit={20}
+                  loadMoreIncrement={20}
+                  loadMoreThreshold={50}
+                  searchLimit={100}
+                  showProgress={true}
+                />
               </div>
+
+              {/* Area Input - Auto-filled from zipcode */}
+              <FormField
+                control={control}
+                name='coverage.area'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-sm font-medium text-gray-700'>
+                      Περιοχή
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type='text'
+                        value={
+                          watchedCoverage?.area
+                            ? allZipcodes.find(
+                                (z) => z.area.id === watchedCoverage.area,
+                              )?.area.name || ''
+                            : ''
+                        }
+                        readOnly
+                        className='bg-gray-100 cursor-not-allowed'
+                        placeholder='Επιλέξτε πρώτα Τ.Κ.'
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* County Input - Auto-filled from zipcode */}
+              <FormField
+                control={control}
+                name='coverage.county'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-sm font-medium text-gray-700'>
+                      Νομός
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type='text'
+                        value={
+                          watchedCoverage?.county
+                            ? allZipcodes.find(
+                                (z) => z.county.id === watchedCoverage.county,
+                              )?.county.name || ''
+                            : ''
+                        }
+                        readOnly
+                        className='bg-gray-100 cursor-not-allowed'
+                        placeholder='Επιλέξτε πρώτα Τ.Κ.'
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </div>
         )}
 
-        {/* Onsite Section */}
+        {/* Onsite Section - Matches coverage form with MultiSelect */}
         {watchedCoverage?.onsite && (
           <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md'>
             <h5 className='font-medium text-gray-900'>Περιοχές κάλυψης</h5>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <div className='space-y-2'>
-                <FormLabel className='text-sm font-medium text-gray-700'>
-                  Νομοί
-                </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      className='w-full justify-between'
-                    >
-                      {watchedCoverage?.counties?.length > 0
-                        ? `${watchedCoverage.counties.length} νομοί επιλεγμένοι`
-                        : 'Επιλέξτε νομούς...'}
-                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-full p-0'>
-                    <Command>
-                      <CommandInput placeholder='Αναζήτηση νομών...' />
-                      <CommandList>
-                        <CommandEmpty>Δεν βρέθηκαν νομοί.</CommandEmpty>
-                        <CommandGroup>
-                          {locationOptions.map((county) => (
-                            <CommandItem
-                              value={county.name}
-                              key={county.id}
-                              onSelect={() => {
-                                const currentCoverage = getValues('coverage');
-                                const currentCounties =
-                                  currentCoverage?.counties || [];
+              {/* Counties MultiSelect */}
+              <FormField
+                control={control}
+                name='coverage.counties'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-sm font-medium text-gray-700'>
+                      Νομοί
+                      {field.value?.length > 0
+                        ? ` (${field.value.length})`
+                        : ''}
+                    </FormLabel>
+                    <FormControl>
+                      <div className='space-y-2'>
+                        <MultiSelect
+                          className='bg-white'
+                          options={locationOptions.map((county) => ({
+                            value: county.id,
+                            label: county.name,
+                          }))}
+                          selected={field.value || []}
+                          onChange={(selected) => {
+                            // When counties change, filter areas to keep only those from selected counties
+                            const currentCoverage = getValues('coverage');
+                            const currentAreas = currentCoverage?.areas || [];
 
-                                // Toggle county ID in array
-                                const isSelected = currentCounties.includes(
-                                  county.id,
+                            // Get all area IDs from selected counties
+                            const validAreaIds = selected.flatMap(
+                              (countyId: string) => {
+                                const county = locationOptions.find(
+                                  (c) => c.id === countyId,
                                 );
-                                const newCounties = isSelected
-                                  ? currentCounties.filter(
-                                      (id) => id !== county.id,
-                                    )
-                                  : [...currentCounties, county.id];
-
-                                // When removing a county, also remove its areas
-                                const currentAreas =
-                                  currentCoverage?.areas || [];
-                                let updatedAreas = currentAreas;
-
-                                if (!newCounties.includes(county.id)) {
-                                  // Remove all areas belonging to this county
-                                  const countyAreaIds =
-                                    county.children?.map((a: any) => a.id) ||
-                                    [];
-                                  updatedAreas = currentAreas.filter(
-                                    (areaId: string) =>
-                                      !countyAreaIds.includes(areaId),
-                                  );
-                                }
-
-                                setValue(
-                                  'coverage',
-                                  {
-                                    ...currentCoverage,
-                                    counties: newCounties,
-                                    areas: updatedAreas,
-                                  },
-                                  { shouldDirty: true },
+                                return (
+                                  county?.children?.map(
+                                    (area: any) => area.id,
+                                  ) || []
                                 );
-                              }}
-                            >
-                              <Check
-                                className={
-                                  watchedCoverage?.counties?.includes(county.id)
-                                    ? 'mr-2 h-4 w-4 opacity-100'
-                                    : 'mr-2 h-4 w-4 opacity-0'
-                                }
-                              />
-                              {county.name}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
+                              },
+                            );
 
-              <div className='space-y-2'>
-                <FormLabel className='text-sm font-medium text-gray-700'>
-                  Περιοχές
-                </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      className='w-full justify-between'
-                      disabled={!watchedCoverage?.counties?.length}
-                    >
-                      {watchedCoverage?.areas?.length > 0
-                        ? `${watchedCoverage.areas.length} περιοχές επιλεγμένες`
-                        : watchedCoverage?.counties?.length > 0
-                          ? 'Επιλέξτε περιοχές...'
-                          : 'Επιλέξτε πρώτα νομούς'}
-                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-full p-0'>
-                    <Command>
-                      <CommandInput placeholder='Αναζήτηση περιοχών...' />
-                      <CommandList>
-                        <CommandEmpty>Δεν βρέθηκαν περιοχές.</CommandEmpty>
-                        <CommandGroup>
-                          {watchedCoverage?.counties?.flatMap(
-                            (selectedCountyId: string) => {
-                              const county = locationOptions.find(
-                                (c) => c.id === selectedCountyId,
-                              );
-                              return (
-                                county?.children?.map((area) => (
-                                  <CommandItem
-                                    value={area.name}
-                                    key={`${selectedCountyId}-${area.id}`}
-                                    onSelect={() => {
-                                      const currentCoverage =
-                                        getValues('coverage');
-                                      const currentAreas =
-                                        currentCoverage?.areas || [];
+                            // Filter areas to keep only those from selected counties
+                            const filteredAreas = currentAreas.filter(
+                              (areaId: string) => validAreaIds.includes(areaId),
+                            );
 
-                                      // Toggle area ID in array
-                                      const isSelected = currentAreas.includes(
-                                        area.id,
-                                      );
-                                      const newAreas = isSelected
-                                        ? currentAreas.filter(
-                                            (id) => id !== area.id,
-                                          )
-                                        : [...currentAreas, area.id];
+                            setValue('coverage.counties', selected, {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                            setValue('coverage.areas', filteredAreas, {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                          }}
+                          placeholder='Επιλέξτε νομούς...'
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                                      setValue(
-                                        'coverage',
-                                        {
-                                          ...currentCoverage,
-                                          areas: newAreas,
-                                        },
-                                        { shouldDirty: true },
-                                      );
-                                    }}
-                                  >
-                                    <Check
-                                      className={
-                                        watchedCoverage?.areas?.includes(
-                                          area.id,
-                                        )
-                                          ? 'mr-2 h-4 w-4 opacity-100'
-                                          : 'mr-2 h-4 w-4 opacity-0'
-                                      }
-                                    />
-                                    {area.name} - {county.name}
-                                  </CommandItem>
-                                )) || []
-                              );
-                            },
-                          )}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
+              {/* Areas MultiSelect */}
+              <FormField
+                control={control}
+                name='coverage.areas'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-sm font-medium text-gray-700'>
+                      Περιοχές
+                      {field.value?.length > 0
+                        ? ` (${field.value.length})`
+                        : ''}
+                    </FormLabel>
+                    <FormControl>
+                      <div className='space-y-2'>
+                        {watchedCoverage?.counties?.length > 0 ? (
+                          <MultiSelect
+                            className='bg-white'
+                            options={watchedCoverage.counties.flatMap(
+                              (selectedCountyId: string) => {
+                                const county = locationOptions.find(
+                                  (c) => c.id === selectedCountyId,
+                                );
+                                return (
+                                  county?.children?.map((area: any) => ({
+                                    value: area.id,
+                                    label: area.name,
+                                    county: county.name,
+                                  })) || []
+                                );
+                              },
+                            )}
+                            selected={field.value || []}
+                            onChange={(selected) => {
+                              setValue('coverage.areas', selected, {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              });
+                            }}
+                            placeholder='Επιλέξτε περιοχές...'
+                            renderLabel={(option) => (
+                              <>
+                                {option.label}{' '}
+                                <span className='text-gray-500'>
+                                  ({option.county})
+                                </span>
+                              </>
+                            )}
+                          />
+                        ) : (
+                          <Button
+                            variant='outline'
+                            className='w-full justify-between cursor-not-allowed'
+                            disabled
+                          >
+                            Επιλέξτε πρώτα νομούς
+                          </Button>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </div>
         )}
@@ -1059,7 +850,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
             <FormItem>
               <div className='space-y-4'>
                 <h3 className='text-lg font-semibold text-gray-900 border-b pb-2'>
-                  Portfolio - Δείγμα εργασιών (προαιρετικό)
+                  Δείγμα εργασιών (προαιρετικό)
                 </h3>
                 <FormControl>
                   <MediaUpload
@@ -1101,11 +892,19 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
           </Alert>
         )}
 
-        {/* Success Display */}
+        {/* Success Display with Redirect Progress */}
         {state.message && state.success && (
           <Alert className='border-green-200 bg-green-50 text-green-800'>
             <CheckCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
+            <AlertDescription className='space-y-2'>
+              <div className='font-medium'>{state.message}</div>
+              {isRedirecting && (
+                <div className='flex items-center gap-2 text-sm'>
+                  <Loader2 className='w-4 h-4 animate-spin' />
+                  <span>Μετάβαση στον Πίνακα Ελέγχου...</span>
+                </div>
+              )}
+            </AlertDescription>
           </Alert>
         )}
 
