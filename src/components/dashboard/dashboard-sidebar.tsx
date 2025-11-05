@@ -82,7 +82,7 @@ export default function DashboardSidebar({
   const accountGroup = [
     {
       title: 'Διαχείριση',
-      url: user?.type === 'pro' ? '/dashboard/profile' : '/dashboard/profile/account',
+      url: '/dashboard/profile/account',
       icon: Settings,
       items: user?.type === 'pro' ? [
         {

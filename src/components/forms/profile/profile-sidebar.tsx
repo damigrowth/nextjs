@@ -77,10 +77,10 @@ export default function ProfileSidebar({ userType = 'user' }: { userType?: strin
                   key={item.url}
                   href={item.url}
                   className={cn(
-                    'flex items-center gap-2 px-4 py-2 rounded-md text-sm transition-colors whitespace-nowrap',
+                    'flex items-center gap-2 px-4 py-2 rounded-md text-sm transition-colors whitespace-nowrap border',
                     isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground border-border',
                   )}
                 >
                   <Icon className='h-4 w-4' />
