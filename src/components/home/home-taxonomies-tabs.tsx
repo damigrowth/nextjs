@@ -36,7 +36,7 @@ const TaxonomiesGrid = ({
   type: 'pros' | 'ipiresies';
 }) => {
   // Data is already flattened and filtered server-side
-  const limitedSubcategories = data.slice(0, 90);
+  const limitedSubcategories = data.slice(0, 100);
 
   // Calculate items per column for 5 columns
   const itemsPerColumn = Math.ceil(limitedSubcategories.length / 5);

@@ -173,11 +173,11 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
         take: 16,
       }),
 
-      // Reuse cached directory page data for pro subcategories (60 for home page)
-      getDirectoryPageData({ limit: 60 }),
+      // Reuse cached directory page data for pro subcategories (100 for home page)
+      getDirectoryPageData({ limit: 100 }),
 
-      // Reuse cached categories page data for service subdivisions (60 for home page)
-      getCategoriesPageData({ limit: 60 }),
+      // Reuse cached categories page data for service subdivisions (100 for home page)
+      getCategoriesPageData({ limit: 100 }),
 
       // Fetch subcategory counts for services (for popular subcategories in hero)
       prisma.service.groupBy({
