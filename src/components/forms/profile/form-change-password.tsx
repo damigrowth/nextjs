@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useActionState } from 'react';
+import React, { useState, useActionState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -51,6 +51,7 @@ export default function ChangePasswordForm({
     changePassword,
     initialState,
   );
+  const [isTransitionPending, startTransition] = useTransition();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -62,7 +63,8 @@ export default function ChangePasswordForm({
       newPassword: '',
       confirmPassword: '',
     },
-    mode: 'onChange',
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
   });
 
   const {
@@ -71,9 +73,18 @@ export default function ChangePasswordForm({
   } = form;
 
   // Handle form submission
-  const handleFormSubmit = (formData: FormData) => {
-    // Call the server action directly (no await)
-    action(formData);
+  const handleFormSubmit = async (formData: FormData) => {
+    // Trigger validation for all fields
+    const isValid = await form.trigger();
+
+    if (!isValid) {
+      return;
+    }
+
+    // Call the server action inside a transition
+    startTransition(() => {
+      action(formData);
+    });
   };
 
   // Handle success state
@@ -228,12 +239,15 @@ export default function ChangePasswordForm({
               type='button'
               variant='outline'
               onClick={onCancel}
-              disabled={isPending}
+              disabled={isPending || isTransitionPending}
             >
               Ακύρωση
             </Button>
-            <Button type='submit' disabled={isPending || !isValid || !isDirty}>
-              {isPending ? (
+            <Button
+              type='submit'
+              disabled={isPending || isTransitionPending}
+            >
+              {isPending || isTransitionPending ? (
                 <>
                   <Loader2 className='w-4 h-4 mr-2 animate-spin' />
                   Αλλαγή...
