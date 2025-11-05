@@ -44,6 +44,15 @@ export default async function RegisterPage(): Promise<JSX.Element> {
               <p className='text-gray-700 font-sans'>
                 Δημιουργία νέου λογαριασμού με λίγα μόνο βήματα
               </p>
+              <p className='text-gray-600 mt-2'>
+                Έχεις ήδη λογαριασμό?{' '}
+                <LinkNP
+                  href='/login'
+                  className='text-green-600 hover:text-green-700 font-medium'
+                >
+                  Σύνδεση!
+                </LinkNP>
+              </p>
             </div>
           </div>
         </div>
@@ -52,18 +61,7 @@ export default async function RegisterPage(): Promise<JSX.Element> {
         <div className='flex justify-center'>
           <div className='xl:w-2/5 w-full max-w-2xl'>
             <div className='relative bg-white p-12 sm:p-8 rounded-xl shadow-lg border border-gray-300'>
-              <div className='mb-8'>
-                <HeadingFormRegister />
-                <p className='text-gray-600 mt-5'>
-                  Έχεις ήδη λογαριασμό?{' '}
-                  <LinkNP
-                    href='/login'
-                    className='text-green-600 hover:text-green-700 font-medium'
-                  >
-                    Σύνδεση!
-                  </LinkNP>
-                </p>
-              </div>
+              <HeadingFormRegister />
               <AuthTypeOptions />
               <FormAuthRegister />
             </div>

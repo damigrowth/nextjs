@@ -11,7 +11,7 @@ import {
 
 import Socials from '@/components/icon/socials';
 
-export default async function Footer() {
+export default function Footer() {
   return (
     <footer className='bg-dark pb-0 pt-[60px]'>
       <div className='container mx-auto px-4'>

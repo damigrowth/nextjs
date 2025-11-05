@@ -3,6 +3,8 @@
 import React, { JSX } from 'react';
 import { useAuthStore } from '@/lib/stores/authStore';
 import { FormButton } from '../../shared';
+import { Card } from '@/components/ui/card';
+import { User, Briefcase } from 'lucide-react';
 
 export default function AuthTypeOptions(): JSX.Element | null {
   const { type, setAuthType } = useAuthStore();
@@ -23,22 +25,57 @@ export default function AuthTypeOptions(): JSX.Element | null {
     );
   } else if (type === '') {
     return (
-      <div>
-        <FormButton
-          text='Εγγραφή ως Απλό Προφίλ'
-          onClick={() => setAuthType('user')}
-          type='button'
-          variant='default'
-          className='mr-5 mb-6'
-        />
-        <FormButton
-          text='Επαγγελματικό Προφίλ'
-          onClick={() => setAuthType('pro')}
-          type='button'
-          variant='default'
-          className='mr-5 mb-6'
-        />
-      </div>
+      <>
+        <h5 className='pb-3'>Εγγραφή ως</h5>
+        <div className='grid md:grid-cols-2 gap-6 mb-2'>
+          {/* Simple Profile Option */}
+          <Card
+            className={`p-6 border-2 transition-all duration-200 cursor-pointer hover:shadow-md border-gray-200 hover:border-secondary`}
+            onClick={() => setAuthType('user')}
+          >
+            <div className='flex flex-col items-center text-center space-y-4'>
+              <div className='w-16 h-16 rounded-full flex items-center justify-center bg-primary/10 text-primary'>
+                <User className='w-8 h-8' />
+              </div>
+
+              <div>
+                <h5 className='font-semibold text-gray-900'>Απλό Προφίλ</h5>
+                <p className='text-sm mt-2 text-gray-600'>
+                  Ανακάλυψε υπηρεσίες
+                  <br />
+                  και επικοινώνησε άμεσα
+                  <br />
+                  με τους επαγγελματίες
+                </p>
+              </div>
+            </div>
+          </Card>
+          {/* Professional Profile Option */}
+          <Card
+            className={`p-6 border-2 transition-all duration-200 cursor-pointer hover:shadow-md border-gray-200 hover:border-secondary`}
+            onClick={() => setAuthType('pro')}
+          >
+            <div className='flex flex-col items-center text-center space-y-4'>
+              <div className='w-16 h-16 rounded-full flex items-center justify-center bg-primary/10 text-primary'>
+                <Briefcase className='w-8 h-8' />
+              </div>
+
+              <div>
+                <h5 className='font-semibold text-gray-900'>
+                  Επαγγελματικό Προφίλ
+                </h5>
+                <p className='text-sm mt-2 text-gray-600'>
+                  Παρουσίασε τις
+                  <br />
+                  υπηρεσίες που προσφέρεις
+                  <br />
+                  και βρες νέους πελάτες
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </>
     );
   }
 

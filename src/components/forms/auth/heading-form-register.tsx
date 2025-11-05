@@ -1,14 +1,18 @@
 'use client';
 
-import authStore from '@/lib/stores/authStore';
+import { useAuthStore } from '@/lib/stores/authStore';
 import React from 'react';
 
 export default function RegisterHeading() {
-  const type = authStore((state) => state.type);
+  const type = useAuthStore((state) => state.type);
+
+  // Don't render anything when no type is selected (per client request)
+  if (type === '') {
+    return null;
+  }
 
   return (
-    <>
-      {type === '' && <h4>Δημιουργία λογαριασμού!</h4>}
+    <div className='mb-4'>
       {type === 'user' && <h4>Δημιουργία λογαριασμού νέου χρήστη!</h4>}
       {type === 'pro' && (
         <h4>
@@ -16,6 +20,6 @@ export default function RegisterHeading() {
           υπηρεσίες σου!
         </h4>
       )}
-    </>
+    </div>
   );
 }
