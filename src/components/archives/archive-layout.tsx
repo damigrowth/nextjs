@@ -59,6 +59,7 @@ interface ArchiveLayoutProps {
     href: string;
     type?: 'freelancer' | 'company'; // Optional for profile subcategories
   }>;
+  gradientColor?: 'white' | 'silver';
 }
 
 export function ArchiveLayout({
@@ -81,6 +82,7 @@ export function ArchiveLayout({
   showResultsPerPage = true,
   isLoading = false,
   availableSubdivisions,
+  gradientColor = 'white',
 }: ArchiveLayoutProps) {
   // Initialize filters with route params
   const routeFilters: FilterState = {
@@ -348,6 +350,7 @@ export function ArchiveLayout({
                 <SubdivisionsCarousel
                   subdivisions={availableSubdivisions}
                   hideTitle={true}
+                  gradientColor={gradientColor}
                 />
               </div>
             )}

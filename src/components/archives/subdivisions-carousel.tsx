@@ -12,15 +12,22 @@ import type { SubdivisionWithCount } from '@/actions/services/get-categories';
 interface SubdivisionsCarouselProps {
   subdivisions: SubdivisionWithCount[];
   hideTitle?: boolean;
+  gradientColor?: 'white' | 'silver';
 }
 
 export function SubdivisionsCarousel({
   subdivisions,
   hideTitle = false,
+  gradientColor = 'white',
 }: SubdivisionsCarouselProps) {
   if (subdivisions.length === 0) {
     return null;
   }
+
+  const gradientClass =
+    gradientColor === 'silver'
+      ? 'from-silver via-silver/60'
+      : 'from-white via-white/60';
 
   return (
     <section>
@@ -63,8 +70,10 @@ export function SubdivisionsCarousel({
           <CarouselPrevious className='hidden md:flex' />
           <CarouselNext className='hidden md:flex' />
         </Carousel>
-        {/* Fade gradient - mobile only */}
-        <div className='absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-silver via-silver/60 to-transparent pointer-events-none' />
+        {/* Fade gradient */}
+        <div
+          className={`absolute inset-y-0 right-0 w-24 bg-gradient-to-l ${gradientClass} to-transparent pointer-events-none`}
+        />
       </div>
     </section>
   );

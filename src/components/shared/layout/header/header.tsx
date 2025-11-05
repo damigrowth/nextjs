@@ -30,9 +30,7 @@ export default function Header({ navigationData }: HeaderProps) {
 
   return (
     <header
-      className={`h-16 md:h-20 w-full z-50 bg-white flex items-center ${pathname === '/' ? 'fixed top-0 bg-transparent border-b border-white/10' : 'relative bg-white border-b border-gray-200 shadow-sm -mb-20'}
-        py-2
-      `}
+      className={`h-16 md:h-20 w-full z-50 bg-white flex items-center border-b border-gray-200 shadow-sm py-2 ${pathname === '/' ? 'fixed top-0' : 'relative -mb-20'}`}
     >
       <div className='container mx-auto px-4'>
         <div className='flex items-center justify-between'>

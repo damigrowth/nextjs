@@ -79,7 +79,10 @@ export default async function CategoriesPage() {
           <div className='container mx-auto px-4'>
             <div className='mt-6 mb-16 space-y-10'>
               {/* Subdivisions Carousel */}
-              <SubdivisionsCarousel subdivisions={subdivisions} />
+              <SubdivisionsCarousel
+                subdivisions={subdivisions}
+                gradientColor='silver'
+              />
 
               {/* Categories Grid */}
               <CategoriesGrid categories={categories} />

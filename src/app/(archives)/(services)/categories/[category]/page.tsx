@@ -147,7 +147,10 @@ export default async function CategoryPage({
             <div className='mt-6 mb-16 space-y-10'>
               {/* Subdivisions Carousel - filtered by category */}
               {subdivisions && subdivisions.length > 0 && (
-                <SubdivisionsCarousel subdivisions={subdivisions} />
+                <SubdivisionsCarousel
+                  subdivisions={subdivisions}
+                  gradientColor='silver'
+                />
               )}
 
               {/* Categories Grid - shows subcategories of current category */}

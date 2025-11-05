@@ -59,7 +59,10 @@ export default async function DirectoryPage() {
           <div className='container mx-auto px-4'>
             <div className='mt-6 mb-16 space-y-10'>
               {/* Popular Pro Subcategories Carousel */}
-              <SubdivisionsCarousel subdivisions={popularSubcategories} />
+              <SubdivisionsCarousel
+                subdivisions={popularSubcategories}
+                gradientColor='silver'
+              />
 
               {/* Categories Grid */}
               <CategoriesGrid categories={categories} />
