@@ -6,7 +6,7 @@ interface CoverageDisplayProps {
 
 /**
  * Component to display coverage areas grouped by county
- * Format: **County** (Area1, Area2) - **County2** (Area3, Area4)
+ * Format: **County** (Area1, Area2), **County2** (Area3, Area4)
  */
 export default function CoverageDisplay({
   groupedCoverage,
@@ -19,7 +19,7 @@ export default function CoverageDisplay({
     <>
       {groupedCoverage.map((item, index) => (
         <React.Fragment key={item.county}>
-          {index > 0 && ' - '}
+          {index > 0 && ', '}
           <strong>{item.county}</strong>
           {item.areas.length > 0 && (
             <span className='font-normal'> ({item.areas.join(', ')})</span>
