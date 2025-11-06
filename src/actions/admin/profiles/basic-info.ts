@@ -6,13 +6,10 @@ import { ActionResponse } from '@/lib/types/api';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
-import {
-  profileBasicInfoUpdateSchema,
-} from '@/lib/validations/profile';
+import { profileBasicInfoUpdateSchema } from '@/lib/validations/profile';
 import { getFormString, getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
-import { processImageForDatabase } from '@/lib/utils/cloudinary';
 import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
 
 /**
@@ -94,10 +91,7 @@ export async function updateProfileBasicInfoAdmin(
 
     const data = validationResult.data;
 
-    // 7. Process image data - convert CloudinaryResource to URL string for database storage
-    const processedImage = processImageForDatabase(data.image);
-
-    // 8. Check if profile exists and get data for cache invalidation
+    // 7. Check if profile exists and get data for cache invalidation
     const existingProfile = await prisma.profile.findUnique({
       where: { id: profileId },
       select: {
@@ -118,7 +112,7 @@ export async function updateProfileBasicInfoAdmin(
       };
     }
 
-    // 9. Update profile with string URL for image field
+    // 8. Update profile
     await prisma.profile.update({
       where: { id: profileId },
       data: {
@@ -128,27 +122,13 @@ export async function updateProfileBasicInfoAdmin(
         subcategory: data.subcategory,
         speciality: data.speciality,
         skills: data.skills || [],
-        coverage: data.coverage,
-        image: processedImage, // Now a string URL
         updatedAt: new Date(),
       },
     });
 
-    // 10. Sync image to user table (if image was updated)
-    // For admin operations updating other users, use Prisma directly
-    // Better Auth's updateUser API only works for the current session user
-    if (data.image !== undefined) {
-      await prisma.user.update({
-        where: { id: existingProfile.uid },
-        data: {
-          image: processedImage,
-        },
-      });
-    }
-
-    // 11. Revalidate cached data with consistent tags
+    // 9. Revalidate cached data with consistent tags
     const profileTags = getProfileTags(existingProfile);
-    profileTags.forEach(tag => revalidateTag(tag));
+    profileTags.forEach((tag) => revalidateTag(tag));
 
     // Also revalidate user-specific tags
     revalidateTag(CACHE_TAGS.user.byId(existingProfile.uid));
@@ -165,7 +145,7 @@ export async function updateProfileBasicInfoAdmin(
     }
 
     // Revalidate all service pages that belong to this profile
-    existingProfile.services.forEach(service => {
+    existingProfile.services.forEach((service) => {
       if (service.slug) {
         revalidatePath(`/s/${service.slug}`);
       }

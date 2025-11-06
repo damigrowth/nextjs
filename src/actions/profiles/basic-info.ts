@@ -14,7 +14,6 @@ import {
 import { getFormString, getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
-import { processImageForDatabase } from '@/lib/utils/cloudinary';
 import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
 
 /**
@@ -87,10 +86,7 @@ export async function updateProfileBasicInfo(
 
     const data = validationResult.data;
 
-    // 5.5. Process image data - convert CloudinaryResource to URL string for database storage
-    const processedImage = processImageForDatabase(data.image);
-
-    // 6. Check if profile exists and get data for cache invalidation
+    // 5.5. Check if profile exists and get data for cache invalidation
     const existingProfile = await prisma.profile.findUnique({
       where: { uid: user.id },
       select: {
@@ -112,7 +108,7 @@ export async function updateProfileBasicInfo(
       };
     }
 
-    // 7. Update profile with string URL for image field
+    // 6. Update profile
     await prisma.profile.update({
       where: { uid: user.id },
       data: {
@@ -122,39 +118,13 @@ export async function updateProfileBasicInfo(
         subcategory: data.subcategory,
         speciality: data.speciality,
         skills: data.skills || [],
-        coverage: data.coverage,
-        image: processedImage, // Now a string URL
         updatedAt: new Date(),
       },
     });
 
-    // 7.5. Sync image to user table using Better Auth API (if image was updated)
-    if (data.image !== undefined) {
-      try {
-        await auth.api.updateUser({
-          headers: await headers(),
-          body: {
-            image: processedImage, // Send URL string directly
-          },
-        });
-      } catch (authError) {
-        console.warn(
-          'Failed to update user via Better Auth, falling back to Prisma:',
-          authError,
-        );
-        // Fallback to direct Prisma update if Better Auth fails
-        await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            image: processedImage, // Send URL string directly
-          },
-        });
-      }
-    }
-
-    // 8. Revalidate cached data with consistent tags
+    // 7. Revalidate cached data with consistent tags
     const profileTags = getProfileTags(existingProfile);
-    profileTags.forEach(tag => revalidateTag(tag));
+    profileTags.forEach((tag) => revalidateTag(tag));
 
     // Also revalidate user-specific tags
     revalidateTag(CACHE_TAGS.user.byId(user.id));
@@ -171,7 +141,7 @@ export async function updateProfileBasicInfo(
     }
 
     // Revalidate all service pages that belong to this profile
-    existingProfile.services.forEach(service => {
+    existingProfile.services.forEach((service) => {
       if (service.slug) {
         revalidatePath(`/s/${service.slug}`);
       }
