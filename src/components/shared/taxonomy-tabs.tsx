@@ -17,7 +17,7 @@ export default function TaxonomyTabs({
   className = '',
 }: TaxonomyTabsProps) {
   return (
-    <section className={`overflow-hidden bg-muted border-b border-gray-200 shadow-sm ${className}`}>
+    <section className={`overflow-hidden bg-muted border-b border-gray-200 ${className}`}>
       <div className='container mx-auto p-2'>
         <div className='flex flex-wrap'>
           <div className='w-full relative overflow-x-clip'>
