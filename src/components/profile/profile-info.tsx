@@ -13,6 +13,7 @@ import { Icon } from '@/components/icon/brands';
 import type { ProfileInfoProps } from '@/lib/types/components';
 import ContactReveal from './contact-reveal';
 import { StartChatDialog } from '@/components/messages/start-chat-dialog';
+import { getYearsOfExperience } from '@/lib/utils/misc/experience';
 
 /**
  * Modern ProfileInfo Component
@@ -43,6 +44,9 @@ export default function ProfileInfo({
   if (coverage?.onsite) covers.push('Στον χώρο σας');
 
   // Get location name from coverage data
+  // Get years of experience (prefer stored value, fallback to calculated)
+  const yearsOfExperience = getYearsOfExperience(commencement, experience);
+
   const locationName = coverage?.county || coverage?.area;
 
   return (
@@ -99,7 +103,7 @@ export default function ProfileInfo({
           )}
 
           {/* Years of Experience */}
-          {commencement && experience && (
+          {yearsOfExperience !== null && commencement && (
             <div className='flex items-center justify-between py-5 border-b border-border'>
               <div className='flex items-center gap-2'>
                 <Calendar className='h-4 w-4 text-primary' />
@@ -108,7 +112,7 @@ export default function ProfileInfo({
                 </span>
               </div>
               <span className='text-sm text-muted-foreground'>
-                {experience} (από {commencement})
+                {yearsOfExperience} (από {commencement})
               </span>
             </div>
           )}

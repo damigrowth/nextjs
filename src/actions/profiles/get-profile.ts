@@ -25,6 +25,7 @@ import {
   getDefaultCoverage,
   resolveTaxonomyHierarchy,
 } from '@/lib/utils/datasets';
+import { getYearsOfExperience } from '@/lib/utils/misc/experience';
 
 /**
  * Internal function to fetch profile data (uncached)
@@ -312,7 +313,7 @@ async function _getProfilePageData(
     const socials = profile.socials || {};
 
     // Use the profile.experience field directly as it's already stored as an integer
-    const calculatedExperience = profile.experience || 0;
+    const calculatedExperience = getYearsOfExperience(profile.commencement, profile.experience) || 0;
 
     // Build breadcrumb segments (taxonomies only)
     const breadcrumbSegments: BreadcrumbSegment[] = [
