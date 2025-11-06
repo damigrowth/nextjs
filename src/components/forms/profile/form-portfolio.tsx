@@ -217,19 +217,10 @@ export default function PortfolioForm({
         />
 
         {/* Submit Button */}
-        <div className='flex justify-end space-x-4'>
-          <FormButton
-            variant='outline'
-            type='button'
-            text='Ακύρωση'
-            onClick={() => form.reset()}
-            disabled={
-              isPending || isPendingTransition || isUploading || !isDirty
-            }
-          />
+        <div className='flex justify-end'>
           <FormButton
             type='submit'
-            text='Αποθήκευση'
+            text='Αποθήκευση Αρχείων'
             loadingText='Αποθήκευση...'
             loading={isPending || isPendingTransition || isUploading}
             disabled={
