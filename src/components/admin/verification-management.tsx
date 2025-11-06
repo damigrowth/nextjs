@@ -39,7 +39,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/shared';
 import { toast } from 'sonner';
 import {
   Search,
@@ -546,17 +546,14 @@ export function VerificationManagement() {
                   className='hover:underline'
                 >
                   <div className='flex items-center gap-3 p-3 border rounded-lg hover:bg-accent transition-colors'>
-                    <Avatar>
-                      <AvatarImage
-                        src={
-                          selectedVerification.profile.image || undefined
-                        }
-                      />
-                      <AvatarFallback>
-                        {selectedVerification.profile.displayName?.[0]?.toUpperCase() ||
-                          'U'}
-                      </AvatarFallback>
-                    </Avatar>
+                    <UserAvatar
+                      displayName={selectedVerification.profile.displayName}
+                      image={selectedVerification.profile.image}
+                      size='md'
+                      className='h-10 w-10'
+                      showBorder={false}
+                      showShadow={false}
+                    />
                     <div className='flex-1'>
                       <p className='font-medium'>
                         {selectedVerification.profile.displayName}

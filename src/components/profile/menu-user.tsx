@@ -36,7 +36,7 @@ import {
 } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { MessagesMenu, SavedMenu } from '../dashboard';
-import UserImage from './user-image';
+import { UserAvatar } from '../shared';
 import { useSession } from '@/lib/auth/client';
 import { capitalizeFirstLetter } from '@/lib/utils/validation';
 
@@ -115,9 +115,10 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
 
       if (needsOAuth) {
         // For OAuth setup, direct to oauth-setup page with appropriate type parameter
-        completionPath = isProfessionalType || user?.type === 'pro'
-          ? '/oauth-setup?type=pro'
-          : '/oauth-setup';
+        completionPath =
+          isProfessionalType || user?.type === 'pro'
+            ? '/oauth-setup?type=pro'
+            : '/oauth-setup';
       }
 
       modifiedNav = [
@@ -172,14 +173,15 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
           <DropdownMenuTrigger asChild>
             <Button
               variant='ghost'
-              className='p-0 h-auto w-auto hover:bg-transparent focus:ring-0 focus:ring-offset-0 focus:outline-none focus-visible:ring-0'
+              className='p-0 flex justify-center items-center w-[30px] h-[30px] hover:bg-transparent focus:ring-0 focus:ring-offset-0 focus:outline-none focus-visible:ring-0'
             >
-              <UserImage
+              <UserAvatar
                 displayName={user?.displayName || user?.username || ''}
                 hideDisplayName
                 image={user?.image}
                 width={30}
                 height={30}
+                showBorder={false}
               />
             </Button>
           </DropdownMenuTrigger>

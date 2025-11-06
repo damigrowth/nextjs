@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/shared';
 import {
   Dialog,
   DialogContent,
@@ -315,15 +315,14 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
           </CardHeader>
           <CardContent className='space-y-4'>
             <div className='flex items-start space-x-4'>
-              <Avatar className='h-16 w-16'>
-                <AvatarImage
-                  src={service.profile.image || undefined}
-                  alt={service.profile.displayName || 'User'}
-                />
-                <AvatarFallback>
-                  {service.profile.displayName?.substring(0, 2).toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar
+                displayName={service.profile.displayName || 'Unnamed Profile'}
+                image={service.profile.image}
+                size='lg'
+                className='h-16 w-16'
+                showBorder={false}
+                showShadow={false}
+              />
               <div className='flex-1'>
                 <h4 className='font-semibold'>
                   {service.profile.displayName || 'Unnamed Profile'}

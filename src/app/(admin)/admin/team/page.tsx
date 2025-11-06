@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/shared';
 import {
   SearchIcon,
   UserPlusIcon,
@@ -207,15 +207,14 @@ export default function TeamPage() {
                   <CardHeader className='pb-3'>
                     <div className='flex items-start justify-between'>
                       <div className='flex items-center space-x-3'>
-                        <Avatar className='h-12 w-12'>
-                          <AvatarImage src={member.avatar} alt={member.name} />
-                          <AvatarFallback>
-                            {member.name
-                              .split(' ')
-                              .map((n) => n[0])
-                              .join('')}
-                          </AvatarFallback>
-                        </Avatar>
+                        <UserAvatar
+                          displayName={member.name}
+                          image={member.avatar}
+                          size='md'
+                          className='h-12 w-12'
+                          showBorder={false}
+                          showShadow={false}
+                        />
                         <div>
                           <div className='flex items-center gap-2'>
                             <CardTitle className='text-base'>
@@ -319,18 +318,13 @@ export default function TeamPage() {
                     <CardHeader className='pb-3'>
                       <div className='flex items-start justify-between'>
                         <div className='flex items-center space-x-3'>
-                          <Avatar className='h-12 w-12'>
-                            <AvatarImage
-                              src={member.avatar}
-                              alt={member.name}
-                            />
-                            <AvatarFallback>
-                              {member.name
-                                .split(' ')
-                                .map((n) => n[0])
-                                .join('')}
-                            </AvatarFallback>
-                          </Avatar>
+                          <UserAvatar
+                            displayName={member.name}
+                            image={member.avatar}
+                            size='md'
+                            className='h-12 w-12'
+                            showBorder={false}
+                          />
                           <div>
                             <div className='flex items-center gap-2'>
                               <CardTitle className='text-base'>
@@ -427,18 +421,13 @@ export default function TeamPage() {
                     <CardHeader className='pb-3'>
                       <div className='flex items-start justify-between'>
                         <div className='flex items-center space-x-3'>
-                          <Avatar className='h-12 w-12'>
-                            <AvatarImage
-                              src={member.avatar}
-                              alt={member.name}
-                            />
-                            <AvatarFallback>
-                              {member.name
-                                .split(' ')
-                                .map((n) => n[0])
-                                .join('')}
-                            </AvatarFallback>
-                          </Avatar>
+                          <UserAvatar
+                            displayName={member.name}
+                            image={member.avatar}
+                            size='md'
+                            className='h-12 w-12'
+                            showBorder={false}
+                          />
                           <div>
                             <div className='flex items-center gap-2'>
                               <CardTitle className='text-base'>
@@ -539,18 +528,14 @@ export default function TeamPage() {
                             key={member.id}
                             className='flex items-center space-x-3 p-4 border rounded-lg'
                           >
-                            <Avatar className='h-10 w-10'>
-                              <AvatarImage
-                                src={member.avatar}
-                                alt={member.name}
-                              />
-                              <AvatarFallback>
-                                {member.name
-                                  .split(' ')
-                                  .map((n) => n[0])
-                                  .join('')}
-                              </AvatarFallback>
-                            </Avatar>
+                            <UserAvatar
+                              displayName={member.name}
+                              image={member.avatar}
+                              size='sm'
+                              className='h-10 w-10'
+                              showBorder={false}
+                              showShadow={false}
+                            />
                             <div className='flex-1'>
                               <div className='flex items-center gap-2'>
                                 <div className='font-medium'>{member.name}</div>

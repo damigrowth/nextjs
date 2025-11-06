@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/shared';
 import {
   ArrowUpDown,
   Edit,
@@ -232,12 +232,14 @@ export function AdminVerificationsDataTable({
             className='hover:underline'
           >
             <div className='flex items-center gap-2'>
-              <Avatar className='h-8 w-8'>
-                <AvatarImage src={profile.image || undefined} />
-                <AvatarFallback>
-                  {profile.displayName?.[0]?.toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar
+                displayName={profile.displayName}
+                image={profile.image}
+                size='sm'
+                className='h-8 w-8'
+                showBorder={false}
+                showShadow={false}
+              />
               <div className='min-w-0'>
                 <p className='font-medium truncate text-sm'>
                   {profile.displayName}

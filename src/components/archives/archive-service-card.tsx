@@ -1,11 +1,10 @@
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
 import type { ArchiveServiceCardData } from '@/lib/types/components';
 import type { ServiceCardData } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { MediaCarousel, ProfileBadges, RatingDisplay } from '../shared';
+import { MediaCarousel, ProfileBadges, RatingDisplay, UserAvatar } from '../shared';
 import { CoverageDisplay } from './coverage-display';
 
 interface ArchiveServiceCardProps {
@@ -123,18 +122,19 @@ export function ArchiveServiceCard({
               {/* Profile Info */}
               {showProfile && (
                 <div className='flex items-center gap-2 flex-1'>
+                  <UserAvatar
+                    displayName={service.profile.displayName}
+                    image={service.profile.image}
+                    size='sm'
+                    className='h-8 w-8'
+                    showBorder={false}
+                    showShadow={false}
+                    href={`/profile/${service.profile.username}`}
+                  />
                   <Link
                     href={`/profile/${service.profile.username}`}
-                    className='flex items-center gap-2 group'
+                    className='group'
                   >
-                    {service.profile.image && (
-                      <Avatar className='h-8 w-8 rounded-lg cursor-pointer'>
-                        <AvatarImage
-                          src={service.profile.image as string}
-                          alt={service.profile.displayName}
-                        />
-                      </Avatar>
-                    )}
                     <span className='text-sm text-body group-hover:text-third transition-colors'>
                       {service.profile.displayName}
                     </span>

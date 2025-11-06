@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/shared';
 import { SearchIcon, MessageSquareIcon, EyeIcon, FlagIcon } from 'lucide-react';
 
 // Force dynamic rendering for admin pages
@@ -184,21 +184,15 @@ export default function ChatsPage() {
                         <div className='flex items-start space-x-4'>
                           <div className='flex -space-x-2'>
                             {chat.avatars.map((avatar, index) => (
-                              <Avatar
+                              <UserAvatar
                                 key={index}
+                                displayName={chat.participants[index]}
+                                image={avatar}
+                                size='sm'
                                 className='h-10 w-10 border-2 border-white'
-                              >
-                                <AvatarImage
-                                  src={avatar}
-                                  alt={chat.participants[index]}
-                                />
-                                <AvatarFallback>
-                                  {chat.participants[index]
-                                    .split(' ')
-                                    .map((n) => n[0])
-                                    .join('')}
-                                </AvatarFallback>
-                              </Avatar>
+                                showBorder={false}
+                                showShadow={false}
+                              />
                             ))}
                           </div>
                           <div className='flex-1'>
@@ -293,21 +287,14 @@ export default function ChatsPage() {
                           <div className='flex items-start space-x-4'>
                             <div className='flex -space-x-2'>
                               {chat.avatars.map((avatar, index) => (
-                                <Avatar
+                                <UserAvatar
                                   key={index}
+                                  displayName={chat.participants[index]}
+                                  image={avatar}
+                                  size='sm'
                                   className='h-10 w-10 border-2 border-white'
-                                >
-                                  <AvatarImage
-                                    src={avatar}
-                                    alt={chat.participants[index]}
-                                  />
-                                  <AvatarFallback>
-                                    {chat.participants[index]
-                                      .split(' ')
-                                      .map((n) => n[0])
-                                      .join('')}
-                                  </AvatarFallback>
-                                </Avatar>
+                                  showBorder={false}
+                                />
                               ))}
                             </div>
                             <div className='flex-1'>
@@ -371,21 +358,14 @@ export default function ChatsPage() {
                           <div className='flex items-start space-x-4'>
                             <div className='flex -space-x-2'>
                               {chat.avatars.map((avatar, index) => (
-                                <Avatar
+                                <UserAvatar
                                   key={index}
+                                  displayName={chat.participants[index]}
+                                  image={avatar}
+                                  size='sm'
                                   className='h-10 w-10 border-2 border-white'
-                                >
-                                  <AvatarImage
-                                    src={avatar}
-                                    alt={chat.participants[index]}
-                                  />
-                                  <AvatarFallback>
-                                    {chat.participants[index]
-                                      .split(' ')
-                                      .map((n) => n[0])
-                                      .join('')}
-                                  </AvatarFallback>
-                                </Avatar>
+                                  showBorder={false}
+                                />
                               ))}
                             </div>
                             <div className='flex-1'>
@@ -459,21 +439,14 @@ export default function ChatsPage() {
                           <div className='flex items-start space-x-4'>
                             <div className='flex -space-x-2'>
                               {chat.avatars.map((avatar, index) => (
-                                <Avatar
+                                <UserAvatar
                                   key={index}
+                                  displayName={chat.participants[index]}
+                                  image={avatar}
+                                  size='sm'
                                   className='h-10 w-10 border-2 border-white'
-                                >
-                                  <AvatarImage
-                                    src={avatar}
-                                    alt={chat.participants[index]}
-                                  />
-                                  <AvatarFallback>
-                                    {chat.participants[index]
-                                      .split(' ')
-                                      .map((n) => n[0])
-                                      .join('')}
-                                  </AvatarFallback>
-                                </Avatar>
+                                  showBorder={false}
+                                />
                               ))}
                             </div>
                             <div className='flex-1'>

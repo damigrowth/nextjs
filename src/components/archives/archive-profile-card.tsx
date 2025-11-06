@@ -55,6 +55,7 @@ export function ArchiveProfileCard({
               top={profile.top}
               size='xl'
               className='h-32 w-32'
+              showShadow={false}
             />
           </div>
 

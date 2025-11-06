@@ -6,11 +6,11 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ChatListItem as ChatListItemType } from '@/lib/types/messages';
-import { getInitials, formatCompactMessageTime } from '@/lib/utils/messages';
+import { formatCompactMessageTime } from '@/lib/utils/messages';
+import { UserAvatar } from '../shared';
 
 interface ChatListItemProps {
   chat: ChatListItemType;
@@ -21,7 +21,6 @@ export function ChatListItem({ chat }: ChatListItemProps) {
   const searchParams = useSearchParams();
   const selectedChatId = searchParams.get('chatId');
   const isSelected = selectedChatId === chat.id;
-  const initials = getInitials(chat.name);
 
   const handleClick = () => {
     router.push(`/dashboard/messages?chatId=${chat.id}`);
@@ -36,10 +35,13 @@ export function ChatListItem({ chat }: ChatListItemProps) {
       )}
     >
       <div className='relative self-center shrink-0'>
-        <Avatar className='h-8 w-8'>
-          <AvatarImage src={chat.avatar || undefined} alt={chat.name} />
-          <AvatarFallback>{initials}</AvatarFallback>
-        </Avatar>
+        <UserAvatar
+          displayName={chat.name}
+          image={chat.avatar}
+          size='sm'
+          className='h-8 w-8'
+          showBorder={false}
+        />
         {chat.online && (
           <div className='absolute bottom-0 right-0 h-2 w-2 rounded-full border-2 border-background bg-green-500' />
         )}

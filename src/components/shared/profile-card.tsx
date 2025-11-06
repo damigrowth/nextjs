@@ -2,12 +2,11 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ProfileCardProps } from '@/lib/types';
-import { formatInitials } from '@/lib/utils/format';
 import ProfileBadges from './profile-badges';
 import RatingDisplay from './rating-display';
 import SaveButton from './save-button';
+import UserAvatar from './user-avatar';
 
 export default function ProfileCard({ profile, isSaved = false }: ProfileCardProps) {
   const {
@@ -37,14 +36,16 @@ export default function ProfileCard({ profile, isSaved = false }: ProfileCardPro
 
       {/* Avatar Section */}
       <div className='flex flex-col items-center text-center'>
-        <Link href={`/profile/${username}`} className='relative mb-4'>
-          <Avatar className='h-20 w-20 rounded-2xl cursor-pointer hover:opacity-90 transition-opacity'>
-            <AvatarImage src={image} alt={displayName} />
-            <AvatarFallback className='text-lg font-bold bg-gradient-to-br from-blue-100 to-purple-100 text-gray-700'>
-              {formatInitials(undefined, undefined, displayName)}
-            </AvatarFallback>
-          </Avatar>
-        </Link>
+        <div className='relative mb-4'>
+          <UserAvatar
+            displayName={displayName}
+            image={image}
+            size='xl'
+            className='h-20 w-20 rounded-2xl'
+            showShadow={false}
+            href={`/profile/${username}`}
+          />
+        </div>
 
         {/* Name and Verification */}
         <div className='flex items-center justify-center gap-2 mb-1'>

@@ -1,11 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 
 import MediaDisplay from '@/components/ui/media-display';
 import RatingDisplay from './rating-display';
 import SaveButton from './save-button';
+import UserAvatar from './user-avatar';
 import { ServiceCardData } from '@/lib/types';
 
 interface ServiceCardProps {
@@ -94,24 +94,27 @@ export default function ServiceCard({
             <div className='flex justify-between gap-3'>
               {/* Profile Info - Separate link */}
               {showProfile && (
-                <Link
-                  href={`/profile/${service.profile.username}`}
-                  className='flex items-center gap-2 w-fit group/profile z-10'
-                >
-                  {service.profile.image && (
-                    <Avatar className='h-6 w-6'>
-                      <AvatarImage
-                        src={service.profile.image}
-                        alt={service.profile.displayName}
-                      />
-                    </Avatar>
-                  )}
+                <div className='flex items-center gap-2 w-fit z-10'>
+                  <UserAvatar
+                    displayName={service.profile.displayName}
+                    image={service.profile.image}
+                    size='sm'
+                    className='h-6 w-6'
+                    showBorder={false}
+                    showShadow={false}
+                    href={`/profile/${service.profile.username}`}
+                  />
                   {!hideDisplayName && (
-                    <span className='text-sm text-body group-hover/profile:text-third transition-colors'>
-                      {service.profile.displayName}
-                    </span>
+                    <Link
+                      href={`/profile/${service.profile.username}`}
+                      className='group/profile'
+                    >
+                      <span className='text-sm text-body group-hover/profile:text-third transition-colors'>
+                        {service.profile.displayName}
+                      </span>
+                    </Link>
                   )}
-                </Link>
+                </div>
               )}
 
               {/* Price - Only show if price > 0 */}

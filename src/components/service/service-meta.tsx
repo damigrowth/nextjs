@@ -1,6 +1,6 @@
 import React from 'react';
-import { ProfileBadges, RatingDisplay } from '../shared';
-import { UserImage } from '../profile';
+import { ProfileBadges, RatingDisplay, UserAvatar } from '../shared';
+import Link from 'next/link';
 
 interface ServiceMetaProps {
   title: string;
@@ -37,16 +37,14 @@ export default function ServiceMeta({
 
         {/* Meta Information */}
         <div className='flex flex-wrap items-center gap-4'>
-          {/* User Image with Name */}
-          <UserImage
-            firstName={firstName}
-            lastName={lastName}
+          {/* User Avatar and Display Name with integrated link */}
+          <UserAvatar
             displayName={displayName}
             image={image}
-            width={40}
-            height={40}
-            path={`/profile/${username}`}
-            className='shrink-0'
+            top={topLevel}
+            size='md'
+            className='h-10 w-10'
+            href={`/profile/${username}`}
           />
 
           {/* Badges Container */}

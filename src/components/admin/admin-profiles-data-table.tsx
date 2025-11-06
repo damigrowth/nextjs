@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ProfileBadges } from '@/components/shared';
+import { ProfileBadges, UserAvatar } from '@/components/shared';
 import { Star, Copy, Check } from 'lucide-react';
 import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
 import { formatDate, formatTime } from '@/lib/utils/date';
@@ -52,17 +51,6 @@ export function AdminProfilesDataTable({
     return 'outline' as const;
   };
 
-  const getInitials = (name: string | null, email: string) => {
-    if (name) {
-      return name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .substring(0, 2);
-    }
-    return email.substring(0, 2).toUpperCase();
-  };
 
   // Column definitions
   const columns: ColumnDef<AdminProfileWithRelations>[] = [
@@ -76,12 +64,14 @@ export function AdminProfilesDataTable({
 
         return (
           <div className='flex items-center gap-3'>
-            <Avatar className='h-10 w-10'>
-              <AvatarImage src={profile.image || undefined} alt={displayName} />
-              <AvatarFallback>
-                {getInitials(displayName, email)}
-              </AvatarFallback>
-            </Avatar>
+            <UserAvatar
+              displayName={displayName}
+              image={profile.image}
+              size='md'
+              className='h-10 w-10'
+              showBorder={false}
+              showShadow={false}
+            />
             <div className='space-y-1'>
               <div className='font-medium'>{displayName}</div>
               <CopyableText text={email} className='text-sm text-muted-foreground' />

@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Shield } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,6 +26,16 @@ export interface UserAvatarProps {
   topIcon?: React.ReactNode;
   /** Custom fallback content */
   fallback?: string;
+  /** Optional href to make avatar clickable */
+  href?: string;
+  /** Hide display name (for compatibility with UserImage) */
+  hideDisplayName?: boolean;
+  /** Custom width in pixels (overrides size) */
+  width?: number;
+  /** Custom height in pixels (overrides size) */
+  height?: number;
+  /** Show shadow */
+  showShadow?: boolean;
 }
 
 const sizeClasses = {
@@ -95,6 +106,11 @@ export default function UserAvatar({
   showBorder = true,
   topIcon,
   fallback,
+  href,
+  hideDisplayName,
+  width,
+  height,
+  showShadow = true,
 }: UserAvatarProps) {
   const sizeClass = sizeClasses[size];
   const borderClass = showBorder ? borderClasses[size] : '';
@@ -116,13 +132,18 @@ export default function UserAvatar({
     `${firstName || ''} ${lastName || ''}`.trim() ||
     'User avatar';
 
-  return (
+  // Generate custom size classes if width/height are provided
+  const customSizeClass =
+    width && height ? `w-[${width}px] h-[${height}px]` : undefined;
+
+  const avatarContent = (
     <div className='relative'>
       <Avatar
         className={cn(
-          sizeClass,
+          customSizeClass || sizeClass,
           borderClass,
-          'border-background shadow-lg rounded-lg bg-white',
+          'border-background rounded-lg bg-white',
+          showShadow && 'shadow-lg',
           className,
         )}
       >
@@ -152,4 +173,14 @@ export default function UserAvatar({
       )}
     </div>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className='hover:opacity-80 transition-opacity'>
+        {avatarContent}
+      </Link>
+    );
+  }
+
+  return avatarContent;
 }
