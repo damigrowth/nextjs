@@ -38,11 +38,7 @@ import { Currency } from '@/components/ui/currency';
 import YearPicker from '@/components/ui/year-picker';
 
 // Icons (lucide-react only)
-import {
-  Loader2,
-  Check,
-  ChevronsUpDown,
-} from 'lucide-react';
+import { Loader2, Check, ChevronsUpDown } from 'lucide-react';
 
 // Auth and utilities
 
@@ -92,12 +88,11 @@ export default function AdditionalInfoForm({
   hideCard = false,
 }: AdditionalInfoFormProps) {
   // Select the appropriate action based on admin mode
-  const actionToUse = adminMode ? updateProfileAdditionalInfoAdmin : updateProfileAdditionalInfo;
+  const actionToUse = adminMode
+    ? updateProfileAdditionalInfoAdmin
+    : updateProfileAdditionalInfo;
 
-  const [state, action, isPending] = useActionState(
-    actionToUse,
-    initialState,
-  );
+  const [state, action, isPending] = useActionState(actionToUse, initialState);
   const router = useRouter();
 
   // Extract data from props
@@ -164,7 +159,7 @@ export default function AdditionalInfoForm({
 
     populateFormData(formData, allValues, {
       stringFields: ['commencement', 'budget', 'terms'], // Simple text fields
-      numericFields: ['rate', 'experience'], // Numeric fields
+      numericFields: ['rate'], // Numeric fields
       jsonFields: [
         'contactMethods',
         'paymentMethods',
@@ -190,7 +185,7 @@ export default function AdditionalInfoForm({
         className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
       >
         {/* Row 1: Commencement and Rate */}
-        <div className='grid grid-cols-1 md:grid-cols-6 gap-6'>
+        <div className='grid grid-cols-1 md:grid-cols-5 gap-6'>
           {/* Commencement Field */}
           <FormField
             control={form.control}

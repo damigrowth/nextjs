@@ -41,7 +41,6 @@ export async function updateProfileAdditionalInfo(
       // Define your form fields and their types
       rate: { type: 'number', required: false, defaultValue: null },
       commencement: { type: 'string', required: false, defaultValue: '' },
-      experience: { type: 'number', required: false, defaultValue: null },
       contactMethods: { type: 'json', required: false, defaultValue: [] },
       paymentMethods: { type: 'json', required: false, defaultValue: [] },
       settlementMethods: { type: 'json', required: false, defaultValue: [] },
@@ -69,7 +68,13 @@ export async function updateProfileAdditionalInfo(
 
     const data = validationResult.data;
 
-    // 5. Business logic validation - check if profile exists and get data for cache invalidation
+    // 5. Calculate experience from commencement year
+    const currentYear = new Date().getFullYear();
+    const calculatedExperience = data.commencement
+      ? currentYear - parseInt(data.commencement)
+      : null;
+
+    // 6. Business logic validation - check if profile exists and get data for cache invalidation
     const existingProfile = await prisma.profile.findUnique({
       where: { uid: user.id },
       select: {
@@ -90,13 +95,13 @@ export async function updateProfileAdditionalInfo(
       };
     }
 
-    // 6. Database operation - update profile with additional info
+    // 7. Database operation - update profile with additional info
     await prisma.profile.update({
       where: { uid: user.id },
       data: {
         rate: data.rate,
         commencement: data.commencement || null,
-        experience: data.experience,
+        experience: calculatedExperience,
         contactMethods: data.contactMethods || [],
         paymentMethods: data.paymentMethods || [],
         settlementMethods: data.settlementMethods || [],
@@ -107,7 +112,7 @@ export async function updateProfileAdditionalInfo(
       },
     });
 
-    // 7. Revalidate cached data with consistent tags
+    // 8. Revalidate cached data with consistent tags
     const profileTags = getProfileTags(existingProfile);
     profileTags.forEach(tag => revalidateTag(tag));
 
@@ -120,7 +125,7 @@ export async function updateProfileAdditionalInfo(
     revalidateTag(CACHE_TAGS.service.byProfile(existingProfile.id));
 
     // Revalidate specific pages
-    revalidatePath('/dashboard/profile/additional-info');
+    revalidatePath('/dashboard/profile/additional');
     if (existingProfile.username) {
       revalidatePath(`/profile/${existingProfile.username}`);
     }
@@ -137,7 +142,7 @@ export async function updateProfileAdditionalInfo(
       message: 'Τα πρόσθετα στοιχεία του προφίλ σας ενημερώθηκαν επιτυχώς!',
     };
   } catch (error: any) {
-    // 8. Comprehensive error handling
+    // 9. Comprehensive error handling
     return handleBetterAuthError(error);
   }
 }
