@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useActionState, useEffect } from 'react';
+import React, { useActionState, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import { MultiSelect, type Option } from '@/components/ui/multi-select';
 import { toast } from 'sonner';
 
 // Icons (lucide-react + brands)
@@ -61,6 +62,18 @@ const initialSocials = {
   dribbble: '',
 };
 
+// Available social media platforms
+const socialPlatformOptions: Option[] = [
+  { value: 'facebook', label: 'Facebook' },
+  { value: 'instagram', label: 'Instagram' },
+  { value: 'linkedin', label: 'LinkedIn' },
+  { value: 'x', label: 'X (Twitter)' },
+  { value: 'youtube', label: 'YouTube' },
+  { value: 'github', label: 'GitHub' },
+  { value: 'behance', label: 'Behance' },
+  { value: 'dribbble', label: 'Dribbble' },
+];
+
 interface PresentationInfoFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null;
@@ -85,6 +98,9 @@ export default function PresentationInfoForm({
 
   // Extract data from props
   const profile = initialProfile;
+
+  // State for selected social platforms
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
 
   const form = useForm<ProfilePresentationUpdateInput>({
     resolver: zodResolver(profilePresentationUpdateSchema),
@@ -122,6 +138,13 @@ export default function PresentationInfoForm({
         socials: profile.socials || initialSocials,
       };
       form.reset(resetData);
+
+      // Initialize selected platforms based on existing data
+      const existingSocials = profile.socials || {};
+      const activePlatforms = Object.keys(existingSocials).filter(
+        (key) => existingSocials[key as keyof typeof existingSocials] && existingSocials[key as keyof typeof existingSocials] !== ''
+      );
+      setSelectedPlatforms(activePlatforms);
     }
   }, [profile]);
 
@@ -343,173 +366,234 @@ export default function PresentationInfoForm({
         <div className='space-y-4'>
           <h4 className='text-sm font-medium'>Κοινωνικά Δίκτυα</h4>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-            <FormField
-              control={form.control}
-              name='socials.facebook'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='flex items-center gap-2'>
-                    <Icon name='facebook' size={16} />
-                    Facebook
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://facebook.com/your-profile'
-                      {...field}
-                      value={field.value || ''}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          {/* MultiSelect for choosing platforms */}
+          <div className='space-y-4'>
+            <FormItem>
+              <FormLabel>Επιλέξτε Κοινωνικά Δίκτυα</FormLabel>
+              <FormControl>
+                <MultiSelect
+                  options={socialPlatformOptions}
+                  selected={selectedPlatforms}
+                  onChange={(platforms) => {
+                    // Find removed platforms
+                    const removedPlatforms = selectedPlatforms.filter(
+                      (p) => !platforms.includes(p)
+                    );
 
-            <FormField
-              control={form.control}
-              name='socials.instagram'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='flex items-center gap-2'>
-                    <Icon name='instagram' size={16} />
-                    Instagram
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://instagram.com/your-profile'
-                      {...field}
-                      value={field.value || ''}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    // Clear form values for removed platforms
+                    removedPlatforms.forEach((platform) => {
+                      setValue(`socials.${platform}` as any, '', {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                    });
 
-            <FormField
-              control={form.control}
-              name='socials.linkedin'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='flex items-center gap-2'>
-                    <Icon name='linkedin' size={16} />
-                    LinkedIn
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://linkedin.com/in/your-profile'
-                      {...field}
-                      value={field.value || ''}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    setSelectedPlatforms(platforms);
+                  }}
+                  placeholder='Επιλέξτε κοινωνικά δίκτυα...'
+                  renderLabel={(option) => (
+                    <div className='flex items-center gap-2'>
+                      <Icon name={option.value} size={16} />
+                      {option.label}
+                    </div>
+                  )}
+                  renderSelected={(option) => (
+                    <div className='flex items-center gap-2'>
+                      <Icon name={option.value} size={14} />
+                      <span className='text-xs'>{option.label}</span>
+                    </div>
+                  )}
+                />
+              </FormControl>
+            </FormItem>
 
-            <FormField
-              control={form.control}
-              name='socials.x'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='flex items-center gap-2'>
-                    <Icon name='x' size={12} />X (Twitter)
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://x.com/your-profile'
-                      {...field}
-                      value={field.value || ''}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Dynamic input fields for selected platforms */}
+            {selectedPlatforms.length > 0 && (
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                {selectedPlatforms.includes('facebook') && (
+                  <FormField
+                    control={form.control}
+                    name='socials.facebook'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='flex items-center gap-2'>
+                          <Icon name='facebook' size={16} />
+                          Facebook
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='https://facebook.com/your-profile'
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-            <FormField
-              control={form.control}
-              name='socials.youtube'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='flex items-center gap-2'>
-                    <Icon name='youtube' size={16} />
-                    YouTube
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://youtube.com/your-channel'
-                      {...field}
-                      value={field.value || ''}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                {selectedPlatforms.includes('instagram') && (
+                  <FormField
+                    control={form.control}
+                    name='socials.instagram'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='flex items-center gap-2'>
+                          <Icon name='instagram' size={16} />
+                          Instagram
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='https://instagram.com/your-profile'
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-            <FormField
-              control={form.control}
-              name='socials.github'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='flex items-center gap-2'>
-                    <Icon name='github' size={16} />
-                    GitHub
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://github.com/your-profile'
-                      {...field}
-                      value={field.value || ''}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                {selectedPlatforms.includes('linkedin') && (
+                  <FormField
+                    control={form.control}
+                    name='socials.linkedin'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='flex items-center gap-2'>
+                          <Icon name='linkedin' size={16} />
+                          LinkedIn
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='https://linkedin.com/in/your-profile'
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-            <FormField
-              control={form.control}
-              name='socials.behance'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='flex items-center gap-2'>
-                    <Icon name='behance' size={16} />
-                    Behance
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://behance.net/your-profile'
-                      {...field}
-                      value={field.value || ''}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                {selectedPlatforms.includes('x') && (
+                  <FormField
+                    control={form.control}
+                    name='socials.x'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='flex items-center gap-2'>
+                          <Icon name='x' size={12} />X (Twitter)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='https://x.com/your-profile'
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-            <FormField
-              control={form.control}
-              name='socials.dribbble'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='flex items-center gap-2'>
-                    <Icon name='dribbble' size={16} />
-                    Dribbble
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://dribbble.com/your-profile'
-                      {...field}
-                      value={field.value || ''}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                {selectedPlatforms.includes('youtube') && (
+                  <FormField
+                    control={form.control}
+                    name='socials.youtube'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='flex items-center gap-2'>
+                          <Icon name='youtube' size={16} />
+                          YouTube
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='https://youtube.com/your-channel'
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {selectedPlatforms.includes('github') && (
+                  <FormField
+                    control={form.control}
+                    name='socials.github'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='flex items-center gap-2'>
+                          <Icon name='github' size={16} />
+                          GitHub
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='https://github.com/your-profile'
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {selectedPlatforms.includes('behance') && (
+                  <FormField
+                    control={form.control}
+                    name='socials.behance'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='flex items-center gap-2'>
+                          <Icon name='behance' size={16} />
+                          Behance
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='https://behance.net/your-profile'
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {selectedPlatforms.includes('dribbble') && (
+                  <FormField
+                    control={form.control}
+                    name='socials.dribbble'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='flex items-center gap-2'>
+                          <Icon name='dribbble' size={16} />
+                          Dribbble
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='https://dribbble.com/your-profile'
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+            )}
           </div>
         </div>
 

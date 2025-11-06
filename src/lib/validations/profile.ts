@@ -230,57 +230,49 @@ export const additionalProfileInfoSchema = z.object({
 export const socialMediaSchema = z.object({
   facebook: z
     .string()
-    .url('Enter a valid Facebook link')
-    .regex(/^https?:\/\/(www\.)?facebook\.com\/.*$/, 'Invalid Facebook link')
+    .url('Εισάγετε έγκυρο URL')
     .optional()
     .nullable()
     .or(z.literal('')),
   linkedin: z
     .string()
-    .url('Enter a valid LinkedIn link')
-    .regex(/^https?:\/\/(www\.)?linkedin\.com\/.*$/, 'Invalid LinkedIn link')
+    .url('Εισάγετε έγκυρο URL')
     .optional()
     .nullable()
     .or(z.literal('')),
   x: z
     .string()
-    .url('Enter a valid X link')
-    .regex(/^https?:\/\/(www\.)?(twitter|x)\.com\/.*$/, 'Invalid X link')
+    .url('Εισάγετε έγκυρο URL')
     .optional()
     .nullable()
     .or(z.literal('')),
   youtube: z
     .string()
-    .url('Enter a valid YouTube link')
-    .regex(/^https?:\/\/(www\.)?youtube\.com\/.*$/, 'Invalid YouTube link')
+    .url('Εισάγετε έγκυρο URL')
     .optional()
     .nullable()
     .or(z.literal('')),
   github: z
     .string()
-    .url('Enter a valid GitHub link')
-    .regex(/^https?:\/\/(www\.)?github\.com\/.*$/, 'Invalid GitHub link')
+    .url('Εισάγετε έγκυρο URL')
     .optional()
     .nullable()
     .or(z.literal('')),
   instagram: z
     .string()
-    .url('Enter a valid Instagram link')
-    .regex(/^https?:\/\/(www\.)?instagram\.com\/.*$/, 'Invalid Instagram link')
+    .url('Εισάγετε έγκυρο URL')
     .optional()
     .nullable()
     .or(z.literal('')),
   behance: z
     .string()
-    .url('Enter a valid Behance link')
-    .regex(/^https?:\/\/(www\.)?behance\.net\/.*$/, 'Invalid Behance link')
+    .url('Εισάγετε έγκυρο URL')
     .optional()
     .nullable()
     .or(z.literal('')),
   dribbble: z
     .string()
-    .url('Enter a valid Dribbble link')
-    .regex(/^https?:\/\/(www\.)?dribbble\.com\/.*$/, 'Invalid Dribbble link')
+    .url('Εισάγετε έγκυρο URL')
     .optional()
     .nullable()
     .or(z.literal('')),
