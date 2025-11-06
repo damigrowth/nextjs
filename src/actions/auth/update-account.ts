@@ -59,9 +59,9 @@ export async function updateAccount(
     const data = validationResult.data;
 
     // Process image data - convert CloudinaryResource to URL string for database storage
-    // Only process image for type='user' (simple users), not for type='pro'
+    // Process image for all user types
     const processedImage =
-      user.type === 'user' && data.image !== undefined
+      data.image !== undefined
         ? processImageForDatabase(data.image)
         : undefined;
 
@@ -80,34 +80,34 @@ export async function updateAccount(
       },
     });
 
-    // Update the user - displayName for all, image only for type='user'
+    // Update the user - displayName and image for all user types
     await prisma.user.update({
       where: { id: user.id },
       data: {
         displayName: data.displayName,
-        ...(user.type === 'user' && processedImage !== undefined && { image: processedImage }),
+        ...(processedImage !== undefined && { image: processedImage }),
       },
     });
 
-    // Update the profile if it exists (only for pro users)
-    // Profile image is NOT updated here - pro users update their image in basic info form
+    // Update the profile if it exists (pro users have profiles)
+    // Update both displayName and image for pro users
     if (profile) {
       await prisma.profile.update({
         where: { uid: user.id },
         data: {
           displayName: data.displayName,
-          // No image update for profile - pro users manage image in basic info
+          ...(processedImage !== undefined && { image: processedImage }),
         },
       });
     }
 
-    // Update Better Auth user data
+    // Update Better Auth user data for all user types
     await auth.api.updateUser({
       headers: await headers(),
       body: {
         displayName: data.displayName,
         name: data.displayName,
-        ...(user.type === 'user' && processedImage !== undefined && { image: processedImage }),
+        ...(processedImage !== undefined && { image: processedImage }),
       },
     });
 

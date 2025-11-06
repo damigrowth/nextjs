@@ -102,9 +102,6 @@ export default function BasicInfoForm({
   const { refetch } = useSession();
   const router = useRouter();
 
-  // Refs for media upload
-  const profileImageRef = useRef<any>(null);
-
   // Extract data from props
   const profile = initialProfile;
   // console.log(
@@ -118,7 +115,6 @@ export default function BasicInfoForm({
   const form = useForm<ProfileBasicInfoUpdateInput>({
     resolver: zodResolver(profileBasicInfoUpdateSchema),
     defaultValues: {
-      image: null,
       tagline: '',
       bio: '',
       category: '',
@@ -141,7 +137,6 @@ export default function BasicInfoForm({
   useEffect(() => {
     if (profile) {
       const resetData = {
-        image: profile.image ? profile.image : null,
         tagline: profile.tagline || '',
         bio: profile.bio || '',
         category: profile.category || '',
@@ -181,12 +176,6 @@ export default function BasicInfoForm({
   // Watch specific fields for dependent logic
   const watchedCategory = watch('category');
   const watchedSkills = watch('skills');
-  const watchedImage = watch('image');
-
-  // Helper function to check if image is present
-  const hasValidImage = () => {
-    return watchedImage !== null && watchedImage !== undefined;
-  };
 
   // Helper functions for formatting inputs
   const handleTaglineChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -231,19 +220,12 @@ export default function BasicInfoForm({
     });
   };
 
-  // Wrapper action that handles media uploads and data population
+  // Wrapper action that handles data population
   const handleFormAction = async (formData: FormData) => {
     setIsUploading(true);
 
     try {
-      // Check for pending files and upload if needed
-      const hasPendingFiles = profileImageRef.current?.hasFiles();
-
-      if (hasPendingFiles) {
-        await profileImageRef.current.uploadFiles();
-      }
-
-      // Get all form values AFTER upload completion
+      // Get all form values
       const allValues = getValues();
 
       populateFormData(formData, allValues, {
@@ -254,7 +236,7 @@ export default function BasicInfoForm({
           'subcategory',
           'speciality',
         ],
-        jsonFields: ['image', 'skills'],
+        jsonFields: ['skills'],
         skipEmpty: true,
       });
 
@@ -270,9 +252,8 @@ export default function BasicInfoForm({
 
       // Note: Don't reset isUploading here, let it be handled by useEffect
     } catch (error) {
-      console.error('❌ Upload failed:', error);
+      console.error('❌ Form submission failed:', error);
       setIsUploading(false);
-      // Don't submit form if upload fails
     }
   };
 
@@ -286,44 +267,6 @@ export default function BasicInfoForm({
         }}
         className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
       >
-        {/* Profile Image */}
-        <FormField
-          control={form.control}
-          name='image'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className='text-sm font-medium text-gray-700'>
-                Εικόνα Προφίλ*
-              </FormLabel>
-              <p className='text-sm text-gray-600'>
-                Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο.
-              </p>
-              <FormControl>
-                <MediaUpload
-                  ref={profileImageRef}
-                  value={field.value}
-                  onChange={(value) => {
-                    setValue('image', value, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    });
-                  }}
-                  uploadPreset='doulitsa_new'
-                  multiple={false}
-                  folder={`users/${initialUser?.username}/profile`}
-                  maxFileSize={3000000} // 3MB
-                  allowedFormats={['jpg', 'jpeg', 'png', 'webp']}
-                  placeholder='Ανεβάστε εικόνα προφίλ'
-                  type='image'
-                  error={errors.image?.message}
-                  signed={false}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         {/* Tagline */}
         <FormField
           control={form.control}
@@ -665,17 +608,15 @@ export default function BasicInfoForm({
 
 
         {/* Debug Info */}
-        {/* {process.env.NODE_ENV === 'development' && (
+        {process.env.NODE_ENV === 'development' && (
           <div className='max-w-xl overflow-scroll p-4 bg-gray-100 rounded text-xs space-y-2'>
             <div>isValid: {isValid.toString()}</div>
             <div>isDirty: {isDirty.toString()}</div>
-            <div>hasValidImage: {hasValidImage().toString()}</div>
-            <div>Image Value: {JSON.stringify(getValues('image'))}</div>
             <div>Username: {initialUser?.username || 'undefined'}</div>
             <div>User ID: {initialUser?.id || 'undefined'}</div>
             <div>Errors: {JSON.stringify(errors, null, 2)}</div>
           </div>
-        )} */}
+        )}
 
         <div className='flex justify-end space-x-4'>
           <FormButton
@@ -695,8 +636,7 @@ export default function BasicInfoForm({
               isPendingTransition ||
               isUploading ||
               !isValid ||
-              !isDirty ||
-              !hasValidImage()
+              !isDirty
             }
           />
         </div>

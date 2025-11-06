@@ -147,40 +147,38 @@ export default function AccountForm({ initialUser }: AccountFormProps) {
         }}
         className='space-y-6 p-6 border rounded-lg'
       >
-        {/* Profile Image - Only for simple users (type='user') */}
-        {initialUser?.type === 'user' && (
-          <FormField
-            control={form.control}
-            name='image'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='text-sm font-medium text-gray-700'>
-                  Εικόνα Προφίλ*
-                </FormLabel>
-                <p className='text-sm text-gray-600'>
-                  Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο.
-                </p>
-                <FormControl>
-                  <MediaUpload
-                    ref={profileImageRef}
-                    value={field.value}
-                    onChange={field.onChange}
-                    uploadPreset='doulitsa_new'
-                    multiple={false}
-                    folder={`users/${initialUser?.username}/profile`}
-                    maxFileSize={3000000} // 3MB
-                    allowedFormats={['jpg', 'jpeg', 'png', 'webp']}
-                    placeholder='Ανεβάστε εικόνα προφίλ'
-                    type='image'
-                    error={errors.image?.message}
-                    signed={false}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
+        {/* Profile Image - For all user types */}
+        <FormField
+          control={form.control}
+          name='image'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className='text-sm font-medium text-gray-700'>
+                Εικόνα Προφίλ*
+              </FormLabel>
+              <p className='text-sm text-gray-600'>
+                Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο.
+              </p>
+              <FormControl>
+                <MediaUpload
+                  ref={profileImageRef}
+                  value={field.value}
+                  onChange={field.onChange}
+                  uploadPreset='doulitsa_new'
+                  multiple={false}
+                  folder={`users/${initialUser?.username}/profile`}
+                  maxFileSize={3000000} // 3MB
+                  allowedFormats={['jpg', 'jpeg', 'png', 'webp']}
+                  placeholder='Ανεβάστε εικόνα προφίλ'
+                  type='image'
+                  error={errors.image?.message}
+                  signed={false}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
           {/* Email - Read Only */}

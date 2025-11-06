@@ -38,11 +38,18 @@ const ProfileImageUpload = memo<ProfileImageUploadProps>(({
   const renderProfileImage = () => {
     if (queuedFile) {
       return (
-        <img
-          src={queuedFile.preview}
-          alt={queuedFile.name}
-          className="w-[71px] h-[71px] rounded-lg object-cover border-2 border-gray-200"
-        />
+        <div className="relative w-[71px] h-[71px]">
+          <img
+            src={queuedFile.preview}
+            alt={queuedFile.name}
+            className="w-full h-full rounded-lg object-cover border-2 border-gray-200"
+          />
+          {isUploading && (
+            <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+              <Loader2 className="w-6 h-6 animate-spin text-white" />
+            </div>
+          )}
+        </div>
       );
     }
 
@@ -50,31 +57,47 @@ const ProfileImageUpload = memo<ProfileImageUploadProps>(({
       // Handle string URL (like Google images)
       if (typeof resource === 'string') {
         return (
-          <img
-            src={resource}
-            alt="Profile image"
-            className="w-[71px] h-[71px] rounded-lg object-cover border-2 border-gray-200"
-          />
+          <div className="relative w-[71px] h-[71px]">
+            <img
+              src={resource}
+              alt="Profile image"
+              className="w-full h-full rounded-lg object-cover border-2 border-gray-200"
+            />
+            {isUploading && (
+              <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                <Loader2 className="w-6 h-6 animate-spin text-white" />
+              </div>
+            )}
+          </div>
         );
       }
 
       // Handle CloudinaryResource objects
       const isPending = isPendingResource(resource);
 
-      return isPending || !resource.public_id ? (
-        <img
-          src={resource.secure_url}
-          alt={resource.original_filename || 'Profile image'}
-          className="w-[71px] h-[71px] rounded-lg object-cover border-2 border-gray-200"
-        />
-      ) : (
-        <CldImage
-          width={71}
-          height={71}
-          src={resource.public_id}
-          alt="Profile image"
-          className="w-[71px] h-[71px] rounded-lg object-cover border-2 border-gray-200"
-        />
+      return (
+        <div className="relative w-[71px] h-[71px]">
+          {isPending || !resource.public_id ? (
+            <img
+              src={resource.secure_url}
+              alt={resource.original_filename || 'Profile image'}
+              className="w-full h-full rounded-lg object-cover border-2 border-gray-200"
+            />
+          ) : (
+            <CldImage
+              width={71}
+              height={71}
+              src={resource.public_id}
+              alt="Profile image"
+              className="w-full h-full rounded-lg object-cover border-2 border-gray-200"
+            />
+          )}
+          {isUploading && (
+            <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+              <Loader2 className="w-6 h-6 animate-spin text-white" />
+            </div>
+          )}
+        </div>
       );
     }
 
@@ -140,14 +163,6 @@ const ProfileImageUpload = memo<ProfileImageUploadProps>(({
           </p>
         </div>
       </div>
-
-      {/* Upload Status */}
-      {isUploading && (
-        <div className="flex items-center justify-center py-4">
-          <Loader2 className="w-5 h-5 animate-spin text-[#1f4b3f] mr-2" />
-          <span className="text-[#1f4b3f] font-medium">Uploading...</span>
-        </div>
-      )}
 
       {/* Error Display */}
       {error && (
