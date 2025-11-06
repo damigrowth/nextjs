@@ -184,9 +184,8 @@ export default function VerificationForm({
                 Η επίσημη διεύθυνση της επιχείρησής σας
               </p>
               <FormControl>
-                <Textarea
+                <Input
                   placeholder='π.χ. Λεωφόρος Κηφισίας 123, Αθήνα 11526'
-                  className='min-h-[80px]'
                   {...field}
                   disabled={isFormDisabled}
                 />
@@ -204,12 +203,11 @@ export default function VerificationForm({
             <FormItem>
               <FormLabel>Τηλέφωνο Επικοινωνίας *</FormLabel>
               <p className='text-sm text-muted-foreground'>
-                Κινητό τηλέφωνο που ξεκινάει με 69
+                Τηλέφωνο επικοινωνίας για την πιστοποίηση
               </p>
               <FormControl>
                 <Input
-                  placeholder='69XXXXXXXX'
-                  maxLength={10}
+                  placeholder='Εισάγετε τηλέφωνο επικοινωνίας'
                   {...field}
                   disabled={isFormDisabled}
                 />

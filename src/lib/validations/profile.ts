@@ -424,12 +424,8 @@ export const verificationFormSchema = z.object({
     .max(200, 'Η διεύθυνση δεν μπορεί να υπερβαίνει τους 200 χαρακτήρες'),
   phone: z
     .string()
-    .min(10, 'Το τηλέφωνο πρέπει να έχει 10 ψηφία')
-    .max(10, 'Το τηλέφωνο πρέπει να έχει 10 ψηφία')
-    .regex(
-      /^69\d{8}$/,
-      'Το τηλέφωνο πρέπει να ξεκινάει με 69 και να έχει 10 ψηφία',
-    ),
+    .min(1, 'Το τηλέφωνο είναι υποχρεωτικό')
+    .max(50, 'Το τηλέφωνο δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες'),
 });
 
 // Removed duplicate cloudinaryResourceSchema - now imported from @/lib/prisma/json-types
@@ -445,7 +441,6 @@ export const categorySchema = z.string().min(1, 'Κατηγορία είναι �
 
 // Profile update schema for basic info form
 export const profileBasicInfoUpdateSchema = z.object({
-  image: z.any().nullable().optional(),
   tagline: z
     .string()
     .refine(
@@ -468,7 +463,6 @@ export const profileBasicInfoUpdateSchema = z.object({
     .optional()
     .transform((val) => val ?? []),
   speciality: z.string().optional().or(z.literal('')),
-  coverage: coverageSchema,
 });
 
 // Profile additional info update schema for new fields
