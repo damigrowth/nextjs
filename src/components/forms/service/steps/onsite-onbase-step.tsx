@@ -107,23 +107,9 @@ export default function OnsiteOnbaseStep({ disabledOptions }: OnsiteOnbaseStepPr
               </p>
             </div>
 
-            {/* Features List */}
-            <div
-              className={`text-xs space-y-1 ${
-                disabledOptions?.onbase
-                  ? 'text-gray-400'
-                  : selectedLocation === 'onbase'
-                    ? 'text-green-600'
-                    : 'text-gray-500'
-              }`}
-            >
-              <div>✓ Ελεγχόμενο περιβάλλον</div>
-              <div>✓ Δικός σας εξοπλισμός</div>
-              <div>✓ Χαμηλότερο κόστος μετακίνησης</div>
-            </div>
-
             {selectedLocation === 'onbase' && !disabledOptions?.onbase && (
-              <div className='flex items-center text-green-600 text-sm font-medium'>
+              <div className='flex items-center gap-1.5 text-green-600 text-base font-medium'>
+                <span>✓</span>
                 <span>Επιλεγμένο</span>
               </div>
             )}
@@ -181,23 +167,9 @@ export default function OnsiteOnbaseStep({ disabledOptions }: OnsiteOnbaseStepPr
               </p>
             </div>
 
-            {/* Features List */}
-            <div
-              className={`text-xs space-y-1 ${
-                disabledOptions?.onsite
-                  ? 'text-gray-400'
-                  : selectedLocation === 'onsite'
-                    ? 'text-green-600'
-                    : 'text-gray-500'
-              }`}
-            >
-              <div>✓ Ευκολία για τον πελάτη</div>
-              <div>✓ Εξοικείωση με το περιβάλλον</div>
-              <div>✓ Υψηλότερες τιμές</div>
-            </div>
-
             {selectedLocation === 'onsite' && !disabledOptions?.onsite && (
-              <div className='flex items-center text-green-600 text-sm font-medium'>
+              <div className='flex items-center gap-1.5 text-green-600 text-base font-medium'>
+                <span>✓</span>
                 <span>Επιλεγμένο</span>
               </div>
             )}

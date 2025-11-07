@@ -10,16 +10,25 @@ import { Check, Plus, Settings, Clock, HelpCircle } from 'lucide-react';
 interface ServiceSuccessProps {
   id: string | number;
   title: string;
+  onReset?: () => void;
 }
 
-export default function ServiceSuccess({ id, title }: ServiceSuccessProps) {
+export default function ServiceSuccess({
+  id,
+  title,
+  onReset,
+}: ServiceSuccessProps) {
   const handleAddServiceReload = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    window.location.reload();
+    if (onReset) {
+      onReset();
+    } else {
+      window.location.reload();
+    }
   };
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-6 py-10'>
       {/* Success Icon and Badges */}
       <div className='text-center space-y-4 pt-6'>
         <div className='mx-auto w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg'>

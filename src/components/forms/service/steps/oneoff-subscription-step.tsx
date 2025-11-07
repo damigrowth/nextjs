@@ -113,19 +113,9 @@ export default function OneoffSubscriptionStep() {
               </p>
             </div>
 
-            {/* Features List */}
-            <div
-              className={`text-xs space-y-1 ${
-                typeValues?.oneoff ? 'text-green-600' : 'text-gray-500'
-              }`}
-            >
-              <div>✓ Μοναδική εκτέλεση</div>
-              <div>✓ Συγκεκριμένο παραδοτέο</div>
-              <div>✓ Καμία επανάληψη</div>
-            </div>
-
             {typeValues?.oneoff && (
-              <div className='flex items-center text-green-600 text-sm font-medium'>
+              <div className='flex items-center gap-1.5 text-green-600 text-base font-medium'>
+                <span>✓</span>
                 <span>Επιλεγμένο</span>
               </div>
             )}
@@ -169,19 +159,9 @@ export default function OneoffSubscriptionStep() {
               </p>
             </div>
 
-            {/* Features List */}
-            <div
-              className={`text-xs space-y-1 ${
-                typeValues?.subscription ? 'text-green-600' : 'text-gray-500'
-              }`}
-            >
-              <div>✓ Περιοδική εκτέλεση</div>
-              <div>✓ Συνεχής παροχή</div>
-              <div>✓ Σταθερό εισόδημα</div>
-            </div>
-
             {typeValues?.subscription && (
-              <div className='flex items-center text-green-600 text-sm font-medium'>
+              <div className='flex items-center gap-1.5 text-green-600 text-base font-medium'>
+                <span>✓</span>
                 <span>Επιλεγμένο</span>
               </div>
             )}

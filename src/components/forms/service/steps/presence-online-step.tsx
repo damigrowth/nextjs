@@ -111,23 +111,9 @@ export default function PresenceOnlineStep({ disabledOptions }: PresenceOnlineSt
               </p>
             </div>
 
-            {/* Features List */}
-            <div
-              className={`text-xs space-y-1 ${
-                disabledOptions?.presence
-                  ? 'text-gray-400'
-                  : selectedType === 'presence'
-                    ? 'text-green-600'
-                    : 'text-gray-500'
-              }`}
-            >
-              <div>✓ Άμεση επικοινωνία</div>
-              <div>✓ Προσωπική εξυπηρέτηση</div>
-              <div>✓ Επιτόπια εργασία</div>
-            </div>
-
             {selectedType === 'presence' && !disabledOptions?.presence && (
-              <div className='flex items-center text-green-600 text-sm font-medium'>
+              <div className='flex items-center gap-1.5 text-green-600 text-base font-medium'>
+                <span>✓</span>
                 <span>Επιλεγμένο</span>
               </div>
             )}
@@ -185,23 +171,9 @@ export default function PresenceOnlineStep({ disabledOptions }: PresenceOnlineSt
               </p>
             </div>
 
-            {/* Features List */}
-            <div
-              className={`text-xs space-y-1 ${
-                disabledOptions?.online
-                  ? 'text-gray-400'
-                  : selectedType === 'online'
-                    ? 'text-green-600'
-                    : 'text-gray-500'
-              }`}
-            >
-              <div>✓ Ευελιξία τοποθεσίας</div>
-              <div>✓ Μείωση κόστους</div>
-              <div>✓ Ψηφιακή παράδοση</div>
-            </div>
-
             {selectedType === 'online' && !disabledOptions?.online && (
-              <div className='flex items-center text-green-600 text-sm font-medium'>
+              <div className='flex items-center gap-1.5 text-green-600 text-base font-medium'>
+                <span>✓</span>
                 <span>Επιλεγμένο</span>
               </div>
             )}
