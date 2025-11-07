@@ -1,9 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Command,
   CommandEmpty,
@@ -37,6 +38,9 @@ export interface LazyComboboxProps {
   formatLabel?: (option: LazyComboboxOption) => React.ReactNode;
   getButtonLabel?: (option: LazyComboboxOption | undefined) => string;
 
+  // Hierarchical Badge Display (optional)
+  renderButtonContent?: (option: LazyComboboxOption | undefined) => React.ReactNode;
+
   // Lazy Loading
   initialLimit?: number;
   loadMoreThreshold?: number;
@@ -61,6 +65,7 @@ export function LazyCombobox({
   emptyMessage = 'Δεν βρέθηκαν αποτελέσματα.',
   formatLabel,
   getButtonLabel,
+  renderButtonContent,
   initialLimit = 20,
   loadMoreThreshold = 100,
   loadMoreIncrement = 20,
@@ -160,11 +165,18 @@ export function LazyCombobox({
           className={cn(
             'w-full justify-between',
             !value && 'text-muted-foreground',
+            renderButtonContent && 'h-auto py-2',
             className
           )}
           disabled={disabled}
         >
-          {buttonLabel}
+          {renderButtonContent ? (
+            <div className='flex items-center flex-1 min-w-0'>
+              {renderButtonContent(selectedOption)}
+            </div>
+          ) : (
+            buttonLabel
+          )}
           <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
         </Button>
       </PopoverTrigger>

@@ -26,12 +26,16 @@ import { createServiceSchema } from '@/lib/validations/service';
 import { populateFormData } from '@/lib/utils/form';
 
 // Use dashboard service schema - pick only taxonomy fields
-const editServiceTaxonomySchema = createServiceSchema.pick({
-  category: true,
-  subcategory: true,
-  subdivision: true,
-  tags: true,
-});
+// Extend to make tags explicitly optional to match the interface
+const editServiceTaxonomySchema = createServiceSchema
+  .pick({
+    category: true,
+    subcategory: true,
+    subdivision: true,
+  })
+  .extend({
+    tags: z.array(z.string()).optional(),
+  });
 
 type EditServiceTaxonomyFormValues = z.infer<typeof editServiceTaxonomySchema>;
 
@@ -41,7 +45,7 @@ interface EditServiceTaxonomyFormProps {
     category: string;
     subcategory: string;
     subdivision: string | null;
-    tags: string[];
+    tags?: string[];
   };
 }
 

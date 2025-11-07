@@ -33,18 +33,19 @@ import {
 // Custom UI components
 import { Currency } from '@/components/ui/currency';
 import { MultiSelect } from '@/components/ui/multi-select';
+import { LazyCombobox } from '@/components/ui/lazy-combobox';
+import { Badge } from '@/components/ui/badge';
 
 // Icons
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, ChevronRight } from 'lucide-react';
 
 // Utilities
-import { findById } from '@/lib/utils/datasets';
+import { findById, getAllSubdivisions } from '@/lib/utils/datasets';
 
 // Dataset utilities
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import type { CreateServiceInput } from '@/lib/validations/service';
 import { useFormContext } from 'react-hook-form';
-import { TaxonomySelector } from '@/components/shared';
 
 export default function ServiceDetailsStep() {
   const form = useFormContext<CreateServiceInput>();
@@ -62,6 +63,18 @@ export default function ServiceDetailsStep() {
   const subcategories = selectedCategoryData?.children || [];
   const selectedSubcategoryData = findById(subcategories, watchedSubcategory);
   const subdivisions = selectedSubcategoryData?.children || [];
+
+  // Create flat list of all subdivisions for LazyCombobox
+  const allSubdivisions = React.useMemo(() => {
+    const subdivisions = getAllSubdivisions(serviceTaxonomies);
+    return subdivisions.map((subdivision) => ({
+      id: subdivision.id,
+      label: `${subdivision.label}`,
+      subdivision: subdivision,
+      subcategory: subdivision.subcategory,
+      category: subdivision.category,
+    }));
+  }, []);
 
   // Generate tags from category subcategories and their subdivisions for MultiSelect
   const availableTags = React.useMemo(() => {
@@ -182,7 +195,7 @@ export default function ServiceDetailsStep() {
         )}
       />
 
-      {/* Taxonomy Selection - Combined Category/Subcategory/Subdivision */}
+      {/* Taxonomy Selection - Subdivision with Auto-populated Category/Subcategory */}
       <div className='space-y-2'>
         <label className='text-sm font-medium text-gray-900'>
           Κατηγορία Υπηρεσίας*
@@ -190,45 +203,56 @@ export default function ServiceDetailsStep() {
         <p className='text-sm text-gray-600'>
           Επιλέξτε τις κατηγορίες της υπηρεσίας
         </p>
-        <TaxonomySelector
-          taxonomies={serviceTaxonomies}
-          value={
-            watchedCategory
-              ? {
-                  category: watchedCategory,
-                  subcategory: watchedSubcategory || '',
-                  subdivision: watchedSubdivision || '',
-                  categoryLabel: findById(serviceTaxonomies, watchedCategory)
-                    ?.label,
-                  subcategoryLabel: watchedSubcategory
-                    ? findById(subcategories, watchedSubcategory)?.label
-                    : undefined,
-                  subdivisionLabel: watchedSubdivision
-                    ? findById(subdivisions, watchedSubdivision)?.label
-                    : undefined,
-                }
-              : null
-          }
-          onValueChange={(value) => {
-            if (value) {
-              setValue('category', value.category, { shouldValidate: true });
-              setValue('subcategory', value.subcategory, {
-                shouldValidate: true,
-              });
-              setValue('subdivision', value.subdivision, {
-                shouldValidate: true,
-              });
-              // Clear tags when taxonomy changes
-              setValue('tags', [], { shouldValidate: true });
-            } else {
-              setValue('category', '', { shouldValidate: true });
-              setValue('subcategory', '', { shouldValidate: true });
-              setValue('subdivision', '', { shouldValidate: true });
-              setValue('tags', [], { shouldValidate: true });
-            }
+        <LazyCombobox
+          options={allSubdivisions}
+          value={watchedSubdivision || undefined}
+          onSelect={(option) => {
+            // Auto-populate all three fields
+            setValue('category', option.category.id, { shouldValidate: true });
+            setValue('subcategory', option.subcategory.id, { shouldValidate: true });
+            setValue('subdivision', option.subdivision.id, { shouldValidate: true });
+            clearErrors(['category', 'subcategory', 'subdivision']);
+            // Clear tags when taxonomy changes
+            setValue('tags', [], { shouldValidate: true });
           }}
-          placeholder='Επιλέξτε κατηγορία υπηρεσίας...'
+          placeholder='Επιλέξτε κατηγορία...'
+          searchPlaceholder='Αναζήτηση κατηγορίας...'
+          emptyMessage='Δεν βρέθηκαν κατηγορίες.'
+          formatLabel={(option) => (
+            <>
+              {option.label}{' '}
+              <span className='text-gray-500 text-sm'>
+                ({option.category.label} / {option.subcategory.label})
+              </span>
+            </>
+          )}
+          renderButtonContent={(option) => {
+            if (!option) {
+              return <span className='text-muted-foreground'>Επιλέξτε κατηγορία...</span>;
+            }
+            return (
+              <div className='flex flex-wrap gap-1 items-center'>
+                <Badge variant='default' className='hover:bg-primary/90'>
+                  {option.category.label}
+                </Badge>
+                <ChevronRight className='h-3 w-3 text-muted-foreground' />
+                <Badge variant='default' className='hover:bg-primary/90'>
+                  {option.subcategory.label}
+                </Badge>
+                <ChevronRight className='h-3 w-3 text-muted-foreground' />
+                <Badge variant='default' className='hover:bg-primary/90'>
+                  {option.label}
+                </Badge>
+              </div>
+            );
+          }}
+          initialLimit={20}
+          loadMoreIncrement={20}
+          loadMoreThreshold={50}
+          searchLimit={100}
+          showProgress={true}
         />
+
         {/* Show validation errors */}
         {formState.errors.category && (
           <p className='text-sm font-medium text-destructive'>
@@ -254,7 +278,7 @@ export default function ServiceDetailsStep() {
           name='tags'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Ετικέτες*</FormLabel>
+              <FormLabel>Ετικέτες</FormLabel>
               <p className='text-sm text-gray-600'>
                 Επιλέξτε έως 10 ετικέτες για την υπηρεσία σας
               </p>
@@ -322,32 +346,32 @@ export default function ServiceDetailsStep() {
           control={form.control}
           name='fixed'
           render={({ field }) => (
-            <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
-              <div className='space-y-0.5'>
-                <FormLabel>Χωρίς εμφάνιση τιμής</FormLabel>
-                <div className='text-xs text-muted-foreground'>
-                  Η τιμή δεν θα εμφανίζεται στο κοινό
-                </div>
-              </div>
+            <FormItem className='space-y-2'>
+              <FormLabel>Χωρίς εμφάνιση τιμής</FormLabel>
+              <p className='text-sm text-gray-600'>
+                Η τιμή δεν θα εμφανίζεται στο κοινό
+              </p>
               <FormControl>
-                <Switch
-                  checked={!field.value}
-                  onCheckedChange={async (checked) => {
-                    field.onChange(!checked);
-                    // Handle price field when toggling fixed
-                    if (checked) {
-                      // When switch is ON (checked=true), fixed becomes false, price is not required, set to 0
-                      setValue('price', 0, { shouldValidate: false });
-                      clearErrors('price');
-                    } else {
-                      // When switch is OFF (checked=false), fixed becomes true, price is required
-                      // Don't automatically change the price, let user set it
-                      clearErrors('price');
-                    }
-                    // Re-trigger validation for the price field
-                    await trigger('price');
-                  }}
-                />
+                <div>
+                  <Switch
+                    checked={!field.value}
+                    onCheckedChange={async (checked) => {
+                      field.onChange(!checked);
+                      // Handle price field when toggling fixed
+                      if (checked) {
+                        // When switch is ON (checked=true), fixed becomes false, price is not required, set to 0
+                        setValue('price', 0, { shouldValidate: false });
+                        clearErrors('price');
+                      } else {
+                        // When switch is OFF (checked=false), fixed becomes true, price is required
+                        // Don't automatically change the price, let user set it
+                        clearErrors('price');
+                      }
+                      // Re-trigger validation for the price field
+                      await trigger('price');
+                    }}
+                  />
+                </div>
               </FormControl>
             </FormItem>
           )}
@@ -361,7 +385,7 @@ export default function ServiceDetailsStep() {
           name='duration'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Χρόνος Παράδοσης*</FormLabel>
+              <FormLabel>Χρόνος Παράδοσης</FormLabel>
               <p className='text-sm text-gray-600'>
                 Εκτιμώμενος χρόνος παράδοσης σε ημέρες
               </p>

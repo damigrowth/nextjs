@@ -412,6 +412,54 @@ export function getAllZipcodes<T extends DatasetItem>(
 }
 
 /**
+ * Flatten service taxonomy to extract all subdivisions with their full hierarchy
+ * Similar to getAllZipcodes but for service taxonomies (3-level hierarchy)
+ * @param serviceTaxonomies - The hierarchical service taxonomy dataset
+ * @returns Array of all subdivisions with their parent category and subcategory information
+ */
+export function getAllSubdivisions<T extends DatasetItem>(
+  serviceTaxonomies: T[],
+): Array<{
+  id: string;
+  label: string;
+  slug: string;
+  subcategory: { id: string; label: string; slug: string };
+  category: { id: string; label: string; slug: string };
+}> {
+  const subdivisions: Array<{
+    id: string;
+    label: string;
+    slug: string;
+    subcategory: { id: string; label: string; slug: string };
+    category: { id: string; label: string; slug: string };
+  }> = [];
+
+  serviceTaxonomies.forEach((category) => {
+    category.children?.forEach((subcategory) => {
+      subcategory.children?.forEach((subdivision) => {
+        subdivisions.push({
+          id: subdivision.id,
+          label: subdivision.label || subdivision.name || '',
+          slug: subdivision.slug || '',
+          subcategory: {
+            id: subcategory.id,
+            label: subcategory.label || subcategory.name || '',
+            slug: subcategory.slug || '',
+          },
+          category: {
+            id: category.id,
+            label: category.label || category.name || '',
+            slug: category.slug || '',
+          },
+        });
+      });
+    });
+  });
+
+  return subdivisions;
+}
+
+/**
  * Toggle an item in an array (add if doesn't exist, remove if exists)
  */
 export function toggleItemInArray<T extends { id: string }>(

@@ -419,9 +419,9 @@ export const serviceDetailsSchema = z
     subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
     subdivision: z.string().min(1, 'Η υποδιαίρεση είναι υποχρεωτική'),
     tags: z
-      .array(z.string().min(1, 'Απαιτείται έγκυρη ετικέτα'))
-      .min(1, 'Επιλέξτε τουλάχιστον μία ετικέτα')
-      .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες'),
+      .array(z.string())
+      .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες')
+      .default([]),
     price: z
       .number()
       .int()
@@ -431,7 +431,7 @@ export const serviceDetailsSchema = z
     duration: z
       .number()
       .int()
-      .min(1, 'Η διάρκεια πρέπει να είναι τουλάχιστον 1 ημέρα')
+      .min(0, 'Η διάρκεια δεν μπορεί να είναι αρνητική')
       .max(365, 'Η διάρκεια δεν μπορεί να ξεπερνά τις 365 ημέρες')
       .optional(),
     type: serviceTypeConfigSchema.optional(),
@@ -460,19 +460,6 @@ export const serviceDetailsSchema = z
     {
       message: 'Η τιμή πρέπει να είναι τουλάχιστον 5€',
       path: ['price'],
-    },
-  )
-  .refine(
-    (data) => {
-      // Duration is required for oneoff services
-      if (data.type?.oneoff && (!data.duration || data.duration === 0)) {
-        return false;
-      }
-      return true;
-    },
-    {
-      message: 'Ο χρόνος παράδοσης είναι υποχρεωτικός για one-off υπηρεσίες',
-      path: ['duration'],
     },
   );
 
@@ -572,8 +559,9 @@ export const createServiceSchema = z
     subdivision: z.string().min(1, 'Η υποδιαίρεση είναι υποχρεωτική'),
     tags: z
       .array(z.string())
-      .min(1, 'Επιλέξτε τουλάχιστον μία ετικέτα')
-      .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες'),
+      .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες')
+      .default([])
+      .optional(),
     price: z
       .number()
       .int()
@@ -583,7 +571,7 @@ export const createServiceSchema = z
     duration: z
       .number()
       .int()
-      .min(1, 'Η διάρκεια πρέπει να είναι τουλάχιστον 1 ημέρα')
+      .min(0, 'Η διάρκεια δεν μπορεί να είναι αρνητική')
       .max(365, 'Η διάρκεια δεν μπορεί να ξεπερνά τις 365 ημέρες')
       .optional(),
 
@@ -723,19 +711,6 @@ export const createServiceSchema = z
     {
       message: 'Η τιμή πρέπει να είναι τουλάχιστον 5€',
       path: ['price'],
-    },
-  )
-  .refine(
-    (data) => {
-      // Duration is required for oneoff services
-      if (data.type?.oneoff && (!data.duration || data.duration === 0)) {
-        return false;
-      }
-      return true;
-    },
-    {
-      message: 'Ο χρόνος παράδοσης είναι υποχρεωτικός για one-off υπηρεσίες',
-      path: ['duration'],
     },
   );
 
