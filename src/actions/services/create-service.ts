@@ -135,7 +135,7 @@ async function createServiceInternal(
             onsite: false,
           },
         },
-        tags: { type: 'json', required: !isDraft, defaultValue: [] },
+        tags: { type: 'json', required: false, defaultValue: [] },
         addons: { type: 'json', required: false, defaultValue: [] },
         faq: { type: 'json', required: false, defaultValue: [] },
         media: { type: 'json', required: false, defaultValue: [] },
@@ -195,12 +195,12 @@ async function createServiceInternal(
 
     if (status === 'draft') {
       // Use transaction to create service with slug and update lastServiceDraft atomically
-      await prisma.$transaction(async (tx) => {
+      createdService = await prisma.$transaction(async (tx) => {
         // Step 1: Create service without slug (auto-increment ID)
         const title = data.title || '';
         const description = data.description || '';
 
-        const createdService = await tx.service.create({
+        const service = await tx.service.create({
           data: {
             pid: profile.id,
             title: title,
@@ -229,13 +229,13 @@ async function createServiceInternal(
             status: status,
             featured: false,
           },
-          select: { id: true },
+          select: { id: true, title: true },
         });
 
         // Step 2: Generate slug with the auto-generated ID and update service
-        const slug = generateServiceSlug(data.title || 'untitled', createdService.id.toString());
+        const slug = generateServiceSlug(data.title || 'untitled', service.id.toString());
         await tx.service.update({
-          where: { id: createdService.id },
+          where: { id: service.id },
           data: { slug },
         });
 
@@ -244,6 +244,8 @@ async function createServiceInternal(
           where: { id: profile.id },
           data: { lastServiceDraft: new Date() },
         });
+
+        return service;
       });
     } else {
       // Regular service creation (non-draft) with slug generation
