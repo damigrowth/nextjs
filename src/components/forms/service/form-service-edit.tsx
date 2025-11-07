@@ -22,12 +22,19 @@ import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Icons (lucide-react)
-import { AlertCircle, CheckCircle, HelpCircle, Package } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle,
+  HelpCircle,
+  Package,
+  ChevronRight,
+} from 'lucide-react';
 
 // Custom components
 import { Currency } from '@/components/ui/currency';
 import { MultiSelect } from '@/components/ui/multi-select';
-import { TaxonomySelector } from '@/components/shared';
+import { LazyCombobox } from '@/components/ui/lazy-combobox';
+import { Badge } from '@/components/ui/badge';
 import { FormButton } from '@/components/shared';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AddonFields } from '@/components/shared';
@@ -36,7 +43,7 @@ import { FaqFields } from '@/components/shared';
 // Static constants and dataset utilities
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { populateFormData } from '@/lib/utils/form';
-import { findById } from '@/lib/utils/datasets';
+import { findById, getAllSubdivisions } from '@/lib/utils/datasets';
 
 // Validation schema and server action
 import {
@@ -170,6 +177,18 @@ export default function FormServiceEdit({
   const watchedSubdivision = watch('subdivision');
   const addons = watch('addons') || [];
   const faq = watch('faq') || [];
+
+  // Create flat list of all subdivisions for LazyCombobox
+  const allSubdivisions = React.useMemo(() => {
+    const subdivisions = getAllSubdivisions(serviceTaxonomies);
+    return subdivisions.map((subdivision) => ({
+      id: subdivision.id,
+      label: `${subdivision.label}`,
+      subdivision: subdivision,
+      subcategory: subdivision.subcategory,
+      category: subdivision.category,
+    }));
+  }, []);
 
   // Get filtered data based on selections
   const selectedCategoryData = findById(serviceTaxonomies, watchedCategory);
@@ -362,32 +381,32 @@ export default function FormServiceEdit({
             control={form.control}
             name='fixed'
             render={({ field }) => (
-              <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
-                <div className='space-y-0.5'>
-                  <FormLabel>Χωρίς εμφάνιση τιμής</FormLabel>
-                  <div className='text-xs text-muted-foreground'>
-                    Η τιμή δεν θα εμφανίζεται στο κοινό
-                  </div>
-                </div>
+              <FormItem className='space-y-2'>
+                <FormLabel>Χωρίς εμφάνιση τιμής</FormLabel>
+                <p className='text-sm text-gray-600'>
+                  Η τιμή δεν θα εμφανίζεται στο κοινό
+                </p>
                 <FormControl>
-                  <Switch
-                    checked={!field.value}
-                    onCheckedChange={async (checked) => {
-                      field.onChange(!checked);
-                      // Handle price field when toggling fixed
-                      if (checked) {
-                        // When switch is ON (checked=true), fixed becomes false, price is not required, set to 0
-                        setValue('price', 0, { shouldValidate: false });
-                        clearErrors('price');
-                      } else {
-                        // When switch is OFF (checked=false), fixed becomes true, price is required
-                        // Don't automatically change the price, let user set it
-                        clearErrors('price');
-                      }
-                      // Re-trigger validation for the price field
-                      await trigger('price');
-                    }}
-                  />
+                  <div>
+                    <Switch
+                      checked={!field.value}
+                      onCheckedChange={async (checked) => {
+                        field.onChange(!checked);
+                        // Handle price field when toggling fixed
+                        if (checked) {
+                          // When switch is ON (checked=true), fixed becomes false, price is not required, set to 0
+                          setValue('price', 0, { shouldValidate: false });
+                          clearErrors('price');
+                        } else {
+                          // When switch is OFF (checked=false), fixed becomes true, price is required
+                          // Don't automatically change the price, let user set it
+                          clearErrors('price');
+                        }
+                        // Re-trigger validation for the price field
+                        await trigger('price');
+                      }}
+                    />
+                  </div>
                 </FormControl>
               </FormItem>
             )}
@@ -419,7 +438,7 @@ export default function FormServiceEdit({
           )}
         />
 
-        {/* Taxonomy Selection - Combined Category/Subcategory/Subdivision */}
+        {/* Taxonomy Selection - Subdivision with Auto-populated Category/Subcategory */}
         <div className='space-y-2'>
           <label className='text-sm font-medium text-gray-900'>
             Κατηγορία Υπηρεσίας*
@@ -427,45 +446,68 @@ export default function FormServiceEdit({
           <p className='text-sm text-gray-600'>
             Επιλέξτε τις κατηγορίες της υπηρεσίας
           </p>
-          <TaxonomySelector
-            taxonomies={serviceTaxonomies}
-            value={
-              watchedCategory
-                ? {
-                    category: watchedCategory,
-                    subcategory: watchedSubcategory || '',
-                    subdivision: watchedSubdivision || '',
-                    categoryLabel: findById(serviceTaxonomies, watchedCategory)
-                      ?.label,
-                    subcategoryLabel: watchedSubcategory
-                      ? findById(subcategories, watchedSubcategory)?.label
-                      : undefined,
-                    subdivisionLabel: watchedSubdivision
-                      ? findById(subdivisions, watchedSubdivision)?.label
-                      : undefined,
-                  }
-                : null
-            }
-            onValueChange={(value) => {
-              if (value) {
-                setValue('category', value.category, { shouldValidate: true });
-                setValue('subcategory', value.subcategory, {
-                  shouldValidate: true,
-                });
-                setValue('subdivision', value.subdivision, {
-                  shouldValidate: true,
-                });
-                // Clear tags when taxonomy changes
-                setValue('tags', [], { shouldValidate: true });
-              } else {
-                setValue('category', '', { shouldValidate: true });
-                setValue('subcategory', '', { shouldValidate: true });
-                setValue('subdivision', '', { shouldValidate: true });
-                setValue('tags', [], { shouldValidate: true });
-              }
+          <LazyCombobox
+            options={allSubdivisions}
+            value={watchedSubdivision || undefined}
+            onSelect={(option) => {
+              // Auto-populate all three fields
+              setValue('category', option.category.id, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+              setValue('subcategory', option.subcategory.id, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+              setValue('subdivision', option.subdivision.id, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+              clearErrors(['category', 'subcategory', 'subdivision']);
+              // Clear tags when taxonomy changes
+              setValue('tags', [], {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
             }}
-            placeholder='Επιλέξτε κατηγορία υπηρεσίας...'
+            placeholder='Επιλέξτε κατηγορία...'
+            searchPlaceholder='Αναζήτηση κατηγορίας...'
+            emptyMessage='Δεν βρέθηκαν κατηγορίες.'
+            formatLabel={(option) => (
+              <>
+                {option.label}{' '}
+                <span className='text-gray-500 text-sm'>
+                  ({option.category.label} / {option.subcategory.label})
+                </span>
+              </>
+            )}
+            renderButtonContent={(option) => {
+              if (!option) {
+                return <span className='text-muted-foreground'>Επιλέξτε κατηγορία...</span>;
+              }
+              return (
+                <div className='flex flex-wrap gap-1 items-center'>
+                  <Badge variant='default' className='hover:bg-primary/90'>
+                    {option.category.label}
+                  </Badge>
+                  <ChevronRight className='h-3 w-3 text-muted-foreground' />
+                  <Badge variant='default' className='hover:bg-primary/90'>
+                    {option.subcategory.label}
+                  </Badge>
+                  <ChevronRight className='h-3 w-3 text-muted-foreground' />
+                  <Badge variant='default' className='hover:bg-primary/90'>
+                    {option.label}
+                  </Badge>
+                </div>
+              );
+            }}
+            initialLimit={20}
+            loadMoreIncrement={20}
+            loadMoreThreshold={50}
+            searchLimit={100}
+            showProgress={true}
           />
+
           {/* Show validation errors */}
           {errors.category && (
             <p className='text-sm font-medium text-destructive'>

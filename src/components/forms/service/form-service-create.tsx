@@ -12,14 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 
 import { FormButton } from '@/components/shared';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form } from '@/components/ui/form';
 import {
   Card,
   CardContent,
@@ -27,14 +20,11 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
+// Progress component removed
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {
@@ -52,7 +42,6 @@ import {
 // Icons
 import {
   Check,
-  AlertCircle,
   MapPin,
   Globe,
   Building,
@@ -123,11 +112,6 @@ const STEPS = [
     title: 'Πολυμέσα',
     description: 'Ανεβάστε εικόνες ή βίντεο για την υπηρεσία σας (προαιρετικό)',
   },
-  {
-    id: 6,
-    title: 'Ολοκλήρωση',
-    description: 'Η υπηρεσία δημιουργήθηκε επιτυχώς',
-  },
 ];
 
 const initialState = {
@@ -145,24 +129,6 @@ const STEP_SCHEMAS = {
   4: addonsAndFaqSchema,
   5: serviceMediaUploadSchema,
 } as const;
-
-const STEP_FIELDS: Record<number, (keyof CreateServiceInput)[]> = {
-  1: ['type'],
-  2: ['type', 'subscriptionType'],
-  3: [
-    'title',
-    'description',
-    'category',
-    'subcategory',
-    'subdivision',
-    'tags',
-    'price',
-    'fixed',
-    'duration',
-  ],
-  4: ['addons', 'faq'],
-  5: ['media'],
-};
 
 interface CreateServiceFormProps {
   initialUser: AuthUser | null;
@@ -182,11 +148,13 @@ export default function CreateServiceForm({
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
 
-  // Success state
-  const [serviceCreated, setServiceCreated] = useState<{
-    id: string | number;
+  // Success state for showing completion
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successData, setSuccessData] = useState<{
+    id: number | string;
     title: string;
   } | null>(null);
+
 
   // Media upload ref
   const mediaRef = useRef<any>(null);
@@ -194,8 +162,8 @@ export default function CreateServiceForm({
   // Loading state for async preparation phase
   const [isPreparingSubmit, setIsPreparingSubmit] = useState(false);
 
-  // Transition for manual server action calls
-  const [isPendingTransition, startTransition] = useTransition();
+  // Transition for calling server actions properly
+  const [, startTransition] = useTransition();
 
   // React Hook Form setup with zodResolver like other forms
   const form = useForm<CreateServiceInput>({
@@ -240,11 +208,7 @@ export default function CreateServiceForm({
   const user = initialUser;
   const isLoading = false; // No loading state needed since user is passed as prop
 
-  const {
-    formState: { errors, isValid, isDirty },
-    getValues,
-    watch,
-  } = form;
+  const { getValues, watch } = form;
 
   const { coverage } = initialProfile || {};
 
@@ -295,9 +259,6 @@ export default function CreateServiceForm({
         const isPriceValid = formValues.fixed
           ? formValues.price && formValues.price > 0
           : true;
-        const isDurationValid =
-          !formValues.type?.oneoff ||
-          (formValues.duration && formValues.duration > 0);
 
         return !!(
           formValues.title &&
@@ -307,10 +268,7 @@ export default function CreateServiceForm({
           formValues.category &&
           formValues.subcategory &&
           formValues.subdivision &&
-          formValues.tags &&
-          formValues.tags.length > 0 &&
-          isPriceValid &&
-          isDurationValid
+          isPriceValid
         );
 
       case 4:
@@ -366,9 +324,9 @@ export default function CreateServiceForm({
       stepSchema.parse(formValues);
       form.clearErrors();
       return true;
-    } catch (error) {
+    } catch (error: any) {
       if (error.errors) {
-        error.errors.forEach((err) => {
+        error.errors.forEach((err: any) => {
           const fieldPath = err.path.join('.');
           form.setError(fieldPath as any, {
             type: 'validation',
@@ -464,8 +422,7 @@ export default function CreateServiceForm({
   };
 
   const currentStepInfo = STEPS.find((step) => step.id === currentStep);
-  const progress = (currentStep / STEPS.length) * 100;
-  const isLastStep = currentStep === 5; // Step 5 is the last actionable step, step 6 is just success display
+  const isLastStep = currentStep === 5; // Step 5 is the last actionable step
 
   // Form submission handler - prepare data but don't call action
   const prepareFormData = async () => {
@@ -552,17 +509,15 @@ export default function CreateServiceForm({
       state.serviceId &&
       state.serviceTitle
     ) {
-      // Only proceed to step 6 if we have both ID and title from server
-      setServiceCreated({
+      // Show success message and screen immediately
+      toast.success(state.message);
+
+      // Set success data and show screen immediately to prevent form flash
+      setSuccessData({
         id: state.serviceId,
         title: state.serviceTitle,
       });
-
-      // Move to completion step
-      setCurrentStep(6);
-      setCompletedSteps([1, 2, 3, 4, 5, 6]);
-
-      toast.success(state.message);
+      setShowSuccess(true);
     } else if (state.message && !state.success) {
       toast.error(state.message);
     }
@@ -610,7 +565,7 @@ export default function CreateServiceForm({
     // Show loading state when form is being submitted or preparing
     if (
       currentStep === 5 &&
-      (isPending || isPendingTransition || isPreparingSubmit)
+      (isPending || isPreparingSubmit)
     ) {
       return (
         <div className='flex flex-col items-center justify-center py-12 space-y-4 w-full'>
@@ -638,18 +593,6 @@ export default function CreateServiceForm({
         return (
           <MediaStep user={user} profile={initialProfile} mediaRef={mediaRef} />
         );
-      case 6:
-        return serviceCreated ? (
-          <ServiceSuccess id={serviceCreated.id} title={serviceCreated.title} />
-        ) : (
-          <div className='flex flex-col items-center justify-center py-12 space-y-4'>
-            <div className='animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent'></div>
-            <p className='text-lg font-medium text-gray-700'>
-              Δημιουργία υπηρεσίας...
-            </p>
-            <p className='text-sm text-gray-500'>Παρακαλώ περιμένετε</p>
-          </div>
-        );
       default:
         return null;
     }
@@ -663,17 +606,18 @@ export default function CreateServiceForm({
           <div className='flex items-center justify-between mb-4'>
             <div>
               <h1 className='text-2xl font-bold text-gray-900'>
-                {currentStep === 6
+                {showSuccess
                   ? 'Επιτυχής δημιουργία υπηρεσίας!'
                   : 'Δημιουργία Υπηρεσίας'}
               </h1>
               <p className='text-gray-600 mt-1'>
-                {currentStep === 6
+                {showSuccess
                   ? 'Η υπηρεσία δημιουργήθηκε επιτυχώς.'
                   : 'Με αυτήν τη φόρμα μπορείτε να προσθέσετε νέες υπηρεσίες.'}
               </p>
             </div>
-            <div className='flex items-center space-x-3'>
+            {!showSuccess && (
+              <div className='flex items-center space-x-3'>
               {/* Action Icons */}
               <div className='flex items-center space-x-2'>
                 {/* Clear Form Button */}
@@ -688,7 +632,7 @@ export default function CreateServiceForm({
                           variant='ghost'
                           size='sm'
                           className='h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50'
-                          disabled={isLoading || currentStep === 6}
+                          disabled={isLoading}
                         >
                           <RotateCcw className='h-4 w-4' />
                         </Button>
@@ -730,19 +674,17 @@ export default function CreateServiceForm({
                           variant='ghost'
                           size='sm'
                           className={`h-8 w-8 p-0 ${
-                            currentStep >= 3 && currentStep !== 6
+                            currentStep >= 3
                               ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
                               : 'text-gray-400 cursor-not-allowed'
                           }`}
                           disabled={
                             currentStep < 3 ||
-                            currentStep === 6 ||
                             isDraftPending ||
-                            isPendingTransition ||
                             isLoading
                           }
                         >
-                          {isDraftPending || isPendingTransition ? (
+                          {isDraftPending ? (
                             <div className='animate-spin h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full' />
                           ) : (
                             <Save className='h-4 w-4' />
@@ -770,7 +712,7 @@ export default function CreateServiceForm({
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel
-                        disabled={isDraftPending || isPendingTransition}
+                        disabled={isDraftPending}
                       >
                         Ακύρωση
                       </AlertDialogCancel>
@@ -779,10 +721,10 @@ export default function CreateServiceForm({
                           e.preventDefault();
                           handleConfirmDraft();
                         }}
-                        disabled={isDraftPending || isPendingTransition}
+                        disabled={isDraftPending}
                         className='bg-green-600 hover:bg-green-700 disabled:opacity-50'
                       >
-                        {isDraftPending || isPendingTransition ? (
+                        {isDraftPending ? (
                           <>
                             <div className='animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2' />
                             Αποθήκευση...
@@ -796,41 +738,20 @@ export default function CreateServiceForm({
                 </AlertDialog>
               </div>
 
-              <Badge
-                variant='outline'
-                className={`text-sm ${currentStep === 6 ? 'bg-green-100 border-green-300 text-green-700' : ''}`}
-              >
-                {currentStep === 6
-                  ? 'Ολοκληρώθηκε'
-                  : currentStep === 5 &&
-                      (isPending || isPendingTransition || isPreparingSubmit)
-                    ? 'Ολοκλήρωση...'
-                    : `Βήμα ${currentStep} από ${STEPS.length}`}
-              </Badge>
-            </div>
+              {/* Removed step badge */}
+              </div>
+            )}
           </div>
 
-          {/* Progress Bar */}
-          <div className='space-y-2'>
-            <div className='flex justify-between text-sm text-gray-500'>
-              <span>Πρόοδος</span>
-              <span className='transition-all duration-300'>
-                {currentStep === 6 ? '100' : Math.round(progress)}%
-              </span>
-            </div>
-            <Progress
-              value={currentStep === 6 ? 100 : progress}
-              className={`h-2 transition-all duration-700 ${currentStep === 6 ? 'bg-green-100' : ''}`}
-            />
-          </div>
+          {/* Progress Bar removed */}
 
           {/* Steps Navigation */}
-          <div className='flex items-center justify-between mt-6 space-x-2'>
-            {STEPS.map((step) => {
+          {!showSuccess && (
+            <div className='flex items-center justify-between mt-6 space-x-2'>
+              {STEPS.map((step) => {
               const isActive = currentStep === step.id;
-              const isCompleted = currentStep === 6 || isStepCompleted(step.id);
+              const isCompleted = isStepCompleted(step.id);
               const isAccessible =
-                currentStep === 6 ||
                 step.id <= currentStep ||
                 isStepCompleted(step.id);
 
@@ -843,9 +764,9 @@ export default function CreateServiceForm({
                       : isCompleted
                         ? 'bg-secondary/10 border-2 border-secondary/30'
                         : 'bg-muted border-2 border-border'
-                  } ${!isAccessible || currentStep === 6 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  } ${!isAccessible ? 'opacity-50 cursor-not-allowed' : ''}`}
                   onClick={() => {
-                    if (isAccessible && currentStep !== 6) {
+                    if (isAccessible) {
                       goToStep(step.id);
                     }
                   }}
@@ -881,15 +802,16 @@ export default function CreateServiceForm({
                 </div>
               );
             })}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Current Step Content */}
         <Card>
-          {currentStep !== 6 &&
+          {!showSuccess &&
             !(
               currentStep === 5 &&
-              (isPending || isPendingTransition || isPreparingSubmit)
+              (isPending || isPreparingSubmit)
             ) && (
               <CardHeader>
                 <CardTitle className='flex items-center space-x-2'>
@@ -912,17 +834,29 @@ export default function CreateServiceForm({
               </CardHeader>
             )}
           <CardContent>
-            <div className='transition-all duration-500 ease-in-out'>
-              <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
-                <div className='space-y-6'>
-                  {renderStepContent()}
-                  {/* Step Navigation - Hide on completion step and loading state */}
-                  {currentStep !== 6 &&
-                    !(
-                      currentStep === 5 &&
-                      (isPending || isPendingTransition || isPreparingSubmit)
-                    ) && (
-                      <div className='flex justify-between items-center mt-6 pt-6 border-t'>
+            {showSuccess && successData ? (
+              <ServiceSuccess
+                id={successData.id}
+                title={successData.title}
+                onReset={() => {
+                  form.reset();
+                  setCurrentStep(1);
+                  setCompletedSteps([]);
+                  setShowSuccess(false);
+                  setSuccessData(null);
+                }}
+              />
+            ) : (
+              <div className='transition-all duration-500 ease-in-out'>
+                <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
+                  <div className='space-y-6'>
+                    {renderStepContent()}
+                  {/* Step Navigation - Hide on loading state */}
+                  {!(
+                    currentStep === 5 &&
+                    (isPending || isPreparingSubmit)
+                  ) && (
+                    <div className='flex justify-between items-center mt-6 pt-6 border-t'>
                         <FormButton
                           type='button'
                           variant='outline'
@@ -937,13 +871,11 @@ export default function CreateServiceForm({
                               text='Δημιουργία υπηρεσίας'
                               loading={
                                 isPending ||
-                                isPendingTransition ||
-                                isPreparingSubmit
+                                    isPreparingSubmit
                               }
                               disabled={
                                 isPending ||
-                                isPendingTransition ||
-                                isPreparingSubmit ||
+                                    isPreparingSubmit ||
                                 !isCurrentStepValid() ||
                                 isDraftPending
                               }
@@ -951,6 +883,7 @@ export default function CreateServiceForm({
                                 setIsPreparingSubmit(true);
                                 try {
                                   const formData = await prepareFormData();
+                                  // Call action inside startTransition to avoid React warning
                                   startTransition(() => {
                                     action(formData);
                                   });
@@ -970,9 +903,10 @@ export default function CreateServiceForm({
                         </div>
                       </div>
                     )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>
