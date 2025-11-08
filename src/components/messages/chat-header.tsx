@@ -34,6 +34,7 @@ export function ChatHeader({ chatId, currentUserId, user }: ChatHeaderProps) {
             size='sm'
             className='h-9 w-9'
             showBorder={false}
+            showShadow={false}
           />
           {user.online && (
             <div className='absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-green-500' />
@@ -61,6 +62,7 @@ export function ChatHeader({ chatId, currentUserId, user }: ChatHeaderProps) {
           username={user.username}
           displayName={displayName}
           profileUrl={profileUrl}
+          userType={user.type}
         />
       </div>
     </div>
