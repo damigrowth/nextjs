@@ -1,5 +1,6 @@
 model Chat {
   id            String       @id @default(cuid())
+  cid           String?      @unique
   name          String?
   published     Boolean      @default(true)
   createdAt     DateTime     @default(now())
@@ -16,6 +17,7 @@ model Chat {
   @@index([published, createdAt])
   @@index([lastMessageId])
   @@index([lastActivity])
+  @@index([cid])
   @@map("chats")
 }
 
