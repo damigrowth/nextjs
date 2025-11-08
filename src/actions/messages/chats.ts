@@ -3,6 +3,10 @@
 import { prisma } from '@/lib/prisma/client';
 import { transformChatForList } from '@/lib/utils/messages';
 import type { ChatListItem, ChatWithRelations } from '@/lib/types/messages';
+import { customAlphabet } from 'nanoid';
+
+// URL-safe alphabet without lookalike characters (no i, l, 1, o, 0)
+const nanoid = customAlphabet('23456789abcdefghjkmnpqrstvwxyz', 10);
 
 /**
  * Get all chats for a user with unread counts
@@ -18,7 +22,16 @@ export async function getChats(userId: string): Promise<ChatListItem[]> {
           },
         },
       },
-      include: {
+      select: {
+        id: true,
+        cid: true,
+        name: true,
+        published: true,
+        createdAt: true,
+        updatedAt: true,
+        creatorUid: true,
+        lastMessageId: true,
+        lastActivity: true,
         lastMessage: true,
         members: {
           include: {
@@ -46,7 +59,7 @@ export async function getChats(userId: string): Promise<ChatListItem[]> {
 
     // Transform chats for UI display
     const chatListItems = chats.map((chat) =>
-      transformChatForList(chat as ChatWithRelations, userId)
+      transformChatForList(chat as ChatWithRelations, userId),
     );
 
     return chatListItems;
@@ -61,7 +74,7 @@ export async function getChats(userId: string): Promise<ChatListItem[]> {
  */
 export async function getChatById(
   chatId: string,
-  userId: string
+  userId: string,
 ): Promise<ChatWithRelations | null> {
   try {
     // Fetch chat with validation that user is a member
@@ -109,7 +122,7 @@ export async function getChatById(
  */
 export async function getOrCreateChat(
   userId: string,
-  otherUserId: string
+  otherUserId: string,
 ): Promise<{ chatId: string; isNew: boolean }> {
   try {
     // Check if either user has blocked the other
@@ -162,9 +175,30 @@ export async function getOrCreateChat(
       return { chatId: existingChat.id, isNew: false };
     }
 
+    // Generate unique cid
+    let cid = nanoid();
+    let attempts = 0;
+
+    // Handle collision (very unlikely)
+    while (attempts < 10) {
+      const exists = await prisma.chat.findUnique({
+        where: { cid },
+      });
+
+      if (!exists) break;
+
+      cid = nanoid();
+      attempts++;
+    }
+
+    if (attempts >= 10) {
+      throw new Error('Failed to generate unique cid after 10 attempts');
+    }
+
     // Create new chat
     const newChat = await prisma.chat.create({
       data: {
+        cid,
         creatorUid: userId,
         members: {
           create: [
@@ -191,7 +225,7 @@ export async function getOrCreateChat(
  */
 export async function deleteChat(
   chatId: string,
-  userId: string
+  userId: string,
 ): Promise<void> {
   try {
     // Verify user is a member of the chat
