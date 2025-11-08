@@ -88,10 +88,10 @@ export function MessageInput({
         await editMessage(editingMessage.id, message, currentUserId);
         setMessage('');
         onCancelEdit();
-        toast.success('Message updated');
+        toast.success('Το μήνυμα ενημερώθηκε');
       } catch (error) {
         console.error('Failed to edit message:', error);
-        toast.error('Failed to update message');
+        toast.error('Αποτυχία ενημέρωσης μηνύματος');
       }
     } else {
       // Handle new message
@@ -139,7 +139,7 @@ export function MessageInput({
       {editingMessage && (
         <div className='px-4 py-2 bg-muted/50 border-b flex items-center justify-between'>
           <div className='flex-1'>
-            <p className='text-sm font-medium'>Editing message</p>
+            <p className='text-sm font-medium'>Επεξεργασία μηνύματος</p>
             <p className='text-xs text-muted-foreground line-clamp-1'>
               {editingMessage.content}
             </p>
@@ -163,10 +163,10 @@ export function MessageInput({
             onKeyDown={handleKeyDown}
             placeholder={
               editingMessage
-                ? 'Edit your message...'
+                ? 'Επεξεργαστείτε το μήνυμά σας...'
                 : replyTo
-                ? 'Type your reply...'
-                : 'Enter message...'
+                ? 'Πληκτρολογήστε την απάντησή σας...'
+                : 'Εισάγετε μήνυμα...'
             }
             className='pr-24 pl-4 h-14'
           />

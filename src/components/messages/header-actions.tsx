@@ -37,6 +37,7 @@ interface HeaderActionsProps {
   username: string | null;
   displayName: string;
   profileUrl: string;
+  userType: string | null;
 }
 
 export function HeaderActions({
@@ -46,6 +47,7 @@ export function HeaderActions({
   username,
   displayName,
   profileUrl,
+  userType,
 }: HeaderActionsProps) {
   const router = useRouter();
   const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
@@ -61,14 +63,14 @@ export function HeaderActions({
     setIsBlockLoading(true);
     try {
       await blockUser(currentUserId, userId);
-      toast.success(`${displayName} has been blocked`);
+      toast.success(`Ο/Η ${displayName} αποκλείστηκε`);
       setIsBlockDialogOpen(false);
       // Redirect to messages list
       router.push('/dashboard/messages');
       router.refresh();
     } catch (error) {
       console.error('Failed to block user:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to block user');
+      toast.error(error instanceof Error ? error.message : 'Αποτυχία αποκλεισμού χρήστη');
     } finally {
       setIsBlockLoading(false);
     }
@@ -82,14 +84,14 @@ export function HeaderActions({
     setIsDeleteLoading(true);
     try {
       await deleteChat(chatId, currentUserId);
-      toast.success('Conversation deleted');
+      toast.success('Η συνομιλία διαγράφηκε');
       setIsDeleteDialogOpen(false);
       // Redirect to messages list
       router.push('/dashboard/messages');
       router.refresh();
     } catch (error) {
       console.error('Failed to delete conversation:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to delete conversation');
+      toast.error(error instanceof Error ? error.message : 'Αποτυχία διαγραφής συνομιλίας');
     } finally {
       setIsDeleteLoading(false);
     }
@@ -104,19 +106,19 @@ export function HeaderActions({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className='w-fit rounded-xl' align='end'>
-          {username && (
+          {username && userType === 'pro' && (
             <DropdownMenuItem asChild>
               <Link href={profileUrl} target='_blank'>
-                View Profile
+                Προβολή Προφίλ
               </Link>
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem onClick={handleBlockClick}>Block</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleBlockClick}>Αποκλεισμός</DropdownMenuItem>
           <DropdownMenuItem
             onClick={handleDeleteClick}
             className='text-destructive focus:text-destructive'
           >
-            Delete
+            Διαγραφή
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -128,14 +130,14 @@ export function HeaderActions({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Block {displayName}?</AlertDialogTitle>
+            <AlertDialogTitle>Αποκλεισμός {displayName};</AlertDialogTitle>
             <AlertDialogDescription>
-              This user will no longer be able to send you messages. You can
-              unblock them anytime from your settings.
+              Αυτός ο χρήστης δεν θα μπορεί πλέον να σας στέλνει μηνύματα. Μπορείτε
+              να τον ξεμπλοκάρετε ανά πάσα στιγμή από τις ρυθμίσεις σας.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isBlockLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isBlockLoading}>Ακύρωση</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -144,7 +146,7 @@ export function HeaderActions({
               disabled={isBlockLoading}
               className='bg-dark text-white hover:bg-dark/90'
             >
-              {isBlockLoading ? 'Blocking...' : 'Block'}
+              {isBlockLoading ? 'Αποκλεισμός...' : 'Αποκλεισμός'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -157,14 +159,14 @@ export function HeaderActions({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Conversation?</AlertDialogTitle>
+            <AlertDialogTitle>Διαγραφή Συνομιλίας;</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete your conversation with {displayName}.
-              This action cannot be undone.
+              Αυτό θα διαγράψει οριστικά τη συνομιλία σας με τον/την {displayName}.
+              Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleteLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleteLoading}>Ακύρωση</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -173,7 +175,7 @@ export function HeaderActions({
               disabled={isDeleteLoading}
               className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
             >
-              {isDeleteLoading ? 'Deleting...' : 'Delete'}
+              {isDeleteLoading ? 'Διαγραφή...' : 'Διαγραφή'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
