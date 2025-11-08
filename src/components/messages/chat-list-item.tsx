@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ChatListItem as ChatListItemType } from '@/lib/types/messages';
@@ -18,12 +18,15 @@ interface ChatListItemProps {
 
 export function ChatListItem({ chat }: ChatListItemProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const selectedChatId = searchParams.get('chatId');
-  const isSelected = selectedChatId === chat.id;
+  const pathname = usePathname();
+  // Use cid if available, fall back to id during migration
+  const chatPath = chat.cid || chat.id;
+  // Check if current pathname matches this chat's route
+  const isSelected = pathname === `/dashboard/messages/${chatPath}`;
 
   const handleClick = () => {
-    router.push(`/dashboard/messages?chatId=${chat.id}`);
+    router.push(`/dashboard/messages/${chatPath}`);
+    router.refresh();
   };
 
   return (
@@ -41,6 +44,7 @@ export function ChatListItem({ chat }: ChatListItemProps) {
           size='sm'
           className='h-8 w-8'
           showBorder={false}
+          showShadow={false}
         />
         {chat.online && (
           <div className='absolute bottom-0 right-0 h-2 w-2 rounded-full border-2 border-background bg-green-500' />
@@ -56,7 +60,7 @@ export function ChatListItem({ chat }: ChatListItemProps) {
         </div>
         <div className='flex items-center gap-2'>
           <p className='flex-1 min-w-0 text-2sm text-muted-foreground line-clamp-1 overflow-hidden text-ellipsis'>
-            {chat.lastMessage || 'No messages yet'}
+            {chat.lastMessage || 'Δεν υπάρχουν μηνύματα ακόμα'}
           </p>
           {chat.unread > 0 && (
             <Badge className='shrink-0 rounded-full text-xs h-5 w-5 p-0 flex items-center justify-center bg-third hover:bg-secondary'>
