@@ -36,13 +36,31 @@ export function DashboardBreadcrumb() {
   const segments = pathname.split('/').filter(Boolean);
 
   // Build breadcrumb items from path segments
-  const breadcrumbItems = segments.map((segment, index) => {
-    const path = `/${segments.slice(0, index + 1).join('/')}`;
-    const label = routeLabels[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
-    const isLast = index === segments.length - 1;
+  const breadcrumbItems = segments
+    .map((segment, index) => {
+      const path = `/${segments.slice(0, index + 1).join('/')}`;
+      const label = routeLabels[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
+      const isLast = index === segments.length - 1;
 
-    return { path, label, isLast };
-  });
+      return { path, label, isLast, segment };
+    })
+    // Filter out dynamic route segments (chat IDs, etc.) that aren't in routeLabels
+    .filter((item, index, array) => {
+      // Keep if it's in routeLabels
+      if (routeLabels[item.segment]) return true;
+
+      // Keep if it's the last segment (current page)
+      if (item.isLast) {
+        // But skip if the previous segment was "messages" (it's a chat ID)
+        if (index > 0 && array[index - 1].segment === 'messages') {
+          return false;
+        }
+        return true;
+      }
+
+      // Keep other segments
+      return true;
+    });
 
   return (
     <Breadcrumb>
