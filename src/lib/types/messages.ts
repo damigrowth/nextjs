@@ -1,10 +1,4 @@
-import {
-  Chat,
-  Message,
-  ChatMember,
-  MessageRead,
-  User,
-} from '@prisma/client';
+import { Chat, Message, ChatMember, MessageRead, User } from '@prisma/client';
 import type { MessageReaction } from '@/lib/prisma/json-types';
 
 // Re-export MessageReaction for external use
@@ -32,6 +26,7 @@ export type ChatWithRelations = Chat & {
  */
 export interface ChatListItem {
   id: string; // Chat.id
+  cid: string | null; // Chat.cid (for URL routing) - nullable during migration
   name: string; // Computed from other member's user data
   avatar: string | null; // From other member's User.image
   lastMessage: string | null; // Chat.lastMessage.content
@@ -51,9 +46,11 @@ export interface ChatListItem {
 export type MessageWithRelations = Message & {
   author: Pick<User, 'id' | 'displayName' | 'firstName' | 'lastName' | 'image'>;
   readBy: MessageRead[];
-  replyTo: (Message & {
-    author: Pick<User, 'displayName' | 'firstName' | 'lastName'>;
-  }) | null;
+  replyTo:
+    | (Message & {
+        author: Pick<User, 'displayName' | 'firstName' | 'lastName'>;
+      })
+    | null;
 };
 
 /**
@@ -77,7 +74,10 @@ export interface ChatMessageItem {
     author: Pick<User, 'displayName' | 'firstName' | 'lastName'> | null;
   } | null;
   reactions: MessageReaction[]; // Transformed reactions for display
-  author: Pick<User, 'id' | 'displayName' | 'firstName' | 'lastName' | 'image'> | null;
+  author: Pick<
+    User,
+    'id' | 'displayName' | 'firstName' | 'lastName' | 'image'
+  > | null;
 }
 
 // ============================================================================
@@ -110,4 +110,5 @@ export interface ChatHeaderUser {
   username: string | null;
   online: boolean;
   phone: string | null; // From User.profile.phone
+  type: string | null; // User type: 'user' or 'pro'
 }

@@ -24,7 +24,7 @@ import {
  */
 export function transformChatForList(
   chat: ChatWithRelations,
-  currentUserId: string
+  currentUserId: string,
 ): ChatListItem {
   // Find the other member (not current user)
   const otherMember = chat.members.find((m) => m.user.id !== currentUserId);
@@ -34,6 +34,7 @@ export function transformChatForList(
 
   return {
     id: chat.id,
+    cid: chat.cid,
     name: displayName,
     avatar: otherMember?.user.image || null,
     lastMessage: chat.lastMessage?.content || null,
@@ -56,7 +57,7 @@ export function transformChatForList(
  */
 export function transformMessageForChat(
   message: MessageWithRelations,
-  currentUserId: string
+  currentUserId: string,
 ): ChatMessageItem {
   // Check if current user has read this message
   const isRead = message.readBy.some((read) => read.uid === currentUserId);
@@ -130,12 +131,12 @@ export function getDisplayName(profile: {
 export function getInitials(
   displayName?: string | null,
   firstName?: string | null,
-  lastName?: string | null
+  lastName?: string | null,
 ): string {
   return formatInitials(
     firstName || undefined,
     lastName || undefined,
-    displayName || undefined
+    displayName || undefined,
   );
 }
 
@@ -176,16 +177,20 @@ export function formatChatDateDivider(date: Date): string {
   yesterday.setDate(yesterday.getDate() - 1);
 
   // Reset time to midnight for accurate comparison
-  const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const dateOnly = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+  );
   const todayOnly = new Date(
     today.getFullYear(),
     today.getMonth(),
-    today.getDate()
+    today.getDate(),
   );
   const yesterdayOnly = new Date(
     yesterday.getFullYear(),
     yesterday.getMonth(),
-    yesterday.getDate()
+    yesterday.getDate(),
   );
 
   if (dateOnly.getTime() === todayOnly.getTime()) {
