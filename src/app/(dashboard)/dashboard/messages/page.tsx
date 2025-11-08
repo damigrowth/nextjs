@@ -6,6 +6,9 @@ import { getDashboardMetadata } from '@/lib/seo/pages';
 import { ChatSidebar } from '@/components/messages/chat-sidebar';
 import { prisma } from '@/lib/prisma/client';
 
+// Force dynamic rendering for this route (auth-protected, user-specific data)
+export const dynamic = 'force-dynamic';
+
 export const metadata = getDashboardMetadata('Μηνύματα');
 
 export default async function MessagesIndexPage() {
