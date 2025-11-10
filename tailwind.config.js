@@ -184,6 +184,27 @@ module.exports = {
             transform: 'translateY(25px)',
           },
         },
+        'fade-in': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(-10px)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)',
+          },
+        },
+        'fade-cycle': {
+          '0%, 100%': {
+            opacity: '0',
+          },
+          '2%, 30%': {
+            opacity: '1',
+          },
+          '33%': {
+            opacity: '0',
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -195,6 +216,8 @@ module.exports = {
         'bounce-x': 'bounce-x 6s ease-in-out infinite',
         'bounce-y': 'bounce-y 6s ease-in-out infinite',
         'bounce-y-reverse': 'bounce-y-reverse 6s ease-in-out infinite',
+        'fade-in': 'fade-in 0.5s ease-out',
+        'fade-cycle': 'fade-cycle 9s ease-in-out infinite',
       },
     },
   },

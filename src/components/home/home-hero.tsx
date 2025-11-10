@@ -3,33 +3,58 @@
 import React, { Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Rocket } from 'lucide-react';
+import Autoplay from 'embla-carousel-autoplay';
+import { Star, Rocket, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from '@/components/ui/carousel';
 import { HomeSearch } from './home-search';
 import type { DatasetItem } from '@/lib/types/datasets';
 
 // Static content that renders immediately for better LCP
 function StaticHeroContent() {
   return (
-    <div className='[contain:layout_style]'>
-      {/* Service Directory Badge */}
-      <Link href='/categories' className='inline-block mb-4'>
-        <Badge className='bg-[#198754] text-primary-foreground hover:bg-secondary rounded-full px-3 py-1 text-3sm font-medium transition-colors cursor-pointer'>
-          Κατάλογος Υπηρεσιών
-        </Badge>
-      </Link>
+    <div className='text-left max-w-4xl [contain:layout_style]'>
+      {/* Badges Row */}
+      <div className='flex flex-wrap gap-2 mb-6 items-center'>
+        {/* Service Directory Badge */}
+        <Link href='/categories' className='inline-block'>
+          <Badge className='bg-[#198754] text-primary-foreground rounded-full px-3 py-1 text-3sm font-medium cursor-pointer'>
+            Κατάλογος Υπηρεσιών
+          </Badge>
+        </Link>
+
+        {/* Cycling Badges Container - All in same position */}
+        <div className='relative inline-block h-[26px]'>
+          <Badge className='absolute top-0 left-0 bg-transparent hover:bg-transparent rounded-full px-3 py-1 text-3sm font-medium text-body animate-fade-cycle opacity-0 flex items-center gap-1.5 pointer-events-none whitespace-nowrap'>
+            <Rocket className='h-3 w-3 fill-[#198754] text-[#198754]' />
+            250+ νέες υπηρεσίες
+          </Badge>
+
+          <Badge className='absolute top-0 left-0 bg-transparent hover:bg-transparent rounded-full px-3 py-1 text-3sm font-medium text-body animate-fade-cycle opacity-0 [animation-delay:3s] flex items-center gap-1.5 pointer-events-none whitespace-nowrap'>
+            <Star className='h-3 w-3 fill-[#198754] text-[#198754]' />
+            Άριστοι επαγγελματίες 5*
+          </Badge>
+
+          <Badge className='absolute top-0 left-0 bg-transparent hover:bg-transparent rounded-full px-3 py-1 text-3sm font-medium text-body animate-fade-cycle opacity-0 [animation-delay:6s] flex items-center gap-1.5 pointer-events-none whitespace-nowrap'>
+            <Sparkles className='h-3 w-3 fill-[#198754] text-[#198754]' />
+            200+ πιστοποιημένοι επαγγελματίες
+          </Badge>
+        </div>
+      </div>
 
       {/* Main Heading - Critical for LCP */}
       <h1 className='text-[clamp(1.6rem,5vw,2.5rem)] font-bold leading-[1.2] text-black mb-[25px] block font-sans [font-display:swap] [contain:layout_style_paint] [will-change:auto] opacity-100 visible [transform:none]'>
-        Οι καλύτερες Υπηρεσίες
-        <br />
-        στην οθόνη σου.
+        Οι καλύτερες υπηρεσίες στην οθόνη σου.
       </h1>
 
       {/* Subtitle */}
-      <h2 className='text-[15px] text-[#6c757d] font-normal mb-0 leading-[1.85] font-sans'>
+      <p className='text-base text-[#6c757d] font-normal mb-8 leading-relaxed font-sans'>
         Άμεση αναζήτηση υπηρεσιών από Επαγγελματίες και Επιχειρήσεις.
-      </h2>
+      </p>
     </div>
   );
 }
@@ -50,106 +75,106 @@ function PopularSearches({ subcategories }: { subcategories: DatasetItem[] }) {
   }
 
   return (
-    <>
-      {/* Equivalent to: dark-color ff-heading mt30 mb15 */}
-      <p className='font-sans mt-7 mb-4 text-gray-600'>
+    <div className='text-left max-w-4xl'>
+      <p className='font-sans mb-4 text-gray-600 text-sm'>
         Δημοφιλείς Αναζητήσεις
       </p>
 
-      {/* Equivalent to: home9-tags at-home12 d-md-flex align-items-center */}
-      <div className='flex flex-wrap gap-2 md:flex md:items-center'>
+      <div className='flex flex-wrap gap-2'>
         {displaySubcategories.map((sub) => (
           <Link href={`/ipiresies/${sub.slug}`} key={sub.id}>
             <Badge
               variant='outline'
-              className='no-underline inline-block font-sans font-normal text-2xs sm:text-sm leading-5 sm:leading-6 py-1 sm:py-1.5 px-4 sm:px-6 rounded-full border border-gray-medium bg-white text-dark transition-colors duration-200 ease-in-out hover:bg-green-light/50 cursor-pointer'
+              className='no-underline inline-block font-sans font-normal text-sm leading-6 py-2 px-5 rounded-full border border-gray-300 bg-white text-gray-700 transition-colors duration-200 ease-in-out hover:border-[#198754] hover:bg-[#198754]/5 cursor-pointer'
             >
               {sub.label}
             </Badge>
           </Link>
         ))}
       </div>
-    </>
-  );
-}
-
-// Hero Images Component - Iconboxes attached to main image
-function HeroImages() {
-  return (
-    <div className='relative overflow-visible'>
-      {/* Main Hero Image Container - This provides positioning context for iconboxes */}
-      <div className='relative inline-block overflow-visible'>
-        {/* Main Hero Image - Normal document flow */}
-        <Image
-          width={688}
-          height={458}
-          src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1755727011/Static/home-hero-main-image_suj3go.webp'
-          alt='Doulitsa Hero Εικόνα'
-          priority
-          fetchPriority='high'
-          quality={85}
-          sizes='(max-width: 640px) 100vw, (max-width: 828px) 90vw, (max-width: 1200px) 75vw, 688px'
-          placeholder='empty'
-          decoding='async'
-          loading='eager'
-          className='w-full h-auto block '
-        />
-
-        {/* Iconbox Small 1 - Glassmorphism design */}
-        <div className='absolute rounded-2xl backdrop-blur-md bg-white/30 border border-white/50 shadow-lg p-5 pr-7 text-left flex left-[2%] bottom-[-13%] z-[1] animate-bounce-x'>
-          <span className='bg-yellow-light text-dark hover:text-dark left-0 relative top-0 rounded-full flex items-center justify-center text-2xl h-12 w-12'>
-            <Star className='h-6 w-6 text-dark/50' />
-          </span>
-          <div className='pl-5'>
-            <h6 className='mb-1 font-semibold text-base text-gray-800'>
-              Κριτικές 5*
-            </h6>
-            <p className='mb-0 text-3sm text-gray-600'>TOP επαγγελματίες</p>
-          </div>
-        </div>
-
-        {/* Iconbox Small 2 - Glassmorphism design with white gradient */}
-        <div className='absolute rounded-2xl backdrop-blur-md bg-gradient-to-t from-white/70 to-white/40 border border-white/50 shadow-md p-5 pr-7 text-left flex left-[20%] bottom-[20%] z-[1] animate-bounce-y'>
-          <span className='bg-third left-0 relative top-0 rounded-full flex items-center justify-center text-2xl h-12 w-12'>
-            <Rocket className='h-6 w-6 text-white/50' />
-          </span>
-          <div className='pl-5'>
-            <h6 className='mb-1 font-semibold text-base text-gray-900'>
-              100+ νέες
-            </h6>
-            <p className='mb-0 text-3sm text-gray-800'>Διαθέσιμες Υπηρεσίες</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Secondary Image - positioned relative to the whole container */}
-      <div className='absolute right-[8%] bottom-[-10%] z-[1]'>
-        <Image
-          width={90}
-          height={90}
-          src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750084063/Static/home12-img-3_rtgiou.webp'
-          alt='Doulitsa Hero Illustration'
-          loading='lazy'
-          quality={75}
-          decoding='async'
-          className='w-20 h-auto animate-bounce-y-reverse'
-        />
-      </div>
     </div>
   );
 }
 
-// Dynamic content component
-function DynamicHeroContent({
-  subcategories,
-}: {
-  subcategories: DatasetItem[];
-}) {
+// Hero Image Gallery Component - Showcase of service categories
+function HeroImageGallery() {
+  const galleryImages = [
+    {
+      src: 'https://plus.unsplash.com/premium_photo-1681505210563-eeb5d84fcaad?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=772',
+      alt: 'Υπηρεσίες 1',
+    },
+    {
+      src: 'https://plus.unsplash.com/premium_photo-1664301548366-f5402468cef2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=774',
+      alt: 'Υπηρεσίες 2',
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1549981832-2ba2ee913334?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=774',
+      alt: 'Υπηρεσίες 3',
+    },
+    {
+      src: 'https://plus.unsplash.com/premium_photo-1664280284972-b0af7e35605f?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=776',
+      alt: 'Υπηρεσίες 4',
+    },
+    {
+      src: 'https://plus.unsplash.com/premium_photo-1706825702836-bcf602e00751?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=928',
+      alt: 'Υπηρεσίες 5',
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1742483359033-13315b247c74?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=776',
+      alt: 'Υπηρεσίες 6',
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1604881991720-f91add269bed?q=80&w=1600&auto=format&fit=crop',
+      alt: 'Υπηρεσίες 7',
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1610462534044-5349e2261b86?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=774',
+      alt: 'Υπηρεσίες 8',
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1589710751893-f9a6770ad71b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=774',
+      alt: 'Υπηρεσίες 9',
+    },
+  ];
+
+  const pluginRef = React.useRef(
+    Autoplay({ delay: 3000, stopOnInteraction: false }),
+  );
+
   return (
-    <>
-      <HeroSearchBar />
-      <PopularSearches subcategories={subcategories} />
-    </>
+    <div className='w-full max-w-4xl mt-12 md:mt-20'>
+      <Carousel
+        plugins={[pluginRef.current]}
+        opts={{
+          align: 'start',
+          loop: true,
+          slidesToScroll: 1,
+        }}
+        onMouseEnter={() => pluginRef.current.stop()}
+        onMouseLeave={() => pluginRef.current.play()}
+        className='w-full'
+      >
+        <CarouselContent className='py-2 pb-4'>
+          {galleryImages.map((image, index) => (
+            <CarouselItem
+              key={index}
+              className='basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5'
+            >
+              <div className='relative w-full h-72 sm:h-80 md:h-96 lg:h-[420px] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300'>
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  className='object-cover'
+                  sizes='(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw'
+                  loading='lazy'
+                />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
+    </div>
   );
 }
 
@@ -160,31 +185,37 @@ type HeroHomeProps = {
 export default function HeroHome({ popularSubcategories = [] }: HeroHomeProps) {
   return (
     <section className='overflow-visible bg-silver bg-gradient-to-t from-white to-silver contain-layout'>
-      <div className='container mx-auto pt-4 mt-2 md:mt-12 lg:mt-24 mb-2 sm:mb-12 md:mb-16 lg:mb-28 px-4 sm:px-6'>
-        <div className='flex flex-wrap overflow-visible'>
-          <div className='w-full flex flex-col justify-center xl:w-7/12 xl:pr-6'>
-            <StaticHeroContent />
+      <div className='container mx-auto pt-12 md:pt-20 lg:pt-20 pb-8 sm:pb-10 md:pb-12 px-4 sm:px-6'>
+        <div className='flex flex-col'>
+          {/* Hero Content */}
+          <StaticHeroContent />
 
-            <div className='mt-6 sm:mt-8'>
-              <Suspense
-                fallback={
-                  <div className='h-32 flex items-center'>
-                    <div
-                      className='inline-block w-4 h-4 mr-2 border-2 border-current border-r-transparent rounded-full animate-spin'
-                      role='status'
-                    />
-                    <span>Φόρτωση επιλογών...</span>
-                  </div>
-                }
-              >
-                <DynamicHeroContent subcategories={popularSubcategories} />
-              </Suspense>
-            </div>
+          {/* Search Bar */}
+          <div className='w-full max-w-2xl mt-4'>
+            <Suspense
+              fallback={
+                <div className='h-14 flex items-center'>
+                  <div
+                    className='inline-block w-4 h-4 mr-2 border-2 border-current border-r-transparent rounded-full animate-spin'
+                    role='status'
+                  />
+                  <span>Φόρτωση...</span>
+                </div>
+              }
+            >
+              <HeroSearchBar />
+            </Suspense>
           </div>
 
-          <div className='hidden xl:block xl:w-5/12 overflow-visible'>
-            <HeroImages />
+          {/* Popular Searches */}
+          <div className='w-full mt-8'>
+            <Suspense fallback={null}>
+              <PopularSearches subcategories={popularSubcategories} />
+            </Suspense>
           </div>
+
+          {/* Image Gallery */}
+          <HeroImageGallery />
         </div>
       </div>
     </section>
