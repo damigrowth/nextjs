@@ -34,9 +34,8 @@ export function AdminUsersDataTable({
       sortable: true,
       render: (user) => (
         <div className='space-y-1'>
-          <div className='font-medium'>{user.name || 'No name'}</div>
-          <div className='text-sm text-muted-foreground'>{user.email}</div>
-          {user.displayName && (
+          <div className='font-medium'>{user.email}</div>
+          {user.type === 'pro' && user.displayName && (
             <div className='text-xs text-muted-foreground'>
               @{user.displayName}
             </div>
@@ -58,11 +57,14 @@ export function AdminUsersDataTable({
       key: 'role',
       header: 'Role',
       sortable: true,
-      render: (user) => (
-        <Badge variant={getRoleBadgeVariant(user.role)}>
-          {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-        </Badge>
-      ),
+      render: (user) => {
+        const roleLabel = user.role === 'freelancer' ? 'Professional' : user.role.charAt(0).toUpperCase() + user.role.slice(1);
+        return (
+          <Badge variant={getRoleBadgeVariant(user.role)}>
+            {roleLabel}
+          </Badge>
+        );
+      },
     },
     {
       key: 'step',

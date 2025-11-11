@@ -122,7 +122,7 @@ export function AdminUsersFilters() {
         <SelectContent>
           <SelectItem value='all'>All Roles</SelectItem>
           <SelectItem value='user'>User</SelectItem>
-          <SelectItem value='freelancer'>Freelancer</SelectItem>
+          <SelectItem value='freelancer'>Professional</SelectItem>
           <SelectItem value='company'>Company</SelectItem>
           <SelectItem value='admin'>Admin</SelectItem>
         </SelectContent>
