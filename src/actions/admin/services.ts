@@ -115,11 +115,19 @@ export async function listServices(
     // Build where clause
     const where: any = {};
 
-    // Search query (title or description)
+    // Search query (title, description, or service ID)
     if (searchQuery) {
+      // Normalize the search query to handle Greek accents
+      const normalizedQuery = normalizeTerm(searchQuery);
+
+      // Check if search query is a number (service ID search)
+      const serviceIdMatch = searchQuery.match(/^\d+$/);
+
       where.OR = [
-        { titleNormalized: { contains: searchQuery.toLowerCase() } },
-        { descriptionNormalized: { contains: searchQuery.toLowerCase() } },
+        { titleNormalized: { contains: normalizedQuery } },
+        { descriptionNormalized: { contains: normalizedQuery } },
+        // If the query is a number, also search by service ID
+        ...(serviceIdMatch ? [{ id: parseInt(searchQuery) }] : []),
       ];
     }
 

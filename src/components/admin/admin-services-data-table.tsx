@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
-import { Star, Globe, FileText, XCircle, Clock } from 'lucide-react';
+import { Globe, FileText, XCircle, Clock, Star } from 'lucide-react';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { Status } from '@prisma/client';
 import TableMedia from '@/components/shared/table-media';
@@ -96,28 +96,6 @@ export function AdminServicesDataTable({
     return `${price}€`;
   };
 
-  const renderStars = (rating: number) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-
-    return (
-      <div className='flex items-center gap-0.5'>
-        {[...Array(5)].map((_, i) => (
-          <Star
-            key={i}
-            className={`h-3 w-3 ${
-              i < fullStars
-                ? 'fill-yellow-400 text-yellow-400'
-                : i === fullStars && hasHalfStar
-                  ? 'fill-yellow-200 text-yellow-400'
-                  : 'text-gray-300'
-            }`}
-          />
-        ))}
-      </div>
-    );
-  };
-
   const columns: ColumnDef<AdminServiceWithRelations>[] = [
     {
       key: 'title',
@@ -183,19 +161,6 @@ export function AdminServicesDataTable({
           status={service.status as Status}
           featured={service.featured}
         />
-      ),
-    },
-    {
-      key: 'rating',
-      header: 'Rating',
-      sortable: true,
-      render: (service) => (
-        <div className='flex flex-col gap-1'>
-          {renderStars(service.rating)}
-          <span className='text-xs text-muted-foreground'>
-            {service.rating.toFixed(1)} ({service._count.reviews} reviews)
-          </span>
-        </div>
       ),
     },
     {
