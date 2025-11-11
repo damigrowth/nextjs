@@ -5,23 +5,16 @@ import Link from 'next/link';
 import {
   ArrowUpCircleIcon,
   BarChartIcon,
-  BellIcon,
   CheckCircleIcon,
-  ClipboardListIcon,
-  HelpCircleIcon,
   LayoutDashboardIcon,
-  MessageSquareIcon,
-  SearchIcon,
   BriefcaseIcon,
-  SettingsIcon,
   UsersIcon,
   UserCheckIcon,
   TagsIcon,
-  BookmarkIcon,
-  GitBranchIcon,
+  MessageSquareIcon,
 } from 'lucide-react';
 
-import { NavDocuments, AdminNavMain, AdminNavSecondary, AdminNavUser } from '@/components';
+import { AdminNavMain, AdminNavUser } from '@/components';
 import { useSession } from '@/lib/auth/client';
 
 import {
@@ -47,16 +40,6 @@ const data = {
       icon: LayoutDashboardIcon,
     },
     {
-      title: 'Users',
-      url: '/admin/users',
-      icon: UsersIcon,
-    },
-    {
-      title: 'Profiles',
-      url: '/admin/profiles',
-      icon: UserCheckIcon,
-    },
-    {
       title: 'Services',
       url: '/admin/services',
       icon: BriefcaseIcon,
@@ -65,6 +48,16 @@ const data = {
       title: 'Verifications',
       url: '/admin/verifications',
       icon: CheckCircleIcon,
+    },
+    {
+      title: 'Profiles',
+      url: '/admin/profiles',
+      icon: UserCheckIcon,
+    },
+    {
+      title: 'Users',
+      url: '/admin/users',
+      icon: UsersIcon,
     },
     {
       title: 'Taxonomies',
@@ -122,54 +115,14 @@ const data = {
       ],
     },
     {
-      title: 'Analytics',
-      url: '/admin/analytics',
-      icon: BarChartIcon,
-    },
-    {
-      title: 'Notifications',
-      url: '/admin/notifications',
-      icon: BellIcon,
-      disabled: true,
-    },
-    {
       title: 'Chats',
       url: '/admin/chats',
       icon: MessageSquareIcon,
-      disabled: true,
     },
     {
-      title: 'Team',
-      url: '/admin/team',
-      icon: UsersIcon,
-      disabled: true,
-    },
-    {
-      title: 'Git',
-      url: '/admin/git',
-      icon: GitBranchIcon,
-    },
-  ],
-  navSecondary: [
-    {
-      title: 'Settings',
-      url: '/admin/settings',
-      icon: SettingsIcon,
-      disabled: true,
-    },
-    {
-      title: 'Search',
-      url: '#',
-      icon: SearchIcon,
-      disabled: true,
-    },
-  ],
-  documents: [
-    {
-      name: 'Reports',
-      url: '/admin/reports',
-      icon: ClipboardListIcon,
-      disabled: true,
+      title: 'Analytics',
+      url: '/admin/analytics',
+      icon: BarChartIcon,
     },
   ],
 };
@@ -204,8 +157,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <AdminNavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
-        <AdminNavSecondary items={data.navSecondary} className='mt-auto' />
       </SidebarContent>
       <SidebarFooter>
         <AdminNavUser user={user} />

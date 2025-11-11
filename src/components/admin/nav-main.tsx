@@ -4,13 +4,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  MailIcon,
   PlusIcon,
   ChevronRight,
   type LucideIcon,
 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import {
   Collapsible,
   CollapsibleContent,
@@ -44,7 +42,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
     <SidebarGroup>
       <SidebarGroupContent className='flex flex-col gap-2'>
         <SidebarMenu>
-          <SidebarMenuItem className='flex items-center gap-2'>
+          <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => setQuickCreateOpen(true)}
               tooltip='Quick Create'
@@ -53,14 +51,6 @@ export function NavMain({ items }: { items: NavItem[] }) {
               <PlusIcon />
               <span>Quick Create</span>
             </SidebarMenuButton>
-            <Button
-              size='icon'
-              className='h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0'
-              variant='outline'
-            >
-              <MailIcon />
-              <span className='sr-only'>Inbox</span>
-            </Button>
           </SidebarMenuItem>
         </SidebarMenu>
         <QuickCreateDialog
