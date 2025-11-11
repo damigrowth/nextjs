@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useActionState, useEffect } from 'react';
+import React, { useActionState, useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -93,6 +93,7 @@ export default function AdditionalInfoForm({
     : updateProfileAdditionalInfo;
 
   const [state, action, isPending] = useActionState(actionToUse, initialState);
+  const [, startTransition] = useTransition();
   const router = useRouter();
 
   // Extract data from props
@@ -174,8 +175,10 @@ export default function AdditionalInfoForm({
       formData.set('profileId', initialProfile.id);
     }
 
-    // Call server action
-    action(formData);
+    // Call the server action with startTransition
+    startTransition(() => {
+      action(formData);
+    });
   };
 
   return (

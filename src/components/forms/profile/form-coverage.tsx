@@ -224,9 +224,9 @@ export default function CoverageForm({
         skipEmpty: false, // Keep all fields for coverage data
       });
 
-      // For admin mode, add targetUserId
-      if (adminMode && initialUser?.id) {
-        formData.set('targetUserId', initialUser.id);
+      // For admin mode, add profileId
+      if (adminMode && initialProfile?.id) {
+        formData.set('profileId', initialProfile.id);
       }
 
       // Call the server action with populated FormData using startTransition

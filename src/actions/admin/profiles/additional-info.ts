@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma/client';
 import { ActionResponse } from '@/lib/types/api';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
 import {
-  additionalProfileInfoSchema,
+  profileAdditionalInfoUpdateSchema,
 } from '@/lib/validations/profile';
 import { extractFormData, getFormString } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
@@ -64,7 +64,7 @@ export async function updateProfileAdditionalInfoAdmin(
     }
 
     // 5. Validate with Zod schema
-    const validationResult = additionalProfileInfoSchema.safeParse(extractedData);
+    const validationResult = profileAdditionalInfoUpdateSchema.safeParse(extractedData);
 
     if (!validationResult.success) {
       return createValidationErrorResponse(

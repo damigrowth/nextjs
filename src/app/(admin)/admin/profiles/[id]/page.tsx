@@ -6,10 +6,12 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
+  AccountForm,
   BasicInfoForm,
   AdditionalInfoForm,
   PresentationInfoForm,
   PortfolioForm,
+  CoverageForm,
   BillingForm,
 } from '@/components';
 import { Badge } from '@/components/ui/badge';
@@ -52,6 +54,9 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
     id: profile.uid,
     email: profile.user.email,
     name: profile.user.name || profile.displayName,
+    username: profile.user.username || profile.username,
+    displayName: profile.user.displayName || profile.displayName,
+    image: profile.user.image || profile.image,
     role: profile.user.role,
     step: profile.user.step || 'DASHBOARD',
     emailVerified: true,
@@ -267,17 +272,52 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
               </div>
 
               <div className='space-y-6'>
+                {/* Account Information */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>Λογαριασμός</CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Εικόνα προφίλ, όνομα εμφάνισης
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <AccountForm
+                      initialUser={mockUser as any}
+                      adminMode={true}
+                      hideCard={true}
+                    />
+                  </CardContent>
+                </Card>
+
                 {/* Basic Information */}
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Βασικά στοιχεία</CardTitle>
                     <p className='text-sm text-muted-foreground'>
-                      Εικόνα προφίλ, tagline, κατηγορία, υποκατηγορία,
-                      τοποθεσία, περιοχές κάλυψης, ειδικότητα, δεξιότητες, bio
+                      Tagline, κατηγορία, υποκατηγορία,
+                      τοποθεσία, ειδικότητα, δεξιότητες, bio
                     </p>
                   </CardHeader>
                   <CardContent>
                     <BasicInfoForm
+                      initialUser={mockUser as any}
+                      initialProfile={profile}
+                      adminMode={true}
+                      hideCard={true}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Coverage */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>Περιοχές Κάλυψης</CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Τρόποι παροχής, διεύθυνση, νομοί και περιοχές κάλυψης
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <CoverageForm
                       initialUser={mockUser as any}
                       initialProfile={profile}
                       adminMode={true}

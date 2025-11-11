@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useActionState } from 'react';
+import React, { useEffect, useActionState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -64,6 +64,7 @@ export default function BillingForm({
     : updateProfileBilling;
 
   const [state, action, isPending] = useActionState(actionToUse, initialState);
+  const [, startTransition] = useTransition();
 
   // Track if user has made any actual changes
   const [hasUserInteracted, setHasUserInteracted] = React.useState(false);
@@ -155,8 +156,10 @@ export default function BillingForm({
       formData.set('profileId', initialProfile.id);
     }
 
-    // Call the server action
-    action(formData);
+    // Call the server action with startTransition
+    startTransition(() => {
+      action(formData);
+    });
   };
 
   return (

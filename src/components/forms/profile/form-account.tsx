@@ -29,6 +29,7 @@ import { MediaUpload } from '@/components/media';
 import { formatDisplayName } from '@/lib/utils/validation/formats';
 import { populateFormData } from '@/lib/utils/form';
 import { updateAccount } from '@/actions/auth/update-account';
+import { updateAccountAdmin } from '@/actions/admin/users';
 import { FormButton } from '../../shared';
 import { AuthUser } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';
@@ -44,11 +45,22 @@ const initialState = {
 
 interface AccountFormProps {
   initialUser: AuthUser | null;
+  adminMode?: boolean;
+  hideCard?: boolean;
 }
 
-export default function AccountForm({ initialUser }: AccountFormProps) {
+export default function AccountForm({
+  initialUser,
+  adminMode = false,
+  hideCard = false,
+}: AccountFormProps) {
+  // Select the appropriate action based on admin mode
+  const actionToUse = adminMode
+    ? updateAccountAdmin
+    : updateAccount;
+
   const [state, action, isPending] = useActionState(
-    updateAccount,
+    actionToUse,
     initialState,
   );
   const router = useRouter();
@@ -124,6 +136,11 @@ export default function AccountForm({ initialUser }: AccountFormProps) {
         skipEmpty: true,
       });
 
+      // Add userId when in admin mode
+      if (adminMode && initialUser?.id) {
+        formData.set('userId', initialUser.id);
+      }
+
       // Call the server action with populated FormData using startTransition
       startTransition(() => {
         action(formData);
@@ -145,7 +162,7 @@ export default function AccountForm({ initialUser }: AccountFormProps) {
           const formData = new FormData(e.currentTarget);
           handleFormAction(formData);
         }}
-        className='space-y-6 p-6 border rounded-lg'
+        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
       >
         {/* Profile Image - For all user types */}
         <FormField
