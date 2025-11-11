@@ -83,7 +83,7 @@ export async function register(
         provider: 'email', // Email/password registration
         proRole: userRole, // 'user', 'freelancer', or 'company' - read by database hook
         callbackURL, // Redirect based on user type after email verification
-      },
+      } as any, // Type assertion needed for custom fields not in Better Auth types
     });
 
     if (!result.user) {
