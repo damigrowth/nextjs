@@ -65,7 +65,7 @@ export function AdminProfilesFilters() {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value='all'>All Roles</SelectItem>
-          <SelectItem value='freelancer'>Freelancer</SelectItem>
+          <SelectItem value='freelancer'>Professional</SelectItem>
           <SelectItem value='company'>Company</SelectItem>
         </SelectContent>
       </Select>

@@ -24,7 +24,7 @@ async function StatsCardsContent() {
         <CardContent className='flex-1 p-0'>
           <div>
             <div className='flex items-center justify-between px-6 py-2'>
-              <span className='text-xs text-muted-foreground'>Freelancer</span>
+              <span className='text-xs text-muted-foreground'>Professional</span>
               <span className='text-xs font-medium'>{stats.professional || 0}</span>
             </div>
             <div className='flex items-center justify-between px-6 py-2'>
@@ -102,7 +102,7 @@ function StatsCardsSkeleton() {
         <CardContent className='flex-1 p-0'>
           <div>
             <div className='flex items-center justify-between px-6 py-2'>
-              <span className='text-xs text-muted-foreground'>Freelancer</span>
+              <span className='text-xs text-muted-foreground'>Professional</span>
               <Skeleton className='h-3 w-8' />
             </div>
             <div className='flex items-center justify-between px-6 py-2'>

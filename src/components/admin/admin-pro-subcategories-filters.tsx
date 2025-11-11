@@ -5,7 +5,7 @@ import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 
 export function AdminProSubcategoriesFilters() {
   const typeOptions = [
-    { value: 'freelancer', label: 'Freelancer' },
+    { value: 'freelancer', label: 'Professional' },
     { value: 'company', label: 'Company' },
   ];
 

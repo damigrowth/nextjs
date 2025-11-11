@@ -9,7 +9,7 @@ export function AdminProTaxonomiesFilters() {
   ];
 
   const typeOptions = [
-    { value: 'freelancer', label: 'Freelancer' },
+    { value: 'freelancer', label: 'Professional' },
     { value: 'company', label: 'Company' },
   ];
 

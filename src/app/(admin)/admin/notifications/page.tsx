@@ -17,7 +17,7 @@ const notifications = [
     id: 1,
     type: 'user',
     title: 'New User Registration',
-    message: 'John Doe has registered as a freelancer',
+    message: 'John Doe has registered as a professional',
     time: '2 minutes ago',
     status: 'unread',
     priority: 'medium',

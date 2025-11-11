@@ -151,11 +151,11 @@ function EditProTaxonomyFormFields({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value='freelancer'>Freelancer</SelectItem>
+                    <SelectItem value='freelancer'>Professional</SelectItem>
                     <SelectItem value='company'>Company</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormDescription>Freelancer or Company</FormDescription>
+                <FormDescription>Professional or Company</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

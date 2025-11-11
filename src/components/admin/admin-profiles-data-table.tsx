@@ -107,11 +107,13 @@ export function AdminProfilesDataTable({
       key: 'type',
       header: 'Role',
       render: (profile) => {
-        if (!profile.type) return <Badge variant='outline'>N/A</Badge>;
+        if (!profile.type) return <span className='text-muted-foreground text-sm'>-</span>;
+
+        const roleLabel = profile.type === 'freelancer' ? 'Professional' : 'Company';
 
         return (
           <Badge variant={getTypeBadgeVariant(profile.type)}>
-            {profile.type.charAt(0).toUpperCase() + profile.type.slice(1)}
+            {roleLabel}
           </Badge>
         );
       },
