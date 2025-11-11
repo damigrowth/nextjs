@@ -96,6 +96,7 @@ export async function completeOnboarding(
     await prisma.profile.upsert({
       where: { uid: user.id },
       update: {
+        type: user.role === 'freelancer' || user.role === 'company' ? user.role : 'freelancer', // Sync user.role to profile.type
         bio: data.bio,
         category: data.category,
         subcategory: data.subcategory,
@@ -110,6 +111,7 @@ export async function completeOnboarding(
         email: user.email,
       },
       create: {
+        type: user.role === 'freelancer' || user.role === 'company' ? user.role : 'freelancer', // Sync user.role to profile.type
         bio: data.bio,
         category: data.category,
         subcategory: data.subcategory,

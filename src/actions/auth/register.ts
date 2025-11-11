@@ -70,6 +70,8 @@ export async function register(
     const callbackURL = userType === 'user' ? '/dashboard' : '/dashboard'; // Both go to dashboard, pro users will be redirected to onboarding by requireOnboardingComplete()
 
     // Use Better Auth to create user
+    // NOTE: The admin plugin blocks direct 'role' assignment for security.
+    // Instead, we pass the role via 'proRole' field which the database hook will read.
     const result = await auth.api.signUpEmail({
       body: {
         email: data.email,
@@ -77,9 +79,9 @@ export async function register(
         username: data.username,
         name: data.displayName,
         displayName: data.displayName,
-        role: userRole,
-        type: userType,
+        type: userType, // 'user' or 'pro'
         provider: 'email', // Email/password registration
+        proRole: userRole, // 'user', 'freelancer', or 'company' - read by database hook
         callbackURL, // Redirect based on user type after email verification
       },
     });

@@ -32,7 +32,7 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false,
+    requireEmailVerification: true,
     // Custom password verification to handle Strapi bcrypt hashes
     password: {
       hash: async (password: string) => {
@@ -153,16 +153,42 @@ export const auth = betterAuth({
           // console.log('CREATING USER CONTEXT:', context);
           // console.log('CREATING USER CONTEXT BODY:', context.body);
 
-          // Get the role and type from the request body, default to 'user'
-          const requestRole = context.body?.role || 'user';
+          /**
+           * User type/role structure:
+           * - Regular users: type='user', role='user'
+           * - Pro users: type='pro', role='freelancer'|'company'
+           *
+           * The admin plugin blocks direct 'role' assignment in signUpEmail.
+           * Instead, we read 'proRole' from context.body and apply it here.
+           */
+
           const requestType = context.body?.type || 'user';
+          const proRole = context.body?.proRole;
+
+          // Determine role based on type and proRole
+          let requestRole: string;
+
+          if (requestType === 'user') {
+            // Regular users always get 'user' role
+            requestRole = 'user';
+          } else if (requestType === 'pro') {
+            // Pro users get role from proRole field
+            if (!proRole || !['freelancer', 'company'].includes(proRole)) {
+              console.error('Invalid or missing proRole for pro user:', proRole);
+              throw new Error('Pro users must have a valid proRole (freelancer or company)');
+            }
+            requestRole = proRole;
+          } else {
+            console.error('Invalid user type:', requestType);
+            throw new Error('Invalid user type. Must be "user" or "pro"');
+          }
 
           // For OAuth users, provider comes from the user data (mapProfileToUser)
           // For email/password users, provider comes from request body
           const requestProvider =
             (user as any).provider || context.body?.provider || 'email';
 
-          // console.log('DETECTED PROVIDER:', requestProvider);
+          // console.log('Setting user - Provider:', requestProvider, 'Type:', requestType, 'Role:', requestRole);
 
           return {
             data: {
