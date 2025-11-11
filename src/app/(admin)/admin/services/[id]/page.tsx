@@ -157,14 +157,6 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                         </span>
                       </div>
                     )}
-                    <div className='flex items-center justify-between px-6 py-2'>
-                      <span className='text-xs text-muted-foreground'>
-                        Tags
-                      </span>
-                      <span className='text-xs font-medium'>
-                        {service.tags?.length || 0}
-                      </span>
-                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -211,11 +203,14 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                     </div>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
-                        Rating
+                        Has Media
                       </span>
-                      <span className='text-xs font-medium'>
-                        {service.rating?.toFixed(1) || 'N/A'} ⭐
-                      </span>
+                      <Badge
+                        variant={service.media && service.media.length > 0 ? 'default' : 'outline'}
+                        className='text-xs h-5'
+                      >
+                        {service.media && service.media.length > 0 ? 'Yes' : 'No'}
+                      </Badge>
                     </div>
                   </div>
                 </CardContent>
@@ -254,10 +249,10 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                     </div>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
-                        Addons
+                        Tags
                       </span>
                       <span className='text-xs font-medium'>
-                        {service.addons?.length || 0}
+                        {service.tags?.length || 0}
                       </span>
                     </div>
                   </div>
@@ -281,6 +276,14 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                     </div>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
+                        Rating
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {service.rating?.toFixed(1) || 'N/A'} ⭐
+                      </span>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
                         FAQ Items
                       </span>
                       <span className='text-xs font-medium'>
@@ -289,18 +292,10 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                     </div>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
-                        Created
+                        Addons
                       </span>
                       <span className='text-xs font-medium'>
-                        {formatDate(service.createdAt)}
-                      </span>
-                    </div>
-                    <div className='flex items-center justify-between px-6 py-2'>
-                      <span className='text-xs text-muted-foreground'>
-                        Updated
-                      </span>
-                      <span className='text-xs font-medium'>
-                        {formatDate(service.updatedAt)}
+                        {service.addons?.length || 0}
                       </span>
                     </div>
                   </div>
@@ -319,6 +314,18 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
               </div>
 
               <div className='space-y-6'>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>Status & Settings</CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Manage service status, published state, and featured flag
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <EditServiceSettingsForm service={service} />
+                  </CardContent>
+                </Card>
+
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Basic Information</CardTitle>
@@ -355,18 +362,6 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                   </CardHeader>
                   <CardContent>
                     <EditServicePricingForm service={service} />
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className='text-lg'>Status & Settings</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Manage service status, published state, and featured flag
-                    </p>
-                  </CardHeader>
-                  <CardContent>
-                    <EditServiceSettingsForm service={service} />
                   </CardContent>
                 </Card>
 
