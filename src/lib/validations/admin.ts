@@ -159,12 +159,9 @@ export const revokeUserSessionsSchema = z.object({
 // Update user basic info - pick specific fields from general schema
 export const updateUserBasicInfoSchema = adminUpdateUserSchema.pick({
   userId: true,
-  name: true,
   email: true,
   username: true,
   displayName: true,
-  firstName: true,
-  lastName: true,
 });
 
 // Update user status - pick status-related fields from general schema

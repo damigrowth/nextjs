@@ -8,12 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatDate, formatDateTime } from '@/lib/utils/date';
 import {
-  EditUserBasicForm,
   EditUserStatusForm,
   EditUserBanForm,
   RevokeSessionsForm,
 } from '@/components/admin/forms';
 import { SiteHeader } from '@/components/admin';
+import { AccountForm } from '@/components';
 
 export const dynamic = 'force-dynamic';
 
@@ -131,22 +131,6 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
                       </span>
                       <span className='text-xs font-medium'>
                         {user.displayName || '-'}
-                      </span>
-                    </div>
-                    <div className='flex items-center justify-between px-6 py-2'>
-                      <span className='text-xs text-muted-foreground'>
-                        First Name
-                      </span>
-                      <span className='text-xs font-medium'>
-                        {user.firstName || '-'}
-                      </span>
-                    </div>
-                    <div className='flex items-center justify-between px-6 py-2'>
-                      <span className='text-xs text-muted-foreground'>
-                        Last Name
-                      </span>
-                      <span className='text-xs font-medium'>
-                        {user.lastName || '-'}
                       </span>
                     </div>
                   </div>
@@ -483,13 +467,17 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
                 {/* Basic Information */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className='text-lg'>Basic Information</CardTitle>
+                    <CardTitle className='text-lg'>Account Information</CardTitle>
                     <p className='text-sm text-muted-foreground'>
-                      Update user's basic account information
+                      Update user's profile image, display name, email, and username
                     </p>
                   </CardHeader>
                   <CardContent>
-                    <EditUserBasicForm user={user} />
+                    <AccountForm
+                      initialUser={user as any}
+                      adminMode={true}
+                      hideCard={true}
+                    />
                   </CardContent>
                 </Card>
 

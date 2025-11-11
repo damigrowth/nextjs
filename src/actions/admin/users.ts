@@ -62,7 +62,11 @@ export async function getUser(userId: string) {
           },
         },
         accounts: true,
-        sessions: true,
+        sessions: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
       },
     });
 
@@ -556,7 +560,7 @@ export async function setUserPassword(
 
 /**
  * Update user basic information via Prisma
- * Fields: name, email, username, displayName, firstName, lastName
+ * Fields: name, email, username, displayName
  */
 export async function updateUserBasicInfo(data: {
   userId: string;
@@ -564,8 +568,6 @@ export async function updateUserBasicInfo(data: {
   email?: string;
   username?: string;
   displayName?: string;
-  firstName?: string;
-  lastName?: string;
 }) {
   try {
     await getAdminSession();
@@ -578,8 +580,6 @@ export async function updateUserBasicInfo(data: {
     if (data.email !== undefined) updateData.email = data.email;
     if (data.username !== undefined) updateData.username = data.username;
     if (data.displayName !== undefined) updateData.displayName = data.displayName;
-    if (data.firstName !== undefined) updateData.firstName = data.firstName;
-    if (data.lastName !== undefined) updateData.lastName = data.lastName;
 
     const user = await prisma.user.update({
       where: { id: data.userId },
@@ -937,8 +937,6 @@ export async function updateUserBasicInfoAction(
       email: formData.get('email') as string,
       username: formData.get('username') as string,
       displayName: formData.get('displayName') as string,
-      firstName: formData.get('firstName') as string,
-      lastName: formData.get('lastName') as string,
     };
 
     // Validate using imported schema (omit userId as it's passed separately)
@@ -1117,6 +1115,84 @@ export async function updateUserImageAction(
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update user image',
+    };
+  }
+}
+
+/**
+ * Update user account (display name and image) - Admin version for useActionState
+ */
+export async function updateAccountAdmin(
+  prevState: any,
+  formData: FormData,
+) {
+  try {
+    // Verify admin authentication
+    await getAdminSession();
+
+    // Parse FormData
+    const userId = formData.get('userId')?.toString();
+    const displayName = formData.get('displayName')?.toString();
+    const imageStr = formData.get('image')?.toString();
+
+    if (!userId) {
+      return {
+        success: false,
+        message: 'User ID is required',
+      };
+    }
+
+    // Parse image if provided
+    let image = null;
+    if (imageStr) {
+      try {
+        image = JSON.parse(imageStr);
+      } catch (e) {
+        return {
+          success: false,
+          message: 'Invalid image data',
+        };
+      }
+    }
+
+    // Validate with schema
+    const validationResult = z.object({
+      userId: z.string().min(1),
+      displayName: z.string().min(1).max(100).optional(),
+      image: z.any().nullable().optional(),
+    }).safeParse({
+      userId,
+      displayName,
+      image,
+    });
+
+    if (!validationResult.success) {
+      return {
+        success: false,
+        message: validationResult.error.issues[0].message,
+      };
+    }
+
+    // Update user via Better Auth admin API
+    const { prisma } = await import('@/lib/prisma/client');
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        displayName: displayName || undefined,
+        image: image || undefined,
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Account updated successfully',
+    };
+  } catch (error) {
+    console.error('Admin account update error:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to update account',
     };
   }
 }
