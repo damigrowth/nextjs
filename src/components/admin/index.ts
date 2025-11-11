@@ -70,6 +70,8 @@ export { NavUser as AdminNavUser } from './nav-user';
 export { QuickCreateDialog } from './quick-create-dialog';
 export { SectionCards } from './section-cards';
 export { SiteHeader } from './site-header';
+export { AdminStatsCards } from './admin-stats-cards';
+export { AdminNavCards } from './admin-nav-cards';
 
 // Generic Taxonomy Pages
 export { TaxonomyListPage } from './taxonomy-list-page';
