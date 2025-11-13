@@ -32,7 +32,6 @@ import {
 
 // Custom components
 import { Currency } from '@/components/ui/currency';
-import { MultiSelect } from '@/components/ui/multi-select';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { Badge } from '@/components/ui/badge';
 import { FormButton } from '@/components/shared';
@@ -531,24 +530,28 @@ export default function FormServiceEdit({
             name='tags'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Ετικέτες
-                  {field.value?.length > 0 ? ` (${field.value.length}/10)` : ''}
-                </FormLabel>
+                <FormLabel>Ετικέτες</FormLabel>
                 <p className='text-sm text-gray-600'>
                   Επιλέξτε ετικέτες που περιγράφουν την υπηρεσία σας (έως 10)
                 </p>
                 <FormControl>
-                  <MultiSelect
-                    options={availableTags}
-                    selected={field.value || []}
-                    onChange={(selected) => {
-                      setValue('tags', selected, {
+                  <LazyCombobox
+                    multiple
+                    options={availableTags.map(tag => ({
+                      id: tag.value,
+                      label: tag.label,
+                    }))}
+                    values={field.value || []}
+                    onMultiSelect={(selectedOptions) => {
+                      const selectedIds = selectedOptions.map((opt) => opt.id);
+                      setValue('tags', selectedIds, {
                         shouldDirty: true,
                         shouldValidate: true,
                       });
                     }}
+                    onSelect={() => {}}
                     placeholder='Επιλέξτε ετικέτες...'
+                    searchPlaceholder='Αναζήτηση ετικετών...'
                     maxItems={10}
                   />
                 </FormControl>

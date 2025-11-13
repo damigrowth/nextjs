@@ -2,8 +2,6 @@
 
 import React, {
   useState,
-  useActionState,
-  useEffect,
   useRef,
   useTransition,
 } from 'react';
@@ -81,7 +79,6 @@ import {
   AddonsFaqStep,
   MediaStep,
 } from './steps';
-import ServiceSuccess from './service-success';
 import { AuthUser } from '@/lib/types/auth';
 import { Profile } from '@prisma/client';
 
@@ -114,13 +111,6 @@ const STEPS = [
   },
 ];
 
-const initialState = {
-  success: false,
-  message: '',
-  serviceId: undefined,
-  serviceTitle: undefined,
-};
-
 // Step validation schemas
 const STEP_SCHEMAS = {
   1: presenceOnlineSchema,
@@ -141,6 +131,8 @@ export default function CreateServiceForm({
 }: CreateServiceFormProps) {
   const router = useRouter();
   const { toast } = useToast();
+
+  // Form state
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
@@ -148,19 +140,14 @@ export default function CreateServiceForm({
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showDraftDialog, setShowDraftDialog] = useState(false);
 
-  // Success state for showing completion
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [successData, setSuccessData] = useState<{
-    id: number | string;
-    title: string;
-  } | null>(null);
-
-
   // Media upload ref
   const mediaRef = useRef<any>(null);
 
   // Loading state for async preparation phase
   const [isPreparingSubmit, setIsPreparingSubmit] = useState(false);
+
+  // Loading state to show overlay during redirect
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Transition for calling server actions properly
   const [, startTransition] = useTransition();
@@ -194,15 +181,70 @@ export default function CreateServiceForm({
     },
   });
 
-  // Server actions
-  const [state, action, isPending] = useActionState(
-    createServiceAction,
-    initialState,
-  );
-  const [draftState, draftAction, isDraftPending] = useActionState(
-    saveServiceAsDraftAction,
-    initialState,
-  );
+  // Server action state management - controlled manually for better success handling
+  const [isPending, setIsPending] = useState(false);
+  const [isDraftPending, setIsDraftPending] = useState(false);
+
+  // Handle service creation
+  const handleServiceSubmit = async (formData: FormData) => {
+    setIsPending(true);
+    try {
+      const result = await createServiceAction(null, formData);
+
+      if (result.success && result.serviceId && result.serviceTitle) {
+        // Success! Show toast and set redirecting state
+        toast.success(result.message || 'Η υπηρεσία υποβλήθηκε για έγκριση επιτυχώς!');
+
+        // Set redirecting state to show loading overlay
+        setIsRedirecting(true);
+
+        // Small delay to ensure toast is visible
+        setTimeout(() => {
+          // Redirect to success page with service info
+          const params = new URLSearchParams({
+            id: result.serviceId.toString(),
+            title: result.serviceTitle
+          });
+          router.push(`/dashboard/services/create/success?${params.toString()}`);
+        }, 500);
+      } else if (result.message) {
+        // Error
+        toast.error(result.message);
+      }
+    } catch (error) {
+      toast.error('Σφάλμα κατά την υποβολή της υπηρεσίας');
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  // Handle draft save
+  const handleDraftSubmit = async (formData: FormData) => {
+    setIsDraftPending(true);
+    try {
+      const result = await saveServiceAsDraftAction(null, formData);
+
+      if (result.success && result.message) {
+        toast.success('Η υπηρεσία αποθηκεύτηκε ως προσχέδιο επιτυχώς!');
+        setTimeout(() => {
+          setShowDraftDialog(false);
+          form.reset();
+          setCurrentStep(1);
+          setCompletedSteps([]);
+        }, 1500);
+      } else if (result.message) {
+        toast.error(result.message);
+        setTimeout(() => {
+          setShowDraftDialog(false);
+        }, 1000);
+      }
+    } catch (error) {
+      toast.error('Σφάλμα κατά την αποθήκευση του προσχεδίου');
+      setShowDraftDialog(false);
+    } finally {
+      setIsDraftPending(false);
+    }
+  };
 
   // Use initialUser prop
   const user = initialUser;
@@ -496,58 +538,10 @@ export default function CreateServiceForm({
   const handleConfirmDraft = async () => {
     // Keep dialog open, start the save process
     const formData = await prepareDraftData();
-    startTransition(() => {
-      draftAction(formData);
-    });
+    await handleDraftSubmit(formData);
   };
 
-  // Handle successful form submission
-  useEffect(() => {
-    if (
-      state.success &&
-      state.message &&
-      state.serviceId &&
-      state.serviceTitle
-    ) {
-      // Show success message and screen immediately
-      toast.success(state.message);
-
-      // Set success data and show screen immediately to prevent form flash
-      setSuccessData({
-        id: state.serviceId,
-        title: state.serviceTitle,
-      });
-      setShowSuccess(true);
-    } else if (state.message && !state.success) {
-      toast.error(state.message);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.success, state.message, state.serviceId, state.serviceTitle]);
-
-  // Handle draft save response
-  useEffect(() => {
-    if (draftState.success && draftState.message) {
-      // Show success toast
-      toast.success('Η υπηρεσία αποθηκεύτηκε ως προσχέδιο επιτυχώς!');
-
-      // Close dialog after a short delay
-      setTimeout(() => {
-        setShowDraftDialog(false);
-        form.reset();
-        setCurrentStep(1);
-        setCompletedSteps([]);
-
-        // Comment out navigation for now as requested
-        // router.push('/dashboard/services?tab=drafts');
-      }, 1500);
-    } else if (draftState.message && !draftState.success) {
-      // Show error toast and close dialog
-      toast.error(draftState.message);
-      setTimeout(() => {
-        setShowDraftDialog(false);
-      }, 1000);
-    }
-  }, [draftState.success, draftState.message]);
+  // No useEffect needed anymore - everything is handled directly in the submit handlers!
 
   // Loading state
   if (isLoading) {
@@ -606,18 +600,13 @@ export default function CreateServiceForm({
           <div className='flex items-center justify-between mb-4'>
             <div>
               <h1 className='text-2xl font-bold text-gray-900'>
-                {showSuccess
-                  ? 'Επιτυχής δημιουργία υπηρεσίας!'
-                  : 'Δημιουργία Υπηρεσίας'}
+                Δημιουργία Υπηρεσίας
               </h1>
               <p className='text-gray-600 mt-1'>
-                {showSuccess
-                  ? 'Η υπηρεσία δημιουργήθηκε επιτυχώς.'
-                  : 'Με αυτήν τη φόρμα μπορείτε να προσθέσετε νέες υπηρεσίες.'}
+                Με αυτήν τη φόρμα μπορείτε να προσθέσετε νέες υπηρεσίες.
               </p>
             </div>
-            {!showSuccess && (
-              <div className='flex items-center space-x-3'>
+            <div className='flex items-center space-x-3'>
               {/* Action Icons */}
               <div className='flex items-center space-x-2'>
                 {/* Clear Form Button */}
@@ -739,15 +728,13 @@ export default function CreateServiceForm({
               </div>
 
               {/* Removed step badge */}
-              </div>
-            )}
+            </div>
           </div>
 
           {/* Progress Bar removed */}
 
           {/* Steps Navigation */}
-          {!showSuccess && (
-            <div className='flex items-center justify-between mt-6 space-x-2'>
+          <div className='flex items-center justify-between mt-6 space-x-2'>
               {STEPS.map((step) => {
               const isActive = currentStep === step.id;
               const isCompleted = isStepCompleted(step.id);
@@ -802,18 +789,16 @@ export default function CreateServiceForm({
                 </div>
               );
             })}
-            </div>
-          )}
+          </div>
         </div>
 
         {/* Current Step Content */}
-        <Card>
-          {!showSuccess &&
-            !(
-              currentStep === 5 &&
-              (isPending || isPreparingSubmit)
-            ) && (
-              <CardHeader>
+        <Card className="relative">
+          {!(
+            currentStep === 5 &&
+            (isPending || isPreparingSubmit)
+          ) && (
+            <CardHeader>
                 <CardTitle className='flex items-center space-x-2'>
                   {currentStep === 1 && <Globe className='w-5 h-5' />}
                   {currentStep === 2 && watch('type')?.presence && (
@@ -834,79 +819,72 @@ export default function CreateServiceForm({
               </CardHeader>
             )}
           <CardContent>
-            {showSuccess && successData ? (
-              <ServiceSuccess
-                id={successData.id}
-                title={successData.title}
-                onReset={() => {
-                  form.reset();
-                  setCurrentStep(1);
-                  setCompletedSteps([]);
-                  setShowSuccess(false);
-                  setSuccessData(null);
-                }}
-              />
-            ) : (
-              <div className='transition-all duration-500 ease-in-out'>
-                <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
-                  <div className='space-y-6'>
-                    {renderStepContent()}
+            {/* Loading overlay when redirecting */}
+            {isRedirecting && (
+              <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+                <div className="text-center space-y-3">
+                  <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                  <p className="text-sm text-gray-600">Ανακατεύθυνση στη σελίδα επιτυχίας...</p>
+                </div>
+              </div>
+            )}
+
+            <div className='transition-all duration-500 ease-in-out'>
+              <div className='animate-in fade-in slide-in-from-right-4 duration-300'>
+                <div className='space-y-6'>
+                  {renderStepContent()}
                   {/* Step Navigation - Hide on loading state */}
                   {!(
                     currentStep === 5 &&
                     (isPending || isPreparingSubmit)
                   ) && (
                     <div className='flex justify-between items-center mt-6 pt-6 border-t'>
-                        <FormButton
-                          type='button'
-                          variant='outline'
-                          text='Προηγουμένο'
-                          onClick={goBack}
-                          disabled={currentStep === 1}
-                        />
-                        <div className='flex gap-3'>
-                          {isLastStep ? (
-                            <FormButton
-                              type='button'
-                              text='Δημιουργία υπηρεσίας'
-                              loading={
-                                isPending ||
-                                    isPreparingSubmit
+                      <FormButton
+                        type='button'
+                        variant='outline'
+                        text='Προηγουμένο'
+                        onClick={goBack}
+                        disabled={currentStep === 1}
+                      />
+                      <div className='flex gap-3'>
+                        {isLastStep ? (
+                          <FormButton
+                            type='button'
+                            text='Δημιουργία υπηρεσίας'
+                            loading={
+                              isPending ||
+                              isPreparingSubmit
+                            }
+                            disabled={
+                              isPending ||
+                              isPreparingSubmit ||
+                              !isCurrentStepValid() ||
+                              isDraftPending
+                            }
+                            onClick={async () => {
+                              setIsPreparingSubmit(true);
+                              try {
+                                const formData = await prepareFormData();
+                                await handleServiceSubmit(formData);
+                              } finally {
+                                setIsPreparingSubmit(false);
                               }
-                              disabled={
-                                isPending ||
-                                    isPreparingSubmit ||
-                                !isCurrentStepValid() ||
-                                isDraftPending
-                              }
-                              onClick={async () => {
-                                setIsPreparingSubmit(true);
-                                try {
-                                  const formData = await prepareFormData();
-                                  // Call action inside startTransition to avoid React warning
-                                  startTransition(() => {
-                                    action(formData);
-                                  });
-                                } finally {
-                                  setIsPreparingSubmit(false);
-                                }
-                              }}
-                            />
-                          ) : (
-                            <FormButton
-                              type='button'
-                              text='Επόμενο'
-                              onClick={goNext}
-                              disabled={isPending || !isCurrentStepValid()}
-                            />
-                          )}
-                        </div>
+                            }}
+                          />
+                        ) : (
+                          <FormButton
+                            type='button'
+                            text='Επόμενο'
+                            onClick={goNext}
+                            disabled={isPending || !isCurrentStepValid()}
+                          />
+                        )}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
           </CardContent>
         </Card>
       </div>

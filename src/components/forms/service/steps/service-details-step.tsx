@@ -32,7 +32,6 @@ import {
 
 // Custom UI components
 import { Currency } from '@/components/ui/currency';
-import { MultiSelect } from '@/components/ui/multi-select';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { Badge } from '@/components/ui/badge';
 
@@ -282,17 +281,22 @@ export default function ServiceDetailsStep() {
               <p className='text-sm text-gray-600'>
                 Επιλέξτε έως 10 ετικέτες για την υπηρεσία σας
               </p>
-              <div className='text-sm text-gray-500'>
-                Επιλεγμένες: {field.value?.length || 0}/10
-              </div>
               <FormControl>
-                <MultiSelect
-                  options={availableTags}
-                  selected={field.value || []}
-                  onChange={field.onChange}
+                <LazyCombobox
+                  multiple
+                  options={availableTags.map(tag => ({
+                    id: tag.value,
+                    label: tag.label,
+                  }))}
+                  values={field.value || []}
+                  onMultiSelect={(selectedOptions) => {
+                    const selectedIds = selectedOptions.map((opt) => opt.id);
+                    field.onChange(selectedIds);
+                  }}
+                  onSelect={() => {}}
                   placeholder='Επιλέξτε ετικέτες...'
+                  searchPlaceholder='Αναζήτηση ετικετών...'
                   maxItems={10}
-                  showClearAll={true}
                 />
               </FormControl>
               <FormMessage />
