@@ -16,6 +16,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
   Form,
   FormControl,
   FormField,
@@ -23,11 +28,15 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { toast } from 'sonner';
+
+// Icons
+import { Loader2, ChevronsUpDown, Check } from 'lucide-react';
+
+// Custom components
+import { MediaUpload } from '@/components/media';
+import { LazyCombobox } from '@/components/ui/lazy-combobox';
+import { Selectbox } from '@/components/ui/selectbox';
 import {
   Command,
   CommandEmpty,
@@ -36,14 +45,6 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { toast } from 'sonner';
-
-// Icons
-import { Loader2, Check, ChevronsUpDown } from 'lucide-react';
-
-// Custom components
-import { MediaUpload } from '@/components/media';
-import { MultiSelect } from '@/components/ui/multi-select';
 
 // Static constants and dataset utilities
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
@@ -104,25 +105,20 @@ export default function BasicInfoForm({
 
   // Extract data from props
   const profile = initialProfile;
-  // console.log(
-  //   '%cMyProject%cline:111%cprofile',
-  //   'color:#fff;background:#ee6f57;padding:3px;border-radius:2px',
-  //   'color:#fff;background:#1f3c88;padding:3px;border-radius:2px',
-  //   'color:#fff;background:rgb(38, 157, 128);padding:3px;border-radius:2px',
-  //   profile,
-  // );
 
   const form = useForm<ProfileBasicInfoUpdateInput>({
     resolver: zodResolver(profileBasicInfoUpdateSchema),
     defaultValues: {
-      tagline: '',
-      bio: '',
-      category: '',
-      subcategory: '',
-      skills: [],
-      speciality: '',
+      tagline: profile?.tagline || '',
+      bio: profile?.bio || '',
+      category: profile?.category || '',
+      subcategory: profile?.subcategory || '',
+      skills: profile?.skills || [],
+      speciality: profile?.speciality || '',
     },
-    mode: 'onChange', // Real-time validation per FORM_PATTERNS.md
+    mode: 'onSubmit', // Only validate on submit
+    reValidateMode: 'onChange', // After submit, validate on change
+    criteriaMode: 'firstError', // Only show first error per field
   });
 
   const {
@@ -133,7 +129,7 @@ export default function BasicInfoForm({
     watch,
   } = form;
 
-  // Update form values when initial data is available
+  // Update form values when profile data changes (e.g., after save)
   useEffect(() => {
     if (profile) {
       const resetData = {
@@ -144,9 +140,9 @@ export default function BasicInfoForm({
         skills: profile.skills || [],
         speciality: profile.speciality || '',
       };
-      form.reset(resetData);
+      form.reset(resetData, { keepDefaultValues: false });
     }
-  }, [profile, form]);
+  }, [profile?.id, profile?.category, profile?.subcategory]); // Only reset when these specific values change
 
   // Handle successful form submission - refresh session and page to get updated data
   useEffect(() => {
@@ -185,7 +181,6 @@ export default function BasicInfoForm({
     });
     setValue('tagline', formattedValue, {
       shouldDirty: true,
-      shouldValidate: true,
     });
   };
 
@@ -196,27 +191,24 @@ export default function BasicInfoForm({
     });
     setValue('bio', formattedValue, {
       shouldDirty: true,
-      shouldValidate: true,
     });
   };
 
   // Selection handlers - store only ID values
-  const handleCategorySelect = (selected: any) => {
-    setValue('category', selected.id, {
+  const handleCategorySelect = (categoryId: string) => {
+    setValue('category', categoryId, {
       shouldDirty: true,
-      shouldValidate: true,
     });
-    setValue('subcategory', '', { shouldDirty: true, shouldValidate: true });
+    setValue('subcategory', '', { shouldDirty: true });
 
     // Clear skills and speciality when category changes since available skills will change
-    setValue('skills', [], { shouldDirty: true, shouldValidate: true });
-    setValue('speciality', '', { shouldDirty: true, shouldValidate: true });
+    setValue('skills', [], { shouldDirty: true });
+    setValue('speciality', '', { shouldDirty: true });
   };
 
   const handleSubcategorySelect = (selected: any) => {
     setValue('subcategory', selected.id, {
       shouldDirty: true,
-      shouldValidate: true,
     });
   };
 
@@ -303,50 +295,18 @@ export default function BasicInfoForm({
               render={({ field }) => (
                 <FormItem className='flex flex-col'>
                   <FormLabel>Κατηγορία*</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant='outline'
-                          role='combobox'
-                          className='w-full justify-between'
-                        >
-                          {field.value
-                            ? findById(proTaxonomies, field.value)?.label
-                            : 'Επιλέξτε κατηγορία...'}
-                          <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className='w-full p-0'>
-                      <Command>
-                        <CommandInput placeholder='Αναζήτηση κατηγορίας...' />
-                        <CommandList>
-                          <CommandEmpty>Δεν βρέθηκαν κατηγορίες.</CommandEmpty>
-                          <CommandGroup>
-                            {proTaxonomies.map((category) => (
-                              <CommandItem
-                                value={category.label}
-                                key={category.id}
-                                onSelect={() => {
-                                  handleCategorySelect(category);
-                                }}
-                              >
-                                <Check
-                                  className={
-                                    field.value === category.id
-                                      ? 'mr-2 h-4 w-4 opacity-100'
-                                      : 'mr-2 h-4 w-4 opacity-0'
-                                  }
-                                />
-                                {category.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                  <FormControl>
+                    <Selectbox
+                      options={proTaxonomies}
+                      value={field.value || ''}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        handleCategorySelect(value);
+                      }}
+                      placeholder='Επιλέξτε κατηγορία...'
+                      fullWidth
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -355,84 +315,34 @@ export default function BasicInfoForm({
             <FormField
               control={form.control}
               name='subcategory'
-              render={({ field }) => (
-                <FormItem className='flex flex-col'>
-                  <FormLabel>Υποκατηγορία*</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant='outline'
-                          role='combobox'
-                          className='w-full justify-between'
-                          disabled={!watchedCategory}
-                        >
-                          {field.value
-                            ? watchedCategory
-                              ? (() => {
-                                  const category = findById(
-                                    proTaxonomies,
-                                    watchedCategory,
-                                  );
-                                  const subcategories =
-                                    category?.children || [];
-                                  return findById(subcategories, field.value)
-                                    ?.label;
-                                })()
-                              : 'Επιλέξτε πρώτα κατηγορία'
-                            : 'Επιλέξτε υποκατηγορία...'}
-                          <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className='w-full p-0'>
-                      <Command>
-                        <CommandInput placeholder='Αναζήτηση υποκατηγορίας...' />
-                        <CommandList>
-                          <CommandEmpty>
-                            Δεν βρέθηκαν υποκατηγορίες.
-                          </CommandEmpty>
-                          <CommandGroup>
-                            {watchedCategory &&
-                              (() => {
-                                const category = findById(
-                                  proTaxonomies,
-                                  watchedCategory,
-                                );
-                                const subcategories = category?.children || [];
-                                return initialUser?.role
-                                  ? filterByField(
-                                      subcategories,
-                                      'type',
-                                      initialUser.role,
-                                    )
-                                  : subcategories;
-                              })().map((subcategory) => (
-                                <CommandItem
-                                  value={subcategory.label}
-                                  key={subcategory.id}
-                                  onSelect={() => {
-                                    handleSubcategorySelect(subcategory);
-                                  }}
-                                >
-                                  <Check
-                                    className={
-                                      field.value === subcategory.id
-                                        ? 'mr-2 h-4 w-4 opacity-100'
-                                        : 'mr-2 h-4 w-4 opacity-0'
-                                    }
-                                  />
-                                  {subcategory.label}
-                                </CommandItem>
-                              ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const category = findById(proTaxonomies, watchedCategory);
+                const subcategories = category?.children || [];
+                const filteredSubcategories = initialUser?.role
+                  ? filterByField(subcategories, 'type', initialUser.role)
+                  : subcategories;
+
+                return (
+                  <FormItem className='flex flex-col'>
+                    <FormLabel>Υποκατηγορία*</FormLabel>
+                    <FormControl>
+                      <LazyCombobox
+                        options={filteredSubcategories}
+                        value={field.value || ''}
+                        onSelect={(selected) => {
+                          field.onChange(selected.id);
+                          handleSubcategorySelect(selected);
+                        }}
+                        placeholder='Επιλέξτε υποκατηγορία...'
+                        searchPlaceholder='Αναζήτηση υποκατηγορίας...'
+                        emptyMessage='Δεν βρέθηκαν υποκατηγορίες.'
+                        disabled={!watchedCategory}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
           </div>
         </div>
@@ -483,34 +393,33 @@ export default function BasicInfoForm({
               <FormControl>
                 <div className='space-y-2'>
                   {watchedCategory ? (
-                    <MultiSelect
+                    <LazyCombobox
+                      multiple
                       options={filterSkillsByCategory(
                         skillsDataset,
                         watchedCategory,
-                      ).map((skill) => ({
-                        value: skill.id,
-                        label: skill.label,
-                      }))}
-                      selected={field.value || []}
-                      onChange={(selected) => {
-                        setValue('skills', selected, {
+                      )}
+                      values={field.value || []}
+                      onMultiSelect={(selectedOptions) => {
+                        const selectedIds = selectedOptions.map((opt) => opt.id);
+                        setValue('skills', selectedIds, {
                           shouldDirty: true,
-                          shouldValidate: true,
                         });
 
                         // Clear speciality if it's not in the selected skills anymore
                         const currentSpeciality = getValues('speciality');
                         if (
                           currentSpeciality &&
-                          !selected.includes(currentSpeciality)
+                          !selectedIds.includes(currentSpeciality)
                         ) {
                           setValue('speciality', '', {
                             shouldDirty: true,
-                            shouldValidate: true,
                           });
                         }
                       }}
+                      onSelect={() => {}} // Required but not used in multi mode
                       placeholder='Επιλέξτε δεξιότητες...'
+                      searchPlaceholder='Αναζήτηση δεξιοτήτων...'
                       maxItems={10}
                     />
                   ) : (
@@ -581,7 +490,6 @@ export default function BasicInfoForm({
                                   onSelect={() => {
                                     setValue('speciality', skill!.id, {
                                       shouldDirty: true,
-                                      shouldValidate: true,
                                     });
                                   }}
                                 >
@@ -612,6 +520,11 @@ export default function BasicInfoForm({
           <div className='max-w-xl overflow-scroll p-4 bg-gray-100 rounded text-xs space-y-2'>
             <div>isValid: {isValid.toString()}</div>
             <div>isDirty: {isDirty.toString()}</div>
+            <div>isSubmitted: {form.formState.isSubmitted.toString()}</div>
+            <div>Category Value: {watch('category') || 'empty'}</div>
+            <div>Subcategory Value: {watch('subcategory') || 'empty'}</div>
+            <div>Category Touched: {form.formState.touchedFields.category?.toString() || 'false'}</div>
+            <div>Subcategory Touched: {form.formState.touchedFields.subcategory?.toString() || 'false'}</div>
             <div>Username: {initialUser?.username || 'undefined'}</div>
             <div>User ID: {initialUser?.id || 'undefined'}</div>
             <div>Errors: {JSON.stringify(errors, null, 2)}</div>

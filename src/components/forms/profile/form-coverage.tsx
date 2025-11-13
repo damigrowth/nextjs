@@ -21,7 +21,6 @@ import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { toast } from 'sonner';
 
 // Custom components
-import { MultiSelect } from '@/components/ui/multi-select';
 import { FormButton } from '../../shared';
 
 // Static constants and dataset utilities
@@ -445,55 +444,54 @@ export default function CoverageForm({
                   <FormItem>
                     <FormLabel className='text-sm font-medium text-gray-700'>
                       Νομοί
-                      {field.value?.length > 0
-                        ? ` (${field.value.length})`
-                        : ''}
                     </FormLabel>
                     <FormControl>
-                      <div className='space-y-2'>
-                        <MultiSelect
-                          className='bg-white'
-                          options={locationOptions.map((county) => ({
-                            value: county.id,
-                            label: county.name,
-                          }))}
-                          selected={field.value || []}
-                          onChange={(selected) => {
-                            // When counties change, filter areas to keep only those from selected counties
-                            const currentCoverage = getValues('coverage');
-                            const currentAreas = currentCoverage?.areas || [];
+                      <LazyCombobox
+                        multiple
+                        className='bg-white'
+                        options={locationOptions.map((county) => ({
+                          id: county.id,
+                          label: county.name,
+                        }))}
+                        values={field.value || []}
+                        onMultiSelect={(selectedOptions) => {
+                          const selected = selectedOptions.map((opt) => opt.id);
+                          // When counties change, filter areas to keep only those from selected counties
+                          const currentCoverage = getValues('coverage');
+                          const currentAreas = currentCoverage?.areas || [];
 
-                            // Get all area IDs from selected counties
-                            const validAreaIds = selected.flatMap(
-                              (countyId: string) => {
-                                const county = locationOptions.find(
-                                  (c) => c.id === countyId,
-                                );
-                                return (
-                                  county?.children?.map(
-                                    (area: any) => area.id,
-                                  ) || []
-                                );
-                              },
-                            );
+                          // Get all area IDs from selected counties
+                          const validAreaIds = selected.flatMap(
+                            (countyId: string) => {
+                              const county = locationOptions.find(
+                                (c) => c.id === countyId,
+                              );
+                              return (
+                                county?.children?.map(
+                                  (area: any) => area.id,
+                                ) || []
+                              );
+                            },
+                          );
 
-                            // Filter areas to keep only those from selected counties
-                            const filteredAreas = currentAreas.filter(
-                              (areaId: string) => validAreaIds.includes(areaId),
-                            );
+                          // Filter areas to keep only those from selected counties
+                          const filteredAreas = currentAreas.filter(
+                            (areaId: string) => validAreaIds.includes(areaId),
+                          );
 
-                            setValue('coverage.counties', selected, {
-                              shouldDirty: true,
-                              shouldValidate: true,
-                            });
-                            setValue('coverage.areas', filteredAreas, {
-                              shouldDirty: true,
-                              shouldValidate: true,
-                            });
-                          }}
-                          placeholder='Επιλέξτε νομούς...'
-                        />
-                      </div>
+                          setValue('coverage.counties', selected, {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          });
+                          setValue('coverage.areas', filteredAreas, {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          });
+                        }}
+                        onSelect={() => {}}
+                        placeholder='Επιλέξτε νομούς...'
+                        searchPlaceholder='Αναζήτηση νομών...'
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -508,14 +506,12 @@ export default function CoverageForm({
                   <FormItem>
                     <FormLabel className='text-sm font-medium text-gray-700'>
                       Περιοχές
-                      {field.value?.length > 0
-                        ? ` (${field.value.length})`
-                        : ''}
                     </FormLabel>
                     <FormControl>
                       <div className='space-y-2'>
                         {watchedCoverage?.counties?.length > 0 ? (
-                          <MultiSelect
+                          <LazyCombobox
+                            multiple
                             className='bg-white'
                             options={watchedCoverage.counties.flatMap(
                               (selectedCountyId: string) => {
@@ -524,22 +520,25 @@ export default function CoverageForm({
                                 );
                                 return (
                                   county?.children?.map((area: any) => ({
-                                    value: area.id,
+                                    id: area.id,
                                     label: area.name,
                                     county: county.name,
                                   })) || []
                                 );
                               },
                             )}
-                            selected={field.value || []}
-                            onChange={(selected) => {
-                              setValue('coverage.areas', selected, {
+                            values={field.value || []}
+                            onMultiSelect={(selectedOptions) => {
+                              const selectedIds = selectedOptions.map((opt) => opt.id);
+                              setValue('coverage.areas', selectedIds, {
                                 shouldDirty: true,
                                 shouldValidate: true,
                               });
                             }}
+                            onSelect={() => {}}
                             placeholder='Επιλέξτε περιοχές...'
-                            renderLabel={(option) => (
+                            searchPlaceholder='Αναζήτηση περιοχών...'
+                            formatLabel={(option) => (
                               <>
                                 {option.label}{' '}
                                 <span className='text-gray-500'>

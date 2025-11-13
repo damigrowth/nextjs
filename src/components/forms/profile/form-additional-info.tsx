@@ -17,36 +17,20 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Selectbox } from '@/components/ui/selectbox';
 import { toast } from 'sonner';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
 
 // Custom components
-import { MultiSelect } from '@/components/ui/multi-select';
+import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { Currency } from '@/components/ui/currency';
 import YearPicker from '@/components/ui/year-picker';
 
 // Icons (lucide-react only)
-import { Loader2, Check, ChevronsUpDown } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 // Auth and utilities
-
 import { formatInput } from '@/lib/utils/validation/formats';
 import { populateFormData } from '@/lib/utils/form';
-
-// Dataset utilities
-import { findById } from '@/lib/utils/datasets';
 
 // Dataset options
 import {
@@ -202,7 +186,7 @@ export default function AdditionalInfoForm({
                     onValueChange={(year) => {
                       setValue('commencement', year, {
                         shouldDirty: true,
-                        shouldValidate: true,
+                        // shouldValidate: true,
                       });
                     }}
                     placeholder='π.χ. 2020'
@@ -232,7 +216,7 @@ export default function AdditionalInfoForm({
                     onValueChange={(value) => {
                       setValue('rate', value, {
                         shouldDirty: true,
-                        shouldValidate: true,
+                        // shouldValidate: true,
                       });
                     }}
                     // className='w-1/2' breaks the layout
@@ -270,7 +254,7 @@ export default function AdditionalInfoForm({
                               : currentValues.filter((id) => id !== method.id);
                             setValue('contactMethods', newValues, {
                               shouldDirty: true,
-                              shouldValidate: true,
+                              // shouldValidate: true,
                             });
                           }}
                         />
@@ -313,7 +297,7 @@ export default function AdditionalInfoForm({
                               : currentValues.filter((id) => id !== method.id);
                             setValue('paymentMethods', newValues, {
                               shouldDirty: true,
-                              shouldValidate: true,
+                              // shouldValidate: true,
                             });
                           }}
                         />
@@ -356,7 +340,7 @@ export default function AdditionalInfoForm({
                               : currentValues.filter((id) => id !== method.id);
                             setValue('settlementMethods', newValues, {
                               shouldDirty: true,
-                              shouldValidate: true,
+                              // shouldValidate: true,
                             });
                           }}
                         />
@@ -385,55 +369,20 @@ export default function AdditionalInfoForm({
             render={({ field }) => (
               <FormItem className='space-y-2 flex flex-col'>
                 <FormLabel>Ελάχιστος Προϋπολογισμός Έργων</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant='outline'
-                        role='combobox'
-                        className='w-full justify-between'
-                      >
-                        {field.value
-                          ? findById(budgetOptions, field.value)?.label
-                          : 'Επιλέξτε προϋπολογισμό...'}
-                        <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-full p-0'>
-                    <Command>
-                      <CommandInput placeholder='Αναζήτηση προϋπολογισμού...' />
-                      <CommandList>
-                        <CommandEmpty>
-                          Δεν βρέθηκαν προϋπολογισμοί.
-                        </CommandEmpty>
-                        <CommandGroup>
-                          {budgetOptions.map((budget) => (
-                            <CommandItem
-                              value={budget.label}
-                              key={budget.id}
-                              onSelect={() => {
-                                setValue('budget', budget.id, {
-                                  shouldDirty: true,
-                                  shouldValidate: true,
-                                });
-                              }}
-                            >
-                              <Check
-                                className={
-                                  field.value === budget.id
-                                    ? 'mr-2 h-4 w-4 opacity-100'
-                                    : 'mr-2 h-4 w-4 opacity-0'
-                                }
-                              />
-                              {budget.label}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <FormControl>
+                  <Selectbox
+                    options={budgetOptions}
+                    value={field.value}
+                    onValueChange={(value) => {
+                      setValue('budget', value, {
+                        shouldDirty: true,
+                        // shouldValidate: true,
+                      });
+                    }}
+                    placeholder='Επιλέξτε προϋπολογισμό...'
+                    fullWidth
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -447,26 +396,23 @@ export default function AdditionalInfoForm({
               <FormItem className='space-y-0 flex flex-col'>
                 <FormLabel>Κλάδοι Δραστηριότητας</FormLabel>
                 <FormControl>
-                  <MultiSelect
-                    options={industriesDataset.map((industry) => ({
-                      value: industry.id,
-                      label: industry.label,
-                    }))}
-                    selected={field.value || []}
-                    onChange={(selected) => {
-                      setValue('industries', selected, {
+                  <LazyCombobox
+                    multiple
+                    options={industriesDataset}
+                    values={field.value || []}
+                    onMultiSelect={(selectedOptions) => {
+                      const selectedIds = selectedOptions.map((opt) => opt.id);
+                      setValue('industries', selectedIds, {
                         shouldDirty: true,
-                        shouldValidate: true,
+                        // shouldValidate: true,
                       });
                     }}
+                    onSelect={() => {}} // Required but not used in multi mode
                     placeholder='Επιλέξτε κλάδους...'
+                    searchPlaceholder='Αναζήτηση κλάδων...'
                     maxItems={10}
-                    className='h-auto space-y-2'
                   />
                 </FormControl>
-                <div className='mt-0 text-xs text-gray-500 self-end'>
-                  {field.value?.length || 0}/10
-                </div>
                 <FormMessage />
               </FormItem>
             )}
@@ -493,7 +439,7 @@ export default function AdditionalInfoForm({
                     });
                     setValue('terms', formatted, {
                       shouldDirty: true,
-                      shouldValidate: true,
+                      // shouldValidate: true,
                     });
                   }}
                 />
