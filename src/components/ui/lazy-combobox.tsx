@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Check, ChevronsUpDown, Loader2, ChevronRight } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2, ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +31,12 @@ export interface LazyComboboxProps {
   value?: string;
   onSelect: (option: LazyComboboxOption) => void;
 
+  // Multi-select mode
+  multiple?: boolean;
+  values?: string[];
+  onMultiSelect?: (options: LazyComboboxOption[]) => void;
+  maxItems?: number;
+
   // Display
   placeholder?: string;
   searchPlaceholder?: string;
@@ -39,7 +45,9 @@ export interface LazyComboboxProps {
   getButtonLabel?: (option: LazyComboboxOption | undefined) => string;
 
   // Hierarchical Badge Display (optional)
-  renderButtonContent?: (option: LazyComboboxOption | undefined) => React.ReactNode;
+  renderButtonContent?: (
+    option: LazyComboboxOption | undefined,
+  ) => React.ReactNode;
 
   // Lazy Loading
   initialLimit?: number;
@@ -60,6 +68,10 @@ export function LazyCombobox({
   options,
   value,
   onSelect,
+  multiple = false,
+  values = [],
+  onMultiSelect,
+  maxItems,
   placeholder = 'Επιλογή...',
   searchPlaceholder = 'Αναζήτηση...',
   emptyMessage = 'Δεν βρέθηκαν αποτελέσματα.',
@@ -95,7 +107,7 @@ export function LazyCombobox({
     // Filter based on search
     const filtered = isSearching
       ? options.filter((option) =>
-          option.label.toLowerCase().includes(searchQuery.toLowerCase())
+          option.label.toLowerCase().includes(searchQuery.toLowerCase()),
         )
       : options;
 
@@ -123,26 +135,78 @@ export function LazyCombobox({
 
       if (scrolledToBottom && displayLimit < options.length) {
         setDisplayLimit((prev) =>
-          Math.min(prev + loadMoreIncrement, options.length)
+          Math.min(prev + loadMoreIncrement, options.length),
         );
       }
     },
-    [isSearching, displayLimit, options.length, loadMoreThreshold, loadMoreIncrement]
+    [
+      isSearching,
+      displayLimit,
+      options.length,
+      loadMoreThreshold,
+      loadMoreIncrement,
+    ],
   );
 
-  // Get selected option
+  // Get selected option(s)
   const selectedOption = React.useMemo(
     () => options.find((option) => option.id === value),
-    [options, value]
+    [options, value],
+  );
+
+  const selectedOptions = React.useMemo(
+    () => options.filter((option) => values.includes(option.id)),
+    [options, values],
+  );
+
+  // Multi-select handlers
+  const handleMultiSelect = React.useCallback(
+    (option: LazyComboboxOption) => {
+      if (!onMultiSelect) return;
+
+      const isSelected = values.includes(option.id);
+      let newValues: string[];
+
+      if (isSelected) {
+        // Remove
+        newValues = values.filter((id) => id !== option.id);
+      } else {
+        // Add (check max limit)
+        if (maxItems && values.length >= maxItems) {
+          return; // Don't add if max reached
+        }
+        newValues = [...values, option.id];
+      }
+
+      const newOptions = options.filter((opt) => newValues.includes(opt.id));
+      onMultiSelect(newOptions);
+    },
+    [values, options, onMultiSelect, maxItems],
+  );
+
+  const handleRemoveBadge = React.useCallback(
+    (optionId: string) => {
+      if (!onMultiSelect) return;
+      const newValues = values.filter((id) => id !== optionId);
+      const newOptions = options.filter((opt) => newValues.includes(opt.id));
+      onMultiSelect(newOptions);
+    },
+    [values, options, onMultiSelect],
   );
 
   // Button label
   const buttonLabel = React.useMemo(() => {
+    if (multiple) {
+      if (selectedOptions.length === 0) return placeholder;
+      if (selectedOptions.length === 1) return selectedOptions[0].label;
+      return `${selectedOptions.length} επιλεγμένα`;
+    }
+
     if (getButtonLabel) {
       return getButtonLabel(selectedOption);
     }
     return selectedOption?.label || placeholder;
-  }, [selectedOption, getButtonLabel, placeholder]);
+  }, [multiple, selectedOptions, selectedOption, getButtonLabel, placeholder]);
 
   // Option label formatter
   const renderLabel = React.useCallback(
@@ -152,7 +216,7 @@ export function LazyCombobox({
       }
       return option.label;
     },
-    [formatLabel]
+    [formatLabel],
   );
 
   return (
@@ -164,15 +228,34 @@ export function LazyCombobox({
           aria-expanded={open}
           className={cn(
             'w-full justify-between',
-            !value && 'text-muted-foreground',
-            renderButtonContent && 'h-auto py-2',
-            className
+            !value && !multiple && 'text-muted-foreground',
+            values.length === 0 && multiple && 'text-muted-foreground',
+            (renderButtonContent || (multiple && selectedOptions.length > 0)) &&
+              'h-auto py-2',
+            className,
           )}
           disabled={disabled}
         >
           {renderButtonContent ? (
             <div className='flex items-center flex-1 min-w-0'>
               {renderButtonContent(selectedOption)}
+            </div>
+          ) : multiple && selectedOptions.length > 0 ? (
+            <div className='flex flex-wrap gap-1 flex-1'>
+              {selectedOptions.map((option) => (
+                <Badge
+                  key={option.id}
+                  variant='default'
+                  className='mr-1'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveBadge(option.id);
+                  }}
+                >
+                  {option.label}
+                  <X className='ml-1 h-3 w-3' />
+                </Badge>
+              ))}
             </div>
           ) : (
             buttonLabel
@@ -190,24 +273,34 @@ export function LazyCombobox({
           <CommandList ref={scrollRef} onScroll={handleScroll}>
             <CommandEmpty>{emptyMessage}</CommandEmpty>
             <CommandGroup>
-              {displayedOptions.map((option) => (
-                <CommandItem
-                  key={option.id}
-                  value={option.id}
-                  onSelect={() => {
-                    onSelect(option);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      'mr-2 h-4 w-4',
-                      value === option.id ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
-                  {renderLabel(option)}
-                </CommandItem>
-              ))}
+              {displayedOptions.map((option) => {
+                const isSelected = multiple
+                  ? values.includes(option.id)
+                  : value === option.id;
+
+                return (
+                  <CommandItem
+                    key={option.id}
+                    value={option.id}
+                    onSelect={() => {
+                      if (multiple) {
+                        handleMultiSelect(option);
+                      } else {
+                        onSelect(option);
+                        setOpen(false);
+                      }
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        isSelected ? 'opacity-100' : 'opacity-0',
+                      )}
+                    />
+                    {renderLabel(option)}
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
 
             {/* Progress Indicator */}
@@ -234,6 +327,29 @@ export function LazyCombobox({
                 {totalFiltered > searchLimit
                   ? `Εμφάνιση ${searchLimit} από ${totalFiltered} αποτελέσματα`
                   : `${totalFiltered} αποτελέσματα`}
+              </div>
+            )}
+
+            {/* Multi-select Footer */}
+            {multiple && (
+              <div className='flex items-center justify-between p-2 text-xs border-t'>
+                <span className='text-muted-foreground'>
+                  {values.length} επιλεγμένα
+                  {maxItems && ` (μέγιστο: ${maxItems})`}
+                </span>
+                {values.length > 0 && (
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    className='h-6 px-2 text-xs'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMultiSelect?.([]);
+                    }}
+                  >
+                    Καθαρισμός
+                  </Button>
+                )}
               </div>
             )}
           </CommandList>
