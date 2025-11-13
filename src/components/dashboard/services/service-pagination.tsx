@@ -10,13 +10,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Selectbox } from '@/components/ui/selectbox';
 
 interface ServicePaginationProps {
   currentPage: number;
@@ -45,21 +39,23 @@ export default function ServicePagination({
     router.push(`/dashboard/services?${params.toString()}`);
   };
 
+  const limitOptions = [
+    { id: '12', label: '12 ανά σελίδα' },
+    { id: '24', label: '24 ανά σελίδα' },
+    { id: '48', label: '48 ανά σελίδα' },
+  ];
+
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
       {/* Page Size Selector */}
       <div className="flex items-center gap-2">
         <span className="text-sm text-gray-600">Εμφάνιση:</span>
-        <Select value={currentLimit.toString()} onValueChange={updateLimit}>
-          <SelectTrigger className="w-[120px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="12">12 ανά σελίδα</SelectItem>
-            <SelectItem value="24">24 ανά σελίδα</SelectItem>
-            <SelectItem value="48">48 ανά σελίδα</SelectItem>
-          </SelectContent>
-        </Select>
+        <Selectbox
+          options={limitOptions}
+          value={currentLimit.toString()}
+          onValueChange={updateLimit}
+          className="w-[120px]"
+        />
       </div>
 
       {/* Pagination Controls */}

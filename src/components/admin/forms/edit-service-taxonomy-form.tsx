@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { updateServiceTaxonomyAction } from '@/actions/admin/services';
 import { TaxonomySelector } from '@/components/shared';
-import { MultiSelect } from '@/components/ui/multi-select';
+import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { findById } from '@/lib/utils/datasets';
 import { useMemo } from 'react';
@@ -217,23 +217,27 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
           name='tags'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                Tags {field.value?.length > 0 ? ` (${field.value.length}/10)` : ''}
-              </FormLabel>
+              <FormLabel>Tags</FormLabel>
               <FormControl>
-                <MultiSelect
-                  options={availableTags}
-                  selected={field.value || []}
-                  onChange={(selected) => {
-                    form.setValue('tags', selected, {
+                <LazyCombobox
+                  multiple
+                  options={availableTags.map(tag => ({
+                    id: tag.value,
+                    label: tag.label,
+                  }))}
+                  values={field.value || []}
+                  onMultiSelect={(selectedOptions) => {
+                    const selectedIds = selectedOptions.map((opt) => opt.id);
+                    form.setValue('tags', selectedIds, {
                       shouldDirty: true,
                       shouldValidate: true,
                     });
                   }}
+                  onSelect={() => {}}
                   placeholder='Select tags...'
+                  searchPlaceholder='Search tags...'
                   maxItems={10}
                   disabled={isPending}
-                  enablePortal={true}
                 />
               </FormControl>
               <FormMessage />

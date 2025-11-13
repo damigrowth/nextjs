@@ -10,13 +10,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Selectbox } from '@/components/ui/selectbox';
 
 interface AdminTablePaginationProps {
   currentPage: number;
@@ -49,23 +43,23 @@ export default function AdminTablePagination({
     router.push(`${basePath}?${params.toString()}`);
   };
 
+  const limitOptions = pageSizeOptions.map((size) => ({
+    id: size.toString(),
+    label: `${size} per page`,
+  }));
+
   return (
     <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
       {/* Page Size Selector */}
       <div className='flex items-center gap-2'>
         <span className='text-sm text-gray-600'>Show:</span>
-        <Select value={currentLimit.toString()} onValueChange={updateLimit}>
-          <SelectTrigger className='w-[140px]'>
-            <SelectValue placeholder={`${currentLimit} per page`} />
-          </SelectTrigger>
-          <SelectContent>
-            {pageSizeOptions.map((size) => (
-              <SelectItem key={size} value={size.toString()}>
-                {size} per page
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Selectbox
+          options={limitOptions}
+          value={currentLimit.toString()}
+          onValueChange={updateLimit}
+          placeholder={`${currentLimit} per page`}
+          className='w-[140px]'
+        />
       </div>
 
       {/* Pagination Controls */}
