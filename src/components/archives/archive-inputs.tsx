@@ -1,23 +1,12 @@
 'use client';
 
-import { Check, ChevronsUpDown, Search, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Search, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
+import { Combobox } from '@/components/ui/combobox';
+import { LazyCombobox } from '@/components/ui/lazy-combobox';
+import { Selectbox } from '@/components/ui/selectbox';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { archiveSortOptions } from '@/constants/datasets/options';
 import { cn } from '@/lib/utils';
@@ -113,75 +102,28 @@ export function CountiesDropdown({
   className,
   fullWidth = true,
 }: CountiesDropdownProps) {
-  const handleValueChange = (selectedValue: string) => {
-    onValueChange(selectedValue === 'all' ? '' : selectedValue);
-  };
-
-  // Find county by slug or name for backward compatibility
-  const selectedCounty =
-    value && value !== 'all'
-      ? counties.find((c) => c.slug === value || c.name === value)
-      : null;
-
-  const displayValue = selectedCounty?.name || allLabel;
+  // Add "all" option to the beginning
+  const optionsWithAll = [
+    { id: 'all', label: allLabel, name: allLabel },
+    ...counties.map((county) => ({
+      id: county.slug || county.name,
+      label: county.name,
+      name: county.name,
+    })),
+  ];
 
   return (
-    <div className={`${fullWidth ? 'min-w-48' : ''} ${className || ''}`}>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            role='combobox'
-            className={`${fullWidth ? 'w-full' : ''} justify-between`}
-          >
-            {displayValue}
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-full p-0'>
-          <Command>
-            <CommandInput placeholder={searchPlaceholder} />
-            <CommandList>
-              <CommandEmpty>{emptyMessage}</CommandEmpty>
-              <CommandGroup>
-                <CommandItem
-                  key='all'
-                  onSelect={() => handleValueChange('all')}
-                >
-                  <Check
-                    className={
-                      !value || value === '' || value === 'all'
-                        ? 'mr-2 h-4 w-4 opacity-100'
-                        : 'mr-2 h-4 w-4 opacity-0'
-                    }
-                  />
-                  {allLabel}
-                </CommandItem>
-                {counties.map((county) => (
-                  <CommandItem
-                    key={county.id}
-                    value={county.name}
-                    onSelect={() =>
-                      handleValueChange(county.slug || county.name)
-                    }
-                  >
-                    <Check
-                      className={
-                        value &&
-                        (value === county.slug || value === county.name)
-                          ? 'mr-2 h-4 w-4 opacity-100'
-                          : 'mr-2 h-4 w-4 opacity-0'
-                      }
-                    />
-                    {county.name}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
+    <Combobox
+      options={optionsWithAll}
+      value={value || 'all'}
+      onSelect={(option) =>
+        onValueChange(option.id === 'all' ? '' : option.id)
+      }
+      placeholder={placeholder}
+      searchPlaceholder={searchPlaceholder}
+      emptyMessage={emptyMessage}
+      className={cn(fullWidth && 'w-full min-w-48', className)}
+    />
   );
 }
 
@@ -189,8 +131,6 @@ interface SortDropdownProps {
   value: string | undefined;
   onValueChange: (value: string) => void;
   placeholder?: string;
-  searchPlaceholder?: string;
-  emptyMessage?: string;
   className?: string;
   fullWidth?: boolean;
 }
@@ -199,59 +139,18 @@ export function SortDropdown({
   value,
   onValueChange,
   placeholder = 'Ταξινόμηση',
-  searchPlaceholder = 'Αναζήτηση ταξινόμησης...',
-  emptyMessage = 'Δεν βρέθηκαν επιλογές.',
   className,
   fullWidth = true,
 }: SortDropdownProps) {
-  const displayValue =
-    value && value !== 'default'
-      ? archiveSortOptions.find((option) => option.id === value)?.label ||
-        placeholder
-      : archiveSortOptions.find((option) => option.id === 'default')?.label ||
-        placeholder;
-
   return (
-    <div className={`${fullWidth ? 'min-w-48' : ''} ${className || ''}`}>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            role='combobox'
-            className={`${fullWidth ? 'w-full' : ''} justify-between`}
-          >
-            {displayValue}
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-full p-0'>
-          <Command>
-            {searchPlaceholder && <CommandInput placeholder={searchPlaceholder} />}
-            <CommandList>
-              <CommandEmpty>{emptyMessage}</CommandEmpty>
-              <CommandGroup>
-                {archiveSortOptions.map((option) => (
-                  <CommandItem
-                    key={option.id}
-                    value={option.label}
-                    onSelect={() => onValueChange(option.id)}
-                  >
-                    <Check
-                      className={
-                        (value || 'default') === option.id
-                          ? 'mr-2 h-4 w-4 opacity-100'
-                          : 'mr-2 h-4 w-4 opacity-0'
-                      }
-                    />
-                    {option.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
+    <Selectbox
+      options={archiveSortOptions}
+      value={value || 'default'}
+      onValueChange={onValueChange}
+      placeholder={placeholder}
+      className={cn(fullWidth && 'min-w-48', className)}
+      fullWidth={fullWidth}
+    />
   );
 }
 
@@ -278,72 +177,28 @@ export function CategoryDropdown({
   className,
   fullWidth = true,
 }: CategoryDropdownProps) {
-  const handleValueChange = (selectedValue: string) => {
-    onValueChange(selectedValue === 'all' ? '' : selectedValue);
-  };
-
-  const selectedCategory =
-    value && value !== 'all'
-      ? categories.find((c) => c.id === value || c.slug === value)
-      : null;
-
-  const displayValue =
-    selectedCategory?.plural || selectedCategory?.label || allLabel;
+  // Add "all" option to the beginning and ensure label is always present
+  const optionsWithAll = [
+    { id: 'all', label: allLabel, plural: allLabel },
+    ...categories.map((cat) => ({
+      ...cat,
+      label: cat.label || cat.name || cat.id,
+    })),
+  ];
 
   return (
-    <div className={`${fullWidth ? 'min-w-48' : ''} ${className || ''}`}>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            role='combobox'
-            className={`${fullWidth ? 'w-full' : ''} justify-between`}
-          >
-            {displayValue}
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-full p-0'>
-          <Command>
-            <CommandInput placeholder={searchPlaceholder} />
-            <CommandList>
-              <CommandEmpty>{emptyMessage}</CommandEmpty>
-              <CommandGroup>
-                <CommandItem
-                  key='all'
-                  onSelect={() => handleValueChange('all')}
-                >
-                  <Check
-                    className={
-                      !value || value === '' || value === 'all'
-                        ? 'mr-2 h-4 w-4 opacity-100'
-                        : 'mr-2 h-4 w-4 opacity-0'
-                    }
-                  />
-                  {allLabel}
-                </CommandItem>
-                {categories.map((category) => (
-                  <CommandItem
-                    key={category.id}
-                    value={category.label}
-                    onSelect={() => handleValueChange(category.id)}
-                  >
-                    <Check
-                      className={
-                        value && value === category.id
-                          ? 'mr-2 h-4 w-4 opacity-100'
-                          : 'mr-2 h-4 w-4 opacity-0'
-                      }
-                    />
-                    {category.plural || category.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
+    <Combobox
+      options={optionsWithAll}
+      value={value || 'all'}
+      onSelect={(option) =>
+        onValueChange(option.id === 'all' ? '' : option.id)
+      }
+      placeholder={placeholder}
+      searchPlaceholder={searchPlaceholder}
+      emptyMessage={emptyMessage}
+      formatLabel={(option) => option.plural || option.label}
+      className={cn(fullWidth && 'w-full min-w-48', className)}
+    />
   );
 }
 
@@ -372,73 +227,32 @@ export function SubcategoryDropdown({
   className,
   fullWidth = true,
 }: SubcategoryDropdownProps) {
-  const handleValueChange = (selectedValue: string) => {
-    onValueChange(selectedValue === 'all' ? '' : selectedValue);
-  };
-
-  const selectedSubcategory =
-    value && value !== 'all'
-      ? subcategories.find((c) => c.id === value || c.slug === value)
-      : null;
-
-  const displayValue =
-    selectedSubcategory?.plural || selectedSubcategory?.label || allLabel;
+  // Add "all" option to the beginning and ensure label is always present
+  const optionsWithAll = [
+    { id: 'all', label: allLabel, plural: allLabel },
+    ...subcategories.map((subcat) => ({
+      ...subcat,
+      label: subcat.label || subcat.name || subcat.id,
+    })),
+  ];
 
   return (
-    <div className={`${fullWidth ? 'min-w-48' : ''} ${className || ''}`}>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            role='combobox'
-            disabled={disabled}
-            className={`${fullWidth ? 'w-full' : ''} justify-between`}
-          >
-            {displayValue}
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-full p-0'>
-          <Command>
-            <CommandInput placeholder={searchPlaceholder} />
-            <CommandList>
-              <CommandEmpty>{emptyMessage}</CommandEmpty>
-              <CommandGroup>
-                <CommandItem
-                  key='all'
-                  onSelect={() => handleValueChange('all')}
-                >
-                  <Check
-                    className={
-                      !value || value === '' || value === 'all'
-                        ? 'mr-2 h-4 w-4 opacity-100'
-                        : 'mr-2 h-4 w-4 opacity-0'
-                    }
-                  />
-                  {allLabel}
-                </CommandItem>
-                {subcategories.map((subcategory) => (
-                  <CommandItem
-                    key={subcategory.id}
-                    value={subcategory.label}
-                    onSelect={() => handleValueChange(subcategory.id)}
-                  >
-                    <Check
-                      className={
-                        value && value === subcategory.id
-                          ? 'mr-2 h-4 w-4 opacity-100'
-                          : 'mr-2 h-4 w-4 opacity-0'
-                      }
-                    />
-                    {subcategory.plural || subcategory.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
+    <LazyCombobox
+      options={optionsWithAll}
+      value={value || 'all'}
+      onSelect={(option) =>
+        onValueChange(option.id === 'all' ? '' : option.id)
+      }
+      placeholder={placeholder}
+      searchPlaceholder={searchPlaceholder}
+      emptyMessage={emptyMessage}
+      formatLabel={(option) => option.plural || option.label}
+      disabled={disabled}
+      initialLimit={20}
+      loadMoreIncrement={20}
+      searchLimit={100}
+      className={cn(fullWidth && 'w-full min-w-48', className)}
+    />
   );
 }
 
@@ -467,72 +281,31 @@ export function SubdivisionDropdown({
   className,
   fullWidth = true,
 }: SubdivisionDropdownProps) {
-  const handleValueChange = (selectedValue: string) => {
-    onValueChange(selectedValue === 'all' ? '' : selectedValue);
-  };
-
-  const selectedSubdivision =
-    value && value !== 'all'
-      ? subdivisions.find((c) => c.id === value || c.slug === value)
-      : null;
-
-  const displayValue = selectedSubdivision?.label || allLabel;
+  // Add "all" option to the beginning and ensure label is always present
+  const optionsWithAll = [
+    { id: 'all', label: allLabel },
+    ...subdivisions.map((subdiv) => ({
+      ...subdiv,
+      label: subdiv.label || subdiv.name || subdiv.id,
+    })),
+  ];
 
   return (
-    <div className={`${fullWidth ? 'min-w-48' : ''} ${className || ''}`}>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            role='combobox'
-            disabled={disabled}
-            className={`${fullWidth ? 'w-full' : ''} justify-between`}
-          >
-            {displayValue}
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-full p-0'>
-          <Command>
-            <CommandInput placeholder={searchPlaceholder} />
-            <CommandList>
-              <CommandEmpty>{emptyMessage}</CommandEmpty>
-              <CommandGroup>
-                <CommandItem
-                  key='all'
-                  onSelect={() => handleValueChange('all')}
-                >
-                  <Check
-                    className={
-                      !value || value === '' || value === 'all'
-                        ? 'mr-2 h-4 w-4 opacity-100'
-                        : 'mr-2 h-4 w-4 opacity-0'
-                    }
-                  />
-                  {allLabel}
-                </CommandItem>
-                {subdivisions.map((subdivision) => (
-                  <CommandItem
-                    key={subdivision.id}
-                    value={subdivision.label}
-                    onSelect={() => handleValueChange(subdivision.id)}
-                  >
-                    <Check
-                      className={
-                        value && value === subdivision.id
-                          ? 'mr-2 h-4 w-4 opacity-100'
-                          : 'mr-2 h-4 w-4 opacity-0'
-                      }
-                    />
-                    {subdivision.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
+    <LazyCombobox
+      options={optionsWithAll}
+      value={value || 'all'}
+      onSelect={(option) =>
+        onValueChange(option.id === 'all' ? '' : option.id)
+      }
+      placeholder={placeholder}
+      searchPlaceholder={searchPlaceholder}
+      emptyMessage={emptyMessage}
+      disabled={disabled}
+      initialLimit={20}
+      loadMoreIncrement={20}
+      searchLimit={100}
+      className={cn(fullWidth && 'w-full min-w-48', className)}
+    />
   );
 }
 
@@ -559,55 +332,14 @@ export function TypeDropdown({
   className,
   fullWidth = true,
 }: TypeDropdownProps) {
-  const handleValueChange = (selectedValue: string) => {
-    onValueChange(selectedValue === 'all' ? '' : selectedValue);
-  };
-
-  const selectedType =
-    value && value !== 'all'
-      ? typeOptions.find((t) => t.id === value)
-      : null;
-
-  const displayValue = selectedType?.label || allLabel;
-
   return (
-    <div className={cn(fullWidth && 'min-w-48', className)}>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            role='combobox'
-            className={cn(fullWidth && 'w-full', 'justify-between')}
-          >
-            {displayValue}
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-full p-0'>
-          <Command>
-            <CommandList>
-              <CommandGroup>
-                {typeOptions.map((option) => (
-                  <CommandItem
-                    key={option.id}
-                    value={option.label}
-                    onSelect={() => handleValueChange(option.id)}
-                  >
-                    <Check
-                      className={
-                        (!value && option.id === 'all') || value === option.id
-                          ? 'mr-2 h-4 w-4 opacity-100'
-                          : 'mr-2 h-4 w-4 opacity-0'
-                      }
-                    />
-                    {option.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
+    <Selectbox
+      options={typeOptions}
+      value={value || 'all'}
+      onValueChange={(val) => onValueChange(val === 'all' ? '' : val)}
+      placeholder={placeholder}
+      className={cn(fullWidth && 'min-w-48', className)}
+      fullWidth={fullWidth}
+    />
   );
 }

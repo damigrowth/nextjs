@@ -98,7 +98,6 @@ export function ArchiveFilters({
             value={filters.sortBy}
             onValueChange={handleSortChange}
             fullWidth={false}
-            searchPlaceholder=''
           />
         </div>
 

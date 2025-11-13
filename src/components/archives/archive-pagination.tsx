@@ -2,13 +2,7 @@
 
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Selectbox } from '@/components/ui/selectbox';
 import { cn } from '@/lib/utils';
 
 interface ArchivePaginationProps {
@@ -25,7 +19,12 @@ interface ArchivePaginationProps {
   className?: string;
 }
 
-const RESULTS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
+const RESULTS_PER_PAGE_OPTIONS = [
+  { id: '10', label: '10' },
+  { id: '20', label: '20' },
+  { id: '50', label: '50' },
+  { id: '100', label: '100' },
+];
 
 export function ArchivePagination({
   currentPage,
@@ -140,22 +139,13 @@ export function ArchivePagination({
             <span className="text-sm text-gray-600 whitespace-nowrap">
               Results per page:
             </span>
-            <Select
+            <Selectbox
+              options={RESULTS_PER_PAGE_OPTIONS}
               value={limit.toString()}
               onValueChange={handleLimitChange}
               disabled={isLoading}
-            >
-              <SelectTrigger className="w-20">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {RESULTS_PER_PAGE_OPTIONS.map((option) => (
-                  <SelectItem key={option} value={option.toString()}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              className="w-20"
+            />
           </div>
         )}
 
