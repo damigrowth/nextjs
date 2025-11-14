@@ -16,7 +16,7 @@ export async function ChatSidebar() {
   const chats = session?.user ? await getChats(session.user.id) : [];
 
   return (
-    <Card className='bg-card text-card-foreground flex flex-col rounded-xl border shadow-none py-6 w-full h-full pb-0 lg:w-96'>
+    <Card className='bg-card text-card-foreground flex flex-col rounded-xl border shadow-none py-6 h-full pb-0 w-full md:w-48 lg:w-64 xl:w-96'>
       <CardHeader className='@container/card-header grid auto-rows-min grid-rows-[auto] items-start gap-1.5 px-6 py-0 has-[data-slot=card-action]:grid-cols-[1fr_auto]'>
         <div className='flex items-center justify-between mb-4'>
           <CardTitle className='font-semibold font-display text-xl lg:text-2xl'>
