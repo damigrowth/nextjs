@@ -35,7 +35,7 @@ export function Selectbox({
   fullWidth = false,
 }: SelectboxProps) {
   return (
-    <Select value={value} onValueChange={onValueChange} disabled={disabled}>
+    <Select value={value || ''} onValueChange={onValueChange} disabled={disabled}>
       <SelectTrigger className={cn(fullWidth && 'w-full', className)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

@@ -90,6 +90,7 @@ export function Combobox({
           aria-expanded={open}
           className={cn(
             'w-full justify-between',
+            'font-normal', // Always apply font-normal
             !value && 'text-muted-foreground',
             className
           )}

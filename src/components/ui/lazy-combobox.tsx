@@ -228,6 +228,7 @@ export function LazyCombobox({
           aria-expanded={open}
           className={cn(
             'w-full justify-between',
+            'font-normal', // Always apply font-normal
             !value && !multiple && 'text-muted-foreground',
             values.length === 0 && multiple && 'text-muted-foreground',
             (renderButtonContent || (multiple && selectedOptions.length > 0)) &&
