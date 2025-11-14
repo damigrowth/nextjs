@@ -73,7 +73,14 @@ export const registrationFormSchema = z
       .string()
       .min(6, 'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες')
       .max(100, 'Ο κωδικός είναι πολύ μεγάλος'),
-    username: z.string().optional(),
+    username: z
+      .string()
+      .min(3, 'Το username είναι υποχρεωτικό')
+      .max(30, 'Το username δεν μπορεί να υπερβαίνει τους 30 χαρακτήρες')
+      .regex(
+        /^[a-zA-Z0-9_-]+$/,
+        'Το username μπορεί να περιέχει μόνο γράμματα, αριθμούς, παύλες και κάτω παύλες',
+      ),
     displayName: z.string().optional(),
     authType: z.union([z.literal(''), z.literal('user'), z.literal('pro')]),
     role: z.union([z.literal('freelancer'), z.literal('company')]).optional(),
@@ -93,6 +100,22 @@ export const registrationFormSchema = z
     {
       message: 'Πρέπει να επιλέξεις τύπο λογαριασμού',
       path: ['role'],
+    },
+  )
+  .refine(
+    (data) => {
+      // If authType is 'pro' (professional), displayName is required
+      if (
+        data.authType === 'pro' &&
+        (!data.displayName || data.displayName.trim() === '')
+      ) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Το όνομα προβολής είναι υποχρεωτικό',
+      path: ['displayName'],
     },
   );
 
