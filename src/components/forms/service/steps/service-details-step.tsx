@@ -275,33 +275,76 @@ export default function ServiceDetailsStep() {
         <FormField
           control={form.control}
           name='tags'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Ετικέτες</FormLabel>
-              <p className='text-sm text-gray-600'>
-                Επιλέξτε έως 10 ετικέτες για την υπηρεσία σας
-              </p>
-              <FormControl>
-                <LazyCombobox
-                  multiple
-                  options={availableTags.map(tag => ({
-                    id: tag.value,
-                    label: tag.label,
-                  }))}
-                  values={field.value || []}
-                  onMultiSelect={(selectedOptions) => {
-                    const selectedIds = selectedOptions.map((opt) => opt.id);
-                    field.onChange(selectedIds);
-                  }}
-                  onSelect={() => {}}
-                  placeholder='Επιλέξτε ετικέτες...'
-                  searchPlaceholder='Αναζήτηση ετικετών...'
-                  maxItems={10}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            // Watch category inside render to get updates
+            const currentCategory = watch('category');
+
+            // Regenerate available tags based on current category
+            const currentAvailableTags = React.useMemo(() => {
+              const categoryData = findById(serviceTaxonomies, currentCategory);
+              if (!currentCategory || !categoryData) return [];
+
+              const tags: Array<{ value: string; label: string }> = [];
+              const subcategories = categoryData.children || [];
+
+              // Add subcategories as tags
+              subcategories.forEach(
+                (subcategory: {
+                  id: string;
+                  label: string;
+                  children?: Array<{ id: string; label: string }>;
+                }) => {
+                  tags.push({
+                    value: subcategory.id,
+                    label: subcategory.label,
+                  });
+
+                  // Add subdivisions as tags
+                  if (subcategory.children) {
+                    subcategory.children.forEach(
+                      (subdivision: { id: string; label: string }) => {
+                        tags.push({
+                          value: subdivision.id,
+                          label: subdivision.label,
+                        });
+                      },
+                    );
+                  }
+                },
+              );
+
+              return tags;
+            }, [currentCategory]);
+
+            return (
+              <FormItem>
+                <FormLabel>Ετικέτες</FormLabel>
+                <p className='text-sm text-gray-600'>
+                  Επιλέξτε έως 10 ετικέτες για την υπηρεσία σας
+                </p>
+                <FormControl>
+                  <LazyCombobox
+                    key={`tags-${currentCategory}`}
+                    multiple
+                    options={currentAvailableTags.map(tag => ({
+                      id: tag.value,
+                      label: tag.label,
+                    }))}
+                    values={field.value || []}
+                    onMultiSelect={(selectedOptions) => {
+                      const selectedIds = selectedOptions.map((opt) => opt.id);
+                      field.onChange(selectedIds);
+                    }}
+                    onSelect={() => {}}
+                    placeholder='Επιλέξτε ετικέτες...'
+                    searchPlaceholder='Αναζήτηση ετικετών...'
+                    maxItems={10}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
       ) : (
         watchedCategory &&
