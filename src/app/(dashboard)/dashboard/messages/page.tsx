@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation';
 import { getChats } from '@/actions/messages';
 import { getDashboardMetadata } from '@/lib/seo/pages';
 import { ChatSidebar } from '@/components/messages/chat-sidebar';
-import { prisma } from '@/lib/prisma/client';
 
 // Force dynamic rendering for this route (auth-protected, user-specific data)
 export const dynamic = 'force-dynamic';
@@ -20,36 +19,28 @@ export default async function MessagesIndexPage() {
     redirect('/sign-in');
   }
 
-  // Fetch user's chats
+  // Fetch user's chats (already filtered for active messages)
   const chats = await getChats(session.user.id);
 
-  // If user has chats, redirect to first chat using cid (or id as fallback)
+  // If user has active chats, redirect to first one
   if (chats.length > 0) {
-    const firstChat = await prisma.chat.findUnique({
-      where: { id: chats[0].id },
-      select: { cid: true, id: true },
-    });
-
-    if (firstChat) {
-      const chatPath = firstChat.cid || firstChat.id;
-      redirect(`/dashboard/messages/${chatPath}`);
-    }
+    // Use the cid from the already filtered chat list
+    const chatPath = chats[0].cid || chats[0].id;
+    redirect(`/dashboard/messages/${chatPath}`);
   }
 
   // No chats - show empty state
   return (
     <div className='flex h-[calc(100vh-6rem)] w-full gap-0'>
-      {/* Left Sidebar - Chat List */}
+      {/* Left Sidebar - Chat List (Always visible when no chats) */}
       <ChatSidebar />
 
-      {/* Right - Empty State */}
-      <div className='grow'>
-        <div className='flex h-full items-center justify-center'>
-          <div className='text-center'>
-            <p className='text-muted-foreground text-lg'>
-              Δεν υπάρχουν συνομιλίες ακόμα. Ξεκινήστε μια συνομιλία!
-            </p>
-          </div>
+      {/* Right - Empty State (Hidden on mobile when no chats) */}
+      <div className='hidden md:flex flex-1 w-full items-center justify-center'>
+        <div className='text-center'>
+          <p className='text-muted-foreground text-lg'>
+            Δεν υπάρχουν συνομιλίες ακόμα. Ξεκινήστε μια συνομιλία!
+          </p>
         </div>
       </div>
     </div>

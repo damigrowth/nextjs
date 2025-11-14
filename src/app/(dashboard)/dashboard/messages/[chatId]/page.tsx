@@ -1,6 +1,6 @@
 import { ChatSidebar } from '@/components/messages/chat-sidebar';
 import { HeaderPresence } from '@/components/messages/header-presence';
-import { MessagesContainer } from '@/components/messages/messages-container';
+import { MessagesContainerWithSidebar } from '@/components/messages/messages-container-with-sidebar';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { getChats, getMessages } from '@/actions/messages';
@@ -65,6 +65,19 @@ export default async function MessagesPage({ params }: MessagesPageProps) {
     redirect('/dashboard/messages');
   }
 
+  // Check if chat has any non-deleted messages
+  const activeMessageCount = await prisma.message.count({
+    where: {
+      chatId: selectedChatId,
+      deleted: false,
+    },
+  });
+
+  // If no active messages, redirect to messages index
+  if (activeMessageCount === 0) {
+    redirect('/dashboard/messages');
+  }
+
   // Fetch all chats for sidebar
   const chats = await getChats(session.user.id);
 
@@ -120,29 +133,53 @@ export default async function MessagesPage({ params }: MessagesPageProps) {
   }
 
   if (!headerUser) {
-    redirect('/dashboard/messages');
+    // If no other member found, this might be a chat with a deleted user
+    // or a data inconsistency. Show an error or empty state instead of redirecting
+    return (
+      <div className='flex h-full md:h-[calc(100vh-6rem)] w-full gap-0'>
+        <div className='hidden md:block'>
+          <ChatSidebar />
+        </div>
+        <div className='flex-1 w-full'>
+          <div className='flex h-full items-center justify-center'>
+            <div className='text-center'>
+              <p className='text-muted-foreground text-lg'>
+                Αυτή η συνομιλία δεν είναι διαθέσιμη
+              </p>
+              <p className='text-muted-foreground text-sm mt-2'>
+                Ο άλλος χρήστης μπορεί να έχει διαγραφεί ή να μην είναι
+                διαθέσιμος
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className='flex h-[calc(100vh-6rem)] w-full gap-0'>
-      {/* Left Sidebar - Chat List */}
-      <ChatSidebar />
+    <div className='flex h-full md:h-[calc(100vh-6rem)] w-full gap-0'>
+      {/* Left Sidebar - Chat List (Hidden on mobile) */}
+      <div className='hidden md:block'>
+        <ChatSidebar />
+      </div>
 
-      {/* Right - Chat Content */}
-      <div className='grow'>
+      {/* Right - Chat Content (Full width on mobile) */}
+      <div className='flex-1 w-full'>
         <div
           key={selectedChatId}
-          className='bg-background fixed inset-0 z-50 flex h-full flex-col p-4 lg:relative lg:z-10 lg:bg-transparent lg:p-0'
+          className='bg-background flex h-full flex-col'
         >
           <HeaderPresence
             chatId={selectedChatId}
             currentUserId={session.user.id}
             user={headerUser}
           />
-          <MessagesContainer
+          <MessagesContainerWithSidebar
             chatId={selectedChatId}
             currentUserId={session.user.id}
             initialMessages={messages}
+            chats={chats}
           />
         </div>
       </div>
