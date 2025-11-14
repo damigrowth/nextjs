@@ -18,12 +18,14 @@ interface MessagesContainerProps {
   chatId: string;
   currentUserId: string;
   initialMessages: ChatMessageItem[];
+  chats?: any[]; // For mobile sidebar
 }
 
 export function MessagesContainer({
   chatId,
   currentUserId,
   initialMessages,
+  chats,
 }: MessagesContainerProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const loadTriggerRef = useRef<HTMLDivElement>(null);
@@ -152,6 +154,7 @@ export function MessagesContainer({
         onCancelReply={() => setReplyTo(null)}
         editingMessage={editingMessage}
         onCancelEdit={() => setEditingMessage(null)}
+        chats={chats}
       />
     </>
   );

@@ -29,8 +29,21 @@ export function transformChatForList(
   // Find the other member (not current user)
   const otherMember = chat.members.find((m) => m.user.id !== currentUserId);
 
-  // Get display name (only use displayName, not firstName/lastName)
-  const displayName = otherMember?.user.displayName || 'Unknown User';
+  // Get display name with Greek fallback for deleted/unavailable users
+  let displayName = 'Χρήστης'; // Default for deleted/missing user
+
+  if (otherMember?.user) {
+    if (otherMember.user.displayName) {
+      displayName = otherMember.user.displayName;
+    } else if (otherMember.user.firstName || otherMember.user.lastName) {
+      // Fallback to first/last name if no display name
+      displayName = [otherMember.user.firstName, otherMember.user.lastName]
+        .filter(Boolean)
+        .join(' ') || 'Χρήστης';
+    } else {
+      displayName = 'Χρήστης';
+    }
+  }
 
   return {
     id: chat.id,
@@ -118,7 +131,7 @@ export function transformMessageForChat(
 export function getDisplayName(profile: {
   displayName: string | null;
 }): string {
-  return profile.displayName || 'Unknown User';
+  return profile.displayName || 'Χρήστης';
 }
 
 /**
