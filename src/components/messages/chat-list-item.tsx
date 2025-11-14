@@ -46,9 +46,6 @@ export function ChatListItem({ chat }: ChatListItemProps) {
           showBorder={false}
           showShadow={false}
         />
-        {chat.online && (
-          <div className='absolute bottom-0 right-0 h-2 w-2 rounded-full border-2 border-background bg-green-500' />
-        )}
       </div>
 
       <div className='flex-1 min-w-0 overflow-hidden'>

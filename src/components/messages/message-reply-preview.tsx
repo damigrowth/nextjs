@@ -32,7 +32,7 @@ export function MessageReplyPreview({
           <div className='flex items-center gap-2 mb-1'>
             <CornerDownRight className='h-3 w-3 text-muted-foreground flex-shrink-0' />
             <p className='text-xs font-medium text-primary'>
-              Replying to {isOwn ? 'yourself' : authorName}
+              Απάντηση {isOwn ? 'στον εαυτό σου' : `σε ${authorName}`}
             </p>
           </div>
           <p className='text-sm text-muted-foreground truncate pl-5'>

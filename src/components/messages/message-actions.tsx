@@ -74,21 +74,21 @@ export function MessageActions({
       <DropdownMenuContent className='w-fit rounded-xl' align={align}>
         <DropdownMenuItem onClick={() => handleMenuAction('reply')}>
           <Reply className='h-4 w-4' />
-          Reply
+          Απάντηση
         </DropdownMenuItem>
         {isOwn && (
           <DropdownMenuItem onClick={() => handleMenuAction('edit')}>
             <Edit className='h-4 w-4' />
-            Edit
+            Επεξεργασία
           </DropdownMenuItem>
         )}
         <DropdownMenuItem onClick={() => handleMenuAction('copy')}>
           <Copy className='h-4 w-4' />
-          Copy message
+          Αντιγραφή
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleMenuAction('forward')}>
           <Forward className='h-4 w-4' />
-          Forward
+          Προώθηση
         </DropdownMenuItem>
         {isOwn && (
           <>
@@ -98,7 +98,7 @@ export function MessageActions({
               className='text-destructive focus:text-destructive'
             >
               <Trash2 className='h-4 w-4' />
-              Delete
+              Διαγραφή
             </DropdownMenuItem>
           </>
         )}

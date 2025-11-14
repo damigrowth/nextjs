@@ -99,7 +99,7 @@ export function MessageEdit({
         onKeyDown={handleKeyDown}
         disabled={isLoading}
         className='min-h-[80px] resize-none text-sm'
-        placeholder='Edit your message...'
+        placeholder='Επεξεργασία μηνύματος...'
       />
       <div className='flex items-center justify-end gap-2'>
         <Button

@@ -186,7 +186,7 @@ export function ChatMessages({
   };
 
   return (
-    <ScrollArea className='flex-1 p-4' ref={scrollRef}>
+    <ScrollArea className='flex-1 pl-0 p-4 pr-0' ref={scrollRef}>
       <div>
         {/* Load trigger for infinite scroll */}
         {hasMore && (

@@ -40,12 +40,12 @@ export function MessageDeleteDialog({
     setIsLoading(true);
     try {
       await deleteMessage(messageId, userId);
-      toast.success('Message deleted');
+      toast.success('Το μήνυμα διαγράφηκε');
       onOpenChange(false);
       onDeleted?.();
     } catch (error) {
       console.error('Failed to delete message:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to delete message');
+      toast.error(error instanceof Error ? error.message : 'Αποτυχία διαγραφής μηνύματος');
     } finally {
       setIsLoading(false);
     }
@@ -55,13 +55,13 @@ export function MessageDeleteDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete message?</AlertDialogTitle>
+          <AlertDialogTitle>Διαγραφή μηνύματος;</AlertDialogTitle>
           <AlertDialogDescription>
-            This message will be permanently deleted. This action cannot be undone.
+            Αυτό το μήνυμα θα διαγραφεί οριστικά. Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>Ακύρωση</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
@@ -70,7 +70,7 @@ export function MessageDeleteDialog({
             disabled={isLoading}
             className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
           >
-            {isLoading ? 'Deleting...' : 'Delete'}
+            {isLoading ? 'Διαγραφή...' : 'Διαγραφή'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
