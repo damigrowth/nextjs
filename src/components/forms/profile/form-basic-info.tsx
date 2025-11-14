@@ -2,14 +2,12 @@
 
 import React, {
   useState,
-  useRef,
   useActionState,
   useEffect,
   useTransition,
 } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
 // Shadcn UI components
 import { Input } from '@/components/ui/input';
@@ -31,12 +29,11 @@ import {
 import { toast } from 'sonner';
 
 // Icons
-import { Loader2, ChevronsUpDown, Check } from 'lucide-react';
+import { ChevronsUpDown, Check } from 'lucide-react';
 
 // Custom components
-import { MediaUpload } from '@/components/media';
-import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { Selectbox } from '@/components/ui/selectbox';
+import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import {
   Command,
   CommandEmpty,
@@ -50,12 +47,7 @@ import {
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import { skills as skillsDataset } from '@/constants/datasets/skills';
 import { formatInput } from '@/lib/utils/validation/formats';
-import {
-  findById,
-  filterByField,
-  toggleItemInArray,
-  filterSkillsByCategory,
-} from '@/lib/utils/datasets';
+import { filterByField, filterSkillsByCategory } from '@/lib/utils/datasets';
 import { populateFormData } from '@/lib/utils/form';
 
 // Import validation schema
@@ -116,8 +108,8 @@ export default function BasicInfoForm({
       skills: profile?.skills || [],
       speciality: profile?.speciality || '',
     },
-    mode: 'onSubmit', // Only validate on submit
-    reValidateMode: 'onChange', // After submit, validate on change
+    mode: 'onChange', // Live validation as user types
+    reValidateMode: 'onChange', // Keep validating on change
     criteriaMode: 'firstError', // Only show first error per field
   });
 
@@ -142,7 +134,7 @@ export default function BasicInfoForm({
       };
       form.reset(resetData, { keepDefaultValues: false });
     }
-  }, [profile?.id, profile?.category, profile?.subcategory]); // Only reset when these specific values change
+  }, [profile, form]); // Reset when profile data changes
 
   // Handle successful form submission - refresh session and page to get updated data
   useEffect(() => {
@@ -181,6 +173,7 @@ export default function BasicInfoForm({
     });
     setValue('tagline', formattedValue, {
       shouldDirty: true,
+      shouldValidate: true, // Trigger real-time validation
     });
   };
 
@@ -191,6 +184,7 @@ export default function BasicInfoForm({
     });
     setValue('bio', formattedValue, {
       shouldDirty: true,
+      shouldValidate: true, // Trigger real-time validation
     });
   };
 
@@ -198,8 +192,12 @@ export default function BasicInfoForm({
   const handleCategorySelect = (categoryId: string) => {
     setValue('category', categoryId, {
       shouldDirty: true,
+      shouldValidate: true,
     });
-    setValue('subcategory', '', { shouldDirty: true });
+    setValue('subcategory', '', {
+      shouldDirty: true,
+      shouldValidate: true, // Trigger validation to show error if required
+    });
 
     // Clear skills and speciality when category changes since available skills will change
     setValue('skills', [], { shouldDirty: true });
@@ -209,54 +207,36 @@ export default function BasicInfoForm({
   const handleSubcategorySelect = (selected: any) => {
     setValue('subcategory', selected.id, {
       shouldDirty: true,
+      shouldValidate: true, // Trigger validation immediately
     });
   };
 
   // Wrapper action that handles data population
-  const handleFormAction = async (formData: FormData) => {
-    setIsUploading(true);
+  const handleFormAction = (formData: FormData) => {
+    // Get all form values
+    const allValues = getValues();
 
-    try {
-      // Get all form values
-      const allValues = getValues();
+    populateFormData(formData, allValues, {
+      stringFields: ['tagline', 'bio', 'category', 'subcategory', 'speciality'],
+      jsonFields: ['skills'],
+      skipEmpty: true,
+    });
 
-      populateFormData(formData, allValues, {
-        stringFields: [
-          'tagline',
-          'bio',
-          'category',
-          'subcategory',
-          'speciality',
-        ],
-        jsonFields: ['skills'],
-        skipEmpty: true,
-      });
-
-      // Add profileId when in admin mode
-      if (adminMode && initialProfile?.id) {
-        formData.set('profileId', initialProfile.id);
-      }
-
-      // Call the server action with populated FormData using startTransition
-      startTransition(() => {
-        action(formData);
-      });
-
-      // Note: Don't reset isUploading here, let it be handled by useEffect
-    } catch (error) {
-      console.error('❌ Form submission failed:', error);
-      setIsUploading(false);
+    // Add profileId when in admin mode
+    if (adminMode && initialProfile?.id) {
+      formData.set('profileId', initialProfile.id);
     }
+
+    // Call the server action with startTransition
+    startTransition(() => {
+      action(formData);
+    });
   };
 
   return (
     <Form {...form}>
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.currentTarget);
-          handleFormAction(formData);
-        }}
+        action={handleFormAction}
         className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
       >
         {/* Tagline */}
@@ -300,8 +280,11 @@ export default function BasicInfoForm({
                       options={proTaxonomies}
                       value={field.value || ''}
                       onValueChange={(value) => {
-                        field.onChange(value);
-                        handleCategorySelect(value);
+                        // Prevent empty value from clearing the field (shadcn Select quirk)
+                        if (value) {
+                          field.onChange(value); // Update React Hook Form field
+                          handleCategorySelect(value);
+                        }
                       }}
                       placeholder='Επιλέξτε κατηγορία...'
                       fullWidth
@@ -316,7 +299,13 @@ export default function BasicInfoForm({
               control={form.control}
               name='subcategory'
               render={({ field }) => {
-                const category = findById(proTaxonomies, watchedCategory);
+                // Get the current category value directly from form
+                const currentCategory = form.watch('category');
+
+                // Find category at top level only - findById searches recursively which could return a subcategory
+                const category = proTaxonomies.find(
+                  (cat) => cat.id === currentCategory,
+                );
                 const subcategories = category?.children || [];
                 const filteredSubcategories = initialUser?.role
                   ? filterByField(subcategories, 'type', initialUser.role)
@@ -327,16 +316,16 @@ export default function BasicInfoForm({
                     <FormLabel>Υποκατηγορία*</FormLabel>
                     <FormControl>
                       <LazyCombobox
+                        key={`${currentCategory}-${filteredSubcategories.length}`} // Force remount when category or options change
                         options={filteredSubcategories}
                         value={field.value || ''}
                         onSelect={(selected) => {
-                          field.onChange(selected.id);
                           handleSubcategorySelect(selected);
                         }}
                         placeholder='Επιλέξτε υποκατηγορία...'
                         searchPlaceholder='Αναζήτηση υποκατηγορίας...'
                         emptyMessage='Δεν βρέθηκαν υποκατηγορίες.'
-                        disabled={!watchedCategory}
+                        disabled={!currentCategory}
                       />
                     </FormControl>
                     <FormMessage />
@@ -380,140 +369,153 @@ export default function BasicInfoForm({
         <FormField
           control={form.control}
           name='skills'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Δεξιότητες
-                {field.value?.length > 0 ? ` (${field.value.length}/10)` : ''}
-              </FormLabel>
-              <p className='text-sm text-gray-600'>
-                Επιλέξτε τις δεξιότητές σας (έως 10). Στη συνέχεια θα μπορέσετε
-                να επιλέξετε την κύρια ειδικότητά σας.
-              </p>
-              <FormControl>
-                <div className='space-y-2'>
-                  {watchedCategory ? (
-                    <LazyCombobox
-                      multiple
-                      options={filterSkillsByCategory(
-                        skillsDataset,
-                        watchedCategory,
-                      )}
-                      values={field.value || []}
-                      onMultiSelect={(selectedOptions) => {
-                        const selectedIds = selectedOptions.map((opt) => opt.id);
-                        setValue('skills', selectedIds, {
-                          shouldDirty: true,
-                        });
+          render={({ field }) => {
+            // Get the current category value directly from form
+            const currentCategory = form.watch('category');
 
-                        // Clear speciality if it's not in the selected skills anymore
-                        const currentSpeciality = getValues('speciality');
-                        if (
-                          currentSpeciality &&
-                          !selectedIds.includes(currentSpeciality)
-                        ) {
-                          setValue('speciality', '', {
+            return (
+              <FormItem>
+                <FormLabel>
+                  Δεξιότητες
+                  {field.value?.length > 0 ? ` (${field.value.length}/10)` : ''}
+                </FormLabel>
+                <p className='text-sm text-gray-600'>
+                  Επιλέξτε τις δεξιότητές σας (έως 10). Στη συνέχεια θα
+                  μπορέσετε να επιλέξετε την κύρια ειδικότητά σας.
+                </p>
+                <FormControl>
+                  <div className='space-y-2'>
+                    {currentCategory ? (
+                      <LazyCombobox
+                        key={`skills-${currentCategory}`} // Force remount when category changes
+                        multiple
+                        options={filterSkillsByCategory(
+                          skillsDataset,
+                          currentCategory,
+                        )}
+                        values={field.value || []}
+                        onMultiSelect={(selectedOptions) => {
+                          const selectedIds = selectedOptions.map(
+                            (opt) => opt.id,
+                          );
+                          setValue('skills', selectedIds, {
                             shouldDirty: true,
                           });
-                        }
-                      }}
-                      onSelect={() => {}} // Required but not used in multi mode
-                      placeholder='Επιλέξτε δεξιότητες...'
-                      searchPlaceholder='Αναζήτηση δεξιοτήτων...'
-                      maxItems={10}
-                    />
-                  ) : (
-                    <div className='p-4 text-center text-gray-500 bg-gray-50 rounded-md'>
-                      Επιλέξτε πρώτα μια κατηγορία για να δείτε τις διαθέσιμες
-                      δεξιότητες
-                    </div>
-                  )}
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+
+                          // Clear speciality if it's not in the selected skills anymore
+                          const currentSpeciality = getValues('speciality');
+                          if (
+                            currentSpeciality &&
+                            !selectedIds.includes(currentSpeciality)
+                          ) {
+                            setValue('speciality', '', {
+                              shouldDirty: true,
+                            });
+                          }
+                        }}
+                        onSelect={() => {}} // Required but not used in multi mode
+                        placeholder='Επιλέξτε δεξιότητες...'
+                        searchPlaceholder='Αναζήτηση δεξιοτήτων...'
+                        maxItems={10}
+                      />
+                    ) : (
+                      <div className='p-4 text-center text-gray-500 bg-gray-50 rounded-md'>
+                        Επιλέξτε πρώτα μια κατηγορία για να δείτε τις διαθέσιμες
+                        δεξιότητες
+                      </div>
+                    )}
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
 
         {/* Speciality */}
         <FormField
           control={form.control}
           name='speciality'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Ειδικότητα</FormLabel>
-              <p className='text-sm text-gray-600'>
-                Επιλέξτε την κύρια ειδικότητά σας από τις επιλεγμένες δεξιότητες
-              </p>
-              <FormControl>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      className='w-full justify-between'
-                      disabled={!watchedSkills || watchedSkills.length === 0}
-                    >
-                      {field.value
-                        ? (() => {
-                            const selectedSkill = skillsDataset.find(
-                              (skill) => skill.id === field.value,
-                            );
-                            return (
-                              selectedSkill?.label || 'Μη έγκυρη ειδικότητα'
-                            );
-                          })()
-                        : watchedSkills && watchedSkills.length > 0
-                          ? 'Επιλέξτε ειδικότητα...'
-                          : 'Επιλέξτε πρώτα δεξιότητες'}
-                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-full p-0'>
-                    <Command>
-                      <CommandInput placeholder='Αναζήτηση ειδικότητας...' />
-                      <CommandList>
-                        <CommandEmpty>Δεν βρέθηκαν ειδικότητες.</CommandEmpty>
-                        <CommandGroup>
-                          {watchedSkills &&
-                            watchedSkills
-                              .map((skillId: string) =>
-                                skillsDataset.find(
-                                  (skill) => skill.id === skillId,
-                                ),
-                              )
-                              .filter(Boolean)
-                              .map((skill) => (
-                                <CommandItem
-                                  value={skill!.label}
-                                  key={skill!.id}
-                                  onSelect={() => {
-                                    setValue('speciality', skill!.id, {
-                                      shouldDirty: true,
-                                    });
-                                  }}
-                                >
-                                  <Check
-                                    className={
-                                      field.value === skill!.id
-                                        ? 'mr-2 h-4 w-4 opacity-100'
-                                        : 'mr-2 h-4 w-4 opacity-0'
-                                    }
-                                  />
-                                  {skill!.label}
-                                </CommandItem>
-                              ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          render={({ field }) => {
+            // Watch skills inside render to get updates
+            const currentSkills = form.watch('skills');
 
+            return (
+              <FormItem>
+                <FormLabel>Ειδικότητα</FormLabel>
+                <p className='text-sm text-gray-600'>
+                  Επιλέξτε την κύρια ειδικότητά σας από τις επιλεγμένες
+                  δεξιότητες
+                </p>
+                <FormControl>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant='outline'
+                        role='combobox'
+                        className='w-full justify-between font-normal'
+                        disabled={!currentSkills || currentSkills.length === 0}
+                      >
+                        {field.value
+                          ? (() => {
+                              const selectedSkill = skillsDataset.find(
+                                (skill) => skill.id === field.value,
+                              );
+                              return (
+                                selectedSkill?.label || 'Μη έγκυρη ειδικότητα'
+                              );
+                            })()
+                          : currentSkills && currentSkills.length > 0
+                            ? 'Επιλέξτε ειδικότητα...'
+                            : 'Επιλέξτε πρώτα δεξιότητες'}
+                        <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-full p-0'>
+                      <Command>
+                        <CommandInput placeholder='Αναζήτηση ειδικότητας...' />
+                        <CommandList>
+                          <CommandEmpty>Δεν βρέθηκαν ειδικότητες.</CommandEmpty>
+                          <CommandGroup>
+                            {currentSkills &&
+                              currentSkills
+                                .map((skillId: string) =>
+                                  skillsDataset.find(
+                                    (skill) => skill.id === skillId,
+                                  ),
+                                )
+                                .filter(Boolean)
+                                .map((skill) => (
+                                  <CommandItem
+                                    value={skill!.label}
+                                    key={skill!.id}
+                                    onSelect={() => {
+                                      setValue('speciality', skill!.id, {
+                                        shouldDirty: true,
+                                      });
+                                    }}
+                                  >
+                                    <Check
+                                      className={
+                                        field.value === skill!.id
+                                          ? 'mr-2 h-4 w-4 opacity-100'
+                                          : 'mr-2 h-4 w-4 opacity-0'
+                                      }
+                                    />
+                                    {skill!.label}
+                                  </CommandItem>
+                                ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
+        />
 
         {/* Debug Info */}
         {process.env.NODE_ENV === 'development' && (
@@ -523,8 +525,14 @@ export default function BasicInfoForm({
             <div>isSubmitted: {form.formState.isSubmitted.toString()}</div>
             <div>Category Value: {watch('category') || 'empty'}</div>
             <div>Subcategory Value: {watch('subcategory') || 'empty'}</div>
-            <div>Category Touched: {form.formState.touchedFields.category?.toString() || 'false'}</div>
-            <div>Subcategory Touched: {form.formState.touchedFields.subcategory?.toString() || 'false'}</div>
+            <div>
+              Category Touched:{' '}
+              {form.formState.touchedFields.category?.toString() || 'false'}
+            </div>
+            <div>
+              Subcategory Touched:{' '}
+              {form.formState.touchedFields.subcategory?.toString() || 'false'}
+            </div>
             <div>Username: {initialUser?.username || 'undefined'}</div>
             <div>User ID: {initialUser?.id || 'undefined'}</div>
             <div>Errors: {JSON.stringify(errors, null, 2)}</div>

@@ -502,31 +502,36 @@ export default function CoverageForm({
               <FormField
                 control={form.control}
                 name='coverage.areas'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-sm font-medium text-gray-700'>
-                      Περιοχές
-                    </FormLabel>
-                    <FormControl>
-                      <div className='space-y-2'>
-                        {watchedCoverage?.counties?.length > 0 ? (
-                          <LazyCombobox
-                            multiple
-                            className='bg-white'
-                            options={watchedCoverage.counties.flatMap(
-                              (selectedCountyId: string) => {
-                                const county = locationOptions.find(
-                                  (c) => c.id === selectedCountyId,
-                                );
-                                return (
-                                  county?.children?.map((area: any) => ({
-                                    id: area.id,
-                                    label: area.name,
-                                    county: county.name,
-                                  })) || []
-                                );
-                              },
-                            )}
+                render={({ field }) => {
+                  // Watch coverage inside the render to get updates
+                  const currentCoverage = form.watch('coverage');
+
+                  return (
+                    <FormItem>
+                      <FormLabel className='text-sm font-medium text-gray-700'>
+                        Περιοχές
+                      </FormLabel>
+                      <FormControl>
+                        <div className='space-y-2'>
+                          {currentCoverage?.counties?.length > 0 ? (
+                            <LazyCombobox
+                              key={`areas-${currentCoverage.counties.join('-')}`} // Force remount when counties change
+                              multiple
+                              className='bg-white'
+                              options={currentCoverage.counties.flatMap(
+                                (selectedCountyId: string) => {
+                                  const county = locationOptions.find(
+                                    (c) => c.id === selectedCountyId,
+                                  );
+                                  return (
+                                    county?.children?.map((area: any) => ({
+                                      id: area.id,
+                                      label: area.name,
+                                      county: county.name,
+                                    })) || []
+                                  );
+                                },
+                              )}
                             values={field.value || []}
                             onMultiSelect={(selectedOptions) => {
                               const selectedIds = selectedOptions.map((opt) => opt.id);
@@ -546,18 +551,19 @@ export default function CoverageForm({
                                 </span>
                               </>
                             )}
-                          />
-                        ) : (
-                          <div className='text-gray-500 bg-gray-50 p-3 rounded-md border'>
-                            Επιλέξτε πρώτα νομούς για να δείτε τις διαθέσιμες
-                            περιοχές
-                          </div>
-                        )}
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                            />
+                          ) : (
+                            <div className='text-gray-500 bg-gray-50 p-3 rounded-md border'>
+                              Επιλέξτε πρώτα νομούς για να δείτε τις διαθέσιμες
+                              περιοχές
+                            </div>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
             </div>
           </div>

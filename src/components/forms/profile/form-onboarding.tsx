@@ -777,65 +777,71 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
               <FormField
                 control={control}
                 name='coverage.areas'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-sm font-medium text-gray-700'>
-                      Περιοχές
-                    </FormLabel>
-                    <FormControl>
-                      <div className='space-y-2'>
-                        {watchedCoverage?.counties?.length > 0 ? (
-                          <LazyCombobox
-                            multiple
-                            className='bg-white'
-                            options={watchedCoverage.counties.flatMap(
-                              (selectedCountyId: string) => {
-                                const county = locationOptions.find(
-                                  (c) => c.id === selectedCountyId,
-                                );
-                                return (
-                                  county?.children?.map((area: any) => ({
-                                    id: area.id,
-                                    label: area.name,
-                                    county: county.name,
-                                  })) || []
-                                );
-                              },
-                            )}
-                            values={field.value || []}
-                            onMultiSelect={(selectedOptions) => {
-                              const selectedIds = selectedOptions.map((opt) => opt.id);
-                              setValue('coverage.areas', selectedIds, {
-                                shouldDirty: true,
-                                shouldValidate: true,
-                              });
-                            }}
-                            onSelect={() => {}}
-                            placeholder='Επιλέξτε περιοχές...'
-                            searchPlaceholder='Αναζήτηση περιοχών...'
-                            formatLabel={(option) => (
-                              <>
-                                {option.label}{' '}
-                                <span className='text-gray-500'>
-                                  ({option.county})
-                                </span>
-                              </>
-                            )}
-                          />
-                        ) : (
-                          <Button
-                            variant='outline'
-                            className='w-full justify-between cursor-not-allowed'
-                            disabled
-                          >
-                            Επιλέξτε πρώτα νομούς
-                          </Button>
-                        )}
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  // Watch coverage inside the render to get updates
+                  const currentCoverage = watch('coverage');
+
+                  return (
+                    <FormItem>
+                      <FormLabel className='text-sm font-medium text-gray-700'>
+                        Περιοχές
+                      </FormLabel>
+                      <FormControl>
+                        <div className='space-y-2'>
+                          {currentCoverage?.counties?.length > 0 ? (
+                            <LazyCombobox
+                              key={`areas-${currentCoverage.counties.join('-')}`}
+                              multiple
+                              className='bg-white'
+                              options={currentCoverage.counties.flatMap(
+                                (selectedCountyId: string) => {
+                                  const county = locationOptions.find(
+                                    (c) => c.id === selectedCountyId,
+                                  );
+                                  return (
+                                    county?.children?.map((area: any) => ({
+                                      id: area.id,
+                                      label: area.name,
+                                      county: county.name,
+                                    })) || []
+                                  );
+                                },
+                              )}
+                              values={field.value || []}
+                              onMultiSelect={(selectedOptions) => {
+                                const selectedIds = selectedOptions.map((opt) => opt.id);
+                                setValue('coverage.areas', selectedIds, {
+                                  shouldDirty: true,
+                                  shouldValidate: true,
+                                });
+                              }}
+                              onSelect={() => {}}
+                              placeholder='Επιλέξτε περιοχές...'
+                              searchPlaceholder='Αναζήτηση περιοχών...'
+                              formatLabel={(option) => (
+                                <>
+                                  {option.label}{' '}
+                                  <span className='text-gray-500'>
+                                    ({option.county})
+                                  </span>
+                                </>
+                              )}
+                            />
+                          ) : (
+                            <Button
+                              variant='outline'
+                              className='w-full justify-between cursor-not-allowed'
+                              disabled
+                            >
+                              Επιλέξτε πρώτα νομούς
+                            </Button>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
             </div>
           </div>

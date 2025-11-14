@@ -183,12 +183,7 @@ export default function AdditionalInfoForm({
                 <FormControl>
                   <YearPicker
                     value={field.value}
-                    onValueChange={(year) => {
-                      setValue('commencement', year, {
-                        shouldDirty: true,
-                        // shouldValidate: true,
-                      });
-                    }}
+                    onValueChange={field.onChange}
                     placeholder='π.χ. 2020'
                   />
                 </FormControl>
@@ -213,12 +208,7 @@ export default function AdditionalInfoForm({
                     max={1000}
                     allowDecimals={false}
                     value={field.value}
-                    onValueChange={(value) => {
-                      setValue('rate', value, {
-                        shouldDirty: true,
-                        // shouldValidate: true,
-                      });
-                    }}
+                    onValueChange={field.onChange}
                     // className='w-1/2' breaks the layout
                   />
                 </FormControl>
@@ -372,12 +362,16 @@ export default function AdditionalInfoForm({
                 <FormControl>
                   <Selectbox
                     options={budgetOptions}
-                    value={field.value}
+                    value={field.value || ''}
                     onValueChange={(value) => {
-                      setValue('budget', value, {
-                        shouldDirty: true,
-                        // shouldValidate: true,
-                      });
+                      // Prevent empty value from clearing the field (shadcn Select quirk)
+                      if (value && value !== '') {
+                        field.onChange(value);
+                        setValue('budget', value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                      }
                     }}
                     placeholder='Επιλέξτε προϋπολογισμό...'
                     fullWidth
@@ -393,7 +387,7 @@ export default function AdditionalInfoForm({
             control={form.control}
             name='industries'
             render={({ field }) => (
-              <FormItem className='space-y-0 flex flex-col'>
+              <FormItem className='space-y-2 flex flex-col'>
                 <FormLabel>Κλάδοι Δραστηριότητας</FormLabel>
                 <FormControl>
                   <LazyCombobox
@@ -402,10 +396,7 @@ export default function AdditionalInfoForm({
                     values={field.value || []}
                     onMultiSelect={(selectedOptions) => {
                       const selectedIds = selectedOptions.map((opt) => opt.id);
-                      setValue('industries', selectedIds, {
-                        shouldDirty: true,
-                        // shouldValidate: true,
-                      });
+                      field.onChange(selectedIds);
                     }}
                     onSelect={() => {}} // Required but not used in multi mode
                     placeholder='Επιλέξτε κλάδους...'
