@@ -497,9 +497,18 @@ export const profilePresentationUpdateSchema = z.object({
   socials: socialMediaSchema.optional(),
 });
 
-// Main onboarding form schema - bio, category, subcategory, coverage are required, image is optional for client validation
+// Required image schema for onboarding (doesn't allow null)
+const requiredImageSchema = z.union([
+  cloudinaryResourceSchema,
+  z.string().url(), // Allow string URLs for Google/external images
+]);
+
+// Main onboarding form schema - bio, category, subcategory, coverage are required, image is now required
 export const onboardingFormSchema = z.object({
-  image: imageSchema, // Optional for client-side validation, required on server
+  image: requiredImageSchema.refine(
+    (val) => val !== null && val !== undefined,
+    'Η εικόνα προφίλ είναι υποχρεωτική'
+  ), // Required for onboarding
   category: categorySchema, // Required - now a string slug
   subcategory: categorySchema, // Required - now a string slug
   bio: z

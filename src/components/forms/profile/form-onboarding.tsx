@@ -124,7 +124,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
   const form = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingFormSchemaWithMedia),
     defaultValues: {
-      image: null, // Will be set below when user data loads
+      image: undefined, // Will be set below when user data loads - use undefined instead of null
       category: '',
       subcategory: '',
       bio: '',
