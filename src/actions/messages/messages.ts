@@ -29,10 +29,11 @@ export async function getMessages(
       throw new Error('User is not a member of this chat');
     }
 
-    // Fetch messages with relations
+    // Fetch messages with relations (excluding deleted messages)
     const messages = await prisma.message.findMany({
       where: {
         chatId: chatId,
+        deleted: false, // Filter out deleted messages
         ...(options?.before && {
           createdAt: {
             lt: new Date(options.before),

@@ -32,7 +32,11 @@ export async function getChats(userId: string): Promise<ChatListItem[]> {
         creatorUid: true,
         lastMessageId: true,
         lastActivity: true,
-        lastMessage: true,
+        lastMessage: {
+          where: {
+            deleted: false,
+          },
+        },
         members: {
           include: {
             user: {
@@ -46,9 +50,22 @@ export async function getChats(userId: string): Promise<ChatListItem[]> {
             },
           },
         },
+        messages: {
+          where: {
+            deleted: false,
+          },
+          select: {
+            id: true,
+          },
+          take: 1,
+        },
         _count: {
           select: {
-            messages: true,
+            messages: {
+              where: {
+                deleted: false,
+              },
+            },
           },
         },
       },
@@ -57,8 +74,11 @@ export async function getChats(userId: string): Promise<ChatListItem[]> {
       },
     });
 
+    // Filter out chats with no non-deleted messages
+    const activeChats = chats.filter((chat) => chat.messages.length > 0 || chat._count.messages > 0);
+
     // Transform chats for UI display
-    const chatListItems = chats.map((chat) =>
+    const chatListItems = activeChats.map((chat) =>
       transformChatForList(chat as ChatWithRelations, userId),
     );
 
@@ -221,7 +241,7 @@ export async function getOrCreateChat(
 }
 
 /**
- * Delete a chat (soft delete all messages)
+ * Delete a chat (soft delete all messages and optionally remove chat)
  */
 export async function deleteChat(
   chatId: string,
@@ -244,20 +264,56 @@ export async function deleteChat(
       throw new Error('Chat not found or user is not a member');
     }
 
-    // Soft delete all messages in the chat
-    await prisma.message.updateMany({
-      where: {
-        chatId: chatId,
-      },
-      data: {
-        deleted: true,
-        deletedAt: new Date(),
-        deletedBy: userId,
-      },
-    });
+    // Use transaction to ensure consistency
+    await prisma.$transaction(async (tx) => {
+      // Soft delete all messages in the chat
+      await tx.message.updateMany({
+        where: {
+          chatId: chatId,
+        },
+        data: {
+          deleted: true,
+          deletedAt: new Date(),
+          deletedBy: userId,
+        },
+      });
 
-    // Optionally delete the chat itself
-    // await prisma.chat.delete({ where: { id: chatId } });
+      // Check if there are only 2 members (1-on-1 chat)
+      const memberCount = await tx.chatMember.count({
+        where: { chatId: chatId },
+      });
+
+      // For 1-on-1 chats, remove the current user's membership
+      // This effectively hides the chat for them
+      if (memberCount <= 2) {
+        await tx.chatMember.delete({
+          where: {
+            chatId_uid: {
+              chatId: chatId,
+              uid: userId,
+            },
+          },
+        });
+
+        // Check remaining members after deletion
+        const remainingMembers = await tx.chatMember.count({
+          where: { chatId: chatId },
+        });
+
+        // If only one or no members left, delete the chat entirely
+        if (remainingMembers <= 1) {
+          // Delete remaining memberships first
+          await tx.chatMember.deleteMany({
+            where: { chatId: chatId },
+          });
+
+          // Then delete the chat
+          await tx.chat.delete({
+            where: { id: chatId },
+          });
+        }
+      }
+    });
   } catch (error) {
     console.error('Error deleting chat:', error);
     throw new Error('Failed to delete chat');
