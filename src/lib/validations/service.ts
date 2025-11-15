@@ -36,10 +36,10 @@ export const formServiceAddonSchema = z.object({
       'Η περιγραφή της extra υπηρεσίας πρέπει να είναι τουλάχιστον 10 χαρακτήρες',
     )
     .max(500, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 500 χαρακτήρες'),
-  price: z.preprocess(
-    (val) => (val === null || val === undefined || val === '' ? 0 : val),
-    z.number().min(5, 'Η ελάχιστη τιμή είναι 5€').max(5000, 'Η μέγιστη τιμή είναι 5.000€')
-  ),
+  price: z
+    .number()
+    .min(5, 'Η ελάχιστη τιμή είναι 5€')
+    .max(5000, 'Η μέγιστη τιμή είναι 5.000€'),
 });
 
 export const formServiceFaqSchema = z.object({
@@ -63,10 +63,11 @@ export const draftServiceAddonSchema = z.object({
     .string()
     .max(500, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 500 χαρακτήρες')
     .optional(),
-  price: z.preprocess(
-    (val) => (val === null || val === undefined || val === '' ? 0 : val),
-    z.number().min(0, 'Η τιμή δεν μπορεί να είναι αρνητική').max(5000, 'Η τιμή δεν μπορεί να ξεπερνά τα 5.000€')
-  ).optional(),
+  price: z
+    .number()
+    .min(0, 'Η τιμή δεν μπορεί να είναι αρνητική')
+    .max(5000, 'Η τιμή δεν μπορεί να ξεπερνά τα 5.000€')
+    .optional(),
 });
 
 export const draftServiceFaqSchema = z.object({
@@ -129,12 +130,12 @@ export const serviceEditSchema = z.object({
     .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
     .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες')
     .optional(),
-  price: z.preprocess(
-    (val) => (val === null || val === undefined || val === '' ? undefined : val),
-    z.number().refine((val) => val === 0 || val >= 10, {
+  price: z
+    .number()
+    .refine((val) => val === 0 || val >= 10, {
       message: 'Η τιμή πρέπει να είναι 0 ή τουλάχιστον 10€',
-    }).optional()
-  ),
+    })
+    .optional(),
   status: z.nativeEnum(Status).optional(),
   category: serviceTaxonomySchema,
   subcategory: serviceTaxonomySchema,
@@ -437,10 +438,11 @@ export const serviceDetailsSchema = z
       .array(z.string())
       .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες')
       .default([]),
-    price: z.preprocess(
-      (val) => (val === null || val === undefined || val === '' ? undefined : val),
-      z.number().int().max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€').optional()
-    ),
+    price: z
+      .number()
+      .int()
+      .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
+      .optional(),
     fixed: z.boolean(),
     duration: z
       .number()
@@ -576,10 +578,11 @@ export const createServiceSchema = z
       .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες')
       .default([])
       .optional(),
-    price: z.preprocess(
-      (val) => (val === null || val === undefined || val === '' ? undefined : val),
-      z.number().int().max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€').optional()
-    ),
+    price: z
+      .number()
+      .int()
+      .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
+      .optional(),
     fixed: z.boolean(),
     duration: z
       .number()
@@ -762,10 +765,12 @@ export const createServiceDraftSchema = z.object({
     .array(z.string())
     .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες')
     .optional(),
-  price: z.preprocess(
-    (val) => (val === null || val === undefined || val === '' ? undefined : val),
-    z.number().int().min(0, 'Η τιμή δεν μπορεί να είναι αρνητική').max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€').optional()
-  ),
+  price: z
+    .number()
+    .int()
+    .min(0, 'Η τιμή δεν μπορεί να είναι αρνητική')
+    .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
+    .optional(),
   fixed: z.boolean().optional(),
   duration: z
     .number()
@@ -832,6 +837,50 @@ export const createServiceDraftSchema = z.object({
     .array(cloudinaryResourceSchema)
     .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
     .optional(),
+});
+
+// =============================================
+// ADMIN EDIT SCHEMAS (Clean types without coercion)
+// =============================================
+
+// Admin edit schemas for forms that edit existing validated data
+// These don't need coercion since data is already validated from DB
+export const adminEditServiceAddonSchema = z.object({
+  title: z
+    .string()
+    .min(5, 'Ο τίτλος της extra υπηρεσίας πρέπει να είναι τουλάχιστον 5 χαρακτήρες')
+    .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
+  description: z
+    .string()
+    .min(10, 'Η περιγραφή της extra υπηρεσίας πρέπει να είναι τουλάχιστον 10 χαρακτήρες')
+    .max(500, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 500 χαρακτήρες'),
+  price: z
+    .number()
+    .min(5, 'Η ελάχιστη τιμή είναι 5€')
+    .max(5000, 'Η μέγιστη τιμή είναι 5.000€'),
+});
+
+export const adminEditServiceAddonsSchema = z.object({
+  addons: z
+    .array(adminEditServiceAddonSchema)
+    .max(3, 'Μπορείτε να προσθέσετε έως 3 extra υπηρεσίες')
+    .optional(),
+});
+
+export const adminEditServicePricingSchema = z.object({
+  price: z
+    .number()
+    .int()
+    .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
+    .optional(),
+  fixed: z.boolean(),
+  duration: z
+    .number()
+    .int()
+    .min(0, 'Η διάρκεια δεν μπορεί να είναι αρνητική')
+    .max(365, 'Η διάρκεια δεν μπορεί να ξεπερνά τις 365 ημέρες')
+    .optional(),
+  subscriptionType: z.nativeEnum(SubscriptionType).optional(),
 });
 
 // =============================================

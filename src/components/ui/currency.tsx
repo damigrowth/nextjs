@@ -52,10 +52,10 @@ const Currency = React.forwardRef<HTMLInputElement, CurrencyProps>(
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const inputValue = e.target.value
 
-      // Allow empty string
+      // Allow empty string - send 0 instead of null for validation
       if (inputValue === '') {
         setDisplayValue('')
-        onValueChange?.(null)
+        onValueChange?.(0)
         return
       }
 

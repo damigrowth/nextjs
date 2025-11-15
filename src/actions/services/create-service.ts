@@ -223,8 +223,12 @@ async function createServiceInternal(
             },
             subscriptionType: data.subscriptionType || null,
             duration: data.duration || 0,
-            addons: data.addons || [],
-            faq: data.faq || [],
+            addons: (data.addons || []).filter((addon): addon is { title: string; description: string; price: number } =>
+              Boolean(addon.title && addon.description && addon.price !== undefined)
+            ),
+            faq: (data.faq || []).filter((faq): faq is { question: string; answer: string } =>
+              Boolean(faq.question && faq.answer)
+            ),
             media: sanitizedMedia,
             status: status,
             featured: false,
@@ -277,8 +281,12 @@ async function createServiceInternal(
             },
             subscriptionType: data.subscriptionType || null,
             duration: data.duration || 0,
-            addons: data.addons || [],
-            faq: data.faq || [],
+            addons: (data.addons || []).filter((addon): addon is { title: string; description: string; price: number } =>
+              Boolean(addon.title && addon.description && addon.price !== undefined)
+            ),
+            faq: (data.faq || []).filter((faq): faq is { question: string; answer: string } =>
+              Boolean(faq.question && faq.answer)
+            ),
             media: sanitizedMedia,
             status: status,
             featured: false,

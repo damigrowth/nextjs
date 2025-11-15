@@ -27,18 +27,10 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { updateServicePricingAction } from '@/actions/admin/services';
 import { populateFormData } from '@/lib/utils/form';
-import { createServiceSchema } from '@/lib/validations/service';
+import { adminEditServicePricingSchema } from '@/lib/validations/service';
 import { Currency } from '@/components/ui/currency';
 
-// Use dashboard service schema - pick only pricing fields
-const editServicePricingSchema = createServiceSchema.pick({
-  price: true,
-  fixed: true,
-  duration: true,
-  subscriptionType: true,
-});
-
-type EditServicePricingFormValues = z.infer<typeof editServicePricingSchema>;
+type EditServicePricingFormValues = z.infer<typeof adminEditServicePricingSchema>;
 
 interface EditServicePricingFormProps {
   service: {
@@ -55,7 +47,7 @@ export function EditServicePricingForm({ service }: EditServicePricingFormProps)
   const [state, formAction, isPending] = useActionState(updateServicePricingAction, null);
 
   const form = useForm<EditServicePricingFormValues>({
-    resolver: zodResolver(editServicePricingSchema),
+    resolver: zodResolver(adminEditServicePricingSchema),
     mode: 'onChange',
     defaultValues: {
       price: service.price,

@@ -12,14 +12,9 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { updateServiceAddonsAction } from '@/actions/admin/services';
 import { populateFormData } from '@/lib/utils/form';
-import { createServiceSchema } from '@/lib/validations/service';
+import { adminEditServiceAddonsSchema } from '@/lib/validations/service';
 
-// Use dashboard service schema - pick only addons field with all validations
-const editServiceAddonsSchema = createServiceSchema.pick({
-  addons: true,
-});
-
-type EditServiceAddonsFormValues = z.infer<typeof editServiceAddonsSchema>;
+type EditServiceAddonsFormValues = z.infer<typeof adminEditServiceAddonsSchema>;
 
 interface EditServiceAddonsFormProps {
   service: {
@@ -37,7 +32,7 @@ export function EditServiceAddonsForm({ service }: EditServiceAddonsFormProps) {
   const [state, formAction, isPending] = useActionState(updateServiceAddonsAction, null);
 
   const form = useForm<EditServiceAddonsFormValues>({
-    resolver: zodResolver(editServiceAddonsSchema),
+    resolver: zodResolver(adminEditServiceAddonsSchema),
     mode: 'onChange',
     defaultValues: {
       addons: service.addons || [],
