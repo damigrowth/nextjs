@@ -17,6 +17,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  PopoverAnchor,
 } from '@/components/ui/popover';
 
 export interface LazyComboboxOption {
@@ -55,6 +56,9 @@ export interface LazyComboboxProps {
   loadMoreIncrement?: number;
   searchLimit?: number;
 
+  // Trigger behavior
+  trigger?: 'click' | 'search';
+
   // Styling
   className?: string;
   disabled?: boolean;
@@ -82,6 +86,7 @@ export function LazyCombobox({
   loadMoreThreshold = 100,
   loadMoreIncrement = 20,
   searchLimit = 100,
+  trigger = 'click',
   className,
   disabled = false,
   showProgress = true,
@@ -91,23 +96,38 @@ export function LazyCombobox({
   const [searchQuery, setSearchQuery] = React.useState('');
   const [displayLimit, setDisplayLimit] = React.useState(initialLimit);
   const scrollRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const [inputValue, setInputValue] = React.useState('');
 
   // Reset display limit when popover closes
   React.useEffect(() => {
     if (!open) {
       setDisplayLimit(initialLimit);
       setSearchQuery('');
+      setInputValue('');
     }
   }, [open, initialLimit]);
 
+  // Auto-open popover when user types (search trigger mode)
+  React.useEffect(() => {
+    if (trigger === 'search') {
+      if (inputValue.length > 0 && !open) {
+        setOpen(true);
+      } else if (inputValue.length === 0 && open) {
+        setOpen(false);
+      }
+    }
+  }, [inputValue, open, trigger]);
+
   // Filter and display logic
   const { displayedOptions, totalFiltered, isSearching } = React.useMemo(() => {
-    const isSearching = searchQuery.length > 0;
+    const activeSearchQuery = trigger === 'search' ? inputValue : searchQuery;
+    const isSearching = activeSearchQuery.length > 0;
 
     // Filter based on search
     const filtered = isSearching
       ? options.filter((option) =>
-          option.label.toLowerCase().includes(searchQuery.toLowerCase()),
+          option.label.toLowerCase().includes(activeSearchQuery.toLowerCase()),
         )
       : options;
 
@@ -121,7 +141,7 @@ export function LazyCombobox({
       totalFiltered: filtered.length,
       isSearching,
     };
-  }, [options, searchQuery, displayLimit, searchLimit]);
+  }, [options, searchQuery, inputValue, displayLimit, searchLimit, trigger]);
 
   // Scroll handler for lazy loading
   const handleScroll = React.useCallback(
@@ -221,56 +241,105 @@ export function LazyCombobox({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant='outline'
-          role='combobox'
-          aria-expanded={open}
-          className={cn(
-            'w-full justify-between',
-            'font-normal', // Always apply font-normal
-            !value && !multiple && 'text-muted-foreground',
-            values.length === 0 && multiple && 'text-muted-foreground',
-            (renderButtonContent || (multiple && selectedOptions.length > 0)) &&
-              'h-auto py-2',
-            className,
-          )}
-          disabled={disabled}
-        >
-          {renderButtonContent ? (
-            <div className='flex items-center flex-1 min-w-0'>
-              {renderButtonContent(selectedOption)}
+      {trigger === 'click' ? (
+        <PopoverTrigger asChild>
+          <Button
+            variant='outline'
+            role='combobox'
+            aria-expanded={open}
+            className={cn(
+              'w-full justify-between',
+              'font-normal', // Always apply font-normal
+              !value && !multiple && 'text-muted-foreground',
+              values.length === 0 && multiple && 'text-muted-foreground',
+              (renderButtonContent || (multiple && selectedOptions.length > 0)) &&
+                'h-auto py-2',
+              className,
+            )}
+            disabled={disabled}
+          >
+            {renderButtonContent ? (
+              <div className='flex items-center flex-1 min-w-0'>
+                {renderButtonContent(selectedOption)}
+              </div>
+            ) : multiple && selectedOptions.length > 0 ? (
+              <div className='flex flex-wrap gap-1 flex-1'>
+                {selectedOptions.map((option) => (
+                  <Badge
+                    key={option.id}
+                    variant='default'
+                    className='mr-1'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveBadge(option.id);
+                    }}
+                  >
+                    {option.label}
+                    <X className='ml-1 h-3 w-3' />
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              buttonLabel
+            )}
+            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+          </Button>
+        </PopoverTrigger>
+      ) : (
+        <>
+          <PopoverAnchor asChild>
+            <div className={cn('relative flex flex-row flex-wrap items-center gap-2 rounded-md border border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring', className)}>
+              {renderButtonContent && selectedOption ? (
+                renderButtonContent(selectedOption)
+              ) : multiple && selectedOptions.length > 0 ? (
+                selectedOptions.map((option) => (
+                  <Badge
+                    key={option.id}
+                    variant='default'
+                    className='mr-1'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveBadge(option.id);
+                    }}
+                  >
+                    {option.label}
+                    <X className='ml-1 h-3 w-3' />
+                  </Badge>
+                ))
+              ) : null}
+              <input
+                ref={inputRef}
+                type='text'
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder={placeholder}
+                disabled={disabled}
+                className='flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
+              />
             </div>
-          ) : multiple && selectedOptions.length > 0 ? (
-            <div className='flex flex-wrap gap-1 flex-1'>
-              {selectedOptions.map((option) => (
-                <Badge
-                  key={option.id}
-                  variant='default'
-                  className='mr-1'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveBadge(option.id);
-                  }}
-                >
-                  {option.label}
-                  <X className='ml-1 h-3 w-3' />
-                </Badge>
-              ))}
-            </div>
-          ) : (
-            buttonLabel
-          )}
-          <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className='w-full p-0' align='start'>
+          </PopoverAnchor>
+        </>
+      )}
+      <PopoverContent
+        className='w-full p-0'
+        side='bottom'
+        align='start'
+        onOpenAutoFocus={(e) => {
+          // Prevent popover from stealing focus from input in search mode
+          if (trigger === 'search') {
+            e.preventDefault();
+            inputRef.current?.focus();
+          }
+        }}
+      >
         <Command shouldFilter={false}>
-          <CommandInput
-            placeholder={searchPlaceholder}
-            value={searchQuery}
-            onValueChange={setSearchQuery}
-          />
+          {trigger === 'click' && (
+            <CommandInput
+              placeholder={searchPlaceholder}
+              value={searchQuery}
+              onValueChange={setSearchQuery}
+            />
+          )}
           <CommandList ref={scrollRef} onScroll={handleScroll}>
             <CommandEmpty>{emptyMessage}</CommandEmpty>
             <CommandGroup>

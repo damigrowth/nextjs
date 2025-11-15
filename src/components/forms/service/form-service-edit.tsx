@@ -446,6 +446,7 @@ export default function FormServiceEdit({
             Επιλέξτε τις κατηγορίες της υπηρεσίας
           </p>
           <LazyCombobox
+            trigger='search'
             options={allSubdivisions}
             value={watchedSubdivision || undefined}
             onSelect={(option) => {
