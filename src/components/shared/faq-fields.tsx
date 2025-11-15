@@ -99,7 +99,7 @@ export function FaqFields({
                     />
                   </FormControl>
                   <div className='text-sm text-gray-500'>
-                    {field.value?.length || 0}/200 χαρακτήρες
+                    {(field.value || '')?.length || 0}/200 χαρακτήρες
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -125,7 +125,7 @@ export function FaqFields({
                     />
                   </FormControl>
                   <div className='text-sm text-gray-500'>
-                    {field.value?.length || 0}/1000 χαρακτήρες
+                    {(field.value || '')?.length || 0}/1000 χαρακτήρες
                   </div>
                   <FormMessage />
                 </FormItem>

@@ -21,7 +21,7 @@ import { SubscriptionType, Status } from '@prisma/client';
 // Using imported schemas: serviceAddonSchema, serviceFaqSchema, serviceTypeSchema, cloudinaryResourceSchema
 
 // Add validation refinements for form-specific requirements
-export const formServiceAddonSchema = serviceAddonSchema.extend({
+export const formServiceAddonSchema = z.object({
   title: z
     .string()
     .min(
@@ -36,13 +36,13 @@ export const formServiceAddonSchema = serviceAddonSchema.extend({
       'Η περιγραφή της extra υπηρεσίας πρέπει να είναι τουλάχιστον 10 χαρακτήρες',
     )
     .max(500, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 500 χαρακτήρες'),
-  price: z
-    .number()
-    .min(5, 'Η ελάχιστη τιμή είναι 5€')
-    .max(5000, 'Η μέγιστη τιμή είναι 5.000€'),
+  price: z.preprocess(
+    (val) => (val === null || val === undefined || val === '' ? 0 : val),
+    z.number().min(5, 'Η ελάχιστη τιμή είναι 5€').max(5000, 'Η μέγιστη τιμή είναι 5.000€')
+  ),
 });
 
-export const formServiceFaqSchema = serviceFaqSchema.extend({
+export const formServiceFaqSchema = z.object({
   question: z
     .string()
     .min(10, 'Η ερώτηση πρέπει να είναι τουλάχιστον 10 χαρακτήρες')
@@ -54,26 +54,30 @@ export const formServiceFaqSchema = serviceFaqSchema.extend({
 });
 
 // Draft versions with relaxed validation
-export const draftServiceAddonSchema = serviceAddonSchema.extend({
+export const draftServiceAddonSchema = z.object({
   title: z
     .string()
-    .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
+    .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες')
+    .optional(),
   description: z
     .string()
-    .max(500, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 500 χαρακτήρες'),
-  price: z
-    .number()
-    .min(0, 'Η τιμή δεν μπορεί να είναι αρνητική')
-    .max(5000, 'Η τιμή δεν μπορεί να ξεπερνά τα 5.000€'),
+    .max(500, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 500 χαρακτήρες')
+    .optional(),
+  price: z.preprocess(
+    (val) => (val === null || val === undefined || val === '' ? 0 : val),
+    z.number().min(0, 'Η τιμή δεν μπορεί να είναι αρνητική').max(5000, 'Η τιμή δεν μπορεί να ξεπερνά τα 5.000€')
+  ).optional(),
 });
 
-export const draftServiceFaqSchema = serviceFaqSchema.extend({
+export const draftServiceFaqSchema = z.object({
   question: z
     .string()
-    .max(200, 'Η ερώτηση δεν μπορεί να ξεπερνά τους 200 χαρακτήρες'),
+    .max(200, 'Η ερώτηση δεν μπορεί να ξεπερνά τους 200 χαρακτήρες')
+    .optional(),
   answer: z
     .string()
-    .max(1000, 'Η απάντηση δεν μπορεί να ξεπερνά τους 1000 χαρακτήρες'),
+    .max(1000, 'Η απάντηση δεν μπορεί να ξεπερνά τους 1000 χαρακτήρες')
+    .optional(),
 });
 
 // =============================================
@@ -125,12 +129,12 @@ export const serviceEditSchema = z.object({
     .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
     .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες')
     .optional(),
-  price: z
-    .number()
-    .refine((val) => val === 0 || val >= 10, {
+  price: z.preprocess(
+    (val) => (val === null || val === undefined || val === '' ? undefined : val),
+    z.number().refine((val) => val === 0 || val >= 10, {
       message: 'Η τιμή πρέπει να είναι 0 ή τουλάχιστον 10€',
-    })
-    .optional(),
+    }).optional()
+  ),
   status: z.nativeEnum(Status).optional(),
   category: serviceTaxonomySchema,
   subcategory: serviceTaxonomySchema,
@@ -189,6 +193,17 @@ export const serviceEditSchema = z.object({
                 'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
               path: [index, 'description'],
             });
+          });
+        }
+      });
+
+      // Check that all addon prices are at least 5€
+      addons.forEach((addon, index) => {
+        if (addon.price < 5) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Η ελάχιστη τιμή είναι 5€',
+            path: [index, 'price'],
           });
         }
       });
@@ -422,11 +437,10 @@ export const serviceDetailsSchema = z
       .array(z.string())
       .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες')
       .default([]),
-    price: z
-      .number()
-      .int()
-      .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
-      .optional(),
+    price: z.preprocess(
+      (val) => (val === null || val === undefined || val === '' ? undefined : val),
+      z.number().int().max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€').optional()
+    ),
     fixed: z.boolean(),
     duration: z
       .number()
@@ -562,11 +576,10 @@ export const createServiceSchema = z
       .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες')
       .default([])
       .optional(),
-    price: z
-      .number()
-      .int()
-      .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
-      .optional(),
+    price: z.preprocess(
+      (val) => (val === null || val === undefined || val === '' ? undefined : val),
+      z.number().int().max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€').optional()
+    ),
     fixed: z.boolean(),
     duration: z
       .number()
@@ -602,6 +615,15 @@ export const createServiceSchema = z
         {
           message:
             'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
+        },
+      )
+      .refine(
+        (addons) => {
+          if (!addons || addons.length === 0) return true;
+          return addons.every((addon) => addon.price >= 5);
+        },
+        {
+          message: 'Η ελάχιστη τιμή για κάθε extra υπηρεσία είναι 5€',
         },
       ),
     faq: z
@@ -740,12 +762,10 @@ export const createServiceDraftSchema = z.object({
     .array(z.string())
     .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες')
     .optional(),
-  price: z
-    .number()
-    .int()
-    .min(0, 'Η τιμή δεν μπορεί να είναι αρνητική')
-    .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
-    .optional(),
+  price: z.preprocess(
+    (val) => (val === null || val === undefined || val === '' ? undefined : val),
+    z.number().int().min(0, 'Η τιμή δεν μπορεί να είναι αρνητική').max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€').optional()
+  ),
   fixed: z.boolean().optional(),
   duration: z
     .number()

@@ -51,7 +51,7 @@ const Currency = React.forwardRef<HTMLInputElement, CurrencyProps>(
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const inputValue = e.target.value
-      
+
       // Allow empty string
       if (inputValue === '') {
         setDisplayValue('')
@@ -60,42 +60,48 @@ const Currency = React.forwardRef<HTMLInputElement, CurrencyProps>(
       }
 
       // Create regex based on decimal settings
-      const decimalRegex = allowDecimals 
+      const decimalRegex = allowDecimals
         ? new RegExp(`^\\d*\\.?\\d{0,${decimalPlaces}}$`)
         : /^\d*$/
 
       // Validate input format
       if (decimalRegex.test(inputValue)) {
         setDisplayValue(inputValue)
-        
+
         // Convert to number
         const numericValue = allowDecimals ? parseFloat(inputValue) : parseInt(inputValue, 10)
-        
-        // Check if it's a valid number
+
+        // Check if it's a valid number and send raw value (no constraints while typing)
         if (!isNaN(numericValue)) {
-          // Apply min/max constraints
-          let constrainedValue = numericValue
-          if (min !== undefined && constrainedValue < min) {
-            constrainedValue = min
-          }
-          if (max !== undefined && constrainedValue > max) {
-            constrainedValue = max
-          }
-          
-          onValueChange?.(constrainedValue)
+          onValueChange?.(numericValue)
         }
       }
     }
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-      // Format the display value on blur if we have a valid number
+      // Apply min/max constraints and format the display value on blur
       if (displayValue && !isNaN(parseFloat(displayValue))) {
-        const numValue = parseFloat(displayValue)
+        let numValue = parseFloat(displayValue)
+
+        // Apply min/max constraints
+        if (min !== undefined && numValue < min) {
+          numValue = min
+        }
+        if (max !== undefined && numValue > max) {
+          numValue = max
+        }
+
+        // Format and update display
         if (allowDecimals) {
           setDisplayValue(numValue.toFixed(decimalPlaces))
+        } else {
+          setDisplayValue(numValue.toString())
         }
+
+        // Send constrained value
+        onValueChange?.(numValue)
       }
-      
+
       // Call original onBlur if provided
       props.onBlur?.(e)
     }
