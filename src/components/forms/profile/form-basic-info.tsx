@@ -11,13 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 // Shadcn UI components
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import {
   Form,
   FormControl,
@@ -28,20 +22,9 @@ import {
 } from '@/components/ui/form';
 import { toast } from 'sonner';
 
-// Icons
-import { ChevronsUpDown, Check } from 'lucide-react';
-
 // Custom components
 import { Selectbox } from '@/components/ui/selectbox';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
 
 // Static constants and dataset utilities
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
@@ -440,6 +423,11 @@ export default function BasicInfoForm({
             // Watch skills inside render to get updates
             const currentSkills = form.watch('skills');
 
+            // Filter skillsDataset to only show skills that are currently selected
+            const availableSpecialities = currentSkills
+              ? skillsDataset.filter((skill) => currentSkills.includes(skill.id))
+              : [];
+
             return (
               <FormItem>
                 <FormLabel>Ειδικότητα</FormLabel>
@@ -448,68 +436,27 @@ export default function BasicInfoForm({
                   δεξιότητες
                 </p>
                 <FormControl>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant='outline'
-                        role='combobox'
-                        className='w-full justify-between font-normal'
-                        disabled={!currentSkills || currentSkills.length === 0}
-                      >
-                        {field.value
-                          ? (() => {
-                              const selectedSkill = skillsDataset.find(
-                                (skill) => skill.id === field.value,
-                              );
-                              return (
-                                selectedSkill?.label || 'Μη έγκυρη ειδικότητα'
-                              );
-                            })()
-                          : currentSkills && currentSkills.length > 0
-                            ? 'Επιλέξτε ειδικότητα...'
-                            : 'Επιλέξτε πρώτα δεξιότητες'}
-                        <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className='w-full p-0'>
-                      <Command>
-                        <CommandInput placeholder='Αναζήτηση ειδικότητας...' />
-                        <CommandList>
-                          <CommandEmpty>Δεν βρέθηκαν ειδικότητες.</CommandEmpty>
-                          <CommandGroup>
-                            {currentSkills &&
-                              currentSkills
-                                .map((skillId: string) =>
-                                  skillsDataset.find(
-                                    (skill) => skill.id === skillId,
-                                  ),
-                                )
-                                .filter(Boolean)
-                                .map((skill) => (
-                                  <CommandItem
-                                    value={skill!.label}
-                                    key={skill!.id}
-                                    onSelect={() => {
-                                      setValue('speciality', skill!.id, {
-                                        shouldDirty: true,
-                                      });
-                                    }}
-                                  >
-                                    <Check
-                                      className={
-                                        field.value === skill!.id
-                                          ? 'mr-2 h-4 w-4 opacity-100'
-                                          : 'mr-2 h-4 w-4 opacity-0'
-                                      }
-                                    />
-                                    {skill!.label}
-                                  </CommandItem>
-                                ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                  <Selectbox
+                    key={`speciality-${currentSkills?.join('-') || 'empty'}`} // Force remount when skills change
+                    options={availableSpecialities}
+                    value={field.value || ''}
+                    onValueChange={(value) => {
+                      if (value) {
+                        field.onChange(value);
+                        setValue('speciality', value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                      }
+                    }}
+                    placeholder={
+                      currentSkills && currentSkills.length > 0
+                        ? 'Επιλέξτε ειδικότητα...'
+                        : 'Επιλέξτε πρώτα δεξιότητες'
+                    }
+                    disabled={!currentSkills || currentSkills.length === 0}
+                    fullWidth
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
