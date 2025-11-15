@@ -148,6 +148,22 @@ export default function BasicInfoForm({
   const watchedCategory = watch('category');
   const watchedSkills = watch('skills');
 
+  // Memoize filtered subcategories based on selected category
+  const filteredSubcategories = React.useMemo(() => {
+    const category = proTaxonomies.find((cat) => cat.id === watchedCategory);
+    const subcategories = category?.children || [];
+    return initialUser?.role
+      ? filterByField(subcategories, 'type', initialUser.role)
+      : subcategories;
+  }, [watchedCategory, initialUser?.role]);
+
+  // Memoize filtered skills based on selected category
+  const filteredSkills = React.useMemo(() => {
+    return watchedCategory
+      ? filterSkillsByCategory(skillsDataset, watchedCategory)
+      : [];
+  }, [watchedCategory]);
+
   // Memoize available specialities based on selected skills
   const availableSpecialities = React.useMemo(() => {
     return watchedSkills
@@ -289,24 +305,12 @@ export default function BasicInfoForm({
               control={form.control}
               name='subcategory'
               render={({ field }) => {
-                // Get the current category value directly from form
-                const currentCategory = form.watch('category');
-
-                // Find category at top level only - findById searches recursively which could return a subcategory
-                const category = proTaxonomies.find(
-                  (cat) => cat.id === currentCategory,
-                );
-                const subcategories = category?.children || [];
-                const filteredSubcategories = initialUser?.role
-                  ? filterByField(subcategories, 'type', initialUser.role)
-                  : subcategories;
-
                 return (
                   <FormItem className='flex flex-col'>
                     <FormLabel>Υποκατηγορία*</FormLabel>
                     <FormControl>
                       <LazyCombobox
-                        key={`${currentCategory}-${filteredSubcategories.length}`} // Force remount when category or options change
+                        key={`${watchedCategory}-${filteredSubcategories.length}`} // Force remount when category or options change
                         options={filteredSubcategories}
                         value={field.value || ''}
                         onSelect={(selected) => {
@@ -315,7 +319,7 @@ export default function BasicInfoForm({
                         placeholder='Επιλέξτε υποκατηγορία...'
                         searchPlaceholder='Αναζήτηση υποκατηγορίας...'
                         emptyMessage='Δεν βρέθηκαν υποκατηγορίες.'
-                        disabled={!currentCategory}
+                        disabled={!watchedCategory}
                       />
                     </FormControl>
                     <FormMessage />
@@ -360,9 +364,6 @@ export default function BasicInfoForm({
           control={form.control}
           name='skills'
           render={({ field }) => {
-            // Get the current category value directly from form
-            const currentCategory = form.watch('category');
-
             return (
               <FormItem>
                 <FormLabel>
@@ -375,14 +376,11 @@ export default function BasicInfoForm({
                 </p>
                 <FormControl>
                   <div className='space-y-2'>
-                    {currentCategory ? (
+                    {watchedCategory ? (
                       <LazyCombobox
-                        key={`skills-${currentCategory}`} // Force remount when category changes
+                        key={`skills-${watchedCategory}`} // Force remount when category changes
                         multiple
-                        options={filterSkillsByCategory(
-                          skillsDataset,
-                          currentCategory,
-                        )}
+                        options={filteredSkills}
                         values={field.value || []}
                         onMultiSelect={(selectedOptions) => {
                           const selectedIds = selectedOptions.map(

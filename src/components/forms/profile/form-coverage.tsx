@@ -115,6 +115,24 @@ export default function CoverageForm({
     }));
   }, []);
 
+  // Memoize available areas based on selected counties
+  const availableAreas = React.useMemo(() => {
+    if (!watchedCoverage?.counties || watchedCoverage.counties.length === 0) {
+      return [];
+    }
+
+    return watchedCoverage.counties.flatMap((selectedCountyId: string) => {
+      const county = locationOptions.find((c) => c.id === selectedCountyId);
+      return (
+        county?.children?.map((area: any) => ({
+          id: area.id,
+          label: area.name,
+          county: county.name,
+        })) || []
+      );
+    });
+  }, [watchedCoverage?.counties]);
+
   // Update form values when profile data is available
   useEffect(() => {
     if (initialProfile?.coverage) {
@@ -503,9 +521,6 @@ export default function CoverageForm({
                 control={form.control}
                 name='coverage.areas'
                 render={({ field }) => {
-                  // Watch coverage inside the render to get updates
-                  const currentCoverage = form.watch('coverage');
-
                   return (
                     <FormItem>
                       <FormLabel className='text-sm font-medium text-gray-700'>
@@ -513,44 +528,31 @@ export default function CoverageForm({
                       </FormLabel>
                       <FormControl>
                         <div className='space-y-2'>
-                          {currentCoverage?.counties?.length > 0 ? (
+                          {watchedCoverage?.counties?.length > 0 ? (
                             <LazyCombobox
-                              key={`areas-${currentCoverage.counties.join('-')}`} // Force remount when counties change
+                              key={`areas-${watchedCoverage.counties.join('-')}`} // Force remount when counties change
                               multiple
                               className='bg-white'
-                              options={currentCoverage.counties.flatMap(
-                                (selectedCountyId: string) => {
-                                  const county = locationOptions.find(
-                                    (c) => c.id === selectedCountyId,
-                                  );
-                                  return (
-                                    county?.children?.map((area: any) => ({
-                                      id: area.id,
-                                      label: area.name,
-                                      county: county.name,
-                                    })) || []
-                                  );
-                                },
+                              options={availableAreas}
+                              values={field.value || []}
+                              onMultiSelect={(selectedOptions) => {
+                                const selectedIds = selectedOptions.map((opt) => opt.id);
+                                setValue('coverage.areas', selectedIds, {
+                                  shouldDirty: true,
+                                  shouldValidate: true,
+                                });
+                              }}
+                              onSelect={() => {}}
+                              placeholder='Επιλέξτε περιοχές...'
+                              searchPlaceholder='Αναζήτηση περιοχών...'
+                              formatLabel={(option) => (
+                                <>
+                                  {option.label}{' '}
+                                  <span className='text-gray-500'>
+                                    ({option.county})
+                                  </span>
+                                </>
                               )}
-                            values={field.value || []}
-                            onMultiSelect={(selectedOptions) => {
-                              const selectedIds = selectedOptions.map((opt) => opt.id);
-                              setValue('coverage.areas', selectedIds, {
-                                shouldDirty: true,
-                                shouldValidate: true,
-                              });
-                            }}
-                            onSelect={() => {}}
-                            placeholder='Επιλέξτε περιοχές...'
-                            searchPlaceholder='Αναζήτηση περιοχών...'
-                            formatLabel={(option) => (
-                              <>
-                                {option.label}{' '}
-                                <span className='text-gray-500'>
-                                  ({option.county})
-                                </span>
-                              </>
-                            )}
                             />
                           ) : (
                             <div className='text-gray-500 bg-gray-50 p-3 rounded-md border'>
