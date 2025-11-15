@@ -148,6 +148,13 @@ export default function BasicInfoForm({
   const watchedCategory = watch('category');
   const watchedSkills = watch('skills');
 
+  // Memoize available specialities based on selected skills
+  const availableSpecialities = React.useMemo(() => {
+    return watchedSkills
+      ? skillsDataset.filter((skill) => watchedSkills.includes(skill.id))
+      : [];
+  }, [watchedSkills]);
+
   // Helper functions for formatting inputs
   const handleTaglineChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatInput({
@@ -420,14 +427,6 @@ export default function BasicInfoForm({
           control={form.control}
           name='speciality'
           render={({ field }) => {
-            // Watch skills inside render to get updates
-            const currentSkills = form.watch('skills');
-
-            // Filter skillsDataset to only show skills that are currently selected
-            const availableSpecialities = currentSkills
-              ? skillsDataset.filter((skill) => currentSkills.includes(skill.id))
-              : [];
-
             return (
               <FormItem>
                 <FormLabel>Ειδικότητα</FormLabel>
@@ -437,7 +436,7 @@ export default function BasicInfoForm({
                 </p>
                 <FormControl>
                   <Selectbox
-                    key={`speciality-${currentSkills?.join('-') || 'empty'}`} // Force remount when skills change
+                    key={`speciality-${watchedSkills?.join('-') || 'empty'}`} // Force remount when skills change
                     options={availableSpecialities}
                     value={field.value || ''}
                     onValueChange={(value) => {
@@ -450,11 +449,11 @@ export default function BasicInfoForm({
                       }
                     }}
                     placeholder={
-                      currentSkills && currentSkills.length > 0
+                      watchedSkills && watchedSkills.length > 0
                         ? 'Επιλέξτε ειδικότητα...'
                         : 'Επιλέξτε πρώτα δεξιότητες'
                     }
-                    disabled={!currentSkills || currentSkills.length === 0}
+                    disabled={!watchedSkills || watchedSkills.length === 0}
                     fullWidth
                   />
                 </FormControl>
