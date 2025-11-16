@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -26,10 +26,13 @@ interface HeaderProps {
 export default function Header({ navigationData }: HeaderProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isHomePage, setIsHomePage] = useState(false);
   const { data: session } = useSession();
 
-  // Check if we're on the home page (handle both '/' and empty pathname)
-  const isHomePage = pathname === '/' || pathname === '';
+  // Prevent hydration mismatch by setting pathname-dependent state after mount
+  useEffect(() => {
+    setIsHomePage(pathname === '/');
+  }, [pathname]);
 
   return (
     <header
