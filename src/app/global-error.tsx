@@ -21,7 +21,7 @@ export default function GlobalError({
   return (
     <html lang='el'>
       <body>
-        <Header navigationData={[]} pathname="/" />
+        <Header navigationData={[]} />
         <main>
           <ErrorPage
             error={error}

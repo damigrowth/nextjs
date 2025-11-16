@@ -4,7 +4,6 @@ import '../styles/globals.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import { NotFoundPage } from '@/components/shared/not-found-page';
 import { Footer, Header } from '@/components/shared/layout';
 import { getNavigationMenuData } from '@/actions/services/get-categories';
@@ -19,14 +18,10 @@ export default async function GlobalNotFound() {
   const navDataResult = await getNavigationMenuData();
   const navigationData = navDataResult.success ? navDataResult.data : [];
 
-  // Get pathname from headers
-  const headersList = await headers();
-  const pathname = headersList.get('x-current-path') || '/';
-
   return (
     <html lang='el'>
       <body>
-        <Header navigationData={navigationData} pathname={pathname} />
+        <Header navigationData={navigationData} />
         <main>
           <NotFoundPage
             title='Ουπς! Η σελίδα δεν βρέθηκε'
