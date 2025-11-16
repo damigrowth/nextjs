@@ -28,9 +28,17 @@ export default function Header({ navigationData }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: session } = useSession();
 
+  // Check if we're on the home page (handle both '/' and empty pathname)
+  const isHomePage = pathname === '/' || pathname === '';
+
+  // Debug: Remove this after verifying
+  if (typeof window !== 'undefined') {
+    console.log('Header - pathname:', pathname, 'isHomePage:', isHomePage);
+  }
+
   return (
     <header
-      className={`h-16 md:h-20 w-full z-50 bg-white flex items-center border-b border-gray-200 shadow-sm py-2 ${pathname === '/' ? 'fixed top-0' : 'relative -mb-20'}`}
+      className={`h-16 md:h-20 w-full z-50 bg-white flex items-center border-b border-gray-200 shadow-sm py-2 ${isHomePage ? 'fixed top-0' : 'relative -mb-20'}`}
     >
       <div className='container mx-auto px-4'>
         <div className='flex items-center justify-between'>
