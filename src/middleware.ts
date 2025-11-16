@@ -8,7 +8,7 @@ import {
 const middlewares = [
   withLowercaseRedirect, // 1. Normalize URLs first
   withSimpleAuth, // 2. Simple auth (cookie check only - page level handles details)
-  withHeaders, // 3. Set headers (last)
+  withHeaders, // 3. Set headers including x-current-path (last)
 ];
 
 export default stackMiddlewares(middlewares);

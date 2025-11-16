@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { RegisterProButton } from '@/components/forms/auth';
@@ -21,18 +20,15 @@ import type { NavigationMenuCategory } from '@/lib/types/components';
 
 interface HeaderProps {
   navigationData: NavigationMenuCategory[];
+  pathname: string;
 }
 
-export default function Header({ navigationData }: HeaderProps) {
-  const pathname = usePathname();
+export default function Header({ navigationData, pathname }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isHomePage, setIsHomePage] = useState(false);
   const { data: session } = useSession();
 
-  // Prevent hydration mismatch by setting pathname-dependent state after mount
-  useEffect(() => {
-    setIsHomePage(pathname === '/');
-  }, [pathname]);
+  // Determine if we're on the home page (no hydration mismatch since pathname comes from server)
+  const isHomePage = pathname === '/';
 
   return (
     <header

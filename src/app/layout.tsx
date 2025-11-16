@@ -3,6 +3,7 @@ import '../styles/globals.css';
 
 import Script from 'next/script';
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
+import { headers } from 'next/headers';
 
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { config } from '@fortawesome/fontawesome-svg-core';
@@ -34,12 +35,16 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const navigationData = navDataResult.success ? navDataResult.data : [];
   const gaId = process.env.GA_ID;
 
+  // Get pathname from headers (set by withHeaders middleware)
+  const headersList = await headers();
+  const pathname = headersList.get('x-current-path') || '/';
+
   return (
     <html lang='el'>
       <Body>
         <TooltipProvider delayDuration={0}>
           <PathChecker excludes={['/dashboard', '/admin']}>
-            <Header navigationData={navigationData} />
+            <Header navigationData={navigationData} pathname={pathname} />
           </PathChecker>
           <main>
             <Notifications>{children}</Notifications>
