@@ -667,9 +667,18 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
     };
   } catch (error) {
     console.error('Error fetching services:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      name: error instanceof Error ? error.name : undefined,
+      stack: error instanceof Error ? error.stack : undefined,
+      filters: JSON.stringify(filters),
+      whereClause: JSON.stringify(whereClause, null, 2),
+      dbUrl: process.env.DATABASE_URL ? 'Set' : 'Not set',
+      directUrl: process.env.DIRECT_URL ? 'Set' : 'Not set',
+    });
     return {
       success: false,
-      error: 'Failed to fetch services',
+      error: `Failed to fetch services: ${error instanceof Error ? error.message : 'Unknown error'}`,
     };
   }
 }
