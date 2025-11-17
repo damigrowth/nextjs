@@ -10,9 +10,4 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
-
-  // Optimized for serverless with Supabase Transaction Pooler
-  // - relationMode: allows external connection pooling
-  // - connection_limit: adjust based on Supabase plan (free tier supports up to 15-20)
-  relationMode = "prisma"
 }
