@@ -26,13 +26,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Icons
@@ -50,14 +44,7 @@ import { locationOptions } from '@/constants/datasets/locations';
 import { formatInput } from '@/lib/utils/validation/formats';
 import { populateFormData } from '@/lib/utils/form';
 import {
-  findById,
-  findBySlug,
-  getLabelBySlug,
-  getChildrenById,
-  getChildrenBySlug,
-  filterByField,
   getAllZipcodes,
-  toggleItemInArray,
   resetCoverageDependencies,
   filterTaxonomyByType,
 } from '@/lib/utils/datasets';
@@ -69,7 +56,6 @@ import { onboardingFormSchemaWithMedia } from '@/lib/validations';
 import { completeOnboarding } from '@/actions/auth/complete-onboarding';
 
 // Types
-import { CloudinaryResource } from '@/lib/types/cloudinary';
 import { MediaUpload } from '../../media';
 import { FormButton } from '../../shared';
 import { AuthUser } from '@/lib/types';
@@ -465,6 +451,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
               <FormLabel>Κατηγορία*</FormLabel>
               <FormControl>
                 <LazyCombobox
+                  trigger='search'
                   options={allSubcategories}
                   value={field.value}
                   onSelect={handleSubcategorySelect}
@@ -479,11 +466,23 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
                       </span>
                     </>
                   )}
-                  getButtonLabel={(option) =>
-                    option
-                      ? `${option.label} (${option.categoryLabel})`
-                      : 'Επιλέξτε κατηγορία...'
-                  }
+                  renderButtonContent={(option) => {
+                    if (!option) {
+                      return (
+                        <span className='text-muted-foreground'>
+                          Επιλέξτε κατηγορία...
+                        </span>
+                      );
+                    }
+                    return (
+                      <>
+                        {option.label}{' '}
+                        <span className='text-gray-500'>
+                          ({option.categoryLabel})
+                        </span>
+                      </>
+                    );
+                  }}
                   initialLimit={20}
                   loadMoreIncrement={20}
                   searchLimit={100}
@@ -742,9 +741,8 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
                                 (c) => c.id === countyId,
                               );
                               return (
-                                county?.children?.map(
-                                  (area: any) => area.id,
-                                ) || []
+                                county?.children?.map((area: any) => area.id) ||
+                                []
                               );
                             },
                           );
@@ -809,7 +807,9 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
                               )}
                               values={field.value || []}
                               onMultiSelect={(selectedOptions) => {
-                                const selectedIds = selectedOptions.map((opt) => opt.id);
+                                const selectedIds = selectedOptions.map(
+                                  (opt) => opt.id,
+                                );
                                 setValue('coverage.areas', selectedIds, {
                                   shouldDirty: true,
                                   shouldValidate: true,

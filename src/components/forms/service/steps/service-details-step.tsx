@@ -209,8 +209,12 @@ export default function ServiceDetailsStep() {
           onSelect={(option) => {
             // Auto-populate all three fields
             setValue('category', option.category.id, { shouldValidate: true });
-            setValue('subcategory', option.subcategory.id, { shouldValidate: true });
-            setValue('subdivision', option.subdivision.id, { shouldValidate: true });
+            setValue('subcategory', option.subcategory.id, {
+              shouldValidate: true,
+            });
+            setValue('subdivision', option.subdivision.id, {
+              shouldValidate: true,
+            });
             clearErrors(['category', 'subcategory', 'subdivision']);
             // Clear tags when taxonomy changes
             setValue('tags', [], { shouldValidate: true });
@@ -228,7 +232,11 @@ export default function ServiceDetailsStep() {
           )}
           renderButtonContent={(option) => {
             if (!option) {
-              return <span className='text-muted-foreground'>Επιλέξτε κατηγορία...</span>;
+              return (
+                <span className='text-muted-foreground'>
+                  Επιλέξτε κατηγορία...
+                </span>
+              );
             }
             return (
               <div className='flex flex-wrap gap-1 items-center'>
@@ -327,7 +335,7 @@ export default function ServiceDetailsStep() {
                   <LazyCombobox
                     key={`tags-${currentCategory}`}
                     multiple
-                    options={currentAvailableTags.map(tag => ({
+                    options={currentAvailableTags.map((tag) => ({
                       id: tag.value,
                       label: tag.label,
                     }))}

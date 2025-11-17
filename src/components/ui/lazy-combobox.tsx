@@ -252,7 +252,8 @@ export function LazyCombobox({
               'font-normal', // Always apply font-normal
               !value && !multiple && 'text-muted-foreground',
               values.length === 0 && multiple && 'text-muted-foreground',
-              (renderButtonContent || (multiple && selectedOptions.length > 0)) &&
+              (renderButtonContent ||
+                (multiple && selectedOptions.length > 0)) &&
                 'h-auto py-2',
               className,
             )}
@@ -288,31 +289,37 @@ export function LazyCombobox({
       ) : (
         <>
           <PopoverAnchor asChild>
-            <div className={cn('relative flex flex-row flex-wrap items-center gap-2 rounded-md border border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring', className)}>
-              {renderButtonContent && selectedOption ? (
-                renderButtonContent(selectedOption)
-              ) : multiple && selectedOptions.length > 0 ? (
-                selectedOptions.map((option) => (
-                  <Badge
-                    key={option.id}
-                    variant='default'
-                    className='mr-1'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveBadge(option.id);
-                    }}
-                  >
-                    {option.label}
-                    <X className='ml-1 h-3 w-3' />
-                  </Badge>
-                ))
-              ) : null}
+            <div
+              onClick={() => inputRef.current?.focus()}
+              className={cn(
+                'relative flex flex-row flex-wrap items-center gap-2 rounded-md border border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring cursor-text',
+                className,
+              )}
+            >
+              {renderButtonContent && selectedOption
+                ? renderButtonContent(selectedOption)
+                : multiple && selectedOptions.length > 0
+                  ? selectedOptions.map((option) => (
+                      <Badge
+                        key={option.id}
+                        variant='default'
+                        className='mr-1'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveBadge(option.id);
+                        }}
+                      >
+                        {option.label}
+                        <X className='ml-1 h-3 w-3' />
+                      </Badge>
+                    ))
+                  : null}
               <input
                 ref={inputRef}
                 type='text'
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder={placeholder}
+                placeholder={selectedOption && !inputValue ? '' : placeholder}
                 disabled={disabled}
                 className='flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
               />
