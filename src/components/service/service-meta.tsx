@@ -18,8 +18,6 @@ interface ServiceMetaProps {
 export default function ServiceMeta({
   title,
   image,
-  firstName,
-  lastName,
   username,
   displayName,
   rating,
@@ -37,18 +35,29 @@ export default function ServiceMeta({
 
         {/* Meta Information */}
         <div className='flex flex-wrap items-center gap-4'>
-          {/* User Avatar and Display Name with integrated link */}
-          <UserAvatar
-            displayName={displayName}
-            image={image}
-            top={topLevel}
-            size='md'
-            className='h-10 w-10'
-            href={`/profile/${username}`}
-          />
-
-          {/* Badges Container */}
-          <ProfileBadges verified={verified} topLevel={topLevel} />
+          {/* User Avatar and Display Name */}
+          <div className='flex items-center'>
+            <UserAvatar
+              displayName={displayName}
+              image={image}
+              top={topLevel}
+              size='md'
+              className='h-10 w-10'
+              href={`/profile/${username}`}
+            />
+            <Link
+              href={`/profile/${username}`}
+              className='font-base text-gray-800 hover:text-primary transition-colors ml-3'
+            >
+              {displayName}
+            </Link>
+            {/* Badges Container */}
+            <ProfileBadges
+              verified={verified}
+              topLevel={topLevel}
+              className='ml-1.5'
+            />
+          </div>
 
           {/* Rating Display */}
           <RatingDisplay
