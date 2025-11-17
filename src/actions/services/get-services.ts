@@ -672,7 +672,6 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
       name: error instanceof Error ? error.name : undefined,
       stack: error instanceof Error ? error.stack : undefined,
       filters: JSON.stringify(filters),
-      whereClause: JSON.stringify(whereClause, null, 2),
       dbUrl: process.env.DATABASE_URL ? 'Set' : 'Not set',
       directUrl: process.env.DIRECT_URL ? 'Set' : 'Not set',
     });
