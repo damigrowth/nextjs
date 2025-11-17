@@ -6,6 +6,7 @@ import { User } from '@prisma/client';
 import { sendAuthEmail } from '@/lib/email';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma/client';
+import { cookies } from 'next/headers';
 
 export const auth = betterAuth({
   // Base URL and trusted origins for Vercel deployment compatibility
@@ -158,35 +159,61 @@ export const auth = betterAuth({
            * - Regular users: type='user', role='user'
            * - Pro users: type='pro', role='freelancer'|'company'
            *
-           * The admin plugin blocks direct 'role' assignment in signUpEmail.
-           * Instead, we read 'proRole' from context.body and apply it here.
+           * For email/password users: Read from context.body (type and proRole)
+           * For OAuth users: Read from oauth_intent cookie (set before OAuth flow)
            */
-
-          const requestType = context.body?.type || 'user';
-          const proRole = context.body?.proRole;
-
-          // Determine role based on type and proRole
-          let requestRole: string;
-
-          if (requestType === 'user') {
-            // Regular users always get 'user' role
-            requestRole = 'user';
-          } else if (requestType === 'pro') {
-            // Pro users get role from proRole field
-            if (!proRole || !['freelancer', 'company'].includes(proRole)) {
-              console.error('Invalid or missing proRole for pro user:', proRole);
-              throw new Error('Pro users must have a valid proRole (freelancer or company)');
-            }
-            requestRole = proRole;
-          } else {
-            console.error('Invalid user type:', requestType);
-            throw new Error('Invalid user type. Must be "user" or "pro"');
-          }
 
           // For OAuth users, provider comes from the user data (mapProfileToUser)
           // For email/password users, provider comes from request body
           const requestProvider =
             (user as any).provider || context.body?.provider || 'email';
+
+          let requestType: string;
+          let requestRole: string;
+
+          // OAuth users: read intent from cookie
+          if (requestProvider === 'google') {
+            try {
+              const cookieStore = await cookies();
+              const intentCookie = cookieStore.get('oauth_intent');
+
+              if (intentCookie?.value) {
+                const intent = JSON.parse(intentCookie.value);
+                requestType = intent.type || 'user';
+
+                if (requestType === 'pro' && intent.role) {
+                  requestRole = intent.role;
+                } else {
+                  requestRole = 'user';
+                }
+              } else {
+                // Fallback for OAuth users without intent (shouldn't happen)
+                requestType = 'user';
+                requestRole = 'user';
+              }
+            } catch (error) {
+              // Fallback on error
+              requestType = 'user';
+              requestRole = 'user';
+            }
+          } else {
+            // Email/password users: read from context.body
+            requestType = context.body?.type || 'user';
+            const proRole = context.body?.proRole;
+
+            if (requestType === 'user') {
+              requestRole = 'user';
+            } else if (requestType === 'pro') {
+              if (!proRole || !['freelancer', 'company'].includes(proRole)) {
+                console.error('Invalid or missing proRole for pro user:', proRole);
+                throw new Error('Pro users must have a valid proRole (freelancer or company)');
+              }
+              requestRole = proRole;
+            } else {
+              console.error('Invalid user type:', requestType);
+              throw new Error('Invalid user type. Must be "user" or "pro"');
+            }
+          }
 
           // console.log('Setting user - Provider:', requestProvider, 'Type:', requestType, 'Role:', requestRole);
 

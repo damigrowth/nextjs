@@ -39,6 +39,7 @@ import {
 } from '@/lib/validations/auth';
 import type { AuthType, ProRole } from '@/lib/types/auth';
 import { register } from '@/actions/auth/register';
+import { storeOAuthIntent } from '@/actions/auth/store-oauth-intent';
 
 // Icons
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
@@ -157,20 +158,32 @@ export default function RegisterForm() {
 
   const handleGoogleSignUp = async () => {
     try {
-      // Pass auth type through URL parameters instead of sessionStorage
-      // This works across devices and browsers
-      const callbackParams = new URLSearchParams({
-        type: type,
-      });
-
-      if (type === 'pro' && role) {
-        callbackParams.set('role', role);
+      // Validate that user has selected a type
+      if (type !== 'user' && type !== 'pro') {
+        setError('root', {
+          message: 'Παρακαλώ επιλέξτε τύπο λογαριασμού (Χρήστης ή Επαγγελματίας)',
+        });
+        return;
       }
 
-      // Better Auth OAuth flow with type parameters in callback URL
+      // Store registration intent (type and role) in secure httpOnly cookie
+      // This survives the OAuth redirect and cannot be manipulated via URL
+      const intentResult = await storeOAuthIntent({
+        type: type,
+        role: type === 'pro' ? role : undefined,
+      });
+
+      if (!intentResult.success) {
+        setError('root', {
+          message: 'Failed to initialize OAuth. Please try again.',
+        });
+        return;
+      }
+
+      // Better Auth OAuth flow - intent is now stored server-side
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: `/oauth-setup?${callbackParams.toString()}`,
+        callbackURL: '/oauth-setup',
       });
     } catch (error: any) {
       console.error('Google sign up error:', error);
