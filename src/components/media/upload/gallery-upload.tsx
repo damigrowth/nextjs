@@ -179,7 +179,9 @@ const GalleryUpload = memo<GalleryUploadProps>(
       [queuedFiles, resources, onRemoveFromQueue, onRemoveResource],
     );
 
-    const totalFiles = resources.length + queuedFiles.length;
+    const totalFiles =
+      resources.filter((r) => !isPendingResource(r)).length +
+      queuedFiles.length;
 
     // Generate stable sortable IDs for resources
     const resourceIds = resources.map((resource, index) => 
@@ -253,7 +255,10 @@ const GalleryUpload = memo<GalleryUploadProps>(
                   (Τρέχον μέγεθος:{' '}
                   <span className='font-semibold'>
                     {(
-                      queuedFiles.reduce((sum, f) => sum + f.size, 0) /
+                      (queuedFiles.reduce((sum, f) => sum + f.size, 0) +
+                        resources
+                          .filter((r) => !isPendingResource(r))
+                          .reduce((sum, r) => sum + (r.bytes || 0), 0)) /
                       1024 /
                       1024
                     ).toFixed(2)}
