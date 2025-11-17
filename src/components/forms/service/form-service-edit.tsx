@@ -302,6 +302,7 @@ export default function FormServiceEdit({
                   placeholder='π.χ. Δημιουργία λογοτύπου και ταυτότητας επιχείρησης'
                   maxLength={100}
                   {...field}
+                  disabled={initialUser?.role !== 'admin'}
                   onChange={(e) => {
                     const value = e.target.value.slice(0, 100);
                     field.onChange(value);
