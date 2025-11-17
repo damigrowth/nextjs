@@ -11,11 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return getOAuthSetupMetadata();
 }
 
-interface PageProps {
-  searchParams: Promise<{ type?: string }>;
-}
-
-export default async function OAuthSetupPage({ searchParams }: PageProps) {
+export default async function OAuthSetupPage() {
   // Get current user - disable caching to get fresh data for OAuth flow
   const userResult = await getCurrentUser({ revalidate: true });
 
@@ -42,13 +38,10 @@ export default async function OAuthSetupPage({ searchParams }: PageProps) {
     }
   }
 
-  // Get type and role from URL parameters (passed from register page) - Next.js 15 requires await
-  const params = await searchParams;
-  const urlType = params.type;
-
-  // Prioritize URL parameter for type determination
-  // URL parameter represents the user's registration intent and should override database record
-  const userType = urlType || 'user';
+  // Read type and role from database - stored during OAuth user creation
+  // This is secure and cannot be manipulated via URL params
+  const userType = user.type || 'user';
+  const userRole = user.role;
 
   return (
     <section className='mt-20 pt-20 pb-40 bg-gray-50'>
@@ -69,7 +62,8 @@ export default async function OAuthSetupPage({ searchParams }: PageProps) {
               {/* Debug info - remove in production */}
               {process.env.NODE_ENV === 'development' && (
                 <p className='text-xs text-gray-500 mt-2'>
-                  Debug: urlType="{urlType}", userType="{userType}"
+                  Debug: userType="{userType}", userRole="{userRole}" (from
+                  database)
                 </p>
               )}
             </div>
@@ -83,6 +77,7 @@ export default async function OAuthSetupPage({ searchParams }: PageProps) {
               <OAuthSetupForm
                 userEmail={user.email}
                 userType={userType}
+                userRole={userRole}
                 googleUsername={user.username}
                 googleDisplayName={user.displayName}
               />

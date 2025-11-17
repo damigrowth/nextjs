@@ -18,11 +18,11 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { FormButton } from '../../shared';
 
 // Actions and Utils
-import { authClient } from '@/lib/auth/client';
+import { authClient, useSession } from '@/lib/auth/client';
 import { completeOAuth } from '@/actions/auth/oauth-setup';
 import {
   formatUsername,
@@ -76,6 +76,7 @@ const professionalUserSchema = z.object({
 interface OAuthSetupFormProps {
   userEmail: string;
   userType: string; // 'user' or 'pro'
+  userRole: string; // 'user', 'freelancer', or 'company' - from database
   googleUsername?: string; // username from Google profile
   googleDisplayName?: string; // displayName from Google profile
 }
@@ -83,13 +84,16 @@ interface OAuthSetupFormProps {
 export default function OAuthSetupForm({
   userEmail,
   userType,
+  userRole,
   googleUsername,
   googleDisplayName,
 }: OAuthSetupFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const { resetAuth } = useAuthStore();
+  const { refetch } = useSession();
   const router = useRouter();
 
   // Debug logging in development
@@ -115,10 +119,11 @@ export default function OAuthSetupForm({
   });
 
   // Professional user form (for type 'pro')
+  // Pre-fill role from database (set during OAuth registration)
   const professionalForm = useForm({
     resolver: zodResolver(professionalUserSchema),
     defaultValues: {
-      role: 'freelancer', // Use existing role or default to freelancer
+      role: userRole || 'freelancer', // Use role from database, fallback to freelancer
       username: googleUsername || '',
       displayName: googleDisplayName || '',
     },
@@ -156,20 +161,32 @@ export default function OAuthSetupForm({
       if (!result.success) {
         console.error('Update user error:', result.error);
         setError(result.error || 'Σφάλμα κατά την ενημέρωση');
+        setLoading(false);
         return;
       }
 
-      // console.log('User updated successfully, redirecting to dashboard');
+      // Success - prepare for redirect
       setSuccess(true);
+      setIsRedirecting(true);
       resetAuth();
 
-      setTimeout(() => {
+      // Sequential flow for reliable session sync
+      const handleRedirect = async () => {
+        // 1. Refresh session to update user.step
+        await refetch();
+
+        // 2. Small delay for Better Auth session propagation
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        // 3. Navigate with router for smoother transition
         router.push('/dashboard');
-      }, 1500);
+        router.refresh(); // Force refresh to ensure new session data
+      };
+
+      handleRedirect();
     } catch (err: any) {
       console.error('Exception during user update:', err);
       setError(err.message || 'Σφάλμα κατά την ενημέρωση');
-    } finally {
       setLoading(false);
     }
   };
@@ -199,8 +216,6 @@ export default function OAuthSetupForm({
       type: 'pro',
     };
 
-    console.log('Submitting to completeOAuth (server action):', updateData);
-
     try {
       // Professional users (freelancer/company) always go to onboarding
       // Use server action with admin privileges to update role
@@ -210,32 +225,61 @@ export default function OAuthSetupForm({
       if (!result.success) {
         console.error('Update user error:', result.error);
         setError(result.error || 'Σφάλμα κατά την ενημέρωση');
+        setLoading(false);
         return;
       }
 
-      // console.log('Professional user updated successfully, redirecting to onboarding');
+      // Success - prepare for redirect to onboarding
       setSuccess(true);
+      setIsRedirecting(true);
       resetAuth();
 
-      setTimeout(() => {
+      // Sequential flow for reliable session sync
+      const handleRedirect = async () => {
+        // 1. Refresh session to update user.step
+        await refetch();
+
+        // 2. Small delay for Better Auth session propagation
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        // 3. Navigate with router for smoother transition
         router.push('/onboarding');
-      }, 1500);
+        router.refresh(); // Force refresh to ensure new session data
+      };
+
+      handleRedirect();
     } catch (err: any) {
       console.error('Exception during professional user update:', err);
       setError(err.message || 'Σφάλμα κατά την ενημέρωση');
-    } finally {
       setLoading(false);
     }
   };
 
+  // Show full-page loading state during redirect
+  if (isRedirecting) {
+    return (
+      <div className='max-w-4xl mx-auto p-6'>
+        <div className='flex items-center gap-2 justify-center text-gray-600'>
+          <Loader2 className='w-5 h-5 animate-spin' />
+          <span>
+            {userType === 'pro'
+              ? 'Μετάβαση στην Ολοκλήρωση Προφίλ...'
+              : 'Μετάβαση στον Πίνακα Ελέγχου...'}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className='space-y-6'>
+    <div className='space-y-6' suppressHydrationWarning>
       {/* Simple User Form - for type 'user' */}
       {userType === 'user' && (
         <Form {...simpleForm}>
           <form
             onSubmit={simpleForm.handleSubmit(handleSimpleUserSubmit)}
             className='space-y-4'
+            suppressHydrationWarning
           >
             <div className='text-center mb-6'>
               <h3 className='text-lg font-semibold text-gray-900 mb-2'>
@@ -305,6 +349,7 @@ export default function OAuthSetupForm({
               handleProfessionalUserSubmit,
             )}
             className='space-y-4'
+            suppressHydrationWarning
           >
             <div className='text-center mb-6'>
               <h3 className='text-lg font-semibold text-gray-900 mb-2'>
