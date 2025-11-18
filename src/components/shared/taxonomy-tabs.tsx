@@ -1,5 +1,5 @@
 import React from 'react';
-import LinkNP from '@/components/link';
+import NextLink from './next-link';
 import { TaxonomyTabsProps } from '@/lib/types';
 
 /**
@@ -25,14 +25,14 @@ export default function TaxonomyTabs({
               <ul className='mb-0 flex flex-nowrap ps-0'>
                 {/* All items link */}
                 <li className='flex-shrink-0'>
-                  <LinkNP
+                  <NextLink
                     href={allItemsHref || `/${basePath}`}
                     className={`inline-block px-4 py-2 text-body hover:text-primary transition-colors text-sm whitespace-nowrap ${
                       !activeItemSlug ? 'text-primary font-medium' : ''
                     }`}
                   >
                     {allItemsLabel}
-                  </LinkNP>
+                  </NextLink>
                 </li>
 
                 {/* Individual item links */}
@@ -43,14 +43,14 @@ export default function TaxonomyTabs({
 
                   return (
                     <li key={item.id} className='flex-shrink-0'>
-                      <LinkNP
+                      <NextLink
                         href={`/${basePath}/${item.slug}`}
                         className={`inline-block px-4 py-2 text-body hover:text-primary transition-colors text-sm whitespace-nowrap ${
                           isActive ? 'text-primary font-medium' : ''
                         }`}
                       >
                         {displayLabel}
-                      </LinkNP>
+                      </NextLink>
                     </li>
                   );
                 })}

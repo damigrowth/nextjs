@@ -9,7 +9,7 @@ export * from './admin';
 export * from './home';
 export * from './profile';
 export * from './service';
-export * from './shared'; // includes LinkNP
+export * from './shared'; // includes NextLink
 export * from './shared/layout';
 export * from './guards';
 export * from './dashboard';

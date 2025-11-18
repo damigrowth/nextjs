@@ -8,7 +8,6 @@ export { default as FeaturesGrid } from './features-grid';
 export { default as FeaturesRow } from './features-row';
 export { default as FormButton } from './button-form';
 export { default as HeroBanner } from './hero-banner';
-export { default as LinkNP } from './link';
 export { default as NextLink } from './next-link';
 export { default as ProfileCard } from './profile-card';
 export { default as ProcessSteps } from './process-steps';

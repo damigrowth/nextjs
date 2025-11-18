@@ -4,7 +4,7 @@ import React, { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import LinkNP from '@/components/link';
+import NextLink from '@/components/shared/next-link';
 
 import { Input } from '@/components/ui/input';
 import {
@@ -80,12 +80,12 @@ const ForgotPasswordForm: React.FC = () => {
           </div>
 
           <div className='space-y-3'>
-            <LinkNP
+            <NextLink
               href='/login'
               className='inline-flex items-center text-green-600 hover:text-green-700 font-medium text-sm'
             >
               ← Πίσω στη σύνδεση
-            </LinkNP>
+            </NextLink>
 
             <button
               onClick={() => setShowSuccess(false)}
@@ -144,12 +144,12 @@ const ForgotPasswordForm: React.FC = () => {
             />
 
             <div className='text-center'>
-              <LinkNP
+              <NextLink
                 href='/login'
                 className='text-sm text-gray-600 hover:text-gray-800'
               >
                 ← Πίσω στη σύνδεση
-              </LinkNP>
+              </NextLink>
             </div>
           </form>
         </Form>

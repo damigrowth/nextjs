@@ -1,4 +1,4 @@
-import { NextLink as Link } from '@/components/shared';
+import NextLink from '@/components/shared/next-link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { DatasetItem } from '@/lib/types/datasets';
 
@@ -17,12 +17,12 @@ const TaxonomyColumn = ({
   <ul className='list-none p-0 m-0'>
     {items.map((item) => (
       <li key={item.id} className='leading-10 list-none'>
-        <Link
+        <NextLink
           href={item.href || `/${type}/${item.slug}`}
           className='text-sm text-dark hover:text-fourth hover:underline transition-colors'
         >
           {type === 'pros' ? item.plural || item.label : item.label}
-        </Link>
+        </NextLink>
       </li>
     ))}
   </ul>
@@ -49,13 +49,13 @@ const TaxonomiesGrid = ({
       {columns.map((column, columnIndex) => (
         <div key={columnIndex} className='flex flex-col flex-1'>
           {column.map((item) => (
-            <Link
+            <NextLink
               key={item.id}
               href={item.href || `/${type}/${item.slug}`}
               className='text-sm text-dark hover:text-fourth hover:underline transition-colors leading-10'
             >
               {type === 'pros' ? item.plural || item.label : item.label}
-            </Link>
+            </NextLink>
           ))}
         </div>
       ))}

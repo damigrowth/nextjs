@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import LinkNP from '@/components/link';
+import NextLink from '@/components/shared/next-link';
 import { useRouter } from 'next/navigation';
 
 import {
@@ -225,7 +225,7 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
 
                 return (
                   <DropdownMenuItem key={item.id} asChild>
-                    <LinkNP
+                    <NextLink
                       href={item.path}
                       className='cursor-pointer'
                       {...(isExternalProfile && {
@@ -242,7 +242,7 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
                           <ExternalLink className='w-3 h-3 ml-auto' />
                         )}
                       </div>
-                    </LinkNP>
+                    </NextLink>
                   </DropdownMenuItem>
                 );
               })}
@@ -262,10 +262,10 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
         size='default'
         className='hover:bg-secondary hover:text-secondary-foreground hover:border-secondary rounded-full'
       >
-        <LinkNP href='/login'>Σύνδεση</LinkNP>
+        <NextLink href='/login'>Σύνδεση</NextLink>
       </Button>
       <Button asChild size='default' className='rounded-full'>
-        <LinkNP href='/register'>Εγγραφή</LinkNP>
+        <NextLink href='/register'>Εγγραφή</NextLink>
       </Button>
     </div>
   );

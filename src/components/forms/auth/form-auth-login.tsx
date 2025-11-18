@@ -4,7 +4,7 @@ import React, { useActionState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import LinkNP from '@/components/link';
+import NextLink from '@/components/shared/next-link';
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -165,9 +165,9 @@ const LoginForm: React.FC = () => {
           />
 
           <div className='flex items-center justify-between pb-5'>
-            <LinkNP href='/forgot-password' className='text-sm font-sans'>
+            <NextLink href='/forgot-password' className='text-sm font-sans'>
               Ξέχασες τον κωδικό σου?
-            </LinkNP>
+            </NextLink>
           </div>
 
           {/* Password Reset Success Message */}

@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import LinkNP from '@/components/link';
+import NextLink from '@/components/shared/next-link';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
   Tooltip,
@@ -118,12 +118,12 @@ export default function UserImage({
   return (
     <div className='user-image-container'>
       {path ? (
-        <LinkNP
+        <NextLink
           href={path}
           className='flex justify-center items-center hover:opacity-80 transition-opacity'
         >
           {content}
-        </LinkNP>
+        </NextLink>
       ) : (
         content
       )}

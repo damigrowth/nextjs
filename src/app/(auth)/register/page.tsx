@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import LinkNP from '@/components/link';
+import NextLink from '@/components/shared/next-link';
 
 import { getRegisterMetadata } from '@/lib/seo/pages';
 import {
@@ -46,12 +46,12 @@ export default async function RegisterPage(): Promise<JSX.Element> {
               </p>
               <p className='text-gray-600 mt-2'>
                 Έχεις ήδη λογαριασμό?{' '}
-                <LinkNP
+                <NextLink
                   href='/login'
                   className='text-green-600 hover:text-green-700 font-medium'
                 >
                   Σύνδεση!
-                </LinkNP>
+                </NextLink>
               </p>
             </div>
           </div>

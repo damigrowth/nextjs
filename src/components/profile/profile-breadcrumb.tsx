@@ -1,5 +1,5 @@
 import React from 'react';
-import LinkNP from '@/components/link';
+import NextLink from '@/components/shared/next-link';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -29,7 +29,7 @@ export default function ProfileBreadcrumb({
                 <BreadcrumbList>
                   <BreadcrumbItem>
                     <BreadcrumbLink asChild>
-                      <LinkNP href='/'>Αρχική</LinkNP>
+                      <NextLink href='/'>Αρχική</NextLink>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
 
@@ -37,13 +37,13 @@ export default function ProfileBreadcrumb({
 
                   <BreadcrumbItem>
                     <BreadcrumbLink asChild>
-                      <LinkNP href={`/${parentSlug}`}>
+                      <NextLink href={`/${parentSlug}`}>
                         <span className='text-muted-foreground'>
                           {profile.role === 'company'
                             ? 'Επιχειρήσεις'
                             : 'Επαγγελματίες'}
                         </span>
-                      </LinkNP>
+                      </NextLink>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
 
@@ -52,11 +52,11 @@ export default function ProfileBreadcrumb({
                       <BreadcrumbSeparator />
                       <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                          <LinkNP href={`/${parentSlug}/${category.slug}`}>
+                          <NextLink href={`/${parentSlug}/${category.slug}`}>
                             <span className='text-muted-foreground'>
                               {category.plural || category.label}
                             </span>
-                          </LinkNP>
+                          </NextLink>
                         </BreadcrumbLink>
                       </BreadcrumbItem>
                     </>

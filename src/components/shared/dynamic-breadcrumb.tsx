@@ -1,5 +1,5 @@
 import React from 'react';
-import LinkNP from '@/components/link';
+import NextLink from '@/components/shared/next-link';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -50,11 +50,11 @@ export default function DynamicBreadcrumb({
                           <BreadcrumbPage>{segment.label}</BreadcrumbPage>
                         ) : segment.href ? (
                           <BreadcrumbLink asChild>
-                            <LinkNP href={segment.href}>
+                            <NextLink href={segment.href}>
                               <span className='text-muted-foreground'>
                                 {segment.label}
                               </span>
-                            </LinkNP>
+                            </NextLink>
                           </BreadcrumbLink>
                         ) : (
                           <span className='text-muted-foreground'>

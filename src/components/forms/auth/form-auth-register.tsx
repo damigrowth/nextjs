@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 // Components
-import LinkNP from '@/components/link';
+import NextLink from '@/components/shared/next-link';
 
 // Shadcn UI components
 import { Input } from '@/components/ui/input';
@@ -59,13 +59,13 @@ const consentOptions = [
     label: (
       <span>
         Αποδέχομαι τους{' '}
-        <LinkNP href='/terms' target='_blank' className='text-thm'>
+        <NextLink href='/terms' target='_blank' className='text-thm'>
           Όρους Χρήσης
-        </LinkNP>{' '}
+        </NextLink>{' '}
         και την{' '}
-        <LinkNP href='/privacy' target='_blank' className='text-thm'>
+        <NextLink href='/privacy' target='_blank' className='text-thm'>
           Πολιτική Απορρήτου
-        </LinkNP>
+        </NextLink>
       </span>
     ),
   },

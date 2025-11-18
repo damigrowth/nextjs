@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import LinkNP from '@/components/link';
+import NextLink from '@/components/shared/next-link';
 
 import { Input } from '@/components/ui/input';
 import {
@@ -98,12 +98,12 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token }) => {
           </AlertDescription>
         </Alert>
 
-        <LinkNP
+        <NextLink
           href='/forgot-password'
           className='inline-flex items-center text-green-600 hover:text-green-700 font-medium text-sm'
         >
           ← Αίτησε νέο σύνδεσμο
-        </LinkNP>
+        </NextLink>
       </div>
     );
   }
@@ -199,12 +199,12 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token }) => {
               {state.message}
               {state.message?.includes('λήξει') && (
                 <div className='mt-2'>
-                  <LinkNP
+                  <NextLink
                     href='/forgot-password'
                     className='text-sm underline text-red-700 hover:text-red-800 font-medium'
                   >
                     Αίτησε νέο σύνδεσμο επαναφοράς →
-                  </LinkNP>
+                  </NextLink>
                 </div>
               )}
             </AlertDescription>
@@ -229,12 +229,12 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ token }) => {
         />
 
         <div className='text-center'>
-          <LinkNP
+          <NextLink
             href='/login'
             className='text-sm text-gray-600 hover:text-gray-800'
           >
             ← Πίσω στη σύνδεση
-          </LinkNP>
+          </NextLink>
         </div>
       </form>
     </Form>

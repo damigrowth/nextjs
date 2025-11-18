@@ -35,7 +35,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const gaId = process.env.GA_ID;
 
   return (
-    <html lang='el'>
+    <html lang='el' suppressHydrationWarning>
       <Body>
         <TooltipProvider delayDuration={0}>
           <PathChecker excludes={['/dashboard', '/admin']}>

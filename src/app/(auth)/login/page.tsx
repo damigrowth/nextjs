@@ -1,6 +1,6 @@
 import { JSX } from 'react';
 import { Metadata } from 'next';
-import LinkNP from '@/components/link';
+import NextLink from '@/components/shared/next-link';
 
 import { getLoginMetadata } from '@/lib/seo/pages';
 
@@ -58,12 +58,12 @@ export default async function LoginPage(): Promise<JSX.Element> {
                 {!isUnderMaintenance && (
                   <p className='text-gray-600'>
                     Δεν έχεις λογαριασμό?{' '}
-                    <LinkNP
+                    <NextLink
                       href='/register'
                       className='text-green-600 hover:text-green-700 font-medium'
                     >
                       Εγγραφή!
-                    </LinkNP>
+                    </NextLink>
                   </p>
                 )}
               </div>

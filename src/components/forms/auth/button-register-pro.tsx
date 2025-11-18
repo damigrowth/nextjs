@@ -1,5 +1,5 @@
 import React from 'react';
-import LinkNP from '../../link';
+import NextLink from '@/components/shared/next-link';
 import { Button } from '@/components/ui/button';
 import { getCurrentSession } from '@/actions/auth/server';
 
@@ -15,7 +15,7 @@ export default async function RegisterProButton() {
         variant='link'
         className='hidden xl:inline-flex text-green-800 hover:text-green-600 p-0 h-auto font-medium'
       >
-        <LinkNP href='/register#pro'>Καταχώριση Επαγγελματία</LinkNP>
+        <NextLink href='/register#pro'>Καταχώριση Επαγγελματία</NextLink>
       </Button>
     </div>
   );

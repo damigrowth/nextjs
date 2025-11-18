@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import LinkNP from '@/components/link';
+import NextLink from '@/components/shared/next-link';
 import { usePathname } from 'next/navigation';
 // import useStickyMenu from '@/hooks/useStickyMenu';
 
@@ -17,7 +17,7 @@ export default function HeaderLogo() {
   return (
     <div className='logos'>
       {/* Logo1 - visible by default, hidden when sticky on homepage */}
-      <LinkNP
+      <NextLink
         className={`header-logo logo1 transition-opacity duration-300 opacity-100`}
         href='/'
       >
@@ -30,7 +30,7 @@ export default function HeaderLogo() {
           priority
           loading='eager'
         />
-      </LinkNP>
+      </NextLink>
       {/* Logo2 - hidden by default, visible when sticky on homepage */}
     </div>
     // <div className='logos'>

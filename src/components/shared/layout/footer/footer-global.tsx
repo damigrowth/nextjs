@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import LinkNP from '@/components/link';
+import NextLink from '@/components/shared/next-link';
 
 import {
   accountLinks,
@@ -22,22 +22,22 @@ export default function Footer() {
                 <div>
                   <div className='link-style1 mb-3'>
                     <h6 className='mb-3 text-white font-semibold'>
-                      <LinkNP
+                      <NextLink
                         href={'/about'}
                         className='text-white hover:text-green-400 transition-colors'
                       >
                         Σχετικά
-                      </LinkNP>
+                      </NextLink>
                     </h6>
                     <div className='link-list space-y-2'>
                       {firstColumnLinks.map((item, i) => (
-                        <LinkNP
+                        <NextLink
                           key={i}
                           href={`/${item.attributes.slug}`}
                           className='block text-gray-300 hover:text-white transition-colors'
                         >
                           {item.attributes.title}
-                        </LinkNP>
+                        </NextLink>
                       ))}
                     </div>
                   </div>
@@ -45,22 +45,22 @@ export default function Footer() {
                 <div>
                   <div className='link-style1 mb-3'>
                     <h6 className='mb-3 text-white font-semibold'>
-                      <LinkNP
+                      <NextLink
                         href={'/categories'}
                         className='text-white hover:text-green-400 transition-colors'
                       >
                         Υπηρεσίες
-                      </LinkNP>
+                      </NextLink>
                     </h6>
                     <ul className='ps-0 space-y-2 list-none'>
                       {secondColumnLinks.map((item, i) => (
                         <li key={i}>
-                          <LinkNP
+                          <NextLink
                             href={`/categories/${item.attributes.slug}`}
                             className='text-gray-300 hover:text-white transition-colors'
                           >
                             {item.attributes.label}
-                          </LinkNP>
+                          </NextLink>
                         </li>
                       ))}
                     </ul>
@@ -69,22 +69,22 @@ export default function Footer() {
                 <div>
                   <div className='link-style1 mb-3'>
                     <h6 className='mb-3 text-white font-semibold'>
-                      <LinkNP
+                      <NextLink
                         href={'/dashboard'}
                         className='text-white hover:text-green-400 transition-colors'
                       >
                         Ο Λογαριασμός μου
-                      </LinkNP>
+                      </NextLink>
                     </h6>
                     <ul className='ps-0 space-y-2 list-none'>
                       {accountLinks.map((item, i) => (
                         <li key={i}>
-                          <LinkNP
+                          <NextLink
                             href={item.slug}
                             className='text-gray-300 hover:text-white transition-colors'
                           >
                             {item.label}
-                          </LinkNP>
+                          </NextLink>
                         </li>
                       ))}
                     </ul>
@@ -96,12 +96,12 @@ export default function Footer() {
                     <ul className='ps-0 space-y-2 list-none'>
                       {proLinks.map((item, i) => (
                         <li key={i}>
-                          <LinkNP
+                          <NextLink
                             href={item.slug}
                             className='text-gray-300 hover:text-white transition-colors'
                           >
                             {item.label}
-                          </LinkNP>
+                          </NextLink>
                         </li>
                       ))}
                     </ul>
@@ -112,7 +112,7 @@ export default function Footer() {
           </div>
           <div className='lg:col-span-4 lg:col-start-9'>
             <div className='footer-widget mb-4 lg:mb-5'>
-              <LinkNP className='footer-logo inline-block' href='/'>
+              <NextLink className='footer-logo inline-block' href='/'>
                 <Image
                   height={45}
                   width={123}
@@ -120,7 +120,7 @@ export default function Footer() {
                   src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1761929834/Static/doulitsa-logo_mpqr5n.svg'
                   alt='Doulitsa logo'
                 />
-              </LinkNP>
+              </NextLink>
               <div className='mb-4 lg:mb-5'>
                 <div>
                   <div className='contact-info'>

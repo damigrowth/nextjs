@@ -1,6 +1,6 @@
 'use client';
 
-import LinkNP from '@/components/link';
+import NextLink from '@/components/shared/next-link';
 import { usePathname } from 'next/navigation';
 import { Mail } from 'lucide-react';
 
@@ -17,7 +17,7 @@ export default function MessagesMenu({ className }: { className?: string }) {
     <div
       className={`hidden sm:flex items-center justify-center ${className || ''}`}
     >
-      <LinkNP
+      <NextLink
         href='/dashboard/messages'
         className='relative text-center flex'
         style={{ color: '#1f4b3f' }}
@@ -25,7 +25,7 @@ export default function MessagesMenu({ className }: { className?: string }) {
       >
         <Mail className='w-5 h-5 flex' />
         {/* {!isOnMessagesPage && <MessagesBadge />} */}
-      </LinkNP>
+      </NextLink>
     </div>
   );
 }
