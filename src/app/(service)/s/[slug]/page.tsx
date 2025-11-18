@@ -33,7 +33,16 @@ interface ServicePageProps {
  */
 export async function generateMetadata({ params }: ServicePageProps) {
   const { slug } = await params;
-  return getServiceMetadata(slug);
+
+  // Extract service ID from slug (last segment after last dash)
+  const parts = slug.split('-');
+  const serviceId = parseInt(parts[parts.length - 1]);
+
+  if (!serviceId || isNaN(serviceId)) {
+    return {};
+  }
+
+  return getServiceMetadata(serviceId);
 }
 
 // Generate static params for all published services
@@ -62,8 +71,17 @@ export default async function ServicePage({
 }: ServicePageProps): Promise<JSX.Element> {
   const { slug } = await params;
 
-  // Fetch complete service page data
-  const result = await getServicePageData(slug);
+  // Extract service ID from slug (last segment after last dash)
+  // This allows old URLs to work even when the title/slug changes
+  const parts = slug.split('-');
+  const serviceId = parseInt(parts[parts.length - 1]);
+
+  if (!serviceId || isNaN(serviceId)) {
+    notFound();
+  }
+
+  // Fetch complete service page data using ID
+  const result = await getServicePageData(serviceId);
 
   if (!result.success || !result.data) {
     notFound();

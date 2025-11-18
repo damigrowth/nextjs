@@ -13,6 +13,7 @@ import {
   type UpdateServiceInfoInput,
 } from '@/lib/validations/service';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
+import { generateServiceSlug } from '@/lib/utils/text';
 
 // =============================================
 // SHARED UTILITIES
@@ -276,6 +277,8 @@ export async function updateServiceInfo(
         case 'title':
           updateData.title = value;
           updateData.titleNormalized = normalizeTerm(value as string);
+          // Regenerate slug when title changes to keep URL in sync
+          updateData.slug = generateServiceSlug(value as string, serviceId.toString());
           break;
 
         case 'description':

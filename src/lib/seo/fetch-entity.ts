@@ -52,6 +52,7 @@ type EntityType =
   | 'proSubcategory';
 
 interface FetchEntityParams {
+  id?: number;
   slug?: string;
   username?: string;
   categorySlug?: string;
@@ -74,12 +75,12 @@ export async function fetchEntity(
   try {
     switch (type) {
       case 'service': {
-        if (!params.slug) {
-          throw new Error('Service slug is required');
+        if (!params.id) {
+          throw new Error('Service ID is required');
         }
 
         const service = await prisma.service.findUnique({
-          where: { slug: params.slug },
+          where: { id: params.id },
           select: {
             title: true,
             description: true,

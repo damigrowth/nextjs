@@ -10,6 +10,7 @@ import { CACHE_TAGS, getServiceTags } from '@/lib/cache';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { tags } from '@/constants/datasets/tags';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
+import { generateServiceSlug } from '@/lib/utils/text';
 
 import {
   adminListServicesSchema,
@@ -361,6 +362,8 @@ export async function updateService(params: AdminUpdateServiceInput) {
     const normalizedUpdates: any = {};
     if (updateData.title) {
       normalizedUpdates.titleNormalized = normalizeTerm(updateData.title);
+      // Regenerate slug when title changes to keep URL in sync
+      normalizedUpdates.slug = generateServiceSlug(updateData.title, serviceId.toString());
     }
     if (updateData.description) {
       normalizedUpdates.descriptionNormalized = normalizeTerm(updateData.description);

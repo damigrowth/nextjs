@@ -3,7 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
-import { Globe, FileText, XCircle, Clock, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Globe, FileText, XCircle, Clock, Star, ExternalLink, Edit } from 'lucide-react';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { Status } from '@prisma/client';
 import TableMedia from '@/components/shared/table-media';
@@ -185,6 +186,52 @@ export function AdminServicesDataTable({
         </div>
       ),
     },
+    {
+      key: 'actions',
+      header: '',
+      render: (service) => (
+        <div className='flex items-center justify-end gap-1'>
+          {/* View service button - only for published services */}
+          {service.status === 'published' && service.slug && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant='ghost'
+                  size='icon'
+                  className='h-8 w-8'
+                  asChild
+                >
+                  <Link href={`/s/${service.slug}`} target='_blank' rel='noopener noreferrer'>
+                    <ExternalLink className='w-4 h-4' />
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>View Service Page</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {/* Edit service button - always visible */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-8 w-8'
+                asChild
+              >
+                <Link href={`${basePath}/${service.id}`}>
+                  <Edit className='w-4 h-4' />
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Edit Service</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -193,7 +240,6 @@ export function AdminServicesDataTable({
       columns={columns}
       loading={loading}
       basePath={basePath}
-      editPath={(service) => `${basePath}/${service.id}`}
       emptyMessage='No services found matching your criteria.'
       skeletonRows={5}
     />

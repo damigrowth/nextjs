@@ -206,11 +206,11 @@ function resolveProfileSubcategory(profile: ServiceProfileFields) {
  * Internal function to fetch service page data (uncached)
  */
 async function _getServicePageData(
-  slug: string,
+  id: number,
 ): Promise<ActionResult<ServicePageData>> {
   try {
     const service = await prisma.service.findUnique({
-      where: { slug },
+      where: { id },
       include: {
         profile: {
           select: {
@@ -437,24 +437,24 @@ async function _getServicePageData(
 /**
  * Cached version of getServicePageData with ISR + tag-based revalidation
  * Uses consistent cache tags for proper invalidation
+ * Now accepts service ID instead of slug for better URL flexibility
  */
 export async function getServicePageData(
-  slug: string,
+  id: number,
 ): Promise<ActionResult<ServicePageData>> {
   const getCached = unstable_cache(
     _getServicePageData,
-    ['service-page', slug],
+    ['service-page', id.toString()],
     {
       tags: [
-        CACHE_TAGS.service.bySlug(slug),
-        CACHE_TAGS.service.page(slug),
+        CACHE_TAGS.service.byId(id),
         CACHE_TAGS.collections.services,
       ],
       revalidate: 300, // 5 minutes, matching ISR
     },
   );
 
-  return getCached(slug);
+  return getCached(id);
 }
 
 

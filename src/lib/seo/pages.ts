@@ -4,15 +4,16 @@ import { Meta } from './meta';
 
 /**
  * Service page metadata generation
+ * Now accepts service ID instead of slug for better URL flexibility
  */
-export async function getServiceMetadata(slug: string) {
+export async function getServiceMetadata(id: number) {
   const { meta } = await Meta({
     type: 'service',
-    params: { slug },
+    params: { id },
     titleTemplate: '%title% από %displayName%',
     descriptionTemplate: '%category% - %description%',
     size: 100,
-    url: `/s/${slug}`,
+    // URL will be constructed from the service slug after fetching
   });
 
   return meta;

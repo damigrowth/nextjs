@@ -54,12 +54,20 @@ export async function Meta({
       const description = formatTemplate(descriptionTemplate, entity);
       const image = formatTemplate('%image%', entity);
 
+      // For services, construct URL from slug if not explicitly provided
+      let finalUrl = url;
+      if (!finalUrl && type === 'service' && entity.slug) {
+        finalUrl = `/s/${entity.slug}`;
+      } else if (!finalUrl && customUrl && entity.slug) {
+        finalUrl = `${customUrl}/${entity.slug}`;
+      }
+
       const { meta } = await MetaData({
         title,
         description,
         size,
         image,
-        url: !url ? `${customUrl}/${entity.slug}` : url,
+        url: finalUrl,
       });
 
       return { meta };
