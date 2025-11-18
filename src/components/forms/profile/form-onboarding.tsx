@@ -455,7 +455,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
                   options={allSubcategories}
                   value={field.value}
                   onSelect={handleSubcategorySelect}
-                  placeholder='Επιλέξτε κατηγορία...'
+                  placeholder='Πληκτρολογήστε επαγγελματική κατηγορία...'
                   searchPlaceholder='Αναζήτηση κατηγορίας...'
                   emptyMessage='Δεν βρέθηκαν κατηγορίες.'
                   formatLabel={(option) => (
@@ -470,7 +470,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
                     if (!option) {
                       return (
                         <span className='text-muted-foreground'>
-                          Επιλέξτε κατηγορία...
+                          Πληκτρολογήστε επαγγελματική κατηγορία...
                         </span>
                       );
                     }
