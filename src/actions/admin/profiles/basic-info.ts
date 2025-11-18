@@ -153,7 +153,7 @@ export async function updateProfileBasicInfoAdmin(
 
     return {
       success: true,
-      message: 'Το προφίλ ενημερώθηκε επιτυχώς!',
+      message: 'Τα βασικά στοιχεία ενημερώθηκαν επιτυχώς!',
     };
   } catch (error: any) {
     // 12. Use comprehensive Better Auth error handling

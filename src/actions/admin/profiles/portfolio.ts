@@ -133,7 +133,7 @@ export async function updateProfilePortfolioAdmin(
 
     return {
       success: true,
-      message: 'Το δείγμα εργασιών ενημερώθηκε επιτυχώς!',
+      message: 'Τα δείγματα εργασιών ενημερώθηκαν επιτυχώς!',
     };
   } catch (error: any) {
     // 10. Comprehensive error handling

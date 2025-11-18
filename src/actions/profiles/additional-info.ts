@@ -139,7 +139,7 @@ export async function updateProfileAdditionalInfo(
 
     return {
       success: true,
-      message: 'Τα πρόσθετα στοιχεία του προφίλ σας ενημερώθηκαν επιτυχώς!',
+      message: 'Τα πρόσθετα στοιχεία ενημερώθηκαν επιτυχώς!',
     };
   } catch (error: any) {
     // 9. Comprehensive error handling

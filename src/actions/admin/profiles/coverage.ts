@@ -31,13 +31,13 @@ export async function updateCoverageAdmin(
       };
     }
 
-    // 3. Extract form data including targetUserId for admin
-    const targetUserId = getFormString(formData, 'targetUserId');
+    // 3. Extract form data including profileId for admin
+    const profileId = getFormString(formData, 'profileId');
 
-    if (!targetUserId) {
+    if (!profileId) {
       return {
         success: false,
-        message: 'Απαιτείται το ID του χρήστη',
+        message: 'Το αναγνωριστικό προφίλ δεν βρέθηκε',
       };
     }
 
@@ -67,7 +67,7 @@ export async function updateCoverageAdmin(
 
     // 5. Check if profile exists and get data for cache invalidation
     const existingProfile = await prisma.profile.findUnique({
-      where: { uid: targetUserId },
+      where: { id: profileId },
       select: {
         id: true,
         uid: true,
@@ -88,7 +88,7 @@ export async function updateCoverageAdmin(
 
     // 6. Update profile with coverage
     await prisma.profile.update({
-      where: { uid: targetUserId },
+      where: { id: profileId },
       data: {
         coverage: data as any,
         updatedAt: new Date(),
@@ -100,8 +100,8 @@ export async function updateCoverageAdmin(
     profileTags.forEach(tag => revalidateTag(tag));
 
     // Also revalidate user-specific tags
-    revalidateTag(CACHE_TAGS.user.byId(targetUserId));
-    revalidateTag(CACHE_TAGS.user.services(targetUserId));
+    revalidateTag(CACHE_TAGS.user.byId(existingProfile.uid));
+    revalidateTag(CACHE_TAGS.user.services(existingProfile.uid));
 
     // Revalidate profile services
     revalidateTag(CACHE_TAGS.profile.services(existingProfile.id));
@@ -112,7 +112,7 @@ export async function updateCoverageAdmin(
 
     // Revalidate specific pages
     revalidatePath('/admin/profiles');
-    revalidatePath(`/admin/profiles/${targetUserId}`);
+    revalidatePath(`/admin/profiles/${profileId}`);
     if (existingProfile.username) {
       revalidatePath(`/profile/${existingProfile.username}`);
     }
@@ -126,7 +126,7 @@ export async function updateCoverageAdmin(
 
     return {
       success: true,
-      message: 'Οι τρόποι παροχής ενημερώθηκαν επιτυχώς!',
+      message: 'Οι περιοχές κάλυψης ενημερώθηκαν επιτυχώς!',
     };
   } catch (error: any) {
     // 8. Use comprehensive Better Auth error handling

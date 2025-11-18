@@ -149,7 +149,7 @@ export async function updateProfileBasicInfo(
 
     return {
       success: true,
-      message: 'Το προφίλ σας ενημερώθηκε επιτυχώς!',
+      message: 'Τα βασικά στοιχεία ενημερώθηκαν επιτυχώς!',
     };
   } catch (error: any) {
     // 9. Use comprehensive Better Auth error handling

@@ -47,7 +47,6 @@ export async function updateProfileAdditionalInfoAdmin(
     const { data: extractedData, errors: extractionErrors } = extractFormData(formData, {
       rate: { type: 'number', required: false, defaultValue: null },
       commencement: { type: 'string', required: false, defaultValue: '' },
-      experience: { type: 'number', required: false, defaultValue: null },
       contactMethods: { type: 'json', required: false, defaultValue: [] },
       paymentMethods: { type: 'json', required: false, defaultValue: [] },
       settlementMethods: { type: 'json', required: false, defaultValue: [] },
@@ -74,6 +73,12 @@ export async function updateProfileAdditionalInfoAdmin(
     }
 
     const data = validationResult.data;
+
+    // 5.5. Calculate experience from commencement year (same as dashboard version)
+    const currentYear = new Date().getFullYear();
+    const calculatedExperience = data.commencement
+      ? currentYear - parseInt(data.commencement)
+      : null;
 
     // 6. Business logic validation - check if profile exists and get data for cache invalidation
     const existingProfile = await prisma.profile.findUnique({
@@ -102,7 +107,7 @@ export async function updateProfileAdditionalInfoAdmin(
       data: {
         rate: data.rate,
         commencement: data.commencement || null,
-        experience: data.experience,
+        experience: calculatedExperience,
         contactMethods: data.contactMethods || [],
         paymentMethods: data.paymentMethods || [],
         settlementMethods: data.settlementMethods || [],
@@ -140,7 +145,7 @@ export async function updateProfileAdditionalInfoAdmin(
 
     return {
       success: true,
-      message: 'Τα πρόσθετα στοιχεία του προφίλ ενημερώθηκαν επιτυχώς!',
+      message: 'Τα πρόσθετα στοιχεία ενημερώθηκαν επιτυχώς!',
     };
   } catch (error: any) {
     // 9. Comprehensive error handling

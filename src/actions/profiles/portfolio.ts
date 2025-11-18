@@ -124,7 +124,7 @@ export async function updateProfilePortfolio(
 
     return {
       success: true,
-      message: 'Το δείγμα εργασιών ενημερώθηκε επιτυχώς!',
+      message: 'Τα δείγματα εργασιών ενημερώθηκαν επιτυχώς!',
     };
   } catch (error: any) {
     // 8. Comprehensive error handling

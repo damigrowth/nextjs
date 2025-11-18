@@ -115,7 +115,7 @@ export async function updateCoverage(
 
     return {
       success: true,
-      message: 'Οι τρόποι παροχής ενημερώθηκαν επιτυχώς!',
+      message: 'Οι περιοχές κάλυψης ενημερώθηκαν επιτυχώς!',
     };
   } catch (error: any) {
     // 8. Use comprehensive Better Auth error handling
