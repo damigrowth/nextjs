@@ -72,6 +72,7 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
     // Build where clause
     const whereClause: any = {
       published: filters.published !== false, // Default to true
+      isActive: true, // Only show active profiles (status='Active' in Strapi)
     };
 
     // Add user role filter if specified
@@ -378,6 +379,7 @@ export async function getProfilesCount(
       async () => {
         const whereClause: any = {
           published: filters.published !== false,
+          isActive: true, // Only show active profiles
         };
 
         if (filters.role) {
@@ -630,6 +632,7 @@ export async function getProfileArchivePageData(params: {
       try {
         const countWhere: any = {
           published: true,
+          isActive: true, // Only show active profiles
         };
 
         if (targetType) {
@@ -938,6 +941,7 @@ export async function getProTaxonomyPaths(
         // Build where clause with optional role filter
         const whereClause: any = {
           published: true,
+          isActive: true, // Only show active profiles
           user: {
             blocked: false,
             confirmed: true,

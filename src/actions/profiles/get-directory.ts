@@ -72,6 +72,7 @@ export async function getDirectoryPageData(options?: {
         // If categorySlug is provided, filter by that category's subcategories only
         let subcategoryFilter: any = {
           published: true,
+          isActive: true, // Only show active profiles
           subcategory: { not: null }, // Exclude null subcategories
         };
 

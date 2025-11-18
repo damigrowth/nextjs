@@ -151,6 +151,7 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
       prisma.profile.findMany({
         where: {
           published: true,
+          isActive: true, // Only show active profiles
           featured: true,
           // Only get profiles with images
           NOT: {

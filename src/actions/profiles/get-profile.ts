@@ -96,6 +96,7 @@ export async function getPublicProfileByUsername(
       where: {
         username: username,
         published: true, // Only show published profiles
+        isActive: true, // Only show active profiles
       },
       include: {
         services: {
@@ -205,6 +206,7 @@ async function getProfileByUsername(username: string) {
       where: {
         username,
         published: true,
+        isActive: true, // Only show active profiles
       },
       include: {
         user: {
