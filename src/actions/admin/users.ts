@@ -1175,7 +1175,16 @@ export async function updateAccountAdmin(
 
     // Update user via Better Auth admin API
     const { prisma } = await import('@/lib/prisma/client');
+    const { revalidateTag, revalidatePath } = await import('next/cache');
+    const { getProfileTags, CACHE_TAGS } = await import('@/lib/cache');
 
+    // Check if user has a profile
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { profile: { select: { id: true } } },
+    });
+
+    // Update User table
     await prisma.user.update({
       where: { id: userId },
       data: {
@@ -1184,9 +1193,36 @@ export async function updateAccountAdmin(
       },
     });
 
+    // Sync to Profile table if profile exists (displayName and image are duplicated fields)
+    if (user?.profile) {
+      await prisma.profile.update({
+        where: { uid: userId },
+        data: {
+          displayName: displayName || undefined,
+          image: image || undefined,
+          updatedAt: new Date(),
+        },
+      });
+
+      // Revalidate profile caches
+      const profile = await prisma.profile.findUnique({
+        where: { uid: userId },
+        select: { id: true, uid: true, username: true },
+      });
+
+      if (profile) {
+        const profileTags = getProfileTags(profile);
+        profileTags.forEach((tag) => revalidateTag(tag));
+        revalidatePath(`/admin/profiles/${profile.id}`);
+        if (profile.username) {
+          revalidatePath(`/profile/${profile.username}`);
+        }
+      }
+    }
+
     return {
       success: true,
-      message: 'Account updated successfully',
+      message: 'Ο λογαριασμός ενημερώθηκε επιτυχώς!',
     };
   } catch (error) {
     console.error('Admin account update error:', error);
