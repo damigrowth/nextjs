@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
 import { ProfileBadges, UserAvatar } from '@/components/shared';
 import { Star, Copy, Check } from 'lucide-react';
@@ -11,7 +11,13 @@ import { AdminDataTable, ColumnDef } from './admin-data-table';
 import type { AdminProfileWithRelations } from '@/lib/types/auth';
 
 // Copyable text component with hover state
-function CopyableText({ text, className }: { text: string; className?: string }) {
+function CopyableText({
+  text,
+  className,
+}: {
+  text: string;
+  className?: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -51,7 +57,6 @@ export function AdminProfilesDataTable({
     return 'outline' as const;
   };
 
-
   // Column definitions
   const columns: ColumnDef<AdminProfileWithRelations>[] = [
     {
@@ -59,7 +64,8 @@ export function AdminProfilesDataTable({
       header: 'Profile',
       sortable: true,
       render: (profile) => {
-        const displayName = profile.displayName || profile.user.name || 'Unknown';
+        const displayName =
+          profile.displayName || profile.user.name || 'Unknown';
         const email = profile.email || profile.user.email;
 
         return (
@@ -74,7 +80,10 @@ export function AdminProfilesDataTable({
             />
             <div className='space-y-1'>
               <div className='font-medium'>{displayName}</div>
-              <CopyableText text={email} className='text-sm text-muted-foreground' />
+              <CopyableText
+                text={email}
+                className='text-sm text-muted-foreground'
+              />
               {profile.username && (
                 <CopyableText
                   text={profile.username}
@@ -107,14 +116,14 @@ export function AdminProfilesDataTable({
       key: 'type',
       header: 'Role',
       render: (profile) => {
-        if (!profile.type) return <span className='text-muted-foreground text-sm'>-</span>;
+        if (!profile.type)
+          return <span className='text-muted-foreground text-sm'>-</span>;
 
-        const roleLabel = profile.type === 'freelancer' ? 'Professional' : 'Company';
+        const roleLabel =
+          profile.type === 'freelancer' ? 'Professional' : 'Company';
 
         return (
-          <Badge variant={getTypeBadgeVariant(profile.type)}>
-            {roleLabel}
-          </Badge>
+          <Badge variant={getTypeBadgeVariant(profile.type)}>{roleLabel}</Badge>
         );
       },
     },
@@ -127,10 +136,7 @@ export function AdminProfilesDataTable({
         }
 
         return (
-          <TaxonomiesDisplay
-            taxonomyLabels={profile.taxonomyLabels}
-            compact
-          />
+          <TaxonomiesDisplay taxonomyLabels={profile.taxonomyLabels} compact />
         );
       },
     },
@@ -150,9 +156,7 @@ export function AdminProfilesDataTable({
       header: 'Services',
       sortable: true,
       render: (profile) => (
-        <div className='text-sm font-medium'>
-          {profile._count.services}
-        </div>
+        <div className='text-sm font-medium'>{profile._count.services}</div>
       ),
     },
     {

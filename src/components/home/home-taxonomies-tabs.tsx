@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { DatasetItem } from '@/lib/types/datasets';
 
@@ -41,7 +41,7 @@ const TaxonomiesGrid = ({
   // Calculate items per column for 5 columns
   const itemsPerColumn = Math.ceil(limitedSubcategories.length / 5);
   const columns = Array.from({ length: 5 }, (_, i) =>
-    limitedSubcategories.slice(i * itemsPerColumn, (i + 1) * itemsPerColumn)
+    limitedSubcategories.slice(i * itemsPerColumn, (i + 1) * itemsPerColumn),
   );
 
   return (

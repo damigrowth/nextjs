@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Edit, Eye } from 'lucide-react';
 import {
   Table,

@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { ArrowRight } from 'lucide-react';
 import {
   Carousel,
@@ -17,9 +17,14 @@ interface ProfilesHomeProps {
   savedProfileIds?: string[];
 }
 
-export default function ProfilesHome({ profiles, savedProfileIds }: ProfilesHomeProps) {
+export default function ProfilesHome({
+  profiles,
+  savedProfileIds,
+}: ProfilesHomeProps) {
   // Convert array to Set for O(1) lookups
-  const savedIdsSet = savedProfileIds ? new Set(savedProfileIds) : new Set<string>();
+  const savedIdsSet = savedProfileIds
+    ? new Set(savedProfileIds)
+    : new Set<string>();
   return (
     <section className='py-8 sm:py-12 md:py-16 bg-dark overflow-hidden'>
       <div className='container mx-auto px-4 sm:px-6'>
@@ -59,7 +64,10 @@ export default function ProfilesHome({ profiles, savedProfileIds }: ProfilesHome
           >
             <CarouselContent className='-ml-2 sm:-ml-4'>
               {profiles.map((profile) => (
-                <CarouselItem key={profile.id} className='pl-2 sm:pl-4 basis-full sm:basis-1/2 lg:basis-1/4'>
+                <CarouselItem
+                  key={profile.id}
+                  className='pl-2 sm:pl-4 basis-full sm:basis-1/2 lg:basis-1/4'
+                >
                   <ProfileCard
                     profile={profile}
                     isSaved={savedIdsSet.has(profile.id)}

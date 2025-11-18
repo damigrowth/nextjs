@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Edit, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -75,7 +75,7 @@ export async function AdminProTaxonomiesTableSection({
       (t) =>
         t.label.toLowerCase().includes(search) ||
         t.slug.toLowerCase().includes(search) ||
-        t.parentLabel?.toLowerCase().includes(search)
+        t.parentLabel?.toLowerCase().includes(search),
     );
   }
 
@@ -95,7 +95,7 @@ export async function AdminProTaxonomiesTableSection({
   const paginatedTaxonomies = taxonomies.slice(start, end);
 
   const getLevelBadgeVariant = (
-    level: string
+    level: string,
   ): 'default' | 'secondary' | 'outline' => {
     switch (level) {
       case 'category':
@@ -124,7 +124,10 @@ export async function AdminProTaxonomiesTableSection({
           <TableBody>
             {paginatedTaxonomies.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className='text-center text-muted-foreground'>
+                <TableCell
+                  colSpan={6}
+                  className='text-center text-muted-foreground'
+                >
                   No taxonomies found
                 </TableCell>
               </TableRow>
@@ -152,9 +155,7 @@ export async function AdminProTaxonomiesTableSection({
                   </TableCell>
                   <TableCell>
                     {taxonomy.type ? (
-                      <Badge variant='outline'>
-                        {taxonomy.type}
-                      </Badge>
+                      <Badge variant='outline'>{taxonomy.type}</Badge>
                     ) : (
                       '—'
                     )}

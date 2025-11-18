@@ -3,7 +3,7 @@
  * Pure presentation - interactive parts moved to HeaderActions client component
  */
 
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { ChatHeaderUser } from '@/lib/types/messages';
 import { getProfileUrl } from '@/lib/utils/messages';
 import { UserAvatar } from '../shared';

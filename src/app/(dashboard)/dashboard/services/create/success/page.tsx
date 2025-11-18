@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { redirect } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -38,31 +38,31 @@ export default async function ServiceSuccessPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className='max-w-5xl mx-auto p-6'>
       <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-6 py-10">
+        <CardContent className='pt-6'>
+          <div className='space-y-6 py-10'>
             {/* Success Icon and Badges */}
-            <div className="text-center space-y-4 pt-6">
-              <div className="mx-auto w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
-                <Check className="w-6 h-6 text-white" />
+            <div className='text-center space-y-4 pt-6'>
+              <div className='mx-auto w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg'>
+                <Check className='w-6 h-6 text-white' />
               </div>
 
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className='text-2xl font-bold text-gray-900'>
                 Επιτυχής δημιουργία υπηρεσίας!
               </h1>
 
               {/* Service ID and Status Badges */}
-              <div className="flex items-center justify-center gap-2">
+              <div className='flex items-center justify-center gap-2'>
                 <Badge
-                  variant="outline"
-                  className="bg-white border-green-300 text-green-700"
+                  variant='outline'
+                  className='bg-white border-green-300 text-green-700'
                 >
                   ID: #{serviceId}
                 </Badge>
                 <Badge
-                  variant="secondary"
-                  className="bg-yellow-100 border-yellow-300 text-yellow-800 hover:bg-yellow-200 hover:border-yellow-400 transition-colors cursor-default"
+                  variant='secondary'
+                  className='bg-yellow-100 border-yellow-300 text-yellow-800 hover:bg-yellow-200 hover:border-yellow-400 transition-colors cursor-default'
                 >
                   Υπό Έλεγχο
                 </Badge>
@@ -70,35 +70,42 @@ export default async function ServiceSuccessPage({ searchParams }: PageProps) {
             </div>
 
             {/* Service Details */}
-            <div className="text-center space-y-4">
-              <p className="text-gray-700">
+            <div className='text-center space-y-4'>
+              <p className='text-gray-700'>
                 Ευχαριστούμε για την δημιουργία υπηρεσίας{' '}
-                <strong className="text-green-800">"{serviceTitle}"</strong>. Σύντομα θα
-                γίνει η δημοσίευση της αφού ολοκληρωθεί η διαδικασία ελέγχου της.
+                <strong className='text-green-800'>"{serviceTitle}"</strong>.
+                Σύντομα θα γίνει η δημοσίευση της αφού ολοκληρωθεί η διαδικασία
+                ελέγχου της.
               </p>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <div className='flex flex-col sm:flex-row gap-3 justify-center items-center'>
               <Button
                 asChild
-                size="lg"
-                className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 px-6"
+                size='lg'
+                className='bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 px-6'
               >
-                <Link href="/dashboard/services/create" className="flex items-center gap-2">
-                  <Plus className="w-4 h-4" />
+                <Link
+                  href='/dashboard/services/create'
+                  className='flex items-center gap-2'
+                >
+                  <Plus className='w-4 h-4' />
                   Δημιουργία Νέας Υπηρεσίας
                 </Link>
               </Button>
 
               <Button
                 asChild
-                variant="outline"
-                size="lg"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6"
+                variant='outline'
+                size='lg'
+                className='border-gray-300 text-gray-700 hover:bg-gray-50 px-6'
               >
-                <Link href="/dashboard/services" className="flex items-center gap-2">
-                  <Settings className="w-4 h-4" />
+                <Link
+                  href='/dashboard/services'
+                  className='flex items-center gap-2'
+                >
+                  <Settings className='w-4 h-4' />
                   Διαχείριση Υπηρεσιών
                 </Link>
               </Button>

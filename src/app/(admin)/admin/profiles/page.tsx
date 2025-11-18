@@ -7,7 +7,7 @@ import {
 } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, UserPlus } from 'lucide-react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 
 export const dynamic = 'force-dynamic';
 

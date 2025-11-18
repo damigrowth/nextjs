@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
 import {
   Carousel,

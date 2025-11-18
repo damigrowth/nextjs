@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { useRouter } from 'next/navigation';
 import {
   ColumnDef,
@@ -23,12 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { UserAvatar } from '@/components/shared';
-import {
-  ArrowUpDown,
-  Edit,
-  Copy,
-  Check,
-} from 'lucide-react';
+import { ArrowUpDown, Edit, Copy, Check } from 'lucide-react';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { cn } from '@/lib/utils';
 
@@ -146,9 +141,7 @@ export function AdminVerificationsDataTable({
                 ? 'indeterminate'
                 : false
           }
-          onCheckedChange={(value) =>
-            table.toggleAllPageRowsSelected(!!value)
-          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label='Select all'
         />
       ),
@@ -300,7 +293,9 @@ export function AdminVerificationsDataTable({
           <Button
             variant='ghost'
             size='icon'
-            onClick={() => router.push(`/admin/verifications/${verification.id}`)}
+            onClick={() =>
+              router.push(`/admin/verifications/${verification.id}`)
+            }
           >
             <Edit className='h-4 w-4' />
             <span className='sr-only'>Edit</span>

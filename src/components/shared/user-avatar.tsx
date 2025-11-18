@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Shield } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';

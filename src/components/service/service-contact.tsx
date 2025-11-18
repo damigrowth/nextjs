@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ProfileBadges, RatingDisplay } from '@/components';
@@ -82,7 +82,9 @@ export default function ServiceContact({
             </div>
 
             {tagline && (
-              <p className='text-sm text-muted-foreground mb-2 line-clamp-3'>{tagline}</p>
+              <p className='text-sm text-muted-foreground mb-2 line-clamp-3'>
+                {tagline}
+              </p>
             )}
 
             <RatingDisplay

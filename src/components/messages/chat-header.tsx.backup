@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Phone, MoreVertical } from 'lucide-react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { useState } from 'react';
 import { ChatHeaderUser } from '@/lib/types/messages';
 import { getInitials, getProfileUrl } from '@/lib/utils/messages';

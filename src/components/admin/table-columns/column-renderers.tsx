@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import type { ColumnDef } from '@/components/admin/admin-data-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -29,7 +29,9 @@ export const columnRenderers = {
       sortable: true,
       className: 'w-[80px]',
       render: (row) => (
-        <span className='font-mono text-xs text-muted-foreground'>{row.id}</span>
+        <span className='font-mono text-xs text-muted-foreground'>
+          {row.id}
+        </span>
       ),
     };
   },
@@ -39,7 +41,10 @@ export const columnRenderers = {
    * @param editBasePath - Base path for edit links (e.g., '/admin/taxonomies/tags')
    * @param labelKey - Key to access label value (default: 'label')
    */
-  label<T extends LabelRow>(editBasePath: string, labelKey = 'label'): ColumnDef<T> {
+  label<T extends LabelRow>(
+    editBasePath: string,
+    labelKey = 'label',
+  ): ColumnDef<T> {
     return {
       key: labelKey,
       header: 'Label',
@@ -135,7 +140,7 @@ export const columnRenderers = {
    */
   actionsButton<T extends IdRow>(
     editBasePath: string,
-    size: 'sm' | 'md' | 'lg' = 'sm'
+    size: 'sm' | 'md' | 'lg' = 'sm',
   ): ColumnDef<T> {
     return {
       key: 'actions',
@@ -161,7 +166,7 @@ export const columnRenderers = {
   badge<T extends Record<string, any>>(
     key: string,
     header: string,
-    variant: 'default' | 'secondary' | 'outline' | 'destructive' = 'secondary'
+    variant: 'default' | 'secondary' | 'outline' | 'destructive' = 'secondary',
   ): ColumnDef<T> {
     return {
       key,
@@ -184,7 +189,7 @@ export const columnRenderers = {
   count<T extends Record<string, any>>(
     key: string,
     header: string,
-    fallback = '0'
+    fallback = '0',
   ): ColumnDef<T> {
     return {
       key,
@@ -211,7 +216,7 @@ export const columnRenderers = {
   text<T extends Record<string, any>>(
     key: string,
     header: string,
-    maxLength?: number
+    maxLength?: number,
   ): ColumnDef<T> {
     return {
       key,
@@ -241,7 +246,7 @@ export const columnRenderers = {
    */
   parent<T extends Record<string, any>>(
     parentKey = 'parent',
-    labelKey = 'label'
+    labelKey = 'label',
   ): ColumnDef<T> {
     return {
       key: parentKey,
@@ -265,7 +270,7 @@ export const columnRenderers = {
   categoryLookup<T extends Record<string, any>>(
     categoryKey: string,
     lookupData: Array<{ id: string | number; [key: string]: any }>,
-    lookupLabelKey = 'label'
+    lookupLabelKey = 'label',
   ): ColumnDef<T> {
     return {
       key: categoryKey,
@@ -274,11 +279,14 @@ export const columnRenderers = {
       className: 'min-w-[160px]',
       render: (row) => {
         const categoryId = row[categoryKey];
-        if (!categoryId) return <span className='text-muted-foreground'>—</span>;
+        if (!categoryId)
+          return <span className='text-muted-foreground'>—</span>;
 
         const category = lookupData.find((cat) => cat.id === categoryId);
         return category ? (
-          <Badge variant='secondary'>{category[lookupLabelKey] as string}</Badge>
+          <Badge variant='secondary'>
+            {category[lookupLabelKey] as string}
+          </Badge>
         ) : (
           <span className='text-muted-foreground'>—</span>
         );
@@ -290,7 +298,9 @@ export const columnRenderers = {
    * Featured star icon column
    * @param featuredKey - Key to access featured boolean (default: 'featured')
    */
-  featured<T extends Record<string, any>>(featuredKey = 'featured'): ColumnDef<T> {
+  featured<T extends Record<string, any>>(
+    featuredKey = 'featured',
+  ): ColumnDef<T> {
     return {
       key: featuredKey,
       header: 'Featured',

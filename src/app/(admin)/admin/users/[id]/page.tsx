@@ -1,7 +1,7 @@
 import { getCurrentUser } from '@/actions/auth/server';
 import { getUser } from '@/actions/admin';
 import { redirect, notFound } from 'next/navigation';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, ExternalLink, Shield, UserCog } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -467,9 +467,12 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
                 {/* Basic Information */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className='text-lg'>Account Information</CardTitle>
+                    <CardTitle className='text-lg'>
+                      Account Information
+                    </CardTitle>
                     <p className='text-sm text-muted-foreground'>
-                      Update user's profile image, display name, email, and username
+                      Update user's profile image, display name, email, and
+                      username
                     </p>
                   </CardHeader>
                   <CardContent>

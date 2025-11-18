@@ -49,7 +49,7 @@ import {
   AlertCircle,
   FileCheck,
 } from 'lucide-react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { AdminVerificationsDataTable } from './admin-verifications-data-table';
 import {
   approveVerificationFormSchema,
@@ -590,10 +590,7 @@ export function VerificationManagement() {
           )}
 
           <DialogFooter>
-            <Button
-              variant='outline'
-              onClick={() => setViewDialogOpen(false)}
-            >
+            <Button variant='outline' onClick={() => setViewDialogOpen(false)}>
               Close
             </Button>
           </DialogFooter>

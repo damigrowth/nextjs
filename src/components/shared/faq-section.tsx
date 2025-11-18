@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import {
   Accordion,
   AccordionContent,
@@ -49,9 +49,12 @@ const variants = {
     titleClassName: 'title text-2xl lg:text-3xl font-bold mb-4 text-dark',
     subtitleClassName: 'paragraph text-body leading-relaxed mt-3',
     accordionClassName: 'w-full space-y-4',
-    accordionItemClassName: 'border border-gray-300 rounded overflow-hidden mb-4 [&>h3]:mb-0',
-    accordionTriggerClassName: 'bg-bluey text-left hover:no-underline px-5 py-6 text-lg font-medium text-dark [&[data-state=open]>svg]:rotate-180',
-    accordionContentClassName: 'bg-bluey text-dark px-5 pb-6 text-base leading-relaxed',
+    accordionItemClassName:
+      'border border-gray-300 rounded overflow-hidden mb-4 [&>h3]:mb-0',
+    accordionTriggerClassName:
+      'bg-bluey text-left hover:no-underline px-5 py-6 text-lg font-medium text-dark [&[data-state=open]>svg]:rotate-180',
+    accordionContentClassName:
+      'bg-bluey text-dark px-5 pb-6 text-base leading-relaxed',
     showHeader: true,
   },
   compact: {
@@ -61,9 +64,12 @@ const variants = {
     titleClassName: 'title text-xl font-bold text-left',
     subtitleClassName: '',
     accordionClassName: 'w-full space-y-3',
-    accordionItemClassName: 'border border-gray-400 rounded overflow-hidden [&>h3]:mb-0',
-    accordionTriggerClassName: 'w-full px-4 py-3 bg-bluey text-left text-dark text-base font-medium hover:bg-bluey/80 hover:no-underline flex justify-between items-center [&[data-state=open]>svg]:rotate-180',
-    accordionContentClassName: 'px-4 py-3 bg-bluey text-dark break-words text-sm',
+    accordionItemClassName:
+      'border border-gray-400 rounded overflow-hidden [&>h3]:mb-0',
+    accordionTriggerClassName:
+      'w-full px-4 py-3 bg-bluey text-left text-dark text-base font-medium hover:bg-bluey/80 hover:no-underline flex justify-between items-center [&[data-state=open]>svg]:rotate-180',
+    accordionContentClassName:
+      'px-4 py-3 bg-bluey text-dark break-words text-sm',
     showHeader: true,
   },
 };
@@ -87,7 +93,7 @@ export default function FaqSection({
 }: Props) {
   // Get variant defaults
   const variantStyles = variants[variant];
-  
+
   // Use provided props or fall back to variant defaults
   const styles = {
     sectionClassName: sectionClassName ?? variantStyles.sectionClassName,
@@ -96,9 +102,12 @@ export default function FaqSection({
     titleClassName: titleClassName ?? variantStyles.titleClassName,
     subtitleClassName: subtitleClassName ?? variantStyles.subtitleClassName,
     accordionClassName: accordionClassName ?? variantStyles.accordionClassName,
-    accordionItemClassName: accordionItemClassName ?? variantStyles.accordionItemClassName,
-    accordionTriggerClassName: accordionTriggerClassName ?? variantStyles.accordionTriggerClassName,
-    accordionContentClassName: accordionContentClassName ?? variantStyles.accordionContentClassName,
+    accordionItemClassName:
+      accordionItemClassName ?? variantStyles.accordionItemClassName,
+    accordionTriggerClassName:
+      accordionTriggerClassName ?? variantStyles.accordionTriggerClassName,
+    accordionContentClassName:
+      accordionContentClassName ?? variantStyles.accordionContentClassName,
     showHeader: showHeader ?? variantStyles.showHeader,
   };
   return (
@@ -149,10 +158,14 @@ export default function FaqSection({
                     value={item.id}
                     className={styles.accordionItemClassName}
                   >
-                    <AccordionTrigger className={styles.accordionTriggerClassName}>
+                    <AccordionTrigger
+                      className={styles.accordionTriggerClassName}
+                    >
                       {item.question}
                     </AccordionTrigger>
-                    <AccordionContent className={styles.accordionContentClassName}>
+                    <AccordionContent
+                      className={styles.accordionContentClassName}
+                    >
                       {item.answer}
                     </AccordionContent>
                   </AccordionItem>

@@ -1,13 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { usePathname } from 'next/navigation';
-import {
-  PlusIcon,
-  ChevronRight,
-  type LucideIcon,
-} from 'lucide-react';
+import { PlusIcon, ChevronRight, type LucideIcon } from 'lucide-react';
 
 import {
   Collapsible,
@@ -94,7 +90,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
                           if (hasNestedItems && !isSubActive) {
                             // Only mark parent as active if we're exactly on one of its nested children
                             const isOnNestedChild = subItem.items?.some(
-                              (nested) => pathname === nested.url
+                              (nested) => pathname === nested.url,
                             );
                             isSubActive = isOnNestedChild || false;
                           }
@@ -120,7 +116,8 @@ export function NavMain({ items }: { items: NavItem[] }) {
                                     <SidebarMenuSub className='ml-3 border-l pl-2'>
                                       {subItem.items?.map((nestedItem) => {
                                         // Use exact match for deepest nested items
-                                        const isNestedActive = pathname === nestedItem.url;
+                                        const isNestedActive =
+                                          pathname === nestedItem.url;
                                         return (
                                           <SidebarMenuSubItem
                                             key={nestedItem.title}

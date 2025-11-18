@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, ArrowRight } from 'lucide-react';
@@ -39,13 +39,14 @@ export default function ContentHero({ data }: Props) {
               {data.heading}
             </h2>
 
-            <p className='mb-6 text-gray-600'>
-              {data.description}
-            </p>
+            <p className='mb-6 text-gray-600'>{data.description}</p>
 
             <ul className='mb-5 space-y-5'>
               {data.list.map((item, index) => (
-                <li key={index} className='flex items-center text-gray-800 font-normal'>
+                <li
+                  key={index}
+                  className='flex items-center text-gray-800 font-normal'
+                >
                   <CheckCircle className='h-5 w-5 text-green-500 mr-3 flex-shrink-0' />
                   {item}
                 </li>

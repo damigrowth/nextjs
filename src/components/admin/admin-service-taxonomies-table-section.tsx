@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Edit, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -85,7 +85,7 @@ export async function AdminServiceTaxonomiesTableSection({
     taxonomies = taxonomies.filter(
       (t) =>
         t.label.toLowerCase().includes(search) ||
-        t.slug.toLowerCase().includes(search)
+        t.slug.toLowerCase().includes(search),
     );
   }
 
@@ -133,15 +133,17 @@ export async function AdminServiceTaxonomiesTableSection({
             ) : (
               paginatedTaxonomies.map((taxonomy) => (
                 <TableRow key={taxonomy.id}>
-                  <TableCell className='font-mono text-xs'>{taxonomy.id}</TableCell>
-                  <TableCell className='font-medium'>{taxonomy.label}</TableCell>
+                  <TableCell className='font-mono text-xs'>
+                    {taxonomy.id}
+                  </TableCell>
+                  <TableCell className='font-medium'>
+                    {taxonomy.label}
+                  </TableCell>
                   <TableCell className='font-mono text-xs text-muted-foreground'>
                     {taxonomy.slug}
                   </TableCell>
                   <TableCell>
-                    <Badge variant='outline'>
-                      {taxonomy.level}
-                    </Badge>
+                    <Badge variant='outline'>{taxonomy.level}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className='flex items-center justify-center'>

@@ -1,7 +1,7 @@
 import { getCurrentUser } from '@/actions/auth/server';
 import { getVerification } from '@/actions/admin/verifications';
 import { redirect, notFound } from 'next/navigation';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

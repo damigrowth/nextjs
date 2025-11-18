@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { notFound, redirect } from 'next/navigation';
 import { getCurrentUser } from '@/actions/auth/server';
 import { getServiceForEdit } from '@/actions/services/get-service';

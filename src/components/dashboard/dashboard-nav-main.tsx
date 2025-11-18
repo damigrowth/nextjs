@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronRight, type LucideIcon } from 'lucide-react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { usePathname } from 'next/navigation';
 import { type ComponentType } from 'react';
 
@@ -46,9 +46,10 @@ export function NavMain({
       <SidebarMenu>
         {items.map((item) => {
           // Exact match for root dashboard, startsWith for sub-routes
-          const isActiveItem = item.url === '/dashboard'
-            ? pathname === '/dashboard'
-            : pathname.startsWith(item.url);
+          const isActiveItem =
+            item.url === '/dashboard'
+              ? pathname === '/dashboard'
+              : pathname.startsWith(item.url);
 
           const isDisabled = item.isActive === false;
 
@@ -60,7 +61,11 @@ export function NavMain({
                   tooltip={item.title}
                   isActive={isActiveItem}
                   disabled={isDisabled}
-                  className={isDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}
+                  className={
+                    isDisabled
+                      ? 'opacity-50 cursor-not-allowed pointer-events-none'
+                      : ''
+                  }
                 >
                   <Link href={isDisabled ? '#' : item.url}>
                     <item.icon />

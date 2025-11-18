@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { ReactNode } from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

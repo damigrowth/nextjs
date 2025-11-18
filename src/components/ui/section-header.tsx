@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -19,12 +19,12 @@ export function SectionHeader({
   className = '',
 }: SectionHeaderProps) {
   return (
-    <div className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8 md:mb-12 ${className}`}>
+    <div
+      className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8 md:mb-12 ${className}`}
+    >
       {/* Left Side - Title & Description */}
       <div className='flex-1 lg:max-w-2xl'>
-        <h2 className='text-2xl font-bold text-gray-900 mb-2'>
-          {title}
-        </h2>
+        <h2 className='text-2xl font-bold text-gray-900 mb-2'>{title}</h2>
         {description && (
           <p className='text-sm font-normal text-gray-600 mb-4'>
             {description}

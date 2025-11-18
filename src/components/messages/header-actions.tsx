@@ -25,7 +25,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { MoreVertical } from 'lucide-react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { toast } from 'sonner';
 import { blockUser } from '@/actions/messages/blocking';
 import { deleteChat } from '@/actions/messages/chats';
@@ -70,7 +70,9 @@ export function HeaderActions({
       router.refresh();
     } catch (error) {
       console.error('Failed to block user:', error);
-      toast.error(error instanceof Error ? error.message : 'Αποτυχία αποκλεισμού χρήστη');
+      toast.error(
+        error instanceof Error ? error.message : 'Αποτυχία αποκλεισμού χρήστη',
+      );
     } finally {
       setIsBlockLoading(false);
     }
@@ -91,7 +93,11 @@ export function HeaderActions({
       router.refresh();
     } catch (error) {
       console.error('Failed to delete conversation:', error);
-      toast.error(error instanceof Error ? error.message : 'Αποτυχία διαγραφής συνομιλίας');
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Αποτυχία διαγραφής συνομιλίας',
+      );
     } finally {
       setIsDeleteLoading(false);
     }
@@ -113,7 +119,9 @@ export function HeaderActions({
               </Link>
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem onClick={handleBlockClick}>Αποκλεισμός</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleBlockClick}>
+            Αποκλεισμός
+          </DropdownMenuItem>
           <DropdownMenuItem
             onClick={handleDeleteClick}
             className='text-destructive focus:text-destructive'
@@ -124,20 +132,20 @@ export function HeaderActions({
       </DropdownMenu>
 
       {/* Block Confirmation Dialog */}
-      <AlertDialog
-        open={isBlockDialogOpen}
-        onOpenChange={setIsBlockDialogOpen}
-      >
+      <AlertDialog open={isBlockDialogOpen} onOpenChange={setIsBlockDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Αποκλεισμός {displayName};</AlertDialogTitle>
             <AlertDialogDescription>
-              Αυτός ο χρήστης δεν θα μπορεί πλέον να σας στέλνει μηνύματα. Μπορείτε
-              να τον ξεμπλοκάρετε ανά πάσα στιγμή από τις ρυθμίσεις σας.
+              Αυτός ο χρήστης δεν θα μπορεί πλέον να σας στέλνει μηνύματα.
+              Μπορείτε να τον ξεμπλοκάρετε ανά πάσα στιγμή από τις ρυθμίσεις
+              σας.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isBlockLoading}>Ακύρωση</AlertDialogCancel>
+            <AlertDialogCancel disabled={isBlockLoading}>
+              Ακύρωση
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -161,12 +169,14 @@ export function HeaderActions({
           <AlertDialogHeader>
             <AlertDialogTitle>Διαγραφή Συνομιλίας;</AlertDialogTitle>
             <AlertDialogDescription>
-              Αυτό θα διαγράψει οριστικά τη συνομιλία σας με τον/την {displayName}.
-              Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
+              Αυτό θα διαγράψει οριστικά τη συνομιλία σας με τον/την{' '}
+              {displayName}. Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleteLoading}>Ακύρωση</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleteLoading}>
+              Ακύρωση
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();

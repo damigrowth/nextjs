@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { RegisterProButton } from '@/components/forms/auth';
 import { MenuUser } from '@/components/profile';
 import NavMenu from './navigation-menu';

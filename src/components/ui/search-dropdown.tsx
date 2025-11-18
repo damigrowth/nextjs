@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Folder, FileText, Loader2 } from 'lucide-react';
 import {
   Command,
@@ -10,7 +10,11 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverAnchor,
+} from '@/components/ui/popover';
 import type { SearchSuggestionsResult } from '@/lib/types/search';
 
 export interface SearchDropdownProps {

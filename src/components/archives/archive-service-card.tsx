@@ -1,10 +1,15 @@
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Card, CardContent } from '@/components/ui/card';
 import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
 import type { ArchiveServiceCardData } from '@/lib/types/components';
 import type { ServiceCardData } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { MediaCarousel, ProfileBadges, RatingDisplay, UserAvatar } from '../shared';
+import {
+  MediaCarousel,
+  ProfileBadges,
+  RatingDisplay,
+  UserAvatar,
+} from '../shared';
 import { CoverageDisplay } from './coverage-display';
 
 interface ArchiveServiceCardProps {

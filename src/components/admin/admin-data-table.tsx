@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,12 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-  Edit,
-} from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Edit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -128,12 +123,7 @@ export function AdminDataTable<T extends { id: string | number }>({
           header: '',
           render: (row) => (
             <div className='flex items-center justify-end'>
-              <Button
-                variant='ghost'
-                size='icon'
-                className='h-8 w-8'
-                asChild
-              >
+              <Button variant='ghost' size='icon' className='h-8 w-8' asChild>
                 <Link href={editPath(row)}>
                   <Edit className='w-4 h-4' />
                 </Link>

@@ -1,10 +1,18 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Globe, FileText, XCircle, Clock, Star, ExternalLink, Edit } from 'lucide-react';
+import {
+  Globe,
+  FileText,
+  XCircle,
+  Clock,
+  Star,
+  ExternalLink,
+  Edit,
+} from 'lucide-react';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { Status } from '@prisma/client';
 import TableMedia from '@/components/shared/table-media';
@@ -107,10 +115,7 @@ export function AdminServicesDataTable({
         <div className='flex items-center gap-3'>
           <TableMedia media={service.media || []} />
           <div className='flex-1 min-w-0'>
-            <Link
-              href={`/admin/services/${service.id}`}
-              className='min-w-0'
-            >
+            <Link href={`/admin/services/${service.id}`} className='min-w-0'>
               <h3 className='text-sm font-medium text-gray-900 truncate hover:text-primary hover:underline cursor-pointer transition-colors'>
                 {service.title}
               </h3>
@@ -135,10 +140,7 @@ export function AdminServicesDataTable({
       className: 'max-w-[200px]',
       render: (service) =>
         service.taxonomyLabels ? (
-          <TaxonomiesDisplay
-            taxonomyLabels={service.taxonomyLabels}
-            compact
-          />
+          <TaxonomiesDisplay taxonomyLabels={service.taxonomyLabels} compact />
         ) : (
           <Badge variant='outline' className='text-xs w-fit'>
             {service.category}
@@ -171,7 +173,9 @@ export function AdminServicesDataTable({
       render: (service) => (
         <div className='text-sm text-muted-foreground'>
           <div>{formatDate(new Date(service.createdAt))}</div>
-          <div className='text-xs'>{formatTime(new Date(service.createdAt))}</div>
+          <div className='text-xs'>
+            {formatTime(new Date(service.createdAt))}
+          </div>
         </div>
       ),
     },
@@ -182,7 +186,9 @@ export function AdminServicesDataTable({
       render: (service) => (
         <div className='text-sm text-muted-foreground'>
           <div>{formatDate(new Date(service.updatedAt))}</div>
-          <div className='text-xs'>{formatTime(new Date(service.updatedAt))}</div>
+          <div className='text-xs'>
+            {formatTime(new Date(service.updatedAt))}
+          </div>
         </div>
       ),
     },
@@ -195,13 +201,12 @@ export function AdminServicesDataTable({
           {service.status === 'published' && service.slug && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  className='h-8 w-8'
-                  asChild
-                >
-                  <Link href={`/s/${service.slug}`} target='_blank' rel='noopener noreferrer'>
+                <Button variant='ghost' size='icon' className='h-8 w-8' asChild>
+                  <Link
+                    href={`/s/${service.slug}`}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  >
                     <ExternalLink className='w-4 h-4' />
                   </Link>
                 </Button>
@@ -214,12 +219,7 @@ export function AdminServicesDataTable({
           {/* Edit service button - always visible */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                variant='ghost'
-                size='icon'
-                className='h-8 w-8'
-                asChild
-              >
+              <Button variant='ghost' size='icon' className='h-8 w-8' asChild>
                 <Link href={`${basePath}/${service.id}`}>
                   <Edit className='w-4 h-4' />
                 </Link>

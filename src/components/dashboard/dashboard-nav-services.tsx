@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronRight, Package, Plus } from 'lucide-react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 

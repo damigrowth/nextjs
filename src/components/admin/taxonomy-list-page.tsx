@@ -1,5 +1,5 @@
 import { Suspense, ComponentType, ReactNode } from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { SiteHeader } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
@@ -19,7 +19,10 @@ export interface TaxonomyListPageProps {
   searchParams: any;
 }
 
-export function TaxonomyListPage({ config, searchParams }: TaxonomyListPageProps) {
+export function TaxonomyListPage({
+  config,
+  searchParams,
+}: TaxonomyListPageProps) {
   return (
     <>
       <SiteHeader

@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Card, CardContent } from '@/components/ui/card';
 
 import MediaDisplay from '@/components/ui/media-display';
@@ -123,9 +123,7 @@ export default function ServiceCard({
                   className={`text-base ${!showProfile ? 'w-full text-right' : ''}`}
                 >
                   <span className='font-normal text-body'>από </span>
-                  <span className='font-semibold text-dark'>
-                    {priceValue}€
-                  </span>
+                  <span className='font-semibold text-dark'>{priceValue}€</span>
                 </div>
               )}
             </div>

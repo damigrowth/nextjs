@@ -2,7 +2,7 @@
 
 import React, { Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Star, Rocket, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { HomeSearch } from './home-search';

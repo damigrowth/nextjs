@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { ArrowRightLong } from '@/components/icon/fa';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Button } from '../ui/button';

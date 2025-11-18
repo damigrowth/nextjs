@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { usePathname } from 'next/navigation';
 import {
   Settings,
@@ -55,13 +55,20 @@ const profileMenuItems = [
   },
 ];
 
-export default function ProfileSidebar({ userType = 'user' }: { userType?: string }) {
+export default function ProfileSidebar({
+  userType = 'user',
+}: {
+  userType?: string;
+}) {
   const pathname = usePathname();
 
   // Filter menu items based on user type
-  const visibleItems = userType === 'pro'
-    ? profileMenuItems
-    : profileMenuItems.filter(item => item.url === '/dashboard/profile/account');
+  const visibleItems =
+    userType === 'pro'
+      ? profileMenuItems
+      : profileMenuItems.filter(
+          (item) => item.url === '/dashboard/profile/account',
+        );
 
   return (
     <div className='bg-card border-b'>

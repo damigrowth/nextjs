@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { usePathname } from 'next/navigation';
 import {
   NavigationMenu,
@@ -19,12 +19,7 @@ import {
 } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { categoryIconMap } from '@/constants/datasets/category-icons';
-import {
-  Grid3x3,
-  ChevronRight,
-  ChevronDown,
-  ArrowRight,
-} from 'lucide-react';
+import { Grid3x3, ChevronRight, ChevronDown, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { NavigationMenuCategory } from '@/lib/types/components';
 
@@ -45,7 +40,9 @@ export default function NavMenu({
   onClose,
 }: NavMenuProps) {
   const pathname = usePathname();
-  const [hoveredCategory, setHoveredCategory] = React.useState<string | null>(null);
+  const [hoveredCategory, setHoveredCategory] = React.useState<string | null>(
+    null,
+  );
   const [timeoutId, setTimeoutId] = React.useState<NodeJS.Timeout | null>(null);
   const [categoriesOpen, setCategoriesOpen] = React.useState(false);
 
@@ -58,25 +55,27 @@ export default function NavMenu({
   // Mobile version - simple vertical list
   if (isMobile) {
     return (
-      <nav className="space-y-2">
+      <nav className='space-y-2'>
         {/* Categories with collapsible submenu */}
         <Collapsible open={categoriesOpen} onOpenChange={setCategoriesOpen}>
           <CollapsibleTrigger asChild>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-between px-0 h-auto py-3"
+            <Button
+              variant='ghost'
+              className='w-full justify-between px-0 h-auto py-3'
             >
-              <span className="text-base font-medium">Κατηγορίες</span>
-              <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${categoriesOpen ? 'rotate-180' : ''}`} />
+              <span className='text-base font-medium'>Κατηγορίες</span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform duration-200 ${categoriesOpen ? 'rotate-180' : ''}`}
+              />
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-2 mt-2">
+          <CollapsibleContent className='space-y-2 mt-2'>
             {navigationData.map((category) => (
               <Link
                 key={category.id}
                 href={`/categories/${category.slug}`}
                 onClick={handleLinkClick}
-                className="block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                className='block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors'
               >
                 {category.label}
               </Link>
@@ -90,7 +89,7 @@ export default function NavMenu({
             key={item.href}
             href={item.href}
             onClick={handleLinkClick}
-            className="block px-0 py-3 text-base font-medium text-gray-900 hover:text-blue-600 transition-colors"
+            className='block px-0 py-3 text-base font-medium text-gray-900 hover:text-blue-600 transition-colors'
           >
             {item.label}
           </Link>
@@ -202,7 +201,8 @@ export default function NavMenu({
                                     href={subcategory.href}
                                     className='block text-sm text-primary hover:text-primary/80 font-medium pt-2'
                                   >
-                                    Προβολή όλων ({subcategory.totalSubdivisions})
+                                    Προβολή όλων (
+                                    {subcategory.totalSubdivisions})
                                   </Link>
                                 )}
                               </div>
@@ -237,8 +237,8 @@ export default function NavMenu({
               <NavigationMenuLink
                 asChild
                 className={cn(
-                  navigationMenuTriggerStyle({ variant: "pale" }),
-                  isActive && 'bg-pale text-pale-foreground'
+                  navigationMenuTriggerStyle({ variant: 'pale' }),
+                  isActive && 'bg-pale text-pale-foreground',
                 )}
               >
                 <Link href={item.href}>{item.label}</Link>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -69,7 +69,10 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
   const getStatusBadge = (status: string) => {
     const variants: Record<
       string,
-      { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }
+      {
+        variant: 'default' | 'secondary' | 'destructive' | 'outline';
+        label: string;
+      }
     > = {
       draft: { variant: 'outline', label: 'Draft' },
       pending: { variant: 'secondary', label: 'Pending' },
@@ -170,24 +173,24 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
       {/* Action Buttons */}
       <div className='flex items-center justify-end gap-2'>
         <Button variant='outline' onClick={handleTogglePublished}>
-            {service.status === 'published' ? (
-              <>
-                <XCircle className='mr-2 h-4 w-4' />
-                Unpublish
-              </>
-            ) : (
-              <>
-                <CheckCircle2 className='mr-2 h-4 w-4' />
-                Publish
-              </>
-            )}
-          </Button>
-          <Button variant='outline' onClick={handleToggleFeatured}>
-            <Star
-              className={`mr-2 h-4 w-4 ${service.featured ? 'fill-yellow-400 text-yellow-400' : ''}`}
-            />
-            {service.featured ? 'Unfeature' : 'Feature'}
-          </Button>
+          {service.status === 'published' ? (
+            <>
+              <XCircle className='mr-2 h-4 w-4' />
+              Unpublish
+            </>
+          ) : (
+            <>
+              <CheckCircle2 className='mr-2 h-4 w-4' />
+              Publish
+            </>
+          )}
+        </Button>
+        <Button variant='outline' onClick={handleToggleFeatured}>
+          <Star
+            className={`mr-2 h-4 w-4 ${service.featured ? 'fill-yellow-400 text-yellow-400' : ''}`}
+          />
+          {service.featured ? 'Unfeature' : 'Feature'}
+        </Button>
         <Button variant='destructive' onClick={() => setDeleteDialogOpen(true)}>
           <Trash2 className='mr-2 h-4 w-4' />
           Delete
@@ -203,7 +206,10 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
                 <div className='flex items-center gap-2 mb-2'>
                   <CardTitle>{service.title}</CardTitle>
                   {service.featured && (
-                    <Badge variant='default' className='bg-yellow-500 text-yellow-900'>
+                    <Badge
+                      variant='default'
+                      className='bg-yellow-500 text-yellow-900'
+                    >
                       Featured
                     </Badge>
                   )}
@@ -282,7 +288,9 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
               <h4 className='text-sm font-medium mb-2'>Rating & Reviews</h4>
               <div className='flex items-center gap-2'>
                 {renderStars(service.rating)}
-                <span className='text-sm font-medium'>{service.rating.toFixed(1)}</span>
+                <span className='text-sm font-medium'>
+                  {service.rating.toFixed(1)}
+                </span>
                 <span className='text-sm text-muted-foreground'>
                   ({service._count.reviews} reviews)
                 </span>
@@ -311,7 +319,9 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
         <Card>
           <CardHeader>
             <CardTitle>Profile Owner</CardTitle>
-            <CardDescription>Information about the service provider</CardDescription>
+            <CardDescription>
+              Information about the service provider
+            </CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
             <div className='flex items-start space-x-4'>
@@ -365,7 +375,10 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
                 </Link>
               </Button>
               <Button variant='outline' size='sm' asChild className='flex-1'>
-                <Link href={`/profiles/${service.profile.username || service.pid}`} target='_blank'>
+                <Link
+                  href={`/profiles/${service.profile.username || service.pid}`}
+                  target='_blank'
+                >
                   View Public
                 </Link>
               </Button>
@@ -434,7 +447,10 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button variant='outline' onClick={() => setStatusDialogOpen(false)}>
+            <Button
+              variant='outline'
+              onClick={() => setStatusDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button onClick={handleUpdateStatus}>Update Status</Button>
@@ -448,18 +464,22 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
           <DialogHeader>
             <DialogTitle>Delete Service</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this service? This action cannot be
-              undone.
+              Are you sure you want to delete this service? This action cannot
+              be undone.
             </DialogDescription>
           </DialogHeader>
           <Alert variant='destructive'>
             <AlertCircle className='h-4 w-4' />
             <AlertDescription>
-              This will permanently delete the service and all associated reviews.
+              This will permanently delete the service and all associated
+              reviews.
             </AlertDescription>
           </Alert>
           <DialogFooter>
-            <Button variant='outline' onClick={() => setDeleteDialogOpen(false)}>
+            <Button
+              variant='outline'
+              onClick={() => setDeleteDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button variant='destructive' onClick={handleDelete}>

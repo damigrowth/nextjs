@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import {
   Dialog,
   DialogContent,
@@ -92,7 +92,11 @@ export function QuickCreateDialog({
           {createLinks.map((link) => {
             const Icon = link.icon;
             return (
-              <Link key={link.href} href={link.href} onClick={() => onOpenChange(false)}>
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => onOpenChange(false)}
+              >
                 <Button
                   variant='outline'
                   className='h-auto w-full justify-start p-4'

@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { SiteHeader } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, GitBranch } from 'lucide-react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { DeploymentManager } from '@/components/admin/deployment/deployment-manager';
 import { DeploymentSkeleton } from '@/components/admin/deployment/deployment-skeleton';
 

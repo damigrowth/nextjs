@@ -1,7 +1,7 @@
 import { getCurrentUser } from '@/actions/auth/server';
 import { getProfile } from '@/actions/admin/profiles';
 import { redirect, notFound } from 'next/navigation';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -294,8 +294,8 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                   <CardHeader>
                     <CardTitle className='text-lg'>Βασικά στοιχεία</CardTitle>
                     <p className='text-sm text-muted-foreground'>
-                      Tagline, κατηγορία, υποκατηγορία,
-                      τοποθεσία, ειδικότητα, δεξιότητες, bio
+                      Tagline, κατηγορία, υποκατηγορία, τοποθεσία, ειδικότητα,
+                      δεξιότητες, bio
                     </p>
                   </CardHeader>
                   <CardContent>

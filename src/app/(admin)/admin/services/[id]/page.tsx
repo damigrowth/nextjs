@@ -1,7 +1,7 @@
 import { getCurrentUser } from '@/actions/auth/server';
 import { getService } from '@/actions/admin/services';
 import { redirect, notFound } from 'next/navigation';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -206,10 +206,16 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                         Has Media
                       </span>
                       <Badge
-                        variant={service.media && service.media.length > 0 ? 'default' : 'outline'}
+                        variant={
+                          service.media && service.media.length > 0
+                            ? 'default'
+                            : 'outline'
+                        }
                         className='text-xs h-5'
                       >
-                        {service.media && service.media.length > 0 ? 'Yes' : 'No'}
+                        {service.media && service.media.length > 0
+                          ? 'Yes'
+                          : 'No'}
                       </Badge>
                     </div>
                   </div>

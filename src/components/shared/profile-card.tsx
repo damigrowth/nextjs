@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ProfileCardProps } from '@/lib/types';
@@ -8,7 +8,10 @@ import RatingDisplay from './rating-display';
 import SaveButton from './save-button';
 import UserAvatar from './user-avatar';
 
-export default function ProfileCard({ profile, isSaved = false }: ProfileCardProps) {
+export default function ProfileCard({
+  profile,
+  isSaved = false,
+}: ProfileCardProps) {
   const {
     id,
     displayName,
@@ -27,11 +30,7 @@ export default function ProfileCard({ profile, isSaved = false }: ProfileCardPro
     <div className='group relative bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:border-gray-300'>
       {/* Save Button - Show on hover or if saved */}
       <div className='absolute top-4 right-4 z-10'>
-        <SaveButton
-          itemType="profile"
-          itemId={id}
-          initialSaved={isSaved}
-        />
+        <SaveButton itemType='profile' itemId={id} initialSaved={isSaved} />
       </div>
 
       {/* Avatar Section */}
