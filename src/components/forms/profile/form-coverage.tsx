@@ -166,16 +166,17 @@ export default function CoverageForm({
 
   // Handle successful form submission
   useEffect(() => {
-    if (state.success) {
-      // Show success toast
-      toast.success(state.message || 'Οι τρόποι παροχής ενημερώθηκαν επιτυχώς');
-      // Refresh the page to get updated data
+    if (state.success && state.message) {
+      toast.success(state.message, {
+        id: `coverage-form-${Date.now()}`,
+      });
       router.refresh();
-    } else if (state.message && !state.success) {
-      // Show error toast
-      toast.error(state.message);
+    } else if (!state.success && state.message) {
+      toast.error(state.message, {
+        id: `coverage-form-${Date.now()}`,
+      });
     }
-  }, [state.success, state.message, router]);
+  }, [state, router]);
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatInput({

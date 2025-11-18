@@ -126,16 +126,17 @@ export default function AdditionalInfoForm({
 
   // Handle successful form submission
   useEffect(() => {
-    if (state.success) {
-      // Show success toast
-      toast.success(state.message || 'Profile updated successfully');
-      // Refresh the page to get updated data
+    if (state.success && state.message) {
+      toast.success(state.message, {
+        id: `additional-info-form-${Date.now()}`,
+      });
       router.refresh();
-    } else if (state.message && !state.success) {
-      // Show error toast
-      toast.error(state.message);
+    } else if (!state.success && state.message) {
+      toast.error(state.message, {
+        id: `additional-info-form-${Date.now()}`,
+      });
     }
-  }, [state.success, state.message, router]);
+  }, [state, router]);
 
   // Form submission handler using utility function
   const handleFormSubmit = (formData: FormData) => {

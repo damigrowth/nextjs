@@ -121,21 +121,19 @@ export default function BasicInfoForm({
 
   // Handle successful form submission - refresh session and page to get updated data
   useEffect(() => {
-    if (state.success) {
-      // Show success toast
-      toast.success(state.message || 'Profile updated successfully');
-      // Reset loading states
+    if (state.success && state.message) {
+      toast.success(state.message, {
+        id: `basic-info-form-${Date.now()}`,
+      });
       setIsUploading(false);
-      // Refresh the session data to update the menu component with new image
       refetch();
-      // Force a fresh server-side render to get the updated session data
-      // This will trigger the profile useEffect to reset the form with new data
       router.refresh();
-    } else if (state.message && !state.success) {
-      // Show error toast
-      toast.error(state.message);
+    } else if (!state.success && state.message) {
+      toast.error(state.message, {
+        id: `basic-info-form-${Date.now()}`,
+      });
     }
-  }, [state.success, state.message, refetch, router]);
+  }, [state, refetch, router]);
 
   // Reset loading states when form submission completes (success or failure)
   useEffect(() => {

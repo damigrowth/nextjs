@@ -16,7 +16,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   DialogHeader,
   DialogTitle,
@@ -24,6 +23,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from 'sonner';
 
 // Types
 import { AuthUser } from '@/lib/types/auth';
@@ -88,7 +89,11 @@ export default function DeleteAccountForm({
       try {
         // Verify the username matches the current user
         if (!user || data.username !== user.username) {
-          setSubmitError('Το username δεν ταιριάζει με τον λογαριασμό σας');
+          const errorMsg = 'Το username δεν ταιριάζει με τον λογαριασμό σας';
+          setSubmitError(errorMsg);
+          toast.error(errorMsg, {
+            id: `delete-account-form-${Date.now()}`,
+          });
           return;
         }
 
@@ -114,10 +119,11 @@ export default function DeleteAccountForm({
         window.location.href = '/';
       } catch (error: any) {
         console.error('Delete account error:', error);
-        setSubmitError(
-          error.message ||
-            'Αποτυχία διαγραφής λογαριασμού. Παρακαλώ δοκιμάστε ξανά.',
-        );
+        const errorMsg = error.message || 'Αποτυχία διαγραφής λογαριασμού. Παρακαλώ δοκιμάστε ξανά.';
+        setSubmitError(errorMsg);
+        toast.error(errorMsg, {
+          id: `delete-account-form-${Date.now()}`,
+        });
       }
     });
   };
@@ -214,14 +220,6 @@ export default function DeleteAccountForm({
               </FormItem>
             )}
           />
-
-          {/* Error Display */}
-          {submitError && (
-            <Alert variant='destructive'>
-              <AlertTriangle className='h-4 w-4' />
-              <AlertDescription>{submitError}</AlertDescription>
-            </Alert>
-          )}
 
           <DialogFooter>
             <Button

@@ -14,13 +14,10 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from 'sonner';
 
 // Auth provider
 import { useSession } from '@/lib/auth/client';
-
-// Icons
-import { AlertCircle, CheckCircle } from 'lucide-react';
 
 // Custom components
 import { MediaUpload } from '@/components/media';
@@ -96,17 +93,24 @@ export default function AccountForm({
     }
   }, [initialUser, form]);
 
-  // Handle successful form submission - refresh session and page to get updated data
+  // Handle form submission responses with toast notifications
   useEffect(() => {
-    if (state.success) {
+    if (state.success && state.message) {
+      toast.success(state.message, {
+        id: `account-form-${Date.now()}`,
+      });
       // Reset loading states
       setIsUploading(false);
       // Refresh the session data to update the menu component with new image
       refetch();
       // Force a fresh server-side render to get the updated session data
       router.refresh();
+    } else if (!state.success && state.message) {
+      toast.error(state.message, {
+        id: `account-form-${Date.now()}`,
+      });
     }
-  }, [state.success, refetch, router]);
+  }, [state, refetch, router]);
 
   // Reset loading states when form submission completes (success or failure)
   useEffect(() => {
@@ -249,22 +253,6 @@ export default function AccountForm({
             )}
           />
         </div>
-
-        {/* Error Display */}
-        {state.message && !state.success && (
-          <Alert variant='destructive'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Success Display */}
-        {state.message && state.success && (
-          <Alert className='border-green-200 bg-green-50 text-green-800'>
-            <CheckCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
 
         <div className='flex justify-end space-x-4'>
           <FormButton

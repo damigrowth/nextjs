@@ -16,9 +16,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from 'sonner';
 
 // Icons (lucide-react only)
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 // Utilities
 import { populateFormData } from '@/lib/utils/form';
@@ -96,13 +97,19 @@ export default function VerificationForm({
     }
   }, [verificationData, form]);
 
-  // Handle successful form submission
+  // Handle form submission response
   useEffect(() => {
-    if (state.success) {
-      // Refresh the page to get updated data
+    if (state.success && state.message) {
+      toast.success(state.message, {
+        id: `verification-form-${Date.now()}`,
+      });
       router.refresh();
+    } else if (!state.success && state.message) {
+      toast.error(state.message, {
+        id: `verification-form-${Date.now()}`,
+      });
     }
-  }, [state.success, router]);
+  }, [state, router]);
 
   // Form submission handler
   const handleFormSubmit = (formData: FormData) => {
@@ -226,22 +233,6 @@ export default function VerificationForm({
               χρησιμοποιηθούν αποκλειστικά για την πιστοποίηση του προφίλ σας. Η
               διαδικασία ελέγχου μπορεί να διαρκέσει 1-3 εργάσιμες ημέρες.
             </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Error Display */}
-        {state.message && !state.success && (
-          <Alert variant='destructive'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Success Display */}
-        {state.message && state.success && (
-          <Alert className='border-green-200 bg-green-50 text-green-800'>
-            <CheckCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
           </Alert>
         )}
 

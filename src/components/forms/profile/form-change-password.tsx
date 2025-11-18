@@ -15,16 +15,16 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 // Icons
-import { AlertCircle, CheckCircle, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 // Actions and validation
 import { changePassword } from '@/actions/auth/change-password';
@@ -87,9 +87,12 @@ export default function ChangePasswordForm({
     });
   };
 
-  // Handle success state
+  // Handle form submission responses with toast notifications
   React.useEffect(() => {
-    if (state.success) {
+    if (state.success && state.message) {
+      toast.success(state.message, {
+        id: `change-password-form-${Date.now()}`,
+      });
       // Reset form
       form.reset();
 
@@ -97,8 +100,12 @@ export default function ChangePasswordForm({
       setTimeout(() => {
         onSuccess?.();
       }, 2000);
+    } else if (!state.success && state.message) {
+      toast.error(state.message, {
+        id: `change-password-form-${Date.now()}`,
+      });
     }
-  }, [state.success, form, onSuccess]);
+  }, [state, form, onSuccess]);
 
   return (
     <>
@@ -217,22 +224,6 @@ export default function ChangePasswordForm({
               </FormItem>
             )}
           />
-
-          {/* Error Display */}
-          {state.message && !state.success && (
-            <Alert variant='destructive'>
-              <AlertCircle className='h-4 w-4' />
-              <AlertDescription>{state.message}</AlertDescription>
-            </Alert>
-          )}
-
-          {/* Success Display */}
-          {state.message && state.success && (
-            <Alert className='border-green-200 bg-green-50 text-green-800'>
-              <CheckCircle className='h-4 w-4' />
-              <AlertDescription>{state.message}</AlertDescription>
-            </Alert>
-          )}
 
           <DialogFooter>
             <Button

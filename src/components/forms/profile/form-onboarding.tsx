@@ -26,11 +26,10 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
-
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from 'sonner';
 
 // Icons
-import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Loader2, CheckCircle } from 'lucide-react';
 
 import { useSession } from '@/lib/auth/client';
 import { useRouter } from 'next/navigation';
@@ -177,7 +176,10 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
 
   // Handle successful onboarding completion and redirect
   useEffect(() => {
-    if (state.success) {
+    if (state.success && state.message) {
+      toast.success(state.message, {
+        id: `onboarding-form-${Date.now()}`,
+      });
       // Clear upload state
       setIsUploading(false);
       // Show redirecting state
@@ -197,8 +199,12 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
       };
 
       handleRedirect();
+    } else if (!state.success && state.message) {
+      toast.error(state.message, {
+        id: `onboarding-form-${Date.now()}`,
+      });
     }
-  }, [state.success, refetch, router]);
+  }, [state, refetch, router]);
 
   // Loading state - show form skeleton
   if (isLoading) {
@@ -889,28 +895,17 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
           )}
         />
 
-        {/* Error Display */}
-        {state.message && !state.success && (
-          <Alert variant='destructive'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
-
         {/* Success Display with Redirect Progress */}
         {state.message && state.success && (
-          <Alert className='border-green-200 bg-green-50 text-green-800'>
-            <CheckCircle className='h-4 w-4' />
-            <AlertDescription className='space-y-2'>
-              <div className='font-medium'>{state.message}</div>
-              {isRedirecting && (
-                <div className='flex items-center gap-2 text-sm'>
-                  <Loader2 className='w-4 h-4 animate-spin' />
-                  <span>Μετάβαση στον Πίνακα Ελέγχου...</span>
-                </div>
-              )}
-            </AlertDescription>
-          </Alert>
+          <div className='space-y-2 p-4 border border-green-200 bg-green-50 text-green-800 rounded-md'>
+            <div className='font-medium text-sm'>{state.message}</div>
+            {isRedirecting && (
+              <div className='flex items-center gap-2 text-sm'>
+                <Loader2 className='w-4 h-4 animate-spin' />
+                <span>Μετάβαση στον Πίνακα Ελέγχου...</span>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Debug Info */}
