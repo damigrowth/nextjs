@@ -45,19 +45,19 @@ export default function AdminTablePagination({
 
   const limitOptions = pageSizeOptions.map((size) => ({
     id: size.toString(),
-    label: `${size} per page`,
+    label: `${size} ανά σελίδα`,
   }));
 
   return (
     <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
       {/* Page Size Selector */}
       <div className='flex items-center gap-2'>
-        <span className='text-sm text-gray-600'>Show:</span>
+        <span className='text-sm text-gray-600'>Εμφάνιση:</span>
         <Selectbox
           options={limitOptions}
           value={currentLimit.toString()}
           onValueChange={updateLimit}
-          placeholder={`${currentLimit} per page`}
+          placeholder={`${currentLimit} ανά σελίδα`}
           className='w-[140px]'
         />
       </div>
