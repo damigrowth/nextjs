@@ -17,6 +17,7 @@ interface ServicesPageProps {
     online?: string;
     sortBy?: string;
     page?: string;
+    limit?: string;
     search?: string; // Search query parameter
   }>;
 }
@@ -30,10 +31,12 @@ export default async function ServicesPage({
   searchParams,
 }: ServicesPageProps) {
   const searchParams_ = await searchParams;
+  const limit = parseInt(searchParams_.limit || '20');
 
   // Use the comprehensive server action
   const result = await getServiceArchivePageData({
     searchParams: searchParams_,
+    limit,
   });
 
   if (!result.success) {
@@ -52,7 +55,7 @@ export default async function ServicesPage({
       counties={counties}
       basePath='/ipiresies'
       total={total}
-      limit={20}
+      limit={limit}
       availableSubdivisions={availableSubdivisions}
     >
       <div className='space-y-6'>

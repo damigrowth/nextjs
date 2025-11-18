@@ -18,6 +18,7 @@ interface DirectoryCategoryPageProps {
     online?: string;
     sortBy?: string;
     page?: string;
+    limit?: string;
     type?: 'pros' | 'companies'; // Type filter
   }>;
 }
@@ -66,11 +67,13 @@ export default async function DirectoryCategoryPage({
 }: DirectoryCategoryPageProps) {
   const params_ = await params;
   const searchParams_ = await searchParams;
+  const limit = parseInt(searchParams_.limit || '20');
 
   const result = await getProfileArchivePageData({
     archiveType: 'directory',
     categorySlug: params_.category,
     searchParams: searchParams_,
+    limit,
   });
 
   if (!result.success) {
@@ -90,7 +93,7 @@ export default async function DirectoryCategoryPage({
       counties={counties}
       basePath={`/dir/${params_.category}`}
       total={total}
-      limit={20}
+      limit={limit}
       availableSubdivisions={availableSubcategories}
     >
       <div className='space-y-6'>

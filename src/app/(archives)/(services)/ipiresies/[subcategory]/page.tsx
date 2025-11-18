@@ -19,6 +19,7 @@ interface SubcategoryPageProps {
     online?: string;
     sortBy?: string;
     page?: string;
+    limit?: string;
   }>;
 }
 
@@ -59,12 +60,14 @@ export default async function ServicesSubcategoryPage({
 }: SubcategoryPageProps) {
   const { category: categorySlug, subcategory: subcategorySlug } = await params;
   const searchParams_ = await searchParams;
+  const limit = parseInt(searchParams_.limit || '20');
 
   // Use the comprehensive server action
   const result = await getServiceArchivePageData({
     categorySlug,
     subcategorySlug,
     searchParams: searchParams_,
+    limit,
   });
 
   if (!result.success) {
@@ -88,7 +91,7 @@ export default async function ServicesSubcategoryPage({
       counties={counties}
       basePath={`/ipiresies/${subcategorySlug}`}
       total={total}
-      limit={20}
+      limit={limit}
       availableSubdivisions={availableSubdivisions}
     >
       <div className='space-y-6'>
