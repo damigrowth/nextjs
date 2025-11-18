@@ -434,6 +434,7 @@ export async function getProfileArchivePageData(params: {
   archiveType?: 'pros' | 'companies' | 'directory'; // Optional, defaults to 'pros'
   categorySlug?: string; // Optional for main pages
   subcategorySlug?: string;
+  limit?: number; // Results per page
   searchParams: {
     county?: string;
     περιοχή?: string;
@@ -570,7 +571,7 @@ export async function getProfileArchivePageData(params: {
 
     // Validate pagination and filters
     const page = parseInt(searchParams.page || '1');
-    const limit = 20;
+    const limit = params.limit || 20;
 
     // Validate sortBy parameter using the existing validation function
     const sortBy =

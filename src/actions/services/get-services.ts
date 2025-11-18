@@ -340,6 +340,14 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
   }>
 > {
   try {
+    console.log('getServicesByFiltersInternal called with filters:', {
+      ...filters,
+      dbConnectionCheck: {
+        DATABASE_URL: process.env.DATABASE_URL ? 'Set' : 'Not set',
+        DIRECT_URL: process.env.DIRECT_URL ? 'Set' : 'Not set',
+      },
+    });
+
     const page = filters.page || 1;
     const limit = filters.limit || 20;
     const offset = (page - 1) * limit;
@@ -884,6 +892,7 @@ export async function getServiceArchivePageData(params: {
   categorySlug?: string; // Optional for main services page
   subcategorySlug?: string;
   subdivisionSlug?: string;
+  limit?: number; // Results per page
   searchParams: {
     county?: string;
     περιοχή?: string;
@@ -982,7 +991,7 @@ export async function getServiceArchivePageData(params: {
 
     // Validate pagination and filters
     const page = parseInt(searchParams.page || '1');
-    const limit = 20;
+    const limit = params.limit || 20;
 
     // Validate sortBy parameter using the existing validation function
     const sortBy =

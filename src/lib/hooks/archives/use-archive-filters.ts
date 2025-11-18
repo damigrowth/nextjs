@@ -60,8 +60,8 @@ export function useArchiveFilters({ initialFilters = {}, basePath }: UseArchiveF
       if (value !== undefined && value !== null && value !== '') {
         // Skip taxonomy filters as they're now in the route, not query params
         if (key === 'category' || key === 'subcategory' || key === 'subdivision') return;
-        // Skip status and limit as they're internal state
-        if (key === 'status' || key === 'limit') return;
+        // Skip status as it's internal state
+        if (key === 'status') return;
         // Skip role and published as they're handled internally by archive type
         if (key === 'role' || key === 'published') return;
 
@@ -73,6 +73,9 @@ export function useArchiveFilters({ initialFilters = {}, basePath }: UseArchiveF
           params.set('county', value.toString());
         } else if (key === 'page') {
           if (value > 1) params.set(key, value.toString());
+        } else if (key === 'limit') {
+          // Always include limit in URL for proper state management
+          params.set(key, value.toString());
         } else if (key === 'sortBy') {
           if (value !== 'default') params.set(key, value.toString()); // Only set if not default
         } else {
