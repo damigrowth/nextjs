@@ -10,11 +10,12 @@ import { cookies } from 'next/headers';
 
 export const auth = betterAuth({
   // Production uses doulitsa.gr, development uses localhost, previews use VERCEL_URL
-  baseURL: process.env.VERCEL_ENV === 'production'
-    ? 'https://doulitsa.gr'
-    : process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000',
+  baseURL:
+    process.env.VERCEL_ENV === 'production'
+      ? 'https://doulitsa.gr'
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : 'http://localhost:3000',
   trustedOrigins: [
     'http://localhost:3000', // Local development
     'https://doulitsa.gr', // Production domain
@@ -108,6 +109,10 @@ export const auth = betterAuth({
       enabled: !!(
         process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
       ),
+      redirectURI:
+        process.env.VERCEL_ENV === 'production'
+          ? 'https://doulitsa.gr/api/auth/callback/google'
+          : undefined,
       mapProfileToUser: (profile) => {
         // console.log('Google profile:', profile);
         // Available Google profile properties:
@@ -223,8 +228,13 @@ export const auth = betterAuth({
               requestRole = 'user';
             } else if (requestType === 'pro') {
               if (!proRole || !['freelancer', 'company'].includes(proRole)) {
-                console.error('Invalid or missing proRole for pro user:', proRole);
-                throw new Error('Pro users must have a valid proRole (freelancer or company)');
+                console.error(
+                  'Invalid or missing proRole for pro user:',
+                  proRole,
+                );
+                throw new Error(
+                  'Pro users must have a valid proRole (freelancer or company)',
+                );
               }
               requestRole = proRole;
             } else {
