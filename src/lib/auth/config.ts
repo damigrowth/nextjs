@@ -37,6 +37,10 @@ export const auth = betterAuth({
     // Fix state_mismatch errors in production by configuring cookies properly
     useSecureCookies: process.env.NODE_ENV === 'production',
     cookiePrefix: 'better-auth',
+    defaultCookieAttributes: {
+      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    },
     crossSubDomainCookies:
       process.env.VERCEL_ENV === 'production'
         ? {
