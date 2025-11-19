@@ -31,6 +31,14 @@ export const auth = betterAuth({
     },
     freshAge: 60 * 60 * 24, // 1 day - sessions are considered "fresh" for 24 hours (needed for deleteUser)
   },
+  advanced: {
+    // Fix state_mismatch errors in production by configuring cookies properly
+    useSecureCookies: process.env.NODE_ENV === 'production',
+    cookiePrefix: 'better-auth',
+    crossSubDomainCookies: {
+      enabled: true,
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
