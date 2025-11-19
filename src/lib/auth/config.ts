@@ -9,17 +9,19 @@ import { prisma } from '@/lib/prisma/client';
 import { cookies } from 'next/headers';
 
 export const auth = betterAuth({
-  // Base URL and trusted origins for Vercel deployment compatibility
-  // Use VERCEL_URL for dynamic preview deployments (server-side), fallback to env or localhost
-  baseURL: process.env.VERCEL_URL
+  // Production uses doulitsa.gr, development uses localhost, previews use VERCEL_URL
+  baseURL: process.env.VERCEL_ENV === 'production'
+    ? 'https://doulitsa.gr'
+    : process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
-    : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    : 'http://localhost:3000',
   trustedOrigins: [
-    'http://localhost:3000',
-    'https://*.vercel.app', // Support Vercel preview deployments
+    'http://localhost:3000', // Local development
     'https://doulitsa.gr', // Production domain
     'https://www.doulitsa.gr', // Production www domain
-    ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []), // Dynamic Vercel URL
+    ...(process.env.VERCEL_URL && process.env.VERCEL_ENV !== 'production'
+      ? [`https://${process.env.VERCEL_URL}`]
+      : []), // Preview deployments only
   ],
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
