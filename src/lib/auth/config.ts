@@ -133,8 +133,8 @@ export const auth = betterAuth({
           image: profile.picture,
           emailVerified: true, // OAuth providers have verified emails
           provider: 'google', // Set provider for Google OAuth users
-          // Extract username and displayName from Google profile for better defaults
-          username: profile.email ? profile.email.split('@')[0] : null, // Use email prefix as username suggestion
+          // Don't set username here - it will be set during OAuth setup to avoid duplicates
+          // displayName can be prefilled for better UX
           displayName:
             profile.name ||
             `${profile.given_name || ''} ${profile.family_name || ''}`.trim() ||
@@ -245,10 +245,12 @@ export const auth = betterAuth({
 
           // console.log('Setting user - Provider:', requestProvider, 'Type:', requestType, 'Role:', requestRole);
 
+          // Store role in context to set after creation (admin plugin blocks role in create)
+          (context as any)._pendingRole = requestRole;
+
           return {
             data: {
               ...user,
-              role: requestRole,
               type: requestType,
               provider: requestProvider,
             },
@@ -262,11 +264,15 @@ export const auth = betterAuth({
           const userWithFields = user as any;
           const provider = userWithFields.provider || 'email';
 
+          // Get pending role from context (set in before hook)
+          const pendingRole = (context as any)._pendingRole || 'user';
+
           if (provider === 'google') {
             // OAuth Flow: Google Auth → OAuth Setup → Dashboard (user) or Onboarding (pro)
             await prisma.user.update({
               where: { id: user.id },
               data: {
+                role: pendingRole, // Set role here (admin plugin allows after creation)
                 step: 'OAUTH_SETUP', // OAuth users go to setup page first
                 confirmed: true, // OAuth users are pre-confirmed
                 emailVerified: true, // OAuth providers have verified emails
@@ -277,6 +283,7 @@ export const auth = betterAuth({
             await prisma.user.update({
               where: { id: user.id },
               data: {
+                role: pendingRole, // Set role here (admin plugin allows after creation)
                 step: 'EMAIL_VERIFICATION',
                 confirmed: true, // Email/password users start as confirmed
               },
