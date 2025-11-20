@@ -64,20 +64,20 @@ export default function ServiceTable({
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell colSpan={4} className='h-32 text-center'>
+              <TableCell colSpan={6} className='text-center py-12'>
                 <div className='flex flex-col items-center justify-center space-y-3'>
-                  <div className='w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center'>
-                    <Edit className='w-8 h-8 text-gray-400' />
+                  <div className='w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center'>
+                    <Edit className='w-6 h-6 text-gray-400' />
                   </div>
                   <div className='space-y-1'>
-                    <h3 className='font-medium text-gray-900'>
+                    <h5 className='font-medium text-gray-900'>
                       Δεν έχεις υπηρεσίες ακόμα
-                    </h3>
+                    </h5>
                     <p className='text-sm text-gray-500'>
                       Δημιούργησε την πρώτη σου υπηρεσία για να ξεκινήσεις
                     </p>
                   </div>
-                  <Button asChild>
+                  <Button variant='link' asChild>
                     <Link href='/dashboard/services/create'>
                       Δημιουργία Υπηρεσίας
                     </Link>
