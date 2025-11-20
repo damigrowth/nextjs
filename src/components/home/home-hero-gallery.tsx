@@ -82,19 +82,18 @@ export default function HeroImageGallery() {
                 key={index}
                 className='basis-1/2 sm:basis-1/2 md:basis-1/3 lg:basis-1/5'
               >
-                <div className='relative rounded-2xl overflow-hidden shadow-lg w-[285px] h-[380px]'>
+                <div className='relative rounded-2xl overflow-hidden shadow-lg max-w-[285px] max-h-[380px] w-full h-auto bg-white'>
                   <Image
                     src={optimizeCloudinaryUrl(image.src)}
                     alt={image.alt}
                     width={285}
                     height={380}
-                    className='object-cover w-full h-full'
-                    sizes='285px'
+                    className='object-contain w-full h-auto'
+                    sizes='(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 20vw, 285px'
                     loading={isVisible ? 'eager' : 'lazy'}
                     priority={isVisible}
                     quality={80}
-                    placeholder='blur'
-                    blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=='
+                    placeholder='empty'
                   />
                 </div>
               </CarouselItem>
