@@ -123,7 +123,7 @@ export function ArchivePagination({
   return (
     <div
       className={cn(
-        'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between',
+        'flex flex-col gap-4 lg:flex-row sm:items-center sm:justify-between',
         className,
       )}
     >
@@ -134,7 +134,7 @@ export function ArchivePagination({
       </div>
 
       {/* Pagination Controls */}
-      <div className='flex flex-col sm:flex-row items-center gap-3 sm:gap-2'>
+      <div className='flex flex-col md:flex-row items-center gap-3 sm:gap-2'>
         {/* Results Per Page */}
         {showResultsPerPage && onLimitChange && (
           <div className='flex items-center gap-2 sm:mr-4'>
@@ -158,7 +158,7 @@ export function ArchivePagination({
             size='sm'
             onClick={handlePrevious}
             disabled={currentPage <= 1 || isLoading}
-            className='flex items-center gap-1'
+            className='hidden xs:flex items-center gap-1'
           >
             <ChevronLeft className='w-4 h-4' />
             <span className='hidden sm:inline'>Προηγούμενη</span>
@@ -203,7 +203,33 @@ export function ArchivePagination({
             size='sm'
             onClick={handleNext}
             disabled={currentPage >= totalPages || isLoading}
-            className='flex items-center gap-1'
+            className='hidden xs:flex items-center gap-1'
+          >
+            <span className='hidden sm:inline'>Επόμενη</span>
+            <ChevronRight className='w-4 h-4' />
+          </Button>
+        </div>
+
+        <div className='w-full flex xs:hidden space-x-2'>
+          {/* Previous Button */}
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={handlePrevious}
+            disabled={currentPage <= 1 || isLoading}
+            className='flex sm:hidden items-center gap-1 w-1/2'
+          >
+            <ChevronLeft className='w-4 h-4' />
+            <span className='hidden sm:inline'>Προηγούμενη</span>
+          </Button>
+
+          {/* Next Button */}
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={handleNext}
+            disabled={currentPage >= totalPages || isLoading}
+            className='flex sm:hidden items-center gap-1 w-1/2'
           >
             <span className='hidden sm:inline'>Επόμενη</span>
             <ChevronRight className='w-4 h-4' />

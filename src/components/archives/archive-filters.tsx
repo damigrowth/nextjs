@@ -75,14 +75,14 @@ export function ArchiveFilters({
         className,
       )}
     >
-      <div className='flex flex-col md:flex-row md:flex-nowrap items-center justify-between w-full h-full gap-4'>
+      <div className='flex flex-col lg:flex-row lg:flex-nowrap items-center justify-between w-full h-full gap-4'>
         {/* Mobile: Filter button and sort in same row */}
-        <div className='flex md:hidden items-center justify-between w-full gap-2'>
+        <div className='flex flex-col xs:flex-row lg:hidden items-center justify-between w-full space-x-2 space-y-3 xs:space-y-0'>
           {filterTrigger || (
             <SheetTrigger asChild>
               <Button
                 variant='outline'
-                className='flex items-center gap-2 relative'
+                className='flex items-center gap-2 relative w-full xs:w-fit'
               >
                 <Filter className='w-4 h-4' />
                 <span>Όλα τα φίλτρα</span>
@@ -98,13 +98,14 @@ export function ArchiveFilters({
             value={filters.sortBy}
             onValueChange={handleSortChange}
             fullWidth={false}
+            className='w-full xs:w-fit'
           />
         </div>
 
         {/* Left side: All Filters, Search, Online Toggle, Counties */}
-        <div className='flex flex-wrap md:flex-nowrap items-center gap-3 md:gap-6 w-full md:w-auto'>
+        <div className='flex flex-wrap lg:flex-nowrap items-center gap-3 lg:gap-6 w-full lg:w-auto'>
           {/* All Filters Button/Trigger - Desktop only */}
-          <div className='hidden md:block'>
+          <div className='hidden lg:block'>
             {filterTrigger || (
               <SheetTrigger asChild>
                 <Button
@@ -145,7 +146,7 @@ export function ArchiveFilters({
         </div>
 
         {/* Right side: Sort Dropdown */}
-        <div className='hidden md:block md:ml-auto'>
+        <div className='hidden lg:block lg:ml-auto'>
           <SortDropdown
             value={filters.sortBy}
             onValueChange={handleSortChange}
