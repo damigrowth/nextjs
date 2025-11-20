@@ -35,18 +35,29 @@ export async function completeOAuth(
     // Determine the next step based on user type
     const nextStep = data.type === 'pro' ? 'ONBOARDING' : 'DASHBOARD';
 
+    // Update user via Better Auth API (excludes role - managed by admin plugin)
+    // NOTE: Don't set 'image' here - it's already set from Google OAuth and should persist
     const updatedUser = await auth.api.updateUser({
       body: {
         username: data.username,
         displayName: data.displayName,
-        role: data.role,
         type: data.type,
         step: nextStep,
         provider: 'google', // Ensure provider stays as 'google'
         confirmed: true, // Google OAuth users are now confirmed after setup
+        // image is intentionally omitted to preserve Google profile picture
       },
       headers: await headers(),
     });
+
+    // Update role directly via Prisma (admin plugin blocks role via API)
+    if (data.role && ['user', 'freelancer', 'company'].includes(data.role)) {
+      const { prisma } = await import('@/lib/prisma/client');
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: { role: data.role },
+      });
+    }
 
     // console.log('Updated Google OAuth user:', updatedUser, 'Next step:', nextStep);
 
