@@ -153,16 +153,23 @@ function createEmailMessage(mailOptions: {
     ? mailOptions.to.join(', ')
     : mailOptions.to;
 
+  // Helper to safely encode UTF-8 strings to base64
+  const utf8ToBase64 = (str: string): string => {
+    const bytes = new TextEncoder().encode(str);
+    const binary = String.fromCharCode(...bytes);
+    return btoa(binary);
+  };
+
   const emailLines = [
     `To: ${recipients}`,
     `From: ${mailOptions.from}`,
     ...(mailOptions.replyTo ? [`Reply-To: ${mailOptions.replyTo}`] : []),
-    `Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(mailOptions.subject)))}?=`,
+    `Subject: =?UTF-8?B?${utf8ToBase64(mailOptions.subject)}?=`,
     'MIME-Version: 1.0',
     'Content-Type: text/html; charset=UTF-8',
     'Content-Transfer-Encoding: base64',
     '',
-    btoa(unescape(encodeURIComponent(mailOptions.html))),
+    utf8ToBase64(mailOptions.html),
   ];
 
   return emailLines.join('\r\n');
