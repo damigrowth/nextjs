@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/actions/auth/server';
 import { getOAuthSetupMetadata } from '@/lib/seo/pages';
 import OAuthSetupForm from '@/components/forms/auth/form-oauth-setup';
+import { OAuthSetupGuard } from '@/components/guards';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,22 +22,6 @@ export default async function OAuthSetupPage() {
   }
 
   const user = userResult.data.user;
-  // console.log('OAUTH-SETUP PAGE - SERVER SIDE USER', user);
-
-  // Check if this is a Google OAuth user who needs setup
-  const needsSetup = user.provider === 'google' && user.step === 'OAUTH_SETUP';
-
-  if (!needsSetup) {
-    // User doesn't need setup, redirect to appropriate page based on type and step
-    if (user.type === 'pro' && user.step === 'ONBOARDING') {
-      redirect('/onboarding');
-    } else if (user.step === 'DASHBOARD') {
-      redirect('/dashboard');
-    } else {
-      // Fallback redirect
-      redirect('/dashboard');
-    }
-  }
 
   // Read type and role from database - stored during OAuth user creation
   // This is secure and cannot be manipulated via URL params
@@ -45,46 +30,48 @@ export default async function OAuthSetupPage() {
 
   return (
     <section className='mt-20 pt-20 pb-40 bg-gray-50'>
-      <div className='container mx-auto px-4'>
-        {/* Title Section */}
-        <div className='flex justify-center mb-15'>
-          <div className='lg:w-1/2 text-center'>
-            <div className='relative mb-15 lg:mb-8'>
-              <h2 className='text-2xl lg:text-3xl font-medium text-gray-900 mb-2'>
-                Ολοκλήρωση Εγγραφής με Google
-              </h2>
-              <p className='text-gray-700 font-sans'>
-                Συνδεθήκατε επιτυχώς ως {user.email}.
-                {userType === 'pro'
-                  ? 'Παρακαλώ συμπληρώστε τα στοιχεία του επαγγελματικού σας προφίλ.'
-                  : 'Παρακαλώ επιλέξτε ένα username για τον λογαριασμό σας.'}
-              </p>
-              {/* Debug info - remove in production */}
-              {process.env.NODE_ENV === 'development' && (
-                <p className='text-xs text-gray-500 mt-2'>
-                  Debug: userType="{userType}", userRole="{userRole}" (from
-                  database)
+      <OAuthSetupGuard user={user}>
+        <div className='container mx-auto px-4'>
+          {/* Title Section */}
+          <div className='flex justify-center mb-15'>
+            <div className='lg:w-1/2 text-center'>
+              <div className='relative mb-15 lg:mb-8'>
+                <h2 className='text-2xl lg:text-3xl font-medium text-gray-900 mb-2'>
+                  Ολοκλήρωση Εγγραφής με Google
+                </h2>
+                <p className='text-gray-700 font-sans'>
+                  Συνδεθήκατε επιτυχώς ως {user.email}.
+                  {userType === 'pro'
+                    ? ' Παρακαλώ συμπληρώστε τα στοιχεία του επαγγελματικού σας λογαριασμού.'
+                    : ' Παρακαλώ επιλέξτε ένα username για τον λογαριασμό σας.'}
                 </p>
-              )}
+                {/* Debug info - remove in production */}
+                {process.env.NODE_ENV === 'development' && (
+                  <p className='text-xs text-gray-500 mt-2'>
+                    Debug: userType="{userType}", userRole="{userRole}" (from
+                    database)
+                  </p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Form Section */}
-        <div className='flex justify-center'>
-          <div className='xl:w-2/5 w-full max-w-2xl'>
-            <div className='relative bg-white p-12 sm:p-8 rounded-xl shadow-lg border border-gray-300'>
-              <OAuthSetupForm
-                userEmail={user.email}
-                userType={userType}
-                userRole={userRole}
-                googleUsername={user.username}
-                googleDisplayName={user.displayName}
-              />
+          {/* Form Section */}
+          <div className='flex justify-center'>
+            <div className='xl:w-2/5 w-full max-w-2xl'>
+              <div className='relative bg-white p-12 sm:p-8 rounded-xl shadow-lg border border-gray-300'>
+                <OAuthSetupForm
+                  userEmail={user.email}
+                  userType={userType}
+                  userRole={userRole}
+                  googleUsername={user.username}
+                  googleDisplayName={user.displayName}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </OAuthSetupGuard>
     </section>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useActionState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -30,6 +30,7 @@ import {
 } from '@/lib/utils/validation/formats';
 import { Label } from '@radix-ui/react-label';
 import { useAuthStore } from '@/lib/stores/authStore';
+import { ActionResponse } from '@/lib/types/api';
 
 // Professional role options (only for type 'pro')
 const roleOptions = [
@@ -81,6 +82,11 @@ interface OAuthSetupFormProps {
   googleDisplayName?: string; // displayName from Google profile
 }
 
+const initialState: ActionResponse = {
+  success: false,
+  message: '',
+};
+
 export default function OAuthSetupForm({
   userEmail,
   userType,
@@ -88,13 +94,16 @@ export default function OAuthSetupForm({
   googleUsername,
   googleDisplayName,
 }: OAuthSetupFormProps) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const { resetAuth } = useAuthStore();
   const { refetch } = useSession();
   const router = useRouter();
+
+  // Use useActionState for form submission
+  const [state, action, isPending] = useActionState(
+    completeOAuth,
+    initialState,
+  );
 
   // Debug logging in development
   // React.useEffect(() => {
@@ -141,118 +150,47 @@ export default function OAuthSetupForm({
   //   }
   // }, [userType, userRole, professionalForm]);
 
-  const handleSimpleUserSubmit = async (data: { username: string }) => {
-    setLoading(true);
-    setError(null);
-
-    const updateData = {
-      username: data.username,
-      role: 'user',
-      type: 'user',
-    };
-
-    // console.log('Submitting to completeOAuth (server action):', updateData);
-
-    try {
-      // Use server action for consistent handling
-      const result = await completeOAuth(updateData);
-      // console.log('completeOAuth result:', result);
-
-      if (!result.success) {
-        console.error('Update user error:', result.error);
-        setError(result.error || 'Σφάλμα κατά την ενημέρωση');
-        setLoading(false);
-        return;
-      }
-
-      // Success - prepare for redirect
-      setSuccess(true);
+  // Handle success state and redirect
+  useEffect(() => {
+    if (state.success && state.message) {
       setIsRedirecting(true);
-      resetAuth();
 
-      // Sequential flow for reliable session sync
       const handleRedirect = async () => {
-        // 1. Refresh session to update user.step
         await refetch();
-
-        // 2. Small delay for Better Auth session propagation
         await new Promise((resolve) => setTimeout(resolve, 300));
 
-        // 3. Navigate with router for smoother transition
-        router.push('/dashboard');
-        router.refresh(); // Force refresh to ensure new session data
+        // Navigate based on user type
+        if (userType === 'pro') {
+          router.push('/onboarding');
+        } else {
+          router.push('/dashboard');
+        }
+        router.refresh();
       };
 
       handleRedirect();
-    } catch (err: any) {
-      console.error('Exception during user update:', err);
-      setError(err.message || 'Σφάλμα κατά την ενημέρωση');
-      setLoading(false);
     }
+  }, [state, refetch, router, userType]);
+
+  const handleSimpleUserSubmit = (data: { username: string }) => {
+    const formData = new FormData();
+    formData.append('username', data.username);
+    formData.append('role', 'user');
+    formData.append('type', 'user');
+    action(formData);
   };
 
-  const handleProfessionalUserSubmit = async (data: {
+  const handleProfessionalUserSubmit = (data: {
     role: string;
     username: string;
     displayName: string;
   }) => {
-    setLoading(true);
-    setError(null);
-
-    // console.log('=== PROFESSIONAL USER FORM SUBMISSION ===');
-    // console.log('Form data:', data);
-    // console.log('Props:', {
-    //   userEmail,
-    //   userType,
-    //   userRole,
-    //   googleUsername,
-    //   googleDisplayName,
-    // });
-
-    const updateData = {
-      username: data.username,
-      displayName: data.displayName,
-      role: data.role, // freelancer or company
-      type: 'pro',
-    };
-
-    try {
-      // Professional users (freelancer/company) always go to onboarding
-      // Use server action with admin privileges to update role
-      const result = await completeOAuth(updateData);
-      // console.log('completeOAuth result:', result);
-
-      if (!result.success) {
-        console.error('Update user error:', result.error);
-        setError(result.error || 'Σφάλμα κατά την ενημέρωση');
-        setLoading(false);
-        return;
-      }
-
-      // Success - prepare for redirect to onboarding
-      setSuccess(true);
-      setIsRedirecting(true);
-      resetAuth();
-
-      // Sequential flow for reliable session sync
-      const handleRedirect = async () => {
-        // 1. Refresh session to update user.step
-        await refetch();
-
-        // 2. Small delay for Better Auth session propagation
-        await new Promise((resolve) => setTimeout(resolve, 300));
-
-        // 3. Navigate with router for smoother transition
-        router.push('/onboarding');
-        router.refresh(); // Force refresh to ensure new session data
-      };
-
-      handleRedirect();
-    } catch (err: any) {
-      console.error('Exception during professional user update:', err);
-      setError(err.message || 'Σφάλμα κατά την ενημέρωση');
-      setLoading(false);
-    }
+    const formData = new FormData();
+    formData.append('username', data.username);
+    formData.append('displayName', data.displayName);
+    formData.append('role', data.role);
+    formData.append('type', 'pro');
+    action(formData);
   };
 
   // Show full-page loading state during redirect
@@ -312,20 +250,10 @@ export default function OAuthSetupForm({
             />
 
             {/* Error Display */}
-            {error && (
+            {!state.success && state.message && (
               <Alert variant='destructive'>
                 <AlertCircle className='h-4 w-4' />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Success Display */}
-            {success && (
-              <Alert className='border-green-200 bg-green-50 text-green-800'>
-                <CheckCircle className='h-4 w-4' />
-                <AlertDescription>
-                  Το προφίλ ολοκληρώθηκε επιτυχώς!
-                </AlertDescription>
+                <AlertDescription>{state.message}</AlertDescription>
               </Alert>
             )}
 
@@ -333,8 +261,8 @@ export default function OAuthSetupForm({
               type='submit'
               text='Ολοκλήρωση Εγγραφής'
               loadingText='Ολοκλήρωση...'
-              loading={loading}
-              disabled={loading}
+              loading={isPending}
+              disabled={isPending}
               fullWidth
             />
           </form>
@@ -447,20 +375,10 @@ export default function OAuthSetupForm({
             />
 
             {/* Error Display */}
-            {error && (
+            {!state.success && state.message && (
               <Alert variant='destructive'>
                 <AlertCircle className='h-4 w-4' />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Success Display */}
-            {success && (
-              <Alert className='border-green-200 bg-green-50 text-green-800'>
-                <CheckCircle className='h-4 w-4' />
-                <AlertDescription>
-                  Το προφίλ ολοκληρώθηκε επιτυχώς!
-                </AlertDescription>
+                <AlertDescription>{state.message}</AlertDescription>
               </Alert>
             )}
 
@@ -468,8 +386,8 @@ export default function OAuthSetupForm({
               type='submit'
               text='Ολοκλήρωση Εγγραφής'
               loadingText='Ολοκλήρωση...'
-              loading={loading}
-              disabled={loading}
+              loading={isPending}
+              disabled={isPending}
               fullWidth
             />
           </form>

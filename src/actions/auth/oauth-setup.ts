@@ -2,23 +2,22 @@
 
 import { auth } from '@/lib/auth/config';
 import { headers } from 'next/headers';
-import { ActionResult } from '@/lib/types/api';
-
-interface OAuthSetupData {
-  username: string;
-  displayName?: string;
-  role: string;
-  type: string;
-}
+import { getFormString } from '@/lib/utils/form';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { ActionResponse } from '@/lib/types/api';
 
 export async function completeOAuth(
-  data: OAuthSetupData,
-): Promise<ActionResult<{ success: boolean }>> {
+  prevState: ActionResponse | null,
+  formData: FormData,
+): Promise<ActionResponse> {
   try {
-    // console.log('=== SERVER ACTION: completeOAuth ===');
-    // console.log('Update data:', data);
+    // Extract form data
+    const username = getFormString(formData, 'username');
+    const displayName = getFormString(formData, 'displayName');
+    const role = getFormString(formData, 'role');
+    const type = getFormString(formData, 'type');
 
-    // // Get current session to get user ID
+    // Get current session to get user ID
     const session = await auth.api.getSession({
       headers: await headers(),
     });
@@ -26,22 +25,20 @@ export async function completeOAuth(
     if (!session?.user?.id) {
       return {
         success: false,
-        error: 'User not authenticated',
+        message: 'Ο χρήστης δεν είναι συνδεδεμένος',
       };
     }
 
-    // console.log('Current user ID:', session.user.id);
-
     // Determine the next step based on user type
-    const nextStep = data.type === 'pro' ? 'ONBOARDING' : 'DASHBOARD';
+    const nextStep = type === 'pro' ? 'ONBOARDING' : 'DASHBOARD';
 
     // Update user via Better Auth API (excludes role - managed by admin plugin)
     // NOTE: Don't set 'image' here - it's already set from Google OAuth and should persist
-    const updatedUser = await auth.api.updateUser({
+    await auth.api.updateUser({
       body: {
-        username: data.username,
-        displayName: data.displayName,
-        type: data.type,
+        username: username,
+        displayName: displayName || undefined,
+        type: type,
         step: nextStep,
         provider: 'google', // Ensure provider stays as 'google'
         confirmed: true, // Google OAuth users are now confirmed after setup
@@ -51,25 +48,20 @@ export async function completeOAuth(
     });
 
     // Update role directly via Prisma (admin plugin blocks role via API)
-    if (data.role && ['user', 'freelancer', 'company'].includes(data.role)) {
+    if (role && ['user', 'freelancer', 'company'].includes(role)) {
       const { prisma } = await import('@/lib/prisma/client');
       await prisma.user.update({
         where: { id: session.user.id },
-        data: { role: data.role },
+        data: { role: role },
       });
     }
 
-    // console.log('Updated Google OAuth user:', updatedUser, 'Next step:', nextStep);
-
     return {
       success: true,
-      data: { success: true },
+      message: 'Η εγγραφή ολοκληρώθηκε επιτυχώς!',
     };
   } catch (error) {
     console.error('Error in completeOAuth:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to update user',
-    };
+    return handleBetterAuthError(error);
   }
 }
