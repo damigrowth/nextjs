@@ -16,17 +16,11 @@ export const prisma =
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
     errorFormat: 'pretty',
     // Connection pool configuration optimized for serverless (Vercel)
+    // NOTE: To reduce connection pool, add to your DATABASE_URL:
+    // ?connection_limit=3&pool_timeout=20
     datasources: {
       db: {
         url: process.env.DATABASE_URL,
-      },
-    },
-    // Reduce connection pool size for serverless environments
-    // Neon/Supabase pooler typically allows 10-15 concurrent connections
-    // Vercel serverless functions should use minimal connections
-    __internal: {
-      engine: {
-        connection_limit: 3, // Reduced from default 10 for serverless
       },
     },
   });
