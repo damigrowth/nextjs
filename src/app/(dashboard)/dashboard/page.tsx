@@ -1,5 +1,5 @@
 import { requireOnboardingComplete } from '@/actions/auth/server';
-import { DashboardContent } from '@/components';
+import DashboardContent from '@/components/dashboard/dashboard-content';
 import { getDashboardMetadata } from '@/lib/seo/pages';
 
 export const metadata = getDashboardMetadata('Πίνακας Ελέγχου');
