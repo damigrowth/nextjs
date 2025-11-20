@@ -21,14 +21,11 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from 'sonner';
 
 // Custom components
 import { MediaUpload } from '@/components/media';
 import { FormButton } from '@/components/shared';
-
-// Icons (lucide-react only)
-import { AlertCircle, CheckCircle } from 'lucide-react';
 
 // Auth and utilities
 import { populateFormData } from '@/lib/utils/form';
@@ -106,15 +103,22 @@ export default function FormServiceEditMedia({
         media: service.media,
       });
     }
-  }, [service, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [service]);
 
   // Handle successful form submission
   useEffect(() => {
-    if (state.success) {
-      // Refresh the page to get updated data
+    if (state.success && state.data?.message) {
+      toast.success(state.data.message, {
+        id: `service-media-form-${Date.now()}`,
+      });
       router.refresh();
+    } else if (!state.success && state.error) {
+      toast.error(state.error, {
+        id: `service-media-form-${Date.now()}`,
+      });
     }
-  }, [state.success, router]);
+  }, [state, router]);
 
   // Clear upload state when both action states complete (success or failure)
   const isAnyPending = isPending || isPendingTransition;
@@ -211,22 +215,6 @@ export default function FormServiceEditMedia({
             </FormItem>
           )}
         />
-
-        {/* Error Display */}
-        {state.message && !state.success && (
-          <Alert variant='destructive'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Success Display */}
-        {state.message && state.success && (
-          <Alert className='border-green-200 bg-green-50 text-green-800'>
-            <CheckCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
 
         {/* Submit Button */}
         <div className='flex justify-end space-x-4'>
