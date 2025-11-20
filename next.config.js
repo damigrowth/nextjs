@@ -30,9 +30,10 @@ const nextConfig = {
     unoptimized: true,
     // Optimized for mobile-first responsive images
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 128, 160, 200, 256, 331],
+    imageSizes: [16, 32, 48, 64, 96, 128, 160, 200, 256, 285, 331],
     formats: ['image/webp'],
     minimumCacheTTL: 2678400, // 31 days
+    qualities: [75, 80, 90, 100], // Support quality parameter
     remotePatterns: [
       {
         protocol: 'https',
