@@ -16,6 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const profiles = await prisma.profile.findMany({
       where: {
         published: true,
+        isActive: true,
         username: { not: null },
         user: {
           blocked: false,
