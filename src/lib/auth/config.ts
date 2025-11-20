@@ -41,6 +41,8 @@ export const auth = betterAuth({
     defaultCookieAttributes: {
       sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
       secure: process.env.NODE_ENV === 'production',
+      httpOnly: true, // Prevent client-side JavaScript access
+      path: '/', // Ensure cookies are available for all paths
     },
     crossSubDomainCookies:
       process.env.VERCEL_ENV === 'production'
@@ -49,6 +51,8 @@ export const auth = betterAuth({
             domain: 'doulitsa.gr', // Explicitly set cookie domain for production
           }
         : undefined,
+    // Add OAuth state validation timeout (5 minutes)
+    oauthStateTimeout: 5 * 60 * 1000, // 5 minutes in milliseconds
   },
   emailAndPassword: {
     enabled: true,
@@ -148,7 +152,7 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       type: { type: 'string', defaultValue: 'user' }, // 'user', 'pro' - for registration flow
-      role: { type: 'string', defaultValue: 'user' }, // user, freelancer, company, admin
+      role: { type: 'string', defaultValue: 'user', input: false }, // user, freelancer, company, admin - MUST NOT be user-settable
       step: { type: 'string', defaultValue: 'EMAIL_VERIFICATION' }, // EMAIL_VERIFICATION, OAUTH_SETUP, ONBOARDING, DASHBOARD
       provider: { type: 'string', defaultValue: 'email' }, // 'email', 'google', 'github', etc.
       username: { type: 'string', required: false }, // Keep in user for auth
