@@ -290,6 +290,7 @@ export const updateProfilePortfolioSchema = z.object({
   portfolio: z
     .array(cloudinaryResourceSchema)
     .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
+    .nullable()
     .optional(),
 });
 
@@ -341,8 +342,8 @@ export const presentationSchema = z.object({
   portfolio: z
     .array(cloudinaryResourceSchema)
     .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
-    .optional()
-    .nullable(),
+    .nullable()
+    .optional(),
 });
 
 // =============================================
@@ -519,6 +520,7 @@ export const onboardingFormSchema = z.object({
   portfolio: z
     .array(cloudinaryResourceSchema)
     .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
+    .nullable()
     .optional(), // Optional - Cloudinary resources with max validation
 });
 

@@ -91,11 +91,11 @@ export default function PortfolioForm({
     getValues,
   } = form;
 
-  // Update form values when initial data is available
+  // Update form values when profile data changes (including after successful saves)
   useEffect(() => {
-    if (initialProfile?.portfolio) {
+    if (initialProfile) {
       form.reset({
-        portfolio: initialProfile.portfolio,
+        portfolio: initialProfile.portfolio || null,
       });
     }
   }, [initialProfile, form]);
@@ -140,7 +140,7 @@ export default function PortfolioForm({
       // Only include portfolio data, preserve other existing data by not including them
       populateFormData(formData, allValues, {
         jsonFields: ['portfolio'],
-        skipEmpty: true,
+        skipEmpty: false, // Allow null values to be sent for clearing portfolio
       });
 
       // Add profileId when in admin mode

@@ -61,11 +61,11 @@ export function EditServiceMediaForm({ service }: EditServiceMediaFormProps) {
     getValues,
   } = form;
 
-  // Update form values when initial data is available
+  // Update form values when service data changes (including after successful saves)
   useEffect(() => {
-    if (service?.media) {
+    if (service) {
       form.reset({
-        media: service.media,
+        media: service.media || null,
       });
     }
   }, [service, form]);
@@ -104,7 +104,7 @@ export function EditServiceMediaForm({ service }: EditServiceMediaFormProps) {
       // Only include media data
       populateFormData(formData, allValues, {
         jsonFields: ['media'],
-        skipEmpty: true,
+        skipEmpty: false, // Allow null values to be sent for clearing media
       });
 
       // Call server action using startTransition

@@ -547,6 +547,7 @@ export const serviceMediaUploadSchema = z.object({
   media: z
     .array(cloudinaryResourceSchema)
     .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία πολυμέσων')
+    .nullable()
     .optional(),
 });
 
@@ -659,6 +660,7 @@ export const createServiceSchema = z
     media: z
       .array(cloudinaryResourceSchema)
       .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
+      .nullable()
       .optional(),
   })
   .refine(
@@ -836,6 +838,7 @@ export const createServiceDraftSchema = z.object({
   media: z
     .array(cloudinaryResourceSchema)
     .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
+    .nullable()
     .optional(),
 });
 
@@ -915,6 +918,7 @@ export const updateServiceMediaSchema = z.object({
   media: z
     .array(cloudinaryResourceSchema)
     .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
+    .nullable()
     .optional(),
 });
 
