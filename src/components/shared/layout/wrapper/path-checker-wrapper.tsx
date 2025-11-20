@@ -20,7 +20,13 @@ export default function PathChecker({
   // Check exclusions
   if (excludes) {
     const excludeArray = Array.isArray(excludes) ? excludes : [excludes];
-    if (excludeArray.some(exclude => pathname?.startsWith(exclude))) {
+    if (excludeArray.some(exclude => {
+      // Exact match for homepage to avoid excluding all paths
+      if (exclude === '/' && pathname === '/') return true;
+      // startsWith for other paths (but not if it's the homepage)
+      if (exclude !== '/' && pathname?.startsWith(exclude)) return true;
+      return false;
+    })) {
       return null;
     }
   }

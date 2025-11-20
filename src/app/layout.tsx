@@ -15,7 +15,7 @@ import {
   // CookiesBanner_D,
   // NavMenuMobileWrapper_D,
 } from '@/components/dynamic';
-import { Footer, Header } from '@/components/shared/layout';
+import { Footer, HeaderFixed, HeaderRelative } from '@/components/shared/layout';
 import {
   Body,
   Notifications,
@@ -38,9 +38,16 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     <html lang='el' suppressHydrationWarning>
       <Body>
         <TooltipProvider delayDuration={0}>
-          <PathChecker excludes={['/dashboard', '/admin']}>
-            <Header navigationData={navigationData} />
+          {/* Fixed header for homepage only */}
+          <PathChecker paths={['/']}>
+            <HeaderFixed navigationData={navigationData} />
           </PathChecker>
+
+          {/* Relative header for all other pages (except dashboard/admin) */}
+          <PathChecker excludes={['/', '/dashboard', '/admin']}>
+            <HeaderRelative navigationData={navigationData} />
+          </PathChecker>
+
           <main>
             <Notifications>{children}</Notifications>
           </main>
