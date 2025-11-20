@@ -15,7 +15,9 @@ export const prisma =
   new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
     errorFormat: 'pretty',
-    // Connection pool configuration to prevent "Max client connections reached"
+    // Connection pool configuration optimized for serverless (Vercel)
+    // NOTE: To reduce connection pool, add to your DATABASE_URL:
+    // ?connection_limit=3&pool_timeout=20
     datasources: {
       db: {
         url: process.env.DATABASE_URL,
