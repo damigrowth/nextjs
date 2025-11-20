@@ -24,7 +24,7 @@ function StaticHeroContent() {
       <div className='flex flex-wrap gap-2 mb-6 items-center'>
         {/* Service Directory Badge */}
         <Link href='/categories' className='inline-block'>
-          <Badge className='bg-[#198754] text-primary-foreground rounded-full px-3 py-1 text-3sm font-medium cursor-pointer'>
+          <Badge className='bg-[#198754] text-primary-foreground rounded-full px-3 py-1 text-3sm font-medium cursor-pointer mb-2 sm:mb-0'>
             Κατάλογος Υπηρεσιών
           </Badge>
         </Link>

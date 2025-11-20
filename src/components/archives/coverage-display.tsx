@@ -47,20 +47,25 @@ export function CoverageDisplay({
   );
 
   // Get the coverage text based on type
+  // Priority: Show location first (onbase or onsite), then append "& Online" if applicable
   const getCoverageText = () => {
-    if (online) {
-      return 'Εξυπηρετεί Online';
-    }
-
+    // Priority 1: Onbase (own location) - show area, county + online if applicable
     if (onbase) {
-      // Show area and county for onbase (e.g., "Εύοσμος, Θεσσαλονίκη")
       const areaName = area || '';
       const countyName = county || '';
-      return `Εξυπηρετεί: ${areaName}${areaName && countyName ? ', ' : ''}${countyName}`;
+
+      // Avoid duplication: if area and county are the same, show only county
+      const locationText = areaName && countyName && areaName !== countyName
+        ? `${areaName}, ${countyName}`
+        : countyName || areaName;
+
+      return online
+        ? `Εξυπηρετεί: ${locationText} & Online`
+        : `Εξυπηρετεί: ${locationText}`;
     }
 
+    // Priority 2: Onsite (client location) - show counties + online if applicable
     if (onsite && groupedCoverage.length > 0) {
-      // Show counties with grouped format
       return (
         <>
           Εξυπηρετεί:{' '}
@@ -70,8 +75,14 @@ export function CoverageDisplay({
               {item.county}
             </React.Fragment>
           ))}
+          {online && ' & Online'}
         </>
       );
+    }
+
+    // Priority 3: Online only (fallback when no physical location)
+    if (online) {
+      return 'Εξυπηρετεί Online';
     }
 
     return null;

@@ -1,6 +1,5 @@
 // Dashboard Components
 export { default as DashboardLayout } from './dashboard-layout';
-export { default as DashboardContent } from './dashboard-content';
 export { DashboardBreadcrumb } from './dashboard-breadcrumb';
 export { NavMain as DashboardNavMain } from './dashboard-nav-main';
 export { NavSecondary as DashboardNavSecondary } from './dashboard-nav-secondary';

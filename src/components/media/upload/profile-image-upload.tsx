@@ -140,19 +140,6 @@ const ProfileImageUpload = memo<ProfileImageUploadProps>(({
                   {hasImage ? 'Αλλαγή Εικόνας' : 'Μεταφόρτωση Εικόνας'}
                 </span>
               </label>
-              {hasImage && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="ml-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                  onClick={onRemove}
-                  disabled={isUploading}
-                  aria-label="Remove profile image"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              )}
             </div>
           </div>
           <p className="text-xs text-gray-600 mt-2 max-w-md">

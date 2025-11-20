@@ -19,16 +19,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { toast } from 'sonner';
 
 // Icons (lucide-react)
-import {
-  AlertCircle,
-  CheckCircle,
-  HelpCircle,
-  Package,
-  ChevronRight,
-} from 'lucide-react';
+import { HelpCircle, Package, ChevronRight } from 'lucide-react';
 
 // Custom components
 import { Currency } from '@/components/ui/currency';
@@ -160,15 +154,22 @@ export default function FormServiceEdit({
       };
       form.reset(resetData);
     }
-  }, [service, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [service]);
 
   // Handle successful form submission
   useEffect(() => {
-    if (state.success) {
-      // Refresh the page to get updated data
+    if (state.success && state.data?.message) {
+      toast.success(state.data.message, {
+        id: `service-edit-form-${Date.now()}`,
+      });
       router.refresh();
+    } else if (!state.success && state.error) {
+      toast.error(state.error, {
+        id: `service-edit-form-${Date.now()}`,
+      });
     }
-  }, [state.success, router]);
+  }, [state, router]);
 
   // Watch specific fields for dependent logic
   const watchedCategory = watch('category');
@@ -650,22 +651,6 @@ export default function FormServiceEdit({
             </TabsContent>
           </Tabs>
         </div>
-
-        {/* Error Display */}
-        {state.message && !state.success && (
-          <Alert variant='destructive'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Success Display */}
-        {state.message && state.success && (
-          <Alert className='border-green-200 bg-green-50 text-green-800'>
-            <CheckCircle className='h-4 w-4' />
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        )}
 
         {/* Submit Button */}
         <div className='flex justify-end space-x-4'>

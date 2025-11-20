@@ -97,17 +97,6 @@ export function EditUserImageForm({ user }: EditUserImageFormProps) {
               <ExternalLink className='mr-2 h-4 w-4' />
               View Full Size
             </Button>
-            <Button
-              type='button'
-              variant='destructive'
-              size='sm'
-              onClick={handleRemoveImage}
-              disabled={isPending}
-            >
-              {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-              <X className='mr-2 h-4 w-4' />
-              Remove
-            </Button>
           </div>
         </div>
       )}

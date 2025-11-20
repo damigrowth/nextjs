@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { NextLink as Link } from '@/components/shared';
 import { RegisterProButton } from '@/components/forms/auth';
@@ -24,18 +23,12 @@ interface HeaderProps {
 }
 
 export default function Header({ navigationData }: HeaderProps) {
-  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: session } = useSession();
 
-  const isHomePage = pathname === '/';
-
   return (
-    <header
-      className={`h-16 md:h-20 w-full z-50 bg-white flex items-center border-b border-gray-200 shadow-sm py-2 ${isHomePage ? 'fixed top-0' : 'relative -mb-20'}`}
-    >
-      <div className='container mx-auto px-4'>
-        <div className='flex items-center justify-between'>
+    <div className='container mx-auto px-4'>
+      <div className='flex items-center justify-between'>
           {/* Left side - Logo and Desktop Navigation */}
           <div className='flex items-center space-x-8'>
             {/* Logo */}
@@ -133,6 +126,5 @@ export default function Header({ navigationData }: HeaderProps) {
           </div>
         </div>
       </div>
-    </header>
   );
 }
