@@ -8,8 +8,8 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        '2xs': '300px',
-        'xs': '475px',
+        // '2xs': '300px', // breaks container class
+        xs: '475px',
         // '2xl': '1400px',
         // '3xl': '1600px',
         // '4xl': '1700px',
