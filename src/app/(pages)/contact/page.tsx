@@ -19,7 +19,7 @@ export default function ContactPage() {
       <HeroBanner data={data.banner} />
 
       <section>
-        <div className='container mx-auto px-4 mb-28'>
+        <div className='container mx-auto px-4 mb-0 lg:mb-28'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
             {/* Contact Information */}
             <div className='mt-10'>
@@ -52,7 +52,12 @@ export default function ContactPage() {
                   <h5 className='text-lg font-medium mb-1 text-foreground'>
                     {contact.email.title}
                   </h5>
-                  <p className='text-body mb-0'>{contact.email.address}</p>
+                  <p
+                    className='text-body mb-0 break-words'
+                    style={{ lineBreak: 'anywhere' }}
+                  >
+                    {contact.email.address}
+                  </p>
                 </div>
               </div>
             </div>

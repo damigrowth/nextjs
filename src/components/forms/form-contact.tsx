@@ -107,7 +107,7 @@ export default function ContactForm({ formData, siteKey }: ContactFormProps) {
   };
 
   return (
-    <div className='absolute -top-40 w-full bg-white shadow-sm border border-border rounded-lg p-12 mb-8 lg:mb-0'>
+    <div className='relative lg:absolute top-0 lg:-top-40 w-full bg-white shadow-sm border border-border rounded-lg p-5 lg:p-12 mb-8 lg:mb-0 overflow-hidden'>
       <h4 className='text-xl font-semibold mb-6 text-foreground'>
         {formData.title}
       </h4>
@@ -193,7 +193,14 @@ export default function ContactForm({ formData, siteKey }: ContactFormProps) {
           )}
 
           {/* ReCAPTCHA */}
-          {siteKey && <ReCAPTCHA sitekey={siteKey} onChange={setCaptcha} />}
+          {siteKey && (
+            <div
+              className='flex flex-1 w-full scale-50 xs:scale-75 lg:scale-100'
+              style={{ transformOrigin: '0 0' }}
+            >
+              <ReCAPTCHA sitekey={siteKey} onChange={setCaptcha} />
+            </div>
+          )}
 
           {/* Submit Button */}
           <FormButton
