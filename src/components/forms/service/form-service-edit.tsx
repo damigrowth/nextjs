@@ -145,7 +145,7 @@ export default function FormServiceEdit({
           service.subscriptionType &&
           isValidSubscriptionType(service.subscriptionType)
             ? service.subscriptionType
-            : undefined,
+            : (service.type?.subscription ? SubscriptionType.month : undefined),
         fixed: service.fixed ?? true,
         duration: service.duration || 0,
         addons: service.addons || [],
