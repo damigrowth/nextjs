@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { usePathname } from 'next/navigation';
 import {
   NavigationMenu,
@@ -22,6 +21,7 @@ import { categoryIconMap } from '@/constants/datasets/category-icons';
 import { Grid3x3, ChevronRight, ChevronDown, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { NavigationMenuCategory } from '@/lib/types/components';
+import NextLink from '../../next-link';
 
 const regularMenuItems = [
   { href: '/categories', label: 'Κατάλογος Υπηρεσιών' },
@@ -71,28 +71,28 @@ export default function NavMenu({
           </CollapsibleTrigger>
           <CollapsibleContent className='space-y-2 mt-2'>
             {navigationData.map((category) => (
-              <Link
+              <NextLink
                 key={category.id}
                 href={`/categories/${category.slug}`}
                 onClick={handleLinkClick}
                 className='block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors'
               >
                 {category.label}
-              </Link>
+              </NextLink>
             ))}
           </CollapsibleContent>
         </Collapsible>
 
         {/* Regular menu items */}
         {regularMenuItems.map((item) => (
-          <Link
+          <NextLink
             key={item.href}
             href={item.href}
             onClick={handleLinkClick}
             className='block px-0 py-3 text-base font-medium text-gray-900 hover:text-blue-600 transition-colors'
           >
             {item.label}
-          </Link>
+          </NextLink>
         ))}
       </nav>
     );
@@ -138,7 +138,7 @@ export default function NavMenu({
                           setHoveredCategory(category.id);
                         }}
                       >
-                        <Link
+                        <NextLink
                           href={`/categories/${category.slug}`}
                           className='flex items-center justify-between rounded-md p-3 text-sm transition-colors hover:bg-accent'
                         >
@@ -149,7 +149,7 @@ export default function NavMenu({
                             </span>
                           </div>
                           <ChevronRight className='h-4 w-4 text-muted-foreground' />
-                        </Link>
+                        </NextLink>
                       </div>
                     );
                   })}
@@ -163,22 +163,22 @@ export default function NavMenu({
                     .filter((cat) => cat.id === hoveredCategory)
                     .map((category) => (
                       <div key={category.id}>
-                        <Link
+                        <NextLink
                           href={`/categories/${category.slug}`}
                           className='mb-4 text-lg font-semibold text-primary hover:text-primary/80 transition-colors inline-block'
                         >
                           {category.label}
-                        </Link>
+                        </NextLink>
                         <div className='grid grid-cols-3 gap-4 pb-12'>
                           {category.subcategories.map((subcategory) => (
                             <div key={subcategory.id} className='space-y-2'>
                               <NavigationMenuLink asChild>
-                                <Link
+                                <NextLink
                                   href={subcategory.href}
                                   className='block font-medium text-sm hover:text-primary transition-colors'
                                 >
                                   {subcategory.label}
-                                </Link>
+                                </NextLink>
                               </NavigationMenuLink>
                               <div className='space-y-2'>
                                 {subcategory.topSubdivisions.map(
@@ -187,23 +187,23 @@ export default function NavMenu({
                                       key={subdivision.id}
                                       asChild
                                     >
-                                      <Link
+                                      <NextLink
                                         href={subdivision.href}
                                         className='block text-sm text-muted-foreground hover:text-foreground transition-colors'
                                       >
                                         - {subdivision.label}
-                                      </Link>
+                                      </NextLink>
                                     </NavigationMenuLink>
                                   ),
                                 )}
                                 {subcategory.hasMoreSubdivisions && (
-                                  <Link
+                                  <NextLink
                                     href={subcategory.href}
                                     className='block text-sm text-primary hover:text-primary/80 font-medium pt-2'
                                   >
                                     Προβολή όλων (
                                     {subcategory.totalSubdivisions})
-                                  </Link>
+                                  </NextLink>
                                 )}
                               </div>
                             </div>
@@ -212,13 +212,13 @@ export default function NavMenu({
                         {/* Show all subcategories button - bottom right */}
                         {category.hasMoreSubcategories && (
                           <div className='absolute bottom-4 right-6'>
-                            <Link
+                            <NextLink
                               href={category.href}
                               className='inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors'
                             >
                               Προβολή όλων των Υποκατηγοριών
                               <ArrowRight className='h-4 w-4' />
-                            </Link>
+                            </NextLink>
                           </div>
                         )}
                       </div>
@@ -241,7 +241,7 @@ export default function NavMenu({
                   isActive && 'bg-pale text-pale-foreground',
                 )}
               >
-                <Link href={item.href}>{item.label}</Link>
+                <NextLink href={item.href}>{item.label}</NextLink>
               </NavigationMenuLink>
             </NavigationMenuItem>
           );

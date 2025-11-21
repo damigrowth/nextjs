@@ -1,7 +1,6 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { NextLink } from '../shared';
 
 interface SectionHeaderProps {
   title: string;
@@ -35,13 +34,13 @@ export function SectionHeader({
       {/* Right Side - Link Button */}
       {linkHref && linkText && (
         <div className='flex-shrink-0'>
-          <Link
+          <NextLink
             href={linkHref}
             className='inline-flex items-center gap-2 text-gray-800 hover:text-primary transition-all duration-300 text-sm font-medium'
           >
             {linkText}
             <ArrowRight className='h-4 w-4' />
-          </Link>
+          </NextLink>
         </div>
       )}
     </div>

@@ -1,11 +1,10 @@
 'use client';
 
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Plus, Settings, Clock, HelpCircle } from 'lucide-react';
+import { Check, Plus, Settings } from 'lucide-react';
+import { NextLink } from '@/components/shared';
 
 interface ServiceSuccessProps {
   id: string | number;
@@ -79,10 +78,13 @@ export default function ServiceSuccess({
           size='lg'
           className='border-gray-300 text-gray-700 hover:bg-gray-50 px-6'
         >
-          <Link href='/dashboard/services' className='flex items-center gap-2'>
+          <NextLink
+            href='/dashboard/services'
+            className='flex items-center gap-2'
+          >
             <Settings className='w-4 h-4' />
             Διαχείριση Υπηρεσιών
-          </Link>
+          </NextLink>
         </Button>
       </div>
     </div>

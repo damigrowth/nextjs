@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,6 +23,7 @@ import {
 } from '@/components/ui/tooltip';
 import { AdminDataTable, ColumnDef } from './admin-data-table';
 import type { AdminServiceWithRelations } from '@/lib/types/services';
+import { NextLink } from '../shared';
 
 interface AdminServicesDataTableProps {
   data: AdminServiceWithRelations[];
@@ -115,19 +115,22 @@ export function AdminServicesDataTable({
         <div className='flex items-center gap-3'>
           <TableMedia media={service.media || []} />
           <div className='flex-1 min-w-0'>
-            <Link href={`/admin/services/${service.id}`} className='min-w-0'>
+            <NextLink
+              href={`/admin/services/${service.id}`}
+              className='min-w-0'
+            >
               <h3 className='text-sm font-medium text-gray-900 truncate hover:text-primary hover:underline cursor-pointer transition-colors'>
                 {service.title}
               </h3>
-            </Link>
+            </NextLink>
             <p className='text-xs text-muted-foreground'>
               by{' '}
-              <Link
+              <NextLink
                 href={`/admin/profiles/${service.profile.id}`}
                 className='hover:text-primary hover:underline transition-colors'
               >
                 {service.profile.displayName || service.profile.user.email}
-              </Link>
+              </NextLink>
             </p>
           </div>
         </div>
@@ -202,13 +205,13 @@ export function AdminServicesDataTable({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant='ghost' size='icon' className='h-8 w-8' asChild>
-                  <Link
+                  <NextLink
                     href={`/s/${service.slug}`}
                     target='_blank'
                     rel='noopener noreferrer'
                   >
                     <ExternalLink className='w-4 h-4' />
-                  </Link>
+                  </NextLink>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -220,9 +223,9 @@ export function AdminServicesDataTable({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant='ghost' size='icon' className='h-8 w-8' asChild>
-                <Link href={`${basePath}/${service.id}`}>
+                <NextLink href={`${basePath}/${service.id}`}>
                   <Edit className='w-4 h-4' />
-                </Link>
+                </NextLink>
               </Button>
             </TooltipTrigger>
             <TooltipContent>

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { useRouter } from 'next/navigation';
 import {
   ColumnDef,
@@ -22,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { UserAvatar } from '@/components/shared';
+import { NextLink, UserAvatar } from '@/components/shared';
 import { ArrowUpDown, Edit, Copy, Check } from 'lucide-react';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { cn } from '@/lib/utils';
@@ -220,7 +219,7 @@ export function AdminVerificationsDataTable({
         const verification = row.original;
         const profile = verification.profile;
         return (
-          <Link
+          <NextLink
             href={`/admin/profiles/${verification.pid}`}
             className='hover:underline'
           >
@@ -239,7 +238,7 @@ export function AdminVerificationsDataTable({
                 </p>
               </div>
             </div>
-          </Link>
+          </NextLink>
         );
       },
     },
@@ -250,12 +249,12 @@ export function AdminVerificationsDataTable({
         const verification = row.original;
         const user = verification.profile.user;
         return (
-          <Link
+          <NextLink
             href={`/admin/users/${verification.uid}`}
             className='hover:underline'
           >
             <CopyableText text={user.email} className='text-sm' />
-          </Link>
+          </NextLink>
         );
       },
     },

@@ -1,5 +1,4 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { Edit, Eye } from 'lucide-react';
 import {
   Table,
@@ -22,6 +21,7 @@ import type {
   ServiceSortField,
   SortOrder,
 } from '@/lib/types/services';
+import { NextLink } from '@/components/shared';
 
 interface ServiceTableProps {
   services: UserServiceTableData[];
@@ -78,9 +78,9 @@ export default function ServiceTable({
                     </p>
                   </div>
                   <Button variant='link' asChild>
-                    <Link href='/dashboard/services/create'>
+                    <NextLink href='/dashboard/services/create'>
                       Δημιουργία Υπηρεσίας
-                    </Link>
+                    </NextLink>
                   </Button>
                 </div>
               </TableCell>
@@ -145,11 +145,11 @@ export default function ServiceTable({
 
                   {/* Title and Info */}
                   <div className='flex-1 min-w-0'>
-                    <Link href={`/dashboard/services/edit/${service.id}`}>
+                    <NextLink href={`/dashboard/services/edit/${service.id}`}>
                       <h3 className='text-2sm font-medium text-gray-900 break-all line-clamp-3 hover:text-primary hover:underline cursor-pointer transition-colors'>
                         {service.title}
                       </h3>
-                    </Link>
+                    </NextLink>
                   </div>
                 </div>
               </TableCell>
@@ -191,9 +191,9 @@ export default function ServiceTable({
                       className='h-8 w-8'
                       asChild
                     >
-                      <Link href={`/s/${service.slug}`} target='_blank'>
+                      <NextLink href={`/s/${service.slug}`} target='_blank'>
                         <Eye className='w-4 h-4' />
-                      </Link>
+                      </NextLink>
                     </Button>
                   )}
                   <Button
@@ -202,9 +202,9 @@ export default function ServiceTable({
                     className='h-8 w-8'
                     asChild
                   >
-                    <Link href={`/dashboard/services/edit/${service.id}`}>
+                    <NextLink href={`/dashboard/services/edit/${service.id}`}>
                       <Edit className='w-4 h-4' />
-                    </Link>
+                    </NextLink>
                   </Button>
                 </div>
               </TableCell>

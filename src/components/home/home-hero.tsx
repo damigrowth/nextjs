@@ -2,11 +2,11 @@
 
 import React, { Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import { NextLink as Link } from '@/components/shared';
 import { Star, Rocket, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { HomeSearch } from './home-search';
 import type { DatasetItem } from '@/lib/types/datasets';
+import { NextLink } from '../shared';
 
 // Lazy load carousel to reduce initial bundle size
 const HeroImageGallery = dynamic(() => import('./home-hero-gallery'), {
@@ -23,11 +23,11 @@ function StaticHeroContent() {
       {/* Badges Row */}
       <div className='flex flex-wrap gap-2 mb-6 items-center'>
         {/* Service Directory Badge */}
-        <Link href='/categories' className='inline-block'>
+        <NextLink href='/categories' className='inline-block'>
           <Badge className='bg-[#198754] text-primary-foreground rounded-full px-3 py-1 text-3sm font-medium cursor-pointer mb-2 sm:mb-0'>
             Κατάλογος Υπηρεσιών
           </Badge>
-        </Link>
+        </NextLink>
 
         {/* Cycling Badges Container - All in same position */}
         <div className='relative inline-block h-[26px] min-w-[220px] [contain:layout]'>
@@ -84,14 +84,14 @@ function PopularSearches({ subcategories }: { subcategories: DatasetItem[] }) {
 
       <div className='flex flex-wrap gap-2'>
         {displaySubcategories.map((sub) => (
-          <Link href={`/ipiresies/${sub.slug}`} key={sub.id}>
+          <NextLink href={`/ipiresies/${sub.slug}`} key={sub.id}>
             <Badge
               variant='outline'
               className='no-underline inline-block font-sans font-normal text-sm leading-6 py-2 px-5 rounded-full border border-gray-300 bg-white text-gray-700 transition-colors duration-200 ease-in-out hover:border-[#198754] hover:bg-[#198754]/5 cursor-pointer'
             >
               {sub.label}
             </Badge>
-          </Link>
+          </NextLink>
         ))}
       </div>
     </div>

@@ -1,4 +1,3 @@
-import { NextLink as Link } from '@/components/shared';
 import {
   Card,
   CardContent,
@@ -18,6 +17,7 @@ import {
 } from 'lucide-react';
 
 import { getCurrentUser, isProfessional } from '@/actions/auth/server';
+import { NextLink } from '../shared';
 
 interface DashboardData {
   services: any;
@@ -63,12 +63,12 @@ export default async function DashboardContent() {
         <CardContent className='space-y-4'>
           <p className='text-sm text-muted-foreground'>
             Μπορείς να συμπληρώσεις τα στοιχεία σου στην{' '}
-            <Link
+            <NextLink
               href='/dashboard/profile'
               className='font-semibold text-primary hover:underline'
             >
               Διαχείριση Προφίλ
-            </Link>
+            </NextLink>
             . Ακόμα, μπορείς να αποθηκεύσεις τις Αγαπημένες σου υπηρεσίες και τα
             προφίλ. Εάν έχεις έρθει σε επικοινωνία με κάποιον επαγγελματία, μη
             διστάσεις να υποβάλεις μια αξιολόγηση. Θα βοηθήσεις έτσι, και άλλους
@@ -76,16 +76,16 @@ export default async function DashboardContent() {
           </p>
           <div className='flex flex-wrap gap-3 pt-4'>
             <Button asChild>
-              <Link href='/ipiresies'>
+              <NextLink href='/ipiresies'>
                 Όλες οι Υπηρεσίες
                 <ArrowRight className='ml-2 h-4 w-4' />
-              </Link>
+              </NextLink>
             </Button>
             <Button variant='outline' asChild>
-              <Link href='/dir'>
+              <NextLink href='/dir'>
                 Επαγγελματικός Κατάλογος
                 <ArrowRight className='ml-2 h-4 w-4' />
-              </Link>
+              </NextLink>
             </Button>
           </div>
         </CardContent>
@@ -147,25 +147,25 @@ export default async function DashboardContent() {
           </CardHeader>
           <CardContent className='space-y-3'>
             <Button variant='outline' className='w-full justify-start' asChild>
-              <Link href='/dashboard/profile'>
+              <NextLink href='/dashboard/profile'>
                 <Users className='mr-2 h-4 w-4' />
                 Διαχείριση Προφίλ
                 <ArrowRight className='ml-auto h-4 w-4' />
-              </Link>
+              </NextLink>
             </Button>
             <Button variant='outline' className='w-full justify-start' asChild>
-              <Link href='/dashboard/services/create'>
+              <NextLink href='/dashboard/services/create'>
                 <Plus className='mr-2 h-4 w-4' />
                 Προσθήκη Υπηρεσίας
                 <ArrowRight className='ml-auto h-4 w-4' />
-              </Link>
+              </NextLink>
             </Button>
             <Button variant='outline' className='w-full justify-start' asChild>
-              <Link href='/dashboard/services'>
+              <NextLink href='/dashboard/services'>
                 <BarChart3 className='mr-2 h-4 w-4' />
                 Διαχείριση Υπηρεσιών
                 <ArrowRight className='ml-auto h-4 w-4' />
-              </Link>
+              </NextLink>
             </Button>
           </CardContent>
         </Card>

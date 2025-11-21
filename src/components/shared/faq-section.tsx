@@ -1,11 +1,11 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import NextLink from './next-link';
 
 type Question = {
   id: string;
@@ -124,12 +124,12 @@ export default function FaqSection({
                     {data.subtitle}{' '}
                     {linkHref && linkText && (
                       <>
-                        <Link
+                        <NextLink
                           href={linkHref}
                           className='text-primary hover:text-secondary underline'
                         >
                           {linkText}
-                        </Link>
+                        </NextLink>
                         .
                       </>
                     )}

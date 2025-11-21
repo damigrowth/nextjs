@@ -1,11 +1,11 @@
-import { NextLink as Link } from '@/components/shared';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
 import type { ArchiveServiceCardData } from '@/lib/types/components';
 import type { ServiceCardData } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import {
   MediaCarousel,
+  NextLink,
   ProfileBadges,
   RatingDisplay,
   UserAvatar,
@@ -56,7 +56,7 @@ export function ArchiveServiceCard({
     >
       <div className='flex flex-col md:flex-row h-full md:h-52'>
         {/* Media Section - Shows first on mobile, second on desktop */}
-        <Link
+        <NextLink
           href={`/s/${service.slug}`}
           className={
             !service.media || service.media.length === 0
@@ -73,16 +73,16 @@ export function ArchiveServiceCard({
             aspectRatio='video'
             noAudioFiles={true}
           />
-        </Link>
+        </NextLink>
 
         {/* Content Section - Shows second on mobile, first on desktop */}
         <div className='flex-1 px-6 pt-4 pb-3 flex flex-col justify-between min-w-0 md:order-1'>
           <div className='space-y-2'>
-            <Link href={`/s/${service.slug}`} className='block'>
+            <NextLink href={`/s/${service.slug}`} className='block'>
               <h3 className='text-lg font-semibold text-gray-900 line-clamp-2 hover:text-third transition-colors mb-0'>
                 {service.title}
               </h3>
-            </Link>
+            </NextLink>
 
             {/* Category Display */}
             <TaxonomiesDisplay
@@ -136,14 +136,14 @@ export function ArchiveServiceCard({
                     showShadow={false}
                     href={`/profile/${service.profile.username}`}
                   />
-                  <Link
+                  <NextLink
                     href={`/profile/${service.profile.username}`}
                     className='group'
                   >
                     <span className='text-sm text-body group-hover:text-third transition-colors'>
                       {service.profile.displayName}
                     </span>
-                  </Link>
+                  </NextLink>
                   <ProfileBadges
                     verified={profileVerified}
                     topLevel={profileTop}

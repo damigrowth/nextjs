@@ -1,5 +1,4 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { ArrowRight } from 'lucide-react';
 import {
   Carousel,
@@ -9,7 +8,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { CarouselPagination } from '@/components/ui/carousel-pagination';
-import { ProfileCard } from '../shared';
+import { NextLink, ProfileCard } from '../shared';
 import { ProfileCardData } from '@/lib/types';
 
 interface ProfilesHomeProps {
@@ -43,13 +42,13 @@ export default function ProfilesHome({
 
           {/* Right Side - View All Button */}
           <div className='flex-shrink-0'>
-            <Link
+            <NextLink
               href='/directory'
               className='inline-flex items-center gap-2 text-accent hover:text-secondary hover:text-gray-900 transition-all duration-300 text-sm font-medium'
             >
               Επαγγελματικός Κατάλογος
               <ArrowRight className='h-4 w-4' />
-            </Link>
+            </NextLink>
           </div>
         </div>
 

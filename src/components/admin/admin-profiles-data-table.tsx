@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
-import { ProfileBadges, UserAvatar } from '@/components/shared';
-import { Star, Copy, Check } from 'lucide-react';
+import { NextLink, ProfileBadges, UserAvatar } from '@/components/shared';
+import { Copy, Check } from 'lucide-react';
 import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { AdminDataTable, ColumnDef } from './admin-data-table';
@@ -103,12 +102,12 @@ export function AdminProfilesDataTable({
         const userEmail = profile.user.email;
 
         return (
-          <Link
+          <NextLink
             href={`/admin/users/${userId}`}
             className='text-sm font-medium hover:text-primary transition-colors hover:underline'
           >
             {userEmail}
-          </Link>
+          </NextLink>
         );
       },
     },

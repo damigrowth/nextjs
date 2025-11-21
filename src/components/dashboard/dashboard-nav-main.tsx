@@ -1,7 +1,6 @@
 'use client';
 
 import { ChevronRight, type LucideIcon } from 'lucide-react';
-import { NextLink as Link } from '@/components/shared';
 import { usePathname } from 'next/navigation';
 import { type ComponentType } from 'react';
 
@@ -21,6 +20,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
+import { NextLink } from '../shared';
 
 export function NavMain({
   items,
@@ -67,10 +67,10 @@ export function NavMain({
                       : ''
                   }
                 >
-                  <Link href={isDisabled ? '#' : item.url}>
+                  <NextLink href={isDisabled ? '#' : item.url}>
                     <item.icon />
                     <span>{item.title}</span>
-                  </Link>
+                  </NextLink>
                 </SidebarMenuButton>
                 {item.items?.length ? (
                   <>
@@ -88,9 +88,9 @@ export function NavMain({
                               asChild
                               isActive={pathname === subItem.url}
                             >
-                              <Link href={subItem.url}>
+                              <NextLink href={subItem.url}>
                                 <span>{subItem.title}</span>
-                              </Link>
+                              </NextLink>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         ))}

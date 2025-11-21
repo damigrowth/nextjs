@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { usePathname } from 'next/navigation';
 import {
   Settings,
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { NextLink } from '@/components/shared';
 
 const profileMenuItems = [
   {
@@ -80,7 +80,7 @@ export default function ProfileSidebar({
               const isActive = pathname === item.url;
 
               return (
-                <Link
+                <NextLink
                   key={item.url}
                   href={item.url}
                   className={cn(
@@ -92,7 +92,7 @@ export default function ProfileSidebar({
                 >
                   <Icon className='h-4 w-4' />
                   {item.title}
-                </Link>
+                </NextLink>
               );
             })}
           </nav>

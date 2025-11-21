@@ -25,10 +25,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { MoreVertical } from 'lucide-react';
-import { NextLink as Link } from '@/components/shared';
 import { toast } from 'sonner';
 import { blockUser } from '@/actions/messages/blocking';
 import { deleteChat } from '@/actions/messages/chats';
+import { NextLink } from '../shared';
 
 interface HeaderActionsProps {
   chatId: string;
@@ -114,9 +114,9 @@ export function HeaderActions({
         <DropdownMenuContent className='w-fit rounded-xl' align='end'>
           {username && userType === 'pro' && (
             <DropdownMenuItem asChild>
-              <Link href={profileUrl} target='_blank'>
+              <NextLink href={profileUrl} target='_blank'>
                 Προβολή Προφίλ
-              </Link>
+              </NextLink>
             </DropdownMenuItem>
           )}
           <DropdownMenuItem onClick={handleBlockClick}>

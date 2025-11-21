@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -12,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { UserAvatar } from '@/components/shared';
+import { NextLink, UserAvatar } from '@/components/shared';
 import {
   Dialog,
   DialogContent,
@@ -32,7 +31,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import {
-  ArrowLeft,
   Star,
   Euro,
   Calendar,
@@ -42,11 +40,8 @@ import {
   XCircle,
   AlertCircle,
   Trash2,
-  Edit,
-  MessageSquare,
   Tag,
   Clock,
-  MapPin,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils/date';
 import {
@@ -370,17 +365,17 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
 
             <div className='flex gap-2'>
               <Button variant='outline' size='sm' asChild className='flex-1'>
-                <Link href={`/admin/profiles?id=${service.profile.id}`}>
+                <NextLink href={`/admin/profiles?id=${service.profile.id}`}>
                   View Profile
-                </Link>
+                </NextLink>
               </Button>
               <Button variant='outline' size='sm' asChild className='flex-1'>
-                <Link
+                <NextLink
                   href={`/profiles/${service.profile.username || service.pid}`}
                   target='_blank'
                 >
                   View Public
-                </Link>
+                </NextLink>
               </Button>
             </div>
           </CardContent>

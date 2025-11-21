@@ -1,12 +1,12 @@
 import { notFound } from 'next/navigation';
 import { ReactNode } from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SiteHeader } from '@/components/admin';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { findById } from '@/lib/utils/datasets';
+import { NextLink } from '../shared';
 
 export interface TaxonomyEditPageProps<T extends DatasetItem> {
   id: string;
@@ -41,10 +41,10 @@ export function TaxonomyEditPage<T extends DatasetItem>({
         title={`Edit ${entityName}: ${displayName}`}
         actions={
           <Button variant='ghost' size='sm' asChild>
-            <Link href={backPath}>
+            <NextLink href={backPath}>
               <ArrowLeft className='h-4 w-4' />
               {backLabel}
-            </Link>
+            </NextLink>
           </Button>
         }
       />

@@ -1,6 +1,5 @@
 'use client';
 
-import { NextLink as Link } from '@/components/shared';
 import {
   Dialog,
   DialogContent,
@@ -21,6 +20,7 @@ import {
   Layers,
   BookmarkIcon,
 } from 'lucide-react';
+import { NextLink } from '../shared';
 
 interface QuickCreateDialogProps {
   open: boolean;
@@ -92,7 +92,7 @@ export function QuickCreateDialog({
           {createLinks.map((link) => {
             const Icon = link.icon;
             return (
-              <Link
+              <NextLink
                 key={link.href}
                 href={link.href}
                 onClick={() => onOpenChange(false)}
@@ -113,7 +113,7 @@ export function QuickCreateDialog({
                     </div>
                   </div>
                 </Button>
-              </Link>
+              </NextLink>
             );
           })}
         </div>

@@ -1,9 +1,8 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
-import { ArrowRightLong } from '@/components/icon/fa';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Button } from '../ui/button';
 import { ArrowRight } from 'lucide-react';
+import NextLink from './next-link';
 
 type TabButton = {
   title: string;
@@ -53,13 +52,13 @@ export default function TabbedCta({ data }: TabbedCtaProps) {
                       dangerouslySetInnerHTML={{ __html: tab.content }}
                     />
                     <Button variant='secondary' asChild size='lg'>
-                      <Link
+                      <NextLink
                         href={tab.button.href}
                         className='inline-flex items-center gap-2'
                       >
                         Εγγραφή Επαγγελματία
                         <ArrowRight className='w-4 h-4' />
-                      </Link>
+                      </NextLink>
                     </Button>
                   </div>
                 </TabsContent>

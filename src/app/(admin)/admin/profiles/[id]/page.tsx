@@ -1,7 +1,6 @@
 import { getCurrentUser } from '@/actions/auth/server';
 import { getProfile } from '@/actions/admin/profiles';
 import { redirect, notFound } from 'next/navigation';
-import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +12,7 @@ import {
   PortfolioForm,
   CoverageForm,
   BillingForm,
+  NextLink,
 } from '@/components';
 import { Badge } from '@/components/ui/badge';
 import { SiteHeader } from '@/components/admin';
@@ -73,22 +73,22 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
         actions={
           <>
             <Button variant='ghost' size='sm' asChild>
-              <Link href='/admin/profiles'>
+              <NextLink href='/admin/profiles'>
                 <ArrowLeft className='h-4 w-4' />
                 Profiles
-              </Link>
+              </NextLink>
             </Button>
             <Button variant='outline' size='sm' asChild>
-              <Link href={`/admin/users/${profile.uid}`}>
+              <NextLink href={`/admin/users/${profile.uid}`}>
                 <ExternalLink className='h-4 w-4' />
                 User
-              </Link>
+              </NextLink>
             </Button>
             <Button variant='outline' size='sm' asChild>
-              <Link href={`/profile/${profile.username}`} target='_blank'>
+              <NextLink href={`/profile/${profile.username}`} target='_blank'>
                 <Eye className='h-4 w-4' />
                 Public Profile
-              </Link>
+              </NextLink>
             </Button>
           </>
         }

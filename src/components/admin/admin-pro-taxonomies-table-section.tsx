@@ -1,4 +1,3 @@
-import { NextLink as Link } from '@/components/shared';
 import { Edit, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +12,7 @@ import {
 import AdminTablePagination from './admin-table-pagination';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import { DatasetItem } from '@/lib/types/datasets';
+import { NextLink } from '../shared';
 
 interface ProTaxonomiesTableSectionProps {
   searchParams: {
@@ -162,9 +162,9 @@ export async function AdminProTaxonomiesTableSection({
                   </TableCell>
                   <TableCell>
                     <Button size='icon' variant='ghost' asChild>
-                      <Link href={`/admin/taxonomies/pro/${taxonomy.id}`}>
+                      <NextLink href={`/admin/taxonomies/pro/${taxonomy.id}`}>
                         <Edit className='h-4 w-4' />
-                      </Link>
+                      </NextLink>
                     </Button>
                   </TableCell>
                 </TableRow>

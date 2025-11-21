@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { NextLink as Link } from '@/components/shared';
 import {
   Card,
   CardContent,
@@ -37,6 +36,7 @@ import {
 import { toast } from 'sonner';
 import { CommitForm } from './commit-form';
 import { GitStatusResponse, RecentCommitsResponse } from '@/lib/types/github';
+import { NextLink } from '@/components/shared';
 
 export function DeploymentManager() {
   const [gitStatus, setGitStatus] = useState<GitStatusResponse['data']>(null);
@@ -470,7 +470,7 @@ export function DeploymentManager() {
                       >
                         <div className='flex items-start justify-between'>
                           <div className='flex justify-center items-center gap-2'>
-                            <Link
+                            <NextLink
                               href={commit.url}
                               target='_blank'
                               rel='noopener noreferrer'
@@ -482,7 +482,7 @@ export function DeploymentManager() {
                               >
                                 {commit.shortHash}
                               </Badge>
-                            </Link>
+                            </NextLink>
                             <span className='text-xs text-muted-foreground'>
                               {commit.author}
                             </span>
@@ -524,7 +524,7 @@ export function DeploymentManager() {
                             ? 'Reverting...'
                             : 'Revert'}
                         </Button> */}
-                            <Link
+                            <NextLink
                               href={commit.url}
                               target='_blank'
                               rel='noopener noreferrer'
@@ -537,7 +537,7 @@ export function DeploymentManager() {
                                 <ExternalLink className='h-3 w-3' />
                                 Preview
                               </Button>
-                            </Link>
+                            </NextLink>
                           </div>
                         </div>
                         <p className='text-sm'>{commit.message}</p>

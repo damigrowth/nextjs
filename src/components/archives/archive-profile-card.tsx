@@ -1,4 +1,3 @@
-import { NextLink as Link } from '@/components/shared';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CoverageDisplay } from './coverage-display';
@@ -9,6 +8,7 @@ import {
   ProfileBadges,
   RatingDisplay,
   TaxonomiesDisplay,
+  NextLink,
 } from '../shared';
 
 interface ArchiveProfileCardProps {
@@ -35,7 +35,7 @@ export function ArchiveProfileCard({
     >
       <div className='flex flex-col md:flex-row h-full md:h-52'>
         {/* Avatar Section */}
-        <Link
+        <NextLink
           href={`/profile/${profile.username}`}
           className='group w-full md:w-48 flex-shrink-0 relative overflow-hidden flex md:items-center md:justify-center pl-5 md:pl-0 bg-gray-50 bg-cover bg-center bg-no-repeat min-h-28'
           style={{
@@ -61,12 +61,12 @@ export function ArchiveProfileCard({
 
           {/* Hover effect - increase saturation and slightly darken */}
           {/* <div className='absolute inset-0 bg-primary/0 group-hover:bg-primary/[.02] transition-all duration-200 z-5'></div> */}
-        </Link>
+        </NextLink>
 
         {/* Content Section */}
         <div className='flex-1 px-6 py-4 pb-6 flex flex-col justify-between min-w-0'>
           <div className='space-y-2'>
-            <Link href={`/profile/${profile.username}`} className='block'>
+            <NextLink href={`/profile/${profile.username}`} className='block'>
               <div className='flex items-center gap-2 mb-1'>
                 <h3 className='text-lg font-semibold text-gray-900 line-clamp-2 hover:text-third transition-colors mb-0'>
                   {profile.displayName}
@@ -76,7 +76,7 @@ export function ArchiveProfileCard({
                   topLevel={profile.top}
                 />
               </div>
-            </Link>
+            </NextLink>
 
             {/* Subcategory and Tagline Row */}
             <div className='flex items-center gap-2 text-sm text-gray-600'>

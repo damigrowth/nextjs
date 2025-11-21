@@ -7,7 +7,6 @@ import {
 } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, UserPlus } from 'lucide-react';
-import { NextLink as Link } from '@/components/shared';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,10 +37,10 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
               Refresh
             </Button>
             <Button variant='default' size='md' asChild>
-              <Link href='/admin/users/create'>
+              <NextLink href='/admin/users/create'>
                 <UserPlus className='h-4 w-4' />
                 Create User
-              </Link>
+              </NextLink>
             </Button>
           </>
         }

@@ -7,7 +7,7 @@ import {
 } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Plus, GitBranch } from 'lucide-react';
-import { NextLink as Link } from '@/components/shared';
+import { NextLink } from '@/components/shared';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,16 +39,16 @@ export default async function ProTaxonomiesPage({
               Refresh
             </Button>
             <Button variant='secondary' size='md' asChild>
-              <Link href='/admin/git'>
+              <NextLink href='/admin/git'>
                 <GitBranch className='h-4 w-4' />
                 Git
-              </Link>
+              </NextLink>
             </Button>
             <Button variant='default' size='md' asChild>
-              <Link href='/admin/taxonomies/pro/create'>
+              <NextLink href='/admin/taxonomies/pro/create'>
                 <Plus className='h-4 w-4' />
                 Create Category
-              </Link>
+              </NextLink>
             </Button>
           </>
         }

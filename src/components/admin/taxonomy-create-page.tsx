@@ -1,9 +1,9 @@
 import { ReactNode } from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SiteHeader } from '@/components/admin';
+import { NextLink } from '../shared';
 
 export interface TaxonomyCreatePageProps {
   title: string;
@@ -26,10 +26,10 @@ export function TaxonomyCreatePage({
         title={title}
         actions={
           <Button variant='ghost' size='sm' asChild>
-            <Link href={backPath}>
+            <NextLink href={backPath}>
               <ArrowLeft className='h-4 w-4' />
               {backLabel}
-            </Link>
+            </NextLink>
           </Button>
         }
       />

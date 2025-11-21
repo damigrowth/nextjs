@@ -1,4 +1,3 @@
-import { NextLink as Link } from '@/components/shared';
 import {
   BriefcaseIcon,
   CheckCircleIcon,
@@ -16,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { NextLink } from '../shared';
 
 const navItems = [
   {
@@ -76,7 +75,7 @@ export function AdminNavCards() {
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
-            <Link key={item.href} href={item.href}>
+            <NextLink key={item.href} href={item.href}>
               <Card className='group transition-all hover:border-primary hover:shadow-md'>
                 <CardHeader>
                   <div className='flex items-start justify-between'>
@@ -87,7 +86,7 @@ export function AdminNavCards() {
                   <CardDescription>{item.description}</CardDescription>
                 </CardHeader>
               </Card>
-            </Link>
+            </NextLink>
           );
         })}
       </div>

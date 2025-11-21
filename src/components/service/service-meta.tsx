@@ -1,6 +1,5 @@
 import React from 'react';
-import { ProfileBadges, RatingDisplay, UserAvatar } from '../shared';
-import { NextLink as Link } from '@/components/shared';
+import { NextLink, ProfileBadges, RatingDisplay, UserAvatar } from '../shared';
 
 interface ServiceMetaProps {
   title: string;
@@ -45,12 +44,12 @@ export default function ServiceMeta({
               className='h-10 w-10'
               href={`/profile/${username}`}
             />
-            <Link
+            <NextLink
               href={`/profile/${username}`}
               className='font-base text-gray-800 hover:text-primary transition-colors ml-3'
             >
               {displayName}
-            </Link>
+            </NextLink>
             {/* Badges Container */}
             <ProfileBadges
               verified={verified}

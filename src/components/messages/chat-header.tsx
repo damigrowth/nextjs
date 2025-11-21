@@ -3,10 +3,9 @@
  * Pure presentation - interactive parts moved to HeaderActions client component
  */
 
-import { NextLink as Link } from '@/components/shared';
 import { ChatHeaderUser } from '@/lib/types/messages';
 import { getProfileUrl } from '@/lib/utils/messages';
-import { UserAvatar } from '../shared';
+import { NextLink, UserAvatar } from '../shared';
 
 interface ChatHeaderProps {
   chatId: string;
@@ -44,14 +43,14 @@ export function ChatHeader({ chatId, currentUserId, user }: ChatHeaderProps) {
     <div className='sticky top-0 z-10 flex items-center justify-between bg-background py-0 md:pl-4'>
       <div className='flex items-center gap-3'>
         {user.type === 'pro' && user.username ? (
-          <Link
+          <NextLink
             href={profileUrl}
             target='_blank'
             rel='noopener noreferrer'
             className='flex items-center gap-3 hover:opacity-80 transition-opacity'
           >
             {profileContent}
-          </Link>
+          </NextLink>
         ) : (
           <div className='flex items-center gap-3'>{profileContent}</div>
         )}

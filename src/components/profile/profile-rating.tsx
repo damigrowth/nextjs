@@ -1,7 +1,7 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { Star } from 'lucide-react';
 import { ProfileRatingProps } from '@/lib/types';
+import { NextLink } from '../shared';
 
 /**
  * Modern ProfileRating Component
@@ -41,9 +41,9 @@ export default function ProfileRating({
 
   if (clickable) {
     return (
-      <Link href='#reviews-section' className='inline-block cursor-pointer'>
+      <NextLink href='#reviews-section' className='inline-block cursor-pointer'>
         {ratingContent}
-      </Link>
+      </NextLink>
     );
   }
 
