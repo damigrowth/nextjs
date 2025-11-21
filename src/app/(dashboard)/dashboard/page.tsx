@@ -1,4 +1,3 @@
-import { requireOnboardingComplete } from '@/actions/auth/server';
 import DashboardContent from '@/components/dashboard/dashboard-content';
 import { getDashboardMetadata } from '@/lib/seo/pages';
 
@@ -9,8 +8,6 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
 
 export default async function DashboardPage() {
-  // Server-side auth check - require authentication and completed onboarding
-  const session = await requireOnboardingComplete();
-
+  // Authentication and onboarding check handled at layout level
   return <DashboardContent />;
 }
