@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import NextLink from '@/components/shared/next-link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 import {
   hasAccessUserMenuNav,
@@ -57,13 +57,23 @@ const getMenuIcon = (iconName: string) => {
 
 export default function UserMenu({ isMobile }: UserMenuProps) {
   const router = useRouter();
-  const { data: session, isPending } = useSession();
+  const pathname = usePathname();
+  const { data: session, isPending, refetch } = useSession();
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Prevent hydration mismatch by only rendering after client-side hydration
   useEffect(() => {
     setIsHydrated(true);
   }, []);
+
+  // Force refresh session when on OAuth setup or onboarding pages
+  // This ensures the menu always has the latest session step value
+  useEffect(() => {
+    if (pathname === '/oauth-setup' || pathname === '/onboarding') {
+      // Refresh session to ensure we have the latest step value
+      refetch();
+    }
+  }, [pathname, refetch]);
 
   // Use Better Auth session data
   const user = session?.user;
