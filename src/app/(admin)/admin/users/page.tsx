@@ -7,6 +7,7 @@ import {
 } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, UserPlus } from 'lucide-react';
+import { NextLink } from '@/components';
 
 export const dynamic = 'force-dynamic';
 
