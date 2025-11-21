@@ -1,7 +1,6 @@
 'use client';
 
-import { ChevronRight, Package, Plus } from 'lucide-react';
-import { NextLink as Link } from '@/components/shared';
+import { ChevronRight, Package } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
@@ -23,6 +22,7 @@ import {
   getRecentServices,
   type RecentService,
 } from '@/actions/services/get-recent-services';
+import { NextLink } from '../shared';
 
 export function NavServices() {
   const pathname = usePathname();
@@ -64,10 +64,10 @@ export function NavServices() {
             tooltip='Διαχείριση Υπηρεσιών'
             isActive={isActiveItem}
           >
-            <Link href='/dashboard/services'>
+            <NextLink href='/dashboard/services'>
               <Package />
               <span>Διαχείριση Υπηρεσιών</span>
-            </Link>
+            </NextLink>
           </SidebarMenuButton>
           <CollapsibleTrigger asChild onClick={handleToggle}>
             <SidebarMenuAction className='data-[state=open]:rotate-90'>
@@ -92,9 +92,9 @@ export function NavServices() {
                       asChild
                       isActive={pathname === item.url}
                     >
-                      <Link href={item.url}>
+                      <NextLink href={item.url}>
                         <span className='truncate'>{item.title}</span>
-                      </Link>
+                      </NextLink>
                     </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
                 );

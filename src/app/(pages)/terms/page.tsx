@@ -7,8 +7,8 @@ export async function generateMetadata() {
 
 export default function TermsPage() {
   return (
-    <div className='mt-16 lg:mt-20 flex flex-col w-full'>
-      <section className='mx-auto max-w-2xl py-12 px-5'>
+    <div className='mt-16 lg:mt-20 flex flex-col w-full overflow-hidden'>
+      <section className='container mx-auto max-w-2xl py-12 px-5'>
         <h1>Όροι Χρήσης</h1>
         <span />
         <p>

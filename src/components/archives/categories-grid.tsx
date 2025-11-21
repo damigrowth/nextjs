@@ -1,4 +1,3 @@
-import { NextLink as Link } from '@/components/shared';
 import Image from 'next/image';
 import {
   Card,
@@ -9,6 +8,7 @@ import {
 } from '@/components/ui/card';
 import type { CategoryWithSubcategories } from '@/actions/services/get-categories';
 import { Separator } from '../ui/separator';
+import { NextLink } from '../shared';
 
 interface CategoriesGridProps {
   categories: CategoryWithSubcategories[];
@@ -58,12 +58,12 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
               <div className='flex items-start space-x-3'>
                 <div className='flex-1 min-w-0'>
                   <CardTitle className='text-lg mb-2'>
-                    <Link
+                    <NextLink
                       href={category.href}
                       className='hover:text-primary transition-colors'
                     >
                       {category.label}
-                    </Link>
+                    </NextLink>
                   </CardTitle>
                   {category.description && (
                     <CardDescription className='text-sm text-gray-600 line-clamp-2'>
@@ -79,23 +79,23 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
                 <div className='space-y-2'>
                   {category.subcategories.slice(0, 6).map((subcategory) => (
                     <div key={subcategory.id}>
-                      <Link
+                      <NextLink
                         href={subcategory.href}
                         className='text-sm font-medium text-gray-700 hover:text-primary transition-colors truncate block'
                       >
                         {subcategory.label}
-                      </Link>
+                      </NextLink>
                     </div>
                   ))}
                   {category.subcategories.length > 6 && (
                     <div className='pt-2'>
-                      <Link
+                      <NextLink
                         href={category.href}
                         className='text-sm text-primary hover:text-primary/80 font-medium'
                       >
                         Δες όλες τις υποκατηγορίες (
                         {category.subcategories.length - 6}+)
-                      </Link>
+                      </NextLink>
                     </div>
                   )}
                 </div>

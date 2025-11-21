@@ -1,7 +1,6 @@
 import { getCurrentUser } from '@/actions/auth/server';
 import { getUser } from '@/actions/admin';
 import { redirect, notFound } from 'next/navigation';
-import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, ExternalLink, Shield, UserCog } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +12,7 @@ import {
   RevokeSessionsForm,
 } from '@/components/admin/forms';
 import { SiteHeader } from '@/components/admin';
-import { AccountForm } from '@/components';
+import { AccountForm, NextLink } from '@/components';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,27 +53,27 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
         actions={
           <>
             <Button variant='ghost' size='sm' asChild>
-              <Link href='/admin/users'>
+              <NextLink href='/admin/users'>
                 <ArrowLeft className='h-4 w-4' />
                 Users
-              </Link>
+              </NextLink>
             </Button>
             {user.profile && (
               <>
                 <Button variant='outline' size='sm' asChild>
-                  <Link href={`/admin/profiles/${user.profile.id}`}>
+                  <NextLink href={`/admin/profiles/${user.profile.id}`}>
                     <ExternalLink className='h-4 w-4' />
                     Profile
-                  </Link>
+                  </NextLink>
                 </Button>
                 <Button variant='outline' size='sm' asChild>
-                  <Link
+                  <NextLink
                     href={`/profile/${user.profile.username}`}
                     target='_blank'
                   >
                     <Eye className='h-4 w-4' />
                     Public Profile
-                  </Link>
+                  </NextLink>
                 </Button>
               </>
             )}

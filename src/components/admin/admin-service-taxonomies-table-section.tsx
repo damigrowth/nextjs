@@ -1,4 +1,3 @@
-import { NextLink as Link } from '@/components/shared';
 import { Edit, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +12,7 @@ import {
 import AdminTablePagination from './admin-table-pagination';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { DatasetItem } from '@/lib/types/datasets';
-import { getItemPath } from '@/lib/utils/datasets';
+import { NextLink } from '../shared';
 
 interface ServiceTaxonomiesTableSectionProps {
   searchParams: {
@@ -163,12 +162,12 @@ export async function AdminServiceTaxonomiesTableSection({
                   </TableCell>
                   <TableCell className='text-right'>
                     <Button variant='ghost' size='sm' asChild>
-                      <Link
+                      <NextLink
                         href={`/admin/taxonomies/service/${taxonomy.level}/${taxonomy.id}`}
                       >
                         <Edit className='h-4 w-4' />
                         <span className='sr-only'>Edit</span>
-                      </Link>
+                      </NextLink>
                     </Button>
                   </TableCell>
                 </TableRow>

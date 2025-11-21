@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import {
   ArrowUpCircleIcon,
   BarChartIcon,
@@ -14,7 +13,7 @@ import {
   MessageSquareIcon,
 } from 'lucide-react';
 
-import { AdminNavMain, AdminNavUser } from '@/components';
+import { AdminNavMain, AdminNavUser, NextLink } from '@/components';
 import { useSession } from '@/lib/auth/client';
 
 import {
@@ -147,10 +146,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className='data-[slot=sidebar-menu-button]:!p-1.5'
             >
-              <Link href='/admin'>
+              <NextLink href='/admin'>
                 <ArrowUpCircleIcon className='h-5 w-5' />
                 <span className='text-base font-semibold'>Doulitsa Admin</span>
-              </Link>
+              </NextLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

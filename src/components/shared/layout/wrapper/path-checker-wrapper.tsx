@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface PathCheckerProps {
   children: React.ReactNode;
@@ -16,6 +17,16 @@ export default function PathChecker({
   paths,
 }: PathCheckerProps) {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return null;
+  }
 
   // Check exclusions
   if (excludes) {
@@ -30,7 +41,7 @@ export default function PathChecker({
       return null;
     }
   }
-  
+
   // Check inclusions
   if (includes) {
     const includeArray = Array.isArray(includes) ? includes : [includes];

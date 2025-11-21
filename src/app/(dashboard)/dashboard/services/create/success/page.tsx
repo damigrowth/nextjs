@@ -1,5 +1,4 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { redirect } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Plus, Settings } from 'lucide-react';
 import { getCurrentUser } from '@/actions/auth/server';
 import { getDashboardMetadata } from '@/lib/seo/pages';
+import { NextLink } from '@/components';
 
 export const metadata = getDashboardMetadata('Επιτυχής Δημιουργία Υπηρεσίας');
 
@@ -86,13 +86,13 @@ export default async function ServiceSuccessPage({ searchParams }: PageProps) {
                 size='lg'
                 className='bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 px-6'
               >
-                <Link
+                <NextLink
                   href='/dashboard/services/create'
                   className='flex items-center gap-2'
                 >
                   <Plus className='w-4 h-4' />
                   Δημιουργία Νέας Υπηρεσίας
-                </Link>
+                </NextLink>
               </Button>
 
               <Button
@@ -101,13 +101,13 @@ export default async function ServiceSuccessPage({ searchParams }: PageProps) {
                 size='lg'
                 className='border-gray-300 text-gray-700 hover:bg-gray-50 px-6'
               >
-                <Link
+                <NextLink
                   href='/dashboard/services'
                   className='flex items-center gap-2'
                 >
                   <Settings className='w-4 h-4' />
                   Διαχείριση Υπηρεσιών
-                </Link>
+                </NextLink>
               </Button>
             </div>
           </div>

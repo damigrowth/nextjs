@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +14,7 @@ import {
 import { ArrowUpDown, ArrowUp, ArrowDown, Edit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { NextLink } from '../shared';
 
 // Column definition type
 export interface ColumnDef<T = any> {
@@ -124,9 +124,9 @@ export function AdminDataTable<T extends { id: string | number }>({
           render: (row) => (
             <div className='flex items-center justify-end'>
               <Button variant='ghost' size='icon' className='h-8 w-8' asChild>
-                <Link href={editPath(row)}>
+                <NextLink href={editPath(row)}>
                   <Edit className='w-4 h-4' />
-                </Link>
+                </NextLink>
               </Button>
             </div>
           ),

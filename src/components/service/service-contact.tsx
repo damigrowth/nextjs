@@ -1,8 +1,7 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ProfileBadges, RatingDisplay } from '@/components';
+import { NextLink, ProfileBadges, RatingDisplay } from '@/components';
 import UserAvatar from '@/components/shared/user-avatar';
 import SocialLinks from '@/components/shared/social-links';
 import { Globe } from 'lucide-react';
@@ -57,7 +56,7 @@ export default function ServiceContact({
       <CardContent className='p-6'>
         {/* Profile Header - matches original wrapper d-flex align-items-center */}
         <div className='flex items-center mb-4'>
-          <Link href={`/profile/${usernameValue}`} className='mr-5'>
+          <NextLink href={`/profile/${usernameValue}`} className='mr-5'>
             <UserAvatar
               displayName={displayNameValue}
               firstName={firstName}
@@ -66,16 +65,16 @@ export default function ServiceContact({
               top={false}
               size='xl'
             />
-          </Link>
+          </NextLink>
 
           <div className='flex-1 min-w-0'>
             <div className='flex items-start gap-2 mb-1'>
-              <Link
+              <NextLink
                 href={`/profile/${usernameValue}`}
                 className='text-lg font-medium text-gray-900 line-clamp-2 mb-1'
               >
                 {displayNameValue}
-              </Link>
+              </NextLink>
               <div className='flex-shrink-0'>
                 <ProfileBadges verified={verified} topLevel={top} />
               </div>
@@ -153,7 +152,7 @@ export default function ServiceContact({
             className='w-full'
             variant='outlineSecondary'
           >
-            <Link href={`/profile/${usernameValue}`}>Περισσότερα</Link>
+            <NextLink href={`/profile/${usernameValue}`}>Περισσότερα</NextLink>
           </Button>
         </div>
       </CardContent>

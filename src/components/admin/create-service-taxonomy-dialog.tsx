@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,6 +11,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Plus, ChevronRight } from 'lucide-react';
+import { NextLink } from '../shared';
 
 export function CreateServiceTaxonomyDialog() {
   const [open, setOpen] = useState(false);
@@ -33,31 +33,31 @@ export function CreateServiceTaxonomyDialog() {
         </DialogHeader>
         <div className='flex flex-col gap-2 py-4'>
           <Button variant='outline' className='justify-between h-12' asChild>
-            <Link
+            <NextLink
               href='/admin/taxonomies/service/categories/create'
               onClick={() => setOpen(false)}
             >
               <span className='font-semibold'>Category</span>
               <ChevronRight className='h-4 w-4' />
-            </Link>
+            </NextLink>
           </Button>
           <Button variant='outline' className='justify-between h-12' asChild>
-            <Link
+            <NextLink
               href='/admin/taxonomies/service/subcategories/create'
               onClick={() => setOpen(false)}
             >
               <span className='font-semibold'>Subcategory</span>
               <ChevronRight className='h-4 w-4' />
-            </Link>
+            </NextLink>
           </Button>
           <Button variant='outline' className='justify-between h-12' asChild>
-            <Link
+            <NextLink
               href='/admin/taxonomies/service/subdivisions/create'
               onClick={() => setOpen(false)}
             >
               <span className='font-semibold'>Subdivision</span>
               <ChevronRight className='h-4 w-4' />
-            </Link>
+            </NextLink>
           </Button>
         </div>
       </DialogContent>

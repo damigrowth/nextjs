@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { NextLink as Link } from '@/components/shared';
+import NextLink from './next-link';
 import { Button } from '@/components/ui/button';
 import { ArrowRightLong } from '@/components/icon/fa';
 
@@ -62,13 +62,13 @@ export default function StatsGrid({ data }: Props) {
                 asChild
                 className='bg-fourth hover:bg-primary text-white border-2 border-fourth hover:border-primary transition-all duration-300 px-6 py-3 rounded font-medium'
               >
-                <Link
+                <NextLink
                   href={data.content.buttonLink}
                   className='inline-flex items-center gap-2'
                 >
                   {data.content.buttonText}
                   <ArrowRightLong className='h-4 w-4' />
-                </Link>
+                </NextLink>
               </Button>
             </div>
           </div>

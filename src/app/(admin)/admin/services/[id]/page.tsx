@@ -1,12 +1,10 @@
 import { getCurrentUser } from '@/actions/auth/server';
 import { getService } from '@/actions/admin/services';
 import { redirect, notFound } from 'next/navigation';
-import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { formatDate } from '@/lib/utils/date';
 import {
   EditServiceBasicForm,
   EditServiceTaxonomyForm,
@@ -18,6 +16,7 @@ import {
 } from '@/components/admin/forms';
 import { SiteHeader } from '@/components/admin';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { NextLink } from '@/components';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,22 +92,22 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
         actions={
           <>
             <Button variant='ghost' size='sm' asChild>
-              <Link href='/admin/services'>
+              <NextLink href='/admin/services'>
                 <ArrowLeft className='h-4 w-4' />
                 Services
-              </Link>
+              </NextLink>
             </Button>
             <Button variant='outline' size='sm' asChild>
-              <Link href={`/admin/profiles/${service.profile.id}`}>
+              <NextLink href={`/admin/profiles/${service.profile.id}`}>
                 <ExternalLink className='h-4 w-4' />
                 Profile
-              </Link>
+              </NextLink>
             </Button>
             <Button variant='outline' size='sm' asChild>
-              <Link href={`/s/${service.slug}`} target='_blank'>
+              <NextLink href={`/s/${service.slug}`} target='_blank'>
                 <Eye className='h-4 w-4' />
                 Public View
-              </Link>
+              </NextLink>
             </Button>
           </>
         }

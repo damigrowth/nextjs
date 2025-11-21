@@ -59,7 +59,7 @@ export default async function HomePage() {
     <>
       {/* <HomeSchema /> */}
       {/* Service Categories Navigation Tabs */}
-      <div className='mt-16 md:mt-20'>
+      <div>
         <TaxonomyTabs
           items={serviceCategories}
           basePath='categories'

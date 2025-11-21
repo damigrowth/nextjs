@@ -1,8 +1,8 @@
 import { Suspense, ComponentType, ReactNode } from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { SiteHeader } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
+import { NextLink } from '../shared';
 
 export interface TaxonomyListPageConfig {
   title: string;
@@ -34,10 +34,10 @@ export function TaxonomyListPage({
               Refresh
             </Button>
             <Button variant='default' size='md' asChild>
-              <Link href={config.createPath}>
+              <NextLink href={config.createPath}>
                 <Plus className='h-4 w-4' />
                 {config.createLabel}
-              </Link>
+              </NextLink>
             </Button>
             {config.additionalActions}
           </>

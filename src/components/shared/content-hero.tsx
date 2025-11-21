@@ -1,8 +1,8 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, ArrowRight } from 'lucide-react';
+import NextLink from './next-link';
 
 type ContentData = {
   heading: string;
@@ -58,10 +58,10 @@ export default function ContentHero({ data }: Props) {
               variant='outline'
               className='mt-6 border-fourth text-fourth hover:bg-fourth hover:text-white'
             >
-              <Link href={data.button.link} className='flex items-center gap-2'>
+              <NextLink href={data.button.link} className='flex items-center gap-2'>
                 {data.button.text}
                 <ArrowRight className='h-4 w-4' />
-              </Link>
+              </NextLink>
             </Button>
           </div>
         </div>

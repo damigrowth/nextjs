@@ -1,9 +1,9 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { Shield } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import NextLink from './next-link';
 
 export interface UserAvatarProps {
   /** Display name */
@@ -176,9 +176,9 @@ export default function UserAvatar({
 
   if (href) {
     return (
-      <Link href={href} className='hover:opacity-80 transition-opacity'>
+      <NextLink href={href} className='hover:opacity-80 transition-opacity'>
         {avatarContent}
-      </Link>
+      </NextLink>
     );
   }
 

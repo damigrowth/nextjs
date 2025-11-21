@@ -1,13 +1,13 @@
 import { getCurrentUser } from '@/actions/auth/server';
 import { getVerification } from '@/actions/admin/verifications';
 import { redirect, notFound } from 'next/navigation';
-import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SiteHeader, AdminVerificationActions } from '@/components/admin';
 import { formatDate, formatTime } from '@/lib/utils/date';
+import { NextLink } from '@/components';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,25 +71,28 @@ export default async function AdminVerificationDetailPage({
         actions={
           <>
             <Button variant='ghost' size='sm' asChild>
-              <Link href='/admin/verifications'>
+              <NextLink href='/admin/verifications'>
                 <ArrowLeft className='h-4 w-4' />
                 Verifications
-              </Link>
+              </NextLink>
             </Button>
             <Button variant='outline' size='sm' asChild>
-              <Link
+              <NextLink
                 href={`/admin/profiles/${verification.pid}`}
                 target='_blank'
               >
                 <ExternalLink className='h-4 w-4' />
                 View Profile
-              </Link>
+              </NextLink>
             </Button>
             <Button variant='outline' size='sm' asChild>
-              <Link href={`/admin/users/${verification.uid}`} target='_blank'>
+              <NextLink
+                href={`/admin/users/${verification.uid}`}
+                target='_blank'
+              >
                 <ExternalLink className='h-4 w-4' />
                 View User
-              </Link>
+              </NextLink>
             </Button>
           </>
         }

@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { Folder, FileText, Loader2 } from 'lucide-react';
 import {
   Command,
@@ -16,6 +15,7 @@ import {
   PopoverAnchor,
 } from '@/components/ui/popover';
 import type { SearchSuggestionsResult } from '@/lib/types/search';
+import { NextLink } from '../shared';
 
 export interface SearchDropdownProps {
   suggestions: SearchSuggestionsResult | null;
@@ -70,7 +70,7 @@ export function SearchDropdown({
                         }}
                         asChild
                       >
-                        <Link
+                        <NextLink
                           href={taxonomy.url}
                           className='flex items-center gap-3 cursor-pointer'
                         >
@@ -83,7 +83,7 @@ export function SearchDropdown({
                               {taxonomy.category}
                             </p>
                           </div>
-                        </Link>
+                        </NextLink>
                       </CommandItem>
                     ))}
                   </CommandGroup>
@@ -102,7 +102,7 @@ export function SearchDropdown({
                         }}
                         asChild
                       >
-                        <Link
+                        <NextLink
                           href={service.url}
                           className='flex items-center gap-3 cursor-pointer'
                         >
@@ -115,7 +115,7 @@ export function SearchDropdown({
                               {service.category}
                             </p>
                           </div>
-                        </Link>
+                        </NextLink>
                       </CommandItem>
                     ))}
                   </CommandGroup>

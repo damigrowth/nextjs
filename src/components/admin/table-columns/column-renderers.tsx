@@ -1,5 +1,5 @@
-import { NextLink as Link } from '@/components/shared';
 import type { ColumnDef } from '@/components/admin/admin-data-table';
+import { NextLink } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ImageIcon, Edit, FileImage, Star } from 'lucide-react';
@@ -53,12 +53,12 @@ export const columnRenderers = {
       render: (row) => {
         const label = row[labelKey] as string;
         return (
-          <Link
+          <NextLink
             href={`${editBasePath}/${row.id}`}
             className='font-medium hover:text-primary hover:underline transition-colors'
           >
             {label}
-          </Link>
+          </NextLink>
         );
       },
     };
@@ -125,9 +125,9 @@ export const columnRenderers = {
       className: 'w-[100px]',
       render: (row) => (
         <Button size='icon' variant='ghost' asChild>
-          <Link href={`${editBasePath}/${row.id}`}>
+          <NextLink href={`${editBasePath}/${row.id}`}>
             <Edit className='h-4 w-4' />
-          </Link>
+          </NextLink>
         </Button>
       ),
     };
@@ -148,10 +148,10 @@ export const columnRenderers = {
       className: 'w-[120px]',
       render: (row) => (
         <Button variant='ghost' size={size} asChild>
-          <Link href={`${editBasePath}/${row.id}`}>
+          <NextLink href={`${editBasePath}/${row.id}`}>
             <Edit className='h-4 w-4' />
             Edit
-          </Link>
+          </NextLink>
         </Button>
       ),
     };

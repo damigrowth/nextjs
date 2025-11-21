@@ -1,8 +1,7 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import ServiceTable from '@/components/dashboard/services/service-table';
 import ServiceTableFilters from '@/components/dashboard/services/service-table-filters';
 import ServicePagination from '@/components/dashboard/services/service-pagination';
@@ -18,6 +17,7 @@ import type {
   SortOrder,
 } from '@/lib/types/services';
 import { getDashboardMetadata } from '@/lib/seo/pages';
+import { NextLink } from '@/components';
 
 export const metadata = getDashboardMetadata('Διαχείριση Υπηρεσιών');
 
@@ -65,10 +65,10 @@ export default async function ServicesPage({
             </h1>
           </div>
           <Button asChild>
-            <Link href='/dashboard/services/create'>
+            <NextLink href='/dashboard/services/create'>
               <Plus className='w-4 h-4 mr-2' />
               Νέα Υπηρεσία
-            </Link>
+            </NextLink>
           </Button>
         </div>
 
@@ -116,10 +116,10 @@ export default async function ServicesPage({
           )}
         </div>
         <Button asChild>
-          <Link href='/dashboard/services/create'>
+          <NextLink href='/dashboard/services/create'>
             <Plus className='w-4 h-4 mr-2' />
             Νέα Υπηρεσία
-          </Link>
+          </NextLink>
         </Button>
       </div>
 

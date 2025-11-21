@@ -1,5 +1,4 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ProfileCardProps } from '@/lib/types';
@@ -7,6 +6,7 @@ import ProfileBadges from './profile-badges';
 import RatingDisplay from './rating-display';
 import SaveButton from './save-button';
 import UserAvatar from './user-avatar';
+import NextLink from './next-link';
 
 export default function ProfileCard({
   profile,
@@ -48,14 +48,14 @@ export default function ProfileCard({
 
         {/* Name and Verification */}
         <div className='flex items-center justify-center gap-2 mb-1'>
-          <Link
+          <NextLink
             href={`/profile/${username}`}
             className='hover:text-third transition-colors'
           >
             <h5 className='font-bold text-lg text-dark hover:text-third transition-colors mb-0'>
               {displayName}
             </h5>
-          </Link>
+          </NextLink>
           <ProfileBadges verified={verified} topLevel={top} />
         </div>
 
@@ -82,7 +82,7 @@ export default function ProfileCard({
 
         {/* View Profile Button */}
         <Button asChild variant='fifth' className='mt-4'>
-          <Link href={`/profile/${username}`}>Περισσότερα</Link>
+          <NextLink href={`/profile/${username}`}>Περισσότερα</NextLink>
         </Button>
       </div>
     </div>

@@ -39,7 +39,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { UserAvatar } from '@/components/shared';
+import { NextLink, UserAvatar } from '@/components/shared';
 import { toast } from 'sonner';
 import {
   Search,
@@ -49,7 +49,6 @@ import {
   AlertCircle,
   FileCheck,
 } from 'lucide-react';
-import { NextLink as Link } from '@/components/shared';
 import { AdminVerificationsDataTable } from './admin-verifications-data-table';
 import {
   approveVerificationFormSchema,
@@ -541,7 +540,7 @@ export function VerificationManagement() {
                 <Label className='text-muted-foreground mb-2 block'>
                   Related Profile
                 </Label>
-                <Link
+                <NextLink
                   href={`/admin/profiles?id=${selectedVerification.pid}`}
                   className='hover:underline'
                 >
@@ -566,7 +565,7 @@ export function VerificationManagement() {
                       {selectedVerification.profile.type}
                     </Badge>
                   </div>
-                </Link>
+                </NextLink>
               </div>
 
               <Separator />

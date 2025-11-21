@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { usePathname } from 'next/navigation';
 import { PlusIcon, ChevronRight, type LucideIcon } from 'lucide-react';
 
@@ -21,6 +20,7 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { QuickCreateDialog } from './quick-create-dialog';
+import { NextLink } from '../shared';
 
 type NavItem = {
   title: string;
@@ -126,9 +126,9 @@ export function NavMain({ items }: { items: NavItem[] }) {
                                               asChild
                                               isActive={isNestedActive}
                                             >
-                                              <Link href={nestedItem.url}>
+                                              <NextLink href={nestedItem.url}>
                                                 <span>{nestedItem.title}</span>
-                                              </Link>
+                                              </NextLink>
                                             </SidebarMenuSubButton>
                                           </SidebarMenuSubItem>
                                         );
@@ -146,9 +146,9 @@ export function NavMain({ items }: { items: NavItem[] }) {
                                 asChild
                                 isActive={isSubActive}
                               >
-                                <Link href={subItem.url}>
+                                <NextLink href={subItem.url}>
                                   <span>{subItem.title}</span>
-                                </Link>
+                                </NextLink>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           );
@@ -174,10 +174,10 @@ export function NavMain({ items }: { items: NavItem[] }) {
                       <span>{item.title}</span>
                     </>
                   ) : (
-                    <Link href={item.url}>
+                    <NextLink href={item.url}>
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
-                    </Link>
+                    </NextLink>
                   )}
                 </SidebarMenuButton>
               </SidebarMenuItem>

@@ -1,4 +1,3 @@
-import { NextLink as Link } from '@/components/shared';
 import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { SiteHeader, EditProTaxonomyForm } from '@/components/admin';
@@ -6,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 import { findById, getItemPath } from '@/lib/utils/datasets';
+import { NextLink } from '@/components';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,10 +33,10 @@ export default async function EditProSubcategoryPage({ params }: PageProps) {
         title={`Edit Subcategory: ${taxonomy.label || ''}`}
         actions={
           <Button variant='ghost' size='sm' asChild>
-            <Link href='/admin/taxonomies/pro/subcategories'>
+            <NextLink href='/admin/taxonomies/pro/subcategories'>
               <ArrowLeft className='h-4 w-4' />
               Back to Subcategories
-            </Link>
+            </NextLink>
           </Button>
         }
       />

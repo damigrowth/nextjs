@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 import { SiteHeader } from '@/components/admin';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, GitBranch } from 'lucide-react';
-import { NextLink as Link } from '@/components/shared';
+import { ArrowLeft } from 'lucide-react';
 import { DeploymentManager } from '@/components/admin/deployment/deployment-manager';
 import { DeploymentSkeleton } from '@/components/admin/deployment/deployment-skeleton';
+import { NextLink } from '@/components';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,10 +15,10 @@ export default async function TaxonomyDeployPage() {
         title='Deploy Taxonomy Changes'
         actions={
           <Button variant='ghost' size='sm' asChild>
-            <Link href='/admin/taxonomies/service'>
+            <NextLink href='/admin/taxonomies/service'>
               <ArrowLeft className='h-4 w-4' />
               Back to Taxonomies
-            </Link>
+            </NextLink>
           </Button>
         }
       />

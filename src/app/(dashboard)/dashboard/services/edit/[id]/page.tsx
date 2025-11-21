@@ -1,15 +1,14 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { notFound, redirect } from 'next/navigation';
 import { getCurrentUser } from '@/actions/auth/server';
 import { getServiceForEdit } from '@/actions/services/get-service';
 import { FormServiceEdit } from '@/components/forms/service';
 import FormServiceEditMedia from '@/components/forms/service/form-service-edit-media';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { StatusLabels, StatusColors } from '@/lib/types/common';
 import { getDashboardMetadata } from '@/lib/seo/pages';
+import { NextLink } from '@/components';
 
 export const metadata = getDashboardMetadata('Επεξεργασία Υπηρεσίας');
 
@@ -70,7 +69,7 @@ export default async function EditServicePage({
           </p>
         </div>
         <Button variant='default' asChild>
-          <Link href='/dashboard/services'>Διαχείριση Υπηρεσιών</Link>
+          <NextLink href='/dashboard/services'>Διαχείριση Υπηρεσιών</NextLink>
         </Button>
       </div>
 

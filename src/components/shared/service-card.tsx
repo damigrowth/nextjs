@@ -1,5 +1,4 @@
 import React from 'react';
-import { NextLink as Link } from '@/components/shared';
 import { Card, CardContent } from '@/components/ui/card';
 
 import MediaDisplay from '@/components/ui/media-display';
@@ -7,6 +6,7 @@ import RatingDisplay from './rating-display';
 import SaveButton from './save-button';
 import UserAvatar from './user-avatar';
 import { ServiceCardData } from '@/lib/types';
+import NextLink from './next-link';
 
 interface ServiceCardProps {
   service: ServiceCardData;
@@ -43,7 +43,7 @@ export default function ServiceCard({
       </div>
 
       {/* Main card content - Link to service */}
-      <Link href={`/s/${service.slug}`} className='block'>
+      <NextLink href={`/s/${service.slug}`} className='block'>
         {/* Media Section */}
         <div className='relative aspect-video bg-gray-100'>
           <MediaDisplay
@@ -85,7 +85,7 @@ export default function ServiceCard({
             reviewCount={service.reviewCount}
           />
         </CardContent>
-      </Link>
+      </NextLink>
 
       {/* Footer section - Outside main link */}
       {(showProfile || hasValidPrice) && (
@@ -105,14 +105,14 @@ export default function ServiceCard({
                     href={`/profile/${service.profile.username}`}
                   />
                   {!hideDisplayName && (
-                    <Link
+                    <NextLink
                       href={`/profile/${service.profile.username}`}
                       className='group/profile'
                     >
                       <span className='text-sm text-body group-hover/profile:text-third transition-colors'>
                         {service.profile.displayName}
                       </span>
-                    </Link>
+                    </NextLink>
                   )}
                 </div>
               )}

@@ -7,7 +7,7 @@ import {
 } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Plus } from 'lucide-react';
-import { NextLink as Link } from '@/components/shared';
+import { NextLink } from '@/components';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,10 +43,10 @@ export default async function ServicesPage({
               Refresh
             </Button>
             <Button variant='default' size='md' asChild>
-              <Link href='/admin/services/create'>
+              <NextLink href='/admin/services/create'>
                 <Plus className='h-4 w-4' />
                 Create Service
-              </Link>
+              </NextLink>
             </Button>
           </>
         }

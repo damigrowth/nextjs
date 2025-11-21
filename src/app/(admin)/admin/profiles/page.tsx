@@ -7,7 +7,7 @@ import {
 } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, UserPlus } from 'lucide-react';
-import { NextLink as Link } from '@/components/shared';
+import { NextLink } from '@/components/shared';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,10 +44,10 @@ export default async function ProfilesPage({
               Refresh
             </Button>
             <Button variant='default' size='md' asChild>
-              <Link href='/admin/profiles/create'>
+              <NextLink href='/admin/profiles/create'>
                 <UserPlus className='h-4 w-4' />
                 Create Profile
-              </Link>
+              </NextLink>
             </Button>
           </>
         }

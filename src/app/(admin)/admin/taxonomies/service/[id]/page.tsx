@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation';
-import { NextLink as Link } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +8,7 @@ import { EditTaxonomyItemForm } from '@/components/admin/forms';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { DatasetItem } from '@/lib/types/datasets';
 import { findById, getItemPath } from '@/lib/utils/datasets';
+import { NextLink } from '@/components';
 
 export const dynamic = 'force-dynamic';
 
@@ -95,10 +95,10 @@ export default async function AdminServiceTaxonomyEditPage({
         title={`${taxonomy.label} (${taxonomy.level})`}
         actions={
           <Button variant='ghost' size='sm' asChild>
-            <Link href='/admin/taxonomies/service'>
+            <NextLink href='/admin/taxonomies/service'>
               <ArrowLeft className='h-4 w-4' />
               Back to List
-            </Link>
+            </NextLink>
           </Button>
         }
       />

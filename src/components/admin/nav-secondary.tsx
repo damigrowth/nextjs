@@ -1,8 +1,7 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import Link from "next/link"
-import { LucideIcon } from "lucide-react"
+import * as React from 'react';
+import { LucideIcon } from 'lucide-react';
 
 import {
   SidebarGroup,
@@ -10,18 +9,19 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar';
+import { NextLink } from '../shared';
 
 export function NavSecondary({
   items,
   ...props
 }: {
   items: {
-    title: string
-    url: string
-    icon: LucideIcon
-    disabled?: boolean
-  }[]
+    title: string;
+    url: string;
+    icon: LucideIcon;
+    disabled?: boolean;
+  }[];
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   return (
     <SidebarGroup {...props}>
@@ -29,17 +29,20 @@ export function NavSecondary({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild={!item.disabled} disabled={item.disabled}>
+              <SidebarMenuButton
+                asChild={!item.disabled}
+                disabled={item.disabled}
+              >
                 {item.disabled ? (
                   <>
                     <item.icon />
                     <span>{item.title}</span>
                   </>
                 ) : (
-                  <Link href={item.url}>
+                  <NextLink href={item.url}>
                     <item.icon />
                     <span>{item.title}</span>
-                  </Link>
+                  </NextLink>
                 )}
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -47,5 +50,5 @@ export function NavSecondary({
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  )
+  );
 }

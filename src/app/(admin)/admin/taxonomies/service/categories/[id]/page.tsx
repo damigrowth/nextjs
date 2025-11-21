@@ -1,6 +1,4 @@
 import { notFound } from 'next/navigation';
-import { NextLink as Link } from '@/components/shared';
-import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SiteHeader } from '@/components/admin';
@@ -8,6 +6,8 @@ import { EditTaxonomyItemForm } from '@/components/admin/forms';
 import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 import { findById } from '@/lib/utils/datasets';
 import { DatasetItem } from '@/lib/types/datasets';
+import { NextLink } from '@/components';
+import { Button } from '@/components/ui/button';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,10 +32,10 @@ export default async function EditCategoryPage({ params }: PageProps) {
         title={`Edit Category: ${taxonomy.label || ''}`}
         actions={
           <Button variant='ghost' size='sm' asChild>
-            <Link href='/admin/taxonomies/service/categories'>
+            <NextLink href='/admin/taxonomies/service/categories'>
               <ArrowLeft className='h-4 w-4' />
               Back to Categories
-            </Link>
+            </NextLink>
           </Button>
         }
       />
