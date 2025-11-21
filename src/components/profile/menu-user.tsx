@@ -114,11 +114,8 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
       let completionPath = '/onboarding';
 
       if (needsOAuth) {
-        // For OAuth setup, direct to oauth-setup page with appropriate type parameter
-        completionPath =
-          isProfessionalType || user?.type === 'pro'
-            ? '/oauth-setup?type=pro'
-            : '/oauth-setup';
+        // OAuth users go to oauth-setup page (they'll choose their type there)
+        completionPath = '/oauth-setup';
       }
 
       modifiedNav = [
