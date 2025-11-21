@@ -7,6 +7,7 @@ import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-stagin
 import { findById } from '@/lib/utils/datasets';
 import { DatasetItem } from '@/lib/types/datasets';
 import { NextLink } from '@/components';
+import { Button } from '@/components/ui/button';
 
 export const dynamic = 'force-dynamic';
 
