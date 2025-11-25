@@ -6,6 +6,9 @@
  */
 export type EmailUser = {
   email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  username?: string | null;
 };
 
 /**
@@ -33,8 +36,8 @@ export interface EmailTemplate {
   from: string;
   replyTo?: string | null;
   subject: string | ((data: any) => string);
-  html: string | ((data: any) => string);
-  text?: string | ((data: any) => string);
+  html: string | ((data: any, ...args: any[]) => string);
+  text?: string | ((data: any, ...args: any[]) => string);
 }
 
 // Contact form data types
@@ -52,4 +55,10 @@ export type EmailTemplateKey =
   | 'WELCOME'
   | 'PASSWORD_RESET'
   | 'CONTACT_ADMIN'
-  | 'CONTACT_CONFIRMATION';
+  | 'CONTACT_CONFIRMATION'
+  | 'SERVICE_CREATED'
+  | 'SERVICE_PUBLISHED'
+  | 'NEW_VERIFICATION'
+  | 'SERVICE_REPORT'
+  | 'PROFILE_REPORT'
+  | 'NEW_PROFILE';

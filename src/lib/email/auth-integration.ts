@@ -1,11 +1,13 @@
 /**
  * Email Integration for Better Auth
  *
- * Simplified functions for Better Auth integration.
+ * Simplified functions for Better Auth integration using Brevo workflows.
  * These can be called from auth configuration or client-side code.
  */
 
-import { sendAuthEmail } from './service';
+import { sendWorkflowEmail } from './workflow-config';
+import { BrevoWorkflow } from './providers/brevo/types';
+import { EMAIL_TEMPLATES, VerificationData, PasswordResetData, WelcomeData } from '@/constants/email/templates';
 import { EmailUser } from '@/lib/types/email';
 
 /**
@@ -13,15 +15,41 @@ import { EmailUser } from '@/lib/types/email';
  */
 export async function sendVerificationEmail(
   userEmail: string,
-  userName?: string,
+  displayName?: string,
+  username?: string,
   verificationUrl?: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const user: EmailUser = {
+    const data: VerificationData = {
       email: userEmail,
+      displayName,
+      username,
+      url: verificationUrl || '',
     };
 
-    await sendAuthEmail('VERIFICATION', user, verificationUrl);
+    // Render the verification template
+    const template = EMAIL_TEMPLATES.VERIFICATION;
+    const subject = typeof template.subject === 'function'
+      ? template.subject(data)
+      : template.subject;
+    const message = typeof template.html === 'function'
+      ? template.html(data)
+      : template.html;
+
+    // Send via Brevo workflow (using USER_REGISTRATION workflow for now)
+    // TODO: Create VERIFICATION workflow in Brevo if needed
+    await sendWorkflowEmail(
+      BrevoWorkflow.USER_REGISTRATION,
+      userEmail,
+      subject,
+      message,
+      {
+        attributes: {
+          USER_NAME: displayName || username || '',
+          VERIFICATION_URL: verificationUrl || '',
+        }
+      }
+    );
 
     return { success: true };
   } catch (error) {
@@ -41,14 +69,38 @@ export async function sendVerificationEmail(
  */
 export async function sendWelcomeEmail(
   userEmail: string,
-  userName?: string,
+  displayName?: string,
+  username?: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const user: EmailUser = {
+    const data = {
       email: userEmail,
+      displayName,
+      username,
+      dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || process.env.BETTER_AUTH_URL || 'https://doulitsa.gr'}/dashboard`,
     };
 
-    await sendAuthEmail('WELCOME', user);
+    // Render the welcome template
+    const template = EMAIL_TEMPLATES.WELCOME;
+    const subject = typeof template.subject === 'function'
+      ? template.subject(data)
+      : template.subject;
+    const message = typeof template.html === 'function'
+      ? template.html(data)
+      : template.html;
+
+    // Send via Brevo workflow
+    await sendWorkflowEmail(
+      BrevoWorkflow.USER_REGISTRATION,
+      userEmail,
+      subject,
+      message,
+      {
+        attributes: {
+          USER_NAME: displayName || username || '',
+        }
+      }
+    );
 
     return { success: true };
   } catch (error) {
@@ -66,15 +118,41 @@ export async function sendWelcomeEmail(
  */
 export async function sendPasswordResetEmail(
   userEmail: string,
-  userName?: string,
+  displayName?: string,
+  username?: string,
   resetUrl?: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const user: EmailUser = {
+    const data: PasswordResetData = {
       email: userEmail,
+      displayName,
+      username,
+      url: resetUrl || '',
     };
 
-    await sendAuthEmail('PASSWORD_RESET', user, resetUrl);
+    // Render the password reset template
+    const template = EMAIL_TEMPLATES.PASSWORD_RESET;
+    const subject = typeof template.subject === 'function'
+      ? template.subject(data)
+      : template.subject;
+    const message = typeof template.html === 'function'
+      ? template.html(data)
+      : template.html;
+
+    // Send via Brevo workflow
+    // TODO: Create PASSWORD_RESET workflow in Brevo if needed
+    await sendWorkflowEmail(
+      BrevoWorkflow.USER_REGISTRATION,
+      userEmail,
+      subject,
+      message,
+      {
+        attributes: {
+          USER_NAME: displayName || username || '',
+          RESET_URL: resetUrl || '',
+        }
+      }
+    );
 
     return { success: true };
   } catch (error) {
@@ -98,15 +176,44 @@ export async function sendPasswordResetEmail(
 export async function sendAuthEmailGeneric(
   templateType: string,
   userEmail: string,
-  userName?: string,
+  displayName?: string,
+  username?: string,
   actionUrl?: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const user: EmailUser = {
+    const data = {
       email: userEmail,
+      displayName,
+      username,
+      url: actionUrl || '',
     };
 
-    await sendAuthEmail(templateType, user, actionUrl);
+    // Try to get template
+    const template = EMAIL_TEMPLATES[templateType];
+    if (!template) {
+      throw new Error(`Template type "${templateType}" not found`);
+    }
+
+    const subject = typeof template.subject === 'function'
+      ? template.subject(data)
+      : template.subject;
+    const message = typeof template.html === 'function'
+      ? template.html(data)
+      : template.html;
+
+    // Send via Brevo workflow (using USER_REGISTRATION as generic)
+    await sendWorkflowEmail(
+      BrevoWorkflow.USER_REGISTRATION,
+      userEmail,
+      subject,
+      message,
+      {
+        attributes: {
+          USER_NAME: displayName || username || '',
+          ACTION_URL: actionUrl || '',
+        }
+      }
+    );
 
     return { success: true };
   } catch (error) {
