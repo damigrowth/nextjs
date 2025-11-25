@@ -1,10 +1,11 @@
-import { EmailTemplate } from '@/lib/types/email';
+export interface WelcomeData {
+  email: string;
+  displayName?: string;
+  username?: string;
+  dashboardUrl?: string;
+}
 
-export const WELCOME: EmailTemplate = {
-  from: 'Doulitsa <contact@doulitsa.gr>',
-  replyTo: 'contact@doulitsa.gr',
-  subject: 'Καλώς ήρθατε στη Doulitsa!',
-  html: (user: any) => `
+export const WELCOME_HTML = (data: WelcomeData): string => `
 <!DOCTYPE html>
 <html lang="el">
   <head>
@@ -22,15 +23,15 @@ export const WELCOME: EmailTemplate = {
                 <table role="presentation" style="width: 100%; border-collapse: collapse;">
                   <tr>
                     <td style="color: #153643; text-align: center;">
-                      <h1 style="font-size: 24px; margin: 0 0 30px 0; font-family: Arial, sans-serif; color: #5bbb7b;">Καλώς ήρθατε στη Doulitsa!</h1>
+                      <h1 style="font-size: 24px; margin: 0 0 30px 0; font-family: Arial, sans-serif; color: #1f4c40;">Καλώς ήρθατε στη Doulitsa!</h1>
                       <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;">
-                        Γεια σας ${user.displayName || user.name || 'φίλε'},
+                        Γεια σας ${data.displayName || data.username || 'φίλε'},
                       </p>
                       <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;">
                         Ο λογαριασμός σας έχει επιβεβαιωθεί επιτυχώς! Μπορείτε τώρα να εκμεταλλευτείτε όλες τις δυνατότητες της πλατφόρμας μας.
                       </p>
                       ${
-                        user.type > 1
+                        data.displayName
                           ? `
                       <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;">
                         Ως επαγγελματίας, μπορείτε να δημιουργήσετε το προφίλ σας και να προσελκύσετε νέους πελάτες.
@@ -42,7 +43,7 @@ export const WELCOME: EmailTemplate = {
                       </p>
                       `
                       }
-                      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://doulitsa.gr'}/dashboard" style="background: #5bbb7b; color: #ffffff; text-decoration: none; padding: 16px 30px; border-radius: 4px; display: inline-block; margin: 20px 0; font-weight: 700;">
+                      <a href="${data.dashboardUrl || 'https://doulitsa.gr/dashboard'}" style="background: #1f4c40; color: #ffffff; text-decoration: none; padding: 16px 30px; border-radius: 4px; display: inline-block; margin: 20px 0; font-weight: 700;">
                         Μετάβαση στο Dashboard
                       </a>
                       <p style="margin: 20px 0 0 0; font-size: 14px; line-height: 24px; font-family: Arial, sans-serif;">
@@ -73,5 +74,4 @@ export const WELCOME: EmailTemplate = {
       </tr>
     </table>
   </body>
-</html>`,
-};
+</html>`;

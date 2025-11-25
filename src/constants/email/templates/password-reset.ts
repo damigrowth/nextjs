@@ -1,10 +1,11 @@
-import { EmailTemplate } from '@/lib/types/email';
+export interface PasswordResetData {
+  email: string;
+  displayName?: string;
+  username?: string;
+  url: string;
+}
 
-export const PASSWORD_RESET: EmailTemplate = {
-  from: 'Doulitsa <contact@doulitsa.gr>',
-  replyTo: 'contact@doulitsa.gr',
-  subject: 'Επαναφορά Κωδικού - Doulitsa',
-  html: (user: any, url?: string) => `
+export const PASSWORD_RESET_HTML = (data: PasswordResetData): string => `
 <!DOCTYPE html>
 <html lang="el">
   <head>
@@ -24,18 +25,18 @@ export const PASSWORD_RESET: EmailTemplate = {
                     <td style="color: #153643; text-align: center;">
                       <h1 style="font-size: 24px; margin: 0 0 30px 0; font-family: Arial, sans-serif; color: #5bbb7b;">Επαναφορά Κωδικού</h1>
                       <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;">
-                        Γεια σου ${user.name || 'φίλε'},
+                        Γεια σου ${data.displayName || data.username || 'φίλε'},
                       </p>
                       <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;">
                         Λάβαμε αίτημα για επαναφορά του κωδικού σου. Κάνε κλικ στον παρακάτω σύνδεσμο για να δημιουργήσεις νέο κωδικό:
                       </p>
-                      <a href="${url}" style="background: #5bbb7b; color: #ffffff; text-decoration: none; padding: 16px 30px; border-radius: 4px; display: inline-block; margin: 20px 0; font-weight: 700;">
+                      <a href="${data.url}" style="background: #5bbb7b; color: #ffffff; text-decoration: none; padding: 16px 30px; border-radius: 4px; display: inline-block; margin: 20px 0; font-weight: 700;">
                         Επαναφορά Κωδικού
                       </a>
                       <p style="margin: 20px 0 0 0; font-size: 14px; line-height: 24px; font-family: Arial, sans-serif;">
                         Αν δεν μπορείς να κάνεις κλικ στο κουμπί, αντίγραψε και επικόλλησε αυτό το link στον browser σου:
                       </p>
-                      <p style="word-break: break-all; color: #6b7280; font-family: monospace; font-size: 12px; margin: 10px 0;">${url}</p>
+                      <p style="word-break: break-all; color: #6b7280; font-family: monospace; font-size: 12px; margin: 10px 0;">${data.url}</p>
                       <p style="color: #dc2626; margin: 20px 0 0 0; font-size: 14px;">
                         Αυτός ο σύνδεσμος θα λήξει σε 1 ώρα.
                       </p>
@@ -66,5 +67,4 @@ export const PASSWORD_RESET: EmailTemplate = {
       </tr>
     </table>
   </body>
-</html>`,
-};
+</html>`;
