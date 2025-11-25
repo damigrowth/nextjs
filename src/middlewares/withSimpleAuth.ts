@@ -1,13 +1,15 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { getSessionCookie } from 'better-auth/cookies';
 
 export const withSimpleAuth = (next: Function) => {
   return async (request: NextRequest, _next: Function) => {
     const currentPath = request.nextUrl.pathname;
 
     try {
-      // Official Better Auth approach: Only check cookie existence for lightweight routing
-      const sessionCookie = getSessionCookie(request);
+      // Check for Better Auth session cookie directly without importing better-auth
+      // This avoids Edge Runtime compatibility issues
+      const cookieStore = request.cookies;
+      const sessionCookie = cookieStore.get('better-auth.session_token') ||
+                           cookieStore.get('__Secure-better-auth.session_token');
       // console.log('Session cookie exists:', !!sessionCookie);
 
       // Route type detection
