@@ -4,6 +4,8 @@ import { revalidateTag, revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { ActionResponse } from '@/lib/types/api';
 import { CACHE_TAGS, getServiceTags } from '@/lib/cache';
+import { sendServiceCreatedEmail } from '@/lib/email/services';
+import { brevoWorkflowService } from '@/lib/email';
 
 // Service creation specific response type
 interface ServiceActionResponse extends ActionResponse {
@@ -233,7 +235,7 @@ async function createServiceInternal(
             status: status,
             featured: false,
           },
-          select: { id: true, title: true },
+          select: { id: true, title: true, description: true },
         });
 
         // Step 2: Generate slug with the auto-generated ID and update service
@@ -291,7 +293,7 @@ async function createServiceInternal(
             status: status,
             featured: false,
           },
-          select: { id: true, title: true },
+          select: { id: true, title: true, description: true },
         });
 
         // Step 2: Generate slug with the auto-generated ID and update service
@@ -306,6 +308,40 @@ async function createServiceInternal(
 
       // Store the created service for returning in response
       // Now we have access to createdService outside the transaction
+
+      // Send email notification to admin for new services (non-draft only)
+      await sendServiceCreatedEmail(
+        { ...createdService, description: data.description || '' },
+        { ...user, email: user.email || '' }, // Ensure email is not undefined
+        typeof profile.id === 'string' ? parseInt(profile.id) : profile.id,
+        data.category
+      );
+
+      // Check if this is the user's first service and move to pros list
+      // Only for non-draft services (status === 'pending' or 'published')
+      const serviceCount = await prisma.service.count({
+        where: {
+          pid: profile.id,
+          status: { not: 'draft' }, // Count only non-draft services
+        },
+      });
+
+      if (serviceCount === 1 && user.email) {
+        // This is the first service - move to pros list
+        brevoWorkflowService
+          .handleFirstServiceCreated(user.email, {
+            DISPLAY_NAME: user.displayName || undefined,
+            USERNAME: user.username || undefined,
+            USER_TYPE: user.type as 'user' | 'pro', // Type assertion for literal type
+            USER_ROLE: user.role as 'user' | 'freelancer' | 'company' | 'admin', // Type assertion for literal type
+            IS_PRO: user.type === 'pro',
+            SERVICES_COUNT: 1,
+          })
+          .catch((error) => {
+            console.error('Failed to move user to pros list:', error);
+            // Don't throw - this shouldn't block service creation
+          });
+      }
     }
 
     // 10. Media handling - now properly sanitizes pending resources before database storage

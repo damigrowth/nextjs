@@ -9,7 +9,7 @@ import {
 } from '@/lib/validations/contact';
 import { getFormString } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { sendTemplateEmail } from '@/lib/email/service';
+import { sendContactFormEmails } from '@/lib/email/services';
 import { ContactEmailData } from '@/lib/types/email';
 
 /**
@@ -80,9 +80,7 @@ export async function submitContactForm(
       },
     });
 
-    // 5. Send email notifications using templates
-    const adminEmail = process.env.ADMIN_EMAIL || 'contact@doulitsa.gr';
-
+    // 5. Send email notifications using Brevo workflows
     try {
       const emailData: ContactEmailData = {
         name: data.name,
@@ -92,14 +90,8 @@ export async function submitContactForm(
         contactId: contact.id,
       };
 
-      // Send admin notification email
-      await sendTemplateEmail('CONTACT_ADMIN', adminEmail, emailData, {
-        from: `${data.name} <${data.email}>`,
-        replyTo: data.email,
-      });
-
-      // Send confirmation email to user
-      await sendTemplateEmail('CONTACT_CONFIRMATION', data.email, emailData);
+      // Send both admin and confirmation emails via Brevo
+      await sendContactFormEmails(emailData);
 
       // console.log(`Contact form emails sent successfully for contact ID: ${contact.id}`);
     } catch (emailError) {

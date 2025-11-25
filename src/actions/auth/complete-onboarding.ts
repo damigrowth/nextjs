@@ -16,6 +16,7 @@ import {
   processImageForDatabase,
   sanitizeCloudinaryResources,
 } from '@/lib/utils/cloudinary';
+import { brevoWorkflowService, sendNewProfileEmail } from '@/lib/email';
 
 /**
  * Complete onboarding action wrapper for useActionState
@@ -93,10 +94,13 @@ export async function completeOnboarding(
     const sanitizedPortfolio = sanitizeCloudinaryResources(data.portfolio);
 
     // Create or update profile with onboarding data
-    await prisma.profile.upsert({
+    const profile = await prisma.profile.upsert({
       where: { uid: user.id },
       update: {
-        type: user.role === 'freelancer' || user.role === 'company' ? user.role : 'freelancer', // Sync user.role to profile.type
+        type:
+          user.role === 'freelancer' || user.role === 'company'
+            ? user.role
+            : 'freelancer', // Sync user.role to profile.type
         bio: data.bio,
         category: data.category,
         subcategory: data.subcategory,
@@ -111,7 +115,10 @@ export async function completeOnboarding(
         email: user.email,
       },
       create: {
-        type: user.role === 'freelancer' || user.role === 'company' ? user.role : 'freelancer', // Sync user.role to profile.type
+        type:
+          user.role === 'freelancer' || user.role === 'company'
+            ? user.role
+            : 'freelancer', // Sync user.role to profile.type
         bio: data.bio,
         category: data.category,
         subcategory: data.subcategory,
@@ -154,8 +161,40 @@ export async function completeOnboarding(
       });
     }
 
+    // Send email notification to admin (non-blocking, only for pro users)
+    if (user.type === 'pro') {
+      sendNewProfileEmail(
+        {
+          id: Number(profile.id),
+          name: user.displayName || user.username || 'Unknown',
+          username: user.username || '',
+        },
+        {
+          email: user.email || '',
+          type: user.type,
+        },
+      ).catch((error) => {
+        console.error('Failed to send new profile email:', error);
+      });
+    }
+
     // Revalidate dashboard path to ensure fresh data
     revalidatePath('/dashboard');
+
+    // Move user to noservices list after onboarding completion
+    // This runs asynchronously and doesn't block onboarding
+    brevoWorkflowService
+      .handleOnboardingComplete(user.email, {
+        DISPLAY_NAME: user.displayName || undefined,
+        USERNAME: user.username || undefined,
+        USER_TYPE: user.type as 'user' | 'pro', // Type assertion for literal type
+        USER_ROLE: user.role as 'user' | 'freelancer' | 'company' | 'admin', // Type assertion for literal type
+        IS_PRO: user.type === 'pro',
+      })
+      .catch((error) => {
+        console.error('Failed to move user to noservices list:', error);
+        // Don't throw - this shouldn't block onboarding
+      });
 
     return {
       success: true,
