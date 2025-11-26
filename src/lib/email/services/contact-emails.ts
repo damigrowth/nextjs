@@ -45,7 +45,6 @@ export async function sendContactAdminEmail(
       }
     );
 
-    console.log(`[Email] Contact form admin notification sent for: ${data.name} (${data.email})`);
   } catch (error) {
     console.error('[Email] Failed to send contact admin notification:', error);
     throw error; // Re-throw for contact action to handle
@@ -85,7 +84,6 @@ export async function sendContactConfirmationEmail(
       }
     );
 
-    console.log(`[Email] Contact form confirmation sent to: ${data.email}`);
   } catch (error) {
     console.error('[Email] Failed to send contact confirmation:', error);
     // Don't re-throw for confirmation email - it's not critical

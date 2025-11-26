@@ -63,7 +63,6 @@ export async function sendNewVerificationEmail(
       }
     );
 
-    console.log(`[Email] New verification request notification sent for user: ${displayName}`);
   } catch (error) {
     console.error('[Email] Failed to send new verification notification:', error);
   }
@@ -129,7 +128,6 @@ export async function sendServiceReportEmail(
       }
     );
 
-    console.log(`[Email] Service report notification sent for: ${service.title} (ID: ${service.id})`);
   } catch (error) {
     console.error('[Email] Failed to send service report notification:', error);
   }
@@ -193,7 +191,6 @@ export async function sendProfileReportEmail(
       }
     );
 
-    console.log(`[Email] Profile report notification sent for: ${profile.name} (ID: ${profile.id})`);
   } catch (error) {
     console.error('[Email] Failed to send profile report notification:', error);
   }
@@ -255,7 +252,6 @@ export async function sendNewProfileEmail(
       }
     );
 
-    console.log(`[Email] New profile notification sent for: ${profile.name} (ID: ${profile.id})`);
   } catch (error) {
     console.error('[Email] Failed to send new profile notification:', error);
   }

@@ -430,7 +430,6 @@ export async function updateService(params: AdminUpdateServiceInput) {
             { ...serviceWithUser.profile.user, email: serviceWithUser.profile.user.email || '' }
           );
 
-          console.log(`[Email] Service published notification sent to ${serviceWithUser.profile.user.email} for: ${serviceWithUser.title} (ID: ${serviceWithUser.id})`);
         } catch (emailError) {
           console.error('[Email] Failed to send service published notification:', emailError);
           // Don't block the status update if email fails
@@ -936,7 +935,6 @@ export async function togglePublished(params: AdminToggleServiceInput) {
           { ...updatedService.profile.user, email: updatedService.profile.user.email || '' }
         );
 
-        console.log(`[Email] Service published notification sent to ${updatedService.profile.user.email} for: ${updatedService.title} (ID: ${updatedService.id})`);
       } catch (emailError) {
         console.error('[Email] Failed to send service published notification:', emailError);
         // Don't block the status update if email fails
@@ -1104,7 +1102,6 @@ export async function updateServiceStatus(
           { ...updatedService.profile.user, email: updatedService.profile.user.email || '' }
         );
 
-        console.log(`[Email] Service published notification sent to ${updatedService.profile.user.email} for: ${updatedService.title} (ID: ${updatedService.id})`);
       } catch (emailError) {
         console.error('[Email] Failed to send service published notification:', emailError);
         // Don't block the status update if email fails

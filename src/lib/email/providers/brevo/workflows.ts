@@ -28,10 +28,6 @@ export class BrevoWorkflowService {
     try {
       // For Brevo workflows that use {{ params.subject }} and {{ params.message }}
       // we send the rendered HTML and subject as parameters
-      console.log(`Triggering workflow ${workflow} for ${email}`, {
-        subject: data?.subject?.substring(0, 50) + '...',
-        hasMessage: !!data?.message
-      });
 
       // For workflows with subject/message pattern, we send directly via Brevo API
       if (data?.subject && data?.message) {
@@ -210,8 +206,6 @@ export class BrevoWorkflowService {
       // Query database for users inactive for 30+ days
       // Trigger re-engagement workflows
 
-      console.log('Checking for inactive users...');
-
       // TODO: Implement inactive user detection and workflow trigger
     } catch (error) {
       console.error('Failed to check inactive users:', error);
@@ -288,15 +282,11 @@ export class BrevoWorkflowService {
   /**
    * Sync all users to Brevo contacts
    */
-  async syncAllUsers(users: Array<User & { profile?: Profile | null }>): Promise<void> {
+  async syncAllUsers(_users: Array<User & { profile?: Profile | null }>): Promise<void> {
     try {
-      console.log(`Syncing ${users.length} users to Brevo...`);
-
       // Contact sync removed - using workflows only
       // Previously synced all user attributes to Brevo contacts
       // This functionality is no longer needed since we're using workflows
-
-      console.log('User sync skipped - using workflows only');
     } catch (error) {
       console.error('Failed to sync users to Brevo:', error);
     }

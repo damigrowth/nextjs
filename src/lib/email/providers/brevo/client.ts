@@ -49,7 +49,6 @@ class BrevoClient {
     }
 
     this.isInitialized = true;
-    console.log('Brevo client initialized');
   }
 
   /**
@@ -189,11 +188,3 @@ class BrevoClient {
 
 // Export singleton instance
 export const brevoClient = BrevoClient.getInstance();
-
-// Try to initialize on module load, but don't fail if it errors
-// The client will try again when actually used
-try {
-  brevoClient.initialize();
-} catch (error) {
-  console.warn('Brevo client initialization deferred:', error);
-}

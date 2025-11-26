@@ -82,7 +82,6 @@ export async function sendServiceCreatedEmail(
       }
     );
 
-    console.log(`[Email] Service created notification sent for: ${service.title} (ID: ${service.id})`);
   } catch (error) {
     // Log error but don't throw - email failure shouldn't break the operation
     console.error('[Email] Failed to send service created notification:', error);
@@ -148,7 +147,6 @@ export async function sendServicePublishedEmail(
       }
     );
 
-    console.log(`[Email] Service published notification sent for: ${service.title} (ID: ${service.id})`);
   } catch (error) {
     console.error('[Email] Failed to send service published notification:', error);
   }
@@ -174,8 +172,7 @@ export async function sendServiceApprovedEmail(
     // TODO: Create SERVICE_APPROVED template
     // TODO: Add SERVICE_APPROVED to BrevoWorkflow enum
 
-    // For now, log the intent
-    console.log(`[Email] Service approved notification would be sent for: ${service.title}`);
+    // For now, log the intent (placeholder for future implementation)
 
     // When ready, implement similar to sendServiceCreatedEmail
     // await sendWorkflowEmail(
@@ -210,8 +207,7 @@ export async function sendServiceExpiringEmail(
     // TODO: Create SERVICE_EXPIRING template
     // TODO: Add SERVICE_EXPIRING to BrevoWorkflow enum
 
-    // For now, log the intent
-    console.log(`[Email] Service expiring notification would be sent for: ${service.title}`);
+    // For now, log the intent (placeholder for future implementation)
 
     // When ready, implement similar to sendServiceCreatedEmail
     // await sendWorkflowEmail(
@@ -246,8 +242,7 @@ export async function sendServiceReviewEmail(
   }
 ): Promise<void> {
   try {
-    // Similar implementation pattern
-    console.log(`[Email] New review notification would be sent for: ${service.title}`);
+    // Similar implementation pattern (placeholder for future implementation)
   } catch (error) {
     console.error('[Email] Failed to send service review notification:', error);
   }
@@ -282,6 +277,5 @@ export async function sendBulkServiceEmails(
     }
   }
 
-  console.log(`[Email] Bulk send completed: ${sent} sent, ${failed} failed`);
   return { sent, failed };
 }
