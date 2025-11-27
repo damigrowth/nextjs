@@ -81,3 +81,23 @@ export const SERVICE_CREATED_HTML = (data: ServiceCreatedData): string => `
     </table>
   </body>
 </html>`;
+
+export const SERVICE_CREATED_TEXT = (data: ServiceCreatedData): string => `
+ΝΕΑ ΥΠΗΡΕΣΙΑ - ${data.serviceTitle}
+
+ΠΕΡΙΓΡΑΦΗ:
+${data.serviceDescription}
+
+---
+
+👤 ΔΗΜΙΟΥΡΓΟΣ:
+${data.creatorName} (${data.creatorEmail})
+
+🔧 ΕΝΕΡΓΕΙΕΣ:
+Επεξεργασία υπηρεσίας: ${data.adminReviewUrl || `https://doulitsa.gr/admin/services/${data.serviceId}`}
+
+---
+Ημερομηνία: ${data.createdAt ? new Date(data.createdAt).toLocaleString('el-GR') : new Date().toLocaleString('el-GR')}
+
+© Doulitsa, 2025
+`;

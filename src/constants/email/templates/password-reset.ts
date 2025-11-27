@@ -68,3 +68,22 @@ export const PASSWORD_RESET_HTML = (data: PasswordResetData): string => `
     </table>
   </body>
 </html>`;
+
+export const PASSWORD_RESET_TEXT = (data: PasswordResetData): string => `
+ΕΠΑΝΑΦΟΡΑ ΚΩΔΙΚΟΥ
+
+Γεια σου ${data.displayName || data.username || 'φίλε'},
+
+Λάβαμε αίτημα για επαναφορά του κωδικού σου. Κάνε κλικ στον παρακάτω σύνδεσμο για να δημιουργήσεις νέο κωδικό:
+
+${data.url}
+
+⚠️ Αυτός ο σύνδεσμος θα λήξει σε 1 ώρα.
+
+---
+
+Αν δεν ζήτησες επαναφορά κωδικού, μπορείς να αγνοήσεις αυτό το email.
+
+---
+© Doulitsa, 2025
+`;

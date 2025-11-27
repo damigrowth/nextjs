@@ -72,3 +72,25 @@ export const SERVICE_PUBLISHED_HTML = (data: ServicePublishedData): string => `
     </table>
   </body>
 </html>`;
+
+export const SERVICE_PUBLISHED_TEXT = (data: ServicePublishedData): string => `
+🎉 ΣΥΓΧΑΡΗΤΗΡΙΑ ${data.userName.toUpperCase()}!
+
+Η υπηρεσία "${data.serviceTitle}" δημοσιεύτηκε με επιτυχία και είναι πλέον ορατή στην Doulitsa!
+
+Οι πελάτες μπορούν πλέον να την βρουν και να επικοινωνήσουν μαζί σου.
+
+Προβολή Υπηρεσίας:
+https://doulitsa.gr/s/${data.serviceSlug}
+
+Επεξεργασία Υπηρεσίας:
+https://doulitsa.gr/dashboard/services/edit/${data.serviceId}
+
+Καλή επιτυχία!
+
+Με εκτίμηση,
+Η ομάδα Doulitsa
+
+---
+© Doulitsa, 2025
+`;

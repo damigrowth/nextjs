@@ -140,3 +140,37 @@ export const SUPPORT_FEEDBACK_HTML = (data: SupportFeedbackData): string => {
 </body>
 </html>`;
 };
+
+export const SUPPORT_FEEDBACK_TEXT = (data: SupportFeedbackData): string => {
+  const formattedDate =
+    data.submitDate instanceof Date
+      ? data.submitDate.toLocaleString('el-GR')
+      : new Date(data.submitDate).toLocaleString('el-GR');
+
+  return `
+ΝΕΑ ΦΟΡΜΑ ΥΠΟΣΤΗΡΙΞΗΣ / ΑΝΑΦΟΡΑΣ
+
+ΕΙΔΟΣ ΖΗΤΗΜΑΤΟΣ:
+${data.issueTypeLabel}
+
+ΠΕΡΙΓΡΑΦΗ ΖΗΤΗΜΑΤΟΣ:
+${data.description}
+
+---
+
+ΥΠΟΒΟΛΗ ΑΝΑΦΟΡΑΣ ΑΠΟ:
+ID: ${data.reporterId}
+Όνομα: ${data.reporterName}
+Email: ${data.reporterEmail}
+Username: ${data.reporterUsername}
+Admin URL: ${data.reporterAdminUrl}
+
+---
+
+Η αναφορά υποβλήθηκε από: ${data.pageUrl}
+Ημερομηνία: ${formattedDate}
+
+---
+© ${new Date().getFullYear()} Doulitsa
+`;
+};

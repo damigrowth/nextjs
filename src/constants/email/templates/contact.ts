@@ -130,3 +130,31 @@ export const CONTACT_CONFIRMATION_HTML = (data: ContactEmailData): string => `<!
     </table>
 </body>
 </html>`;
+
+export const CONTACT_ADMIN_TEXT = (data: ContactEmailData): string => `
+ΝΕΑ ΦΟΡΜΑ ΕΠΙΚΟΙΝΩΝΙΑΣ!
+
+Όνομα: ${data.name}
+Email: ${data.email}
+Θέμα: ${data.subject || 'Φόρμα Επικοινωνίας'}
+
+Μήνυμα:
+${data.message}
+
+${data.contactId ? `ID Μηνύματος: ${data.contactId}` : ''}
+
+---
+© Doulitsa, 2025
+`;
+
+export const CONTACT_CONFIRMATION_TEXT = (data: ContactEmailData): string => `
+ΛΑΒΑΜΕ ΤΟ ΜΗΝΥΜΑ ΣΟΥ ${data.name.toUpperCase()}!
+
+Σε ευχαριστούμε που επικοινώνησες μαζί μας!
+
+Η ομάδα μας θα δει το αίτημά σου και θα σου απαντήσει το συντομότερο.
+Συνήθως απαντάμε μέσα σε 24-48 ώρες.
+
+---
+© Doulitsa, 2025
+`;

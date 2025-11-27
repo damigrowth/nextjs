@@ -75,3 +75,28 @@ export const WELCOME_HTML = (data: WelcomeData): string => `
     </table>
   </body>
 </html>`;
+
+export const WELCOME_TEXT = (data: WelcomeData): string => `
+ΚΑΛΩΣ ΗΡΘΑΤΕ ΣΤΗ DOULITSA!
+
+Γεια σας ${data.displayName || data.username || 'φίλε'},
+
+Ο λογαριασμός σας έχει επιβεβαιωθεί επιτυχώς! Μπορείτε τώρα να εκμεταλλευτείτε όλες τις δυνατότητες της πλατφόρμας μας.
+
+${
+  data.displayName
+    ? 'Ως επαγγελματίας, μπορείτε να δημιουργήσετε το προφίλ σας και να προσελκύσετε νέους πελάτες.'
+    : 'Μπορείτε τώρα να αναζητήσετε και να επικοινωνήσετε με επαγγελματίες στην περιοχή σας.'
+}
+
+Μετάβαση στο Dashboard:
+${data.dashboardUrl || 'https://doulitsa.gr/dashboard'}
+
+Αν έχετε οποιαδήποτε απορία, είμαστε στη διάθεσή σας!
+
+Με εκτίμηση,
+Η ομάδα Doulitsa
+
+---
+© Doulitsa, 2025
+`;
