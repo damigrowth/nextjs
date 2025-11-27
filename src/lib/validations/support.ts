@@ -10,9 +10,7 @@ import { z } from 'zod';
 // =============================================
 
 export const supportFormSchema = z.object({
-  issueType: z.enum(['problem', 'option', 'feature'], {
-    required_error: 'Επιλέξτε είδος ζητήματος',
-  }),
+  issueType: z.enum(['problem', 'option', 'feature']),
   description: z
     .string()
     .min(10, 'Η περιγραφή πρέπει να έχει τουλάχιστον 10 χαρακτήρες')
