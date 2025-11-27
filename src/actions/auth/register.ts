@@ -8,6 +8,7 @@ import { RegisterInput } from '@/lib/validations/auth';
 import { getFormString, getFormArray } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { brevoWorkflowService } from '@/lib/email';
 
 /**
  * Register action wrapper for useActionState
@@ -92,6 +93,26 @@ export async function register(
         message: 'Αποτυχία εγγραφής. Παρακαλώ δοκιμάστε ξανά.',
       };
     }
+
+    // Add user to Brevo list based on type
+    // This runs asynchronously and doesn't block registration
+    brevoWorkflowService
+      .handleUserRegistration(
+        result.user.email,
+        userType as 'user' | 'pro',
+        {
+          DISPLAY_NAME: data.displayName,
+          USERNAME: data.username,
+          USER_TYPE: userType as 'user' | 'pro', // Type assertion for literal type
+          USER_ROLE: userRole as 'user' | 'freelancer' | 'company' | 'admin', // Type assertion for literal type
+          REGISTRATION_DATE: new Date().toISOString(),
+          IS_PRO: userType === 'pro',
+        }
+      )
+      .catch((error) => {
+        console.error('Failed to add user to Brevo list:', error);
+        // Don't throw - this shouldn't block registration
+      });
   } catch (error: any) {
     // Use comprehensive Better Auth error handling
     return handleBetterAuthError(error);

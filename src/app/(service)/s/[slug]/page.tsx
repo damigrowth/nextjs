@@ -15,6 +15,7 @@ import {
   ServiceFAQ,
   ProfileTerms,
   ServiceRelated,
+  ReportServiceDialog,
 } from '@/components';
 
 // ISR configuration with shorter interval + tag-based revalidation
@@ -193,6 +194,13 @@ export default async function ServicePage({
 
               {/* Profile Terms */}
               <ProfileTerms terms={service.profile.terms} />
+
+              {/* Report Service Button */}
+              <ReportServiceDialog
+                serviceId={service.id}
+                serviceTitle={service.title}
+                serviceSlug={service.slug || ''}
+              />
             </div>
 
             {/* Sidebar */}

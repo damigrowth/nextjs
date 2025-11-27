@@ -3,7 +3,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { nextCookies } from 'better-auth/next-js';
 import { admin, apiKey } from 'better-auth/plugins';
 import { User } from '@prisma/client';
-import { sendAuthEmail } from '@/lib/email';
+import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from '@/lib/email';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma/client';
 import { cookies } from 'next/headers';
@@ -81,7 +81,12 @@ export const auth = betterAuth({
           );
           return;
         }
-        await sendAuthEmail('PASSWORD_RESET', user as User, url);
+        // Fetch full user data if needed
+        const userWithFields = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { displayName: true, username: true }
+        });
+        await sendPasswordResetEmail(user.email, userWithFields?.displayName, userWithFields?.username, url);
       } catch (error) {
         console.error('Failed to send password reset email:', error);
         // Don't throw error here to prevent reset from failing
@@ -98,7 +103,12 @@ export const auth = betterAuth({
           );
           return;
         }
-        await sendAuthEmail('VERIFICATION', user as User, url);
+        // Fetch full user data if needed
+        const userWithFields = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { displayName: true, username: true }
+        });
+        await sendVerificationEmail(user.email, userWithFields?.displayName, userWithFields?.username, url);
       } catch (error) {
         console.error('Failed to send verification email:', error);
         // Don't throw error here to prevent registration from failing
@@ -342,12 +352,7 @@ export const auth = betterAuth({
                   step: 'DASHBOARD',
                 },
               });
-
-              try {
-                await sendAuthEmail('WELCOME', userWithFields);
-              } catch (error) {
-                console.error('Failed to send welcome email:', error);
-              }
+              // Welcome email is now sent via Brevo automation when contact is added to list
             } else if (userWithFields.type === 'pro') {
               // Pro users: Register → Email Confirmation → Onboarding → Dashboard
               await prisma.user.update({

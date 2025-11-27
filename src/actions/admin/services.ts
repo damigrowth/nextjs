@@ -11,6 +11,7 @@ import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { tags } from '@/constants/datasets/tags';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 import { generateServiceSlug } from '@/lib/utils/text';
+import { sendServicePublishedEmail } from '@/lib/email/services';
 
 import {
   adminListServicesSchema,
@@ -397,6 +398,44 @@ export async function updateService(params: AdminUpdateServiceInput) {
       profileId: updatedService.profile.id,
       profileUsername: updatedService.profile.username,
     });
+
+    // Send email notification if service status was changed to published
+    if (updateData.status === 'published' && existingService.status !== 'published') {
+      // Fetch full service with user data for email
+      const serviceWithUser = await prisma.service.findUnique({
+        where: { id: serviceId },
+        include: {
+          profile: {
+            include: {
+              user: {
+                select: {
+                  email: true,
+                  displayName: true,
+                  username: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (serviceWithUser?.profile.user) {
+        try {
+          await sendServicePublishedEmail(
+            {
+              id: serviceWithUser.id,
+              title: serviceWithUser.title,
+              slug: serviceWithUser.slug || '',
+            },
+            { ...serviceWithUser.profile.user, email: serviceWithUser.profile.user.email || '' }
+          );
+
+        } catch (emailError) {
+          console.error('[Email] Failed to send service published notification:', emailError);
+          // Don't block the status update if email fails
+        }
+      }
+    }
 
     return {
       success: true,
@@ -861,6 +900,13 @@ export async function togglePublished(params: AdminToggleServiceInput) {
             uid: true,
             id: true,
             username: true,
+            user: {
+              select: {
+                email: true,
+                displayName: true,
+                username: true,
+              },
+            },
           },
         },
       },
@@ -876,6 +922,24 @@ export async function togglePublished(params: AdminToggleServiceInput) {
       profileId: updatedService.profile.id,
       profileUsername: updatedService.profile.username,
     });
+
+    // Send email notification if service was published
+    if (newStatus === 'published') {
+      try {
+        await sendServicePublishedEmail(
+          {
+            id: updatedService.id,
+            title: updatedService.title,
+            slug: updatedService.slug || '',
+          },
+          { ...updatedService.profile.user, email: updatedService.profile.user.email || '' }
+        );
+
+      } catch (emailError) {
+        console.error('[Email] Failed to send service published notification:', emailError);
+        // Don't block the status update if email fails
+      }
+    }
 
     return {
       success: true,
@@ -1003,6 +1067,13 @@ export async function updateServiceStatus(
             uid: true,
             id: true,
             username: true,
+            user: {
+              select: {
+                email: true,
+                displayName: true,
+                username: true,
+              },
+            },
           },
         },
       },
@@ -1018,6 +1089,24 @@ export async function updateServiceStatus(
       profileId: updatedService.profile.id,
       profileUsername: updatedService.profile.username,
     });
+
+    // Send email notification if service was published
+    if (status === 'published') {
+      try {
+        await sendServicePublishedEmail(
+          {
+            id: updatedService.id,
+            title: updatedService.title,
+            slug: updatedService.slug || '',
+          },
+          { ...updatedService.profile.user, email: updatedService.profile.user.email || '' }
+        );
+
+      } catch (emailError) {
+        console.error('[Email] Failed to send service published notification:', emailError);
+        // Don't block the status update if email fails
+      }
+    }
 
     return {
       success: true,

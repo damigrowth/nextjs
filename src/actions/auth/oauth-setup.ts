@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import { getFormString } from '@/lib/utils/form';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
 import { ActionResponse } from '@/lib/types/api';
+import { brevoWorkflowService } from '@/lib/email';
 
 export async function completeOAuth(
   prevState: ActionResponse | null,
@@ -55,6 +56,25 @@ export async function completeOAuth(
         data: { role: role },
       });
     }
+
+    // Add user to Brevo list based on type (for pro users after OAuth setup)
+    // This runs asynchronously and doesn't block OAuth completion
+    brevoWorkflowService
+      .handleOAuthSetupComplete(
+        session.user.email,
+        type as 'user' | 'pro',
+        {
+          DISPLAY_NAME: displayName,
+          USERNAME: username,
+          USER_TYPE: type as 'user' | 'pro', // Type assertion for literal type
+          USER_ROLE: role as 'user' | 'freelancer' | 'company' | 'admin', // Type assertion for literal type
+          IS_PRO: type === 'pro',
+        }
+      )
+      .catch((error) => {
+        console.error('Failed to add user to Brevo list after OAuth:', error);
+        // Don't throw - this shouldn't block OAuth setup
+      });
 
     return {
       success: true,

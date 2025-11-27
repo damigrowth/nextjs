@@ -11,6 +11,7 @@ export { default as ProfileInfo } from './profile-info';
 export { default as ProfileSkills } from './profile-skills';
 export { default as ProfileBreadcrumb } from './profile-breadcrumb';
 export { default as ContactReveal } from './contact-reveal';
+export { ReportProfileDialog } from './report-profile-dialog';
 
 // User Components
 // Note: UserImage has been deprecated in favor of UserAvatar from @/components/shared

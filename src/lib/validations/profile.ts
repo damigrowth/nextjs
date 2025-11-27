@@ -557,3 +557,19 @@ export type ProfileAdditionalInfoUpdateInput = z.infer<
 export type ProfilePresentationUpdateInput = z.infer<
   typeof profilePresentationUpdateSchema
 >;
+
+// =============================================
+// REPORT PROFILE SCHEMA
+// =============================================
+
+export const reportProfileSchema = z.object({
+  profileId: z.string(),
+  profileName: z.string(),
+  profileUsername: z.string(),
+  description: z
+    .string()
+    .min(10, 'Η περιγραφή πρέπει να έχει τουλάχιστον 10 χαρακτήρες')
+    .max(500, 'Η περιγραφή δεν μπορεί να υπερβαίνει τους 500 χαρακτήρες'),
+});
+
+export type ReportProfileFormValues = z.infer<typeof reportProfileSchema>;

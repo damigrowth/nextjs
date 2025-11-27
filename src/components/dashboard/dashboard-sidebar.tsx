@@ -25,9 +25,9 @@ import {
 } from 'lucide-react';
 
 import { NavMain } from './dashboard-nav-main';
-import { NavSecondary } from './dashboard-nav-secondary';
 import { NavUser } from './dashboard-nav-user';
 import { NavServices } from './dashboard-nav-services';
+import { SupportFeedbackDialog } from './support-feedback-dialog';
 import {
   Sidebar,
   SidebarContent,
@@ -117,13 +117,6 @@ export default function DashboardSidebar({
     },
   ];
 
-  const navSecondary = [
-    {
-      title: 'Υποστήριξη / Αναφορά',
-      url: '#',
-      icon: LifeBuoy,
-    },
-  ];
 
   const userData = {
     name: isProfessional
@@ -188,8 +181,10 @@ export default function DashboardSidebar({
         {/* Group 3: Account Management */}
         <NavMain items={accountGroup} label='Λογαριασμός' />
 
-        {/* Secondary Navigation */}
-        <NavSecondary items={navSecondary} className='mt-auto' />
+        {/* Secondary Navigation - Support/Feedback */}
+        <div className='mt-auto px-2'>
+          <SupportFeedbackDialog />
+        </div>
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={userData} />

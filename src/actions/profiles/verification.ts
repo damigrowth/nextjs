@@ -12,6 +12,7 @@ import { extractFormData } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
 import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
+import { sendNewVerificationEmail } from '@/lib/email';
 
 /**
  * Server action for submitting verification form
@@ -93,8 +94,8 @@ export async function submitVerificationRequest(
     });
 
     if (existingVerification) {
-      // Update existing verificationi
-      await prisma.profileVerification.update({
+      // Update existing verification
+      const updatedVerification = await prisma.profileVerification.update({
         where: { pid: profile.id },
         data: {
           afm: data.afm,
@@ -105,6 +106,28 @@ export async function submitVerificationRequest(
           updatedAt: new Date(),
         },
       });
+
+      // Send email notification to admin
+      const userForEmail = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: {
+          email: true,
+          displayName: true,
+          username: true,
+        },
+      });
+
+      if (userForEmail) {
+        try {
+          await sendNewVerificationEmail(
+            userForEmail,
+            profile.id,
+            updatedVerification.id
+          );
+        } catch (emailError) {
+          console.error('[Email] Failed to send verification update notification:', emailError);
+        }
+      }
 
       // 7. Revalidate cached data with consistent tags
       const profileTags = getProfileTags(profile);
@@ -137,7 +160,7 @@ export async function submitVerificationRequest(
       };
     } else {
       // Create new verification
-      await prisma.profileVerification.create({
+      const newVerification = await prisma.profileVerification.create({
         data: {
           afm: data.afm,
           name: data.name,
@@ -148,6 +171,28 @@ export async function submitVerificationRequest(
           status: 'PENDING',
         },
       });
+
+      // Send email notification to admin
+      const userForEmail = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: {
+          email: true,
+          displayName: true,
+          username: true,
+        },
+      });
+
+      if (userForEmail) {
+        try {
+          await sendNewVerificationEmail(
+            userForEmail,
+            profile.id,
+            newVerification.id
+          );
+        } catch (emailError) {
+          console.error('[Email] Failed to send verification notification:', emailError);
+        }
+      }
 
       // 7. Revalidate cached data with consistent tags
       const profileTags = getProfileTags(profile);

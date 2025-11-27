@@ -1,17 +1,24 @@
-export interface PasswordResetData {
-  email: string;
-  displayName?: string;
-  username?: string;
-  url: string;
+/**
+ * Service Published Email Template
+ *
+ * HTML template for notifying user when their service is published
+ */
+
+export interface ServicePublishedData {
+  userName: string;
+  userEmail: string;
+  serviceTitle: string;
+  serviceSlug: string;
+  serviceId: string;
 }
 
-export const PASSWORD_RESET_HTML = (data: PasswordResetData): string => `
+export const SERVICE_PUBLISHED_HTML = (data: ServicePublishedData): string => `
 <!DOCTYPE html>
 <html lang="el">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Επαναφορά Κωδικού</title>
+    <title>Η υπηρεσία δημοσιεύτηκε</title>
   </head>
   <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
     <table role="presentation" style="width: 100%; border-collapse: collapse;">
@@ -23,26 +30,23 @@ export const PASSWORD_RESET_HTML = (data: PasswordResetData): string => `
                 <table role="presentation" style="width: 100%; border-collapse: collapse;">
                   <tr>
                     <td style="color: #153643; text-align: center;">
-                      <h1 style="font-size: 24px; margin: 0 0 30px 0; font-family: Arial, sans-serif; color: #5bbb7b;">Επαναφορά Κωδικού</h1>
+                      <h1 style="font-size: 24px; margin: 0 0 30px 0; font-family: Arial, sans-serif; color: #1f4c40;">🎉 Συγχαρητήρια ${data.userName}!</h1>
                       <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;">
-                        Γεια σου ${data.displayName || data.username || 'φίλε'},
+                        Η υπηρεσία <strong>${data.serviceTitle}</strong> δημοσιεύτηκε με επιτυχία και είναι πλέον ορατή στην Doulitsa!
                       </p>
                       <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;">
-                        Λάβαμε αίτημα για επαναφορά του κωδικού σου. Κάνε κλικ στον παρακάτω σύνδεσμο για να δημιουργήσεις νέο κωδικό:
+                        Οι πελάτες μπορούν πλέον να την βρουν και να επικοινωνήσουν μαζί σου.
                       </p>
-                      <a href="${data.url}" style="background: #5bbb7b; color: #ffffff; text-decoration: none; padding: 16px 30px; border-radius: 4px; display: inline-block; margin: 20px 0; font-weight: 700;">
-                        Επαναφορά Κωδικού
+                      <a href="https://doulitsa.gr/s/${data.serviceSlug}" style="background: #1f4c40; color: #ffffff; text-decoration: none; padding: 16px 30px; border-radius: 4px; display: inline-block; margin: 20px 10px 10px 10px; font-weight: 700;">
+                        Προβολή Υπηρεσίας
+                      </a>
+                      <a href="https://doulitsa.gr/dashboard/services/edit/${data.serviceId}" style="background: #ffffff; color: #1f4c40; text-decoration: none; padding: 16px 30px; border-radius: 4px; display: inline-block; margin: 10px; font-weight: 700; border: 2px solid #1f4c40;">
+                        Επεξεργασία Υπηρεσίας
                       </a>
                       <p style="margin: 20px 0 0 0; font-size: 14px; line-height: 24px; font-family: Arial, sans-serif;">
-                        Αν δεν μπορείς να κάνεις κλικ στο κουμπί, αντίγραψε και επικόλλησε αυτό το link στον browser σου:
-                      </p>
-                      <p style="word-break: break-all; color: #6b7280; font-family: monospace; font-size: 12px; margin: 10px 0;">${data.url}</p>
-                      <p style="color: #dc2626; margin: 20px 0 0 0; font-size: 14px;">
-                        Αυτός ο σύνδεσμος θα λήξει σε 1 ώρα.
-                      </p>
-                      <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-                      <p style="color: #6b7280; font-size: 14px; margin: 0;">
-                        Αν δεν ζήτησες επαναφορά κωδικού, μπορείς να αγνοήσεις αυτό το email.
+                        Καλή επιτυχία!<br /><br />
+                        Με εκτίμηση,<br />
+                        Η ομάδα Doulitsa
                       </p>
                     </td>
                   </tr>
