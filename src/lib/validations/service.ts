@@ -330,6 +330,18 @@ export const updateServiceStatusSchema = z.object({
 // SERVICE REPORTING SCHEMA
 // =============================================
 
+// Simple service report form schema for the report dialog
+export const reportServiceFormSchema = z.object({
+  serviceId: z.number(),
+  serviceTitle: z.string(),
+  serviceSlug: z.string(),
+  description: z
+    .string()
+    .min(10, 'Η περιγραφή πρέπει να έχει τουλάχιστον 10 χαρακτήρες')
+    .max(500, 'Η περιγραφή δεν μπορεί να υπερβαίνει τους 500 χαρακτήρες'),
+});
+
+// Keep the original complex schemas for potential future use
 export const reportServiceSchema = z.object({
   id: z.string().min(1, 'Το ID της υπηρεσίας είναι υποχρεωτικό'),
   title: z.string().min(1, 'Ο τίτλος της υπηρεσίας είναι υποχρεωτικός'),
@@ -897,6 +909,7 @@ export type ServiceFaqInput = z.infer<typeof formServiceFaqSchema>;
 export type ServicePackageInput = z.infer<typeof servicePackageSchema>;
 export type ServiceMediaInput = z.infer<typeof serviceMediaSchema>;
 export type ServiceReportInput = z.infer<typeof serviceReportSchema>;
+export type ReportServiceFormValues = z.infer<typeof reportServiceFormSchema>;
 
 // Multi-step form types
 export type ServiceTypeInput = z.infer<typeof presenceOnlineSchema>;
