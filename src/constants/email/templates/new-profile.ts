@@ -78,3 +78,30 @@ export const NEW_PROFILE_HTML = (data: NewProfileData): string => `
     </table>
   </body>
 </html>`;
+
+export const NEW_PROFILE_TEXT = (data: NewProfileData): string => `
+ΝΕΟ ΕΠΑΓΓΕΛΜΑΤΙΚΟ ΠΡΟΦΙΛ
+
+${data.profileName}
+
+---
+
+👤 ΣΤΟΙΧΕΙΑ ΠΡΟΦΙΛ:
+Email: ${data.userEmail}
+Τύπος: ${data.userType}
+
+---
+
+🔧 ΕΝΕΡΓΕΙΕΣ:
+
+Προβολή Προφίλ:
+${data.publicUrl || `https://doulitsa.gr/profile/${data.username}`}
+
+Επεξεργασία Προφίλ:
+${data.adminUrl || `https://doulitsa.gr/admin/profiles/${data.profileId}`}
+
+---
+Ημερομηνία: ${data.createdAt ? new Date(data.createdAt).toLocaleString('el-GR') : new Date().toLocaleString('el-GR')}
+
+© Doulitsa, 2025
+`;

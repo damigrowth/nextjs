@@ -70,3 +70,27 @@ export const NEW_VERIFICATION_HTML = (data: NewVerificationData): string => `
     </table>
   </body>
 </html>`;
+
+export const NEW_VERIFICATION_TEXT = (data: NewVerificationData): string => `
+ΝΕΟ ΑΙΤΗΜΑ ΠΙΣΤΟΠΟΙΗΣΗΣ
+
+${data.displayName}
+
+Ο χρήστης ${data.displayName} (${data.userEmail}) αιτείται πιστοποίηση του προφίλ του.
+
+---
+
+📋 ΕΝΕΡΓΕΙΕΣ:
+
+Προβολή Πιστοποίησης:
+https://doulitsa.gr/admin/verifications/${data.verificationId}
+
+Προβολή Προφίλ:
+https://doulitsa.gr/admin/profiles/${data.profileId}
+
+Διαχείριση Πιστοποιήσεων:
+https://doulitsa.gr/admin/verifications
+
+---
+© Doulitsa, 2025
+`;

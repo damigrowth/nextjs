@@ -41,6 +41,7 @@ export async function sendNewVerificationEmail(
     const to = typeof config.to === 'function' ? config.to(emailData) : config.to;
     const subject = typeof config.subject === 'function' ? config.subject(emailData) : config.subject;
     const message = config.html(emailData);
+    const textMessage = config.text(emailData);
     const from = typeof config.from === 'function' ? config.from(emailData) : config.from;
     const replyTo = config.replyTo
       ? (typeof config.replyTo === 'function' ? config.replyTo(emailData) : config.replyTo)
@@ -55,6 +56,7 @@ export async function sendNewVerificationEmail(
       {
         from,
         replyTo,
+        text: textMessage,
         attributes: {
           DISPLAY_NAME: displayName,
           USER_EMAIL: user.email,
@@ -113,6 +115,7 @@ export async function sendServiceReportEmail(
     const to = typeof config.to === 'function' ? config.to(emailData) : config.to;
     const subject = typeof config.subject === 'function' ? config.subject(emailData) : config.subject;
     const message = config.html(emailData);
+    const textMessage = config.text(emailData);
     const from = typeof config.from === 'function' ? config.from(emailData) : config.from;
     const replyTo = config.replyTo
       ? (typeof config.replyTo === 'function' ? config.replyTo(emailData) : config.replyTo)
@@ -127,6 +130,7 @@ export async function sendServiceReportEmail(
       {
         from,
         replyTo,
+        text: textMessage,
         attributes: {
           SERVICE_TITLE: service.title,
           SERVICE_ID: service.id.toString(),
@@ -187,6 +191,7 @@ export async function sendProfileReportEmail(
     const to = typeof config.to === 'function' ? config.to(emailData) : config.to;
     const subject = typeof config.subject === 'function' ? config.subject(emailData) : config.subject;
     const message = config.html(emailData);
+    const textMessage = config.text(emailData);
     const from = typeof config.from === 'function' ? config.from(emailData) : config.from;
     const replyTo = config.replyTo
       ? (typeof config.replyTo === 'function' ? config.replyTo(emailData) : config.replyTo)
@@ -201,6 +206,7 @@ export async function sendProfileReportEmail(
       {
         from,
         replyTo,
+        text: textMessage,
         attributes: {
           PROFILE_NAME: profile.name,
           PROFILE_ID: profile.username,
@@ -248,6 +254,7 @@ export async function sendNewProfileEmail(
     const to = typeof config.to === 'function' ? config.to(emailData) : config.to;
     const subject = typeof config.subject === 'function' ? config.subject(emailData) : config.subject;
     const message = config.html(emailData);
+    const textMessage = config.text(emailData);
     const from = typeof config.from === 'function' ? config.from(emailData) : config.from;
     const replyTo = config.replyTo
       ? (typeof config.replyTo === 'function' ? config.replyTo(emailData) : config.replyTo)
@@ -262,6 +269,7 @@ export async function sendNewProfileEmail(
       {
         from,
         replyTo,
+        text: textMessage,
         attributes: {
           PROFILE_NAME: profile.name,
           PROFILE_ID: profile.id.toString(),
@@ -321,6 +329,7 @@ export async function sendSupportFeedbackEmail(
     const to = typeof config.to === 'function' ? config.to(emailData) : config.to;
     const subject = typeof config.subject === 'function' ? config.subject(emailData) : config.subject;
     const message = config.html(emailData);
+    const textMessage = config.text(emailData);
     const from = typeof config.from === 'function' ? config.from(emailData) : config.from;
     const replyTo = config.replyTo
       ? (typeof config.replyTo === 'function' ? config.replyTo(emailData) : config.replyTo)
@@ -335,6 +344,7 @@ export async function sendSupportFeedbackEmail(
       {
         from,
         replyTo,
+        text: textMessage,
         attributes: {
           REPORTER_NAME: reporter.name,
           REPORTER_EMAIL: reporter.email,

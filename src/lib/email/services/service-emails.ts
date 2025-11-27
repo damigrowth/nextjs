@@ -57,6 +57,7 @@ export async function sendServiceCreatedEmail(
     const to = typeof config.to === 'function' ? config.to(emailData) : config.to;
     const subject = typeof config.subject === 'function' ? config.subject(emailData) : config.subject;
     const message = config.html(emailData);
+    const textMessage = config.text(emailData);
     const from = typeof config.from === 'function' ? config.from(emailData) : config.from;
     const replyTo = config.replyTo
       ? (typeof config.replyTo === 'function' ? config.replyTo(emailData) : config.replyTo)
@@ -71,6 +72,7 @@ export async function sendServiceCreatedEmail(
       {
         from,
         replyTo,
+        text: textMessage,
         // Add contact attributes for Brevo analytics
         attributes: {
           SERVICE_TITLE: service.title,
@@ -124,6 +126,7 @@ export async function sendServicePublishedEmail(
     const to = typeof config.to === 'function' ? config.to(emailData) : config.to;
     const subject = typeof config.subject === 'function' ? config.subject(emailData) : config.subject;
     const message = config.html(emailData);
+    const textMessage = config.text(emailData);
     const from = typeof config.from === 'function' ? config.from(emailData) : config.from;
     const replyTo = config.replyTo
       ? (typeof config.replyTo === 'function' ? config.replyTo(emailData) : config.replyTo)
@@ -138,6 +141,7 @@ export async function sendServicePublishedEmail(
       {
         from,
         replyTo,
+        text: textMessage,
         attributes: {
           SERVICE_TITLE: service.title,
           SERVICE_SLUG: service.slug,

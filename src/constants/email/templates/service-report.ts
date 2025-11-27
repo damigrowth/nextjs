@@ -106,3 +106,35 @@ export const SERVICE_REPORT_HTML = (data: ServiceReportData): string => `
     </table>
   </body>
 </html>`;
+
+export const SERVICE_REPORT_TEXT = (data: ServiceReportData): string => `
+ΑΝΑΦΟΡΑ ΥΠΗΡΕΣΙΑΣ
+
+ΠΕΡΙΓΡΑΦΗ ΖΗΤΗΜΑΤΟΣ:
+${data.reportDetails}
+
+---
+
+ΑΝΑΦΟΡΑ ΓΙΑ ΤΗΝ ΥΠΗΡΕΣΙΑ:
+ID: ${data.serviceId}
+Τίτλος: ${data.serviceTitle}
+Slug: ${data.serviceSlug}
+Admin URL: ${data.serviceAdminUrl}
+
+---
+
+ΥΠΟΒΟΛΗ ΑΝΑΦΟΡΑΣ ΑΠΟ:
+ID: ${data.reporterId}
+Όνομα: ${data.reporterName}
+Email: ${data.reporterEmail}
+Username: ${data.reporterUsername}
+Admin URL: ${data.reporterAdminUrl}
+
+---
+
+Η αναφορά υποβλήθηκε από: ${data.servicePageUrl}
+Ημερομηνία: ${data.reportDate instanceof Date ? data.reportDate.toLocaleString('el-GR') : new Date(data.reportDate).toLocaleString('el-GR')}
+
+---
+© Doulitsa, 2025
+`;

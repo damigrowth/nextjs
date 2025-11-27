@@ -22,6 +22,7 @@ export async function sendContactAdminEmail(
     const to = typeof config.to === 'function' ? config.to(data) : config.to;
     const subject = typeof config.subject === 'function' ? config.subject(data) : config.subject;
     const message = config.html(data);
+    const textMessage = config.text(data);
     const from = typeof config.from === 'function' ? config.from(data) : config.from;
     const replyTo = config.replyTo
       ? (typeof config.replyTo === 'function' ? config.replyTo(data) : config.replyTo)
@@ -36,6 +37,7 @@ export async function sendContactAdminEmail(
       {
         from,
         replyTo,
+        text: textMessage,
         attributes: {
           CONTACT_NAME: data.name,
           CONTACT_EMAIL: data.email,
@@ -63,6 +65,7 @@ export async function sendContactConfirmationEmail(
     const to = typeof config.to === 'function' ? config.to(data) : config.to;
     const subject = typeof config.subject === 'function' ? config.subject(data) : config.subject;
     const message = config.html(data);
+    const textMessage = config.text(data);
     const from = typeof config.from === 'function' ? config.from(data) : config.from;
     const replyTo = config.replyTo
       ? (typeof config.replyTo === 'function' ? config.replyTo(data) : config.replyTo)
@@ -77,6 +80,7 @@ export async function sendContactConfirmationEmail(
       {
         from,
         replyTo,
+        text: textMessage,
         attributes: {
           CONTACT_NAME: data.name,
           CONTACT_EMAIL: data.email,

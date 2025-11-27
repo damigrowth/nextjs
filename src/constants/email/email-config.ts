@@ -7,38 +7,47 @@
 
 import {
   SERVICE_CREATED_HTML,
+  SERVICE_CREATED_TEXT,
   ServiceCreatedData,
 } from './templates/service-created';
 import {
   SERVICE_PUBLISHED_HTML,
+  SERVICE_PUBLISHED_TEXT,
   ServicePublishedData,
 } from './templates/service-published';
 import {
   CONTACT_ADMIN_HTML,
+  CONTACT_ADMIN_TEXT,
   CONTACT_CONFIRMATION_HTML,
+  CONTACT_CONFIRMATION_TEXT,
   ContactEmailData,
 } from './templates/contact';
 import {
   NEW_VERIFICATION_HTML,
+  NEW_VERIFICATION_TEXT,
   NewVerificationData,
 } from './templates/new-verification';
 import {
   SERVICE_REPORT_HTML,
+  SERVICE_REPORT_TEXT,
   ServiceReportData,
 } from './templates/service-report';
 import {
   PROFILE_REPORT_HTML,
+  PROFILE_REPORT_TEXT,
   ProfileReportData,
 } from './templates/profile-report';
-import { NEW_PROFILE_HTML, NewProfileData } from './templates/new-profile';
-import { VERIFICATION_HTML, VerificationData } from './templates/verification';
-import { WELCOME_HTML, WelcomeData } from './templates/welcome';
+import { NEW_PROFILE_HTML, NEW_PROFILE_TEXT, NewProfileData } from './templates/new-profile';
+import { VERIFICATION_HTML, VERIFICATION_TEXT, VerificationData } from './templates/verification';
+import { WELCOME_HTML, WELCOME_TEXT, WelcomeData } from './templates/welcome';
 import {
   PASSWORD_RESET_HTML,
+  PASSWORD_RESET_TEXT,
   PasswordResetData,
 } from './templates/password-reset';
 import {
   SUPPORT_FEEDBACK_HTML,
+  SUPPORT_FEEDBACK_TEXT,
   SupportFeedbackData,
 } from './templates/support-feedback';
 
@@ -48,6 +57,7 @@ export interface EmailConfig<T = any> {
   replyTo?: string | null | ((data: T) => string | null);
   subject: string | ((data: T) => string);
   html: (data: T) => string;
+  text: (data: T) => string;
 }
 
 export const EMAIL_CONFIG = {
@@ -59,6 +69,7 @@ export const EMAIL_CONFIG = {
     subject: (data: ServiceCreatedData) =>
       `Νέα Υπηρεσία - ${data.serviceTitle} - από ${data.creatorEmail}`,
     html: SERVICE_CREATED_HTML,
+    text: SERVICE_CREATED_TEXT,
   } as EmailConfig<ServiceCreatedData>,
 
   SERVICE_PUBLISHED: {
@@ -68,6 +79,7 @@ export const EMAIL_CONFIG = {
     subject: (data: ServicePublishedData) =>
       `Η υπηρεσία σας "${data.serviceTitle}" δημοσιεύτηκε!`,
     html: SERVICE_PUBLISHED_HTML,
+    text: SERVICE_PUBLISHED_TEXT,
   } as EmailConfig<ServicePublishedData>,
 
   // Contact Emails
@@ -78,6 +90,7 @@ export const EMAIL_CONFIG = {
     subject: (data: ContactEmailData) =>
       `Νέα Φόρμα Επικοινωνίας - ${data.email}`,
     html: CONTACT_ADMIN_HTML,
+    text: CONTACT_ADMIN_TEXT,
   } as EmailConfig<ContactEmailData>,
 
   CONTACT_CONFIRMATION: {
@@ -86,6 +99,7 @@ export const EMAIL_CONFIG = {
     replyTo: 'contact@doulitsa.gr',
     subject: () => 'Λάβαμε το μήνυμα σου!',
     html: CONTACT_CONFIRMATION_HTML,
+    text: CONTACT_CONFIRMATION_TEXT,
   } as EmailConfig<ContactEmailData>,
 
   // Admin Notification Emails
@@ -96,6 +110,7 @@ export const EMAIL_CONFIG = {
     subject: (data: NewVerificationData) =>
       `Νέο Αίτημα Πιστοποίησης - ${data.displayName} (${data.userEmail})`,
     html: NEW_VERIFICATION_HTML,
+    text: NEW_VERIFICATION_TEXT,
   } as EmailConfig<NewVerificationData>,
 
   SERVICE_REPORT: {
@@ -105,6 +120,7 @@ export const EMAIL_CONFIG = {
     subject: (data: ServiceReportData) =>
       `Αναφορά Υπηρεσίας - ${data.serviceTitle}`,
     html: SERVICE_REPORT_HTML,
+    text: SERVICE_REPORT_TEXT,
   } as EmailConfig<ServiceReportData>,
 
   PROFILE_REPORT: {
@@ -114,6 +130,7 @@ export const EMAIL_CONFIG = {
     subject: (data: ProfileReportData) =>
       `Αναφορά Προφίλ - ${data.profileName}`,
     html: PROFILE_REPORT_HTML,
+    text: PROFILE_REPORT_TEXT,
   } as EmailConfig<ProfileReportData>,
 
   NEW_PROFILE: {
@@ -123,6 +140,7 @@ export const EMAIL_CONFIG = {
     subject: (data: NewProfileData) =>
       `Νέο Επαγγελματικό Προφίλ - ${data.profileName} (${data.userEmail})`,
     html: NEW_PROFILE_HTML,
+    text: NEW_PROFILE_TEXT,
   } as EmailConfig<NewProfileData>,
 
   SUPPORT_FEEDBACK: {
@@ -132,6 +150,7 @@ export const EMAIL_CONFIG = {
     subject: (data: SupportFeedbackData) =>
       `${data.issueTypeLabel} από ${data.reporterName}`,
     html: SUPPORT_FEEDBACK_HTML,
+    text: SUPPORT_FEEDBACK_TEXT,
   } as EmailConfig<SupportFeedbackData>,
 
   // Auth Emails
@@ -141,6 +160,7 @@ export const EMAIL_CONFIG = {
     replyTo: null,
     subject: () => 'Επαληθεύστε το email σας - Doulitsa',
     html: VERIFICATION_HTML,
+    text: VERIFICATION_TEXT,
   } as EmailConfig<VerificationData>,
 
   WELCOME: {
@@ -150,6 +170,7 @@ export const EMAIL_CONFIG = {
     subject: (data: WelcomeData) =>
       `Καλώς ήρθες στο Doulitsa, ${data.displayName || data.username || 'φίλε'}!`,
     html: WELCOME_HTML,
+    text: WELCOME_TEXT,
   } as EmailConfig<WelcomeData>,
 
   PASSWORD_RESET: {
@@ -158,6 +179,7 @@ export const EMAIL_CONFIG = {
     replyTo: null,
     subject: () => 'Επαναφορά κωδικού πρόσβασης - Doulitsa',
     html: PASSWORD_RESET_HTML,
+    text: PASSWORD_RESET_TEXT,
   } as EmailConfig<PasswordResetData>,
 } as const;
 

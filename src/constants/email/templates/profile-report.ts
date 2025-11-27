@@ -108,3 +108,36 @@ export const PROFILE_REPORT_HTML = (data: ProfileReportData): string => `
     </table>
   </body>
 </html>`;
+
+export const PROFILE_REPORT_TEXT = (data: ProfileReportData): string => `
+ΑΝΑΦΟΡΑ ΠΡΟΦΙΛ
+
+ΠΕΡΙΓΡΑΦΗ ΖΗΤΗΜΑΤΟΣ:
+${data.reportDetails}
+
+---
+
+ΑΝΑΦΟΡΑ ΓΙΑ ΤΟ ΠΡΟΦΙΛ:
+ID: ${data.profileId}
+Όνομα: ${data.profileName}
+Email: ${data.profileEmail}
+Username: ${data.profileUsername}
+Admin URL: ${data.reportedUserAdminUrl}
+
+---
+
+ΥΠΟΒΟΛΗ ΑΝΑΦΟΡΑΣ ΑΠΟ:
+ID: ${data.reporterId}
+Όνομα: ${data.reporterName}
+Email: ${data.reporterEmail}
+Username: ${data.reporterUsername}
+Admin URL: ${data.reporterAdminUrl}
+
+---
+
+Η αναφορά υποβλήθηκε από: ${data.profilePageUrl}
+Ημερομηνία: ${data.reportDate instanceof Date ? data.reportDate.toLocaleString('el-GR') : new Date(data.reportDate).toLocaleString('el-GR')}
+
+---
+© Doulitsa, 2025
+`;
