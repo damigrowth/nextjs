@@ -182,7 +182,6 @@ export default async function ServicePage({
               <ServiceOrderFixed
                 price={service.price || 0}
                 addons={service.addons || []}
-                isOwner={false} // TODO: Check if current user is the owner
                 compact={false}
                 profileUserId={service.profile.uid}
                 profileDisplayName={service.profile.displayName || ''}
@@ -209,7 +208,6 @@ export default async function ServicePage({
               <ServiceOrderFixed
                 price={service.price || 0}
                 addons={service.addons || []}
-                isOwner={false} // TODO: Check if current user is the owner
                 compact={true}
                 profileUserId={service.profile.uid}
                 profileDisplayName={service.profile.displayName || ''}

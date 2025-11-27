@@ -23,6 +23,7 @@ interface StartChatDialogProps {
   initialMessage?: string;
   customTrigger?: string;
   currentUserId?: string; // Optional: can be passed from server component
+  className?: string;
 }
 
 export function StartChatDialog({
@@ -31,6 +32,7 @@ export function StartChatDialog({
   initialMessage,
   customTrigger,
   currentUserId: propCurrentUserId,
+  className,
 }: StartChatDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -103,22 +105,13 @@ export function StartChatDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className='w-full'
+          className={className || 'w-full'}
           size='lg'
           type='button'
           disabled={isButtonLoading}
         >
-          {isButtonLoading ? (
-            <>
-              <Loader2 className='h-4 w-4 animate-spin' />
-              Φόρτωση...
-            </>
-          ) : (
-            <>
-              {customTrigger || 'Επικοινωνία'}
-              {!customTrigger && <MessageCircle className='h-4 w-4' />}
-            </>
-          )}
+          {customTrigger || 'Επικοινωνία'}
+          {!customTrigger && <MessageCircle className='h-4 w-4' />}
         </Button>
       </DialogTrigger>
       <DialogContent className='sm:max-w-base'>
