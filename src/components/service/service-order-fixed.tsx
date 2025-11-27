@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { useSession } from '@/lib/auth/client';
 import ServiceAddons from './service-addons';
 import ServiceCalculatedPrice from './service-calculated-price';
 import ServiceBuy from './service-buy';
@@ -9,7 +10,6 @@ import ServiceBuy from './service-buy';
 interface ServiceOrderFixedProps {
   price: number;
   addons: PrismaJson.ServiceAddon[];
-  isOwner: boolean;
   compact?: boolean;
   profileUserId: string;
   profileDisplayName: string;
@@ -19,15 +19,16 @@ interface ServiceOrderFixedProps {
 export default function ServiceOrderFixed({
   price,
   addons,
-  isOwner,
   compact = false,
   profileUserId,
   profileDisplayName,
   serviceTitle,
 }: ServiceOrderFixedProps) {
+  const { data: session } = useSession();
+  const isOwner = session?.user?.id === profileUserId;
   return (
     <Card className='mb-6'>
-      <CardContent className='p-6'>
+      <CardContent className='p-6 flex flex-col'>
         {/* Price Display */}
         <ServiceCalculatedPrice basePrice={price} compact={compact} />
 
@@ -43,6 +44,7 @@ export default function ServiceOrderFixed({
           profileUserId={profileUserId}
           profileDisplayName={profileDisplayName}
           serviceTitle={serviceTitle}
+          compact={compact}
         />
       </CardContent>
     </Card>

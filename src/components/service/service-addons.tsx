@@ -59,11 +59,11 @@ export default function ServiceAddons({
                 </div>
 
                 {/* Content stacked to the right of checkbox */}
-                <div className='flex-1'>
-                  <h5 className='text-sm font-medium text-gray-900 truncate mb-1'>
+                <div className='flex-1 space-y-2 '>
+                  <h5 className='text-sm font-medium text-gray-900 mb-1'>
                     {addon.title}
                   </h5>
-                  <p className='text-xs text-muted-foreground line-clamp-2 mb-2'>
+                  <p className='text-xs text-muted-foreground mb-2'>
                     {addon.description}
                   </p>
 

@@ -10,6 +10,7 @@ interface ServiceBuyProps {
   profileUserId: string;
   profileDisplayName: string;
   serviceTitle: string;
+  compact?: boolean;
 }
 
 export default function ServiceBuy({
@@ -18,6 +19,7 @@ export default function ServiceBuy({
   profileUserId,
   profileDisplayName,
   serviceTitle,
+  compact = false,
 }: ServiceBuyProps) {
   const { order, setOrder, calculateTotal } = useServiceOrderStore();
 
@@ -53,16 +55,17 @@ export default function ServiceBuy({
     return message;
   };
 
-  const buttonText = !hasValidPrice ? 'Επικοινωνήστε' : `Σύνολο ${order?.total}€`;
+  const buttonText = !hasValidPrice
+    ? 'Επικοινωνήστε'
+    : `Σύνολο ${order?.total}€`;
 
   return (
-    <div className='w-full'>
-      <StartChatDialog
-        recipientId={profileUserId}
-        recipientName={profileDisplayName}
-        initialMessage={buildInitialMessage()}
-        customTrigger={buttonText}
-      />
-    </div>
+    <StartChatDialog
+      recipientId={profileUserId}
+      recipientName={profileDisplayName}
+      initialMessage={buildInitialMessage()}
+      customTrigger={buttonText}
+      className={compact ? 'w-full' : 'w-full max-w-md mx-auto'}
+    />
   );
 }
