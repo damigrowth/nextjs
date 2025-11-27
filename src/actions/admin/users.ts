@@ -189,6 +189,7 @@ export async function listUsers(
         step: true,
         createdAt: true,
         updatedAt: true,
+        lastUnreadEmailSentAt: true,
       },
     });
 
