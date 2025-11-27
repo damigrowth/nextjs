@@ -168,6 +168,7 @@ export enum BrevoTransactional {
   SERVICE_APPROVED = 'service_approved',
   SERVICE_EXPIRING = 'service_expiring',
   NEW_MESSAGE = 'new_message',
+  UNREAD_MESSAGES = 'unread_messages',
 }
 
 // Workflow automation types (sequences with list management)

@@ -37,14 +37,17 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { Badge } from '@/components/ui/badge';
 import { useSession } from '@/lib/auth/client';
 import { capitalizeFirstLetter } from '@/lib/utils/validation';
+import { useUnreadCount } from '@/lib/hooks/use-unread-count';
 import FlaticonMenu from '@/components/icon/flaticon/flaticon-menu';
 
 export default function DashboardSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession();
+  const { unreadCount } = useUnreadCount();
 
   // Use Better Auth session data
   const user = session?.user;
@@ -62,6 +65,11 @@ export default function DashboardSidebar({
       title: 'Μηνύματα',
       url: '/dashboard/messages',
       icon: MessageSquare,
+      badge: unreadCount > 0 ? (
+        <Badge variant='destructive' className='h-4 min-w-4 flex items-center justify-center px-1 text-[10px] font-semibold rounded-full'>
+          {unreadCount > 99 ? '99+' : unreadCount}
+        </Badge>
+      ) : undefined,
     },
     {
       title: 'Αποθηκευμένα',

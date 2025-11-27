@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useChatSubscription } from '@/lib/hooks/chat/use-chat-subscription';
 import { useMessageOptimistic } from '@/lib/hooks/chat/use-message-optimistic';
 import { getMessages } from '@/actions/messages';
@@ -95,7 +95,11 @@ export function MessagesContainer({
   }, [chatId, currentUserId, olderMessages, realtimeMessages, isLoadingOlder, hasMore]);
 
   // Combine all messages: older + realtime + optimistic
-  const allMessages = [...olderMessages, ...realtimeMessages, ...optimisticMessages];
+  // Use useMemo to prevent unnecessary re-renders that trigger Next.js route cache
+  const allMessages = useMemo(
+    () => [...olderMessages, ...realtimeMessages, ...optimisticMessages],
+    [olderMessages, realtimeMessages, optimisticMessages]
+  );
 
   // Setup intersection observer for infinite scroll
   useEffect(() => {
