@@ -37,6 +37,10 @@ import {
   PASSWORD_RESET_HTML,
   PasswordResetData,
 } from './templates/password-reset';
+import {
+  SUPPORT_FEEDBACK_HTML,
+  SupportFeedbackData,
+} from './templates/support-feedback';
 
 export interface EmailConfig<T = any> {
   to: string | ((data: T) => string);
@@ -120,6 +124,15 @@ export const EMAIL_CONFIG = {
       `Νέο Επαγγελματικό Προφίλ - ${data.profileName} (${data.userEmail})`,
     html: NEW_PROFILE_HTML,
   } as EmailConfig<NewProfileData>,
+
+  SUPPORT_FEEDBACK: {
+    to: () => process.env.ADMIN_EMAIL || 'contact@doulitsa.gr',
+    from: 'Admin Doulitsa <noreply@doulitsa.gr>',
+    replyTo: (data: SupportFeedbackData) => data.reporterEmail,
+    subject: (data: SupportFeedbackData) =>
+      `${data.issueTypeLabel} από ${data.reporterName}`,
+    html: SUPPORT_FEEDBACK_HTML,
+  } as EmailConfig<SupportFeedbackData>,
 
   // Auth Emails
   VERIFICATION: {

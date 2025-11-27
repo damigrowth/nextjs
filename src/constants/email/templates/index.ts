@@ -21,6 +21,7 @@ export * from './new-verification';
 export * from './service-report';
 export * from './profile-report';
 export * from './new-profile';
+export * from './support-feedback';
 
 // Legacy EMAIL_TEMPLATES export for auth emails only
 // TODO: Migrate auth emails to use EMAIL_CONFIG

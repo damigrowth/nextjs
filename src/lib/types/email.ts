@@ -61,4 +61,5 @@ export type EmailTemplateKey =
   | 'NEW_VERIFICATION'
   | 'SERVICE_REPORT'
   | 'PROFILE_REPORT'
-  | 'NEW_PROFILE';
+  | 'NEW_PROFILE'
+  | 'SUPPORT_FEEDBACK';

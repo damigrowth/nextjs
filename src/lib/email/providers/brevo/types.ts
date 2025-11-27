@@ -163,6 +163,7 @@ export enum BrevoTransactional {
   NEW_VERIFICATION = 'new_verification',
   SERVICE_REPORT = 'service_report',
   PROFILE_REPORT = 'profile_report',
+  SUPPORT_FEEDBACK = 'support_feedback',
   NEW_REVIEW = 'new_review',
   SERVICE_APPROVED = 'service_approved',
   SERVICE_EXPIRING = 'service_expiring',
