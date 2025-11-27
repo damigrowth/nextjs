@@ -15,6 +15,7 @@ import {
   ProfileTerms,
   TaxonomyTabs,
   DynamicBreadcrumb,
+  ReportProfileDialog,
 } from '@/components';
 
 // ISR configuration with shorter interval + tag-based revalidation
@@ -178,6 +179,14 @@ export default async function ProfilePage({
               )}
 
               <ProfileTerms terms={profile.terms} />
+
+              {/* Report Profile Button */}
+
+              <ReportProfileDialog
+                profileId={profile.id}
+                profileName={profile.displayName || profile.username || ''}
+                profileUsername={profile.username || ''}
+              />
 
               {/* Mobile Sidebar - Skills shown on mobile */}
               <div className='lg:hidden mb-8'>
