@@ -85,7 +85,7 @@ export default function ServiceInfo({
         </div>
       )}
 
-      {online && oneoff && !subscription && duration && (
+      {online && oneoff && !subscription && duration > 0 && (
         <div className='sm:col-span-1 md:col-span-1'>
           <IconBox
             icon={<Clock className='h-10 w-10' />}
