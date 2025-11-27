@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma/client';
 import { transformMessageForChat } from '@/lib/utils/messages';
 import type { ChatMessageItem, MessageWithRelations } from '@/lib/types/messages';
+import { sendUnreadMessagesEmail } from '@/lib/email/services/message-emails';
 
 /**
  * Get messages for a chat with pagination support
@@ -163,6 +164,12 @@ export async function sendMessage(
       return newMessage;
     });
 
+    // Check if we should trigger unread messages email notification (async, non-blocking)
+    checkAndSendUnreadEmailNotification(chatId, authorUid).catch((error) => {
+      console.error('[Email] Failed to check/send unread email notification:', error);
+      // Don't throw - email failure shouldn't break message send
+    });
+
     // Transform for UI
     return transformMessageForChat(message as MessageWithRelations, authorUid);
   } catch (error) {
@@ -315,5 +322,203 @@ export async function getUnreadCount(
   } catch (error) {
     console.error('Error getting unread count:', error);
     return 0;
+  }
+}
+
+/**
+ * Get total unread message count across all chats for a user
+ * Optimized with single aggregation query
+ */
+export async function getTotalUnreadCount(userId: string): Promise<number> {
+  try {
+    // Get all chats where user is a member
+    const userChats = await prisma.chatMember.findMany({
+      where: { uid: userId },
+      select: { chatId: true },
+    });
+
+    const chatIds = userChats.map((cm) => cm.chatId);
+
+    if (chatIds.length === 0) {
+      return 0;
+    }
+
+    // Count all unread messages across user's chats in a single query
+    const count = await prisma.message.count({
+      where: {
+        chatId: {
+          in: chatIds,
+        },
+        authorUid: {
+          not: userId,
+        },
+        deleted: false,
+        readBy: {
+          none: {
+            uid: userId,
+          },
+        },
+      },
+    });
+
+    return count;
+  } catch (error) {
+    console.error('Error getting total unread count:', error);
+    return 0;
+  }
+}
+
+/**
+ * Get recent unread messages for a user from the last N minutes
+ * Used for email notification context
+ */
+export async function getRecentUnreadMessages(
+  userId: string,
+  minutes: number = 15
+): Promise<
+  Array<{
+    id: string;
+    content: string;
+    createdAt: Date;
+    chatId: string;
+    author: {
+      id: string;
+      displayName: string | null;
+      username: string | null;
+      image: string | null;
+    };
+  }>
+> {
+  try {
+    // Calculate time threshold
+    const timeThreshold = new Date();
+    timeThreshold.setMinutes(timeThreshold.getMinutes() - minutes);
+
+    // Get all chats where user is a member
+    const userChats = await prisma.chatMember.findMany({
+      where: { uid: userId },
+      select: { chatId: true },
+    });
+
+    const chatIds = userChats.map((cm) => cm.chatId);
+
+    if (chatIds.length === 0) {
+      return [];
+    }
+
+    // Fetch recent unread messages with author info
+    const messages = await prisma.message.findMany({
+      where: {
+        chatId: {
+          in: chatIds,
+        },
+        authorUid: {
+          not: userId,
+        },
+        deleted: false,
+        createdAt: {
+          gte: timeThreshold,
+        },
+        readBy: {
+          none: {
+            uid: userId,
+          },
+        },
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            displayName: true,
+            username: true,
+            image: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return messages;
+  } catch (error) {
+    console.error('Error getting recent unread messages:', error);
+    return [];
+  }
+}
+
+/**
+ * Check if recipient has unread messages to trigger email notification
+ * Triggers email if:
+ * 1. Recipient has unread messages in last 15 minutes
+ * 2. At least 15 minutes passed since last email notification
+ *
+ * This is called asynchronously after sending a message (non-blocking)
+ */
+async function checkAndSendUnreadEmailNotification(
+  chatId: string,
+  senderUid: string
+): Promise<void> {
+  try {
+    // Get the other member(s) in the chat (recipients)
+    const chatMembers = await prisma.chatMember.findMany({
+      where: {
+        chatId: chatId,
+        uid: {
+          not: senderUid, // Exclude the sender
+        },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            displayName: true,
+            username: true,
+            lastUnreadEmailSentAt: true,
+          },
+        },
+      },
+    });
+
+    // Check each recipient
+    for (const member of chatMembers) {
+      const recipient = member.user;
+
+      // Check if 15 minutes have passed since last email
+      if (recipient.lastUnreadEmailSentAt) {
+        const minutesSinceLastEmail =
+          (Date.now() - new Date(recipient.lastUnreadEmailSentAt).getTime()) / (1000 * 60);
+
+        if (minutesSinceLastEmail < 15) {
+          // Skip this recipient - cooldown period active (15 min)
+          continue;
+        }
+      }
+
+      // Get recent unread messages for this recipient (last 15 minutes)
+      const recentUnreadMessages = await getRecentUnreadMessages(recipient.id, 15);
+
+      // Check if recipient has any unread messages in last 15 minutes
+      if (recentUnreadMessages.length >= 1) {
+        // Send email notification
+        await sendUnreadMessagesEmail(recipient, recentUnreadMessages);
+
+        // Update lastUnreadEmailSentAt to prevent spam
+        await prisma.user.update({
+          where: { id: recipient.id },
+          data: {
+            lastUnreadEmailSentAt: new Date(),
+          },
+        });
+
+        console.log(
+          `[Email] Sent unread messages notification to ${recipient.email} (${recentUnreadMessages.length} messages)`
+        );
+      }
+    }
+  } catch (error) {
+    console.error('[Email] Error in checkAndSendUnreadEmailNotification:', error);
+    // Don't throw - this is a background task
   }
 }

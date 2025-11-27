@@ -9,8 +9,11 @@ import { prisma } from '@/lib/prisma/client';
 import type { ChatHeaderUser } from '@/lib/types/messages';
 import { getDashboardMetadata } from '@/lib/seo/pages';
 
-// Force dynamic rendering for this route (auth-protected, user-specific data)
-export const dynamic = 'force-dynamic';
+// Real-time chat with Supabase WebSocket - prevent Next.js route cache polling
+// Let Supabase subscriptions handle all updates instead of HTTP polling
+export const dynamic = 'force-dynamic'; // Force server rendering for auth
+export const fetchCache = 'force-no-store'; // Prevent aggressive route caching
+export const revalidate = false; // Disable auto-revalidation, rely on WebSocket
 export const dynamicParams = true;
 
 export const metadata = getDashboardMetadata('Μηνύματα');

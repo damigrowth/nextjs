@@ -19,6 +19,7 @@ model User {
   type            String        @default("user") // 'user', 'pro' - for registration flow UI starts as ''
   role            String        @default("user")
   provider        String        @default("email") // email or google
+  lastUnreadEmailSentAt DateTime?   // Track when last unread messages email was sent (24h cooldown)
   accounts        Account[]
   chatMemberships ChatMember[]
   chatsCreated    Chat[]

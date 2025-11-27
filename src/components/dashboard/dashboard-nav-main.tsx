@@ -2,7 +2,7 @@
 
 import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { type ComponentType } from 'react';
+import { type ComponentType, type ReactNode } from 'react';
 
 import {
   Collapsible,
@@ -31,6 +31,7 @@ export function NavMain({
     url: string;
     icon: LucideIcon | ComponentType<any>;
     isActive?: boolean;
+    badge?: ReactNode;
     items?: {
       title: string;
       url: string;
@@ -70,6 +71,7 @@ export function NavMain({
                   <NextLink href={isDisabled ? '#' : item.url}>
                     <item.icon />
                     <span>{item.title}</span>
+                    {item.badge && <span className='ml-auto'>{item.badge}</span>}
                   </NextLink>
                 </SidebarMenuButton>
                 {item.items?.length ? (

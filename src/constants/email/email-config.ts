@@ -50,6 +50,11 @@ import {
   SUPPORT_FEEDBACK_TEXT,
   SupportFeedbackData,
 } from './templates/support-feedback';
+import {
+  UNREAD_MESSAGES_HTML,
+  UNREAD_MESSAGES_TEXT,
+  UnreadMessagesData,
+} from './templates/unread-messages';
 
 export interface EmailConfig<T = any> {
   to: string | ((data: T) => string);
@@ -181,6 +186,19 @@ export const EMAIL_CONFIG = {
     html: PASSWORD_RESET_HTML,
     text: PASSWORD_RESET_TEXT,
   } as EmailConfig<PasswordResetData>,
+
+  // Message Notifications
+  UNREAD_MESSAGES: {
+    to: (data: UnreadMessagesData) => data.userEmail,
+    from: 'Doulitsa <noreply@doulitsa.gr>',
+    replyTo: null,
+    subject: (data: UnreadMessagesData) =>
+      data.unreadCount === 1
+        ? `Έχεις 1 αδιάβαστο μήνυμα - Doulitsa`
+        : `Έχεις ${data.unreadCount} αδιάβαστα μηνύματα - Doulitsa`,
+    html: UNREAD_MESSAGES_HTML,
+    text: UNREAD_MESSAGES_TEXT,
+  } as EmailConfig<UnreadMessagesData>,
 } as const;
 
 export type EmailConfigKey = keyof typeof EMAIL_CONFIG;

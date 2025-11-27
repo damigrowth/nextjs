@@ -3,15 +3,16 @@
 import NextLink from '@/components/shared/next-link';
 import { usePathname } from 'next/navigation';
 import { Mail } from 'lucide-react';
-
-// import MessagesBadge from '../../../oldcode/components/badge/badge-messages';
+import { Badge } from '@/components/ui/badge';
+import { useUnreadCount } from '@/lib/hooks/use-unread-count';
 
 export default function MessagesMenu({ className }: { className?: string }) {
-  // export default function MessagesMenu({ className }: MessagesMenuProps) {
   const pathname = usePathname();
+  const { unreadCount } = useUnreadCount();
 
   // Don't show badge when on messages page
   const isOnMessagesPage = pathname === '/dashboard/messages';
+  const showBadge = !isOnMessagesPage && unreadCount > 0;
 
   return (
     <div
@@ -21,10 +22,17 @@ export default function MessagesMenu({ className }: { className?: string }) {
         href='/dashboard/messages'
         className='relative text-center flex'
         style={{ color: '#1f4b3f' }}
-        aria-label='Messages'
+        aria-label={`Messages${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
       >
         <Mail className='w-5 h-5 flex' />
-        {/* {!isOnMessagesPage && <MessagesBadge />} */}
+        {showBadge && (
+          <Badge
+            variant='destructive'
+            className='absolute -top-2 -right-2 h-4 min-w-4 flex items-center justify-center px-1 text-[10px] font-semibold rounded-full'
+          >
+            {unreadCount > 99 ? '99+' : unreadCount}
+          </Badge>
+        )}
       </NextLink>
     </div>
   );
