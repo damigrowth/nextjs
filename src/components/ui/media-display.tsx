@@ -17,6 +17,8 @@ interface MediaDisplayProps {
   aspectRatio?: 'square' | 'video' | 'portrait';
   showControls?: boolean;
   showAudio?: boolean;
+  loading?: 'eager' | 'lazy';
+  priority?: boolean;
 }
 
 export default function MediaDisplay({
@@ -25,6 +27,8 @@ export default function MediaDisplay({
   aspectRatio = 'video',
   showControls = true,
   showAudio = false,
+  loading = 'lazy',
+  priority = false,
 }: MediaDisplayProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -182,6 +186,8 @@ export default function MediaDisplay({
             fill
             className='object-cover'
             sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+            loading={loading}
+            priority={priority}
           />
         );
     }
