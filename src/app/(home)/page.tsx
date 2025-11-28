@@ -4,12 +4,12 @@ import {
   HeroHome,
   TaxonomiesHome,
   TestimonialsHome,
-  ServicesHomeWrapper,
-  ProfilesHomeWrapper,
   TaxonomyTabs,
 } from '@/components';
 import { getHomeMetadata } from '@/lib/seo/pages';
 import { getHomePageData } from '@/actions/home/get-home-data';
+import { ServicesHomeLazy } from '@/components/home/services-home-lazy';
+import { ProfilesHomeLazy } from '@/components/home/profiles-home-lazy';
 
 // import HomeSchema from 'oldcode/utils/Seo/Schema/HomeSchema';
 
@@ -73,11 +73,11 @@ export default async function HomePage() {
       <HeroHome popularSubcategories={homeData.popularSubcategories} />
       <CategoriesHome categories={homeData.categoriesWithSubcategories} />
       <FeaturesHome />
-      <ServicesHomeWrapper
+      <ServicesHomeLazy
         mainCategories={homeData.services.mainCategories}
         servicesByCategory={homeData.services.servicesByCategory}
       />
-      <ProfilesHomeWrapper profiles={homeData.profiles} />
+      <ProfilesHomeLazy profiles={homeData.profiles} />
       <TestimonialsHome />
       <TaxonomiesHome
         proSubcategories={homeData.proSubcategoriesWithProfiles}

@@ -48,7 +48,7 @@ export function ServicesCarousel({
       >
         <CarouselContent className='-ml-2 sm:-ml-4'>
           {displayServices.map((service) => (
-            <CarouselItem key={service.id} className='pl-2 sm:pl-4 basis-full sm:basis-1/2 lg:basis-1/4'>
+            <CarouselItem key={service.id} className='pl-2 sm:pl-4 basis-full sm:basis-1/2 lg:basis-1/4 cursor-pointer'>
               <ServiceCard
                 service={service}
                 isSaved={savedIdsSet.has(service.id)}

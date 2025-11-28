@@ -126,53 +126,100 @@ export async function getHomePageData(): Promise<ActionResult<HomePageData>> {
       categoriesDataResult,
       subcategoryCounts,
     ] = await Promise.all([
-      // Fetch featured services
-      prisma.service.findMany({
-        where: {
-          status: 'published',
-          featured: true,
-          // Only get services with media
-          NOT: {
+      // Fetch featured services with fallback to top-rated
+      (async () => {
+        // Try to fetch featured services first
+        const featuredServices = await prisma.service.findMany({
+          where: {
+            status: 'published',
+            featured: true,
+            // Only get services with media (not null and not empty array)
             media: {
-              equals: Prisma.JsonNull,
+              not: Prisma.JsonNull,
             },
           },
-        },
-        include: serviceInclude,
-        orderBy: [
-          { rating: 'desc' },
-          { reviewCount: 'desc' },
-          { updatedAt: 'desc' },
-        ],
-        take: 16,
-      }),
+          include: serviceInclude,
+          orderBy: [
+            { rating: 'desc' },
+            { reviewCount: 'desc' },
+            { updatedAt: 'desc' },
+          ],
+          take: 16,
+        });
 
-      // Fetch featured profiles
-      prisma.profile.findMany({
-        where: {
-          published: true,
-          isActive: true, // Only show active profiles
-          featured: true,
-          // Only get profiles with images
-          NOT: {
-            image: null,
-          },
-          user: {
-            role: {
-              in: ['freelancer', 'company'],
+        // Fallback: If no featured services found, get top-rated services
+        if (featuredServices.length === 0) {
+          console.warn('[Home] No featured services found, using top-rated services as fallback');
+          return prisma.service.findMany({
+            where: {
+              status: 'published',
+              rating: { gte: 0 }, // All published services
+              media: {
+                not: Prisma.JsonNull,
+              },
             },
-            confirmed: true,
-            blocked: false,
+            include: serviceInclude,
+            orderBy: [
+              { rating: 'desc' },
+              { reviewCount: 'desc' },
+              { updatedAt: 'desc' },
+            ],
+            take: 16,
+          });
+        }
+
+        return featuredServices;
+      })(),
+
+      // Fetch featured profiles with fallback to top-rated
+      (async () => {
+        const featuredProfiles = await prisma.profile.findMany({
+          where: {
+            published: true,
+            isActive: true,
+            featured: true,
+            NOT: { image: null },
+            user: {
+              role: { in: ["freelancer", "company"] },
+              confirmed: true,
+              blocked: false,
+            },
           },
-        },
-        include: profileInclude,
-        orderBy: [
-          { rating: 'desc' },
-          { reviewCount: 'desc' },
-          { updatedAt: 'desc' },
-        ],
-        take: 16,
-      }),
+          include: profileInclude,
+          orderBy: [
+            { rating: "desc" },
+            { reviewCount: "desc" },
+            { updatedAt: "desc" },
+          ],
+          take: 16,
+        });
+
+        if (featuredProfiles.length === 0) {
+          console.warn("[Home] No featured profiles found, using top-rated profiles as fallback");
+          return prisma.profile.findMany({
+            where: {
+              published: true,
+              isActive: true,
+              rating: { gte: 0 },
+              NOT: { image: null },
+              user: {
+                role: { in: ["freelancer", "company"] },
+                confirmed: true,
+                blocked: false,
+              },
+            },
+            include: profileInclude,
+            orderBy: [
+              { rating: "desc" },
+              { reviewCount: "desc" },
+              { updatedAt: "desc" },
+            ],
+            take: 16,
+          });
+        }
+
+        return featuredProfiles;
+      })(),
 
       // Reuse cached directory page data for pro subcategories (100 for home page)
       getDirectoryPageData({ limit: 100 }),

@@ -22,8 +22,10 @@ Avatar.displayName = AvatarPrimitive.Root.displayName;
 
 const AvatarImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
->(({ className, src, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image> & {
+    loading?: 'eager' | 'lazy';
+  }
+>(({ className, src, loading = 'lazy', ...props }, ref) => {
   // Don't render if src is empty string or null/undefined
   if (!src || src === '') {
     return null;
@@ -34,6 +36,7 @@ const AvatarImage = React.forwardRef<
       ref={ref}
       src={src}
       className={cn('aspect-square h-full w-full object-cover', className)}
+      loading={loading}
       {...props}
     />
   );

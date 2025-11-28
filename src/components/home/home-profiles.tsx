@@ -65,7 +65,7 @@ export default function ProfilesHome({
               {profiles.map((profile) => (
                 <CarouselItem
                   key={profile.id}
-                  className='pl-2 sm:pl-4 basis-full sm:basis-1/2 lg:basis-1/4'
+                  className='pl-2 sm:pl-4 basis-full sm:basis-1/2 lg:basis-1/4 cursor-pointer'
                 >
                   <ProfileCard
                     profile={profile}

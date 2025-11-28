@@ -36,6 +36,8 @@ export interface UserAvatarProps {
   height?: number;
   /** Show shadow */
   showShadow?: boolean;
+  /** Image loading strategy */
+  loading?: 'eager' | 'lazy';
 }
 
 const sizeClasses = {
@@ -111,6 +113,7 @@ export default function UserAvatar({
   width,
   height,
   showShadow = true,
+  loading = 'lazy',
 }: UserAvatarProps) {
   const sizeClass = sizeClasses[size];
   const borderClass = showBorder ? borderClasses[size] : '';
@@ -148,7 +151,7 @@ export default function UserAvatar({
         )}
       >
         {imageUrl && (
-          <AvatarImage src={imageUrl} alt={altText} className='object-cover' />
+          <AvatarImage src={imageUrl} alt={altText} className='object-cover' loading={loading} />
         )}
         <AvatarFallback className='rounded-lg'>
           {imageUrl ? (
