@@ -51,7 +51,7 @@ export default function ProfileInfo({
 
   return (
     <Card className='rounded-lg bg-muted border border-border shadow-sm'>
-      {rate && (
+      {rate ? (
         <CardHeader className='pb-0'>
           <h3 className='text-2xl font-bold text-foreground'>
             {rate}€
@@ -60,7 +60,7 @@ export default function ProfileInfo({
             </span>
           </h3>
         </CardHeader>
-      )}
+      ) : null}
 
       <CardContent className='space-y-0'>
         <div className=''>
