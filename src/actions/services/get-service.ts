@@ -369,12 +369,15 @@ async function _getServicePageData(
         { reviewCount: 'desc' },
         { updatedAt: 'desc' },
       ],
-      take: 12, // Fetch 12 and randomize to get 6
+      take: 20, // Fetch 20 to account for empty array filtering
     });
 
     // Shuffle and take 5 for randomization
+    // Filter out services with empty media arrays
     const shuffled = relatedServicesRaw.sort(() => Math.random() - 0.5);
-    const relatedServicesSubset = shuffled.slice(0, 5);
+    const relatedServicesSubset = shuffled
+      .filter((s) => s.media && Array.isArray(s.media) && s.media.length > 0)
+      .slice(0, 5);
 
     // Transform to ServiceCardData format
     const relatedServices: ServiceCardData[] = relatedServicesSubset.map(

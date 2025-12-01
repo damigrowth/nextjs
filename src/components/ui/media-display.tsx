@@ -74,7 +74,7 @@ export default function MediaDisplay({
     if (!mediaUrl) {
       return (
         <div className='absolute inset-0 bg-gray-100 flex items-center justify-center'>
-          <p className='text-gray-500'>Media unavailable</p>
+          <p className='text-gray-500'>Μη Διαθέσιμη Εικόνα</p>
         </div>
       );
     }
@@ -203,7 +203,7 @@ export default function MediaDisplay({
       <div
         className={`${containerClass} bg-gray-100 flex items-center justify-center`}
       >
-        <span className='text-gray-500'>No media available</span>
+        <span className='text-gray-500'>Μη Διαθέσιμη Εικόνα</span>
       </div>
     );
   }
