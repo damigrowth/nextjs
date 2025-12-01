@@ -8,7 +8,7 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useChatSubscription } from '@/lib/hooks/chat/use-chat-subscription';
 import { useMessageOptimistic } from '@/lib/hooks/chat/use-message-optimistic';
-import { getMessages } from '@/actions/messages';
+import { getMessages, markAsRead } from '@/actions/messages';
 import { ChatMessages } from './chat-messages';
 import { MessageInput, ReplyToMessage, EditingMessage } from './message-input';
 import { Loader2 } from 'lucide-react';
@@ -48,6 +48,27 @@ export function MessagesContainer({
     chatId,
     currentUserId,
   });
+
+  // Mark messages as read when chat opens
+  useEffect(() => {
+    const markChatAsRead = async () => {
+      // Get all unread messages (messages not sent by current user and not already read)
+      const unreadMessageIds = initialMessages
+        .filter(m => !m.isOwn && !m.isRead)
+        .map(m => m.id);
+
+      // Mark them as read if there are any
+      if (unreadMessageIds.length > 0) {
+        try {
+          await markAsRead(unreadMessageIds, currentUserId);
+        } catch (error) {
+          console.error('Failed to mark messages as read:', error);
+        }
+      }
+    };
+
+    markChatAsRead();
+  }, [chatId, currentUserId]); // Run when chatId changes (new chat opened)
 
   // Load older messages when scrolling to top
   const loadOlderMessages = useCallback(async () => {

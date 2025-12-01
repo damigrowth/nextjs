@@ -51,7 +51,6 @@ export async function getMessages(
             image: true,
           },
         },
-        readBy: true,
         replyTo: {
           include: {
             author: {
@@ -137,7 +136,6 @@ export async function sendMessage(
               image: true,
             },
           },
-          readBy: true,
           replyTo: {
             include: {
               author: {
@@ -265,26 +263,21 @@ export async function markAsRead(
   try {
     if (messageIds.length === 0) return;
 
-    // Create MessageRead records (upsert to avoid duplicates)
-    await prisma.$transaction(
-      messageIds.map((messageId) =>
-        prisma.messageRead.upsert({
-          where: {
-            messageId_uid: {
-              messageId: messageId,
-              uid: userId,
-            },
-          },
-          create: {
-            messageId: messageId,
-            uid: userId,
-          },
-          update: {
-            readAt: new Date(),
-          },
-        })
-      )
-    );
+    // Update messages to mark as read
+    // Only update messages not sent by the current user
+    await prisma.message.updateMany({
+      where: {
+        id: {
+          in: messageIds,
+        },
+        authorUid: {
+          not: userId,
+        },
+      },
+      data: {
+        read: true,
+      },
+    });
   } catch (error) {
     console.error('Error marking messages as read:', error);
     throw new Error('Failed to mark messages as read');
@@ -302,7 +295,7 @@ export async function getUnreadCount(
     // Count messages where:
     // - chatId matches
     // - author is NOT current user
-    // - no MessageRead record for current user
+    // - message is not read
     const count = await prisma.message.count({
       where: {
         chatId: chatId,
@@ -310,11 +303,7 @@ export async function getUnreadCount(
           not: userId,
         },
         deleted: false,
-        readBy: {
-          none: {
-            uid: userId,
-          },
-        },
+        read: false,
       },
     });
 
@@ -353,11 +342,7 @@ export async function getTotalUnreadCount(userId: string): Promise<number> {
           not: userId,
         },
         deleted: false,
-        readBy: {
-          none: {
-            uid: userId,
-          },
-        },
+        read: false,
       },
     });
 
@@ -419,11 +404,7 @@ export async function getRecentUnreadMessages(
         createdAt: {
           gte: timeThreshold,
         },
-        readBy: {
-          none: {
-            uid: userId,
-          },
-        },
+        read: false,
       },
       include: {
         author: {

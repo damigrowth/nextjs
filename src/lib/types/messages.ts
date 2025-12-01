@@ -1,4 +1,4 @@
-import { Chat, Message, ChatMember, MessageRead, User } from '@prisma/client';
+import { Chat, Message, ChatMember, User } from '@prisma/client';
 import type { MessageReaction } from '@/lib/prisma/json-types';
 
 // Re-export MessageReaction for external use
@@ -45,7 +45,6 @@ export interface ChatListItem {
  */
 export type MessageWithRelations = Message & {
   author: Pick<User, 'id' | 'displayName' | 'firstName' | 'lastName' | 'image'>;
-  readBy: MessageRead[];
   replyTo:
     | (Message & {
         author: Pick<User, 'displayName' | 'firstName' | 'lastName'>;
@@ -65,7 +64,7 @@ export interface ChatMessageItem {
   deleted: boolean; // Message.deleted
   authorUid: string; // Message.authorUid
   isOwn: boolean; // Computed: authorUid === currentUserId
-  isRead: boolean; // Computed: readBy includes currentUser
+  isRead: boolean; // Computed: message.read or message is own
   replyToId: string | null; // Message.replyToId
   replyTo: {
     // For displaying quoted message

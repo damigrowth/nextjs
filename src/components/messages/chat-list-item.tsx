@@ -61,7 +61,7 @@ export function ChatListItem({ chat }: ChatListItemProps) {
             {chat.lastMessage || 'Δεν υπάρχουν μηνύματα ακόμα'}
           </p>
           {chat.unread > 0 && (
-            <Badge className='shrink-0 rounded-full text-xs h-5 w-5 p-0 flex items-center justify-center bg-third hover:bg-secondary'>
+            <Badge variant='destructive' className='shrink-0 rounded-full h-4 w-4 p-0 flex items-center justify-center text-[10px] font-semibold'>
               {chat.unread}
             </Badge>
           )}
