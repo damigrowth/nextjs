@@ -409,8 +409,8 @@ export default function MediaCarousel({
               </>
             ) : (
               <>
-                <CarouselPrevious className='left-2' />
-                <CarouselNext className='right-2' />
+                <CarouselPrevious className='left-0 !opacity-100 !translate-x-0' />
+                <CarouselNext className='right-0 !opacity-100 !translate-x-0' />
               </>
             ))}
         </Carousel>
