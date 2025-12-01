@@ -498,18 +498,56 @@ export const profilePresentationUpdateSchema = z.object({
   socials: socialMediaSchema.optional(),
 });
 
-// Required image schema for onboarding (doesn't allow null)
-const requiredImageSchema = z.union([
-  cloudinaryResourceSchema,
-  z.string().url(), // Allow string URLs for Google/external images
-]);
+// Strict onboarding image schema - rejects blob URLs and validates structure
+// Used ONLY for onboarding (first-time profile setup for pro users)
+export const onboardingImageSchema = z.union([
+  // CloudinaryResource object
+  cloudinaryResourceSchema.refine(
+    (val) => {
+      if (!val || !val.secure_url) return false;
+
+      // ALLOW pending resources (normal upload flow - don't show errors)
+      // Pending resources have _pending flag or public_id starting with 'pending_'
+      const isPending =
+        (val as any)._pending === true ||
+        val.public_id?.startsWith('pending_');
+
+      if (isPending) return true; // Accept pending resources silently
+
+      // Reject blob URLs (only for non-pending resources)
+      if (val.secure_url.startsWith('blob:')) return false;
+
+      // Accept Cloudinary URLs
+      if (val.secure_url.startsWith('https://res.cloudinary.com/')) return true;
+      // Accept all Google CDN variations (lh3, lh4, lh5, lh6, etc.)
+      if (val.secure_url.startsWith('https://lh')) return true;
+      if (val.secure_url.includes('googleusercontent.com')) return true;
+      // Accept any other valid HTTPS URL
+      return val.secure_url.startsWith('https://') && val.secure_url.length > 10;
+    },
+    'Η εικόνα δεν έχει ανέβει ακόμα. Παρακαλώ περιμένετε να ολοκληρωθεί το ανέβασμα.'
+  ),
+  // String URL (for Google OAuth images or direct URLs)
+  z.string().refine(
+    (val) => {
+      if (!val || val.length === 0) return false;
+      // Reject blob URLs
+      if (val.startsWith('blob:')) return false;
+      // Accept all Google CDN URLs (more permissive for OAuth)
+      if (val.includes('googleusercontent.com')) return true;
+      // Must be valid HTTPS URL
+      return val.startsWith('https://') && val.length > 10;
+    },
+    'Η εικόνα προφίλ είναι υποχρεωτική'
+  ),
+]).refine(
+  (val) => val !== null && val !== undefined,
+  'Η εικόνα προφίλ είναι υποχρεωτική'
+);
 
 // Main onboarding form schema - bio, category, subcategory, coverage are required, image is now required
 export const onboardingFormSchema = z.object({
-  image: requiredImageSchema.refine(
-    (val) => val !== null && val !== undefined,
-    'Η εικόνα προφίλ είναι υποχρεωτική'
-  ), // Required for onboarding
+  image: onboardingImageSchema, // Required for onboarding - strict validation
   category: categorySchema, // Required - now a string slug
   subcategory: categorySchema, // Required - now a string slug
   bio: z
