@@ -38,47 +38,34 @@ model ChatMember {
 }
 
 model Message {
-  id            String        @id @default(cuid())
+  id            String    @id @default(cuid())
   content       String
-  read          Boolean       @default(false)
-  published     Boolean       @default(true)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  read          Boolean   @default(false)
+  published     Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   authorUid     String
   chatId        String
-  deleted       Boolean       @default(false)
+  deleted       Boolean   @default(false)
   deletedAt     DateTime?
   deletedBy     String?
-  edited        Boolean       @default(false)
+  edited        Boolean   @default(false)
   editedAt      DateTime?
   replyToId     String?
   /// [MessageReactions]
   reactions     Json?
-  lastMessageOf Chat?         @relation("ChatLastMessage")
-  readBy        MessageRead[]
-  author        User          @relation("MessageAuthor", fields: [authorUid], references: [id])
-  chat          Chat          @relation("ChatMessages", fields: [chatId], references: [id], onDelete: Cascade)
-  deletedByUser User?         @relation("MessageDeletedBy", fields: [deletedBy], references: [id])
-  replyTo       Message?      @relation("MessageReplies", fields: [replyToId], references: [id])
-  replies       Message[]     @relation("MessageReplies")
+  lastMessageOf Chat?     @relation("ChatLastMessage")
+  author        User      @relation("MessageAuthor", fields: [authorUid], references: [id])
+  chat          Chat      @relation("ChatMessages", fields: [chatId], references: [id], onDelete: Cascade)
+  deletedByUser User?     @relation("MessageDeletedBy", fields: [deletedBy], references: [id])
+  replyTo       Message?  @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies       Message[] @relation("MessageReplies")
 
   @@index([authorUid])
   @@index([chatId, createdAt])
   @@index([deleted, createdAt])
   @@index([replyToId])
   @@map("messages")
-}
-
-model MessageRead {
-  messageId String
-  uid       String
-  readAt    DateTime @default(now())
-  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [uid], references: [id], onDelete: Cascade)
-
-  @@id([messageId, uid])
-  @@index([uid])
-  @@map("message_reads")
 }
 
 model BlockedUser {

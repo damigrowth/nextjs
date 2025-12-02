@@ -24,7 +24,6 @@ model User {
   chatMemberships ChatMember[]
   chatsCreated    Chat[]
   media           Media[]
-  messagesRead    MessageRead[]
   messagesAuthored Message[]     @relation("MessageAuthor")
   messagesDeleted Message[]     @relation("MessageDeletedBy")
   profile         Profile?

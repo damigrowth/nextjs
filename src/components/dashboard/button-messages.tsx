@@ -10,9 +10,9 @@ export default function MessagesMenu({ className }: { className?: string }) {
   const pathname = usePathname();
   const { unreadCount } = useUnreadCount();
 
-  // Don't show badge when on messages page
-  const isOnMessagesPage = pathname === '/dashboard/messages';
-  const showBadge = !isOnMessagesPage && unreadCount > 0;
+  // Don't show badge when on messages routes
+  const isOnMessagesRoute = pathname.startsWith('/dashboard/messages');
+  const showBadge = !isOnMessagesRoute && unreadCount > 0;
 
   return (
     <div

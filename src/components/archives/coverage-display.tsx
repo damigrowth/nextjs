@@ -101,8 +101,8 @@ export function CoverageDisplay({
       <div className='text-sm text-gray-600'>
         {showExpandButton ? (
           <Popover open={isExpanded} onOpenChange={setIsExpanded}>
-            <div className='flex items-center gap-1.5'>
-              <MapPin className='w-4 h-4' />
+            <div className='flex items-start gap-1.5'>
+              <MapPin className='w-4 h-4 shrink-0 mt-1' />
               <PopoverTrigger asChild>
                 <button className='text-left hover:text-gray-900 transition-colors cursor-pointer'>
                   <span>{coverageText}</span>
@@ -127,8 +127,8 @@ export function CoverageDisplay({
             </PopoverContent>
           </Popover>
         ) : (
-          <div className='flex items-center gap-1.5'>
-            <MapPin className='w-4 h-4' />
+          <div className='flex items-start gap-1.5'>
+            <MapPin className='w-4 h-4 shrink-0 mt-1' />
             {coverageText}
           </div>
         )}
