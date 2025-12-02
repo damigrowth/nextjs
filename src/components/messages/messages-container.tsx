@@ -70,6 +70,27 @@ export function MessagesContainer({
     markChatAsRead();
   }, [chatId, currentUserId]); // Run when chatId changes (new chat opened)
 
+  // Auto-mark new real-time messages as read when they arrive
+  useEffect(() => {
+    const markNewMessagesAsRead = async () => {
+      // Get unread messages from real-time subscription (not sent by current user)
+      const unreadMessageIds = realtimeMessages
+        .filter(m => !m.isOwn && !m.isRead)
+        .map(m => m.id);
+
+      // Mark new messages as read since user has this chat open
+      if (unreadMessageIds.length > 0) {
+        try {
+          await markAsRead(unreadMessageIds, currentUserId);
+        } catch (error) {
+          console.error('Failed to mark new messages as read:', error);
+        }
+      }
+    };
+
+    markNewMessagesAsRead();
+  }, [realtimeMessages, currentUserId]); // Run when new real-time messages arrive
+
   // Load older messages when scrolling to top
   const loadOlderMessages = useCallback(async () => {
     if (isLoadingOlder || !hasMore) return;
