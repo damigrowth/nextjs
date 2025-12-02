@@ -4,7 +4,7 @@
  * Runs every 15 minutes to check for unprocessed email batches
  * and send notification emails for batches that are 15+ minutes old.
  *
- * Schedule: */15 * * * * (every 15 minutes)
+ * Schedule: Every 15 minutes (cron expression in vercel.json)
  * Security: Requires CRON_SECRET in Authorization header
  */
 
