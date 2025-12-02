@@ -429,10 +429,11 @@ export async function getRecentUnreadMessages(
 }
 
 /**
- * Check if recipient has unread messages to trigger email notification
- * Triggers email if:
- * 1. Recipient has unread messages in last 15 minutes
- * 2. At least 15 minutes passed since last email notification
+ * Manage email batch state when a message is sent
+ * Creates or updates EmailBatch records for 15-minute collection windows
+ *
+ * Note: Email sending is handled by Vercel cron job (/api/cron/process-email-batches)
+ * that runs every 15 minutes automatically
  *
  * This is called asynchronously after sending a message (non-blocking)
  */
@@ -454,9 +455,6 @@ async function checkAndSendUnreadEmailNotification(
           select: {
             id: true,
             email: true,
-            displayName: true,
-            username: true,
-            lastUnreadEmailSentAt: true,
           },
         },
       },
@@ -466,35 +464,44 @@ async function checkAndSendUnreadEmailNotification(
     for (const member of chatMembers) {
       const recipient = member.user;
 
-      // Check if 15 minutes have passed since last email
-      if (recipient.lastUnreadEmailSentAt) {
-        const minutesSinceLastEmail =
-          (Date.now() - new Date(recipient.lastUnreadEmailSentAt).getTime()) / (1000 * 60);
+      // Check for existing unprocessed email batch
+      const batch = await prisma.emailBatch.findFirst({
+        where: {
+          userId: recipient.id,
+          processed: false,
+        },
+        orderBy: {
+          firstMessageAt: 'desc',
+        },
+      });
 
-        if (minutesSinceLastEmail < 15) {
-          // Skip this recipient - cooldown period active (15 min)
-          continue;
-        }
-      }
-
-      // Get recent unread messages for this recipient (last 15 minutes)
-      const recentUnreadMessages = await getRecentUnreadMessages(recipient.id, 15);
-
-      // Check if recipient has any unread messages in last 15 minutes
-      if (recentUnreadMessages.length >= 1) {
-        // Send email notification
-        await sendUnreadMessagesEmail(recipient, recentUnreadMessages);
-
-        // Update lastUnreadEmailSentAt to prevent spam
-        await prisma.user.update({
-          where: { id: recipient.id },
+      if (!batch) {
+        // No active batch - create new one (start 15-minute collection window)
+        await prisma.emailBatch.create({
           data: {
-            lastUnreadEmailSentAt: new Date(),
+            userId: recipient.id,
+            firstMessageAt: new Date(),
+            messageCount: 1,
           },
         });
 
         console.log(
-          `[Email] Sent unread messages notification to ${recipient.email} (${recentUnreadMessages.length} messages)`
+          `[Email Batch] Started new 15-minute collection window for user ${recipient.id}`
+        );
+      } else {
+        // Batch exists - increment message count
+        const minutesSinceFirst =
+          (Date.now() - new Date(batch.firstMessageAt).getTime()) / (1000 * 60);
+
+        await prisma.emailBatch.update({
+          where: { id: batch.id },
+          data: {
+            messageCount: { increment: 1 },
+          },
+        });
+
+        console.log(
+          `[Email Batch] Added message to batch for user ${recipient.id} (${Math.floor(minutesSinceFirst)} min elapsed, cron will send at 15 min)`
         );
       }
     }

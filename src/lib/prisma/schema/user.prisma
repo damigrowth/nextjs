@@ -33,6 +33,7 @@ model User {
   blockedByUsers  BlockedUser[] @relation("BlockedBy")
   savedServices   SavedService[]
   savedProfiles   SavedProfile[]
+  emailBatches    EmailBatch[]
 
   @@index([role])
   @@index([step])
