@@ -11,6 +11,9 @@ export { EditServiceAddonsForm } from './edit-service-addons-form';
 export { EditServiceFaqForm } from './edit-service-faq-form';
 export { EditServiceMediaForm } from './edit-service-media-form';
 
+// Profile forms
+export { EditProfileSettingsForm } from './edit-profile-settings-form';
+
 // Taxonomy forms
 export { CreateServiceTaxonomyForm } from './create-service-taxonomy-form';
 export { EditTaxonomyItemForm } from './edit-taxonomy-item-form';
