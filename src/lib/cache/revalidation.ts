@@ -154,6 +154,7 @@ export async function revalidateProfile(params: {
     revalidatePath(`/profile/${username}`);
   }
   revalidatePath('/dir');
+  revalidatePath('/dashboard'); // Dashboard main page shows profile summary
 }
 
 /**

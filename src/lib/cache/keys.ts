@@ -328,24 +328,23 @@ export const TaxonomyCacheKeys = {
   /**
    * Categories page data (all categories with counts)
    *
+   * @param params - Optional filter parameters
    * @returns Cache key for categories page
    *
    * @example
    * TaxonomyCacheKeys.categoriesPage()
-   * // Returns: ['categories', 'page-data']
-   */
-  categoriesPage: () => ['categories', 'page-data'],
-
-  /**
-   * Directory page data (all categories and profiles)
+   * // Returns: ['categories:page-data']
    *
-   * @returns Cache key for directory page
+   * TaxonomyCacheKeys.categoriesPage({ category: 'texnika' })
+   * // Returns: ['categories:page-data', 'category:texnika']
    *
-   * @example
-   * TaxonomyCacheKeys.directoryPage()
-   * // Returns: ['directory', 'page-data']
+   * TaxonomyCacheKeys.categoriesPage({ category: 'texnika', subcategory: 'web' })
+   * // Returns: ['categories:page-data', 'category:texnika', 'subcategory:web']
    */
-  directoryPage: () => ['directory', 'page-data'],
+  categoriesPage: (params?: {
+    category?: string;
+    subcategory?: string;
+  }) => buildCacheKey('categories:page-data', params || {}),
 };
 
 // ============================================================================
