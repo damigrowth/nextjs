@@ -60,7 +60,7 @@ export function AdminProfilesDataTable({
   const columns: ColumnDef<AdminProfileWithRelations>[] = [
     {
       key: 'displayName',
-      header: 'Profile',
+      header: 'Προφίλ',
       sortable: true,
       render: (profile) => {
         const displayName =
@@ -96,7 +96,7 @@ export function AdminProfilesDataTable({
     },
     {
       key: 'relatedUser',
-      header: 'Related User',
+      header: 'Email',
       render: (profile) => {
         const userId = profile.user.id;
         const userEmail = profile.user.email;
@@ -113,7 +113,7 @@ export function AdminProfilesDataTable({
     },
     {
       key: 'type',
-      header: 'Role',
+      header: 'Τύπος',
       render: (profile) => {
         if (!profile.type)
           return <span className='text-muted-foreground text-sm'>-</span>;
@@ -128,7 +128,7 @@ export function AdminProfilesDataTable({
     },
     {
       key: 'category',
-      header: 'Category',
+      header: 'Κατηγορία',
       render: (profile) => {
         if (!profile.taxonomyLabels) {
           return <span className='text-muted-foreground text-sm'>-</span>;
@@ -152,7 +152,7 @@ export function AdminProfilesDataTable({
     },
     {
       key: 'services',
-      header: 'Services',
+      header: 'Υπηρεσίες',
       sortable: true,
       render: (profile) => (
         <div className='text-sm font-medium'>{profile._count.services}</div>

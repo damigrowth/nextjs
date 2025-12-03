@@ -147,7 +147,7 @@ export const coverageSchema = z
       return true;
     },
     {
-      message: 'Όλα τα πεδία για "Στον χώρο μου" είναι υποχρεωτικά',
+      message: 'Συμπληρώστε τη Διεύθυνση και τον Τ.Κ. σας',
       path: ['address'],
     }
   )
@@ -160,7 +160,7 @@ export const coverageSchema = z
       return true;
     },
     {
-      message: 'Επιλέξτε τουλάχιστον έναν νομό για "Στον χώρο του πελάτη"',
+      message: 'Επιλέξτε τουλάχιστον έναν νομό που εξυπηρετείτε',
       path: ['counties'],
     }
   );

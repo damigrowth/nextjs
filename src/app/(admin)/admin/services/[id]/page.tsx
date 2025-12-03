@@ -120,7 +120,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
               {/* Service Information */}
               <Card>
                 <CardHeader className='pb-3'>
-                  <CardTitle className='text-sm'>Service Information</CardTitle>
+                  <CardTitle className='text-sm'>Πληροφορίες Υπηρεσίας</CardTitle>
                 </CardHeader>
                 <CardContent className='p-0'>
                   <div className='divide-y'>
@@ -311,20 +311,13 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
             {/* Service Management Forms - LAST SECTION */}
             <div className='mx-auto w-full max-w-5xl px-4 lg:px-6 space-y-6'>
               <div>
-                <h2>Service Management</h2>
-                <p className='text-muted-foreground'>
-                  Edit service information, taxonomy, pricing, and status
-                  settings
-                </p>
+                <h2>Διαχείρηση Υπηρεσίας</h2>
               </div>
 
               <div className='space-y-6'>
                 <Card>
                   <CardHeader>
-                    <CardTitle className='text-lg'>Status & Settings</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Manage service status, published state, and featured flag
-                    </p>
+                    <CardTitle className='text-lg'>Status</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <EditServiceSettingsForm service={service} />
@@ -333,10 +326,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className='text-lg'>Basic Information</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Update service title and description
-                    </p>
+                    <CardTitle className='text-lg'>Πληροφορίες</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <EditServiceBasicForm service={service} />
@@ -345,10 +335,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className='text-lg'>Taxonomy & Tags</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Manage category, subcategory, subdivision, and tags
-                    </p>
+                    <CardTitle className='text-lg'>Κατηγορία & Tags</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <EditServiceTaxonomyForm service={service} />
@@ -360,10 +347,6 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                     <CardTitle className='text-lg'>
                       Pricing & Duration
                     </CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Update price, fixed pricing, duration, and subscription
-                      type
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <EditServicePricingForm service={service} />
@@ -373,11 +356,8 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>
-                      Extra Services (Addons)
+                     Addons
                     </CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Manage additional services and pricing
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <EditServiceAddonsForm service={service} />
@@ -387,11 +367,8 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>
-                      Frequently Asked Questions
+                      Συχνές Ερωτήσεις
                     </CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Manage service FAQ section
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <EditServiceFaqForm service={service} />
@@ -400,10 +377,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className='text-lg'>Media & Images</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Manage service photos and videos
-                    </p>
+                    <CardTitle className='text-lg'>Media</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <EditServiceMediaForm service={service} />

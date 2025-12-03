@@ -30,7 +30,7 @@ export const EMAIL_TEMPLATES: Partial<Record<EmailTemplateKey, EmailTemplate>> =
   VERIFICATION: {
     from: 'Doulitsa <noreply@doulitsa.gr>',
     replyTo: null,
-    subject: 'Επαλήθευση λογαριασμού στη Doulitsa',
+    subject: 'Επιβεβαίωση	 λογαριασμού στη Doulitsa',
     html: (data: VerificationData) => VERIFICATION_HTML(data),
   },
   WELCOME: {

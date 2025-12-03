@@ -19,44 +19,37 @@ import { NextLink } from '../shared';
 
 const navItems = [
   {
-    title: 'Services',
-    description: 'Manage service listings and categories',
+    title: 'Υπηρεσίες',
     icon: BriefcaseIcon,
     href: '/admin/services',
   },
   {
-    title: 'Verifications',
-    description: 'Review and approve user verifications',
-    icon: CheckCircleIcon,
-    href: '/admin/verifications',
-  },
-  {
-    title: 'Profiles',
-    description: 'View and manage user profiles',
+    title: 'Προφίλ',
     icon: UserCheckIcon,
     href: '/admin/profiles',
   },
   {
-    title: 'Users',
-    description: 'User accounts and permissions',
+    title: 'Πιστοποιήσεις',
+    icon: CheckCircleIcon,
+    href: '/admin/verifications',
+  },
+  {
+    title: 'Χρήστες',
     icon: UsersIcon,
     href: '/admin/users',
   },
   {
     title: 'Taxonomies',
-    description: 'Categories, tags, and classifications',
     icon: TagsIcon,
     href: '/admin/taxonomies',
   },
   {
     title: 'Analytics',
-    description: 'Platform insights and statistics',
     icon: BarChartIcon,
     href: '/admin/analytics',
   },
   {
     title: 'Git',
-    description: 'Version control and deployments',
     icon: GitBranchIcon,
     href: '/admin/git',
   },
@@ -66,10 +59,7 @@ export function AdminNavCards() {
   return (
     <div className='px-4 lg:px-6'>
       <div className='mb-4'>
-        <h2 className='text-lg font-semibold'>Quick Access</h2>
-        <p className='text-sm text-muted-foreground'>
-          Navigate to different admin sections
-        </p>
+        <h2 className='text-lg font-semibold'>Γρήγορη Πρόσβαση</h2>
       </div>
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
         {navItems.map((item) => {
@@ -83,7 +73,6 @@ export function AdminNavCards() {
                     <ArrowRightIcon className='h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100' />
                   </div>
                   <CardTitle className='mt-4'>{item.title}</CardTitle>
-                  <CardDescription>{item.description}</CardDescription>
                 </CardHeader>
               </Card>
             </NextLink>

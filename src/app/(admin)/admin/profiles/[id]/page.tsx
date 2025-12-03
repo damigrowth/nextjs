@@ -101,7 +101,7 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
               {/* Profile Information Table */}
               <Card>
                 <CardHeader className='pb-3'>
-                  <CardTitle className='text-sm'>Profile Information</CardTitle>
+                  <CardTitle className='text-sm'>Πληροφορίες Προφίλ</CardTitle>
                 </CardHeader>
                 <CardContent className='p-0'>
                   <div className='divide-y'>
@@ -264,21 +264,13 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
             {/* Profile Management Forms */}
             <div className='mx-auto w-full max-w-5xl px-4 lg:px-6 space-y-6'>
               <div>
-                <h2>Profile Management</h2>
-                <p className='text-muted-foreground'>
-                  Edit profile information, presentation, portfolio, and billing
-                  details
-                </p>
+                <h2>Διαχείρηση Προφίλ</h2>
               </div>
-
               <div className='space-y-6'>
                 {/* Account Information */}
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Λογαριασμός</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Εικόνα προφίλ, όνομα εμφάνισης
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <AccountForm
@@ -293,10 +285,6 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Βασικά στοιχεία</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Tagline, κατηγορία, υποκατηγορία, τοποθεσία, ειδικότητα,
-                      δεξιότητες, bio
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <BasicInfoForm
@@ -312,9 +300,6 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Περιοχές Κάλυψης</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Τρόποι παροχής, διεύθυνση, νομοί και περιοχές κάλυψης
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <CoverageForm
@@ -330,12 +315,6 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Πρόσθετα Στοιχεία</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Έναρξη δραστηριότητας, ωριαία αμοιβή, μέθοδοι
-                      επικοινωνίας, μέθοδοι πληρωμής, μέθοδοι διακανονισμού,
-                      ελάχιστος προϋπολογισμός, κλάδοι δραστηριότητας, όροι
-                      συνεργασίας
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <AdditionalInfoForm
@@ -351,11 +330,7 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Παρουσίαση</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Τηλέφωνο, ιστοσελίδα, ορατότητα στοιχείων, μέσα κοινωνικής
-                      δικτύωσης
-                    </p>
-                  </CardHeader>
+                     </CardHeader>
                   <CardContent>
                     <PresentationInfoForm
                       initialUser={mockUser as any}
@@ -370,9 +345,6 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Portfolio</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Εικόνες και βίντεο χαρτοφυλακίου
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <PortfolioForm
@@ -391,11 +363,7 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                     <CardTitle className='text-lg'>
                       Στοιχεία Τιμολόγησης
                     </CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Τύπος παραστατικού, ΑΦΜ, ΔΟΥ, επωνυμία, επάγγελμα,
-                      διεύθυνση τιμολόγησης
-                    </p>
-                  </CardHeader>
+                    </CardHeader>
                   <CardContent>
                     <BillingForm
                       initialUser={mockUser as any}

@@ -200,7 +200,7 @@ export const validateFileType = (
     return {
       isValid: false,
       type: 'unknown',
-      error: 'Unsupported file type. Please choose a different file.'
+      error: 'Μη έγκυρος τύπος αρχείου. Παρακαλώ επιλέξτε ένα έγκυρο είδος αρχείου.'
     };
   }
   
