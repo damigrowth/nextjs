@@ -3,7 +3,7 @@
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { ActionResponse } from '@/lib/types/api';
-import { CACHE_TAGS, getServiceTags } from '@/lib/cache';
+import { CACHE_TAGS, getServiceTags, revalidateService, logCacheRevalidation } from '@/lib/cache';
 import { sendServiceCreatedEmail } from '@/lib/email/services';
 import { brevoWorkflowService } from '@/lib/email';
 
@@ -193,7 +193,7 @@ async function createServiceInternal(
     const typeConfig = data.type;
 
     // 9. Create service in database - let Prisma auto-generate ID, then create slug
-    let createdService: { id: number; title: string } | undefined;
+    let createdService: { id: number; title: string; description: string; pid: string; category: string; slug: string } | undefined;
 
     if (status === 'draft') {
       // Use transaction to create service with slug and update lastServiceDraft atomically
@@ -235,7 +235,7 @@ async function createServiceInternal(
             status: status,
             featured: false,
           },
-          select: { id: true, title: true, description: true },
+          select: { id: true, title: true, description: true, pid: true, category: true },
         });
 
         // Step 2: Generate slug with the auto-generated ID and update service
@@ -251,7 +251,8 @@ async function createServiceInternal(
           data: { lastServiceDraft: new Date() },
         });
 
-        return service;
+        // Return service with slug for cache revalidation
+        return { ...service, slug };
       });
     } else {
       // Regular service creation (non-draft) with slug generation
@@ -293,7 +294,7 @@ async function createServiceInternal(
             status: status,
             featured: false,
           },
-          select: { id: true, title: true, description: true },
+          select: { id: true, title: true, description: true, pid: true, category: true },
         });
 
         // Step 2: Generate slug with the auto-generated ID and update service
@@ -303,7 +304,8 @@ async function createServiceInternal(
           data: { slug },
         });
 
-        return service;
+        // Return service with slug for cache revalidation
+        return { ...service, slug };
       });
 
       // Store the created service for returning in response
@@ -354,44 +356,19 @@ async function createServiceInternal(
       revalidateTag(CACHE_TAGS.user.services(user.id));
       revalidateTag(CACHE_TAGS.profile.services(profile.id));
     } else if (createdService) {
-      // For published services, get service data for comprehensive invalidation
-      const serviceForTags = await prisma.service.findUnique({
-        where: { id: createdService.id },
-        select: {
-          id: true,
-          slug: true,
-          pid: true,
-          category: true,
-        },
+      // For published services, use centralized revalidation helper
+      await revalidateService({
+        serviceId: createdService.id,
+        slug: createdService.slug,
+        pid: createdService.pid,
+        category: createdService.category,
+        userId: user.id,
+        profileId: profile.id,
+        profileUsername: profile.username,
+        includeHome: false, // New services don't need home page revalidation (not featured by default)
       });
 
-      if (serviceForTags) {
-        // Revalidate service-specific tags
-        const serviceTags = getServiceTags(serviceForTags);
-        serviceTags.forEach(tag => revalidateTag(tag));
-
-        // Revalidate profile tags
-        revalidateTag(CACHE_TAGS.profile.byId(profile.id));
-        revalidateTag(CACHE_TAGS.user.byId(user.id));
-        revalidateTag(CACHE_TAGS.user.services(user.id));
-        revalidateTag(CACHE_TAGS.profile.services(profile.id));
-
-        // Revalidate search caches (new service added)
-        revalidateTag(CACHE_TAGS.search.all);
-        revalidateTag(CACHE_TAGS.search.taxonomies);
-
-        // Revalidate archive caches (new service affects listings)
-        revalidateTag(CACHE_TAGS.archive.all);
-        revalidateTag(CACHE_TAGS.archive.servicesFiltered);
-
-        // Revalidate specific pages
-        if (serviceForTags.slug) {
-          revalidatePath(`/s/${serviceForTags.slug}`);
-        }
-        if (profile.username) {
-          revalidatePath(`/profile/${profile.username}`);
-        }
-      }
+      logCacheRevalidation('service', createdService.id, 'create');
     }
 
     // 12. Success response - let client handle navigation

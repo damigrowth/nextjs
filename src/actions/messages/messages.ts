@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma/client';
 import { transformMessageForChat } from '@/lib/utils/messages';
 import type { ChatMessageItem, MessageWithRelations } from '@/lib/types/messages';
 import { sendUnreadMessagesEmail } from '@/lib/email/services/message-emails';
+import { MESSAGE_WITH_AUTHOR_INCLUDE } from '@/lib/database/selects';
 
 /**
  * Get messages for a chat with pagination support
@@ -126,28 +127,7 @@ export async function sendMessage(
           authorUid: authorUid,
           ...(replyToId && { replyToId }),
         },
-        include: {
-          author: {
-            select: {
-              id: true,
-              displayName: true,
-              firstName: true,
-              lastName: true,
-              image: true,
-            },
-          },
-          replyTo: {
-            include: {
-              author: {
-                select: {
-                  displayName: true,
-                  firstName: true,
-                  lastName: true,
-                },
-              },
-            },
-          },
-        },
+        include: MESSAGE_WITH_AUTHOR_INCLUDE,
       });
 
       // Update chat's lastMessage and lastActivity

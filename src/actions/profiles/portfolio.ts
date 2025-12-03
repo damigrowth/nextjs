@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidateTag, revalidatePath } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { ActionResponse } from '@/lib/types/api';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
@@ -9,7 +9,7 @@ import { extractFormData } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
 import { sanitizeCloudinaryResources } from '@/lib/utils/cloudinary';
-import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
+import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
 import { updateProfilePortfolioSchema } from '@/lib/validations/profile';
 
 /**
@@ -71,6 +71,8 @@ export async function updateProfilePortfolio(
         id: true,
         uid: true,
         username: true,
+        category: true,
+        featured: true,
         services: {
           where: { status: 'published' },
           select: { slug: true },
@@ -97,23 +99,18 @@ export async function updateProfilePortfolio(
       },
     });
 
-    // 7. Revalidate cached data with consistent tags
-    const profileTags = getProfileTags(existingProfile);
-    profileTags.forEach((tag) => revalidateTag(tag));
+    // 7. Revalidate cached data using centralized helper
+    await revalidateProfile({
+      profileId: existingProfile.id,
+      userId: user.id,
+      username: existingProfile.username,
+      category: existingProfile.category,
+      includeHome: existingProfile.featured,
+      includeServices: true,
+    });
 
-    // Also revalidate user-specific tags
-    revalidateTag(CACHE_TAGS.user.byId(user.id));
-    revalidateTag(CACHE_TAGS.user.services(user.id));
-
-    // Revalidate profile services (they show profile data)
-    revalidateTag(CACHE_TAGS.profile.services(existingProfile.id));
-    revalidateTag(CACHE_TAGS.service.byProfile(existingProfile.id));
-
-    // Revalidate specific pages
+    // Dashboard-specific revalidation
     revalidatePath('/dashboard/profile/presentation');
-    if (existingProfile.username) {
-      revalidatePath(`/profile/${existingProfile.username}`);
-    }
 
     // Revalidate all service pages that belong to this profile
     existingProfile.services.forEach((service) => {
@@ -121,6 +118,8 @@ export async function updateProfilePortfolio(
         revalidatePath(`/s/${service.slug}`);
       }
     });
+
+    logCacheRevalidation('profile', existingProfile.id, 'portfolio update');
 
     return {
       success: true,
