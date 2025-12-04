@@ -14,7 +14,7 @@ import {
 import { getFormString, getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
-import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
+import { CACHE_TAGS, getProfileTags, revalidateProfile, logCacheRevalidation } from '@/lib/cache';
 
 /**
  * Server action wrapper for useActionState
@@ -93,6 +93,7 @@ export async function updateProfileBasicInfo(
         id: true,
         uid: true,
         username: true,
+        featured: true,
         services: {
           where: { status: 'published' },
           select: { slug: true },
@@ -122,23 +123,18 @@ export async function updateProfileBasicInfo(
       },
     });
 
-    // 7. Revalidate cached data with consistent tags
-    const profileTags = getProfileTags(existingProfile);
-    profileTags.forEach((tag) => revalidateTag(tag));
+    // 7. Revalidate cached data using centralized helper
+    await revalidateProfile({
+      profileId: existingProfile.id,
+      userId: user.id,
+      username: existingProfile.username,
+      category: data.category,
+      includeHome: existingProfile.featured,
+      includeServices: true,
+    });
 
-    // Also revalidate user-specific tags
-    revalidateTag(CACHE_TAGS.user.byId(user.id));
-    revalidateTag(CACHE_TAGS.user.services(user.id));
-
-    // Revalidate profile services (they show profile data)
-    revalidateTag(CACHE_TAGS.profile.services(existingProfile.id));
-    revalidateTag(CACHE_TAGS.service.byProfile(existingProfile.id));
-
-    // Revalidate specific pages
+    // Dashboard-specific revalidation
     revalidatePath('/dashboard/profile/basic');
-    if (existingProfile.username) {
-      revalidatePath(`/profile/${existingProfile.username}`);
-    }
 
     // Revalidate all service pages that belong to this profile
     existingProfile.services.forEach((service) => {
@@ -146,6 +142,8 @@ export async function updateProfileBasicInfo(
         revalidatePath(`/s/${service.slug}`);
       }
     });
+
+    logCacheRevalidation('profile', existingProfile.id, 'basic-info update');
 
     return {
       success: true,

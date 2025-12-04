@@ -271,6 +271,29 @@ export async function commitDatasetChanges(
     // Clear staged changes after successful commit
     await clearStagedChanges();
 
+    // Regenerate taxonomy hash maps for local development
+    // (Vercel regenerates automatically during build, so skip there)
+    if (!process.env.VERCEL && !process.env.CI) {
+      console.log('[GIT_COMMIT] Regenerating taxonomy maps (local dev)...');
+      try {
+        const { execSync } = require('child_process');
+        execSync('yarn build:taxonomies', {
+          cwd: process.cwd(),
+          stdio: 'inherit',
+          timeout: 30000, // 30 second timeout
+        });
+        console.log('[GIT_COMMIT] Hash maps regenerated successfully');
+      } catch (error) {
+        console.warn(
+          '[GIT_COMMIT] Hash map regeneration failed (non-critical):',
+          error
+        );
+        // Don't fail the commit - Vercel will regenerate on deploy
+      }
+    } else {
+      console.log('[GIT_COMMIT] Skipping local regeneration (Vercel build will handle it)');
+    }
+
     const { owner, repo } = REPO_CONFIG;
     const commitUrl = `https://github.com/${owner}/${repo}/commit/${commitSha}`;
 

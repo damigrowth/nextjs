@@ -5,6 +5,7 @@ import { transformChatForList } from '@/lib/utils/messages';
 import type { ChatListItem, ChatWithRelations } from '@/lib/types/messages';
 import { customAlphabet } from 'nanoid';
 import { getUnreadCount } from './messages';
+import { CHAT_LIST_SELECT } from '@/lib/database/selects';
 
 // URL-safe alphabet without lookalike characters (no i, l, 1, o, 0)
 const nanoid = customAlphabet('23456789abcdefghjkmnpqrstvwxyz', 10);
@@ -23,53 +24,7 @@ export async function getChats(userId: string): Promise<ChatListItem[]> {
           },
         },
       },
-      select: {
-        id: true,
-        cid: true,
-        name: true,
-        published: true,
-        createdAt: true,
-        updatedAt: true,
-        creatorUid: true,
-        lastMessageId: true,
-        lastActivity: true,
-        lastMessage: {
-          where: {
-            deleted: false,
-          },
-        },
-        members: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                displayName: true,
-                firstName: true,
-                lastName: true,
-                image: true,
-              },
-            },
-          },
-        },
-        messages: {
-          where: {
-            deleted: false,
-          },
-          select: {
-            id: true,
-          },
-          take: 1,
-        },
-        _count: {
-          select: {
-            messages: {
-              where: {
-                deleted: false,
-              },
-            },
-          },
-        },
-      },
+      select: CHAT_LIST_SELECT,
       orderBy: {
         lastActivity: 'desc',
       },
