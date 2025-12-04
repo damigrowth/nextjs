@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation';
-import { ClientAdminGuard } from './client-admin-guard';
 import { requireRole } from '@/actions/auth/server';
 
 interface AdminGuardProps {
@@ -11,8 +10,8 @@ export async function AdminGuard({ children }: AdminGuardProps) {
   try {
     await requireRole('admin');
 
-    // User is authenticated as admin, now handle API key access client-side
-    return <ClientAdminGuard>{children}</ClientAdminGuard>;
+    // User is authenticated as admin - render children directly
+    return <>{children}</>;
   } catch (error) {
     // requireRole should handle redirects, but catch any other errors
     redirect('/login');
