@@ -346,8 +346,9 @@ export async function updateService(params: AdminUpdateServiceInput) {
   try {
     await getAdminSession();
 
-    const validated = adminUpdateServiceSchema.parse(params);
-    const { serviceId, ...updateData } = validated;
+    // params is already validated by action functions (updateServiceSettingsAction, etc.)
+    // No need to re-validate here - the redundant parse was causing .partial() to add empty arrays
+    const { serviceId, ...updateData } = params;
 
     // Check if service exists
     const existingService = await prisma.service.findUnique({
@@ -360,6 +361,15 @@ export async function updateService(params: AdminUpdateServiceInput) {
         error: 'Service not found',
       };
     }
+
+    // Filter out undefined values to prevent accidental overwrites
+    // Only include fields that are explicitly provided
+    const cleanedUpdateData = Object.entries(updateData).reduce((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as Record<string, any>);
 
     // Update normalized fields if title or description changed
     const normalizedUpdates: any = {};
@@ -375,7 +385,7 @@ export async function updateService(params: AdminUpdateServiceInput) {
     const updatedService = await prisma.service.update({
       where: { id: serviceId },
       data: {
-        ...updateData,
+        ...cleanedUpdateData,
         ...normalizedUpdates,
       },
       include: {
