@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useActionState, useEffect } from 'react';
+import React, { useActionState, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,7 +21,7 @@ import { login } from '@/actions/auth/login';
 import { loginSchema, type LoginInput } from '@/lib/validations/auth';
 import { authClient, useSession } from '@/lib/auth/client';
 import { AuthUser } from '@/lib/types/auth';
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { FormButton } from '../../shared';
 import { Separator } from '../../ui/separator';
 import GoogleLoginButton from './button-login-goolge';
@@ -49,6 +49,7 @@ const LoginForm: React.FC = () => {
     initialState,
   );
   const { refetch } = useSession();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Check for success messages from URL params
   const message = searchParams?.get('message');
@@ -66,40 +67,27 @@ const LoginForm: React.FC = () => {
   // Handle successful login and redirect - same pattern as profile forms
   useEffect(() => {
     if (state.success) {
+      // Show redirecting state immediately
+      setIsRedirecting(true);
+
       const handleSuccessfulLogin = async () => {
-        try {
-          // First refresh to update server components and clear any cached data
-          router.refresh();
+        // 1. Refresh session to update user data
+        await refetch();
 
-          // Force Better Auth session refetch to clear client-side cache
-          await refetch();
+        // 2. Small delay for Better Auth session propagation
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
-          // Small delay to ensure both refresh and session update complete
-          await new Promise((resolve) => setTimeout(resolve, 200));
+        // 3. Get the redirect path from the server response
+        const redirectPath = state.data?.redirectPath || '/dashboard';
 
-          // Get the redirect path from the server response or fallback to session check
-          let redirectPath = '/dashboard';
-
-          if (state.data?.redirectPath) {
-            redirectPath = state.data.redirectPath;
-          } else {
-            // Fallback: check session for redirect path (fresh session data)
-            const session = await authClient.getSession();
-            redirectPath =
-              session?.data?.user?.role === 'admin' ? '/admin' : '/dashboard';
-          }
-
-          // Navigate to the appropriate path
-          router.push(redirectPath);
-        } catch (error) {
-          console.error('Login redirect error:', error);
-          router.push('/dashboard');
-        }
+        // 4. Navigate with router for smoother transition
+        router.push(redirectPath);
+        router.refresh(); // Force refresh to ensure new session data
       };
 
       handleSuccessfulLogin();
     }
-  }, [state.success, state.data, router]);
+  }, [state.success, state.data, router, refetch]);
 
   // Handle form submission
   const handleFormSubmit = (formData: FormData) => {
@@ -118,8 +106,44 @@ const LoginForm: React.FC = () => {
     }
   };
 
+  // Show success state during redirect (same pattern as onboarding)
+  if (isRedirecting) {
+    return (
+      <div className='text-center space-y-4'>
+        <div className='flex justify-center'>
+          <CheckCircle className='w-16 h-16 text-green-600 mb-2' />
+        </div>
+        <div className='space-y-2'>
+          <h2 className='text-2xl font-semibold text-gray-900'>
+            Επιτυχής Σύνδεση!
+          </h2>
+          <div className='flex items-center gap-2 justify-center text-gray-600'>
+            <Loader2 className='w-5 h-5 animate-spin' />
+            <span>Μετάβαση στον Πίνακα Ελέγχου...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
+      {/* Header Section */}
+      <div className='mb-8'>
+        <h4 className='text-xl font-semibold text-gray-900 mb-2'>
+          Συνδέσου στον λογαριασμό σου
+        </h4>
+        <p className='text-gray-600'>
+          Δεν έχεις λογαριασμό?{' '}
+          <NextLink
+            href='/register'
+            className='text-green-600 hover:text-green-700 font-medium'
+          >
+            Εγγραφή!
+          </NextLink>
+        </p>
+      </div>
+
       <Form {...form}>
         <form action={handleFormSubmit} className='space-y-4'>
           {/* Email */}
