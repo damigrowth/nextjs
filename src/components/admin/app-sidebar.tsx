@@ -11,10 +11,10 @@ import {
   UserCheckIcon,
   TagsIcon,
   MessageSquareIcon,
+  GitBranchIcon,
 } from 'lucide-react';
 
 import { AdminNavMain, AdminNavUser, NextLink } from '@/components';
-import { useSession } from '@/lib/auth/client';
 
 import {
   Sidebar,
@@ -123,18 +123,20 @@ const data = {
       url: '/admin/analytics',
       icon: BarChartIcon,
     },
+    {
+      title: 'Git',
+      url: '/admin/git',
+      icon: GitBranchIcon,
+    },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  // Get current session using Better Auth client hook
-  const { data: session } = useSession();
-
-  // Prepare user data for the sidebar
+  // Fallback user data (nav-user.tsx fetches real session data)
   const user = {
-    name: session?.user?.name || 'Admin',
-    email: session?.user?.email || 'admin@doulitsa.com',
-    avatar: session?.user?.image || '/avatars/admin.jpg',
+    name: 'Admin',
+    email: 'admin@doulitsa.com',
+    avatar: '/avatars/admin.jpg',
   };
 
   return (
