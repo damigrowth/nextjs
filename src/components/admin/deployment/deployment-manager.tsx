@@ -637,7 +637,8 @@ export function DeploymentManager() {
                             </span>
                           </div>
                           <div className='flex items-center gap-2'>
-                            <Button
+                            {/* Undo button commented out per user request */}
+                            {/* <Button
                               variant='ghost'
                               size='sm'
                               onClick={() =>
@@ -657,7 +658,8 @@ export function DeploymentManager() {
                                 : index === 0
                                   ? 'Undo'
                                   : `Undo ${index + 1}`}
-                            </Button>
+                            </Button> */}
+                            {/* Revert button already commented out */}
                             {/* <Button
                           variant='ghost'
                           size='sm'
@@ -670,7 +672,8 @@ export function DeploymentManager() {
                             ? 'Reverting...'
                             : 'Revert'}
                         </Button> */}
-                            <NextLink
+                            {/* View Deployment button removed - commit badge already links to GitHub commit page */}
+                            {/* <NextLink
                               href={getVercelPreviewUrl(gitStatus?.branch || 'datasets')}
                               target='_blank'
                               rel='noopener noreferrer'
@@ -683,7 +686,7 @@ export function DeploymentManager() {
                                 <ExternalLink className='h-3 w-3' />
                                 View Deployment
                               </Button>
-                            </NextLink>
+                            </NextLink> */}
                           </div>
                         </div>
                         <p className='text-sm'>{commit.message}</p>
