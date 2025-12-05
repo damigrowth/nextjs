@@ -28,20 +28,35 @@ export const authClient = createAuthClient({
   baseURL: getBaseURL(),
   fetchOptions: {
     onError: (ctx) => {
-      // console.log('Auth Client Error Context:', ctx);
+      // Enhanced error logging for debugging
+      const timestamp = new Date().toISOString();
 
-      // Log detailed error information for debugging
-      if (ctx.error) {
-        console.error('Auth Error Details:', {
+      if (ctx.error && (ctx.error.code || ctx.error.message || ctx.error.status)) {
+        // Structured HTTP error
+        console.error(`[Auth Error ${timestamp}]`, {
           code: ctx.error.code,
           message: ctx.error.message,
           status: ctx.error.status,
           statusText: ctx.error.statusText,
         });
+      } else if (ctx.error) {
+        // Network/fetch error (error object exists but has no standard properties)
+        console.error(`[Auth Network Error ${timestamp}]`, {
+          type: 'network_failure',
+          rawError: ctx.error,
+          errorString: String(ctx.error),
+        });
+      } else {
+        // Unknown error type
+        console.error(`[Auth Unknown Error ${timestamp}]`, {
+          type: 'unknown',
+          context: ctx,
+        });
       }
     },
     onSuccess: async (ctx) => {
-      // console.log('Auth Success:', ctx);
+      // Success logging disabled by default for performance
+      // Uncomment for debugging: console.log('[Auth Success]', { endpoint: ctx.url });
     },
   },
   plugins: [
