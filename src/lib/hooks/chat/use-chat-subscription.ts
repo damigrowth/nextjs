@@ -31,7 +31,9 @@ export function useChatSubscription({
   enabled = true,
 }: UseChatSubscriptionOptions) {
   const [messages, setMessages] = useState<ChatMessageItem[]>(initialMessages);
+  const [subscriptionError, setSubscriptionError] = useState<string | null>(null);
   const processedMessageIds = useRef<Set<string>>(new Set());
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize processed IDs with initial messages when chatId changes
   useEffect(() => {
@@ -53,8 +55,13 @@ export function useChatSubscription({
     let messagesChannel: RealtimeChannel | null;
     let readReceiptsChannel: RealtimeChannel | null;
 
-    // Subscribe to message changes
-    messagesChannel = subscribeToMessages(
+    // Initialize subscriptions (async with error handling)
+    (async () => {
+      try {
+        setSubscriptionError(null); // Clear previous errors
+
+        // Subscribe to message changes
+        messagesChannel = await subscribeToMessages(
       chatId,
       // On new message
       (newMessage) => {
@@ -141,24 +148,57 @@ export function useChatSubscription({
           )
         );
       }
-    );
+      );
 
-    // Subscribe to read receipts
-    readReceiptsChannel = subscribeToReadReceipts(
-      chatId,
-      (messageId, userId) => {
-        // If the read receipt is from the other user, mark message as read
-        if (userId !== currentUserId) {
-          setMessages((prev) =>
-            prev.map((m) => (m.id === messageId ? { ...m, isRead: true } : m))
-          );
+        // Subscribe to read receipts
+        readReceiptsChannel = await subscribeToReadReceipts(
+          chatId,
+          (messageId, userId) => {
+            // If the read receipt is from the other user, mark message as read
+            if (userId !== currentUserId) {
+              setMessages((prev) =>
+                prev.map((m) => (m.id === messageId ? { ...m, isRead: true } : m))
+              );
+            }
+          }
+        );
+
+        // If subscriptions failed (both null), set error
+        if (!messagesChannel && !readReceiptsChannel) {
+          setSubscriptionError('Real-time updates temporarily unavailable');
         }
+      } catch (error) {
+        // Handle subscription initialization errors
+        const timestamp = new Date().toISOString();
+        console.error(`[Chat Subscription Error ${timestamp}]`, {
+          chatId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+
+        setSubscriptionError('Failed to establish real-time connection');
+
+        // Retry after 5 seconds
+        retryTimeoutRef.current = setTimeout(() => {
+          if (enabled && chatId) {
+            console.info(`[Chat Subscription Retry ${timestamp}]`, { chatId });
+            // Trigger re-subscription by clearing error
+            setSubscriptionError(null);
+          }
+        }, 5000);
       }
-    );
+    })();
 
     // Cleanup subscriptions
     return () => {
       activeSubscriptions.delete(subscriptionKey);
+
+      // Clear retry timeout
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+
+      // Unsubscribe channels
       if (messagesChannel) {
         unsubscribe(messagesChannel);
       }
@@ -168,5 +208,5 @@ export function useChatSubscription({
     };
   }, [chatId, currentUserId, enabled]);
 
-  return { messages };
+  return { messages, subscriptionError };
 }
