@@ -55,3 +55,13 @@ model PendingRegistration {
 
   @@map("pending_registrations")
 }
+
+// JWT Web Key Set (JWKS) for Better Auth JWT plugin
+model Jwks {
+  id        String   @id @default(cuid())
+  publicKey String
+  privateKey String
+  createdAt DateTime @default(now())
+
+  @@map("jwks")
+}

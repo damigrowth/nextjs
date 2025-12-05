@@ -1,7 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { nextCookies } from 'better-auth/next-js';
-import { admin, apiKey } from 'better-auth/plugins';
+import { admin, apiKey, jwt } from 'better-auth/plugins';
 import { User } from '@prisma/client';
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from '@/lib/email';
 import bcrypt from 'bcrypt';
@@ -395,6 +395,19 @@ export const auth = betterAuth({
         enabled: true,
         timeWindow: 1000 * 60 * 60, // 1 hour
         maxRequests: 1000, // 1000 requests per hour for admin operations
+      },
+    }),
+    jwt({
+      jwt: {
+        // Configure JWT for Supabase RLS integration
+        definePayload: ({ user }) => ({
+          sub: user.id, // Standard JWT subject claim (user ID)
+          email: user.email,
+          role: (user as User).role || 'user',
+          // Additional claims for RLS policies
+          type: (user as User).type || 'user',
+        }),
+        expirationTime: '15m', // 15 minutes (match Supabase default)
       },
     }),
     nextCookies(), // MUST be the last plugin in the array
