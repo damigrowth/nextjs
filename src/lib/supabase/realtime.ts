@@ -1,20 +1,23 @@
 /**
  * Supabase Real-time Subscription Utilities
- * Typed helpers for subscribing to database changes
+ * Typed helpers for subscribing to database changes with JWT authentication
  */
 
-import { supabase } from './client';
+import { getRealtimeClient } from './client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 /**
  * Subscribe to new messages in a specific chat
+ * Requires user to be authenticated (JWT) for RLS policies
  */
-export function subscribeToMessages(
+export async function subscribeToMessages(
   chatId: string,
   onNewMessage: (message: any) => void,
   onMessageUpdate: (message: any) => void,
   onMessageDelete: (messageId: string) => void
-): RealtimeChannel | null {
+): Promise<RealtimeChannel | null> {
+  const supabase = await getRealtimeClient();
+
   if (!supabase) {
     console.warn('Supabase client not initialized. Real-time features disabled.');
     return null;
@@ -68,11 +71,14 @@ export function subscribeToMessages(
 
 /**
  * Subscribe to read receipts for messages in a chat
+ * Requires user to be authenticated (JWT) for RLS policies
  */
-export function subscribeToReadReceipts(
+export async function subscribeToReadReceipts(
   chatId: string,
   onReadReceipt: (messageId: string, userId: string) => void
-): RealtimeChannel | null {
+): Promise<RealtimeChannel | null> {
+  const supabase = await getRealtimeClient();
+
   if (!supabase) {
     console.warn('Supabase client not initialized. Real-time features disabled.');
     return null;
@@ -101,11 +107,14 @@ export function subscribeToReadReceipts(
 
 /**
  * Subscribe to presence changes for chat members
+ * Requires user to be authenticated (JWT) for RLS policies
  */
-export function subscribeToChatMemberPresence(
+export async function subscribeToChatMemberPresence(
   chatId: string,
   onPresenceChange: (userId: string, online: boolean, lastSeen: Date) => void
-): RealtimeChannel | null {
+): Promise<RealtimeChannel | null> {
+  const supabase = await getRealtimeClient();
+
   if (!supabase) {
     console.warn('Supabase client not initialized. Real-time features disabled.');
     return null;
@@ -139,11 +148,14 @@ export function subscribeToChatMemberPresence(
 
 /**
  * Subscribe to all chats for a user (for chat list updates)
+ * Requires user to be authenticated (JWT) for RLS policies
  */
-export function subscribeToUserChats(
+export async function subscribeToUserChats(
   userId: string,
   onChatUpdate: (chat: any) => void
-): RealtimeChannel | null {
+): Promise<RealtimeChannel | null> {
+  const supabase = await getRealtimeClient();
+
   if (!supabase) {
     console.warn('Supabase client not initialized. Real-time features disabled.');
     return null;
@@ -182,6 +194,10 @@ export function subscribeToUserChats(
  * Unsubscribe and remove a channel
  */
 export async function unsubscribe(channel: RealtimeChannel | null): Promise<void> {
-  if (!supabase || !channel) return;
+  if (!channel) return;
+
+  const supabase = await getRealtimeClient();
+  if (!supabase) return;
+
   await supabase.removeChannel(channel);
 }
