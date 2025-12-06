@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Generate JWT using Better Auth JWT plugin
-    const result = await auth.api.signJWT({
+    const token = await auth.api.signJWT({
       body: {
         payload: {
           sub: session.user.id,
@@ -33,17 +33,6 @@ export async function GET(request: NextRequest) {
         },
       },
     });
-
-    // Extract the actual token string from the result
-    const token = typeof result === 'string' ? result : (result as any)?.token;
-
-    if (!token) {
-      console.error('JWT generation failed - no token in result:', result);
-      return NextResponse.json(
-        { error: 'Failed to generate JWT token' },
-        { status: 500 }
-      );
-    }
 
     return NextResponse.json({
       token,

@@ -46,14 +46,11 @@ export function useChatListSubscription({
 
     let channel: RealtimeChannel | null;
 
-    // Initialize subscription (async)
-    (async () => {
-      channel = await subscribeToUserChats(userId, (updatedChat) => {
-        // When any chat-related change happens, refresh the entire list
-        // This ensures we get accurate unread counts, last messages, etc.
-        refreshChats();
-      });
-    })();
+    channel = subscribeToUserChats(userId, (updatedChat) => {
+      // When any chat-related change happens, refresh the entire list
+      // This ensures we get accurate unread counts, last messages, etc.
+      refreshChats();
+    });
 
     // Cleanup
     return () => {

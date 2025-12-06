@@ -120,30 +120,13 @@ async function getSupabaseJWT(): Promise<string | null> {
       return null;
     }
 
-    // Better Auth JWT plugin exposes JWT at /api/auth/jwt endpoint
-    // Fetch the JWT from the plugin endpoint
-    const jwtResponse = await fetch('/api/auth/jwt', {
-      credentials: 'include',
-    });
-
-    if (!jwtResponse.ok) {
-      const timestamp = new Date().toISOString();
-      console.warn(`[JWT Client Warning ${timestamp}]`, {
-        reason: 'Failed to fetch JWT from Better Auth',
-        status: jwtResponse.status,
-        fallback: 'Using anonymous access',
-      });
-      tokenCache = null;
-      return null;
-    }
-
-    const jwtData = await jwtResponse.json();
-    const betterAuthJWT = jwtData?.token;
+    // Get Better Auth JWT from session
+    const betterAuthJWT = session.data.session.token;
 
     if (!betterAuthJWT) {
       const timestamp = new Date().toISOString();
       console.warn(`[JWT Client Warning ${timestamp}]`, {
-        reason: 'JWT endpoint returned no token',
+        reason: 'Session exists but no JWT token found',
         fallback: 'Using anonymous access',
       });
       tokenCache = null;

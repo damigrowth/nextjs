@@ -83,19 +83,16 @@ export function usePresence({
 
     // Subscribe to presence changes in chat (if chatId provided)
     if (chatId) {
-      // Initialize subscription (async)
-      (async () => {
-        channel = await subscribeToChatMemberPresence(
-          chatId,
-          (memberId, online, lastSeen) => {
-            setPresenceMap((prev) => {
-              const newMap = new Map(prev);
-              newMap.set(memberId, { online, lastSeen });
-              return newMap;
-            });
-          }
-        );
-      })();
+      channel = subscribeToChatMemberPresence(
+        chatId,
+        (memberId, online, lastSeen) => {
+          setPresenceMap((prev) => {
+            const newMap = new Map(prev);
+            newMap.set(memberId, { online, lastSeen });
+            return newMap;
+          });
+        }
+      );
     }
 
     // Cleanup
