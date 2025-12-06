@@ -23,14 +23,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Generate JWT using Better Auth JWT plugin
-    // The JWT plugin automatically adds the token to the session
-    // We need to use the internal method to generate it
     const token = await auth.api.signJWT({
-      payload: {
-        sub: session.user.id,
-        email: session.user.email,
-        role: (session.user as any).role || 'user',
-        type: (session.user as any).type || 'user',
+      body: {
+        payload: {
+          sub: session.user.id,
+          email: session.user.email,
+          role: (session.user as any).role || 'user',
+          type: (session.user as any).type || 'user',
+        },
       },
     });
 
