@@ -22,7 +22,15 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 
 // Icons (lucide-react)
-import { HelpCircle, Package, ChevronRight } from 'lucide-react';
+import { HelpCircle, Package, ChevronRight, Info } from 'lucide-react';
+
+// Tooltip
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 // Custom components
 import { Currency } from '@/components/ui/currency';
@@ -284,39 +292,16 @@ export default function FormServiceEdit({
     <Form {...form}>
       <form
         action={handleFormSubmit}
-        className='space-y-6 p-6 border rounded-lg'
+        className='space-y-6 p-6 border rounded-lg shadow'
       >
-        <h3 className='text-lg font-medium'>Βασικές Πληροφορίες</h3>
+      
 
         {/* Title */}
-        <FormField
-          control={form.control}
-          name='title'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Τίτλος υπηρεσίας*</FormLabel>
-              <p className='text-sm text-gray-600'>
-                Ένας σαφής και περιγραφικός τίτλος
-              </p>
-              <FormControl>
-                <Input
-                  placeholder='π.χ. Δημιουργία λογοτύπου και ταυτότητας επιχείρησης'
-                  maxLength={100}
-                  {...field}
-                  disabled={initialUser?.role !== 'admin'}
-                  onChange={(e) => {
-                    const value = e.target.value.slice(0, 100);
-                    field.onChange(value);
-                  }}
-                />
-              </FormControl>
-              <div className='text-sm text-gray-500'>
-                {field.value?.length || 0}/100 χαρακτήρες
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div>
+          <h2 className='text-xl font-bold text-foreground'>
+            {form.watch('title')}
+          </h2>
+        </div>
 
         {/* Description */}
         <FormField
@@ -324,10 +309,19 @@ export default function FormServiceEdit({
           name='description'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Περιγραφή υπηρεσίας*</FormLabel>
-              <p className='text-sm text-gray-600'>
-                Αναλυτική περιγραφή τουλάχιστον 80 χαρακτήρων
-              </p>
+              <div className='flex items-center gap-2'>
+                <FormLabel>Περιγραφή υπηρεσίας*</FormLabel>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className='h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help' />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Αναλυτική περιγραφή τουλάχιστον 80 χαρακτήρων</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
               <FormControl>
                 <Textarea
                   placeholder='Περιγράψτε την υπηρεσία σας αναλυτικά...'
@@ -341,7 +335,7 @@ export default function FormServiceEdit({
                   }}
                 />
               </FormControl>
-              <div className='text-sm text-gray-500'>
+              <div className='text-xs text-gray-500'>
                 {field.value?.length || 0}/5000 χαρακτήρες
               </div>
               <FormMessage />
@@ -350,30 +344,33 @@ export default function FormServiceEdit({
         />
 
         {/* Price and Fixed Price Toggle */}
-        <div className='grid md:grid-cols-2 gap-4'>
+        <div className='space-y-3'>
           <FormField
             control={form.control}
             name='price'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Τιμή{watch('fixed') ? '*' : ''}</FormLabel>
-                <p className='text-sm text-gray-600'>
-                  {watch('fixed') ? 'Τιμή σε ευρώ' : 'Χωρίς εμφάνιση τιμής'}
-                </p>
-                <FormControl>
-                  <Currency
-                    currency='€'
-                    position='right'
-                    placeholder={watch('fixed') ? 'π.χ. 50' : 'Τιμή κρυφή'}
-                    min={1}
-                    max={10000}
-                    allowDecimals={false}
-                    value={field.value || 0}
-                    onValueChange={field.onChange}
-                    disabled={!watch('fixed')}
-                  />
-                </FormControl>
-                <FormMessage />
+                <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
+                  <FormLabel className={`sm:min-w-[50px] transition-colors ${!watch('fixed') ? 'text-muted-foreground' : ''}`}>
+                    Τιμή{watch('fixed') ? '*' : ''}
+                  </FormLabel>
+                  <FormControl>
+                    <div className='w-[150px]'>
+                      <Currency
+                        currency='€'
+                        position='right'
+                        placeholder={watch('fixed') ? 'π.χ. 50' : 'Τιμή κρυφή'}
+                        min={1}
+                        max={10000}
+                        allowDecimals={false}
+                        value={field.value || 0}
+                        onValueChange={field.onChange}
+                        disabled={!watch('fixed')}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage className='sm:!mt-0' />
+                </div>
               </FormItem>
             )}
           />
@@ -382,33 +379,39 @@ export default function FormServiceEdit({
             control={form.control}
             name='fixed'
             render={({ field }) => (
-              <FormItem className='space-y-2'>
-                <FormLabel>Χωρίς εμφάνιση τιμής</FormLabel>
-                <p className='text-sm text-gray-600'>
-                  Η τιμή δεν θα εμφανίζεται στο κοινό
-                </p>
-                <FormControl>
-                  <div>
-                    <Switch
-                      checked={!field.value}
-                      onCheckedChange={async (checked) => {
-                        field.onChange(!checked);
-                        // Handle price field when toggling fixed
-                        if (checked) {
-                          // When switch is ON (checked=true), fixed becomes false, price is not required, set to 0
-                          setValue('price', 0, { shouldValidate: false });
-                          clearErrors('price');
-                        } else {
-                          // When switch is OFF (checked=false), fixed becomes true, price is required
-                          // Don't automatically change the price, let user set it
-                          clearErrors('price');
-                        }
-                        // Re-trigger validation for the price field
-                        await trigger('price');
-                      }}
-                    />
-                  </div>
-                </FormControl>
+              <FormItem>
+                <div className='flex items-center gap-2'>
+                  <label
+                    className={`flex items-center justify-between shadow gap-4 p-3 rounded-lg border transition-colors cursor-pointer hover:border-primary/50 w-[220px] ${!field.value ? 'bg-white shadow-sm' : 'bg-muted/30'}`}
+                  >
+                    <span className='text-sm font-medium'>Απόκρυψη τιμής</span>
+                    <FormControl>
+                      <Switch
+                        checked={!field.value}
+                        onCheckedChange={async (checked) => {
+                          field.onChange(!checked);
+                          if (checked) {
+                            setValue('price', 0, { shouldValidate: false });
+                            clearErrors('price');
+                          } else {
+                            clearErrors('price');
+                          }
+                          await trigger('price');
+                        }}
+                      />
+                    </FormControl>
+                  </label>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className='h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help flex-shrink-0' />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Ενεργοποίηση για να μην εμφανίζεται τιμή</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </FormItem>
             )}
           />
@@ -420,19 +423,30 @@ export default function FormServiceEdit({
           name='duration'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Διάρκεια εκτέλεσης</FormLabel>
-              <p className='text-sm text-gray-600'>
-                Εκτιμώμενη διάρκεια σε ημέρες (προαιρετικό)
-              </p>
+              <div className='flex items-center gap-2 pt-4'>
+                <FormLabel>Ημέρες παράδοσης</FormLabel>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className='h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help' />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Εκτιμώμενη διάρκεια σε ημέρες που θα ολοκληρωθεί η υπηρεσία (προαιρετικό)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
               <FormControl>
-                <Input
-                  type='number'
-                  placeholder='π.χ. 7'
-                  min={0}
-                  max={365}
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value) || 0)}
-                />
+                <div className='max-w-[200px]'>
+                  <Input
+                    type='number'
+                    placeholder='π.χ. 7'
+                    min={0}
+                    max={365}
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                  />
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -440,13 +454,22 @@ export default function FormServiceEdit({
         />
 
         {/* Taxonomy Selection - Subdivision with Auto-populated Category/Subcategory */}
-        <div className='space-y-2'>
-          <label className='text-sm font-medium text-gray-900'>
-            Κατηγορία Υπηρεσίας*
-          </label>
-          <p className='text-sm text-gray-600'>
-            Επιλέξτε τις κατηγορίες της υπηρεσίας
-          </p>
+        <div className='space-y-3'>
+          <div className='flex items-center gap-2'>
+            <label className='text-sm font-medium text-gray-900'>
+              Κατηγορία Υπηρεσίας*
+            </label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className='h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help' />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Πληκτρολογήστε και επιλέξτε την πιο σχετική κατηγορία</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           <LazyCombobox
             trigger='search'
             options={allSubdivisions}
@@ -472,7 +495,7 @@ export default function FormServiceEdit({
                 shouldValidate: true,
               });
             }}
-            placeholder='Επιλέξτε κατηγορία...'
+            placeholder='Πληκτρολογήστε κατηγορία...'
             searchPlaceholder='Αναζήτηση κατηγορίας...'
             emptyMessage='Δεν βρέθηκαν κατηγορίες.'
             formatLabel={(option) => (
@@ -485,7 +508,7 @@ export default function FormServiceEdit({
             )}
             renderButtonContent={(option) => {
               if (!option) {
-                return <span className='text-muted-foreground'>Επιλέξτε κατηγορία...</span>;
+                return <span className='text-muted-foreground'>Πληκτρολογήστε κατηγορία...</span>;
               }
               return (
                 <div className='flex flex-wrap gap-1 items-center'>
@@ -574,10 +597,19 @@ export default function FormServiceEdit({
 
               return (
                 <FormItem>
-                  <FormLabel>Ετικέτες</FormLabel>
-                  <p className='text-sm text-gray-600'>
-                    Επιλέξτε ετικέτες που περιγράφουν την υπηρεσία σας (έως 10)
-                  </p>
+                  <div className='flex items-center gap-2 pt-4'>
+                    <FormLabel>Ετικέτες (tags)</FormLabel>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className='h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help' />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Επιλέξτε ετικέτες (tags) που περιγράφουν την υπηρεσία σας (έως 10)</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                   <FormControl>
                     <LazyCombobox
                       key={`tags-${currentCategory}`}
@@ -595,8 +627,8 @@ export default function FormServiceEdit({
                         });
                       }}
                       onSelect={() => {}}
-                      placeholder='Επιλέξτε ετικέτες...'
-                      searchPlaceholder='Αναζήτηση ετικετών...'
+                      placeholder='Επιλέξτε tags..'
+                      searchPlaceholder='Αναζήτηση tags...'
                       maxItems={10}
                     />
                   </FormControl>
@@ -609,7 +641,7 @@ export default function FormServiceEdit({
 
         {/* Addons and FAQ Section */}
         <div className='space-y-6'>
-          <h3 className='text-lg font-medium'>
+          <h3 className='text-lg font-medium pt-4'>
             Extra υπηρεσίες & Συχνές ερωτήσεις
           </h3>
 

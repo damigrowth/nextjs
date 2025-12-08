@@ -89,7 +89,7 @@ export default function NavMenu({
             key={item.href}
             href={item.href}
             onClick={handleLinkClick}
-            className='block px-0 py-3 text-base font-medium text-gray-900 hover:text-blue-600 transition-colors'
+            className='block px-0 py-3 text-base font-medium text-gray-900 hover:text-primary transition-colors'
           >
             {item.label}
           </NextLink>
@@ -101,7 +101,7 @@ export default function NavMenu({
   // Desktop version - full NavigationMenu with mega menu
   return (
     <NavigationMenu>
-      <NavigationMenuList>
+      <NavigationMenuList className='gap-2'>
         {/* Mega Menu Dropdown for Categories */}
         <NavigationMenuItem>
           <NavigationMenuTrigger variant='pale' className='flex items-center'>
@@ -232,6 +232,7 @@ export default function NavMenu({
         {/* Regular Menu Items */}
         {regularMenuItems.map((item) => {
           const isActive = pathname?.startsWith(item.href);
+          const isCategoriesLink = item.href === '/categories';
           return (
             <NavigationMenuItem key={item.href}>
               <NavigationMenuLink
@@ -239,6 +240,7 @@ export default function NavMenu({
                 className={cn(
                   navigationMenuTriggerStyle({ variant: 'pale' }),
                   isActive && 'bg-pale text-pale-foreground',
+                  isCategoriesLink && 'border border-current',
                 )}
               >
                 <NextLink href={item.href}>{item.label}</NextLink>

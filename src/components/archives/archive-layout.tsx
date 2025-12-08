@@ -264,7 +264,7 @@ export function ArchiveLayout({
   };
 
   return (
-    <div className={clsx(className, 'py-20')}>
+    <div className={clsx(className, 'py-20 bg-silver')}>
       {/* Category Navigation Tabs */}
       <TaxonomyTabs
         items={validCategories}
@@ -314,7 +314,7 @@ export function ArchiveLayout({
             </ArchiveSidebar>
 
             {/* Results Summary */}
-            <div className='bg-white border-b border-gray-200'>
+            <div className='border-b border-gray-200'>
               <div className='py-4'>
                 <div className='flex items-center justify-between'>
                   <div className='text-sm text-gray-600'>

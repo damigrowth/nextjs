@@ -167,7 +167,7 @@ export default function BillingForm({
     <Form {...form}>
       <form
         action={handleFormSubmit}
-        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
+        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg shadow bg-sidebar'}
       >
         {/* Billing Type Selection */}
         <div className='space-y-4'>

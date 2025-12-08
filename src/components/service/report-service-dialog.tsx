@@ -4,7 +4,7 @@ import { useState, useEffect, startTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Flag, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -127,7 +127,6 @@ export function ReportServiceDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant='outline' size='default'>
-          <Flag className='w-4 h-4 mr-2' />
           Αναφορά Υπηρεσίας
         </Button>
       </DialogTrigger>

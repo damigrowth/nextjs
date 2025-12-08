@@ -51,7 +51,7 @@ export default async function DirectoryPage() {
         {/* Archive Banner */}
         <ArchiveBanner
           title='Επαγγελματικός Κατάλογος'
-          subtitle='Ανακάλυψε επαγγελματίες και επιχειρήσεις για κάθε ανάγκη από όλες τις κατηγορίες.'
+          subtitle='Ανακάλυψε όλες τις κατηγορίες με επαγγελματίες και επιχειρήσεις για κάθε ανάγκη.'
         />
 
         {/* Page Content */}

@@ -99,7 +99,7 @@ export default async function DashboardContent() {
       <div className='space-y-2'>
         <h1 className='text-3xl font-bold tracking-tight'>Πίνακας Ελέγχου</h1>
         <p className='text-muted-foreground'>
-          Καλώς ήρθες πίσω! Ελέγξε τη δραστηριότητά σου.
+          Καλώς ήρθατε! Βελτιώστε την εικόνα σας, προσθέστε πληροφορίες στο επαγγελματικό προφίλ σας και προσθέστε όλες τις υπηρεσίες σας για να σας εντοπίσουν οι χρήστες της πλατφόρμας!
         </p>
       </div>
 
@@ -177,13 +177,10 @@ export default async function DashboardContent() {
               <MessageSquare className='h-5 w-5' />
               Τελευταία Μηνύματα
             </CardTitle>
-            <CardDescription>
-              Παρακολούθησε τις πρόσφατες επικοινωνίες
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className='text-sm text-muted-foreground text-center py-8'>
-              Δεν υπάρχουν πρόσφατα μηνύματα
+              Δεν υπάρχουν μηνύματα μέχρι τώρα. Βελτιώστε την εμφάνιση του επαγγελματικού προφίλ και των υπηρεσιών σας για να σας ξεχωρίσουν περισσότεροι χρήστες!
             </div>
           </CardContent>
         </Card>

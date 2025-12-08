@@ -5,6 +5,7 @@ import { formatDate, formatTime } from '@/lib/utils/date';
 import { AdminDataTable, ColumnDef } from './admin-data-table';
 import type { AdminUserForTable } from '@/lib/types/auth';
 import UserBadges from '@/components/shared/user-badges';
+import { NextLink } from '@/components/shared';
 
 interface AdminUsersDataTableProps {
   data: AdminUserForTable[];
@@ -34,7 +35,12 @@ export function AdminUsersDataTable({
       sortable: true,
       render: (user) => (
         <div className='space-y-1'>
-          <div className='font-medium'>{user.email}</div>
+          <NextLink
+            href={`${basePath}/${user.id}`}
+            className='font-medium hover:text-primary transition-colors hover:underline'
+          >
+            {user.email}
+          </NextLink>
           {user.type === 'pro' && user.displayName && (
             <div className='text-xs text-muted-foreground'>
               @{user.displayName}

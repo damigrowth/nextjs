@@ -170,7 +170,7 @@ export default function AdditionalInfoForm({
     <Form {...form}>
       <form
         action={handleFormSubmit}
-        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
+        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg shadow bg-sidebar'}
       >
         {/* Row 1: Commencement and Rate */}
         <div className='grid grid-cols-1 md:grid-cols-5 gap-6'>

@@ -134,7 +134,7 @@ export default function VerificationForm({
     <Form {...form}>
       <form
         action={handleFormSubmit}
-        className='space-y-6 p-6 border rounded-lg'
+        className='space-y-6 p-6 border rounded-lg shadow bg-sidebar'
       >
         {/* AFM Field */}
         <FormField

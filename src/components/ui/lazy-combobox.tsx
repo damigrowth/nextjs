@@ -292,7 +292,7 @@ export function LazyCombobox({
             <div
               onClick={() => inputRef.current?.focus()}
               className={cn(
-                'relative flex flex-row flex-wrap items-center gap-2 rounded-md border border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring cursor-text',
+                'relative flex flex-row flex-wrap items-center gap-2 rounded-md bg-white shadow border-2 border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring cursor-text',
                 className,
               )}
             >

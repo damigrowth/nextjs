@@ -46,6 +46,15 @@ export function DashboardBreadcrumb() {
     })
     // Filter out dynamic route segments (chat IDs, etc.) that aren't in routeLabels
     .filter((item, index, array) => {
+      // Hide "edit" and service ID for /dashboard/services/edit/* pages
+      const isServicesEditPath = segments[0] === 'dashboard' && segments[1] === 'services' && segments[2] === 'edit';
+      if (isServicesEditPath) {
+        // Hide "edit" segment
+        if (item.segment === 'edit') return false;
+        // Hide the ID segment (after "edit")
+        if (index > 0 && array[index - 1]?.segment === 'edit') return false;
+      }
+
       // Keep if it's in routeLabels
       if (routeLabels[item.segment]) return true;
 

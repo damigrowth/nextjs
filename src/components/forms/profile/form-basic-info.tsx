@@ -241,7 +241,7 @@ export default function BasicInfoForm({
     <Form {...form}>
       <form
         action={handleFormAction}
-        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
+        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg shadow bg-sidebar'}
       >
         {/* Tagline */}
         <FormField
@@ -262,7 +262,7 @@ export default function BasicInfoForm({
                   onChange={handleTaglineChange}
                 />
               </FormControl>
-              <div className='text-sm text-gray-500'>
+              <div className='text-xs text-gray-500'>
                 {field.value?.length || 0}/100 χαρακτήρες
               </div>
               <FormMessage />
@@ -343,13 +343,13 @@ export default function BasicInfoForm({
               <FormControl>
                 <Textarea
                   placeholder='Τουλάχιστον 80 χαρακτήρες (2-3 προτάσεις)'
-                  className='min-h-[360px]'
+                  className='min-h-[200px]'
                   rows={8}
                   value={field.value}
                   onChange={handleBioChange}
                 />
               </FormControl>
-              <div className='text-sm text-gray-500'>
+              <div className='text-xs text-gray-500'>
                 {field.value.length}/5000 χαρακτήρες (ελάχιστο: 80)
               </div>
               <FormMessage />

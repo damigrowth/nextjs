@@ -521,7 +521,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
                   onChange={handleBioChange}
                 />
               </FormControl>
-              <div className='text-sm text-gray-500'>
+              <div className='text-xs text-gray-500'>
                 {field.value.length}/80 χαρακτήρες
               </div>
               <FormMessage />

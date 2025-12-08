@@ -71,7 +71,7 @@ export default function ProfileSidebar({
         );
 
   return (
-    <div className='bg-card border-b'>
+    <div className='bg-silver border-b'>
       <div className='relative overflow-x-clip lg:overflow-x-visible'>
         <ScrollArea className='w-full'>
           <nav className='flex items-center gap-2 px-6 py-4'>
@@ -87,7 +87,7 @@ export default function ProfileSidebar({
                     'flex items-center gap-2 px-4 py-2 rounded-md text-sm transition-colors whitespace-nowrap border',
                     isActive
                       ? 'bg-primary text-primary-foreground border-primary'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground border-border',
+                      : 'text-muted-foreground bg-white hover:bg-accent hover:text-accent-foreground border-border',
                   )}
                 >
                   <Icon className='h-4 w-4' />

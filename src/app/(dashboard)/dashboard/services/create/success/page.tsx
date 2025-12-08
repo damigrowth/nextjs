@@ -49,7 +49,7 @@ export default async function ServiceSuccessPage({ searchParams }: PageProps) {
               </div>
 
               <h1 className='text-2xl font-bold text-gray-900'>
-                Επιτυχής δημιουργία υπηρεσίας!
+                Επιτυχής υποβολή υπηρεσίας!
               </h1>
 
               {/* Service ID and Status Badges */}
@@ -72,10 +72,10 @@ export default async function ServiceSuccessPage({ searchParams }: PageProps) {
             {/* Service Details */}
             <div className='text-center space-y-4'>
               <p className='text-gray-700'>
-                Ευχαριστούμε για την δημιουργία υπηρεσίας{' '}
+                Επιτυχής δημιουργία της υπηρεσίας{' '}
                 <strong className='text-green-800'>"{serviceTitle}"</strong>.
-                Σύντομα θα γίνει η δημοσίευση της αφού ολοκληρωθεί η διαδικασία
-                ελέγχου της.
+              <br></br>  Σύντομα θα γίνει η δημοσίευση της αφού ολοκληρωθεί η διαδικασία
+                ελέγχου.
               </p>
             </div>
 

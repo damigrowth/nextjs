@@ -78,7 +78,12 @@ export function AdminProfilesDataTable({
               showShadow={false}
             />
             <div className='space-y-1'>
-              <div className='font-medium'>{displayName}</div>
+              <NextLink
+                href={`${basePath}/${profile.id}`}
+                className='font-medium hover:text-primary transition-colors hover:underline'
+              >
+                {displayName}
+              </NextLink>
               <CopyableText
                 text={email}
                 className='text-sm text-muted-foreground'
@@ -91,23 +96,6 @@ export function AdminProfilesDataTable({
               )}
             </div>
           </div>
-        );
-      },
-    },
-    {
-      key: 'relatedUser',
-      header: 'Email',
-      render: (profile) => {
-        const userId = profile.user.id;
-        const userEmail = profile.user.email;
-
-        return (
-          <NextLink
-            href={`/admin/users/${userId}`}
-            className='text-sm font-medium hover:text-primary transition-colors hover:underline'
-          >
-            {userEmail}
-          </NextLink>
         );
       },
     },
