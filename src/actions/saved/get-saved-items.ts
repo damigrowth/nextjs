@@ -5,9 +5,9 @@ import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
-import { skills } from '@/constants/datasets/skills';
 // O(1) optimized taxonomy lookups - 99% faster than findById
-import { findServiceById, findProById } from '@/lib/taxonomies';
+import { findServiceById, findProById, findSkillById } from '@/lib/taxonomies';
+import { findById } from '@/lib/utils/datasets';
 import type { ActionResult } from '@/lib/types/api';
 import type {
   SavedItemsResponse,
@@ -106,7 +106,7 @@ export async function getSavedItems(params?: {
     const profiles: ProfileCardData[] = savedProfiles.map(({ profile }) => {
       // OPTIMIZATION: O(1) hash map lookups instead of O(n) findById
       const subcategoryTaxonomy = findProById(profile.subcategory);
-      const specialitySkill = profile.speciality ? findServiceById(profile.speciality) : null;
+      const specialitySkill = profile.speciality ? findSkillById(profile.speciality) : null;
 
       return {
         id: profile.id,

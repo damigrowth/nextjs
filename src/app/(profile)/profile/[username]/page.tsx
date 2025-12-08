@@ -86,7 +86,6 @@ export default async function ProfilePage({
     profile,
     category,
     subcategory,
-    speciality,
     featuredCategories,
     skillsData,
     specialityData,
@@ -206,7 +205,7 @@ export default async function ProfilePage({
                     profileDisplayName={profile.displayName || ''}
                   />
 
-                  {(skillsData.length > 0 || speciality) && (
+                  {(skillsData.length > 0 || specialityData) && (
                     <ProfileSkills
                       skills={skillsData}
                       speciality={specialityData?.label}
@@ -237,7 +236,7 @@ export default async function ProfilePage({
                 profileDisplayName={profile.displayName || ''}
               />
 
-              {(skillsData.length > 0 || speciality) && (
+              {(skillsData.length > 0 || specialityData) && (
                 <ProfileSkills
                   skills={skillsData}
                   speciality={specialityData?.label}

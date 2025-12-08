@@ -164,6 +164,100 @@ export function findProBySlug(slug: string | null | undefined): DatasetItem | nu
 }
 
 // ============================================================================
+// LAYER 3: Skills Lookups (O(1))
+// ============================================================================
+
+/**
+ * Find skill by ID - O(1) optimized
+ *
+ * Drop-in replacement for `findById(skills, id)`
+ *
+ * @param id - Skill ID
+ * @returns DatasetItem or null if not found
+ *
+ * @example
+ * const skill = findSkillById('11'); // 2D Animation
+ * const skill = findSkillById('312'); // Agile Development
+ */
+export function findSkillById(id: string | null | undefined): DatasetItem | null {
+  if (!id) return null;
+  return getTaxonomyMaps().skills.byId[id] || null;
+}
+
+/**
+ * Find skill by slug - O(1) optimized
+ *
+ * Drop-in replacement for `findBySlug(skills, slug)`
+ *
+ * @param slug - Skill slug
+ * @returns DatasetItem or null if not found
+ *
+ * @example
+ * const skill = findSkillBySlug('2d-animation');
+ * const skill = findSkillBySlug('agile-development');
+ */
+export function findSkillBySlug(slug: string | null | undefined): DatasetItem | null {
+  if (!slug) return null;
+  return getTaxonomyMaps().skills.bySlug[slug] || null;
+}
+
+/**
+ * Get all skills for a pro category - O(1) optimized
+ *
+ * Retrieves all skills that belong to a specific pro-taxonomy category
+ *
+ * @param categoryId - Pro taxonomy category ID
+ * @returns Array of skill DatasetItems for that category
+ *
+ * @example
+ * const graphicSkills = getSkillsByCategory('7');  // All graphic design skills
+ * const devSkills = getSkillsByCategory('12');     // All development skills
+ */
+export function getSkillsByCategory(categoryId: string): DatasetItem[] {
+  const maps = getTaxonomyMaps();
+  const skillIds = maps.skills.byCategory[categoryId] || [];
+  return skillIds.map(id => maps.skills.byId[id]).filter(Boolean);
+}
+
+// ============================================================================
+// LAYER 3: Tags Lookups (O(1))
+// ============================================================================
+
+/**
+ * Find tag by ID - O(1) optimized
+ *
+ * Drop-in replacement for `findById(tags, id)`
+ *
+ * @param id - Tag ID
+ * @returns DatasetItem or null if not found
+ *
+ * @example
+ * const tag = findTagById('1');    // Web Development
+ * const tag = findTagById('100');  // Digital Marketing
+ */
+export function findTagById(id: string | null | undefined): DatasetItem | null {
+  if (!id) return null;
+  return getTaxonomyMaps().tags.byId[id] || null;
+}
+
+/**
+ * Find tag by slug - O(1) optimized
+ *
+ * Drop-in replacement for `findBySlug(tags, slug)`
+ *
+ * @param slug - Tag slug
+ * @returns DatasetItem or null if not found
+ *
+ * @example
+ * const tag = findTagBySlug('web-development');
+ * const tag = findTagBySlug('digital-marketing');
+ */
+export function findTagBySlug(slug: string | null | undefined): DatasetItem | null {
+  if (!slug) return null;
+  return getTaxonomyMaps().tags.bySlug[slug] || null;
+}
+
+// ============================================================================
 // LAYER 3: Location Lookups (O(1))
 // ============================================================================
 
@@ -362,6 +456,50 @@ export function batchFindProByIds(ids: string[]): (DatasetItem | null)[] {
 export function batchFindLocationsByIds(ids: string[]): (DatasetItem | null)[] {
   const maps = getTaxonomyMaps();
   return ids.map(id => maps.location.byId[id] || null);
+}
+
+/**
+ * Batch lookup skills by IDs - Optimized for multiple lookups
+ *
+ * More efficient than calling findSkillById in a loop
+ *
+ * @param ids - Array of skill IDs
+ * @returns Array of DatasetItems (or null for not found)
+ *
+ * @example
+ * const skills = batchFindSkillsByIds(['11', '12', '312']);
+ * // Returns: [2D Animation, 3D Animation, Agile Development]
+ *
+ * // Instead of:
+ * const skills = skillIds.map(id => findSkillById(id)); // Multiple hash lookups
+ * // Use:
+ * const skills = batchFindSkillsByIds(skillIds); // Single map operation
+ */
+export function batchFindSkillsByIds(ids: string[]): (DatasetItem | null)[] {
+  const maps = getTaxonomyMaps();
+  return ids.map(id => maps.skills.byId[id] || null);
+}
+
+/**
+ * Batch lookup tags by IDs - Optimized for multiple lookups
+ *
+ * More efficient than calling findTagById in a loop
+ *
+ * @param ids - Array of tag IDs
+ * @returns Array of DatasetItems (or null for not found)
+ *
+ * @example
+ * const tags = batchFindTagsByIds(['1', '5', '10']);
+ * // Returns: [Tag1, Tag5, Tag10]
+ *
+ * // Instead of:
+ * const tags = tagIds.map(id => findTagById(id)); // Multiple hash lookups
+ * // Use:
+ * const tags = batchFindTagsByIds(tagIds); // Single map operation
+ */
+export function batchFindTagsByIds(ids: string[]): (DatasetItem | null)[] {
+  const maps = getTaxonomyMaps();
+  return ids.map(id => maps.tags.byId[id] || null);
 }
 
 // ============================================================================

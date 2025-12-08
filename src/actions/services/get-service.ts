@@ -9,10 +9,10 @@ import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import { locationOptions } from '@/constants/datasets/locations';
 // O(1) optimized taxonomy lookups - 99% faster than findById
-import { findServiceById, findProById } from '@/lib/taxonomies';
+import { findServiceById, findProById, batchFindTagsByIds } from '@/lib/taxonomies';
 // Complex utilities - KEEP for coverage transformation, defaults, and non-taxonomy datasets
 import {
-  findById, // Generic utility for options, industries, tags (not yet optimized)
+  findById, // Generic utility for options, industries (not yet optimized)
   transformCoverageWithLocationNames,
   getDefaultCoverage,
 } from '@/lib/utils/datasets';
@@ -23,7 +23,6 @@ import {
   paymentMethodsOptions,
   settlementMethodsOptions,
 } from '@/constants/datasets/options';
-import { tags } from '@/constants/datasets/tags';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
 import { ServiceCacheKeys } from '@/lib/cache/keys';
@@ -257,10 +256,9 @@ async function _getServicePageData(
       .map((methodId) => findById(settlementMethodsOptions, methodId))
       .filter((method) => method !== undefined);
 
-    // Transform tags - resolve tag IDs to actual tag objects
-    const tagsData = (service.tags || [])
-      .map((tagId) => findById(tags, tagId))
-      .filter((tag) => tag !== undefined);
+    // Transform tags - resolve tag IDs to actual tag objects - O(1) optimized
+    const tagsData = batchFindTagsByIds(service.tags || [])
+      .filter((tag) => tag !== null);
 
     // Prepare breadcrumb buttons config
     const breadcrumbButtons = {

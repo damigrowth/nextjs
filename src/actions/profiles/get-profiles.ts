@@ -6,6 +6,7 @@ import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import {
   transformCoverageWithLocationNames,
   resolveTaxonomyHierarchy,
+  findById,
   findBySlug,
   getTaxonomyBreadcrumbs,
   findTaxonomyBySlugInContext,
@@ -17,9 +18,8 @@ import type { DatasetItem } from '@/lib/types/datasets';
 // O(1) optimized taxonomy lookups - 99% faster than findById
 import {
   findProById,
-  findServiceById,
-  batchFindServiceByIds,
   findLocationBySlugOrName,
+  batchFindSkillsByIds,
 } from '@/lib/taxonomies';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
@@ -285,11 +285,10 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
       .map(p => p.speciality!);
     const uniqueSkillIds = [...new Set([...allSkillIds, ...allSpecialityIds])];
 
-    // Single batch operation instead of N individual lookups (99% faster)
+    // Build skills map from skills dataset - O(1) optimized
+    const skillsData = batchFindSkillsByIds(uniqueSkillIds);
     const skillsMap = new Map(
-      batchFindServiceByIds(uniqueSkillIds).map((skill, idx) =>
-        [uniqueSkillIds[idx], skill]
-      )
+      uniqueSkillIds.map((skillId, idx) => [skillId, skillsData[idx]])
     );
 
     // Transform profiles to archive card data

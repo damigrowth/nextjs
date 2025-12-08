@@ -9,7 +9,6 @@ import type { BreadcrumbSegment } from '@/components/shared/dynamic-breadcrumb';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-import { skills } from '@/constants/datasets/skills';
 import {
   contactMethodsOptions,
   paymentMethodsOptions,
@@ -20,7 +19,7 @@ import {
 import { industriesOptions } from '@/constants/datasets/industries';
 import { locationOptions } from '@/constants/datasets/locations';
 // O(1) optimized taxonomy lookups - 99% faster than findById
-import { findProById, findServiceById, batchFindServiceByIds } from '@/lib/taxonomies';
+import { findProById, batchFindServiceByIds, batchFindSkillsByIds, findSkillById } from '@/lib/taxonomies';
 // Complex utilities - KEEP for coverage transformation, defaults, and non-taxonomy datasets
 import {
   findById, // Generic utility for options, industries, tags (not yet optimized)
@@ -143,7 +142,6 @@ export interface ProfilePageData {
   profile: NonNullable<Awaited<ReturnType<typeof getProfileByUsername>>>;
   category?: DatasetItem | null;
   subcategory?: DatasetItem | null;
-  speciality?: DatasetItem | null;
   featuredCategories: typeof proTaxonomies;
   skillsData: (DatasetItem | null)[];
   specialityData?: DatasetItem | null;
@@ -234,16 +232,12 @@ async function _getProfilePageData(
       ? findProById(profile.subcategory)
       : null;
 
-    const speciality = profile.speciality
-      ? findProById(profile.speciality)
-      : null;
-
     const featuredCategories = proTaxonomies.slice(0, 8);
 
-    // OPTIMIZATION: Batch lookup for skills instead of N individual lookups (99% faster)
-    const skillsData = batchFindServiceByIds(profile.skills).filter(skill => skill !== null);
+    // Skills lookup from skills dataset - O(1) optimized
+    const skillsData = batchFindSkillsByIds(profile.skills).filter((skill) => skill !== null);
 
-    const specialityData = profile.speciality ? findServiceById(profile.speciality) : null;
+    const specialityData = profile.speciality ? findSkillById(profile.speciality) : null;
 
     // Resolve dataset options for features
     const contactMethodsData = profile.contactMethods
@@ -352,7 +346,6 @@ async function _getProfilePageData(
         profile,
         category: category || undefined,
         subcategory: subcategory || undefined,
-        speciality: speciality || undefined,
         featuredCategories,
         skillsData,
         specialityData,
