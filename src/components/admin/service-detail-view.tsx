@@ -50,6 +50,7 @@ import {
   updateServiceStatus,
   deleteService,
 } from '@/actions/admin/services';
+import { tags } from '@/constants/datasets/tags';
 
 interface ServiceDetailViewProps {
   service: any; // Use proper type from your schema
@@ -298,11 +299,14 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
                 <div>
                   <h4 className='text-sm font-medium mb-2'>Tags</h4>
                   <div className='flex flex-wrap gap-2'>
-                    {service.tags.map((tag: string, index: number) => (
-                      <Badge key={index} variant='outline'>
-                        {tag}
-                      </Badge>
-                    ))}
+                    {service.tags.map((tagId: string, index: number) => {
+                      const tagData = tags.find((t) => t.id === tagId);
+                      return (
+                        <Badge key={index} variant='outline'>
+                          {tagData ? tagData.label : tagId}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
               </>

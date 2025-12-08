@@ -43,6 +43,7 @@ import { findById, getAllSubdivisions } from '@/lib/utils/datasets';
 
 // Dataset utilities
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { tags } from '@/constants/datasets/tags';
 import type { CreateServiceInput } from '@/lib/validations/service';
 import { useFormContext } from 'react-hook-form';
 
@@ -75,40 +76,13 @@ export default function ServiceDetailsStep() {
     }));
   }, []);
 
-  // Generate tags from category subcategories and their subdivisions for MultiSelect
+  // Generate tags from tags dataset for MultiSelect
   const availableTags = React.useMemo(() => {
-    if (!watchedCategory || !selectedCategoryData) return [];
-
-    const tags: Array<{ value: string; label: string }> = [];
-
-    // Add subcategories as tags
-    subcategories.forEach(
-      (subcategory: {
-        id: string;
-        label: string;
-        children?: Array<{ id: string; label: string }>;
-      }) => {
-        tags.push({
-          value: subcategory.id,
-          label: subcategory.label,
-        });
-
-        // Add subdivisions as tags
-        if (subcategory.children) {
-          subcategory.children.forEach(
-            (subdivision: { id: string; label: string }) => {
-              tags.push({
-                value: subdivision.id,
-                label: subdivision.label,
-              });
-            },
-          );
-        }
-      },
-    );
-
-    return tags;
-  }, [watchedCategory, selectedCategoryData, subcategories]);
+    return tags.map((tag) => ({
+      value: tag.id,
+      label: tag.label,
+    }));
+  }, []);
 
   // Handle dependent field clearing
   const handleCategorySelect = (categoryId: string) => {
@@ -195,179 +169,121 @@ export default function ServiceDetailsStep() {
       />
 
       {/* Taxonomy Selection - Subdivision with Auto-populated Category/Subcategory */}
-      <div className='space-y-2'>
-        <label className='text-sm font-medium text-gray-900'>
-          Κατηγορία Υπηρεσίας*
-        </label>
-        <p className='text-sm text-gray-600'>
-          Επιλέξτε τις κατηγορίες της υπηρεσίας
-        </p>
-        <LazyCombobox
-          trigger='search'
-          options={allSubdivisions}
-          value={watchedSubdivision || undefined}
-          onSelect={(option) => {
-            // Auto-populate all three fields
-            setValue('category', option.category.id, { shouldValidate: true });
-            setValue('subcategory', option.subcategory.id, {
-              shouldValidate: true,
-            });
-            setValue('subdivision', option.subdivision.id, {
-              shouldValidate: true,
-            });
-            clearErrors(['category', 'subcategory', 'subdivision']);
-            // Clear tags when taxonomy changes
-            setValue('tags', [], { shouldValidate: true });
-          }}
-          placeholder='Επιλέξτε κατηγορία...'
-          searchPlaceholder='Αναζήτηση κατηγορίας...'
-          emptyMessage='Δεν βρέθηκαν κατηγορίες.'
-          formatLabel={(option) => (
-            <>
-              {option.label}{' '}
-              <span className='text-gray-500 text-sm'>
-                ({option.category.label} / {option.subcategory.label})
-              </span>
-            </>
-          )}
-          renderButtonContent={(option) => {
-            if (!option) {
-              return (
-                <span className='text-muted-foreground'>
-                  Επιλέξτε κατηγορία...
-                </span>
-              );
-            }
-            return (
-              <div className='flex flex-wrap gap-1 items-center'>
-                <Badge variant='default' className='hover:bg-primary/90'>
-                  {option.category.label}
-                </Badge>
-                <ChevronRight className='h-3 w-3 text-muted-foreground' />
-                <Badge variant='default' className='hover:bg-primary/90'>
-                  {option.subcategory.label}
-                </Badge>
-                <ChevronRight className='h-3 w-3 text-muted-foreground' />
-                <Badge variant='default' className='hover:bg-primary/90'>
-                  {option.label}
-                </Badge>
-              </div>
-            );
-          }}
-          initialLimit={20}
-          loadMoreIncrement={20}
-          loadMoreThreshold={50}
-          searchLimit={100}
-          showProgress={true}
-        />
+      <FormField
+        control={form.control}
+        name='subdivision'
+        render={({ field }) => {
+          // Watch subdivision inside render to get updates
+          const currentSubdivision = watch('subdivision');
 
-        {/* Show validation errors */}
-        {formState.errors.category && (
-          <p className='text-sm font-medium text-destructive'>
-            {formState.errors.category.message}
-          </p>
-        )}
-        {formState.errors.subcategory && (
-          <p className='text-sm font-medium text-destructive'>
-            {formState.errors.subcategory.message}
-          </p>
-        )}
-        {formState.errors.subdivision && (
-          <p className='text-sm font-medium text-destructive'>
-            {formState.errors.subdivision.message}
-          </p>
-        )}
-      </div>
-
-      {/* Tags - Multi-select from category subcategories and subdivisions */}
-      {watchedCategory && availableTags.length > 0 ? (
-        <FormField
-          control={form.control}
-          name='tags'
-          render={({ field }) => {
-            // Watch category inside render to get updates
-            const currentCategory = watch('category');
-
-            // Regenerate available tags based on current category
-            const currentAvailableTags = React.useMemo(() => {
-              const categoryData = findById(serviceTaxonomies, currentCategory);
-              if (!currentCategory || !categoryData) return [];
-
-              const tags: Array<{ value: string; label: string }> = [];
-              const subcategories = categoryData.children || [];
-
-              // Add subcategories as tags
-              subcategories.forEach(
-                (subcategory: {
-                  id: string;
-                  label: string;
-                  children?: Array<{ id: string; label: string }>;
-                }) => {
-                  tags.push({
-                    value: subcategory.id,
-                    label: subcategory.label,
-                  });
-
-                  // Add subdivisions as tags
-                  if (subcategory.children) {
-                    subcategory.children.forEach(
-                      (subdivision: { id: string; label: string }) => {
-                        tags.push({
-                          value: subdivision.id,
-                          label: subdivision.label,
-                        });
-                      },
+          return (
+            <FormItem>
+              <FormLabel>Κατηγορία Υπηρεσίας*</FormLabel>
+              <p className='text-sm text-gray-600'>
+                Επιλέξτε τις κατηγορίες της υπηρεσίας
+              </p>
+              <FormControl>
+                <LazyCombobox
+                  key={`subdivision-${currentSubdivision || 'empty'}`}
+                  trigger='search'
+                  options={allSubdivisions}
+                  value={currentSubdivision || undefined}
+                  onSelect={(option) => {
+                    // Auto-populate all three fields
+                    setValue('category', option.category.id, {
+                      shouldValidate: true,
+                    });
+                    setValue('subcategory', option.subcategory.id, {
+                      shouldValidate: true,
+                    });
+                    setValue('subdivision', option.subdivision.id, {
+                      shouldValidate: true,
+                    });
+                    clearErrors(['category', 'subcategory', 'subdivision']);
+                  }}
+                  placeholder='Επιλέξτε κατηγορία...'
+                  searchPlaceholder='Αναζήτηση κατηγορίας...'
+                  emptyMessage='Δεν βρέθηκαν κατηγορίες.'
+                  formatLabel={(option) => (
+                    <>
+                      {option.label}{' '}
+                      <span className='text-gray-500 text-sm'>
+                        ({option.category.label} / {option.subcategory.label})
+                      </span>
+                    </>
+                  )}
+                  renderButtonContent={(option) => {
+                    if (!option) {
+                      return (
+                        <span className='text-muted-foreground'>
+                          Επιλέξτε κατηγορία...
+                        </span>
+                      );
+                    }
+                    return (
+                      <div className='flex flex-wrap gap-1 items-center'>
+                        <Badge variant='default' className='hover:bg-primary/90'>
+                          {option.category.label}
+                        </Badge>
+                        <ChevronRight className='h-3 w-3 text-muted-foreground' />
+                        <Badge
+                          variant='default'
+                          className='hover:bg-primary/90'
+                        >
+                          {option.subcategory.label}
+                        </Badge>
+                        <ChevronRight className='h-3 w-3 text-muted-foreground' />
+                        <Badge variant='default' className='hover:bg-primary/90'>
+                          {option.label}
+                        </Badge>
+                      </div>
                     );
-                  }
-                },
-              );
+                  }}
+                  initialLimit={20}
+                  loadMoreIncrement={20}
+                  loadMoreThreshold={50}
+                  searchLimit={100}
+                  showProgress={true}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          );
+        }}
+      />
 
-              return tags;
-            }, [currentCategory]);
-
-            return (
-              <FormItem>
-                <FormLabel>Ετικέτες</FormLabel>
-                <p className='text-sm text-gray-600'>
-                  Επιλέξτε έως 10 ετικέτες για την υπηρεσία σας
-                </p>
-                <FormControl>
-                  <LazyCombobox
-                    key={`tags-${currentCategory}`}
-                    multiple
-                    options={currentAvailableTags.map((tag) => ({
-                      id: tag.value,
-                      label: tag.label,
-                    }))}
-                    values={field.value || []}
-                    onMultiSelect={(selectedOptions) => {
-                      const selectedIds = selectedOptions.map((opt) => opt.id);
-                      field.onChange(selectedIds);
-                    }}
-                    onSelect={() => {}}
-                    placeholder='Επιλέξτε ετικέτες...'
-                    searchPlaceholder='Αναζήτηση ετικετών...'
-                    maxItems={10}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            );
-          }}
-        />
-      ) : (
-        watchedCategory &&
-        availableTags.length === 0 && (
-          <div className='space-y-2'>
-            <label className='text-sm font-medium text-gray-900'>
-              Ετικέτες
-            </label>
-            <div className='p-4 text-center text-gray-500 bg-gray-50 rounded-md'>
-              Δεν υπάρχουν διαθέσιμες ετικέτες για αυτήν την κατηγορία
-            </div>
-          </div>
-        )
-      )}
+      {/* Tags - Multi-select from tags dataset */}
+      <FormField
+        control={form.control}
+        name='tags'
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Ετικέτες</FormLabel>
+            <p className='text-sm text-gray-600'>
+              Επιλέξτε έως 10 ετικέτες για την υπηρεσία σας
+            </p>
+            <FormControl>
+              <LazyCombobox
+                multiple
+                options={availableTags.map((tag) => ({
+                  id: tag.value,
+                  label: tag.label,
+                }))}
+                values={field.value || []}
+                onMultiSelect={(selectedOptions) => {
+                  const selectedIds = selectedOptions.map((opt) => opt.id);
+                  field.onChange(selectedIds);
+                }}
+                onSelect={() => {}}
+                placeholder='Επιλέξτε ετικέτες...'
+                searchPlaceholder='Αναζήτηση ετικετών...'
+                maxItems={10}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
       {/* Price and Fixed Price Toggle */}
       <div className='grid md:grid-cols-2 gap-4'>

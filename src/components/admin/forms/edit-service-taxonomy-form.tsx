@@ -20,6 +20,7 @@ import { updateServiceTaxonomyAction } from '@/actions/admin/services';
 import { TaxonomySelector } from '@/components/shared';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { tags } from '@/constants/datasets/tags';
 import { findById } from '@/lib/utils/datasets';
 import { useMemo } from 'react';
 import { createServiceSchema } from '@/lib/validations/service';
@@ -76,36 +77,11 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
   const subdivisions = selectedSubcategoryData?.children || [];
 
   const availableTags = useMemo(() => {
-    if (!watchedCategory || !selectedCategoryData) return [];
-
-    const tags: Array<{ value: string; label: string }> = [];
-
-    subcategories.forEach(
-      (subcategory: {
-        id: string;
-        label: string;
-        children?: Array<{ id: string; label: string }>;
-      }) => {
-        tags.push({
-          value: subcategory.id,
-          label: subcategory.label,
-        });
-
-        if (subcategory.children) {
-          subcategory.children.forEach(
-            (subdivision: { id: string; label: string }) => {
-              tags.push({
-                value: subdivision.id,
-                label: subdivision.label,
-              });
-            },
-          );
-        }
-      },
-    );
-
-    return tags;
-  }, [watchedCategory, selectedCategoryData, subcategories]);
+    return tags.map((tag) => ({
+      value: tag.id,
+      label: tag.label,
+    }));
+  }, []);
 
   // Handle state changes from server action
   useEffect(() => {
@@ -173,11 +149,6 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
                   shouldDirty: true,
                   shouldValidate: true,
                 });
-                // Clear tags when taxonomy changes
-                form.setValue('tags', [], {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
               } else {
                 form.setValue('category', '', {
                   shouldDirty: true,
@@ -188,10 +159,6 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
                   shouldValidate: true,
                 });
                 form.setValue('subdivision', '', {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-                form.setValue('tags', [], {
                   shouldDirty: true,
                   shouldValidate: true,
                 });
