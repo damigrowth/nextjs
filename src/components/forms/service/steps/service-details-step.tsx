@@ -90,20 +90,16 @@ export default function ServiceDetailsStep() {
     // Clear dependent fields when category changes
     setValue('subcategory', '', { shouldValidate: true });
     setValue('subdivision', '', { shouldValidate: true });
-    setValue('tags', [], { shouldValidate: true });
   };
 
   const handleSubcategorySelect = (subcategoryId: string) => {
     setValue('subcategory', subcategoryId, { shouldValidate: true });
     // Clear dependent fields when subcategory changes
     setValue('subdivision', '', { shouldValidate: true });
-    setValue('tags', [], { shouldValidate: true });
   };
 
   const handleSubdivisionSelect = (subdivisionId: string) => {
     setValue('subdivision', subdivisionId, { shouldValidate: true });
-    // Clear tags when subdivision changes
-    setValue('tags', [], { shouldValidate: true });
   };
 
   return (

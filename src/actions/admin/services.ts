@@ -8,10 +8,9 @@ import { z } from 'zod';
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { CACHE_TAGS, getServiceTags } from '@/lib/cache';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-import { tags } from '@/constants/datasets/tags';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 // O(1) optimized taxonomy lookups - 99% faster than nested find
-import { findServiceById } from '@/lib/taxonomies';
+import { findServiceById, findTagById, findTagBySlug } from '@/lib/taxonomies';
 import { generateServiceSlug } from '@/lib/utils/text';
 import { sendServicePublishedEmail } from '@/lib/email/services';
 
@@ -1355,9 +1354,9 @@ export async function getServiceStats() {
       ? findServiceById(servicesBySubdivision[0].subdivision)
       : null;
 
-    // Resolve tag label
+    // Resolve tag label - O(1) optimized hash map lookups
     const topTagData = topTagRaw
-      ? tags.find((tag) => tag.id === topTagRaw.name || tag.slug === topTagRaw.name)
+      ? (findTagById(topTagRaw.name) || findTagBySlug(topTagRaw.name))
       : null;
     const topTag = topTagData
       ? { name: topTagData.label, count: topTagRaw.count }
