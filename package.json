@@ -5,7 +5,8 @@
   "engine": "yarn",
   "scripts": {
     "dev": "next dev --turbo",
-    "build": "prisma generate && next build",
+    "build": "yarn build:taxonomies && prisma generate && next build",
+    "build:taxonomies": "tsx scripts/build-taxonomy-maps.ts",
     "start": "next start",
     "lint": "next lint",
     "db:pull": "npx prisma db pull --schema=./src/lib/prisma/schema/",

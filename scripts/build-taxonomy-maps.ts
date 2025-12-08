@@ -12,6 +12,8 @@
 import { serviceTaxonomies } from '../src/constants/datasets/service-taxonomies';
 import { proTaxonomies } from '../src/constants/datasets/pro-taxonomies';
 import { locationOptions } from '../src/constants/datasets/locations';
+import { skills } from '../src/constants/datasets/skills';
+import { tags } from '../src/constants/datasets/tags';
 import fs from 'fs';
 import path from 'path';
 import { gzip } from 'zlib';
@@ -47,6 +49,15 @@ interface TaxonomyMaps {
     byId: Record<string, DatasetItem>;
     bySlug: Record<string, DatasetItem>;
   };
+  skills: {
+    byId: Record<string, DatasetItem>;
+    bySlug: Record<string, DatasetItem>;
+    byCategory: Record<string, string[]>; // categoryId -> skillIds
+  };
+  tags: {
+    byId: Record<string, DatasetItem>;
+    bySlug: Record<string, DatasetItem>;
+  };
   metadata: {
     generatedAt: string;
     version: string;
@@ -57,6 +68,9 @@ interface TaxonomyMaps {
       proCategories: number;
       proSubcategories: number;
       locations: number;
+      skills: number;
+      skillsByCategory: Record<string, number>;
+      tags: number;
     };
   };
 }
@@ -182,6 +196,53 @@ function buildLocationMaps(items: DatasetItem[]) {
 }
 
 /**
+ * Build skills maps (flat structure with optional category grouping)
+ * Skills link to pro-taxonomy categories via optional category field
+ */
+function buildSkillsMaps(items: DatasetItem[]) {
+  const maps = {
+    byId: {} as Record<string, DatasetItem>,
+    bySlug: {} as Record<string, DatasetItem>,
+    byCategory: {} as Record<string, string[]>,
+  };
+
+  items.forEach(skill => {
+    // Add to byId and bySlug maps
+    maps.byId[skill.id] = skill;
+    maps.bySlug[skill.slug] = skill;
+
+    // Group by category (optional field linking to pro-taxonomies)
+    if (skill.category) {
+      if (!maps.byCategory[skill.category]) {
+        maps.byCategory[skill.category] = [];
+      }
+      maps.byCategory[skill.category].push(skill.id);
+    }
+  });
+
+  return maps;
+}
+
+/**
+ * Build tags maps (flat structure)
+ * Tags are used for service tagging and search
+ */
+function buildTagsMaps(items: DatasetItem[]) {
+  const maps = {
+    byId: {} as Record<string, DatasetItem>,
+    bySlug: {} as Record<string, DatasetItem>,
+  };
+
+  items.forEach(tag => {
+    // Add to byId and bySlug maps
+    maps.byId[tag.id] = tag;
+    maps.bySlug[tag.slug] = tag;
+  });
+
+  return maps;
+}
+
+/**
  * Main build function
  */
 async function buildTaxonomyMaps() {
@@ -203,11 +264,19 @@ async function buildTaxonomyMaps() {
   // Build location maps
   const locationMaps = buildLocationMaps(locationOptions);
 
+  // Build skills maps
+  const skillsMaps = buildSkillsMaps(skills);
+
+  // Build tags maps
+  const tagsMaps = buildTagsMaps(tags);
+
   // Create final structure
   const maps: TaxonomyMaps = {
     service: serviceMaps,
     pro: proMaps,
     location: locationMaps,
+    skills: skillsMaps,
+    tags: tagsMaps,
     metadata: {
       generatedAt: new Date().toISOString(),
       version: '1.0.0',
@@ -218,6 +287,11 @@ async function buildTaxonomyMaps() {
         proCategories: proTaxonomies.length,
         proSubcategories,
         locations: locationOptions.length,
+        skills: skills.length,
+        skillsByCategory: Object.fromEntries(
+          Object.entries(skillsMaps.byCategory).map(([k, v]) => [k, v.length])
+        ),
+        tags: tags.length,
       },
     },
   };
@@ -258,6 +332,9 @@ async function buildTaxonomyMaps() {
   console.log(`   - Pro categories: ${maps.metadata.counts.proCategories}`);
   console.log(`   - Pro subcategories: ${maps.metadata.counts.proSubcategories}`);
   console.log(`   - Locations: ${maps.metadata.counts.locations}`);
+  console.log(`   - Skills: ${maps.metadata.counts.skills}`);
+  console.log(`   - Skills by category: ${Object.keys(maps.metadata.counts.skillsByCategory).length} categories`);
+  console.log(`   - Tags: ${maps.metadata.counts.tags}`);
   console.log();
   console.log('📁 Output:');
   console.log(`   - Original size: ${(originalSize / 1024).toFixed(2)} KB`);
