@@ -5,7 +5,8 @@ import { prisma } from '@/lib/prisma/client';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 // O(1) optimized taxonomy lookups - 99% faster than findById
-import { findServiceById, findProById, findServiceBySlug } from '@/lib/taxonomies';
+import { findServiceById, findProById, findServiceBySlug, findSkillById } from '@/lib/taxonomies';
+import { findById } from '@/lib/utils/datasets';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
 import { HomeCacheKeys } from '@/lib/cache/keys';
@@ -53,8 +54,8 @@ function transformProfileForComponent(
   const subcategoryTaxonomy = findProById(profile.subcategory);
   const subcategoryLabel = subcategoryTaxonomy?.label || 'Γενικός';
 
-  // Resolve speciality label for display - skills are service taxonomy items
-  const specialitySkill = profile.speciality ? findServiceById(profile.speciality) : null;
+  // Resolve speciality label for display - speciality is a skill ID - O(1) optimized
+  const specialitySkill = profile.speciality ? findSkillById(profile.speciality) : null;
   const specialityLabel = specialitySkill?.label;
 
   return {
