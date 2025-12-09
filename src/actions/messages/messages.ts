@@ -15,7 +15,7 @@ export async function getMessages(
   options?: { limit?: number; before?: string }
 ): Promise<ChatMessageItem[]> {
   try {
-    const limit = options?.limit || 100;
+    const limit = options?.limit || 20;
 
     // Verify user is a member of the chat
     const chatMember = await prisma.chatMember.findUnique({
@@ -65,7 +65,7 @@ export async function getMessages(
         },
       },
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc', // Get newest messages first
       },
       take: limit,
     });
@@ -75,7 +75,8 @@ export async function getMessages(
       transformMessageForChat(message as MessageWithRelations, currentUserId)
     );
 
-    return chatMessages;
+    // Reverse to display oldest→newest (bottom of chat shows most recent)
+    return chatMessages.reverse();
   } catch (error) {
     console.error('Error fetching messages:', error);
     throw new Error('Failed to fetch messages');
