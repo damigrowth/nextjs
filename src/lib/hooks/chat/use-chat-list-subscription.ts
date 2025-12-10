@@ -44,17 +44,45 @@ export function useChatListSubscription({
   useEffect(() => {
     if (!enabled || !userId) return;
 
-    let channel: RealtimeChannel | null;
+    let channel: RealtimeChannel | null = null;
+    let mounted = true;
 
-    channel = subscribeToUserChats(userId, (updatedChat) => {
-      // When any chat-related change happens, refresh the entire list
-      // This ensures we get accurate unread counts, last messages, etc.
-      refreshChats();
+    // Subscribe to user chats (async function)
+    const setupSubscription = async () => {
+      // console.log('🔌 Subscribing to chat list for user:', userId);
+
+      channel = await subscribeToUserChats(userId, (updatedChat) => {
+        // console.log('💬 Chat list update received:', updatedChat);
+        // When any chat-related change happens, refresh the entire list
+        // This ensures we get accurate unread counts, last messages, etc.
+        refreshChats();
+      });
+
+      // Check if component unmounted during async setup
+      if (!mounted && channel) {
+        // console.log('⚠️ Component unmounted during setup, cleaning up');
+        await unsubscribe(channel);
+      }
+    };
+
+    // Start async subscription setup
+    setupSubscription().catch((error) => {
+      console.error('❌ Failed to setup chat list subscription:', error);
     });
 
     // Cleanup
     return () => {
-      if (channel) unsubscribe(channel);
+      // console.log('🧹 Cleanup: Starting for chat list');
+      mounted = false;
+
+      // Async cleanup - fire and forget
+      (async () => {
+        if (channel) {
+          // console.log('🧹 Cleanup: Unsubscribing chat list channel');
+          await unsubscribe(channel);
+        }
+        // console.log('✅ Cleanup: Complete for chat list');
+      })();
     };
   }, [userId, enabled, refreshChats]);
 

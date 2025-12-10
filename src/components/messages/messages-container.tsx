@@ -33,7 +33,7 @@ export function MessagesContainer({
   const [editingMessage, setEditingMessage] = useState<EditingMessage | null>(null);
   const [olderMessages, setOlderMessages] = useState<ChatMessageItem[]>([]);
   const [isLoadingOlder, setIsLoadingOlder] = useState(false);
-  const [hasMore, setHasMore] = useState(initialMessages.length >= 50);
+  const [hasMore, setHasMore] = useState(initialMessages.length >= 20);
 
   // Subscribe to real-time message updates
   const { messages: realtimeMessages } = useChatSubscription({
@@ -91,6 +91,25 @@ export function MessagesContainer({
     markNewMessagesAsRead();
   }, [realtimeMessages, currentUserId]); // Run when new real-time messages arrive
 
+  // Scroll to bottom on initial load and when switching chats
+  useEffect(() => {
+    const scrollToBottom = () => {
+      if (scrollRef.current) {
+        const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (viewport) {
+          requestAnimationFrame(() => {
+            // Add extra padding buffer to ensure last message is fully visible
+            viewport.scrollTop = viewport.scrollHeight + 20;
+          });
+        }
+      }
+    };
+
+    // Small delay to ensure DOM is fully rendered
+    const timer = setTimeout(scrollToBottom, 100);
+    return () => clearTimeout(timer);
+  }, [chatId]); // Re-run when chat changes
+
   // Load older messages when scrolling to top
   const loadOlderMessages = useCallback(async () => {
     if (isLoadingOlder || !hasMore) return;
@@ -144,27 +163,38 @@ export function MessagesContainer({
   );
 
   // Setup intersection observer for infinite scroll
+  // Delay setup to prevent triggering on initial load
   useEffect(() => {
     if (!loadTriggerRef.current || !hasMore) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting && hasMore && !isLoadingOlder) {
-          loadOlderMessages();
-        }
-      },
-      {
-        root: null,
-        rootMargin: '200px',
-        threshold: 0.1,
-      }
-    );
+    let observer: IntersectionObserver | null = null;
 
-    observer.observe(loadTriggerRef.current);
+    // Delay observer setup by 500ms to allow initial scroll to complete
+    const timer = setTimeout(() => {
+      observer = new IntersectionObserver(
+        (entries) => {
+          const [entry] = entries;
+          if (entry.isIntersecting && hasMore && !isLoadingOlder) {
+            loadOlderMessages();
+          }
+        },
+        {
+          root: null,
+          rootMargin: '200px',
+          threshold: 0.1,
+        }
+      );
+
+      if (loadTriggerRef.current) {
+        observer.observe(loadTriggerRef.current);
+      }
+    }, 500); // 500ms delay
 
     return () => {
-      observer.disconnect();
+      clearTimeout(timer);
+      if (observer) {
+        observer.disconnect();
+      }
     };
   }, [loadOlderMessages, hasMore, isLoadingOlder]);
 
@@ -175,7 +205,11 @@ export function MessagesContainer({
       // Only scroll if we got new messages (not older ones)
       const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
       if (viewport) {
-        viewport.scrollTop = viewport.scrollHeight;
+        // Use requestAnimationFrame to ensure DOM has updated
+        requestAnimationFrame(() => {
+          // Add extra padding buffer to ensure last message is fully visible
+          viewport.scrollTop = viewport.scrollHeight + 20;
+        });
       }
     }
     prevMessageCountRef.current = allMessages.length;
