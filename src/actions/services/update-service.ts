@@ -14,6 +14,8 @@ import {
 } from '@/lib/validations/service';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 import { generateServiceSlug } from '@/lib/utils/text';
+import { sendServiceCreatedEmail } from '@/lib/email/services';
+import { brevoWorkflowService } from '@/lib/email';
 
 // =============================================
 // SHARED UTILITIES
@@ -210,6 +212,9 @@ export async function updateServiceInfo(
       return { success: false, error: 'Unauthorized access' };
     }
 
+    // Track if service was draft before update (for transition logic)
+    const wasDraft = existingService.status === 'draft';
+
     // Parse FormData - only include fields that are present
     const rawData: Partial<UpdateServiceInfoInput> = {};
 
@@ -269,6 +274,8 @@ export async function updateServiceInfo(
     // Build update data object with only provided fields
     const updateData: any = {
       updatedAt: new Date(),
+      // Transition draft services to pending on first save
+      ...(wasDraft && { status: 'pending' }),
     };
 
     // Add each field if present in validated data
@@ -318,6 +325,48 @@ export async function updateServiceInfo(
       },
     });
 
+    // If service transitioned from draft to pending, send notification email
+    if (wasDraft && updatedService.status === 'pending') {
+      // Send email notification to admin
+      await sendServiceCreatedEmail(
+        {
+          id: updatedService.id,
+          title: updatedService.title,
+          description: updatedService.description,
+          slug: updatedService.slug,
+        },
+        {
+          ...session.user,
+          email: session.user.email || '',
+        },
+        typeof profile.id === 'string' ? parseInt(profile.id) : profile.id,
+        updatedService.category
+      );
+
+      // Check if this is the user's first service and move to pros list
+      const serviceCount = await prisma.service.count({
+        where: {
+          pid: profile.id,
+          status: { not: 'draft' },
+        },
+      });
+
+      if (serviceCount === 1 && session.user.email) {
+        brevoWorkflowService
+          .handleFirstServiceCreated(session.user.email, {
+            DISPLAY_NAME: session.user.displayName || undefined,
+            USERNAME: session.user.username || undefined,
+            USER_TYPE: session.user.type as 'user' | 'pro',
+            USER_ROLE: session.user.role as 'user' | 'freelancer' | 'company' | 'admin',
+            IS_PRO: session.user.type === 'pro',
+            SERVICES_COUNT: 1,
+          })
+          .catch((error) => {
+            console.error('Failed to move user to pros list:', error);
+          });
+      }
+    }
+
     // Invalidate caches
     await invalidateServiceCaches({
       serviceId: updatedService.id,
@@ -331,7 +380,11 @@ export async function updateServiceInfo(
 
     return {
       success: true,
-      data: { message: 'Η υπηρεσία ενημερώθηκε επιτυχώς!' },
+      data: {
+        message: wasDraft
+          ? 'Η υπηρεσία υποβλήθηκε για έγκριση επιτυχώς!'
+          : 'Η υπηρεσία ενημερώθηκε επιτυχώς!'
+      },
     };
   } catch (error) {
     console.error('Update service info error:', error);
