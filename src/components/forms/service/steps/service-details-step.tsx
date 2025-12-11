@@ -185,6 +185,7 @@ export default function ServiceDetailsStep() {
                 <LazyCombobox
                   key={`subdivision-${currentSubdivision || 'empty'}`}
                   trigger='search'
+                  clearable={true}
                   options={allSubdivisions}
                   value={currentSubdivision || undefined}
                   onSelect={(option) => {
@@ -199,6 +200,12 @@ export default function ServiceDetailsStep() {
                       shouldValidate: true,
                     });
                     clearErrors(['category', 'subcategory', 'subdivision']);
+                  }}
+                  onClear={() => {
+                    // Clear all three fields
+                    setValue('category', '', { shouldValidate: true });
+                    setValue('subcategory', '', { shouldValidate: true });
+                    setValue('subdivision', '', { shouldValidate: true });
                   }}
                   placeholder='Επιλέξτε κατηγορία...'
                   searchPlaceholder='Αναζήτηση κατηγορίας...'

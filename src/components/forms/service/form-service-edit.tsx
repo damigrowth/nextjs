@@ -426,6 +426,7 @@ export default function FormServiceEdit({
           </p>
           <LazyCombobox
             trigger='search'
+            clearable={true}
             options={allSubdivisions}
             value={watchedSubdivision || undefined}
             onSelect={(option) => {
@@ -443,6 +444,12 @@ export default function FormServiceEdit({
                 shouldValidate: true,
               });
               clearErrors(['category', 'subcategory', 'subdivision']);
+            }}
+            onClear={() => {
+              // Clear all three fields
+              setValue('category', '', { shouldDirty: true, shouldValidate: true });
+              setValue('subcategory', '', { shouldDirty: true, shouldValidate: true });
+              setValue('subdivision', '', { shouldDirty: true, shouldValidate: true });
             }}
             placeholder='Επιλέξτε κατηγορία...'
             searchPlaceholder='Αναζήτηση κατηγορίας...'
@@ -482,17 +489,7 @@ export default function FormServiceEdit({
             showProgress={true}
           />
 
-          {/* Show validation errors */}
-          {errors.category && (
-            <p className='text-sm font-medium text-destructive'>
-              {errors.category.message}
-            </p>
-          )}
-          {errors.subcategory && (
-            <p className='text-sm font-medium text-destructive'>
-              {errors.subcategory.message}
-            </p>
-          )}
+          {/* Show validation error - only subdivision since it's the primary field */}
           {errors.subdivision && (
             <p className='text-sm font-medium text-destructive'>
               {errors.subdivision.message}

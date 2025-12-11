@@ -445,7 +445,7 @@ export const serviceDetailsSchema = z
       .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες'),
     category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
     subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
-    subdivision: z.string().min(1, 'Η υποδιαίρεση είναι υποχρεωτική'),
+    subdivision: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
     tags: z
       .array(z.string())
       .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες')
@@ -585,7 +585,7 @@ export const createServiceSchema = z
       .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες'),
     category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
     subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
-    subdivision: z.string().min(1, 'Η υποδιαίρεση είναι υποχρεωτική'),
+    subdivision: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
     tags: z
       .array(z.string())
       .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες')
@@ -863,11 +863,17 @@ export const createServiceDraftSchema = z.object({
 export const adminEditServiceAddonSchema = z.object({
   title: z
     .string()
-    .min(5, 'Ο τίτλος της extra υπηρεσίας πρέπει να είναι τουλάχιστον 5 χαρακτήρες')
+    .min(
+      5,
+      'Ο τίτλος της extra υπηρεσίας πρέπει να είναι τουλάχιστον 5 χαρακτήρες',
+    )
     .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
   description: z
     .string()
-    .min(10, 'Η περιγραφή της extra υπηρεσίας πρέπει να είναι τουλάχιστον 10 χαρακτήρες')
+    .min(
+      10,
+      'Η περιγραφή της extra υπηρεσίας πρέπει να είναι τουλάχιστον 10 χαρακτήρες',
+    )
     .max(500, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 500 χαρακτήρες'),
   price: z
     .number()

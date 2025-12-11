@@ -85,8 +85,15 @@ export default async function ServicesSubdivisionPage({
     throw new Error(result.error || 'Failed to fetch services');
   }
 
-  const { services, total, taxonomyData, breadcrumbData, counties, filters, availableSubdivisions } =
-    result.data;
+  const {
+    services,
+    total,
+    taxonomyData,
+    breadcrumbData,
+    counties,
+    filters,
+    availableSubdivisions,
+  } = result.data;
 
   return (
     <ArchiveLayout
@@ -107,7 +114,7 @@ export default async function ServicesSubdivisionPage({
         {services.length === 0 ? (
           <div className='text-center py-12'>
             <h3 className='text-lg font-medium text-gray-900 mb-2'>
-              Δεν βρέθηκαν υπηρεσίες στην υποδιαίρεση "
+              Δεν βρέθηκαν υπηρεσίες στην κατηγορία "
               {taxonomyData.currentSubdivision?.label}"
             </h3>
             <p className='text-gray-600'>
