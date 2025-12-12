@@ -1,6 +1,7 @@
 export { EditUserStatusForm } from './edit-user-status-form';
 export { EditUserBanForm } from './edit-user-ban-form';
 export { RevokeSessionsForm } from './revoke-sessions-form';
+export { DeleteUserForm } from './delete-user-form';
 
 // Service forms
 export { EditServiceBasicForm } from './edit-service-basic-form';

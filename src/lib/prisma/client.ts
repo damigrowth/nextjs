@@ -13,7 +13,12 @@ const globalForPrisma = globalThis as unknown as {
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+    log: [
+      { emit: 'event', level: 'query' },
+      { emit: 'event', level: 'error' },
+      { emit: 'event', level: 'info' },
+      { emit: 'event', level: 'warn' },
+    ],
     errorFormat: 'pretty',
     // Connection pool configuration optimized for serverless (Vercel)
     // NOTE: To reduce connection pool, add to your DATABASE_URL:
@@ -24,6 +29,17 @@ export const prisma =
       },
     },
   });
+
+// Filter out session deletion errors from logs
+// These are expected during user deletion when Better Auth cleans up sessions
+prisma.$on('error', (e) => {
+  // Suppress session deletion errors - these occur when getSession() tries to sign out
+  // a deleted user whose sessions were already removed by Better Auth's deleteUser
+  if (e.target !== 'session.delete') {
+    console.error('Prisma error:', e);
+  }
+  // Session deletion errors are silently ignored as they're expected during account deletion
+});
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 

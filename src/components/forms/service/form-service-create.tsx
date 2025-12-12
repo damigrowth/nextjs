@@ -273,6 +273,7 @@ export default function CreateServiceForm({
   // Watch form values for reactive button state
   const watchedType = watch('type');
   const watchedSubscriptionType = watch('subscriptionType');
+  const watchedTitle = watch('title');
 
   // Check if current step is valid and ready to proceed
   const isCurrentStepValid = (): boolean => {
@@ -663,12 +664,14 @@ export default function CreateServiceForm({
                           variant='ghost'
                           size='sm'
                           className={`h-8 w-8 p-0 ${
-                            currentStep >= 3
+                            currentStep === 3 && watchedTitle && watchedTitle.length >= 10
                               ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
                               : 'text-gray-400 cursor-not-allowed'
                           }`}
                           disabled={
-                            currentStep < 3 ||
+                            currentStep !== 3 ||
+                            !watchedTitle ||
+                            watchedTitle.length < 10 ||
                             isDraftPending ||
                             isLoading
                           }
@@ -683,9 +686,9 @@ export default function CreateServiceForm({
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>
-                        {currentStep >= 3
+                        {currentStep === 3 && watchedTitle && watchedTitle.length >= 10
                           ? 'Αποθήκευση ως προσχέδιο'
-                          : 'Διαθέσιμο από το βήμα 3'}
+                          : 'Διαθέσιμο στο βήμα 3 μετά τη συμπλήρωση τίτλου'}
                       </p>
                     </TooltipContent>
                   </Tooltip>

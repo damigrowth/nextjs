@@ -179,6 +179,7 @@ export default function FormServiceEdit({
   const watchedCategory = watch('category');
   const watchedSubcategory = watch('subcategory');
   const watchedSubdivision = watch('subdivision');
+  const watchedType = watch('type');
   const addons = watch('addons') || [];
   const faq = watch('faq') || [];
 
@@ -280,7 +281,7 @@ export default function FormServiceEdit({
                   placeholder='π.χ. Δημιουργία λογοτύπου και ταυτότητας επιχείρησης'
                   maxLength={100}
                   {...field}
-                  disabled={initialUser?.role !== 'admin'}
+                  disabled={service.status !== 'draft' && initialUser?.role !== 'admin'}
                   onChange={(e) => {
                     const value = e.target.value.slice(0, 100);
                     field.onChange(value);
@@ -391,30 +392,32 @@ export default function FormServiceEdit({
           />
         </div>
 
-        {/* Duration */}
-        <FormField
-          control={form.control}
-          name='duration'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Διάρκεια εκτέλεσης</FormLabel>
-              <p className='text-sm text-gray-600'>
-                Εκτιμώμενη διάρκεια σε ημέρες (προαιρετικό)
-              </p>
-              <FormControl>
-                <Input
-                  type='number'
-                  placeholder='π.χ. 7'
-                  min={0}
-                  max={365}
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value) || 0)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Duration - Only show for oneoff services */}
+        {watchedType?.oneoff && (
+          <FormField
+            control={form.control}
+            name='duration'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Διάρκεια εκτέλεσης</FormLabel>
+                <p className='text-sm text-gray-600'>
+                  Εκτιμώμενη διάρκεια σε ημέρες (προαιρετικό)
+                </p>
+                <FormControl>
+                  <Input
+                    type='number'
+                    placeholder='π.χ. 7'
+                    min={0}
+                    max={365}
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {/* Taxonomy Selection - Subdivision with Auto-populated Category/Subcategory */}
         <div className='space-y-2'>
@@ -589,8 +592,8 @@ export default function FormServiceEdit({
           />
           <FormButton
             type='submit'
-            text='Αποθήκευση'
-            loadingText='Αποθήκευση...'
+            text={service.status === 'draft' ? 'Δημιουργία' : 'Αποθήκευση'}
+            loadingText={service.status === 'draft' ? 'Δημιουργία...' : 'Αποθήκευση...'}
             loading={isPending}
             disabled={isPending || !isValid || !isDirty}
           />
