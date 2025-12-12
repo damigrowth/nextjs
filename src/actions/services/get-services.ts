@@ -681,10 +681,9 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
 }
 
 /**
- * Get services by filters with coverage filtering (cached)
- * Caches results for 5 minutes based on filter combination
+ * Get services by filters with coverage filtering
+ * Uses direct database queries with ISR caching at page level (matches profile pattern)
  */
-// OPTIMIZATION: Cached wrapper with hierarchical cache key and semantic TTL
 export async function getServicesByFilters(filters: ServiceFilters): Promise<
   ActionResult<{
     services: ArchiveServiceCardData[];
@@ -692,28 +691,7 @@ export async function getServicesByFilters(filters: ServiceFilters): Promise<
     hasMore: boolean;
   }>
 > {
-  const getCachedServices = unstable_cache(
-    () => getServicesByFiltersInternal(filters),
-    ServiceCacheKeys.archive({
-      category: filters.category,
-      subcategory: filters.subcategory,
-      subdivision: filters.subdivision,
-      status: filters.status,
-      featured: filters.search ? undefined : undefined, // Search queries don't use featured flag
-    }),
-    {
-      revalidate: getCacheTTL('SERVICE_ARCHIVE'), // 10 minutes - moderate frequency updates
-      tags: [
-        CACHE_TAGS.collections.services,
-        CACHE_TAGS.archive.servicesFiltered,
-        CACHE_TAGS.archive.all,
-        ...(filters.category ? [CACHE_TAGS.collections.servicesCategory(filters.category)] : []),
-        ...(filters.search ? [CACHE_TAGS.search.all] : []),
-      ],
-    },
-  );
-
-  return getCachedServices();
+  return getServicesByFiltersInternal(filters);
 }
 
 /**
