@@ -1,13 +1,20 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useIsMobile } from '@/lib/hooks';
 import Footer from './footer-global';
 
 export default function FooterWrapper() {
   const pathname = usePathname();
+  const isMobile = useIsMobile();
 
-  // Hide footer on dashboard and admin pages
-  if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/admin')) {
+  // Always hide footer on admin pages
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
+  // Hide footer on dashboard pages only on desktop (show on mobile for navigation)
+  if (pathname?.startsWith('/dashboard') && !isMobile) {
     return null;
   }
 
