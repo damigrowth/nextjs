@@ -32,11 +32,15 @@ export function createSlug(text: string): string {
   // Replace Greek characters with Latin equivalents
   const latinizedText = greekToLatin(text);
 
-  // Remove all non-alphanumeric characters except dashes and spaces
-  const cleanedText = latinizedText.replace(/[^a-zA-Z0-9\s-]/g, '');
+  // Remove all non-alphanumeric characters (including hyphens)
+  const cleanedText = latinizedText.replace(/[^a-zA-Z0-9\s]/g, '');
 
-  // Replace spaces with dashes and convert to lowercase
-  return cleanedText.trim().toLowerCase().replace(/\s+/g, '-');
+  // Replace spaces with hyphens, collapse multiple hyphens, and convert to lowercase
+  return cleanedText
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')      // Replace one or more spaces with single hyphen
+    .replace(/-+/g, '-');      // Collapse multiple consecutive hyphens to single hyphen
 }
 
 // Generate service slug with numeric ID
