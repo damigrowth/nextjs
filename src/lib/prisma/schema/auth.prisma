@@ -8,7 +8,7 @@ model Session {
   ipAddress      String?
   userAgent      String?
   impersonatedBy String? // Admin plugin: ID of admin impersonating this session
-  user           User     @relation(fields: [userId], references: [id])
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
@@ -27,7 +27,7 @@ model Account {
   password              String?
   providerId            String
   refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
-  user                  User      @relation(fields: [userId], references: [id])
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("accounts")
 }
