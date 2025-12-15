@@ -55,8 +55,8 @@ export const UNREAD_MESSAGES_HTML = (data: UnreadMessagesData): string => {
   const dashboardUrl =
     data.dashboardUrl || 'https://doulitsa.gr/dashboard/messages';
 
-  // Show max 15 messages
-  const messagesToShow = data.messages.slice(0, 15);
+  // Show max 15 messages in chronological order (oldest first)
+  const messagesToShow = data.messages.slice(0, 15).reverse();
   const hasMoreMessages = data.unreadCount > 15;
 
   // Generate message list HTML
@@ -166,8 +166,8 @@ export const UNREAD_MESSAGES_TEXT = (data: UnreadMessagesData): string => {
   const dashboardUrl =
     data.dashboardUrl || 'https://doulitsa.gr/dashboard/messages';
 
-  // Show max 15 messages
-  const messagesToShow = data.messages.slice(0, 15);
+  // Show max 15 messages in chronological order (oldest first)
+  const messagesToShow = data.messages.slice(0, 15).reverse();
   const hasMoreMessages = data.unreadCount > 15;
 
   const messagesList =
