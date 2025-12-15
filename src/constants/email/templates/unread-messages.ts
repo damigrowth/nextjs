@@ -4,7 +4,19 @@
  * HTML template for notifying users of unread messages from the last 15 minutes
  */
 
-import { formatMessageTime } from '@/lib/utils/formatting/time';
+/**
+ * Format message timestamp for email in Greece timezone (24-hour format)
+ * Uses Europe/Athens timezone to match what users see in chat
+ */
+function formatEmailMessageTime(date: Date): string {
+  return new Intl.DateTimeFormat('el-GR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    hourCycle: 'h23',
+    timeZone: 'Europe/Athens', // Force Greece timezone
+  }).format(date);
+}
 
 export interface UnreadMessagesData {
   userName: string;
@@ -58,7 +70,7 @@ export const UNREAD_MESSAGES_HTML = (data: UnreadMessagesData): string => {
         <td style="padding: 15px; border-bottom: 1px solid #eee;">
           <p style="margin: 0 0 5px 0; font-size: 14px; font-weight: 600; color: #1f4c40;">
             ${getSenderName(msg.author)}
-            <span style="font-weight: normal; color: #999; font-size: 12px;">• ${formatMessageTime(msg.createdAt.toISOString())}</span>
+            <span style="font-weight: normal; color: #999; font-size: 12px;">• ${formatEmailMessageTime(msg.createdAt)}</span>
           </p>
           <p style="margin: 0; font-size: 14px; line-height: 20px; color: #333;">
             ${truncateMessage(msg.content, 120)}
@@ -164,7 +176,7 @@ export const UNREAD_MESSAGES_TEXT = (data: UnreadMessagesData): string => {
     messagesToShow
       .map((msg) => {
         const senderName = getSenderName(msg.author);
-        const time = formatMessageTime(msg.createdAt.toISOString());
+        const time = formatEmailMessageTime(msg.createdAt);
         const content = truncateMessage(msg.content, 100);
         return `• ${senderName} (${time}): ${content}`;
       })
