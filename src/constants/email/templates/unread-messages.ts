@@ -22,12 +22,14 @@ export interface UnreadMessagesData {
 }
 
 /**
- * Format message timestamp in Greek
+ * Format message timestamp in Greek (24-hour format)
  */
 function formatMessageTime(date: Date): string {
   return new Intl.DateTimeFormat('el-GR', {
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
+    hourCycle: 'h23',
   }).format(new Date(date));
 }
 
