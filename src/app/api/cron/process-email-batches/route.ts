@@ -1,8 +1,8 @@
 /**
- * Vercel Cron Job: Process Email Batches
+ * Vercel Cron Job: Check for Unread Messages
  *
- * Runs every 15 minutes to check for unprocessed email batches
- * and send notification emails for batches that are 15+ minutes old.
+ * Runs every 15 minutes to check for unread messages and send email notifications.
+ * Only sends notifications for messages that haven't been emailed about yet.
  *
  * Schedule: Every 15 minutes (cron expression in vercel.json)
  * Security: Requires CRON_SECRET in Authorization header
@@ -10,7 +10,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma/client';
-import { getRecentUnreadMessages } from '@/actions/messages/messages';
 import { sendUnreadMessagesEmail } from '@/lib/email/services/message-emails';
 
 export const dynamic = 'force-dynamic';
@@ -23,118 +22,147 @@ export async function GET(request: NextRequest) {
     const expectedAuth = `Bearer ${process.env.CRON_SECRET}`;
 
     if (authHeader !== expectedAuth) {
-      console.error('[Cron] Unauthorized access attempt to email batch processor');
+      console.error('[Cron] Unauthorized access attempt to email notification processor');
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    console.log('[Cron] Starting email batch processing...');
+    console.log('[Cron] Starting unread message notification check...');
 
-    // Find all unprocessed email batches that are 15+ minutes old
-    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
-
-    const pendingBatches = await prisma.emailBatch.findMany({
+    // Get all users with emails
+    const usersWithEmails = await prisma.user.findMany({
       where: {
-        processed: false,
-        firstMessageAt: {
-          lte: fifteenMinutesAgo,
+        email: {
+          not: null,
         },
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            displayName: true,
-            username: true,
-          },
-        },
+      select: {
+        id: true,
+        email: true,
+        displayName: true,
+        username: true,
       },
     });
 
-    console.log(`[Cron] Found ${pendingBatches.length} pending email batches to process`);
+    // Filter out users without emails (TypeScript safety)
+    const users = usersWithEmails.filter(
+      (u): u is typeof u & { email: string } => u.email !== null
+    );
 
-    let successCount = 0;
-    let skipCount = 0;
-    let errorCount = 0;
+    console.log(`[Cron] Checking ${users.length} users for unread messages`);
 
-    // Process each pending batch
-    for (const batch of pendingBatches) {
+    let notificationsSent = 0;
+    let usersSkipped = 0;
+    let errors = 0;
+
+    for (const user of users) {
       try {
-        const user = batch.user;
+        // 1. Get user's chats
+        const userChats = await prisma.chatMember.findMany({
+          where: { uid: user.id },
+          select: { chatId: true },
+        });
 
-        // Get recent unread messages for this user
-        const recentUnreadMessages = await getRecentUnreadMessages(user.id, 15);
+        const chatIds = userChats.map((cm) => cm.chatId);
 
-        if (recentUnreadMessages.length >= 1) {
-          // Send email notification
-          await sendUnreadMessagesEmail(user, recentUnreadMessages);
-
-          // Mark batch as processed
-          await prisma.emailBatch.update({
-            where: { id: batch.id },
-            data: {
-              processed: true,
-              processedAt: new Date(),
-            },
-          });
-
-          const minutesElapsed = Math.floor(
-            (Date.now() - new Date(batch.firstMessageAt).getTime()) / (1000 * 60)
-          );
-
-          console.log(
-            `[Cron] ✅ Sent email to ${user.email} with ${recentUnreadMessages.length} messages (batch age: ${minutesElapsed} min)`
-          );
-          successCount++;
-        } else {
-          // No unread messages (might have been marked as read) - just mark batch as processed
-          await prisma.emailBatch.update({
-            where: { id: batch.id },
-            data: {
-              processed: true,
-              processedAt: new Date(),
-            },
-          });
-
-          console.log(
-            `[Cron] ⏭️ Skipped batch for ${user.email} - no unread messages`
-          );
-          skipCount++;
+        if (chatIds.length === 0) {
+          continue; // User has no chats
         }
-      } catch (batchError) {
-        console.error(
-          `[Cron] ❌ Error processing batch ${batch.id} for user ${batch.userId}:`,
-          batchError
+
+        // 2. Get ALL unread messages for this user
+        const unreadMessages = await prisma.message.findMany({
+          where: {
+            chatId: { in: chatIds },
+            authorUid: { not: user.id },
+            read: false,
+            deleted: false,
+          },
+          include: {
+            author: {
+              select: {
+                id: true,
+                displayName: true,
+                username: true,
+                image: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+        });
+
+        if (unreadMessages.length === 0) {
+          continue; // No unread messages
+        }
+
+        // 3. Check if we've already notified about these specific messages
+        const recentBatch = await prisma.emailBatch.findFirst({
+          where: {
+            userId: user.id,
+            sentAt: {
+              gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
+            },
+          },
+          orderBy: { sentAt: 'desc' },
+        });
+
+        // 4. Filter out messages we've already emailed about
+        const newMessages = recentBatch
+          ? unreadMessages.filter((msg) => !recentBatch.messageIds.includes(msg.id))
+          : unreadMessages;
+
+        if (newMessages.length === 0) {
+          console.log(
+            `[Cron] ⏭️ Skipped ${user.email} - All ${unreadMessages.length} unread messages already notified`
+          );
+          usersSkipped++;
+          continue;
+        }
+
+        // 5. Send email notification
+        await sendUnreadMessagesEmail(user, newMessages);
+
+        // 6. Create batch record to track what we sent
+        await prisma.emailBatch.create({
+          data: {
+            userId: user.id,
+            messageIds: newMessages.map((m) => m.id),
+            messageCount: newMessages.length,
+            sentAt: new Date(),
+          },
+        });
+
+        console.log(
+          `[Cron] ✅ Sent email to ${user.email} with ${newMessages.length} new unread messages`
         );
-        errorCount++;
-        // Continue processing other batches even if one fails
+        notificationsSent++;
+      } catch (userError) {
+        console.error(`[Cron] ❌ Error processing user ${user.id} (${user.email}):`, userError);
+        errors++;
+        continue; // Continue processing other users
       }
     }
 
     const summary = {
-      totalBatches: pendingBatches.length,
-      emailsSent: successCount,
-      skipped: skipCount,
-      errors: errorCount,
+      success: true,
+      totalUsers: users.length,
+      notificationsSent,
+      usersSkipped,
+      errors,
       timestamp: new Date().toISOString(),
     };
 
-    console.log('[Cron] Email batch processing complete:', summary);
+    console.log('[Cron] Email notification check complete:', summary);
 
-    return NextResponse.json({
-      success: true,
-      ...summary,
-    });
+    return NextResponse.json(summary);
   } catch (error) {
-    console.error('[Cron] Fatal error in email batch processor:', error);
+    console.error('[Cron] Fatal error in email notification processor:', error);
     return NextResponse.json(
       {
         success: false,
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );
