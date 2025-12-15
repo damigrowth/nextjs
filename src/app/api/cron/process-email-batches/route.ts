@@ -82,21 +82,25 @@ export async function GET(request: NextRequest) {
           continue; // No unread messages
         }
 
-        // 3. Check if we've already notified about these specific messages
-        const recentBatch = await prisma.emailBatch.findFirst({
+        // 3. Get ALL batches for this user to check which messages were already notified
+        const allBatches = await prisma.emailBatch.findMany({
           where: {
             userId: user.id,
-            sentAt: {
-              gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
-            },
           },
-          orderBy: { sentAt: 'desc' },
+          select: {
+            messageIds: true,
+          },
         });
 
-        // 4. Filter out messages we've already emailed about
-        const newMessages = recentBatch
-          ? unreadMessages.filter((msg) => !recentBatch.messageIds.includes(msg.id))
-          : unreadMessages;
+        // 4. Create a Set of all message IDs that have been emailed before
+        const alreadyNotifiedIds = new Set(
+          allBatches.flatMap((batch) => batch.messageIds)
+        );
+
+        // 5. Filter out messages we've already emailed about
+        const newMessages = unreadMessages.filter(
+          (msg) => !alreadyNotifiedIds.has(msg.id)
+        );
 
         if (newMessages.length === 0) {
           usersSkipped++;
