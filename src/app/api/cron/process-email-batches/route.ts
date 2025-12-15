@@ -34,8 +34,8 @@ export async function GET(request: NextRequest) {
     // Get all users with emails
     const usersWithEmails = await prisma.user.findMany({
       where: {
-        email: {
-          not: null,
+        NOT: {
+          email: null,
         },
       },
       select: {
