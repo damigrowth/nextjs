@@ -31,13 +31,8 @@ export async function GET(request: NextRequest) {
 
     console.log('[Cron] Starting unread message notification check...');
 
-    // Get all users with emails
-    const usersWithEmails = await prisma.user.findMany({
-      where: {
-        NOT: {
-          email: null,
-        },
-      },
+    // Get all users (email is required field in User model)
+    const users = await prisma.user.findMany({
       select: {
         id: true,
         email: true,
@@ -45,11 +40,6 @@ export async function GET(request: NextRequest) {
         username: true,
       },
     });
-
-    // Filter out users without emails (TypeScript safety)
-    const users = usersWithEmails.filter(
-      (u): u is typeof u & { email: string } => u.email !== null
-    );
 
     console.log(`[Cron] Checking ${users.length} users for unread messages`);
 
