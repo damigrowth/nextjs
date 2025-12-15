@@ -422,7 +422,11 @@ async function checkAndSendUnreadEmailNotification(
   chatId: string,
   senderUid: string
 ): Promise<void> {
+  const timestamp = new Date().toISOString();
+
   try {
+    console.log(`[Email Batch] ${timestamp} - Processing message in chat ${chatId} from sender ${senderUid}`);
+
     // Get the other member(s) in the chat (recipients)
     const chatMembers = await prisma.chatMember.findMany({
       where: {
@@ -441,6 +445,8 @@ async function checkAndSendUnreadEmailNotification(
       },
     });
 
+    console.log(`[Email Batch] ${timestamp} - Found ${chatMembers.length} recipient(s) in chat`);
+
     // Check each recipient
     for (const member of chatMembers) {
       const recipient = member.user;
@@ -458,7 +464,7 @@ async function checkAndSendUnreadEmailNotification(
 
       if (!batch) {
         // No active batch - create new one (start 15-minute collection window)
-        await prisma.emailBatch.create({
+        const newBatch = await prisma.emailBatch.create({
           data: {
             userId: recipient.id,
             firstMessageAt: new Date(),
@@ -467,14 +473,17 @@ async function checkAndSendUnreadEmailNotification(
         });
 
         console.log(
-          `[Email Batch] Started new 15-minute collection window for user ${recipient.id}`
+          `[Email Batch] ${timestamp} - ✅ Created NEW batch ${newBatch.id} for user ${recipient.id} (${recipient.email})`
+        );
+        console.log(
+          `[Email Batch] ${timestamp} - ⏰ Batch window started. Cron will process in ~15 minutes (next run at ${getNextCronTime()})`
         );
       } else {
         // Batch exists - increment message count
         const minutesSinceFirst =
           (Date.now() - new Date(batch.firstMessageAt).getTime()) / (1000 * 60);
 
-        await prisma.emailBatch.update({
+        const updatedBatch = await prisma.emailBatch.update({
           where: { id: batch.id },
           data: {
             messageCount: { increment: 1 },
@@ -482,12 +491,39 @@ async function checkAndSendUnreadEmailNotification(
         });
 
         console.log(
-          `[Email Batch] Added message to batch for user ${recipient.id} (${Math.floor(minutesSinceFirst)} min elapsed, cron will send at 15 min)`
+          `[Email Batch] ${timestamp} - 📊 Updated EXISTING batch ${batch.id} for user ${recipient.id} (${recipient.email})`
+        );
+        console.log(
+          `[Email Batch] ${timestamp} - ⏳ Batch age: ${Math.floor(minutesSinceFirst)} minutes | Message count: ${updatedBatch.messageCount} | Will process at ~${new Date(new Date(batch.firstMessageAt).getTime() + 15 * 60 * 1000).toLocaleTimeString('el-GR', { hour: '2-digit', minute: '2-digit', hour12: false })}`
         );
       }
     }
+
+    console.log(`[Email Batch] ${timestamp} - ✅ Batch processing complete. NO emails sent (handled by cron).`);
   } catch (error) {
-    console.error('[Email] Error in checkAndSendUnreadEmailNotification:', error);
+    console.error(`[Email Batch] ${timestamp} - ❌ Error in checkAndSendUnreadEmailNotification:`, error);
     // Don't throw - this is a background task
   }
+}
+
+/**
+ * Helper function to calculate next cron execution time
+ * Cron runs every 15 minutes
+ */
+function getNextCronTime(): string {
+  const now = new Date();
+  const minutes = now.getMinutes();
+  const nextQuarter = Math.ceil((minutes + 1) / 15) * 15;
+  const nextRun = new Date(now);
+
+  if (nextQuarter >= 60) {
+    nextRun.setHours(now.getHours() + 1);
+    nextRun.setMinutes(nextQuarter - 60);
+  } else {
+    nextRun.setMinutes(nextQuarter);
+  }
+  nextRun.setSeconds(0);
+  nextRun.setMilliseconds(0);
+
+  return nextRun.toLocaleTimeString('el-GR', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
