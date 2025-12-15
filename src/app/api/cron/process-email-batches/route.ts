@@ -29,8 +29,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('[Cron] Starting unread message notification check...');
-
     // Get all users (email is required field in User model)
     const users = await prisma.user.findMany({
       select: {
@@ -40,8 +38,6 @@ export async function GET(request: NextRequest) {
         username: true,
       },
     });
-
-    console.log(`[Cron] Checking ${users.length} users for unread messages`);
 
     let notificationsSent = 0;
     let usersSkipped = 0;
@@ -103,9 +99,6 @@ export async function GET(request: NextRequest) {
           : unreadMessages;
 
         if (newMessages.length === 0) {
-          console.log(
-            `[Cron] ⏭️ Skipped ${user.email} - All ${unreadMessages.length} unread messages already notified`
-          );
           usersSkipped++;
           continue;
         }
@@ -123,9 +116,6 @@ export async function GET(request: NextRequest) {
           },
         });
 
-        console.log(
-          `[Cron] ✅ Sent email to ${user.email} with ${newMessages.length} new unread messages`
-        );
         notificationsSent++;
       } catch (userError) {
         console.error(`[Cron] ❌ Error processing user ${user.id} (${user.email}):`, userError);
@@ -134,18 +124,14 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const summary = {
+    return NextResponse.json({
       success: true,
       totalUsers: users.length,
       notificationsSent,
       usersSkipped,
       errors,
       timestamp: new Date().toISOString(),
-    };
-
-    console.log('[Cron] Email notification check complete:', summary);
-
-    return NextResponse.json(summary);
+    });
   } catch (error) {
     console.error('[Cron] Fatal error in email notification processor:', error);
     return NextResponse.json(
