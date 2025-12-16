@@ -9,8 +9,8 @@ const nextConfig = {
       bodySizeLimit: '20mb',
     },
     reactCompiler: true,
-    // inlineCss: true, // Disabled due to critters ESM compatibility issue with Vercel
-    // optimizeCss: true, // Disabled due to critters ESM compatibility issue with Vercel
+    inlineCss: true,
+    optimizeCss: true,
     webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB'],
     optimizePackageImports: [
       '@apollo/client',
