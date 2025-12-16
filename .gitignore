@@ -69,3 +69,4 @@ public/css/animate.css
 docs
 legacy
 *.md
+vercel.json

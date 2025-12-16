@@ -1,10 +1,9 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { nextCookies } from 'better-auth/next-js';
-import { admin, apiKey, jwt } from 'better-auth/plugins';
+import { admin, apiKey } from 'better-auth/plugins';
 import { User } from '@prisma/client';
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from '@/lib/email';
-import { brevoListManager } from '@/lib/email/providers/brevo/list-management';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma/client';
 import { cookies } from 'next/headers';
@@ -177,21 +176,6 @@ export const auth = betterAuth({
     deleteUser: {
       enabled: true,
       beforeDelete: async (user) => {
-        // Clean up Brevo email lists (GDPR compliance)
-        try {
-          if (user.email) {
-            const result = await brevoListManager.deleteContact(user.email);
-            if (result.success) {
-              console.log(`Brevo contact deleted for ${user.email}`);
-            } else {
-              console.error(`Failed to delete Brevo contact for ${user.email}:`, result.message);
-            }
-          }
-        } catch (error) {
-          // Log error but don't block deletion - this is a non-critical cleanup operation
-          console.error('Brevo cleanup error during account deletion:', error);
-        }
-
         // Delete Better Auth verification tokens (no relation to User, must delete manually)
         try {
           const deleted = await prisma.verification.deleteMany({
@@ -417,19 +401,6 @@ export const auth = betterAuth({
         enabled: true,
         timeWindow: 1000 * 60 * 60, // 1 hour
         maxRequests: 1000, // 1000 requests per hour for admin operations
-      },
-    }),
-    jwt({
-      jwt: {
-        // Configure JWT for Supabase RLS integration
-        definePayload: ({ user }) => ({
-          sub: user.id, // Standard JWT subject claim (user ID)
-          email: user.email,
-          role: (user as User).role || 'user',
-          // Additional claims for RLS policies
-          type: (user as User).type || 'user',
-        }),
-        expirationTime: '15m', // 15 minutes (match Supabase default)
       },
     }),
     nextCookies(), // MUST be the last plugin in the array
