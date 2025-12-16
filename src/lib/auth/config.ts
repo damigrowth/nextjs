@@ -246,9 +246,11 @@ export const auth = betterAuth({
                   requestRole = 'user';
                 }
               } else {
-                // Fallback for OAuth users without intent (shouldn't happen)
+                // No intent cookie = New user from /login OAuth flow without type selection
+                // Set temporary default type='user' - will be updated after type selection
+                // The TYPE_SELECTION step will control the flow, not the type field
                 requestType = 'user';
-                requestRole = 'user';
+                requestRole = 'user'; // Temporary, will be set after type selection
               }
             } catch (error) {
               // Fallback on error
@@ -281,8 +283,18 @@ export const auth = betterAuth({
 
           // console.log('Setting user - Provider:', requestProvider, 'Type:', requestType, 'Role:', requestRole);
 
-          // Store role in context to set after creation (admin plugin blocks role in create)
+          // Store role and intent status in context to set after creation (admin plugin blocks role in create)
           (context as any)._pendingRole = requestRole;
+          // For OAuth users, track if they came with intent cookie (from /register) or without (from /login)
+          if (requestProvider === 'google') {
+            try {
+              const cookieStore = await cookies();
+              const intentCookie = cookieStore.get('oauth_intent');
+              (context as any)._hasOAuthIntent = !!intentCookie?.value;
+            } catch {
+              (context as any)._hasOAuthIntent = false;
+            }
+          }
 
           return {
             data: {
@@ -304,12 +316,18 @@ export const auth = betterAuth({
           const pendingRole = (context as any)._pendingRole || 'user';
 
           if (provider === 'google') {
-            // OAuth Flow: Google Auth → OAuth Setup → Dashboard (user) or Onboarding (pro)
+            // Check if user has OAuth intent (came from /register with type selection)
+            // If no intent, they came from /login and need type selection
+            const hasOAuthIntent = (context as any)._hasOAuthIntent || false;
+
+            // OAuth Flow:
+            // - With intent (from /register): Google Auth → OAuth Setup → Dashboard/Onboarding
+            // - Without intent (from /login): Google Auth → Type Selection → OAuth Setup → Dashboard/Onboarding
             await prisma.user.update({
               where: { id: user.id },
               data: {
                 role: pendingRole, // Set role here (admin plugin allows after creation)
-                step: 'OAUTH_SETUP', // OAuth users go to setup page first
+                step: hasOAuthIntent ? 'OAUTH_SETUP' : 'TYPE_SELECTION',
                 confirmed: true, // OAuth users are pre-confirmed
                 emailVerified: true, // OAuth providers have verified emails
               },

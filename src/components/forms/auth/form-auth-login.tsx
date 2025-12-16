@@ -97,6 +97,8 @@ const LoginForm: React.FC = () => {
 
   const handleGoogleSignIn = async (): Promise<void> => {
     try {
+      // Type selection now happens AFTER OAuth on /oauth-type-selection page
+      // This works for both new users (type selection) and existing users (direct login)
       await authClient.signIn.social({
         provider: 'google',
         callbackURL: '/dashboard',
@@ -241,6 +243,7 @@ const LoginForm: React.FC = () => {
         </div>
       </div>
 
+      {/* Google Login Button */}
       <GoogleLoginButton onClick={handleGoogleSignIn} disabled={isPending}>
         Σύνδεση με Google
       </GoogleLoginButton>
