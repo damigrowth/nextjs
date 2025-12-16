@@ -153,7 +153,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
-    "next": "^15.4.4",
+    "next": "15.4.8",
     "prettier": "^3.5.3",
     "prisma": "^6.15.0",
     "prisma-json-types-generator": "^3.6.0",

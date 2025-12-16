@@ -251,13 +251,13 @@ export default function BasicInfoForm({
             <FormItem>
               <FormLabel>Tagline</FormLabel>
               <p className='text-sm text-gray-600'>
-                Μια σύντομη φράση που περιγράφει τι κάνετε (π.χ. "Δημιουργός
+                Μια σύντομη φράση που περιγράφει τι κάνετε (π.χ. "Προγραμματιστής
                 ιστοσελίδων")
               </p>
               <FormControl>
                 <Input
                   type='text'
-                  placeholder='π.χ. Δημιουργός ιστοσελίδων και εφαρμογών'
+                  placeholder='π.χ. Προγραμματιστής ιστοσελίδων και εφαρμογών'
                   {...field}
                   onChange={handleTaglineChange}
                 />

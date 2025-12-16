@@ -19,7 +19,7 @@ import { MultiSelect, type Option } from '@/components/ui/multi-select';
 import { toast } from 'sonner';
 
 // Icons (lucide-react + brands)
-import { Loader2, Phone, Globe, MessageCircle } from 'lucide-react';
+import { Loader2, Phone, Globe } from 'lucide-react';
 import { Icon } from '@/components/icon/brands';
 
 // Auth and utilities
@@ -239,7 +239,7 @@ export default function PresentationInfoForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className='flex items-center gap-2'>
-                  <MessageCircle className='h-4 w-4 text-purple-500' />
+                  <Icon name='viber' size={16} color='#665CAC' />
                   Viber
                 </FormLabel>
                 <FormControl>
@@ -261,7 +261,7 @@ export default function PresentationInfoForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className='flex items-center gap-2'>
-                  <MessageCircle className='h-4 w-4 text-green-500' />
+                  <Icon name='whatsapp' size={16} color='#25D366' />
                   WhatsApp
                 </FormLabel>
                 <FormControl>

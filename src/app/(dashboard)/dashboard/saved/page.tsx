@@ -83,11 +83,19 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
 
       {/* Tabs */}
       <Tabs defaultValue='services' className='w-full'>
-        <TabsList className='grid w-full max-w-md grid-cols-2'>
-          <TabsTrigger value='services'>
+        <TabsList className='grid w-full max-w-md grid-cols-2 bg-muted/50 p-1.5 px-3 rounded-xl h-auto'>
+          <TabsTrigger 
+            value='services'
+            className='rounded-lg py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all'
+          >
             Υπηρεσίες ({servicesTotal})
           </TabsTrigger>
-          <TabsTrigger value='profiles'>Προφίλ ({profilesTotal})</TabsTrigger>
+          <TabsTrigger 
+            value='profiles'
+            className='rounded-lg py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all'
+          >
+            Προφίλ ({profilesTotal})
+          </TabsTrigger>
         </TabsList>
 
         {/* Services Tab */}

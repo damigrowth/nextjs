@@ -64,7 +64,7 @@ export default async function DashboardContent() {
           <p className='text-sm text-muted-foreground'>
             Μπορείς να συμπληρώσεις τα στοιχεία σου στην{' '}
             <NextLink
-              href='/dashboard/profile'
+              href='/dashboard/profile/account'
               className='font-semibold text-primary hover:underline'
             >
               Διαχείριση Προφίλ
@@ -147,7 +147,7 @@ export default async function DashboardContent() {
           </CardHeader>
           <CardContent className='space-y-3'>
             <Button variant='outline' className='w-full justify-start' asChild>
-              <NextLink href='/dashboard/profile'>
+              <NextLink href='/dashboard/profile/account'>
                 <Users className='mr-2 h-4 w-4' />
                 Διαχείριση Προφίλ
                 <ArrowRight className='ml-auto h-4 w-4' />

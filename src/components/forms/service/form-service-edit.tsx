@@ -650,10 +650,10 @@ export default function FormServiceEdit({
             onValueChange={setActiveTab}
             className='w-full'
           >
-            <TabsList className='grid w-full grid-cols-2'>
+            <TabsList className='grid w-full grid-cols-2 p-1.5 h-auto'>
               <TabsTrigger
                 value='addons'
-                className='flex items-center space-x-2'
+                className='flex items-center space-x-2 py-1.5'
               >
                 <Package className='w-4 h-4' />
                 <span>Extra υπηρεσίες</span>
@@ -663,7 +663,7 @@ export default function FormServiceEdit({
                   </span>
                 )}
               </TabsTrigger>
-              <TabsTrigger value='faq' className='flex items-center space-x-2'>
+              <TabsTrigger value='faq' className='flex items-center space-x-2 py-1.5'>
                 <HelpCircle className='w-4 h-4' />
                 <span>Συχνές ερωτήσεις</span>
                 {faq.length > 0 && (

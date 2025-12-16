@@ -125,7 +125,7 @@ export default async function ProfilePage({
       />
       {/* Profile Content */}
       <section className='pt-4 pb-20 bg-white'>
-        <div className='container mx-auto px-4'>
+        <div className='container mx-auto px-4 lg:px-10'>
           <div className='relative grid grid-cols-1 lg:grid-cols-3 gap-28'>
             {/* Main Content */}
             <div className='lg:col-span-2 space-y-12'>

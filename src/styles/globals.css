@@ -272,7 +272,7 @@
     --primary: 163.64 42% 21%; /* HEX: #1f4c40 */
     --primary-foreground: 0 0% 98%; /* HEX: #fafafa */
     --primary-dark: 163.64 41.51% 20.78%; /* HEX: #1f4b3f */
-    --secondary: 139.99 41% 55%; /* HEX: #5dbb7d */
+    --secondary: 152 69% 31%; /* HEX: #5dbb7d */
     --secondary-foreground: 0 0% 98%; /* HEX: #fafafa */
     --third: 152.18 68.75% 31.37%; /* HEX: #198754 */
     --fourth: 140 41.38% 54.51%; /* HEX: #5bbb7b */
@@ -319,6 +319,17 @@
     --gray-medium: 0 0% 49.02%; /* HEX: #7d7d7d */
     --green-light: 139.13 100% 89.02%; /* HEX: #e2ffeb */
     --purple-dark: 300 100% 25.1%; /* HEX: #821987 */
+    /* Custom green scale based on secondary color */
+    --green-50: 142.5 33% 96%; /* Very light green for backgrounds */
+    --green-100: 141 46% 91%; /* Light green */
+    --green-200: 141 49% 83%; /* Lighter green */
+    --green-300: 140 47% 74%; /* Light-medium green */
+    --green-400: 141 42% 66%; /* Medium green */
+    --green-500: 141 28% 46%; /* Main green - based on secondary */
+    --green-600: 142 46% 31%; /* Darker green */
+    --green-700: 142 55% 27%; /* Dark green */
+    --green-800: 164 42% 28%; /* Very dark green */
+    --green-900: 168 50% 20%; /* Darkest green */
   }
   .dark {
     --background: 0 0% 3.9%; /* HEX: #0a0a0a */
@@ -350,6 +361,17 @@
     --gray-medium: 0 0% 69%; /* HEX: #7d7d7d */
     --green-light: 139.13 100% 89.02%; /* HEX: #e2ffeb */
     --purple-dark: 300 100% 25.1%; /* HEX: #821987 */
+    /* Custom green scale for dark mode */
+    --green-50: 140 35% 15%; /* Very dark green for dark mode backgrounds */
+    --green-100: 140 35% 20%; /* Dark green */
+    --green-200: 140 40% 30%; /* Darker medium green */
+    --green-300: 140 42% 40%; /* Medium dark green */
+    --green-400: 140 42% 50%; /* Medium green */
+    --green-500: 149 44% 55%; /* Main green - based on primary dark mode */
+    --green-600: 149 44% 62%; /* Lighter green for dark mode */
+    --green-700: 149 44% 70%; /* Light green for dark mode */
+    --green-800: 149 44% 78%; /* Very light green for dark mode */
+    --green-900: 149 44% 85%; /* Lightest green for dark mode */
     --muted: 0 0% 14.9%; /* HEX: #262626 */
     --muted-foreground: 0 0% 63.9%; /* HEX: #a3a3a3 */
     --accent: 0 0% 14.9%; /* HEX: #262626 */
