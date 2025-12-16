@@ -127,7 +127,7 @@ export const coverageSchema = z
     {
       message: 'Επιλέξτε τουλάχιστον έναν τρόπο εργασίας',
       path: ['online'], // Show error on first checkbox
-    }
+    },
   )
   .refine(
     (data) => {
@@ -147,9 +147,10 @@ export const coverageSchema = z
       return true;
     },
     {
-      message: 'Όλα τα πεδία για "Στον χώρο μου" είναι υποχρεωτικά',
+      error:
+        'Μη έγκυρος τύπος αρχείου. Παρακαλώ επιλέξτε ένα έγκυρο είδος αρχείου.',
       path: ['address'],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -160,9 +161,9 @@ export const coverageSchema = z
       return true;
     },
     {
-      message: 'Επιλέξτε τουλάχιστον έναν νομό για "Στον χώρο του πελάτη"',
+      message: 'Επιλέξτε τουλάχιστον έναν νομό που εξυπηρετείτε',
       path: ['counties'],
-    }
+    },
   );
 
 // =============================================
@@ -500,17 +501,16 @@ export const profilePresentationUpdateSchema = z.object({
 
 // Strict onboarding image schema - rejects blob URLs and validates structure
 // Used ONLY for onboarding (first-time profile setup for pro users)
-export const onboardingImageSchema = z.union([
-  // CloudinaryResource object
-  cloudinaryResourceSchema.refine(
-    (val) => {
+export const onboardingImageSchema = z
+  .union([
+    // CloudinaryResource object
+    cloudinaryResourceSchema.refine((val) => {
       if (!val || !val.secure_url) return false;
 
       // ALLOW pending resources (normal upload flow - don't show errors)
       // Pending resources have _pending flag or public_id starting with 'pending_'
       const isPending =
-        (val as any)._pending === true ||
-        val.public_id?.startsWith('pending_');
+        (val as any)._pending === true || val.public_id?.startsWith('pending_');
 
       if (isPending) return true; // Accept pending resources silently
 
@@ -523,13 +523,12 @@ export const onboardingImageSchema = z.union([
       if (val.secure_url.startsWith('https://lh')) return true;
       if (val.secure_url.includes('googleusercontent.com')) return true;
       // Accept any other valid HTTPS URL
-      return val.secure_url.startsWith('https://') && val.secure_url.length > 10;
-    },
-    'Η εικόνα δεν έχει ανέβει ακόμα. Παρακαλώ περιμένετε να ολοκληρωθεί το ανέβασμα.'
-  ),
-  // String URL (for Google OAuth images or direct URLs)
-  z.string().refine(
-    (val) => {
+      return (
+        val.secure_url.startsWith('https://') && val.secure_url.length > 10
+      );
+    }, 'Η εικόνα δεν έχει ανέβει ακόμα. Παρακαλώ περιμένετε να ολοκληρωθεί το ανέβασμα.'),
+    // String URL (for Google OAuth images or direct URLs)
+    z.string().refine((val) => {
       if (!val || val.length === 0) return false;
       // Reject blob URLs
       if (val.startsWith('blob:')) return false;
@@ -537,13 +536,12 @@ export const onboardingImageSchema = z.union([
       if (val.includes('googleusercontent.com')) return true;
       // Must be valid HTTPS URL
       return val.startsWith('https://') && val.length > 10;
-    },
-    'Η εικόνα προφίλ είναι υποχρεωτική'
-  ),
-]).refine(
-  (val) => val !== null && val !== undefined,
-  'Η εικόνα προφίλ είναι υποχρεωτική'
-);
+    }, 'Η εικόνα προφίλ είναι υποχρεωτική'),
+  ])
+  .refine(
+    (val) => val !== null && val !== undefined,
+    'Η εικόνα προφίλ είναι υποχρεωτική',
+  );
 
 // Main onboarding form schema - bio, category, subcategory, coverage are required, image is now required
 export const onboardingFormSchema = z.object({

@@ -19,7 +19,7 @@ export default function AuthTypeOptions(): JSX.Element | null {
           variant='outline'
           icon='arrow-left'
           iconPosition='left'
-          className='mb-6 hover:bg-green-500 hover:text-white hover:border-green-500'
+          className='mb-6 hover:bg-primary hover:text-white hover:border-primary'
         />
       </>
     );

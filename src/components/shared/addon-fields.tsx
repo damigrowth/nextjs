@@ -34,7 +34,9 @@ export function AddonFields({
   });
 
   // Get form context to access errors
-  const { formState: { errors } } = useFormContext();
+  const {
+    formState: { errors },
+  } = useFormContext();
 
   const addNewAddon = () => {
     const newAddon: ServiceAddonInput = {
@@ -105,7 +107,7 @@ export function AddonFields({
                       }}
                     />
                   </FormControl>
-                  <div className='text-sm text-gray-500'>
+                  <div className='text-xs text-gray-500'>
                     {field.value?.length || 0}/100 χαρακτήρες
                   </div>
                   <FormMessage />
@@ -131,7 +133,7 @@ export function AddonFields({
                       }}
                     />
                   </FormControl>
-                  <div className='text-sm text-gray-500'>
+                  <div className='text-xs text-gray-500'>
                     {field.value?.length || 0}/500 χαρακτήρες
                   </div>
                   <FormMessage />
@@ -175,7 +177,7 @@ export function AddonFields({
           className='w-full flex items-center space-x-2'
         >
           <Plus className='w-4 h-4' />
-          <span>Προσθήκη άλλης extra υπηρεσίας</span>
+          <span>Προσθήκη νέας extra υπηρεσίας</span>
         </Button>
       )}
 

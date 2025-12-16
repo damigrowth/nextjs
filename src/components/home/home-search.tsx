@@ -19,7 +19,7 @@ const HomeSearch = React.forwardRef<HTMLFormElement, HomeSearchProps>(
   (
     {
       className,
-      placeholder = 'Τι ψάχνεις;',
+      placeholder = 'Τι υπηρεσία ψάχνεις;',
       buttonText = 'Αναζήτηση',
       ...props
     },
@@ -159,7 +159,9 @@ const HomeSearch = React.forwardRef<HTMLFormElement, HomeSearchProps>(
                     className='w-11 aspect-square md:w-auto md:aspect-auto h-11 bg-[#198754] text-primary-foreground hover:bg-secondary rounded-full md:rounded-[60px] p-0 md:px-5 md:py-1.5 text-[15px] border-none outline-none focus:outline-none focus:ring-0 transition-all duration-300 ease-in-out inline-flex items-center justify-center relative overflow-hidden md:text-center z-0'
                   >
                     <Search className='h-5 w-5 md:hidden' />
-                    <span className='hidden md:inline font-semibold'>{buttonText}</span>
+                    <span className='hidden md:inline font-semibold'>
+                      {buttonText}
+                    </span>
                   </Button>
                 </div>
               </div>

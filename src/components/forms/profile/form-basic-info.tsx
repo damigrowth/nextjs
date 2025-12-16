@@ -168,10 +168,10 @@ export default function BasicInfoForm({
   // Memoize available specialities based on selected skills - O(1) hash map lookups
   const availableSpecialities = React.useMemo(() => {
     return watchedSkills
-      ? batchFindSkillsByIds(watchedSkills)
-          .filter((skill): skill is DatasetItem & { label: string } =>
-            skill !== null && skill.label !== undefined
-          )
+      ? batchFindSkillsByIds(watchedSkills).filter(
+          (skill): skill is DatasetItem & { label: string } =>
+            skill !== null && skill.label !== undefined,
+        )
       : [];
   }, [watchedSkills]);
 
@@ -247,7 +247,11 @@ export default function BasicInfoForm({
     <Form {...form}>
       <form
         action={handleFormAction}
-        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
+        className={
+          hideCard
+            ? 'space-y-6'
+            : 'space-y-6 p-6 border rounded-lg shadow bg-sidebar'
+        }
       >
         {/* Tagline */}
         <FormField
@@ -257,18 +261,18 @@ export default function BasicInfoForm({
             <FormItem>
               <FormLabel>Tagline</FormLabel>
               <p className='text-sm text-gray-600'>
-                Μια σύντομη φράση που περιγράφει τι κάνετε (π.χ. "Δημιουργός
-                ιστοσελίδων")
+                Μια σύντομη φράση που περιγράφει τι κάνετε (π.χ.
+                "Προγραμματιστής ιστοσελίδων")
               </p>
               <FormControl>
                 <Input
                   type='text'
-                  placeholder='π.χ. Δημιουργός ιστοσελίδων και εφαρμογών'
+                  placeholder='π.χ. Προγραμματιστής ιστοσελίδων και εφαρμογών'
                   {...field}
                   onChange={handleTaglineChange}
                 />
               </FormControl>
-              <div className='text-sm text-gray-500'>
+              <div className='text-xs text-gray-500'>
                 {field.value?.length || 0}/100 χαρακτήρες
               </div>
               <FormMessage />
@@ -349,13 +353,13 @@ export default function BasicInfoForm({
               <FormControl>
                 <Textarea
                   placeholder='Τουλάχιστον 80 χαρακτήρες (2-3 προτάσεις)'
-                  className='min-h-[360px]'
+                  className='min-h-[200px]'
                   rows={8}
                   value={field.value}
                   onChange={handleBioChange}
                 />
               </FormControl>
-              <div className='text-sm text-gray-500'>
+              <div className='text-xs text-gray-500'>
                 {field.value.length}/5000 χαρακτήρες (ελάχιστο: 80)
               </div>
               <FormMessage />

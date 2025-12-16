@@ -74,6 +74,7 @@ module.exports = {
         'green-light': 'hsl(var(--green-light))',
         'purple-dark': 'hsl(var(--purple-dark))',
         dark: 'hsl(var(--dark))',
+        subtle: 'hsl(var(--subtle))',
         body: 'hsl(var(--body))',
         muted: {
           DEFAULT: 'hsl(var(--muted))',
@@ -110,6 +111,18 @@ module.exports = {
         pale: {
           DEFAULT: 'hsl(var(--pale))',
           foreground: 'hsl(var(--pale-foreground))',
+        },
+        green: {
+          50: 'hsl(var(--green-50))',
+          100: 'hsl(var(--green-100))',
+          200: 'hsl(var(--green-200))',
+          300: 'hsl(var(--green-300))',
+          400: 'hsl(var(--green-400))',
+          500: 'hsl(var(--green-500))',
+          600: 'hsl(var(--green-600))',
+          700: 'hsl(var(--green-700))',
+          800: 'hsl(var(--green-800))',
+          900: 'hsl(var(--green-900))',
         },
       },
       keyframes: {

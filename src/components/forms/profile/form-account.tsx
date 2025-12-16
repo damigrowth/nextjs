@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useActionState, useEffect, useState, useRef, useTransition } from 'react';
+import React, {
+  useActionState,
+  useEffect,
+  useState,
+  useRef,
+  useTransition,
+} from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -52,14 +58,9 @@ export default function AccountForm({
   hideCard = false,
 }: AccountFormProps) {
   // Select the appropriate action based on admin mode
-  const actionToUse = adminMode
-    ? updateAccountAdmin
-    : updateAccount;
+  const actionToUse = adminMode ? updateAccountAdmin : updateAccount;
 
-  const [state, action, isPending] = useActionState(
-    actionToUse,
-    initialState,
-  );
+  const [state, action, isPending] = useActionState(actionToUse, initialState);
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
   const [isPendingTransition, startTransition] = useTransition();
@@ -166,7 +167,11 @@ export default function AccountForm({
           const formData = new FormData(e.currentTarget);
           handleFormAction(formData);
         }}
-        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
+        className={
+          hideCard
+            ? 'space-y-6'
+            : 'space-y-6 p-6 border rounded-lg shadow bg-sidebar'
+        }
       >
         {/* Profile Image - For all user types */}
         <FormField
@@ -178,7 +183,8 @@ export default function AccountForm({
                 Εικόνα Προφίλ*
               </FormLabel>
               <p className='text-sm text-gray-600'>
-                Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο.
+                Μία εικόνα/φωτογραφία χωρίς κείμενο ή λογότυπο. Για καλύτερη
+                εμφάνιση προτείνονται τετράγωνες εικόνες.
               </p>
               <FormControl>
                 <MediaUpload

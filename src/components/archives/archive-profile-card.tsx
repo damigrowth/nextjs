@@ -143,7 +143,7 @@ export function ArchiveProfileCard({
                           {profile.specialityData && (
                             <Badge
                               variant='muted'
-                              className='bg-third/10 text-primary/80 border-primary/20 hover:bg-blue-100 hover:bg-third/10'
+                              className='text-primary/80 border-primary/20'
                             >
                               {profile.specialityData.label}
                             </Badge>

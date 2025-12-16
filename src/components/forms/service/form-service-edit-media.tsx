@@ -34,7 +34,7 @@ import { populateFormData } from '@/lib/utils/form';
 import { updateServiceMedia } from '@/actions/services/update-service';
 import {
   updateServiceMediaSchema,
-  type UpdateServiceMediaInput
+  type UpdateServiceMediaInput,
 } from '@/lib/validations/service';
 import { AuthUser } from '@/lib/types/auth';
 
@@ -168,7 +168,7 @@ export default function FormServiceEditMedia({
           const formData = new FormData(e.currentTarget);
           handleFormSubmit(formData);
         }}
-        className='space-y-6 p-6 border rounded-lg'
+        className='space-y-6 p-6 border rounded-lg shadow'
       >
         <h3 className='text-lg font-medium'>Πολυμέσα</h3>
 
@@ -229,8 +229,8 @@ export default function FormServiceEditMedia({
           />
           <FormButton
             type='submit'
-            text='Αποθήκευση'
-            loadingText='Αποθήκευση...'
+            text='Ενημέρωση Αρχείων'
+            loadingText='Ενημέρωση...'
             loading={isPending || isPendingTransition || isUploading}
             disabled={
               isPending ||

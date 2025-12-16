@@ -63,7 +63,7 @@ export default function ServiceAddons({
                   <h5 className='text-sm font-medium text-gray-900 mb-1'>
                     {addon.title}
                   </h5>
-                  <p className='text-xs text-muted-foreground mb-2'>
+                  <p className='text-sm text-muted-foreground mb-2'>
                     {addon.description}
                   </p>
 
@@ -84,10 +84,10 @@ export default function ServiceAddons({
 
   return (
     <div className='mb-10'>
-      {price && price > 0 && (
+      {/* {price && price > 0 && (
         <div className='text-2xl font-bold text-primary mb-2'>{price}€</div>
       )}
-      <h2 className='text-lg font-semibold mb-4'>Extra Υπηρεσίες</h2>
+      <h2 className='text-lg font-semibold mb-4'>Extra Υπηρεσίες</h2> */}
       <div className='space-y-4'>
         {addons.map((addon, index) => {
           const isSelected = order.addons.some((a) => a.title === addon.title);
@@ -120,7 +120,7 @@ export default function ServiceAddons({
 
                 {/* Price centered vertically on right */}
                 <div className='flex items-center'>
-                  <span className='text-2xl font-bold text-gray-900'>
+                  <span className='text-xl font-bold text-gray-900'>
                     +{addon.price}€
                   </span>
                 </div>

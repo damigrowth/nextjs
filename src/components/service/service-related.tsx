@@ -25,7 +25,7 @@ export default function ServiceRelated({
             Δείτε Ακόμα
           </h2>
           <p className='text-sm font-normal text-dark leading-7'>
-            Ανακαλύψτε παρόμοιες υπηρεσίες που μπορεί να σας ενδιαφέρουν.
+            Περισσότερες σχετικές υπηρεσίες...
           </p>
         </div>
 

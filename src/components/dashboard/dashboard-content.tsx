@@ -64,7 +64,7 @@ export default async function DashboardContent() {
           <p className='text-sm text-muted-foreground'>
             Μπορείς να συμπληρώσεις τα στοιχεία σου στην{' '}
             <NextLink
-              href='/dashboard/profile'
+              href='/dashboard/profile/account'
               className='font-semibold text-primary hover:underline'
             >
               Διαχείριση Προφίλ
@@ -99,7 +99,9 @@ export default async function DashboardContent() {
       <div className='space-y-2'>
         <h1 className='text-3xl font-bold tracking-tight'>Πίνακας Ελέγχου</h1>
         <p className='text-muted-foreground'>
-          Καλώς ήρθες πίσω! Ελέγξε τη δραστηριότητά σου.
+          Καλώς ήρθατε! Βελτιώστε την εικόνα σας, προσθέστε πληροφορίες στο
+          επαγγελματικό προφίλ σας και προσθέστε όλες τις υπηρεσίες σας για να
+          σας εντοπίσουν οι χρήστες της πλατφόρμας!
         </p>
       </div>
 
@@ -147,7 +149,7 @@ export default async function DashboardContent() {
           </CardHeader>
           <CardContent className='space-y-3'>
             <Button variant='outline' className='w-full justify-start' asChild>
-              <NextLink href='/dashboard/profile'>
+              <NextLink href='/dashboard/profile/account'>
                 <Users className='mr-2 h-4 w-4' />
                 Διαχείριση Προφίλ
                 <ArrowRight className='ml-auto h-4 w-4' />
@@ -177,13 +179,12 @@ export default async function DashboardContent() {
               <MessageSquare className='h-5 w-5' />
               Τελευταία Μηνύματα
             </CardTitle>
-            <CardDescription>
-              Παρακολούθησε τις πρόσφατες επικοινωνίες
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className='text-sm text-muted-foreground text-center py-8'>
-              Δεν υπάρχουν πρόσφατα μηνύματα
+              Δεν υπάρχουν μηνύματα μέχρι τώρα. Βελτιώστε την εμφάνιση του
+              επαγγελματικού προφίλ και των υπηρεσιών σας για να σας ξεχωρίσουν
+              περισσότεροι χρήστες!
             </div>
           </CardContent>
         </Card>

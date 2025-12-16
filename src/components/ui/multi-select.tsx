@@ -50,7 +50,11 @@ export function MultiSelect({
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
-  const [dropdownPosition, setDropdownPosition] = React.useState({ top: 0, left: 0, width: 0 });
+  const [dropdownPosition, setDropdownPosition] = React.useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
 
   const selectedOptions = React.useMemo(
     () => options.filter((option) => selected.includes(option.value)),
@@ -122,43 +126,51 @@ export function MultiSelect({
   }, [open, enablePortal]);
 
   // Render dropdown content for portal mode
-  const portalDropdownContent = enablePortal && open && availableOptions.length > 0 && !isMaxReached && typeof window !== 'undefined' ? (
-    <div
-      style={{
-        position: 'absolute',
-        top: `${dropdownPosition.top}px`,
-        left: `${dropdownPosition.left}px`,
-        width: `${dropdownPosition.width}px`,
-        zIndex: 9999,
-      }}
-      className='rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in'
-    >
-      <CommandList>
-        <CommandGroup className='h-full overflow-auto max-h-64'>
-          {availableOptions.map((option) => (
-            <CommandItem
-              key={option.value}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              onSelect={() => handleSelect(option.value)}
-              className='cursor-pointer'
-            >
-              {renderLabel ? renderLabel(option) : option.label}
-            </CommandItem>
-          ))}
-        </CommandGroup>
-      </CommandList>
-    </div>
-  ) : null;
+  const portalDropdownContent =
+    enablePortal &&
+    open &&
+    availableOptions.length > 0 &&
+    !isMaxReached &&
+    typeof window !== 'undefined' ? (
+      <div
+        style={{
+          position: 'absolute',
+          top: `${dropdownPosition.top}px`,
+          left: `${dropdownPosition.left}px`,
+          width: `${dropdownPosition.width}px`,
+          zIndex: 9999,
+        }}
+        className='rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in'
+      >
+        <CommandList>
+          <CommandGroup className='h-full overflow-auto max-h-64'>
+            {availableOptions.map((option) => (
+              <CommandItem
+                key={option.value}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onSelect={() => handleSelect(option.value)}
+                className='cursor-pointer'
+              >
+                {renderLabel ? renderLabel(option) : option.label}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </div>
+    ) : null;
 
   return (
     <Command
       onKeyDown={handleKeyDown}
       className={`overflow-visible bg-transparent ${className || ''}`}
     >
-      <div ref={containerRef} className='group relative flex items-center rounded-md border border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring'>
+      <div
+        ref={containerRef}
+        className='group relative flex items-center rounded-md bg-white border-2 border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring'
+      >
         <div className='flex flex-wrap gap-1 flex-1 pr-8'>
           {selectedOptions.map((option) => (
             <Badge
@@ -194,7 +206,7 @@ export function MultiSelect({
               isMaxReached ? `Maximum ${maxItems} items` : placeholder
             }
             disabled={isMaxReached || disabled}
-            className='ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
+            className='ml-2 flex-1 outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
           />
         </div>
         {showClearAll && selectedOptions.length > 0 && (
@@ -239,7 +251,10 @@ export function MultiSelect({
         </div>
       )}
       {/* Portal dropdown */}
-      {enablePortal && typeof window !== 'undefined' && portalDropdownContent && createPortal(portalDropdownContent, document.body)}
+      {enablePortal &&
+        typeof window !== 'undefined' &&
+        portalDropdownContent &&
+        createPortal(portalDropdownContent, document.body)}
     </Command>
   );
 }

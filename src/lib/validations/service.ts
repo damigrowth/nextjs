@@ -448,7 +448,7 @@ export const serviceDetailsSchema = z
     subdivision: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
     tags: z
       .array(z.string())
-      .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες')
+      .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες (tags)')
       .default([]),
     price: z
       .number()
@@ -473,7 +473,7 @@ export const serviceDetailsSchema = z
       return true;
     },
     {
-      message: 'Η τιμή είναι υποχρεωτική',
+      message: 'Πληκτρολογήστε τιμή',
       path: ['price'],
     },
   )
@@ -588,7 +588,7 @@ export const createServiceSchema = z
     subdivision: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
     tags: z
       .array(z.string())
-      .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες')
+      .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες (tags)')
       .default([])
       .optional(),
     price: z
@@ -735,7 +735,7 @@ export const createServiceSchema = z
       return true;
     },
     {
-      message: 'Η τιμή είναι υποχρεωτική',
+      message: 'Πληκτρολογήστε τιμή',
       path: ['price'],
     },
   )
@@ -777,7 +777,7 @@ export const createServiceDraftSchema = z.object({
   subdivision: z.string().optional(),
   tags: z
     .array(z.string())
-    .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες')
+    .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες (tags)')
     .optional(),
   price: z
     .number()

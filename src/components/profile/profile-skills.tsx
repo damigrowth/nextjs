@@ -31,7 +31,7 @@ export default function ProfileSkills({
           {speciality && (
             <Badge
               variant='outline'
-              className='inline-block text-sm font-semibold mb-1.5 mr-1.5 py-2 px-2 text-center border border-third rounded-xl bg-third/20 text-third'
+              className='inline-block text-sm font-semibold mb-1.5 mr-1.5 py-2 px-2 text-center border border-primary rounded-xl text-primary'
             >
               {speciality}
             </Badge>

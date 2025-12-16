@@ -89,7 +89,7 @@ export default function ServiceInfo({
         <div className='sm:col-span-1 md:col-span-1'>
           <IconBox
             icon={<Clock className='h-10 w-10' />}
-            title='Χρόνος Παράδοσης'
+            title='Ημέρες παράδοσης'
             value={
               duration > 1 ? duration + ' ' + 'Μέρες' : duration + ' ' + 'Μέρα'
             }
@@ -107,18 +107,15 @@ export default function ServiceInfo({
         </div>
       )}
 
-      {presence &&
-        onsite &&
-        coverage.onsite &&
-        groupedCoverage.length > 0 && (
-          <div className='sm:col-span-2 md:col-span-2'>
-            <IconBox
-              icon={<Users className='h-10 w-10' />}
-              title='Περιοχές Εξυπηρέτησης'
-              value={<CoverageDisplay groupedCoverage={groupedCoverage} />}
-            />
-          </div>
-        )}
+      {presence && onsite && coverage.onsite && groupedCoverage.length > 0 && (
+        <div className='sm:col-span-2 md:col-span-2'>
+          <IconBox
+            icon={<Users className='h-10 w-10' />}
+            title='Περιοχές Εξυπηρέτησης'
+            value={<CoverageDisplay groupedCoverage={groupedCoverage} />}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -134,7 +134,7 @@ export default function VerificationForm({
     <Form {...form}>
       <form
         action={handleFormSubmit}
-        className='space-y-6 p-6 border rounded-lg'
+        className='space-y-6 p-6 border rounded-lg shadow bg-sidebar'
       >
         {/* AFM Field */}
         <FormField
@@ -186,9 +186,9 @@ export default function VerificationForm({
           name='address'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Διεύθυνση Εργασίας *</FormLabel>
+              <FormLabel>Επαγγελματική Διεύθυνση *</FormLabel>
               <p className='text-sm text-muted-foreground'>
-                Η επίσημη διεύθυνση της επιχείρησής σας
+                Η διεύθυνση της έδρας σας
               </p>
               <FormControl>
                 <Input
@@ -210,7 +210,7 @@ export default function VerificationForm({
             <FormItem>
               <FormLabel>Τηλέφωνο Επικοινωνίας *</FormLabel>
               <p className='text-sm text-muted-foreground'>
-                Τηλέφωνο επικοινωνίας για την πιστοποίηση
+                Σταθερό ή κινητό τηλέφωνο
               </p>
               <FormControl>
                 <Input
@@ -229,9 +229,10 @@ export default function VerificationForm({
           <Alert>
             <AlertCircle className='h-4 w-4' />
             <AlertDescription>
-              <strong>Σημαντικό:</strong> Τα στοιχεία που υποβάλλετε θα
-              χρησιμοποιηθούν αποκλειστικά για την πιστοποίηση του προφίλ σας. Η
-              διαδικασία ελέγχου μπορεί να διαρκέσει 1-3 εργάσιμες ημέρες.
+              <strong>Σημαντικό:</strong> Τα στοιχεία θα χρησιμοποιηθούν για τη
+              διασταύρωση ότι το ΑΦΜ σας αντιστοιχεί σε ενεργό επαγγελματία /
+              επιχείρηση. Η διαδικασία ελέγχου συνήθως διαρκεί 1-2 εργάσιμες
+              ημέρες.
             </AlertDescription>
           </Alert>
         )}
