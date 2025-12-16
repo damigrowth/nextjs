@@ -47,7 +47,7 @@ import {
 } from '@/components/ui/tooltip';
 
 // Utilities
-import { getAllSubdivisions } from '@/lib/utils/datasets';
+import { getAllSubdivisions, findById } from '@/lib/utils/datasets';
 
 // Dataset utilities
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
@@ -316,88 +316,22 @@ export default function ServiceDetailsStep() {
                     label: subcategory.label,
                   });
 
-          return (
-            <FormItem>
-              <FormLabel>Κατηγορία Υπηρεσίας*</FormLabel>
-              <p className='text-sm text-gray-600'>
-                Επιλέξτε τις κατηγορίες της υπηρεσίας
-              </p>
-              <FormControl>
-                <LazyCombobox
-                  key={`subdivision-${currentSubdivision || 'empty'}`}
-                  trigger='search'
-                  clearable={true}
-                  options={allSubdivisions}
-                  value={currentSubdivision || undefined}
-                  onSelect={(option) => {
-                    // Auto-populate all three fields
-                    setValue('category', option.category.id, {
-                      shouldValidate: true,
-                    });
-                    setValue('subcategory', option.subcategory.id, {
-                      shouldValidate: true,
-                    });
-                    setValue('subdivision', option.subdivision.id, {
-                      shouldValidate: true,
-                    });
-                    clearErrors(['category', 'subcategory', 'subdivision']);
-                  }}
-                  onClear={() => {
-                    // Clear all three fields
-                    setValue('category', '', { shouldValidate: true });
-                    setValue('subcategory', '', { shouldValidate: true });
-                    setValue('subdivision', '', { shouldValidate: true });
-                  }}
-                  placeholder='Επιλέξτε κατηγορία...'
-                  searchPlaceholder='Αναζήτηση κατηγορίας...'
-                  emptyMessage='Δεν βρέθηκαν κατηγορίες.'
-                  formatLabel={(option) => (
-                    <>
-                      {option.label}{' '}
-                      <span className='text-gray-500 text-sm'>
-                        ({option.category.label} / {option.subcategory.label})
-                      </span>
-                    </>
-                  )}
-                  renderButtonContent={(option) => {
-                    if (!option) {
-                      return (
-                        <span className='text-muted-foreground'>
-                          Επιλέξτε κατηγορία...
-                        </span>
-                      );
-                    }
-                    return (
-                      <div className='flex flex-wrap gap-1 items-center'>
-                        <Badge variant='default' className='hover:bg-primary/90'>
-                          {option.category.label}
-                        </Badge>
-                        <ChevronRight className='h-3 w-3 text-muted-foreground' />
-                        <Badge
-                          variant='default'
-                          className='hover:bg-primary/90'
-                        >
-                          {option.subcategory.label}
-                        </Badge>
-                        <ChevronRight className='h-3 w-3 text-muted-foreground' />
-                        <Badge variant='default' className='hover:bg-primary/90'>
-                          {option.label}
-                        </Badge>
-                      </div>
+                  // Add subdivisions as tags
+                  if (subcategory.children) {
+                    subcategory.children.forEach(
+                      (subdivision: { id: string; label: string }) => {
+                        tags.push({
+                          value: subdivision.id,
+                          label: subdivision.label,
+                        });
+                      },
                     );
-                  }}
-                  initialLimit={20}
-                  loadMoreIncrement={20}
-                  loadMoreThreshold={50}
-                  searchLimit={100}
-                  showProgress={true}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          );
-        }}
-      />
+                  }
+                },
+              );
+
+              return tags;
+            }, [currentCategory]);
 
             return (
               <FormItem>

@@ -45,7 +45,7 @@ import { FaqFields } from '@/components/shared';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { tags } from '@/constants/datasets/tags';
 import { populateFormData } from '@/lib/utils/form';
-import { getAllSubdivisions } from '@/lib/utils/datasets';
+import { getAllSubdivisions, findById } from '@/lib/utils/datasets';
 
 // O(1) optimized hash map lookups - 99% faster than findById utility
 import { findServiceById } from '@/lib/taxonomies';
