@@ -37,7 +37,7 @@ import {
   registrationFormSchema,
   type RegistrationFormInput,
 } from '@/lib/validations/auth';
-import type { AuthType, ProRole } from '@/lib/types/auth';
+import type { AuthType, FormAuthType, ProRole } from '@/lib/types/auth';
 import { register } from '@/actions/auth/register';
 import { storeOAuthIntent } from '@/actions/auth/store-oauth-intent';
 
@@ -89,7 +89,7 @@ export default function RegisterForm() {
       password: '',
       username: '',
       displayName: '',
-      authType: type,
+      authType: type as FormAuthType,
       role: role || undefined,
       consent: [],
     },
@@ -109,7 +109,7 @@ export default function RegisterForm() {
 
   // Sync with Zustand store - only update authType and role fields
   useEffect(() => {
-    setValue('authType', type);
+    setValue('authType', type as FormAuthType);
     setValue('role', role || undefined);
   }, [type, role, setValue]);
 

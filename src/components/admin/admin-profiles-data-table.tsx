@@ -60,7 +60,7 @@ export function AdminProfilesDataTable({
   const columns: ColumnDef<AdminProfileWithRelations>[] = [
     {
       key: 'displayName',
-      header: 'Profile',
+      header: 'Προφίλ',
       sortable: true,
       render: (profile) => {
         const displayName =
@@ -78,7 +78,12 @@ export function AdminProfilesDataTable({
               showShadow={false}
             />
             <div className='space-y-1'>
-              <div className='font-medium'>{displayName}</div>
+              <NextLink
+                href={`${basePath}/${profile.id}`}
+                className='font-medium hover:text-primary transition-colors hover:underline'
+              >
+                {displayName}
+              </NextLink>
               <CopyableText
                 text={email}
                 className='text-sm text-muted-foreground'
@@ -95,25 +100,8 @@ export function AdminProfilesDataTable({
       },
     },
     {
-      key: 'relatedUser',
-      header: 'Related User',
-      render: (profile) => {
-        const userId = profile.user.id;
-        const userEmail = profile.user.email;
-
-        return (
-          <NextLink
-            href={`/admin/users/${userId}`}
-            className='text-sm font-medium hover:text-primary transition-colors hover:underline'
-          >
-            {userEmail}
-          </NextLink>
-        );
-      },
-    },
-    {
       key: 'type',
-      header: 'Role',
+      header: 'Τύπος',
       render: (profile) => {
         if (!profile.type)
           return <span className='text-muted-foreground text-sm'>-</span>;
@@ -128,7 +116,7 @@ export function AdminProfilesDataTable({
     },
     {
       key: 'category',
-      header: 'Category',
+      header: 'Κατηγορία',
       render: (profile) => {
         if (!profile.taxonomyLabels) {
           return <span className='text-muted-foreground text-sm'>-</span>;
@@ -152,7 +140,7 @@ export function AdminProfilesDataTable({
     },
     {
       key: 'services',
-      header: 'Services',
+      header: 'Υπηρεσίες',
       sortable: true,
       render: (profile) => (
         <div className='text-sm font-medium'>{profile._count.services}</div>

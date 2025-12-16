@@ -131,6 +131,7 @@ export async function completeOnboarding(
         coverage: data.coverage,
         ...(processedImage && { image: processedImage }), // Only include if image exists
         portfolio: sanitizedPortfolio,
+        visibility: { email: false, phone: true, address: true }, // Default visibility settings - email hidden
         published: user.role !== 'user',
         isActive: true,
         // Sync user fields to profile
@@ -149,6 +150,7 @@ export async function completeOnboarding(
         coverage: data.coverage,
         ...(processedImage && { image: processedImage }), // Only include if image exists
         portfolio: sanitizedPortfolio,
+        visibility: { email: false, phone: true, address: true }, // Default visibility settings - email hidden
         published: user.role !== 'user',
         isActive: true,
         // Sync user fields to profile

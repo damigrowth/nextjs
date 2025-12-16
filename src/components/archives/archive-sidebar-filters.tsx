@@ -5,7 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { OnlineToggle, CountiesDropdown, CategoryDropdown, SubcategoryDropdown, SubdivisionDropdown } from './archive-inputs';
+import {
+  OnlineToggle,
+  CountiesDropdown,
+  CategoryDropdown,
+  SubcategoryDropdown,
+  SubdivisionDropdown,
+} from './archive-inputs';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -81,14 +87,17 @@ export function ArchiveSidebarFilters({
   }
 
   // Find current category, subcategory and subdivision from available lists
-  const currentCategory = currentCategorySlug ?
-    categories.find(cat => cat.slug === currentCategorySlug) : null;
+  const currentCategory = currentCategorySlug
+    ? categories.find((cat) => cat.slug === currentCategorySlug)
+    : null;
 
-  const currentSubcategory = currentSubcategorySlug ?
-    subcategories?.find(sub => sub.slug === currentSubcategorySlug) : null;
+  const currentSubcategory = currentSubcategorySlug
+    ? subcategories?.find((sub) => sub.slug === currentSubcategorySlug)
+    : null;
 
-  const currentSubdivision = currentSubdivisionSlug ?
-    subdivisions?.find(div => div.slug === currentSubdivisionSlug) : null;
+  const currentSubdivision = currentSubdivisionSlug
+    ? subdivisions?.find((div) => div.slug === currentSubdivisionSlug)
+    : null;
 
   // Use only filtered subcategories and subdivisions from server action
   // For directory archives, filter subcategories by type if a type filter is active
@@ -98,11 +107,11 @@ export function ArchiveSidebarFilters({
     // Only apply type filtering for directory archives
     let filteredSubs = subs;
     if (isDirectory && filters.type) {
-      filteredSubs = subs.filter(sub => {
+      filteredSubs = subs.filter((sub) => {
         // Map filter values to dataset type values
         const typeMap = {
-          'pros': 'freelancer',
-          'companies': 'company'
+          pros: 'freelancer',
+          companies: 'company',
         } as const;
 
         const targetType = typeMap[filters.type as keyof typeof typeMap];
@@ -113,7 +122,7 @@ export function ArchiveSidebarFilters({
     // Deduplicate by slug (keep first occurrence)
     // This handles cases like 'daskaloi' which has both 'Δασκάλα' and 'Δάσκαλος'
     const seenSlugs = new Set<string>();
-    const deduplicatedSubs = filteredSubs.filter(sub => {
+    const deduplicatedSubs = filteredSubs.filter((sub) => {
       if (seenSlugs.has(sub.slug)) {
         return false;
       }
@@ -147,7 +156,7 @@ export function ArchiveSidebarFilters({
 
   const handleFilterChange = <K extends keyof FilterState>(
     key: K,
-    value: FilterState[K] | 'all' | ''
+    value: FilterState[K] | 'all' | '',
   ) => {
     // Don't handle taxonomy filters here - they're handled by navigation
     if (key === 'category' || key === 'subcategory' || key === 'subdivision') {
@@ -184,7 +193,7 @@ export function ArchiveSidebarFilters({
     }
 
     // For profiles (pros/companies), navigate to category-specific route
-    const category = categories.find(cat => cat.id === categoryId);
+    const category = categories.find((cat) => cat.id === categoryId);
     if (!category) return;
 
     const path = `${baseArchivePath}/${category.slug}`;
@@ -203,7 +212,9 @@ export function ArchiveSidebarFilters({
       return;
     }
 
-    const subcategory = availableSubcategories.find(sub => sub.id === subcategoryId);
+    const subcategory = availableSubcategories.find(
+      (sub) => sub.id === subcategoryId,
+    );
     if (!subcategory) return;
 
     let path;
@@ -229,7 +240,9 @@ export function ArchiveSidebarFilters({
       return;
     }
 
-    const subdivision = availableSubdivisions.find(div => div.id === subdivisionId);
+    const subdivision = availableSubdivisions.find(
+      (div) => div.id === subdivisionId,
+    );
     if (!subdivision) return;
 
     const path = `${baseArchivePath}/${currentSubcategory.slug}/${subdivision.slug}`;
@@ -249,7 +262,13 @@ export function ArchiveSidebarFilters({
     // Only copy non-taxonomy and non-system params
     searchParams.forEach((value, key) => {
       // Skip taxonomy params that are now in the route and system filters that are handled internally
-      if (key !== 'category' && key !== 'subcategory' && key !== 'subdivision' && key !== 'role' && key !== 'published') {
+      if (
+        key !== 'category' &&
+        key !== 'subcategory' &&
+        key !== 'subdivision' &&
+        key !== 'role' &&
+        key !== 'published'
+      ) {
         params.append(key, value);
       }
     });
@@ -261,7 +280,14 @@ export function ArchiveSidebarFilters({
   // Only count filters that represent actual user selections from search params
   const activeFilterCount = Object.entries(filters).filter(([key, value]) => {
     // System/navigation filters - not user-applied
-    const systemFilters = ['page', 'limit', 'status', 'archiveType', 'role', 'published'];
+    const systemFilters = [
+      'page',
+      'limit',
+      'status',
+      'archiveType',
+      'role',
+      'published',
+    ];
     if (systemFilters.includes(key)) {
       return false;
     }
@@ -273,8 +299,14 @@ export function ArchiveSidebarFilters({
     }
 
     // Default or empty values - not active filters
-    if (value === undefined || value === null || value === false ||
-        value === '' || value === 'all' || value === 'default') {
+    if (
+      value === undefined ||
+      value === null ||
+      value === false ||
+      value === '' ||
+      value === 'all' ||
+      value === 'default'
+    ) {
       return false;
     }
 
@@ -309,8 +341,16 @@ export function ArchiveSidebarFilters({
             onValueChange={handleSubcategoryChange}
             subcategories={availableSubcategories}
             disabled={archiveType === 'profiles' ? !currentCategory : false}
-            placeholder={archiveType === 'services' ? 'Όλες οι κατηγορίες' : 'Όλες οι υποκατηγορίες'}
-            allLabel={archiveType === 'services' ? 'Όλες οι κατηγορίες' : 'Όλες οι υποκατηγορίες'}
+            placeholder={
+              archiveType === 'services'
+                ? 'Όλες οι κατηγορίες'
+                : 'Όλες οι υποκατηγορίες'
+            }
+            allLabel={
+              archiveType === 'services'
+                ? 'Όλες οι κατηγορίες'
+                : 'Όλες οι υποκατηγορίες'
+            }
           />
         </div>
 
@@ -364,12 +404,20 @@ export function ArchiveSidebarFilters({
               <RadioGroup
                 value={filters.type || 'all'}
                 onValueChange={(value) =>
-                  handleFilterChange('type', value === 'all' ? undefined : value as 'pros' | 'companies' | undefined)
+                  handleFilterChange(
+                    'type',
+                    value === 'all'
+                      ? undefined
+                      : (value as 'pros' | 'companies' | undefined),
+                  )
                 }
               >
                 <div className='flex items-center space-x-2'>
                   <RadioGroupItem value='all' id='type-all' />
-                  <Label htmlFor='type-all' className='font-normal cursor-pointer'>
+                  <Label
+                    htmlFor='type-all'
+                    className='font-normal cursor-pointer'
+                  >
                     Όλοι
                   </Label>
                 </div>
@@ -383,7 +431,9 @@ export function ArchiveSidebarFilters({
                     htmlFor='type-pros'
                     className={cn(
                       'font-normal',
-                      typeFilterOptions.pros ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                      typeFilterOptions.pros
+                        ? 'cursor-not-allowed opacity-50'
+                        : 'cursor-pointer',
                     )}
                   >
                     Μόνο Επαγγελματίες
@@ -399,7 +449,9 @@ export function ArchiveSidebarFilters({
                     htmlFor='type-companies'
                     className={cn(
                       'font-normal',
-                      typeFilterOptions.companies ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                      typeFilterOptions.companies
+                        ? 'cursor-not-allowed opacity-50'
+                        : 'cursor-pointer',
                     )}
                   >
                     Μόνο Επιχειρήσεις
@@ -412,7 +464,7 @@ export function ArchiveSidebarFilters({
       </div>
 
       {/* Clear Button */}
-      <div className='absolute bottom-0 left-0 right-0 p-6 bg-white border-t'>
+      <div className='absolute bottom-0 left-0 right-0 p-6 bg-silver border-t'>
         <Button
           variant='outline'
           onClick={handleClearAll}

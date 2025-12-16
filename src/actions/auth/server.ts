@@ -344,10 +344,11 @@ export async function requireOnboardingComplete(onboardingUrl = '/onboarding') {
     }
   }
 
-  // Check if this is a Google OAuth user who needs role/type assignment
+  // Check if this is a Google OAuth user who needs setup (type selection or username)
+  // Both TYPE_SELECTION and OAUTH_SETUP are handled in /oauth-setup page
   if (
     user?.provider === 'google' &&
-    user?.step === 'OAUTH_SETUP'
+    (user?.step === 'TYPE_SELECTION' || user?.step === 'OAUTH_SETUP')
   ) {
     redirect('/oauth-setup');
   }

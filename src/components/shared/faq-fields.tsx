@@ -22,11 +22,7 @@ interface FaqFieldsProps {
   maxFaq?: number;
 }
 
-export function FaqFields({
-  control,
-  name,
-  maxFaq = 5,
-}: FaqFieldsProps) {
+export function FaqFields({ control, name, maxFaq = 5 }: FaqFieldsProps) {
   const { fields, append, remove } = useFieldArray({
     control,
     name,
@@ -98,7 +94,7 @@ export function FaqFields({
                       }}
                     />
                   </FormControl>
-                  <div className='text-sm text-gray-500'>
+                  <div className='text-xs text-gray-500'>
                     {(field.value || '')?.length || 0}/200 χαρακτήρες
                   </div>
                   <FormMessage />
@@ -124,7 +120,7 @@ export function FaqFields({
                       }}
                     />
                   </FormControl>
-                  <div className='text-sm text-gray-500'>
+                  <div className='text-xs text-gray-500'>
                     {(field.value || '')?.length || 0}/1000 χαρακτήρες
                   </div>
                   <FormMessage />
@@ -143,7 +139,7 @@ export function FaqFields({
           className='w-full flex items-center space-x-2'
         >
           <Plus className='w-4 h-4' />
-          <span>Προσθήκη άλλης ερώτησης</span>
+          <span>Προσθήκη νέας ερώτησης</span>
         </Button>
       )}
 

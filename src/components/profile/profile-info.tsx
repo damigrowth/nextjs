@@ -179,7 +179,7 @@ export default function ProfileInfo({
           )}
 
           {/* Email - only show if visibility allows and email exists */}
-          {email && visibility?.email !== false && (
+          {email && visibility?.email === true && (
             <div className='flex items-center justify-between py-5 border-b border-border'>
               <div className='flex items-center gap-2'>
                 <Mail className='h-4 w-4 text-primary' />

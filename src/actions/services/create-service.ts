@@ -3,7 +3,12 @@
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { ActionResponse } from '@/lib/types/api';
-import { CACHE_TAGS, getServiceTags, revalidateService, logCacheRevalidation } from '@/lib/cache';
+import {
+  CACHE_TAGS,
+  getServiceTags,
+  revalidateService,
+  logCacheRevalidation,
+} from '@/lib/cache';
 import { sendServiceCreatedEmail } from '@/lib/email/services';
 import { brevoWorkflowService } from '@/lib/email';
 
@@ -193,7 +198,16 @@ async function createServiceInternal(
     const typeConfig = data.type;
 
     // 9. Create service in database - let Prisma auto-generate ID, then create slug
-    let createdService: { id: number; title: string; description: string; pid: string; category: string; slug: string } | undefined;
+    let createdService:
+      | {
+          id: number;
+          title: string;
+          description: string;
+          pid: string;
+          category: string;
+          slug: string;
+        }
+      | undefined;
 
     if (status === 'draft') {
       // Use transaction to create service with slug and update lastServiceDraft atomically
@@ -225,21 +239,40 @@ async function createServiceInternal(
             },
             subscriptionType: data.subscriptionType || null,
             duration: data.duration || 0,
-            addons: (data.addons || []).filter((addon): addon is { title: string; description: string; price: number } =>
-              Boolean(addon.title && addon.description && addon.price !== undefined)
+            addons: (data.addons || []).filter(
+              (
+                addon,
+              ): addon is {
+                title: string;
+                description: string;
+                price: number;
+              } =>
+                Boolean(
+                  addon.title && addon.description && addon.price !== undefined,
+                ),
             ),
-            faq: (data.faq || []).filter((faq): faq is { question: string; answer: string } =>
-              Boolean(faq.question && faq.answer)
+            faq: (data.faq || []).filter(
+              (faq): faq is { question: string; answer: string } =>
+                Boolean(faq.question && faq.answer),
             ),
             media: sanitizedMedia,
             status: status,
             featured: false,
           },
-          select: { id: true, title: true, description: true, pid: true, category: true },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            pid: true,
+            category: true,
+          },
         });
 
         // Step 2: Generate slug with the auto-generated ID and update service
-        const slug = generateServiceSlug(data.title || 'untitled', service.id.toString());
+        const slug = generateServiceSlug(
+          data.title || 'untitled',
+          service.id.toString(),
+        );
         await tx.service.update({
           where: { id: service.id },
           data: { slug },
@@ -284,21 +317,40 @@ async function createServiceInternal(
             },
             subscriptionType: data.subscriptionType || null,
             duration: data.duration || 0,
-            addons: (data.addons || []).filter((addon): addon is { title: string; description: string; price: number } =>
-              Boolean(addon.title && addon.description && addon.price !== undefined)
+            addons: (data.addons || []).filter(
+              (
+                addon,
+              ): addon is {
+                title: string;
+                description: string;
+                price: number;
+              } =>
+                Boolean(
+                  addon.title && addon.description && addon.price !== undefined,
+                ),
             ),
-            faq: (data.faq || []).filter((faq): faq is { question: string; answer: string } =>
-              Boolean(faq.question && faq.answer)
+            faq: (data.faq || []).filter(
+              (faq): faq is { question: string; answer: string } =>
+                Boolean(faq.question && faq.answer),
             ),
             media: sanitizedMedia,
             status: status,
             featured: false,
           },
-          select: { id: true, title: true, description: true, pid: true, category: true },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            pid: true,
+            category: true,
+          },
         });
 
         // Step 2: Generate slug with the auto-generated ID and update service
-        const slug = generateServiceSlug(data.title || 'untitled', service.id.toString());
+        const slug = generateServiceSlug(
+          data.title || 'untitled',
+          service.id.toString(),
+        );
         await tx.service.update({
           where: { id: service.id },
           data: { slug },
@@ -316,7 +368,7 @@ async function createServiceInternal(
         { ...createdService, description: data.description || '' },
         { ...user, email: user.email || '' }, // Ensure email is not undefined
         typeof profile.id === 'string' ? parseInt(profile.id) : profile.id,
-        data.category
+        data.category,
       );
 
       // Check if this is the user's first service and move to pros list
@@ -375,12 +427,12 @@ async function createServiceInternal(
     if (status === 'draft') {
       return {
         success: true,
-        message: 'Η υπηρεσία αποθηκεύτηκε ως προσχέδιο επιτυχώς!',
+        message: 'Η υπηρεσία αποθηκεύτηκε ως προσχέδιο!',
       };
     } else {
       return {
         success: true,
-        message: 'Η υπηρεσία υποβλήθηκε για έγκριση επιτυχώς!',
+        message: 'Η υπηρεσία υποβλήθηκε για έγκριση!',
         serviceId: createdService!.id,
         serviceTitle: createdService!.title,
       };

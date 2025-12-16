@@ -338,7 +338,7 @@ export function LazyCombobox({
             <div
               onClick={() => inputRef.current?.focus()}
               className={cn(
-                'relative flex flex-row flex-wrap items-center gap-2 rounded-md border border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring cursor-text',
+                'relative flex flex-row flex-wrap items-center gap-2 rounded-md bg-white shadow border-2 border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring cursor-text',
                 className,
               )}
             >
@@ -373,7 +373,7 @@ export function LazyCombobox({
                 }}
                 placeholder={selectedOption && !inputValue ? '' : placeholder}
                 disabled={disabled}
-                className='flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
+                className='flex-1 bg-subtle outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
               />
               {/* Clear button - right end of input (only if clearable enabled) */}
               {clearable && (selectedOption || selectedOptions.length > 0) && (

@@ -19,7 +19,7 @@ import { MultiSelect, type Option } from '@/components/ui/multi-select';
 import { toast } from 'sonner';
 
 // Icons (lucide-react + brands)
-import { Loader2, Phone, Globe, MessageCircle } from 'lucide-react';
+import { Loader2, Phone, Globe } from 'lucide-react';
 import { Icon } from '@/components/icon/brands';
 
 // Auth and utilities
@@ -45,7 +45,7 @@ const initialState = {
 
 // Default visibility configuration - outside component to prevent re-creation
 const initialVisibility = {
-  email: true,
+  email: false,
   phone: true,
   address: true,
 };
@@ -110,7 +110,7 @@ export default function PresentationInfoForm({
       viber: '',
       whatsapp: '',
       visibility: {
-        email: true,
+        email: false,
         phone: true,
         address: true,
       },
@@ -142,7 +142,9 @@ export default function PresentationInfoForm({
       // Initialize selected platforms based on existing data
       const existingSocials = profile.socials || {};
       const activePlatforms = Object.keys(existingSocials).filter(
-        (key) => existingSocials[key as keyof typeof existingSocials] && existingSocials[key as keyof typeof existingSocials] !== ''
+        (key) =>
+          existingSocials[key as keyof typeof existingSocials] &&
+          existingSocials[key as keyof typeof existingSocials] !== '',
       );
       setSelectedPlatforms(activePlatforms);
     }
@@ -186,7 +188,11 @@ export default function PresentationInfoForm({
     <Form {...form}>
       <form
         action={handleFormSubmit}
-        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
+        className={
+          hideCard
+            ? 'space-y-6'
+            : 'space-y-6 p-6 border rounded-lg shadow bg-sidebar'
+        }
       >
         {/* Contact Fields - All in one row */}
         <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
@@ -239,7 +245,7 @@ export default function PresentationInfoForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className='flex items-center gap-2'>
-                  <MessageCircle className='h-4 w-4 text-purple-500' />
+                  <Icon name='viber' size={16} color='#665CAC' />
                   Viber
                 </FormLabel>
                 <FormControl>
@@ -261,7 +267,7 @@ export default function PresentationInfoForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className='flex items-center gap-2'>
-                  <MessageCircle className='h-4 w-4 text-green-500' />
+                  <Icon name='whatsapp' size={16} color='#25D366' />
                   WhatsApp
                 </FormLabel>
                 <FormControl>
@@ -378,7 +384,7 @@ export default function PresentationInfoForm({
                   onChange={(platforms) => {
                     // Find removed platforms
                     const removedPlatforms = selectedPlatforms.filter(
-                      (p) => !platforms.includes(p)
+                      (p) => !platforms.includes(p),
                     );
 
                     // Clear form values for removed platforms

@@ -43,8 +43,8 @@ export default function VerificationStatus({
         };
       default:
         return {
-          title: 'Πιστοποίηση',
-          description: 'Πιστοποιήστε την ταυτότητα και τα στοιχεία σας',
+          title: 'Πιστοποίηση Επαγγελματικού Προφίλ',
+          description: 'Πιστοποιήστε τα επαγγελματικά στοιχεία σας',
           icon: null,
         };
     }

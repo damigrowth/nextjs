@@ -26,23 +26,25 @@ export * from './unread-messages';
 
 // Legacy EMAIL_TEMPLATES export for auth emails only
 // TODO: Migrate auth emails to use EMAIL_CONFIG
-export const EMAIL_TEMPLATES: Partial<Record<EmailTemplateKey, EmailTemplate>> = {
-  VERIFICATION: {
-    from: 'Doulitsa <noreply@doulitsa.gr>',
-    replyTo: null,
-    subject: 'Επαλήθευση λογαριασμού στη Doulitsa',
-    html: (data: VerificationData) => VERIFICATION_HTML(data),
-  },
-  WELCOME: {
-    from: 'Doulitsa <noreply@doulitsa.gr>',
-    replyTo: null,
-    subject: (data: WelcomeData) => `Καλώς ήρθες στο Doulitsa, ${data.displayName || data.username || 'φίλε'}!`,
-    html: (data: WelcomeData) => WELCOME_HTML(data),
-  },
-  PASSWORD_RESET: {
-    from: 'Doulitsa <noreply@doulitsa.gr>',
-    replyTo: null,
-    subject: 'Επαναφορά κωδικού πρόσβασης - Doulitsa',
-    html: (data: PasswordResetData) => PASSWORD_RESET_HTML(data),
-  },
-};
+export const EMAIL_TEMPLATES: Partial<Record<EmailTemplateKey, EmailTemplate>> =
+  {
+    VERIFICATION: {
+      from: 'Doulitsa <noreply@doulitsa.gr>',
+      replyTo: null,
+      subject: 'Επιβεβαίωση λογαριασμού στη Doulitsa',
+      html: (data: VerificationData) => VERIFICATION_HTML(data),
+    },
+    WELCOME: {
+      from: 'Doulitsa <noreply@doulitsa.gr>',
+      replyTo: null,
+      subject: (data: WelcomeData) =>
+        `Καλώς ήρθες στο Doulitsa, ${data.displayName || data.username || 'φίλε'}!`,
+      html: (data: WelcomeData) => WELCOME_HTML(data),
+    },
+    PASSWORD_RESET: {
+      from: 'Doulitsa <noreply@doulitsa.gr>',
+      replyTo: null,
+      subject: 'Επαναφορά κωδικού πρόσβασης - Doulitsa',
+      html: (data: PasswordResetData) => PASSWORD_RESET_HTML(data),
+    },
+  };

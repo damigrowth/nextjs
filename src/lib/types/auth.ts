@@ -31,13 +31,15 @@ export type AuthSession = typeof auth.$Infer.Session;
 export type UserRole = 'user' | 'freelancer' | 'company' | 'admin';
 export type AuthStep =
   | 'EMAIL_VERIFICATION'
+  | 'TYPE_SELECTION'
   | 'OAUTH_SETUP'
   | 'ONBOARDING'
   | 'DASHBOARD';
 export type AuthProvider = 'email' | 'google' | 'github'; // Add more providers as needed
 
 // Auth form UI types
-export type AuthType = '' | 'user' | 'pro'; // '' = no selection, 'user' = user, 'pro' = professional
+export type AuthType = '' | 'user' | 'pro'; // '' = no selection, 'user' = simple user, 'pro' = professional
+export type FormAuthType = Exclude<AuthType, ''>; // For form validation - excludes empty selection state
 export type ProRole = 'freelancer' | 'company' | null; // freelancer, company, null = not selected
 export type ConsentType = boolean | string[];
 

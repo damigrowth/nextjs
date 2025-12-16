@@ -63,7 +63,9 @@ function StaticHeroContent() {
 
 // Search Bar Component using the new HomeSearch UI component
 function HeroSearchBar() {
-  return <HomeSearch placeholder='Τι ψάχνεις;' buttonText='Αναζήτηση' />;
+  return (
+    <HomeSearch placeholder='Τι υπηρεσία ψάχνεις;' buttonText='Αναζήτηση' />
+  );
 }
 
 // Popular Searches Component - Dynamic links to popular subcategories

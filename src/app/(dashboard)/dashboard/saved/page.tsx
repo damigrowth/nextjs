@@ -44,7 +44,7 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
         <div>
           <h1 className='text-2xl font-bold text-gray-900'>Αποθηκευμένα</h1>
           <p className='text-gray-600 mt-1'>
-            Οι αγαπημένες σας υπηρεσίες και προφίλ
+            Αποθηκευμένες υπηρεσίες και επαγγελματικά προφίλ
           </p>
         </div>
 
@@ -77,17 +77,25 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
       <div>
         <h1 className='text-2xl font-bold text-gray-900'>Αποθηκευμένα</h1>
         <p className='text-gray-600 mt-1'>
-          Οι αγαπημένες σας υπηρεσίες και προφίλ
+          Αποθηκευμένες υπηρεσίες και επαγγελματικά προφίλ
         </p>
       </div>
 
       {/* Tabs */}
       <Tabs defaultValue='services' className='w-full'>
-        <TabsList className='grid w-full max-w-md grid-cols-2'>
-          <TabsTrigger value='services'>
+        <TabsList className='grid w-full max-w-md grid-cols-2 bg-muted/50 p-1.5 px-3 rounded-xl h-auto'>
+          <TabsTrigger
+            value='services'
+            className='rounded-lg py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all'
+          >
             Υπηρεσίες ({servicesTotal})
           </TabsTrigger>
-          <TabsTrigger value='profiles'>Προφίλ ({profilesTotal})</TabsTrigger>
+          <TabsTrigger
+            value='profiles'
+            className='rounded-lg py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all'
+          >
+            Προφίλ ({profilesTotal})
+          </TabsTrigger>
         </TabsList>
 
         {/* Services Tab */}
@@ -98,10 +106,10 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
                 <div className='text-center'>
                   <Heart className='w-12 h-12 text-gray-300 mx-auto mb-4' />
                   <h3 className='text-lg font-semibold text-gray-900 mb-2'>
-                    Δεν έχετε αποθηκευμένες υπηρεσίες
+                    Δεν υπάρχουν αποθηκευμένες υπηρεσίες
                   </h3>
                   <p className='text-gray-600'>
-                    Αποθηκεύστε υπηρεσίες που σας ενδιαφέρουν πατώντας την
+                    Αποθήκευσε τις υπηρεσίες που σε ενδιαφέρουν πατώντας την
                     καρδιά
                   </p>
                 </div>
@@ -109,7 +117,7 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
             </Card>
           ) : (
             <>
-              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6'>
                 {services.map((service) => (
                   <ServiceCard
                     key={service.id}
@@ -141,17 +149,18 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
                 <div className='text-center'>
                   <Heart className='w-12 h-12 text-gray-300 mx-auto mb-4' />
                   <h3 className='text-lg font-semibold text-gray-900 mb-2'>
-                    Δεν έχετε αποθηκευμένα προφίλ
+                    Δεν υπάρχουν αποθηκευμένα προφίλ
                   </h3>
                   <p className='text-gray-600'>
-                    Αποθηκεύστε προφίλ που σας ενδιαφέρουν πατώντας την καρδιά
+                    Αποθήκευσε τα επαγγελματικά προφίλ που σε ενδιαφέρουν
+                    πατώντας την καρδιά
                   </p>
                 </div>
               </CardContent>
             </Card>
           ) : (
             <>
-              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-6'>
                 {profiles.map((profile) => (
                   <ProfileCard
                     key={profile.id}

@@ -112,11 +112,14 @@ export default function Footer() {
           </div>
           <div className='lg:col-span-4 lg:col-start-9'>
             <div className='footer-widget mb-4 lg:mb-5'>
-              <NextLink className='footer-logo inline-block' href='/'>
+              <NextLink
+                className='inline-block bg-white h-[50px] w-[140px] rounded-[10px] p-[5px]'
+                href='/'
+              >
                 <Image
                   height={45}
                   width={123}
-                  className='mb-10 object-contain'
+                  className='object-contain h-full w-full'
                   src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1761929834/Static/doulitsa-logo_mpqr5n.svg'
                   alt='Doulitsa logo'
                 />

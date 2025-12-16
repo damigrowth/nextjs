@@ -242,7 +242,6 @@ export default function TaxonomySelector({
     return false;
   };
 
-
   return (
     <div className={cn('relative', className)}>
       <div className='relative'>
@@ -251,13 +250,19 @@ export default function TaxonomySelector({
             <div
               role='combobox'
               aria-expanded={open}
-              className='group relative flex items-center rounded-md border border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring cursor-pointer'
+              className='group relative flex items-center rounded-md bg-white border-2 border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring cursor-pointer'
               onClick={() => !disabled && setOpen(!open)}
             >
               <div className='flex flex-wrap gap-1 flex-1 pr-8'>
                 {value && value.category ? (
                   <div className='flex flex-wrap gap-1 items-center'>
-                    <Badge variant='default' className={cn('hover:bg-primary/90', getTextSizeClasses())}>
+                    <Badge
+                      variant='default'
+                      className={cn(
+                        'hover:bg-primary/90',
+                        getTextSizeClasses(),
+                      )}
+                    >
                       {value.categoryLabel}
                     </Badge>
                     {value.subcategoryLabel && (
@@ -265,7 +270,10 @@ export default function TaxonomySelector({
                         <ChevronRight className='h-3 w-3 text-muted-foreground' />
                         <Badge
                           variant='default'
-                          className={cn('hover:bg-primary/90', getTextSizeClasses())}
+                          className={cn(
+                            'hover:bg-primary/90',
+                            getTextSizeClasses(),
+                          )}
                         >
                           {value.subcategoryLabel}
                         </Badge>
@@ -276,7 +284,10 @@ export default function TaxonomySelector({
                         <ChevronRight className='h-3 w-3 text-muted-foreground' />
                         <Badge
                           variant='default'
-                          className={cn('hover:bg-primary/90', getTextSizeClasses())}
+                          className={cn(
+                            'hover:bg-primary/90',
+                            getTextSizeClasses(),
+                          )}
                         >
                           {value.subdivisionLabel}
                         </Badge>
@@ -329,17 +340,21 @@ export default function TaxonomySelector({
                           'flex items-center justify-between cursor-pointer',
                           isSelected
                             ? 'bg-primary text-primary-foreground data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground'
-                            : 'hover:bg-accent hover:text-accent-foreground'
+                            : 'hover:bg-accent hover:text-accent-foreground',
                         )}
                       >
                         <div className='flex items-center gap-2'>
                           <span>{item.label}</span>
                         </div>
                         {item.children && item.children.length > 0 && (
-                          <span className={cn(
-                            'text-xs',
-                            isSelected ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                          )}>
+                          <span
+                            className={cn(
+                              'text-xs',
+                              isSelected
+                                ? 'text-primary-foreground/70'
+                                : 'text-muted-foreground',
+                            )}
+                          >
                             {item.children.length} επιλογές
                           </span>
                         )}

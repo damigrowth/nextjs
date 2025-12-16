@@ -20,7 +20,7 @@ export default async function AccountPage() {
       <div>
         <h1 className='text-2xl font-bold'>Λογαριασμός</h1>
         <p className='text-muted-foreground'>
-          Διαχειριστείτε τις ρυθμίσεις του λογαριασμού σας
+          Διαχείριση ρυθμίσεων λογαριασμού
         </p>
       </div>
 

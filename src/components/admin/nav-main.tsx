@@ -37,7 +37,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
   return (
     <SidebarGroup>
       <SidebarGroupContent className='flex flex-col gap-2'>
-        <SidebarMenu>
+        {/* <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => setQuickCreateOpen(true)}
@@ -48,7 +48,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
               <span>Quick Create</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
+        </SidebarMenu> */}
         <QuickCreateDialog
           open={quickCreateOpen}
           onOpenChange={setQuickCreateOpen}
