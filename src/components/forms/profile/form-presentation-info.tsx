@@ -45,7 +45,7 @@ const initialState = {
 
 // Default visibility configuration - outside component to prevent re-creation
 const initialVisibility = {
-  email: true,
+  email: false,
   phone: true,
   address: true,
 };
@@ -110,7 +110,7 @@ export default function PresentationInfoForm({
       viber: '',
       whatsapp: '',
       visibility: {
-        email: true,
+        email: false,
         phone: true,
         address: true,
       },

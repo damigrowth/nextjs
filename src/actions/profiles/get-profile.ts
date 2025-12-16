@@ -19,7 +19,12 @@ import {
 import { industriesOptions } from '@/constants/datasets/industries';
 import { locationOptions } from '@/constants/datasets/locations';
 // O(1) optimized taxonomy lookups - 99% faster than findById
-import { findProById, batchFindServiceByIds, batchFindSkillsByIds, findSkillById } from '@/lib/taxonomies';
+import {
+  findProById,
+  batchFindServiceByIds,
+  batchFindSkillsByIds,
+  findSkillById,
+} from '@/lib/taxonomies';
 // Complex utilities - KEEP for coverage transformation, defaults, and non-taxonomy datasets
 import {
   findById, // Generic utility for options, industries, tags (not yet optimized)
@@ -224,9 +229,7 @@ async function _getProfilePageData(
     }
 
     // OPTIMIZATION: O(1) hash map lookups for pro taxonomies
-    const category = profile.category
-      ? findProById(profile.category)
-      : null;
+    const category = profile.category ? findProById(profile.category) : null;
 
     const subcategory = profile.subcategory
       ? findProById(profile.subcategory)
@@ -235,9 +238,13 @@ async function _getProfilePageData(
     const featuredCategories = proTaxonomies.slice(0, 8);
 
     // Skills lookup from skills dataset - O(1) optimized
-    const skillsData = batchFindSkillsByIds(profile.skills).filter((skill) => skill !== null);
+    const skillsData = batchFindSkillsByIds(profile.skills).filter(
+      (skill) => skill !== null,
+    );
 
-    const specialityData = profile.speciality ? findSkillById(profile.speciality) : null;
+    const specialityData = profile.speciality
+      ? findSkillById(profile.speciality)
+      : null;
 
     // Resolve dataset options for features
     const contactMethodsData = profile.contactMethods
@@ -270,7 +277,7 @@ async function _getProfilePageData(
     );
 
     const visibility = profile.visibility || {
-      email: true,
+      email: false,
       phone: true,
       address: true,
     };
@@ -278,7 +285,8 @@ async function _getProfilePageData(
     const socials = profile.socials || {};
 
     // Use the profile.experience field directly as it's already stored as an integer
-    const calculatedExperience = getYearsOfExperience(profile.commencement, profile.experience) || 0;
+    const calculatedExperience =
+      getYearsOfExperience(profile.commencement, profile.experience) || 0;
 
     // Build breadcrumb segments (taxonomies only)
     const breadcrumbSegments: BreadcrumbSegment[] = [
@@ -330,8 +338,9 @@ async function _getProfilePageData(
       new Set(services.map((s) => s.subdivision)),
     ).filter(Boolean); // Remove nulls/undefined
 
-    const serviceSubdivisionsData = batchFindServiceByIds(uniqueSubdivisions)
-      .filter((subdivision) => subdivision !== null);
+    const serviceSubdivisionsData = batchFindServiceByIds(
+      uniqueSubdivisions,
+    ).filter((subdivision) => subdivision !== null);
 
     // Prepare breadcrumb buttons config
     const breadcrumbButtons = {
