@@ -50,6 +50,7 @@ import {
   updateServiceStatus,
   deleteService,
 } from '@/actions/admin/services';
+import { batchFindTagsByIds } from '@/lib/taxonomies';
 
 interface ServiceDetailViewProps {
   service: any; // Use proper type from your schema
@@ -298,9 +299,9 @@ export function ServiceDetailView({ service }: ServiceDetailViewProps) {
                 <div>
                   <h4 className='text-sm font-medium mb-2'>Tags</h4>
                   <div className='flex flex-wrap gap-2'>
-                    {service.tags.map((tag: string, index: number) => (
+                    {batchFindTagsByIds(service.tags).map((tagData, index) => (
                       <Badge key={index} variant='outline'>
-                        {tag}
+                        {tagData ? tagData.label : service.tags[index]}
                       </Badge>
                     ))}
                   </div>

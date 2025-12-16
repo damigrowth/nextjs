@@ -64,7 +64,7 @@ export function transformChatForList(
 
 /**
  * Transform database message with relations to UI-ready message item
- * @param message - Message from database with author and readBy
+ * @param message - Message from database with author
  * @param currentUserId - Current user's ID to determine ownership and check read status
  * @returns ChatMessageItem ready for UI display
  */
@@ -73,7 +73,9 @@ export function transformMessageForChat(
   currentUserId: string,
 ): ChatMessageItem {
   // Check if current user has read this message
-  const isRead = message.readBy.some((read) => read.uid === currentUserId);
+  // For own messages, always considered read
+  // For other users' messages, check the read field
+  const isRead = message.authorUid === currentUserId || message.read;
 
   // Transform reply data if exists
   let replyTo = null;

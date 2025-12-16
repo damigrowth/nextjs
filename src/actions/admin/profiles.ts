@@ -5,6 +5,8 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma/client';
 import { z } from 'zod';
+import { revalidateTag, revalidatePath } from 'next/cache';
+import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import { resolveTaxonomyHierarchy } from '@/lib/utils/datasets';
 
@@ -345,7 +347,12 @@ export async function toggleFeatured(params: AdminToggleProfileInput) {
 
     const currentProfile = await prisma.profile.findUnique({
       where: { id: validatedParams.profileId },
-      select: { featured: true },
+      select: {
+        featured: true,
+        id: true,
+        uid: true,
+        username: true,
+      },
     });
 
     if (!currentProfile) {
@@ -369,6 +376,28 @@ export async function toggleFeatured(params: AdminToggleProfileInput) {
         },
       },
     });
+
+    // Revalidate profile tags
+    const profileTags = getProfileTags({
+      id: currentProfile.id,
+      uid: currentProfile.uid,
+      username: currentProfile.username,
+    });
+    profileTags.forEach((tag) => revalidateTag(tag));
+
+    // Revalidate home page (featured profiles)
+    revalidateTag(CACHE_TAGS.home);
+
+    // Revalidate archive pages
+    revalidateTag(CACHE_TAGS.archive.all);
+    revalidateTag(CACHE_TAGS.collections.profiles);
+
+    // Revalidate paths
+    revalidatePath('/'); // Home page
+    revalidatePath('/dir'); // Directory page
+    if (currentProfile.username) {
+      revalidatePath(`/profile/${currentProfile.username}`);
+    }
 
     return {
       success: true,
@@ -623,6 +652,112 @@ export async function getProfileStats() {
       success: false,
       error:
         error instanceof Error ? error.message : 'Failed to get profile stats',
+    };
+  }
+}
+
+/**
+ * Update profile settings (boolean flags) - FormData version for useActionState
+ */
+export async function updateProfileSettingsAction(
+  prevState: any,
+  formData: FormData,
+): Promise<any> {
+  try {
+    await getAdminSession();
+
+    const profileId = formData.get('profileId');
+
+    if (!profileId || typeof profileId !== 'string') {
+      return {
+        success: false,
+        error: 'Profile ID is required',
+      };
+    }
+
+    // Parse FormData - all boolean fields
+    const rawData = {
+      published: formData.get('published') === 'true',
+      featured: formData.get('featured') === 'true',
+      verified: formData.get('verified') === 'true',
+      top: formData.get('top') === 'true',
+      isActive: formData.get('isActive') === 'true',
+    };
+
+    // Validate - create a schema for settings fields only
+    const settingsSchema = z.object({
+      published: z.boolean(),
+      featured: z.boolean(),
+      verified: z.boolean(),
+      top: z.boolean(),
+      isActive: z.boolean(),
+    });
+
+    const validationResult = settingsSchema.safeParse(rawData);
+
+    if (!validationResult.success) {
+      console.error('Settings validation errors:', validationResult.error);
+      return {
+        success: false,
+        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+      };
+    }
+
+    // Get current profile data for cache invalidation
+    const currentProfile = await prisma.profile.findUnique({
+      where: { id: profileId },
+      select: {
+        id: true,
+        uid: true,
+        username: true,
+      },
+    });
+
+    if (!currentProfile) {
+      return {
+        success: false,
+        error: 'Profile not found',
+      };
+    }
+
+    // Update profile with validated data
+    const profile = await prisma.profile.update({
+      where: { id: profileId },
+      data: validationResult.data,
+    });
+
+    // Revalidate profile tags
+    const profileTags = getProfileTags({
+      id: currentProfile.id,
+      uid: currentProfile.uid,
+      username: currentProfile.username,
+    });
+    profileTags.forEach((tag) => revalidateTag(tag));
+
+    // Revalidate home page (featured profiles)
+    revalidateTag(CACHE_TAGS.home);
+
+    // Revalidate archive pages
+    revalidateTag(CACHE_TAGS.archive.all);
+    revalidateTag(CACHE_TAGS.collections.profiles);
+
+    // Revalidate paths
+    revalidatePath('/'); // Home page
+    revalidatePath('/dir'); // Directory page
+    if (currentProfile.username) {
+      revalidatePath(`/profile/${currentProfile.username}`);
+    }
+
+    return {
+      success: true,
+      message: 'Profile settings updated successfully',
+      data: profile,
+    };
+  } catch (error) {
+    console.error('Error updating profile settings:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update profile settings',
     };
   }
 }

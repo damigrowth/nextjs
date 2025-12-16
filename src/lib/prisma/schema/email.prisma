@@ -26,3 +26,20 @@ model Contact {
 
 //   @@map("pending_registrations")
 // }
+
+/// Email notification tracking for unread messages
+/// Records which messages have been sent to users to prevent duplicate notifications
+model EmailBatch {
+  id           String   @id @default(cuid())
+  userId       String   // Recipient user ID
+  messageIds   String[] // Array of message IDs that were sent in this notification
+  messageCount Int      // Number of messages included in the email
+  sentAt       DateTime @default(now()) // When the notification email was sent
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sentAt])
+  @@map("email_batches")
+}

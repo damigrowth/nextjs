@@ -76,7 +76,7 @@ export default function ProfileMeta({
             <div className='flex-1 min-w-0'>
               {/* Name and verification */}
               <div className='flex flex-wrap items-center gap-2'>
-                <h1 className='text-lg font-medium text-gray-900 truncate mb-1'>
+                <h1 className='text-lg font-medium text-gray-900 mb-1'>
                   {displayName}
                 </h1>
                 <VerifiedBadge verified={verified} />

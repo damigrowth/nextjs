@@ -4,7 +4,8 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-import { findById, resolveTaxonomyHierarchy } from '@/lib/utils/datasets';
+// Complex utilities - KEEP for hierarchy resolution
+import { resolveTaxonomyHierarchy } from '@/lib/utils/datasets';
 import type { ActionResult } from '@/lib/types/api';
 import type { Prisma, Status } from '@prisma/client';
 

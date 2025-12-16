@@ -10,6 +10,7 @@ import {
   EditUserStatusForm,
   EditUserBanForm,
   RevokeSessionsForm,
+  DeleteUserForm,
 } from '@/components/admin/forms';
 import { SiteHeader } from '@/components/admin';
 import { AccountForm, NextLink } from '@/components';
@@ -524,6 +525,22 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
                   </CardHeader>
                   <CardContent>
                     <RevokeSessionsForm user={user} />
+                  </CardContent>
+                </Card>
+
+                {/* Delete User - DANGER ZONE */}
+                <Card className='border-destructive'>
+                  <CardHeader className='bg-destructive/10'>
+                    <CardTitle className='text-lg text-destructive'>
+                      Danger Zone: Delete User
+                    </CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Permanently delete this user and all associated data. This
+                      action cannot be undone.
+                    </p>
+                  </CardHeader>
+                  <CardContent className='pt-6'>
+                    <DeleteUserForm user={user} />
                   </CardContent>
                 </Card>
               </div>

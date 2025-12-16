@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidateTag, revalidatePath } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { ActionResponse } from '@/lib/types/api';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
@@ -8,7 +8,7 @@ import { coverageSchema } from '@/lib/validations/profile';
 import { getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
-import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
+import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
 
 /**
  * Server action for updating profile coverage
@@ -64,6 +64,8 @@ export async function updateCoverage(
         id: true,
         uid: true,
         username: true,
+        category: true,
+        featured: true,
         services: {
           where: { status: 'published' },
           select: { slug: true },
@@ -88,23 +90,18 @@ export async function updateCoverage(
       },
     });
 
-    // 7. Revalidate cached data with consistent tags
-    const profileTags = getProfileTags(existingProfile);
-    profileTags.forEach(tag => revalidateTag(tag));
+    // 7. Revalidate cached data using centralized helper
+    await revalidateProfile({
+      profileId: existingProfile.id,
+      userId: user.id,
+      username: existingProfile.username,
+      category: existingProfile.category,
+      includeHome: existingProfile.featured,
+      includeServices: true,
+    });
 
-    // Also revalidate user-specific tags
-    revalidateTag(CACHE_TAGS.user.byId(user.id));
-    revalidateTag(CACHE_TAGS.user.services(user.id));
-
-    // Revalidate profile services (they show profile data)
-    revalidateTag(CACHE_TAGS.profile.services(existingProfile.id));
-    revalidateTag(CACHE_TAGS.service.byProfile(existingProfile.id));
-
-    // Revalidate specific pages
+    // Dashboard-specific revalidation
     revalidatePath('/dashboard/profile/coverage');
-    if (existingProfile.username) {
-      revalidatePath(`/profile/${existingProfile.username}`);
-    }
 
     // Revalidate all service pages that belong to this profile
     existingProfile.services.forEach(service => {
@@ -112,6 +109,8 @@ export async function updateCoverage(
         revalidatePath(`/s/${service.slug}`);
       }
     });
+
+    logCacheRevalidation('profile', existingProfile.id, 'coverage update');
 
     return {
       success: true,

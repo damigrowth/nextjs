@@ -70,7 +70,7 @@ function normalizeItemProperties(item: DatasetItem): DatasetItem {
     slug: item.slug,
   };
 
-  // Add optional properties in order
+  // Core optional properties (structured order)
   if (item.description !== undefined) {
     normalized.description = item.description;
   }
@@ -89,6 +89,13 @@ function normalizeItemProperties(item: DatasetItem): DatasetItem {
       original_filename: item.image.original_filename,
     };
   }
+
+  // Additional taxonomy-specific properties (alphabetical order)
+  if (item.category !== undefined) normalized.category = item.category;
+  if (item.featured !== undefined) normalized.featured = item.featured;
+  if (item.icon !== undefined) normalized.icon = item.icon;
+  if (item.plural !== undefined) normalized.plural = item.plural;
+  if (item.type !== undefined) normalized.type = item.type;
 
   // Add children if present (recursively normalize)
   if (item.children && item.children.length > 0) {

@@ -2,9 +2,9 @@
 
 import {
   BellIcon,
+  ChevronsUpDown,
   CreditCardIcon,
   LogOutIcon,
-  MoreVerticalIcon,
   UserCircleIcon,
 } from 'lucide-react';
 
@@ -24,6 +24,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { signOut, useSession } from '@/lib/auth/client';
 
 export function NavUser({
   user,
@@ -35,6 +36,23 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const { data: session } = useSession();
+
+  // Get real user data from session with fallbacks
+  const realUser = {
+    name: session?.user?.name || session?.user?.username || user.name,
+    email: session?.user?.email || user.email,
+    avatar: session?.user?.image || user.avatar,
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      window.location.href = '/';
+    } catch (error) {
+      window.location.href = '/';
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -43,23 +61,20 @@ export function NavUser({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size='lg'
-              className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+              className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground ring-transparent'
             >
               <UserAvatar
-                displayName={user.name}
-                image={user.avatar}
+                displayName={realUser.name}
+                image={realUser.avatar}
                 size='sm'
-                className='h-8 w-8 rounded-lg grayscale'
+                className='h-8 w-8 rounded-lg'
                 showBorder={false}
-                showShadow={false}
               />
               <div className='grid flex-1 text-left text-sm leading-tight'>
-                <span className='truncate font-medium'>{user.name}</span>
-                <span className='truncate text-xs text-muted-foreground'>
-                  {user.email}
-                </span>
+                <span className='truncate font-medium'>{realUser.name}</span>
+                <span className='truncate text-xs'>{realUser.email}</span>
               </div>
-              <MoreVerticalIcon className='ml-auto size-4' />
+              <ChevronsUpDown className='ml-auto size-4' />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -71,18 +86,15 @@ export function NavUser({
             <DropdownMenuLabel className='p-0 font-normal'>
               <div className='flex items-center gap-2 px-2 py-1.5 text-left text-sm'>
                 <UserAvatar
-                  displayName={user.name}
-                  image={user.avatar}
+                  displayName={realUser.name}
+                  image={realUser.avatar}
                   size='sm'
                   className='h-8 w-8 rounded-lg'
                   showBorder={false}
-                  showShadow={false}
                 />
                 <div className='grid flex-1 text-left text-sm leading-tight'>
-                  <span className='truncate font-medium'>{user.name}</span>
-                  <span className='truncate text-xs text-muted-foreground'>
-                    {user.email}
-                  </span>
+                  <span className='truncate font-medium'>{realUser.name}</span>
+                  <span className='truncate text-xs'>{realUser.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -98,7 +110,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem className='cursor-pointer' onClick={handleLogout}>
               <LogOutIcon />
               Log out
             </DropdownMenuItem>

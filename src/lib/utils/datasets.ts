@@ -504,6 +504,228 @@ export function filterSkillsByCategory<
 }
 
 // =============================================================================
+// TAGS & SKILLS UTILITIES
+// =============================================================================
+
+/**
+ * Search tags by term (optimized for LazyCombobox with large datasets)
+ * @param tags - Flat tags array
+ * @param searchTerm - Search query
+ * @returns Filtered tags matching search term
+ * @example
+ * const results = searchTags(tags, 'animation');
+ * // Returns all tags with 'animation' in label or slug
+ */
+export function searchTags<
+  T extends { id: string; label: string; slug: string },
+>(tags: T[], searchTerm: string): T[] {
+  if (!searchTerm) return tags;
+  const term = searchTerm.toLowerCase().trim();
+  return tags.filter(
+    (tag) =>
+      tag.label.toLowerCase().includes(term) ||
+      tag.slug.toLowerCase().includes(term),
+  );
+}
+
+/**
+ * Get tags by IDs (for resolving saved tag IDs to full tag objects)
+ * @param tags - Flat tags array
+ * @param tagIds - Array of tag IDs to retrieve
+ * @returns Array of tag objects matching the IDs
+ * @example
+ * const selectedTags = getTagsByIds(tags, ['23', '24', '25']);
+ * // Returns full tag objects for display
+ */
+export function getTagsByIds<T extends { id: string }>(
+  tags: T[],
+  tagIds: string[],
+): T[] {
+  if (!Array.isArray(tagIds) || tagIds.length === 0) return [];
+  const idSet = new Set(tagIds);
+  return tags.filter((tag) => idSet.has(tag.id));
+}
+
+/**
+ * Get tag by ID (single lookup)
+ * @param tags - Flat tags array
+ * @param tagId - Tag ID to retrieve
+ * @returns Tag object or undefined
+ * @example
+ * const tag = getTagById(tags, '23');
+ */
+export function getTagById<T extends { id: string }>(
+  tags: T[],
+  tagId: string,
+): T | undefined {
+  return tags.find((tag) => tag.id === tagId);
+}
+
+/**
+ * Create tag lookup map for O(1) access (performance optimization)
+ * Use this when you need to do many tag lookups
+ * @param tags - Flat tags array
+ * @returns Map of id → tag object
+ * @example
+ * const tagMap = createTagMap(tags);
+ * const tag = tagMap.get('23'); // O(1) lookup
+ */
+export function createTagMap<T extends { id: string }>(
+  tags: T[],
+): Map<string, T> {
+  return new Map(tags.map((tag) => [tag.id, tag]));
+}
+
+/**
+ * Validate that tag IDs exist in the dataset
+ * @param tags - Flat tags array
+ * @param tagIds - Array of tag IDs to validate
+ * @returns Array of valid tag IDs that exist in the dataset
+ * @example
+ * const validIds = validateTagIds(tags, ['23', '999', '24']);
+ * // Returns ['23', '24'] (999 doesn't exist)
+ */
+export function validateTagIds<T extends { id: string }>(
+  tags: T[],
+  tagIds: string[],
+): string[] {
+  const idSet = new Set(tags.map((tag) => tag.id));
+  return tagIds.filter((id) => idSet.has(id));
+}
+
+/**
+ * Search skills by term (optimized for LazyCombobox)
+ * @param skills - Flat skills array
+ * @param searchTerm - Search query
+ * @returns Filtered skills matching search term
+ * @example
+ * const results = searchSkills(skills, 'react');
+ * // Returns all skills with 'react' in label or slug
+ */
+export function searchSkills<
+  T extends { id: string; label: string; slug: string },
+>(skills: T[], searchTerm: string): T[] {
+  if (!searchTerm) return skills;
+  const term = searchTerm.toLowerCase().trim();
+  return skills.filter(
+    (skill) =>
+      skill.label.toLowerCase().includes(term) ||
+      skill.slug.toLowerCase().includes(term),
+  );
+}
+
+/**
+ * Get skills by IDs (for resolving saved skill IDs to full skill objects)
+ * @param skills - Flat skills array
+ * @param skillIds - Array of skill IDs to retrieve
+ * @returns Array of skill objects matching the IDs
+ * @example
+ * const selectedSkills = getSkillsByIds(skills, ['11', '12', '13']);
+ * // Returns full skill objects for display
+ */
+export function getSkillsByIds<T extends { id: string }>(
+  skills: T[],
+  skillIds: string[],
+): T[] {
+  if (!Array.isArray(skillIds) || skillIds.length === 0) return [];
+  const idSet = new Set(skillIds);
+  return skills.filter((skill) => idSet.has(skill.id));
+}
+
+/**
+ * Get skill by ID (single lookup)
+ * @param skills - Flat skills array
+ * @param skillId - Skill ID to retrieve
+ * @returns Skill object or undefined
+ * @example
+ * const skill = getSkillById(skills, '11');
+ */
+export function getSkillById<T extends { id: string }>(
+  skills: T[],
+  skillId: string,
+): T | undefined {
+  return skills.find((skill) => skill.id === skillId);
+}
+
+/**
+ * Create skill lookup map for O(1) access (performance optimization)
+ * @param skills - Flat skills array
+ * @returns Map of id → skill object
+ * @example
+ * const skillMap = createSkillMap(skills);
+ * const skill = skillMap.get('11'); // O(1) lookup
+ */
+export function createSkillMap<T extends { id: string }>(
+  skills: T[],
+): Map<string, T> {
+  return new Map(skills.map((skill) => [skill.id, skill]));
+}
+
+/**
+ * Get skills by subcategory (from pro-taxonomy hierarchy)
+ * This finds the parent category of a subcategory, then filters skills by that category
+ * @param skills - Flat skills array with category field
+ * @param proTaxonomies - Pro taxonomies with categories/subcategories
+ * @param subcategoryId - Subcategory ID to filter by
+ * @returns Skills belonging to that subcategory's parent category
+ * @example
+ * const webDevSkills = getSkillsBySubcategory(skills, proTaxonomies, '3372');
+ * // Returns skills for the Web Development category
+ */
+export function getSkillsBySubcategory<
+  T extends { id: string; category: string },
+>(
+  skills: T[],
+  proTaxonomies: DatasetItem[],
+  subcategoryId: string,
+): T[] {
+  // Find which category this subcategory belongs to
+  for (const category of proTaxonomies) {
+    const subcategory = category.children?.find(
+      (sub: any) => sub.id === subcategoryId,
+    );
+    if (subcategory) {
+      return filterSkillsByCategory(skills, category.id);
+    }
+  }
+  return [];
+}
+
+/**
+ * Validate that skill IDs exist in the dataset
+ * @param skills - Flat skills array
+ * @param skillIds - Array of skill IDs to validate
+ * @returns Array of valid skill IDs that exist in the dataset
+ * @example
+ * const validIds = validateSkillIds(skills, ['11', '999', '12']);
+ * // Returns ['11', '12'] (999 doesn't exist)
+ */
+export function validateSkillIds<T extends { id: string }>(
+  skills: T[],
+  skillIds: string[],
+): string[] {
+  const idSet = new Set(skills.map((skill) => skill.id));
+  return skillIds.filter((id) => idSet.has(id));
+}
+
+/**
+ * Filter skills by multiple categories (OR logic)
+ * @param skills - Flat skills array with category field
+ * @param categoryIds - Array of category IDs to filter by
+ * @returns Skills belonging to any of the specified categories
+ * @example
+ * const contentSkills = filterSkillsByCategories(skills, ['7', '8']);
+ * // Returns skills from categories 7 OR 8
+ */
+export function filterSkillsByCategories<
+  T extends { id: string; category: string },
+>(skills: T[], categoryIds: string[]): T[] {
+  if (!Array.isArray(categoryIds) || categoryIds.length === 0) return [];
+  const categorySet = new Set(categoryIds);
+  return skills.filter((skill) => categorySet.has(skill.category));
+}
+
+// =============================================================================
 // TAXONOMY-SPECIFIC UTILITIES
 // =============================================================================
 

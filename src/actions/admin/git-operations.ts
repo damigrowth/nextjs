@@ -271,6 +271,29 @@ export async function commitDatasetChanges(
     // Clear staged changes after successful commit
     await clearStagedChanges();
 
+    // Regenerate taxonomy hash maps for local development
+    // (Vercel regenerates automatically during build, so skip there)
+    if (!process.env.VERCEL && !process.env.CI) {
+      console.log('[GIT_COMMIT] Regenerating taxonomy maps (local dev)...');
+      try {
+        const { execSync } = require('child_process');
+        execSync('yarn build:taxonomies', {
+          cwd: process.cwd(),
+          stdio: 'inherit',
+          timeout: 30000, // 30 second timeout
+        });
+        console.log('[GIT_COMMIT] Hash maps regenerated successfully');
+      } catch (error) {
+        console.warn(
+          '[GIT_COMMIT] Hash map regeneration failed (non-critical):',
+          error
+        );
+        // Don't fail the commit - Vercel will regenerate on deploy
+      }
+    } else {
+      console.log('[GIT_COMMIT] Skipping local regeneration (Vercel build will handle it)');
+    }
+
     const { owner, repo } = REPO_CONFIG;
     const commitUrl = `https://github.com/${owner}/${repo}/commit/${commitSha}`;
 
@@ -641,6 +664,267 @@ export async function undoLastCommit(count: number = 1): Promise<UndoCommitRespo
       success: false,
       error:
         error instanceof Error ? error.message : 'Failed to undo commit',
+    };
+  }
+}
+
+/**
+ * Merge datasets branch into main (deploy to production)
+ * Creates a merge commit from datasets → main
+ * Triggers production deployment on Vercel
+ */
+export async function mergeDatasetsToMain(): Promise<
+  import('@/lib/types/github').MergeBranchResponse
+> {
+  try {
+    await getAdminSession();
+    validateRepoConfig();
+
+    const octokit = getGitHubClient();
+    const { defaultBranch, comparisonBranch, owner, repo } = REPO_CONFIG;
+
+    console.log(
+      `[MERGE_TO_MAIN] Merging ${defaultBranch} → ${comparisonBranch}`,
+    );
+
+    // Check if there are commits to merge
+    const comparison = await getCommitDiff(
+      octokit,
+      comparisonBranch,
+      defaultBranch,
+    );
+
+    if (comparison.ahead_by === 0) {
+      return {
+        success: true,
+        data: {
+          sourceBranch: defaultBranch,
+          targetBranch: comparisonBranch,
+          mergeCommitSha: '',
+          mergeCommitUrl: '',
+          message: `${defaultBranch} is already up-to-date with ${comparisonBranch}. Nothing to deploy.`,
+        },
+      };
+    }
+
+    // Perform merge: datasets → main
+    const mergeResult = await octokit.repos.merge({
+      owner,
+      repo,
+      base: comparisonBranch, // main (target)
+      head: defaultBranch, // datasets (source)
+      commit_message: `Deploy ${defaultBranch} to production\n\nMerged ${comparison.ahead_by} commit${comparison.ahead_by > 1 ? 's' : ''} from ${defaultBranch} to ${comparisonBranch} for production deployment.\n\nThis will trigger production deployment on Vercel.`,
+    });
+
+    const mergeCommitUrl = `https://github.com/${owner}/${repo}/commit/${mergeResult.data.sha}`;
+
+    console.log(
+      `[MERGE_TO_MAIN] Success! Merge commit: ${mergeResult.data.sha.substring(0, 7)}`,
+    );
+
+    return {
+      success: true,
+      data: {
+        sourceBranch: defaultBranch,
+        targetBranch: comparisonBranch,
+        mergeCommitSha: mergeResult.data.sha,
+        mergeCommitUrl,
+        message: `Successfully deployed ${comparison.ahead_by} commit${comparison.ahead_by > 1 ? 's' : ''} to production`,
+      },
+    };
+  } catch (error: any) {
+    console.error('[MERGE_TO_MAIN] Error:', error);
+
+    // Handle merge conflicts (HTTP 409)
+    if (error.status === 409) {
+      return {
+        success: false,
+        error: `Merge conflict detected. Manual resolution required via GitHub.`,
+      };
+    }
+
+    // Handle already up-to-date (HTTP 204)
+    if (error.status === 204) {
+      return {
+        success: true,
+        data: {
+          sourceBranch: REPO_CONFIG.defaultBranch,
+          targetBranch: REPO_CONFIG.comparisonBranch,
+          mergeCommitSha: '',
+          mergeCommitUrl: '',
+          message: `Already up-to-date. Nothing to deploy.`,
+        },
+      };
+    }
+
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'Failed to deploy to production',
+    };
+  }
+}
+
+/**
+ * Sync datasets branch with main (get production updates)
+ * Creates a merge commit from main → datasets
+ * Keeps datasets up-to-date with production changes
+ */
+export async function syncDatasetsWithMain(): Promise<
+  import('@/lib/types/github').MergeBranchResponse
+> {
+  try {
+    await getAdminSession();
+    validateRepoConfig();
+
+    const octokit = getGitHubClient();
+    const { defaultBranch, comparisonBranch, owner, repo } = REPO_CONFIG;
+
+    console.log(
+      `[SYNC_DATASETS] Syncing ${defaultBranch} with ${comparisonBranch}`,
+    );
+
+    // Check how many commits behind
+    const comparison = await getCommitDiff(
+      octokit,
+      comparisonBranch,
+      defaultBranch,
+    );
+
+    if (comparison.behind_by === 0) {
+      return {
+        success: true,
+        data: {
+          sourceBranch: comparisonBranch,
+          targetBranch: defaultBranch,
+          mergeCommitSha: '',
+          mergeCommitUrl: '',
+          message: `${defaultBranch} is already up-to-date with ${comparisonBranch}`,
+        },
+      };
+    }
+
+    // Perform merge: main → datasets
+    const mergeResult = await octokit.repos.merge({
+      owner,
+      repo,
+      base: defaultBranch, // datasets (target)
+      head: comparisonBranch, // main (source)
+      commit_message: `Sync ${defaultBranch} with ${comparisonBranch} production\n\nMerged ${comparison.behind_by} commit${comparison.behind_by > 1 ? 's' : ''} from ${comparisonBranch} to keep ${defaultBranch} up-to-date with production.\n\nBranch: ${defaultBranch}`,
+    });
+
+    const mergeCommitUrl = `https://github.com/${owner}/${repo}/commit/${mergeResult.data.sha}`;
+
+    console.log(
+      `[SYNC_DATASETS] Success! Merge commit: ${mergeResult.data.sha.substring(0, 7)}`,
+    );
+
+    return {
+      success: true,
+      data: {
+        sourceBranch: comparisonBranch,
+        targetBranch: defaultBranch,
+        mergeCommitSha: mergeResult.data.sha,
+        mergeCommitUrl,
+        message: `Successfully synced ${comparison.behind_by} commit${comparison.behind_by > 1 ? 's' : ''} from production`,
+      },
+    };
+  } catch (error: any) {
+    console.error('[SYNC_DATASETS] Error:', error);
+
+    // Handle merge conflicts (HTTP 409)
+    if (error.status === 409) {
+      return {
+        success: false,
+        error: `Merge conflict detected between ${REPO_CONFIG.defaultBranch} and ${REPO_CONFIG.comparisonBranch}. Manual resolution required via GitHub.`,
+      };
+    }
+
+    // Handle already up-to-date (HTTP 204)
+    if (error.status === 204) {
+      return {
+        success: true,
+        data: {
+          sourceBranch: REPO_CONFIG.comparisonBranch,
+          targetBranch: REPO_CONFIG.defaultBranch,
+          mergeCommitSha: '',
+          mergeCommitUrl: '',
+          message: `Already up-to-date with production`,
+        },
+      };
+    }
+
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to sync with production',
+    };
+  }
+}
+
+/**
+ * Reset datasets branch to match main exactly
+ * Permanently removes all commits that are ahead of main
+ * WARNING: This is a destructive operation
+ */
+export async function resetDatasetsToMain(): Promise<
+  import('@/lib/types/github').MergeBranchResponse
+> {
+  try {
+    await getAdminSession();
+    validateRepoConfig();
+
+    const octokit = getGitHubClient();
+    const { defaultBranch, comparisonBranch, owner, repo } = REPO_CONFIG;
+
+    console.log(
+      `[RESET_BRANCH] Resetting ${defaultBranch} to match ${comparisonBranch}`,
+    );
+
+    // Get main branch's latest commit SHA
+    const { data: mainBranch } = await octokit.rest.repos.getBranch({
+      owner,
+      repo,
+      branch: comparisonBranch,
+    });
+
+    const mainSha = mainBranch.commit.sha;
+
+    console.log(
+      `[RESET_BRANCH] Main branch SHA: ${mainSha.substring(0, 7)}`,
+    );
+
+    // Update datasets branch ref to point to main's SHA (force update)
+    await octokit.rest.git.updateRef({
+      owner,
+      repo,
+      ref: `heads/${defaultBranch}`,
+      sha: mainSha,
+      force: true, // Force update (like git push --force)
+    });
+
+    console.log(
+      `[RESET_BRANCH] Success! ${defaultBranch} now points to ${mainSha.substring(0, 7)}`,
+    );
+
+    return {
+      success: true,
+      data: {
+        sourceBranch: comparisonBranch,
+        targetBranch: defaultBranch,
+        mergeCommitSha: mainSha,
+        mergeCommitUrl: `https://github.com/${owner}/${repo}/commit/${mainSha}`,
+        message: `Successfully reset ${defaultBranch} to match ${comparisonBranch}`,
+      },
+    };
+  } catch (error: any) {
+    console.error('[RESET_BRANCH] Error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'Failed to reset branch',
     };
   }
 }

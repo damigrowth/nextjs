@@ -5,7 +5,7 @@
 
 'use client';
 
-import { RefObject, useState, useEffect, useRef } from 'react';
+import { RefObject, useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
@@ -43,12 +43,6 @@ export function ChatMessages({
   const [deletingMessageId, setDeletingMessageId] = useState<string | null>(
     null,
   );
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   const handleReply = (message: ChatMessageItem) => {
     if (onReply) {
@@ -186,8 +180,12 @@ export function ChatMessages({
   };
 
   return (
-    <ScrollArea className='flex-1 pl-0 p-4 pr-0' ref={scrollRef}>
-      <div>
+    <ScrollArea
+      className='flex-1 pl-0 p-4 pr-0'
+      scrollBarClassName='hidden'
+      ref={scrollRef}
+    >
+      <div className='pb-4'>
         {/* Load trigger for infinite scroll */}
         {hasMore && (
           <div ref={loadTriggerRef} className='flex justify-center py-4'>
@@ -332,8 +330,6 @@ export function ChatMessages({
             </div>
           </div>
         ))}
-        {/* Invisible element to scroll to */}
-        <div ref={messagesEndRef} />
       </div>
       <MessageDeleteDialog
         messageId={deletingMessageId || ''}

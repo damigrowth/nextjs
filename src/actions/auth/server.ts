@@ -94,12 +94,8 @@ export async function getSession(
         // console.log('getSession - database user found:', !!dbUser);
 
         if (!dbUser) {
-          // console.log('User not found in database - cleaning up session');
-          // User was deleted from database, invalidate session
-          await auth.api.signOut({
-            headers: await headers(),
-          });
-
+          // User was deleted - sessions already cleaned up by Better Auth's deleteUser
+          // No need to call signOut (would fail with P2025 since sessions are already gone)
           return {
             success: false,
             error: 'User account no longer exists',

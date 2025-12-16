@@ -28,9 +28,9 @@ export default function ServiceBuy({
   const hasValidPrice = priceValue > 0;
 
   useEffect(() => {
-    setOrder({ fixed: true, fixedPrice: priceValue });
+    setOrder({ fixed: true, fixedPrice: priceValue, addons: [] });
     calculateTotal();
-  }, [priceValue, setOrder, calculateTotal]);
+  }, [priceValue, serviceTitle, setOrder, calculateTotal]);
 
   if (isOwner) {
     return null;

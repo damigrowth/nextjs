@@ -214,18 +214,45 @@ export function sanitizeCloudinaryResources(
  * Process image data for database storage
  * Converts CloudinaryResource objects to URL strings for consistency
  * Supports both migrated users (string URLs) and new uploads (CloudinaryResource objects)
+ * CRITICAL: Rejects blob URLs and validates HTTPS URLs to prevent temporary URLs from being saved
  */
 export function processImageForDatabase(imageData: any): string | null {
   if (!imageData) return null;
 
-  // If it's already a string URL, return as-is
+  // If it's already a string URL, validate it
   if (typeof imageData === 'string') {
+    // Reject blob URLs (client-side temporary URLs that should never be persisted)
+    if (imageData.startsWith('blob:')) {
+      console.warn('❌ Rejected blob URL in processImageForDatabase:', imageData);
+      return null;
+    }
+
+    // Validate it's a proper HTTPS URL (Cloudinary or OAuth provider)
+    if (!imageData.startsWith('https://')) {
+      console.warn('❌ Rejected non-HTTPS URL in processImageForDatabase:', imageData);
+      return null;
+    }
+
     return imageData;
   }
 
-  // If it's a CloudinaryResource object, extract the secure_url
+  // If it's a CloudinaryResource object, extract and validate the secure_url
   if (typeof imageData === 'object' && imageData.secure_url) {
-    return imageData.secure_url;
+    const url = imageData.secure_url;
+
+    // Reject blob URLs from CloudinaryResource objects
+    if (url.startsWith('blob:')) {
+      console.warn('❌ Rejected blob URL from CloudinaryResource in processImageForDatabase:', url);
+      return null;
+    }
+
+    // Validate HTTPS URL
+    if (!url.startsWith('https://')) {
+      console.warn('❌ Rejected non-HTTPS URL from CloudinaryResource in processImageForDatabase:', url);
+      return null;
+    }
+
+    return url;
   }
 
   return null;

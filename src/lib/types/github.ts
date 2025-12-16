@@ -88,6 +88,7 @@ export interface GitStatusResponse {
     datasetDiffs: Record<string, string>;
     datasetModifiedCount: number;
     ahead_by?: number;
+    behind_by?: number;
   };
   error?: string;
 }
@@ -140,6 +141,18 @@ export interface UndoCommitResponse {
     }>;
     newHeadSha: string;
     newHeadUrl: string;
+  };
+  error?: string;
+}
+
+export interface MergeBranchResponse {
+  success: boolean;
+  data?: {
+    sourceBranch: string;
+    targetBranch: string;
+    mergeCommitSha: string;
+    mergeCommitUrl: string;
+    message: string;
   };
   error?: string;
 }

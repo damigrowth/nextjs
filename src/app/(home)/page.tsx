@@ -14,7 +14,7 @@ import { ProfilesHomeLazy } from '@/components/home/profiles-home-lazy';
 // import HomeSchema from 'oldcode/utils/Seo/Schema/HomeSchema';
 
 export const dynamic = 'force-static';
-export const revalidate = 3600; // Revalidate every hour (public content only)
+export const revalidate = 86400; // Revalidate every 24 hours (1 day)
 export const fetchCache = 'force-cache';
 
 export async function generateMetadata() {

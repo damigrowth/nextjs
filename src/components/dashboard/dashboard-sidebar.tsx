@@ -42,17 +42,23 @@ import { useSession } from '@/lib/auth/client';
 import { capitalizeFirstLetter } from '@/lib/utils/validation';
 import { useUnreadCount } from '@/lib/hooks/use-unread-count';
 import FlaticonMenu from '@/components/icon/flaticon/flaticon-menu';
+import { usePathname } from 'next/navigation';
 
 export default function DashboardSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession();
   const { unreadCount } = useUnreadCount();
+  const pathname = usePathname();
 
   // Use Better Auth session data
   const user = session?.user;
   const isProfessional =
     user?.role === 'freelancer' || user?.role === 'company';
+
+  // Don't show badge when on messages routes
+  const isOnMessagesRoute = pathname.startsWith('/dashboard/messages');
+  const showBadge = !isOnMessagesRoute && unreadCount > 0;
 
   // Group 1: Main Navigation (always visible)
   const navMain = [
@@ -65,7 +71,7 @@ export default function DashboardSidebar({
       title: 'Μηνύματα',
       url: '/dashboard/messages',
       icon: MessageSquare,
-      badge: unreadCount > 0 ? (
+      badge: showBadge ? (
         <Badge variant='destructive' className='h-4 min-w-4 flex items-center justify-center px-1 text-[10px] font-semibold rounded-full'>
           {unreadCount > 99 ? '99+' : unreadCount}
         </Badge>

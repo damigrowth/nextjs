@@ -1,6 +1,7 @@
 export { EditUserStatusForm } from './edit-user-status-form';
 export { EditUserBanForm } from './edit-user-ban-form';
 export { RevokeSessionsForm } from './revoke-sessions-form';
+export { DeleteUserForm } from './delete-user-form';
 
 // Service forms
 export { EditServiceBasicForm } from './edit-service-basic-form';
@@ -10,6 +11,9 @@ export { EditServiceSettingsForm } from './edit-service-settings-form';
 export { EditServiceAddonsForm } from './edit-service-addons-form';
 export { EditServiceFaqForm } from './edit-service-faq-form';
 export { EditServiceMediaForm } from './edit-service-media-form';
+
+// Profile forms
+export { EditProfileSettingsForm } from './edit-profile-settings-form';
 
 // Taxonomy forms
 export { CreateServiceTaxonomyForm } from './create-service-taxonomy-form';
