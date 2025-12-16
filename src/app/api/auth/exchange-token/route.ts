@@ -14,20 +14,28 @@ import { SignJWT, jwtVerify } from 'jose';
  * 4. Client uses Supabase JWT for database operations
  */
 
-const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET!;
-const SUPABASE_JWT_SECRET = process.env.SUPABASE_JWT_SECRET!;
-
-// Verify environment variables are set
-if (!BETTER_AUTH_SECRET) {
-  throw new Error('BETTER_AUTH_SECRET environment variable is required');
-}
-
-if (!SUPABASE_JWT_SECRET) {
-  throw new Error('SUPABASE_JWT_SECRET environment variable is required');
-}
-
 export async function POST(request: NextRequest) {
   try {
+    // Verify environment variables are set at runtime (not build time)
+    const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
+    const SUPABASE_JWT_SECRET = process.env.SUPABASE_JWT_SECRET;
+
+    if (!BETTER_AUTH_SECRET) {
+      console.error('BETTER_AUTH_SECRET environment variable is missing');
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
+
+    if (!SUPABASE_JWT_SECRET) {
+      console.error('SUPABASE_JWT_SECRET environment variable is missing');
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
+
     // Get Better Auth JWT from request
     const { token } = await request.json();
 
