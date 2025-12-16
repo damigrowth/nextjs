@@ -1,4 +1,4 @@
-import { MediaGallery } from '@/components';
+import MediaGallery from '../shared/media-gallery';
 import React from 'react';
 
 type Props = {
