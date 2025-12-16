@@ -51,22 +51,6 @@ export default async function LoginPage(): Promise<JSX.Element> {
         <div className='flex justify-center'>
           <div className='xl:w-1/3 w-full max-w-2xl'>
             <div className='relative bg-white p-12 sm:p-8 rounded-xl shadow-lg border border-gray-300'>
-              <div className='mb-8'>
-                <h4 className='text-xl font-semibold text-gray-900 mb-2'>
-                  Συνδέσου στον λογαριασμό σου
-                </h4>
-                {!isUnderMaintenance && (
-                  <p className='text-gray-600'>
-                    Δεν έχεις λογαριασμό?{' '}
-                    <NextLink
-                      href='/register'
-                      className='text-green-600 hover:text-green-700 font-medium'
-                    >
-                      Εγγραφή!
-                    </NextLink>
-                  </p>
-                )}
-              </div>
               <FormAuthLogin />
             </div>
           </div>

@@ -374,16 +374,41 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
       const hasImageFiles = profileImageRef.current?.hasFiles();
       const hasPortfolioFiles = portfolioRef.current?.hasFiles();
 
+      // CRITICAL: Upload image files and WAIT for completion
       if (hasImageFiles) {
-        await profileImageRef.current.uploadFiles();
+        try {
+          await profileImageRef.current.uploadFiles();
+        } catch (error) {
+          console.error('❌ Image upload failed:', error);
+          toast.error(
+            'Το ανέβασμα της εικόνας απέτυχε. Παρακαλώ δοκιμάστε ξανά.',
+          );
+          setIsUploading(false);
+          return; // Don't submit if image upload fails
+        }
       }
 
       if (hasPortfolioFiles) {
         await portfolioRef.current.uploadFiles();
       }
 
-      // Get all form values and populate FormData using centralized utility
+      // Get form values AFTER upload completion
       const allValues = getValues();
+
+      // FINAL CLIENT-SIDE CHECK: Ensure image is not blob URL
+      const imageValue = allValues.image;
+      if (imageValue) {
+        const imageUrl =
+          typeof imageValue === 'string' ? imageValue : imageValue.secure_url;
+
+        if (imageUrl?.startsWith('blob:')) {
+          toast.error(
+            'Η εικόνα δεν ανέβηκε σωστά. Παρακαλώ δοκιμάστε ξανά.',
+          );
+          setIsUploading(false);
+          return;
+        }
+      }
 
       // Use centralized populateFormData utility (same as portfolio form)
       populateFormData(formData, allValues, {
@@ -397,9 +422,9 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
         action(formData);
       });
     } catch (error) {
-      console.error('❌ Upload failed:', error);
+      console.error('❌ Form submission failed:', error);
+      toast.error('Η υποβολή απέτυχε. Παρακαλώ δοκιμάστε ξανά.');
       setIsUploading(false);
-      // Don't submit form if upload fails
     }
   };
 
@@ -964,7 +989,29 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
             }
             loading={isPending || isUploading || isPendingTransition}
             disabled={
-              isPending || isUploading || isPendingTransition || !isValid
+              isPending ||
+              isUploading ||
+              isPendingTransition ||
+              !isValid ||
+              // Block if image is blob URL AND not a pending resource
+              (() => {
+                const img = watch('image');
+                if (!img) return true; // No image
+
+                // Check if it's a pending resource (normal upload state)
+                if (typeof img === 'object') {
+                  const isPendingResource =
+                    (img as any)._pending === true ||
+                    img.public_id?.startsWith('pending_');
+
+                  // Allow pending resources (upload in progress)
+                  if (isPendingResource) return false;
+                }
+
+                // Block non-pending blob URLs (someone bypassing upload)
+                const url = typeof img === 'string' ? img : img?.secure_url;
+                return url?.startsWith('blob:') || false;
+              })()
             }
             className='w-2/3'
             variant='default'

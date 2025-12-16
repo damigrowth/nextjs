@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma/client';
 import { transformMessageForChat } from '@/lib/utils/messages';
 import type { ChatMessageItem, MessageWithRelations } from '@/lib/types/messages';
-import { sendUnreadMessagesEmail } from '@/lib/email/services/message-emails';
+import { MESSAGE_WITH_AUTHOR_INCLUDE } from '@/lib/database/selects';
 
 /**
  * Get messages for a chat with pagination support
@@ -14,7 +14,7 @@ export async function getMessages(
   options?: { limit?: number; before?: string }
 ): Promise<ChatMessageItem[]> {
   try {
-    const limit = options?.limit || 100;
+    const limit = options?.limit || 20;
 
     // Verify user is a member of the chat
     const chatMember = await prisma.chatMember.findUnique({
@@ -51,7 +51,6 @@ export async function getMessages(
             image: true,
           },
         },
-        readBy: true,
         replyTo: {
           include: {
             author: {
@@ -65,7 +64,7 @@ export async function getMessages(
         },
       },
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc', // Get newest messages first
       },
       take: limit,
     });
@@ -75,7 +74,8 @@ export async function getMessages(
       transformMessageForChat(message as MessageWithRelations, currentUserId)
     );
 
-    return chatMessages;
+    // Reverse to display oldest→newest (bottom of chat shows most recent)
+    return chatMessages.reverse();
   } catch (error) {
     console.error('Error fetching messages:', error);
     throw new Error('Failed to fetch messages');
@@ -127,29 +127,7 @@ export async function sendMessage(
           authorUid: authorUid,
           ...(replyToId && { replyToId }),
         },
-        include: {
-          author: {
-            select: {
-              id: true,
-              displayName: true,
-              firstName: true,
-              lastName: true,
-              image: true,
-            },
-          },
-          readBy: true,
-          replyTo: {
-            include: {
-              author: {
-                select: {
-                  displayName: true,
-                  firstName: true,
-                  lastName: true,
-                },
-              },
-            },
-          },
-        },
+        include: MESSAGE_WITH_AUTHOR_INCLUDE,
       });
 
       // Update chat's lastMessage and lastActivity
@@ -164,13 +142,8 @@ export async function sendMessage(
       return newMessage;
     });
 
-    // Check if we should trigger unread messages email notification (async, non-blocking)
-    checkAndSendUnreadEmailNotification(chatId, authorUid).catch((error) => {
-      console.error('[Email] Failed to check/send unread email notification:', error);
-      // Don't throw - email failure shouldn't break message send
-    });
-
     // Transform for UI
+    // Note: Email notifications are handled by cron job (/api/cron/process-email-batches)
     return transformMessageForChat(message as MessageWithRelations, authorUid);
   } catch (error) {
     console.error('Error sending message:', error);
@@ -265,26 +238,21 @@ export async function markAsRead(
   try {
     if (messageIds.length === 0) return;
 
-    // Create MessageRead records (upsert to avoid duplicates)
-    await prisma.$transaction(
-      messageIds.map((messageId) =>
-        prisma.messageRead.upsert({
-          where: {
-            messageId_uid: {
-              messageId: messageId,
-              uid: userId,
-            },
-          },
-          create: {
-            messageId: messageId,
-            uid: userId,
-          },
-          update: {
-            readAt: new Date(),
-          },
-        })
-      )
-    );
+    // Update messages to mark as read
+    // Only update messages not sent by the current user
+    await prisma.message.updateMany({
+      where: {
+        id: {
+          in: messageIds,
+        },
+        authorUid: {
+          not: userId,
+        },
+      },
+      data: {
+        read: true,
+      },
+    });
   } catch (error) {
     console.error('Error marking messages as read:', error);
     throw new Error('Failed to mark messages as read');
@@ -302,7 +270,7 @@ export async function getUnreadCount(
     // Count messages where:
     // - chatId matches
     // - author is NOT current user
-    // - no MessageRead record for current user
+    // - message is not read
     const count = await prisma.message.count({
       where: {
         chatId: chatId,
@@ -310,11 +278,7 @@ export async function getUnreadCount(
           not: userId,
         },
         deleted: false,
-        readBy: {
-          none: {
-            uid: userId,
-          },
-        },
+        read: false,
       },
     });
 
@@ -353,11 +317,7 @@ export async function getTotalUnreadCount(userId: string): Promise<number> {
           not: userId,
         },
         deleted: false,
-        readBy: {
-          none: {
-            uid: userId,
-          },
-        },
+        read: false,
       },
     });
 
@@ -419,11 +379,7 @@ export async function getRecentUnreadMessages(
         createdAt: {
           gte: timeThreshold,
         },
-        readBy: {
-          none: {
-            uid: userId,
-          },
-        },
+        read: false,
       },
       include: {
         author: {
@@ -447,78 +403,3 @@ export async function getRecentUnreadMessages(
   }
 }
 
-/**
- * Check if recipient has unread messages to trigger email notification
- * Triggers email if:
- * 1. Recipient has unread messages in last 15 minutes
- * 2. At least 15 minutes passed since last email notification
- *
- * This is called asynchronously after sending a message (non-blocking)
- */
-async function checkAndSendUnreadEmailNotification(
-  chatId: string,
-  senderUid: string
-): Promise<void> {
-  try {
-    // Get the other member(s) in the chat (recipients)
-    const chatMembers = await prisma.chatMember.findMany({
-      where: {
-        chatId: chatId,
-        uid: {
-          not: senderUid, // Exclude the sender
-        },
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            displayName: true,
-            username: true,
-            lastUnreadEmailSentAt: true,
-          },
-        },
-      },
-    });
-
-    // Check each recipient
-    for (const member of chatMembers) {
-      const recipient = member.user;
-
-      // Check if 15 minutes have passed since last email
-      if (recipient.lastUnreadEmailSentAt) {
-        const minutesSinceLastEmail =
-          (Date.now() - new Date(recipient.lastUnreadEmailSentAt).getTime()) / (1000 * 60);
-
-        if (minutesSinceLastEmail < 15) {
-          // Skip this recipient - cooldown period active (15 min)
-          continue;
-        }
-      }
-
-      // Get recent unread messages for this recipient (last 15 minutes)
-      const recentUnreadMessages = await getRecentUnreadMessages(recipient.id, 15);
-
-      // Check if recipient has any unread messages in last 15 minutes
-      if (recentUnreadMessages.length >= 1) {
-        // Send email notification
-        await sendUnreadMessagesEmail(recipient, recentUnreadMessages);
-
-        // Update lastUnreadEmailSentAt to prevent spam
-        await prisma.user.update({
-          where: { id: recipient.id },
-          data: {
-            lastUnreadEmailSentAt: new Date(),
-          },
-        });
-
-        console.log(
-          `[Email] Sent unread messages notification to ${recipient.email} (${recentUnreadMessages.length} messages)`
-        );
-      }
-    }
-  } catch (error) {
-    console.error('[Email] Error in checkAndSendUnreadEmailNotification:', error);
-    // Don't throw - this is a background task
-  }
-}

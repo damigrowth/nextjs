@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { processImageForDatabase } from '@/lib/utils/cloudinary';
 // legacy exports
 // import {
 //   listUsersSchema,
@@ -1143,11 +1144,12 @@ export async function updateAccountAdmin(
       };
     }
 
-    // Parse image if provided
-    let image = null;
+    // Parse image if provided and extract URL string
+    let processedImage: string | null | undefined = undefined;
     if (imageStr) {
       try {
-        image = JSON.parse(imageStr);
+        const imageData = JSON.parse(imageStr);
+        processedImage = processImageForDatabase(imageData);
       } catch (e) {
         return {
           success: false,
@@ -1160,11 +1162,11 @@ export async function updateAccountAdmin(
     const validationResult = z.object({
       userId: z.string().min(1),
       displayName: z.string().min(1).max(100).optional(),
-      image: z.any().nullable().optional(),
+      image: z.string().nullable().optional(),
     }).safeParse({
       userId,
       displayName,
-      image,
+      image: processedImage,
     });
 
     if (!validationResult.success) {
@@ -1190,7 +1192,7 @@ export async function updateAccountAdmin(
       where: { id: userId },
       data: {
         displayName: displayName || undefined,
-        image: image || undefined,
+        ...(processedImage !== undefined && { image: processedImage }),
       },
     });
 
@@ -1200,7 +1202,7 @@ export async function updateAccountAdmin(
         where: { uid: userId },
         data: {
           displayName: displayName || undefined,
-          image: image || undefined,
+          ...(processedImage !== undefined && { image: processedImage }),
           updatedAt: new Date(),
         },
       });

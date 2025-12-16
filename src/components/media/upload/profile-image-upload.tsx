@@ -62,6 +62,8 @@ const ProfileImageUpload = memo<ProfileImageUploadProps>(({
               src={resource}
               alt="Profile image"
               className="w-full h-full rounded-lg object-cover border-2 border-gray-200"
+              crossOrigin="anonymous"
+              referrerPolicy="no-referrer"
             />
             {isUploading && (
               <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">

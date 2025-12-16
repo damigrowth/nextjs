@@ -8,7 +8,7 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useChatSubscription } from '@/lib/hooks/chat/use-chat-subscription';
 import { useMessageOptimistic } from '@/lib/hooks/chat/use-message-optimistic';
-import { getMessages } from '@/actions/messages';
+import { getMessages, markAsRead } from '@/actions/messages';
 import { ChatMessages } from './chat-messages';
 import { MessageInput, ReplyToMessage, EditingMessage } from './message-input';
 import { Loader2 } from 'lucide-react';
@@ -33,7 +33,7 @@ export function MessagesContainer({
   const [editingMessage, setEditingMessage] = useState<EditingMessage | null>(null);
   const [olderMessages, setOlderMessages] = useState<ChatMessageItem[]>([]);
   const [isLoadingOlder, setIsLoadingOlder] = useState(false);
-  const [hasMore, setHasMore] = useState(initialMessages.length >= 50);
+  const [hasMore, setHasMore] = useState(initialMessages.length >= 20);
 
   // Subscribe to real-time message updates
   const { messages: realtimeMessages } = useChatSubscription({
@@ -48,6 +48,67 @@ export function MessagesContainer({
     chatId,
     currentUserId,
   });
+
+  // Mark messages as read when chat opens
+  useEffect(() => {
+    const markChatAsRead = async () => {
+      // Get all unread messages (messages not sent by current user and not already read)
+      const unreadMessageIds = initialMessages
+        .filter(m => !m.isOwn && !m.isRead)
+        .map(m => m.id);
+
+      // Mark them as read if there are any
+      if (unreadMessageIds.length > 0) {
+        try {
+          await markAsRead(unreadMessageIds, currentUserId);
+        } catch (error) {
+          console.error('Failed to mark messages as read:', error);
+        }
+      }
+    };
+
+    markChatAsRead();
+  }, [chatId, currentUserId]); // Run when chatId changes (new chat opened)
+
+  // Auto-mark new real-time messages as read when they arrive
+  useEffect(() => {
+    const markNewMessagesAsRead = async () => {
+      // Get unread messages from real-time subscription (not sent by current user)
+      const unreadMessageIds = realtimeMessages
+        .filter(m => !m.isOwn && !m.isRead)
+        .map(m => m.id);
+
+      // Mark new messages as read since user has this chat open
+      if (unreadMessageIds.length > 0) {
+        try {
+          await markAsRead(unreadMessageIds, currentUserId);
+        } catch (error) {
+          console.error('Failed to mark new messages as read:', error);
+        }
+      }
+    };
+
+    markNewMessagesAsRead();
+  }, [realtimeMessages, currentUserId]); // Run when new real-time messages arrive
+
+  // Scroll to bottom on initial load and when switching chats
+  useEffect(() => {
+    const scrollToBottom = () => {
+      if (scrollRef.current) {
+        const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (viewport) {
+          requestAnimationFrame(() => {
+            // Add extra padding buffer to ensure last message is fully visible
+            viewport.scrollTop = viewport.scrollHeight + 20;
+          });
+        }
+      }
+    };
+
+    // Small delay to ensure DOM is fully rendered
+    const timer = setTimeout(scrollToBottom, 100);
+    return () => clearTimeout(timer);
+  }, [chatId]); // Re-run when chat changes
 
   // Load older messages when scrolling to top
   const loadOlderMessages = useCallback(async () => {
@@ -102,27 +163,38 @@ export function MessagesContainer({
   );
 
   // Setup intersection observer for infinite scroll
+  // Delay setup to prevent triggering on initial load
   useEffect(() => {
     if (!loadTriggerRef.current || !hasMore) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting && hasMore && !isLoadingOlder) {
-          loadOlderMessages();
-        }
-      },
-      {
-        root: null,
-        rootMargin: '200px',
-        threshold: 0.1,
-      }
-    );
+    let observer: IntersectionObserver | null = null;
 
-    observer.observe(loadTriggerRef.current);
+    // Delay observer setup by 500ms to allow initial scroll to complete
+    const timer = setTimeout(() => {
+      observer = new IntersectionObserver(
+        (entries) => {
+          const [entry] = entries;
+          if (entry.isIntersecting && hasMore && !isLoadingOlder) {
+            loadOlderMessages();
+          }
+        },
+        {
+          root: null,
+          rootMargin: '200px',
+          threshold: 0.1,
+        }
+      );
+
+      if (loadTriggerRef.current) {
+        observer.observe(loadTriggerRef.current);
+      }
+    }, 500); // 500ms delay
 
     return () => {
-      observer.disconnect();
+      clearTimeout(timer);
+      if (observer) {
+        observer.disconnect();
+      }
     };
   }, [loadOlderMessages, hasMore, isLoadingOlder]);
 
@@ -133,7 +205,11 @@ export function MessagesContainer({
       // Only scroll if we got new messages (not older ones)
       const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
       if (viewport) {
-        viewport.scrollTop = viewport.scrollHeight;
+        // Use requestAnimationFrame to ensure DOM has updated
+        requestAnimationFrame(() => {
+          // Add extra padding buffer to ensure last message is fully visible
+          viewport.scrollTop = viewport.scrollHeight + 20;
+        });
       }
     }
     prevMessageCountRef.current = allMessages.length;

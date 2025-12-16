@@ -1,4 +1,4 @@
-// Generated on 2025-10-24T12:44:38.251Z
+// Generated on 2025-12-04T17:51:08.823Z
 // All data is sorted alphabetically by label/name at all levels
 // Three-level taxonomy hierarchy: categories → subcategories → subdivisions
 // Complete three-level taxonomy hierarchy: categories → subcategories → subdivisions
@@ -8454,6 +8454,17 @@ export const serviceTaxonomies = [
         slug: 'kataskeues',
         description:
           'Ανακάλυψε επαγγελματικές λύσεις για κάθε κατασκευαστική ανάγκη από επαγγελματίες που ξεχωρίζουν.',
+        image: {
+          public_id: 'subcategories/Doulitsa_Cover_wjno9o',
+          secure_url:
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1764778763/subcategories/Doulitsa_Cover_wjno9o.webp',
+          width: 1200,
+          height: 675,
+          resource_type: 'image',
+          format: 'webp',
+          bytes: 44162,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1764778763/subcategories/Doulitsa_Cover_wjno9o.webp',
+        },
         children: [
           {
             id: '443',
@@ -9140,18 +9151,6 @@ export const serviceTaxonomies = [
             },
           },
         ],
-        image: {
-          public_id: '441_b2724f5b48',
-          secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168776/441_b2724f5b48.webp',
-          width: 1792,
-          height: 1024,
-          resource_type: 'image',
-          format: 'webp',
-          bytes: 111401,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168776/441_b2724f5b48.webp',
-          original_filename: '441.webp',
-        },
       },
       {
         id: '91',

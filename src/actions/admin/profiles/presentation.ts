@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidateTag, revalidatePath } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { ActionResponse } from '@/lib/types/api';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
@@ -11,7 +11,7 @@ import {
 import { extractFormData, getFormString } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
-import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
+import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
 
 /**
  * Admin-specific profile presentation update action
@@ -86,6 +86,8 @@ export async function updateProfilePresentationAdmin(
         id: true,
         uid: true,
         username: true,
+        category: true,
+        featured: true,
         services: {
           where: { status: 'published' },
           select: { slug: true },
@@ -118,23 +120,19 @@ export async function updateProfilePresentationAdmin(
       },
     });
 
-    // 8. Revalidate cached data with consistent tags
-    const profileTags = getProfileTags(existingProfile);
-    profileTags.forEach(tag => revalidateTag(tag));
+    // 8. Revalidate cached data using centralized helper
+    await revalidateProfile({
+      profileId: existingProfile.id,
+      userId: existingProfile.uid,
+      username: existingProfile.username,
+      category: existingProfile.category,
+      includeHome: existingProfile.featured, // Always include home for admin (featured might change)
+      includeServices: true,
+    });
 
-    // Also revalidate user-specific tags
-    revalidateTag(CACHE_TAGS.user.byId(existingProfile.uid));
-    revalidateTag(CACHE_TAGS.user.services(existingProfile.uid));
-
-    // Revalidate profile services (they show profile data)
-    revalidateTag(CACHE_TAGS.profile.services(existingProfile.id));
-    revalidateTag(CACHE_TAGS.service.byProfile(existingProfile.id));
-
-    // Revalidate specific pages
+    // Admin-specific revalidation
+    revalidatePath('/admin/profiles');
     revalidatePath(`/admin/profiles/${profileId}`);
-    if (existingProfile.username) {
-      revalidatePath(`/profile/${existingProfile.username}`);
-    }
 
     // Revalidate all service pages that belong to this profile
     existingProfile.services.forEach(service => {
@@ -142,6 +140,8 @@ export async function updateProfilePresentationAdmin(
         revalidatePath(`/s/${service.slug}`);
       }
     });
+
+    logCacheRevalidation('profile', existingProfile.id, 'admin presentation update');
 
     return {
       success: true,

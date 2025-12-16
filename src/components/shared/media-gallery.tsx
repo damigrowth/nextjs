@@ -1,5 +1,6 @@
 import React from 'react';
-import { AudioGallery, MediaCarousel } from '@/components';
+import AudioGallery from './audio-gallery';
+import MediaCarousel from './media-carousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { detectMediaType } from '@/lib/utils/media';
 

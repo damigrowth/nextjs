@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { NextLink, ProfileBadges, RatingDisplay } from '@/components';
+import { NextLink, ProfileBadges, RatingDisplay } from '../shared';
 import UserAvatar from '@/components/shared/user-avatar';
 import SocialLinks from '@/components/shared/social-links';
 import { Globe } from 'lucide-react';

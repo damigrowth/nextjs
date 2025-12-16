@@ -6,6 +6,9 @@
 import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
 
+// Re-export revalidation helpers for convenience
+export * from './revalidation';
+
 /**
  * Consistent cache tag naming convention
  * Using hierarchical structure for efficient invalidation
@@ -47,6 +50,7 @@ export const CACHE_TAGS = {
     services: 'services:all' as const,
     verifications: 'verifications:all' as const,
     profilesCategory: (category: string) => `profiles:category:${category}` as const,
+    profilesSubcategory: (subcategory: string) => `profiles:subcategory:${subcategory}` as const,
     servicesCategory: (category: string) => `services:category:${category}` as const,
   },
 
@@ -71,6 +75,36 @@ export const CACHE_TAGS = {
     services: 'admin:services' as const,
     verifications: 'admin:verifications' as const,
     all: 'admin:all' as const,
+  },
+
+  // Home page tag
+  home: 'page:home' as const,
+
+  // Review-related tags
+  review: {
+    byId: (id: number) => `review:id:${id}` as const,
+    byService: (serviceId: number) => `review:service:${serviceId}` as const,
+    byProfile: (profileId: string) => `review:profile:${profileId}` as const,
+    byUser: (userId: string) => `review:user:${userId}` as const,
+  },
+
+  // Dashboard pages
+  dashboard: {
+    user: (userId: string) => `dashboard:user:${userId}` as const,
+    messages: (userId: string) => `dashboard:messages:${userId}` as const,
+    services: (userId: string) => `dashboard:services:${userId}` as const,
+  },
+
+  // Directory/Archive pages (more specific)
+  directory: {
+    all: 'directory:all' as const,
+    category: (category: string) => `directory:category:${category}` as const,
+    subcategory: (subcategory: string) => `directory:subcategory:${subcategory}` as const,
+  },
+
+  categories: {
+    all: 'categories:all' as const,
+    category: (category: string) => `categories:category:${category}` as const,
   },
 } as const;
 

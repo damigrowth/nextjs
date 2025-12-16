@@ -23,6 +23,9 @@ import {
   // RotateCcw,
   ExternalLink,
   Undo2,
+  GitMerge,
+  RefreshCw,
+  Rocket,
 } from 'lucide-react';
 import {
   getGitStatus,
@@ -32,6 +35,9 @@ import {
   discardStagedChanges,
   // revertCommits,
   undoLastCommit,
+  mergeDatasetsToMain,
+  syncDatasetsWithMain,
+  resetDatasetsToMain,
 } from '@/actions/admin/git-operations';
 import { toast } from 'sonner';
 import { CommitForm } from './commit-form';
@@ -49,6 +55,17 @@ export function DeploymentManager() {
   const [discarding, setDiscarding] = useState(false);
   // const [reverting, setReverting] = useState<string | null>(null);
   const [undoing, setUndoing] = useState<string | null>(null);
+  const [deploying, setDeploying] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [resetting, setResetting] = useState(false);
+
+  // Helper function to generate Vercel preview URL
+  const getVercelPreviewUrl = (branch: string) => {
+    // Vercel preview URL format: project-git-branch-username.vercel.app
+    const projectName = 'doulitsa';
+    const username = 'damigrowth';
+    return `https://${projectName}-git-${branch}-${username}.vercel.app`;
+  };
 
   const loadGitStatus = async () => {
     const result = await getGitStatus();
@@ -222,6 +239,136 @@ export function DeploymentManager() {
       console.error(error);
     } finally {
       setUndoing(null);
+    }
+  };
+
+  const handleDeployToProduction = async () => {
+    const aheadCount = gitStatus?.ahead_by || 0;
+
+    if (aheadCount === 0) {
+      toast.info('No changes to deploy. Already up-to-date with production.');
+      return;
+    }
+
+    if (
+      !confirm(
+        `Deploy to Production?\n\n` +
+          `This will merge ${aheadCount} commit${aheadCount > 1 ? 's' : ''} from ${gitStatus?.branch} to main.\n\n` +
+          `This operation:\n` +
+          `• Merges ${gitStatus?.branch} → main\n` +
+          `• Triggers production deployment on Vercel\n` +
+          `• Makes changes live to all users\n\n` +
+          `Continue?`,
+      )
+    ) {
+      return;
+    }
+
+    setDeploying(true);
+
+    try {
+      const result = await mergeDatasetsToMain();
+
+      if (result.success && result.data) {
+        toast.success(result.data.message);
+        await loadGitStatus();
+        await loadRecentCommits();
+      } else {
+        toast.error(result.error || 'Failed to deploy to production');
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred');
+      console.error(error);
+    } finally {
+      setDeploying(false);
+    }
+  };
+
+  const handleSyncWithProduction = async () => {
+    const behindCount = gitStatus?.behind_by || 0;
+
+    if (behindCount === 0) {
+      toast.info('Already up-to-date with production.');
+      return;
+    }
+
+    if (
+      !confirm(
+        `Sync with Production?\n\n` +
+          `This will merge ${behindCount} commit${behindCount > 1 ? 's' : ''} from main into ${gitStatus?.branch}.\n\n` +
+          `This operation:\n` +
+          `• Merges main → ${gitStatus?.branch}\n` +
+          `• Updates ${gitStatus?.branch} with production changes\n` +
+          `• Triggers preview deployment on Vercel\n\n` +
+          `Continue?`,
+      )
+    ) {
+      return;
+    }
+
+    setSyncing(true);
+
+    try {
+      const result = await syncDatasetsWithMain();
+
+      if (result.success && result.data) {
+        toast.success(result.data.message);
+        await loadGitStatus();
+        await loadRecentCommits();
+      } else {
+        toast.error(result.error || 'Failed to sync with production');
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred');
+      console.error(error);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleResetToProduction = async () => {
+    const aheadCount = gitStatus?.ahead_by || 0;
+
+    if (aheadCount === 0) {
+      toast.info('Already in sync with production.');
+      return;
+    }
+
+    if (
+      !confirm(
+        `⚠️ WARNING: Reset ${gitStatus?.branch} to Production?\n\n` +
+          `This will PERMANENTLY DELETE ${aheadCount} commit${aheadCount > 1 ? 's' : ''} from ${gitStatus?.branch}:\n\n` +
+          recentCommits
+            .slice(0, aheadCount)
+            .map((c) => `- ${c.shortHash}: ${c.message}`)
+            .join('\n') +
+          `\n\nAfter reset:\n` +
+          `• ${gitStatus?.branch} will be identical to main\n` +
+          `• All test commits will be lost\n` +
+          `• Cannot be undone\n\n` +
+          `Are you absolutely sure?`,
+      )
+    ) {
+      return;
+    }
+
+    setResetting(true);
+
+    try {
+      const result = await resetDatasetsToMain();
+
+      if (result.success && result.data) {
+        toast.success(result.data.message);
+        await loadGitStatus();
+        await loadRecentCommits();
+      } else {
+        toast.error(result.error || 'Failed to reset branch');
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred');
+      console.error(error);
+    } finally {
+      setResetting(false);
     }
   };
 
@@ -427,16 +574,16 @@ export function DeploymentManager() {
         />
       )}
 
-      {/* Push to Remote */}
+      {/* Recent Commits */}
       {(loading || recentCommits.length > 0) && (
         <Card>
           <CardHeader>
             <CardTitle className='flex items-center gap-2 mb-2'>
-              <Upload className='h-5 w-5' />
-              Push Changes
+              <GitCommit className='h-5 w-5' />
+              Recent Commits
             </CardTitle>
             <CardDescription>
-              Push committed changes to remote repository
+              Latest commits on {gitStatus?.branch || 'current'} branch
             </CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
@@ -451,16 +598,15 @@ export function DeploymentManager() {
               <>
                 <Alert>
                   <AlertDescription>
-                    Your changes are committed locally. Push them to{' '}
-                    <Badge variant='outline'>{gitStatus?.branch}</Badge> to
-                    deploy.
+                    Commits are on GitHub and trigger automatic Vercel
+                    deployments.
                   </AlertDescription>
                 </Alert>
 
                 {/* Recent Commits */}
                 <div className='space-y-2'>
                   <h4 className='text-sm font-medium'>
-                    Committed changes to Push:
+                    Commits on {gitStatus?.branch}:
                   </h4>
                   <div className='space-y-2'>
                     {recentCommits.map((commit, index) => (
@@ -491,7 +637,8 @@ export function DeploymentManager() {
                             </span>
                           </div>
                           <div className='flex items-center gap-2'>
-                            <Button
+                            {/* Undo button commented out per user request */}
+                            {/* <Button
                               variant='ghost'
                               size='sm'
                               onClick={() =>
@@ -511,7 +658,8 @@ export function DeploymentManager() {
                                 : index === 0
                                   ? 'Undo'
                                   : `Undo ${index + 1}`}
-                            </Button>
+                            </Button> */}
+                            {/* Revert button already commented out */}
                             {/* <Button
                           variant='ghost'
                           size='sm'
@@ -524,8 +672,9 @@ export function DeploymentManager() {
                             ? 'Reverting...'
                             : 'Revert'}
                         </Button> */}
-                            <NextLink
-                              href={commit.url}
+                            {/* View Deployment button removed - commit badge already links to GitHub commit page */}
+                            {/* <NextLink
+                              href={getVercelPreviewUrl(gitStatus?.branch || 'datasets')}
                               target='_blank'
                               rel='noopener noreferrer'
                             >
@@ -535,9 +684,9 @@ export function DeploymentManager() {
                                 className='hover:bg-white'
                               >
                                 <ExternalLink className='h-3 w-3' />
-                                Preview
+                                View Deployment
                               </Button>
-                            </NextLink>
+                            </NextLink> */}
                           </div>
                         </div>
                         <p className='text-sm'>{commit.message}</p>
@@ -545,34 +694,114 @@ export function DeploymentManager() {
                     ))}
                   </div>
                 </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Branch Management */}
+      {!loading && gitStatus && (
+        <Card>
+          <CardHeader>
+            <CardTitle className='flex items-center gap-2 mb-2'>
+              <GitMerge className='h-5 w-5' />
+              Branch Management
+            </CardTitle>
+            <CardDescription>
+              Deploy to production or sync with production changes
+            </CardDescription>
+          </CardHeader>
+          <CardContent className='space-y-4'>
+            {/* Deploy to Production Section */}
+            {gitStatus.ahead_by !== undefined && gitStatus.ahead_by > 0 && (
+              <div className='space-y-3'>
+                <Alert>
+                  <Rocket className='h-4 w-4' />
+                  <AlertDescription>
+                    {gitStatus.branch} is{' '}
+                    <span className='font-bold'>{gitStatus.ahead_by}</span>{' '}
+                    commit{gitStatus.ahead_by !== 1 ? 's' : ''} ahead of main.
+                    Ready to deploy to production.
+                  </AlertDescription>
+                </Alert>
                 <div className='flex justify-center'>
                   <Button
-                    onClick={handlePush}
-                    disabled={pushing}
+                    onClick={handleDeployToProduction}
+                    disabled={deploying}
                     size='lg'
-                    variant='primary'
+                    className='bg-green-600 hover:bg-green-700'
                   >
-                    <Upload className='h-4 w-4' />
-                    {pushing ? (
-                      'Pushing...'
-                    ) : (
-                      <>
-                        Push to origin
-                        <Badge
-                          variant='secondary'
-                          className='ml-2 pr-1.5 rounded-full text-white bg-secondary/80 hover:bg-secondary/80'
-                        >
-                          {recentCommits.length}
-                          <ArrowUp
-                            style={{ height: '13px' }}
-                            className='mr-0'
-                          />
-                        </Badge>
-                      </>
-                    )}
+                    <Rocket
+                      className={`h-4 w-4 ${deploying ? 'animate-bounce' : ''}`}
+                    />
+                    {deploying ? 'Deploying...' : 'Deploy to Production'}
                   </Button>
                 </div>
-              </>
+              </div>
+            )}
+
+            {/* Sync with Production Section */}
+            {gitStatus.behind_by !== undefined && gitStatus.behind_by > 0 && (
+              <div className='space-y-3'>
+                <Alert variant='warning'>
+                  <AlertCircle className='h-4 w-4' />
+                  <AlertDescription>
+                    {gitStatus.branch} is{' '}
+                    <span className='font-bold'>{gitStatus.behind_by}</span>{' '}
+                    commit{gitStatus.behind_by !== 1 ? 's' : ''} behind main.
+                    Sync to get the latest production changes.
+                  </AlertDescription>
+                </Alert>
+                <div className='flex justify-center'>
+                  <Button
+                    onClick={handleSyncWithProduction}
+                    disabled={syncing}
+                    size='lg'
+                    variant='outline'
+                  >
+                    <RefreshCw
+                      className={`h-4 w-4 ${syncing ? 'animate-spin' : ''}`}
+                    />
+                    {syncing ? 'Syncing...' : 'Sync with Production'}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* All up-to-date */}
+            {gitStatus.ahead_by === 0 && gitStatus.behind_by === 0 && (
+              <Alert>
+                <CheckCircle className='h-4 w-4' />
+                <AlertDescription>
+                  {gitStatus.branch} is up-to-date with production (main
+                  branch).
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Reset to Production Section - Danger Zone */}
+            {gitStatus.ahead_by !== undefined && gitStatus.ahead_by > 0 && (
+              <div className='mt-4 pt-4 border-t'>
+                <Alert variant='destructive'>
+                  <AlertCircle className='h-4 w-4' />
+                  <AlertDescription className='text-sm'>
+                    Danger Zone: Reset will permanently delete all{' '}
+                    {gitStatus.ahead_by} commit
+                    {gitStatus.ahead_by !== 1 ? 's' : ''} ahead of main.
+                  </AlertDescription>
+                </Alert>
+                <div className='flex justify-center mt-3'>
+                  <Button
+                    onClick={handleResetToProduction}
+                    disabled={resetting}
+                    size='sm'
+                    variant='destructive'
+                  >
+                    {resetting ? 'Resetting...' : 'Reset to Production'}
+                  </Button>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>

@@ -59,7 +59,6 @@ export { AdminSkillsFilters } from './admin-skills-filters';
 export { AdminSkillsTableSection } from './admin-skills-table-section';
 export { AdminSkillsTableSkeleton } from './admin-skills-table-skeleton';
 export { ApiKeyManagement } from './api-key-management';
-export { ApiKeyPrompt } from './api-key-prompt';
 export { AppSidebar } from './app-sidebar';
 export { ChartAreaInteractive } from './chart-area-interactive';
 export { DataTable } from './data-table';

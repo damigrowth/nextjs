@@ -1,4 +1,3 @@
 export { AdminGuard } from './admin-guard'
-export { ClientAdminGuard } from './client-admin-guard'
 export { OAuthSetupGuard } from './oauth-setup-guard'
 export { OnboardingGuard } from './onboarding-guard'

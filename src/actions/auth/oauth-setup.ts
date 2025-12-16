@@ -33,8 +33,11 @@ export async function completeOAuth(
     // Determine the next step based on user type
     const nextStep = type === 'pro' ? 'ONBOARDING' : 'DASHBOARD';
 
+    // Get existing user image to preserve it (Better Auth updateUser may clear fields not included)
+    const existingImage = session.user.image;
+
     // Update user via Better Auth API (excludes role - managed by admin plugin)
-    // NOTE: Don't set 'image' here - it's already set from Google OAuth and should persist
+    // CRITICAL: Explicitly pass image to prevent Better Auth from clearing it
     await auth.api.updateUser({
       body: {
         username: username,
@@ -43,7 +46,7 @@ export async function completeOAuth(
         step: nextStep,
         provider: 'google', // Ensure provider stays as 'google'
         confirmed: true, // Google OAuth users are now confirmed after setup
-        // image is intentionally omitted to preserve Google profile picture
+        image: existingImage || undefined, // Preserve Google profile picture
       },
       headers: await headers(),
     });

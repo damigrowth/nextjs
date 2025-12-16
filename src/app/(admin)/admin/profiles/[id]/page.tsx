@@ -16,6 +16,7 @@ import {
 } from '@/components';
 import { Badge } from '@/components/ui/badge';
 import { SiteHeader } from '@/components/admin';
+import { EditProfileSettingsForm } from '@/components/admin/forms/edit-profile-settings-form';
 
 export const dynamic = 'force-dynamic';
 
@@ -267,6 +268,19 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                 <h2>Διαχείρηση Προφίλ</h2>
               </div>
               <div className='space-y-6'>
+                {/* Profile Settings */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>Ρυθμίσεις Προφίλ</CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Κατάσταση δημοσίευσης, προβολής και επαλήθευσης
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <EditProfileSettingsForm profile={profile} />
+                  </CardContent>
+                </Card>
+
                 {/* Account Information */}
                 <Card>
                   <CardHeader>

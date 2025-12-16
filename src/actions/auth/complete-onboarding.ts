@@ -93,6 +93,30 @@ export async function completeOnboarding(
     const processedImage = processImageForDatabase(data.image);
     const sanitizedPortfolio = sanitizeCloudinaryResources(data.portfolio);
 
+    // CRITICAL: Validate image is required for pro users and not a blob URL
+    if (!processedImage || processedImage.length === 0) {
+      return {
+        success: false,
+        message: 'Η εικόνα προφίλ είναι υποχρεωτική για επαγγελματικό προφίλ',
+      };
+    }
+
+    // Reject blob URLs (client-side temporary URLs that should never be saved to database)
+    if (processedImage.startsWith('blob:')) {
+      return {
+        success: false,
+        message: 'Η εικόνα δεν έχει ανέβει. Παρακαλώ περιμένετε να ολοκληρωθεί το ανέβασμα και δοκιμάστε ξανά.',
+      };
+    }
+
+    // Ensure it's a valid HTTPS URL (Cloudinary or Google OAuth)
+    if (!processedImage.startsWith('https://')) {
+      return {
+        success: false,
+        message: 'Μη έγκυρη διεύθυνση εικόνας προφίλ',
+      };
+    }
+
     // Create or update profile with onboarding data
     const profile = await prisma.profile.upsert({
       where: { uid: user.id },

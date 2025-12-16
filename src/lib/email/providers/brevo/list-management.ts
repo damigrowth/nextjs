@@ -262,6 +262,45 @@ export class BrevoListManagementService {
       };
     }
   }
+
+  /**
+   * Delete contact completely from Brevo
+   * This removes the contact from ALL lists and deletes all contact data
+   * Used for GDPR compliance when users delete their account
+   */
+  async deleteContact(
+    email: string
+  ): Promise<{ success: boolean; message?: string }> {
+    try {
+      const response = await fetch(
+        `https://api.brevo.com/v3/contacts/${encodeURIComponent(email)}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Accept': 'application/json',
+            'api-key': process.env.BREVO_API_KEY || '',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        // Contact not found is not an error for deletion
+        if (response.status === 404 || errorData.code === 'document_not_found') {
+          return { success: true, message: 'Contact not found or already deleted' };
+        }
+        throw new Error(`Brevo API error: ${response.status} - ${JSON.stringify(errorData)}`);
+      }
+
+      return { success: true, message: 'Contact deleted from Brevo' };
+    } catch (error) {
+      console.error(`Failed to delete contact ${email} from Brevo:`, error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to delete contact',
+      };
+    }
+  }
 }
 
 // Export singleton instance
