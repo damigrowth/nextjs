@@ -87,17 +87,17 @@ const STEPS = [
     id: 1,
     title: 'Τύπος υπηρεσίας',
     description:
-      'Παρέχετε την συγκεκριμένη υπηρεσία, με την φυσική σας παρουσία ή online (απομακρυσμένα);',
+      'Η συγκεκριμένη υπηρεσία παρέχεται με την φυσική σας παρουσία ή online (απομακρυσμένα);',
   },
   {
     id: 2,
-    title: 'Τόπος/Τρόπος παροχής',
-    description: 'Καθορίστε πώς θα παρέχετε την υπηρεσία',
+    title: 'Τρόπος παροχής',
+    description: 'Με ποιον τρόπο παρέχεται η συγκεκριμένη υπηρεσία;',
   },
   {
     id: 3,
     title: 'Στοιχεία υπηρεσίας',
-    description: 'Συμπληρώστε τα βασικά στοιχεία της υπηρεσίας σας',
+    description: 'Συμπληρώστε τα βασικά στοιχεία της υπηρεσίας',
   },
   {
     id: 4,
@@ -225,7 +225,7 @@ export default function CreateServiceForm({
       const result = await saveServiceAsDraftAction(null, formData);
 
       if (result.success && result.message) {
-        toast.success('Η υπηρεσία αποθηκεύτηκε ως προσχέδιο επιτυχώς!');
+        toast.success('Η υπηρεσία αποθηκεύτηκε επιτυχώς!');
         setTimeout(() => {
           setShowDraftDialog(false);
           form.reset();
@@ -604,7 +604,7 @@ export default function CreateServiceForm({
                 Δημιουργία Υπηρεσίας
               </h1>
               <p className='text-gray-600 mt-1'>
-                Με αυτήν τη φόρμα μπορείτε να προσθέσετε νέες υπηρεσίες.
+                Από αυτήν τη φόρμα μπορείτε να προσθέσετε κάθε υπηρεσία που προσφέρετε.
               </p>
             </div>
             <div className='flex items-center space-x-3'>
@@ -636,8 +636,7 @@ export default function CreateServiceForm({
                     <AlertDialogHeader>
                       <AlertDialogTitle>Καθαρισμός φόρμας</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Θέλετε να καθαρίσετε όλα τα δεδομένα της φόρμας; Αυτή η
-                        ενέργεια δεν μπορεί να αναιρεθεί.
+                        Θέλετε να σβηστούν όλα τα δεδομένα της φόρμας που συμπληρώσατε;
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -796,7 +795,7 @@ export default function CreateServiceForm({
         </div>
 
         {/* Current Step Content */}
-        <Card className="relative">
+        <Card className="relative bg-sidebar">
           {!(
             currentStep === 5 &&
             (isPending || isPreparingSubmit)
@@ -827,7 +826,7 @@ export default function CreateServiceForm({
               <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
                 <div className="text-center space-y-3">
                   <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                  <p className="text-sm text-gray-600">Ανακατεύθυνση στη σελίδα επιτυχίας...</p>
+                  <p className="text-sm text-gray-600">Ανακατεύθυνση στη σελίδα ολοκλήρωσης...</p>
                 </div>
               </div>
             )}

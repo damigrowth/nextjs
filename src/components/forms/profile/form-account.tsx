@@ -166,7 +166,7 @@ export default function AccountForm({
           const formData = new FormData(e.currentTarget);
           handleFormAction(formData);
         }}
-        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
+        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg shadow bg-sidebar'}
       >
         {/* Profile Image - For all user types */}
         <FormField
@@ -178,7 +178,7 @@ export default function AccountForm({
                 Εικόνα Προφίλ*
               </FormLabel>
               <p className='text-sm text-gray-600'>
-                Λογότυπο ή μία εικόνα/φωτογραφία χωρίς κείμενο.
+                Μία εικόνα/φωτογραφία χωρίς κείμενο ή λογότυπο. Για καλύτερη εμφάνιση προτείνονται τετράγωνες εικόνες.
               </p>
               <FormControl>
                 <MediaUpload

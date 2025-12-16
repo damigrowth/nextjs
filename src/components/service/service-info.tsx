@@ -89,7 +89,7 @@ export default function ServiceInfo({
         <div className='sm:col-span-1 md:col-span-1'>
           <IconBox
             icon={<Clock className='h-10 w-10' />}
-            title='Χρόνος Παράδοσης'
+            title='Ημέρες παράδοσης'
             value={
               duration > 1 ? duration + ' ' + 'Μέρες' : duration + ' ' + 'Μέρα'
             }

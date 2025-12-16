@@ -155,14 +155,6 @@ export function AdminVerificationsDataTable({
       enableHiding: false,
     },
     {
-      accessorKey: 'id',
-      header: 'ID',
-      cell: ({ row }) => {
-        const id = row.original.id;
-        return <CopyableText text={id.slice(0, 8)} className='text-xs' />;
-      },
-    },
-    {
       accessorKey: 'status',
       header: ({ column }) => {
         return (
@@ -238,22 +230,6 @@ export function AdminVerificationsDataTable({
                 </p>
               </div>
             </div>
-          </NextLink>
-        );
-      },
-    },
-    {
-      id: 'user',
-      header: 'User',
-      cell: ({ row }) => {
-        const verification = row.original;
-        const user = verification.profile.user;
-        return (
-          <NextLink
-            href={`/admin/users/${verification.uid}`}
-            className='hover:underline'
-          >
-            <CopyableText text={user.email} className='text-sm' />
           </NextLink>
         );
       },

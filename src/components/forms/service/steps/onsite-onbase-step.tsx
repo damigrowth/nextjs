@@ -103,7 +103,7 @@ export default function OnsiteOnbaseStep({ disabledOptions }: OnsiteOnbaseStepPr
                       : 'text-gray-600'
                 }`}
               >
-                Ο πελάτης έρχεται στον χώρο σας (γραφείο, κατάστημα, εργαστήριο, κτλ.)
+                Ο πελάτης έρχεται στον χώρο σας (γραφείο, κατάστημα κλπ.)
               </p>
             </div>
 
@@ -163,7 +163,7 @@ export default function OnsiteOnbaseStep({ disabledOptions }: OnsiteOnbaseStepPr
                       : 'text-gray-600'
                 }`}
               >
-                Επισκέπτεστε τον πελάτη στον χώρο του (σπίτι, γραφείο, επιχείρηση)
+                Επισκέπτεστε τον πελάτη στον χώρο του
               </p>
             </div>
 
@@ -181,18 +181,18 @@ export default function OnsiteOnbaseStep({ disabledOptions }: OnsiteOnbaseStepPr
       {(disabledOptions?.onbase || disabledOptions?.onsite) && (
         <div className="mt-4 space-y-2">
           {disabledOptions?.onbase && (
-            <Alert className="border-orange-200 bg-orange-50">
-              <AlertCircle className="h-4 w-4 text-orange-600" />
-              <AlertDescription className="text-orange-800">
-                Δεν μπορείτε να επιλέξετε "Στον χώρο μου" γιατί δεν έχετε συμπληρώσει το αντίστοιχο πεδίο στη Διαχείριση Προφίλ.
+            <Alert className="border-gray-200 bg-gray-50">
+              <AlertCircle className="h-4 w-4 text-gray-600" />
+              <AlertDescription className="text-gray-700">
+                Για να επιλέξετε "Στον χώρο μου" ενεργοποιήστε το από τη Διαχείριση Προφίλ (Τρόποι Παροχής).
               </AlertDescription>
             </Alert>
           )}
           {disabledOptions?.onsite && (
-            <Alert className="border-orange-200 bg-orange-50">
-              <AlertCircle className="h-4 w-4 text-orange-600" />
-              <AlertDescription className="text-orange-800">
-                Δεν μπορείτε να επιλέξετε "Στον χώρο του πελάτη" γιατί δεν έχετε συμπληρώσει το αντίστοιχο πεδίο στη Διαχείριση Προφίλ.
+            <Alert className="border-gray-200 bg-gray-50">
+              <AlertCircle className="h-4 w-4 text-gray-600" />
+              <AlertDescription className="text-gray-700">
+              Για να επιλέξετε "Στον χώρο του πελάτη" ενεργοποιήστε το από τη Διαχείριση Προφίλ (Τρόποι Παροχής).
               </AlertDescription>
             </Alert>
           )}

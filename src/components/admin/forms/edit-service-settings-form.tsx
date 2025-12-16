@@ -109,9 +109,6 @@ export function EditServiceSettingsForm({ service }: EditServiceSettingsFormProp
                   <SelectItem value='inactive'>Inactive</SelectItem>
                 </SelectContent>
               </Select>
-              <FormDescription>
-                Control the visibility and approval status of this service
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

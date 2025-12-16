@@ -50,7 +50,7 @@ export function AdminProfilesFilters() {
       <div className='flex-1 relative'>
         <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
         <Input
-          placeholder='Search profiles...'
+          placeholder='Αναζήτηση προφίλ...'
           defaultValue={searchParams.get('search') || ''}
           onChange={handleSearchChange}
           className='pl-9'
@@ -64,7 +64,7 @@ export function AdminProfilesFilters() {
           <SelectValue placeholder='Role' />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value='all'>All Roles</SelectItem>
+          <SelectItem value='all'>Τύπος</SelectItem>
           <SelectItem value='freelancer'>Professional</SelectItem>
           <SelectItem value='company'>Company</SelectItem>
         </SelectContent>

@@ -37,6 +37,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
   return (
     <SidebarGroup>
       <SidebarGroupContent className='flex flex-col gap-2'>
+        {/*
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -53,6 +54,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
           open={quickCreateOpen}
           onOpenChange={setQuickCreateOpen}
         />
+        */}
         <SidebarMenu>
           {items.map((item) => {
             const isActive =

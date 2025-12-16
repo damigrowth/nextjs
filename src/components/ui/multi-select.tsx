@@ -158,7 +158,7 @@ export function MultiSelect({
       onKeyDown={handleKeyDown}
       className={`overflow-visible bg-transparent ${className || ''}`}
     >
-      <div ref={containerRef} className='group relative flex items-center rounded-md border border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring'>
+      <div ref={containerRef} className='group relative flex items-center rounded-md bg-white border-2 border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring'>
         <div className='flex flex-wrap gap-1 flex-1 pr-8'>
           {selectedOptions.map((option) => (
             <Badge
@@ -194,7 +194,7 @@ export function MultiSelect({
               isMaxReached ? `Maximum ${maxItems} items` : placeholder
             }
             disabled={isMaxReached || disabled}
-            className='ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
+            className='ml-2 flex-1 outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
           />
         </div>
         {showClearAll && selectedOptions.length > 0 && (

@@ -375,12 +375,12 @@ async function createServiceInternal(
     if (status === 'draft') {
       return {
         success: true,
-        message: 'Η υπηρεσία αποθηκεύτηκε ως προσχέδιο επιτυχώς!',
+        message: 'Η υπηρεσία αποθηκεύτηκε ως προσχέδιο!',
       };
     } else {
       return {
         success: true,
-        message: 'Η υπηρεσία υποβλήθηκε για έγκριση επιτυχώς!',
+        message: 'Η υπηρεσία υποβλήθηκε για έγκριση!',
         serviceId: createdService!.id,
         serviceTitle: createdService!.title,
       };

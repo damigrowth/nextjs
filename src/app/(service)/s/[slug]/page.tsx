@@ -127,7 +127,7 @@ export default async function ServicePage({
 
       {/* Service Content */}
       <section className='pt-4'>
-        <div className='container mx-auto px-4'>
+        <div className='container mx-auto px-4 lg:px-10'>
           <div className='relative grid grid-cols-1 lg:grid-cols-3 gap-28'>
             {/* Main Content */}
             <div className='lg:col-span-2 space-y-6'>

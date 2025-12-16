@@ -251,7 +251,7 @@ export default function TaxonomySelector({
             <div
               role='combobox'
               aria-expanded={open}
-              className='group relative flex items-center rounded-md border border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring cursor-pointer'
+              className='group relative flex items-center rounded-md bg-white border-2 border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring cursor-pointer'
               onClick={() => !disabled && setOpen(!open)}
             >
               <div className='flex flex-wrap gap-1 flex-1 pr-8'>

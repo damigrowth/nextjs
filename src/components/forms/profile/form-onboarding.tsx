@@ -546,7 +546,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
                   onChange={handleBioChange}
                 />
               </FormControl>
-              <div className='text-sm text-gray-500'>
+              <div className='text-xs text-gray-500'>
                 {field.value.length}/80 χαρακτήρες
               </div>
               <FormMessage />
@@ -618,7 +618,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
 
         {/* Conditional Onbase Section - Matches coverage form */}
         {watchedCoverage?.onbase && (
-          <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md'>
+          <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md shadow border'>
             <h5 className='font-medium text-gray-900'>
               Στοιχεία για τον χώρο σας
             </h5>
@@ -738,7 +738,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
 
         {/* Onsite Section - Matches coverage form with MultiSelect */}
         {watchedCoverage?.onsite && (
-          <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md'>
+          <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md shadow border'>
             <h5 className='font-medium text-gray-900'>Περιοχές κάλυψης</h5>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               {/* Counties MultiSelect */}

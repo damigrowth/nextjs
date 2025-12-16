@@ -36,7 +36,7 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
         <h2 className='text-2xl font-bold text-gray-900 mb-2'>Κατηγορίες</h2>
       </div>
 
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
         {categories.map((category) => (
           <Card
             key={category.id}
@@ -66,7 +66,7 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
                     </NextLink>
                   </CardTitle>
                   {category.description && (
-                    <CardDescription className='text-sm text-gray-600 line-clamp-2'>
+                    <CardDescription className='text-sm text-gray-600 line-clamp-3'>
                       {category.description}
                     </CardDescription>
                   )}

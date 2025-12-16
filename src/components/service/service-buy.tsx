@@ -65,7 +65,7 @@ export default function ServiceBuy({
       recipientName={profileDisplayName}
       initialMessage={buildInitialMessage()}
       customTrigger={buttonText}
-      className={compact ? 'w-full' : 'w-full max-w-md mx-auto'}
+      className={compact ? 'w-full' : 'w-full mx-auto'}
     />
   );
 }

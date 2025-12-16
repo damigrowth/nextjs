@@ -412,7 +412,7 @@ export function ArchiveSidebarFilters({
       </div>
 
       {/* Clear Button */}
-      <div className='absolute bottom-0 left-0 right-0 p-6 bg-white border-t'>
+      <div className='absolute bottom-0 left-0 right-0 p-6 bg-silver border-t'>
         <Button
           variant='outline'
           onClick={handleClearAll}

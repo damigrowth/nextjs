@@ -334,7 +334,7 @@ export default function CoverageForm({
 
         {/* Conditional Onbase Section */}
         {watchedCoverage?.onbase && (
-          <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md'>
+          <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md shadow border'>
             <h5 className='font-medium text-gray-900'>
               Στοιχεία για τον χώρο σας
             </h5>
@@ -452,7 +452,7 @@ export default function CoverageForm({
 
         {/* Onsite Section */}
         {watchedCoverage?.onsite && (
-          <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md'>
+          <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md shadow border'>
             <h5 className='font-medium text-gray-900'>Περιοχές κάλυψης</h5>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               {/* Counties MultiSelect */}

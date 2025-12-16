@@ -19,7 +19,7 @@ const HomeSearch = React.forwardRef<HTMLFormElement, HomeSearchProps>(
   (
     {
       className,
-      placeholder = 'Τι ψάχνεις;',
+      placeholder = 'Τι υπηρεσία ψάχνεις;',
       buttonText = 'Αναζήτηση',
       ...props
     },

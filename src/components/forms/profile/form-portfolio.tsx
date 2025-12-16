@@ -167,7 +167,7 @@ export default function PortfolioForm({
           const formData = new FormData(e.currentTarget);
           handleFormSubmit(formData);
         }}
-        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
+        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg shadow bg-sidebar'}
       >
         {!hideCard && <h3 className='text-lg font-medium'>Δείγμα Εργασιών</h3>}
 

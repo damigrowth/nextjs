@@ -102,14 +102,14 @@ export default function OneoffSubscriptionStep() {
                   typeValues?.oneoff ? 'text-green-900' : 'text-gray-900'
                 }`}
               >
-                Μια φορά (one-off)
+                Υπηρεσία μιας φοράς
               </h3>
               <p
                 className={`text-sm mt-2 ${
                   typeValues?.oneoff ? 'text-green-700' : 'text-gray-600'
                 }`}
               >
-                Η υπηρεσία εκτελείται μια φορά χωρίς να επαναλαμβάνεται αυτόματα
+                Η υπηρεσία εκτελείται μια φορά χωρίς να επαναλαμβάνεται
               </p>
             </div>
 
@@ -148,14 +148,14 @@ export default function OneoffSubscriptionStep() {
                   typeValues?.subscription ? 'text-green-900' : 'text-gray-900'
                 }`}
               >
-                Συνδρομή
+                Υπηρεσία συνδρομής
               </h3>
               <p
                 className={`text-sm mt-2 ${
                   typeValues?.subscription ? 'text-green-700' : 'text-gray-600'
                 }`}
               >
-                Η υπηρεσία παρέχεται συνεχώς με τακτική επανάληψη
+                Η υπηρεσία επαναλαμβάνεται <br></br>(π.χ. μαθήματα, συνεδρίες, συμβάσεις κλπ.)
               </p>
             </div>
 
@@ -174,10 +174,10 @@ export default function OneoffSubscriptionStep() {
         <div className='space-y-4'>
           <div className='text-center'>
             <h4 className='text-lg font-medium text-gray-900'>
-              Επιλέξτε περίοδο συνδρομής
+              Επιλέξτε περίοδο πληρωμής
             </h4>
             <p className='text-sm text-gray-600 mt-1'>
-              Πόσο συχνά θα επαναλαμβάνεται η συνδρομή;
+              Με ποιον τρόπο υπολογίζεται η πληρωμή της συγκεκριμένης υπηρεσίας;
             </p>
           </div>
 

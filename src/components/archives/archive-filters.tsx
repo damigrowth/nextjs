@@ -71,7 +71,7 @@ export function ArchiveFilters({
   return (
     <div
       className={cn(
-        'flex items-center bg-white border-b border-gray-200 py-4',
+        'flex items-center border-b border-gray-200 py-4',
         className,
       )}
     >
