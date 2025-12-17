@@ -20,16 +20,19 @@ import {
   adminToggleServiceSchema,
   adminUpdateServiceStatusSchema,
   adminDeleteServiceSchema,
+  adminCreateServiceSchema,
   type AdminListServicesInput,
   type AdminUpdateServiceInput,
   type AdminToggleServiceInput,
   type AdminUpdateServiceStatusInput,
   type AdminDeleteServiceInput,
+  type AdminCreateServiceInput,
 } from '@/lib/validations/admin';
 import {
   updateServiceMediaSchema,
   createServiceSchema,
-  type UpdateServiceMediaInput
+  type UpdateServiceMediaInput,
+  type CreateServiceInput,
 } from '@/lib/validations/service';
 import type { ActionResult } from '@/lib/types/api';
 import { getAdminSession } from './helpers';
@@ -1409,6 +1412,208 @@ export async function getServiceStats() {
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to get service stats',
+    };
+  }
+}
+
+/**
+ * Admin create service for a specific profile
+ */
+export async function createServiceForProfile(
+  prevState: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    // 1. Verify admin session
+    await getAdminSession();
+
+    // 2. Extract profile ID from form data
+    const profileId = formData.get('profileId') as string;
+    if (!profileId) {
+      return {
+        success: false,
+        error: 'Profile ID is required',
+      };
+    }
+
+    // 3. Verify profile exists and has correct role
+    const profile = await prisma.profile.findUnique({
+      where: { id: profileId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            displayName: true,
+            username: true,
+            role: true,
+          },
+        },
+      },
+    });
+
+    if (!profile) {
+      return {
+        success: false,
+        error: 'Profile not found',
+      };
+    }
+
+    if (profile.user.role !== 'freelancer' && profile.user.role !== 'company') {
+      return {
+        success: false,
+        error: 'Services can only be assigned to freelancers or companies',
+      };
+    }
+
+    // 4. Parse and validate service data
+    const serviceData: Partial<CreateServiceInput> = {
+      type: formData.has('type') ? JSON.parse(formData.get('type') as string) : undefined,
+      subscriptionType: (formData.get('subscriptionType') as any) || undefined,
+      title: formData.get('title') as string,
+      description: formData.get('description') as string,
+      category: formData.get('category') as string,
+      subcategory: formData.get('subcategory') as string,
+      subdivision: formData.get('subdivision') as string,
+      tags: formData.has('tags') ? JSON.parse(formData.get('tags') as string) : [],
+      price: formData.has('price') ? Number(formData.get('price')) : 0,
+      fixed: formData.get('fixed') === 'true',
+      duration: formData.has('duration') ? Number(formData.get('duration')) : 0,
+      addons: formData.has('addons') ? JSON.parse(formData.get('addons') as string) : [],
+      faq: formData.has('faq') ? JSON.parse(formData.get('faq') as string) : [],
+      media: formData.has('media') ? JSON.parse(formData.get('media') as string) : [],
+    };
+
+    const validationResult = createServiceSchema.safeParse(serviceData);
+
+    if (!validationResult.success) {
+      return {
+        success: false,
+        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+      };
+    }
+
+    const data = validationResult.data;
+
+    // 5. Create service in transaction with slug generation
+    const createdService = await prisma.$transaction(async (tx) => {
+      const title = data.title || '';
+      const description = data.description || '';
+
+      const service = await tx.service.create({
+        data: {
+          pid: profile.id,
+          title: title,
+          titleNormalized: normalizeTerm(title),
+          description: description,
+          descriptionNormalized: normalizeTerm(description),
+          category: data.category || '',
+          subcategory: data.subcategory || '',
+          subdivision: data.subdivision || '',
+          tags: data.tags || [],
+          price: data.price || 0,
+          fixed: data.fixed ?? true,
+          type: data.type || {
+            presence: false,
+            online: false,
+            oneoff: false,
+            onbase: false,
+            subscription: false,
+            onsite: false,
+          },
+          subscriptionType: data.subscriptionType || null,
+          duration: data.duration || 0,
+          addons: (data.addons || []).filter(
+            (
+              addon,
+            ): addon is {
+              title: string;
+              description: string;
+              price: number;
+            } =>
+              Boolean(
+                addon.title && addon.description && addon.price !== undefined,
+              ),
+          ),
+          faq: (data.faq || []).filter(
+            (faq): faq is { question: string; answer: string } =>
+              Boolean(faq.question && faq.answer),
+          ),
+          media: data.media || [],
+          status: 'pending', // Admin-created services need review
+          featured: false,
+        },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          pid: true,
+          category: true,
+        },
+      });
+
+      // Generate slug with the auto-generated ID and update service
+      const slug = generateServiceSlug(title, service.id.toString());
+      await tx.service.update({
+        where: { id: service.id },
+        data: { slug },
+      });
+
+      return { ...service, slug };
+    });
+
+    // 6. Invalidate caches
+    await invalidateServiceCaches({
+      serviceId: createdService.id,
+      slug: createdService.slug,
+      pid: createdService.pid,
+      category: createdService.category,
+      userId: profile.user.id,
+      profileId: profile.id,
+      profileUsername: profile.username,
+    });
+
+    // 7. Send email notification to profile owner (not admin)
+    if (profile.user.email) {
+      try {
+        await sendServicePublishedEmail(
+          {
+            id: createdService.id,
+            title: createdService.title,
+            slug: createdService.slug || '',
+          },
+          {
+            email: profile.user.email,
+            displayName: profile.user.displayName,
+            username: profile.user.username,
+          }
+        );
+      } catch (emailError) {
+        console.error('[Email] Failed to send service published notification:', emailError);
+        // Don't block service creation if email fails
+      }
+    }
+
+    return {
+      success: true,
+      message: 'Service created and published successfully',
+      data: {
+        serviceId: createdService.id,
+        serviceTitle: createdService.title,
+        serviceSlug: createdService.slug,
+      },
+    };
+  } catch (error) {
+    console.error('Error creating service for profile:', error);
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: 'Invalid parameters',
+      };
+    }
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to create service',
     };
   }
 }
