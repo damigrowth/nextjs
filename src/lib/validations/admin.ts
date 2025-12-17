@@ -384,6 +384,14 @@ export const adminDeleteServiceSchema = z.object({
   serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
 });
 
+// Admin create service schema - combines create service schema with profile assignment
+// Using .and() instead of .extend() because createServiceSchema contains refinements
+export const adminCreateServiceSchema = createServiceSchema.and(
+  z.object({
+    profileId: z.string().min(1, 'Profile ID is required'),
+  })
+);
+
 // Note: Admin service forms should use the same validation schemas as dashboard
 // Import from '@/lib/validations/service' instead of defining duplicates
 // Available schemas: serviceEditSchema, formServiceAddonSchema, formServiceFaqSchema, etc.
@@ -399,6 +407,7 @@ export type AdminUpdateServiceStatusInput = z.infer<
   typeof adminUpdateServiceStatusSchema
 >;
 export type AdminDeleteServiceInput = z.infer<typeof adminDeleteServiceSchema>;
+export type AdminCreateServiceInput = z.infer<typeof adminCreateServiceSchema>;
 
 // =============================================
 // ADMIN VERIFICATION MANAGEMENT SCHEMAS

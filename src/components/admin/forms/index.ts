@@ -11,6 +11,8 @@ export { EditServiceSettingsForm } from './edit-service-settings-form';
 export { EditServiceAddonsForm } from './edit-service-addons-form';
 export { EditServiceFaqForm } from './edit-service-faq-form';
 export { EditServiceMediaForm } from './edit-service-media-form';
+export { AdminCreateServiceForm } from './admin-create-service-form';
+export { ProfileSelector } from './profile-selector';
 
 // Profile forms
 export { EditProfileSettingsForm } from './edit-profile-settings-form';
