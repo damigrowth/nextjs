@@ -1609,7 +1609,6 @@ export async function createServiceForProfile(
       return {
         success: false,
         error: 'Invalid parameters',
-        details: error.issues,
       };
     }
     return {

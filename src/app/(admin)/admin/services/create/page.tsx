@@ -4,6 +4,8 @@ import { AdminCreateServiceForm } from '@/components/admin/forms/admin-create-se
 import { listProfiles } from '@/actions/admin/profiles';
 import type { LazyComboboxOption } from '@/components/ui/lazy-combobox';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Δημιουργία Υπηρεσίας | Admin',
   description: 'Δημιουργήστε μια νέα υπηρεσία και αναθέστε την σε ένα προφίλ',
@@ -42,10 +44,7 @@ export default async function AdminCreateServicePage() {
 
   return (
     <>
-      <SiteHeader
-        title='Δημιουργία Υπηρεσίας'
-        description='Δημιουργήστε μια νέα υπηρεσία και αναθέστε την σε ένα προφίλ'
-      />
+      <SiteHeader title='Δημιουργία Υπηρεσίας' />
       <div className='flex flex-col gap-4 pb-6 pt-4 md:gap-6'>
         <div className='px-4 lg:px-6'>
           <AdminCreateServiceForm profileOptions={profileOptions} />
