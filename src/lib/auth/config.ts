@@ -2,6 +2,7 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { nextCookies } from 'better-auth/next-js';
 import { admin, apiKey, jwt } from 'better-auth/plugins';
+import { localization } from 'better-auth-localization';
 import { User } from '@prisma/client';
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from '@/lib/email';
 import { brevoListManager } from '@/lib/email/providers/brevo/list-management';
@@ -408,6 +409,10 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    localization({
+      defaultLocale: 'el-GR',
+      fallbackLocale: 'default',
+    }),
     admin({
       defaultRole: 'user',
       adminRoles: ['admin'],
