@@ -17,6 +17,7 @@ const EL_GR: Record<string, string> = {
   USER_EMAIL_NOT_FOUND: 'Το email του χρήστη δεν βρέθηκε',
   USER_ALREADY_HAS_PASSWORD: 'Ο χρήστης έχει ήδη κωδικό',
   EMAIL_ALREADY_EXISTS: 'Το email δεν είναι διαθέσιμο',
+  USERNAME_ALREADY_EXISTS: 'Το συγκεκριμένο username χρησιμοποιείται ήδη. Επιλέξτε ένα διαφορετικό username.',
   ACCOUNT_BLOCKED: 'Ο λογαριασμός έχει αποκλειστεί',
 
   // Session related errors
@@ -73,6 +74,9 @@ const FIELD_MAPPING: Record<string, string> = {
   PASSWORD_TOO_LONG: 'password',
   USER_ALREADY_HAS_PASSWORD: 'password',
 
+  // Username related
+  USERNAME_ALREADY_EXISTS: 'username',
+
   // Token related
   INVALID_TOKEN: 'token',
   ID_TOKEN_NOT_SUPPORTED: 'token',
@@ -123,6 +127,9 @@ const ERROR_PATTERNS: Array<{ pattern: RegExp; code: string }> = [
   { pattern: /account.*not.*found/i, code: 'ACCOUNT_NOT_FOUND' },
   { pattern: /account.*blocked|blocked.*account/i, code: 'ACCOUNT_BLOCKED' },
 
+  // Username patterns
+  { pattern: /username.*already.*exists|duplicate.*username|username.*taken|username.*unique/i, code: 'USERNAME_ALREADY_EXISTS' },
+
   // Social auth patterns
   { pattern: /social.*account.*already.*linked/i, code: 'SOCIAL_ACCOUNT_ALREADY_LINKED' },
   { pattern: /provider.*not.*found/i, code: 'PROVIDER_NOT_FOUND' },
@@ -145,6 +152,16 @@ function detectErrorCode(error: any): string {
   // Then check the error body for code
   if (error?.body?.code && EL_GR[error.body.code]) {
     return error.body.code;
+  }
+
+  // Check for Prisma unique constraint violations (P2002)
+  if (error?.code === 'P2002' || error?.body?.code === 'P2002') {
+    const target = error?.meta?.target || error?.body?.meta?.target || [];
+    if (Array.isArray(target) && target.includes('username')) {
+      return 'USERNAME_ALREADY_EXISTS';
+    }
+    // Default to email for other unique constraint violations
+    return 'EMAIL_ALREADY_EXISTS';
   }
 
   // Fallback to message pattern matching
