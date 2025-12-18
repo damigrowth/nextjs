@@ -53,10 +53,12 @@ export function ProfileSelector({
 
   return (
     <LazyCombobox
+      trigger='search'
+      clearable={true}
       options={options}
       value={value || ''}
       onSelect={handleSelect}
-      placeholder='Επιλέξτε προφίλ...'
+      placeholder='Πληκτρολογήστε για αναζήτηση προφίλ...'
       searchPlaceholder='Αναζήτηση προφίλ...'
       emptyMessage='Δεν βρέθηκαν προφίλ.'
       formatLabel={formatLabel}
