@@ -3,7 +3,8 @@
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+// O(1) optimized taxonomy lookups
+import { getServiceTaxonomies } from '@/lib/taxonomies';
 // Complex utilities - KEEP for hierarchy resolution
 import { resolveTaxonomyHierarchy } from '@/lib/utils/datasets';
 import type { ActionResult } from '@/lib/types/api';
@@ -19,7 +20,7 @@ import type {
 function transformServiceForTable(service: any): UserServiceTableData {
   // Resolve taxonomy labels using the reusable utility
   const taxonomyLabels = resolveTaxonomyHierarchy(
-    serviceTaxonomies,
+    getServiceTaxonomies(),
     service.category,
     service.subcategory,
     service.subdivision,

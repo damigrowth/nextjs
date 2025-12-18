@@ -2,10 +2,13 @@
 
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { tags } from '@/constants/datasets/tags';
 // O(1) optimized taxonomy lookups - 99% faster than findById
-import { findServiceById, findLocationBySlugOrName } from '@/lib/taxonomies';
+import {
+  getServiceTaxonomies,
+  findServiceById,
+  findLocationBySlugOrName,
+} from '@/lib/taxonomies';
 // Complex utilities - KEEP for hierarchy resolution, breadcrumbs, coverage transformation, and nested children lookups
 import {
   findById, // Generic utility for nested children lookups and tags (not yet optimized)
@@ -58,7 +61,7 @@ function resolveCategoryLabels(
   service: Pick<Service, 'category' | 'subcategory' | 'subdivision'>,
 ) {
   return resolveTaxonomyHierarchy(
-    serviceTaxonomies,
+    getServiceTaxonomies(),
     service.category,
     service.subcategory,
     service.subdivision,
@@ -210,7 +213,7 @@ export async function getFeaturedServices(): Promise<
     // Prepare categories for tabs (server-side computation)
     const mainCategories = [
       { id: 'all', label: 'Όλες', slug: 'all' },
-      ...serviceTaxonomies.slice(0, 6).map((cat) => ({
+      ...getServiceTaxonomies().slice(0, 6).map((cat) => ({
         id: cat.id,
         label: cat.label,
         slug: cat.slug,
@@ -226,7 +229,7 @@ export async function getFeaturedServices(): Promise<
     mainCategories.slice(1).forEach((category) => {
       servicesByCategory[category.id] = transformedServices.filter(
         (service) => {
-          const serviceCat = serviceTaxonomies.find(
+          const serviceCat = getServiceTaxonomies().find(
             (cat) => cat.label === service.category,
           );
           return serviceCat?.id === category.id;
@@ -629,6 +632,8 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
           locationOptions,
         );
 
+        const taxonomyLabels = resolveCategoryLabels(service);
+
         return {
           id: service.id,
           title: service.title,
@@ -638,7 +643,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
           reviewCount: service.reviewCount,
           media: service.media,
           type: service.type,
-          taxonomyLabels: resolveCategoryLabels(service),
+          taxonomyLabels,
           profile: {
             id: service.profile.id,
             displayName: service.profile.displayName,
@@ -789,7 +794,7 @@ export async function getServiceTaxonomyPaths(): Promise<
 
         for (const group of sortedGroups) {
           const categoryData = group.category
-            ? findById(serviceTaxonomies, group.category)
+            ? findServiceById(group.category)
             : null;
 
           if (!categoryData) continue; // Skip if category not found
@@ -915,7 +920,7 @@ export async function getServiceArchivePageData(params: {
     if (subcategorySlug) {
       // Use new utility to find by subcategory (no category required)
       const result = findTaxonomyBySubcategorySlug(
-        serviceTaxonomies,
+        getServiceTaxonomies(),
         subcategorySlug,
         subdivisionSlug,
       );
@@ -936,7 +941,7 @@ export async function getServiceArchivePageData(params: {
       };
     } else if (categorySlug) {
       // Find category by slug when only categorySlug is provided
-      const category = findBySlug(serviceTaxonomies, categorySlug);
+      const category = findBySlug(getServiceTaxonomies(), categorySlug);
       if (!category) {
         return {
           success: false,
@@ -1141,7 +1146,7 @@ export async function getServiceArchivePageData(params: {
     // Generate breadcrumbs using new route structure (no category)
     const breadcrumbData = {
       segments: getBreadcrumbsForNewRoutes(
-        serviceTaxonomies,
+        getServiceTaxonomies(),
         subcategorySlug,
         subdivisionSlug,
         {
@@ -1171,7 +1176,7 @@ export async function getServiceArchivePageData(params: {
 
       // Build a flat list of all subcategories that have services
       const allSubcategoriesWithServices: DatasetItem[] = [];
-      serviceTaxonomies.forEach((category) => {
+      getServiceTaxonomies().forEach((category) => {
         if (category.children) {
           category.children.forEach((subcat) => {
             if (availableSubcategories.has(subcat.slug)) {
@@ -1237,7 +1242,7 @@ export async function getServiceArchivePageData(params: {
     }
 
     // Filter categories to only show those with services
-    const categories = serviceTaxonomies
+    const categories = getServiceTaxonomies()
       .filter((cat) => availableCategories.has(cat.slug))
       .slice(0, 10);
 
@@ -1313,7 +1318,7 @@ export async function getServiceArchivePageData(params: {
         Object.entries(filteredSubdivisionCounts).forEach(
           ([subdivisionId, count]) => {
             // subdivisionId is the actual ID, not slug - need to find it in taxonomy
-            for (const category of serviceTaxonomies) {
+            for (const category of getServiceTaxonomies()) {
               if (!category.children) continue;
               for (const subcategory of category.children) {
                 if (!subcategory.children) continue;
