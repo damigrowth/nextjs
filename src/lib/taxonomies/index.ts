@@ -68,7 +68,7 @@ export function getProTaxonomies(): DatasetItem[] {
  */
 export function getLocations(): DatasetItem[] {
   if (!_locations) {
-    _locations = require('@/constants/datasets/locations').locations;
+    _locations = require('@/constants/datasets/locations').locationOptions;
   }
   return _locations;
 }
@@ -388,6 +388,80 @@ export function getServiceHierarchy(itemId: string): {
   subdivision?: string;
 } | null {
   return getTaxonomyMaps().service.hierarchy[itemId] || null;
+}
+
+/**
+ * Resolve service taxonomy hierarchy with context-aware lookup - O(1) optimized
+ *
+ * Handles duplicate IDs across different hierarchy levels by using parent context.
+ * Prevents ID collisions by navigating the tree structure from parent to child.
+ *
+ * @param categoryId - Category ID
+ * @param subcategoryId - Subcategory ID (optional)
+ * @param subdivisionId - Subdivision ID (optional)
+ * @returns Full DatasetItem objects for category, subcategory, subdivision
+ *
+ * @example
+ * const { category, subcategory, subdivision } = resolveServiceHierarchy('8', '27', '108');
+ * // Returns: { category: {...}, subcategory: {...}, subdivision: {...} }
+ * // Each with full properties: id, label, slug, children, etc.
+ */
+export function resolveServiceHierarchy(
+  categoryId: string | null | undefined,
+  subcategoryId: string | null | undefined,
+  subdivisionId: string | null | undefined
+): {
+  category: DatasetItem | null;
+  subcategory: DatasetItem | null;
+  subdivision: DatasetItem | null;
+} {
+  // Get category (top level - no collision possible)
+  const category = categoryId ? findServiceById(categoryId) : null;
+
+  // Get subcategory from category's children (context-aware)
+  const subcategory = category?.children && subcategoryId
+    ? category.children.find((sub: DatasetItem) => sub.id === subcategoryId) || null
+    : null;
+
+  // Get subdivision from subcategory's children (context-aware, avoids collision)
+  const subdivision = subcategory?.children && subdivisionId
+    ? subcategory.children.find((div: DatasetItem) => div.id === subdivisionId) || null
+    : null;
+
+  return { category, subcategory, subdivision };
+}
+
+/**
+ * Resolve pro taxonomy hierarchy with context-aware lookup - O(1) optimized
+ *
+ * Handles duplicate IDs across different hierarchy levels by using parent context.
+ * Similar to resolveServiceHierarchy but for 2-level pro taxonomies.
+ *
+ * @param categoryId - Pro category ID
+ * @param subcategoryId - Pro subcategory ID (optional)
+ * @returns Full DatasetItem objects for category and subcategory
+ *
+ * @example
+ * const { category, subcategory } = resolveProHierarchy('7', '42');
+ * // Returns: { category: {...}, subcategory: {...} }
+ * // Each with full properties: id, label, slug, children, etc.
+ */
+export function resolveProHierarchy(
+  categoryId: string | null | undefined,
+  subcategoryId: string | null | undefined
+): {
+  category: DatasetItem | null;
+  subcategory: DatasetItem | null;
+} {
+  // Get category (top level - no collision possible)
+  const category = categoryId ? findProById(categoryId) : null;
+
+  // Get subcategory from category's children (context-aware)
+  const subcategory = category?.children && subcategoryId
+    ? category.children.find((sub: DatasetItem) => sub.id === subcategoryId) || null
+    : null;
+
+  return { category, subcategory };
 }
 
 /**
