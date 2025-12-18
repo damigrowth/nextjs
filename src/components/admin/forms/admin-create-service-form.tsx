@@ -435,7 +435,9 @@ export function AdminCreateServiceForm() {
       setIsPreparingSubmit(false);
       setIsPending(false);
       toast.error(
-        error instanceof Error ? error.message : 'Προέκυψε ένα απρόσμενο σφάλμα',
+        error instanceof Error
+          ? error.message
+          : 'Προέκυψε ένα απρόσμενο σφάλμα',
       );
     }
   };
@@ -538,8 +540,7 @@ export function AdminCreateServiceForm() {
                 </div>
               </div>
             )}
-            placeholder='Αναζήτηση προφίλ...'
-            searchPlaceholder='Αναζήτηση με όνομα, email ή username...'
+            placeholder='Αναζήτηση profile...'
             emptyMessage='Δεν βρέθηκαν προφίλ'
             clearable
           />
@@ -554,11 +555,7 @@ export function AdminCreateServiceForm() {
         return <AddonsFaqStep />;
       case 6:
         return (
-          <MediaStep
-            user={null}
-            profile={selectedProfile}
-            mediaRef={mediaRef}
-          />
+          <MediaStep username={selectedProfile.username} mediaRef={mediaRef} />
         );
       default:
         return null;
@@ -614,7 +611,9 @@ export function AdminCreateServiceForm() {
                     variant='ghost'
                     size='sm'
                     className={`h-8 w-8 p-0 ${
-                      currentStep >= 4 && watchedTitle && watchedTitle.length >= 10
+                      currentStep >= 4 &&
+                      watchedTitle &&
+                      watchedTitle.length >= 10
                         ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
                         : 'text-gray-400 cursor-not-allowed'
                     }`}
@@ -637,7 +636,9 @@ export function AdminCreateServiceForm() {
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>
-                    {currentStep >= 4 && watchedTitle && watchedTitle.length >= 10
+                    {currentStep >= 4 &&
+                    watchedTitle &&
+                    watchedTitle.length >= 10
                       ? 'Αποθήκευση ως προσχέδιο'
                       : 'Διαθέσιμο στο βήμα 4 μετά τη συμπλήρωση τίτλου'}
                   </p>
@@ -710,9 +711,7 @@ export function AdminCreateServiceForm() {
               <div className='absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center'>
                 <div className='text-center space-y-3'>
                   <div className='w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto'></div>
-                  <p className='text-sm text-gray-600'>
-                    Ανακατεύθυνση...
-                  </p>
+                  <p className='text-sm text-gray-600'>Ανακατεύθυνση...</p>
                 </div>
               </div>
             )}
@@ -748,7 +747,10 @@ export function AdminCreateServiceForm() {
               variant='outline'
               onClick={handleBack}
               disabled={
-                currentStep === 1 || isPreparingSubmit || isPending || isRedirecting
+                currentStep === 1 ||
+                isPreparingSubmit ||
+                isPending ||
+                isRedirecting
               }
             >
               <ArrowLeft className='h-4 w-4 mr-2' />
@@ -794,7 +796,10 @@ export function AdminCreateServiceForm() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Ακύρωση</AlertDialogCancel>
-            <AlertDialogAction onClick={handleReset} className='bg-red-600 hover:bg-red-700'>
+            <AlertDialogAction
+              onClick={handleReset}
+              className='bg-red-600 hover:bg-red-700'
+            >
               Καθαρισμός
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -583,7 +583,7 @@ export default function CreateServiceForm({
         return <AddonsFaqStep />;
       case 5:
         return (
-          <MediaStep user={user} profile={initialProfile} mediaRef={mediaRef} />
+          <MediaStep username={initialProfile.username} mediaRef={mediaRef} />
         );
       default:
         return null;
