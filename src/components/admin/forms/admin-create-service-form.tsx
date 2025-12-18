@@ -54,7 +54,9 @@ import {
   AddonsFaqStep,
   MediaStep,
 } from '@/components/forms/service/steps';
-import { ProfileSelector } from './profile-selector';
+import { ServerSearchCombobox } from '@/components/ui/server-search-combobox';
+import { searchProfilesForSelection } from '@/actions/admin/profiles';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   ArrowLeft,
   ArrowRight,
@@ -67,14 +69,11 @@ import {
   Building,
   Home,
 } from 'lucide-react';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import type { LazyComboboxOption } from '@/components/ui/lazy-combobox';
 
 const STEPS = [
   {
@@ -119,21 +118,29 @@ const STEP_SCHEMAS = {
   6: serviceMediaUploadSchema,
 } as const;
 
-interface AdminCreateServiceFormProps {
-  profileOptions: LazyComboboxOption[];
+interface Profile {
+  id: string;
+  uid: string;
+  username: string | null;
+  displayName: string | null;
+  email: string | null;
+  image: string | null;
+  coverage: any;
+  user: {
+    id: string;
+    email: string;
+    role: string;
+  };
 }
 
-export function AdminCreateServiceForm({
-  profileOptions,
-}: AdminCreateServiceFormProps) {
+export function AdminCreateServiceForm() {
   const router = useRouter();
   const { toast } = useToast();
 
   // Form state
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [selectedProfile, setSelectedProfile] =
-    useState<LazyComboboxOption | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
 
   // Alert dialog states
   const [showResetDialog, setShowResetDialog] = useState(false);
@@ -189,9 +196,7 @@ export function AdminCreateServiceForm({
   const watchedFixed = watch('fixed');
 
   // Extract coverage from selected profile
-  const coverage = selectedProfile?.metadata?.coverage as
-    | PrismaJson.Coverage
-    | undefined;
+  const coverage = selectedProfile?.coverage as PrismaJson.Coverage | undefined;
 
   // Calculate disabled options based on coverage (same logic as dashboard form)
   const disabledOptions = {
@@ -376,7 +381,7 @@ export function AdminCreateServiceForm({
 
     // Create FormData with explicit field type handling
     const formData = new FormData();
-    formData.append('profileId', selectedProfile.value);
+    formData.append('profileId', selectedProfile.id);
     populateFormData(formData, allValues, {
       stringFields: [
         'title',
@@ -474,37 +479,70 @@ export function AdminCreateServiceForm({
     switch (currentStep) {
       case 1:
         return (
-          <div className='space-y-4'>
-            <div className='space-y-2'>
-              <Label>Προφίλ</Label>
-              <ProfileSelector
-                options={profileOptions}
-                value={selectedProfile?.value}
-                onValueChange={(value, profile) => setSelectedProfile(profile)}
-              />
-            </div>
-            {selectedProfile && (
-              <div className='rounded-lg border p-4 space-y-2'>
-                <p className='text-sm font-medium'>Επιλεγμένο Προφίλ:</p>
-                <div className='flex items-center gap-3'>
-                  <Avatar className='h-10 w-10'>
-                    <AvatarImage src={selectedProfile.metadata?.image || ''} />
-                    <AvatarFallback>
-                      {(selectedProfile.label || 'U')[0].toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className='flex flex-col'>
-                    <p className='text-sm text-muted-foreground'>
-                      {selectedProfile.label}
-                    </p>
-                    <p className='text-xs text-muted-foreground'>
-                      {selectedProfile.metadata?.email || ''}
-                    </p>
-                  </div>
+          <ServerSearchCombobox
+            value={selectedProfile}
+            onSelect={setSelectedProfile}
+            onSearch={async (query) => {
+              const result = await searchProfilesForSelection(query);
+              return result.success && result.data ? result.data : [];
+            }}
+            getLabel={(profile) =>
+              profile.displayName ||
+              profile.username ||
+              profile.email ||
+              profile.user.email ||
+              'Unknown'
+            }
+            getKey={(profile) => profile.id}
+            renderSelected={(profile) => (
+              <div className='flex items-center gap-3'>
+                <Avatar className='h-8 w-8'>
+                  <AvatarImage src={profile.image || ''} />
+                  <AvatarFallback>
+                    {(
+                      profile.displayName?.[0] ||
+                      profile.username?.[0] ||
+                      'U'
+                    ).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className='flex flex-col'>
+                  <p className='text-sm font-medium'>
+                    {profile.displayName || profile.username || profile.email}
+                  </p>
+                  <p className='text-xs text-muted-foreground'>
+                    {profile.email || profile.user.email || ''}
+                  </p>
                 </div>
               </div>
             )}
-          </div>
+            renderItem={(profile) => (
+              <div className='flex items-center gap-3'>
+                <Avatar className='h-8 w-8'>
+                  <AvatarImage src={profile.image || ''} />
+                  <AvatarFallback>
+                    {(
+                      profile.displayName?.[0] ||
+                      profile.username?.[0] ||
+                      'U'
+                    ).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className='flex-1 min-w-0'>
+                  <p className='text-sm font-medium truncate'>
+                    {profile.displayName || profile.username || profile.email}
+                  </p>
+                  <p className='text-xs text-muted-foreground truncate'>
+                    {profile.email || profile.user.email || ''}
+                  </p>
+                </div>
+              </div>
+            )}
+            placeholder='Αναζήτηση προφίλ...'
+            searchPlaceholder='Αναζήτηση με όνομα, email ή username...'
+            emptyMessage='Δεν βρέθηκαν προφίλ'
+            clearable
+          />
         );
       case 2:
         return <PresenceOnlineStep disabledOptions={disabledOptions} />;
@@ -515,22 +553,10 @@ export function AdminCreateServiceForm({
       case 5:
         return <AddonsFaqStep />;
       case 6:
-        // Construct minimal profile object from selected profile metadata
-        const selectedProfileData = selectedProfile
-          ? ({
-              id: selectedProfile.value,
-              username: selectedProfile.metadata?.username || 'unknown',
-              email: selectedProfile.metadata?.email || '',
-              // Add other required Profile fields with safe defaults
-              displayName: selectedProfile.label,
-              image: selectedProfile.metadata?.image || null,
-            } as any)
-          : null;
-
         return (
           <MediaStep
             user={null}
-            profile={selectedProfileData}
+            profile={selectedProfile}
             mediaRef={mediaRef}
           />
         );
