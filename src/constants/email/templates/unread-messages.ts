@@ -190,7 +190,7 @@ export const UNREAD_MESSAGES_TEXT = (data: UnreadMessagesData): string => {
 
 Γεια σου ${data.userName}!
 
-Έχεις ${data.unreadCount} αδιάβαστα μηνύματα από τα τελευταία 15 λεπτά:
+Έλαβες ${data.unreadCount} μηνύματα τα τελευταία λεπτά:
 
 ${messagesList}
 
