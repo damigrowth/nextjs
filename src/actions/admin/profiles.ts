@@ -616,6 +616,84 @@ export async function deleteProfile(params: AdminDeleteProfileInput) {
 }
 
 /**
+ * Search profiles for selection dropdown (unlimited search across all profiles)
+ */
+export async function searchProfilesForSelection(searchQuery: string) {
+  try {
+    await getAdminSession();
+
+    // Validate search query
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      return {
+        success: true,
+        data: [],
+      };
+    }
+
+    const trimmedQuery = searchQuery.trim();
+
+    // Search ALL profiles matching query (no pagination)
+    // Filter by role and search across displayName, email, username
+    const profiles = await prisma.profile.findMany({
+      where: {
+        AND: [
+          // Only freelancers and companies
+          {
+            user: {
+              role: {
+                in: ['freelancer', 'company'],
+              },
+            },
+          },
+          // Search across multiple fields
+          {
+            OR: [
+              { username: { contains: trimmedQuery, mode: 'insensitive' } },
+              { displayName: { contains: trimmedQuery, mode: 'insensitive' } },
+              { email: { contains: trimmedQuery, mode: 'insensitive' } },
+              { user: { email: { contains: trimmedQuery, mode: 'insensitive' } } },
+            ],
+          },
+        ],
+      },
+      select: {
+        id: true,
+        uid: true,
+        username: true,
+        displayName: true,
+        email: true,
+        image: true,
+        coverage: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+      // Limit to 50 results for performance (reasonable for dropdown)
+      take: 50,
+      orderBy: {
+        displayName: 'asc',
+      },
+    });
+
+    return {
+      success: true,
+      data: profiles,
+    };
+  } catch (error) {
+    console.error('Error searching profiles:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to search profiles',
+      data: [],
+    };
+  }
+}
+
+/**
  * Get profile statistics
  */
 export async function getProfileStats() {
