@@ -157,7 +157,7 @@ export function MessageInput({
           </Button>
         </div>
       )}
-      <div className='flex items-end gap-2 px-0 md:pl-4 '>
+      <div className='flex items-end gap-2 px-0 pb-0 sm:pb-2 sm:px-2 '>
         <MobileChatSidebar userId={currentUserId} initialChats={chats || []} />
 
         <div className='relative w-full'>
@@ -173,7 +173,7 @@ export function MessageInput({
                   ? 'Πληκτρολογήστε την απάντησή σας...'
                   : 'Εισάγετε μήνυμα...'
             }
-            className='pr-24 pl-4 h-14 rounded-xl'
+            className='pr-24 pl-4 h-14 rounded-xl shadow-none'
           />
           <div className='absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2'>
             <div className='relative'>
