@@ -9,7 +9,7 @@ import type { DatasetItem } from '@/lib/types/datasets';
 
 // O(1) optimized hash map lookups - 99% faster than findById utility
 import {
-  findServiceById,
+  resolveServiceHierarchy,
   findServiceBySlug,
   findProById,
   findProBySlug,
@@ -109,16 +109,12 @@ export async function fetchEntity(
 
         if (!service) return { entity: null };
 
-        // Resolve taxonomy labels from IDs - O(1) hash map lookups
-        const category = service.category
-          ? findServiceById(service.category)
-          : undefined;
-        const subcategory = service.subcategory
-          ? findServiceById(service.subcategory)
-          : undefined;
-        const subdivision = service.subdivision
-          ? findServiceById(service.subdivision)
-          : undefined;
+        // Resolve taxonomy labels from IDs - O(1) hierarchical lookups (avoids ID collisions)
+        const { category, subcategory, subdivision } = resolveServiceHierarchy(
+          service.category,
+          service.subcategory,
+          service.subdivision
+        );
 
         // Transform to match entity structure with resolved labels
         return {

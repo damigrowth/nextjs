@@ -7,6 +7,7 @@ import { tags } from '@/constants/datasets/tags';
 import {
   getServiceTaxonomies,
   findServiceById,
+  resolveServiceHierarchy,
   findLocationBySlugOrName,
 } from '@/lib/taxonomies';
 // Complex utilities - KEEP for hierarchy resolution, breadcrumbs, coverage transformation, and nested children lookups
@@ -793,30 +794,11 @@ export async function getServiceTaxonomyPaths(): Promise<
         }> = [];
 
         for (const group of sortedGroups) {
-          const categoryData = group.category
-            ? findServiceById(group.category)
-            : null;
+          // O(1) hierarchical lookups - context-aware resolution (avoids ID collisions)
+          const { category: categoryData, subcategory: subcategoryData, subdivision: subdivisionData } =
+            resolveServiceHierarchy(group.category, group.subcategory, group.subdivision);
 
           if (!categoryData) continue; // Skip if category not found
-
-          let subcategoryData = null;
-          let subdivisionData = null;
-
-          // Find subcategory within the category's children
-          if (group.subcategory && categoryData.children) {
-            subcategoryData = findById(
-              categoryData.children,
-              group.subcategory,
-            );
-          }
-
-          // Find subdivision within the subcategory's children
-          if (group.subdivision && subcategoryData?.children) {
-            subdivisionData = findById(
-              subcategoryData.children,
-              group.subdivision,
-            );
-          }
 
           // Add the path with slugs
           paths.push({
