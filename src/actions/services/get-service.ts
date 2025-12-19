@@ -5,11 +5,16 @@ import { unstable_cache } from 'next/cache';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
 import { Prisma } from '@prisma/client';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
-import { locationOptions } from '@/constants/datasets/locations';
 // O(1) optimized taxonomy lookups - 99% faster than findById
-import { findServiceById, findProById, batchFindTagsByIds } from '@/lib/taxonomies';
+import {
+  getServiceTaxonomies,
+  resolveServiceHierarchy, // Context-aware hierarchical resolution (avoids ID collisions)
+  resolveProHierarchy,
+  batchFindTagsByIds,
+  findServiceById,
+  findProById,
+  getLocations,
+} from '@/lib/taxonomies';
 // Complex utilities - KEEP for coverage transformation, defaults, and non-taxonomy datasets
 import {
   findById, // Generic utility for options, industries (not yet optimized)
@@ -30,7 +35,10 @@ import { CACHE_TAGS } from '@/lib/cache';
 import type { ActionResult } from '@/lib/types/api';
 import type { Service, Profile } from '@prisma/client';
 import type { BreadcrumbSegment } from '@/components/shared/dynamic-breadcrumb';
-import type { ServiceCardData } from '@/lib/types/components';
+import type {
+  ServiceCardData,
+  TaxonomyTab,
+} from '@/lib/types/components';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { SERVICE_DETAIL_SELECT } from '@/lib/database/selects';
 
@@ -79,7 +87,7 @@ export interface ServicePageData {
   subdivision?: DatasetItem | null;
   profileSubcategory?: DatasetItem | null;
   coverage: ReturnType<typeof transformCoverageWithLocationNames>;
-  featuredCategories: typeof serviceTaxonomies;
+  featuredCategories: TaxonomyTab[];
   breadcrumbSegments: BreadcrumbSegment[];
   breadcrumbButtons: {
     subjectTitle: string;
@@ -139,22 +147,14 @@ export async function getServiceBySlug(
 
 /**
  * Helper to resolve category and subcategory taxonomies
- * OPTIMIZATION: Using O(1) hash map lookups instead of O(n) findById
+ * Uses optimized O(1) hierarchical lookup to ensure subdivision is found in correct parent context
  */
 function resolveServiceTaxonomies(service: Service) {
-  const category = service.category
-    ? findServiceById(service.category)
-    : null;
-
-  const subcategory = service.subcategory
-    ? findServiceById(service.subcategory)
-    : null;
-
-  const subdivision = service.subdivision
-    ? findServiceById(service.subdivision)
-    : null;
-
-  return { category, subcategory, subdivision };
+  return resolveServiceHierarchy(
+    service.category,
+    service.subcategory,
+    service.subdivision,
+  );
 }
 
 /**
@@ -202,11 +202,11 @@ async function _getServicePageData(
     const rawCoverage = service.profile.coverage || getDefaultCoverage();
     const coverage = transformCoverageWithLocationNames(
       rawCoverage,
-      locationOptions,
+      getLocations(),
     );
 
     // Get featured categories for tabs (first 8 service taxonomies)
-    const featuredCategories = serviceTaxonomies.slice(0, 8);
+    const featuredCategories = getServiceTaxonomies().slice(0, 8) as TaxonomyTab[];
 
     // Build breadcrumb segments (taxonomies only)
     const breadcrumbSegments: BreadcrumbSegment[] = [
@@ -257,8 +257,9 @@ async function _getServicePageData(
       .filter((method) => method !== undefined);
 
     // Transform tags - resolve tag IDs to actual tag objects - O(1) optimized
-    const tagsData = batchFindTagsByIds(service.tags || [])
-      .filter((tag) => tag !== null);
+    const tagsData = batchFindTagsByIds(service.tags || []).filter(
+      (tag) => tag !== null,
+    );
 
     // Prepare breadcrumb buttons config
     const breadcrumbButtons = {
@@ -316,10 +317,7 @@ async function _getServicePageData(
     // Transform to ServiceCardData format
     const relatedServices: ServiceCardData[] = relatedServicesSubset.map(
       (relatedService) => {
-        const categoryTaxonomy = findById(
-          serviceTaxonomies,
-          relatedService.category,
-        );
+        const categoryTaxonomy = findServiceById(relatedService.category);
 
         return {
           id: relatedService.id,
@@ -382,17 +380,13 @@ export async function getServicePageData(
     _getServicePageData,
     ServiceCacheKeys.detail(id.toString()),
     {
-      tags: [
-        CACHE_TAGS.service.byId(id),
-        CACHE_TAGS.collections.services,
-      ],
+      tags: [CACHE_TAGS.service.byId(id), CACHE_TAGS.collections.services],
       revalidate: getCacheTTL('SERVICE_PAGE'), // 30 minutes - detail pages change less frequently
     },
   );
 
   return getCached(id);
 }
-
 
 /**
  * Get a service by ID for editing (user must own the service)

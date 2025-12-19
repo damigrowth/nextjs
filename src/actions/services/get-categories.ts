@@ -1,7 +1,7 @@
 'use server';
 
 import { unstable_cache } from 'next/cache';
-import { serviceTaxonomies as importedServiceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { getServiceTaxonomies } from '@/lib/taxonomies';
 import { getServiceTaxonomyPaths } from './get-services';
 // O(1) optimized taxonomy lookups - 99% faster than findBySlug/findById
 import { findServiceBySlug, findServiceById } from '@/lib/taxonomies';
@@ -17,9 +17,6 @@ import type {
   NavigationMenuSubcategory,
   NavigationMenuSubdivision,
 } from '@/lib/types/components';
-
-// Cast to proper type to allow optional image fields at all levels
-const serviceTaxonomies = importedServiceTaxonomies as DatasetItem[];
 
 // Types for categories page data
 export interface SubdivisionWithCount {
@@ -163,7 +160,7 @@ export async function getCategoriesPageData(options?: {
             // If we have context from the paths, use it
             if (context) {
               const category = findBySlug(
-                serviceTaxonomies,
+                getServiceTaxonomies(),
                 context.categorySlug,
               );
               const subcategory = category?.children
@@ -177,7 +174,7 @@ export async function getCategoriesPageData(options?: {
 
             // If not found via context, search all taxonomies
             if (!subdivisionData) {
-              for (const category of serviceTaxonomies) {
+              for (const category of getServiceTaxonomies()) {
                 if (category.children) {
                   for (const subcategory of category.children) {
                     if (subcategory.children) {
@@ -225,7 +222,7 @@ export async function getCategoriesPageData(options?: {
 
         if (categorySlug) {
           // When filtering by category, restructure data to show subcategories as main items
-          const filteredCategory = serviceTaxonomies.find(
+          const filteredCategory = getServiceTaxonomies().find(
             (cat) => cat.slug === categorySlug,
           );
           if (filteredCategory && filteredCategory.children) {
@@ -282,7 +279,7 @@ export async function getCategoriesPageData(options?: {
           }
         } else {
           // Original logic for main categories page
-          categories = serviceTaxonomies
+          categories = getServiceTaxonomies()
             .map((category) => {
               // Get subcategories that have services
               const subcategoriesWithServices = (category.children || [])
@@ -388,7 +385,7 @@ export async function getNavigationMenuData(): Promise<
         const taxonomyPaths = taxonomyPathsResult.data;
 
         // Build counts at all three levels
-        const categories = serviceTaxonomies
+        const categories = getServiceTaxonomies()
           .map((category) => {
             // Get subcategories for this category with service counts
             const subcategoriesData = (category.children || [])

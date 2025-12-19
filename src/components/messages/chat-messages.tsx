@@ -181,7 +181,7 @@ export function ChatMessages({
 
   return (
     <ScrollArea
-      className='flex-1 pl-0 p-4 pr-0'
+      className='flex-1 pl-0 p-0 sm:p-2'
       scrollBarClassName='hidden'
       ref={scrollRef}
     >

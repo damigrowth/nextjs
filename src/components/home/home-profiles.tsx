@@ -57,7 +57,7 @@ export default function ProfilesHome({
           <Carousel
             opts={{
               align: 'start',
-              slidesToScroll: 1,
+              slidesToScroll: 'auto',
             }}
             className='w-full'
           >
@@ -75,11 +75,15 @@ export default function ProfilesHome({
               ))}
             </CarouselContent>
 
-            {/* Navigation Controls - hide on mobile, show on larger screens */}
+            {/* Navigation Controls - always visible with default positioning */}
             {profiles.length > 1 && (
               <>
-                <CarouselPrevious className='hidden sm:flex' />
-                <CarouselNext className='hidden sm:flex' />
+                <CarouselPrevious
+                  className='hidden sm:flex !opacity-100 !-translate-x-12 !rounded-full !bg-white/90 !backdrop-blur-sm !border !border-gray-200/50 !text-gray-800 hover:!bg-white hover:!text-gray-900 hover:!border-gray-300 !shadow-lg hover:!shadow-xl'
+                />
+                <CarouselNext
+                  className='hidden sm:flex !opacity-100 !translate-x-12 !rounded-full !bg-white/90 !backdrop-blur-sm !border !border-gray-200/50 !text-gray-800 hover:!bg-white hover:!text-gray-900 hover:!border-gray-300 !shadow-lg hover:!shadow-xl'
+                />
               </>
             )}
 
