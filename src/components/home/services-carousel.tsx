@@ -22,7 +22,9 @@ export function ServicesCarousel({
   savedServiceIds,
 }: ServicesCarouselProps) {
   // Convert array to Set for O(1) lookups
-  const savedIdsSet = savedServiceIds ? new Set(savedServiceIds) : new Set<number>();
+  const savedIdsSet = savedServiceIds
+    ? new Set(savedServiceIds)
+    : new Set<number>();
 
   // Filter services based on active category (if provided)
   const displayServices = services;
@@ -42,13 +44,16 @@ export function ServicesCarousel({
       <Carousel
         opts={{
           align: 'start',
-          slidesToScroll: 1,
+          slidesToScroll: 'auto',
         }}
         className='w-full'
       >
         <CarouselContent className='-ml-2 sm:-ml-4'>
           {displayServices.map((service) => (
-            <CarouselItem key={service.id} className='pl-2 sm:pl-4 basis-full sm:basis-1/2 lg:basis-1/4 cursor-pointer'>
+            <CarouselItem
+              key={service.id}
+              className='pl-2 sm:pl-4 basis-full sm:basis-1/2 lg:basis-1/4 cursor-pointer'
+            >
               <ServiceCard
                 service={service}
                 isSaved={savedIdsSet.has(service.id)}
@@ -57,11 +62,15 @@ export function ServicesCarousel({
           ))}
         </CarouselContent>
 
-        {/* Navigation Controls - hide on mobile, show on larger screens */}
+        {/* Navigation Controls - always visible with default positioning */}
         {displayServices.length > 1 && (
           <>
-            <CarouselPrevious className='hidden sm:flex' />
-            <CarouselNext className='hidden sm:flex' />
+            <CarouselPrevious
+              className='hidden sm:flex !opacity-100 !-translate-x-12 !rounded-full !bg-white/90 !backdrop-blur-sm !border !border-gray-200/50 !text-gray-800 hover:!bg-white hover:!text-gray-900 hover:!border-gray-300 !shadow-lg hover:!shadow-xl'
+            />
+            <CarouselNext
+              className='hidden sm:flex !opacity-100 !translate-x-12 !rounded-full !bg-white/90 !backdrop-blur-sm !border !border-gray-200/50 !text-gray-800 hover:!bg-white hover:!text-gray-900 hover:!border-gray-300 !shadow-lg hover:!shadow-xl'
+            />
           </>
         )}
 

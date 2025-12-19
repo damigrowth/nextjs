@@ -5,7 +5,12 @@ import { prisma } from '@/lib/prisma/client';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 // O(1) optimized taxonomy lookups - 99% faster than findById
-import { findServiceById, findProById, findServiceBySlug, findSkillById } from '@/lib/taxonomies';
+import {
+  findServiceById,
+  findProById,
+  findServiceBySlug,
+  findSkillById,
+} from '@/lib/taxonomies';
 import { findById } from '@/lib/utils/datasets';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
@@ -18,7 +23,10 @@ import type { DatasetItem } from '@/lib/types/datasets';
 import { Prisma } from '@prisma/client';
 import { getDirectoryPageData } from '@/actions/profiles/get-directory';
 import { getCategoriesPageData } from '@/actions/services/get-categories';
-import { HOME_SERVICE_SELECT, HOME_PROFILE_SELECT } from '@/lib/database/selects';
+import {
+  HOME_SERVICE_SELECT,
+  HOME_PROFILE_SELECT,
+} from '@/lib/database/selects';
 
 // Transform service to component-ready format
 function transformServiceForComponent(
@@ -47,15 +55,15 @@ function transformServiceForComponent(
 }
 
 // Transform profile to profile card format
-function transformProfileForComponent(
-  profile: any,
-): ProfileCardData {
+function transformProfileForComponent(profile: any): ProfileCardData {
   // OPTIMIZATION: O(1) hash map lookups instead of O(n) findById
   const subcategoryTaxonomy = findProById(profile.subcategory);
   const subcategoryLabel = subcategoryTaxonomy?.label || 'Γενικός';
 
   // Resolve speciality label for display - speciality is a skill ID - O(1) optimized
-  const specialitySkill = profile.speciality ? findSkillById(profile.speciality) : null;
+  const specialitySkill = profile.speciality
+    ? findSkillById(profile.speciality)
+    : null;
   const specialityLabel = specialitySkill?.label;
 
   return {
@@ -105,49 +113,33 @@ async function getHomePageDataUncached(): Promise<ActionResult<HomePageData>> {
       categoriesDataResult,
       subcategoryCounts,
     ] = await Promise.all([
-      // Fetch featured services with fallback to top-rated
+      // Fetch 8 featured services per category (sequential queries)
       (async () => {
-        // Try to fetch featured services first
-        const featuredServices = await prisma.service.findMany({
-          where: {
-            status: 'published',
-            featured: true,
-            // Only get services with media (not null and not empty array)
-            media: {
-              not: Prisma.JsonNull,
-            },
-          },
-          select: HOME_SERVICE_SELECT,
-          orderBy: [
-            { rating: 'desc' },
-            { reviewCount: 'desc' },
-            { updatedAt: 'desc' },
-          ],
-          take: 16,
-        });
+        const categories = serviceTaxonomies;
+        const allServices: any[] = [];
 
-        // Fallback: If no featured services found, get top-rated services
-        if (featuredServices.length === 0) {
-          console.warn('[Home] No featured services found, using top-rated services as fallback');
-          return prisma.service.findMany({
+        // For each category, fetch up to 8 featured services
+        for (const category of categories) {
+          const categoryServices = await prisma.service.findMany({
             where: {
               status: 'published',
-              rating: { gte: 0 }, // All published services
-              media: {
-                not: Prisma.JsonNull,
-              },
+              category: category.id,
+              featured: true,
+              media: { not: Prisma.JsonNull },
             },
             select: HOME_SERVICE_SELECT,
             orderBy: [
-              { rating: 'desc' },
-              { reviewCount: 'desc' },
+              // { rating: 'desc' },
+              // { reviewCount: 'desc' },
               { updatedAt: 'desc' },
             ],
-            take: 16,
+            take: 8,
           });
+
+          allServices.push(...categoryServices);
         }
 
-        return featuredServices;
+        return allServices;
       })(),
 
       // Fetch featured profiles with fallback to top-rated
@@ -159,22 +151,24 @@ async function getHomePageDataUncached(): Promise<ActionResult<HomePageData>> {
             featured: true,
             NOT: { image: null },
             user: {
-              role: { in: ["freelancer", "company"] },
+              role: { in: ['freelancer', 'company'] },
               confirmed: true,
               blocked: false,
             },
           },
           select: HOME_PROFILE_SELECT,
           orderBy: [
-            { rating: "desc" },
-            { reviewCount: "desc" },
-            { updatedAt: "desc" },
+            // { rating: "desc" },
+            // { reviewCount: "desc" },
+            { updatedAt: 'desc' },
           ],
           take: 16,
         });
 
         if (featuredProfiles.length === 0) {
-          console.warn("[Home] No featured profiles found, using top-rated profiles as fallback");
+          console.warn(
+            '[Home] No featured profiles found, using top-rated profiles as fallback',
+          );
           return prisma.profile.findMany({
             where: {
               published: true,
@@ -182,16 +176,16 @@ async function getHomePageDataUncached(): Promise<ActionResult<HomePageData>> {
               rating: { gte: 0 },
               NOT: { image: null },
               user: {
-                role: { in: ["freelancer", "company"] },
+                role: { in: ['freelancer', 'company'] },
                 confirmed: true,
                 blocked: false,
               },
             },
             select: HOME_PROFILE_SELECT,
             orderBy: [
-              { rating: "desc" },
-              { reviewCount: "desc" },
-              { updatedAt: "desc" },
+              // { rating: "desc" },
+              // { reviewCount: "desc" },
+              { updatedAt: 'desc' },
             ],
             take: 16,
           });
@@ -220,7 +214,9 @@ async function getHomePageDataUncached(): Promise<ActionResult<HomePageData>> {
     ]);
 
     // Transform services data
-    const transformedServices = servicesResult.map(transformServiceForComponent);
+    const transformedServices = servicesResult.map(
+      transformServiceForComponent,
+    );
 
     // Prepare categories for tabs (server-side computation)
     const mainCategories = [
@@ -239,12 +235,14 @@ async function getHomePageDataUncached(): Promise<ActionResult<HomePageData>> {
 
     // Group services for each main category
     mainCategories.slice(1).forEach((category) => {
-      servicesByCategory[category.id] = transformedServices.filter((service) => {
-        const serviceCat = serviceTaxonomies.find(
-          (cat) => cat.label === service.category,
-        );
-        return serviceCat?.id === category.id;
-      });
+      servicesByCategory[category.id] = transformedServices.filter(
+        (service) => {
+          const serviceCat = serviceTaxonomies.find(
+            (cat) => cat.label === service.category,
+          );
+          return serviceCat?.id === category.id;
+        },
+      );
     });
 
     const servicesData: FeaturedServicesData = {
@@ -254,7 +252,9 @@ async function getHomePageDataUncached(): Promise<ActionResult<HomePageData>> {
     };
 
     // Transform profiles data
-    const transformedProfiles = profilesResult.map(transformProfileForComponent);
+    const transformedProfiles = profilesResult.map(
+      transformProfileForComponent,
+    );
 
     // Extract data from cached functions
     const directoryData = directoryDataResult.success
@@ -374,5 +374,5 @@ export const getHomePageData = unstable_cache(
       CACHE_TAGS.search.taxonomies,
     ],
     revalidate: getCacheTTL('HOME'), // 5 minutes - frequently updated featured content
-  }
+  },
 );
