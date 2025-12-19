@@ -10,7 +10,7 @@ import { CACHE_TAGS, getServiceTags } from '@/lib/cache';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 // O(1) optimized taxonomy lookups - 99% faster than nested find
-import { findServiceById, findTagById, findTagBySlug } from '@/lib/taxonomies';
+import { resolveServiceHierarchy, findTagById, findTagBySlug } from '@/lib/taxonomies';
 import { generateServiceSlug } from '@/lib/utils/text';
 import { sendServicePublishedEmail } from '@/lib/email/services';
 
@@ -225,14 +225,9 @@ export async function listServices(
 
     // Transform services to include taxonomyLabels for TaxonomiesDisplay
     const servicesWithLabels = services.map((service) => {
-      // O(1) lookups - 99% faster than O(n²) nested find
-      const categoryData = findServiceById(service.category);
-      const subcategoryData = service.subcategory
-        ? findServiceById(service.subcategory)
-        : null;
-      const subdivisionData = service.subdivision
-        ? findServiceById(service.subdivision)
-        : null;
+      // O(1) hierarchical lookups - context-aware resolution (avoids ID collisions)
+      const { category: categoryData, subcategory: subcategoryData, subdivision: subdivisionData } =
+        resolveServiceHierarchy(service.category, service.subcategory, service.subdivision);
 
       return {
         ...service,
@@ -1346,16 +1341,13 @@ export async function getServiceStats() {
     const topTagRaw = topTagEntry ? { name: topTagEntry[0], count: topTagEntry[1] } : null;
 
     // Resolve taxonomy labels
-    // O(1) lookups - 99% faster than O(n³) nested flatMap.find chains
-    const categoryData = servicesByCategory[0]
-      ? findServiceById(servicesByCategory[0].category)
-      : null;
-    const subcategoryData = servicesBySubcategory[0]
-      ? findServiceById(servicesBySubcategory[0].subcategory)
-      : null;
-    const subdivisionData = servicesBySubdivision[0]
-      ? findServiceById(servicesBySubdivision[0].subdivision)
-      : null;
+    // O(1) hierarchical lookups - context-aware resolution (avoids ID collisions)
+    const categoryId = servicesByCategory[0]?.category || null;
+    const subcategoryId = servicesBySubcategory[0]?.subcategory || null;
+    const subdivisionId = servicesBySubdivision[0]?.subdivision || null;
+
+    const { category: categoryData, subcategory: subcategoryData, subdivision: subdivisionData } =
+      resolveServiceHierarchy(categoryId, subcategoryId, subdivisionId);
 
     // Resolve tag label - O(1) optimized hash map lookups
     const topTagData = topTagRaw
