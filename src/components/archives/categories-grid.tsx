@@ -9,6 +9,7 @@ import {
 import type { CategoryWithSubcategories } from '@/actions/services/get-categories';
 import { Separator } from '../ui/separator';
 import { NextLink } from '../shared';
+import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 
 interface CategoriesGridProps {
   categories: CategoryWithSubcategories[];
@@ -46,7 +47,10 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
             {category.image && (
               <div className='relative w-full h-48 bg-gray-100'>
                 <Image
-                  src={category.image.secure_url}
+                  src={
+                    getOptimizedImageUrl(category.image, 'card') ||
+                    category.image.secure_url
+                  }
                   alt={category.label}
                   fill
                   className='object-cover'

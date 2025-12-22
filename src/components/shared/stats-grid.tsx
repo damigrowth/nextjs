@@ -3,6 +3,7 @@ import Image from 'next/image';
 import NextLink from './next-link';
 import { Button } from '@/components/ui/button';
 import { ArrowRightLong } from '@/components/icon/fa';
+import { buildCloudinaryUrl, extractPublicId } from '@/lib/utils/cloudinary';
 
 type StatItem = {
   value: string;
@@ -29,6 +30,35 @@ type Props = {
 };
 
 export default function StatsGrid({ data }: Props) {
+  // Optimize decorative images
+  const leftTopUrl = (() => {
+    const publicId = extractPublicId(data.images.leftTop);
+    return publicId
+      ? buildCloudinaryUrl(publicId, {
+          width: 198,
+          height: 226,
+          crop: 'limit', // Don't crop or upscale, just optimize
+          quality: 'auto:good',
+          format: 'auto',
+          dpr: 'auto',
+        })
+      : data.images.leftTop;
+  })();
+
+  const rightBottomUrl = (() => {
+    const publicId = extractPublicId(data.images.rightBottom);
+    return publicId
+      ? buildCloudinaryUrl(publicId, {
+          width: 255,
+          height: 181,
+          crop: 'limit',
+          quality: 'auto:good',
+          format: 'auto',
+          dpr: 'auto',
+        })
+      : data.images.rightBottom;
+  })();
+
   return (
     <section className='bg-silver overflow-hidden max-w-4xl mx-auto rounded relative'>
       {/* Decorative Images */}
@@ -36,14 +66,14 @@ export default function StatsGrid({ data }: Props) {
         height={226}
         width={198}
         className='absolute -left-16 top-0 hidden lg:block'
-        src={data.images.leftTop}
+        src={leftTopUrl}
         alt='object'
       />
       <Image
         height={181}
         width={255}
         className='absolute right-0 -bottom-12 hidden lg:block'
-        src={data.images.rightBottom}
+        src={rightBottomUrl}
         alt='object'
       />
 

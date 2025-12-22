@@ -68,39 +68,39 @@ export const categoriesClassNames = [
 
 export const galleryImagesHome = [
   {
-    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1763469749/Static/home-image-1_jmulfl.png',
+    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/w_400,h_225,c_limit,q_auto:good,f_auto,dpr_auto/v1763469749/Static/home-image-1_jmulfl.png',
     alt: 'Υπηρεσίες 1',
   },
   {
-    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1763469748/Static/home-image-2_wmu7jf.png',
+    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/w_400,h_225,c_limit,q_auto:good,f_auto,dpr_auto/v1763469748/Static/home-image-2_wmu7jf.png',
     alt: 'Υπηρεσίες 2',
   },
   {
-    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1763469747/Static/home-image-3_d4edmv.png',
+    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/w_400,h_225,c_limit,q_auto:good,f_auto,dpr_auto/v1763469747/Static/home-image-3_d4edmv.png',
     alt: 'Υπηρεσίες 3',
   },
   {
-    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1763469747/Static/home-image-4_v6vjh5.png',
+    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/w_400,h_225,c_limit,q_auto:good,f_auto,dpr_auto/v1763469747/Static/home-image-4_v6vjh5.png',
     alt: 'Υπηρεσίες 4',
   },
   {
-    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1763469748/Static/home-image-5_thsnc1.png',
+    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/w_400,h_225,c_limit,q_auto:good,f_auto,dpr_auto/v1763469748/Static/home-image-5_thsnc1.png',
     alt: 'Υπηρεσίες 5',
   },
   {
-    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1763469749/Static/home-image-6_aeiog7.png',
+    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/w_400,h_225,c_limit,q_auto:good,f_auto,dpr_auto/v1763469749/Static/home-image-6_aeiog7.png',
     alt: 'Υπηρεσίες 6',
   },
   {
-    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1763469748/Static/home-image-7_jmttlx.png',
+    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/w_400,h_225,c_limit,q_auto:good,f_auto,dpr_auto/v1763469748/Static/home-image-7_jmttlx.png',
     alt: 'Υπηρεσίες 7',
   },
   {
-    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1763469749/Static/home-image-8_veavzk.png',
+    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/w_400,h_225,c_limit,q_auto:good,f_auto,dpr_auto/v1763469749/Static/home-image-8_veavzk.png',
     alt: 'Υπηρεσίες 8',
   },
   {
-    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1763469749/Static/home-image-9_n5bycv.png',
+    src: 'https://res.cloudinary.com/ddejhvzbf/image/upload/w_400,h_225,c_limit,q_auto:good,f_auto,dpr_auto/v1763469749/Static/home-image-9_n5bycv.png',
     alt: 'Υπηρεσίες 9',
   },
 ];

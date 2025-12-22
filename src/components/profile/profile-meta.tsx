@@ -14,6 +14,7 @@ import { RatingDisplay, UserAvatar } from '../shared';
 import { VerifiedBadge } from '../shared/profile-badges';
 import SocialLinks from '../shared/social-links';
 import CoverageDisplay from '../shared/coverage-display';
+import { buildCloudinaryUrl, extractPublicId } from '@/lib/utils/cloudinary';
 
 /**
  * Modern ProfileMeta Component
@@ -36,6 +37,38 @@ export default function ProfileMeta({
 }: ProfileMetaProps) {
   // Get grouped coverage data for display
   const groupedCoverage = coverage ? getCoverageGroupedByCounty(coverage) : [];
+
+  // Generate optimized decorative image URLs with exact dimensions
+  const leftTopUrl = (() => {
+    const url = 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071394/Static/left-top_dnznwz.webp';
+    const publicId = extractPublicId(url);
+    return publicId
+      ? buildCloudinaryUrl(publicId, {
+          width: 150,
+          height: 170,
+          crop: 'limit', // Don't crop or upscale, just optimize
+          quality: 'auto:good',
+          format: 'auto',
+          dpr: 'auto',
+        })
+      : url;
+  })();
+
+  const rightBottomUrl = (() => {
+    const url = 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071395/Static/right-bottom_w0dkoq.webp';
+    const publicId = extractPublicId(url);
+    return publicId
+      ? buildCloudinaryUrl(publicId, {
+          width: 200,
+          height: 140,
+          crop: 'limit', // Don't crop or upscale, just optimize
+          quality: 'auto:good',
+          format: 'auto',
+          dpr: 'auto',
+        })
+      : url;
+  })();
+
   return (
     <section>
       <Card className='relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5 border border-border rounded-xl shadow-lg mb-8'>
@@ -45,7 +78,7 @@ export default function ProfileMeta({
             width={150}
             height={170}
             className='object-contain'
-            src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071394/Static/left-top_dnznwz.webp'
+            src={leftTopUrl}
             alt='Decorative background'
           />
         </div>
@@ -54,7 +87,7 @@ export default function ProfileMeta({
             width={200}
             height={140}
             className='object-contain'
-            src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071395/Static/right-bottom_w0dkoq.webp'
+            src={rightBottomUrl}
             alt='Decorative background'
           />
         </div>

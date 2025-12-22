@@ -8,6 +8,7 @@ import {
   TooltipContent,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 
 interface UserImageProps {
   image?: string | null;
@@ -80,14 +81,30 @@ export default function UserImage({
     return 'text-lg';
   };
 
+  // Determine optimal avatar size preset based on display width
+  const getAvatarSizePreset = (displayWidth: number): 'sm' | 'md' | 'lg' | 'xl' | '2xl' => {
+    if (displayWidth <= 50) return 'sm';   // 50×50px
+    if (displayWidth <= 100) return 'md';  // 100×100px
+    if (displayWidth <= 150) return 'lg';  // 150×150px
+    if (displayWidth <= 200) return 'xl';  // 200×200px
+    return '2xl'; // 300×300px
+  };
+
+  const avatarSizePreset = getAvatarSizePreset(width);
+
+  // Get optimized avatar image URL with appropriate size preset
+  const optimizedImage = image
+    ? getOptimizedImageUrl(image, 'avatar', avatarSizePreset) || image
+    : null;
+
   const avatarElement = (
     <Avatar
       className={cn('relative rounded-md', className)}
       style={{ width, height }}
     >
-      {image ? (
+      {optimizedImage ? (
         <AvatarImage
-          src={image}
+          src={optimizedImage}
           alt={alt || 'profile-image'}
           className='object-cover'
         />

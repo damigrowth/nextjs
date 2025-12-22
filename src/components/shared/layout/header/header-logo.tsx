@@ -26,7 +26,6 @@ export default function HeaderLogo() {
           height={40}
           src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1761929834/Static/doulitsa-logo_mpqr5n.svg'
           alt='Doulitsa Logo'
-          unoptimized
           priority
           loading='eager'
         />

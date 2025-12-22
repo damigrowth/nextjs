@@ -7,6 +7,35 @@ import { JsonValue } from '@prisma/client/runtime/library';
 import { CloudinaryResource } from '@/lib/types/cloudinary';
 
 /**
+ * Image size presets for consistent optimization
+ */
+export const IMAGE_SIZES = {
+  avatar: {
+    sm: { width: 50, height: 50 },
+    md: { width: 100, height: 100 },
+    lg: { width: 150, height: 150 },
+    xl: { width: 200, height: 200 },
+    '2xl': { width: 300, height: 300 },
+  },
+  thumbnail: { width: 80, height: 80 },
+  card: { width: 400, height: 225 }, // 16:9 aspect ratio
+  cardLarge: { width: 600, height: 338 },
+  carousel: { width: 1200, height: 675 },
+  full: { width: 1920, height: 1080 },
+} as const;
+
+/**
+ * Quality presets for different use cases
+ */
+export const QUALITY_PRESETS = {
+  thumbnail: 'auto:eco',
+  card: 'auto:good',
+  avatar: 'auto:good',
+  carousel: 'auto:good',
+  full: 'auto:best',
+} as const;
+
+/**
  * Build Cloudinary URL with transformations
  */
 export function buildCloudinaryUrl(
@@ -14,15 +43,16 @@ export function buildCloudinaryUrl(
   options?: {
     width?: number;
     height?: number;
-    crop?: 'fill' | 'fit' | 'crop' | 'scale' | 'pad';
-    quality?: number | 'auto';
+    crop?: 'fill' | 'fit' | 'crop' | 'scale' | 'pad' | 'limit';
+    quality?: number | 'auto' | 'auto:eco' | 'auto:good' | 'auto:best' | 'auto:low';
     format?: 'auto' | 'jpg' | 'png' | 'webp' | 'avif';
-    gravity?: 'center' | 'face' | 'faces' | 'north' | 'south' | 'east' | 'west';
+    gravity?: 'center' | 'face' | 'faces' | 'north' | 'south' | 'east' | 'west' | 'auto';
     folder?: string;
+    dpr?: number | 'auto';
   }
 ) {
   if (!publicId) return '';
-  
+
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   if (!cloudName) {
     console.warn('Cloudinary cloud name not configured');
@@ -30,29 +60,61 @@ export function buildCloudinaryUrl(
   }
 
   const transformations: string[] = [];
-  
+
   if (options?.width) transformations.push(`w_${options.width}`);
   if (options?.height) transformations.push(`h_${options.height}`);
   if (options?.crop) transformations.push(`c_${options.crop}`);
   if (options?.quality) transformations.push(`q_${options.quality}`);
   if (options?.format) transformations.push(`f_${options.format}`);
   if (options?.gravity) transformations.push(`g_${options.gravity}`);
-  
-  const transformationString = transformations.length > 0 
-    ? `/${transformations.join(',')}` 
+  if (options?.dpr) transformations.push(`dpr_${options.dpr}`);
+
+  const transformationString = transformations.length > 0
+    ? `/${transformations.join(',')}`
     : '';
-  
+
   return `https://res.cloudinary.com/${cloudName}/image/upload${transformationString}/${publicId}`;
 }
 
 /**
- * Extract public ID from Cloudinary URL
+ * Extract public ID from Cloudinary URL (supports images and videos)
  */
 export function extractPublicId(cloudinaryUrl: string): string {
   if (!cloudinaryUrl) return '';
-  
-  const match = cloudinaryUrl.match(/\/image\/upload\/(?:v\d+\/)?(.+)$/);
-  return match?.[1] || '';
+
+  // Match both image and video URLs, preserving version and folder structure
+  // Supports formats like:
+  // - /image/upload/folder/file.jpg
+  // - /image/upload/v123456/folder/file.jpg
+  // - /image/upload/w_150,h_150,c_fill/v123456/folder/file.jpg (with transformations)
+  // - /image/upload/w_150,h_150,c_fill/folder/file.jpg (transformations, no version)
+
+  // Match everything after /upload/ including version, folders, and filename
+  const match = cloudinaryUrl.match(/\/(image|video)\/upload\/(.+)$/i);
+
+  if (match && match[2]) {
+    let publicId = match[2];
+
+    // Remove version prefix if present (e.g., v1234567/)
+    publicId = publicId.replace(/^v\d+\//, '');
+
+    // Remove file extension if present (e.g., .jpg, .png, .webp)
+    publicId = publicId.replace(/\.[a-z]+$/i, '');
+
+    // Debug logging for troubleshooting (remove in production)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Cloudinary Debug] Extracted public_id:', publicId, 'from URL:', cloudinaryUrl.substring(0, 100));
+    }
+
+    return publicId;
+  }
+
+  // If extraction fails, log for debugging
+  if (process.env.NODE_ENV === 'development' && cloudinaryUrl.includes('cloudinary')) {
+    console.warn('[Cloudinary] Failed to extract public_id from URL:', cloudinaryUrl.substring(0, 100));
+  }
+
+  return '';
 }
 
 /**
@@ -71,30 +133,173 @@ export function generateResponsiveSizes(publicId: string, sizes: { width: number
 }
 
 /**
- * Get optimized avatar URL
+ * Get optimized avatar URL with size preset
+ * @param publicId - Cloudinary public ID
+ * @param sizePreset - Avatar size preset (sm: 50px, md: 100px, lg: 150px, xl: 200px, 2xl: 300px)
  */
-export function getAvatarUrl(publicId: string, size: number = 150) {
+export function getAvatarUrl(
+  publicId: string,
+  sizePreset: keyof typeof IMAGE_SIZES.avatar = 'lg'
+) {
+  const size = IMAGE_SIZES.avatar[sizePreset];
   return buildCloudinaryUrl(publicId, {
-    width: size,
-    height: size,
+    width: size.width,
+    height: size.height,
     crop: 'fill',
     gravity: 'face',
-    quality: 'auto',
-    format: 'auto'
+    quality: QUALITY_PRESETS.avatar,
+    format: 'auto',
+    dpr: 'auto',
   });
 }
 
 /**
  * Get optimized thumbnail URL
  */
-export function getThumbnailUrl(publicId: string, width: number = 300, height: number = 200) {
+export function getThumbnailUrl(publicId: string, width: number = 80, height: number = 80) {
   return buildCloudinaryUrl(publicId, {
     width,
     height,
     crop: 'fill',
-    quality: 'auto',
-    format: 'auto'
+    quality: QUALITY_PRESETS.thumbnail,
+    format: 'auto',
+    dpr: 'auto',
   });
+}
+
+/**
+ * Get optimized card image URL
+ */
+export function getCardImageUrl(publicId: string, large: boolean = false) {
+  const size = large ? IMAGE_SIZES.cardLarge : IMAGE_SIZES.card;
+  return buildCloudinaryUrl(publicId, {
+    width: size.width,
+    height: size.height,
+    crop: 'fill',
+    quality: QUALITY_PRESETS.card,
+    format: 'auto',
+    dpr: 'auto',
+  });
+}
+
+/**
+ * Get optimized carousel image URL
+ */
+export function getCarouselImageUrl(publicId: string) {
+  return buildCloudinaryUrl(publicId, {
+    width: IMAGE_SIZES.carousel.width,
+    height: IMAGE_SIZES.carousel.height,
+    crop: 'limit', // Don't upscale
+    quality: QUALITY_PRESETS.carousel,
+    format: 'auto',
+    dpr: 'auto',
+  });
+}
+
+/**
+ * Get video thumbnail URL (poster image from first frame)
+ * @param publicId - Cloudinary video public_id (including version/folder if present)
+ * @param width - Thumbnail width in pixels
+ * @param height - Thumbnail height in pixels
+ * @returns Optimized video thumbnail URL
+ */
+export function getVideoThumbnailUrl(
+  publicId: string,
+  width: number = 400,
+  height: number = 225
+): string {
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  if (!cloudName || !publicId) return '';
+
+  // Video thumbnail transformations: extract first frame as JPG
+  const transformations = [
+    `w_${width}`,
+    `h_${height}`,
+    'c_fill',
+    'f_jpg',       // Format transformation specifies JPG output
+    'q_auto:good',
+    'so_0',        // Start offset at 0 seconds (first frame)
+  ].join(',');
+
+  // Note: No .jpg extension needed - f_jpg transformation handles format conversion
+  // Public ID may include version and folders (e.g., v1234567/Static/video-name)
+  return `https://res.cloudinary.com/${cloudName}/video/upload/${transformations}/${publicId}`;
+}
+
+/**
+ * Get optimized image URL from CloudinaryResource or URL string
+ * @param image - CloudinaryResource object or URL string
+ * @param preset - Image preset (avatar, thumbnail, card, etc.)
+ * @param avatarSize - Avatar size preset (only used when preset='avatar')
+ */
+export function getOptimizedImageUrl(
+  image: CloudinaryResource | string | null,
+  preset: 'avatar' | 'thumbnail' | 'card' | 'cardLarge' | 'carousel' | 'full' = 'card',
+  avatarSize?: keyof typeof IMAGE_SIZES.avatar
+): string | null {
+  if (!image) return null;
+
+  // Extract public_id or URL
+  const publicId = typeof image === 'object' && image.public_id
+    ? image.public_id
+    : typeof image === 'string' && image.includes('res.cloudinary.com')
+    ? extractPublicId(image)
+    : null;
+
+  if (!publicId) {
+    // Return original URL if it's a string (e.g., OAuth avatar)
+    // Debug log for non-Cloudinary images
+    if (process.env.NODE_ENV === 'development' && typeof image === 'string') {
+      console.log('[Cloudinary] Non-Cloudinary image, returning original URL:', image.substring(0, 100));
+    }
+    return typeof image === 'string' ? image : null;
+  }
+
+  // Apply preset transformations
+  switch (preset) {
+    case 'avatar':
+      return getAvatarUrl(publicId, avatarSize || 'lg');
+    case 'thumbnail':
+      return getThumbnailUrl(publicId);
+    case 'card':
+      return getCardImageUrl(publicId, false);
+    case 'cardLarge':
+      return getCardImageUrl(publicId, true);
+    case 'carousel':
+      return getCarouselImageUrl(publicId);
+    case 'full':
+      const size = IMAGE_SIZES.full;
+      return buildCloudinaryUrl(publicId, {
+        width: size.width,
+        height: size.height,
+        crop: 'limit',
+        quality: QUALITY_PRESETS.full,
+        format: 'auto',
+        dpr: 'auto',
+      });
+    default:
+      return getCardImageUrl(publicId);
+  }
+}
+
+/**
+ * Generate responsive srcSet for Next.js Image component
+ */
+export function getResponsiveSrcSet(
+  publicId: string,
+  sizes: number[] = [640, 750, 828, 1080, 1200, 1920]
+): string {
+  return sizes
+    .map(width => {
+      const url = buildCloudinaryUrl(publicId, {
+        width,
+        quality: 'auto:good',
+        format: 'auto',
+        crop: 'limit',
+      });
+      return `${url} ${width}w`;
+    })
+    .join(', ');
 }
 
 /**

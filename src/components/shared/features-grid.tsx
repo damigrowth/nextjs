@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { Star, DollarSign, Shield } from 'lucide-react';
+import { buildCloudinaryUrl, extractPublicId } from '@/lib/utils/cloudinary';
 
 type FeatureItem = {
   title: string;
@@ -27,6 +28,22 @@ const iconMap = {
 };
 
 export default function FeaturesGrid({ data }: Props) {
+  // Optimize image with crop: 'limit' to preserve aspect ratio
+  // (image changes from 4:3 on mobile to square on desktop)
+  const optimizedImageUrl = (() => {
+    const publicId = extractPublicId(data.image);
+    return publicId
+      ? buildCloudinaryUrl(publicId, {
+          width: 600,
+          height: 600,
+          crop: 'limit', // Preserve aspect ratio, don't upscale
+          quality: 'auto:good',
+          format: 'auto',
+          dpr: 'auto',
+        })
+      : data.image;
+  })();
+
   return (
     <section className='py-16 lg:py-24 bg-background'>
       <div className='container mx-auto px-4 sm:px-6 lg:px-8'>
@@ -46,8 +63,8 @@ export default function FeaturesGrid({ data }: Props) {
               {data.list.map((feature, index) => {
                 const IconComponent = iconMap[feature.icon as keyof typeof iconMap] || Star;
                 return (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className='flex gap-4 group hover:translate-x-1 transition-transform duration-300'
                   >
                     <div className='flex-shrink-0 w-12 h-12 bg-hsl(var(--primary))/10 rounded-lg flex items-center justify-center group-hover:bg-hsl(var(--primary))/20 transition-colors duration-300'>
@@ -71,7 +88,7 @@ export default function FeaturesGrid({ data }: Props) {
           <div className='order-1 lg:order-2'>
             <div className='relative'>
               <Image
-                src={data.image}
+                src={optimizedImageUrl}
                 alt={data.alt}
                 width={600}
                 height={600}
