@@ -9,20 +9,11 @@ import {
 } from '@/components/ui/carousel';
 import { galleryImagesHome } from '@/constants/datasets/data';
 import type { CarouselApi } from '@/components/ui/carousel';
-import { extractPublicId, buildCloudinaryUrl } from '@/lib/utils/cloudinary';
 
-// Optimized Cloudinary image URLs using centralized utilities
+// Optimized Cloudinary image URLs with transformations
 const optimizeCloudinaryUrl = (url: string) => {
-  const publicId = extractPublicId(url);
-  if (!publicId) return url;
-
-  return buildCloudinaryUrl(publicId, {
-    width: 285,
-    quality: 'auto:good',
-    format: 'auto',
-    crop: 'limit',
-    dpr: 'auto',
-  });
+  // Insert Cloudinary transformations: auto format, quality 80, width 285
+  return url.replace('/upload/', '/upload/f_auto,q_80,w_285/');
 };
 
 // Hero Image Gallery Component - Optimized for Google PageSpeed
