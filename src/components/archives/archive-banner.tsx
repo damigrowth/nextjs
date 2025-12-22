@@ -82,7 +82,7 @@ export function ArchiveBanner({
           className='absolute rounded-3xl h-45 right-12pc w-80 hidden lg:block z-0 object-cover'
           style={{ right: '12%' }}
           src={
-            getOptimizedImageUrl(image, 'card') ||
+            getOptimizedImageUrl(image?.secure_url, 'card') ||
             'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750071394/Static/vector-service-v1_p6jy69.webp'
           }
           priority

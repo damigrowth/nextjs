@@ -28,10 +28,7 @@ export default function ContentHero({ data }: Props) {
           <div className='w-full md:w-1/2 mb-8 sm:mb-8'>
             <Image
               src={
-                getOptimizedImageUrl(
-                  { secure_url: data.image, public_id: '' },
-                  'cardLarge'
-                ) || data.image
+                getOptimizedImageUrl(data.image, 'cardLarge') || data.image
               }
               alt='content hero'
               width={600}
