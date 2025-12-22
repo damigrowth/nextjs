@@ -188,7 +188,8 @@ export default function ChatsPage() {
                                 key={index}
                                 displayName={chat.participants[index]}
                                 image={avatar}
-                                size='sm'
+                                width={40}
+                                height={40}
                                 className='h-10 w-10 border-2 border-white'
                                 showBorder={false}
                                 showShadow={false}
@@ -291,7 +292,8 @@ export default function ChatsPage() {
                                   key={index}
                                   displayName={chat.participants[index]}
                                   image={avatar}
-                                  size='sm'
+                                  width={40}
+                                  height={40}
                                   className='h-10 w-10 border-2 border-white'
                                   showBorder={false}
                                 />
@@ -362,7 +364,8 @@ export default function ChatsPage() {
                                   key={index}
                                   displayName={chat.participants[index]}
                                   image={avatar}
-                                  size='sm'
+                                  width={40}
+                                  height={40}
                                   className='h-10 w-10 border-2 border-white'
                                   showBorder={false}
                                 />
@@ -443,7 +446,8 @@ export default function ChatsPage() {
                                   key={index}
                                   displayName={chat.participants[index]}
                                   image={avatar}
-                                  size='sm'
+                                  width={40}
+                                  height={40}
                                   className='h-10 w-10 border-2 border-white'
                                   showBorder={false}
                                 />

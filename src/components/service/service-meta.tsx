@@ -40,7 +40,7 @@ export default function ServiceMeta({
               displayName={displayName}
               image={image}
               top={topLevel}
-              size='md'
+              size='sm'
               className='h-10 w-10'
               href={`/profile/${username}`}
             />

@@ -72,7 +72,7 @@ export function AdminProfilesDataTable({
             <UserAvatar
               displayName={displayName}
               image={profile.image}
-              size='md'
+              size='sm'
               className='h-10 w-10'
               showBorder={false}
               showShadow={false}

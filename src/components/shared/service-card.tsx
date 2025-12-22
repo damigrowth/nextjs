@@ -98,7 +98,8 @@ export default function ServiceCard({
                   <UserAvatar
                     displayName={service.profile.displayName}
                     image={service.profile.image}
-                    size='sm'
+                    width={24}
+                    height={24}
                     className='h-6 w-6'
                     showBorder={false}
                     showShadow={false}
