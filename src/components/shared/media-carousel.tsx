@@ -326,7 +326,9 @@ export default function MediaCarousel({
           );
         }
         // Use optimized Cloudinary URL for images - 85%+ bandwidth savings
-        const optimizedUrl = getOptimizedImageUrl(item, 'carousel') || mediaUrl;
+        // Use context-aware sizing: smaller for archives (compactMode), larger for detail pages
+        const imagePreset = compactMode ? 'cardLarge' : 'carousel';
+        const optimizedUrl = getOptimizedImageUrl(item, imagePreset) || mediaUrl;
         return (
           <div className='relative h-full w-full'>
             <Image

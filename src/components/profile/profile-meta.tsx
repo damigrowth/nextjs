@@ -103,6 +103,9 @@ export default function ProfileMeta({
               image={image}
               top={top}
               size='2xl'
+              width={112}
+              height={112}
+              className='h-28 w-28'
             />
 
             {/* Profile info */}

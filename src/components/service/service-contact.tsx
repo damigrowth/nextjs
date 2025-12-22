@@ -64,6 +64,9 @@ export default function ServiceContact({
               image={image}
               top={false}
               size='xl'
+              width={72}
+              height={72}
+              className='h-[72px] w-[72px]'
             />
           </NextLink>
 
