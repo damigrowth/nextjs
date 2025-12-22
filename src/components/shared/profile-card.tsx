@@ -39,7 +39,7 @@ export default function ProfileCard({
           <UserAvatar
             displayName={displayName}
             image={image}
-            size='xl'
+            size='md'
             className='h-20 w-20 rounded-2xl'
             showShadow={false}
             href={`/profile/${username}`}

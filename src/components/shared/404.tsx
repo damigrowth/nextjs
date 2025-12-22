@@ -1,8 +1,29 @@
+import React from 'react';
 import Image from 'next/image';
+import {
+  buildCloudinaryUrl,
+  extractPublicId,
+} from '@/lib/utils/cloudinary';
 // import LinkNP from '@/components/link';
 // import { ArrowRightLong } from '@/components/icon/fa';
 
 export default function Four0Four() {
+  const errorImageUrl = React.useMemo(() => {
+    const url =
+      'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750081347/Static/error-page-img_rr1uvk.svg';
+    const publicId = extractPublicId(url);
+    return publicId
+      ? buildCloudinaryUrl(publicId, {
+          width: 300,
+          height: 300,
+          crop: 'limit',
+          quality: 'auto:good',
+          format: 'auto',
+          dpr: 'auto',
+        })
+      : url;
+  }, []);
+
   return (
     <>
       <section className='our-error'>
@@ -15,7 +36,7 @@ export default function Four0Four() {
                     height={300}
                     width={300}
                     className='w-100'
-                    src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750081347/Static/error-page-img_rr1uvk.svg'
+                    src={errorImageUrl}
                     alt='error-page-img'
                   />
                 </div>

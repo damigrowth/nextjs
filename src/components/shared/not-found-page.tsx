@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
+import React from 'react';
 import Image from 'next/image';
 import { NavigationButton } from './navigation-button';
+import {
+  buildCloudinaryUrl,
+  extractPublicId,
+} from '@/lib/utils/cloudinary';
 
 interface NotFoundPageProps {
   title?: string;
@@ -23,6 +28,22 @@ export function NotFoundPage({
   backButtonHref = '/',
   className = '',
 }: NotFoundPageProps) {
+  const notFoundImageUrl = React.useMemo(() => {
+    const url =
+      'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750081347/Static/error-page-img_rr1uvk.svg';
+    const publicId = extractPublicId(url);
+    return publicId
+      ? buildCloudinaryUrl(publicId, {
+          width: 400,
+          height: 400,
+          crop: 'limit',
+          quality: 'auto:good',
+          format: 'auto',
+          dpr: 'auto',
+        })
+      : url;
+  }, []);
+
   return (
     <div
       className={`min-h-screen flex justify-center items-center bg-silver py-20 ${className}`}
@@ -36,7 +57,7 @@ export function NotFoundPage({
                 height={400}
                 width={400}
                 className='w-full max-w-md mx-auto lg:mx-0'
-                src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750081347/Static/error-page-img_rr1uvk.svg'
+                src={notFoundImageUrl}
                 alt='Η σελίδα δεν βρέθηκε'
                 priority
               />
