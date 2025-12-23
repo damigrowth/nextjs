@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Performance optimizations
+  swcMinify: true, // Use SWC for faster minification
+  poweredByHeader: false, // Remove X-Powered-By header for security
+  generateEtags: true, // Enable ETags for better caching
+
   experimental: {
     globalNotFound: true,
     browserDebugInfoInTerminal: true,
@@ -11,7 +16,7 @@ const nextConfig = {
     reactCompiler: true,
     inlineCss: true,
     optimizeCss: true,
-    webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB'],
+    webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB', 'INP'],
     optimizePackageImports: [
       '@apollo/client',
       'react-loading-skeleton',
@@ -24,6 +29,8 @@ const nextConfig = {
       'react-countup',
       'date-fns',
       'lodash.debounce',
+      'lucide-react',
+      '@radix-ui/react-icons',
     ],
   },
   images: {
@@ -33,7 +40,9 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 160, 200, 256, 285, 331],
     formats: ['image/webp'],
     minimumCacheTTL: 2678400, // 31 days
-    qualities: [75, 80, 90, 100], // Support quality parameter
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: 'https',
@@ -94,6 +103,11 @@ const nextConfig = {
 
   // Enable compression
   compress: true,
+
+  // Production-only optimizations
+  ...(process.env.NODE_ENV === 'production' && {
+    productionBrowserSourceMaps: false, // Disable source maps in production
+  }),
 };
 
 module.exports = nextConfig;
