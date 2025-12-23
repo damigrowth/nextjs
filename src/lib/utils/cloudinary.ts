@@ -55,7 +55,6 @@ export function buildCloudinaryUrl(
 
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   if (!cloudName) {
-    console.warn('Cloudinary cloud name not configured');
     return '';
   }
 
@@ -101,17 +100,7 @@ export function extractPublicId(cloudinaryUrl: string): string {
     // Remove file extension if present (e.g., .jpg, .png, .webp)
     publicId = publicId.replace(/\.[a-z]+$/i, '');
 
-    // Debug logging for troubleshooting (remove in production)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Cloudinary Debug] Extracted public_id:', publicId, 'from URL:', cloudinaryUrl.substring(0, 100));
-    }
-
     return publicId;
-  }
-
-  // If extraction fails, log for debugging
-  if (process.env.NODE_ENV === 'development' && cloudinaryUrl.includes('cloudinary')) {
-    console.warn('[Cloudinary] Failed to extract public_id from URL:', cloudinaryUrl.substring(0, 100));
   }
 
   return '';
@@ -248,10 +237,6 @@ export function getOptimizedImageUrl(
 
   if (!publicId) {
     // Return original URL if it's a string (e.g., OAuth avatar)
-    // Debug log for non-Cloudinary images
-    if (process.env.NODE_ENV === 'development' && typeof image === 'string') {
-      console.log('[Cloudinary] Non-Cloudinary image, returning original URL:', image.substring(0, 100));
-    }
     return typeof image === 'string' ? image : null;
   }
 
@@ -428,13 +413,11 @@ export function processImageForDatabase(imageData: any): string | null {
   if (typeof imageData === 'string') {
     // Reject blob URLs (client-side temporary URLs that should never be persisted)
     if (imageData.startsWith('blob:')) {
-      console.warn('❌ Rejected blob URL in processImageForDatabase:', imageData);
       return null;
     }
 
     // Validate it's a proper HTTPS URL (Cloudinary or OAuth provider)
     if (!imageData.startsWith('https://')) {
-      console.warn('❌ Rejected non-HTTPS URL in processImageForDatabase:', imageData);
       return null;
     }
 
@@ -447,13 +430,11 @@ export function processImageForDatabase(imageData: any): string | null {
 
     // Reject blob URLs from CloudinaryResource objects
     if (url.startsWith('blob:')) {
-      console.warn('❌ Rejected blob URL from CloudinaryResource in processImageForDatabase:', url);
       return null;
     }
 
     // Validate HTTPS URL
     if (!url.startsWith('https://')) {
-      console.warn('❌ Rejected non-HTTPS URL from CloudinaryResource in processImageForDatabase:', url);
       return null;
     }
 

@@ -212,7 +212,6 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
         // Clear uploaded files from queue
         setQueuedFiles((prev) => prev.filter((qf) => !qf.isUploaded));
       } catch (error) {
-        console.error('Upload failed:', error);
         setUploadError(
           error instanceof Error
             ? error.message
