@@ -93,10 +93,10 @@ export default function MediaDisplay({
     switch (item.resource_type) {
       case 'video':
         // Use video thumbnail until user clicks play
-        // Use 'card' preset (400×225px) to match image optimization strategy
+        // Use 'cardResponsive' preset (294×165px) to match image optimization strategy
         const publicId = extractPublicId(mediaUrl);
         const thumbnailUrl = publicId
-          ? getVideoThumbnailUrl(publicId, IMAGE_SIZES.card.width, IMAGE_SIZES.card.height)
+          ? getVideoThumbnailUrl(publicId, IMAGE_SIZES.cardResponsive.width, IMAGE_SIZES.cardResponsive.height)
           : null;
 
         if (!showVideo && thumbnailUrl) {
@@ -108,7 +108,7 @@ export default function MediaDisplay({
                 alt={item.original_filename || 'Video thumbnail'}
                 fill
                 className='object-cover'
-                sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+                sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 294px'
                 loading={loading}
                 priority={priority}
               />
@@ -218,15 +218,15 @@ export default function MediaDisplay({
 
       case 'image':
       default:
-        // Use optimized Cloudinary URL
-        const optimizedUrl = getOptimizedImageUrl(item, 'card') || mediaUrl;
+        // Use optimized Cloudinary URL with responsive sizing
+        const optimizedUrl = getOptimizedImageUrl(item, 'cardResponsive') || mediaUrl;
         return (
           <Image
             src={optimizedUrl}
             alt={item.original_filename || 'Service media'}
             fill
             className='object-cover'
-            sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+            sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 294px'
             loading={loading}
             priority={priority}
           />

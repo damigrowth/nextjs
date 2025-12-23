@@ -18,7 +18,8 @@ export const IMAGE_SIZES = {
     '2xl': { width: 300, height: 300 },
   },
   thumbnail: { width: 80, height: 80 },
-  card: { width: 400, height: 225 }, // 16:9 aspect ratio
+  card: { width: 400, height: 225 }, // 16:9 aspect ratio (legacy)
+  cardResponsive: { width: 358, height: 201 }, // Actual rendered size for service cards
   cardLarge: { width: 600, height: 338 },
   carousel: { width: 1200, height: 675 },
   full: { width: 1920, height: 1080 },
@@ -29,7 +30,7 @@ export const IMAGE_SIZES = {
  */
 export const QUALITY_PRESETS = {
   thumbnail: 'auto:eco',
-  card: 'auto:good',
+  card: 'auto:eco',
   avatar: 'auto:good',
   carousel: 'auto:good',
   full: 'auto:best',
@@ -160,12 +161,12 @@ export function getThumbnailUrl(publicId: string, width: number = 80, height: nu
  * Get optimized card image URL
  */
 export function getCardImageUrl(publicId: string, large: boolean = false) {
-  const size = large ? IMAGE_SIZES.cardLarge : IMAGE_SIZES.card;
+  const size = large ? IMAGE_SIZES.cardLarge : IMAGE_SIZES.cardResponsive;
   return buildCloudinaryUrl(publicId, {
     width: size.width,
     height: size.height,
     crop: 'fill',
-    quality: QUALITY_PRESETS.card,
+    quality: 'auto:eco',
     format: 'auto',
     dpr: 'auto',
   });
@@ -223,7 +224,7 @@ export function getVideoThumbnailUrl(
  */
 export function getOptimizedImageUrl(
   image: CloudinaryResource | string | null,
-  preset: 'avatar' | 'thumbnail' | 'card' | 'cardLarge' | 'carousel' | 'full' = 'card',
+  preset: 'avatar' | 'thumbnail' | 'card' | 'cardResponsive' | 'cardLarge' | 'carousel' | 'full' = 'card',
   avatarSize?: keyof typeof IMAGE_SIZES.avatar
 ): string | null {
   if (!image) return null;
@@ -247,6 +248,8 @@ export function getOptimizedImageUrl(
     case 'thumbnail':
       return getThumbnailUrl(publicId);
     case 'card':
+      return getCardImageUrl(publicId, false);
+    case 'cardResponsive':
       return getCardImageUrl(publicId, false);
     case 'cardLarge':
       return getCardImageUrl(publicId, true);
