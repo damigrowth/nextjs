@@ -287,8 +287,8 @@ export function getResponsiveCardImageUrl(publicId: string) {
   ];
 
   const srcSet = sizes.map(size => {
-    // Use more aggressive compression for mobile and standard sizes
-    const quality = size.width <= 358 ? 'auto:low' : 'auto:eco';
+    // Use numeric quality for more aggressive and predictable compression
+    const quality = size.width <= 358 ? 45 : 65;
     const url = buildCloudinaryUrl(publicId, {
       width: size.width,
       height: size.height,
@@ -305,7 +305,7 @@ export function getResponsiveCardImageUrl(publicId: string) {
     width: 358,
     height: 201,
     crop: 'fill',
-    quality: 'auto:low', // More aggressive compression for default
+    quality: 45, // Use numeric quality for consistent compression
     format: 'webp',
     dpr: 'auto',
   });
