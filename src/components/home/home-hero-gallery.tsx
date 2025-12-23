@@ -75,7 +75,7 @@ export default function HeroImageGallery() {
       >
         <CarouselContent className='py-2 pb-4'>
           {galleryImagesHome.map((image, index) => {
-            const isVisible = index < 3; // Only first 3 images are visible initially
+            const isVisible = index < 5; // First 5 images are visible initially
 
             return (
               <CarouselItem
@@ -93,6 +93,7 @@ export default function HeroImageGallery() {
                     loading={isVisible ? 'eager' : 'lazy'}
                     priority={isVisible}
                     placeholder='empty'
+                    fetchPriority={isVisible ? 'high' : 'auto'}
                   />
                 </div>
               </CarouselItem>
