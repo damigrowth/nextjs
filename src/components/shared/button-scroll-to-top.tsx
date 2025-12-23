@@ -8,18 +8,30 @@ export default function BottomToTop() {
 
   // scroll from top
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+    let throttleTimer: NodeJS.Timeout | null = null;
 
-      setBottom(scrollTop > 200);
+    const handleScroll = () => {
+      // Use requestAnimationFrame to defer layout read
+      requestAnimationFrame(() => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        setBottom(scrollTop > 200);
+      });
+    };
+
+    // Throttle scroll events to max 10/second
+    const throttledScroll = () => {
+      if (throttleTimer) return;
+      throttleTimer = setTimeout(() => {
+        handleScroll();
+        throttleTimer = null;
+      }, 100);
     };
 
     if (typeof window !== 'undefined') {
-      window.addEventListener('scroll', handleScroll);
+      window.addEventListener('scroll', throttledScroll, { passive: true });
 
       return () => {
-        window.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('scroll', throttledScroll);
       };
     }
   }, []);
