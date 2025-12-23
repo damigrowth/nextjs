@@ -1,20 +1,12 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import dynamic from 'next/dynamic';
 import { Star, Rocket, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { HomeSearch } from './home-search';
+import HeroImageGallery from './home-hero-gallery';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { NextLink } from '../shared';
-
-// Lazy load carousel to reduce initial bundle size
-const HeroImageGallery = dynamic(() => import('./home-hero-gallery'), {
-  ssr: false,
-  loading: () => (
-    <div className='w-full max-w-3xl lg:max-w-4xl mt-6 md:mt-10 min-h-[200px] sm:min-h-[240px] md:min-h-[280px]' />
-  ),
-});
 
 // Static content that renders immediately for better LCP
 function StaticHeroContent() {
@@ -139,7 +131,7 @@ export default function HeroHome({ popularSubcategories = [] }: HeroHomeProps) {
             </div>
           </div>
 
-          {/* Image Gallery - Lazy loaded, not critical for LCP */}
+          {/* Image Gallery - Critical for LCP on desktop */}
           <HeroImageGallery />
         </div>
       </div>

@@ -70,7 +70,14 @@ export default function HeroImageGallery() {
       >
         <CarouselContent className='py-2 pb-4'>
           {galleryImagesHome.map((image, index) => {
-            const isVisible = index < 5; // First 5 images are visible initially
+            // First 5 images are visible on desktop, 2 on mobile
+            const isLCP = index === 2; // Third image is typically LCP on desktop
+
+            // Optimize loading strategy
+            let loading: 'eager' | 'lazy' = 'lazy';
+            if (index < 2) loading = 'eager'; // First 2 always eager (mobile)
+            else if (index < 5) loading = 'eager'; // Next 3 eager on desktop
+            else loading = 'lazy'; // Rest are lazy
 
             return (
               <CarouselItem
@@ -89,7 +96,8 @@ export default function HeroImageGallery() {
                         width={285}
                         height={380}
                         className='object-contain w-full h-auto'
-                        loading={isVisible ? 'eager' : 'lazy'}
+                        loading={loading}
+                        {...(isLCP && { fetchPriority: 'high' } as any)}
                       />
                     );
                   })()}
