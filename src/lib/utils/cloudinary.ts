@@ -112,10 +112,10 @@ export function extractPublicId(cloudinaryUrl: string): string {
  */
 export function generateResponsiveSizes(publicId: string, sizes: { width: number; breakpoint?: string }[]) {
   return sizes.map(({ width, breakpoint }) => ({
-    url: buildCloudinaryUrl(publicId, { 
-      width, 
-      quality: 'auto', 
-      format: 'auto' 
+    url: buildCloudinaryUrl(publicId, {
+      width,
+      quality: 'auto',
+      format: 'webp'
     }),
     width,
     breakpoint
@@ -138,7 +138,7 @@ export function getAvatarUrl(
     crop: 'fill',
     gravity: 'face',
     quality: QUALITY_PRESETS.avatar,
-    format: 'auto',
+    format: 'webp',
     dpr: 'auto',
   });
 }
@@ -152,7 +152,7 @@ export function getThumbnailUrl(publicId: string, width: number = 80, height: nu
     height,
     crop: 'fill',
     quality: QUALITY_PRESETS.thumbnail,
-    format: 'auto',
+    format: 'webp',
     dpr: 'auto',
   });
 }
@@ -167,7 +167,7 @@ export function getCardImageUrl(publicId: string, large: boolean = false) {
     height: size.height,
     crop: 'fill',
     quality: 'auto:eco',
-    format: 'auto',
+    format: 'webp',
     dpr: 'auto',
   });
 }
@@ -181,7 +181,7 @@ export function getCarouselImageUrl(publicId: string) {
     height: IMAGE_SIZES.carousel.height,
     crop: 'limit', // Don't upscale
     quality: QUALITY_PRESETS.carousel,
-    format: 'auto',
+    format: 'webp',
     dpr: 'auto',
   });
 }
@@ -262,7 +262,7 @@ export function getOptimizedImageUrl(
         height: size.height,
         crop: 'limit',
         quality: QUALITY_PRESETS.full,
-        format: 'auto',
+        format: 'webp',
         dpr: 'auto',
       });
     default:

@@ -12,8 +12,8 @@ import type { CarouselApi } from '@/components/ui/carousel';
 
 // Optimized Cloudinary image URLs with transformations
 const optimizeCloudinaryUrl = (url: string) => {
-  // Insert Cloudinary transformations: auto format, quality 80, width 285
-  return url.replace('/upload/', '/upload/f_auto,q_80,w_285/');
+  // Insert Cloudinary transformations: WebP format, quality 80, width 285
+  return url.replace('/upload/', '/upload/f_webp,q_80,w_285/');
 };
 
 // Hero Image Gallery Component - Optimized for Google PageSpeed
