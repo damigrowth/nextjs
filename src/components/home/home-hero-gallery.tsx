@@ -89,7 +89,7 @@ export default function HeroImageGallery() {
                     width={285}
                     height={380}
                     className='object-contain w-full h-auto'
-                    sizes='(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 20vw, 285px'
+                    sizes='(max-width: 640px) 234px, (max-width: 768px) 33vw, (max-width: 1024px) 20vw, 285px'
                     loading={isVisible ? 'eager' : 'lazy'}
                     priority={isVisible}
                     placeholder='empty'

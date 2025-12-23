@@ -108,7 +108,7 @@ export default function MediaDisplay({
                 alt={item.original_filename || 'Video thumbnail'}
                 fill
                 className='object-cover'
-                sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 294px'
+                sizes='(max-width: 640px) 295px, (max-width: 1024px) 50vw, 358px'
                 loading={loading}
                 priority={priority}
               />
@@ -226,7 +226,7 @@ export default function MediaDisplay({
             alt={item.original_filename || 'Service media'}
             fill
             className='object-cover'
-            sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 294px'
+            sizes='(max-width: 640px) 295px, (max-width: 1024px) 50vw, 358px'
             loading={loading}
             priority={priority}
           />
