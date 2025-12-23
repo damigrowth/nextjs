@@ -57,7 +57,6 @@ export function CloudinaryMediaPicker({
 
   const openMediaLibrary = async () => {
     if (!window.cloudinary) {
-      console.error('Cloudinary Media Library not loaded');
       return;
     }
 
@@ -118,7 +117,6 @@ export function CloudinaryMediaPicker({
 
       widgetRef.current.show();
     } catch (error) {
-      console.error('Error opening Media Library:', error);
       alert('Failed to open Media Library. Please try again.');
     } finally {
       setIsLoading(false);

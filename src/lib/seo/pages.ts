@@ -231,7 +231,7 @@ export async function getOAuthSetupMetadata() {
 }
 
 /**
- * Home page metadata generation
+ * Home page metadata generation with performance optimizations
  */
 export async function getHomeMetadata() {
   const { meta } = await Meta({
@@ -243,7 +243,16 @@ export async function getHomeMetadata() {
     url: '/',
   });
 
-  return meta;
+  // Add resource hints for performance optimization
+  return {
+    ...meta,
+    other: {
+      // DNS prefetch for external resources
+      'dns-prefetch': 'https://res.cloudinary.com',
+      // Preconnect to critical origins
+      'preconnect': 'https://res.cloudinary.com',
+    },
+  };
 }
 
 /**

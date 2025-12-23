@@ -92,7 +92,6 @@ export default function HeroImageGallery() {
                     sizes='(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 20vw, 285px'
                     loading={isVisible ? 'eager' : 'lazy'}
                     priority={isVisible}
-                    quality={80}
                     placeholder='empty'
                   />
                 </div>
