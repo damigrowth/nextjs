@@ -8,13 +8,8 @@ import {
   CarouselItem,
 } from '@/components/ui/carousel';
 import { galleryImagesHome } from '@/constants/datasets/data';
+import { getResponsiveGalleryImageUrl } from '@/lib/utils/cloudinary';
 import type { CarouselApi } from '@/components/ui/carousel';
-
-// Optimized Cloudinary image URLs with transformations
-const optimizeCloudinaryUrl = (url: string) => {
-  // Insert Cloudinary transformations: WebP format, quality 80, width 285
-  return url.replace('/upload/', '/upload/f_webp,q_80,w_285/');
-};
 
 // Hero Image Gallery Component - Optimized for Google PageSpeed
 export default function HeroImageGallery() {
@@ -83,18 +78,21 @@ export default function HeroImageGallery() {
                 className='basis-1/2 sm:basis-1/2 md:basis-1/3 lg:basis-1/5'
               >
                 <div className='relative rounded-2xl overflow-hidden shadow-lg max-w-[285px] max-h-[380px] w-full h-auto bg-white'>
-                  <Image
-                    src={optimizeCloudinaryUrl(image.src)}
-                    alt={image.alt}
-                    width={285}
-                    height={380}
-                    className='object-contain w-full h-auto'
-                    sizes='(max-width: 640px) 234px, (max-width: 768px) 33vw, (max-width: 1024px) 20vw, 285px'
-                    loading={isVisible ? 'eager' : 'lazy'}
-                    priority={isVisible}
-                    placeholder='empty'
-                    fetchPriority={isVisible ? 'high' : 'auto'}
-                  />
+                  {(() => {
+                    const { src, srcSet } = getResponsiveGalleryImageUrl(image.src);
+                    return (
+                      <img
+                        src={src}
+                        srcSet={srcSet}
+                        sizes='(max-width: 640px) 234px, (max-width: 768px) 33vw, (max-width: 1024px) 20vw, 285px'
+                        alt={image.alt}
+                        width={285}
+                        height={380}
+                        className='object-contain w-full h-auto'
+                        loading={isVisible ? 'eager' : 'lazy'}
+                      />
+                    );
+                  })()}
                 </div>
               </CarouselItem>
             );

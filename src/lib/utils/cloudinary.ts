@@ -19,7 +19,7 @@ export const IMAGE_SIZES = {
   },
   thumbnail: { width: 80, height: 80 },
   card: { width: 400, height: 225 }, // 16:9 aspect ratio (legacy)
-  cardResponsive: { width: 358, height: 201 }, // Actual rendered size for service cards
+  cardResponsive: { width: 358, height: 201 }, // Default size for old functions
   cardLarge: { width: 600, height: 338 },
   carousel: { width: 1200, height: 675 },
   full: { width: 1920, height: 1080 },
@@ -268,6 +268,81 @@ export function getOptimizedImageUrl(
     default:
       return getCardImageUrl(publicId);
   }
+}
+
+/**
+ * Get responsive card image URLs with srcset for optimal loading
+ * Returns both a default src and a srcSet string for responsive images
+ */
+export function getResponsiveCardImageUrl(publicId: string) {
+  if (!publicId) return { src: '', srcSet: '' };
+
+  // Generate multiple sizes for srcset (aspect ratio 16:9 approximately)
+  const sizes = [
+    { width: 295, height: 165 }, // Mobile (PageSpeed optimal)
+    { width: 358, height: 201 }, // Tablet/Default
+    { width: 590, height: 330 }, // 2x Mobile
+    { width: 716, height: 401 }, // 2x Tablet
+  ];
+
+  const srcSet = sizes.map(size => {
+    const url = buildCloudinaryUrl(publicId, {
+      width: size.width,
+      height: size.height,
+      crop: 'fill',
+      quality: 'auto:eco',
+      format: 'webp',
+      dpr: 'auto',
+    });
+    return `${url} ${size.width}w`;
+  }).join(', ');
+
+  // Default src for fallback (use tablet size as default)
+  const defaultSrc = buildCloudinaryUrl(publicId, {
+    width: 358,
+    height: 201,
+    crop: 'fill',
+    quality: 'auto:eco',
+    format: 'webp',
+    dpr: 'auto',
+  });
+
+  return { src: defaultSrc, srcSet };
+}
+
+/**
+ * Get responsive gallery image URLs with srcset for optimal loading
+ * Returns both a default src and a srcSet string for responsive images
+ */
+export function getResponsiveGalleryImageUrl(url: string) {
+  const publicId = extractPublicId(url);
+  if (!publicId) return { src: url, srcSet: '' };
+
+  // Generate multiple sizes for srcset (maintaining aspect ratio)
+  const sizes = [
+    { width: 234 }, // Mobile (PageSpeed optimal)
+    { width: 285 }, // Default/Tablet
+    { width: 468 }, // 2x Mobile
+    { width: 570 }, // 2x Default
+  ];
+
+  const srcSet = sizes.map(size => {
+    const optimizedUrl = buildCloudinaryUrl(publicId, {
+      width: size.width,
+      quality: 80,
+      format: 'webp',
+    });
+    return `${optimizedUrl} ${size.width}w`;
+  }).join(', ');
+
+  // Default for fallback
+  const defaultSrc = buildCloudinaryUrl(publicId, {
+    width: 285,
+    quality: 80,
+    format: 'webp',
+  });
+
+  return { src: defaultSrc, srcSet };
 }
 
 /**

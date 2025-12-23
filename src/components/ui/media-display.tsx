@@ -15,6 +15,7 @@ import {
   getVideoThumbnailUrl,
   extractPublicId,
   IMAGE_SIZES,
+  getResponsiveCardImageUrl,
 } from '@/lib/utils/cloudinary';
 
 interface MediaDisplayProps {
@@ -218,19 +219,36 @@ export default function MediaDisplay({
 
       case 'image':
       default:
-        // Use optimized Cloudinary URL with responsive sizing
-        const optimizedUrl = getOptimizedImageUrl(item, 'cardResponsive') || mediaUrl;
-        return (
-          <Image
-            src={optimizedUrl}
-            alt={item.original_filename || 'Service media'}
-            fill
-            className='object-cover'
-            sizes='(max-width: 640px) 295px, (max-width: 1024px) 50vw, 358px'
-            loading={loading}
-            priority={priority}
-          />
-        );
+        // Extract publicId for responsive image generation
+        const imagePublicId = extractPublicId(mediaUrl);
+        if (imagePublicId) {
+          // Use responsive srcset for optimal loading
+          const { src, srcSet } = getResponsiveCardImageUrl(imagePublicId);
+          return (
+            <img
+              src={src}
+              srcSet={srcSet}
+              sizes='(max-width: 640px) 295px, (max-width: 1024px) 50vw, 358px'
+              alt={item.original_filename || 'Service media'}
+              className='absolute inset-0 h-full w-full object-cover'
+              loading={loading === 'lazy' ? 'lazy' : 'eager'}
+            />
+          );
+        } else {
+          // Fallback for non-Cloudinary images
+          const optimizedUrl = getOptimizedImageUrl(item, 'cardResponsive') || mediaUrl;
+          return (
+            <Image
+              src={optimizedUrl}
+              alt={item.original_filename || 'Service media'}
+              fill
+              className='object-cover'
+              sizes='(max-width: 640px) 295px, (max-width: 1024px) 50vw, 358px'
+              loading={loading}
+              priority={priority}
+            />
+          );
+        }
     }
   };
 
