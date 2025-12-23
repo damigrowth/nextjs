@@ -71,7 +71,7 @@ export default function HeroImageGallery() {
         <CarouselContent className='py-2 pb-4'>
           {galleryImagesHome.map((image, index) => {
             // First 5 images are visible on desktop, 2 on mobile
-            const isLCP = index === 2; // Third image is typically LCP on desktop
+            const isLCP = index === 0; // First image is LCP on mobile
 
             // Optimize loading strategy
             let loading: 'eager' | 'lazy' = 'lazy';
