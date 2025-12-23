@@ -17,6 +17,7 @@ const nextConfig = {
     inlineCss: true,
     optimizeCss: true,
     webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB', 'INP'],
+    legacyBrowsers: false, // Disable legacy browser support
     optimizePackageImports: [
       '@apollo/client',
       'react-loading-skeleton',
