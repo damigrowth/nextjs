@@ -30,7 +30,7 @@ export const IMAGE_SIZES = {
  */
 export const QUALITY_PRESETS = {
   thumbnail: 'auto:eco',
-  card: 'auto:eco',
+  card: 'auto:low', // More aggressive compression for cards
   avatar: 'auto:good',
   carousel: 'auto:good',
   full: 'auto:best',
@@ -162,11 +162,12 @@ export function getThumbnailUrl(publicId: string, width: number = 80, height: nu
  */
 export function getCardImageUrl(publicId: string, large: boolean = false) {
   const size = large ? IMAGE_SIZES.cardLarge : IMAGE_SIZES.cardResponsive;
+  const quality = large ? QUALITY_PRESETS.carousel : QUALITY_PRESETS.card;
   return buildCloudinaryUrl(publicId, {
     width: size.width,
     height: size.height,
     crop: 'fill',
-    quality: 'auto:eco',
+    quality,
     format: 'webp',
     dpr: 'auto',
   });
@@ -286,11 +287,13 @@ export function getResponsiveCardImageUrl(publicId: string) {
   ];
 
   const srcSet = sizes.map(size => {
+    // Use more aggressive compression for mobile sizes
+    const quality = size.width <= 295 ? 'auto:low' : 'auto:eco';
     const url = buildCloudinaryUrl(publicId, {
       width: size.width,
       height: size.height,
       crop: 'fill',
-      quality: 'auto:eco',
+      quality,
       format: 'webp',
       dpr: 'auto',
     });
@@ -327,9 +330,11 @@ export function getResponsiveGalleryImageUrl(url: string) {
   ];
 
   const srcSet = sizes.map(size => {
+    // Use more aggressive compression for mobile sizes
+    const quality = size.width <= 234 ? 'auto:low' : 80;
     const optimizedUrl = buildCloudinaryUrl(publicId, {
       width: size.width,
-      quality: 80,
+      quality,
       format: 'webp',
     });
     return `${optimizedUrl} ${size.width}w`;
