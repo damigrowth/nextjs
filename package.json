@@ -167,5 +167,11 @@
   },
   "prisma": {
     "schema": "./src/lib/prisma/schema/"
-  }
+  },
+  "browserslist": [
+    "chrome >= 90",
+    "edge >= 90",
+    "firefox >= 88",
+    "safari >= 14"
+  ]
 }
