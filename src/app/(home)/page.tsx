@@ -18,17 +18,7 @@ export const revalidate = 86400; // Revalidate every 24 hours (1 day)
 export const fetchCache = 'force-cache';
 
 export async function generateMetadata() {
-  const metadata = await getHomeMetadata();
-
-  // Add critical resource preloading
-  return {
-    ...metadata,
-    other: {
-      ...metadata.other,
-      // Preload critical fonts (if using custom fonts)
-      // This should match your actual font files
-    },
-  };
+  return await getHomeMetadata();
 }
 
 export async function generateStaticParams() {

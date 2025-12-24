@@ -243,16 +243,7 @@ export async function getHomeMetadata() {
     url: '/',
   });
 
-  // Add resource hints for performance optimization
-  return {
-    ...meta,
-    other: {
-      // DNS prefetch for external resources
-      'dns-prefetch': 'https://res.cloudinary.com',
-      // Preconnect to critical origins
-      'preconnect': 'https://res.cloudinary.com',
-    },
-  };
+  return { meta };
 }
 
 /**

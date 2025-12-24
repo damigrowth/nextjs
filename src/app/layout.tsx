@@ -31,6 +31,11 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
   return (
     <html lang='el' suppressHydrationWarning>
+      <head>
+        {/* Resource hints for Cloudinary image optimization */}
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+      </head>
       <Body>
         <TooltipProvider delayDuration={0}>
           <main>
