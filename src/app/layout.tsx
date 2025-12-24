@@ -3,6 +3,7 @@ import '../styles/globals.css';
 
 import Script from 'next/script';
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
+import { Metadata } from 'next';
 
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { config } from '@fortawesome/fontawesome-svg-core';
@@ -21,6 +22,14 @@ import {
   Notifications,
 } from '@/components/shared/layout/wrapper';
 import { TooltipProvider } from '@/components/ui/tooltip';
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη',
+    template: '%s | Doulitsa',
+  },
+  description: 'Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα.',
+};
 
 interface RootLayoutProps {
   children: React.ReactNode;
