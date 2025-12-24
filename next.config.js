@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Performance optimizations
-  swcMinify: true, // Use SWC for faster minification
   poweredByHeader: false, // Remove X-Powered-By header for security
   generateEtags: true, // Enable ETags for better caching
 
@@ -17,7 +16,6 @@ const nextConfig = {
     inlineCss: true,
     optimizeCss: true,
     webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB', 'INP'],
-    legacyBrowsers: false, // Disable legacy browser support
     optimizePackageImports: [
       '@apollo/client',
       'react-loading-skeleton',
@@ -33,6 +31,13 @@ const nextConfig = {
       'lucide-react',
       '@radix-ui/react-icons',
     ],
+  },
+
+  // Compiler options for better optimization
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
   },
   images: {
     unoptimized: true,
@@ -50,6 +55,34 @@ const nextConfig = {
         hostname: 'res.cloudinary.com',
       },
     ],
+  },
+
+  // HTTP headers for performance and security
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+        ],
+      },
+      {
+        source: '/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
   },
 
   async redirects() {
