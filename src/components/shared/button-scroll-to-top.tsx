@@ -45,20 +45,21 @@ export default function BottomToTop() {
 
   return (
     <>
-      <a
+      <button
         onClick={bottomToTopHandler}
+        aria-label="Μετάβαση στην κορυφή της σελίδας"
         className={`
           fixed w-12 h-12 rounded-full border border-black/5 text-gray-700 bg-gray-300/75
           flex items-center justify-center cursor-pointer transition-all duration-300 ease-in-out
           hover:bg-green-800 hover:text-white z-50
-          ${isBottom 
-            ? 'bottom-11 right-11 opacity-100 transform scale-100' 
+          ${isBottom
+            ? 'bottom-11 right-11 opacity-100 transform scale-100'
             : '-bottom-11 opacity-0 transform scale-0'
           }
         `}
       >
         <IconAngleUp />
-      </a>
+      </button>
     </>
   );
 }
