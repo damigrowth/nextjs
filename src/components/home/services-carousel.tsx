@@ -48,7 +48,7 @@ export function ServicesCarousel({
         }}
         className='w-full'
       >
-        <CarouselContent className='-ml-2 sm:-ml-4'>
+        <CarouselContent className='-ml-0 sm:-ml-2'>
           {displayServices.map((service) => (
             <CarouselItem
               key={service.id}
@@ -65,12 +65,8 @@ export function ServicesCarousel({
         {/* Navigation Controls - always visible with default positioning */}
         {displayServices.length > 1 && (
           <>
-            <CarouselPrevious
-              className='hidden sm:flex !opacity-100 !-translate-x-12 !rounded-full !bg-white/90 !backdrop-blur-sm !border !border-gray-200/50 !text-gray-800 hover:!bg-white hover:!text-gray-900 hover:!border-gray-300 !shadow-lg hover:!shadow-xl'
-            />
-            <CarouselNext
-              className='hidden sm:flex !opacity-100 !translate-x-12 !rounded-full !bg-white/90 !backdrop-blur-sm !border !border-gray-200/50 !text-gray-800 hover:!bg-white hover:!text-gray-900 hover:!border-gray-300 !shadow-lg hover:!shadow-xl'
-            />
+            <CarouselPrevious className='hidden sm:flex !opacity-100 !-translate-x-12 !rounded-full !bg-white/90 !backdrop-blur-sm !border !border-gray-200/50 !text-gray-800 hover:!bg-white hover:!text-gray-900 hover:!border-gray-300 !shadow-lg hover:!shadow-xl' />
+            <CarouselNext className='hidden sm:flex !opacity-100 !translate-x-12 !rounded-full !bg-white/90 !backdrop-blur-sm !border !border-gray-200/50 !text-gray-800 hover:!bg-white hover:!text-gray-900 hover:!border-gray-300 !shadow-lg hover:!shadow-xl' />
           </>
         )}
 

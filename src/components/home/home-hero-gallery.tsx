@@ -68,15 +68,17 @@ export default function HeroImageGallery() {
         onMouseLeave={handleMouseLeave}
         className='w-full'
       >
-        <CarouselContent className='py-2 pb-4'>
+        <CarouselContent className='py-2 pb-4 -ml-2'>
           {galleryImagesHome.map((image, index) => {
             // First 5 images are visible on desktop, 2 on mobile
             const isLCP = index === 0; // First image is LCP on mobile
 
             // Optimize loading strategy
             let loading: 'eager' | 'lazy' = 'lazy';
-            if (index < 2) loading = 'eager'; // First 2 always eager (mobile)
-            else if (index < 5) loading = 'eager'; // Next 3 eager on desktop
+            if (index < 2)
+              loading = 'eager'; // First 2 always eager (mobile)
+            else if (index < 5)
+              loading = 'eager'; // Next 3 eager on desktop
             else loading = 'lazy'; // Rest are lazy
 
             return (
@@ -86,7 +88,9 @@ export default function HeroImageGallery() {
               >
                 <div className='relative rounded-2xl overflow-hidden shadow-lg max-w-[285px] max-h-[380px] w-full h-auto bg-white'>
                   {(() => {
-                    const { src, srcSet } = getResponsiveGalleryImageUrl(image.src);
+                    const { src, srcSet } = getResponsiveGalleryImageUrl(
+                      image.src,
+                    );
                     return (
                       <img
                         src={src}
@@ -97,7 +101,7 @@ export default function HeroImageGallery() {
                         height={380}
                         className='object-contain w-full h-auto'
                         loading={loading}
-                        {...(isLCP && { fetchPriority: 'high' } as any)}
+                        {...(isLCP && ({ fetchPriority: 'high' } as any))}
                       />
                     );
                   })()}

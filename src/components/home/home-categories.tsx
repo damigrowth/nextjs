@@ -31,7 +31,11 @@ function CategoryCard({ category }: { category: DatasetItem }) {
   return (
     <div className='bg-transparent rounded-xl p-6 relative transition-all duration-300 ease-in-out group'>
       <div className='text-left'>
-        <NextLink href={`/categories/${slug}`} className='inline-block' aria-label={label}>
+        <NextLink
+          href={`/categories/${slug}`}
+          className='inline-block'
+          aria-label={label}
+        >
           <div className='relative inline-block text-4xl text-primary z-10 mb-4 sm:mb-5 transition-all duration-300 ease-in-out before:content-[""] before:bg-orangy before:rounded-full before:absolute before:-bottom-2.5 before:-right-5 before:h-10 before:w-10 before:-z-10 before:transition-all before:duration-300 before:ease-in-out group-hover:before:bg-sixth'>
             {getCategoryIconComponent(icon)}
           </div>
@@ -142,7 +146,7 @@ export default function CategoriesHome({ categories = [] }: Props) {
             }}
             className='w-full'
           >
-            <CarouselContent className='-ml-2 sm:-ml-4'>
+            <CarouselContent className='-ml-0 sm:-ml-2'>
               {displayCategories.map((category, index) => (
                 <CarouselItem
                   key={index}

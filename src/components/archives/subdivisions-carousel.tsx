@@ -47,7 +47,7 @@ export function SubdivisionsCarousel({
           }}
           className='w-full'
         >
-          <CarouselContent className='-ml-2 md:-ml-4'>
+          <CarouselContent className='-ml-0 sm:-ml-2'>
             {subdivisions.map((subdivision) => (
               <CarouselItem
                 key={subdivision.id}
