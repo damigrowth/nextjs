@@ -230,6 +230,7 @@ const CarouselPrevious = React.forwardRef<
         e.stopPropagation();
         scrollPrev();
       }}
+      aria-label='Προηγούμενη σελίδα'
       {...props}
     >
       <ChevronLeft className='h-4 w-4' />
@@ -268,6 +269,7 @@ const CarouselNext = React.forwardRef<
         e.stopPropagation();
         scrollNext();
       }}
+      aria-label='Επόμενη σελίδα'
       {...props}
     >
       <ChevronRight className='h-4 w-4' />

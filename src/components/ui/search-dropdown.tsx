@@ -45,7 +45,7 @@ export function SearchDropdown({
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Command shouldFilter={false}>
-          <CommandList>
+          <CommandList id='search-suggestions-listbox' role='listbox'>
             {isLoading ? (
               <div className='flex items-center justify-center py-6'>
                 <Loader2 className='h-4 w-4 animate-spin text-muted-foreground' />

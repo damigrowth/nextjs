@@ -31,7 +31,7 @@ function CategoryCard({ category }: { category: DatasetItem }) {
   return (
     <div className='bg-transparent rounded-xl p-6 relative transition-all duration-300 ease-in-out group'>
       <div className='text-left'>
-        <NextLink href={`/categories/${slug}`} className='inline-block'>
+        <NextLink href={`/categories/${slug}`} className='inline-block' aria-label={label}>
           <div className='relative inline-block text-4xl text-primary z-10 mb-4 sm:mb-5 transition-all duration-300 ease-in-out before:content-[""] before:bg-orangy before:rounded-full before:absolute before:-bottom-2.5 before:-right-5 before:h-10 before:w-10 before:-z-10 before:transition-all before:duration-300 before:ease-in-out group-hover:before:bg-sixth'>
             {getCategoryIconComponent(icon)}
           </div>
@@ -39,14 +39,14 @@ function CategoryCard({ category }: { category: DatasetItem }) {
       </div>
 
       <div className='mt-2'>
-        <h4 className='text-sm mb-1.5 font-bold leading-6 text-left'>
+        <h2 className='text-sm mb-1.5 font-bold leading-6 text-left'>
           <NextLink
             href={`/categories/${slug}`}
             className='text-gray-900 hover:text-third transition-colors'
           >
             {label}
           </NextLink>
-        </h4>
+        </h2>
 
         <p className='mb-0 text-sm text-gray-600 text-left'>
           {(subcategories || []).map((sub, i, array) => (

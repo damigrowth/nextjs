@@ -143,9 +143,12 @@ const HomeSearch = React.forwardRef<HTMLFormElement, HomeSearchProps>(
                     }}
                     placeholder={placeholder}
                     className='w-full h-11 bg-transparent border-none outline-none focus:ring-0 focus:border-none rounded-full pl-5 md:pl-[50px] pr-4 py-2 text-[15px] font-sans placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                    role='combobox'
                     aria-label='Αναζήτηση υπηρεσιών'
                     aria-autocomplete='list'
                     aria-expanded={isDropdownOpen}
+                    aria-controls='search-suggestions-listbox'
+                    aria-haspopup='listbox'
                     autoComplete='off'
                   />
                 </div>

@@ -52,9 +52,9 @@ export default function ProfileCard({
             href={`/profile/${username}`}
             className='hover:text-third transition-colors'
           >
-            <h5 className='font-bold text-lg text-dark hover:text-third transition-colors mb-0'>
+            <h3 className='font-bold text-lg text-dark hover:text-third transition-colors mb-0'>
               {displayName}
-            </h5>
+            </h3>
           </NextLink>
           <ProfileBadges verified={verified} topLevel={top} />
         </div>
