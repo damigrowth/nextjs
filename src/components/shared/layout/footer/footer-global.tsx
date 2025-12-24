@@ -21,7 +21,7 @@ export default function Footer() {
               <div className='grid grid-cols-1 md:grid-cols-3 gap-8 justify-between'>
                 <div>
                   <div className='link-style1 mb-3'>
-                    <h3 className='mb-3 text-white font-semibold'>
+                    <h3 className='mb-3 text-white font-semibold text-base'>
                       <NextLink
                         href={'/about'}
                         className='text-white hover:text-green-400 transition-colors'
@@ -44,7 +44,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <div className='link-style1 mb-3'>
-                    <h3 className='mb-3 text-white font-semibold'>
+                    <h3 className='mb-3 text-white font-semibold text-base'>
                       <NextLink
                         href={'/categories'}
                         className='text-white hover:text-green-400 transition-colors'
@@ -68,7 +68,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <div className='link-style1 mb-3'>
-                    <h3 className='mb-3 text-white font-semibold'>
+                    <h3 className='mb-3 text-white font-semibold text-base'>
                       <NextLink
                         href={'/dashboard'}
                         className='text-white hover:text-green-400 transition-colors'
@@ -90,7 +90,7 @@ export default function Footer() {
                     </ul>
                   </div>
                   <div className='link-style1 mb-3 pt-3'>
-                    <h3 className='text-white mb-3 font-semibold'>
+                    <h3 className='text-white mb-3 font-semibold text-base'>
                       Επαγγελματικά Προφίλ
                     </h3>
                     <ul className='ps-0 space-y-2 list-none'>
