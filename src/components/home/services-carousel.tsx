@@ -1,5 +1,5 @@
 import React from 'react';
-import { ServiceCard } from '../shared';
+import ServiceCard from '@/components/shared/service-card';
 import {
   Carousel,
   CarouselContent,

@@ -33,7 +33,7 @@ import {
 } from '@/lib/validations/profile';
 import { updateProfilePresentation } from '@/actions/profiles/presentation';
 import { updateProfilePresentationAdmin } from '@/actions/admin/profiles/presentation';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { AuthUser, ProfileWithRelations } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';
 import { Profile } from '@prisma/client';

@@ -45,7 +45,7 @@ import {
 // Import server actions
 import { updateProfileBasicInfo } from '@/actions/profiles/basic-info';
 import { updateProfileBasicInfoAdmin } from '@/actions/admin/profiles/basic-info';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { useSession } from '@/lib/auth/client';
 import { AuthUser } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';

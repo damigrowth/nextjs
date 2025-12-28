@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { HomeSearch } from './home-search';
 import HeroImageGallery from './home-hero-gallery';
 import type { DatasetItem } from '@/lib/types/datasets';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 // Static content that renders immediately for better LCP
 function StaticHeroContent() {

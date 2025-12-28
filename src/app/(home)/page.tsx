@@ -1,11 +1,10 @@
-import {
-  CategoriesHome,
-  FeaturesHome,
-  HeroHome,
-  TaxonomiesHome,
-  TestimonialsHome,
-  TaxonomyTabs,
-} from '@/components';
+// Specific imports to avoid loading admin bundle (4.5MB)
+import CategoriesHome from '@/components/home/home-categories';
+import FeaturesHome from '@/components/home/home-features';
+import HeroHome from '@/components/home/home-hero';
+import TaxonomiesHome from '@/components/home/home-taxonomies';
+import TestimonialsHome from '@/components/home/home-testimonials';
+import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
 import { getHomeMetadata } from '@/lib/seo/pages';
 import { getHomePageData } from '@/actions/home/get-home-data';
 import { ServicesHomeLazy } from '@/components/home/services-home-lazy';

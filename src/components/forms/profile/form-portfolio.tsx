@@ -37,7 +37,7 @@ import {
   updateProfilePortfolioSchema,
   type UpdateProfilePortfolioInput,
 } from '@/lib/validations/profile';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { AuthUser, ProfileWithRelations } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';
 import { Profile } from '@prisma/client';

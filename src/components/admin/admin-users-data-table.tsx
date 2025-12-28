@@ -5,7 +5,7 @@ import { formatDate, formatTime } from '@/lib/utils/date';
 import { AdminDataTable, ColumnDef } from './admin-data-table';
 import type { AdminUserForTable } from '@/lib/types/auth';
 import UserBadges from '@/components/shared/user-badges';
-import { NextLink } from '@/components/shared';
+import { NextLink } from '@/components';
 
 interface AdminUsersDataTableProps {
   data: AdminUserForTable[];

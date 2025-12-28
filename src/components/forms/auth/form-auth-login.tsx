@@ -22,7 +22,7 @@ import { loginSchema, type LoginInput } from '@/lib/validations/auth';
 import { authClient, useSession } from '@/lib/auth/client';
 import { AuthUser } from '@/lib/types/auth';
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { Separator } from '../../ui/separator';
 import GoogleLoginButton from './button-login-goolge';
 

@@ -6,13 +6,14 @@ import { ArchiveSidebar } from './archive-sidebar';
 import { ArchivePagination } from './archive-pagination';
 import { ArchiveBanner } from './archive-banner';
 import { SubdivisionsCarousel } from './subdivisions-carousel';
-import { TaxonomyTabs, DynamicBreadcrumb } from '@/components';
 
 import type { DatasetItem } from '@/lib/types/datasets';
 import { FilterState } from '@/hooks/archives/use-archive-filters';
 import { useArchiveFilters } from '@/hooks/archives/use-archive-filters';
 import { useArchivePagination } from '@/hooks/archives/use-archive-pagination';
 import clsx from 'clsx';
+import TaxonomyTabs from '../shared/taxonomy-tabs';
+import DynamicBreadcrumb from '../shared/dynamic-breadcrumb';
 
 interface ArchiveLayoutProps {
   children: ReactNode;

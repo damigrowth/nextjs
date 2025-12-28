@@ -1,5 +1,8 @@
 import React from 'react';
-import { NextLink, ProfileBadges, RatingDisplay, UserAvatar } from '../shared';
+import { NextLink } from '@/components';
+import ProfileBadges from '@/components/shared/profile-badges';
+import RatingDisplay from '@/components/shared/rating-display';
+import UserAvatar from '@/components/shared/user-avatar';
 
 interface ServiceMetaProps {
   title: string;

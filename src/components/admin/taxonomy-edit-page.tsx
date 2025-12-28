@@ -3,10 +3,10 @@ import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SiteHeader } from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { findById } from '@/lib/utils/datasets';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 export interface TaxonomyEditPageProps<T extends DatasetItem> {
   id: string;

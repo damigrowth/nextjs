@@ -22,7 +22,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 export function NavDocuments({
   items,

@@ -12,8 +12,9 @@ import {
   RevokeSessionsForm,
   DeleteUserForm,
 } from '@/components/admin/forms';
-import { SiteHeader } from '@/components/admin';
-import { AccountForm, NextLink } from '@/components';
+import { SiteHeader } from '@/components/admin/site-header';
+import { NextLink } from '@/components';
+import { AccountForm } from '@/components/forms';
 
 export const dynamic = 'force-dynamic';
 

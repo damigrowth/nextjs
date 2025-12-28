@@ -1,5 +1,5 @@
-import { MediaGallery } from '@/components';
 import React from 'react';
+import MediaGallery from '../shared/media-gallery';
 
 type Props = {
   media: PrismaJson.Media;

@@ -33,7 +33,7 @@ import { formatDisplayName } from '@/lib/utils/validation/formats';
 import { populateFormData } from '@/lib/utils/form';
 import { updateAccount } from '@/actions/auth/update-account';
 import { updateAccountAdmin } from '@/actions/admin/users';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { AuthUser } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';
 import {

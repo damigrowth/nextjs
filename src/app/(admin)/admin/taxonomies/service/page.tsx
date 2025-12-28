@@ -1,11 +1,9 @@
 import { Suspense } from 'react';
-import {
-  SiteHeader,
-  AdminServiceTaxonomiesFilters,
-  AdminServiceTaxonomiesTableSection,
-  AdminServiceTaxonomiesTableSkeleton,
-  CreateServiceTaxonomyDialog,
-} from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
+import { AdminServiceTaxonomiesFilters } from '@/components/admin/admin-service-taxonomies-filters';
+import { AdminServiceTaxonomiesTableSection } from '@/components/admin/admin-service-taxonomies-table-section';
+import { AdminServiceTaxonomiesTableSkeleton } from '@/components/admin/admin-service-taxonomies-table-skeleton';
+import { CreateServiceTaxonomyDialog } from '@/components/admin/create-service-taxonomy-dialog';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 

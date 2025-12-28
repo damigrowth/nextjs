@@ -56,7 +56,7 @@ import { completeOnboarding } from '@/actions/auth/complete-onboarding';
 
 // Types
 import { MediaUpload } from '../../media';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { AuthUser } from '@/lib/types';
 
 // Use existing Zod schema

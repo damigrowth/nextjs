@@ -1,9 +1,9 @@
-import React from 'react';
-import { FaqSection, HeroBanner } from '@/components/shared';
-import { data } from '@/constants/datasets/contact';
 import { Phone, Mail } from 'lucide-react';
 import { ContactForm } from '@/components/forms';
 import { getContactMetadata } from '@/lib/seo/pages';
+import HeroBanner from '@/components/shared/hero-banner';
+import FaqSection from '@/components/shared/faq-section';
+import { data } from '@/constants/datasets/contact';
 
 export async function generateMetadata() {
   return getContactMetadata();

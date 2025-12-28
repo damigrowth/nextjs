@@ -4,6 +4,7 @@ import { redirect, notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { NextLink } from '@/components';
 import {
   AccountForm,
   BasicInfoForm,
@@ -12,10 +13,9 @@ import {
   PortfolioForm,
   CoverageForm,
   BillingForm,
-  NextLink,
-} from '@/components';
+} from '@/components/forms';
 import { Badge } from '@/components/ui/badge';
-import { SiteHeader } from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
 import { EditProfileSettingsForm } from '@/components/admin/forms/edit-profile-settings-form';
 
 export const dynamic = 'force-dynamic';

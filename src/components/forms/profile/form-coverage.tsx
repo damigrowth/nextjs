@@ -21,7 +21,7 @@ import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { toast } from 'sonner';
 
 // Custom components
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 
 // Static constants and dataset utilities
 import { locationOptions } from '@/constants/datasets/locations';

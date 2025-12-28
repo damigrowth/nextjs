@@ -1,13 +1,11 @@
 import { Suspense } from 'react';
-import {
-  AdminProTaxonomiesFilters,
-  AdminProTaxonomiesTableSkeleton,
-  AdminProTaxonomiesTableSection,
-  SiteHeader,
-} from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
+import { AdminProTaxonomiesFilters } from '@/components/admin/admin-pro-taxonomies-filters';
+import { AdminProTaxonomiesTableSkeleton } from '@/components/admin/admin-pro-taxonomies-table-skeleton';
+import { AdminProTaxonomiesTableSection } from '@/components/admin/admin-pro-taxonomies-table-section';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Plus, GitBranch } from 'lucide-react';
-import { NextLink } from '@/components/shared';
+import { NextLink } from '@/components';
 
 export const dynamic = 'force-dynamic';
 

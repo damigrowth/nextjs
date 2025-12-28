@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getSavedItems } from '@/actions/saved';
 import ServiceCard from '@/components/shared/service-card';
-import ProfileCard from '@/components/shared/profile-card';
+import { ProfileCard } from '@/components/shared/profile-card';
 import SavedPagination from '@/components/dashboard/saved/saved-pagination';
 import { Heart } from 'lucide-react';
 import { getDashboardMetadata } from '@/lib/seo/pages';

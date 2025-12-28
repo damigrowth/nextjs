@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/card';
 import type { CategoryWithSubcategories } from '@/actions/services/get-categories';
 import { Separator } from '../ui/separator';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 
 interface CategoriesGridProps {

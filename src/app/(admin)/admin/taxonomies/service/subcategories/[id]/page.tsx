@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SiteHeader } from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
 import { EditTaxonomyItemForm } from '@/components/admin/forms';
 import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 import { getItemPath } from '@/lib/utils/datasets';

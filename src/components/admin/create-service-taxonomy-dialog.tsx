@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Plus, ChevronRight } from 'lucide-react';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 export function CreateServiceTaxonomyDialog() {
   const [open, setOpen] = useState(false);

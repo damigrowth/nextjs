@@ -8,7 +8,8 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { CarouselPagination } from '@/components/ui/carousel-pagination';
-import { NextLink, ProfileCard } from '../shared';
+import { NextLink } from '@/components';
+import { ProfileCard } from '@/components/shared/profile-card';
 import { ProfileCardData } from '@/lib/types';
 
 interface ProfilesHomeProps {

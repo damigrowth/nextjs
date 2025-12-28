@@ -6,10 +6,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from '@/components/ui/tooltip';
-import {
-  buildCloudinaryUrl,
-  extractPublicId,
-} from '@/lib/utils/cloudinary';
+import { buildCloudinaryUrl, extractPublicId } from '@/lib/utils/cloudinary';
 
 interface ProfileBadgesProps {
   verified?: boolean;

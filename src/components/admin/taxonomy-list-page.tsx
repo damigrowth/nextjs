@@ -1,8 +1,8 @@
 import { Suspense, ComponentType, ReactNode } from 'react';
-import { SiteHeader } from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 export interface TaxonomyListPageConfig {
   title: string;

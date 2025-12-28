@@ -1,4 +1,6 @@
-import { AdminGuard, AppSidebar, SiteHeader } from '@/components';
+import { AdminGuard } from '@/components/guards';
+// import { SiteHeader } from '@/components/admin/site-header';
+import { AppSidebar } from '@/components/admin/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 

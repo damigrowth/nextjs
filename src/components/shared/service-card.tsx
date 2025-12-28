@@ -2,11 +2,11 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 
 import MediaDisplay from '@/components/ui/media-display';
-import RatingDisplay from './rating-display';
 import SaveButton from './save-button';
 import UserAvatar from './user-avatar';
 import { ServiceCardData } from '@/lib/types';
 import NextLink from './next-link';
+import RatingDisplay from './rating-display';
 
 interface ServiceCardProps {
   service: ServiceCardData;

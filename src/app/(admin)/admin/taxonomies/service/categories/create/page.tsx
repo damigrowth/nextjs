@@ -1,4 +1,5 @@
-import { TaxonomyCreatePage, CreateServiceTaxonomyForm } from '@/components/admin';
+import { TaxonomyCreatePage } from '@/components/admin/taxonomy-create-page';
+import { CreateServiceTaxonomyForm } from '@/components/admin/forms/create-service-taxonomy-form';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 
 export const dynamic = 'force-dynamic';

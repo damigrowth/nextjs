@@ -17,11 +17,9 @@ import {
   // NavMenuMobileWrapper_D,
 } from '@/components/dynamic';
 import { FooterWrapper } from '@/components/shared/layout';
-import {
-  Body,
-  Notifications,
-} from '@/components/shared/layout/wrapper';
+import { Body, Notifications } from '@/components/shared/layout/wrapper';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { WebVitals } from '@/components/shared/web-vitals';
 
 export const metadata: Metadata = {
   title: {
@@ -55,6 +53,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           <BottomToTop_D />
           <GoogleTagManager gtmId='GTM-KR7N94L4' />
           <GoogleAnalytics gaId={gaId} />
+          {/* Web Vitals monitoring */}
+          <WebVitals />
           {/* Cloudinary Upload Widget */}
           {/* <Script
             src='https://upload-widget.cloudinary.com/global/all.js'

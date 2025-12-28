@@ -1,7 +1,6 @@
-import { DashboardLayout } from '@/components';
-import { Toaster } from '@/components/ui/sonner';
 import { requireOnboardingComplete } from '@/actions/auth/server';
-import React from 'react';
+import { DashboardLayout } from '@/components/dashboard';
+import { Toaster } from '@/components/ui/sonner';
 
 // Dashboard requires auth and user-specific data, so it should be dynamic
 export const dynamic = 'force-dynamic';

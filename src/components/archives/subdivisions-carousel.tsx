@@ -7,7 +7,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import type { SubdivisionWithCount } from '@/actions/services/get-categories';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 interface SubdivisionsCarouselProps {
   subdivisions: SubdivisionWithCount[];

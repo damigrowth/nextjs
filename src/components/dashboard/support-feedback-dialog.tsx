@@ -32,7 +32,7 @@ import {
 } from '@/lib/validations/support';
 import { submitFeedback } from '@/actions/support/submit-feedback';
 import { populateFormData } from '@/lib/utils/form';
-import { FormButton } from '@/components/shared';
+import FormButton from '@/components/shared/button-form';
 import { useResettableActionState } from '@/lib/hooks/use-resettable-action-state';
 
 const initialState = {
@@ -94,12 +94,17 @@ export function SupportFeedbackDialog() {
     const allValues = getValues();
 
     // Capture current page URL
-    const currentPageUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const currentPageUrl =
+      typeof window !== 'undefined' ? window.location.href : '';
 
-    populateFormData(formData, { ...allValues, pageUrl: currentPageUrl }, {
-      stringFields: ['issueType', 'description', 'pageUrl'],
-      skipEmpty: false,
-    });
+    populateFormData(
+      formData,
+      { ...allValues, pageUrl: currentPageUrl },
+      {
+        stringFields: ['issueType', 'description', 'pageUrl'],
+        skipEmpty: false,
+      },
+    );
 
     // Call server action directly (no await)
     action(formData);
@@ -118,9 +123,7 @@ export function SupportFeedbackDialog() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <button
-          className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-        >
+        <button className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'>
           <LifeBuoy className='h-4 w-4' />
           <span>Υποστήριξη / Αναφορά</span>
         </button>

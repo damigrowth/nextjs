@@ -17,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { UserAvatar } from '@/components/shared';
+import UserAvatar from '@/components/shared/user-avatar';
 import {
   SidebarMenu,
   SidebarMenuButton,

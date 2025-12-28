@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/tooltip';
 import { AdminDataTable, ColumnDef } from './admin-data-table';
 import type { AdminServiceWithRelations } from '@/lib/types/services';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 interface AdminServicesDataTableProps {
   data: AdminServiceWithRelations[];

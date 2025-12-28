@@ -14,7 +14,7 @@ import {
   EditServiceFaqForm,
   EditServiceMediaForm,
 } from '@/components/admin/forms';
-import { SiteHeader } from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { NextLink } from '@/components';
 

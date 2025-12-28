@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ChatListItem as ChatListItemType } from '@/lib/types/messages';
 import { formatCompactMessageTime } from '@/lib/utils/messages';
-import { UserAvatar } from '../shared';
+import UserAvatar from '@/components/shared/user-avatar';
 
 interface ChatListItemProps {
   chat: ChatListItemType;
@@ -61,7 +61,10 @@ export function ChatListItem({ chat }: ChatListItemProps) {
             {chat.lastMessage || 'Δεν υπάρχουν μηνύματα ακόμα'}
           </p>
           {chat.unread > 0 && (
-            <Badge variant='destructive' className='shrink-0 rounded-full h-4 w-4 p-0 flex items-center justify-center text-[10px] font-semibold'>
+            <Badge
+              variant='destructive'
+              className='shrink-0 rounded-full h-4 w-4 p-0 flex items-center justify-center text-[10px] font-semibold'
+            >
               {chat.unread}
             </Badge>
           )}

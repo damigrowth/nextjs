@@ -11,7 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { NextLink, UserAvatar } from '@/components/shared';
+import { NextLink } from '@/components';
+import UserAvatar from '@/components/shared/user-avatar';
 import {
   Dialog,
   DialogContent,

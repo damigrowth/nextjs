@@ -2,6 +2,8 @@ import type { JSX } from 'react';
 import { notFound } from 'next/navigation';
 import { getProfilePageData } from '@/actions/profiles/get-profile';
 import { getProfileMetadata } from '@/lib/seo/pages';
+import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
+import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
 import {
   ProfileBio,
   ProfileFeatures,
@@ -13,10 +15,8 @@ import {
   ProfileServices,
   ProfileSkills,
   ProfileTerms,
-  TaxonomyTabs,
-  DynamicBreadcrumb,
   ReportProfileDialog,
-} from '@/components';
+} from '@/components/profile';
 
 // ISR configuration with shorter interval + tag-based revalidation
 export const revalidate = 300; // Revalidate every 5 minutes (backup for tag-based)

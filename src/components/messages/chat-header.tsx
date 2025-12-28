@@ -5,7 +5,8 @@
 
 import { ChatHeaderUser, ChatListItem } from '@/lib/types/messages';
 import { getProfileUrl } from '@/lib/utils/messages';
-import { NextLink, UserAvatar } from '../shared';
+import { NextLink } from '@/components';
+import UserAvatar from '@/components/shared/user-avatar';
 import { MobileChatListButton } from './mobile-chat-list-button';
 
 interface ChatHeaderProps {

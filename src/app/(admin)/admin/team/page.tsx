@@ -16,7 +16,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UserAvatar } from '@/components/shared';
 import {
   SearchIcon,
   UserPlusIcon,
@@ -26,6 +25,7 @@ import {
   PhoneIcon,
   ShieldIcon,
 } from 'lucide-react';
+import UserAvatar from '@/components/shared/user-avatar';
 
 export const dynamic = 'force-dynamic';
 

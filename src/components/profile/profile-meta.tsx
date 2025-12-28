@@ -10,7 +10,8 @@ import {
   hasOnbaseCoverage,
   hasOnsiteCoverage,
 } from '@/lib/utils/datasets';
-import { RatingDisplay, UserAvatar } from '../shared';
+import RatingDisplay from '@/components/shared/rating-display';
+import UserAvatar from '@/components/shared/user-avatar';
 import { VerifiedBadge } from '../shared/profile-badges';
 import SocialLinks from '../shared/social-links';
 import CoverageDisplay from '../shared/coverage-display';

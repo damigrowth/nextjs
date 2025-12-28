@@ -28,7 +28,7 @@ import { MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { blockUser } from '@/actions/messages/blocking';
 import { deleteChat } from '@/actions/messages/chats';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 interface HeaderActionsProps {
   chatId: string;

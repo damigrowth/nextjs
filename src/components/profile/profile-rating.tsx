@@ -1,7 +1,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 import { ProfileRatingProps } from '@/lib/types';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 /**
  * Modern ProfileRating Component

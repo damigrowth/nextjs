@@ -48,7 +48,7 @@ import {
 } from '@/lib/validations/profile';
 import { updateProfileAdditionalInfo } from '@/actions/profiles/additional-info';
 import { updateProfileAdditionalInfoAdmin } from '@/actions/admin/profiles/additional-info';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { AuthUser, ProfileWithRelations } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';
 import { Profile } from '@prisma/client';

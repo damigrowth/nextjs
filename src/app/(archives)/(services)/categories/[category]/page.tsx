@@ -2,11 +2,12 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getServiceArchivePageData } from '@/actions/services/get-services';
 import { getCategoriesPageData } from '@/actions/services/get-categories';
-import { TaxonomyTabs, DynamicBreadcrumb } from '@/components/shared';
 import { ArchiveBanner } from '@/components/archives/archive-banner';
 import { SubdivisionsCarousel } from '@/components/archives/subdivisions-carousel';
 import { CategoriesGrid } from '@/components/archives/categories-grid';
 import { getCategoryMetadata } from '@/lib/seo/pages';
+import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
+import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour

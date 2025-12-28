@@ -12,7 +12,7 @@ import {
 import AdminTablePagination from './admin-table-pagination';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { DatasetItem } from '@/lib/types/datasets';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 interface ServiceTaxonomiesTableSectionProps {
   searchParams: {

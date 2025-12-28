@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { NextLink } from '@/components/shared';
+import { NextLink } from '@/components';
 
 const profileMenuItems = [
   {

@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { SiteHeader } from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { DeploymentManager } from '@/components/admin/deployment/deployment-manager';

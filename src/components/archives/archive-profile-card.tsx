@@ -4,13 +4,11 @@ import { CoverageDisplay } from './coverage-display';
 import type { ArchiveProfileCardData } from '@/lib/types/components';
 import { cn } from '@/lib/utils';
 import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
-import {
-  UserAvatar,
-  ProfileBadges,
-  RatingDisplay,
-  TaxonomiesDisplay,
-  NextLink,
-} from '../shared';
+import { NextLink } from '@/components';
+import UserAvatar from '@/components/shared/user-avatar';
+import ProfileBadges from '@/components/shared/profile-badges';
+import RatingDisplay from '@/components/shared/rating-display';
+import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
 
 interface ArchiveProfileCardProps {
   profile: ArchiveProfileCardData;
@@ -45,7 +43,9 @@ export function ArchiveProfileCard({
           href={`/profile/${profile.username}`}
           className='group w-full md:w-48 flex-shrink-0 relative overflow-hidden flex md:items-center md:justify-center pl-5 md:pl-0 bg-gray-50 bg-cover bg-center bg-no-repeat min-h-28'
           style={{
-            backgroundImage: optimizedBgImage ? `url(${optimizedBgImage})` : undefined,
+            backgroundImage: optimizedBgImage
+              ? `url(${optimizedBgImage})`
+              : undefined,
           }}
         >
           {/* Grayscale and transparency overlay */}

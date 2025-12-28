@@ -4,7 +4,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, Plus, Settings } from 'lucide-react';
-import { NextLink } from '@/components/shared';
+import { NextLink } from '@/components';
 
 interface ServiceSuccessProps {
   id: string | number;

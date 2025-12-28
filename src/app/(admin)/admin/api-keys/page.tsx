@@ -1,4 +1,4 @@
-import { ApiKeyManagement } from '@/components';
+import { ApiKeyManagement } from '@/components/admin/api-key-management';
 
 export const dynamic = 'force-dynamic';
 

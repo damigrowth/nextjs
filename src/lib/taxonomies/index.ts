@@ -21,7 +21,6 @@
  *
  * @see scripts/build-taxonomy-maps.ts - Build script that generates maps
  */
-
 import type { DatasetItem } from '@/types/datasets';
 
 // ============================================================================

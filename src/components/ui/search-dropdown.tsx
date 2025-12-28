@@ -15,7 +15,7 @@ import {
   PopoverAnchor,
 } from '@/components/ui/popover';
 import type { SearchSuggestionsResult } from '@/lib/types/search';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 export interface SearchDropdownProps {
   suggestions: SearchSuggestionsResult | null;

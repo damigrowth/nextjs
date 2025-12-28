@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UserAvatar } from '@/components/shared';
+import UserAvatar from '@/components/shared/user-avatar';
 import { SearchIcon, MessageSquareIcon, EyeIcon, FlagIcon } from 'lucide-react';
 
 // Force dynamic rendering for admin pages

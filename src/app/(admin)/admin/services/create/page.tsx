@@ -1,4 +1,4 @@
-import { SiteHeader } from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
 import { getAdminSession } from '@/actions/admin/helpers';
 import { AdminCreateServiceForm } from '@/components/admin/forms/admin-create-service-form';
 

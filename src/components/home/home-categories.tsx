@@ -14,7 +14,7 @@ import { SectionHeader } from '@/components/ui/section-header';
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { getCategoryIcon } from '@/constants/datasets/category-icons';
 import type { DatasetItem } from '@/lib/types/datasets';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 type Props = {
   categories?: DatasetItem[];

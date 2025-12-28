@@ -2,16 +2,14 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ProfileCardProps } from '@/lib/types';
-import ProfileBadges from './profile-badges';
-import RatingDisplay from './rating-display';
+
 import SaveButton from './save-button';
 import UserAvatar from './user-avatar';
 import NextLink from './next-link';
+import ProfileBadges from './profile-badges';
+import RatingDisplay from './rating-display';
 
-export default function ProfileCard({
-  profile,
-  isSaved = false,
-}: ProfileCardProps) {
+export function ProfileCard({ profile, isSaved = false }: ProfileCardProps) {
   const {
     id,
     displayName,

@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 export function NavSecondary({
   items,

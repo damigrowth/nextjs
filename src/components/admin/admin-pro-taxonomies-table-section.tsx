@@ -12,7 +12,7 @@ import {
 import AdminTablePagination from './admin-table-pagination';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import { DatasetItem } from '@/lib/types/datasets';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 interface ProTaxonomiesTableSectionProps {
   searchParams: {

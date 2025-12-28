@@ -19,7 +19,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { resetPassword } from '@/actions/auth/reset-password';
 import { AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 
 // Schema for reset password form with password confirmation
 const resetPasswordFormSchema = z

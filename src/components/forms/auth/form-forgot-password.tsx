@@ -22,7 +22,7 @@ import {
   type ForgotPasswordInput,
 } from '@/lib/validations/auth';
 import { AlertCircle, CheckCircle, Mail } from 'lucide-react';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 
 const initialState = {
   success: false,

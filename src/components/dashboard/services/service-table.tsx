@@ -21,7 +21,7 @@ import type {
   ServiceSortField,
   SortOrder,
 } from '@/lib/types/services';
-import { NextLink } from '@/components/shared';
+import { NextLink } from '@/components';
 
 interface ServiceTableProps {
   services: UserServiceTableData[];

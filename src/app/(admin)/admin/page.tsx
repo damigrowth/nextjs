@@ -1,4 +1,5 @@
-import { AdminStatsCards, AdminNavCards } from '@/components';
+import { AdminStatsCards } from '@/components/admin/admin-stats-cards';
+import { AdminNavCards } from '@/components/admin/admin-nav-cards';
 import { getServiceStats } from '@/actions/admin/services';
 import { getProfileStats } from '@/actions/admin/profiles';
 import { getUserStats } from '@/actions/admin/users';

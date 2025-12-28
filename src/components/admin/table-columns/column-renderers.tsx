@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@/components/admin/admin-data-table';
-import { NextLink } from '@/components/shared';
+import { NextLink } from '@/components';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ImageIcon, Edit, FileImage, Star } from 'lucide-react';

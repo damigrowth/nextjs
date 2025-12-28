@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 
@@ -28,10 +28,8 @@ import { HelpCircle, Package, ChevronRight, Info } from 'lucide-react';
 import { Currency } from '@/components/ui/currency';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { Badge } from '@/components/ui/badge';
-import { FormButton } from '@/components/shared';
+import FormButton from '@/components/shared/button-form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AddonFields } from '@/components/shared';
-import { FaqFields } from '@/components/shared';
 
 // Static constants and dataset utilities
 import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
@@ -57,6 +55,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { AddonFields } from '@/components/shared/addon-fields';
+import { FaqFields } from '@/components/shared/faq-fields';
 
 const initialState = {
   success: false,

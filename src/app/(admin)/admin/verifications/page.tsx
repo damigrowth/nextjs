@@ -1,11 +1,9 @@
 import { Suspense } from 'react';
-import {
-  AdminVerificationsFilters,
-  AdminVerificationsTableSkeleton,
-  AdminVerificationsStats,
-  AdminVerificationsTableSection,
-  SiteHeader,
-} from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
+import { AdminVerificationsFilters } from '@/components/admin/admin-verifications-filters';
+import { AdminVerificationsTableSkeleton } from '@/components/admin/admin-verifications-table-skeleton';
+import { AdminVerificationsStats } from '@/components/admin/admin-verifications-stats';
+import { AdminVerificationsTableSection } from '@/components/admin/admin-verifications-table-section';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 
