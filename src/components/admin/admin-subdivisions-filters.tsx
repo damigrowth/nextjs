@@ -11,9 +11,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import type { DatasetItem } from '@/lib/types/datasets';
 
-export function AdminSubdivisionsFilters() {
+interface AdminSubdivisionsFiltersProps {
+  taxonomyTree?: DatasetItem[];
+}
+
+export function AdminSubdivisionsFilters({
+  taxonomyTree = [],
+}: AdminSubdivisionsFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { handleFilterChange } = useFilterNavigation();
@@ -36,7 +42,7 @@ export function AdminSubdivisionsFilters() {
 
   const subcategories =
     selectedCategory && selectedCategory !== 'all'
-      ? serviceTaxonomies.find((c) => c.id === selectedCategory)?.children || []
+      ? taxonomyTree.find((c) => c.id === selectedCategory)?.children || []
       : [];
 
   return (
@@ -51,7 +57,7 @@ export function AdminSubdivisionsFilters() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value='all'>All Categories</SelectItem>
-            {serviceTaxonomies.map((category) => (
+            {taxonomyTree.map((category) => (
               <SelectItem key={category.id} value={category.id}>
                 {category.label}
               </SelectItem>

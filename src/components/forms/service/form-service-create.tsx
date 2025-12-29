@@ -77,6 +77,7 @@ import {
 } from './steps';
 import { AuthUser } from '@/lib/types/auth';
 import { Profile } from '@prisma/client';
+import type { DatasetItem } from '@/lib/types/datasets';
 
 const STEPS = [
   {
@@ -119,11 +120,36 @@ const STEP_SCHEMAS = {
 interface CreateServiceFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null; // Profile type with coverage data
+  serviceTaxonomies: DatasetItem[];
+  allSubdivisions: Array<{
+    id: string;
+    label: string;
+    subdivision: any;
+    subcategory: any;
+    category: any;
+  }>;
+  availableTags: Array<{ value: string; label: string }>;
 }
+
+// Create context to pass taxonomy data to step components
+export const TaxonomyDataContext = React.createContext<{
+  serviceTaxonomies: DatasetItem[];
+  allSubdivisions: Array<{
+    id: string;
+    label: string;
+    subdivision: any;
+    subcategory: any;
+    category: any;
+  }>;
+  availableTags: Array<{ value: string; label: string }>;
+} | null>(null);
 
 export default function CreateServiceForm({
   initialUser,
   initialProfile,
+  serviceTaxonomies,
+  allSubdivisions,
+  availableTags,
 }: CreateServiceFormProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -591,8 +617,11 @@ export default function CreateServiceForm({
   };
 
   return (
-    <Form {...form}>
-      <div className='max-w-5xl w-full mx-auto space-y-6 p-2 pr-0'>
+    <TaxonomyDataContext.Provider
+      value={{ serviceTaxonomies, allSubdivisions, availableTags }}
+    >
+      <Form {...form}>
+        <div className='max-w-5xl w-full mx-auto space-y-6 p-2 pr-0'>
         {/* Progress Header */}
         <div className='w-full mb-8'>
           <div className='flex items-center justify-between mb-4'>
@@ -882,5 +911,6 @@ export default function CreateServiceForm({
         </Card>
       </div>
     </Form>
+    </TaxonomyDataContext.Provider>
   );
 }

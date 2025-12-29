@@ -38,7 +38,7 @@ import { useRouter } from 'next/navigation';
 import { OnboardingFormSkeleton } from './onboarding-form-skeleton';
 
 // Static constants and dataset utilities
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
+import type { DatasetItem } from '@/lib/types/datasets';
 import { locationOptions } from '@/constants/datasets/locations';
 import { formatInput } from '@/lib/utils/validation/formats';
 import { populateFormData } from '@/lib/utils/form';
@@ -64,7 +64,7 @@ type OnboardingFormData = z.infer<typeof onboardingFormSchemaWithMedia>;
 
 interface OnboardingFormProps {
   user: AuthUser | null;
-  // Props will be derived from useAuth hook
+  proTaxonomies: DatasetItem[];
 }
 
 const initialState = {
@@ -77,7 +77,10 @@ const initialState = {
  * No Zustand needed - RHF handles all state management
  * Integrates with existing formatting utilities and custom components
  */
-export default function OnboardingForm({ user }: OnboardingFormProps) {
+export default function OnboardingForm({
+  user,
+  proTaxonomies,
+}: OnboardingFormProps) {
   const [state, action, isPending] = useActionState(
     completeOnboarding,
     initialState,

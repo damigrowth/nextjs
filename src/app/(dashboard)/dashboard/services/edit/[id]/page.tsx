@@ -9,6 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { StatusLabels, StatusColors } from '@/lib/types/common';
 import { getDashboardMetadata } from '@/lib/seo/pages';
 import { NextLink } from '@/components';
+import { getServiceTaxonomies, batchFindTagsByIds } from '@/lib/taxonomies';
+import { tags } from '@/constants/datasets/tags';
+import { getAllSubdivisions } from '@/lib/utils/datasets';
 
 export const metadata = getDashboardMetadata('Επεξεργασία Υπηρεσίας');
 
@@ -46,6 +49,21 @@ export default async function EditServicePage({
 
   const service = serviceResult.data;
 
+  // Prepare taxonomy data server-side to prevent client-side bundle bloat
+  const serviceTaxonomies = getServiceTaxonomies();
+  const subdivisions = getAllSubdivisions(serviceTaxonomies);
+  const allSubdivisions = subdivisions.map((subdivision) => ({
+    id: subdivision.id,
+    label: `${subdivision.label}`,
+    subdivision: subdivision,
+    subcategory: subdivision.subcategory,
+    category: subdivision.category,
+  }));
+  const availableTags = tags.map((tag) => ({
+    value: tag.id,
+    label: tag.label,
+  }));
+
   return (
     <div className='max-w-5xl w-full mx-auto space-y-6 p-2 pr-0'>
       {/* Header */}
@@ -79,6 +97,9 @@ export default async function EditServicePage({
           service={service}
           initialUser={user}
           initialProfile={profile}
+          serviceTaxonomies={serviceTaxonomies}
+          allSubdivisions={allSubdivisions}
+          availableTags={availableTags}
         />
 
         {/* Service Media Form */}

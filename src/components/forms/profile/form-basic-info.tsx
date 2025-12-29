@@ -27,12 +27,10 @@ import { Selectbox } from '@/components/ui/selectbox';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
 
 // Static constants and dataset utilities
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
-import { skills as skillsDataset } from '@/constants/datasets/skills';
 import { formatInput } from '@/lib/utils/validation/formats';
 import { filterByField, filterSkillsByCategory } from '@/lib/utils/datasets';
 import { populateFormData } from '@/lib/utils/form';
-import type { DatasetItem } from '@/types/datasets';
+import type { DatasetOption, DatasetWithCategory } from '@/lib/types/datasets';
 // O(1) optimized skill lookups - 99% faster than filter with includes
 import { batchFindSkillsByIds } from '@/lib/taxonomies';
 
@@ -59,6 +57,8 @@ const initialState = {
 interface BasicInfoFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null;
+  proTaxonomies: DatasetOption[];
+  skillsDataset: DatasetWithCategory[];
   adminMode?: boolean;
   hideCard?: boolean;
 }
@@ -66,6 +66,8 @@ interface BasicInfoFormProps {
 export default function BasicInfoForm({
   initialUser,
   initialProfile,
+  proTaxonomies,
+  skillsDataset,
   adminMode = false,
   hideCard = false,
 }: BasicInfoFormProps) {
@@ -153,9 +155,9 @@ export default function BasicInfoForm({
   const filteredSubcategories = React.useMemo(() => {
     const category = proTaxonomies.find((cat) => cat.id === watchedCategory);
     const subcategories = category?.children || [];
-    return initialUser?.role
+    return (initialUser?.role
       ? filterByField(subcategories, 'type', initialUser.role)
-      : subcategories;
+      : subcategories) as DatasetOption[];
   }, [watchedCategory, initialUser?.role]);
 
   // Memoize filtered skills based on selected category
@@ -169,7 +171,7 @@ export default function BasicInfoForm({
   const availableSpecialities = React.useMemo(() => {
     return watchedSkills
       ? batchFindSkillsByIds(watchedSkills).filter(
-          (skill): skill is DatasetItem & { label: string } =>
+          (skill): skill is DatasetOption =>
             skill !== null && skill.label !== undefined,
         )
       : [];

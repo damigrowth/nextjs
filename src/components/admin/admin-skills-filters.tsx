@@ -1,14 +1,14 @@
 'use client';
 
 import { SearchFilter, SelectFilter, FilterContainer } from './filters/filter-components';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 
-export function AdminSkillsFilters() {
-  const categoryOptions = proTaxonomies.map((cat) => ({
-    value: cat.id,
-    label: cat.label,
-  }));
+interface AdminSkillsFiltersProps {
+  categoryOptions?: Array<{ value: string; label: string }>;
+}
 
+export function AdminSkillsFilters({
+  categoryOptions = [],
+}: AdminSkillsFiltersProps) {
   return (
     <FilterContainer>
       <SearchFilter />

@@ -18,9 +18,7 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { updateServiceTaxonomyAction } from '@/actions/admin/services';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-import { tags } from '@/constants/datasets/tags';
-import { useMemo } from 'react';
+import type { DatasetItem } from '@/lib/types/datasets';
 
 // O(1) optimized hash map lookups - 99% faster than findById utility
 import { findServiceById } from '@/lib/taxonomies';
@@ -50,10 +48,14 @@ interface EditServiceTaxonomyFormProps {
     subdivision: string | null;
     tags?: string[];
   };
+  serviceTaxonomies: DatasetItem[];
+  availableTags: Array<{ value: string; label: string }>;
 }
 
 export function EditServiceTaxonomyForm({
   service,
+  serviceTaxonomies,
+  availableTags,
 }: EditServiceTaxonomyFormProps) {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(
@@ -82,13 +84,6 @@ export function EditServiceTaxonomyForm({
   const subcategories = selectedCategoryData?.children || [];
   const selectedSubcategoryData = findServiceById(watchedSubcategory);
   const subdivisions = selectedSubcategoryData?.children || [];
-
-  const availableTags = useMemo(() => {
-    return tags.map((tag) => ({
-      value: tag.id,
-      label: tag.label,
-    }));
-  }, []);
 
   // Handle state changes from server action
   useEffect(() => {

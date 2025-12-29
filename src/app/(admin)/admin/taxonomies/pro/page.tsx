@@ -6,6 +6,7 @@ import { AdminProTaxonomiesTableSection } from '@/components/admin/admin-pro-tax
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Plus, GitBranch } from 'lucide-react';
 import { NextLink } from '@/components';
+import { getProTaxonomies } from '@/lib/taxonomies';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +26,9 @@ export default async function ProTaxonomiesPage({
   searchParams,
 }: ProTaxonomiesPageProps) {
   const params = await searchParams;
+
+  // Prepare taxonomy data server-side to prevent client-side bundle bloat
+  const proTaxonomies = getProTaxonomies();
 
   return (
     <>
@@ -62,7 +66,10 @@ export default async function ProTaxonomiesPage({
               key={JSON.stringify(params)}
               fallback={<AdminProTaxonomiesTableSkeleton />}
             >
-              <AdminProTaxonomiesTableSection searchParams={params} />
+              <AdminProTaxonomiesTableSection
+                searchParams={params}
+                proTaxonomies={proTaxonomies}
+              />
             </Suspense>
           </div>
         </div>

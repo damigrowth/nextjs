@@ -9,6 +9,7 @@ import { getHomeMetadata } from '@/lib/seo/pages';
 import { getHomePageData } from '@/actions/home/get-home-data';
 import { ServicesHomeLazy } from '@/components/home/services-home-lazy';
 import { ProfilesHomeLazy } from '@/components/home/profiles-home-lazy';
+import { getServiceTaxonomies } from '@/lib/taxonomies';
 
 // import HomeSchema from 'oldcode/utils/Seo/Schema/HomeSchema';
 
@@ -45,6 +46,25 @@ export default async function HomePage() {
           serviceSubcategoriesWithServices: [],
         };
 
+  // Prepare taxonomy data server-side to prevent client-side bundle bloat (fallback)
+  const serviceTaxonomies = getServiceTaxonomies();
+  const featuredCategories = serviceTaxonomies
+    .filter((cat) => cat.featured === true)
+    .slice(0, 8)
+    .map((cat) => ({
+      id: cat.id,
+      label: cat.label,
+      slug: cat.slug,
+      icon: cat.icon,
+      featured: cat.featured,
+      subcategories: (cat.children || []).slice(0, 3).map((sub) => ({
+        id: sub.id,
+        label: sub.label,
+        slug: sub.slug,
+        count: 0,
+      })),
+    }));
+
   // Get categories for TaxonomyTabs
   const serviceCategories = homeData.services.mainCategories
     .filter((cat) => cat.slug !== 'all')
@@ -70,7 +90,10 @@ export default async function HomePage() {
       </div>
 
       <HeroHome popularSubcategories={homeData.popularSubcategories} />
-      <CategoriesHome categories={homeData.categoriesWithSubcategories} />
+      <CategoriesHome
+        categories={homeData.categoriesWithSubcategories}
+        fallbackCategories={featuredCategories}
+      />
       <FeaturesHome />
       <ServicesHomeLazy
         mainCategories={homeData.services.mainCategories}

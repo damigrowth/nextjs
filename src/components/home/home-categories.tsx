@@ -11,13 +11,13 @@ import {
 } from '@/components/ui/carousel';
 import { CarouselPagination } from '@/components/ui/carousel-pagination';
 import { SectionHeader } from '@/components/ui/section-header';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { getCategoryIcon } from '@/constants/datasets/category-icons';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { NextLink } from '@/components';
 
 type Props = {
   categories?: DatasetItem[];
+  fallbackCategories?: any[];
 };
 
 function getCategoryIconComponent(iconKey?: string) {
@@ -70,27 +70,13 @@ function CategoryCard({ category }: { category: DatasetItem }) {
   );
 }
 
-export default function CategoriesHome({ categories = [] }: Props) {
-  // Use provided categories with subcategories or fallback to featured categories from static data
+export default function CategoriesHome({
+  categories = [],
+  fallbackCategories = [],
+}: Props) {
+  // Use provided categories with subcategories or server-prepared fallback
   const displayCategories =
-    categories.length > 0
-      ? categories
-      : serviceTaxonomies
-          .filter((cat) => cat.featured === true)
-          .slice(0, 8)
-          .map((cat) => ({
-            id: cat.id,
-            label: cat.label,
-            slug: cat.slug,
-            icon: cat.icon,
-            featured: cat.featured,
-            subcategories: (cat.children || []).slice(0, 3).map((sub) => ({
-              id: sub.id,
-              label: sub.label,
-              slug: sub.slug,
-              count: 0,
-            })),
-          }));
+    categories.length > 0 ? categories : fallbackCategories;
 
   return (
     <section className='py-8 sm:py-12 md:py-16 lg:pb-24'>

@@ -1,18 +1,18 @@
 'use client';
 
 import { SearchFilter, SelectFilter, FilterContainer } from './filters/filter-components';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 
-export function AdminProSubcategoriesFilters() {
+interface AdminProSubcategoriesFiltersProps {
+  categoryOptions?: Array<{ value: string; label: string }>;
+}
+
+export function AdminProSubcategoriesFilters({
+  categoryOptions = [],
+}: AdminProSubcategoriesFiltersProps) {
   const typeOptions = [
     { value: 'freelancer', label: 'Professional' },
     { value: 'company', label: 'Company' },
   ];
-
-  const categoryOptions = proTaxonomies.map((cat) => ({
-    value: cat.id,
-    label: cat.label,
-  }));
 
   return (
     <FilterContainer>

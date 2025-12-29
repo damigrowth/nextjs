@@ -15,7 +15,8 @@ import {
   EditServiceMediaForm,
 } from '@/components/admin/forms';
 import { SiteHeader } from '@/components/admin/site-header';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { getServiceTaxonomies } from '@/lib/taxonomies';
+import { tags } from '@/constants/datasets/tags';
 import { NextLink } from '@/components';
 
 export const dynamic = 'force-dynamic';
@@ -54,6 +55,13 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
   }
 
   const service = serviceResult.data as any;
+
+  // Prepare taxonomy data server-side to prevent client-side bundle bloat
+  const serviceTaxonomies = getServiceTaxonomies();
+  const availableTags = tags.map((tag) => ({
+    value: tag.id,
+    label: tag.label,
+  }));
 
   // Resolve taxonomy labels
   const categoryData = serviceTaxonomies.find(
@@ -340,7 +348,11 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                     <CardTitle className='text-lg'>Κατηγορία & Tags</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <EditServiceTaxonomyForm service={service} />
+                    <EditServiceTaxonomyForm
+                      service={service}
+                      serviceTaxonomies={serviceTaxonomies}
+                      availableTags={availableTags}
+                    />
                   </CardContent>
                 </Card>
 

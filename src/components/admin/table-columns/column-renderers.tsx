@@ -295,6 +295,35 @@ export const columnRenderers = {
   },
 
   /**
+   * Category lookup display with badge using a lookup map (server-side optimized)
+   * @param categoryKey - Key to access category ID
+   * @param lookupMap - Object mapping category IDs to labels
+   */
+  categoryLookupFromMap<T extends Record<string, any>>(
+    categoryKey: string,
+    lookupMap: Record<string, string>,
+  ): ColumnDef<T> {
+    return {
+      key: categoryKey,
+      header: 'Category',
+      sortable: true,
+      className: 'min-w-[160px]',
+      render: (row) => {
+        const categoryId = row[categoryKey];
+        if (!categoryId)
+          return <span className='text-muted-foreground'>—</span>;
+
+        const categoryLabel = lookupMap[categoryId as string];
+        return categoryLabel ? (
+          <Badge variant='secondary'>{categoryLabel}</Badge>
+        ) : (
+          <span className='text-muted-foreground'>—</span>
+        );
+      },
+    };
+  },
+
+  /**
    * Featured star icon column
    * @param featuredKey - Key to access featured boolean (default: 'featured')
    */

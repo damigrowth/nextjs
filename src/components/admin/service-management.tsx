@@ -54,7 +54,6 @@ import {
 } from '@/actions/admin/services';
 
 import { AdminServicesDataTable } from './admin-services-data-table';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 
 interface ServiceListResponse {
   services: AdminServiceWithRelations[];
@@ -281,8 +280,8 @@ export function ServiceManagement() {
     loadStats();
   };
 
-  // Get unique categories from pro taxonomies
-  const categories = Object.keys(proTaxonomies);
+  // TODO: Get unique categories from service taxonomies (currently unused - dead code)
+  const categories: string[] = [];
 
   return (
     <div className='space-y-6'>

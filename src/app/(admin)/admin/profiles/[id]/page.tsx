@@ -17,6 +17,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { SiteHeader } from '@/components/admin/site-header';
 import { EditProfileSettingsForm } from '@/components/admin/forms/edit-profile-settings-form';
+import { getProTaxonomies } from '@/lib/taxonomies';
+import { skills as skillsDataset } from '@/constants/datasets/skills';
+import type { DatasetOption, DatasetWithCategory } from '@/lib/types/datasets';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,6 +52,9 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
   }
 
   const profile = profileResult.data as any;
+
+  // Prepare taxonomy data server-side to prevent client-side bundle bloat
+  const proTaxonomies = getProTaxonomies();
 
   // Create a mock user object for the forms (they expect AuthUser)
   const mockUser = {
@@ -304,6 +310,8 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                     <BasicInfoForm
                       initialUser={mockUser as any}
                       initialProfile={profile}
+                      proTaxonomies={proTaxonomies as DatasetOption[]}
+                      skillsDataset={skillsDataset as DatasetWithCategory[]}
                       adminMode={true}
                       hideCard={true}
                     />
