@@ -1,7 +1,3 @@
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // TEMPORARY: Disable strict mode to test if React double-mounting is causing realtime subscription issues
@@ -178,4 +174,4 @@ const nextConfig = {
   }),
 };
 
-module.exports = withBundleAnalyzer(nextConfig);
+module.exports = nextConfig;
