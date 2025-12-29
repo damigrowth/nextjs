@@ -1,5 +1,13 @@
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // TEMPORARY: Disable strict mode to test if React double-mounting is causing realtime subscription issues
+  // TODO: Re-enable after implementing useRef pattern for channel persistence
+  reactStrictMode: false,
+
   // Performance optimizations
   poweredByHeader: false, // Remove X-Powered-By header for security
   generateEtags: true, // Enable ETags for better caching
@@ -30,17 +38,43 @@ const nextConfig = {
       'lodash.debounce',
       'lucide-react',
       '@radix-ui/react-icons',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-select',
+      '@radix-ui/react-popover',
+      '@tanstack/react-table',
+      'react-hook-form',
+      'recharts',
+      'react-select',
+      'react-day-picker',
+      'cmdk',
+      '@hookform/resolvers',
+      'embla-carousel-react',
     ],
+  },
+
+  // Server-only packages (moved out of experimental per Next.js 15.5)
+  serverExternalPackages: ['bcrypt', '@prisma/client', 'cloudinary'],
+
+  // Modularize imports for better tree-shaking
+  modularizeImports: {
+    '@radix-ui/react-icons': {
+      transform: '@radix-ui/react-icons/dist/{{member}}',
+    },
+    // Note: lucide-react already optimized via optimizePackageImports
   },
 
   // Compiler options for better optimization
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn'],
-    } : false,
+    removeConsole:
+      process.env.NODE_ENV === 'production'
+        ? {
+            exclude: ['error', 'warn'],
+          }
+        : false,
   },
   images: {
-    unoptimized: true,
+    unoptimized: true, // Use Cloudinary optimization instead of Next.js
     // Optimized for mobile-first responsive images
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 160, 200, 256, 285, 331],
@@ -144,4 +178,4 @@ const nextConfig = {
   }),
 };
 
-module.exports = nextConfig;
+module.exports = withBundleAnalyzer(nextConfig);
