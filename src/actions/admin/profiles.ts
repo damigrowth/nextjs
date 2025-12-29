@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma/client';
 import { z } from 'zod';
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
+import { getProTaxonomies } from '@/lib/taxonomies';
 import { resolveTaxonomyHierarchy } from '@/lib/utils/datasets';
 
 import {
@@ -133,6 +133,9 @@ export async function listProfiles(
       }),
       prisma.profile.count({ where }),
     ]);
+
+    // Lazy-load pro taxonomies for O(1) lookups
+    const proTaxonomies = getProTaxonomies();
 
     // Transform profiles to include taxonomy labels
     const transformedProfiles = profiles.map((profile) => ({

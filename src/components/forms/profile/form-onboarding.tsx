@@ -39,7 +39,6 @@ import { OnboardingFormSkeleton } from './onboarding-form-skeleton';
 
 // Static constants and dataset utilities
 import type { DatasetItem } from '@/lib/types/datasets';
-import { locationOptions } from '@/constants/datasets/locations';
 import { formatInput } from '@/lib/utils/validation/formats';
 import { populateFormData } from '@/lib/utils/form';
 import {
@@ -65,6 +64,7 @@ type OnboardingFormData = z.infer<typeof onboardingFormSchemaWithMedia>;
 interface OnboardingFormProps {
   user: AuthUser | null;
   proTaxonomies: DatasetItem[];
+  locationOptions: DatasetItem[];
 }
 
 const initialState = {
@@ -80,6 +80,7 @@ const initialState = {
 export default function OnboardingForm({
   user,
   proTaxonomies,
+  locationOptions,
 }: OnboardingFormProps) {
   const [state, action, isPending] = useActionState(
     completeOnboarding,
@@ -163,7 +164,7 @@ export default function OnboardingForm({
       area: zipcode.area,
       county: zipcode.county,
     }));
-  }, []);
+  }, [locationOptions]);
 
   // Prefetch dashboard for instant navigation
   useEffect(() => {

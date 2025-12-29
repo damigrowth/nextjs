@@ -19,9 +19,7 @@ import { Loader2 } from 'lucide-react';
 import { updateServiceTaxonomyAction } from '@/actions/admin/services';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import type { DatasetItem } from '@/lib/types/datasets';
-
-// O(1) optimized hash map lookups - 99% faster than findById utility
-import { findServiceById } from '@/lib/taxonomies';
+import { findById } from '@/lib/utils/datasets';
 import { createServiceSchema } from '@/lib/validations/service';
 import { populateFormData } from '@/lib/utils/form';
 import TaxonomySelector from '@/components/shared/taxonomy-selector';
@@ -79,10 +77,10 @@ export function EditServiceTaxonomyForm({
   const watchedSubcategory = form.watch('subcategory');
   const watchedSubdivision = form.watch('subdivision');
 
-  // Find taxonomy data - O(1) hash map lookups
-  const selectedCategoryData = findServiceById(watchedCategory);
+  // Find taxonomy data
+  const selectedCategoryData = findById(serviceTaxonomies, watchedCategory);
   const subcategories = selectedCategoryData?.children || [];
-  const selectedSubcategoryData = findServiceById(watchedSubcategory);
+  const selectedSubcategoryData = findById(serviceTaxonomies, watchedSubcategory);
   const subdivisions = selectedSubcategoryData?.children || [];
 
   // Handle state changes from server action
@@ -136,7 +134,7 @@ export function EditServiceTaxonomyForm({
                     categoryLabel: selectedCategoryData?.label,
                     subcategoryLabel: selectedSubcategoryData?.label,
                     subdivisionLabel: watchedSubdivision
-                      ? findServiceById(watchedSubdivision)?.label
+                      ? findById(subdivisions, watchedSubdivision)?.label
                       : undefined,
                   }
                 : null

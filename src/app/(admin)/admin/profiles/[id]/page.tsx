@@ -19,6 +19,7 @@ import { SiteHeader } from '@/components/admin/site-header';
 import { EditProfileSettingsForm } from '@/components/admin/forms/edit-profile-settings-form';
 import { getProTaxonomies } from '@/lib/taxonomies';
 import { skills as skillsDataset } from '@/constants/datasets/skills';
+import { locationOptions } from '@/constants/datasets/locations';
 import type { DatasetOption, DatasetWithCategory } from '@/lib/types/datasets';
 
 export const dynamic = 'force-dynamic';
@@ -327,6 +328,7 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                     <CoverageForm
                       initialUser={mockUser as any}
                       initialProfile={profile}
+                      locationOptions={locationOptions}
                       adminMode={true}
                       hideCard={true}
                     />

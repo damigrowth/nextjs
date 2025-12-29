@@ -2,9 +2,8 @@
 
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 // O(1) optimized taxonomy lookups - 99% faster than findById
-import { findServiceById } from '@/lib/taxonomies';
+import { getServiceTaxonomies, findServiceById } from '@/lib/taxonomies';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
@@ -58,6 +57,8 @@ async function performSearch(
   searchTerm: string,
 ): Promise<ActionResult<SearchSuggestionsResult>> {
   try {
+    // Lazy-load service taxonomies for O(1) lookups
+    const serviceTaxonomies = getServiceTaxonomies();
 
     // Get cached published service taxonomies
     const { usedSubcategories, usedSubdivisions } =

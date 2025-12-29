@@ -32,9 +32,7 @@ import {
 
 // Utilities
 import { TaxonomyDataContext } from '../form-service-create';
-
-// O(1) optimized hash map lookups - 99% faster than findById utility
-import { findServiceById } from '@/lib/taxonomies';
+import { findById } from '@/lib/utils/datasets';
 import type { CreateServiceInput } from '@/lib/validations/service';
 import { useFormContext } from 'react-hook-form';
 
@@ -57,10 +55,10 @@ export default function ServiceDetailsStep() {
   const watchedFixed = watch('fixed');
   const watchedType = watch('type');
 
-  // Get filtered data based on selections - O(1) hash map lookups
-  const selectedCategoryData = findServiceById(watchedCategory);
+  // Get filtered data based on selections
+  const selectedCategoryData = findById(serviceTaxonomies, watchedCategory);
   const subcategories = selectedCategoryData?.children || [];
-  const selectedSubcategoryData = findServiceById(watchedSubcategory);
+  const selectedSubcategoryData = findById(serviceTaxonomies, watchedSubcategory);
   const subdivisions = selectedSubcategoryData?.children || [];
 
   // allSubdivisions and availableTags now come from context (server-side prepared)

@@ -24,7 +24,7 @@ import { toast } from 'sonner';
 import FormButton from '@/components/shared/button-form';
 
 // Static constants and dataset utilities
-import { locationOptions } from '@/constants/datasets/locations';
+import type { DatasetItem } from '@/lib/types/datasets';
 import { formatInput } from '@/lib/utils/validation/formats';
 import {
   resetCoverageDependencies,
@@ -56,6 +56,7 @@ const initialState = {
 interface CoverageFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null;
+  locationOptions: DatasetItem[];
   adminMode?: boolean;
   hideCard?: boolean;
 }
@@ -63,6 +64,7 @@ interface CoverageFormProps {
 export default function CoverageForm({
   initialUser,
   initialProfile,
+  locationOptions,
   adminMode = false,
   hideCard = false,
 }: CoverageFormProps) {
@@ -114,7 +116,7 @@ export default function CoverageForm({
       area: zipcode.area,
       county: zipcode.county,
     }));
-  }, []);
+  }, [locationOptions]);
 
   // Memoize available areas based on selected counties
   const availableAreas = React.useMemo(() => {
@@ -132,7 +134,7 @@ export default function CoverageForm({
         })) || []
       );
     });
-  }, [watchedCoverage?.counties]);
+  }, [watchedCoverage?.counties, locationOptions]);
 
   // Update form values when profile data is available
   useEffect(() => {

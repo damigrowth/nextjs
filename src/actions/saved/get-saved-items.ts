@@ -3,10 +3,14 @@
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 // O(1) optimized taxonomy lookups - 99% faster than findById
-import { findServiceById, findProById, findSkillById } from '@/lib/taxonomies';
+import {
+  getServiceTaxonomies,
+  getProTaxonomies,
+  findServiceById,
+  findProById,
+  findSkillById,
+} from '@/lib/taxonomies';
 import { findById } from '@/lib/utils/datasets';
 import type { ActionResult } from '@/lib/types/api';
 import type {

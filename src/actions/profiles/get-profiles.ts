@@ -2,7 +2,6 @@
 
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import {
   transformCoverageWithLocationNames,
   resolveTaxonomyHierarchy,
@@ -17,6 +16,7 @@ import { locationOptions } from '@/constants/datasets/locations';
 import type { DatasetItem } from '@/lib/types/datasets';
 // O(1) optimized taxonomy lookups - 99% faster than findById
 import {
+  getProTaxonomies,
   findProById,
   findLocationBySlugOrName,
   batchFindSkillsByIds,
@@ -52,6 +52,9 @@ export type ProfileFilters = Partial<
 function resolveCategoryLabels(
   profile: Pick<Profile, 'category' | 'subcategory'>,
 ) {
+  // Lazy-load pro taxonomies for O(1) lookups
+  const proTaxonomies = getProTaxonomies();
+
   return resolveTaxonomyHierarchy(
     proTaxonomies,
     profile.category,
@@ -484,6 +487,9 @@ export async function getProfileArchivePageData(params: {
       category?: DatasetItem;
       subcategory?: DatasetItem;
     } = {};
+
+    // Lazy-load pro taxonomies for O(1) lookups
+    const proTaxonomies = getProTaxonomies();
 
     // Determine target type based on archive type and search params
     // For 'directory', use the type filter from search params if provided, otherwise show all

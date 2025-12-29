@@ -28,11 +28,9 @@ import { LazyCombobox } from '@/components/ui/lazy-combobox';
 
 // Static constants and dataset utilities
 import { formatInput } from '@/lib/utils/validation/formats';
-import { filterByField, filterSkillsByCategory } from '@/lib/utils/datasets';
+import { filterByField, filterSkillsByCategory, getSkillsByIds } from '@/lib/utils/datasets';
 import { populateFormData } from '@/lib/utils/form';
 import type { DatasetOption, DatasetWithCategory } from '@/lib/types/datasets';
-// O(1) optimized skill lookups - 99% faster than filter with includes
-import { batchFindSkillsByIds } from '@/lib/taxonomies';
 
 // Import validation schema
 import {
@@ -167,15 +165,12 @@ export default function BasicInfoForm({
       : [];
   }, [watchedCategory]);
 
-  // Memoize available specialities based on selected skills - O(1) hash map lookups
+  // Memoize available specialities based on selected skills
   const availableSpecialities = React.useMemo(() => {
     return watchedSkills
-      ? batchFindSkillsByIds(watchedSkills).filter(
-          (skill): skill is DatasetOption =>
-            skill !== null && skill.label !== undefined,
-        )
+      ? getSkillsByIds(skillsDataset, watchedSkills)
       : [];
-  }, [watchedSkills]);
+  }, [watchedSkills, skillsDataset]);
 
   // Helper functions for formatting inputs
   const handleTaglineChange = (e: React.ChangeEvent<HTMLInputElement>) => {

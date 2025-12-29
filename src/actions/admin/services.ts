@@ -7,7 +7,6 @@ import { prisma } from '@/lib/prisma/client';
 import { z } from 'zod';
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { CACHE_TAGS, getServiceTags } from '@/lib/cache';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 // O(1) optimized taxonomy lookups - 99% faster than nested find
 import { resolveServiceHierarchy, findTagById, findTagBySlug } from '@/lib/taxonomies';

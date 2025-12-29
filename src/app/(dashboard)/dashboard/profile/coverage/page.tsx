@@ -2,6 +2,7 @@ import { getCurrentUser } from '@/actions/auth/server';
 import { CoverageForm } from '@/components';
 import { redirect } from 'next/navigation';
 import { getDashboardMetadata } from '@/lib/seo/pages';
+import { locationOptions } from '@/constants/datasets/locations';
 
 export const metadata = getDashboardMetadata('Τρόποι Παροχής');
 
@@ -29,7 +30,11 @@ export default async function CoveragePage() {
         </p>
       </div>
 
-      <CoverageForm initialUser={user} initialProfile={profile} />
+      <CoverageForm
+        initialUser={user}
+        initialProfile={profile}
+        locationOptions={locationOptions}
+      />
     </div>
   );
 }
