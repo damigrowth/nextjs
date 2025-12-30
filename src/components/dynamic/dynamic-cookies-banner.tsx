@@ -10,6 +10,10 @@ const CookiesBanner = dynamic(
   },
 );
 
-export default function CookiesBanner_D() {
-  return <CookiesBanner />;
+interface CookiesBanner_DProps {
+  children: React.ReactNode;
+}
+
+export default function CookiesBanner_D({ children }: CookiesBanner_DProps) {
+  return <CookiesBanner>{children}</CookiesBanner>;
 }
