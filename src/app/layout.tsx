@@ -5,10 +5,6 @@ import Script from 'next/script';
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import { Metadata } from 'next';
 
-import '@fortawesome/fontawesome-svg-core/styles.css';
-import { config } from '@fortawesome/fontawesome-svg-core';
-config.autoAddCss = false; /* eslint-disable import/first */
-
 // import 'react-tooltip/dist/react-tooltip.css';
 // import 'react-loading-skeleton/dist/skeleton.css';
 import {
