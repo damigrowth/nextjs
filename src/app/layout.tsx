@@ -38,8 +38,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
       </head>
       <Body>
-        {/* CookieFirst Cookie Consent Wrapper - wraps entire app */}
-        <CookiesBanner_D>
+        {/* CookieFirst Cookie Consent Wrapper - TEMPORARILY DISABLED FOR TESTING */}
+        {/* <CookiesBanner_D> */}
           <TooltipProvider delayDuration={0}>
             <main>
               <Notifications>{children}</Notifications>
@@ -91,7 +91,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             strategy='beforeInteractive'
           /> */}
           </TooltipProvider>
-        </CookiesBanner_D>
+        {/* </CookiesBanner_D> */}
       </Body>
     </html>
   );
