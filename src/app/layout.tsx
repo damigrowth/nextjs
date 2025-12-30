@@ -46,10 +46,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             <FooterWrapper />
             <BottomToTop_D />
 
-            {/* Google Tag Manager - Deferred to reduce main-thread blocking */}
+            {/* Google Tag Manager - Lazy loaded to reduce TBT (Total Blocking Time) */}
             <Script
               id='gtm-script'
-              strategy='afterInteractive'
+              strategy='lazyOnload'
               dangerouslySetInnerHTML={{
                 __html: `
                 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -61,18 +61,18 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               }}
             />
 
-            {/* Google Analytics - Deferred to reduce main-thread blocking */}
+            {/* Google Analytics - Lazy loaded to reduce TBT (Total Blocking Time) */}
             {gaId && (
               <Script
                 id='ga-script'
-                strategy='afterInteractive'
+                strategy='lazyOnload'
                 src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
               />
             )}
             {gaId && (
               <Script
                 id='ga-config'
-                strategy='afterInteractive'
+                strategy='lazyOnload'
                 dangerouslySetInnerHTML={{
                   __html: `
                   window.dataLayer = window.dataLayer || [];
