@@ -29,18 +29,27 @@ const nextConfig = {
       'date-fns',
       'lodash.debounce',
       'lucide-react',
+      // Granular Radix UI splitting for better tree-shaking
       '@radix-ui/react-icons',
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
       '@radix-ui/react-select',
       '@radix-ui/react-popover',
-      '@tanstack/react-table',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-slot',
+      '@radix-ui/react-avatar',
+      '@radix-ui/react-label',
+      '@radix-ui/react-separator',
+      // Admin-only dependencies removed to prevent homepage bundle bloat:
+      // '@tanstack/react-table' - only used in admin data tables
+      // 'recharts' - only used in admin charts
+      // 'react-select' - primarily admin forms
       'react-hook-form',
-      'recharts',
-      'react-select',
       'react-day-picker',
       'cmdk',
       '@hookform/resolvers',
+      // Embla carousel removed from homepage hero (using CSS scroll-snap instead)
+      // Still available for below-fold carousels (services, profiles, testimonials)
       'embla-carousel-react',
     ],
   },
