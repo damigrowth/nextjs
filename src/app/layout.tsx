@@ -8,7 +8,6 @@ import { Metadata } from 'next';
 // import 'react-loading-skeleton/dist/skeleton.css';
 import {
   BottomToTop_D,
-  CookiesBanner_D,
   // NavMenuMobileWrapper_D,
 } from '@/components/dynamic';
 import { FooterWrapper } from '@/components/shared/layout';
@@ -38,9 +37,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
       </head>
       <Body>
-        {/* CookieFirst Cookie Consent Wrapper - TEMPORARILY DISABLED FOR TESTING */}
-        {/* <CookiesBanner_D> */}
-          <TooltipProvider delayDuration={0}>
+        {/* CookieFirst loads via Google Tag Manager - no React wrapper needed */}
+        <TooltipProvider delayDuration={0}>
             <main>
               <Notifications>{children}</Notifications>
             </main>
@@ -91,7 +89,6 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             strategy='beforeInteractive'
           /> */}
           </TooltipProvider>
-        {/* </CookiesBanner_D> */}
       </Body>
     </html>
   );
