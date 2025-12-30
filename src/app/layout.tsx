@@ -2,7 +2,6 @@ import '../styles/critical.css';
 import '../styles/globals.css';
 
 import Script from 'next/script';
-import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import { Metadata } from 'next';
 
 // import 'react-tooltip/dist/react-tooltip.css';
@@ -46,8 +45,44 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           {/* Footer is shown globally except for dashboard and admin */}
           <FooterWrapper />
           <BottomToTop_D />
-          <GoogleTagManager gtmId='GTM-KR7N94L4' />
-          <GoogleAnalytics gaId={gaId} />
+
+          {/* Google Tag Manager - Deferred to reduce main-thread blocking */}
+          <Script
+            id='gtm-script'
+            strategy='afterInteractive'
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                })(window,document,'script','dataLayer','GTM-KR7N94L4');
+              `,
+            }}
+          />
+
+          {/* Google Analytics - Deferred to reduce main-thread blocking */}
+          {gaId && (
+            <Script
+              id='ga-script'
+              strategy='afterInteractive'
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+            />
+          )}
+          {gaId && (
+            <Script
+              id='ga-config'
+              strategy='afterInteractive'
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${gaId}');
+                `,
+              }}
+            />
+          )}
           {/* Cloudinary Upload Widget */}
           {/* <Script
             src='https://upload-widget.cloudinary.com/global/all.js'
