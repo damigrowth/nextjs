@@ -20,9 +20,6 @@ const nextConfig = {
     inlineCss: true,
     optimizeCss: true,
     webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB', 'INP'],
-    // Aggressive route-based code splitting to separate admin/dashboard from public pages
-    // This prevents admin-only code from being included in homepage/public route bundles
-    optimizeServerReact: true,
     optimizePackageImports: [
       '@apollo/client',
       'react-loading-skeleton',
