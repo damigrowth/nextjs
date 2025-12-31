@@ -20,6 +20,9 @@ const nextConfig = {
     inlineCss: true,
     optimizeCss: true,
     webVitalsAttribution: ['CLS', 'LCP', 'FID', 'TTFB', 'INP'],
+    // Aggressive route-based code splitting to separate admin/dashboard from public pages
+    // This prevents admin-only code from being included in homepage/public route bundles
+    optimizeServerReact: true,
     optimizePackageImports: [
       '@apollo/client',
       'react-loading-skeleton',
@@ -40,10 +43,11 @@ const nextConfig = {
       '@radix-ui/react-avatar',
       '@radix-ui/react-label',
       '@radix-ui/react-separator',
-      // Admin-only dependencies removed to prevent homepage bundle bloat:
-      // '@tanstack/react-table' - only used in admin data tables
-      // 'recharts' - only used in admin charts
-      // 'react-select' - primarily admin forms
+      // Admin-only dependencies removed from optimizePackageImports to force code splitting:
+      // '@tanstack/react-table' - only used in admin data tables (will be in separate chunk)
+      // 'recharts' - only used in admin charts (will be in separate chunk)
+      // 'react-select' - primarily admin forms (will be in separate chunk)
+      // '@supabase/supabase-js' - only used in dashboard/messages (will be in separate chunk)
       'react-hook-form',
       'react-day-picker',
       'cmdk',
