@@ -38,7 +38,7 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
       </div>
 
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-        {categories.map((category) => (
+        {categories.map((category, index) => (
           <Card
             key={category.id}
             className='h-full hover:shadow-lg transition-shadow overflow-hidden'
@@ -55,6 +55,8 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
                   fill
                   className='object-cover'
                   sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+                  priority={index < 4}
+                  fetchPriority={index < 4 ? 'high' : undefined}
                 />
               </div>
             )}
