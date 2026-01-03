@@ -942,8 +942,24 @@ export const updateServiceMediaSchema = z.object({
 });
 
 // Update service info (everything except media)
+// Note: Using .pick() instead of .omit() because createServiceSchema has refinements
 export const updateServiceInfoSchema = createServiceSchema
-  .omit({ media: true })
+  .pick({
+    type: true,
+    subscriptionType: true,
+    title: true,
+    description: true,
+    category: true,
+    subcategory: true,
+    subdivision: true,
+    tags: true,
+    price: true,
+    fixed: true,
+    duration: true,
+    addons: true,
+    faq: true,
+    // media: false - explicitly excluded
+  })
   .partial();
 
 export type UpdateServiceMediaInput = z.infer<typeof updateServiceMediaSchema>;
