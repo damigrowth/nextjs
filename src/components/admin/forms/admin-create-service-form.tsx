@@ -32,7 +32,7 @@ import { useToast } from '@/lib/hooks/ui/use-toast';
 
 // Validation schemas
 import {
-  adminCreateServiceSchema,
+  adminServiceValidationSchema,
   presenceOnlineSchema,
   onbaseOnsiteSchema,
   oneoffSubscriptionSchema,
@@ -176,7 +176,7 @@ export function AdminCreateServiceForm({
 
   // Initialize form with react-hook-form and zod
   const form = useForm<CreateServiceInput>({
-    resolver: zodResolver(adminCreateServiceSchema),
+    resolver: zodResolver(adminServiceValidationSchema),
     mode: 'onChange',
     defaultValues: {
       type: {

@@ -14,7 +14,7 @@ import {
   registerSchema,
   accountUpdateSchema,
 } from '../validations';
-import { createServiceSchema } from './service';
+import { adminServiceValidationSchema } from './service';
 import { cloudinaryResourceSchema } from '../prisma/json-types';
 
 // =============================================
@@ -384,9 +384,10 @@ export const adminDeleteServiceSchema = z.object({
   serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
 });
 
-// Admin create service schema - combines create service schema with profile assignment
-// Using .and() instead of .extend() because createServiceSchema contains refinements
-export const adminCreateServiceSchema = createServiceSchema.and(
+// Admin create service schema - combines admin validation schema with profile assignment
+// Uses adminServiceValidationSchema for field-level validation, adds profileId for submission
+// Using .and() instead of .extend() because schema contains refinements
+export const adminCreateServiceSchema = adminServiceValidationSchema.and(
   z.object({
     profileId: z.string().min(1, 'Profile ID is required'),
   })

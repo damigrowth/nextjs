@@ -685,9 +685,10 @@ export const adminAddonsAndFaqSchema = z
   })
   .passthrough();
 
-// Complete Service Creation Schema - ADMIN VERSION
+// Admin Service Validation Schema - For real-time field-level validation in forms
 // Uses .superRefine() for field-level validation on addons/FAQ (shows errors on specific fields)
-export const adminCreateServiceSchema = z
+// Note: For admin form submission, use adminCreateServiceSchema from admin.ts which adds profileId
+export const adminServiceValidationSchema = z
   .object({
     // Service type configuration (Boolean object matching Prisma schema)
     type: serviceTypeConfigSchema,
