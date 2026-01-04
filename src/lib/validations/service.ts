@@ -493,6 +493,8 @@ export const serviceDetailsSchema = z
 
 // Step 4: Addons and FAQ Schema (optional) - DASHBOARD VERSION
 // Uses .refine() for array-level validation (works for dashboard forms)
+// Step 4: Addons and FAQ Schema - Dashboard version with field-level validation
+// Uses .superRefine() for field-level validation (shows errors on specific fields)
 export const addonsAndFaqSchema = z
   .object({
     addons: z
@@ -500,58 +502,124 @@ export const addonsAndFaqSchema = z
       .max(3, 'Μπορείτε να προσθέσετε έως 3 extra υπηρεσίες')
       .optional()
       .default([])
-      .refine(
-        (addons) => {
-          if (!addons || addons.length === 0) return true;
-          const titles = addons.map((addon) =>
-            addon.title.toLowerCase().trim(),
-          );
-          return titles.length === new Set(titles).size;
-        },
-        {
-          message: 'Οι τίτλοι των extra υπηρεσιών πρέπει να είναι μοναδικοί',
-        },
-      )
-      .refine(
-        (addons) => {
-          if (!addons || addons.length === 0) return true;
-          const descriptions = addons.map((addon) =>
-            addon.description.toLowerCase().trim(),
-          );
-          return descriptions.length === new Set(descriptions).size;
-        },
-        {
-          message:
-            'Οι περιγραφές των extra υπηρεσιών πρέπει να είναι μοναδικές',
-        },
-      ),
+      .superRefine((addons, ctx) => {
+        if (!addons || addons.length === 0) return;
+
+        // Check for duplicate titles
+        const titles = addons.map((addon) => addon.title.toLowerCase().trim());
+        const titleIndexMap = new Map<string, number[]>();
+
+        titles.forEach((title, index) => {
+          if (!titleIndexMap.has(title)) {
+            titleIndexMap.set(title, []);
+          }
+          titleIndexMap.get(title)!.push(index);
+        });
+
+        titleIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'Οι τίτλοι των extra υπηρεσιών πρέπει να είναι μοναδικοί',
+                path: [index, 'title'],
+              });
+            });
+          }
+        });
+
+        // Check for duplicate descriptions
+        const descriptions = addons.map((addon) =>
+          addon.description.toLowerCase().trim(),
+        );
+        const descriptionIndexMap = new Map<string, number[]>();
+
+        descriptions.forEach((description, index) => {
+          if (!descriptionIndexMap.has(description)) {
+            descriptionIndexMap.set(description, []);
+          }
+          descriptionIndexMap.get(description)!.push(index);
+        });
+
+        descriptionIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'Οι περιγραφές των extra υπηρεσιών πρέπει να είναι μοναδικές',
+                path: [index, 'description'],
+              });
+            });
+          }
+        });
+
+        // Check that all addon prices are at least 5€
+        addons.forEach((addon, index) => {
+          if (addon.price < 5) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Η ελάχιστη τιμή είναι 5€',
+              path: [index, 'price'],
+            });
+          }
+        });
+      }),
     faq: z
       .array(formServiceFaqSchema)
       .max(5, 'Μπορείτε να προσθέσετε έως 5 συχνές ερωτήσεις')
       .optional()
       .default([])
-      .refine(
-        (faqs) => {
-          if (!faqs || faqs.length === 0) return true;
-          const questions = faqs.map((faq) =>
-            faq.question.toLowerCase().trim(),
-          );
-          return questions.length === new Set(questions).size;
-        },
-        {
-          message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
-        },
-      )
-      .refine(
-        (faqs) => {
-          if (!faqs || faqs.length === 0) return true;
-          const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
-          return answers.length === new Set(answers).size;
-        },
-        {
-          message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
-        },
-      ),
+      .superRefine((faqs, ctx) => {
+        if (!faqs || faqs.length === 0) return;
+
+        // Check for duplicate questions
+        const questions = faqs.map((faq) => faq.question.toLowerCase().trim());
+        const questionIndexMap = new Map<string, number[]>();
+
+        questions.forEach((question, index) => {
+          if (!questionIndexMap.has(question)) {
+            questionIndexMap.set(question, []);
+          }
+          questionIndexMap.get(question)!.push(index);
+        });
+
+        questionIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
+                path: [index, 'question'],
+              });
+            });
+          }
+        });
+
+        // Check for duplicate answers
+        const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
+        const answerIndexMap = new Map<string, number[]>();
+
+        answers.forEach((answer, index) => {
+          if (!answerIndexMap.has(answer)) {
+            answerIndexMap.set(answer, []);
+          }
+          answerIndexMap.get(answer)!.push(index);
+        });
+
+        answerIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
+                path: [index, 'answer'],
+              });
+            });
+          }
+        });
+      }),
   })
   .passthrough();
 
@@ -986,65 +1054,122 @@ export const createServiceSchema = z
     addons: z
       .array(formServiceAddonSchema)
       .optional()
-      .refine(
-        (addons) => {
-          if (!addons || addons.length === 0) return true;
-          const titles = addons.map((addon) =>
-            addon.title.toLowerCase().trim(),
-          );
-          return titles.length === new Set(titles).size;
-        },
-        {
-          message: 'Οι τίτλοι των extra υπηρεσιών πρέπει να είναι μοναδικοί',
-        },
-      )
-      .refine(
-        (addons) => {
-          if (!addons || addons.length === 0) return true;
-          const descriptions = addons.map((addon) =>
-            addon.description.toLowerCase().trim(),
-          );
-          return descriptions.length === new Set(descriptions).size;
-        },
-        {
-          message:
-            'Οι περιγραφές των extra υπηρεσιών πρέπει να είναι μοναδικές',
-        },
-      )
-      .refine(
-        (addons) => {
-          if (!addons || addons.length === 0) return true;
-          return addons.every((addon) => addon.price >= 5);
-        },
-        {
-          message: 'Η ελάχιστη τιμή για κάθε extra υπηρεσία είναι 5€',
-        },
-      ),
+      .superRefine((addons, ctx) => {
+        if (!addons || addons.length === 0) return;
+
+        // Check for duplicate titles
+        const titles = addons.map((addon) => addon.title.toLowerCase().trim());
+        const titleIndexMap = new Map<string, number[]>();
+
+        titles.forEach((title, index) => {
+          if (!titleIndexMap.has(title)) {
+            titleIndexMap.set(title, []);
+          }
+          titleIndexMap.get(title)!.push(index);
+        });
+
+        titleIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'Οι τίτλοι των extra υπηρεσιών πρέπει να είναι μοναδικοί',
+                path: [index, 'title'],
+              });
+            });
+          }
+        });
+
+        // Check for duplicate descriptions
+        const descriptions = addons.map((addon) =>
+          addon.description.toLowerCase().trim(),
+        );
+        const descriptionIndexMap = new Map<string, number[]>();
+
+        descriptions.forEach((description, index) => {
+          if (!descriptionIndexMap.has(description)) {
+            descriptionIndexMap.set(description, []);
+          }
+          descriptionIndexMap.get(description)!.push(index);
+        });
+
+        descriptionIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'Οι περιγραφές των extra υπηρεσιών πρέπει να είναι μοναδικές',
+                path: [index, 'description'],
+              });
+            });
+          }
+        });
+
+        // Check that all addon prices are at least 5€
+        addons.forEach((addon, index) => {
+          if (addon.price < 5) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Η ελάχιστη τιμή είναι 5€',
+              path: [index, 'price'],
+            });
+          }
+        });
+      }),
     faq: z
       .array(formServiceFaqSchema)
       .optional()
-      .refine(
-        (faqs) => {
-          if (!faqs || faqs.length === 0) return true;
-          const questions = faqs.map((faq) =>
-            faq.question.toLowerCase().trim(),
-          );
-          return questions.length === new Set(questions).size;
-        },
-        {
-          message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
-        },
-      )
-      .refine(
-        (faqs) => {
-          if (!faqs || faqs.length === 0) return true;
-          const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
-          return answers.length === new Set(answers).size;
-        },
-        {
-          message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
-        },
-      ),
+      .superRefine((faqs, ctx) => {
+        if (!faqs || faqs.length === 0) return;
+
+        // Check for duplicate questions
+        const questions = faqs.map((faq) => faq.question.toLowerCase().trim());
+        const questionIndexMap = new Map<string, number[]>();
+
+        questions.forEach((question, index) => {
+          if (!questionIndexMap.has(question)) {
+            questionIndexMap.set(question, []);
+          }
+          questionIndexMap.get(question)!.push(index);
+        });
+
+        questionIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
+                path: [index, 'question'],
+              });
+            });
+          }
+        });
+
+        // Check for duplicate answers
+        const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
+        const answerIndexMap = new Map<string, number[]>();
+
+        answers.forEach((answer, index) => {
+          if (!answerIndexMap.has(answer)) {
+            answerIndexMap.set(answer, []);
+          }
+          answerIndexMap.get(answer)!.push(index);
+        });
+
+        answerIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
+                path: [index, 'answer'],
+              });
+            });
+          }
+        });
+      }),
 
     // Step 5 data
     media: z
