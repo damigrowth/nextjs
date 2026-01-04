@@ -14,7 +14,7 @@ import {
   registerSchema,
   accountUpdateSchema,
 } from '../validations';
-import { adminServiceValidationSchema } from './service';
+import { adminServiceValidationSchema, createServiceSchema } from './service';
 import { cloudinaryResourceSchema } from '../prisma/json-types';
 
 // =============================================
