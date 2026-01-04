@@ -20,21 +20,9 @@ import { updateServiceTaxonomyAction } from '@/actions/admin/services';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { findById } from '@/lib/utils/datasets';
-import { createServiceSchema } from '@/lib/validations/service';
+import { editServiceTaxonomySchema } from '@/lib/validations/service';
 import { populateFormData } from '@/lib/utils/form';
 import TaxonomySelector from '@/components/shared/taxonomy-selector';
-
-// Use dashboard service schema - pick only taxonomy fields
-// Extend to make tags explicitly optional to match the interface
-const editServiceTaxonomySchema = createServiceSchema
-  .pick({
-    category: true,
-    subcategory: true,
-    subdivision: true,
-  })
-  .extend({
-    tags: z.array(z.string()).optional(),
-  });
 
 type EditServiceTaxonomyFormValues = z.infer<typeof editServiceTaxonomySchema>;
 

@@ -18,15 +18,9 @@ import {
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { updateServiceBasicAction } from '@/actions/admin/services';
-import { createServiceSchema } from '@/lib/validations/service';
+import { editServiceBasicSchema } from '@/lib/validations/service';
 import { populateFormData } from '@/lib/utils/form';
 import { z } from 'zod';
-
-// Use dashboard service schema - pick only basic fields
-const editServiceBasicSchema = createServiceSchema.pick({
-  title: true,
-  description: true,
-});
 
 type EditServiceBasicFormValues = z.infer<typeof editServiceBasicSchema>;
 
