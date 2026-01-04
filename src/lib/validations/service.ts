@@ -1320,10 +1320,11 @@ export const updateServiceMediaSchema = z.object({
 
 // Update service info (everything except media)
 // Note: Defined independently because .pick()/.omit() cannot be used on schemas with refinements
+// All fields are optional for partial updates (cannot use .partial() on schemas with refinements)
 export const updateServiceInfoSchema = z
   .object({
     // Service type configuration (Boolean object matching Prisma schema)
-    type: serviceTypeConfigSchema,
+    type: serviceTypeConfigSchema.optional(),
 
     // Subscription period (only for subscription services)
     subscriptionType: z.nativeEnum(SubscriptionType).optional(),
@@ -1332,14 +1333,19 @@ export const updateServiceInfoSchema = z
     title: z
       .string()
       .min(10, 'Ο τίτλος πρέπει να είναι τουλάχιστον 10 χαρακτήρες')
-      .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
+      .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες')
+      .optional(),
     description: z
       .string()
       .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
-      .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες'),
-    category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
-    subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
-    subdivision: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
+      .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες')
+      .optional(),
+    category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική').optional(),
+    subcategory: z
+      .string()
+      .min(1, 'Η υποκατηγορία είναι υποχρεωτική')
+      .optional(),
+    subdivision: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική').optional(),
     tags: z
       .array(z.string())
       .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες (tags)')
@@ -1350,7 +1356,7 @@ export const updateServiceInfoSchema = z
       .int()
       .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
       .optional(),
-    fixed: z.boolean(),
+    fixed: z.boolean().optional(),
     duration: z
       .number()
       .int()
@@ -1366,7 +1372,8 @@ export const updateServiceInfoSchema = z
   })
   .refine(
     (data) => {
-      // Validate that at least one service type is selected
+      // Validate that at least one service type is selected (skip if type not provided)
+      if (!data.type) return true;
       const hasPresence = data.type.presence;
       const hasOnline = data.type.online;
       return hasPresence || hasOnline;
@@ -1378,7 +1385,8 @@ export const updateServiceInfoSchema = z
   )
   .refine(
     (data) => {
-      // Validate presence service location
+      // Validate presence service location (skip if type not provided)
+      if (!data.type) return true;
       if (data.type.presence) {
         return data.type.onbase || data.type.onsite;
       }
@@ -1391,7 +1399,8 @@ export const updateServiceInfoSchema = z
   )
   .refine(
     (data) => {
-      // Validate online service delivery type
+      // Validate online service delivery type (skip if type not provided)
+      if (!data.type) return true;
       if (data.type.online) {
         return data.type.oneoff || data.type.subscription;
       }
@@ -1404,7 +1413,8 @@ export const updateServiceInfoSchema = z
   )
   .refine(
     (data) => {
-      // Validate subscription period for subscription services
+      // Validate subscription period for subscription services (skip if type not provided)
+      if (!data.type) return true;
       if (data.type.subscription) {
         return data.subscriptionType !== undefined;
       }
@@ -1417,7 +1427,7 @@ export const updateServiceInfoSchema = z
   )
   .refine(
     (data) => {
-      // Price is required when fixed is true (default state, showing price)
+      // Price is required when fixed is true (skip if fixed not provided)
       if (data.fixed && (!data.price || data.price === 0)) {
         return false;
       }
@@ -1430,7 +1440,7 @@ export const updateServiceInfoSchema = z
   )
   .refine(
     (data) => {
-      // Price must be at least 5€ when fixed is true (showing price)
+      // Price must be at least 5€ when fixed is true (skip if fixed not provided)
       if (data.fixed && data.price !== undefined && data.price < 5) {
         return false;
       }
@@ -1440,8 +1450,7 @@ export const updateServiceInfoSchema = z
       message: 'Η τιμή πρέπει να είναι τουλάχιστον 5€',
       path: ['price'],
     },
-  )
-  .partial();
+  );
 
 // =============================================
 // ADMIN EDIT SERVICE SCHEMAS (Independent schemas for partial updates)
@@ -1480,6 +1489,7 @@ export const editServiceBasicSchema = z
 
 // Edit service pricing (price, fixed, duration, subscriptionType)
 // Includes price-related refinements from createServiceSchema
+// All fields optional for partial updates (cannot use .partial() on schemas with refinements)
 export const editServicePricingSchema = z
   .object({
     price: z
@@ -1487,7 +1497,7 @@ export const editServicePricingSchema = z
       .int()
       .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
       .optional(),
-    fixed: z.boolean(),
+    fixed: z.boolean().optional(),
     duration: z
       .number()
       .int()
@@ -1498,7 +1508,7 @@ export const editServicePricingSchema = z
   })
   .refine(
     (data) => {
-      // Price is required when fixed is true (default state, showing price)
+      // Price is required when fixed is true (skip if fixed not provided)
       if (data.fixed && (!data.price || data.price === 0)) {
         return false;
       }
@@ -1511,7 +1521,7 @@ export const editServicePricingSchema = z
   )
   .refine(
     (data) => {
-      // Price must be at least 5€ when fixed is true (showing price)
+      // Price must be at least 5€ when fixed is true (skip if fixed not provided)
       if (data.fixed && data.price !== undefined && data.price < 5) {
         return false;
       }
@@ -1521,84 +1531,81 @@ export const editServicePricingSchema = z
       message: 'Η τιμή πρέπει να είναι τουλάχιστον 5€',
       path: ['price'],
     },
-  )
-  .partial();
+  );
 
 // Edit service addons
 // Includes all addon-specific refinements from createServiceSchema
-export const editServiceAddonsSchema = z
-  .object({
-    addons: z
-      .array(formServiceAddonSchema)
-      .optional()
-      .refine(
-        (addons) => {
-          if (!addons || addons.length === 0) return true;
-          const titles = addons.map((addon) =>
-            addon.title.toLowerCase().trim(),
-          );
-          return titles.length === new Set(titles).size;
-        },
-        {
-          message: 'Οι τίτλοι των extra υπηρεσιών πρέπει να είναι μοναδικοί',
-        },
-      )
-      .refine(
-        (addons) => {
-          if (!addons || addons.length === 0) return true;
-          const descriptions = addons.map((addon) =>
-            addon.description.toLowerCase().trim(),
-          );
-          return descriptions.length === new Set(descriptions).size;
-        },
-        {
-          message:
-            'Οι περιγραφές των extra υπηρεσιών πρέπει να είναι μοναδικές',
-        },
-      )
-      .refine(
-        (addons) => {
-          if (!addons || addons.length === 0) return true;
-          return addons.every((addon) => addon.price >= 5);
-        },
-        {
-          message: 'Η ελάχιστη τιμή για κάθε extra υπηρεσία είναι 5€',
-        },
-      ),
-  })
-  .partial();
+// Field is already optional (cannot use .partial() on schemas with refinements)
+export const editServiceAddonsSchema = z.object({
+  addons: z
+    .array(formServiceAddonSchema)
+    .optional()
+    .refine(
+      (addons) => {
+        if (!addons || addons.length === 0) return true;
+        const titles = addons.map((addon) =>
+          addon.title.toLowerCase().trim(),
+        );
+        return titles.length === new Set(titles).size;
+      },
+      {
+        message: 'Οι τίτλοι των extra υπηρεσιών πρέπει να είναι μοναδικοί',
+      },
+    )
+    .refine(
+      (addons) => {
+        if (!addons || addons.length === 0) return true;
+        const descriptions = addons.map((addon) =>
+          addon.description.toLowerCase().trim(),
+        );
+        return descriptions.length === new Set(descriptions).size;
+      },
+      {
+        message:
+          'Οι περιγραφές των extra υπηρεσιών πρέπει να είναι μοναδικές',
+      },
+    )
+    .refine(
+      (addons) => {
+        if (!addons || addons.length === 0) return true;
+        return addons.every((addon) => addon.price >= 5);
+      },
+      {
+        message: 'Η ελάχιστη τιμή για κάθε extra υπηρεσία είναι 5€',
+      },
+    ),
+});
 
 // Edit service FAQ
 // Includes all FAQ-specific refinements from createServiceSchema
-export const editServiceFaqSchema = z
-  .object({
-    faq: z
-      .array(formServiceFaqSchema)
-      .optional()
-      .refine(
-        (faqs) => {
-          if (!faqs || faqs.length === 0) return true;
-          const questions = faqs.map((faq) =>
-            faq.question.toLowerCase().trim(),
-          );
-          return questions.length === new Set(questions).size;
-        },
-        {
-          message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
-        },
-      )
-      .refine(
-        (faqs) => {
-          if (!faqs || faqs.length === 0) return true;
-          const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
-          return answers.length === new Set(answers).size;
-        },
-        {
-          message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
-        },
-      ),
-  })
-  .partial();
+// Field is already optional (cannot use .partial() on schemas with refinements)
+export const editServiceFaqSchema = z.object({
+  faq: z
+    .array(formServiceFaqSchema)
+    .optional()
+    .refine(
+      (faqs) => {
+        if (!faqs || faqs.length === 0) return true;
+        const questions = faqs.map((faq) =>
+          faq.question.toLowerCase().trim(),
+        );
+        return questions.length === new Set(questions).size;
+      },
+      {
+        message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
+      },
+    )
+    .refine(
+      (faqs) => {
+        if (!faqs || faqs.length === 0) return true;
+        const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
+        return answers.length === new Set(answers).size;
+      },
+      {
+        message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
+      },
+    ),
+});
 
 // Edit service settings (admin only - status and featured)
 export const editServiceSettingsSchema = z
