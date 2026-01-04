@@ -19,13 +19,11 @@ import { sendServicePublishedEmail } from '@/lib/email/services';
 
 import {
   adminListServicesSchema,
-  adminUpdateServiceSchema,
   adminToggleServiceSchema,
   adminUpdateServiceStatusSchema,
   adminDeleteServiceSchema,
   adminCreateServiceSchema,
   type AdminListServicesInput,
-  type AdminUpdateServiceInput,
   type AdminToggleServiceInput,
   type AdminUpdateServiceStatusInput,
   type AdminDeleteServiceInput,

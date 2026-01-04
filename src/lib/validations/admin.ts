@@ -342,27 +342,6 @@ export const adminListServicesSchema = z.object({
   sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
 });
 
-// Admin update service schema - extends dashboard schema with admin-only fields
-export const adminUpdateServiceSchema = createServiceSchema
-  .partial() // Make all dashboard fields optional for partial updates
-  .extend({
-    serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
-    // Admin-only fields
-    status: z
-      .enum([
-        'draft',
-        'pending',
-        'published',
-        'rejected',
-        'approved',
-        'inactive',
-      ])
-      .optional(),
-    featured: z.boolean().optional(),
-    // Media (not in dashboard schema)
-    media: z.array(z.record(z.string(), z.any())).optional().nullable(),
-  });
-
 export const adminToggleServiceSchema = z.object({
   serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
 });
@@ -402,7 +381,6 @@ export const adminCreateServiceSchema = adminServiceValidationSchema.and(
 // =============================================
 
 export type AdminListServicesInput = z.infer<typeof adminListServicesSchema>;
-export type AdminUpdateServiceInput = z.infer<typeof adminUpdateServiceSchema>;
 export type AdminToggleServiceInput = z.infer<typeof adminToggleServiceSchema>;
 export type AdminUpdateServiceStatusInput = z.infer<
   typeof adminUpdateServiceStatusSchema
