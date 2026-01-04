@@ -24,6 +24,7 @@ import {
   adminDeleteServiceSchema,
   adminCreateServiceSchema,
   type AdminListServicesInput,
+  type AdminUpdateServiceInput,
   type AdminToggleServiceInput,
   type AdminUpdateServiceStatusInput,
   type AdminDeleteServiceInput,

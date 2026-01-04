@@ -14,7 +14,17 @@ import {
   registerSchema,
   accountUpdateSchema,
 } from '../validations';
-import { adminServiceValidationSchema, createServiceSchema } from './service';
+import {
+  adminServiceValidationSchema,
+  createServiceSchema,
+  type EditServiceTaxonomyInput,
+  type EditServiceBasicInput,
+  type EditServicePricingInput,
+  type EditServiceSettingsInput,
+  type EditServiceAddonsInput,
+  type EditServiceFaqInput,
+  type UpdateServiceMediaInput,
+} from './service';
 import { cloudinaryResourceSchema } from '../prisma/json-types';
 
 // =============================================
@@ -387,6 +397,19 @@ export type AdminUpdateServiceStatusInput = z.infer<
 >;
 export type AdminDeleteServiceInput = z.infer<typeof adminDeleteServiceSchema>;
 export type AdminCreateServiceInput = z.infer<typeof adminCreateServiceSchema>;
+
+// Admin update service input - union of all edit schemas + serviceId
+// The updateService function accepts data from any edit schema (taxonomy, basic, pricing, etc.)
+// Each caller validates their specific data before passing it with serviceId
+export type AdminUpdateServiceInput =
+  | ({ serviceId: number } & Partial<EditServiceTaxonomyInput>)
+  | ({ serviceId: number } & Partial<EditServiceBasicInput>)
+  | ({ serviceId: number } & Partial<EditServicePricingInput>)
+  | ({ serviceId: number } & Partial<EditServiceSettingsInput>)
+  | ({ serviceId: number } & Partial<EditServiceAddonsInput>)
+  | ({ serviceId: number } & Partial<EditServiceFaqInput>)
+  | ({ serviceId: number } & Partial<UpdateServiceMediaInput>)
+  | ({ serviceId: number; status?: string; featured?: boolean; media?: any[] });
 
 // =============================================
 // ADMIN VERIFICATION MANAGEMENT SCHEMAS
