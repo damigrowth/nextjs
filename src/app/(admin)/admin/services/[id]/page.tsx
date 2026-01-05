@@ -2,7 +2,7 @@ import { getCurrentUser } from '@/actions/auth/server';
 import { getService } from '@/actions/admin/services';
 import { redirect, notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Eye, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Eye, ExternalLink, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -108,8 +108,14 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
             </Button>
             <Button variant='outline' size='sm' asChild>
               <NextLink href={`/admin/profiles/${service.profile.id}`}>
+                <User className='h-4 w-4' />
+                Edit Profile
+              </NextLink>
+            </Button>
+            <Button variant='outline' size='sm' asChild>
+              <NextLink href={`/profile/${service.profile.username}`}>
                 <ExternalLink className='h-4 w-4' />
-                Profile
+                View Profile
               </NextLink>
             </Button>
             <Button variant='outline' size='sm' asChild>
@@ -140,6 +146,18 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                         Service ID
                       </span>
                       <span className='text-xs font-mono'>{service.id}</span>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Profile
+                      </span>
+                      <NextLink
+                        href={`/profile/${service.profile.username}`}
+                        className='flex items-center gap-1.5 text-xs font-medium hover:underline'
+                      >
+                        <ExternalLink className='h-3 w-3' />
+                        {service.profile.displayName}
+                      </NextLink>
                     </div>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
