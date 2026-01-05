@@ -110,7 +110,7 @@ export async function deleteService(
       return {
         success: false,
         error: 'Invalid parameters',
-        fieldErrors: error.formErrors.fieldErrors,
+        fieldErrors: error.flatten().fieldErrors,
       };
     }
 
@@ -200,7 +200,7 @@ export async function archiveService(
       return {
         success: false,
         error: 'Invalid parameters',
-        fieldErrors: error.formErrors.fieldErrors,
+        fieldErrors: error.flatten().fieldErrors,
       };
     }
 
