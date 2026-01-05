@@ -8,8 +8,8 @@ export {
   type ServiceWithFullProfile,
 } from './get-service';
 export { getFeaturedServices, getServicesWithPagination } from './get-services';
+export { deleteService, archiveService } from './delete-service';
 // export { updateServiceAction, toggleServiceStatusAction } from './update-service';
-// export { deleteService, archiveService } from './delete-service';
 // export {
 //   getMyServices,
 //   getPublishedServices,

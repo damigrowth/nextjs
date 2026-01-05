@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/actions/auth/server';
 import { getServiceForEdit } from '@/actions/services/get-service';
 import { FormServiceEdit } from '@/components/forms/service';
 import FormServiceEditMedia from '@/components/forms/service/form-service-edit-media';
+import { FormServiceDelete } from '@/components/forms/service/form-service-delete';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { StatusLabels, StatusColors } from '@/lib/types/common';
@@ -109,6 +110,9 @@ export default async function EditServicePage({
           initialProfile={profile}
           showHeading={false}
         />
+
+        {/* Delete Service Section */}
+        <FormServiceDelete service={service} />
       </div>
     </div>
   );

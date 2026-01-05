@@ -13,12 +13,14 @@ interface SubdivisionsCarouselProps {
   subdivisions: SubdivisionWithCount[];
   hideTitle?: boolean;
   gradientColor?: 'white' | 'silver';
+  title?: string;
 }
 
 export function SubdivisionsCarousel({
   subdivisions,
   hideTitle = false,
   gradientColor = 'white',
+  title = 'Πιο δημοφιλείς εργασίες',
 }: SubdivisionsCarouselProps) {
   if (subdivisions.length === 0) {
     return null;
@@ -33,9 +35,7 @@ export function SubdivisionsCarousel({
     <section>
       {!hideTitle && (
         <div className='mb-6'>
-          <h2 className='text-2xl font-bold text-gray-900 mb-2'>
-            Πιο δημοφιλείς εργασίες
-          </h2>
+          <h2 className='text-2xl font-bold text-gray-900 mb-2'>{title}</h2>
         </div>
       )}
 

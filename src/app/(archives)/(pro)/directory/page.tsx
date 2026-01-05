@@ -62,6 +62,7 @@ export default async function DirectoryPage() {
               <SubdivisionsCarousel
                 subdivisions={popularSubcategories}
                 gradientColor='silver'
+                title='Πιο δημοφιλείς επαγγελματικές κατηγορίες'
               />
 
               {/* Categories Grid */}
