@@ -46,43 +46,55 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             <FooterWrapper />
             <BottomToTop_D />
 
-            {/* Google Tag Manager - Lazy loaded to reduce TBT (Total Blocking Time) */}
+            {/* Google Tag Manager & Analytics - User-interaction based loading for TBT optimization */}
+            {/* Only loads after first user interaction (scroll, click, touch) or after 5s idle */}
             <Script
-              id='gtm-script'
-              strategy='lazyOnload'
+              id='gtm-ga-loader'
+              strategy='afterInteractive'
               dangerouslySetInnerHTML={{
                 __html: `
-                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                })(window,document,'script','dataLayer','GTM-KR7N94L4');
+                (function() {
+                  let loaded = false;
+
+                  function loadGTMAndGA() {
+                    if (loaded) return;
+                    loaded = true;
+
+                    // Load GTM
+                    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                    })(window,document,'script','dataLayer','GTM-KR7N94L4');
+
+                    ${gaId ? `
+                    // Load Google Analytics
+                    var gaScript = document.createElement('script');
+                    gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=${gaId}';
+                    gaScript.async = true;
+                    document.head.appendChild(gaScript);
+
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', '${gaId}');
+                    ` : ''}
+                  }
+
+                  // Load on first user interaction
+                  const events = ['scroll', 'click', 'touchstart', 'mousemove', 'keydown'];
+                  const loadOnce = function() {
+                    loadGTMAndGA();
+                    events.forEach(e => window.removeEventListener(e, loadOnce));
+                  };
+                  events.forEach(e => window.addEventListener(e, loadOnce, { passive: true, once: true }));
+
+                  // Fallback: Load after 5 seconds if no interaction
+                  setTimeout(loadGTMAndGA, 5000);
+                })();
               `,
               }}
             />
-
-            {/* Google Analytics - Lazy loaded to reduce TBT (Total Blocking Time) */}
-            {gaId && (
-              <Script
-                id='ga-script'
-                strategy='lazyOnload'
-                src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-              />
-            )}
-            {gaId && (
-              <Script
-                id='ga-config'
-                strategy='lazyOnload'
-                dangerouslySetInnerHTML={{
-                  __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${gaId}');
-                `,
-                }}
-              />
-            )}
             {/* Cloudinary Upload Widget */}
             {/* <Script
             src='https://upload-widget.cloudinary.com/global/all.js'
