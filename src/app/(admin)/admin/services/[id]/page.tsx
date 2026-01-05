@@ -14,6 +14,7 @@ import {
   EditServiceFaqForm,
   EditServiceMediaForm,
 } from '@/components/admin/forms';
+import { FormServiceDelete } from '@/components/forms/service/form-service-delete';
 import { SiteHeader } from '@/components/admin/site-header';
 import { getServiceTaxonomies } from '@/lib/taxonomies';
 import { tags } from '@/constants/datasets/tags';
@@ -393,6 +394,9 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                     <EditServiceMediaForm service={service} />
                   </CardContent>
                 </Card>
+
+                {/* Delete Service Section */}
+                <FormServiceDelete service={service} isAdmin />
               </div>
             </div>
           </div>

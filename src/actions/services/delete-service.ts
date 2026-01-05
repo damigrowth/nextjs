@@ -1,157 +1,212 @@
-// 'use server';
+'use server';
 
-// import { auth } from '@/lib/auth';
-// import { prisma } from '@/lib/prisma/client';
-// import { revalidatePath } from 'next/cache';
-// import { headers } from 'next/headers';
+import { requireAuth } from '@/actions/auth/server';
+import { getProfileByUserId } from '@/actions/profiles/get-profile';
+import { prisma } from '@/lib/prisma/client';
+import { ActionResult } from '@/lib/types/api';
+import {
+  deleteServiceSchema,
+  type DeleteServiceInput,
+} from '@/lib/validations/service';
+import { revalidateService, logCacheRevalidation } from '@/lib/cache';
+import { z } from 'zod';
 
-// type ActionResult<T = any> = {
-//   success: boolean;
-//   data?: T;
-//   error?: string;
-// };
+/**
+ * Delete service - User-facing action
+ * Only allows users to delete their own services
+ * Follows SERVER_ACTIONS_PATTERNS.md template
+ */
+export async function deleteService(
+  input: DeleteServiceInput
+): Promise<ActionResult<void>> {
+  try {
+    // 1. Validate input
+    const validated = deleteServiceSchema.parse(input);
+    const { serviceId } = validated;
 
-// export async function deleteService(
-//   serviceId: string,
-// ): Promise<ActionResult<void>> {
-//   try {
-//     // Check authentication
-//     const session = await auth.api.getSession({
-//       headers: await headers(),
-//     });
+    // 2. Get authenticated session
+    const session = await requireAuth();
+    const user = session.user;
 
-//     if (!session?.user) {
-//       return { success: false, error: 'Authentication required' };
-//     }
+    // 3. Check permissions - only freelancers and companies can manage services
+    if (user.role !== 'freelancer' && user.role !== 'company') {
+      return {
+        success: false,
+        error: 'Only professionals can manage services',
+      };
+    }
 
-//     // Get user profile
-//     const profile = await prisma.profile.findUnique({
-//       where: { uid: session.user.id },
-//     });
+    // 4. Get user profile using cached function
+    const profileResult = await getProfileByUserId(user.id);
 
-//     if (!profile) {
-//       return { success: false, error: 'Profile not found' };
-//     }
+    if (!profileResult.success || !profileResult.data) {
+      return {
+        success: false,
+        error: 'Profile not found',
+      };
+    }
 
-//     // Check if service exists and belongs to user
-//     const service = await prisma.service.findUnique({
-//       where: { id: serviceId },
-//       include: {
-//         reviews: { select: { id: true } },
-//         media: { select: { id: true } },
-//       },
-//     });
+    const profile = profileResult.data;
 
-//     if (!service) {
-//       return { success: false, error: 'Service not found' };
-//     }
+    // 5. Get service with ownership check
+    const service = await prisma.service.findUnique({
+      where: { id: serviceId },
+      include: {
+        reviews: { select: { id: true } },
+      },
+    });
 
-//     if (service.pid !== profile.id) {
-//       return {
-//         success: false,
-//         error: 'Unauthorized: You can only delete your own services',
-//       };
-//     }
+    if (!service) {
+      return { success: false, error: 'Service not found' };
+    }
 
-//     // Check if service has reviews (optional: prevent deletion if it has reviews)
-//     if (service.reviews.length > 0) {
-//       return {
-//         success: false,
-//         error:
-//           'Cannot delete service with existing reviews. Please contact support if you need to remove this service.',
-//       };
-//     }
+    // 6. Verify ownership
+    if (service.pid !== profile.id) {
+      return {
+        success: false,
+        error: 'Unauthorized: You can only delete your own services',
+      };
+    }
 
-//     // Use transaction to safely delete service and related data
-//     await prisma.$transaction(async (tx) => {
-//       // Delete related media files first
-//       if (service.media.length > 0) {
-//         await tx.media.deleteMany({
-//           where: { serviceMediaId: serviceId },
-//         });
-//       }
+    // 7. Optional: Prevent deletion if service has reviews
+    // Uncomment if you want to protect services with reviews
+    // if (service.reviews.length > 0) {
+    //   return {
+    //     success: false,
+    //     error:
+    //       'Cannot delete service with existing reviews. Please contact support if you need to remove this service.',
+    //   };
+    // }
 
-//       // Delete the service
-//       await tx.service.delete({
-//         where: { id: serviceId },
-//       });
-//     });
+    // 8. Delete the service (cascade will handle reviews, savedBy, etc.)
+    // Note: media is stored as JSON in the service table, not as a separate relation
+    await prisma.service.delete({
+      where: { id: serviceId },
+    });
 
-//     // Revalidate relevant pages
-//     revalidatePath('/dashboard/services');
-//     revalidatePath(`/profile/${profile.username}`);
+    // 9. Comprehensive cache invalidation using centralized utility
+    await revalidateService({
+      serviceId: service.id,
+      slug: service.slug,
+      pid: service.pid,
+      category: service.category,
+      userId: user.id,
+      profileId: profile.id,
+      profileUsername: profile.username,
+      includeHome: service.featured, // Invalidate home if service was featured
+    });
 
-//     return {
-//       success: true,
-//       data: undefined,
-//     };
-//   } catch (error) {
-//     console.error('Delete service error:', error);
-//     return {
-//       success: false,
-//       error:
-//         error instanceof Error ? error.message : 'Failed to delete service',
-//     };
-//   }
-// }
+    // 10. Log cache revalidation for monitoring
+    logCacheRevalidation('service', service.id, 'deleted');
 
-// // Soft delete - mark as unpublished instead of deleting
-// export async function archiveService(
-//   serviceId: string,
-// ): Promise<ActionResult<void>> {
-//   try {
-//     // Check authentication
-//     const session = await auth.api.getSession({
-//       headers: await headers(),
-//     });
+    return {
+      success: true,
+      message: 'Service deleted successfully',
+    };
+  } catch (error) {
+    console.error('Delete service error:', error);
 
-//     if (!session?.user) {
-//       return { success: false, error: 'Authentication required' };
-//     }
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: 'Invalid parameters',
+        fieldErrors: error.formErrors.fieldErrors,
+      };
+    }
 
-//     // Get user profile
-//     const profile = await prisma.profile.findUnique({
-//       where: { uid: session.user.id },
-//     });
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'Failed to delete service',
+    };
+  }
+}
 
-//     if (!profile) {
-//       return { success: false, error: 'Profile not found' };
-//     }
+/**
+ * Soft delete - mark as inactive instead of deleting
+ * Alternative approach for preserving data
+ */
+export async function archiveService(
+  input: DeleteServiceInput
+): Promise<ActionResult<void>> {
+  try {
+    // 1. Validate input
+    const validated = deleteServiceSchema.parse(input);
+    const { serviceId } = validated;
 
-//     // Check service ownership
-//     const service = await prisma.service.findUnique({
-//       where: { id: serviceId },
-//     });
+    // 2. Get authenticated session
+    const session = await requireAuth();
+    const user = session.user;
 
-//     if (!service) {
-//       return { success: false, error: 'Service not found' };
-//     }
+    // 3. Get user profile
+    const profileResult = await getProfileByUserId(user.id);
 
-//     if (service.pid !== profile.id) {
-//       return { success: false, error: 'Unauthorized' };
-//     }
+    if (!profileResult.success || !profileResult.data) {
+      return {
+        success: false,
+        error: 'Profile not found',
+      };
+    }
 
-//     // Archive service (mark as unpublished)
-//     await prisma.service.update({
-//       where: { id: serviceId },
-//       data: {
-//         published: false,
-//         // Optionally add an archived flag if you add it to schema later
-//       },
-//     });
+    const profile = profileResult.data;
 
-//     revalidatePath('/dashboard/services');
-//     revalidatePath(`/profile/${profile.username}`);
+    // 4. Get service and check ownership
+    const service = await prisma.service.findUnique({
+      where: { id: serviceId },
+    });
 
-//     return {
-//       success: true,
-//       data: undefined,
-//     };
-//   } catch (error) {
-//     console.error('Archive service error:', error);
-//     return {
-//       success: false,
-//       error: 'Failed to archive service',
-//     };
-//   }
-// }
+    if (!service) {
+      return { success: false, error: 'Service not found' };
+    }
+
+    if (service.pid !== profile.id) {
+      return {
+        success: false,
+        error: 'Unauthorized: You can only archive your own services',
+      };
+    }
+
+    // 5. Archive service (mark as inactive)
+    await prisma.service.update({
+      where: { id: serviceId },
+      data: {
+        status: 'inactive',
+      },
+    });
+
+    // 6. Invalidate caches
+    await revalidateService({
+      serviceId: service.id,
+      slug: service.slug,
+      pid: service.pid,
+      category: service.category,
+      userId: user.id,
+      profileId: profile.id,
+      profileUsername: profile.username,
+      includeHome: service.featured,
+    });
+
+    // 7. Log cache revalidation
+    logCacheRevalidation('service', service.id, 'archived');
+
+    return {
+      success: true,
+      message: 'Service archived successfully',
+    };
+  } catch (error) {
+    console.error('Archive service error:', error);
+
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: 'Invalid parameters',
+        fieldErrors: error.formErrors.fieldErrors,
+      };
+    }
+
+    return {
+      success: false,
+      error: 'Failed to archive service',
+    };
+  }
+}

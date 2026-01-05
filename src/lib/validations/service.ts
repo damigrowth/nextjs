@@ -1761,3 +1761,13 @@ export type EditServiceFaqInput = z.infer<typeof editServiceFaqSchema>;
 export type EditServiceSettingsInput = z.infer<
   typeof editServiceSettingsSchema
 >;
+
+// =============================================
+// DELETE SERVICE SCHEMA
+// =============================================
+
+export const deleteServiceSchema = z.object({
+  serviceId: z.number().int().min(1, 'Service ID is required'),
+});
+
+export type DeleteServiceInput = z.infer<typeof deleteServiceSchema>;
