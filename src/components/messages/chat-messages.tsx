@@ -5,12 +5,11 @@
 
 'use client';
 
-import { RefObject, useState } from 'react';
+import { RefObject } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 import { MessageActions } from './message-actions';
-import { MessageDeleteDialog } from './message-delete-dialog';
 import { MessageReplyQuote } from './message-reply-quote';
 import { ReactionPicker } from './reaction-picker';
 import { ChatMessageItem } from '@/lib/types/messages';
@@ -40,10 +39,6 @@ export function ChatMessages({
   isLoadingOlder,
   hasMore,
 }: ChatMessagesProps) {
-  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(
-    null,
-  );
-
   const handleReply = (message: ChatMessageItem) => {
     if (onReply) {
       onReply({
@@ -220,7 +215,6 @@ export function ChatMessages({
                   isOwn={true}
                   align='end'
                   onEdit={() => handleEdit(message)}
-                  onDelete={() => setDeletingMessageId(message.id)}
                   onCopy={() => handleCopyMessage(message.content)}
                   onReply={() => handleReply(message)}
                   messageContent={message.content}
@@ -331,12 +325,6 @@ export function ChatMessages({
           </div>
         ))}
       </div>
-      <MessageDeleteDialog
-        messageId={deletingMessageId || ''}
-        userId={currentUserId}
-        open={!!deletingMessageId}
-        onOpenChange={(open) => !open && setDeletingMessageId(null)}
-      />
     </ScrollArea>
   );
 }

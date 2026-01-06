@@ -10,10 +10,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Reply, Edit, Copy, Forward, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Reply, Edit, Copy, Forward } from 'lucide-react';
 
 interface MessageActionsProps {
   messageId: string;
@@ -21,7 +20,6 @@ interface MessageActionsProps {
   align?: 'start' | 'end';
   messageContent: string;
   onEdit?: () => void;
-  onDelete?: () => void;
   onCopy?: () => void;
   onReply?: () => void;
   onForward?: () => void;
@@ -33,7 +31,6 @@ export function MessageActions({
   align = 'end',
   messageContent,
   onEdit,
-  onDelete,
   onCopy,
   onReply,
   onForward,
@@ -51,9 +48,6 @@ export function MessageActions({
         break;
       case 'forward':
         onForward?.();
-        break;
-      case 'delete':
-        onDelete?.();
         break;
       default:
         console.log('Unknown action:', action);
@@ -90,18 +84,6 @@ export function MessageActions({
           <Forward className='h-4 w-4' />
           Προώθηση
         </DropdownMenuItem>
-        {isOwn && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => handleMenuAction('delete')}
-              className='text-destructive focus:text-destructive'
-            >
-              <Trash2 className='h-4 w-4' />
-              Διαγραφή
-            </DropdownMenuItem>
-          </>
-        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
