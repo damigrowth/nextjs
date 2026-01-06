@@ -193,42 +193,6 @@ export async function editMessage(
 }
 
 /**
- * Delete a message (soft delete)
- */
-export async function deleteMessage(
-  messageId: string,
-  userId: string
-): Promise<void> {
-  try {
-    // Get the message and verify ownership
-    const message = await prisma.message.findUnique({
-      where: { id: messageId },
-    });
-
-    if (!message) {
-      throw new Error('Message not found');
-    }
-
-    if (message.authorUid !== userId) {
-      throw new Error('You can only delete your own messages');
-    }
-
-    // Soft delete message
-    await prisma.message.update({
-      where: { id: messageId },
-      data: {
-        deleted: true,
-        deletedAt: new Date(),
-        deletedBy: userId,
-      },
-    });
-  } catch (error) {
-    console.error('Error deleting message:', error);
-    throw error;
-  }
-}
-
-/**
  * Mark messages as read (batch operation)
  */
 export async function markAsRead(

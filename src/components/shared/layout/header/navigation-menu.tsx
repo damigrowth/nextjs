@@ -22,6 +22,7 @@ import { Grid3x3, ChevronRight, ChevronDown, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { NavigationMenuCategory } from '@/lib/types/components';
 import NextLink from '../../next-link';
+import { FlaticonCategory } from '@/components/icon';
 
 const regularMenuItems = [
   { href: '/categories', label: 'Κατάλογος Υπηρεσιών' },
@@ -105,7 +106,7 @@ export default function NavMenu({
         {/* Mega Menu Dropdown for Categories */}
         <NavigationMenuItem>
           <NavigationMenuTrigger variant='pale' className='flex items-center'>
-            <Grid3x3 className='h-4 w-4 mr-2' />
+            <FlaticonCategory size={16} className='mr-2' />
             Κατηγορίες
           </NavigationMenuTrigger>
           <NavigationMenuContent>

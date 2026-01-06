@@ -11,7 +11,6 @@ export {
   getChats,
   getChatById,
   getOrCreateChat,
-  deleteChat,
 } from './chats';
 
 // Message operations
@@ -19,7 +18,6 @@ export {
   getMessages,
   sendMessage,
   editMessage,
-  deleteMessage,
   markAsRead,
   getUnreadCount,
 } from './messages';
