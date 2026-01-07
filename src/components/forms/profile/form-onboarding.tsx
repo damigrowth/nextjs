@@ -375,6 +375,9 @@ export default function OnboardingForm({
 
     try {
       // Check for pending files and upload if needed
+      // Note: When using widget mode (type="image"), profile image uploads happen immediately
+      // via the widget's onDirectUpload callback, so there won't be pending files.
+      // This check is still needed for portfolio images and backward compatibility.
       const hasImageFiles = profileImageRef.current?.hasFiles();
       const hasPortfolioFiles = portfolioRef.current?.hasFiles();
 
@@ -459,7 +462,7 @@ export default function OnboardingForm({
                   ref={profileImageRef}
                   value={field.value}
                   onChange={field.onChange}
-                  uploadPreset='doulitsa_new'
+                  uploadPreset='doulitsa_profile_images'
                   multiple={false}
                   folder={`users/${user?.username}/profile`}
                   maxFileSize={3000000} // 3MB

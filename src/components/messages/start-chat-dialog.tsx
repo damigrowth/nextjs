@@ -99,7 +99,8 @@ export function StartChatDialog({
   };
 
   // Show loading state if session is still loading and no prop provided
-  const isButtonLoading = !propCurrentUserId && isPending;
+  // Ensure disabled is always boolean to prevent hydration mismatch
+  const isButtonLoading = Boolean(!propCurrentUserId && isPending);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
