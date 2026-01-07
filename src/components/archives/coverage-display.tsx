@@ -66,10 +66,13 @@ export function CoverageDisplay({
 
     // Priority 2: Onsite (client location) - show counties + online if applicable
     if (onsite && groupedCoverage.length > 0) {
+      const COUNTY_DISPLAY_LIMIT = 5;
+      const visibleCounties = groupedCoverage.slice(0, COUNTY_DISPLAY_LIMIT);
+
       return (
         <>
           Εξυπηρετεί:{' '}
-          {groupedCoverage.map((item, index) => (
+          {visibleCounties.map((item, index) => (
             <React.Fragment key={item.county}>
               {index > 0 && ', '}
               {item.county}
@@ -88,8 +91,15 @@ export function CoverageDisplay({
     return null;
   };
 
+  const COUNTY_DISPLAY_LIMIT = 5;
   const coverageText = getCoverageText();
-  const showExpandButton = onsite && totalAreas > 0;
+  // Show expand button for:
+  // 1. onbase services with additional counties beyond primary (for multi-county indicator)
+  // 2. onsite services with >5 counties (for overflow truncation)
+  // 3. onsite services with specific areas (for area details)
+  const showExpandButton =
+    (onbase && groupedCoverage.length > 1) || // onbase with additional counties
+    (onsite && (groupedCoverage.length > COUNTY_DISPLAY_LIMIT || totalAreas > 0)); // onsite overflow or has areas
 
   if (!coverageText) {
     return null;
