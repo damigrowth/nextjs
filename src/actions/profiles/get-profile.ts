@@ -334,7 +334,7 @@ async function _getProfilePageData(
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { sortDate: 'desc' },
     });
 
     // Transform services for component use

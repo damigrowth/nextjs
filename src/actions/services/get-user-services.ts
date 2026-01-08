@@ -38,6 +38,8 @@ function transformServiceForTable(service: any): UserServiceTableData {
     media: service.media,
     createdAt: service.createdAt,
     updatedAt: service.updatedAt,
+    refreshedAt: service.refreshedAt,
+    sortDate: service.sortDate,
   };
 }
 
@@ -106,24 +108,27 @@ export async function getUserServices(
     }
 
     // Build order by clause
-    const orderBy: Prisma.ServiceOrderByWithRelationInput = {};
+    let orderBy:
+      | Prisma.ServiceOrderByWithRelationInput
+      | Prisma.ServiceOrderByWithRelationInput[] = {};
 
     switch (sortBy) {
       case 'title':
-        orderBy.title = sortOrder;
+        orderBy = { title: sortOrder };
         break;
       case 'status':
-        orderBy.status = sortOrder;
+        orderBy = { status: sortOrder };
         break;
       case 'category':
-        orderBy.category = sortOrder;
+        orderBy = { category: sortOrder };
         break;
       case 'createdAt':
-        orderBy.createdAt = sortOrder;
+        orderBy = { createdAt: sortOrder };
         break;
       case 'updatedAt':
       default:
-        orderBy.updatedAt = sortOrder;
+        // Sort by most recent activity (refresh or creation)
+        orderBy = { sortDate: sortOrder };
         break;
     }
 
@@ -145,6 +150,8 @@ export async function getUserServices(
           media: true,
           createdAt: true,
           updatedAt: true,
+          refreshedAt: true,
+          sortDate: true,
         },
       }),
       prisma.service.count({ where }),

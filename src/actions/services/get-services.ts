@@ -607,10 +607,10 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
     let orderBy: any[] = [];
     switch (filters.sortBy) {
       case 'recent':
-        orderBy = [{ updatedAt: 'desc' }];
+        orderBy = [{ sortDate: 'desc' }];
         break;
       case 'oldest':
-        orderBy = [{ updatedAt: 'asc' }];
+        orderBy = [{ sortDate: 'asc' }];
         break;
       case 'price_asc':
         orderBy = [{ price: 'asc' }];
@@ -626,7 +626,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
         break;
       case 'default':
       default:
-        // Default sort: featured first, then by rating and date, with media nulls last
+        // Default sort: featured first, then by rating and most recent activity
         orderBy = [
           { featured: 'desc' },
           { rating: 'desc' },
@@ -637,7 +637,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
               nulls: 'last',
             },
           },
-          { updatedAt: 'desc' },
+          { sortDate: 'desc' },
         ];
         break;
     }
