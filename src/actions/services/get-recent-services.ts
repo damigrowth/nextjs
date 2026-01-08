@@ -32,7 +32,7 @@ export async function getRecentServices(): Promise<
       return { success: false, error: 'Profile not found' };
     }
 
-    // Get last 5 services ordered by updatedAt desc
+    // Get last 5 services ordered by most recent activity (sortDate)
     const services = await prisma.service.findMany({
       where: {
         pid: profile.id,
@@ -42,7 +42,7 @@ export async function getRecentServices(): Promise<
         title: true,
       },
       orderBy: {
-        updatedAt: 'desc',
+        sortDate: 'desc',
       },
       take: 5,
     });

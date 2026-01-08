@@ -16,6 +16,7 @@ import TableMedia from '@/components/shared/table-media';
 import ServiceStatusBadge from './service-status-badge';
 import TaxonomiesDisplay from '../../shared/taxonomies-display';
 import ServiceTableHeaderSort from './service-table-header-sort';
+import ServiceRefreshButton from './service-refresh-button';
 import type {
   UserServiceTableData,
   ServiceSortField,
@@ -44,27 +45,24 @@ export default function ServiceTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className='w-[18%] text-base font-semibold'>
+              <TableHead className='w-[40%] text-base font-semibold'>
                 Υπηρεσία
               </TableHead>
-              <TableHead className='w-[22%] text-base font-semibold'>
+              <TableHead className='w-[28%] text-base font-semibold'>
                 Κατηγορία
               </TableHead>
-              <TableHead className='w-[15%] text-base font-semibold'>
+              <TableHead className='w-[12%] text-base font-semibold'>
                 Κατάσταση
               </TableHead>
-              <TableHead className='w-[15%] text-base font-semibold'>
+              <TableHead className='w-[12%] text-base font-semibold'>
                 Ενημέρωση
               </TableHead>
-              <TableHead className='w-[15%] text-base font-semibold'>
-                Δημιουργία
-              </TableHead>
-              <TableHead className='w-[10%]'></TableHead>
+              <TableHead className='w-[8%]'></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell colSpan={6} className='text-center py-12'>
+              <TableCell colSpan={5} className='text-center py-12'>
                 <div className='flex flex-col items-center justify-center space-y-3'>
                   <div className='w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center'>
                     <Edit className='w-6 h-6 text-gray-400' />
@@ -99,39 +97,32 @@ export default function ServiceTable({
             <ServiceTableHeaderSort
               field='title'
               currentSort={currentSort}
-              className='w-[35%] text-base font-semibold'
+              className='w-[40%] text-base font-semibold'
             >
               Υπηρεσία
             </ServiceTableHeaderSort>
             <ServiceTableHeaderSort
               field='category'
               currentSort={currentSort}
-              className='w-[30%] text-base font-semibold'
+              className='w-[28%] text-base font-semibold'
             >
               Κατηγορία
             </ServiceTableHeaderSort>
             <ServiceTableHeaderSort
               field='status'
               currentSort={currentSort}
-              className='w-[10%] text-base font-semibold'
+              className='w-[12%] text-base font-semibold'
             >
               Κατάσταση
             </ServiceTableHeaderSort>
             <ServiceTableHeaderSort
               field='updatedAt'
               currentSort={currentSort}
-              className='w-[10%] text-base font-semibold'
+              className='w-[12%] text-base font-semibold'
             >
               Ενημέρωση
             </ServiceTableHeaderSort>
-            <ServiceTableHeaderSort
-              field='createdAt'
-              currentSort={currentSort}
-              className='w-[10%] text-base font-semibold'
-            >
-              Δημιουργία
-            </ServiceTableHeaderSort>
-            <TableHead className='w-[5%]'></TableHead>
+            <TableHead className='w-[8%]'></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -167,18 +158,12 @@ export default function ServiceTable({
                 <ServiceStatusBadge status={service.status as Status} />
               </TableCell>
 
-              {/* Updated Date Column */}
+              {/* Updated Date Column - NOW WITH REFRESH BUTTON */}
               <TableCell>
-                <span className='text-2sm text-gray-600'>
-                  {formatDate(service.updatedAt)}
-                </span>
-              </TableCell>
-
-              {/* Created Date Column */}
-              <TableCell>
-                <span className='text-2sm text-gray-600'>
-                  {formatDate(service.createdAt)}
-                </span>
+                <ServiceRefreshButton
+                  serviceId={service.id}
+                  refreshedAt={service.refreshedAt}
+                />
               </TableCell>
 
               {/* Actions Column */}

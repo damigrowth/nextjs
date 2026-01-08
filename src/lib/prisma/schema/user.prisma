@@ -94,6 +94,8 @@ model Profile {
 
   // Rate limiting fields
   lastServiceDraft DateTime? // Last time user saved a service draft
+  lastServiceRefreshDate  DateTime? // Last date when any service was refreshed
+  dailyServiceRefreshCount Int @default(0) // Count of unique services refreshed today
 
   verified        Boolean              @default(false)
   featured        Boolean              @default(false)

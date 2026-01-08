@@ -9,6 +9,7 @@ export {
 } from './get-service';
 export { getFeaturedServices, getServicesWithPagination } from './get-services';
 export { deleteService, archiveService } from './delete-service';
+export { refreshService } from './refresh-service';
 // export { updateServiceAction, toggleServiceStatusAction } from './update-service';
 // export {
 //   getMyServices,

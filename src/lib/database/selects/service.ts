@@ -77,6 +77,8 @@ export const SERVICE_DETAIL_SELECT = {
   faq: true,
   createdAt: true,
   updatedAt: true,
+  refreshedAt: true,
+  sortDate: true,
   profile: {
     select: {
       uid: true,

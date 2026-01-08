@@ -346,9 +346,9 @@ export const adminListServicesSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional().default(10),
   offset: z.coerce.number().int().min(0).optional().default(0),
   sortBy: z
-    .enum(['createdAt', 'rating', 'reviewCount', 'updatedAt', 'price'])
+    .enum(['sortDate', 'rating', 'reviewCount', 'price', 'createdAt'])
     .optional()
-    .default('createdAt'),
+    .default('sortDate'),
   sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
 });
 
