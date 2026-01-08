@@ -146,6 +146,17 @@ export async function listServices(
       where.OR = [
         { titleNormalized: { contains: normalizedQuery } },
         { descriptionNormalized: { contains: normalizedQuery } },
+        // Search in profile displayName and username
+        {
+          profile: {
+            displayName: { contains: searchQuery, mode: 'insensitive' }
+          }
+        },
+        {
+          profile: {
+            username: { contains: searchQuery, mode: 'insensitive' }
+          }
+        },
         // If the query is a number, also search by service ID
         ...(serviceIdMatch ? [{ id: parseInt(searchQuery) }] : []),
       ];
