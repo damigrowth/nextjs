@@ -174,6 +174,7 @@ export async function listUsers(
         email: true,
         name: true,
         username: true,
+        displayUsername: true,
         displayName: true,
         firstName: true,
         lastName: true,
@@ -575,6 +576,28 @@ export async function updateUserBasicInfo(data: {
     await getAdminSession();
 
     const { prisma } = await import('@/lib/prisma/client');
+
+    // Check if username is being changed and if it's already taken
+    if (data.username !== undefined) {
+      const usernameCheck = await auth.api.isUsernameAvailable({
+        body: { username: data.username },
+      });
+
+      // Allow if username is available OR if it's the same user keeping their username
+      const currentUser = await prisma.user.findUnique({
+        where: { id: data.userId },
+        select: { username: true },
+      });
+
+      const isKeepingSameUsername = currentUser?.username === data.username;
+
+      if (!usernameCheck?.available && !isKeepingSameUsername) {
+        return {
+          success: false,
+          error: 'Το συγκεκριμένο username χρησιμοποιείται ήδη. Επιλέξτε ένα διαφορετικό username.',
+        };
+      }
+    }
 
     // Build update object with only provided fields
     const updateData: any = {};

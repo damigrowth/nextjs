@@ -10,7 +10,7 @@ import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
 import { getFormString } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 
 export async function login(
   prevState: ActionResponse | null,

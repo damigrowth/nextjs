@@ -7,7 +7,7 @@ import { ActionResponse } from '@/lib/types/api';
 import { PasswordChangeInput } from '@/lib/validations/auth';
 import { getFormString } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { getSession } from './server';
 
 export async function changePassword(

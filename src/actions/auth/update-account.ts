@@ -12,7 +12,7 @@ import {
 } from '@/lib/validations/auth';
 import { extractFormData } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { processImageForDatabase } from '@/lib/utils/cloudinary';

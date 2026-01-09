@@ -10,7 +10,7 @@ import {
 } from '@/lib/validations/profile';
 import { extractFormData } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
 import { sendNewVerificationEmail } from '@/lib/email';
 

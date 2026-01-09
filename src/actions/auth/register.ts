@@ -7,7 +7,7 @@ import { ActionResult, ActionResponse } from '@/lib/types/api';
 import { RegisterInput } from '@/lib/validations/auth';
 import { getFormString, getFormArray } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { brevoWorkflowService } from '@/lib/email';
 
 /**
@@ -66,6 +66,19 @@ export async function register(
     }
 
     const data = validatedFields.data;
+
+    // Check username availability using Better Auth's official API
+    // This is the recommended approach from Better Auth username plugin
+    const usernameCheck = await auth.api.isUsernameAvailable({
+      body: { username: data.username },
+    });
+
+    if (!usernameCheck?.available) {
+      return {
+        success: false,
+        message: 'Το συγκεκριμένο username χρησιμοποιείται ήδη. Επιλέξτε ένα διαφορετικό username.',
+      };
+    }
 
     // Determine callback URL based on user type
     const callbackURL = userType === 'user' ? '/dashboard' : '/dashboard'; // Both go to dashboard, pro users will be redirected to onboarding by requireOnboardingComplete()

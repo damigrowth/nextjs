@@ -9,6 +9,7 @@ model User {
   confirmed       Boolean       @default(false)
   blocked         Boolean       @default(false)
   username        String?       @unique // Keep in user for auth purposes
+  displayUsername String?       @unique // Better Auth username plugin requirement - original case version
   displayName     String? // Keep in user for auth purposes
   firstName       String? // Keep in user for menu/auth purposes
   lastName        String? // Keep in user for menu/auth purposes

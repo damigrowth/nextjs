@@ -202,7 +202,9 @@ export default function OAuthSetupForm({
     formData.append('username', data.username);
     formData.append('role', 'user');
     formData.append('type', 'user');
-    action(formData);
+    startTransition(() => {
+      action(formData);
+    });
   };
 
   const handleProfessionalUserSubmit = (data: {
@@ -215,7 +217,9 @@ export default function OAuthSetupForm({
     formData.append('displayName', data.displayName);
     formData.append('role', data.role);
     formData.append('type', 'pro');
-    action(formData);
+    startTransition(() => {
+      action(formData);
+    });
   };
 
   // Handle type selection (for pending users)
