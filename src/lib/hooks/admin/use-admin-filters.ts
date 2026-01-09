@@ -48,7 +48,8 @@ export function useAdminFilters(basePath: string) {
     params.set('page', '1');
 
     router.push(`${basePath}?${params.toString()}`);
-  }, [debouncedSearchValue, router, searchParams, basePath]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearchValue, router]);
 
   /**
    * Handle filter dropdown changes
