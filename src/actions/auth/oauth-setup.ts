@@ -3,7 +3,7 @@
 import { auth } from '@/lib/auth/config';
 import { headers } from 'next/headers';
 import { getFormString } from '@/lib/utils/form';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { ActionResponse } from '@/lib/types/api';
 import { brevoWorkflowService } from '@/lib/email';
 
@@ -27,6 +27,18 @@ export async function completeOAuth(
       return {
         success: false,
         message: 'Ο χρήστης δεν είναι συνδεδεμένος',
+      };
+    }
+
+    // Check if username is already taken
+    const usernameCheck = await auth.api.isUsernameAvailable({
+      body: { username },
+    });
+
+    if (!usernameCheck?.available) {
+      return {
+        success: false,
+        message: 'Το συγκεκριμένο username χρησιμοποιείται ήδη. Επιλέξτε ένα διαφορετικό username.',
       };
     }
 

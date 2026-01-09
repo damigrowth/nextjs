@@ -11,7 +11,7 @@ import { CloudinaryResource } from '@/lib/types/cloudinary';
 import { onboardingFormSchemaWithMedia } from '@/lib/validations';
 import { getFormString, getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import {
   processImageForDatabase,
   sanitizeCloudinaryResources,
