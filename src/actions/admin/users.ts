@@ -174,6 +174,7 @@ export async function listUsers(
         email: true,
         name: true,
         username: true,
+        displayUsername: true,
         displayName: true,
         firstName: true,
         lastName: true,
