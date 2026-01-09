@@ -1,10 +1,14 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { nextCookies } from 'better-auth/next-js';
-import { admin, apiKey, jwt } from 'better-auth/plugins';
+import { admin, apiKey, jwt, username } from 'better-auth/plugins';
 import { localization } from 'better-auth-localization';
 import { User } from '@prisma/client';
-import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from '@/lib/email';
+import {
+  sendVerificationEmail,
+  sendWelcomeEmail,
+  sendPasswordResetEmail,
+} from '@/lib/email';
 import { brevoListManager } from '@/lib/email/providers/brevo/list-management';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma/client';
@@ -86,9 +90,14 @@ export const auth = betterAuth({
         // Fetch full user data if needed
         const userWithFields = await prisma.user.findUnique({
           where: { id: user.id },
-          select: { displayName: true, username: true }
+          select: { displayName: true, username: true },
         });
-        await sendPasswordResetEmail(user.email, userWithFields?.displayName, userWithFields?.username, url);
+        await sendPasswordResetEmail(
+          user.email,
+          userWithFields?.displayName,
+          userWithFields?.username,
+          url,
+        );
       } catch (error) {
         console.error('Failed to send password reset email:', error);
         // Don't throw error here to prevent reset from failing
@@ -108,9 +117,14 @@ export const auth = betterAuth({
         // Fetch full user data if needed
         const userWithFields = await prisma.user.findUnique({
           where: { id: user.id },
-          select: { displayName: true, username: true }
+          select: { displayName: true, username: true },
         });
-        await sendVerificationEmail(user.email, userWithFields?.displayName, userWithFields?.username, url);
+        await sendVerificationEmail(
+          user.email,
+          userWithFields?.displayName,
+          userWithFields?.username,
+          url,
+        );
       } catch (error) {
         console.error('Failed to send verification email:', error);
         // Don't throw error here to prevent registration from failing
@@ -185,7 +199,10 @@ export const auth = betterAuth({
             if (result.success) {
               console.log(`Brevo contact deleted for ${user.email}`);
             } else {
-              console.error(`Failed to delete Brevo contact for ${user.email}:`, result.message);
+              console.error(
+                `Failed to delete Brevo contact for ${user.email}:`,
+                result.message,
+              );
             }
           }
         } catch (error) {
@@ -198,10 +215,15 @@ export const auth = betterAuth({
           const deleted = await prisma.verification.deleteMany({
             where: { identifier: user.email },
           });
-          console.log(`Deleted ${deleted.count} verification token(s) for ${user.email}`);
+          console.log(
+            `Deleted ${deleted.count} verification token(s) for ${user.email}`,
+          );
         } catch (error) {
           // Log error but don't block deletion - verification cleanup is non-critical
-          console.error('Verification token cleanup error during account deletion:', error);
+          console.error(
+            'Verification token cleanup error during account deletion:',
+            error,
+          );
         }
       },
     },
@@ -412,6 +434,11 @@ export const auth = betterAuth({
     localization({
       defaultLocale: 'el-GR',
       fallbackLocale: 'default',
+    }),
+    username({
+      minUsernameLength: 3,
+      maxUsernameLength: 30,
+      usernameValidator: (username) => /^[a-zA-Z0-9_]+$/.test(username),
     }),
     admin({
       defaultRole: 'user',
