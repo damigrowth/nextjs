@@ -10,29 +10,33 @@ import {
 import { useAdminFilters } from '@/lib/hooks/admin/use-admin-filters';
 import { AdminSearchInput } from './admin-search-input';
 
-export function AdminVerificationsFilters() {
+interface AdminChatMessagesFiltersProps {
+  chatId: string;
+}
+
+export function AdminChatMessagesFilters({ chatId }: AdminChatMessagesFiltersProps) {
   const { searchValue, setSearchValue, handleFilterChange, searchParams } =
-    useAdminFilters('/admin/verifications');
+    useAdminFilters(`/admin/chats/${chatId}`);
 
   return (
     <div className='flex items-center gap-4'>
       <AdminSearchInput
-        placeholder='Αναζήτηση με ΑΦΜ ή επωνυμία...'
+        placeholder='Αναζήτηση μηνυμάτων...'
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
       />
+
+      {/* Sort Filter */}
       <Select
-        value={searchParams.get('status') || 'all'}
-        onValueChange={(value) => handleFilterChange('status', value)}
+        value={searchParams.get('sort') || 'newest'}
+        onValueChange={(value) => handleFilterChange('sort', value)}
       >
         <SelectTrigger className='w-40'>
-          <SelectValue placeholder='Status' />
+          <SelectValue placeholder='Sort By' />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value='all'>All Status</SelectItem>
-          <SelectItem value='PENDING'>Pending</SelectItem>
-          <SelectItem value='APPROVED'>Approved</SelectItem>
-          <SelectItem value='REJECTED'>Rejected</SelectItem>
+          <SelectItem value='newest'>Newest First</SelectItem>
+          <SelectItem value='oldest'>Oldest First</SelectItem>
         </SelectContent>
       </Select>
     </div>

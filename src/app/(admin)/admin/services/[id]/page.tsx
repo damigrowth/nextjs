@@ -19,6 +19,7 @@ import { SiteHeader } from '@/components/admin/site-header';
 import { getServiceTaxonomies } from '@/lib/taxonomies';
 import { tags } from '@/constants/datasets/tags';
 import { NextLink } from '@/components';
+import { formatServiceType } from '@/lib/utils/service';
 
 export const dynamic = 'force-dynamic';
 
@@ -139,7 +140,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                     Πληροφορίες Υπηρεσίας
                   </CardTitle>
                 </CardHeader>
-                <CardContent className='p-0'>
+                <CardContent className='px-0'>
                   <div className='divide-y'>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
@@ -194,7 +195,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                 <CardHeader className='pb-3'>
                   <CardTitle className='text-sm'>Status & Flags</CardTitle>
                 </CardHeader>
-                <CardContent className='p-0'>
+                <CardContent className='px-0'>
                   <div className='divide-y'>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
@@ -246,6 +247,14 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                           : 'No'}
                       </Badge>
                     </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Type
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {formatServiceType(service.type).join(', ')}
+                      </span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -255,7 +264,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                 <CardHeader className='pb-3'>
                   <CardTitle className='text-sm'>Pricing & Duration</CardTitle>
                 </CardHeader>
-                <CardContent className='p-0'>
+                <CardContent className='px-0'>
                   <div className='divide-y'>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
@@ -298,7 +307,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                 <CardHeader className='pb-3'>
                   <CardTitle className='text-sm'>Activity & Stats</CardTitle>
                 </CardHeader>
-                <CardContent className='p-0'>
+                <CardContent className='px-0'>
                   <div className='divide-y'>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
