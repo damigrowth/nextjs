@@ -42,7 +42,7 @@ import {
 import { toast } from 'sonner';
 import { CommitForm } from './commit-form';
 import { GitStatusResponse, RecentCommitsResponse } from '@/lib/types/github';
-import { NextLink } from '@/components/shared';
+import { NextLink } from '@/components';
 
 export function DeploymentManager() {
   const [gitStatus, setGitStatus] = useState<GitStatusResponse['data']>(null);

@@ -2,8 +2,8 @@ import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SiteHeader } from '@/components/admin';
-import { NextLink } from '../shared';
+import { SiteHeader } from '@/components/admin/site-header';
+import { NextLink } from '@/components';
 
 export interface TaxonomyCreatePageProps {
   title: string;

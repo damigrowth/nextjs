@@ -1,5 +1,4 @@
-import React from 'react';
-import { FaqSection } from '@/components';
+import FaqSection from '@/components/shared/faq-section';
 import { data } from '@/constants/datasets/faq';
 import { getFaqMetadata } from '@/lib/seo/pages';
 

@@ -21,8 +21,8 @@
  *
  * @see scripts/build-taxonomy-maps.ts - Build script that generates maps
  */
-
 import type { DatasetItem } from '@/types/datasets';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 
 // ============================================================================
 // LAZY-LOADED SINGLETONS
@@ -333,6 +333,54 @@ export function findLocationBySlugOrName(slugOrName: string | null | undefined):
   }
 
   return null;
+}
+
+/**
+ * Find matching location name from profile coverage arrays - O(1) optimized
+ *
+ * Searches profile coverage object (counties and areas arrays) for a location
+ * that matches the normalized search term. Prioritizes areas (more specific)
+ * over counties (less specific).
+ *
+ * Uses O(1) hash map lookups via findLocationById for performance.
+ *
+ * @param coverage - Profile coverage object with counties and areas arrays
+ * @param searchTerm - Normalized search term to match against location names
+ * @returns Matched location name or undefined if no match found
+ *
+ * @example
+ * // Search for location in service profile coverage
+ * const matchedLocation = findMatchingLocationInCoverage(
+ *   service.profile.coverage,
+ *   normalizeTerm('θεσσαλονικη')
+ * );
+ * // Returns: "Θεσσαλονίκη" if found in coverage.areas or coverage.counties
+ */
+export function findMatchingLocationInCoverage(
+  coverage: any,
+  searchTerm: string
+): string | undefined {
+  // Priority 1: Check areas first (more specific locations)
+  if (Array.isArray(coverage.areas)) {
+    for (const areaId of coverage.areas) {
+      const area = findLocationById(areaId);
+      if (area?.name && normalizeTerm(area.name).includes(searchTerm)) {
+        return area.name;
+      }
+    }
+  }
+
+  // Priority 2: Check counties as fallback (less specific locations)
+  if (Array.isArray(coverage.counties)) {
+    for (const countyId of coverage.counties) {
+      const county = findLocationById(countyId);
+      if (county?.name && normalizeTerm(county.name).includes(searchTerm)) {
+        return county.name;
+      }
+    }
+  }
+
+  return undefined;
 }
 
 // ============================================================================

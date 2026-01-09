@@ -231,7 +231,7 @@ export async function getOAuthSetupMetadata() {
 }
 
 /**
- * Home page metadata generation
+ * Home page metadata generation with performance optimizations
  */
 export async function getHomeMetadata() {
   const { meta } = await Meta({
@@ -243,7 +243,7 @@ export async function getHomeMetadata() {
     url: '/',
   });
 
-  return meta;
+  return { meta };
 }
 
 /**

@@ -38,8 +38,7 @@ import { useRouter } from 'next/navigation';
 import { OnboardingFormSkeleton } from './onboarding-form-skeleton';
 
 // Static constants and dataset utilities
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
-import { locationOptions } from '@/constants/datasets/locations';
+import type { DatasetItem } from '@/lib/types/datasets';
 import { formatInput } from '@/lib/utils/validation/formats';
 import { populateFormData } from '@/lib/utils/form';
 import {
@@ -56,7 +55,7 @@ import { completeOnboarding } from '@/actions/auth/complete-onboarding';
 
 // Types
 import { MediaUpload } from '../../media';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { AuthUser } from '@/lib/types';
 
 // Use existing Zod schema
@@ -64,7 +63,8 @@ type OnboardingFormData = z.infer<typeof onboardingFormSchemaWithMedia>;
 
 interface OnboardingFormProps {
   user: AuthUser | null;
-  // Props will be derived from useAuth hook
+  proTaxonomies: DatasetItem[];
+  locationOptions: DatasetItem[];
 }
 
 const initialState = {
@@ -77,7 +77,11 @@ const initialState = {
  * No Zustand needed - RHF handles all state management
  * Integrates with existing formatting utilities and custom components
  */
-export default function OnboardingForm({ user }: OnboardingFormProps) {
+export default function OnboardingForm({
+  user,
+  proTaxonomies,
+  locationOptions,
+}: OnboardingFormProps) {
   const [state, action, isPending] = useActionState(
     completeOnboarding,
     initialState,
@@ -160,7 +164,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
       area: zipcode.area,
       county: zipcode.county,
     }));
-  }, []);
+  }, [locationOptions]);
 
   // Prefetch dashboard for instant navigation
   useEffect(() => {
@@ -371,6 +375,9 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
 
     try {
       // Check for pending files and upload if needed
+      // Note: When using widget mode (type="image"), profile image uploads happen immediately
+      // via the widget's onDirectUpload callback, so there won't be pending files.
+      // This check is still needed for portfolio images and backward compatibility.
       const hasImageFiles = profileImageRef.current?.hasFiles();
       const hasPortfolioFiles = portfolioRef.current?.hasFiles();
 
@@ -455,7 +462,7 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
                   ref={profileImageRef}
                   value={field.value}
                   onChange={field.onChange}
-                  uploadPreset='doulitsa_new'
+                  uploadPreset='doulitsa_profile_images'
                   multiple={false}
                   folder={`users/${user?.username}/profile`}
                   maxFileSize={3000000} // 3MB

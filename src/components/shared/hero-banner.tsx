@@ -1,6 +1,10 @@
 import React from 'react';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import {
+  buildCloudinaryUrl,
+  extractPublicId,
+} from '@/lib/utils/cloudinary';
 
 type HeroData = {
   title: string;
@@ -66,6 +70,43 @@ export default function HeroBanner({
   className = '',
   contentClassName = '',
 }: Props) {
+  // Optimize background image
+  const optimizedBgImage = React.useMemo(() => {
+    if (!backgroundImage) return null;
+    const publicId = extractPublicId(backgroundImage);
+    return publicId
+      ? buildCloudinaryUrl(publicId, {
+          width: 1200,
+          height: 675,
+          crop: 'limit',
+          quality: 'auto:good',
+          format: 'auto',
+          dpr: 'auto',
+        })
+      : backgroundImage;
+  }, [backgroundImage]);
+
+  // Optimize decorative images
+  const optimizedDecorativeImages = React.useMemo(() => {
+    if (!decorativeImages) return [];
+    return decorativeImages.map((image) => {
+      const publicId = extractPublicId(image.src);
+      return {
+        ...image,
+        src: publicId
+          ? buildCloudinaryUrl(publicId, {
+              width: image.width,
+              height: image.height,
+              crop: 'limit',
+              quality: 'auto:good',
+              format: 'auto',
+              dpr: 'auto',
+            })
+          : image.src,
+      };
+    });
+  }, [decorativeImages]);
+
   // Determine container classes based on whether we're using background image or color
   const containerClasses = backgroundColor
     ? `${backgroundColor} h-80 px-5 lg:px-20`
@@ -77,9 +118,9 @@ export default function HeroBanner({
         className={`max-w-4xl mx-auto rounded-2xl relative flex items-center overflow-hidden ${containerClasses}`}
       >
         {/* Background Image (only if no backgroundColor) */}
-        {!backgroundColor && backgroundImage && (
+        {!backgroundColor && optimizedBgImage && (
           <Image
-            src={backgroundImage}
+            src={optimizedBgImage}
             alt='Banner background'
             fill
             className='object-cover rounded-2xl'
@@ -88,7 +129,7 @@ export default function HeroBanner({
         )}
 
         {/* Decorative Images */}
-        {decorativeImages?.map((image, index) => (
+        {optimizedDecorativeImages.map((image, index) => (
           <Image
             key={index}
             src={image.src}

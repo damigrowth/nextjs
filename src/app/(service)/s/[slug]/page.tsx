@@ -2,7 +2,6 @@ import type { JSX } from 'react';
 import { notFound } from 'next/navigation';
 import { getServicePageData } from '@/actions/services';
 import { getServiceMetadata } from '@/lib/seo/pages';
-import { TaxonomyTabs, DynamicBreadcrumb } from '@/components';
 import { Card, CardContent } from '@/components/ui/card';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import {
@@ -13,10 +12,12 @@ import {
   ServiceContact,
   ServiceOrderFixed,
   ServiceFAQ,
-  ProfileTerms,
   ServiceRelated,
   ReportServiceDialog,
-} from '@/components';
+} from '@/components/service';
+import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
+import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
+import { ProfileTerms } from '@/components/profile';
 
 // ISR configuration with shorter interval + tag-based revalidation
 export const revalidate = 300; // Revalidate every 5 minutes (backup for tag-based)

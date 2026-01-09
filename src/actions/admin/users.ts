@@ -924,25 +924,17 @@ export async function updateUserBasicInfoAction(
   formData: FormData,
 ): Promise<ActionResult> {
   try {
-    const userId = formData.get('userId');
-
-    if (!userId) {
-      return {
-        success: false,
-        error: 'User ID is required',
-      };
-    }
-
-    // Parse FormData
+    // Parse FormData including userId
     const rawData = {
+      userId: formData.get('userId') as string,
       name: formData.get('name') as string,
       email: formData.get('email') as string,
       username: formData.get('username') as string,
       displayName: formData.get('displayName') as string,
     };
 
-    // Validate using imported schema (omit userId as it's passed separately)
-    const validationResult = updateUserBasicInfoSchema.omit({ userId: true }).safeParse(rawData);
+    // Validate complete data with userId
+    const validationResult = updateUserBasicInfoSchema.safeParse(rawData);
 
     if (!validationResult.success) {
       console.error('User basic info validation errors:', validationResult.error);
@@ -952,10 +944,7 @@ export async function updateUserBasicInfoAction(
       };
     }
 
-    const result = await updateUserBasicInfo({
-      userId: userId as string,
-      ...validationResult.data,
-    });
+    const result = await updateUserBasicInfo(validationResult.data);
 
     return result;
   } catch (error) {
@@ -974,17 +963,9 @@ export async function updateUserStatusAction(
   formData: FormData,
 ): Promise<ActionResult> {
   try {
-    const userId = formData.get('userId');
-
-    if (!userId) {
-      return {
-        success: false,
-        error: 'User ID is required',
-      };
-    }
-
-    // Parse FormData
+    // Parse FormData including userId
     const rawData = {
+      userId: formData.get('userId') as string,
       role: formData.get('role') as string,
       type: formData.get('type') as string,
       step: formData.get('step') as string,
@@ -993,8 +974,8 @@ export async function updateUserStatusAction(
       blocked: formData.get('blocked') === 'true',
     };
 
-    // Validate using imported schema (omit userId as it's passed separately)
-    const validationResult = updateUserStatusSchema.omit({ userId: true }).safeParse(rawData);
+    // Validate complete data with userId
+    const validationResult = updateUserStatusSchema.safeParse(rawData);
 
     if (!validationResult.success) {
       console.error('User status validation errors:', validationResult.error);
@@ -1004,11 +985,13 @@ export async function updateUserStatusAction(
       };
     }
 
+    const { userId, role, ...statusData } = validationResult.data;
+
     // Handle role separately if provided (Better Auth API requirement)
-    if (validationResult.data.role) {
+    if (role) {
       const roleResult = await setUserRole({
-        userId: userId as string,
-        role: validationResult.data.role as any,
+        userId,
+        role: role as any,
       });
 
       if (!roleResult.success) {
@@ -1017,9 +1000,8 @@ export async function updateUserStatusAction(
     }
 
     // Update other status fields (excluding role which was handled above)
-    const { role, ...statusData } = validationResult.data;
     const result = await updateUserStatus({
-      userId: userId as string,
+      userId,
       ...statusData,
     });
 

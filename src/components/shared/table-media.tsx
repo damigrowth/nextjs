@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { FileImage } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 import type { CloudinaryResource } from '@/lib/types/cloudinary';
 
 interface TableMediaProps {
@@ -39,7 +40,11 @@ export default function TableMedia({ media, className }: TableMediaProps) {
     );
   }
 
-  const imageUrl = firstImage.secure_url || firstImage.url;
+  // Get optimized thumbnail URL (80x80px is appropriate for 64px display)
+  const optimizedUrl = getOptimizedImageUrl(firstImage, 'thumbnail');
+
+  // Fallback to original URL if optimization fails
+  const imageUrl = optimizedUrl || firstImage.secure_url || firstImage.url;
 
   // Return fallback if no valid URL
   if (!imageUrl || imageUrl.trim() === '') {
@@ -62,6 +67,7 @@ export default function TableMedia({ media, className }: TableMediaProps) {
           fill
           className='object-cover rounded'
           sizes='64px'
+          loading='lazy'
         />
       </div>
     </div>

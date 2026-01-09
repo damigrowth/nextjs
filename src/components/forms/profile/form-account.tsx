@@ -33,7 +33,7 @@ import { formatDisplayName } from '@/lib/utils/validation/formats';
 import { populateFormData } from '@/lib/utils/form';
 import { updateAccount } from '@/actions/auth/update-account';
 import { updateAccountAdmin } from '@/actions/admin/users';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { AuthUser } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';
 import {
@@ -126,6 +126,9 @@ export default function AccountForm({
 
     try {
       // Check for pending files and upload if needed
+      // Note: When using widget mode (type="image"), uploads happen immediately
+      // via the widget's onDirectUpload callback, so there won't be pending files.
+      // This check is still needed for backward compatibility with non-widget uploads.
       const hasPendingFiles = profileImageRef.current?.hasFiles();
 
       if (hasPendingFiles) {
@@ -191,7 +194,7 @@ export default function AccountForm({
                   ref={profileImageRef}
                   value={field.value}
                   onChange={field.onChange}
-                  uploadPreset='doulitsa_new'
+                  uploadPreset='doulitsa_profile_images'
                   multiple={false}
                   folder={`users/${initialUser?.username}/profile`}
                   maxFileSize={3000000} // 3MB

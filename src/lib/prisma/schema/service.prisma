@@ -55,10 +55,12 @@ model Service {
   rating      Float @default(0)
   reviewCount Int   @default(0)
 
-  status    Status   @default(draft)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  reviews   Review[]
+  status      Status    @default(draft)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  refreshedAt DateTime? // When service was last refreshed/boosted to top
+  sortDate    DateTime  @default(now()) // Always = refreshedAt ?? createdAt, used for sorting
+  reviews     Review[]
   profile   Profile  @relation(fields: [pid], references: [id], onDelete: Cascade)
   savedBy   SavedService[]
 
@@ -91,6 +93,9 @@ model Service {
 
   // Search and filtering with sorting
   @@index([status, rating, reviewCount]) // Advanced filtering/search
+
+  // Service sorting by most recent activity (refresh or creation)
+  @@index([sortDate]) // Sort by most recent service activity
 
   // REMOVED redundant indexes (covered by composite indexes above):
   // @@index([status, featured]) - covered by featured/status/rating

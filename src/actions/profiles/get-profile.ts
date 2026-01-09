@@ -4,11 +4,9 @@ import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { Profile } from '@prisma/client';
 import { ActionResult } from '@/lib/types/api';
-import type { ServiceCardData } from '@/lib/types/components';
+import type { ServiceCardData, TaxonomyTab } from '@/lib/types/components';
 import type { BreadcrumbSegment } from '@/components/shared/dynamic-breadcrumb';
 import type { DatasetItem } from '@/lib/types/datasets';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import {
   contactMethodsOptions,
   paymentMethodsOptions,
@@ -20,6 +18,8 @@ import { industriesOptions } from '@/constants/datasets/industries';
 import { locationOptions } from '@/constants/datasets/locations';
 // O(1) optimized taxonomy lookups - 99% faster than findById
 import {
+  getProTaxonomies,
+  getServiceTaxonomies,
   findProById,
   batchFindServiceByIds,
   batchFindSkillsByIds,
@@ -113,6 +113,9 @@ export async function getPublicProfileByUsername(
  * Transform a service for use in ServiceCard component
  */
 function transformProfileService(service: any): ServiceCardData {
+  // Lazy-load service taxonomies for O(1) lookups
+  const serviceTaxonomies = getServiceTaxonomies();
+
   // Resolve full taxonomy hierarchy
   const taxonomyLabels = resolveTaxonomyHierarchy(
     serviceTaxonomies,
@@ -147,7 +150,7 @@ export interface ProfilePageData {
   profile: NonNullable<Awaited<ReturnType<typeof getProfileByUsername>>>;
   category?: DatasetItem | null;
   subcategory?: DatasetItem | null;
-  featuredCategories: typeof proTaxonomies;
+  featuredCategories: TaxonomyTab[];
   skillsData: (DatasetItem | null)[];
   specialityData?: DatasetItem | null;
   contactMethodsData: (DatasetItem | null)[];
@@ -228,6 +231,9 @@ async function _getProfilePageData(
       };
     }
 
+    // Lazy-load pro taxonomies for O(1) lookups
+    const proTaxonomies = getProTaxonomies();
+
     // OPTIMIZATION: O(1) hash map lookups for pro taxonomies
     const category = profile.category ? findProById(profile.category) : null;
 
@@ -235,7 +241,8 @@ async function _getProfilePageData(
       ? findProById(profile.subcategory)
       : null;
 
-    const featuredCategories = proTaxonomies.slice(0, 8);
+    // Cast to TaxonomyTab[] since all taxonomy items have slug (required by component)
+    const featuredCategories = proTaxonomies.slice(0, 8) as TaxonomyTab[];
 
     // Skills lookup from skills dataset - O(1) optimized
     const skillsData = batchFindSkillsByIds(profile.skills).filter(
@@ -327,7 +334,7 @@ async function _getProfilePageData(
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { sortDate: 'desc' },
     });
 
     // Transform services for component use

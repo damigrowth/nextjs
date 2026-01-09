@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
-import { SiteHeader, EditProTaxonomyForm } from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
+import { EditProTaxonomyForm } from '@/components/admin/forms/edit-pro-taxonomy-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';

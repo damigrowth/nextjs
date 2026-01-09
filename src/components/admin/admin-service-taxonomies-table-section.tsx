@@ -10,9 +10,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import AdminTablePagination from './admin-table-pagination';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { DatasetItem } from '@/lib/types/datasets';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 interface ServiceTaxonomiesTableSectionProps {
   searchParams: {
@@ -24,6 +23,7 @@ interface ServiceTaxonomiesTableSectionProps {
     sortBy?: string;
     sortOrder?: string;
   };
+  serviceTaxonomies: DatasetItem[];
 }
 
 interface FlatTaxonomy extends DatasetItem {
@@ -34,7 +34,7 @@ interface FlatTaxonomy extends DatasetItem {
 }
 
 // Flatten the hierarchical taxonomy structure with proper DatasetItem handling
-function flattenTaxonomies(): FlatTaxonomy[] {
+function flattenTaxonomies(serviceTaxonomies: DatasetItem[]): FlatTaxonomy[] {
   const flat: FlatTaxonomy[] = [];
 
   serviceTaxonomies.forEach((category: DatasetItem) => {
@@ -69,6 +69,7 @@ function flattenTaxonomies(): FlatTaxonomy[] {
 
 export async function AdminServiceTaxonomiesTableSection({
   searchParams,
+  serviceTaxonomies,
 }: ServiceTaxonomiesTableSectionProps) {
   const page = parseInt(searchParams.page || '1');
   const limit = parseInt(searchParams.limit || '20');
@@ -77,7 +78,7 @@ export async function AdminServiceTaxonomiesTableSection({
   const featuredFilter = searchParams.featured || 'all';
 
   // Flatten and filter taxonomies
-  let taxonomies = flattenTaxonomies();
+  let taxonomies = flattenTaxonomies(serviceTaxonomies);
 
   // Apply filters
   if (search) {

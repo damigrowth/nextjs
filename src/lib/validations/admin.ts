@@ -14,7 +14,17 @@ import {
   registerSchema,
   accountUpdateSchema,
 } from '../validations';
-import { createServiceSchema } from './service';
+import {
+  adminServiceValidationSchema,
+  createServiceSchema,
+  type EditServiceTaxonomyInput,
+  type EditServiceBasicInput,
+  type EditServicePricingInput,
+  type EditServiceSettingsInput,
+  type EditServiceAddonsInput,
+  type EditServiceFaqInput,
+  type UpdateServiceMediaInput,
+} from './service';
 import { cloudinaryResourceSchema } from '../prisma/json-types';
 
 // =============================================
@@ -336,32 +346,11 @@ export const adminListServicesSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional().default(10),
   offset: z.coerce.number().int().min(0).optional().default(0),
   sortBy: z
-    .enum(['createdAt', 'rating', 'reviewCount', 'updatedAt', 'price'])
+    .enum(['sortDate', 'rating', 'reviewCount', 'price', 'createdAt'])
     .optional()
-    .default('createdAt'),
+    .default('sortDate'),
   sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
 });
-
-// Admin update service schema - extends dashboard schema with admin-only fields
-export const adminUpdateServiceSchema = createServiceSchema
-  .partial() // Make all dashboard fields optional for partial updates
-  .extend({
-    serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
-    // Admin-only fields
-    status: z
-      .enum([
-        'draft',
-        'pending',
-        'published',
-        'rejected',
-        'approved',
-        'inactive',
-      ])
-      .optional(),
-    featured: z.boolean().optional(),
-    // Media (not in dashboard schema)
-    media: z.array(z.record(z.string(), z.any())).optional().nullable(),
-  });
 
 export const adminToggleServiceSchema = z.object({
   serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
@@ -384,9 +373,10 @@ export const adminDeleteServiceSchema = z.object({
   serviceId: z.coerce.number().int().min(1, 'Service ID is required'),
 });
 
-// Admin create service schema - combines create service schema with profile assignment
-// Using .and() instead of .extend() because createServiceSchema contains refinements
-export const adminCreateServiceSchema = createServiceSchema.and(
+// Admin create service schema - combines admin validation schema with profile assignment
+// Uses adminServiceValidationSchema for field-level validation, adds profileId for submission
+// Using .and() instead of .extend() because schema contains refinements
+export const adminCreateServiceSchema = adminServiceValidationSchema.and(
   z.object({
     profileId: z.string().min(1, 'Profile ID is required'),
   })
@@ -401,13 +391,29 @@ export const adminCreateServiceSchema = createServiceSchema.and(
 // =============================================
 
 export type AdminListServicesInput = z.infer<typeof adminListServicesSchema>;
-export type AdminUpdateServiceInput = z.infer<typeof adminUpdateServiceSchema>;
 export type AdminToggleServiceInput = z.infer<typeof adminToggleServiceSchema>;
 export type AdminUpdateServiceStatusInput = z.infer<
   typeof adminUpdateServiceStatusSchema
 >;
 export type AdminDeleteServiceInput = z.infer<typeof adminDeleteServiceSchema>;
 export type AdminCreateServiceInput = z.infer<typeof adminCreateServiceSchema>;
+
+// Admin update service input - intersection of all edit schemas + serviceId
+// The updateService function accepts data from any combination of edit schemas
+// Using intersection (&) instead of union (|) allows TypeScript to access all fields
+export type AdminUpdateServiceInput = {
+  serviceId: number;
+} & Partial<EditServiceTaxonomyInput> &
+  Partial<EditServiceBasicInput> &
+  Partial<EditServicePricingInput> &
+  Partial<EditServiceSettingsInput> &
+  Partial<EditServiceAddonsInput> &
+  Partial<EditServiceFaqInput> &
+  Partial<UpdateServiceMediaInput> & {
+    status?: string;
+    featured?: boolean;
+    media?: any[];
+  };
 
 // =============================================
 // ADMIN VERIFICATION MANAGEMENT SCHEMAS

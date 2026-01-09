@@ -7,16 +7,18 @@ import { prisma } from '@/lib/prisma/client';
 import { z } from 'zod';
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { CACHE_TAGS, getServiceTags } from '@/lib/cache';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 // O(1) optimized taxonomy lookups - 99% faster than nested find
-import { resolveServiceHierarchy, findTagById, findTagBySlug } from '@/lib/taxonomies';
+import {
+  resolveServiceHierarchy,
+  findTagById,
+  findTagBySlug,
+} from '@/lib/taxonomies';
 import { generateServiceSlug } from '@/lib/utils/text';
 import { sendServicePublishedEmail } from '@/lib/email/services';
 
 import {
   adminListServicesSchema,
-  adminUpdateServiceSchema,
   adminToggleServiceSchema,
   adminUpdateServiceStatusSchema,
   adminDeleteServiceSchema,
@@ -31,8 +33,20 @@ import {
 import {
   updateServiceMediaSchema,
   createServiceSchema,
+  editServiceTaxonomySchema,
+  editServiceBasicSchema,
+  editServicePricingSchema,
+  editServiceAddonsSchema,
+  editServiceFaqSchema,
+  editServiceSettingsSchema,
   type UpdateServiceMediaInput,
   type CreateServiceInput,
+  type EditServiceTaxonomyInput,
+  type EditServiceBasicInput,
+  type EditServicePricingInput,
+  type EditServiceAddonsInput,
+  type EditServiceFaqInput,
+  type EditServiceSettingsInput,
 } from '@/lib/validations/service';
 import type { ActionResult } from '@/lib/types/api';
 import { getAdminSession } from './helpers';
@@ -132,6 +146,17 @@ export async function listServices(
       where.OR = [
         { titleNormalized: { contains: normalizedQuery } },
         { descriptionNormalized: { contains: normalizedQuery } },
+        // Search in profile displayName and username
+        {
+          profile: {
+            displayName: { contains: searchQuery, mode: 'insensitive' }
+          }
+        },
+        {
+          profile: {
+            username: { contains: searchQuery, mode: 'insensitive' }
+          }
+        },
         // If the query is a number, also search by service ID
         ...(serviceIdMatch ? [{ id: parseInt(searchQuery) }] : []),
       ];
@@ -226,8 +251,15 @@ export async function listServices(
     // Transform services to include taxonomyLabels for TaxonomiesDisplay
     const servicesWithLabels = services.map((service) => {
       // O(1) hierarchical lookups - context-aware resolution (avoids ID collisions)
-      const { category: categoryData, subcategory: subcategoryData, subdivision: subdivisionData } =
-        resolveServiceHierarchy(service.category, service.subcategory, service.subdivision);
+      const {
+        category: categoryData,
+        subcategory: subcategoryData,
+        subdivision: subdivisionData,
+      } = resolveServiceHierarchy(
+        service.category,
+        service.subcategory,
+        service.subdivision,
+      );
 
       return {
         ...service,
@@ -361,22 +393,30 @@ export async function updateService(params: AdminUpdateServiceInput) {
 
     // Filter out undefined values to prevent accidental overwrites
     // Only include fields that are explicitly provided
-    const cleanedUpdateData = Object.entries(updateData).reduce((acc, [key, value]) => {
-      if (value !== undefined) {
-        acc[key] = value;
-      }
-      return acc;
-    }, {} as Record<string, any>);
+    const cleanedUpdateData = Object.entries(updateData).reduce(
+      (acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
 
     // Update normalized fields if title or description changed
     const normalizedUpdates: any = {};
     if (updateData.title) {
       normalizedUpdates.titleNormalized = normalizeTerm(updateData.title);
       // Regenerate slug when title changes to keep URL in sync
-      normalizedUpdates.slug = generateServiceSlug(updateData.title, serviceId.toString());
+      normalizedUpdates.slug = generateServiceSlug(
+        updateData.title,
+        serviceId.toString(),
+      );
     }
     if (updateData.description) {
-      normalizedUpdates.descriptionNormalized = normalizeTerm(updateData.description);
+      normalizedUpdates.descriptionNormalized = normalizeTerm(
+        updateData.description,
+      );
     }
 
     const updatedService = await prisma.service.update({
@@ -409,7 +449,10 @@ export async function updateService(params: AdminUpdateServiceInput) {
     });
 
     // Send email notification if service status was changed to published
-    if (updateData.status === 'published' && existingService.status !== 'published') {
+    if (
+      updateData.status === 'published' &&
+      existingService.status !== 'published'
+    ) {
       // Fetch full service with user data for email
       const serviceWithUser = await prisma.service.findUnique({
         where: { id: serviceId },
@@ -436,11 +479,16 @@ export async function updateService(params: AdminUpdateServiceInput) {
               title: serviceWithUser.title,
               slug: serviceWithUser.slug || '',
             },
-            { ...serviceWithUser.profile.user, email: serviceWithUser.profile.user.email || '' }
+            {
+              ...serviceWithUser.profile.user,
+              email: serviceWithUser.profile.user.email || '',
+            },
           );
-
         } catch (emailError) {
-          console.error('[Email] Failed to send service published notification:', emailError);
+          console.error(
+            '[Email] Failed to send service published notification:',
+            emailError,
+          );
           // Don't block the status update if email fails
         }
       }
@@ -462,7 +510,8 @@ export async function updateService(params: AdminUpdateServiceInput) {
     }
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update service',
+      error:
+        error instanceof Error ? error.message : 'Failed to update service',
     };
   }
 }
@@ -489,24 +538,21 @@ export async function updateServiceTaxonomyAction(
       category: formData.get('category') as string,
       subcategory: formData.get('subcategory') as string,
       subdivision: formData.get('subdivision') as string,
-      tags: formData.get('tags') ? JSON.parse(formData.get('tags') as string) : [],
+      tags: formData.get('tags')
+        ? JSON.parse(formData.get('tags') as string)
+        : [],
     };
 
-    // Validate using dashboard schema
-    const taxonomySchema = createServiceSchema.pick({
-      category: true,
-      subcategory: true,
-      subdivision: true,
-      tags: true,
-    });
-
-    const validationResult = taxonomySchema.safeParse(rawData);
+    // Validate using taxonomy schema
+    const validationResult = editServiceTaxonomySchema.safeParse(rawData);
 
     if (!validationResult.success) {
       console.error('Taxonomy validation errors:', validationResult.error);
       return {
         success: false,
-        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+        error:
+          'Validation failed: ' +
+          validationResult.error.issues.map((e) => e.message).join(', '),
       };
     }
 
@@ -519,7 +565,10 @@ export async function updateServiceTaxonomyAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update service taxonomy',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to update service taxonomy',
     };
   }
 }
@@ -547,19 +596,16 @@ export async function updateServiceBasicAction(
       description: formData.get('description') as string,
     };
 
-    // Validate using dashboard schema
-    const basicSchema = createServiceSchema.pick({
-      title: true,
-      description: true,
-    });
-
-    const validationResult = basicSchema.safeParse(rawData);
+    // Validate using basic schema
+    const validationResult = editServiceBasicSchema.safeParse(rawData);
 
     if (!validationResult.success) {
       console.error('Basic info validation errors:', validationResult.error);
       return {
         success: false,
-        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+        error:
+          'Validation failed: ' +
+          validationResult.error.issues.map((e) => e.message).join(', '),
       };
     }
 
@@ -572,7 +618,10 @@ export async function updateServiceBasicAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update service basic info',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to update service basic info',
     };
   }
 }
@@ -598,7 +647,9 @@ export async function updateServicePricingAction(
     const rawData: any = {
       price: formData.get('price') ? Number(formData.get('price')) : undefined,
       fixed: formData.get('fixed') === 'true',
-      duration: formData.get('duration') ? Number(formData.get('duration')) : undefined,
+      duration: formData.get('duration')
+        ? Number(formData.get('duration'))
+        : undefined,
     };
 
     // Add subscriptionType if present
@@ -606,21 +657,16 @@ export async function updateServicePricingAction(
       rawData.subscriptionType = formData.get('subscriptionType');
     }
 
-    // Validate using dashboard schema
-    const pricingSchema = createServiceSchema.pick({
-      price: true,
-      fixed: true,
-      duration: true,
-      subscriptionType: true,
-    });
-
-    const validationResult = pricingSchema.safeParse(rawData);
+    // Validate using pricing schema
+    const validationResult = editServicePricingSchema.safeParse(rawData);
 
     if (!validationResult.success) {
       console.error('Pricing validation errors:', validationResult.error);
       return {
         success: false,
-        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+        error:
+          'Validation failed: ' +
+          validationResult.error.issues.map((e) => e.message).join(', '),
       };
     }
 
@@ -633,7 +679,10 @@ export async function updateServicePricingAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update service pricing',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to update service pricing',
     };
   }
 }
@@ -661,19 +710,16 @@ export async function updateServiceSettingsAction(
       featured: formData.get('featured') === 'true',
     };
 
-    // Validate using admin schema (status and featured are admin-only fields)
-    const settingsSchema = adminUpdateServiceSchema.pick({
-      status: true,
-      featured: true,
-    });
-
-    const validationResult = settingsSchema.safeParse(rawData);
+    // Validate using settings schema (status and featured are admin-only fields)
+    const validationResult = editServiceSettingsSchema.safeParse(rawData);
 
     if (!validationResult.success) {
       console.error('Settings validation errors:', validationResult.error);
       return {
         success: false,
-        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+        error:
+          'Validation failed: ' +
+          validationResult.error.issues.map((e) => e.message).join(', '),
       };
     }
 
@@ -686,7 +732,10 @@ export async function updateServiceSettingsAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update service settings',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to update service settings',
     };
   }
 }
@@ -710,21 +759,21 @@ export async function updateServiceAddonsAction(
 
     // Parse FormData
     const rawData = {
-      addons: formData.get('addons') ? JSON.parse(formData.get('addons') as string) : [],
+      addons: formData.get('addons')
+        ? JSON.parse(formData.get('addons') as string)
+        : [],
     };
 
-    // Validate using dashboard schema
-    const addonsSchema = createServiceSchema.pick({
-      addons: true,
-    });
-
-    const validationResult = addonsSchema.safeParse(rawData);
+    // Validate using addons schema
+    const validationResult = editServiceAddonsSchema.safeParse(rawData);
 
     if (!validationResult.success) {
       console.error('Addons validation errors:', validationResult.error);
       return {
         success: false,
-        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+        error:
+          'Validation failed: ' +
+          validationResult.error.issues.map((e) => e.message).join(', '),
       };
     }
 
@@ -737,7 +786,10 @@ export async function updateServiceAddonsAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update service addons',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to update service addons',
     };
   }
 }
@@ -764,18 +816,16 @@ export async function updateServiceFaqAction(
       faq: formData.get('faq') ? JSON.parse(formData.get('faq') as string) : [],
     };
 
-    // Validate using dashboard schema
-    const faqSchema = createServiceSchema.pick({
-      faq: true,
-    });
-
-    const validationResult = faqSchema.safeParse(rawData);
+    // Validate using FAQ schema
+    const validationResult = editServiceFaqSchema.safeParse(rawData);
 
     if (!validationResult.success) {
       console.error('FAQ validation errors:', validationResult.error);
       return {
         success: false,
-        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+        error:
+          'Validation failed: ' +
+          validationResult.error.issues.map((e) => e.message).join(', '),
       };
     }
 
@@ -788,7 +838,8 @@ export async function updateServiceFaqAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update service FAQ',
+      error:
+        error instanceof Error ? error.message : 'Failed to update service FAQ',
     };
   }
 }
@@ -870,7 +921,10 @@ export async function updateServiceMedia(
     console.error('Error updating service media:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update service media',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to update service media',
     };
   }
 }
@@ -941,11 +995,16 @@ export async function togglePublished(params: AdminToggleServiceInput) {
             title: updatedService.title,
             slug: updatedService.slug || '',
           },
-          { ...updatedService.profile.user, email: updatedService.profile.user.email || '' }
+          {
+            ...updatedService.profile.user,
+            email: updatedService.profile.user.email || '',
+          },
         );
-
       } catch (emailError) {
-        console.error('[Email] Failed to send service published notification:', emailError);
+        console.error(
+          '[Email] Failed to send service published notification:',
+          emailError,
+        );
         // Don't block the status update if email fails
       }
     }
@@ -966,7 +1025,9 @@ export async function togglePublished(params: AdminToggleServiceInput) {
     return {
       success: false,
       error:
-        error instanceof Error ? error.message : 'Failed to toggle published status',
+        error instanceof Error
+          ? error.message
+          : 'Failed to toggle published status',
     };
   }
 }
@@ -1034,7 +1095,9 @@ export async function toggleFeatured(params: AdminToggleServiceInput) {
     return {
       success: false,
       error:
-        error instanceof Error ? error.message : 'Failed to toggle featured status',
+        error instanceof Error
+          ? error.message
+          : 'Failed to toggle featured status',
     };
   }
 }
@@ -1108,11 +1171,16 @@ export async function updateServiceStatus(
             title: updatedService.title,
             slug: updatedService.slug || '',
           },
-          { ...updatedService.profile.user, email: updatedService.profile.user.email || '' }
+          {
+            ...updatedService.profile.user,
+            email: updatedService.profile.user.email || '',
+          },
         );
-
       } catch (emailError) {
-        console.error('[Email] Failed to send service published notification:', emailError);
+        console.error(
+          '[Email] Failed to send service published notification:',
+          emailError,
+        );
         // Don't block the status update if email fails
       }
     }
@@ -1133,7 +1201,9 @@ export async function updateServiceStatus(
     return {
       success: false,
       error:
-        error instanceof Error ? error.message : 'Failed to update service status',
+        error instanceof Error
+          ? error.message
+          : 'Failed to update service status',
     };
   }
 }
@@ -1199,7 +1269,8 @@ export async function deleteService(params: AdminDeleteServiceInput) {
     }
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to delete service',
+      error:
+        error instanceof Error ? error.message : 'Failed to delete service',
     };
   }
 }
@@ -1268,7 +1339,14 @@ export async function getServiceStats() {
 
     // Get service types, tags, and pricing data (need to query JSON field)
     const allServices = await prisma.service.findMany({
-      select: { type: true, tags: true, fixed: true, subscriptionType: true, duration: true, price: true },
+      select: {
+        type: true,
+        tags: true,
+        fixed: true,
+        subscriptionType: true,
+        duration: true,
+        price: true,
+      },
     });
 
     // Count service types by checking boolean flags
@@ -1333,12 +1411,18 @@ export async function getServiceStats() {
     });
 
     // Calculate averages
-    const averageDuration = durationCount > 0 ? Math.round(totalDuration / durationCount) : 0;
-    const averagePrice = priceCount > 0 ? Math.round(totalPrice / priceCount) : 0;
+    const averageDuration =
+      durationCount > 0 ? Math.round(totalDuration / durationCount) : 0;
+    const averagePrice =
+      priceCount > 0 ? Math.round(totalPrice / priceCount) : 0;
 
     // Get top tag
-    const topTagEntry = Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0];
-    const topTagRaw = topTagEntry ? { name: topTagEntry[0], count: topTagEntry[1] } : null;
+    const topTagEntry = Object.entries(tagCounts).sort(
+      (a, b) => b[1] - a[1],
+    )[0];
+    const topTagRaw = topTagEntry
+      ? { name: topTagEntry[0], count: topTagEntry[1] }
+      : null;
 
     // Resolve taxonomy labels
     // O(1) hierarchical lookups - context-aware resolution (avoids ID collisions)
@@ -1346,12 +1430,15 @@ export async function getServiceStats() {
     const subcategoryId = servicesBySubcategory[0]?.subcategory || null;
     const subdivisionId = servicesBySubdivision[0]?.subdivision || null;
 
-    const { category: categoryData, subcategory: subcategoryData, subdivision: subdivisionData } =
-      resolveServiceHierarchy(categoryId, subcategoryId, subdivisionId);
+    const {
+      category: categoryData,
+      subcategory: subcategoryData,
+      subdivision: subdivisionData,
+    } = resolveServiceHierarchy(categoryId, subcategoryId, subdivisionId);
 
     // Resolve tag label - O(1) optimized hash map lookups
     const topTagData = topTagRaw
-      ? (findTagById(topTagRaw.name) || findTagBySlug(topTagRaw.name))
+      ? findTagById(topTagRaw.name) || findTagBySlug(topTagRaw.name)
       : null;
     const topTag = topTagData
       ? { name: topTagData.label, count: topTagRaw.count }
@@ -1403,7 +1490,8 @@ export async function getServiceStats() {
     console.error('Error getting service stats:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to get service stats',
+      error:
+        error instanceof Error ? error.message : 'Failed to get service stats',
     };
   }
 }
@@ -1460,20 +1548,28 @@ export async function createServiceForProfile(
 
     // 4. Parse and validate service data
     const serviceData: Partial<CreateServiceInput> = {
-      type: formData.has('type') ? JSON.parse(formData.get('type') as string) : undefined,
+      type: formData.has('type')
+        ? JSON.parse(formData.get('type') as string)
+        : undefined,
       subscriptionType: (formData.get('subscriptionType') as any) || undefined,
       title: formData.get('title') as string,
       description: formData.get('description') as string,
       category: formData.get('category') as string,
       subcategory: formData.get('subcategory') as string,
       subdivision: formData.get('subdivision') as string,
-      tags: formData.has('tags') ? JSON.parse(formData.get('tags') as string) : [],
+      tags: formData.has('tags')
+        ? JSON.parse(formData.get('tags') as string)
+        : [],
       price: formData.has('price') ? Number(formData.get('price')) : 0,
       fixed: formData.get('fixed') === 'true',
       duration: formData.has('duration') ? Number(formData.get('duration')) : 0,
-      addons: formData.has('addons') ? JSON.parse(formData.get('addons') as string) : [],
+      addons: formData.has('addons')
+        ? JSON.parse(formData.get('addons') as string)
+        : [],
       faq: formData.has('faq') ? JSON.parse(formData.get('faq') as string) : [],
-      media: formData.has('media') ? JSON.parse(formData.get('media') as string) : [],
+      media: formData.has('media')
+        ? JSON.parse(formData.get('media') as string)
+        : [],
     };
 
     const validationResult = createServiceSchema.safeParse(serviceData);
@@ -1481,7 +1577,9 @@ export async function createServiceForProfile(
     if (!validationResult.success) {
       return {
         success: false,
-        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+        error:
+          'Validation failed: ' +
+          validationResult.error.issues.map((e) => e.message).join(', '),
       };
     }
 
@@ -1578,17 +1676,20 @@ export async function createServiceForProfile(
             email: profile.user.email,
             displayName: profile.user.displayName,
             username: profile.user.username,
-          }
+          },
         );
       } catch (emailError) {
-        console.error('[Email] Failed to send service published notification:', emailError);
+        console.error(
+          '[Email] Failed to send service published notification:',
+          emailError,
+        );
         // Don't block service creation if email fails
       }
     }
 
     return {
       success: true,
-      message: 'Service created and published successfully',
+      message: 'Service created successfully',
       data: {
         serviceId: createdService.id,
         serviceTitle: createdService.title,
@@ -1605,7 +1706,8 @@ export async function createServiceForProfile(
     }
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to create service',
+      error:
+        error instanceof Error ? error.message : 'Failed to create service',
     };
   }
 }

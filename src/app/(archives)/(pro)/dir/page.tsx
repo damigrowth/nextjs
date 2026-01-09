@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+// import type { Metadata } from 'next';
 import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
 import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
 import { getDirectoryMetadata } from '@/lib/seo/pages';
@@ -45,8 +45,15 @@ export default async function DirectoryPage({
     throw new Error(result.error || 'Failed to fetch profiles');
   }
 
-  const { profiles, total, taxonomyData, breadcrumbData, counties, filters, availableSubcategories } =
-    result.data;
+  const {
+    profiles,
+    total,
+    taxonomyData,
+    breadcrumbData,
+    counties,
+    filters,
+    availableSubcategories,
+  } = result.data;
 
   return (
     <ArchiveLayout

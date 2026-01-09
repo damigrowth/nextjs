@@ -2,13 +2,13 @@
 
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma/client';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import { findBySlug } from '@/lib/utils/datasets';
 import type { DatasetItem } from '@/lib/types/datasets';
 
 // O(1) optimized hash map lookups - 99% faster than findById utility
 import {
+  getServiceTaxonomies,
+  getProTaxonomies,
   resolveServiceHierarchy,
   findServiceBySlug,
   findProById,
@@ -230,6 +230,9 @@ export async function fetchEntity(
           };
         }
 
+        // Lazy-load service taxonomies for O(1) lookups
+        const serviceTaxonomies = getServiceTaxonomies();
+
         // Otherwise, find the subcategory by searching all categories
         for (const category of serviceTaxonomies) {
           if (category.children) {
@@ -279,6 +282,9 @@ export async function fetchEntity(
             },
           };
         }
+
+        // Lazy-load service taxonomies for O(1) lookups
+        const serviceTaxonomies = getServiceTaxonomies();
 
         // Otherwise, search all categories and subcategories
         for (const category of serviceTaxonomies) {

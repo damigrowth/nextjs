@@ -22,7 +22,7 @@ import {
   getRecentServices,
   type RecentService,
 } from '@/actions/services/get-recent-services';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 export function NavServices() {
   const pathname = usePathname();

@@ -2,16 +2,14 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ProfileCardProps } from '@/lib/types';
-import ProfileBadges from './profile-badges';
-import RatingDisplay from './rating-display';
+
 import SaveButton from './save-button';
 import UserAvatar from './user-avatar';
 import NextLink from './next-link';
+import ProfileBadges from './profile-badges';
+import RatingDisplay from './rating-display';
 
-export default function ProfileCard({
-  profile,
-  isSaved = false,
-}: ProfileCardProps) {
+export function ProfileCard({ profile, isSaved = false }: ProfileCardProps) {
   const {
     id,
     displayName,
@@ -39,7 +37,7 @@ export default function ProfileCard({
           <UserAvatar
             displayName={displayName}
             image={image}
-            size='xl'
+            size='md'
             className='h-20 w-20 rounded-2xl'
             showShadow={false}
             href={`/profile/${username}`}
@@ -52,9 +50,9 @@ export default function ProfileCard({
             href={`/profile/${username}`}
             className='hover:text-third transition-colors'
           >
-            <h5 className='font-bold text-lg text-dark hover:text-third transition-colors mb-0'>
+            <h3 className='font-bold text-lg text-dark hover:text-third transition-colors mb-0'>
               {displayName}
-            </h5>
+            </h3>
           </NextLink>
           <ProfileBadges verified={verified} topLevel={top} />
         </div>

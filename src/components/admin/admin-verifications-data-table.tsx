@@ -21,7 +21,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { NextLink, UserAvatar } from '@/components/shared';
+import { NextLink } from '@/components';
+import UserAvatar from '@/components/shared/user-avatar';
 import { ArrowUpDown, Edit, Copy, Check } from 'lucide-react';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { cn } from '@/lib/utils';

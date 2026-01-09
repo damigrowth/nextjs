@@ -1,5 +1,5 @@
 import React from 'react';
-import { MediaGallery } from '@/components';
+import MediaGallery from '@/components/shared/media-gallery';
 
 type ProfilePortfolioProps = {
   portfolio?: PrismaJson.Portfolio | null;

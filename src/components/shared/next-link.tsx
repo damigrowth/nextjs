@@ -43,7 +43,7 @@ type NextLinkCustomProps = Omit<NextLinkProps, 'prefetch'> &
  *
  * @example
  * ```tsx
- * import { NextLink } from '@/components/shared';
+ * import { NextLink } from '@/components';
  *
  * // Default: no prefetching
  * <NextLink href="/profile/123">View Profile</NextLink>

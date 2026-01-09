@@ -1,4 +1,4 @@
-import { TaxonomyEditPage } from '@/components/admin';
+import { TaxonomyEditPage } from '@/components/admin/taxonomy-edit-page';
 import { EditSkillForm } from '@/components/admin/forms/edit-skill-form';
 import { skills } from '@/constants/datasets/skills';
 import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';

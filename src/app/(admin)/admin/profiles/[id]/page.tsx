@@ -4,6 +4,7 @@ import { redirect, notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { NextLink } from '@/components';
 import {
   AccountForm,
   BasicInfoForm,
@@ -12,11 +13,14 @@ import {
   PortfolioForm,
   CoverageForm,
   BillingForm,
-  NextLink,
-} from '@/components';
+} from '@/components/forms';
 import { Badge } from '@/components/ui/badge';
-import { SiteHeader } from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
 import { EditProfileSettingsForm } from '@/components/admin/forms/edit-profile-settings-form';
+import { getProTaxonomies } from '@/lib/taxonomies';
+import { skills as skillsDataset } from '@/constants/datasets/skills';
+import { locationOptions } from '@/constants/datasets/locations';
+import type { DatasetOption, DatasetWithCategory } from '@/lib/types/datasets';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,6 +53,9 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
   }
 
   const profile = profileResult.data as any;
+
+  // Prepare taxonomy data server-side to prevent client-side bundle bloat
+  const proTaxonomies = getProTaxonomies();
 
   // Create a mock user object for the forms (they expect AuthUser)
   const mockUser = {
@@ -304,6 +311,8 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                     <BasicInfoForm
                       initialUser={mockUser as any}
                       initialProfile={profile}
+                      proTaxonomies={proTaxonomies as DatasetOption[]}
+                      skillsDataset={skillsDataset as DatasetWithCategory[]}
                       adminMode={true}
                       hideCard={true}
                     />
@@ -319,6 +328,7 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                     <CoverageForm
                       initialUser={mockUser as any}
                       initialProfile={profile}
+                      locationOptions={locationOptions}
                       adminMode={true}
                       hideCard={true}
                     />

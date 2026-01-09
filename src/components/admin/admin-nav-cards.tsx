@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 const navItems = [
   {

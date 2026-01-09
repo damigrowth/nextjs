@@ -1,10 +1,8 @@
 import { Suspense } from 'react';
-import {
-  AdminUsersFilters,
-  AdminUsersTableSkeleton,
-  AdminUsersTableSection,
-  SiteHeader,
-} from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
+import { AdminUsersFilters } from '@/components/admin/admin-users-filters';
+import { AdminUsersTableSkeleton } from '@/components/admin/admin-users-table-skeleton';
+import { AdminUsersTableSection } from '@/components/admin/admin-users-table-section';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, UserPlus } from 'lucide-react';
 import { NextLink } from '@/components';

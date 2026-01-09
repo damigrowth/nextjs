@@ -20,7 +20,7 @@ import {
   Layers,
   BookmarkIcon,
 } from 'lucide-react';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 interface QuickCreateDialogProps {
   open: boolean;

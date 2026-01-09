@@ -1,9 +1,7 @@
-import {
-  AdminUsersStats,
-  AdminProfilesStats,
-  AdminServicesStats,
-  SiteHeader,
-} from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
+import { AdminUsersStats } from '@/components/admin/admin-users-stats';
+import { AdminProfilesStats } from '@/components/admin/admin-profiles-stats';
+import { AdminServicesStats } from '@/components/admin/admin-services-stats';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Force dynamic rendering for admin pages

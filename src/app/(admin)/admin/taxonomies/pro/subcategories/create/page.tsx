@@ -1,4 +1,5 @@
-import { TaxonomyCreatePage, CreateProTaxonomyForm } from '@/components/admin';
+import { TaxonomyCreatePage } from '@/components/admin/taxonomy-create-page';
+import { CreateProTaxonomyForm } from '@/components/admin/forms/create-pro-taxonomy-form';
 import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 
 export const dynamic = 'force-dynamic';

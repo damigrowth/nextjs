@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 
@@ -28,19 +28,13 @@ import { HelpCircle, Package, ChevronRight, Info } from 'lucide-react';
 import { Currency } from '@/components/ui/currency';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { Badge } from '@/components/ui/badge';
-import { FormButton } from '@/components/shared';
+import FormButton from '@/components/shared/button-form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AddonFields } from '@/components/shared';
-import { FaqFields } from '@/components/shared';
 
 // Static constants and dataset utilities
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-import { tags } from '@/constants/datasets/tags';
 import { populateFormData } from '@/lib/utils/form';
-import { getAllSubdivisions } from '@/lib/utils/datasets';
-
-// O(1) optimized hash map lookups - 99% faster than findById utility
-import { findServiceById } from '@/lib/taxonomies';
+import { findById } from '@/lib/utils/datasets';
+import type { DatasetItem } from '@/lib/types/datasets';
 
 // Validation schema and server action
 import {
@@ -57,6 +51,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { AddonFields } from '@/components/shared/addon-fields';
+import { FaqFields } from '@/components/shared/faq-fields';
 
 const initialState = {
   success: false,
@@ -78,12 +74,24 @@ interface FormServiceEditProps {
   service: ServiceWithProfile;
   initialUser: AuthUser | null;
   initialProfile: Profile | null;
+  serviceTaxonomies: DatasetItem[];
+  allSubdivisions: Array<{
+    id: string;
+    label: string;
+    subdivision: any;
+    subcategory: any;
+    category: any;
+  }>;
+  availableTags: Array<{ value: string; label: string }>;
 }
 
 export default function FormServiceEdit({
   service,
   initialUser,
   initialProfile,
+  serviceTaxonomies,
+  allSubdivisions,
+  availableTags,
 }: FormServiceEditProps) {
   const [state, action, isPending] = useActionState(
     async (prevState: any, formData: FormData) => {
@@ -191,31 +199,16 @@ export default function FormServiceEdit({
   const addons = watch('addons') || [];
   const faq = watch('faq') || [];
 
-  // Create flat list of all subdivisions for LazyCombobox
-  const allSubdivisions = React.useMemo(() => {
-    const subdivisions = getAllSubdivisions(serviceTaxonomies);
-    return subdivisions.map((subdivision) => ({
-      id: subdivision.id,
-      label: `${subdivision.label}`,
-      subdivision: subdivision,
-      subcategory: subdivision.subcategory,
-      category: subdivision.category,
-    }));
-  }, []);
+  // allSubdivisions now passed as prop from server-side (no need for useMemo)
 
-  // Get filtered data based on selections - O(1) hash map lookups
-  const selectedCategoryData = findServiceById(watchedCategory);
+  // Get filtered data based on selections
+  const selectedCategoryData = findById(serviceTaxonomies, watchedCategory);
   const subcategories = selectedCategoryData?.children || [];
-  const selectedSubcategoryData = findServiceById(watchedSubcategory);
+  const selectedSubcategoryData = findById(serviceTaxonomies, watchedSubcategory);
   const subdivisions = selectedSubcategoryData?.children || [];
 
-  // Generate tags from tags dataset for MultiSelect
-  const availableTags = React.useMemo(() => {
-    return tags.map((tag) => ({
-      value: tag.id,
-      label: tag.label,
-    }));
-  }, []);
+  // availableTags now passed as prop from server-side
+  // No need for useMemo since it's already prepared
 
   // Selection handlers - store only ID values
   const handleCategorySelect = (selected: any) => {

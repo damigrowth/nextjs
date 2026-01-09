@@ -135,7 +135,6 @@ const MediaUploadSimple = forwardRef<MediaUploadRef, MediaUploadProps>((props, r
       }
 
     } catch (error) {
-      console.error('Upload failed:', error);
       setUploadError(error instanceof Error ? error.message : 'Upload failed');
     } finally {
       setIsUploading(false);

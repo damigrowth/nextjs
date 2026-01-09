@@ -34,6 +34,7 @@ export const CHAT_LIST_SELECT = {
           displayName: true,
           firstName: true,
           lastName: true,
+          username: true,
           image: true,
         },
       },

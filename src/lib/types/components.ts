@@ -113,6 +113,13 @@ export interface ProfileImageUploadProps {
   maxFileSize: number;
   formats: string[];
   className?: string;
+  // Widget mode props
+  useWidget?: boolean;
+  folder?: string;
+  uploadPreset?: string;
+  signed?: boolean;
+  signatureEndpoint?: string;
+  onDirectUpload?: (resource: import('./cloudinary').CloudinaryResource) => void;
 }
 
 export interface GalleryUploadProps {

@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { SiteHeader, AdminVerificationActions } from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
+import { AdminVerificationActions } from '@/components/admin/admin-verification-actions';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { NextLink } from '@/components';
 

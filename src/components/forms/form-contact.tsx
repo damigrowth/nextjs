@@ -22,7 +22,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 
 // Custom components
-import { FormButton } from '@/components/shared';
+import FormButton from '@/components/shared/button-form';
 
 // Utilities
 import { populateFormData } from '@/lib/utils/form';

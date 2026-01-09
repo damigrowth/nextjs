@@ -115,7 +115,7 @@ export const UNREAD_MESSAGES_HTML = (data: UnreadMessagesData): string => {
                   Γεια σου ${data.userName}!
                 </p>
                 <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif; color: #333;">
-                  Έχεις <strong>${data.unreadCount === 1 ? '1 αδιάβαστο μήνυμα' : `${data.unreadCount} αδιάβαστα μηνύματα`}</strong> από τα τελευταία 15 λεπτά.
+                  Έλαβες <strong>${data.unreadCount === 1 ? '1 μήνυμα' : `${data.unreadCount} μηνύματα`}</strong> τα τελευταία λεπτά.
                 </p>
               </td>
             </tr>

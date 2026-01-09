@@ -20,7 +20,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 export function NavMain({
   items,

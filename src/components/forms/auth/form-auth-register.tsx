@@ -50,7 +50,7 @@ import {
   cutSpaces,
   formatDisplayName,
 } from '@/lib/utils/validation/formats';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import GoogleLoginButton from './button-login-goolge';
 
 const consentOptions = [
@@ -161,7 +161,8 @@ export default function RegisterForm() {
       // Validate that user has selected a type
       if (type !== 'user' && type !== 'pro') {
         setError('root', {
-          message: 'Παρακαλώ επιλέξτε τύπο λογαριασμού (Χρήστης ή Επαγγελματίας)',
+          message:
+            'Παρακαλώ επιλέξτε τύπο λογαριασμού (Χρήστης ή Επαγγελματίας)',
         });
         return;
       }

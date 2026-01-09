@@ -70,6 +70,8 @@ export interface UserServiceTableData {
   media: any;
   createdAt: Date;
   updatedAt: Date;
+  refreshedAt: Date | null;
+  sortDate: Date;
 }
 
 export interface UserServicesResponse {

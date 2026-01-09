@@ -162,7 +162,7 @@ export async function createItem(
       const uniqueSlug = generateUniqueSlug(data.slug!, currentItems);
 
       const newId = getNextId(currentItems);
-      const newItem = { id: newId, ...data, slug: uniqueSlug };
+      const newItem = { id: newId, ...data, slug: uniqueSlug } as DatasetItem;
 
       // Normalize property order before staging
       const normalizedItem = normalizeItemProperties(newItem);
@@ -520,7 +520,7 @@ export async function createHierarchicalItem(
         throw new Error(`A ${config.typeName} with ID "${newId}" already exists`);
       }
 
-      const newItem = { id: newId, ...data.item, slug: uniqueSlug };
+      const newItem = { id: newId, ...data.item, slug: uniqueSlug } as DatasetItem;
 
       // Stage the change in database with hierarchy info
       const { createStagedChange } = await import('./taxonomy-staging');

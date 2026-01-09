@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import NextLink from './next-link';
+import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 
 type ContentData = {
   heading: string;
@@ -26,7 +27,9 @@ export default function ContentHero({ data }: Props) {
         <div className='flex flex-col md:flex-row items-center'>
           <div className='w-full md:w-1/2 mb-8 sm:mb-8'>
             <Image
-              src={data.image}
+              src={
+                getOptimizedImageUrl(data.image, 'cardLarge') || data.image
+              }
               alt='content hero'
               width={600}
               height={400}

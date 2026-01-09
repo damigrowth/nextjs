@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 
-import { FormButton } from '@/components/shared';
+import FormButton from '@/components/shared/button-form';
 import { Form } from '@/components/ui/form';
 import {
   Card,
@@ -32,12 +32,12 @@ import { useToast } from '@/lib/hooks/ui/use-toast';
 
 // Validation schemas
 import {
-  createServiceSchema,
+  adminServiceValidationSchema,
   presenceOnlineSchema,
   onbaseOnsiteSchema,
   oneoffSubscriptionSchema,
   serviceDetailsSchema,
-  addonsAndFaqSchema,
+  adminAddonsAndFaqSchema,
   serviceMediaUploadSchema,
   type CreateServiceInput,
 } from '@/lib/validations/service';
@@ -54,6 +54,7 @@ import {
   AddonsFaqStep,
   MediaStep,
 } from '@/components/forms/service/steps';
+import { TaxonomyDataContext } from '@/components/forms/service/form-service-create';
 import { ServerSearchCombobox } from '@/components/ui/server-search-combobox';
 import { searchProfilesForSelection } from '@/actions/admin/profiles';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -74,6 +75,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import type { DatasetItem } from '@/lib/types/datasets';
 
 const STEPS = [
   {
@@ -114,7 +116,7 @@ const STEP_SCHEMAS = {
   2: presenceOnlineSchema,
   3: onbaseOnsiteSchema.or(oneoffSubscriptionSchema),
   4: serviceDetailsSchema,
-  5: addonsAndFaqSchema,
+  5: adminAddonsAndFaqSchema,
   6: serviceMediaUploadSchema,
 } as const;
 
@@ -133,7 +135,23 @@ interface Profile {
   };
 }
 
-export function AdminCreateServiceForm() {
+interface AdminCreateServiceFormProps {
+  serviceTaxonomies: DatasetItem[];
+  allSubdivisions: Array<{
+    id: string;
+    label: string;
+    subdivision: any;
+    subcategory: any;
+    category: any;
+  }>;
+  availableTags: Array<{ value: string; label: string }>;
+}
+
+export function AdminCreateServiceForm({
+  serviceTaxonomies,
+  allSubdivisions,
+  availableTags,
+}: AdminCreateServiceFormProps) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -158,7 +176,7 @@ export function AdminCreateServiceForm() {
 
   // Initialize form with react-hook-form and zod
   const form = useForm<CreateServiceInput>({
-    resolver: zodResolver(createServiceSchema),
+    resolver: zodResolver(adminServiceValidationSchema),
     mode: 'onChange',
     defaultValues: {
       type: {
@@ -570,9 +588,12 @@ export function AdminCreateServiceForm() {
   };
 
   return (
-    <div className='mx-auto w-full max-w-5xl space-y-6'>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-6'>
+    <TaxonomyDataContext.Provider
+      value={{ serviceTaxonomies, allSubdivisions, availableTags }}
+    >
+      <div className='mx-auto w-full max-w-5xl space-y-6'>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-6'>
           {/* Header with Action Icons (dashboard pattern) */}
           <div className='flex items-center justify-between mb-4'>
             <div>
@@ -781,11 +802,11 @@ export function AdminCreateServiceForm() {
               </Button>
             )}
           </div>
-        </form>
-      </Form>
+          </form>
+        </Form>
 
-      {/* Reset Dialog */}
-      <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        {/* Reset Dialog */}
+        <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Καθαρισμός Φόρμας;</AlertDialogTitle>
@@ -840,6 +861,7 @@ export function AdminCreateServiceForm() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </div>
+    </TaxonomyDataContext.Provider>
   );
 }

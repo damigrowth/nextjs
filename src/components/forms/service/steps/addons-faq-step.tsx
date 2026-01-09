@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react';
 // Custom components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AddonFields, FaqFields } from '@/components/shared';
 
 // Icons
 import { HelpCircle, Package } from 'lucide-react';
@@ -15,6 +14,8 @@ import { useFormContext, useWatch } from 'react-hook-form';
 
 // Types
 import type { CreateServiceInput } from '@/lib/validations/service';
+import { AddonFields } from '@/components/shared/addon-fields';
+import { FaqFields } from '@/components/shared/faq-fields';
 
 export default function AddonsFaqStep() {
   const form = useFormContext<CreateServiceInput>();

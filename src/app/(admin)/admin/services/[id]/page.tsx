@@ -2,7 +2,7 @@ import { getCurrentUser } from '@/actions/auth/server';
 import { getService } from '@/actions/admin/services';
 import { redirect, notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Eye, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Eye, ExternalLink, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -14,9 +14,12 @@ import {
   EditServiceFaqForm,
   EditServiceMediaForm,
 } from '@/components/admin/forms';
-import { SiteHeader } from '@/components/admin';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import { FormServiceDelete } from '@/components/forms/service/form-service-delete';
+import { SiteHeader } from '@/components/admin/site-header';
+import { getServiceTaxonomies } from '@/lib/taxonomies';
+import { tags } from '@/constants/datasets/tags';
 import { NextLink } from '@/components';
+import { formatServiceType } from '@/lib/utils/service';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,6 +57,13 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
   }
 
   const service = serviceResult.data as any;
+
+  // Prepare taxonomy data server-side to prevent client-side bundle bloat
+  const serviceTaxonomies = getServiceTaxonomies();
+  const availableTags = tags.map((tag) => ({
+    value: tag.id,
+    label: tag.label,
+  }));
 
   // Resolve taxonomy labels
   const categoryData = serviceTaxonomies.find(
@@ -99,8 +109,14 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
             </Button>
             <Button variant='outline' size='sm' asChild>
               <NextLink href={`/admin/profiles/${service.profile.id}`}>
+                <User className='h-4 w-4' />
+                Edit Profile
+              </NextLink>
+            </Button>
+            <Button variant='outline' size='sm' asChild>
+              <NextLink href={`/profile/${service.profile.username}`}>
                 <ExternalLink className='h-4 w-4' />
-                Profile
+                View Profile
               </NextLink>
             </Button>
             <Button variant='outline' size='sm' asChild>
@@ -124,13 +140,25 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                     Πληροφορίες Υπηρεσίας
                   </CardTitle>
                 </CardHeader>
-                <CardContent className='p-0'>
+                <CardContent className='px-0'>
                   <div className='divide-y'>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
                         Service ID
                       </span>
                       <span className='text-xs font-mono'>{service.id}</span>
+                    </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Profile
+                      </span>
+                      <NextLink
+                        href={`/profile/${service.profile.username}`}
+                        className='flex items-center gap-1.5 text-xs font-medium hover:underline'
+                      >
+                        <ExternalLink className='h-3 w-3' />
+                        {service.profile.displayName}
+                      </NextLink>
                     </div>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
@@ -167,7 +195,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                 <CardHeader className='pb-3'>
                   <CardTitle className='text-sm'>Status & Flags</CardTitle>
                 </CardHeader>
-                <CardContent className='p-0'>
+                <CardContent className='px-0'>
                   <div className='divide-y'>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
@@ -219,6 +247,14 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                           : 'No'}
                       </Badge>
                     </div>
+                    <div className='flex items-center justify-between px-6 py-2'>
+                      <span className='text-xs text-muted-foreground'>
+                        Type
+                      </span>
+                      <span className='text-xs font-medium'>
+                        {formatServiceType(service.type).join(', ')}
+                      </span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -228,7 +264,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                 <CardHeader className='pb-3'>
                   <CardTitle className='text-sm'>Pricing & Duration</CardTitle>
                 </CardHeader>
-                <CardContent className='p-0'>
+                <CardContent className='px-0'>
                   <div className='divide-y'>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
@@ -271,7 +307,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                 <CardHeader className='pb-3'>
                   <CardTitle className='text-sm'>Activity & Stats</CardTitle>
                 </CardHeader>
-                <CardContent className='p-0'>
+                <CardContent className='px-0'>
                   <div className='divide-y'>
                     <div className='flex items-center justify-between px-6 py-2'>
                       <span className='text-xs text-muted-foreground'>
@@ -340,7 +376,11 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                     <CardTitle className='text-lg'>Κατηγορία & Tags</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <EditServiceTaxonomyForm service={service} />
+                    <EditServiceTaxonomyForm
+                      service={service}
+                      serviceTaxonomies={serviceTaxonomies}
+                      availableTags={availableTags}
+                    />
                   </CardContent>
                 </Card>
 
@@ -381,6 +421,9 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                     <EditServiceMediaForm service={service} />
                   </CardContent>
                 </Card>
+
+                {/* Delete Service Section */}
+                <FormServiceDelete service={service} isAdmin />
               </div>
             </div>
           </div>

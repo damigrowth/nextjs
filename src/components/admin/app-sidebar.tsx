@@ -14,7 +14,9 @@ import {
   GitBranchIcon,
 } from 'lucide-react';
 
-import { AdminNavMain, AdminNavUser, NextLink } from '@/components';
+import { NextLink } from '@/components';
+import { NavMain } from '@/components/admin/nav-main';
+import { NavUser } from '@/components/admin/nav-user';
 
 import {
   Sidebar,
@@ -157,10 +159,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <AdminNavMain items={data.navMain} />
+        <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <AdminNavUser user={user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   );

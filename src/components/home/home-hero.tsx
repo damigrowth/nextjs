@@ -1,20 +1,12 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import dynamic from 'next/dynamic';
 import { Star, Rocket, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { HomeSearch } from './home-search';
+import HeroImageGallery from './home-hero-gallery';
 import type { DatasetItem } from '@/lib/types/datasets';
-import { NextLink } from '../shared';
-
-// Lazy load carousel to reduce initial bundle size
-const HeroImageGallery = dynamic(() => import('./home-hero-gallery'), {
-  ssr: false,
-  loading: () => (
-    <div className='w-full max-w-3xl lg:max-w-4xl mt-6 md:mt-10 min-h-[200px] sm:min-h-[240px] md:min-h-[280px]' />
-  ),
-});
+import { NextLink } from '@/components';
 
 // Static content that renders immediately for better LCP
 function StaticHeroContent() {
@@ -49,7 +41,7 @@ function StaticHeroContent() {
       </div>
 
       {/* Main Heading - Critical for LCP */}
-      <h1 className='text-[clamp(1.4rem,4.5vw,2.2rem)] font-bold leading-[1.2] text-black mb-[25px] block font-sans [font-display:swap] [contain:layout_style_paint] [will-change:auto] opacity-100 visible [transform:none]'>
+      <h1 className='text-[clamp(1.4rem,4.5vw,2.2rem)] font-bold leading-[1.2] text-black mb-[25px] block font-sans opacity-100 visible'>
         Οι καλύτερες υπηρεσίες στην οθόνη σου.
       </h1>
 
@@ -110,19 +102,20 @@ export default function HeroHome({ popularSubcategories = [] }: HeroHomeProps) {
       <div className='container mx-auto pt-8 md:pt-10 pb-6 sm:pb-7 md:pb-8 px-4 sm:px-6'>
         <div className='flex flex-col'>
           <div className='max-w-6xl mx-auto'>
-            {/* Hero Content */}
+            {/* Hero Content - Critical for LCP */}
             <StaticHeroContent />
 
             {/* Search Bar */}
             <div className='w-full max-w-3xl lg:max-w-4xl mt-2'>
               <Suspense
                 fallback={
-                  <div className='h-14 flex items-center'>
+                  <div className='h-14 flex items-center' aria-label='Φόρτωση αναζήτησης'>
                     <div
                       className='inline-block w-4 h-4 mr-2 border-2 border-current border-r-transparent rounded-full animate-spin'
                       role='status'
+                      aria-hidden='true'
                     />
-                    <span>Φόρτωση...</span>
+                    <span className='sr-only'>Φόρτωση...</span>
                   </div>
                 }
               >
@@ -130,15 +123,15 @@ export default function HeroHome({ popularSubcategories = [] }: HeroHomeProps) {
               </Suspense>
             </div>
 
-            {/* Popular Searches */}
+            {/* Popular Searches - Deferred for better performance */}
             <div className='w-full mt-8'>
-              <Suspense fallback={null}>
+              <Suspense fallback={<div className='min-h-[60px]' />}>
                 <PopularSearches subcategories={popularSubcategories} />
               </Suspense>
             </div>
           </div>
 
-          {/* Image Gallery */}
+          {/* Image Gallery - Critical for LCP on desktop */}
           <HeroImageGallery />
         </div>
       </div>

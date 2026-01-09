@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { SiteHeader } from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
 import { DeploymentManager } from '@/components/admin/deployment/deployment-manager';
 import { DeploymentSkeleton } from '@/components/admin/deployment/deployment-skeleton';
 

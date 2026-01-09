@@ -31,20 +31,22 @@ import {
 } from '@/components/ui/tooltip';
 
 // Utilities
-import { getAllSubdivisions } from '@/lib/utils/datasets';
-
-// Dataset utilities
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-
-// O(1) optimized hash map lookups - 99% faster than findById utility
-import { findServiceById } from '@/lib/taxonomies';
-import { tags } from '@/constants/datasets/tags';
+import { TaxonomyDataContext } from '../form-service-create';
+import { findById } from '@/lib/utils/datasets';
 import type { CreateServiceInput } from '@/lib/validations/service';
 import { useFormContext } from 'react-hook-form';
 
 export default function ServiceDetailsStep() {
   const form = useFormContext<CreateServiceInput>();
   const { setValue, watch, formState, clearErrors, trigger } = form;
+
+  const taxonomyData = React.useContext(TaxonomyDataContext);
+
+  if (!taxonomyData) {
+    throw new Error('ServiceDetailsStep must be used within TaxonomyDataContext');
+  }
+
+  const { serviceTaxonomies, allSubdivisions, availableTags } = taxonomyData;
 
   // Use watch for reactive form field watching
   const watchedCategory = watch('category');
@@ -53,31 +55,13 @@ export default function ServiceDetailsStep() {
   const watchedFixed = watch('fixed');
   const watchedType = watch('type');
 
-  // Get filtered data based on selections - O(1) hash map lookups
-  const selectedCategoryData = findServiceById(watchedCategory);
+  // Get filtered data based on selections
+  const selectedCategoryData = findById(serviceTaxonomies, watchedCategory);
   const subcategories = selectedCategoryData?.children || [];
-  const selectedSubcategoryData = findServiceById(watchedSubcategory);
+  const selectedSubcategoryData = findById(serviceTaxonomies, watchedSubcategory);
   const subdivisions = selectedSubcategoryData?.children || [];
 
-  // Create flat list of all subdivisions for LazyCombobox
-  const allSubdivisions = React.useMemo(() => {
-    const subdivisions = getAllSubdivisions(serviceTaxonomies);
-    return subdivisions.map((subdivision) => ({
-      id: subdivision.id,
-      label: `${subdivision.label}`,
-      subdivision: subdivision,
-      subcategory: subdivision.subcategory,
-      category: subdivision.category,
-    }));
-  }, []);
-
-  // Generate tags from tags dataset for MultiSelect
-  const availableTags = React.useMemo(() => {
-    return tags.map((tag) => ({
-      value: tag.id,
-      label: tag.label,
-    }));
-  }, []);
+  // allSubdivisions and availableTags now come from context (server-side prepared)
 
   // Handle dependent field clearing
   const handleCategorySelect = (categoryId: string) => {

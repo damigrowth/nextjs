@@ -2,10 +2,10 @@
 
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 // O(1) optimized taxonomy lookups - 99% faster than findById
 import {
+  getServiceTaxonomies,
+  getProTaxonomies,
   findServiceById,
   findProById,
   findServiceBySlug,
@@ -105,6 +105,10 @@ export interface HomePageData {
 // Internal uncached function for home page data
 async function getHomePageDataUncached(): Promise<ActionResult<HomePageData>> {
   try {
+    // Lazy-load taxonomies for O(1) lookups
+    const serviceTaxonomies = getServiceTaxonomies();
+    const proTaxonomies = getProTaxonomies();
+
     // OPTIMIZATION: Parallel fetch with minimal SELECT constants (60-70% less data transfer)
     const [
       servicesResult,

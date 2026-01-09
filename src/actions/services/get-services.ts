@@ -10,6 +10,7 @@ import {
   resolveServiceHierarchy,
   findLocationBySlugOrName,
 } from '@/lib/taxonomies';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 // Complex utilities - KEEP for hierarchy resolution, breadcrumbs, coverage transformation, and nested children lookups
 import {
   findById, // Generic utility for nested children lookups and tags (not yet optimized)
@@ -24,7 +25,6 @@ import {
   findSubdivisionBySlug,
 } from '@/lib/utils/datasets';
 import { locationOptions } from '@/constants/datasets/locations';
-import { normalizeTerm } from '@/lib/utils/text/normalize';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
 import { ServiceCacheKeys } from '@/lib/cache/keys';
@@ -56,6 +56,34 @@ export type ServiceFilters = Partial<
   limit?: number;
   sortBy?: ArchiveSortBy;
 };
+
+/**
+ * Build Prisma where clause for county coverage filtering
+ * Checks both coverage.county (single) and coverage.counties (array)
+ * Reusable function to avoid query duplication across multiple filter scenarios
+ */
+function buildCountyCoverageFilter(countyId: string) {
+  return {
+    OR: [
+      {
+        profile: {
+          coverage: {
+            path: ['county'],
+            equals: countyId,
+          },
+        },
+      },
+      {
+        profile: {
+          coverage: {
+            path: ['counties'],
+            array_contains: countyId,
+          },
+        },
+      },
+    ],
+  };
+}
 
 // Helper function to resolve category labels using the reusable utility
 function resolveCategoryLabels(
@@ -380,76 +408,122 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
 
     // Add search filter for title, description, and tags using normalized fields
     // This provides accent-insensitive search for Greek text
+    // IMPORTANT: Skip text search if the search term matches a location name
     if (filters.search) {
       const searchTerm = filters.search.trim();
       if (searchTerm.length >= 2) {
         // Normalize search term to handle Greek accents (ά → α, etc.)
         const normalizedSearch = normalizeTerm(searchTerm);
 
-        // Find matching tags by searching in tag labels
-        const matchingTags = tags.filter((tag) => {
-          const normalizedLabel = normalizeTerm(tag.label);
-          return normalizedLabel
-            .toLowerCase()
-            .includes(normalizedSearch.toLowerCase());
-        });
-        const matchingTagIds = matchingTags.map((tag) => tag.id);
+        // Check if search term is a location - if so, skip text search
+        // User intent when searching for a location is to filter by that location, not find mentions of it
+        const isLocationSearch = findLocationBySlugOrName(normalizedSearch);
 
-        whereClause.OR = whereClause.OR || [];
-        const searchConditions: Array<
-          | { titleNormalized: { contains: string; mode: 'insensitive' } }
-          | { descriptionNormalized: { contains: string; mode: 'insensitive' } }
-          | { title: { contains: string; mode: 'insensitive' } }
-          | { description: { contains: string; mode: 'insensitive' } }
-          | { tags: { hasSome: string[] } }
-        > = [
-          // Search in normalized fields (for services with proper normalized data)
-          {
-            titleNormalized: {
-              contains: normalizedSearch,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            descriptionNormalized: {
-              contains: normalizedSearch,
-              mode: 'insensitive' as const,
-            },
-          },
-          // Fallback: Also search in original fields for services without normalized data
-          {
-            title: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            description: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-        ];
-
-        // Add tag search condition if matching tags found
-        if (matchingTagIds.length > 0) {
-          searchConditions.push({
-            tags: {
-              hasSome: matchingTagIds,
-            },
+        // Only create text search if NOT searching for a location
+        if (!isLocationSearch) {
+          // Find matching tags by searching in tag labels
+          const matchingTags = tags.filter((tag) => {
+            const normalizedLabel = normalizeTerm(tag.label);
+            return normalizedLabel
+              .toLowerCase()
+              .includes(normalizedSearch.toLowerCase());
           });
+          const matchingTagIds = matchingTags.map((tag) => tag.id);
+
+          whereClause.OR = whereClause.OR || [];
+          const searchConditions: Array<
+            | { titleNormalized: { contains: string; mode: 'insensitive' } }
+            | { descriptionNormalized: { contains: string; mode: 'insensitive' } }
+            | { title: { contains: string; mode: 'insensitive' } }
+            | { description: { contains: string; mode: 'insensitive' } }
+            | { tags: { hasSome: string[] } }
+          > = [
+            // Search in normalized fields (for services with proper normalized data)
+            {
+              titleNormalized: {
+                contains: normalizedSearch,
+                mode: 'insensitive' as const,
+              },
+            },
+            {
+              descriptionNormalized: {
+                contains: normalizedSearch,
+                mode: 'insensitive' as const,
+              },
+            },
+            // Fallback: Also search in original fields for services without normalized data
+            {
+              title: {
+                contains: searchTerm,
+                mode: 'insensitive' as const,
+              },
+            },
+            {
+              description: {
+                contains: searchTerm,
+                mode: 'insensitive' as const,
+              },
+            },
+          ];
+
+          // Add tag search condition if matching tags found
+          if (matchingTagIds.length > 0) {
+            searchConditions.push({
+              tags: {
+                hasSome: matchingTagIds,
+              },
+            });
+          }
+
+          // If there's already an OR clause (from filters), combine them with AND
+          if (whereClause.OR.length > 0) {
+            const existingOR = whereClause.OR;
+            whereClause.AND = whereClause.AND || [];
+            whereClause.AND.push({
+              OR: searchConditions,
+            });
+            whereClause.OR = existingOR;
+          } else {
+            whereClause.OR = searchConditions;
+          }
         }
+      }
+    }
 
-        // If there's already an OR clause (from filters), combine them with AND
-        if (whereClause.OR.length > 0) {
-          const existingOR = whereClause.OR;
-          whereClause.AND = whereClause.AND || [];
-          whereClause.AND.push({
-            OR: searchConditions,
-          });
-          whereClause.OR = existingOR;
-        } else {
-          whereClause.OR = searchConditions;
+    // Add automatic location detection from search query
+    // Only applies if no explicit county filter is already set
+    if (filters.search && !filters.county) {
+      const searchTerm = filters.search.trim();
+      if (searchTerm.length >= 2) {
+        const normalizedSearch = normalizeTerm(searchTerm);
+
+        // Try to find a location match using normalized search term
+        // This handles both slugs and Greek names with/without accents
+        const locationMatch = findLocationBySlugOrName(normalizedSearch);
+
+        if (locationMatch) {
+          // Determine if matched location is a county or area
+          const isCounty = locationOptions.some(c => c.id === locationMatch.id);
+
+          let countyId: string | undefined;
+          if (isCounty) {
+            // Direct county match
+            countyId = locationMatch.id;
+          } else {
+            // Area match - find parent county
+            const parentCounty = locationOptions.find(county =>
+              county.children?.some(area => area.id === locationMatch.id)
+            );
+            if (parentCounty) {
+              countyId = parentCounty.id;
+            }
+          }
+
+          // Apply county filter using reusable helper function
+          if (countyId) {
+            whereClause.AND = whereClause.AND || [];
+            whereClause.AND.push(buildCountyCoverageFilter(countyId));
+          }
         }
       }
     }
@@ -470,31 +544,10 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
               equals: true,
             },
           },
-          // County-based services (onbase OR onsite) - check both county and counties array
+          // County-based services (onbase OR onsite) with county coverage filter
           {
             AND: [
-              {
-                OR: [
-                  // Single county match
-                  {
-                    profile: {
-                      coverage: {
-                        path: ['county'],
-                        equals: countyId,
-                      },
-                    },
-                  },
-                  // Counties array match
-                  {
-                    profile: {
-                      coverage: {
-                        path: ['counties'],
-                        array_contains: countyId,
-                      },
-                    },
-                  },
-                ],
-              },
+              buildCountyCoverageFilter(countyId),
               {
                 OR: [
                   {
@@ -529,28 +582,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
 
       if (countyId) {
         whereClause.AND = [
-          {
-            OR: [
-              // Single county match
-              {
-                profile: {
-                  coverage: {
-                    path: ['county'],
-                    equals: countyId,
-                  },
-                },
-              },
-              // Counties array match
-              {
-                profile: {
-                  coverage: {
-                    path: ['counties'],
-                    array_contains: countyId,
-                  },
-                },
-              },
-            ],
-          },
+          buildCountyCoverageFilter(countyId),
           {
             OR: [
               {
@@ -575,10 +607,10 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
     let orderBy: any[] = [];
     switch (filters.sortBy) {
       case 'recent':
-        orderBy = [{ updatedAt: 'desc' }];
+        orderBy = [{ sortDate: 'desc' }];
         break;
       case 'oldest':
-        orderBy = [{ updatedAt: 'asc' }];
+        orderBy = [{ sortDate: 'asc' }];
         break;
       case 'price_asc':
         orderBy = [{ price: 'asc' }];
@@ -594,7 +626,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
         break;
       case 'default':
       default:
-        // Default sort: featured first, then by rating and date, with media nulls last
+        // Default sort: featured first, then by rating and most recent activity
         orderBy = [
           { featured: 'desc' },
           { rating: 'desc' },
@@ -605,7 +637,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
               nulls: 'last',
             },
           },
-          { updatedAt: 'desc' },
+          { sortDate: 'desc' },
         ];
         break;
     }

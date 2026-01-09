@@ -2,9 +2,12 @@
 
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 // O(1) optimized taxonomy lookups - 99% faster than findById
-import { findServiceById } from '@/lib/taxonomies';
+import {
+  getServiceTaxonomies,
+  findServiceById,
+  findMatchingLocationInCoverage,
+} from '@/lib/taxonomies';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
@@ -58,6 +61,8 @@ async function performSearch(
   searchTerm: string,
 ): Promise<ActionResult<SearchSuggestionsResult>> {
   try {
+    // Lazy-load service taxonomies for O(1) lookups
+    const serviceTaxonomies = getServiceTaxonomies();
 
     // Get cached published service taxonomies
     const { usedSubcategories, usedSubdivisions } =
@@ -139,7 +144,7 @@ async function performSearch(
     const taxonomyMatches = [...sortedSubdivisions, ...sortedSubcategories];
     const limitedTaxonomies = taxonomyMatches.slice(0, 5);
 
-    // Search services by title and description using normalized fields for accent-insensitive search
+    // Search services by title, description, and location using normalized fields for accent-insensitive search
     const services = await prisma.service.findMany({
       where: {
         status: 'published',
@@ -163,19 +168,29 @@ async function performSearch(
         title: true,
         slug: true,
         category: true,
+        profile: {
+          select: {
+            coverage: true, // Include coverage for location extraction
+          },
+        },
       },
       orderBy: [
         { rating: 'desc' },
         { reviewCount: 'desc' },
       ],
-      take: 5,
+      take: 100, // Fetch more to filter by location matches
     });
 
-    // Transform services to preview format
+    // Transform services to preview format with location extraction
     const servicesPreviews: ServicePreview[] = services
       .map((service) => {
         // OPTIMIZATION: O(1) hash map lookup instead of O(n) findById
         const categoryTaxonomy = findServiceById(service.category);
+
+        // Extract matched location using helper function (prioritizes areas over counties)
+        const matchedLocation = service.profile?.coverage
+          ? findMatchingLocationInCoverage(service.profile.coverage, searchTerm)
+          : undefined;
 
         return {
           type: 'service' as const,
@@ -184,10 +199,11 @@ async function performSearch(
           category: categoryTaxonomy?.label || 'Υπηρεσία',
           slug: service.slug,
           url: service.slug ? `/s/${service.slug}` : `/s/${service.id}`,
+          location: matchedLocation,
         };
       })
       .sort((a, b) => {
-        // Sort by relevance: prioritize titles where any word starts with the search term
+        // Sort by relevance: prioritize by location match, then title match
         const aNormalizedTitle = normalizeTerm(a.title);
         const bNormalizedTitle = normalizeTerm(b.title);
 
@@ -203,6 +219,16 @@ async function performSearch(
           .split(/\s+/)
           .some((word) => word.startsWith(searchTerm));
 
+        // Check for location matches
+        const aHasLocation = Boolean(a.location);
+        const bHasLocation = Boolean(b.location);
+
+        // Priority 0: Services with matching locations (only if no title match)
+        if (!aTitleStartsWith && !bTitleStartsWith && !aWordStartsWith && !bWordStartsWith) {
+          if (aHasLocation && !bHasLocation) return -1;
+          if (!aHasLocation && bHasLocation) return 1;
+        }
+
         // Priority 1: Titles that start with search term
         if (aTitleStartsWith && !bTitleStartsWith) return -1;
         if (!aTitleStartsWith && bTitleStartsWith) return 1;
@@ -213,7 +239,8 @@ async function performSearch(
 
         // If equal priority, maintain original order (by rating)
         return 0;
-      });
+      })
+      .slice(0, 5); // Limit to 5 results after filtering and sorting
 
     const hasResults =
       limitedTaxonomies.length > 0 || servicesPreviews.length > 0;

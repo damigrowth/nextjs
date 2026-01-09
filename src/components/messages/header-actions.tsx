@@ -1,6 +1,6 @@
 /**
  * Client Component: Chat header action menu and dialogs
- * Interactive dropdown menu with block/delete confirmation dialogs
+ * Interactive dropdown menu with block confirmation dialog
  */
 
 'use client';
@@ -27,8 +27,7 @@ import {
 import { MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { blockUser } from '@/actions/messages/blocking';
-import { deleteChat } from '@/actions/messages/chats';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 interface HeaderActionsProps {
   chatId: string;
@@ -51,9 +50,7 @@ export function HeaderActions({
 }: HeaderActionsProps) {
   const router = useRouter();
   const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isBlockLoading, setIsBlockLoading] = useState(false);
-  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const handleBlockClick = () => {
     setIsBlockDialogOpen(true);
@@ -78,31 +75,6 @@ export function HeaderActions({
     }
   };
 
-  const handleDeleteClick = () => {
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    setIsDeleteLoading(true);
-    try {
-      await deleteChat(chatId, currentUserId);
-      toast.success('Η συνομιλία διαγράφηκε');
-      setIsDeleteDialogOpen(false);
-      // Redirect to messages list
-      router.push('/dashboard/messages');
-      router.refresh();
-    } catch (error) {
-      console.error('Failed to delete conversation:', error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Αποτυχία διαγραφής συνομιλίας',
-      );
-    } finally {
-      setIsDeleteLoading(false);
-    }
-  };
-
   return (
     <>
       <DropdownMenu>
@@ -121,12 +93,6 @@ export function HeaderActions({
           )}
           <DropdownMenuItem onClick={handleBlockClick}>
             Αποκλεισμός
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={handleDeleteClick}
-            className='text-destructive focus:text-destructive'
-          >
-            Διαγραφή
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -155,37 +121,6 @@ export function HeaderActions({
               className='bg-dark text-white hover:bg-dark/90'
             >
               {isBlockLoading ? 'Αποκλεισμός...' : 'Αποκλεισμός'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Διαγραφή Συνομιλίας;</AlertDialogTitle>
-            <AlertDialogDescription>
-              Αυτό θα διαγράψει οριστικά τη συνομιλία σας με τον/την{' '}
-              {displayName}. Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleteLoading}>
-              Ακύρωση
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault();
-                handleDeleteConfirm();
-              }}
-              disabled={isDeleteLoading}
-              className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
-            >
-              {isDeleteLoading ? 'Διαγραφή...' : 'Διαγραφή'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

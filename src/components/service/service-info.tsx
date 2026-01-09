@@ -1,9 +1,9 @@
 import React from 'react';
-import { Clock, MapPin, Globe, Users, Briefcase } from 'lucide-react';
+import { Clock, MapPin, Globe, Users } from 'lucide-react';
 import { DatasetItem } from '@/lib/types/datasets';
 import { getCoverageGroupedByCounty } from '@/lib/utils/datasets';
 import IconBox from '@/components/shared/icon-box';
-import { FlaticonCategory } from '@/components/icon';
+import { FlaticonCategory, FlaticonRefresh } from '@/components/icon';
 import CoverageDisplay from '@/components/shared/coverage-display';
 
 interface ServiceInfoProps {
@@ -70,7 +70,7 @@ export default function ServiceInfo({
       {online && subscription && subscriptionType && (
         <div className='sm:col-span-1 md:col-span-1'>
           <IconBox
-            icon={<Briefcase className='h-10 w-10' />}
+            icon={<FlaticonRefresh size={40} />}
             title='Πληρωμή'
             value={
               {

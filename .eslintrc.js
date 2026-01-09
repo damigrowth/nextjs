@@ -1,16 +1,9 @@
 module.exports = {
-  parser: '@babel/eslint-parser',
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    requireConfigFile: false,
     ecmaVersion: 'latest',
     sourceType: 'module',
-    babelOptions: {
-      presets: ['@babel/preset-env'],
-      plugins: [
-        '@babel/plugin-syntax-jsx',
-        '@babel/plugin-syntax-import-assertions',
-      ],
-    },
+    project: './tsconfig.json',
   },
   env: {
     es6: true,

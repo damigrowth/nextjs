@@ -33,7 +33,7 @@ import { updateProfileBillingAdmin } from '@/actions/admin/profiles/billing';
 // Utility for form data population
 import { populateFormData, parseJSONValue } from '@/lib/utils/form';
 
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { AuthUser } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';
 import { Profile } from '@prisma/client';

@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 import { getCurrentUser, isProfessional } from '@/actions/auth/server';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 interface DashboardData {
   services: any;

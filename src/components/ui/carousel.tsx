@@ -159,14 +159,19 @@ const CarouselContent = React.forwardRef<
   const { carouselRef, orientation } = useCarousel();
 
   return (
-    <div ref={carouselRef} className={cn('overflow-hidden', containerClassName)}>
+    <div
+      ref={carouselRef}
+      className={cn('overflow-hidden', containerClassName)}
+      style={{ contain: 'layout style paint' }}
+    >
       <div
         ref={ref}
         className={cn(
           'flex',
-          orientation === 'horizontal' ? '-ml-4' : '-mt-4 flex-col',
+          orientation === 'horizontal' ? '-ml-1' : '-mt-4 flex-col',
           className,
         )}
+        style={{ willChange: 'transform' }}
         {...props}
       />
     </div>
@@ -225,6 +230,7 @@ const CarouselPrevious = React.forwardRef<
         e.stopPropagation();
         scrollPrev();
       }}
+      aria-label='Προηγούμενη σελίδα'
       {...props}
     >
       <ChevronLeft className='h-4 w-4' />
@@ -263,6 +269,7 @@ const CarouselNext = React.forwardRef<
         e.stopPropagation();
         scrollNext();
       }}
+      aria-label='Επόμενη σελίδα'
       {...props}
     >
       <ChevronRight className='h-4 w-4' />

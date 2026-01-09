@@ -7,18 +7,20 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import type { SubdivisionWithCount } from '@/actions/services/get-categories';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 interface SubdivisionsCarouselProps {
   subdivisions: SubdivisionWithCount[];
   hideTitle?: boolean;
   gradientColor?: 'white' | 'silver';
+  title?: string;
 }
 
 export function SubdivisionsCarousel({
   subdivisions,
   hideTitle = false,
   gradientColor = 'white',
+  title = 'Πιο δημοφιλείς εργασίες',
 }: SubdivisionsCarouselProps) {
   if (subdivisions.length === 0) {
     return null;
@@ -33,9 +35,7 @@ export function SubdivisionsCarousel({
     <section>
       {!hideTitle && (
         <div className='mb-6'>
-          <h2 className='text-2xl font-bold text-gray-900 mb-2'>
-            Πιο δημοφιλείς εργασίες
-          </h2>
+          <h2 className='text-2xl font-bold text-gray-900 mb-2'>{title}</h2>
         </div>
       )}
 
@@ -47,7 +47,7 @@ export function SubdivisionsCarousel({
           }}
           className='w-full'
         >
-          <CarouselContent className='-ml-2 md:-ml-4'>
+          <CarouselContent className='-ml-0 sm:-ml-2'>
             {subdivisions.map((subdivision) => (
               <CarouselItem
                 key={subdivision.id}

@@ -11,10 +11,12 @@ import {
 
 interface AdminSkillsTableSectionProps {
   searchParams: BaseSearchParams;
+  categoryLookup?: Record<string, string>;
 }
 
 export async function AdminSkillsTableSection({
   searchParams,
+  categoryLookup,
 }: AdminSkillsTableSectionProps) {
   // Get skills including staged changes
   const skills = await getTaxonomyWithStaging('skills');
@@ -42,7 +44,10 @@ export async function AdminSkillsTableSection({
       currentLimit={currentLimit}
       basePath='/admin/taxonomies/skills'
     >
-      <AdminSkillsDataTable data={paginatedData} />
+      <AdminSkillsDataTable
+        data={paginatedData}
+        categoryLookup={categoryLookup}
+      />
     </TableSectionWrapper>
   );
 }

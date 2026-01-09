@@ -133,11 +133,6 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.26.7",
-    "@babel/eslint-parser": "^7.27.1",
-    "@babel/plugin-syntax-import-assertions": "^7.27.1",
-    "@babel/plugin-syntax-jsx": "^7.27.1",
-    "@babel/preset-env": "^7.27.2",
     "@stylistic/eslint-plugin-js": "^4.4.0",
     "@types/bcrypt": "^6.0.0",
     "@types/node": "^24.0.12",
@@ -167,5 +162,11 @@
   },
   "prisma": {
     "schema": "./src/lib/prisma/schema/"
-  }
+  },
+  "browserslist": [
+    "chrome >= 90",
+    "edge >= 90",
+    "firefox >= 88",
+    "safari >= 14"
+  ]
 }

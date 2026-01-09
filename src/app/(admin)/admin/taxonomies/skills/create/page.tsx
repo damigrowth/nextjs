@@ -1,4 +1,4 @@
-import { TaxonomyCreatePage } from '@/components/admin';
+import { TaxonomyCreatePage } from '@/components/admin/taxonomy-create-page';
 import { CreateSkillForm } from '@/components/admin/forms/create-skill-form';
 import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 

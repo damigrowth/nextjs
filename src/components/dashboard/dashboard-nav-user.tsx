@@ -27,7 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { UserAvatar } from '@/components/shared';
+import UserAvatar from '@/components/shared/user-avatar';
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -85,9 +85,10 @@ export function NavUser({
 
       if (needsOAuth) {
         // For OAuth setup, direct to oauth-setup page with appropriate type parameter
-        completionPath = isProfessionalType || sessionUser?.type === 'pro'
-          ? '/oauth-setup?type=pro'
-          : '/oauth-setup';
+        completionPath =
+          isProfessionalType || sessionUser?.type === 'pro'
+            ? '/oauth-setup?type=pro'
+            : '/oauth-setup';
       }
 
       return [

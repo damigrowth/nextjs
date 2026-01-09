@@ -1,7 +1,9 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { NextLink, ProfileBadges, RatingDisplay } from '@/components';
+import { NextLink } from '@/components';
+import ProfileBadges from '@/components/shared/profile-badges';
+import RatingDisplay from '@/components/shared/rating-display';
 import UserAvatar from '@/components/shared/user-avatar';
 import SocialLinks from '@/components/shared/social-links';
 import { Globe } from 'lucide-react';
@@ -64,6 +66,9 @@ export default function ServiceContact({
               image={image}
               top={false}
               size='xl'
+              width={72}
+              height={72}
+              className='h-[72px] w-[72px]'
             />
           </NextLink>
 

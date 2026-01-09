@@ -143,7 +143,7 @@ export const serviceEditSchema = z.object({
   tags: z.union([z.array(serviceTagSchema), z.array(z.string())]).optional(),
   addons: z
     .array(formServiceAddonSchema)
-    .max(3, 'Μέγιστος αριθμός επιπλέον υπηρεσιών: 3')
+    .max(3, 'Μέγιστος αριθμός extra υπηρεσιών: 3')
     .optional()
     .superRefine((addons, ctx) => {
       if (!addons || addons.length === 0) return;
@@ -165,7 +165,7 @@ export const serviceEditSchema = z.object({
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message:
-                'Οι τίτλοι των επιπλέον υπηρεσιών πρέπει να είναι μοναδικοί',
+                'Οι τίτλοι των extra υπηρεσιών πρέπει να είναι μοναδικοί',
               path: [index, 'title'],
             });
           });
@@ -191,7 +191,7 @@ export const serviceEditSchema = z.object({
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message:
-                'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
+                'Οι περιγραφές των extra υπηρεσιών πρέπει να είναι μοναδικές',
               path: [index, 'description'],
             });
           });
@@ -491,7 +491,10 @@ export const serviceDetailsSchema = z
     },
   );
 
-// Step 4: Addons and FAQ Schema (optional)
+// Step 4: Addons and FAQ Schema (optional) - DASHBOARD VERSION
+// Uses .refine() for array-level validation (works for dashboard forms)
+// Step 4: Addons and FAQ Schema - Dashboard version with field-level validation
+// Uses .superRefine() for field-level validation (shows errors on specific fields)
 export const addonsAndFaqSchema = z
   .object({
     addons: z
@@ -499,60 +502,503 @@ export const addonsAndFaqSchema = z
       .max(3, 'Μπορείτε να προσθέσετε έως 3 extra υπηρεσίες')
       .optional()
       .default([])
-      .refine(
-        (addons) => {
-          if (!addons || addons.length === 0) return true;
-          const titles = addons.map((addon) =>
-            addon.title.toLowerCase().trim(),
-          );
-          return titles.length === new Set(titles).size;
-        },
-        {
-          message: 'Οι τίτλοι των επιπλέον υπηρεσιών πρέπει να είναι μοναδικοί',
-        },
-      )
-      .refine(
-        (addons) => {
-          if (!addons || addons.length === 0) return true;
-          const descriptions = addons.map((addon) =>
-            addon.description.toLowerCase().trim(),
-          );
-          return descriptions.length === new Set(descriptions).size;
-        },
-        {
-          message:
-            'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
-        },
-      ),
+      .superRefine((addons, ctx) => {
+        if (!addons || addons.length === 0) return;
+
+        // Check for duplicate titles
+        const titles = addons.map((addon) => addon.title.toLowerCase().trim());
+        const titleIndexMap = new Map<string, number[]>();
+
+        titles.forEach((title, index) => {
+          if (!titleIndexMap.has(title)) {
+            titleIndexMap.set(title, []);
+          }
+          titleIndexMap.get(title)!.push(index);
+        });
+
+        titleIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'Οι τίτλοι των extra υπηρεσιών πρέπει να είναι μοναδικοί',
+                path: [index, 'title'],
+              });
+            });
+          }
+        });
+
+        // Check for duplicate descriptions
+        const descriptions = addons.map((addon) =>
+          addon.description.toLowerCase().trim(),
+        );
+        const descriptionIndexMap = new Map<string, number[]>();
+
+        descriptions.forEach((description, index) => {
+          if (!descriptionIndexMap.has(description)) {
+            descriptionIndexMap.set(description, []);
+          }
+          descriptionIndexMap.get(description)!.push(index);
+        });
+
+        descriptionIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'Οι περιγραφές των extra υπηρεσιών πρέπει να είναι μοναδικές',
+                path: [index, 'description'],
+              });
+            });
+          }
+        });
+
+        // Check that all addon prices are at least 5€
+        addons.forEach((addon, index) => {
+          if (addon.price < 5) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Η ελάχιστη τιμή είναι 5€',
+              path: [index, 'price'],
+            });
+          }
+        });
+      }),
     faq: z
       .array(formServiceFaqSchema)
       .max(5, 'Μπορείτε να προσθέσετε έως 5 συχνές ερωτήσεις')
       .optional()
       .default([])
-      .refine(
-        (faqs) => {
-          if (!faqs || faqs.length === 0) return true;
-          const questions = faqs.map((faq) =>
-            faq.question.toLowerCase().trim(),
-          );
-          return questions.length === new Set(questions).size;
-        },
-        {
-          message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
-        },
-      )
-      .refine(
-        (faqs) => {
-          if (!faqs || faqs.length === 0) return true;
-          const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
-          return answers.length === new Set(answers).size;
-        },
-        {
-          message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
-        },
-      ),
+      .superRefine((faqs, ctx) => {
+        if (!faqs || faqs.length === 0) return;
+
+        // Check for duplicate questions
+        const questions = faqs.map((faq) => faq.question.toLowerCase().trim());
+        const questionIndexMap = new Map<string, number[]>();
+
+        questions.forEach((question, index) => {
+          if (!questionIndexMap.has(question)) {
+            questionIndexMap.set(question, []);
+          }
+          questionIndexMap.get(question)!.push(index);
+        });
+
+        questionIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
+                path: [index, 'question'],
+              });
+            });
+          }
+        });
+
+        // Check for duplicate answers
+        const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
+        const answerIndexMap = new Map<string, number[]>();
+
+        answers.forEach((answer, index) => {
+          if (!answerIndexMap.has(answer)) {
+            answerIndexMap.set(answer, []);
+          }
+          answerIndexMap.get(answer)!.push(index);
+        });
+
+        answerIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
+                path: [index, 'answer'],
+              });
+            });
+          }
+        });
+      }),
   })
   .passthrough();
+
+// Step 4: Addons and FAQ Schema (optional) - ADMIN VERSION
+// Uses .superRefine() for field-level validation (shows errors on specific fields)
+export const adminAddonsAndFaqSchema = z
+  .object({
+    addons: z
+      .array(formServiceAddonSchema)
+      .max(3, 'Μπορείτε να προσθέσετε έως 3 extra υπηρεσίες')
+      .optional()
+      .default([])
+      .superRefine((addons, ctx) => {
+        if (!addons || addons.length === 0) return;
+
+        // Check for duplicate titles
+        const titles = addons.map((addon) => addon.title.toLowerCase().trim());
+        const titleIndexMap = new Map<string, number[]>();
+
+        titles.forEach((title, index) => {
+          if (!titleIndexMap.has(title)) {
+            titleIndexMap.set(title, []);
+          }
+          titleIndexMap.get(title)!.push(index);
+        });
+
+        titleIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'Οι τίτλοι των extra υπηρεσιών πρέπει να είναι μοναδικοί',
+                path: [index, 'title'],
+              });
+            });
+          }
+        });
+
+        // Check for duplicate descriptions
+        const descriptions = addons.map((addon) =>
+          addon.description.toLowerCase().trim(),
+        );
+        const descriptionIndexMap = new Map<string, number[]>();
+
+        descriptions.forEach((description, index) => {
+          if (!descriptionIndexMap.has(description)) {
+            descriptionIndexMap.set(description, []);
+          }
+          descriptionIndexMap.get(description)!.push(index);
+        });
+
+        descriptionIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'Οι περιγραφές των extra υπηρεσιών πρέπει να είναι μοναδικές',
+                path: [index, 'description'],
+              });
+            });
+          }
+        });
+
+        // Check that all addon prices are at least 5€
+        addons.forEach((addon, index) => {
+          if (addon.price < 5) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Η ελάχιστη τιμή είναι 5€',
+              path: [index, 'price'],
+            });
+          }
+        });
+      }),
+    faq: z
+      .array(formServiceFaqSchema)
+      .max(5, 'Μπορείτε να προσθέσετε έως 5 συχνές ερωτήσεις')
+      .optional()
+      .default([])
+      .superRefine((faqs, ctx) => {
+        if (!faqs || faqs.length === 0) return;
+
+        // Check for duplicate questions
+        const questions = faqs.map((faq) => faq.question.toLowerCase().trim());
+        const questionIndexMap = new Map<string, number[]>();
+
+        questions.forEach((question, index) => {
+          if (!questionIndexMap.has(question)) {
+            questionIndexMap.set(question, []);
+          }
+          questionIndexMap.get(question)!.push(index);
+        });
+
+        questionIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
+                path: [index, 'question'],
+              });
+            });
+          }
+        });
+
+        // Check for duplicate answers
+        const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
+        const answerIndexMap = new Map<string, number[]>();
+
+        answers.forEach((answer, index) => {
+          if (!answerIndexMap.has(answer)) {
+            answerIndexMap.set(answer, []);
+          }
+          answerIndexMap.get(answer)!.push(index);
+        });
+
+        answerIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
+                path: [index, 'answer'],
+              });
+            });
+          }
+        });
+      }),
+  })
+  .passthrough();
+
+// Admin Service Validation Schema - For real-time field-level validation in forms
+// Uses .superRefine() for field-level validation on addons/FAQ (shows errors on specific fields)
+// Note: For admin form submission, use adminCreateServiceSchema from admin.ts which adds profileId
+export const adminServiceValidationSchema = z
+  .object({
+    // Service type configuration (Boolean object matching Prisma schema)
+    type: serviceTypeConfigSchema,
+
+    // Subscription period (only for subscription services)
+    subscriptionType: z.nativeEnum(SubscriptionType).optional(),
+
+    // Step 3 data
+    title: z
+      .string()
+      .min(10, 'Ο τίτλος πρέπει να είναι τουλάχιστον 10 χαρακτήρες')
+      .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
+    description: z
+      .string()
+      .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
+      .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες'),
+    category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
+    subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
+    subdivision: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
+    tags: z
+      .array(z.string())
+      .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες (tags)')
+      .default([])
+      .optional(),
+    price: z
+      .number()
+      .int()
+      .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
+      .optional(),
+    fixed: z.boolean(),
+    duration: z
+      .number()
+      .int()
+      .min(0, 'Η διάρκεια δεν μπορεί να είναι αρνητική')
+      .max(365, 'Η διάρκεια δεν μπορεί να ξεπερνά τις 365 ημέρες')
+      .optional(),
+
+    // Step 4 data - using .superRefine() for field-level validation
+    addons: z
+      .array(formServiceAddonSchema)
+      .optional()
+      .superRefine((addons, ctx) => {
+        if (!addons || addons.length === 0) return;
+
+        // Check for duplicate titles
+        const titles = addons.map((addon) => addon.title.toLowerCase().trim());
+        const titleIndexMap = new Map<string, number[]>();
+
+        titles.forEach((title, index) => {
+          if (!titleIndexMap.has(title)) {
+            titleIndexMap.set(title, []);
+          }
+          titleIndexMap.get(title)!.push(index);
+        });
+
+        titleIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'Οι τίτλοι των extra υπηρεσιών πρέπει να είναι μοναδικοί',
+                path: [index, 'title'],
+              });
+            });
+          }
+        });
+
+        // Check for duplicate descriptions
+        const descriptions = addons.map((addon) =>
+          addon.description.toLowerCase().trim(),
+        );
+        const descriptionIndexMap = new Map<string, number[]>();
+
+        descriptions.forEach((description, index) => {
+          if (!descriptionIndexMap.has(description)) {
+            descriptionIndexMap.set(description, []);
+          }
+          descriptionIndexMap.get(description)!.push(index);
+        });
+
+        descriptionIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'Οι περιγραφές των extra υπηρεσιών πρέπει να είναι μοναδικές',
+                path: [index, 'description'],
+              });
+            });
+          }
+        });
+
+        // Check that all addon prices are at least 5€
+        addons.forEach((addon, index) => {
+          if (addon.price < 5) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Η ελάχιστη τιμή είναι 5€',
+              path: [index, 'price'],
+            });
+          }
+        });
+      }),
+    faq: z
+      .array(formServiceFaqSchema)
+      .optional()
+      .superRefine((faqs, ctx) => {
+        if (!faqs || faqs.length === 0) return;
+
+        // Check for duplicate questions
+        const questions = faqs.map((faq) => faq.question.toLowerCase().trim());
+        const questionIndexMap = new Map<string, number[]>();
+
+        questions.forEach((question, index) => {
+          if (!questionIndexMap.has(question)) {
+            questionIndexMap.set(question, []);
+          }
+          questionIndexMap.get(question)!.push(index);
+        });
+
+        questionIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
+                path: [index, 'question'],
+              });
+            });
+          }
+        });
+
+        // Check for duplicate answers
+        const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
+        const answerIndexMap = new Map<string, number[]>();
+
+        answers.forEach((answer, index) => {
+          if (!answerIndexMap.has(answer)) {
+            answerIndexMap.set(answer, []);
+          }
+          answerIndexMap.get(answer)!.push(index);
+        });
+
+        answerIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
+                path: [index, 'answer'],
+              });
+            });
+          }
+        });
+      }),
+
+    // Step 5 data
+    media: z
+      .array(cloudinaryResourceSchema)
+      .max(10, 'Μπορείτε να ανεβάσετε έως 10 αρχεία')
+      .nullable()
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      // Validate that at least one service type is selected
+      const hasPresence = data.type.presence;
+      const hasOnline = data.type.online;
+      return hasPresence || hasOnline;
+    },
+    {
+      message: 'Επιλέξτε τουλάχιστον έναν τύπο υπηρεσίας',
+      path: ['type'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Validate presence service location
+      if (data.type.presence) {
+        return data.type.onbase || data.type.onsite;
+      }
+      return true;
+    },
+    {
+      message: 'Επιλέξτε τόπο παροχής για υπηρεσίες φυσικής παρουσίας',
+      path: ['type'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Validate online service delivery type
+      if (data.type.online) {
+        return data.type.oneoff || data.type.subscription;
+      }
+      return true;
+    },
+    {
+      message: 'Επιλέξτε τύπο παράδοσης για online υπηρεσίες',
+      path: ['type'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Validate subscription period for subscription services
+      if (data.type.subscription) {
+        return data.subscriptionType !== undefined;
+      }
+      return true;
+    },
+    {
+      message: 'Επιλέξτε περίοδο συνδρομής',
+      path: ['subscriptionType'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Price is required when fixed is true (default state, showing price)
+      if (data.fixed && (!data.price || data.price === 0)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Πληκτρολογήστε τιμή',
+      path: ['price'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Price must be at least 5€ when fixed is true (showing price)
+      if (data.fixed && data.price !== undefined && data.price < 5) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Η τιμή πρέπει να είναι τουλάχιστον 5€',
+      path: ['price'],
+    },
+  );
 
 // Step 5: Media Schema (optional)
 export const serviceMediaUploadSchema = z.object({
@@ -608,65 +1054,122 @@ export const createServiceSchema = z
     addons: z
       .array(formServiceAddonSchema)
       .optional()
-      .refine(
-        (addons) => {
-          if (!addons || addons.length === 0) return true;
-          const titles = addons.map((addon) =>
-            addon.title.toLowerCase().trim(),
-          );
-          return titles.length === new Set(titles).size;
-        },
-        {
-          message: 'Οι τίτλοι των επιπλέον υπηρεσιών πρέπει να είναι μοναδικοί',
-        },
-      )
-      .refine(
-        (addons) => {
-          if (!addons || addons.length === 0) return true;
-          const descriptions = addons.map((addon) =>
-            addon.description.toLowerCase().trim(),
-          );
-          return descriptions.length === new Set(descriptions).size;
-        },
-        {
-          message:
-            'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
-        },
-      )
-      .refine(
-        (addons) => {
-          if (!addons || addons.length === 0) return true;
-          return addons.every((addon) => addon.price >= 5);
-        },
-        {
-          message: 'Η ελάχιστη τιμή για κάθε extra υπηρεσία είναι 5€',
-        },
-      ),
+      .superRefine((addons, ctx) => {
+        if (!addons || addons.length === 0) return;
+
+        // Check for duplicate titles
+        const titles = addons.map((addon) => addon.title.toLowerCase().trim());
+        const titleIndexMap = new Map<string, number[]>();
+
+        titles.forEach((title, index) => {
+          if (!titleIndexMap.has(title)) {
+            titleIndexMap.set(title, []);
+          }
+          titleIndexMap.get(title)!.push(index);
+        });
+
+        titleIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'Οι τίτλοι των extra υπηρεσιών πρέπει να είναι μοναδικοί',
+                path: [index, 'title'],
+              });
+            });
+          }
+        });
+
+        // Check for duplicate descriptions
+        const descriptions = addons.map((addon) =>
+          addon.description.toLowerCase().trim(),
+        );
+        const descriptionIndexMap = new Map<string, number[]>();
+
+        descriptions.forEach((description, index) => {
+          if (!descriptionIndexMap.has(description)) {
+            descriptionIndexMap.set(description, []);
+          }
+          descriptionIndexMap.get(description)!.push(index);
+        });
+
+        descriptionIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'Οι περιγραφές των extra υπηρεσιών πρέπει να είναι μοναδικές',
+                path: [index, 'description'],
+              });
+            });
+          }
+        });
+
+        // Check that all addon prices are at least 5€
+        addons.forEach((addon, index) => {
+          if (addon.price < 5) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Η ελάχιστη τιμή είναι 5€',
+              path: [index, 'price'],
+            });
+          }
+        });
+      }),
     faq: z
       .array(formServiceFaqSchema)
       .optional()
-      .refine(
-        (faqs) => {
-          if (!faqs || faqs.length === 0) return true;
-          const questions = faqs.map((faq) =>
-            faq.question.toLowerCase().trim(),
-          );
-          return questions.length === new Set(questions).size;
-        },
-        {
-          message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
-        },
-      )
-      .refine(
-        (faqs) => {
-          if (!faqs || faqs.length === 0) return true;
-          const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
-          return answers.length === new Set(answers).size;
-        },
-        {
-          message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
-        },
-      ),
+      .superRefine((faqs, ctx) => {
+        if (!faqs || faqs.length === 0) return;
+
+        // Check for duplicate questions
+        const questions = faqs.map((faq) => faq.question.toLowerCase().trim());
+        const questionIndexMap = new Map<string, number[]>();
+
+        questions.forEach((question, index) => {
+          if (!questionIndexMap.has(question)) {
+            questionIndexMap.set(question, []);
+          }
+          questionIndexMap.get(question)!.push(index);
+        });
+
+        questionIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
+                path: [index, 'question'],
+              });
+            });
+          }
+        });
+
+        // Check for duplicate answers
+        const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
+        const answerIndexMap = new Map<string, number[]>();
+
+        answers.forEach((answer, index) => {
+          if (!answerIndexMap.has(answer)) {
+            answerIndexMap.set(answer, []);
+          }
+          answerIndexMap.get(answer)!.push(index);
+        });
+
+        answerIndexMap.forEach((indices) => {
+          if (indices.length > 1) {
+            indices.forEach((index) => {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
+                path: [index, 'answer'],
+              });
+            });
+          }
+        });
+      }),
 
     // Step 5 data
     media: z
@@ -805,7 +1308,7 @@ export const createServiceDraftSchema = z.object({
         return titles.length === new Set(titles).size;
       },
       {
-        message: 'Οι τίτλοι των επιπλέον υπηρεσιών πρέπει να είναι μοναδικοί',
+        message: 'Οι τίτλοι των extra υπηρεσιών πρέπει να είναι μοναδικοί',
       },
     )
     .refine(
@@ -817,8 +1320,7 @@ export const createServiceDraftSchema = z.object({
         return descriptions.length === new Set(descriptions).size;
       },
       {
-        message:
-          'Οι περιγραφές των επιπλέον υπηρεσιών πρέπει να είναι μοναδικές',
+        message: 'Οι περιγραφές των extra υπηρεσιών πρέπει να είναι μοναδικές',
       },
     ),
   faq: z
@@ -942,9 +1444,330 @@ export const updateServiceMediaSchema = z.object({
 });
 
 // Update service info (everything except media)
-export const updateServiceInfoSchema = createServiceSchema
-  .omit({ media: true })
+// Note: Defined independently because .pick()/.omit() cannot be used on schemas with refinements
+// All fields are optional for partial updates (cannot use .partial() on schemas with refinements)
+export const updateServiceInfoSchema = z
+  .object({
+    // Service type configuration (Boolean object matching Prisma schema)
+    type: serviceTypeConfigSchema.optional(),
+
+    // Subscription period (only for subscription services)
+    subscriptionType: z.nativeEnum(SubscriptionType).optional(),
+
+    // Step 3 data
+    title: z
+      .string()
+      .min(10, 'Ο τίτλος πρέπει να είναι τουλάχιστον 10 χαρακτήρες')
+      .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες')
+      .optional(),
+    description: z
+      .string()
+      .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
+      .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες')
+      .optional(),
+    category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική').optional(),
+    subcategory: z
+      .string()
+      .min(1, 'Η υποκατηγορία είναι υποχρεωτική')
+      .optional(),
+    subdivision: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική').optional(),
+    tags: z
+      .array(z.string())
+      .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες (tags)')
+      .default([])
+      .optional(),
+    price: z
+      .number()
+      .int()
+      .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
+      .optional(),
+    fixed: z.boolean().optional(),
+    duration: z
+      .number()
+      .int()
+      .min(0, 'Η διάρκεια δεν μπορεί να είναι αρνητική')
+      .max(365, 'Η διάρκεια δεν μπορεί να ξεπερνά τις 365 ημέρες')
+      .optional(),
+
+    // Step 4 data (without field-level refinements for updateServiceInfoSchema)
+    addons: z.array(formServiceAddonSchema).optional(),
+    faq: z.array(formServiceFaqSchema).optional(),
+
+    // media: explicitly excluded (only in createServiceSchema and updateServiceMediaSchema)
+  })
+  .refine(
+    (data) => {
+      // Validate that at least one service type is selected (skip if type not provided)
+      if (!data.type) return true;
+      const hasPresence = data.type.presence;
+      const hasOnline = data.type.online;
+      return hasPresence || hasOnline;
+    },
+    {
+      message: 'Επιλέξτε τουλάχιστον έναν τύπο υπηρεσίας',
+      path: ['type'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Validate presence service location (skip if type not provided)
+      if (!data.type) return true;
+      if (data.type.presence) {
+        return data.type.onbase || data.type.onsite;
+      }
+      return true;
+    },
+    {
+      message: 'Επιλέξτε τόπο παροχής για υπηρεσίες φυσικής παρουσίας',
+      path: ['type'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Validate online service delivery type (skip if type not provided)
+      if (!data.type) return true;
+      if (data.type.online) {
+        return data.type.oneoff || data.type.subscription;
+      }
+      return true;
+    },
+    {
+      message: 'Επιλέξτε τύπο παράδοσης για online υπηρεσίες',
+      path: ['type'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Validate subscription period for subscription services (skip if type not provided)
+      if (!data.type) return true;
+      if (data.type.subscription) {
+        return data.subscriptionType !== undefined;
+      }
+      return true;
+    },
+    {
+      message: 'Επιλέξτε περίοδο συνδρομής',
+      path: ['subscriptionType'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Price is required when fixed is true (skip if fixed not provided)
+      if (data.fixed && (!data.price || data.price === 0)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Πληκτρολογήστε τιμή',
+      path: ['price'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Price must be at least 5€ when fixed is true (skip if fixed not provided)
+      if (data.fixed && data.price !== undefined && data.price < 5) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Η τιμή πρέπει να είναι τουλάχιστον 5€',
+      path: ['price'],
+    },
+  );
+
+// =============================================
+// ADMIN EDIT SERVICE SCHEMAS (Independent schemas for partial updates)
+// NOTE: Defined independently because .pick()/.omit() cannot be used on schemas with refinements in Zod 4.0
+// These schemas must stay in sync with createServiceSchema fields and refinements
+// =============================================
+
+// Edit service taxonomy (category, subcategory, subdivision, tags)
+// Includes relevant schema-level refinements for service type validation
+export const editServiceTaxonomySchema = z
+  .object({
+    category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
+    subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
+    subdivision: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
+    tags: z
+      .array(z.string())
+      .max(10, 'Μπορείτε να επιλέξετε έως 10 ετικέτες (tags)')
+      .default([])
+      .optional(),
+  })
+  .partial();
+
+// Edit service basic info (title, description)
+export const editServiceBasicSchema = z
+  .object({
+    title: z
+      .string()
+      .min(10, 'Ο τίτλος πρέπει να είναι τουλάχιστον 10 χαρακτήρες')
+      .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
+    description: z
+      .string()
+      .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
+      .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες'),
+  })
+  .partial();
+
+// Edit service pricing (price, fixed, duration, subscriptionType)
+// Includes price-related refinements from createServiceSchema
+// All fields optional for partial updates (cannot use .partial() on schemas with refinements)
+export const editServicePricingSchema = z
+  .object({
+    price: z
+      .number()
+      .int()
+      .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
+      .optional(),
+    fixed: z.boolean().optional(),
+    duration: z
+      .number()
+      .int()
+      .min(0, 'Η διάρκεια δεν μπορεί να είναι αρνητική')
+      .max(365, 'Η διάρκεια δεν μπορεί να ξεπερνά τις 365 ημέρες')
+      .optional(),
+    subscriptionType: z.nativeEnum(SubscriptionType).optional(),
+  })
+  .refine(
+    (data) => {
+      // Price is required when fixed is true (skip if fixed not provided)
+      if (data.fixed && (!data.price || data.price === 0)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Πληκτρολογήστε τιμή',
+      path: ['price'],
+    },
+  )
+  .refine(
+    (data) => {
+      // Price must be at least 5€ when fixed is true (skip if fixed not provided)
+      if (data.fixed && data.price !== undefined && data.price < 5) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Η τιμή πρέπει να είναι τουλάχιστον 5€',
+      path: ['price'],
+    },
+  );
+
+// Edit service addons
+// Includes all addon-specific refinements from createServiceSchema
+// Field is already optional (cannot use .partial() on schemas with refinements)
+export const editServiceAddonsSchema = z.object({
+  addons: z
+    .array(formServiceAddonSchema)
+    .optional()
+    .refine(
+      (addons) => {
+        if (!addons || addons.length === 0) return true;
+        const titles = addons.map((addon) =>
+          addon.title.toLowerCase().trim(),
+        );
+        return titles.length === new Set(titles).size;
+      },
+      {
+        message: 'Οι τίτλοι των extra υπηρεσιών πρέπει να είναι μοναδικοί',
+      },
+    )
+    .refine(
+      (addons) => {
+        if (!addons || addons.length === 0) return true;
+        const descriptions = addons.map((addon) =>
+          addon.description.toLowerCase().trim(),
+        );
+        return descriptions.length === new Set(descriptions).size;
+      },
+      {
+        message:
+          'Οι περιγραφές των extra υπηρεσιών πρέπει να είναι μοναδικές',
+      },
+    )
+    .refine(
+      (addons) => {
+        if (!addons || addons.length === 0) return true;
+        return addons.every((addon) => addon.price >= 5);
+      },
+      {
+        message: 'Η ελάχιστη τιμή για κάθε extra υπηρεσία είναι 5€',
+      },
+    ),
+});
+
+// Edit service FAQ
+// Includes all FAQ-specific refinements from createServiceSchema
+// Field is already optional (cannot use .partial() on schemas with refinements)
+export const editServiceFaqSchema = z.object({
+  faq: z
+    .array(formServiceFaqSchema)
+    .optional()
+    .refine(
+      (faqs) => {
+        if (!faqs || faqs.length === 0) return true;
+        const questions = faqs.map((faq) =>
+          faq.question.toLowerCase().trim(),
+        );
+        return questions.length === new Set(questions).size;
+      },
+      {
+        message: 'Οι ερωτήσεις πρέπει να είναι μοναδικές',
+      },
+    )
+    .refine(
+      (faqs) => {
+        if (!faqs || faqs.length === 0) return true;
+        const answers = faqs.map((faq) => faq.answer.toLowerCase().trim());
+        return answers.length === new Set(answers).size;
+      },
+      {
+        message: 'Οι απαντήσεις πρέπει να είναι μοναδικές',
+      },
+    ),
+});
+
+// Edit service settings (admin only - status and featured)
+export const editServiceSettingsSchema = z
+  .object({
+    status: z
+      .enum([
+        'draft',
+        'pending',
+        'published',
+        'rejected',
+        'approved',
+        'inactive',
+      ])
+      .optional(),
+    featured: z.boolean().optional(),
+  })
   .partial();
 
 export type UpdateServiceMediaInput = z.infer<typeof updateServiceMediaSchema>;
 export type UpdateServiceInfoInput = z.infer<typeof updateServiceInfoSchema>;
+export type EditServiceTaxonomyInput = z.infer<
+  typeof editServiceTaxonomySchema
+>;
+export type EditServiceBasicInput = z.infer<typeof editServiceBasicSchema>;
+export type EditServicePricingInput = z.infer<typeof editServicePricingSchema>;
+export type EditServiceAddonsInput = z.infer<typeof editServiceAddonsSchema>;
+export type EditServiceFaqInput = z.infer<typeof editServiceFaqSchema>;
+export type EditServiceSettingsInput = z.infer<
+  typeof editServiceSettingsSchema
+>;
+
+// =============================================
+// DELETE SERVICE SCHEMA
+// =============================================
+
+export const deleteServiceSchema = z.object({
+  serviceId: z.number().int().min(1, 'Service ID is required'),
+});
+
+export type DeleteServiceInput = z.infer<typeof deleteServiceSchema>;

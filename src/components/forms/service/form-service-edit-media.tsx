@@ -25,7 +25,7 @@ import { toast } from 'sonner';
 
 // Custom components
 import { MediaUpload } from '@/components/media';
-import { FormButton } from '@/components/shared';
+import FormButton from '@/components/shared/button-form';
 
 // Auth and utilities
 import { populateFormData } from '@/lib/utils/form';

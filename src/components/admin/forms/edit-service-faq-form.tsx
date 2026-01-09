@@ -12,12 +12,7 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { updateServiceFaqAction } from '@/actions/admin/services';
 import { populateFormData } from '@/lib/utils/form';
-import { createServiceSchema } from '@/lib/validations/service';
-
-// Use dashboard service schema - pick only faq field with all validations
-const editServiceFaqSchema = createServiceSchema.pick({
-  faq: true,
-});
+import { editServiceFaqSchema } from '@/lib/validations/service';
 
 type EditServiceFaqFormValues = z.infer<typeof editServiceFaqSchema>;
 

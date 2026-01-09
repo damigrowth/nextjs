@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 
-import { FormButton } from '@/components/shared';
+import FormButton from '@/components/shared/button-form';
 import { Form } from '@/components/ui/form';
 import {
   Card,
@@ -77,6 +77,7 @@ import {
 } from './steps';
 import { AuthUser } from '@/lib/types/auth';
 import { Profile } from '@prisma/client';
+import type { DatasetItem } from '@/lib/types/datasets';
 
 const STEPS = [
   {
@@ -119,11 +120,36 @@ const STEP_SCHEMAS = {
 interface CreateServiceFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null; // Profile type with coverage data
+  serviceTaxonomies: DatasetItem[];
+  allSubdivisions: Array<{
+    id: string;
+    label: string;
+    subdivision: any;
+    subcategory: any;
+    category: any;
+  }>;
+  availableTags: Array<{ value: string; label: string }>;
 }
+
+// Create context to pass taxonomy data to step components
+export const TaxonomyDataContext = React.createContext<{
+  serviceTaxonomies: DatasetItem[];
+  allSubdivisions: Array<{
+    id: string;
+    label: string;
+    subdivision: any;
+    subcategory: any;
+    category: any;
+  }>;
+  availableTags: Array<{ value: string; label: string }>;
+} | null>(null);
 
 export default function CreateServiceForm({
   initialUser,
   initialProfile,
+  serviceTaxonomies,
+  allSubdivisions,
+  availableTags,
 }: CreateServiceFormProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -591,8 +617,11 @@ export default function CreateServiceForm({
   };
 
   return (
-    <Form {...form}>
-      <div className='max-w-5xl w-full mx-auto space-y-6 p-2 pr-0'>
+    <TaxonomyDataContext.Provider
+      value={{ serviceTaxonomies, allSubdivisions, availableTags }}
+    >
+      <Form {...form}>
+        <div className='max-w-5xl w-full mx-auto space-y-6 p-2 pr-0'>
         {/* Progress Header */}
         <div className='w-full mb-8'>
           <div className='flex items-center justify-between mb-4'>
@@ -737,60 +766,66 @@ export default function CreateServiceForm({
           {/* Progress Bar removed */}
 
           {/* Steps Navigation */}
-          <div className='flex items-center justify-between mt-6 space-x-2'>
-            {STEPS.map((step) => {
-              const isActive = currentStep === step.id;
-              const isCompleted = isStepCompleted(step.id);
-              const isAccessible =
-                step.id <= currentStep || isStepCompleted(step.id);
+          <div className='relative overflow-x-clip mt-6'>
+            <nav className='overflow-x-auto scrollbar-hide'>
+              <div className='flex flex-nowrap gap-2'>
+                {STEPS.map((step) => {
+                  const isActive = currentStep === step.id;
+                  const isCompleted = isStepCompleted(step.id);
+                  const isAccessible =
+                    step.id <= currentStep || isStepCompleted(step.id);
 
-              return (
-                <div
-                  key={step.id}
-                  className={`flex-1 flex items-center space-x-2 p-2 rounded-lg cursor-pointer transition-colors ${
-                    isActive
-                      ? 'bg-primary/10 border-2 border-primary/30'
-                      : isCompleted
-                        ? 'bg-secondary/10 border-2 border-secondary/30'
-                        : 'bg-muted border-2 border-border'
-                  } ${!isAccessible ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  onClick={() => {
-                    if (isAccessible) {
-                      goToStep(step.id);
-                    }
-                  }}
-                >
-                  <div
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
-                      isActive
-                        ? 'bg-primary text-primary-foreground'
-                        : isCompleted
-                          ? 'bg-secondary text-secondary-foreground'
-                          : 'bg-muted-foreground text-muted'
-                    }`}
-                  >
-                    {isCompleted ? (
-                      <Check className='w-3 h-3' />
-                    ) : (
-                      <span>{step.id}</span>
-                    )}
-                  </div>
-                  <div className='flex-1 min-w-0'>
+                  return (
                     <div
-                      className={`text-xs font-medium truncate ${
+                      key={step.id}
+                      className={`flex-1 flex-shrink-0 flex items-center space-x-2 p-2 rounded-lg cursor-pointer transition-colors ${
                         isActive
-                          ? 'text-primary'
+                          ? 'bg-primary/10 border-2 border-primary/30'
                           : isCompleted
-                            ? 'text-secondary'
-                            : 'text-muted-foreground'
-                      }`}
+                            ? 'bg-secondary/10 border-2 border-secondary/30'
+                            : 'bg-muted border-2 border-border'
+                      } ${!isAccessible ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      onClick={() => {
+                        if (isAccessible) {
+                          goToStep(step.id);
+                        }
+                      }}
                     >
-                      {step.title}
+                      <div
+                        className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                          isActive
+                            ? 'bg-primary text-primary-foreground'
+                            : isCompleted
+                              ? 'bg-secondary text-secondary-foreground'
+                              : 'bg-muted-foreground text-muted'
+                        }`}
+                      >
+                        {isCompleted ? (
+                          <Check className='w-3 h-3' />
+                        ) : (
+                          <span>{step.id}</span>
+                        )}
+                      </div>
+                      <div className='flex-1 min-w-0'>
+                        <div
+                          className={`text-xs font-medium truncate ${
+                            isActive
+                              ? 'text-primary'
+                              : isCompleted
+                                ? 'text-secondary'
+                                : 'text-muted-foreground'
+                          }`}
+                        >
+                          {step.title}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+            </nav>
+            {/* Fade overlay on right edge - only on small screens */}
+            <div className='absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-silver via-silver/60 to-transparent pointer-events-none lg:hidden' />
           </div>
         </div>
 
@@ -882,5 +917,6 @@ export default function CreateServiceForm({
         </Card>
       </div>
     </Form>
+    </TaxonomyDataContext.Provider>
   );
 }

@@ -10,6 +10,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import {
+  getOptimizedImageUrl,
+  getVideoThumbnailUrl,
+  extractPublicId,
+  IMAGE_SIZES,
+  getResponsiveCardImageUrl,
+} from '@/lib/utils/cloudinary';
 
 interface MediaDisplayProps {
   media: PrismaJson.Media;
@@ -32,6 +39,7 @@ export default function MediaDisplay({
 }: MediaDisplayProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [showVideo, setShowVideo] = useState(false); // For click-to-play
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -85,6 +93,37 @@ export default function MediaDisplay({
 
     switch (item.resource_type) {
       case 'video':
+        // Use video thumbnail until user clicks play
+        // Use 'cardResponsive' preset (294×165px) to match image optimization strategy
+        const publicId = extractPublicId(mediaUrl);
+        const thumbnailUrl = publicId
+          ? getVideoThumbnailUrl(publicId, IMAGE_SIZES.cardResponsive.width, IMAGE_SIZES.cardResponsive.height)
+          : null;
+
+        if (!showVideo && thumbnailUrl) {
+          // Show thumbnail with play overlay
+          return (
+            <div className='relative h-full w-full group cursor-pointer' onClick={() => setShowVideo(true)}>
+              <Image
+                src={thumbnailUrl}
+                alt={item.original_filename || 'Video thumbnail'}
+                fill
+                className='object-cover'
+                sizes='(max-width: 640px) 295px, (max-width: 1024px) 50vw, 358px'
+                loading={loading}
+                priority={priority}
+              />
+              {/* Play overlay */}
+              <div className='absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors'>
+                <div className='rounded-full bg-black/50 p-4 backdrop-blur-sm group-hover:bg-black/60 transition-colors'>
+                  <Play className='h-8 w-8 text-white' />
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        // Show actual video after click
         return (
           <>
             <video
@@ -95,6 +134,7 @@ export default function MediaDisplay({
               onEnded={() => setIsPlaying(false)}
               muted={isMuted}
               preload='metadata'
+              autoPlay
             >
               Your browser does not support the video tag.
             </video>
@@ -179,17 +219,36 @@ export default function MediaDisplay({
 
       case 'image':
       default:
-        return (
-          <Image
-            src={mediaUrl}
-            alt={item.original_filename || 'Service media'}
-            fill
-            className='object-cover'
-            sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
-            loading={loading}
-            priority={priority}
-          />
-        );
+        // Extract publicId for responsive image generation
+        const imagePublicId = extractPublicId(mediaUrl);
+        if (imagePublicId) {
+          // Use responsive srcset for optimal loading
+          const { src, srcSet } = getResponsiveCardImageUrl(imagePublicId);
+          return (
+            <img
+              src={src}
+              srcSet={srcSet}
+              sizes='(max-width: 640px) 295px, (max-width: 1024px) 50vw, 358px'
+              alt={item.original_filename || 'Service media'}
+              className='absolute inset-0 h-full w-full object-cover'
+              loading={loading === 'lazy' ? 'lazy' : 'eager'}
+            />
+          );
+        } else {
+          // Fallback for non-Cloudinary images
+          const optimizedUrl = getOptimizedImageUrl(item, 'cardResponsive') || mediaUrl;
+          return (
+            <Image
+              src={optimizedUrl}
+              alt={item.original_filename || 'Service media'}
+              fill
+              className='object-cover'
+              sizes='(max-width: 640px) 295px, (max-width: 1024px) 50vw, 358px'
+              loading={loading}
+              priority={priority}
+            />
+          );
+        }
     }
   };
 

@@ -2,7 +2,7 @@
 
 import React, { JSX } from 'react';
 import { useAuthStore } from '@/lib/stores/authStore';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { Card } from '@/components/ui/card';
 import { User, Briefcase } from 'lucide-react';
 

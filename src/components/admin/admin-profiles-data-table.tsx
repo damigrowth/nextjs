@@ -2,12 +2,14 @@
 
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { NextLink, ProfileBadges, UserAvatar } from '@/components/shared';
+import ProfileBadges from '@/components/shared/profile-badges';
 import { Copy, Check } from 'lucide-react';
 import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { AdminDataTable, ColumnDef } from './admin-data-table';
 import type { AdminProfileWithRelations } from '@/lib/types/auth';
+import UserAvatar from '../shared/user-avatar';
+import { NextLink } from '@/components';
 
 // Copyable text component with hover state
 function CopyableText({
@@ -72,7 +74,7 @@ export function AdminProfilesDataTable({
             <UserAvatar
               displayName={displayName}
               image={profile.image}
-              size='md'
+              size='sm'
               className='h-10 w-10'
               showBorder={false}
               showShadow={false}

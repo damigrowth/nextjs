@@ -1,6 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useActionState, useTransition } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useActionState,
+  useTransition,
+} from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -18,8 +23,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, CheckCircle, Loader2, User, Briefcase } from 'lucide-react';
-import { FormButton } from '../../shared';
+import {
+  AlertCircle,
+  CheckCircle,
+  Loader2,
+  User,
+  Briefcase,
+} from 'lucide-react';
+import FormButton from '@/components/shared/button-form';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
@@ -109,7 +120,8 @@ export default function OAuthSetupForm({
 
   // Type selection state (for users in TYPE_SELECTION step)
   const [isPendingTransition, startTransition] = useTransition();
-  const [selectedType, setSelectedType] = useState<Exclude<AuthType, ''>>('user');
+  const [selectedType, setSelectedType] =
+    useState<Exclude<AuthType, ''>>('user');
   const [typeSelectionError, setTypeSelectionError] = useState<string>('');
 
   // Use useActionState for form submission
@@ -220,7 +232,9 @@ export default function OAuthSetupForm({
       });
 
       if (!result.success) {
-        setTypeSelectionError(result.error || 'Αποτυχία ενημέρωσης λογαριασμού');
+        setTypeSelectionError(
+          result.error || 'Αποτυχία ενημέρωσης λογαριασμού',
+        );
         return;
       }
 
@@ -352,7 +366,9 @@ export default function OAuthSetupForm({
             className='w-full'
             size='lg'
           >
-            {isPendingTransition && <Loader2 className='w-4 h-4 mr-2 animate-spin' />}
+            {isPendingTransition && (
+              <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+            )}
             {isPendingTransition
               ? 'Ενημέρωση...'
               : `Συνέχεια με ${selectedType === 'user' ? 'Απλό' : 'Επαγγελματικό'} λογαριασμό`}

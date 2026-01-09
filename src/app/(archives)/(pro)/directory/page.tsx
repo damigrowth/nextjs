@@ -1,5 +1,5 @@
 import { getDirectoryPageData } from '@/actions/profiles/get-directory';
-import { TaxonomyTabs } from '@/components/shared';
+import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
 import { ArchiveBanner } from '@/components/archives/archive-banner';
 import { SubdivisionsCarousel } from '@/components/archives/subdivisions-carousel';
 import { CategoriesGrid } from '@/components/archives/categories-grid';
@@ -62,6 +62,7 @@ export default async function DirectoryPage() {
               <SubdivisionsCarousel
                 subdivisions={popularSubcategories}
                 gradientColor='silver'
+                title='Πιο δημοφιλείς επαγγελματικές κατηγορίες'
               />
 
               {/* Categories Grid */}

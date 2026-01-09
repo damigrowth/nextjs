@@ -20,7 +20,7 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { QuickCreateDialog } from './quick-create-dialog';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 type NavItem = {
   title: string;

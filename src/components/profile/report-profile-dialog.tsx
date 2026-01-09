@@ -31,7 +31,7 @@ import {
 } from '@/lib/validations/profile';
 import { reportProfile } from '@/actions/profiles/report-profile';
 import { populateFormData } from '@/lib/utils/form';
-import { FormButton } from '@/components/shared';
+import FormButton from '@/components/shared/button-form';
 import { useResettableActionState } from '@/lib/hooks/use-resettable-action-state';
 
 interface ReportProfileDialogProps {

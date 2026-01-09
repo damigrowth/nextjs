@@ -1,16 +1,13 @@
-import {
-  HeroBanner,
-  ContentHero,
-  StatisticsCounter,
-  FeaturesGrid,
-  StatsGrid,
-  TestimonialsSection,
-  ProcessSteps,
-  FaqSection,
-} from '@/components/shared';
-import { data } from '@/constants/datasets/about';
+import ContentHero from '@/components/shared/content-hero';
+import FaqSection from '@/components/shared/faq-section';
+import FeaturesGrid from '@/components/shared/features-grid';
+import HeroBanner from '@/components/shared/hero-banner';
+import ProcessSteps from '@/components/shared/process-steps';
+import StatisticsCounter from '@/components/shared/statistics-counter';
+import StatsGrid from '@/components/shared/stats-grid';
+import TestimonialsSection from '@/components/shared/testimonials-section';
 import { getAboutMetadata } from '@/lib/seo/pages';
-import React from 'react';
+import { data } from '@/constants/datasets/about';
 
 export async function generateMetadata() {
   return getAboutMetadata();

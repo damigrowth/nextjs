@@ -1,5 +1,5 @@
 import React from 'react';
-import { ServiceCard } from '@/components/shared';
+import ServiceCard from '@/components/shared/service-card';
 import { ServiceCardData } from '@/lib/types';
 
 interface ServiceRelatedProps {

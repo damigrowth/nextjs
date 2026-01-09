@@ -31,7 +31,7 @@ import {
 } from '@/lib/validations/service';
 import { reportService } from '@/actions/services/report-service';
 import { populateFormData } from '@/lib/utils/form';
-import { FormButton } from '@/components/shared';
+import FormButton from '@/components/shared/button-form';
 import { useResettableActionState } from '@/lib/hooks/use-resettable-action-state';
 
 interface ReportServiceDialogProps {
