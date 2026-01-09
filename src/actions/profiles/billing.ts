@@ -8,7 +8,7 @@ import { Prisma } from '@prisma/client';
 import { billingSchema, type BillingInput } from '@/lib/validations/profile';
 import { getFormString, getFormBoolean } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
 
 /**

@@ -27,7 +27,7 @@ import {
 } from '@/lib/validations/service';
 import { extractFormData } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { sanitizeCloudinaryResources } from '@/lib/utils/cloudinary';
 import { generateServiceSlug } from '@/lib/utils/text';
 import { normalizeTerm } from '@/lib/utils/text/normalize';

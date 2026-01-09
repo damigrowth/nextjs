@@ -13,7 +13,7 @@ import {
 } from '@/lib/validations/profile';
 import { getFormString, getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { CACHE_TAGS, getProfileTags, revalidateProfile, logCacheRevalidation } from '@/lib/cache';
 
 /**

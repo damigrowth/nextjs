@@ -7,7 +7,7 @@ import { requireAuth, hasAnyRole } from '@/actions/auth/server';
 import { Prisma } from '@prisma/client';
 import { extractFormData } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { sanitizeCloudinaryResources } from '@/lib/utils/cloudinary';
 import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
 import { updateProfilePortfolioSchema } from '@/lib/validations/profile';
