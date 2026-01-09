@@ -378,14 +378,6 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
   }>
 > {
   try {
-    // console.log('getServicesByFiltersInternal called with filters:', {
-    //   ...filters,
-    //   dbConnectionCheck: {
-    //     DATABASE_URL: process.env.DATABASE_URL ? 'Set' : 'Not set',
-    //     DIRECT_URL: process.env.DIRECT_URL ? 'Set' : 'Not set',
-    //   },
-    // });
-
     const page = filters.page || 1;
     const limit = filters.limit || 20;
     const offset = (page - 1) * limit;
