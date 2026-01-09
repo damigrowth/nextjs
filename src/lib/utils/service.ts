@@ -3,8 +3,6 @@
  * Helper functions for service-related operations
  */
 
-import type { PrismaJson } from '@/lib/prisma/json-types';
-
 /**
  * Format service type JSON object into readable labels
  * Converts boolean flags into Greek labels matching create service flow
