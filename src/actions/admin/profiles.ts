@@ -9,6 +9,7 @@ import { revalidateTag, revalidatePath } from 'next/cache';
 import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
 import { getProTaxonomies } from '@/lib/taxonomies';
 import { resolveTaxonomyHierarchy } from '@/lib/utils/datasets';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 
 import {
   adminListProfilesSchema,
@@ -246,10 +247,23 @@ export async function updateProfile(params: AdminUpdateProfileInput) {
 
     const { profileId, ...updateData } = validatedParams;
 
-    // Remove undefined values
-    const cleanData = Object.fromEntries(
-      Object.entries(updateData).filter(([_, v]) => v !== undefined),
-    );
+    // Remove undefined values and add normalized fields for searchable text
+    const cleanData: Record<string, any> = {};
+    Object.entries(updateData).forEach(([key, value]) => {
+      if (value !== undefined) {
+        cleanData[key] = value;
+
+        // Add normalized version for searchable text fields
+        // Only normalize non-empty strings (empty string should set normalized to null)
+        if (key === 'displayName' && value) {
+          cleanData.displayNameNormalized = normalizeTerm(value as string);
+        } else if (key === 'tagline' && value) {
+          cleanData.taglineNormalized = normalizeTerm(value as string);
+        } else if (key === 'bio' && value) {
+          cleanData.bioNormalized = normalizeTerm(value as string);
+        }
+      }
+    });
 
     const profile = await prisma.profile.update({
       where: { id: profileId },

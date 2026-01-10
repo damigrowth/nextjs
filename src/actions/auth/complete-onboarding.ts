@@ -17,6 +17,7 @@ import {
   sanitizeCloudinaryResources,
 } from '@/lib/utils/cloudinary';
 import { brevoWorkflowService, sendNewProfileEmail } from '@/lib/email';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 
 /**
  * Complete onboarding action wrapper for useActionState
@@ -126,6 +127,7 @@ export async function completeOnboarding(
             ? user.role
             : 'freelancer', // Sync user.role to profile.type
         bio: data.bio,
+        bioNormalized: data.bio ? normalizeTerm(data.bio) : null,
         category: data.category,
         subcategory: data.subcategory,
         coverage: data.coverage,
@@ -137,6 +139,7 @@ export async function completeOnboarding(
         // Sync user fields to profile
         username: user.username,
         displayName: user.displayName,
+        displayNameNormalized: user.displayName ? normalizeTerm(user.displayName) : null,
         email: user.email,
       },
       create: {
@@ -145,6 +148,7 @@ export async function completeOnboarding(
             ? user.role
             : 'freelancer', // Sync user.role to profile.type
         bio: data.bio,
+        bioNormalized: data.bio ? normalizeTerm(data.bio) : null,
         category: data.category,
         subcategory: data.subcategory,
         coverage: data.coverage,
@@ -156,6 +160,7 @@ export async function completeOnboarding(
         // Sync user fields to profile
         username: user.username,
         displayName: user.displayName,
+        displayNameNormalized: user.displayName ? normalizeTerm(user.displayName) : null,
         email: user.email,
         user: {
           connect: { id: user.id },

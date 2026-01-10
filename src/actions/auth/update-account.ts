@@ -16,6 +16,7 @@ import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { processImageForDatabase } from '@/lib/utils/cloudinary';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 
 /**
  * Server action wrapper for useActionState
@@ -96,6 +97,7 @@ export async function updateAccount(
         where: { uid: user.id },
         data: {
           displayName: data.displayName,
+          displayNameNormalized: normalizeTerm(data.displayName),
           ...(processedImage !== undefined && { image: processedImage }),
         },
       });

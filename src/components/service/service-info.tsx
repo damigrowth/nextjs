@@ -1,7 +1,10 @@
 import React from 'react';
 import { Clock, MapPin, Globe, Users } from 'lucide-react';
 import { DatasetItem } from '@/lib/types/datasets';
-import { getCoverageGroupedByCounty } from '@/lib/utils/datasets';
+import {
+  getCoverageGroupedByCounty,
+  getCoverageAddressWithLocation,
+} from '@/lib/utils/datasets';
 import IconBox from '@/components/shared/icon-box';
 import { FlaticonCategory, FlaticonRefresh } from '@/components/icon';
 import CoverageDisplay from '@/components/shared/coverage-display';
@@ -102,7 +105,7 @@ export default function ServiceInfo({
           <IconBox
             icon={<MapPin className='h-10 w-10' />}
             title='Διεύθυνση'
-            value={coverage.address}
+            value={getCoverageAddressWithLocation(coverage)}
           />
         </div>
       )}

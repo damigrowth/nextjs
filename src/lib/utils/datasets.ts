@@ -962,6 +962,37 @@ export function getCoverageAddress(coverage: CoverageWithNames): string | null {
 }
 
 /**
+ * Get the formatted address for onbase coverage with area and county
+ * @param coverage - Coverage object from profile (already transformed with names)
+ * @returns Formatted address string: "address, area (county)" or null
+ * @example
+ * // Returns: "Κάδμου 3, Αγία Παρασκευή (Αττική)"
+ * getCoverageAddressWithLocation({ address: "Κάδμου 3", area: "Αγία Παρασκευή", county: "Αττική" })
+ */
+export function getCoverageAddressWithLocation(
+  coverage: CoverageWithNames,
+): string | null {
+  if (!coverage.onbase || !coverage.address) {
+    return null;
+  }
+
+  // Build formatted address: "address, area (county)"
+  const parts: string[] = [coverage.address];
+
+  if (coverage.area) {
+    parts.push(coverage.area);
+  }
+
+  let formattedAddress = parts.join(', ');
+
+  if (coverage.county) {
+    formattedAddress += ` (${coverage.county})`;
+  }
+
+  return formattedAddress;
+}
+
+/**
  * Check if coverage has any onsite areas to display
  * @param coverage - Coverage object from profile
  * @returns Boolean indicating if there are areas to display
@@ -1041,6 +1072,46 @@ export function getCoverageGroupedByCounty(
 // =============================================================================
 // COVERAGE TRANSFORMATION UTILITIES
 // =============================================================================
+
+/**
+ * Helper function to get area name from a location ID (handles both area IDs and zipcode IDs)
+ * If the locationId is a zipcode ID, it returns the parent area name
+ * If the locationId is an area ID, it returns the area name
+ * @param locationOptions - Hierarchical location dataset
+ * @param locationId - Can be either an area ID or a zipcode ID
+ * @param countyId - County ID for context (optional, helps narrow search)
+ * @returns Area name or null
+ */
+function getAreaNameFromLocationId<T extends DatasetItem>(
+  locationOptions: T[],
+  locationId: string | null | undefined,
+  countyId: string | null | undefined,
+): string | null {
+  if (!locationId) return null;
+
+  // First, try to find it as an area (direct child of county)
+  for (const county of locationOptions) {
+    // If countyId is provided, only search in that county
+    if (countyId && county.id !== countyId) continue;
+
+    const area = county.children?.find((a: any) => a.id === locationId);
+    if (area) {
+      // Found as area - return area name
+      return area.name || area.label || null;
+    }
+
+    // Not found as area, search in zipcodes (grandchildren)
+    for (const area of county.children || []) {
+      const zipcode = (area as any).children?.find((z: any) => z.id === locationId);
+      if (zipcode) {
+        // Found as zipcode - return parent area name
+        return area.name || area.label || null;
+      }
+    }
+  }
+
+  return null;
+}
 
 /**
  * Transform raw coverage data by resolving all location IDs to names
@@ -1147,9 +1218,12 @@ export function transformCoverageWithLocationNames<T extends DatasetItem>(
     county: rawCoverage.county
       ? getLocationName(locationOptions, rawCoverage.county)
       : null,
+    // Use helper that handles both area IDs and zipcode IDs
     area: rawCoverage.area
-      ? getLocationNameInContext(locationOptions, rawCoverage.area, rawCoverage.county)
-      : null,
+      ? getAreaNameFromLocationId(locationOptions, rawCoverage.area, rawCoverage.county)
+      : rawCoverage.zipcode
+        ? getAreaNameFromLocationId(locationOptions, rawCoverage.zipcode, rawCoverage.county)
+        : null,
     zipcode: rawCoverage.zipcode
       ? getLocationNameInContext(locationOptions, rawCoverage.zipcode, rawCoverage.county)
       : null,

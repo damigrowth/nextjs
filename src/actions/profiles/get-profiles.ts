@@ -28,6 +28,7 @@ import { isValidArchiveSortBy } from '@/lib/types/common';
 import type { ActionResult } from '@/lib/types/api';
 import type { ArchiveProfileCardData } from '@/lib/types/components';
 import type { ArchiveSortBy } from '@/lib/types/common';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 import type { FilterState } from '@/lib/hooks/archives/use-archive-filters';
 import { Prisma, Profile, User } from '@prisma/client';
 import { getDirectoryPageData, type ProSubcategoryWithCount } from './get-directory';
@@ -111,45 +112,6 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
         : filters.subcategory;
     }
 
-    // Add search filter for displayName, tagline, and bio
-    if (filters.search) {
-      const searchTerm = filters.search.trim();
-      if (searchTerm.length >= 2) {
-        const searchConditions = [
-          {
-            displayName: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            tagline: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            bio: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-        ];
-
-        // If there's already an OR clause (from location filters), combine with AND
-        if (whereClause.OR) {
-          const existingOR = whereClause.OR;
-          whereClause.AND = whereClause.AND || [];
-          whereClause.AND.push({
-            OR: searchConditions,
-          });
-          whereClause.OR = existingOR;
-        } else {
-          whereClause.OR = searchConditions;
-        }
-      }
-    }
-
     // Handle combined online and county filters
     if (filters.online !== undefined && filters.county) {
       // Resolve county slug to ID using O(1) hash map lookup (slug) with O(n) name fallback
@@ -222,6 +184,70 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
             },
           },
         ];
+      }
+    }
+
+    // Add search filter for displayName, tagline, and bio using normalized fields
+    // This provides accent-insensitive search for Greek text
+    // IMPORTANT: Process AFTER location filters so search can combine with existing OR clause
+    if (filters.search) {
+      const searchTerm = filters.search.trim();
+      if (searchTerm.length >= 2) {
+        // Normalize search term to handle Greek accents (ά → α, etc.)
+        const normalizedSearch = normalizeTerm(searchTerm);
+
+        const searchConditions = [
+          // Search in normalized fields (for profiles with proper normalized data)
+          {
+            displayNameNormalized: {
+              contains: normalizedSearch,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            taglineNormalized: {
+              contains: normalizedSearch,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            bioNormalized: {
+              contains: normalizedSearch,
+              mode: 'insensitive' as const,
+            },
+          },
+          // Fallback: Also search in original fields for profiles without normalized data
+          {
+            displayName: {
+              contains: searchTerm,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            tagline: {
+              contains: searchTerm,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            bio: {
+              contains: searchTerm,
+              mode: 'insensitive' as const,
+            },
+          },
+        ];
+
+        // If there's already an OR clause (from location filters), combine with AND
+        if (whereClause.OR) {
+          const existingOR = whereClause.OR;
+          whereClause.AND = whereClause.AND || [];
+          whereClause.AND.push({
+            OR: searchConditions,
+          });
+          whereClause.OR = existingOR;
+        } else {
+          whereClause.OR = searchConditions;
+        }
       }
     }
 
@@ -827,6 +853,7 @@ export async function getProfileArchivePageData(params: {
       subcategory: subcategorySlug,
       county: searchParams.county || searchParams.περιοχή,
       online: searchParams.online === 'true' || searchParams.online === '' ? true : undefined,
+      search: searchParams.search,
       sortBy,
       type: searchParams.type,
     };

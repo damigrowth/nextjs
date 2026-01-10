@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { processImageForDatabase } from '@/lib/utils/cloudinary';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 // legacy exports
 // import {
 //   listUsersSchema,
@@ -1207,6 +1208,7 @@ export async function updateAccountAdmin(
         where: { uid: userId },
         data: {
           displayName: displayName || undefined,
+          displayNameNormalized: displayName ? normalizeTerm(displayName) : undefined,
           ...(processedImage !== undefined && { image: processedImage }),
           updatedAt: new Date(),
         },

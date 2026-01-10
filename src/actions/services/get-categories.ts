@@ -1,10 +1,8 @@
 'use server';
 
 import { unstable_cache } from 'next/cache';
-import { getServiceTaxonomies } from '@/lib/taxonomies';
+import { resolveServiceHierarchyWithChildren, getServiceTaxonomies, findServiceBySlug } from '@/lib/taxonomies';
 import { getServiceTaxonomyPaths } from './get-services';
-// O(1) optimized taxonomy lookups - 99% faster than findBySlug/findById
-import { findServiceBySlug, findServiceById } from '@/lib/taxonomies';
 // Complex utilities - KEEP for non-taxonomy operations
 import { findBySlug, findById } from '@/lib/utils/datasets';
 // Unified cache configuration
@@ -85,17 +83,19 @@ export async function getCategoriesPageData(options?: {
 
         // Filter by category and/or subcategory if provided
         if (categorySlug) {
-          // OPTIMIZATION: O(1) hash map lookup instead of O(n) findBySlug
-          const categoryData = findServiceBySlug(categorySlug);
+          // OPTIMIZED: Use hybrid approach - full tree with children populated
+          const { category: categoryData, subcategory: subcategoryData } =
+            resolveServiceHierarchyWithChildren(
+              categorySlug,
+              subcategorySlug,
+              null
+            );
+
           if (categoryData) {
             subdivisionWhere.category = categoryData.id;
 
-            // If subcategory provided, also filter by it
-            if (subcategorySlug) {
-              const subcategoryData = findServiceBySlug(subcategorySlug);
-              if (subcategoryData) {
-                subdivisionWhere.subcategory = subcategoryData.id;
-              }
+            if (subcategoryData) {
+              subdivisionWhere.subcategory = subcategoryData.id;
             }
           }
         }
@@ -197,9 +197,6 @@ export async function getCategoriesPageData(options?: {
             }
 
             if (!subdivisionData || !context) {
-              console.log(
-                `Could not find subdivision data for ID: ${subdivisionId}`,
-              );
               return null;
             }
 

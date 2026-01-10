@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import type { ProfileMetaProps } from '@/lib/types/components';
 
 import {
-  getCoverageAddress,
+  getCoverageAddressWithLocation,
   getCoverageGroupedByCounty,
   hasOnbaseCoverage,
   hasOnsiteCoverage,
@@ -141,7 +141,7 @@ export default function ProfileMeta({
                   visibility?.address && (
                     <div className='flex items-center gap-2 text-muted-foreground'>
                       <Home className='h-4 w-4 text-primary' />
-                      <span>{getCoverageAddress(coverage)}</span>
+                      <span>{getCoverageAddressWithLocation(coverage)}</span>
                     </div>
                   )}
 

@@ -15,6 +15,7 @@ import { getFormString, getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { CACHE_TAGS, getProfileTags, revalidateProfile, logCacheRevalidation } from '@/lib/cache';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 
 /**
  * Server action wrapper for useActionState
@@ -114,7 +115,9 @@ export async function updateProfileBasicInfo(
       where: { uid: user.id },
       data: {
         tagline: data.tagline,
+        taglineNormalized: data.tagline ? normalizeTerm(data.tagline) : null,
         bio: data.bio,
+        bioNormalized: data.bio ? normalizeTerm(data.bio) : null,
         category: data.category,
         subcategory: data.subcategory,
         speciality: data.speciality,
