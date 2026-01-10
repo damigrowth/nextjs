@@ -398,90 +398,6 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
       whereClause.subdivision = filters.subdivision;
     }
 
-    // Add search filter for title, description, and tags using normalized fields
-    // This provides accent-insensitive search for Greek text
-    // IMPORTANT: Skip text search if the search term matches a location name
-    if (filters.search) {
-      const searchTerm = filters.search.trim();
-      if (searchTerm.length >= 2) {
-        // Normalize search term to handle Greek accents (ά → α, etc.)
-        const normalizedSearch = normalizeTerm(searchTerm);
-
-        // Check if search term is a location - if so, skip text search
-        // User intent when searching for a location is to filter by that location, not find mentions of it
-        const isLocationSearch = findLocationBySlugOrName(normalizedSearch);
-
-        // Only create text search if NOT searching for a location
-        if (!isLocationSearch) {
-          // Find matching tags by searching in tag labels
-          const matchingTags = tags.filter((tag) => {
-            const normalizedLabel = normalizeTerm(tag.label);
-            return normalizedLabel
-              .toLowerCase()
-              .includes(normalizedSearch.toLowerCase());
-          });
-          const matchingTagIds = matchingTags.map((tag) => tag.id);
-
-          whereClause.OR = whereClause.OR || [];
-          const searchConditions: Array<
-            | { titleNormalized: { contains: string; mode: 'insensitive' } }
-            | { descriptionNormalized: { contains: string; mode: 'insensitive' } }
-            | { title: { contains: string; mode: 'insensitive' } }
-            | { description: { contains: string; mode: 'insensitive' } }
-            | { tags: { hasSome: string[] } }
-          > = [
-            // Search in normalized fields (for services with proper normalized data)
-            {
-              titleNormalized: {
-                contains: normalizedSearch,
-                mode: 'insensitive' as const,
-              },
-            },
-            {
-              descriptionNormalized: {
-                contains: normalizedSearch,
-                mode: 'insensitive' as const,
-              },
-            },
-            // Fallback: Also search in original fields for services without normalized data
-            {
-              title: {
-                contains: searchTerm,
-                mode: 'insensitive' as const,
-              },
-            },
-            {
-              description: {
-                contains: searchTerm,
-                mode: 'insensitive' as const,
-              },
-            },
-          ];
-
-          // Add tag search condition if matching tags found
-          if (matchingTagIds.length > 0) {
-            searchConditions.push({
-              tags: {
-                hasSome: matchingTagIds,
-              },
-            });
-          }
-
-          // If there's already an OR clause (from filters), combine them with AND
-          if (whereClause.OR.length > 0) {
-            const existingOR = whereClause.OR;
-            whereClause.AND = whereClause.AND || [];
-            whereClause.AND.push({
-              OR: searchConditions,
-            });
-            whereClause.OR = existingOR;
-          } else {
-            whereClause.OR = searchConditions;
-          }
-        }
-      }
-    }
-
     // Add automatic location detection from search query
     // Only applies if no explicit county filter is already set
     if (filters.search && !filters.county) {
@@ -592,6 +508,90 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
             ],
           },
         ];
+      }
+    }
+
+    // Add search filter for title, description, and tags using normalized fields
+    // This provides accent-insensitive search for Greek text
+    // IMPORTANT: Process AFTER location filters so search can combine with existing OR clause
+    // IMPORTANT: Skip text search if the search term matches a location name
+    if (filters.search) {
+      const searchTerm = filters.search.trim();
+      if (searchTerm.length >= 2) {
+        // Normalize search term to handle Greek accents (ά → α, etc.)
+        const normalizedSearch = normalizeTerm(searchTerm);
+
+        // Check if search term is a location - if so, skip text search
+        // User intent when searching for a location is to filter by that location, not find mentions of it
+        const isLocationSearch = findLocationBySlugOrName(normalizedSearch);
+
+        // Only create text search if NOT searching for a location
+        if (!isLocationSearch) {
+          // Find matching tags by searching in tag labels
+          const matchingTags = tags.filter((tag) => {
+            const normalizedLabel = normalizeTerm(tag.label);
+            return normalizedLabel
+              .toLowerCase()
+              .includes(normalizedSearch.toLowerCase());
+          });
+          const matchingTagIds = matchingTags.map((tag) => tag.id);
+
+          const searchConditions: Array<
+            | { titleNormalized: { contains: string; mode: 'insensitive' } }
+            | { descriptionNormalized: { contains: string; mode: 'insensitive' } }
+            | { title: { contains: string; mode: 'insensitive' } }
+            | { description: { contains: string; mode: 'insensitive' } }
+            | { tags: { hasSome: string[] } }
+          > = [
+            // Search in normalized fields (for services with proper normalized data)
+            {
+              titleNormalized: {
+                contains: normalizedSearch,
+                mode: 'insensitive' as const,
+              },
+            },
+            {
+              descriptionNormalized: {
+                contains: normalizedSearch,
+                mode: 'insensitive' as const,
+              },
+            },
+            // Fallback: Also search in original fields for services without normalized data
+            {
+              title: {
+                contains: searchTerm,
+                mode: 'insensitive' as const,
+              },
+            },
+            {
+              description: {
+                contains: searchTerm,
+                mode: 'insensitive' as const,
+              },
+            },
+          ];
+
+          // Add tag search condition if matching tags found
+          if (matchingTagIds.length > 0) {
+            searchConditions.push({
+              tags: {
+                hasSome: matchingTagIds,
+              },
+            });
+          }
+
+          // If there's already an OR clause (from filters), combine them with AND
+          if (whereClause.OR && whereClause.OR.length > 0) {
+            const existingOR = whereClause.OR;
+            whereClause.AND = whereClause.AND || [];
+            whereClause.AND.push({
+              OR: searchConditions,
+            });
+            whereClause.OR = existingOR;
+          } else {
+            whereClause.OR = searchConditions;
+          }
+        }
       }
     }
 
