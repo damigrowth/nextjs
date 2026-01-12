@@ -13,6 +13,7 @@ import {
 import { FooterWrapper } from '@/components/shared/layout';
 import { Body, Notifications } from '@/components/shared/layout/wrapper';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import NavigationSkeletonOverlay from '@/components/shared/navigation-skeleton-overlay';
 
 export const metadata: Metadata = {
   title: {
@@ -39,6 +40,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       <Body>
         {/* CookieFirst loads via Google Tag Manager - no React wrapper needed */}
         <TooltipProvider delayDuration={0}>
+            {/* Global navigation skeleton overlay */}
+            <NavigationSkeletonOverlay />
             <main>
               <Notifications>{children}</Notifications>
             </main>

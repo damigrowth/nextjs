@@ -10,7 +10,7 @@ import { useChatSubscription } from '@/lib/hooks/chat/use-chat-subscription';
 import { useMessageOptimistic } from '@/lib/hooks/chat/use-message-optimistic';
 import { getMessages, markAsRead } from '@/actions/messages';
 import { ChatMessages } from './chat-messages';
-import { MessageInput, ReplyToMessage, EditingMessage } from './message-input';
+import { MessageInput, ReplyToMessage } from './message-input';
 import { Loader2 } from 'lucide-react';
 import type { ChatMessageItem } from '@/lib/types/messages';
 
@@ -30,7 +30,6 @@ export function MessagesContainer({
   const scrollRef = useRef<HTMLDivElement>(null);
   const loadTriggerRef = useRef<HTMLDivElement>(null);
   const [replyTo, setReplyTo] = useState<ReplyToMessage | null>(null);
-  const [editingMessage, setEditingMessage] = useState<EditingMessage | null>(null);
   const [olderMessages, setOlderMessages] = useState<ChatMessageItem[]>([]);
   const [isLoadingOlder, setIsLoadingOlder] = useState(false);
   const [hasMore, setHasMore] = useState(initialMessages.length >= 20);
@@ -222,7 +221,6 @@ export function MessagesContainer({
         scrollRef={scrollRef}
         currentUserId={currentUserId}
         onReply={setReplyTo}
-        onEdit={setEditingMessage}
         loadTriggerRef={loadTriggerRef}
         isLoadingOlder={isLoadingOlder}
         hasMore={hasMore}
@@ -232,8 +230,6 @@ export function MessagesContainer({
         currentUserId={currentUserId}
         replyTo={replyTo}
         onCancelReply={() => setReplyTo(null)}
-        editingMessage={editingMessage}
-        onCancelEdit={() => setEditingMessage(null)}
         chats={chats}
       />
     </>

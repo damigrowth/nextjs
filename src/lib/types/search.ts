@@ -18,6 +18,7 @@ export interface ServicePreview {
   slug: string | null;
   url: string; // Service detail URL
   location?: string; // Matched location from profile coverage (county or area)
+  matchType: 'title' | 'description' | 'coverage'; // Where the match was found
 }
 
 export type SearchSuggestion = TaxonomySuggestion | ServicePreview;

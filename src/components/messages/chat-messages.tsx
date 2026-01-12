@@ -13,7 +13,7 @@ import { MessageActions } from './message-actions';
 import { MessageReplyQuote } from './message-reply-quote';
 import { ReactionPicker } from './reaction-picker';
 import { ChatMessageItem } from '@/lib/types/messages';
-import { ReplyToMessage, EditingMessage } from './message-input';
+import { ReplyToMessage } from './message-input';
 import { formatMessageTime, formatChatDateDivider } from '@/lib/utils/messages';
 import { toast } from 'sonner';
 import { toggleReaction } from '@/actions/messages/reactions';
@@ -23,7 +23,6 @@ interface ChatMessagesProps {
   scrollRef?: RefObject<HTMLDivElement>;
   currentUserId: string;
   onReply?: (replyTo: ReplyToMessage) => void;
-  onEdit?: (editing: EditingMessage) => void;
   loadTriggerRef?: RefObject<HTMLDivElement>;
   isLoadingOlder?: boolean;
   hasMore?: boolean;
@@ -34,7 +33,6 @@ export function ChatMessages({
   scrollRef,
   currentUserId,
   onReply,
-  onEdit,
   loadTriggerRef,
   isLoadingOlder,
   hasMore,
@@ -50,15 +48,6 @@ export function ChatMessages({
           message.author?.lastName ||
           'Unknown User',
         isOwn: message.isOwn,
-      });
-    }
-  };
-
-  const handleEdit = (message: ChatMessageItem) => {
-    if (onEdit) {
-      onEdit({
-        id: message.id,
-        content: message.content,
       });
     }
   };
@@ -214,7 +203,6 @@ export function ChatMessages({
                   messageId={message.id}
                   isOwn={true}
                   align='end'
-                  onEdit={() => handleEdit(message)}
                   onCopy={() => handleCopyMessage(message.content)}
                   onReply={() => handleReply(message)}
                   messageContent={message.content}
