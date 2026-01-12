@@ -581,6 +581,7 @@ export default function FormServiceEdit({
                   </div>
                   <FormControl>
                     <LazyCombobox
+                      trigger='search'
                       multiple
                       options={availableTags.map((tag) => ({
                         id: tag.value,

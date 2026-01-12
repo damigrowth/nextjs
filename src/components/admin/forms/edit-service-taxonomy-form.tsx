@@ -179,6 +179,7 @@ export function EditServiceTaxonomyForm({
               <FormLabel>Tags</FormLabel>
               <FormControl>
                 <LazyCombobox
+                  trigger='search'
                   multiple
                   options={availableTags.map((tag) => ({
                     id: tag.value,

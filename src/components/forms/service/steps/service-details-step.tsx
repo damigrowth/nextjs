@@ -285,6 +285,7 @@ export default function ServiceDetailsStep() {
               </div>
               <FormControl>
                 <LazyCombobox
+                  trigger='search'
                   multiple
                   options={availableTags.map((tag) => ({
                     id: tag.value,
