@@ -179,7 +179,9 @@ function buildProMaps(items: DatasetItem[]) {
 }
 
 /**
- * Build location maps (flat structure)
+ * Build location maps (flat structure with recursive flattening)
+ * Recursively adds ALL locations (counties AND areas) to the byId/bySlug maps
+ * for O(1) lookup performance across all location levels
  */
 function buildLocationMaps(items: DatasetItem[]) {
   const maps = {
@@ -187,10 +189,21 @@ function buildLocationMaps(items: DatasetItem[]) {
     bySlug: {} as Record<string, DatasetItem>,
   };
 
-  items.forEach(location => {
-    maps.byId[location.id] = location;
-    maps.bySlug[location.slug] = location;
-  });
+  function addItemToMaps(item: DatasetItem) {
+    // Add item to maps
+    maps.byId[item.id] = item;
+    if (item.slug) {
+      maps.bySlug[item.slug] = item;
+    }
+
+    // Recursively add all children (areas under counties)
+    if (item.children && Array.isArray(item.children)) {
+      item.children.forEach(child => addItemToMaps(child));
+    }
+  }
+
+  // Process all top-level locations (counties) and their nested children (areas)
+  items.forEach(location => addItemToMaps(location));
 
   return maps;
 }

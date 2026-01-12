@@ -161,6 +161,14 @@ async function performSearch(
               mode: 'insensitive',
             },
           },
+          {
+            profile: {
+              coverageNormalized: {
+                contains: searchTerm,
+                mode: 'insensitive',
+              },
+            },
+          },
         ],
       },
       select: {
@@ -168,9 +176,12 @@ async function performSearch(
         title: true,
         slug: true,
         category: true,
+        titleNormalized: true,
+        descriptionNormalized: true,
         profile: {
           select: {
             coverage: true, // Include coverage for location extraction
+            coverageNormalized: true, // For match type detection
           },
         },
       },
@@ -192,6 +203,22 @@ async function performSearch(
           ? findMatchingLocationInCoverage(service.profile.coverage, searchTerm)
           : undefined;
 
+        // Detect match type for prioritization
+        // Check coverage FIRST - highest priority for location searches
+        const coverageMatch =
+          service.profile?.coverageNormalized?.includes(searchTerm);
+        const titleMatch = service.titleNormalized?.includes(searchTerm);
+        const descriptionMatch =
+          !coverageMatch &&
+          !titleMatch &&
+          service.descriptionNormalized?.includes(searchTerm);
+
+        const matchType: 'coverage' | 'title' | 'description' = coverageMatch
+          ? 'coverage'
+          : titleMatch
+            ? 'title'
+            : 'description';
+
         return {
           type: 'service' as const,
           id: service.id,
@@ -200,10 +227,11 @@ async function performSearch(
           slug: service.slug,
           url: service.slug ? `/s/${service.slug}` : `/s/${service.id}`,
           location: matchedLocation,
+          matchType,
         };
       })
       .sort((a, b) => {
-        // Sort by relevance: prioritize by location match, then title match
+        // Sort by relevance: title match > coverage match > description match
         const aNormalizedTitle = normalizeTerm(a.title);
         const bNormalizedTitle = normalizeTerm(b.title);
 
@@ -237,19 +265,28 @@ async function performSearch(
         if (aWordStartsWith && !bWordStartsWith) return -1;
         if (!aWordStartsWith && bWordStartsWith) return 1;
 
+        // Priority 3: Coverage matches (higher priority than description)
+        const aCoverageMatch = a.matchType === 'coverage';
+        const bCoverageMatch = b.matchType === 'coverage';
+        if (aCoverageMatch && !bCoverageMatch) return -1;
+        if (!aCoverageMatch && bCoverageMatch) return 1;
+
+        // Priority 4: Description matches fall here naturally
         // If equal priority, maintain original order (by rating)
         return 0;
-      })
-      .slice(0, 5); // Limit to 5 results after filtering and sorting
+      });
+
+    // Take only top 5 after sorting
+    const limitedServices = servicesPreviews.slice(0, 5);
 
     const hasResults =
-      limitedTaxonomies.length > 0 || servicesPreviews.length > 0;
+      limitedTaxonomies.length > 0 || limitedServices.length > 0;
 
     return {
       success: true,
       data: {
         taxonomies: limitedTaxonomies,
-        services: servicesPreviews,
+        services: limitedServices,
         hasResults,
       },
     };

@@ -2,6 +2,10 @@
 // These are pure utility functions that work with any hierarchical dataset structure
 
 import { DatasetItem } from '../types/datasets';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
+import type { coverageSchema } from '@/lib/prisma/json-types';
+import { z } from 'zod';
+import { getLocations } from '../taxonomies';
 
 // =============================================================================
 // GENERIC DATASET UTILITIES
@@ -910,6 +914,82 @@ type CoverageWithNames = {
   areas?: string[]; // Already resolved names
   countyAreasMap?: Array<{ county: string; areas: string[] }>; // Grouped county-area relationships
 };
+
+type Coverage = z.infer<typeof coverageSchema>;
+
+/**
+ * Generate normalized coverage string for search
+ * Extracts all location names from coverage object and normalizes them
+ *
+ * Uses getLocationName() which searches hierarchically through the location dataset
+ * to find counties, areas, and even zipcodes by their IDs.
+ *
+ * @param coverage - Profile coverage object containing area/county IDs
+ * @returns Space-separated normalized location names for search
+ *
+ * @example
+ * const coverage = {
+ *   online: true,
+ *   onsite: true,
+ *   areas: ['216', '224'], // Area IDs (Γαλάτσι, Γέρακας)
+ *   counties: ['2'] // County ID (Αττική)
+ * };
+ * generateCoverageNormalized(coverage);
+ * // Returns: "γαλατσι γερακας αττικη"
+ */
+export function generateCoverageNormalized(
+  coverage: Coverage | null | undefined,
+): string | null {
+  if (!coverage) return null;
+
+  // Load hierarchical location dataset once
+  const locations = getLocations();
+  const locationNames: string[] = [];
+
+  // Extract area names from area IDs
+  if (Array.isArray(coverage.areas)) {
+    for (const areaId of coverage.areas) {
+      const areaName = getLocationName(locations, areaId);
+      if (areaName) {
+        // Normalize: "Γαλάτσι" → "γαλατσι"
+        locationNames.push(normalizeTerm(areaName));
+      }
+    }
+  }
+
+  // Extract county names from county IDs
+  if (Array.isArray(coverage.counties)) {
+    for (const countyId of coverage.counties) {
+      const countyName = getLocationName(locations, countyId);
+      if (countyName) {
+        // Normalize: "Αττική" → "αττικη"
+        locationNames.push(normalizeTerm(countyName));
+      }
+    }
+  }
+
+  // Legacy single area/county support (if exists)
+  if (coverage.area) {
+    const areaName = getLocationName(locations, coverage.area);
+    if (areaName) {
+      locationNames.push(normalizeTerm(areaName));
+    }
+  }
+
+  if (coverage.county) {
+    const countyName = getLocationName(locations, coverage.county);
+    if (countyName) {
+      locationNames.push(normalizeTerm(countyName));
+    }
+  }
+
+  // Remove duplicate location names while preserving order
+  const uniqueLocationNames = [...new Set(locationNames)];
+
+  // Return space-separated normalized location names
+  // This allows database CONTAINS search to find any location
+  return uniqueLocationNames.length > 0 ? uniqueLocationNames.join(' ') : null;
+}
 
 /**
  * Get formatted coverage areas display text
