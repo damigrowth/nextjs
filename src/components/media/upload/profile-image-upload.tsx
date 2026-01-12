@@ -9,6 +9,7 @@ import {
   generateAcceptString,
   MediaType
 } from '@/lib/utils/media';
+import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 import { ProfileImageUploadProps } from '@/lib/types/components';
 import { CloudinaryUploadWidget } from './cloudinary-upload-widget';
 import { CloudinaryResource } from '@/lib/types/cloudinary';
@@ -40,10 +41,14 @@ const renderProfileImage = (
   if (resource) {
     // Handle string URLs (OAuth images, persisted cropped URLs)
     if (typeof resource === 'string') {
+      // Optimize Cloudinary URLs with transformations (w_150,h_150,c_fill,g_face, etc.)
+      // Falls back to original URL for non-Cloudinary images (OAuth avatars)
+      const optimizedUrl = getOptimizedImageUrl(resource, 'avatar', 'lg');
+
       return (
         <div className="relative w-[71px] h-[71px]">
           <img
-            src={resource}
+            src={optimizedUrl || resource}
             alt="Profile image"
             className="w-full h-full rounded-lg object-cover border-2 border-gray-200"
             crossOrigin="anonymous"

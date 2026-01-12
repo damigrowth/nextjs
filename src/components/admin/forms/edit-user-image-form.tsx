@@ -1,149 +1,196 @@
 'use client';
 
-import { useEffect, useActionState, useState } from 'react';
+import { useEffect, useActionState, useState, useRef } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { updateUserImageAction } from '@/actions/admin';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { toast } from 'sonner';
-import { Loader2, Upload, X, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { populateFormData } from '@/lib/utils/form';
+import { MediaUpload } from '@/components/media';
 
 interface EditUserImageFormProps {
   user: {
     id: string;
+    username?: string | null;
     image?: string | null;
   };
 }
 
+// Validation schema for admin image update
+const adminImageSchema = z.object({
+  image: z
+    .any()
+    .refine((val) => val === null || typeof val === 'string' || typeof val === 'object', {
+      message: 'Invalid image format',
+    })
+    .nullable(),
+});
+
+type AdminImageFormData = z.infer<typeof adminImageSchema>;
+
 export function EditUserImageForm({ user }: EditUserImageFormProps) {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(updateUserImageAction, null);
-  const [currentImage, setCurrentImage] = useState<string | null>(user.image || null);
-  const [imageUrl, setImageUrl] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const profileImageRef = useRef<any>(null);
+
+  const form = useForm<AdminImageFormData>({
+    resolver: zodResolver(adminImageSchema),
+    defaultValues: {
+      image: user.image || null,
+    },
+    mode: 'onChange',
+  });
+
+  const { formState: { isDirty } } = form;
 
   useEffect(() => {
     if (state?.success) {
-      const message = state.data?.image ? 'Profile image updated successfully' : 'Profile image removed successfully';
+      const message = state.data?.image
+        ? 'Profile image updated successfully'
+        : 'Profile image removed successfully';
       toast.success(message);
       router.refresh();
+      setIsUploading(false);
       if (state.data?.image) {
-        setCurrentImage(state.data.image as string);
-        setImageUrl('');
+        form.reset({ image: state.data.image as string });
       } else {
-        setCurrentImage(null);
+        form.reset({ image: null });
       }
     } else if (state?.error) {
       toast.error(state.error);
+      setIsUploading(false);
     }
-  }, [state, router]);
+  }, [state, router, form]);
 
-  const handleImageUpdate = () => {
-    if (!imageUrl.trim()) {
-      toast.error('Please enter an image URL');
-      return;
+  // Reset loading states when form submission completes
+  useEffect(() => {
+    if (!isPending) {
+      setIsUploading(false);
     }
+  }, [isPending]);
 
-    const newFormData = new FormData();
-    const payload = {
-      userId: user.id,
-      image: imageUrl.trim(),
-    };
+  const handleFormAction = async (formData: FormData) => {
+    setIsUploading(true);
 
-    populateFormData(newFormData, payload, {
-      stringFields: ['userId', 'image'],
-    });
+    try {
+      // Check for pending files and upload if needed
+      // Note: When using widget mode (type="image"), uploads happen immediately
+      // via the widget's onDirectUpload callback, so there won't be pending files.
+      // This check is still needed for backward compatibility with non-widget uploads.
+      const hasPendingFiles = profileImageRef.current?.hasFiles();
 
-    formAction(newFormData);
+      if (hasPendingFiles) {
+        await profileImageRef.current.uploadFiles();
+      }
+
+      // Get all form values AFTER upload completion
+      const allValues = form.getValues();
+
+      populateFormData(formData, allValues, {
+        jsonFields: ['image'],
+        skipEmpty: true,
+      });
+
+      // Add userId for admin action
+      formData.set('userId', user.id);
+
+      // Call the server action with populated FormData
+      formAction(formData);
+    } catch (error) {
+      console.error('❌ Upload failed:', error);
+      setIsUploading(false);
+      toast.error('Failed to upload image');
+    }
   };
 
   const handleRemoveImage = () => {
-    const newFormData = new FormData();
-    const payload = {
-      userId: user.id,
-      image: '',
-    };
-
-    populateFormData(newFormData, payload, {
-      stringFields: ['userId', 'image'],
-    });
-
-    formAction(newFormData);
+    const formData = new FormData();
+    formData.set('userId', user.id);
+    formData.set('image', '');
+    formAction(formData);
   };
 
   return (
-    <div className='space-y-6'>
-      {/* Current Image Preview */}
-      {currentImage && (
-        <div className='space-y-2'>
-          <Label>Current Image</Label>
-          <div className='relative w-32 h-32 rounded-lg overflow-hidden border'>
-            <Image
-              src={currentImage}
-              alt='User profile'
-              fill
-              className='object-cover'
-            />
-          </div>
-          <div className='flex items-center gap-2'>
+    <Form {...form}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          const formData = new FormData(e.currentTarget);
+          handleFormAction(formData);
+        }}
+        className='space-y-6'
+      >
+        {/* Profile Image Upload with Widget */}
+        <FormField
+          control={form.control}
+          name='image'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Profile Image</FormLabel>
+              <p className='text-sm text-muted-foreground'>
+                Upload a professional profile image. Square images work best.
+                Cropping interface will open after selection.
+              </p>
+              <FormControl>
+                <MediaUpload
+                  ref={profileImageRef}
+                  value={field.value}
+                  onChange={field.onChange}
+                  uploadPreset='doulitsa_profile_images'
+                  multiple={false}
+                  folder={user.username ? `users/${user.username}/profile` : `users/${user.id}/profile`}
+                  maxFileSize={3000000} // 3MB
+                  allowedFormats={['jpg', 'jpeg', 'png', 'webp']}
+                  placeholder='Upload profile image'
+                  type='image'
+                  signed={false}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Action Buttons */}
+        <div className='flex items-center gap-3'>
+          <Button
+            type='submit'
+            disabled={isPending || isUploading || !isDirty}
+          >
+            {(isPending || isUploading) ? 'Saving...' : 'Save Image'}
+          </Button>
+
+          {user.image && (
             <Button
               type='button'
               variant='outline'
-              size='sm'
-              onClick={() => window.open(currentImage, '_blank')}
+              onClick={handleRemoveImage}
+              disabled={isPending || isUploading}
             >
-              <ExternalLink className='mr-2 h-4 w-4' />
-              View Full Size
+              Remove Image
             </Button>
-          </div>
+          )}
         </div>
-      )}
 
-      {!currentImage && (
-        <div className='space-y-2'>
-          <div className='w-32 h-32 rounded-lg border-2 border-dashed border-muted-foreground/25 flex items-center justify-center'>
-            <Upload className='h-8 w-8 text-muted-foreground' />
-          </div>
-          <p className='text-sm text-muted-foreground'>No profile image set</p>
-        </div>
-      )}
-
-      {/* Update Image Form */}
-      <div className='space-y-4'>
-        <div className='space-y-2'>
-          <Label htmlFor='imageUrl'>Image URL</Label>
-          <Input
-            id='imageUrl'
-            type='url'
-            placeholder='https://example.com/image.jpg'
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            disabled={isPending}
-          />
-          <p className='text-xs text-muted-foreground'>
-            Enter a direct URL to an image (must be publicly accessible)
+        <div className='rounded-lg bg-muted/50 p-4'>
+          <p className='text-sm text-muted-foreground'>
+            <strong>Note:</strong> The image will be automatically optimized and cropped using
+            Cloudinary's upload widget with face detection and smart cropping.
           </p>
         </div>
-
-        <Button
-          type='button'
-          onClick={handleImageUpdate}
-          disabled={isPending || !imageUrl.trim()}
-        >
-          {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-          <Upload className='mr-2 h-4 w-4' />
-          {currentImage ? 'Update Image' : 'Set Image'}
-        </Button>
-      </div>
-
-      <div className='rounded-lg bg-muted/50 p-4'>
-        <p className='text-sm text-muted-foreground'>
-          <strong>Tip:</strong> You can use Cloudinary, Imgur, or any other image hosting service.
-          Make sure the URL points directly to an image file and is publicly accessible.
-        </p>
-      </div>
-    </div>
+      </form>
+    </Form>
   );
 }
