@@ -669,60 +669,66 @@ export function AdminCreateServiceForm({
           </div>
 
           {/* Rich Step Navigation (dashboard pattern) */}
-          <div className='flex items-center justify-between space-x-2'>
-            {STEPS.map((step) => {
-              const isActive = currentStep === step.id;
-              const isCompleted = isStepCompleted(step.id);
-              const isAccessible =
-                step.id <= currentStep || isStepCompleted(step.id);
+          <div className='relative overflow-x-clip'>
+            <nav className='overflow-x-auto scrollbar-hide'>
+              <div className='flex flex-nowrap gap-2'>
+                {STEPS.map((step) => {
+                  const isActive = currentStep === step.id;
+                  const isCompleted = isStepCompleted(step.id);
+                  const isAccessible =
+                    step.id <= currentStep || isStepCompleted(step.id);
 
-              return (
-                <div
-                  key={step.id}
-                  className={`flex-1 flex items-center space-x-2 p-2 rounded-lg cursor-pointer transition-colors ${
-                    isActive
-                      ? 'bg-primary/10 border-2 border-primary/30'
-                      : isCompleted
-                        ? 'bg-secondary/10 border-2 border-secondary/30'
-                        : 'bg-muted border-2 border-border'
-                  } ${!isAccessible ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  onClick={() => {
-                    if (isAccessible) {
-                      goToStep(step.id);
-                    }
-                  }}
-                >
-                  <div
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
-                      isActive
-                        ? 'bg-primary text-primary-foreground'
-                        : isCompleted
-                          ? 'bg-secondary text-secondary-foreground'
-                          : 'bg-muted-foreground text-muted'
-                    }`}
-                  >
-                    {isCompleted ? (
-                      <Check className='w-3 h-3' />
-                    ) : (
-                      <span>{step.id}</span>
-                    )}
-                  </div>
-                  <div className='flex-1 min-w-0'>
+                  return (
                     <div
-                      className={`text-xs font-medium truncate ${
+                      key={step.id}
+                      className={`flex-1 flex-shrink-0 flex items-center space-x-2 p-2 rounded-lg cursor-pointer transition-colors ${
                         isActive
-                          ? 'text-primary'
+                          ? 'bg-primary/10 border-2 border-primary/30'
                           : isCompleted
-                            ? 'text-secondary'
-                            : 'text-muted-foreground'
-                      }`}
+                            ? 'bg-secondary/10 border-2 border-secondary/30'
+                            : 'bg-muted border-2 border-border'
+                      } ${!isAccessible ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      onClick={() => {
+                        if (isAccessible) {
+                          goToStep(step.id);
+                        }
+                      }}
                     >
-                      {step.title}
+                      <div
+                        className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                          isActive
+                            ? 'bg-primary text-primary-foreground'
+                            : isCompleted
+                              ? 'bg-secondary text-secondary-foreground'
+                              : 'bg-muted-foreground text-muted'
+                        }`}
+                      >
+                        {isCompleted ? (
+                          <Check className='w-3 h-3' />
+                        ) : (
+                          <span>{step.id}</span>
+                        )}
+                      </div>
+                      <div className='flex-1 min-w-0'>
+                        <div
+                          className={`text-xs font-medium truncate ${
+                            isActive
+                              ? 'text-primary'
+                              : isCompleted
+                                ? 'text-secondary'
+                                : 'text-muted-foreground'
+                          }`}
+                        >
+                          {step.title}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+            </nav>
+            {/* Fade overlay on right edge - only on small screens */}
+            <div className='absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-silver via-silver/60 to-transparent pointer-events-none lg:hidden' />
           </div>
 
           {/* Current Step with Contextual Icons */}
