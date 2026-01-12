@@ -19,11 +19,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Smile, Send, X } from 'lucide-react';
+import { Smile, Send } from 'lucide-react';
 import { useMessageOptimistic } from '@/lib/hooks/chat/use-message-optimistic';
 import { MessageReplyPreview } from './message-reply-preview';
-import { editMessage } from '@/actions/messages';
-import { toast } from 'sonner';
 import { MobileChatSidebar } from './mobile-chat-sidebar';
 
 export interface ReplyToMessage {
@@ -43,8 +41,6 @@ interface MessageInputProps {
   currentUserId: string;
   replyTo: ReplyToMessage | null;
   onCancelReply: () => void;
-  editingMessage: EditingMessage | null;
-  onCancelEdit: () => void;
   chats?: any[]; // For mobile sidebar
 }
 
@@ -53,8 +49,6 @@ export function MessageInput({
   currentUserId,
   replyTo,
   onCancelReply,
-  editingMessage,
-  onCancelEdit,
   chats,
 }: MessageInputProps) {
   const [message, setMessage] = useState('');
@@ -67,14 +61,6 @@ export function MessageInput({
     currentUserId,
   });
 
-  // Load editing message content into input
-  useEffect(() => {
-    if (editingMessage) {
-      setMessage(editingMessage.content);
-      inputRef.current?.focus();
-    }
-  }, [editingMessage]);
-
   // Focus input when replying
   useEffect(() => {
     if (replyTo && inputRef.current) {
@@ -85,27 +71,14 @@ export function MessageInput({
   const handleSend = async () => {
     if (!message.trim()) return;
 
-    if (editingMessage) {
-      // Handle edit
-      try {
-        await editMessage(editingMessage.id, message, currentUserId);
-        setMessage('');
-        onCancelEdit();
-        toast.success('Το μήνυμα ενημερώθηκε');
-      } catch (error) {
-        console.error('Failed to edit message:', error);
-        toast.error('Αποτυχία ενημέρωσης μηνύματος');
-      }
-    } else {
-      // Handle new message
-      const messageToSend = message;
-      const replyToId = replyTo?.id;
+    // Handle new message
+    const messageToSend = message;
+    const replyToId = replyTo?.id;
 
-      setMessage(''); // Clear input immediately
-      onCancelReply(); // Clear reply state
+    setMessage(''); // Clear input immediately
+    onCancelReply(); // Clear reply state
 
-      await sendOptimisticMessage(messageToSend, replyToId); // Send with optimistic UI
-    }
+    await sendOptimisticMessage(messageToSend, replyToId); // Send with optimistic UI
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -120,42 +93,15 @@ export function MessageInput({
     setIsEmojiPickerOpen(false);
   };
 
-  const handleCancel = () => {
-    if (editingMessage) {
-      setMessage('');
-      onCancelEdit();
-    } else if (replyTo) {
-      onCancelReply();
-    }
-  };
-
   return (
     <div className='py-0'>
-      {replyTo && !editingMessage && (
+      {replyTo && (
         <MessageReplyPreview
           authorName={replyTo.authorName}
           content={replyTo.content}
           isOwn={replyTo.isOwn}
           onCancel={onCancelReply}
         />
-      )}
-      {editingMessage && (
-        <div className='px-4 py-2 bg-muted/50 border-b flex items-center justify-between'>
-          <div className='flex-1'>
-            <p className='text-sm font-medium'>Επεξεργασία μηνύματος</p>
-            <p className='text-xs text-muted-foreground line-clamp-1'>
-              {editingMessage.content}
-            </p>
-          </div>
-          <Button
-            size='icon'
-            variant='ghost'
-            className='size-8'
-            onClick={handleCancel}
-          >
-            <X className='size-4' />
-          </Button>
-        </div>
       )}
       <div className='flex items-end gap-2 px-0 pb-0 sm:pb-2 sm:px-2 '>
         <MobileChatSidebar userId={currentUserId} initialChats={chats || []} />
@@ -167,11 +113,9 @@ export function MessageInput({
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={
-              editingMessage
-                ? 'Επεξεργαστείτε το μήνυμά σας...'
-                : replyTo
-                  ? 'Πληκτρολογήστε την απάντησή σας...'
-                  : 'Εισάγετε μήνυμα...'
+              replyTo
+                ? 'Πληκτρολογήστε την απάντησή σας...'
+                : 'Εισάγετε μήνυμα...'
             }
             className='pr-24 pl-4 h-14 rounded-xl shadow-none'
           />
