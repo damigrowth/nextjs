@@ -1,48 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { Copy, Check } from 'lucide-react';
 import { AdminDataTable, ColumnDef } from '@/components/admin/admin-data-table';
 import UserAvatar from '@/components/shared/user-avatar';
 import { formatDateTime } from '@/lib/utils/date';
-import { AdminMessageViewDialog } from '@/components/admin/admin-message-view-dialog';
-
-// Copyable text component with hover state
-function CopyableText({
-  text,
-  maxLength,
-  className,
-}: {
-  text: string;
-  maxLength?: number;
-  className?: string;
-}) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const displayText = maxLength && text.length > maxLength
-    ? `${text.slice(0, maxLength)}...`
-    : text;
-
-  return (
-    <div
-      className={`group flex items-center gap-2 cursor-pointer hover:text-primary transition-colors ${className}`}
-      onClick={handleCopy}
-    >
-      <span>{displayText}</span>
-      {copied ? (
-        <Check className='h-3 w-3 text-green-600' />
-      ) : (
-        <Copy className='h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity' />
-      )}
-    </div>
-  );
-}
 
 interface AdminMessageTableItem {
   id: string;
@@ -50,6 +10,7 @@ interface AdminMessageTableItem {
   createdAt: Date;
   edited: boolean;
   deleted: boolean;
+  isCreator: boolean;
   author: {
     id: string;
     displayName: string | null;
@@ -71,20 +32,8 @@ export function AdminChatMessagesDataTable({
 }: AdminChatMessagesDataTableProps) {
   const columns: ColumnDef<AdminMessageTableItem>[] = [
     {
-      key: 'id',
-      header: 'ID',
-      sortable: false,
-      render: (message) => (
-        <CopyableText
-          text={message.id}
-          maxLength={8}
-          className='font-mono text-xs'
-        />
-      ),
-    },
-    {
       key: 'author',
-      header: 'Author',
+      header: 'Συνομιλητής',
       sortable: false,
       render: (message) => (
         <div className='flex items-center gap-3'>
@@ -111,11 +60,11 @@ export function AdminChatMessagesDataTable({
     },
     {
       key: 'content',
-      header: 'Content',
+      header: 'Περιεχόμενο',
       sortable: false,
       render: (message) => (
-        <div className='max-w-md'>
-          <p className='text-sm truncate'>
+        <div className='py-2'>
+          <p className='text-sm whitespace-pre-wrap break-words'>
             {message.deleted ? (
               <span className='italic text-muted-foreground'>Message deleted</span>
             ) : (
@@ -127,20 +76,12 @@ export function AdminChatMessagesDataTable({
     },
     {
       key: 'createdAt',
-      header: 'Created',
+      header: 'Ημερομηνία',
       sortable: true,
       render: (message) => (
-        <div className='text-sm text-muted-foreground'>
+        <div className='text-sm text-muted-foreground whitespace-nowrap'>
           {formatDateTime(message.createdAt.toISOString())}
         </div>
-      ),
-    },
-    {
-      key: 'actions',
-      header: '',
-      sortable: false,
-      render: (message) => (
-        <AdminMessageViewDialog message={message} />
       ),
     },
   ];
