@@ -76,13 +76,18 @@ const NextLink = forwardRef<HTMLAnchorElement, NextLinkCustomProps>(
     /**
      * Detect if href is a service or profile page
      * Returns skeleton type or null
+     * Explicitly excludes admin routes
      */
     const detectSkeletonType = (href: string): 'service' | 'profile' | null => {
-      // Service page: /s/[slug]
+      // Exclude admin routes
+      if (href.startsWith('/admin/')) {
+        return null;
+      }
+      // Service page: /s/[slug] (exact match, no additional segments)
       if (/^\/s\/[^/]+$/.test(href)) {
         return 'service';
       }
-      // Profile page: /profile/[username]
+      // Profile page: /profile/[username] (exact match, no additional segments)
       if (/^\/profile\/[^/]+$/.test(href)) {
         return 'profile';
       }
