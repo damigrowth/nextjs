@@ -20,7 +20,7 @@ export async function getTaxonomyWithStaging(
   type: TaxonomyType,
 ): Promise<DatasetItem[]> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'view');
 
     // 1. Fetch current committed state from GitHub API
     const fileContent = await readTaxonomyFile(type);

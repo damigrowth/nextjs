@@ -38,7 +38,7 @@ export async function createStagedChange(
     parentId?: string;
   },
 ): Promise<StagedChange> {
-  const session = await getAdminSession();
+  await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
 
   const staged = await prisma.taxonomyStaging.create({
     data: {
@@ -71,7 +71,7 @@ export async function createStagedChange(
 export async function getStagedChanges(
   taxonomyType?: TaxonomyType,
 ): Promise<StagedChange[]> {
-  await getAdminSession();
+  await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
 
   const staged = await prisma.taxonomyStaging.findMany({
     where: taxonomyType ? { taxonomyType } : undefined,
@@ -97,7 +97,7 @@ export async function getStagedChanges(
 export async function getStagedChangesByType(): Promise<
   Record<TaxonomyType, StagedChange[]>
 > {
-  await getAdminSession();
+  await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
 
   const allChanges = await getStagedChanges();
 
@@ -121,7 +121,7 @@ export async function getStagedChangesByType(): Promise<
 export async function getStagedChangesCount(
   taxonomyType?: TaxonomyType,
 ): Promise<number> {
-  await getAdminSession();
+  await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
 
   return prisma.taxonomyStaging.count({
     where: taxonomyType ? { taxonomyType } : undefined,
@@ -134,7 +134,7 @@ export async function getStagedChangesCount(
 export async function clearStagedChanges(
   taxonomyType?: TaxonomyType,
 ): Promise<number> {
-  await getAdminSession();
+  await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
 
   const result = await prisma.taxonomyStaging.deleteMany({
     where: taxonomyType ? { taxonomyType } : undefined,
@@ -147,7 +147,7 @@ export async function clearStagedChanges(
  * Clear a specific staged change by ID
  */
 export async function clearStagedChange(id: string): Promise<void> {
-  await getAdminSession();
+  await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
 
   await prisma.taxonomyStaging.delete({
     where: { id },
@@ -258,7 +258,7 @@ function deleteItemRecursively(
 export async function hasStagedChanges(
   taxonomyType?: TaxonomyType,
 ): Promise<boolean> {
-  await getAdminSession();
+  await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
 
   const count = await getStagedChangesCount(taxonomyType);
   return count > 0;

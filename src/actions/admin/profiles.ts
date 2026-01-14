@@ -23,7 +23,8 @@ import {
   type AdminDeleteProfileInput,
   type AdminUpdateVerificationInput,
 } from '@/lib/validations/admin';
-import { getAdminSession } from './helpers';
+import { getAdminSession, getAdminSessionWithPermission } from './helpers';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 
 /**
  * List profiles with filters and pagination
@@ -32,7 +33,7 @@ export async function listProfiles(
   params: Partial<AdminListProfilesInput> = {},
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'view');
 
     const validatedParams = adminListProfilesSchema.parse(params);
 
@@ -173,7 +174,7 @@ export async function listProfiles(
  */
 export async function getProfile(profileId: string) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'view');
 
     const profile = await prisma.profile.findUnique({
       where: { id: profileId },
@@ -241,7 +242,7 @@ export async function getProfile(profileId: string) {
  */
 export async function updateProfile(params: AdminUpdateProfileInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'edit');
 
     const validatedParams = adminUpdateProfileSchema.parse(params);
 
@@ -306,7 +307,7 @@ export async function updateProfile(params: AdminUpdateProfileInput) {
  */
 export async function togglePublished(params: AdminToggleProfileInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'edit');
 
     const validatedParams = adminToggleProfileSchema.parse(params);
 
@@ -358,7 +359,7 @@ export async function togglePublished(params: AdminToggleProfileInput) {
  */
 export async function toggleFeatured(params: AdminToggleProfileInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'edit');
 
     const validatedParams = adminToggleProfileSchema.parse(params);
 
@@ -437,7 +438,7 @@ export async function toggleFeatured(params: AdminToggleProfileInput) {
  */
 export async function toggleVerified(params: AdminToggleProfileInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'edit');
 
     const validatedParams = adminToggleProfileSchema.parse(params);
 
@@ -508,7 +509,7 @@ export async function updateVerificationStatus(
   params: AdminUpdateVerificationInput,
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'edit');
 
     const validatedParams = adminUpdateVerificationSchema.parse(params);
 
@@ -583,7 +584,7 @@ export async function updateVerificationStatus(
  */
 export async function deleteProfile(params: AdminDeleteProfileInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'full');
 
     const validatedParams = adminDeleteProfileSchema.parse(params);
 
@@ -637,7 +638,7 @@ export async function deleteProfile(params: AdminDeleteProfileInput) {
  */
 export async function searchProfilesForSelection(searchQuery: string) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'view');
 
     // Validate search query
     if (!searchQuery || searchQuery.trim().length < 2) {
@@ -715,7 +716,7 @@ export async function searchProfilesForSelection(searchQuery: string) {
  */
 export async function getProfileStats() {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'view');
 
     const [total, published, featured, verified, unverified, top, professional, company] = await Promise.all([
       prisma.profile.count(),
@@ -759,7 +760,7 @@ export async function updateProfileSettingsAction(
   formData: FormData,
 ): Promise<any> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'edit');
 
     const profileId = formData.get('profileId');
 

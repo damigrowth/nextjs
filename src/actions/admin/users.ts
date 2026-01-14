@@ -41,12 +41,13 @@ import {
 // Import types from centralized validation schemas
 import type { CreateUserInput, UpdateUserInput } from '@/lib/validations';
 import type { ActionResult } from '@/lib/types/api';
-import { getAdminSession } from './helpers';
+import { getAdminSession, getAdminSessionWithPermission } from './helpers';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 
 // Admin Actions using correct Better Auth API methods
 export async function getUser(userId: string) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -103,7 +104,7 @@ export async function listUsers(
   } = {},
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -215,7 +216,7 @@ export async function listUsers(
 
 export async function createUser(data: z.infer<typeof adminCreateUserSchema>) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = adminCreateUserSchema.parse(data);
 
@@ -248,7 +249,7 @@ export async function createUser(data: z.infer<typeof adminCreateUserSchema>) {
 
 export async function setUserRole(data: z.infer<typeof adminSetRoleSchema>) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = adminSetRoleSchema.parse(data);
 
@@ -276,7 +277,7 @@ export async function setUserRole(data: z.infer<typeof adminSetRoleSchema>) {
 
 export async function banUser(data: z.infer<typeof adminBanUserSchema>) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = adminBanUserSchema.parse(data);
 
@@ -300,7 +301,7 @@ export async function banUser(data: z.infer<typeof adminBanUserSchema>) {
 
 export async function unbanUser(data: z.infer<typeof adminUnbanUserSchema>) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = adminUnbanUserSchema.parse(data);
 
@@ -324,7 +325,7 @@ export async function unbanUser(data: z.infer<typeof adminUnbanUserSchema>) {
 
 export async function removeUser(data: z.infer<typeof adminRemoveUserSchema>) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'full');
 
     const validatedData = adminRemoveUserSchema.parse(data);
 
@@ -350,7 +351,7 @@ export async function impersonateUser(
   data: z.infer<typeof adminImpersonateUserSchema>,
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const validatedData = adminImpersonateUserSchema.parse(data);
 
@@ -375,7 +376,7 @@ export async function impersonateUser(
 
 export async function stopImpersonating() {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const result = await auth.api.stopImpersonating({
       headers: await headers(),
@@ -397,7 +398,7 @@ export async function stopImpersonating() {
 
 export async function listUserSessions(userId: string) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const result = await auth.api.listUserSessions({
       body: { userId },
@@ -427,7 +428,7 @@ export async function revokeUserSession(
   data: z.infer<typeof revokeSessionSchema>,
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = revokeSessionSchema.parse(data);
 
@@ -456,7 +457,7 @@ export async function revokeAllUserSessions(
   data: z.infer<typeof revokeUserSessionsSchema>,
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = revokeUserSessionsSchema.parse(data);
 
@@ -483,7 +484,7 @@ export async function revokeAllUserSessions(
 
 export async function updateUser(data: z.infer<typeof adminUpdateUserSchema>) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = adminUpdateUserSchema.parse(data);
     const { userId, ...updateFields } = validatedData;
@@ -536,7 +537,7 @@ export async function setUserPassword(
   data: z.infer<typeof adminSetPasswordSchema>,
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const validatedData = adminSetPasswordSchema.parse(data);
 
@@ -575,7 +576,7 @@ export async function updateUserBasicInfo(data: {
   displayName?: string;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -638,7 +639,7 @@ export async function updateUserStatus(data: {
   step?: JourneyStep;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -678,7 +679,7 @@ export async function updateUserBanStatus(data: {
   banExpires?: Date | null;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -712,7 +713,7 @@ export async function updateUserImage(data: {
   image: string | null;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -742,7 +743,7 @@ export async function toggleUserBlock(data: {
   blocked: boolean;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -773,7 +774,7 @@ export async function toggleUserConfirmation(data: {
   confirmed: boolean;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -804,7 +805,7 @@ export async function updateUserJourneyStep(data: {
   step: JourneyStep;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -832,7 +833,7 @@ export async function updateUserJourneyStep(data: {
  */
 export async function getUserStats() {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -1137,7 +1138,7 @@ export async function updateAccountAdmin(
 ) {
   try {
     // Verify admin authentication
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     // Parse FormData
     const userId = formData.get('userId')?.toString();
@@ -1274,12 +1275,11 @@ export interface TeamMember {
  */
 export async function getTeamMembers(): Promise<ActionResult<TeamMember[]>> {
   try {
-    // Require admin role to view team
-    const { requireRole } = await import('@/actions/auth/server');
+    // Require permission to view team
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.TEAM, 'view');
+
     const { ADMIN_ROLES } = await import('@/lib/auth/roles');
     const { prisma } = await import('@/lib/prisma/client');
-
-    await requireRole('admin');
 
     const teamMembers = await prisma.user.findMany({
       where: {
@@ -1334,13 +1334,12 @@ export async function assignAdminRole(
   role: UserRole,
 ): Promise<ActionResult<void>> {
   try {
-    // Require admin role to assign roles
-    const { requireRole } = await import('@/actions/auth/server');
+    // Require permission to assign roles
+    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.TEAM, 'edit');
+
     const { revalidatePath } = await import('next/cache');
     const { ADMIN_ROLES } = await import('@/lib/auth/roles');
     const { prisma } = await import('@/lib/prisma/client');
-
-    const currentUser = await requireRole('admin');
 
     // Validate role
     if (!Object.values(ADMIN_ROLES).includes(role as any)) {
@@ -1368,7 +1367,7 @@ export async function assignAdminRole(
     }
 
     // Prevent admin from removing their own admin role
-    if (currentUser.id === userId && role !== ADMIN_ROLES.ADMIN) {
+    if (session.user.id === userId && role !== ADMIN_ROLES.ADMIN) {
       return {
         success: false,
         error: 'You cannot remove your own admin role',
@@ -1409,12 +1408,11 @@ export async function assignAdminRole(
  */
 export async function removeAdminRole(userId: string): Promise<ActionResult<void>> {
   try {
-    // Require admin role to remove roles
-    const { requireRole } = await import('@/actions/auth/server');
+    // Require permission to remove roles
+    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.TEAM, 'edit');
+
     const { revalidatePath } = await import('next/cache');
     const { prisma } = await import('@/lib/prisma/client');
-
-    const currentUser = await requireRole('admin');
 
     // Check if user exists
     const user = await prisma.user.findUnique({
@@ -1435,7 +1433,7 @@ export async function removeAdminRole(userId: string): Promise<ActionResult<void
     }
 
     // Prevent admin from removing their own admin role
-    if (currentUser.id === userId) {
+    if (session.user.id === userId) {
       return {
         success: false,
         error: 'You cannot remove your own admin role',
@@ -1495,10 +1493,10 @@ export async function searchUsersForRoleAssignment(
   limit: number = 10,
 ): Promise<ActionResult<TeamMember[]>> {
   try {
-    // Require admin role to search users
-    const { requireRole } = await import('@/actions/auth/server');
+    // Require permission to search users
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.TEAM, 'view');
+
     const { prisma } = await import('@/lib/prisma/client');
-    await requireRole('admin');
 
     if (!search || search.length < 2) {
       return {

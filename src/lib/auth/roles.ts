@@ -122,15 +122,15 @@ export const ROLE_PERMISSIONS: PermissionMatrix = {
     settings: null, // Cannot access settings
   },
 
-  // Editor: Content management only
+  // Editor: Services management only
   editor: {
     dashboard: 'view',
-    services: 'edit', // Can edit services (no delete)
+    services: 'full', // Full services access (create, edit, delete, approve)
     verifications: null, // Cannot verify profiles
-    profiles: 'edit', // Can edit profiles (no delete)
+    profiles: null, // Cannot access profiles
     users: null, // Cannot manage users
     team: null, // Cannot access team management
-    taxonomies: 'view', // Read-only access to taxonomies
+    taxonomies: null, // Cannot access taxonomies
     chats: null, // Cannot access chats
     analytics: null, // Cannot access analytics
     git: null, // Cannot access git

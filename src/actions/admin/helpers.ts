@@ -12,8 +12,9 @@ import type { LucideIcon } from 'lucide-react';
 
 /**
  * Get authenticated admin session
- * Throws error if user is not authenticated or not an admin
- * Redirects to login if no session exists
+ * @deprecated Use getAdminSessionWithPermission instead for proper role-based access control
+ * @throws Error if user is not authenticated or not an admin
+ * @throws Redirects to login if no session exists
  */
 export async function getAdminSession() {
   const headersList = await headers();
@@ -29,6 +30,48 @@ export async function getAdminSession() {
 
   if (!isAdmin) {
     throw new Error('Unauthorized: Admin role required');
+  }
+
+  return session;
+}
+
+/**
+ * Get authenticated session with permission check
+ * Uses role-based access control to verify user has required permission level
+ *
+ * @param resource - The admin resource to check (from ADMIN_RESOURCES)
+ * @param level - Permission level required: 'view' | 'edit' | 'full' (default: 'view')
+ * @returns Session object if authorized
+ * @throws Redirects to login if not authenticated
+ * @throws Redirects to /admin if unauthorized for resource
+ */
+export async function getAdminSessionWithPermission(
+  resource: string,
+  level: 'view' | 'edit' | 'full' = 'view'
+) {
+  const headersList = await headers();
+  const session = await auth.api.getSession({
+    headers: headersList,
+  });
+
+  if (!session?.user) {
+    redirect('/login');
+  }
+
+  // Import permission checkers
+  const {
+    requirePermission,
+    requireEditPermission,
+    requireFullPermission
+  } = await import('@/actions/auth/server');
+
+  // Check appropriate permission level
+  if (level === 'full') {
+    await requireFullPermission(resource, '/admin');
+  } else if (level === 'edit') {
+    await requireEditPermission(resource, '/admin');
+  } else {
+    await requirePermission(resource, '/admin');
   }
 
   return session;
