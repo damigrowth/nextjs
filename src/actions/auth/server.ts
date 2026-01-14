@@ -318,6 +318,28 @@ export async function requireAdmin(): Promise<AuthUser> {
   return requireRole('admin');
 }
 
+/**
+ * Require any of the specified roles - throws if user doesn't have any role
+ */
+export async function requireAnyRole(roles: string[]): Promise<AuthUser> {
+  const session = await requireAuth();
+  const roleCheck = await hasAnyRole(roles);
+
+  if (!roleCheck.success || !roleCheck.data) {
+    redirect('/login');
+  }
+
+  return session.user;
+}
+
+/**
+ * Check if user has any admin role (admin, support, or editor)
+ */
+export async function hasAdminRole(): Promise<boolean> {
+  const result = await hasAnyRole(['admin', 'support', 'editor']);
+  return result.success && result.data;
+}
+
 export async function requireOnboardingComplete(onboardingUrl = '/onboarding') {
   // Get cached session first
   let sessionResult = await getSession();
@@ -535,4 +557,164 @@ export async function requireProUser(redirectTo = '/dashboard/profile/account') 
   }
 
   return result.data;
+}
+
+// =============================================
+// ADMIN PERMISSION SYSTEM
+// =============================================
+
+/**
+ * Get current user's role from session
+ */
+async function getCurrentRole(): Promise<string | null> {
+  const sessionResult = await getSession({ revalidate: true });
+  if (!sessionResult.success || !sessionResult.data.session) {
+    return null;
+  }
+  return sessionResult.data.session.user.role || null;
+}
+
+/**
+ * Check if current user has permission to access a resource
+ *
+ * @param resource - The admin resource to check
+ * @returns Promise<boolean> - True if user has any access level
+ */
+export async function hasPermission(resource: string): Promise<boolean> {
+  const { hasAccess } = await import('@/lib/auth/roles');
+  const role = await getCurrentRole();
+  return hasAccess(role, resource as any);
+}
+
+/**
+ * Check if current user can edit a resource
+ *
+ * @param resource - The admin resource to check
+ * @returns Promise<boolean> - True if user has edit or full access
+ */
+export async function canEditResource(resource: string): Promise<boolean> {
+  const { canEdit } = await import('@/lib/auth/roles');
+  const role = await getCurrentRole();
+  return canEdit(role, resource as any);
+}
+
+/**
+ * Check if current user has full access to a resource
+ *
+ * @param resource - The admin resource to check
+ * @returns Promise<boolean> - True if user has full access
+ */
+export async function hasFullPermission(resource: string): Promise<boolean> {
+  const { hasFullAccess } = await import('@/lib/auth/roles');
+  const role = await getCurrentRole();
+  return hasFullAccess(role, resource as any);
+}
+
+/**
+ * Require permission to access a resource - redirect if unauthorized
+ *
+ * @param resource - The admin resource to check
+ * @param redirectTo - Where to redirect if unauthorized (default: /admin)
+ * @throws Redirects to specified URL if user lacks permission
+ */
+export async function requirePermission(
+  resource: string,
+  redirectTo: string = '/admin',
+): Promise<void> {
+  const hasAccess = await hasPermission(resource);
+  if (!hasAccess) {
+    redirect(redirectTo);
+  }
+}
+
+/**
+ * Require edit permission for a resource - redirect if unauthorized
+ *
+ * @param resource - The admin resource to check
+ * @param redirectTo - Where to redirect if unauthorized (default: /admin)
+ * @throws Redirects to specified URL if user lacks edit permission
+ */
+export async function requireEditPermission(
+  resource: string,
+  redirectTo: string = '/admin',
+): Promise<void> {
+  const canEdit = await canEditResource(resource);
+  if (!canEdit) {
+    redirect(redirectTo);
+  }
+}
+
+/**
+ * Require full permission for a resource - redirect if unauthorized
+ *
+ * @param resource - The admin resource to check
+ * @param redirectTo - Where to redirect if unauthorized (default: /admin)
+ * @throws Redirects to specified URL if user lacks full permission
+ */
+export async function requireFullPermission(
+  resource: string,
+  redirectTo: string = '/admin',
+): Promise<void> {
+  const hasFull = await hasFullPermission(resource);
+  if (!hasFull) {
+    redirect(redirectTo);
+  }
+}
+
+/**
+ * Get filtered admin navigation items based on current user's role
+ *
+ * Returns only the navigation items the user has permission to access
+ */
+export async function getAdminNavigationItems() {
+  const {
+    ADMIN_RESOURCES,
+    ROLE_PERMISSIONS,
+    isAdminRole,
+  } = await import('@/lib/auth/roles');
+  const role = await getCurrentRole();
+
+  if (!role || !isAdminRole(role)) {
+    return [];
+  }
+
+  // Map resource names to navigation items
+  const resourceToNav: Record<string, string> = {
+    [ADMIN_RESOURCES.DASHBOARD]: '/admin',
+    [ADMIN_RESOURCES.SERVICES]: '/admin/services',
+    [ADMIN_RESOURCES.VERIFICATIONS]: '/admin/verifications',
+    [ADMIN_RESOURCES.PROFILES]: '/admin/profiles',
+    [ADMIN_RESOURCES.USERS]: '/admin/users',
+    [ADMIN_RESOURCES.TEAM]: '/admin/team',
+    [ADMIN_RESOURCES.TAXONOMIES]: '/admin/taxonomies',
+    [ADMIN_RESOURCES.CHATS]: '/admin/chats',
+    [ADMIN_RESOURCES.ANALYTICS]: '/admin/analytics',
+    [ADMIN_RESOURCES.GIT]: '/admin/git',
+  };
+
+  // Filter resources based on role permissions
+  const permissions = ROLE_PERMISSIONS[role as any];
+  const allowedResources: string[] = [];
+
+  for (const [resource, permission] of Object.entries(permissions)) {
+    if (permission !== null) {
+      allowedResources.push(resource);
+    }
+  }
+
+  // Map allowed resources to navigation URLs
+  return allowedResources
+    .map((resource) => resourceToNav[resource])
+    .filter(Boolean);
+}
+
+/**
+ * Check if a specific navigation item should be visible for current user
+ *
+ * @param navUrl - The navigation URL to check (e.g., '/admin/team')
+ * @returns Promise<boolean> - True if user should see this nav item
+ */
+export async function canViewNavItem(navUrl: string): Promise<boolean> {
+  const allowedItems = await getAdminNavigationItems();
+  return allowedItems.includes(navUrl);
 }
