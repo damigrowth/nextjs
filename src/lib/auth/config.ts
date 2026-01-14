@@ -3,7 +3,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { nextCookies } from 'better-auth/next-js';
 import { admin, apiKey, jwt, username } from 'better-auth/plugins';
 import { localization } from 'better-auth-localization';
-import { User } from '@prisma/client';
+import { User, UserRole, UserType, JourneyStep } from '@prisma/client';
 import {
   sendVerificationEmail,
   sendWelcomeEmail,
@@ -355,8 +355,8 @@ export const auth = betterAuth({
             await prisma.user.update({
               where: { id: user.id },
               data: {
-                role: pendingRole, // Set role here (admin plugin allows after creation)
-                step: hasOAuthIntent ? 'OAUTH_SETUP' : 'TYPE_SELECTION',
+                role: pendingRole as UserRole, // Set role here (admin plugin allows after creation)
+                step: (hasOAuthIntent ? 'OAUTH_SETUP' : 'TYPE_SELECTION') as JourneyStep,
                 confirmed: true, // OAuth users are pre-confirmed
                 emailVerified: true, // OAuth providers have verified emails
               },
@@ -366,8 +366,8 @@ export const auth = betterAuth({
             await prisma.user.update({
               where: { id: user.id },
               data: {
-                role: pendingRole, // Set role here (admin plugin allows after creation)
-                step: 'EMAIL_VERIFICATION',
+                role: pendingRole as UserRole, // Set role here (admin plugin allows after creation)
+                step: 'EMAIL_VERIFICATION' as JourneyStep,
                 confirmed: true, // Email/password users start as confirmed
               },
             });
@@ -393,7 +393,7 @@ export const auth = betterAuth({
             await prisma.user.update({
               where: { id: userWithFields.id },
               data: {
-                role: context.body.role,
+                role: context.body.role as UserRole,
               },
             });
           }
@@ -418,7 +418,7 @@ export const auth = betterAuth({
               await prisma.user.update({
                 where: { id: userWithFields.id },
                 data: {
-                  step: 'DASHBOARD',
+                  step: 'DASHBOARD' as JourneyStep,
                 },
               });
               // Welcome email is now sent via Brevo automation when contact is added to list
@@ -427,7 +427,7 @@ export const auth = betterAuth({
               await prisma.user.update({
                 where: { id: userWithFields.id },
                 data: {
-                  step: 'ONBOARDING',
+                  step: 'ONBOARDING' as JourneyStep,
                 },
               });
             }

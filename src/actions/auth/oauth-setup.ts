@@ -6,6 +6,7 @@ import { getFormString } from '@/lib/utils/form';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { ActionResponse } from '@/lib/types/api';
 import { brevoWorkflowService } from '@/lib/email';
+import { UserRole, UserType, JourneyStep } from '@prisma/client';
 
 export async function completeOAuth(
   prevState: ActionResponse | null,
@@ -68,7 +69,7 @@ export async function completeOAuth(
       const { prisma } = await import('@/lib/prisma/client');
       await prisma.user.update({
         where: { id: session.user.id },
-        data: { role: role },
+        data: { role: role as UserRole },
       });
     }
 

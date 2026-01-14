@@ -15,9 +15,15 @@ export const userRoleSchema = z.enum([
   'freelancer',
   'company',
   'admin',
+  'support',
+  'editor',
 ]);
+
+export const userTypeSchema = z.enum(['user', 'pro']);
+
 export const authStepSchema = z.enum([
   'EMAIL_VERIFICATION',
+  'TYPE_SELECTION',
   'OAUTH_SETUP',
   'ONBOARDING',
   'DASHBOARD',
