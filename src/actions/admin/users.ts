@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { processImageForDatabase } from '@/lib/utils/cloudinary';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
+import { UserRole, UserType, JourneyStep } from '@prisma/client';
 // legacy exports
 // import {
 //   listUsersSchema,
@@ -94,11 +95,11 @@ export async function getUser(userId: string) {
 
 export async function listUsers(
   params: Partial<z.infer<typeof adminListUsersSchema>> & {
-    type?: string;
+    type?: UserType | 'all';
     provider?: string;
-    step?: string;
+    step?: JourneyStep | 'all';
     status?: string;
-    role?: string;
+    role?: UserRole | 'all';
   } = {},
 ) {
   try {
@@ -634,7 +635,7 @@ export async function updateUserStatus(data: {
   confirmed?: boolean;
   blocked?: boolean;
   emailVerified?: boolean;
-  step?: string;
+  step?: JourneyStep;
 }) {
   try {
     await getAdminSession();
@@ -800,7 +801,7 @@ export async function toggleUserConfirmation(data: {
  */
 export async function updateUserJourneyStep(data: {
   userId: string;
-  step: string;
+  step: JourneyStep;
 }) {
   try {
     await getAdminSession();
@@ -990,9 +991,9 @@ export async function updateUserStatusAction(
     // Parse FormData including userId
     const rawData = {
       userId: formData.get('userId') as string,
-      role: formData.get('role') as string,
-      type: formData.get('type') as string,
-      step: formData.get('step') as string,
+      role: formData.get('role') as UserRole,
+      type: formData.get('type') as UserType,
+      step: formData.get('step') as JourneyStep,
       emailVerified: formData.get('emailVerified') === 'true',
       confirmed: formData.get('confirmed') === 'true',
       blocked: formData.get('blocked') === 'true',
@@ -1258,7 +1259,7 @@ export interface TeamMember {
   firstName: string | null;
   lastName: string | null;
   image: string | null;
-  role: string;
+  role: UserRole;
   createdAt: Date;
   updatedAt: Date;
   emailVerified: boolean;
@@ -1276,6 +1277,7 @@ export async function getTeamMembers(): Promise<ActionResult<TeamMember[]>> {
     // Require admin role to view team
     const { requireRole } = await import('@/actions/auth/server');
     const { ADMIN_ROLES } = await import('@/lib/auth/roles');
+    const { prisma } = await import('@/lib/prisma/client');
 
     await requireRole('admin');
 
@@ -1329,13 +1331,14 @@ export async function getTeamMembers(): Promise<ActionResult<TeamMember[]>> {
  */
 export async function assignAdminRole(
   userId: string,
-  role: string,
+  role: UserRole,
 ): Promise<ActionResult<void>> {
   try {
     // Require admin role to assign roles
     const { requireRole } = await import('@/actions/auth/server');
     const { revalidatePath } = await import('next/cache');
     const { ADMIN_ROLES } = await import('@/lib/auth/roles');
+    const { prisma } = await import('@/lib/prisma/client');
 
     const currentUser = await requireRole('admin');
 
@@ -1409,6 +1412,7 @@ export async function removeAdminRole(userId: string): Promise<ActionResult<void
     // Require admin role to remove roles
     const { requireRole } = await import('@/actions/auth/server');
     const { revalidatePath } = await import('next/cache');
+    const { prisma } = await import('@/lib/prisma/client');
 
     const currentUser = await requireRole('admin');
 
@@ -1439,7 +1443,7 @@ export async function removeAdminRole(userId: string): Promise<ActionResult<void
     }
 
     // Determine what role to revert to based on user type
-    let newRole = 'user';
+    let newRole: UserRole = 'user';
     if (user.type === 'pro') {
       // For pro users, check if they have a profile to determine role
       const profile = await prisma.profile.findUnique({
@@ -1493,6 +1497,7 @@ export async function searchUsersForRoleAssignment(
   try {
     // Require admin role to search users
     const { requireRole } = await import('@/actions/auth/server');
+    const { prisma } = await import('@/lib/prisma/client');
     await requireRole('admin');
 
     if (!search || search.length < 2) {

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma/client';
 import { revalidatePath } from 'next/cache';
 import type { ActionResult } from '@/lib/types/api';
 import type { AuthType, ProRole } from '@/lib/types/auth';
+import { UserRole, UserType, JourneyStep } from '@prisma/client';
 
 interface UpdateUserTypeInput {
   userId: string;
@@ -24,7 +25,7 @@ export async function updateUserType({
 }: UpdateUserTypeInput): Promise<ActionResult<{ success: boolean }>> {
   try {
     // Determine final role based on type
-    let finalRole: string;
+    let finalRole: UserRole;
 
     if (type === 'user') {
       finalRole = 'user';
@@ -36,7 +37,7 @@ export async function updateUserType({
           error: 'Επαγγελματίες χρήστες πρέπει να επιλέξουν τύπο λογαριασμού (Επαγγελματίας ή Επιχείρηση)',
         };
       }
-      finalRole = role;
+      finalRole = role as UserRole;
     } else {
       return {
         success: false,
@@ -48,9 +49,9 @@ export async function updateUserType({
     await prisma.user.update({
       where: { id: userId },
       data: {
-        type,
+        type: type as UserType,
         role: finalRole,
-        step: 'OAUTH_SETUP', // Move to username setup
+        step: 'OAUTH_SETUP' as JourneyStep, // Move to username setup
       },
     });
 

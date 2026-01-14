@@ -5,7 +5,7 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { ActionResult } from '@/lib/types/api';
 import { AuthUser, AuthSession } from '@/lib/types/auth';
-import { Profile } from '@prisma/client';
+import { Profile, UserRole } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import { getProfileByUserId } from '@/actions/profiles/get-profile';
 import { Session } from 'better-auth';
@@ -236,7 +236,7 @@ export async function getCurrentSession(): Promise<
 /**
  * Check if user has specific role
  */
-export async function hasRole(role: string): Promise<ActionResult<boolean>> {
+export async function hasRole(role: UserRole): Promise<ActionResult<boolean>> {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -261,7 +261,7 @@ export async function hasRole(role: string): Promise<ActionResult<boolean>> {
  * Check if user has any of the specified roles
  */
 export async function hasAnyRole(
-  roles: string[],
+  roles: UserRole[],
 ): Promise<ActionResult<boolean>> {
   try {
     const session = await auth.api.getSession({
@@ -272,7 +272,7 @@ export async function hasAnyRole(
 
     return {
       success: true,
-      data: roles.includes(userRole),
+      data: roles.includes(userRole as UserRole),
     };
   } catch (error) {
     console.error('Check roles error:', error);
@@ -300,7 +300,7 @@ export async function isProfessional(): Promise<ActionResult<boolean>> {
 /**
  * Require specific role - throws if user doesn't have role
  */
-export async function requireRole(role: string): Promise<AuthUser> {
+export async function requireRole(role: UserRole): Promise<AuthUser> {
   const session = await requireAuth();
   const roleCheck = await hasRole(role);
 
@@ -321,7 +321,7 @@ export async function requireAdmin(): Promise<AuthUser> {
 /**
  * Require any of the specified roles - throws if user doesn't have any role
  */
-export async function requireAnyRole(roles: string[]): Promise<AuthUser> {
+export async function requireAnyRole(roles: UserRole[]): Promise<AuthUser> {
   const session = await requireAuth();
   const roleCheck = await hasAnyRole(roles);
 

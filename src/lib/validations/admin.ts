@@ -8,6 +8,7 @@
 import { z } from 'zod';
 import {
   userRoleSchema,
+  userTypeSchema,
   authStepSchema,
   emailSchema,
   passwordSchema,
@@ -67,7 +68,7 @@ export const adminUpdateUserSchema = accountUpdateSchema
     firstName: z.string().min(1).max(100).optional(),
     lastName: z.string().min(1).max(100).optional(),
     role: userRoleSchema.optional(),
-    type: z.enum(['user', 'pro']).optional(),
+    type: userTypeSchema.optional(),
     confirmed: z.boolean().optional(),
     blocked: z.boolean().optional(),
     step: authStepSchema.optional(),

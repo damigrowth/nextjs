@@ -82,7 +82,7 @@ export function AssignRoleDialog({ open, onOpenChange }: AssignRoleDialogProps) 
           {/* Search Users */}
           <div className='space-y-2'>
             <Label>Search User</Label>
-            <ServerSearchCombobox
+            <ServerSearchCombobox<TeamMember>
               value={selectedUser}
               onSelect={setSelectedUser}
               onSearch={async (query) => {
