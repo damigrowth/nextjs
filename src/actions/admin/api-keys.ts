@@ -78,7 +78,7 @@ export async function createAdminApiKey(data: {
   metadata?: { purpose?: string; owner?: string };
 }) {
   try {
-    await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'view');
+    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'edit');
     const validatedData = createAdminApiKeySchema.parse(data);
 
     const result = await auth.api.createApiKey({
@@ -213,7 +213,7 @@ export async function deleteAdminApiKey(keyId: string) {
  */
 export async function checkAdminApiAccess() {
   try {
-    await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'view');
+    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'view');
 
     // Check if session was created with a valid admin API key
     // This would be stored in session metadata when API key is used

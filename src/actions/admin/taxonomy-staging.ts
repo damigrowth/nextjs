@@ -8,7 +8,8 @@
 
 import { prisma } from '@/lib/prisma/client';
 import type { DatasetItem } from '@/lib/types/datasets';
-import { getAdminSession } from './helpers';
+import { getAdminSession, getAdminSessionWithPermission } from './helpers';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 
 export type TaxonomyType = 'service' | 'pro' | 'tags' | 'skills';
 export type StagingOperation = 'create' | 'update' | 'delete';
@@ -38,7 +39,7 @@ export async function createStagedChange(
     parentId?: string;
   },
 ): Promise<StagedChange> {
-  await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
+  const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
 
   const staged = await prisma.taxonomyStaging.create({
     data: {

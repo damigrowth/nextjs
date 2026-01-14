@@ -1,6 +1,7 @@
 'use server';
 
-import { getAdminSession } from './helpers';
+import { getAdminSession, getAdminSessionWithPermission } from './helpers';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import { getStagedChanges, applyStagedChangesToData } from './taxonomy-staging';
 import {
   readTaxonomyFile,
