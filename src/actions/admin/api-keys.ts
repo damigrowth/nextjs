@@ -7,7 +7,8 @@ import {
   createAdminApiKeySchema,
   updateAdminApiKeySchema,
 } from '@/lib/validations/admin';
-import { getAdminSession } from './helpers';
+import { getAdminSession, getAdminSessionWithPermission } from './helpers';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 
 // Environment admin API keys (fallback for initial access)
 const ADMIN_API_KEYS =
@@ -77,7 +78,7 @@ export async function createAdminApiKey(data: {
   metadata?: { purpose?: string; owner?: string };
 }) {
   try {
-    const session = await getAdminSession();
+    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'edit');
     const validatedData = createAdminApiKeySchema.parse(data);
 
     const result = await auth.api.createApiKey({
@@ -121,7 +122,7 @@ export async function createAdminApiKey(data: {
  */
 export async function listAdminApiKeys() {
   try {
-    const session = await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'view');
 
     const result = await auth.api.listApiKeys({
       headers: await headers(),
@@ -154,7 +155,7 @@ export async function updateAdminApiKey(
   data: { name?: string; enabled?: boolean },
 ) {
   try {
-    const session = await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'edit');
 
     const result = await auth.api.updateApiKey({
       body: {
@@ -184,7 +185,7 @@ export async function updateAdminApiKey(
  */
 export async function deleteAdminApiKey(keyId: string) {
   try {
-    const session = await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'view');
 
     const result = await auth.api.deleteApiKey({
       body: {
@@ -212,7 +213,7 @@ export async function deleteAdminApiKey(keyId: string) {
  */
 export async function checkAdminApiAccess() {
   try {
-    const session = await getAdminSession();
+    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'view');
 
     // Check if session was created with a valid admin API key
     // This would be stored in session metadata when API key is used

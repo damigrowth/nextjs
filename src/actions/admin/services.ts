@@ -49,7 +49,8 @@ import {
   type EditServiceSettingsInput,
 } from '@/lib/validations/service';
 import type { ActionResult } from '@/lib/types/api';
-import { getAdminSession } from './helpers';
+import { getAdminSession, getAdminSessionWithPermission } from './helpers';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 
 /**
  * Invalidate all caches related to a service update
@@ -112,7 +113,7 @@ export async function listServices(
   params: Partial<AdminListServicesInput> = {},
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SERVICES, 'view');
 
     const validated = adminListServicesSchema.parse(params);
     const {
@@ -307,7 +308,7 @@ export async function listServices(
  */
 export async function getService(serviceId: number) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SERVICES, 'view');
 
     const service = await prisma.service.findUnique({
       where: { id: serviceId },
@@ -373,7 +374,7 @@ export async function getService(serviceId: number) {
  */
 export async function updateService(params: AdminUpdateServiceInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SERVICES, 'edit');
 
     // params is already validated by action functions (updateServiceSettingsAction, etc.)
     // No need to re-validate here - the redundant parse was causing .partial() to add empty arrays
@@ -852,7 +853,7 @@ export async function updateServiceMedia(
   formData: FormData,
 ): Promise<ActionResult<{ message: string }>> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SERVICES, 'edit');
 
     // Check if service exists
     const existingService = await prisma.service.findUnique({
@@ -934,7 +935,7 @@ export async function updateServiceMedia(
  */
 export async function togglePublished(params: AdminToggleServiceInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SERVICES, 'edit');
 
     const validated = adminToggleServiceSchema.parse(params);
     const { serviceId } = validated;
@@ -1037,7 +1038,7 @@ export async function togglePublished(params: AdminToggleServiceInput) {
  */
 export async function toggleFeatured(params: AdminToggleServiceInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SERVICES, 'edit');
 
     const validated = adminToggleServiceSchema.parse(params);
     const { serviceId } = validated;
@@ -1109,7 +1110,7 @@ export async function updateServiceStatus(
   params: AdminUpdateServiceStatusInput,
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SERVICES, 'edit');
 
     const validated = adminUpdateServiceStatusSchema.parse(params);
     const { serviceId, status, rejectionReason } = validated;
@@ -1213,7 +1214,7 @@ export async function updateServiceStatus(
  */
 export async function deleteService(params: AdminDeleteServiceInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SERVICES, 'full');
 
     const validated = adminDeleteServiceSchema.parse(params);
     const { serviceId } = validated;
@@ -1280,7 +1281,7 @@ export async function deleteService(params: AdminDeleteServiceInput) {
  */
 export async function getServiceStats() {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SERVICES, 'view');
 
     const [
       total,
@@ -1505,7 +1506,7 @@ export async function createServiceForProfile(
 ): Promise<ActionResult> {
   try {
     // 1. Verify admin session
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SERVICES, 'edit');
 
     // 2. Extract profile ID from form data
     const profileId = formData.get('profileId') as string;

@@ -16,7 +16,8 @@ import {
   getRecentCommits as fetchRecentCommits,
   getCommitsAhead,
 } from '@/actions/github/operations';
-import { getAdminSession } from './helpers';
+import { getAdminSession, getAdminSessionWithPermission } from './helpers';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import type {
   GitStatusResponse,
   CommitResponse,
@@ -31,7 +32,7 @@ import type {
  */
 export async function getGitStatus(): Promise<GitStatusResponse> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     const octokit = getGitHubClient();
@@ -182,7 +183,7 @@ export async function commitDatasetChanges(
   message: string,
 ): Promise<CommitResponse> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     const octokit = getGitHubClient();
@@ -324,7 +325,7 @@ export async function commitDatasetChanges(
  */
 export async function pushToRemote(branch?: string): Promise<PushResponse> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     const octokit = getGitHubClient();
@@ -370,7 +371,7 @@ export async function getRecentCommits(
   branch?: string,
 ): Promise<RecentCommitsResponse> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     const octokit = getGitHubClient();
@@ -433,7 +434,7 @@ export async function discardStagedChanges(): Promise<{
   error?: string;
 }> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'edit');
 
     const { clearStagedChanges } = await import('./taxonomy-staging');
     const count = await clearStagedChanges();
@@ -462,7 +463,7 @@ export async function revertCommits(
   commitHashes: string[],
 ): Promise<CommitResponse> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'full');
     validateRepoConfig();
 
     if (!commitHashes || commitHashes.length === 0) {
@@ -587,7 +588,7 @@ export async function revertCommits(
  */
 export async function undoLastCommit(count: number = 1): Promise<UndoCommitResponse> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     if (count < 1 || count > 10) {
@@ -677,7 +678,7 @@ export async function mergeDatasetsToMain(): Promise<
   import('@/lib/types/github').MergeBranchResponse
 > {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     const octokit = getGitHubClient();
@@ -774,7 +775,7 @@ export async function syncDatasetsWithMain(): Promise<
   import('@/lib/types/github').MergeBranchResponse
 > {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'edit');
     validateRepoConfig();
 
     const octokit = getGitHubClient();
@@ -873,7 +874,7 @@ export async function resetDatasetsToMain(): Promise<
   import('@/lib/types/github').MergeBranchResponse
 > {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     const octokit = getGitHubClient();

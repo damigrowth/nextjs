@@ -49,7 +49,7 @@ export default async function AdminDashboard() {
   return (
     <>
       <SiteHeader title='Dashboard' />
-      <div className='flex flex-col gap-4 py-4 md:gap-6'>
+      <div className='flex flex-col gap-6 py-4'>
         <AdminStatsCards
           serviceStats={serviceStats}
           profileStats={profileStats}

@@ -119,30 +119,19 @@ export const support = ac.newRole({
 
 /**
  * EDITOR ROLE
- * Content management only - limited to editing content with no destructive actions
+ * Services management only - full CRUD access to services
  *
  * Can access:
- * - Services (edit only - no delete/approve)
- * - Profiles (edit only - no delete/verify)
- * - Taxonomies (read-only)
+ * - Services (full access - create, read, update, delete, approve, reject)
  * - Dashboard (read-only)
  *
  * Cannot access:
- * - User management
- * - Verifications
- * - Chats
- * - Reviews
- * - Team management
- * - Analytics
- * - Settings
- * - Git operations
+ * - All other resources (profiles, taxonomies, users, verifications, chats, reviews, team, analytics, settings, git)
  */
 export const editor = ac.newRole({
-  services: ['read', 'update'], // Edit only, no delete/approve
-  profiles: ['read', 'update'], // Edit only, no verify
-  taxonomies: ['read'], // Read-only
+  services: ['read', 'update', 'delete', 'approve', 'reject'], // Full services access
   dashboard: ['read'],
-  // No access to: users, verifications, chats, reviews, team, analytics, settings, git
+  // No access to: profiles, taxonomies, users, verifications, chats, reviews, team, analytics, settings, git
 });
 
 // ============================================================================
