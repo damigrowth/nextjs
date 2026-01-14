@@ -28,10 +28,9 @@ export type AuthSession = typeof auth.$Infer.Session;
 /**
  * Type definitions
  */
-export type UserRole = 'user' | 'freelancer' | 'company' | 'admin';
+export type UserRole = 'user' | 'freelancer' | 'company' | 'admin' | 'support' | 'editor';
 export type AuthStep =
   | 'EMAIL_VERIFICATION'
-  | 'TYPE_SELECTION'
   | 'OAUTH_SETUP'
   | 'ONBOARDING'
   | 'DASHBOARD';

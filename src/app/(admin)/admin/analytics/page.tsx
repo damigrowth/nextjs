@@ -3,11 +3,15 @@ import { AdminUsersStats } from '@/components/admin/admin-users-stats';
 import { AdminProfilesStats } from '@/components/admin/admin-profiles-stats';
 import { AdminServicesStats } from '@/components/admin/admin-services-stats';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { requirePermission } from '@/actions/auth/server';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 
 // Force dynamic rendering for admin pages
 export const dynamic = 'force-dynamic';
 
-export default function AnalyticsPage() {
+export default async function AnalyticsPage() {
+  // Require admin-only access
+  await requirePermission(ADMIN_RESOURCES.ANALYTICS);
   return (
     <>
       <SiteHeader title='Analytics' />

@@ -5,7 +5,7 @@ model User {
   name            String?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-  step            String        @default("EMAIL_VERIFICATION")
+  step            JourneyStep   @default(EMAIL_VERIFICATION)
   confirmed       Boolean       @default(false)
   blocked         Boolean       @default(false)
   username        String?       @unique // Keep in user for auth purposes
@@ -17,8 +17,8 @@ model User {
   banExpires      DateTime?
   banReason       String?
   banned          Boolean       @default(false)
-  type            String        @default("user") // 'user', 'pro' - for registration flow UI starts as ''
-  role            String        @default("user")
+  type            UserType      @default(user)
+  role            UserRole      @default(user)
   provider        String        @default("email") // email or google
   lastUnreadEmailSentAt DateTime?   // Track when last unread messages email was sent (24h cooldown)
   accounts        Account[]
@@ -172,14 +172,23 @@ model ProfileVerification {
   @@map("verifications")
 }
 
+enum UserRole {
+  user
+  freelancer
+  company
+  admin
+  support
+  editor
+}
+
 enum UserType {
-  USER
-  FREELANCER
-  COMPANY
+  user
+  pro
 }
 
 enum JourneyStep {
   EMAIL_VERIFICATION
+  OAUTH_SETUP
   ONBOARDING
   DASHBOARD
 }

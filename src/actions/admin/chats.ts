@@ -383,6 +383,7 @@ export interface AdminMessageListItem {
   createdAt: Date;
   edited: boolean;
   deleted: boolean;
+  isCreator: boolean;
   author: {
     id: string;
     displayName: string | null;
@@ -409,7 +410,7 @@ export async function getAdminChatMessages(
   try {
     const { search, sortBy, sortOrder, page = 1, limit = 12 } = params;
 
-    // Get the actual chat ID (handle both cid and id)
+    // Get the actual chat ID and creatorUid (handle both cid and id)
     const chat = await prisma.chat.findFirst({
       where: {
         OR: [
@@ -417,7 +418,10 @@ export async function getAdminChatMessages(
           { id: chatId }
         ]
       },
-      select: { id: true },
+      select: {
+        id: true,
+        creatorUid: true,
+      },
     });
 
     if (!chat) {
@@ -448,7 +452,7 @@ export async function getAdminChatMessages(
     const total = await prisma.message.count({ where });
 
     // Fetch messages with pagination
-    const messages = await prisma.message.findMany({
+    const messagesRaw = await prisma.message.findMany({
       where,
       select: {
         id: true,
@@ -469,6 +473,17 @@ export async function getAdminChatMessages(
       skip: (page - 1) * limit,
       take: limit,
     });
+
+    // Map messages to include isCreator flag
+    const messages: AdminMessageListItem[] = messagesRaw.map((message) => ({
+      id: message.id,
+      content: message.content,
+      createdAt: message.createdAt,
+      edited: message.edited,
+      deleted: message.deleted,
+      isCreator: message.author.id === chat.creatorUid,
+      author: message.author,
+    }));
 
     return {
       messages,

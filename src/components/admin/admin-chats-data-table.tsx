@@ -26,9 +26,10 @@ function CopyableText({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const displayText = maxLength && text.length > maxLength
-    ? `${text.slice(0, maxLength)}...`
-    : text;
+  const displayText =
+    maxLength && text.length > maxLength
+      ? `${text.slice(0, maxLength)}...`
+      : text;
 
   return (
     <div
@@ -76,20 +77,8 @@ export function AdminChatsDataTable({
 }: AdminChatsDataTableProps) {
   const columns: ColumnDef<AdminChatTableItem>[] = [
     {
-      key: 'id',
-      header: 'ID',
-      sortable: false,
-      render: (chat) => (
-        <CopyableText
-          text={chat.cid || chat.id}
-          maxLength={8}
-          className='font-mono text-xs'
-        />
-      ),
-    },
-    {
       key: 'creator',
-      header: 'Creator',
+      header: 'Αποστολέας',
       sortable: false,
       render: (chat) => (
         <div className='flex items-center gap-3'>
@@ -116,7 +105,7 @@ export function AdminChatsDataTable({
     },
     {
       key: 'member',
-      header: 'Member',
+      header: 'Παραλήπτης',
       sortable: false,
       render: (chat) => (
         <div className='flex items-center gap-3'>
@@ -143,7 +132,7 @@ export function AdminChatsDataTable({
     },
     {
       key: 'messageCount',
-      header: 'Messages',
+      header: 'Μηνύματα',
       sortable: true,
       render: (chat) => (
         <div className='font-medium'>{chat.messageCount.toLocaleString()}</div>
@@ -151,7 +140,7 @@ export function AdminChatsDataTable({
     },
     {
       key: 'createdAt',
-      header: 'Created',
+      header: 'Δημιουργία',
       sortable: true,
       render: (chat) => (
         <div className='text-sm text-muted-foreground'>
@@ -161,7 +150,7 @@ export function AdminChatsDataTable({
     },
     {
       key: 'lastActivity',
-      header: 'Last Activity',
+      header: 'Ενημέρωση',
       sortable: true,
       render: (chat) => (
         <div className='text-sm text-muted-foreground'>

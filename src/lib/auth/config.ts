@@ -13,6 +13,12 @@ import { brevoListManager } from '@/lib/email/providers/brevo/list-management';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma/client';
 import { cookies } from 'next/headers';
+import {
+  ac,
+  admin as adminRole,
+  support as supportRole,
+  editor as editorRole,
+} from './permissions';
 
 export const auth = betterAuth({
   // Production uses doulitsa.gr, development uses localhost, previews use VERCEL_URL
@@ -442,7 +448,13 @@ export const auth = betterAuth({
     }),
     admin({
       defaultRole: 'user',
-      adminRoles: ['admin'],
+      ac, // Access control system
+      roles: {
+        // Define admin roles with specific permissions
+        admin: adminRole,
+        support: supportRole,
+        editor: editorRole,
+      },
       // Admin user IDs can be set via environment variables
       adminUserIds: process.env.ADMIN_USER_IDS?.split(',') || [],
     }),

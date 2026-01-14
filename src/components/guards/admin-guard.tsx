@@ -1,19 +1,19 @@
 import { redirect } from 'next/navigation';
-import { requireRole } from '@/actions/auth/server';
+import { requireAnyRole } from '@/actions/auth/server';
 
 interface AdminGuardProps {
   children: React.ReactNode;
 }
 
 export async function AdminGuard({ children }: AdminGuardProps) {
-  // Server-side admin role check using existing auth utilities
+  // Server-side admin role check - allow admin, support, and editor roles
   try {
-    await requireRole('admin');
+    await requireAnyRole(['admin', 'support', 'editor']);
 
-    // User is authenticated as admin - render children directly
+    // User is authenticated with admin role - render children directly
     return <>{children}</>;
   } catch (error) {
-    // requireRole should handle redirects, but catch any other errors
+    // requireAnyRole should handle redirects, but catch any other errors
     redirect('/login');
   }
 }

@@ -1242,3 +1242,309 @@ export async function updateAccountAdmin(
     };
   }
 }
+
+// =============================================
+// TEAM MANAGEMENT (ADMIN ROLE ASSIGNMENT)
+// =============================================
+
+/**
+ * Team member interface for admin display
+ */
+export interface TeamMember {
+  id: string;
+  email: string;
+  username: string | null;
+  displayName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  image: string | null;
+  role: string;
+  createdAt: Date;
+  updatedAt: Date;
+  emailVerified: boolean;
+  confirmed: boolean;
+  blocked: boolean;
+}
+
+/**
+ * Get all team members (users with admin, support, or editor roles)
+ *
+ * Only admins can view team members
+ */
+export async function getTeamMembers(): Promise<ActionResult<TeamMember[]>> {
+  try {
+    // Require admin role to view team
+    const { requireRole } = await import('@/actions/auth/server');
+    const { ADMIN_ROLES } = await import('@/lib/auth/roles');
+
+    await requireRole('admin');
+
+    const teamMembers = await prisma.user.findMany({
+      where: {
+        role: {
+          in: [ADMIN_ROLES.ADMIN, ADMIN_ROLES.SUPPORT, ADMIN_ROLES.EDITOR],
+        },
+      },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        displayName: true,
+        firstName: true,
+        lastName: true,
+        image: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        emailVerified: true,
+        confirmed: true,
+        blocked: true,
+      },
+      orderBy: [
+        { role: 'asc' }, // admin first, then support, then editor
+        { createdAt: 'desc' }, // newest first within each role
+      ],
+    });
+
+    return {
+      success: true,
+      data: teamMembers,
+    };
+  } catch (error) {
+    console.error('Get team members error:', error);
+    return {
+      success: false,
+      error: 'Failed to get team members',
+    };
+  }
+}
+
+/**
+ * Assign an admin role to a user
+ *
+ * Only admins can assign roles
+ *
+ * @param userId - User ID to assign role to
+ * @param role - Admin role to assign (admin, support, or editor)
+ */
+export async function assignAdminRole(
+  userId: string,
+  role: string,
+): Promise<ActionResult<void>> {
+  try {
+    // Require admin role to assign roles
+    const { requireRole } = await import('@/actions/auth/server');
+    const { revalidatePath } = await import('next/cache');
+    const { ADMIN_ROLES } = await import('@/lib/auth/roles');
+
+    const currentUser = await requireRole('admin');
+
+    // Validate role
+    if (!Object.values(ADMIN_ROLES).includes(role as any)) {
+      return {
+        success: false,
+        error: 'Invalid role. Must be admin, support, or editor',
+      };
+    }
+
+    // Check if user exists
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        error: 'User not found',
+      };
+    }
+
+    // Prevent admin from removing their own admin role
+    if (currentUser.id === userId && role !== ADMIN_ROLES.ADMIN) {
+      return {
+        success: false,
+        error: 'You cannot remove your own admin role',
+      };
+    }
+
+    // Update user role
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        role,
+        step: 'DASHBOARD', // Ensure admin users are marked as completed
+      },
+    });
+
+    // Revalidate team page
+    revalidatePath('/admin/team');
+
+    return {
+      success: true,
+      data: undefined,
+    };
+  } catch (error) {
+    console.error('Assign admin role error:', error);
+    return {
+      success: false,
+      error: 'Failed to assign admin role',
+    };
+  }
+}
+
+/**
+ * Remove admin role from a user (revert to their original role)
+ *
+ * Only admins can remove roles
+ *
+ * @param userId - User ID to remove admin role from
+ */
+export async function removeAdminRole(userId: string): Promise<ActionResult<void>> {
+  try {
+    // Require admin role to remove roles
+    const { requireRole } = await import('@/actions/auth/server');
+    const { revalidatePath } = await import('next/cache');
+
+    const currentUser = await requireRole('admin');
+
+    // Check if user exists
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        type: true,
+      },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        error: 'User not found',
+      };
+    }
+
+    // Prevent admin from removing their own admin role
+    if (currentUser.id === userId) {
+      return {
+        success: false,
+        error: 'You cannot remove your own admin role',
+      };
+    }
+
+    // Determine what role to revert to based on user type
+    let newRole = 'user';
+    if (user.type === 'pro') {
+      // For pro users, check if they have a profile to determine role
+      const profile = await prisma.profile.findUnique({
+        where: { uid: userId },
+        select: { type: true },
+      });
+
+      if (profile?.type === 'company') {
+        newRole = 'company';
+      } else if (profile?.type === 'freelancer') {
+        newRole = 'freelancer';
+      }
+    }
+
+    // Update user role back to original role
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        role: newRole,
+      },
+    });
+
+    // Revalidate team page
+    revalidatePath('/admin/team');
+
+    return {
+      success: true,
+      data: undefined,
+    };
+  } catch (error) {
+    console.error('Remove admin role error:', error);
+    return {
+      success: false,
+      error: 'Failed to remove admin role',
+    };
+  }
+}
+
+/**
+ * Search users by email or username for role assignment
+ *
+ * Only admins can search users for role assignment
+ *
+ * @param search - Search query (email or username)
+ * @param limit - Maximum number of results (default: 10)
+ */
+export async function searchUsersForRoleAssignment(
+  search: string,
+  limit: number = 10,
+): Promise<ActionResult<TeamMember[]>> {
+  try {
+    // Require admin role to search users
+    const { requireRole } = await import('@/actions/auth/server');
+    await requireRole('admin');
+
+    if (!search || search.length < 2) {
+      return {
+        success: false,
+        error: 'Search query must be at least 2 characters',
+      };
+    }
+
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          { email: { contains: search, mode: 'insensitive' } },
+          { username: { contains: search, mode: 'insensitive' } },
+          { displayName: { contains: search, mode: 'insensitive' } },
+        ],
+        // Optionally exclude users who already have admin roles
+        // Commented out to allow changing existing admin roles
+        // role: {
+        //   notIn: [ADMIN_ROLES.ADMIN, ADMIN_ROLES.SUPPORT, ADMIN_ROLES.EDITOR],
+        // },
+      },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        displayName: true,
+        firstName: true,
+        lastName: true,
+        image: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        emailVerified: true,
+        confirmed: true,
+        blocked: true,
+      },
+      take: limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return {
+      success: true,
+      data: users,
+    };
+  } catch (error) {
+    console.error('Search users for role assignment error:', error);
+    return {
+      success: false,
+      error: 'Failed to search users',
+    };
+  }
+}

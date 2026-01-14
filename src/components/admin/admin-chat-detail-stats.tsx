@@ -59,7 +59,7 @@ export function AdminChatDetailStats({ stats }: AdminChatDetailStatsProps) {
       {/* Creator Card */}
       <Card>
         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium'>Creator</CardTitle>
+          <CardTitle className='text-sm font-medium'>Αποστολέας</CardTitle>
           <UserIcon className='h-4 w-4 text-muted-foreground' />
         </CardHeader>
         <CardContent>
@@ -93,7 +93,7 @@ export function AdminChatDetailStats({ stats }: AdminChatDetailStatsProps) {
       {/* Member Card */}
       <Card>
         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium'>Member</CardTitle>
+          <CardTitle className='text-sm font-medium'>Παραλήπτης</CardTitle>
           <UserIcon className='h-4 w-4 text-muted-foreground' />
         </CardHeader>
         <CardContent>

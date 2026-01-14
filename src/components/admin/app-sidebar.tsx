@@ -12,11 +12,14 @@ import {
   TagsIcon,
   MessageSquareIcon,
   GitBranchIcon,
+  ShieldIcon,
+  type LucideIcon,
 } from 'lucide-react';
 
 import { NextLink } from '@/components';
 import { NavMain } from '@/components/admin/nav-main';
 import { NavUser } from '@/components/admin/nav-user';
+import type { NavItem } from '@/actions/admin/helpers';
 
 import {
   Sidebar,
@@ -28,118 +31,91 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 
-const data = {
-  user: {
-    name: 'Admin',
-    email: 'admin@doulitsa.com',
-    avatar: '/avatars/admin.jpg',
-  },
-  navMain: [
-    {
-      title: 'Dashboard',
-      url: '/admin',
-      icon: LayoutDashboardIcon,
-    },
-    {
-      title: 'Services',
-      url: '/admin/services',
-      icon: BriefcaseIcon,
-    },
-    {
-      title: 'Verifications',
-      url: '/admin/verifications',
-      icon: CheckCircleIcon,
-    },
-    {
-      title: 'Profiles',
-      url: '/admin/profiles',
-      icon: UserCheckIcon,
-    },
-    {
-      title: 'Users',
-      url: '/admin/users',
-      icon: UsersIcon,
-    },
-    {
-      title: 'Taxonomies',
-      url: '/admin/taxonomies',
-      icon: TagsIcon,
-      items: [
-        {
-          title: 'Service',
-          url: '/admin/taxonomies/service',
-          items: [
-            {
-              title: 'Overview',
-              url: '/admin/taxonomies/service',
-            },
-            {
-              title: 'Categories',
-              url: '/admin/taxonomies/service/categories',
-            },
-            {
-              title: 'Subcategories',
-              url: '/admin/taxonomies/service/subcategories',
-            },
-            {
-              title: 'Subdivisions',
-              url: '/admin/taxonomies/service/subdivisions',
-            },
-          ],
-        },
-        {
-          title: 'Pro',
-          url: '/admin/taxonomies/pro',
-          items: [
-            {
-              title: 'Overview',
-              url: '/admin/taxonomies/pro',
-            },
-            {
-              title: 'Categories',
-              url: '/admin/taxonomies/pro/categories',
-            },
-            {
-              title: 'Subcategories',
-              url: '/admin/taxonomies/pro/subcategories',
-            },
-          ],
-        },
-        {
-          title: 'Skills',
-          url: '/admin/taxonomies/skills',
-        },
-        {
-          title: 'Tags',
-          url: '/admin/taxonomies/tags',
-        },
-      ],
-    },
-    {
-      title: 'Chats',
-      url: '/admin/chats',
-      icon: MessageSquareIcon,
-    },
-    {
-      title: 'Analytics',
-      url: '/admin/analytics',
-      icon: BarChartIcon,
-    },
-    {
-      title: 'Git',
-      url: '/admin/git',
-      icon: GitBranchIcon,
-    },
-  ],
+// Icon mapping for navigation items
+const iconMap: Record<string, LucideIcon> = {
+  '/admin': LayoutDashboardIcon,
+  '/admin/services': BriefcaseIcon,
+  '/admin/verifications': CheckCircleIcon,
+  '/admin/profiles': UserCheckIcon,
+  '/admin/users': UsersIcon,
+  '/admin/team': ShieldIcon,
+  '/admin/taxonomies': TagsIcon,
+  '/admin/chats': MessageSquareIcon,
+  '/admin/analytics': BarChartIcon,
+  '/admin/git': GitBranchIcon,
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+// Taxonomy subitems structure
+const taxonomySubitems = [
+  {
+    title: 'Service',
+    url: '/admin/taxonomies/service',
+    items: [
+      {
+        title: 'Overview',
+        url: '/admin/taxonomies/service',
+      },
+      {
+        title: 'Categories',
+        url: '/admin/taxonomies/service/categories',
+      },
+      {
+        title: 'Subcategories',
+        url: '/admin/taxonomies/service/subcategories',
+      },
+      {
+        title: 'Subdivisions',
+        url: '/admin/taxonomies/service/subdivisions',
+      },
+    ],
+  },
+  {
+    title: 'Pro',
+    url: '/admin/taxonomies/pro',
+    items: [
+      {
+        title: 'Overview',
+        url: '/admin/taxonomies/pro',
+      },
+      {
+        title: 'Categories',
+        url: '/admin/taxonomies/pro/categories',
+      },
+      {
+        title: 'Subcategories',
+        url: '/admin/taxonomies/pro/subcategories',
+      },
+    ],
+  },
+  {
+    title: 'Skills',
+    url: '/admin/taxonomies/skills',
+  },
+  {
+    title: 'Tags',
+    url: '/admin/taxonomies/tags',
+  },
+];
+
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  navItems: NavItem[];
+}
+
+export function AppSidebar({ navItems, ...props }: AppSidebarProps) {
   // Fallback user data (nav-user.tsx fetches real session data)
   const user = {
     name: 'Admin',
     email: 'admin@doulitsa.com',
     avatar: '/avatars/admin.jpg',
   };
+
+  // Map nav items with icons and subitems
+  const navMainWithIcons = navItems.map((item) => ({
+    ...item,
+    icon: iconMap[item.url],
+    // Add taxonomy subitems if this is the taxonomies page
+    items: item.url === '/admin/taxonomies' ? taxonomySubitems : undefined,
+  }));
 
   return (
     <Sidebar collapsible='offcanvas' {...props}>
@@ -159,7 +135,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navMainWithIcons} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />
