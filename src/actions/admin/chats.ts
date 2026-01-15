@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma/client';
 import type { ChatListItem } from '@/lib/types/messages';
 import { transformChatForList } from '@/lib/utils/messages';
 import { CHAT_LIST_SELECT } from '@/lib/database/selects';
+import type { ActionResult } from '@/lib/types/api';
 
 // ============================================================================
 // Stats Types
@@ -39,7 +40,7 @@ export interface AdminChatListItem extends ChatListItem {
 /**
  * Get admin chat statistics
  */
-export async function getAdminChatStats(): Promise<AdminChatStats> {
+export async function getAdminChatStats(): Promise<ActionResult<AdminChatStats>> {
   try {
     // Get total chats
     const totalChats = await prisma.chat.count();
@@ -68,14 +69,21 @@ export async function getAdminChatStats(): Promise<AdminChatStats> {
     const totalChatMembers = await prisma.chatMember.count();
 
     return {
-      totalChats,
-      totalMessages,
-      messagesToday,
-      totalChatMembers,
+      success: true,
+      data: {
+        totalChats,
+        totalMessages,
+        messagesToday,
+        totalChatMembers,
+      },
     };
   } catch (error) {
     console.error('Error fetching admin chat stats:', error);
-    throw new Error('Failed to fetch chat statistics');
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'Failed to fetch chat statistics',
+    };
   }
 }
 
@@ -297,7 +305,7 @@ export interface AdminChatDetailStats {
 /**
  * Get statistics for a specific chat
  */
-export async function getAdminChatDetailStats(chatId: string): Promise<AdminChatDetailStats> {
+export async function getAdminChatDetailStats(chatId: string): Promise<ActionResult<AdminChatDetailStats>> {
   try {
     // Get the chat with members
     const chat = await prisma.chat.findFirst({
@@ -326,7 +334,10 @@ export async function getAdminChatDetailStats(chatId: string): Promise<AdminChat
     });
 
     if (!chat) {
-      throw new Error('Chat not found');
+      return {
+        success: false,
+        error: 'Chat not found',
+      };
     }
 
     // Get total messages for this chat
@@ -356,24 +367,31 @@ export async function getAdminChatDetailStats(chatId: string): Promise<AdminChat
     const member = chat.members.find((m) => m.uid !== chat.creatorUid)?.user || null;
 
     return {
-      totalMessages,
-      messagesToday,
-      creator: creator ? {
-        id: creator.id,
-        displayName: creator.displayName,
-        username: creator.username,
-        image: creator.image,
-      } : null,
-      member: member ? {
-        id: member.id,
-        displayName: member.displayName,
-        username: member.username,
-        image: member.image,
-      } : null,
+      success: true,
+      data: {
+        totalMessages,
+        messagesToday,
+        creator: creator ? {
+          id: creator.id,
+          displayName: creator.displayName,
+          username: creator.username,
+          image: creator.image,
+        } : null,
+        member: member ? {
+          id: member.id,
+          displayName: member.displayName,
+          username: member.username,
+          image: member.image,
+        } : null,
+      },
     };
   } catch (error) {
     console.error('Error fetching admin chat detail stats:', error);
-    throw new Error('Failed to fetch chat detail statistics');
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'Failed to fetch chat detail statistics',
+    };
   }
 }
 

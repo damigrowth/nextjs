@@ -26,10 +26,25 @@ interface AdminChatDetailStats {
 }
 
 interface AdminChatDetailStatsProps {
-  stats: AdminChatDetailStats;
+  stats: AdminChatDetailStats | null;
 }
 
 export function AdminChatDetailStats({ stats }: AdminChatDetailStatsProps) {
+  // Show error state if stats failed to load
+  if (!stats) {
+    return (
+      <div className='px-4 lg:px-6'>
+        <Card>
+          <CardContent className='pt-6'>
+            <p className='text-sm text-muted-foreground'>
+              Failed to load chat statistics. Please try refreshing the page.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className='grid gap-4 px-4 md:grid-cols-2 lg:grid-cols-4 lg:px-6'>
       {/* Total Messages Card */}

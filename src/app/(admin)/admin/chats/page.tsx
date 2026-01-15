@@ -24,7 +24,8 @@ export default async function ChatsPage({ searchParams }: ChatsPageProps) {
   const params = await searchParams;
 
   // Fetch stats data
-  const stats = await getAdminChatStats();
+  const statsResult = await getAdminChatStats();
+  const stats = statsResult.success ? statsResult.data : null;
 
   // Create stable key for Suspense based on data-fetching params only
   const tableKey = `${params.page || '1'}-${params.limit || '12'}-${params.search || ''}-${params.sort || ''}-${params.sortBy || ''}-${params.sortOrder || ''}`;
