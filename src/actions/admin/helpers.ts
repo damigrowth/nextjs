@@ -12,9 +12,11 @@ import type { LucideIcon } from 'lucide-react';
 
 /**
  * Get authenticated admin session
- * @deprecated Use getAdminSessionWithPermission instead for proper role-based access control
- * @throws Error if user is not authenticated or not an admin
+ * @deprecated Use requirePermission, requireEditPermission, or requireFullPermission instead
+ * This function only checks for 'admin' role and does not support the resource-based permission system.
+ * All admin pages should use the proper permission functions from @/actions/auth/server
  * @throws Redirects to login if no session exists
+ * @throws Redirects to /admin if not an admin
  */
 export async function getAdminSession() {
   const headersList = await headers();
@@ -29,7 +31,7 @@ export async function getAdminSession() {
   const isAdmin = session.user.role === 'admin';
 
   if (!isAdmin) {
-    throw new Error('Unauthorized: Admin role required');
+    redirect('/admin');
   }
 
   return session;
