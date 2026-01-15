@@ -17,6 +17,7 @@ import {
   ProfileTerms,
   ReportProfileDialog,
 } from '@/components/profile';
+import { ProfileSchema } from '@/lib/seo/schema';
 
 // ISR configuration with shorter interval + tag-based revalidation
 export const revalidate = 300; // Revalidate every 5 minutes (backup for tag-based)
@@ -105,8 +106,21 @@ export default async function ProfilePage({
 
   const image = profile.image;
 
+  // Get first county for location schema
+  const firstCounty = coverage.counties && coverage.counties.length > 0
+    ? coverage.counties[0]
+    : undefined;
+
   return (
     <div className='my-20'>
+      <ProfileSchema
+        username={profile.username || ''}
+        displayName={profile.displayName || ''}
+        location={firstCounty}
+        // rating={profile.rating}
+        // reviewCount={profile.reviewCount}
+        image={image}
+      />
       {/* Category Navigation Tabs */}
       <TaxonomyTabs
         items={featuredCategories}

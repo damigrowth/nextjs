@@ -4,6 +4,7 @@ import { ArchiveBanner } from '@/components/archives/archive-banner';
 import { SubdivisionsCarousel } from '@/components/archives/subdivisions-carousel';
 import { CategoriesGrid } from '@/components/archives/categories-grid';
 import { getDirectoryMetadata } from '@/lib/seo/pages';
+import { DirectorySchema } from '@/lib/seo/schema';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -38,6 +39,7 @@ export default async function DirectoryPage() {
 
     return (
       <div className='py-20 bg-silver'>
+        <DirectorySchema categories={categories} />
         {/* Pro Category Navigation Tabs */}
         <TaxonomyTabs
           items={proCategories}

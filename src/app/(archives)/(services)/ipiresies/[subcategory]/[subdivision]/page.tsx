@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ArchiveLayout, ArchiveServiceCard } from '@/components/archives';
 import { getServiceArchivePageData } from '@/actions/services/get-services';
 import { getServiceSubdivisionMetadata } from '@/lib/seo/pages';
+import { ServicesSchema } from '@/lib/seo/schema';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -96,7 +97,16 @@ export default async function ServicesSubdivisionPage({
   } = result.data;
 
   return (
-    <ArchiveLayout
+    <>
+      <ServicesSchema
+        services={services}
+        taxonomies={{
+          category: taxonomyData.currentCategory,
+          subcategory: taxonomyData.currentSubcategory,
+          subdivision: taxonomyData.currentSubdivision,
+        }}
+      />
+      <ArchiveLayout
       archiveType='services'
       category={categorySlug}
       subcategory={subcategorySlug}
@@ -129,5 +139,6 @@ export default async function ServicesSubdivisionPage({
         )}
       </div>
     </ArchiveLayout>
+    </>
   );
 }

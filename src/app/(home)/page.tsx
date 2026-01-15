@@ -10,8 +10,7 @@ import { getHomePageData } from '@/actions/home/get-home-data';
 import { ServicesHomeLazy } from '@/components/home/services-home-lazy';
 import { ProfilesHomeLazy } from '@/components/home/profiles-home-lazy';
 import { getServiceTaxonomies } from '@/lib/taxonomies';
-
-// import HomeSchema from 'oldcode/utils/Seo/Schema/HomeSchema';
+import { HomeSchema } from '@/lib/seo/schema';
 
 export const dynamic = 'force-static';
 export const revalidate = 86400; // Revalidate every 24 hours (1 day)
@@ -76,7 +75,7 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* <HomeSchema /> */}
+      <HomeSchema />
       {/* Service Categories Navigation Tabs */}
       <div>
         <TaxonomyTabs
