@@ -6,66 +6,49 @@ import {
   TagsIcon,
   BarChartIcon,
   GitBranchIcon,
+  ShieldIcon,
+  MessageSquareIcon,
   ArrowRightIcon,
+  type LucideIcon,
 } from 'lucide-react';
 
 import {
   Card,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import { NextLink } from '@/components';
+import { getFilteredNavItems } from '@/actions/admin/helpers';
 
-const navItems = [
-  {
-    title: 'Υπηρεσίες',
-    icon: BriefcaseIcon,
-    href: '/admin/services',
-  },
-  {
-    title: 'Προφίλ',
-    icon: UserCheckIcon,
-    href: '/admin/profiles',
-  },
-  {
-    title: 'Πιστοποιήσεις',
-    icon: CheckCircleIcon,
-    href: '/admin/verifications',
-  },
-  {
-    title: 'Χρήστες',
-    icon: UsersIcon,
-    href: '/admin/users',
-  },
-  {
-    title: 'Taxonomies',
-    icon: TagsIcon,
-    href: '/admin/taxonomies',
-  },
-  {
-    title: 'Analytics',
-    icon: BarChartIcon,
-    href: '/admin/analytics',
-  },
-  {
-    title: 'Git',
-    icon: GitBranchIcon,
-    href: '/admin/git',
-  },
-];
+// Icon mapping for navigation items
+const iconMap: Record<string, LucideIcon> = {
+  '/admin/services': BriefcaseIcon,
+  '/admin/verifications': CheckCircleIcon,
+  '/admin/profiles': UserCheckIcon,
+  '/admin/users': UsersIcon,
+  '/admin/team': ShieldIcon,
+  '/admin/taxonomies': TagsIcon,
+  '/admin/chats': MessageSquareIcon,
+  '/admin/analytics': BarChartIcon,
+  '/admin/git': GitBranchIcon,
+};
 
-export function AdminNavCards() {
+export async function AdminNavCards() {
+  const { navItems } = await getFilteredNavItems();
+
+  // Filter out dashboard itself, only show other resources for quick access
+  const quickAccessItems = navItems.filter(item => item.url !== '/admin');
+
   return (
     <div className='px-4 lg:px-6'>
       <div className='mb-4'>
         <h2 className='text-lg font-semibold'>Γρήγορη Πρόσβαση</h2>
       </div>
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-        {navItems.map((item) => {
-          const Icon = item.icon;
+        {quickAccessItems.map((item) => {
+          const Icon = iconMap[item.url] || BriefcaseIcon;
           return (
-            <NextLink key={item.href} href={item.href}>
+            <NextLink key={item.url} href={item.url}>
               <Card className='group transition-all hover:border-primary hover:shadow-md'>
                 <CardHeader>
                   <div className='flex items-start justify-between'>

@@ -41,79 +41,89 @@ export function AdminStatsCards({
   return (
     <div className='grid gap-4 px-4 md:grid-cols-3 lg:px-6'>
       {/* Services Card */}
-      <Card>
-        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium'>Total Services</CardTitle>
-          <BriefcaseIcon className='h-4 w-4 text-muted-foreground' />
-        </CardHeader>
-        <CardContent>
-          <div className='text-2xl font-bold'>{serviceStats?.total || 0}</div>
-          <div className='mt-4 space-y-1 text-xs text-muted-foreground'>
-            <div className='flex items-center justify-between'>
-              <span>Published</span>
-              <span className='font-medium text-foreground'>
-                {serviceStats?.published || 0}
-              </span>
+      {serviceStats && (
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>
+              Total Services
+            </CardTitle>
+            <BriefcaseIcon className='h-4 w-4 text-muted-foreground' />
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold'>{serviceStats.total}</div>
+            <div className='mt-4 space-y-1 text-xs text-muted-foreground'>
+              <div className='flex items-center justify-between'>
+                <span>Published</span>
+                <span className='font-medium text-foreground'>
+                  {serviceStats.published}
+                </span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span>Pending</span>
+                <span className='font-medium text-foreground'>
+                  {serviceStats.pending}
+                </span>
+              </div>
             </div>
-            <div className='flex items-center justify-between'>
-              <span>Pending</span>
-              <span className='font-medium text-foreground'>
-                {serviceStats?.pending || 0}
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Verifications Card */}
-      <Card>
-        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium'>Verifications</CardTitle>
-          <CheckCircleIcon className='h-4 w-4 text-muted-foreground' />
-        </CardHeader>
-        <CardContent>
-          <div className='text-2xl font-bold'>{profileStats?.total || 0}</div>
-          <div className='mt-4 space-y-1 text-xs text-muted-foreground'>
-            <div className='flex items-center justify-between'>
-              <span>Verified</span>
-              <span className='font-medium text-foreground'>
-                {profileStats?.verified || 0}
-              </span>
+      {profileStats && (
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>
+              Verifications
+            </CardTitle>
+            <CheckCircleIcon className='h-4 w-4 text-muted-foreground' />
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold'>{profileStats.total}</div>
+            <div className='mt-4 space-y-1 text-xs text-muted-foreground'>
+              <div className='flex items-center justify-between'>
+                <span>Verified</span>
+                <span className='font-medium text-foreground'>
+                  {profileStats.verified}
+                </span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span>Pending</span>
+                <span className='font-medium text-foreground'>
+                  {profileStats.unverified}
+                </span>
+              </div>
             </div>
-            <div className='flex items-center justify-between'>
-              <span>Pending</span>
-              <span className='font-medium text-foreground'>
-                {profileStats?.unverified || 0}
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Users Card */}
-      <Card>
-        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium'>Total Users</CardTitle>
-          <UsersIcon className='h-4 w-4 text-muted-foreground' />
-        </CardHeader>
-        <CardContent>
-          <div className='text-2xl font-bold'>{userStats?.total || 0}</div>
-          <div className='mt-4 space-y-1 text-xs text-muted-foreground'>
-            <div className='flex items-center justify-between'>
-              <span>User</span>
-              <span className='font-medium text-foreground'>
-                {userStats?.byType.simple || 0}
-              </span>
+      {userStats && (
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>Total Users</CardTitle>
+            <UsersIcon className='h-4 w-4 text-muted-foreground' />
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold'>{userStats.total}</div>
+            <div className='mt-4 space-y-1 text-xs text-muted-foreground'>
+              <div className='flex items-center justify-between'>
+                <span>User</span>
+                <span className='font-medium text-foreground'>
+                  {userStats.byType.simple}
+                </span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span>Pro</span>
+                <span className='font-medium text-foreground'>
+                  {userStats.byType.pro}
+                </span>
+              </div>
             </div>
-            <div className='flex items-center justify-between'>
-              <span>Pro</span>
-              <span className='font-medium text-foreground'>
-                {userStats?.byType.pro || 0}
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
