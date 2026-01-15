@@ -1,6 +1,7 @@
-import { getCurrentUser } from '@/actions/auth/server';
+import { requirePermission } from '@/actions/auth/server';
 import { getProfile } from '@/actions/admin/profiles';
 import { redirect, notFound } from 'next/navigation';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,18 +30,8 @@ interface PageProps {
 }
 
 export default async function AdminProfileEditPage({ params }: PageProps) {
-  // Verify admin authentication
-  const userResult = await getCurrentUser({ revalidate: true });
-
-  if (!userResult.success || !userResult.data.user) {
-    redirect('/login');
-  }
-
-  const { user: currentUser } = userResult.data;
-
-  if (currentUser.role !== 'admin') {
-    redirect('/dashboard');
-  }
+  // Verify permission to view profiles
+  await requirePermission(ADMIN_RESOURCES.PROFILES, '/admin/profiles');
 
   // Get profile ID from params
   const { id: profileId } = await params;

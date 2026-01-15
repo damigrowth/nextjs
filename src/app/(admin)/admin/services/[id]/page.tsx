@@ -1,6 +1,7 @@
-import { getCurrentUser } from '@/actions/auth/server';
+import { requirePermission, hasPermission } from '@/actions/auth/server';
 import { getService } from '@/actions/admin/services';
 import { redirect, notFound } from 'next/navigation';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, ExternalLink, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,18 +29,11 @@ interface PageProps {
 }
 
 export default async function AdminServiceDetailPage({ params }: PageProps) {
-  // Verify admin authentication
-  const userResult = await getCurrentUser({ revalidate: true });
+  // Verify permission to view services
+  await requirePermission(ADMIN_RESOURCES.SERVICES, '/admin/services');
 
-  if (!userResult.success || !userResult.data.user) {
-    redirect('/login');
-  }
-
-  const { user: currentUser } = userResult.data;
-
-  if (currentUser.role !== 'admin') {
-    redirect('/dashboard');
-  }
+  // Check if user can view profiles (for conditional rendering)
+  const canViewProfiles = await hasPermission(ADMIN_RESOURCES.PROFILES);
 
   // Get service ID from params
   const { id } = await params;
@@ -107,12 +101,14 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                 Services
               </NextLink>
             </Button>
-            <Button variant='outline' size='sm' asChild>
-              <NextLink href={`/admin/profiles/${service.profile.id}`}>
-                <User className='h-4 w-4' />
-                Edit Profile
-              </NextLink>
-            </Button>
+            {canViewProfiles && (
+              <Button variant='outline' size='sm' asChild>
+                <NextLink href={`/admin/profiles/${service.profile.id}`}>
+                  <User className='h-4 w-4' />
+                  Edit Profile
+                </NextLink>
+              </Button>
+            )}
             <Button variant='outline' size='sm' asChild>
               <NextLink href={`/profile/${service.profile.username}`}>
                 <ExternalLink className='h-4 w-4' />

@@ -4,16 +4,31 @@ import { SiteHeader } from '@/components/admin/site-header';
 import { getServiceStats } from '@/actions/admin/services';
 import { getProfileStats } from '@/actions/admin/profiles';
 import { getUserStats } from '@/actions/admin/users';
+import { hasPermission } from '@/actions/auth/server';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 
 // Force dynamic rendering for admin pages
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
-  // Fetch all stats in parallel at page level
+  // Check permissions first to avoid redirect errors
+  const [canViewServices, canViewProfiles, canViewUsers] = await Promise.all([
+    hasPermission(ADMIN_RESOURCES.SERVICES),
+    hasPermission(ADMIN_RESOURCES.PROFILES),
+    hasPermission(ADMIN_RESOURCES.USERS),
+  ]);
+
+  // Only fetch stats for resources user can access
   const [servicesResult, profilesResult, usersResult] = await Promise.all([
-    getServiceStats(),
-    getProfileStats(),
-    getUserStats(),
+    canViewServices
+      ? getServiceStats()
+      : Promise.resolve({ success: false, data: null }),
+    canViewProfiles
+      ? getProfileStats()
+      : Promise.resolve({ success: false, data: null }),
+    canViewUsers
+      ? getUserStats()
+      : Promise.resolve({ success: false, data: null }),
   ]);
 
   // Extract data from results
