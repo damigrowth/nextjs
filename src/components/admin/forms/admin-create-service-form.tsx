@@ -56,7 +56,7 @@ import {
 } from '@/components/forms/service/steps';
 import { TaxonomyDataContext } from '@/components/forms/service/form-service-create';
 import { ServerSearchCombobox } from '@/components/ui/server-search-combobox';
-import { searchProfilesForSelection } from '@/actions/admin/profiles';
+import { searchProfilesForServiceCreation } from '@/actions/admin/profiles';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   ArrowLeft,
@@ -503,7 +503,7 @@ export function AdminCreateServiceForm({
             value={selectedProfile}
             onSelect={setSelectedProfile}
             onSearch={async (query) => {
-              const result = await searchProfilesForSelection(query);
+              const result = await searchProfilesForServiceCreation(query);
               return result.success && result.data ? result.data : [];
             }}
             getLabel={(profile) =>

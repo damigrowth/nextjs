@@ -1,5 +1,6 @@
 import { SiteHeader } from '@/components/admin/site-header';
-import { getAdminSession } from '@/actions/admin/helpers';
+import { requireFullPermission } from '@/actions/auth/server';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import { AdminCreateServiceForm } from '@/components/admin/forms/admin-create-service-form';
 import { getServiceTaxonomies } from '@/lib/taxonomies';
 import { tags } from '@/constants/datasets/tags';
@@ -13,8 +14,8 @@ export const metadata = {
 };
 
 export default async function AdminCreateServicePage() {
-  // Verify admin session
-  await getAdminSession();
+  // Verify full permission to create services
+  await requireFullPermission(ADMIN_RESOURCES.SERVICES, '/admin/services');
 
   // Prepare taxonomy data server-side to prevent client-side bundle bloat
   const serviceTaxonomies = getServiceTaxonomies();

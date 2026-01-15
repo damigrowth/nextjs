@@ -712,6 +712,86 @@ export async function searchProfilesForSelection(searchQuery: string) {
 }
 
 /**
+ * Search profiles for service creation (used by Editors who don't have profiles permission)
+ * Assumes caller has been authorized with SERVICES permission
+ * This function does NOT check permissions - it's meant for service creation workflows
+ */
+export async function searchProfilesForServiceCreation(searchQuery: string) {
+  try {
+    // NO permission check - assumes caller verified with SERVICES permission
+
+    // Validate search query
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      return {
+        success: true,
+        data: [],
+      };
+    }
+
+    const trimmedQuery = searchQuery.trim();
+
+    // Search ALL profiles matching query (no pagination)
+    // Filter by role and search across displayName, email, username
+    const profiles = await prisma.profile.findMany({
+      where: {
+        AND: [
+          // Only freelancers and companies
+          {
+            user: {
+              role: {
+                in: ['freelancer', 'company'],
+              },
+            },
+          },
+          // Search across multiple fields
+          {
+            OR: [
+              { username: { contains: trimmedQuery, mode: 'insensitive' } },
+              { displayName: { contains: trimmedQuery, mode: 'insensitive' } },
+              { email: { contains: trimmedQuery, mode: 'insensitive' } },
+              { user: { email: { contains: trimmedQuery, mode: 'insensitive' } } },
+            ],
+          },
+        ],
+      },
+      select: {
+        id: true,
+        uid: true,
+        username: true,
+        displayName: true,
+        email: true,
+        image: true,
+        coverage: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+      // Limit to 50 results for performance (reasonable for dropdown)
+      take: 50,
+      orderBy: {
+        displayName: 'asc',
+      },
+    });
+
+    return {
+      success: true,
+      data: profiles,
+    };
+  } catch (error) {
+    console.error('Error searching profiles for service creation:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to search profiles for service creation',
+      data: [],
+    };
+  }
+}
+
+/**
  * Get profile statistics
  */
 export async function getProfileStats() {
