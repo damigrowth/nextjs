@@ -79,18 +79,24 @@ const NextLink = forwardRef<HTMLAnchorElement, NextLinkCustomProps>(
      * Explicitly excludes admin routes
      */
     const detectSkeletonType = (href: string): 'service' | 'profile' | null => {
-      // Exclude admin routes
-      if (href.startsWith('/admin/')) {
+      // Normalize href - handle both absolute and relative paths
+      const normalizedHref = href.toString();
+
+      // Exclude any admin routes (both /admin and routes containing /admin/)
+      if (normalizedHref.includes('/admin')) {
         return null;
       }
+
       // Service page: /s/[slug] (exact match, no additional segments)
-      if (/^\/s\/[^/]+$/.test(href)) {
+      if (/^\/s\/[^/]+$/.test(normalizedHref)) {
         return 'service';
       }
+
       // Profile page: /profile/[username] (exact match, no additional segments)
-      if (/^\/profile\/[^/]+$/.test(href)) {
+      if (/^\/profile\/[^/]+$/.test(normalizedHref)) {
         return 'profile';
       }
+
       return null;
     };
 
@@ -99,9 +105,20 @@ const NextLink = forwardRef<HTMLAnchorElement, NextLinkCustomProps>(
      */
     const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
       const href = rest.href as string;
+      const target = rest.target;
+
+      // Never show skeleton for links opening in new tab
+      if (target === '_blank') {
+        // Just call original onClick if provided
+        if (onClick) {
+          onClick(event);
+        }
+        return;
+      }
+
       const skeletonType = detectSkeletonType(href);
 
-      // Show skeleton overlay if service or profile page
+      // Show skeleton overlay if service or profile page (and not opening in new tab)
       if (skeletonType) {
         // Show skeleton first to hide the scroll action
         showSkeleton(skeletonType);
