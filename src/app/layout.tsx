@@ -20,7 +20,6 @@ export const metadata: Metadata = {
     default: 'Doulitsa - Βρες Επαγγελματίες και Υπηρεσίες για Κάθε Ανάγκη',
     template: '%s | Doulitsa',
   },
-  description: 'Ανακάλυψε εξειδικευμένους επαγγελματίες και υπηρεσίες από όλη την Ελλάδα.',
 };
 
 interface RootLayoutProps {

@@ -64,7 +64,6 @@ export const Icon: React.FC<IconProps> = ({
       aria-label={title || iconData.title}
       {...props}
     >
-      {!title && <title>{iconData.title}</title>}
       <path d={iconData.path} />
     </svg>
   );
