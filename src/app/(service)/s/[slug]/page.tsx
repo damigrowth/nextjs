@@ -18,6 +18,7 @@ import {
 import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
 import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
 import { ProfileTerms } from '@/components/profile';
+import { ServiceSchema } from '@/lib/seo/schema';
 
 // ISR configuration with shorter interval + tag-based revalidation
 export const revalidate = 300; // Revalidate every 5 minutes (backup for tag-based)
@@ -108,8 +109,23 @@ export default async function ServicePage({
     relatedServices,
   } = result.data;
 
+  // Get first media image for schema
+  const firstMediaImage = service.media && Array.isArray(service.media) && service.media.length > 0
+    ? service.media[0].url
+    : undefined;
+
   return (
     <div className='py-20 bg-silver'>
+      <ServiceSchema
+        slug={service.slug || ''}
+        title={service.title}
+        displayName={service.profile.displayName || ''}
+        price={service.price || 0}
+        // rating={service.rating}
+        // reviewCount={service.reviewCount}
+        faq={service.faq || []}
+        image={firstMediaImage}
+      />
       {/* Category Navigation Tabs */}
       <TaxonomyTabs
         items={featuredCategories}

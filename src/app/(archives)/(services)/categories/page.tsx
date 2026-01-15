@@ -6,6 +6,7 @@ import { CategoriesGrid } from '@/components/archives/categories-grid';
 import { getCategoriesMetadata } from '@/lib/seo/pages';
 import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
 import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
+import { CategoriesSchema } from '@/lib/seo/schema';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -57,6 +58,7 @@ export default async function CategoriesPage() {
 
     return (
       <div className='py-20 bg-silver'>
+        <CategoriesSchema categories={categories} />
         {/* Category Navigation Tabs */}
         <TaxonomyTabs
           items={validCategories}

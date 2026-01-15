@@ -1,6 +1,7 @@
 import { ArchiveLayout, ArchiveServiceCard } from '@/components/archives';
 import { getServiceArchivePageData } from '@/actions/services/get-services';
 import { getServicesMetadata } from '@/lib/seo/pages';
+import { ServicesSchema } from '@/lib/seo/schema';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -47,7 +48,16 @@ export default async function ServicesPage({
     result.data;
 
   return (
-    <ArchiveLayout
+    <>
+      <ServicesSchema
+        services={services}
+        taxonomies={{
+          category: taxonomyData.currentCategory,
+          subcategory: taxonomyData.currentSubcategory,
+          subdivision: taxonomyData.currentSubdivision,
+        }}
+      />
+      <ArchiveLayout
       archiveType='services'
       initialFilters={filters}
       taxonomyData={taxonomyData}
@@ -75,5 +85,6 @@ export default async function ServicesPage({
         )}
       </div>
     </ArchiveLayout>
+    </>
   );
 }

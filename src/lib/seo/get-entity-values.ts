@@ -28,10 +28,12 @@ export function getEntityValues(
   // Taxonomy metadata (stored as IDs in database)
   const category = entity.category;
   const subcategory = entity.subcategory;
+  const subcategorySingular = entity.subcategorySingular;
   const subdivision = entity.subdivision;
 
   // Image handling
   const image = entity.image;
+  const profileImage = entity.profileImage;
 
   // Media handling for services (JSON field from Prisma)
   const mediaImage =
@@ -52,6 +54,8 @@ export function getEntityValues(
       return category || '';
     case 'subcategory':
       return subcategory || '';
+    case 'subcategorySingular':
+      return subcategorySingular || '';
     case 'subdivision':
       return subdivision || '';
     case 'description':
@@ -78,7 +82,11 @@ export function getEntityValues(
 
     // Image handling
     case 'image':
-      return mediaImage || image || '';
+      // For services: try service media first, then profile image, then entity image
+      return mediaImage || profileImage || image || '';
+
+    case 'profileImage':
+      return profileImage || '';
 
     default:
       return '';
