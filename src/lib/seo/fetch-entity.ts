@@ -42,8 +42,10 @@ export type EntityData = Partial<
       // Additional taxonomy metadata
       category?: string;
       subcategory?: string;
+      subcategorySingular?: string; // Singular form of subcategory for profile titles
       subdivision?: string;
       type?: string; // Pro subcategory type: 'freelancer' | 'company'
+      profileImage?: string | null; // Profile image for service fallback
     }
 >;
 
@@ -124,6 +126,7 @@ export async function fetchEntity(
             slug: service.slug,
             media: service.media,
             displayName: service.profile.displayName,
+            profileImage: service.profile.image, // Add profile image for fallback
             // Include taxonomy labels for SEO templates
             category: category?.label,
             subcategory: subcategory?.label,
@@ -182,6 +185,7 @@ export async function fetchEntity(
             // Include taxonomy labels and type for SEO templates
             category: category?.label,
             subcategory: subcategory?.label,
+            subcategorySingular: subcategory?.label, // Add singular form of subcategory for title
             type: typeLabel, // 'Επαγγελματίας' or 'Επιχείρηση'
           },
         };
