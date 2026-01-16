@@ -38,6 +38,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { populateFormData } from '@/lib/utils/form';
+import { RoleSelect } from './role-select';
 
 type EditUserStatusFormValues = z.infer<typeof updateUserStatusSchema>;
 
@@ -51,9 +52,10 @@ interface EditUserStatusFormProps {
     confirmed: boolean;
     blocked: boolean;
   };
+  currentUserRole: string; // The admin user's role (admin or support)
 }
 
-export function EditUserStatusForm({ user }: EditUserStatusFormProps) {
+export function EditUserStatusForm({ user, currentUserRole }: EditUserStatusFormProps) {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(updateUserStatusAction, null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -150,22 +152,13 @@ export function EditUserStatusForm({ user }: EditUserStatusFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select role' />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value='user'>User</SelectItem>
-                      <SelectItem value='freelancer'>Επαγγελματίας</SelectItem>
-                      <SelectItem value='company'>Επιχείρηση</SelectItem>
-                      <SelectItem value='admin'>Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <RoleSelect
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      currentUserRole={currentUserRole}
+                    />
+                  </FormControl>
                   <FormDescription>
                     User&apos;s role in the system
                   </FormDescription>

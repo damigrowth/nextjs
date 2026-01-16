@@ -207,9 +207,102 @@ export const ROLE_DISPLAY_INFO = {
 } as const;
 
 /**
+ * Display information for all user roles (including admin roles)
+ */
+export const ALL_ROLES_DISPLAY_INFO = {
+  user: {
+    label: 'User',
+    description: 'Regular user - can browse and review services',
+    color: 'gray',
+    icon: 'user',
+  },
+  freelancer: {
+    label: 'Freelancer',
+    description: 'Professional service provider - can create and manage services',
+    color: 'purple',
+    icon: 'briefcase',
+  },
+  company: {
+    label: 'Company',
+    description: 'Business account - can create and manage company services',
+    color: 'orange',
+    icon: 'building',
+  },
+  admin: {
+    label: 'Admin',
+    description: 'Full system access - can manage all features including team, taxonomies, and analytics',
+    color: 'yellow',
+    icon: 'shield',
+  },
+  support: {
+    label: 'Support',
+    description: 'Limited admin access - can manage users, services, and verifications but not team, taxonomies, analytics, or settings',
+    color: 'blue',
+    icon: 'headphones',
+  },
+  editor: {
+    label: 'Editor',
+    description: 'Content management only - can edit services and profiles with read-only access to taxonomies',
+    color: 'green',
+    icon: 'pencil',
+  },
+} as const;
+
+/**
  * Get display information for a role
  */
 export function getRoleDisplayInfo(role: string | undefined) {
   if (!role || !isAdminRole(role)) return null;
   return ROLE_DISPLAY_INFO[role];
+}
+
+// ============================================================================
+// ROLE ASSIGNMENT PERMISSIONS
+// ============================================================================
+
+/**
+ * Get roles that a given admin role can assign
+ *
+ * - Admin: Can assign ALL roles (user, freelancer, company, admin, support, editor)
+ * - Support: Can assign only user-level roles (user, freelancer, company)
+ * - Editor: Cannot assign any roles
+ */
+export function getAllowedRolesToAssign(userRole: string | undefined): UserRole[] {
+  if (!userRole) return [];
+
+  if (userRole === USER_ROLES.ADMIN) {
+    // Admins can assign all roles
+    return Object.values(USER_ROLES) as UserRole[];
+  }
+
+  if (userRole === USER_ROLES.SUPPORT) {
+    // Support can only assign non-admin roles
+    return [USER_ROLES.USER, USER_ROLES.FREELANCER, USER_ROLES.COMPANY] as UserRole[];
+  }
+
+  // Editor and others cannot assign roles
+  return [];
+}
+
+/**
+ * Get display info for roles a user can assign
+ * Returns a filtered version of ALL_ROLES_DISPLAY_INFO based on user's permission level
+ */
+export function getAllowedRolesDisplayInfo(userRole: string | undefined) {
+  const allowedRoles = getAllowedRolesToAssign(userRole);
+
+  return Object.entries(ALL_ROLES_DISPLAY_INFO)
+    .filter(([role]) => allowedRoles.includes(role as UserRole))
+    .reduce((acc, [role, info]) => {
+      acc[role] = info;
+      return acc;
+    }, {} as Record<string, typeof ALL_ROLES_DISPLAY_INFO[keyof typeof ALL_ROLES_DISPLAY_INFO]>);
+}
+
+/**
+ * Check if a user can assign a specific role
+ */
+export function canAssignRole(userRole: string | undefined, targetRole: string): boolean {
+  const allowedRoles = getAllowedRolesToAssign(userRole);
+  return allowedRoles.includes(targetRole as UserRole);
 }

@@ -22,7 +22,7 @@ import { UserPlusIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ServerSearchCombobox } from '@/components/ui/server-search-combobox';
 import { searchUsersForRoleAssignment, assignAdminRole, type TeamMember } from '@/actions/admin/users';
-import { ROLE_DISPLAY_INFO, type AdminRole } from '@/lib/auth/roles';
+import { ALL_ROLES_DISPLAY_INFO, type UserRole } from '@/lib/auth/roles';
 import { useRouter } from 'next/navigation';
 
 interface AssignRoleDialogProps {
@@ -33,7 +33,7 @@ interface AssignRoleDialogProps {
 export function AssignRoleDialog({ open, onOpenChange }: AssignRoleDialogProps) {
   const router = useRouter();
   const [selectedUser, setSelectedUser] = useState<TeamMember | null>(null);
-  const [selectedRole, setSelectedRole] = useState<AdminRole | ''>('');
+  const [selectedRole, setSelectedRole] = useState<UserRole | ''>('');
   const [assigning, setAssigning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -139,12 +139,12 @@ export function AssignRoleDialog({ open, onOpenChange }: AssignRoleDialogProps) 
           {selectedUser && (
             <div className='space-y-2'>
               <Label>Select Role</Label>
-              <Select value={selectedRole} onValueChange={(value) => setSelectedRole(value as AdminRole)}>
+              <Select value={selectedRole} onValueChange={(value) => setSelectedRole(value as UserRole)}>
                 <SelectTrigger>
                   <SelectValue placeholder='Choose a role' />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(ROLE_DISPLAY_INFO).map(([role, info]) => (
+                  {Object.entries(ALL_ROLES_DISPLAY_INFO).map(([role, info]) => (
                     <SelectItem key={role} value={role}>
                       <span className='font-medium'>{info.label}</span>
                     </SelectItem>
@@ -152,9 +152,9 @@ export function AssignRoleDialog({ open, onOpenChange }: AssignRoleDialogProps) 
                 </SelectContent>
               </Select>
               {/* Show description for selected role */}
-              {selectedRole && ROLE_DISPLAY_INFO[selectedRole] && (
+              {selectedRole && ALL_ROLES_DISPLAY_INFO[selectedRole] && (
                 <p className='text-sm text-muted-foreground'>
-                  {ROLE_DISPLAY_INFO[selectedRole].description}
+                  {ALL_ROLES_DISPLAY_INFO[selectedRole].description}
                 </p>
               )}
             </div>

@@ -42,7 +42,7 @@ import {
 import type { CreateUserInput, UpdateUserInput } from '@/lib/validations';
 import type { ActionResult } from '@/lib/types/api';
 import { getAdminSession, getAdminSessionWithPermission } from './helpers';
-import { ADMIN_RESOURCES } from '@/lib/auth/roles';
+import { ADMIN_RESOURCES, canAssignRole } from '@/lib/auth/roles';
 
 // Admin Actions using correct Better Auth API methods
 export async function getUser(userId: string) {
@@ -249,9 +249,17 @@ export async function createUser(data: z.infer<typeof adminCreateUserSchema>) {
 
 export async function setUserRole(data: z.infer<typeof adminSetRoleSchema>) {
   try {
-    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
+    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = adminSetRoleSchema.parse(data);
+
+    // Check if current user has permission to assign this role
+    if (!canAssignRole(session.user.role, validatedData.role)) {
+      return {
+        success: false,
+        error: 'You do not have permission to assign this role',
+      };
+    }
 
     // Your Better Auth supports all your custom roles: 'user', 'freelancer', 'company', 'admin'
     const result = await auth.api.setRole({
@@ -1338,14 +1346,22 @@ export async function assignAdminRole(
     const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.TEAM, 'edit');
 
     const { revalidatePath } = await import('next/cache');
-    const { ADMIN_ROLES } = await import('@/lib/auth/roles');
+    const { USER_ROLES } = await import('@/lib/auth/roles');
     const { prisma } = await import('@/lib/prisma/client');
 
-    // Validate role
-    if (!Object.values(ADMIN_ROLES).includes(role as any)) {
+    // Validate role - accept all user roles
+    if (!Object.values(USER_ROLES).includes(role as any)) {
       return {
         success: false,
-        error: 'Invalid role. Must be admin, support, or editor',
+        error: 'Invalid role. Must be one of: user, freelancer, company, admin, support, or editor',
+      };
+    }
+
+    // Check if current user has permission to assign this role
+    if (!canAssignRole(session.user.role, role)) {
+      return {
+        success: false,
+        error: 'You do not have permission to assign this role',
       };
     }
 
@@ -1367,7 +1383,7 @@ export async function assignAdminRole(
     }
 
     // Prevent admin from removing their own admin role
-    if (session.user.id === userId && role !== ADMIN_ROLES.ADMIN) {
+    if (session.user.id === userId && role !== USER_ROLES.ADMIN) {
       return {
         success: false,
         error: 'You cannot remove your own admin role',
