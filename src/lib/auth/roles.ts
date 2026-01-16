@@ -107,7 +107,7 @@ export const ROLE_PERMISSIONS: PermissionMatrix = {
     settings: 'full', // Only admins can manage settings
   },
 
-  // Support: Limited admin access (no team, taxonomies, analytics, settings)
+  // Support: Limited admin access (no git, team, taxonomies, analytics, settings)
   support: {
     dashboard: 'view',
     services: 'full', // Can moderate services
@@ -118,7 +118,7 @@ export const ROLE_PERMISSIONS: PermissionMatrix = {
     taxonomies: null, // Cannot access taxonomies
     chats: 'full', // Can monitor chats
     analytics: null, // Cannot access analytics
-    git: 'full', // Can access git operations
+    git: null, // Cannot access git operations
     settings: null, // Cannot access settings
   },
 

@@ -490,8 +490,11 @@ export async function redirectCompletedUsers(dashboardUrl = '/dashboard') {
   const session = sessionResult.data.session;
 
   if (session && session.user?.step === 'DASHBOARD') {
-    // Redirect admin users to admin panel, others to dashboard
-    const redirectUrl = session.user.role === 'admin' ? '/admin' : dashboardUrl;
+    // Redirect all admin roles to admin panel, others to dashboard
+    const isAdminRole = session.user.role === 'admin' ||
+                       session.user.role === 'support' ||
+                       session.user.role === 'editor';
+    const redirectUrl = isAdminRole ? '/admin' : dashboardUrl;
     // console.log('Redirecting completed user from auth page to:', redirectUrl);
     redirect(redirectUrl);
   }

@@ -26,8 +26,8 @@ export async function updateProfilePresentationAdmin(
     const session = await requireAuth();
     const user = session.user;
 
-    // 2. Check if user is admin
-    const roleCheck = await hasAnyRole(['admin']);
+    // 2. Check if user has admin or support role
+    const roleCheck = await hasAnyRole(['admin', 'support']);
     if (!roleCheck.success || !roleCheck.data) {
       return {
         success: false,

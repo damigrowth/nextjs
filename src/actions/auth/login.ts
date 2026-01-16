@@ -91,7 +91,8 @@ export async function login(
   } else if (user.step === 'ONBOARDING') {
     redirectPath = '/onboarding';
   } else if (user.step === 'DASHBOARD') {
-    if (user.role === 'admin') {
+    // Redirect all admin roles (admin, support, editor) to /admin
+    if (user.role === 'admin' || user.role === 'support' || user.role === 'editor') {
       redirectPath = '/admin';
     } else {
       redirectPath = '/dashboard';
