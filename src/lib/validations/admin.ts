@@ -226,7 +226,7 @@ export const adminListProfilesSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional().default(10),
   offset: z.coerce.number().int().min(0).optional().default(0),
   sortBy: z
-    .enum(['createdAt', 'rating', 'reviewCount', 'updatedAt'])
+    .enum(['createdAt', 'rating', 'reviewCount', 'updatedAt', 'displayName', 'services'])
     .optional()
     .default('createdAt'),
   sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
@@ -347,7 +347,7 @@ export const adminListServicesSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional().default(10),
   offset: z.coerce.number().int().min(0).optional().default(0),
   sortBy: z
-    .enum(['sortDate', 'rating', 'reviewCount', 'price', 'createdAt'])
+    .enum(['sortDate', 'rating', 'reviewCount', 'price', 'createdAt', 'updatedAt'])
     .optional()
     .default('sortDate'),
   sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
