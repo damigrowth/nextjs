@@ -101,7 +101,7 @@ const LoginForm: React.FC = () => {
       // This works for both new users (type selection) and existing users (direct login)
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: '/dashboard',
+        callbackURL: '/oauth-callback',
       });
     } catch (error) {
       console.error('Google Sign-in Error:', error);
