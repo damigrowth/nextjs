@@ -1,4 +1,4 @@
-import { requirePermission } from '@/actions/auth/server';
+import { requirePermission, getSession } from '@/actions/auth/server';
 import { getUser } from '@/actions/admin';
 import { redirect, notFound } from 'next/navigation';
 import { ADMIN_RESOURCES } from '@/lib/auth/roles';
@@ -26,6 +26,12 @@ interface PageProps {
 export default async function AdminUserDetailPage({ params }: PageProps) {
   // Verify permission to view users
   await requirePermission(ADMIN_RESOURCES.USERS, '/admin/users');
+
+  // Get current user session
+  const sessionResult = await getSession({ revalidate: true });
+  const currentUserRole = sessionResult.success && sessionResult.data.session
+    ? sessionResult.data.session.user.role
+    : undefined;
 
   // Get user ID from params
   const { id: userId } = await params;
@@ -488,7 +494,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
                     </p>
                   </CardHeader>
                   <CardContent>
-                    <EditUserStatusForm user={user} />
+                    <EditUserStatusForm user={user} currentUserRole={currentUserRole || ''} />
                   </CardContent>
                 </Card>
 

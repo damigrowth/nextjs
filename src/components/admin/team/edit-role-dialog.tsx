@@ -21,7 +21,7 @@ import { Label } from '@/components/ui/label';
 import { PencilIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { assignAdminRole, type TeamMember } from '@/actions/admin/users';
-import { ROLE_DISPLAY_INFO, ADMIN_ROLES, type AdminRole } from '@/lib/auth/roles';
+import { ALL_ROLES_DISPLAY_INFO, USER_ROLES, type UserRole } from '@/lib/auth/roles';
 import { useRouter } from 'next/navigation';
 
 interface EditRoleDialogProps {
@@ -32,17 +32,17 @@ interface EditRoleDialogProps {
 
 export function EditRoleDialog({ open, onOpenChange, member }: EditRoleDialogProps) {
   const router = useRouter();
-  const [selectedRole, setSelectedRole] = useState<AdminRole | ''>('');
+  const [selectedRole, setSelectedRole] = useState<UserRole | ''>('');
   const [assigning, setAssigning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Pre-populate role when member changes
   useEffect(() => {
     if (member) {
-      // Check if member.role is a valid AdminRole
-      const adminRoleValues = Object.values(ADMIN_ROLES);
-      if (adminRoleValues.includes(member.role as any)) {
-        setSelectedRole(member.role as AdminRole);
+      // Check if member.role is a valid UserRole
+      const userRoleValues = Object.values(USER_ROLES);
+      if (userRoleValues.includes(member.role as any)) {
+        setSelectedRole(member.role as UserRole);
       } else {
         setSelectedRole('');
       }
@@ -114,16 +114,16 @@ export function EditRoleDialog({ open, onOpenChange, member }: EditRoleDialogPro
 
           {/* Role Selection */}
           <div className='space-y-2'>
-            <Label htmlFor='role'>Admin Role</Label>
+            <Label htmlFor='role'>User Role</Label>
             <Select
               value={selectedRole}
-              onValueChange={(value) => setSelectedRole(value as AdminRole)}
+              onValueChange={(value) => setSelectedRole(value as UserRole)}
             >
               <SelectTrigger id='role'>
                 <SelectValue placeholder='Select a role' />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(ROLE_DISPLAY_INFO).map(([role, info]) => (
+                {Object.entries(ALL_ROLES_DISPLAY_INFO).map(([role, info]) => (
                   <SelectItem key={role} value={role}>
                     <span className='font-medium'>{info.label}</span>
                   </SelectItem>
@@ -131,9 +131,9 @@ export function EditRoleDialog({ open, onOpenChange, member }: EditRoleDialogPro
               </SelectContent>
             </Select>
             {/* Show description for selected role */}
-            {selectedRole && ROLE_DISPLAY_INFO[selectedRole] && (
+            {selectedRole && ALL_ROLES_DISPLAY_INFO[selectedRole] && (
               <p className='text-sm text-muted-foreground'>
-                {ROLE_DISPLAY_INFO[selectedRole].description}
+                {ALL_ROLES_DISPLAY_INFO[selectedRole].description}
               </p>
             )}
           </div>
