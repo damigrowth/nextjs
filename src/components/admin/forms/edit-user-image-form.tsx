@@ -31,9 +31,13 @@ interface EditUserImageFormProps {
 const adminImageSchema = z.object({
   image: z
     .any()
-    .refine((val) => val === null || typeof val === 'string' || typeof val === 'object', {
-      message: 'Invalid image format',
-    })
+    .refine(
+      (val) =>
+        val === null || typeof val === 'string' || typeof val === 'object',
+      {
+        message: 'Invalid image format',
+      },
+    )
     .nullable(),
 });
 
@@ -41,7 +45,10 @@ type AdminImageFormData = z.infer<typeof adminImageSchema>;
 
 export function EditUserImageForm({ user }: EditUserImageFormProps) {
   const router = useRouter();
-  const [state, formAction, isPending] = useActionState(updateUserImageAction, null);
+  const [state, formAction, isPending] = useActionState(
+    updateUserImageAction,
+    null,
+  );
   const [isUploading, setIsUploading] = useState(false);
   const profileImageRef = useRef<any>(null);
 
@@ -53,7 +60,9 @@ export function EditUserImageForm({ user }: EditUserImageFormProps) {
     mode: 'onChange',
   });
 
-  const { formState: { isDirty } } = form;
+  const {
+    formState: { isDirty },
+  } = form;
 
   useEffect(() => {
     if (state?.success) {
@@ -109,7 +118,7 @@ export function EditUserImageForm({ user }: EditUserImageFormProps) {
       // Call the server action with populated FormData
       formAction(formData);
     } catch (error) {
-      console.error('❌ Upload failed:', error);
+      console.error('❌ Αποτυχία μεταφόρτωσης:', error);
       setIsUploading(false);
       toast.error('Failed to upload image');
     }
@@ -150,7 +159,11 @@ export function EditUserImageForm({ user }: EditUserImageFormProps) {
                   onChange={field.onChange}
                   uploadPreset='doulitsa_profile_images'
                   multiple={false}
-                  folder={user.username ? `users/${user.username}/profile` : `users/${user.id}/profile`}
+                  folder={
+                    user.username
+                      ? `users/${user.username}/profile`
+                      : `users/${user.id}/profile`
+                  }
                   maxFileSize={3000000} // 3MB
                   allowedFormats={['jpg', 'jpeg', 'png', 'webp']}
                   placeholder='Upload profile image'
@@ -165,11 +178,8 @@ export function EditUserImageForm({ user }: EditUserImageFormProps) {
 
         {/* Action Buttons */}
         <div className='flex items-center gap-3'>
-          <Button
-            type='submit'
-            disabled={isPending || isUploading || !isDirty}
-          >
-            {(isPending || isUploading) ? 'Saving...' : 'Save Image'}
+          <Button type='submit' disabled={isPending || isUploading || !isDirty}>
+            {isPending || isUploading ? 'Saving...' : 'Save Image'}
           </Button>
 
           {user.image && (
@@ -186,8 +196,9 @@ export function EditUserImageForm({ user }: EditUserImageFormProps) {
 
         <div className='rounded-lg bg-muted/50 p-4'>
           <p className='text-sm text-muted-foreground'>
-            <strong>Note:</strong> The image will be automatically optimized and cropped using
-            Cloudinary's upload widget with face detection and smart cropping.
+            <strong>Note:</strong> The image will be automatically optimized and
+            cropped using Cloudinary's upload widget with face detection and
+            smart cropping.
           </p>
         </div>
       </form>

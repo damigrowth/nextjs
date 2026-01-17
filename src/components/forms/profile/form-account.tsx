@@ -156,7 +156,7 @@ export default function AccountForm({
 
       // Note: Don't reset isUploading here, let it be handled by useEffect
     } catch (error) {
-      console.error('❌ Upload failed:', error);
+      console.error('❌ Αποτυχία μεταφόρτωσης:', error);
       setIsUploading(false);
       // Don't submit form if upload fails
     }

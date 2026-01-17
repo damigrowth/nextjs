@@ -153,7 +153,7 @@ export default function PortfolioForm({
         action(formData);
       });
     } catch (error) {
-      console.error('❌ Upload failed:', error);
+      console.error('❌ Αποτυχία μεταφόρτωσης:', error);
       setIsUploading(false);
       // Don't submit form if upload fails
     }

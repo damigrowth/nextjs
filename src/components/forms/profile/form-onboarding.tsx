@@ -386,7 +386,7 @@ export default function OnboardingForm({
         try {
           await profileImageRef.current.uploadFiles();
         } catch (error) {
-          console.error('❌ Image upload failed:', error);
+          console.error('❌ Αποτυχία μεταφόρτωσης εικόνας:', error);
           toast.error(
             'Το ανέβασμα της εικόνας απέτυχε. Παρακαλώ δοκιμάστε ξανά.',
           );
