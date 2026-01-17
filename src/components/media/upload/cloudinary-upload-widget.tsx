@@ -15,6 +15,8 @@ interface CloudinaryUploadWidgetProps {
   croppingAspectRatio?: number;
   showSkipCropButton?: boolean;
   maxFileSize?: number;
+  minImageWidth?: number;
+  minImageHeight?: number;
   className?: string;
   children: (params: {
     open: () => void;
@@ -45,6 +47,8 @@ export function CloudinaryUploadWidget({
   croppingAspectRatio = 1, // Square crop by default
   showSkipCropButton = false, // Force cropping for profile images
   maxFileSize = 10000000, // 10MB default
+  minImageWidth = 400, // Minimum image width (400x400 for profile images)
+  minImageHeight = 400, // Minimum image height (400x400 for profile images)
   className = '',
   children,
 }: CloudinaryUploadWidgetProps) {
@@ -118,6 +122,9 @@ export function CloudinaryUploadWidget({
       resourceType: 'image',
       clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
       folder,
+      // Minimum image dimensions validation
+      minImageWidth,
+      minImageHeight,
       cropping: true,
       croppingAspectRatio,
       croppingShowDimensions: true,
@@ -157,7 +164,7 @@ export function CloudinaryUploadWidget({
     if (signed) {
       widgetOptions.uploadSignature = async (
         callback: (signature: string) => void,
-        paramsToSign: any
+        paramsToSign: any,
       ) => {
         try {
           const response = await fetch(signatureEndpoint, {
@@ -186,7 +193,22 @@ export function CloudinaryUploadWidget({
       widgetOptions,
       (error: any, result: any) => {
         if (error) {
-          setError(error.message || 'Upload failed');
+          // Check if error is about minimum dimensions - check multiple possible formats
+          const errorString = JSON.stringify(error).toLowerCase();
+          const errorMessage = error.message || error.statusText || '';
+
+          const isDimensionError =
+            errorMessage.includes('minimum required') ||
+            errorMessage.includes('image dimensions') ||
+            errorString.includes('minimum') ||
+            errorString.includes('dimensions') ||
+            error.status === 'invalid_dimensions';
+
+          const finalErrorMessage = isDimensionError
+            ? `Αποτυχία μεταφόρτωσης εικόνας. Ελάχιστες διαστάσεις: ${minImageWidth}x${minImageHeight} pixels.`
+            : errorMessage || 'Αποτυχία μεταφόρτωσης';
+
+          setError(finalErrorMessage);
           setIsLoading(false);
           onUploadComplete?.();
           return;
@@ -195,6 +217,29 @@ export function CloudinaryUploadWidget({
         // Handle different upload events
         switch (result.event) {
           case 'upload-added':
+            // Validate crop dimensions if cropping is enabled
+            if (result.info?.coordinates?.custom) {
+              const crop = result.info.coordinates.custom[0];
+              // Crop format: [x, y, width, height]
+              const cropWidth = crop[2];
+              const cropHeight = crop[3];
+
+              if (cropWidth < minImageWidth || cropHeight < minImageHeight) {
+                setError(
+                  `Η διαστάσεις της εικόνας πρέπει να είναι τουλάχιστον ${minImageWidth}x${minImageHeight} pixels`,
+                );
+                setIsLoading(false);
+                onUploadComplete?.();
+                // Close widget to force re-selection
+                setTimeout(() => {
+                  if (widgetRef.current) {
+                    widgetRef.current.close();
+                  }
+                }, 100);
+                return;
+              }
+            }
+
             setIsLoading(true);
             setError(null);
             onUploadStart?.();
@@ -247,11 +292,11 @@ export function CloudinaryUploadWidget({
 
           case 'abort':
             setIsLoading(false);
-            setError('Upload cancelled');
+            setError('Ακύρωση μεταφόρτωσης');
             onUploadComplete?.();
             break;
         }
-      }
+      },
     );
   };
 
