@@ -366,7 +366,14 @@ export function LazyCombobox({
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onFocus={() => {
-                  // Open dropdown when focus + value exists
+                  // In search trigger mode with multi-select, don't auto-open
+                  // This prevents showing all tags when adding 2nd, 3rd, 4th+ tags
+                  if (trigger === 'search' && multiple) {
+                    // Don't auto-open - let typing trigger it (via inputValue effect)
+                    return;
+                  }
+
+                  // For single-select search OR click mode: auto-open if value exists
                   if (selectedOption || selectedOptions.length > 0) {
                     setOpen(true);
                   }
@@ -440,6 +447,7 @@ export function LazyCombobox({
                     onSelect={() => {
                       if (multiple) {
                         handleMultiSelect(option);
+                        setOpen(false); // Close dropdown after tag selection
                       } else {
                         onSelect(option);
                         setOpen(false);
