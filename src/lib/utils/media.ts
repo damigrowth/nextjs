@@ -910,7 +910,7 @@ export const uploadFileToCloudinary = async (
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(
-      errorData.error?.message || `Upload failed for ${file.name}`,
+      errorData.error?.message || `Αποτυχία μεταφόρτωσης για το ${file.name}`,
     );
   }
 
