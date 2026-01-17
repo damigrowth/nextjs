@@ -140,6 +140,8 @@ const ProfileImageUpload = memo<ProfileImageUploadProps>(({
           croppingAspectRatio={1}
           showSkipCropButton={false}
           maxFileSize={maxFileSize}
+          minImageWidth={400}
+          minImageHeight={400}
         >
           {({ open, isLoading, error: widgetError }) => (
             <>
@@ -179,6 +181,8 @@ const ProfileImageUpload = memo<ProfileImageUploadProps>(({
                     </div>
                   </div>
                   <p className="text-xs text-gray-600 mt-2 max-w-md">
+                    <strong>Ελάχιστες διαστάσεις: 400x400 pixels.</strong>
+                    <br />
                     Μέγιστο μέγεθος αρχείου: {Math.round(maxFileSize / 1024 / 1024)} MB.
                     <br />
                     Επιτρεπόμενοι τύποι αρχείων: {formats.join(', ')}

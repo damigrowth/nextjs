@@ -45,7 +45,17 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
       folder = 'uploads',
       maxFiles = 10,
       maxFileSize = 15000000, // 15MB
-      allowedFormats = ['jpg', 'jpeg', 'png', 'webp', 'mp4', 'webm', 'mp3', 'ogg', 'wav'],
+      allowedFormats = [
+        'jpg',
+        'jpeg',
+        'png',
+        'webp',
+        'mp4',
+        'webm',
+        'mp3',
+        'ogg',
+        'wav',
+      ],
       className = '',
       placeholder = 'Ανεβάστε αρχεία',
       error,
@@ -213,9 +223,7 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
         setQueuedFiles((prev) => prev.filter((qf) => !qf.isUploaded));
       } catch (error) {
         setUploadError(
-          error instanceof Error
-            ? error.message
-            : 'Upload failed. Please try again.',
+          error instanceof Error ? error.message : 'Αποτυχία μεταφόρτωσης.',
         );
       } finally {
         setIsUploading(false);

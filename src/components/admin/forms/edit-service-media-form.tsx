@@ -1,6 +1,12 @@
 'use client';
 
-import { useRef, useTransition, useState, useEffect, useActionState } from 'react';
+import {
+  useRef,
+  useTransition,
+  useState,
+  useEffect,
+  useActionState,
+} from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,7 +24,10 @@ import { MediaUpload } from '@/components/media';
 import { Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import { updateServiceMedia } from '@/actions/admin/services';
 import { populateFormData } from '@/lib/utils/form';
-import { updateServiceMediaSchema, type UpdateServiceMediaInput } from '@/lib/validations/service';
+import {
+  updateServiceMediaSchema,
+  type UpdateServiceMediaInput,
+} from '@/lib/validations/service';
 
 type ServiceMediaInput = UpdateServiceMediaInput;
 
@@ -112,7 +121,7 @@ export function EditServiceMediaForm({ service }: EditServiceMediaFormProps) {
         action(formData);
       });
     } catch (error) {
-      console.error('❌ Upload failed:', error);
+      console.error('❌ Αποτυχία μεταφόρτωσης:', error);
       setIsUploading(false);
       // Don't submit form if upload fails
     }
@@ -184,7 +193,9 @@ export function EditServiceMediaForm({ service }: EditServiceMediaFormProps) {
             type='button'
             variant='outline'
             onClick={() => form.reset()}
-            disabled={isPending || isPendingTransition || isUploading || !isDirty}
+            disabled={
+              isPending || isPendingTransition || isUploading || !isDirty
+            }
           >
             Cancel
           </Button>
