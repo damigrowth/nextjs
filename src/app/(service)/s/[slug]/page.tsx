@@ -114,11 +114,17 @@ export default async function ServicePage({
     ? service.media[0].url
     : undefined;
 
+  // Get metadata to reuse the formatted and truncated description
+  // This ensures schema description matches meta description exactly
+  const metadata = await getServiceMetadata(serviceId);
+  const schemaDescription = metadata.description || '';
+
   return (
     <div className='py-20 bg-silver'>
       <ServiceSchema
         slug={service.slug || ''}
         title={service.title}
+        description={schemaDescription}
         displayName={service.profile.displayName || ''}
         price={service.price || 0}
         // rating={service.rating}
