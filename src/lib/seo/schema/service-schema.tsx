@@ -4,6 +4,7 @@ import { JsonLd } from './json-ld';
 interface ServiceSchemaProps {
   slug: string;
   title: string;
+  description?: string;
   displayName: string;
   price: number;
   // rating: number;
@@ -19,6 +20,7 @@ interface ServiceSchemaProps {
 export function ServiceSchema({
   slug,
   title,
+  description,
   displayName,
   price,
   // rating,
@@ -28,19 +30,8 @@ export function ServiceSchema({
 }: ServiceSchemaProps) {
   const baseUrl = process.env.BETTER_AUTH_URL || process.env.LIVE_URL || 'https://doulitsa.gr';
 
-  // Map FAQ data to schema.org Question format
-  const faqData = faq.map((f, index) => ({
-    '@type': 'Question',
-    name: `Ερώτηση ${index + 1}`,
-    text: f.question,
-    acceptedAnswer: {
-      '@type': 'Answer',
-      name: `Απάντηση ${index + 1}`,
-      text: f.answer,
-    },
-  }));
-
-  const data = {
+  // Build base product schema
+  const data: any = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: title,
@@ -65,11 +56,31 @@ export function ServiceSchema({
     //   ratingValue: rating,
     //   reviewCount: reviewCount,
     // },
-    mainEntity: {
+  };
+
+  // Add description if provided
+  if (description) {
+    data.description = description;
+  }
+
+  // Only include FAQ schema if FAQs exist
+  if (faq && faq.length > 0) {
+    const faqData = faq.map((f, index) => ({
+      '@type': 'Question',
+      name: `Ερώτηση ${index + 1}`,
+      text: f.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        name: `Απάντηση ${index + 1}`,
+        text: f.answer,
+      },
+    }));
+
+    data.mainEntity = {
       '@type': 'FAQPage',
       mainEntity: faqData,
-    },
-  };
+    };
+  }
 
   return <JsonLd data={data} />;
 }
