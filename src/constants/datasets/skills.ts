@@ -1,4 +1,4 @@
-// Generated on 2025-10-13T11:46:21.089Z
+// Generated on 2026-01-19T14:43:17.420Z
 // All data is sorted alphabetically by label
 // Skills with optional category relationship
 
@@ -725,9 +725,8 @@ export const skills = [
   },
   {
     id: '131',
-    slug: 'akadimaiki-14',
-    label: 'Ακαδημαϊκή 14',
-    category: '9',
+    label: 'Ακαδημαϊκά',
+    slug: 'akadimaika',
   },
   {
     id: '422',
@@ -2267,9 +2266,8 @@ export const skills = [
   },
   {
     id: '184',
-    slug: 'kinitro-kai-14',
-    label: 'Κίνητρο και 14',
-    category: '9',
+    label: 'Coaching',
+    slug: 'coaching',
   },
   {
     id: '238',
@@ -2789,9 +2787,8 @@ export const skills = [
   },
   {
     id: '307',
-    slug: 'stratigiki-11',
-    label: 'Στρατηγική 11',
-    category: '11',
+    label: 'Στρατηγική',
+    slug: 'stratigiki',
   },
   {
     id: '304',
@@ -2879,9 +2876,8 @@ export const skills = [
   },
   {
     id: '415',
-    slug: 'sumvouleutiki-12s',
-    label: 'Συμβουλευτική 12ς',
-    category: '12',
+    label: 'Συμβουλευτική',
+    slug: 'sumvouleutiki',
   },
   {
     id: '602',
@@ -3251,9 +3247,8 @@ export const skills = [
   },
   {
     id: '536',
-    slug: 'texniki-14',
-    label: 'Τεχνική 14',
-    category: '13',
+    label: 'Τεχνικά',
+    slug: 'texnika',
   },
   {
     id: '202',
