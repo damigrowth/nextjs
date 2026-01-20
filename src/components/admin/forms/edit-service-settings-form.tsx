@@ -29,7 +29,14 @@ import { populateFormData } from '@/lib/utils/form';
 import { Switch } from '@/components/ui/switch';
 
 const editServiceSettingsSchema = z.object({
-  status: z.enum(['draft', 'pending', 'approved', 'published', 'rejected', 'inactive']),
+  status: z.enum([
+    'draft',
+    'pending',
+    'approved',
+    'published',
+    'rejected',
+    'inactive',
+  ]),
   featured: z.boolean(),
 });
 
@@ -43,9 +50,14 @@ interface EditServiceSettingsFormProps {
   };
 }
 
-export function EditServiceSettingsForm({ service }: EditServiceSettingsFormProps) {
+export function EditServiceSettingsForm({
+  service,
+}: EditServiceSettingsFormProps) {
   const router = useRouter();
-  const [state, formAction, isPending] = useActionState(updateServiceSettingsAction, null);
+  const [state, formAction, isPending] = useActionState(
+    updateServiceSettingsAction,
+    null,
+  );
 
   const form = useForm<EditServiceSettingsFormValues>({
     resolver: zodResolver(editServiceSettingsSchema),
@@ -109,9 +121,7 @@ export function EditServiceSettingsForm({ service }: EditServiceSettingsFormProp
                   <SelectItem value='inactive'>Inactive</SelectItem>
                 </SelectContent>
               </Select>
-              <FormDescription>
-                Control the visibility and approval status of this service
-              </FormDescription>
+
               <FormMessage />
             </FormItem>
           )}
@@ -150,7 +160,9 @@ export function EditServiceSettingsForm({ service }: EditServiceSettingsFormProp
           </Button>
           <Button
             type='submit'
-            disabled={isPending || !form.formState.isValid || !form.formState.isDirty}
+            disabled={
+              isPending || !form.formState.isValid || !form.formState.isDirty
+            }
           >
             {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
             Save Changes

@@ -1,9 +1,11 @@
-import { getCurrentUser } from '@/actions/auth/server';
+import { requirePermission } from '@/actions/auth/server';
 import { getProfile } from '@/actions/admin/profiles';
 import { redirect, notFound } from 'next/navigation';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { NextLink } from '@/components';
 import {
   AccountForm,
   BasicInfoForm,
@@ -12,11 +14,14 @@ import {
   PortfolioForm,
   CoverageForm,
   BillingForm,
-  NextLink,
-} from '@/components';
+} from '@/components/forms';
 import { Badge } from '@/components/ui/badge';
-import { SiteHeader } from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
 import { EditProfileSettingsForm } from '@/components/admin/forms/edit-profile-settings-form';
+import { getProTaxonomies } from '@/lib/taxonomies';
+import { skills as skillsDataset } from '@/constants/datasets/skills';
+import { locationOptions } from '@/constants/datasets/locations';
+import type { DatasetOption, DatasetWithCategory } from '@/lib/types/datasets';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,18 +30,8 @@ interface PageProps {
 }
 
 export default async function AdminProfileEditPage({ params }: PageProps) {
-  // Verify admin authentication
-  const userResult = await getCurrentUser({ revalidate: true });
-
-  if (!userResult.success || !userResult.data.user) {
-    redirect('/login');
-  }
-
-  const { user: currentUser } = userResult.data;
-
-  if (currentUser.role !== 'admin') {
-    redirect('/dashboard');
-  }
+  // Verify permission to view profiles
+  await requirePermission(ADMIN_RESOURCES.PROFILES, '/admin/profiles');
 
   // Get profile ID from params
   const { id: profileId } = await params;
@@ -49,6 +44,9 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
   }
 
   const profile = profileResult.data as any;
+
+  // Prepare taxonomy data server-side to prevent client-side bundle bloat
+  const proTaxonomies = getProTaxonomies();
 
   // Create a mock user object for the forms (they expect AuthUser)
   const mockUser = {
@@ -102,7 +100,7 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
               {/* Profile Information Table */}
               <Card>
                 <CardHeader className='pb-3'>
-                  <CardTitle className='text-sm'>Profile Information</CardTitle>
+                  <CardTitle className='text-sm'>Πληροφορίες Προφίλ</CardTitle>
                 </CardHeader>
                 <CardContent className='p-0'>
                   <div className='divide-y'>
@@ -265,13 +263,8 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
             {/* Profile Management Forms */}
             <div className='mx-auto w-full max-w-5xl px-4 lg:px-6 space-y-6'>
               <div>
-                <h2>Profile Management</h2>
-                <p className='text-muted-foreground'>
-                  Edit profile information, presentation, portfolio, and billing
-                  details
-                </p>
+                <h2>Διαχείρηση Προφίλ</h2>
               </div>
-
               <div className='space-y-6'>
                 {/* Profile Settings */}
                 <Card>
@@ -290,9 +283,6 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Λογαριασμός</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Εικόνα προφίλ, όνομα εμφάνισης
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <AccountForm
@@ -307,15 +297,13 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Βασικά στοιχεία</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Tagline, κατηγορία, υποκατηγορία, τοποθεσία, ειδικότητα,
-                      δεξιότητες, bio
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <BasicInfoForm
                       initialUser={mockUser as any}
                       initialProfile={profile}
+                      proTaxonomies={proTaxonomies as DatasetOption[]}
+                      skillsDataset={skillsDataset as DatasetWithCategory[]}
                       adminMode={true}
                       hideCard={true}
                     />
@@ -326,14 +314,12 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Περιοχές Κάλυψης</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Τρόποι παροχής, διεύθυνση, νομοί και περιοχές κάλυψης
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <CoverageForm
                       initialUser={mockUser as any}
                       initialProfile={profile}
+                      locationOptions={locationOptions}
                       adminMode={true}
                       hideCard={true}
                     />
@@ -344,12 +330,6 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Πρόσθετα Στοιχεία</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Έναρξη δραστηριότητας, ωριαία αμοιβή, μέθοδοι
-                      επικοινωνίας, μέθοδοι πληρωμής, μέθοδοι διακανονισμού,
-                      ελάχιστος προϋπολογισμός, κλάδοι δραστηριότητας, όροι
-                      συνεργασίας
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <AdditionalInfoForm
@@ -365,10 +345,6 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Παρουσίαση</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Τηλέφωνο, ιστοσελίδα, ορατότητα στοιχείων, μέσα κοινωνικής
-                      δικτύωσης
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <PresentationInfoForm
@@ -384,9 +360,6 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className='text-lg'>Portfolio</CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Εικόνες και βίντεο χαρτοφυλακίου
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <PortfolioForm
@@ -405,10 +378,6 @@ export default async function AdminProfileEditPage({ params }: PageProps) {
                     <CardTitle className='text-lg'>
                       Στοιχεία Τιμολόγησης
                     </CardTitle>
-                    <p className='text-sm text-muted-foreground'>
-                      Τύπος παραστατικού, ΑΦΜ, ΔΟΥ, επωνυμία, επάγγελμα,
-                      διεύθυνση τιμολόγησης
-                    </p>
                   </CardHeader>
                   <CardContent>
                     <BillingForm

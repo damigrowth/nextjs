@@ -32,6 +32,15 @@ export interface LazyComboboxProps {
   value?: string;
   onSelect: (option: LazyComboboxOption) => void;
 
+  // React Hook Form integration - direct form control
+  onChange?: (value: string) => void;
+
+  // Optional clear handler (alternative to onChange)
+  onClear?: () => void;
+
+  // Control clear button visibility (default: false)
+  clearable?: boolean;
+
   // Multi-select mode
   multiple?: boolean;
   values?: string[];
@@ -72,6 +81,9 @@ export function LazyCombobox({
   options,
   value,
   onSelect,
+  onChange,
+  onClear,
+  clearable = false,
   multiple = false,
   values = [],
   onMultiSelect,
@@ -111,11 +123,11 @@ export function LazyCombobox({
   // Auto-open popover when user types (search trigger mode)
   React.useEffect(() => {
     if (trigger === 'search') {
+      // Auto-open only when user types
       if (inputValue.length > 0 && !open) {
         setOpen(true);
-      } else if (inputValue.length === 0 && open) {
-        setOpen(false);
       }
+      // Don't auto-close - let user control via blur/selection
     }
   }, [inputValue, open, trigger]);
 
@@ -132,16 +144,50 @@ export function LazyCombobox({
       : options;
 
     // Apply limit
-    const limited = isSearching
+    let limited = isSearching
       ? filtered.slice(0, searchLimit)
       : filtered.slice(0, displayLimit);
+
+    // ENSURE SELECTED OPTION IS ALWAYS VISIBLE (when not searching)
+    if (!isSearching && (value || (multiple && values.length > 0))) {
+      const selectedIds = multiple ? values : value ? [value] : [];
+      const selected = options.filter((opt) => selectedIds.includes(opt.id));
+
+      // Add selected options that aren't in limited view
+      selected.forEach((sel) => {
+        if (!limited.find((opt) => opt.id === sel.id)) {
+          limited = [sel, ...limited.slice(0, -1)]; // Replace last with selected
+        }
+      });
+
+      // Move selected to top for easy visibility (single select only)
+      if (value && !multiple) {
+        const selectedOption = limited.find((opt) => opt.id === value);
+        if (selectedOption) {
+          limited = [
+            selectedOption,
+            ...limited.filter((opt) => opt.id !== value),
+          ];
+        }
+      }
+    }
 
     return {
       displayedOptions: limited,
       totalFiltered: filtered.length,
       isSearching,
     };
-  }, [options, searchQuery, inputValue, displayLimit, searchLimit, trigger]);
+  }, [
+    options,
+    searchQuery,
+    inputValue,
+    displayLimit,
+    searchLimit,
+    trigger,
+    value,
+    values,
+    multiple,
+  ]);
 
   // Scroll handler for lazy loading
   const handleScroll = React.useCallback(
@@ -292,7 +338,7 @@ export function LazyCombobox({
             <div
               onClick={() => inputRef.current?.focus()}
               className={cn(
-                'relative flex flex-row flex-wrap items-center gap-2 rounded-md border border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring cursor-text',
+                'relative flex flex-row flex-wrap items-center gap-2 rounded-md bg-white shadow border-2 border-input px-4 py-2 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring cursor-text',
                 className,
               )}
             >
@@ -319,10 +365,49 @@ export function LazyCombobox({
                 type='text'
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
+                onFocus={() => {
+                  // In search trigger mode with multi-select, don't auto-open
+                  // This prevents showing all tags when adding 2nd, 3rd, 4th+ tags
+                  if (trigger === 'search' && multiple) {
+                    // Don't auto-open - let typing trigger it (via inputValue effect)
+                    return;
+                  }
+
+                  // For single-select search OR click mode: auto-open if value exists
+                  if (selectedOption || selectedOptions.length > 0) {
+                    setOpen(true);
+                  }
+                }}
                 placeholder={selectedOption && !inputValue ? '' : placeholder}
                 disabled={disabled}
-                className='flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
+                className='flex-1 bg-subtle outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
               />
+              {/* Clear button - right end of input (only if clearable enabled) */}
+              {clearable && (selectedOption || selectedOptions.length > 0) && (
+                <button
+                  type='button'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Clear selection properly
+                    if (multiple) {
+                      onMultiSelect?.([]);
+                    } else {
+                      // Priority: onChange (RHF) > onClear (explicit) > silent (no crash)
+                      if (onChange) {
+                        onChange(''); // React Hook Form direct update
+                      } else if (onClear) {
+                        onClear(); // Explicit clear handler
+                      }
+                      // If neither provided, just clear visual state (don't call onSelect)
+                    }
+                    setInputValue('');
+                    setOpen(false); // Close dropdown after clear
+                  }}
+                  className='h-4 w-4 shrink-0 opacity-50 hover:opacity-100 transition-opacity'
+                >
+                  <X className='h-3 w-3' />
+                </button>
+              )}
             </div>
           </PopoverAnchor>
         </>
@@ -362,10 +447,12 @@ export function LazyCombobox({
                     onSelect={() => {
                       if (multiple) {
                         handleMultiSelect(option);
+                        setOpen(false); // Close dropdown after tag selection
                       } else {
                         onSelect(option);
                         setOpen(false);
                       }
+                      setInputValue(''); // Clear search input after selection
                     }}
                   >
                     <Check

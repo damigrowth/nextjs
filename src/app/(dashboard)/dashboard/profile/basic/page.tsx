@@ -2,6 +2,9 @@ import { BasicInfoForm } from '@/components';
 import { getCurrentUser, requireProUser } from '@/actions/auth/server';
 import { redirect } from 'next/navigation';
 import { getDashboardMetadata } from '@/lib/seo/pages';
+import { getProTaxonomies } from '@/lib/taxonomies';
+import { skills as skillsDataset } from '@/constants/datasets/skills';
+import type { DatasetOption, DatasetWithCategory } from '@/lib/types/datasets';
 
 export const metadata = getDashboardMetadata('Βασικά στοιχεία');
 
@@ -27,6 +30,9 @@ export default async function BasicPage() {
     redirect('/dashboard');
   }
 
+  // Prepare taxonomy data server-side to prevent client-side bundle bloat
+  const proTaxonomies = getProTaxonomies();
+
   return (
     <div className='space-y-6'>
       <div>
@@ -35,7 +41,12 @@ export default async function BasicPage() {
           Επεξεργαστείτε τα βασικά στοιχεία του προφίλ σας
         </p>
       </div>
-      <BasicInfoForm initialUser={user} initialProfile={profile} />
+      <BasicInfoForm
+        initialUser={user}
+        initialProfile={profile}
+        proTaxonomies={proTaxonomies as DatasetOption[]}
+        skillsDataset={skillsDataset as DatasetWithCategory[]}
+      />
     </div>
   );
 }

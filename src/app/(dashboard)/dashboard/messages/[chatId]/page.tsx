@@ -139,7 +139,7 @@ export default async function MessagesPage({ params }: MessagesPageProps) {
     // If no other member found, this might be a chat with a deleted user
     // or a data inconsistency. Show an error or empty state instead of redirecting
     return (
-      <div className='flex h-full md:h-[calc(100vh-6rem)] w-full gap-0'>
+      <div className='flex h-full md:h-[calc(100vh-6rem)] w-full gap-4'>
         <div className='hidden md:block'>
           <ChatSidebar />
         </div>
@@ -161,7 +161,7 @@ export default async function MessagesPage({ params }: MessagesPageProps) {
   }
 
   return (
-    <div className='flex h-full md:h-[calc(100vh-6rem)] w-full gap-0'>
+    <div className='flex h-full md:h-[calc(100vh-6rem)] w-full gap-4'>
       {/* Left Sidebar - Chat List (Hidden on mobile) */}
       <div className='hidden md:block'>
         <ChatSidebar />
@@ -171,12 +171,14 @@ export default async function MessagesPage({ params }: MessagesPageProps) {
       <div className='flex-1 w-full'>
         <div
           key={selectedChatId}
-          className='bg-background flex h-full flex-col'
+          className='bg-background flex h-full flex-col p-2 text-card-foreground rounded-xl border shadow-none '
         >
           <HeaderPresence
             chatId={selectedChatId}
             currentUserId={session.user.id}
             user={headerUser}
+            chats={chats}
+            showMobileChatButton={true}
           />
           <MessagesContainerWithSidebar
             chatId={selectedChatId}

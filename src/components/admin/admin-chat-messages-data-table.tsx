@@ -1,0 +1,98 @@
+'use client';
+
+import { AdminDataTable, ColumnDef } from '@/components/admin/admin-data-table';
+import UserAvatar from '@/components/shared/user-avatar';
+import { formatDateTime } from '@/lib/utils/date';
+
+interface AdminMessageTableItem {
+  id: string;
+  content: string;
+  createdAt: Date;
+  edited: boolean;
+  deleted: boolean;
+  isCreator: boolean;
+  author: {
+    id: string;
+    displayName: string | null;
+    username: string | null;
+    image: string | null;
+  };
+}
+
+interface AdminChatMessagesDataTableProps {
+  data: AdminMessageTableItem[];
+  chatId: string;
+  loading?: boolean;
+}
+
+export function AdminChatMessagesDataTable({
+  data,
+  chatId,
+  loading = false,
+}: AdminChatMessagesDataTableProps) {
+  const columns: ColumnDef<AdminMessageTableItem>[] = [
+    {
+      key: 'author',
+      header: 'Συνομιλητής',
+      sortable: false,
+      render: (message) => (
+        <div className='flex items-center gap-3'>
+          <UserAvatar
+            displayName={message.author.displayName}
+            image={message.author.image}
+            size='sm'
+            className='h-8 w-8'
+            showBorder={false}
+            showShadow={false}
+          />
+          <div className='space-y-0.5'>
+            <div className='font-medium'>
+              {message.author.displayName || 'Χρήστης'}
+            </div>
+            {message.author.username && (
+              <div className='text-xs text-muted-foreground'>
+                @{message.author.username}
+              </div>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'content',
+      header: 'Περιεχόμενο',
+      sortable: false,
+      render: (message) => (
+        <div className='py-2'>
+          <p className='text-sm whitespace-pre-wrap break-words'>
+            {message.deleted ? (
+              <span className='italic text-muted-foreground'>Message deleted</span>
+            ) : (
+              message.content
+            )}
+          </p>
+        </div>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: 'Ημερομηνία',
+      sortable: true,
+      render: (message) => (
+        <div className='text-sm text-muted-foreground whitespace-nowrap'>
+          {formatDateTime(message.createdAt.toISOString())}
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <AdminDataTable
+      data={data}
+      columns={columns}
+      loading={loading}
+      basePath={`/admin/chats/${chatId}`}
+      emptyMessage='Δεν βρέθηκαν μηνύματα'
+    />
+  );
+}

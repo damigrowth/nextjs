@@ -2,10 +2,10 @@
 
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 import {
   transformCoverageWithLocationNames,
   resolveTaxonomyHierarchy,
+  findById,
   findBySlug,
   getTaxonomyBreadcrumbs,
   findTaxonomyBySlugInContext,
@@ -16,10 +16,10 @@ import { locationOptions } from '@/constants/datasets/locations';
 import type { DatasetItem } from '@/lib/types/datasets';
 // O(1) optimized taxonomy lookups - 99% faster than findById
 import {
+  getProTaxonomies,
   findProById,
-  findServiceById,
-  batchFindServiceByIds,
   findLocationBySlugOrName,
+  batchFindSkillsByIds,
 } from '@/lib/taxonomies';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
@@ -28,6 +28,7 @@ import { isValidArchiveSortBy } from '@/lib/types/common';
 import type { ActionResult } from '@/lib/types/api';
 import type { ArchiveProfileCardData } from '@/lib/types/components';
 import type { ArchiveSortBy } from '@/lib/types/common';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 import type { FilterState } from '@/lib/hooks/archives/use-archive-filters';
 import { Prisma, Profile, User } from '@prisma/client';
 import { getDirectoryPageData, type ProSubcategoryWithCount } from './get-directory';
@@ -52,6 +53,9 @@ export type ProfileFilters = Partial<
 function resolveCategoryLabels(
   profile: Pick<Profile, 'category' | 'subcategory'>,
 ) {
+  // Lazy-load pro taxonomies for O(1) lookups
+  const proTaxonomies = getProTaxonomies();
+
   return resolveTaxonomyHierarchy(
     proTaxonomies,
     profile.category,
@@ -106,45 +110,6 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
       whereClause.subcategory = Array.isArray(filters.subcategory)
         ? { in: filters.subcategory }
         : filters.subcategory;
-    }
-
-    // Add search filter for displayName, tagline, and bio
-    if (filters.search) {
-      const searchTerm = filters.search.trim();
-      if (searchTerm.length >= 2) {
-        const searchConditions = [
-          {
-            displayName: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            tagline: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            bio: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-        ];
-
-        // If there's already an OR clause (from location filters), combine with AND
-        if (whereClause.OR) {
-          const existingOR = whereClause.OR;
-          whereClause.AND = whereClause.AND || [];
-          whereClause.AND.push({
-            OR: searchConditions,
-          });
-          whereClause.OR = existingOR;
-        } else {
-          whereClause.OR = searchConditions;
-        }
-      }
     }
 
     // Handle combined online and county filters
@@ -222,6 +187,70 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
       }
     }
 
+    // Add search filter for displayName, tagline, and bio using normalized fields
+    // This provides accent-insensitive search for Greek text
+    // IMPORTANT: Process AFTER location filters so search can combine with existing OR clause
+    if (filters.search) {
+      const searchTerm = filters.search.trim();
+      if (searchTerm.length >= 2) {
+        // Normalize search term to handle Greek accents (ά → α, etc.)
+        const normalizedSearch = normalizeTerm(searchTerm);
+
+        const searchConditions = [
+          // Search in normalized fields (for profiles with proper normalized data)
+          {
+            displayNameNormalized: {
+              contains: normalizedSearch,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            taglineNormalized: {
+              contains: normalizedSearch,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            bioNormalized: {
+              contains: normalizedSearch,
+              mode: 'insensitive' as const,
+            },
+          },
+          // Fallback: Also search in original fields for profiles without normalized data
+          {
+            displayName: {
+              contains: searchTerm,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            tagline: {
+              contains: searchTerm,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            bio: {
+              contains: searchTerm,
+              mode: 'insensitive' as const,
+            },
+          },
+        ];
+
+        // If there's already an OR clause (from location filters), combine with AND
+        if (whereClause.OR) {
+          const existingOR = whereClause.OR;
+          whereClause.AND = whereClause.AND || [];
+          whereClause.AND.push({
+            OR: searchConditions,
+          });
+          whereClause.OR = existingOR;
+        } else {
+          whereClause.OR = searchConditions;
+        }
+      }
+    }
+
     // Build order by clause based on sortBy
     let orderBy: any[] = [];
     switch (filters.sortBy) {
@@ -285,11 +314,10 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
       .map(p => p.speciality!);
     const uniqueSkillIds = [...new Set([...allSkillIds, ...allSpecialityIds])];
 
-    // Single batch operation instead of N individual lookups (99% faster)
+    // Build skills map from skills dataset - O(1) optimized
+    const skillsData = batchFindSkillsByIds(uniqueSkillIds);
     const skillsMap = new Map(
-      batchFindServiceByIds(uniqueSkillIds).map((skill, idx) =>
-        [uniqueSkillIds[idx], skill]
-      )
+      uniqueSkillIds.map((skillId, idx) => [skillId, skillsData[idx]])
     );
 
     // Transform profiles to archive card data
@@ -485,6 +513,9 @@ export async function getProfileArchivePageData(params: {
       category?: DatasetItem;
       subcategory?: DatasetItem;
     } = {};
+
+    // Lazy-load pro taxonomies for O(1) lookups
+    const proTaxonomies = getProTaxonomies();
 
     // Determine target type based on archive type and search params
     // For 'directory', use the type filter from search params if provided, otherwise show all
@@ -822,6 +853,7 @@ export async function getProfileArchivePageData(params: {
       subcategory: subcategorySlug,
       county: searchParams.county || searchParams.περιοχή,
       online: searchParams.online === 'true' || searchParams.online === '' ? true : undefined,
+      search: searchParams.search,
       sortBy,
       type: searchParams.type,
     };

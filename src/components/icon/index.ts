@@ -3,4 +3,4 @@ export { default as Socials } from './socials';
 export { default as IconMobileMenu } from './icon-mobile-menu';
 
 // Flaticon icons
-export { FlaticonCategory } from './flaticon';
+export { FlaticonCategory, FlaticonRefresh } from './flaticon';

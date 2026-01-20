@@ -1,14 +1,11 @@
-import {
-  HeroBanner,
-  TabbedCta,
-  StatisticsCounter,
-  FaqSection,
-  FeaturesGrid,
-  FeaturesRow,
-} from '@/components/shared';
-import { data } from '@/constants/datasets/for-pros';
+import FaqSection from '@/components/shared/faq-section';
+import FeaturesGrid from '@/components/shared/features-grid';
+import FeaturesRow from '@/components/shared/features-row';
+import HeroBanner from '@/components/shared/hero-banner';
+import StatisticsCounter from '@/components/shared/statistics-counter';
+import TabbedCta from '@/components/shared/tabbed-cta';
 import { getForProsMetadata } from '@/lib/seo/pages';
-import React from 'react';
+import { data } from '@/constants/datasets/for-pros';
 
 export async function generateMetadata() {
   return getForProsMetadata();

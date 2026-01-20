@@ -6,13 +6,14 @@ import { ArchiveSidebar } from './archive-sidebar';
 import { ArchivePagination } from './archive-pagination';
 import { ArchiveBanner } from './archive-banner';
 import { SubdivisionsCarousel } from './subdivisions-carousel';
-import { TaxonomyTabs, DynamicBreadcrumb } from '@/components';
 
 import type { DatasetItem } from '@/lib/types/datasets';
 import { FilterState } from '@/hooks/archives/use-archive-filters';
 import { useArchiveFilters } from '@/hooks/archives/use-archive-filters';
 import { useArchivePagination } from '@/hooks/archives/use-archive-pagination';
 import clsx from 'clsx';
+import TaxonomyTabs from '../shared/taxonomy-tabs';
+import DynamicBreadcrumb from '../shared/dynamic-breadcrumb';
 
 interface ArchiveLayoutProps {
   children: ReactNode;
@@ -264,7 +265,7 @@ export function ArchiveLayout({
   };
 
   return (
-    <div className={clsx(className, 'py-20')}>
+    <div className={clsx(className, 'py-20 bg-silver')}>
       {/* Category Navigation Tabs */}
       <TaxonomyTabs
         items={validCategories}
@@ -314,7 +315,7 @@ export function ArchiveLayout({
             </ArchiveSidebar>
 
             {/* Results Summary */}
-            <div className='bg-white border-b border-gray-200'>
+            <div className='border-b border-gray-200'>
               <div className='py-4'>
                 <div className='flex items-center justify-between'>
                   <div className='text-sm text-gray-600'>

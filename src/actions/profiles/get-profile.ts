@@ -4,12 +4,9 @@ import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
 import { Profile } from '@prisma/client';
 import { ActionResult } from '@/lib/types/api';
-import type { ServiceCardData } from '@/lib/types/components';
+import type { ServiceCardData, TaxonomyTab } from '@/lib/types/components';
 import type { BreadcrumbSegment } from '@/components/shared/dynamic-breadcrumb';
 import type { DatasetItem } from '@/lib/types/datasets';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
-import { skills } from '@/constants/datasets/skills';
 import {
   contactMethodsOptions,
   paymentMethodsOptions,
@@ -20,7 +17,14 @@ import {
 import { industriesOptions } from '@/constants/datasets/industries';
 import { locationOptions } from '@/constants/datasets/locations';
 // O(1) optimized taxonomy lookups - 99% faster than findById
-import { findProById, findServiceById, batchFindServiceByIds } from '@/lib/taxonomies';
+import {
+  getProTaxonomies,
+  getServiceTaxonomies,
+  findProById,
+  batchFindServiceByIds,
+  batchFindSkillsByIds,
+  findSkillById,
+} from '@/lib/taxonomies';
 // Complex utilities - KEEP for coverage transformation, defaults, and non-taxonomy datasets
 import {
   findById, // Generic utility for options, industries, tags (not yet optimized)
@@ -109,6 +113,9 @@ export async function getPublicProfileByUsername(
  * Transform a service for use in ServiceCard component
  */
 function transformProfileService(service: any): ServiceCardData {
+  // Lazy-load service taxonomies for O(1) lookups
+  const serviceTaxonomies = getServiceTaxonomies();
+
   // Resolve full taxonomy hierarchy
   const taxonomyLabels = resolveTaxonomyHierarchy(
     serviceTaxonomies,
@@ -143,8 +150,7 @@ export interface ProfilePageData {
   profile: NonNullable<Awaited<ReturnType<typeof getProfileByUsername>>>;
   category?: DatasetItem | null;
   subcategory?: DatasetItem | null;
-  speciality?: DatasetItem | null;
-  featuredCategories: typeof proTaxonomies;
+  featuredCategories: TaxonomyTab[];
   skillsData: (DatasetItem | null)[];
   specialityData?: DatasetItem | null;
   contactMethodsData: (DatasetItem | null)[];
@@ -225,25 +231,27 @@ async function _getProfilePageData(
       };
     }
 
+    // Lazy-load pro taxonomies for O(1) lookups
+    const proTaxonomies = getProTaxonomies();
+
     // OPTIMIZATION: O(1) hash map lookups for pro taxonomies
-    const category = profile.category
-      ? findProById(profile.category)
-      : null;
+    const category = profile.category ? findProById(profile.category) : null;
 
     const subcategory = profile.subcategory
       ? findProById(profile.subcategory)
       : null;
 
-    const speciality = profile.speciality
-      ? findProById(profile.speciality)
+    // Cast to TaxonomyTab[] since all taxonomy items have slug (required by component)
+    const featuredCategories = proTaxonomies.slice(0, 8) as TaxonomyTab[];
+
+    // Skills lookup from skills dataset - O(1) optimized
+    const skillsData = batchFindSkillsByIds(profile.skills).filter(
+      (skill) => skill !== null,
+    );
+
+    const specialityData = profile.speciality
+      ? findSkillById(profile.speciality)
       : null;
-
-    const featuredCategories = proTaxonomies.slice(0, 8);
-
-    // OPTIMIZATION: Batch lookup for skills instead of N individual lookups (99% faster)
-    const skillsData = batchFindServiceByIds(profile.skills).filter(skill => skill !== null);
-
-    const specialityData = profile.speciality ? findServiceById(profile.speciality) : null;
 
     // Resolve dataset options for features
     const contactMethodsData = profile.contactMethods
@@ -276,7 +284,7 @@ async function _getProfilePageData(
     );
 
     const visibility = profile.visibility || {
-      email: true,
+      email: false,
       phone: true,
       address: true,
     };
@@ -284,7 +292,8 @@ async function _getProfilePageData(
     const socials = profile.socials || {};
 
     // Use the profile.experience field directly as it's already stored as an integer
-    const calculatedExperience = getYearsOfExperience(profile.commencement, profile.experience) || 0;
+    const calculatedExperience =
+      getYearsOfExperience(profile.commencement, profile.experience) || 0;
 
     // Build breadcrumb segments (taxonomies only)
     const breadcrumbSegments: BreadcrumbSegment[] = [
@@ -325,7 +334,7 @@ async function _getProfilePageData(
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { sortDate: 'desc' },
     });
 
     // Transform services for component use
@@ -336,8 +345,9 @@ async function _getProfilePageData(
       new Set(services.map((s) => s.subdivision)),
     ).filter(Boolean); // Remove nulls/undefined
 
-    const serviceSubdivisionsData = batchFindServiceByIds(uniqueSubdivisions)
-      .filter((subdivision) => subdivision !== null);
+    const serviceSubdivisionsData = batchFindServiceByIds(
+      uniqueSubdivisions,
+    ).filter((subdivision) => subdivision !== null);
 
     // Prepare breadcrumb buttons config
     const breadcrumbButtons = {
@@ -352,7 +362,6 @@ async function _getProfilePageData(
         profile,
         category: category || undefined,
         subcategory: subcategory || undefined,
-        speciality: speciality || undefined,
         featuredCategories,
         skillsData,
         specialityData,

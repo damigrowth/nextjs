@@ -1,26 +1,18 @@
-import { AdminGuard, AppSidebar, SiteHeader } from '@/components';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { Toaster } from '@/components/ui/sonner';
+import { AdminGuard } from '@/components/guards';
+import { AdminLayoutWrapper } from '@/components/admin/admin-layout-wrapper';
+import { getFilteredNavItems } from '@/actions/admin/helpers';
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Fetch navigation items at the server layout level
+  const { navItems } = await getFilteredNavItems();
+
   return (
     <AdminGuard>
-      <SidebarProvider>
-        <AppSidebar variant='inset' />
-        <SidebarInset>
-          {/* <SiteHeader /> */}
-          <div className='flex flex-1 flex-col'>
-            <div className='@container/main flex flex-1 flex-col gap-2'>
-              {children}
-            </div>
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
-      <Toaster />
+      <AdminLayoutWrapper navItems={navItems}>{children}</AdminLayoutWrapper>
     </AdminGuard>
   );
 }

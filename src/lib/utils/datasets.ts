@@ -2,6 +2,10 @@
 // These are pure utility functions that work with any hierarchical dataset structure
 
 import { DatasetItem } from '../types/datasets';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
+import type { coverageSchema } from '@/lib/prisma/json-types';
+import { z } from 'zod';
+import { getLocations } from '../taxonomies';
 
 // =============================================================================
 // GENERIC DATASET UTILITIES
@@ -504,6 +508,228 @@ export function filterSkillsByCategory<
 }
 
 // =============================================================================
+// TAGS & SKILLS UTILITIES
+// =============================================================================
+
+/**
+ * Search tags by term (optimized for LazyCombobox with large datasets)
+ * @param tags - Flat tags array
+ * @param searchTerm - Search query
+ * @returns Filtered tags matching search term
+ * @example
+ * const results = searchTags(tags, 'animation');
+ * // Returns all tags with 'animation' in label or slug
+ */
+export function searchTags<
+  T extends { id: string; label: string; slug: string },
+>(tags: T[], searchTerm: string): T[] {
+  if (!searchTerm) return tags;
+  const term = searchTerm.toLowerCase().trim();
+  return tags.filter(
+    (tag) =>
+      tag.label.toLowerCase().includes(term) ||
+      tag.slug.toLowerCase().includes(term),
+  );
+}
+
+/**
+ * Get tags by IDs (for resolving saved tag IDs to full tag objects)
+ * @param tags - Flat tags array
+ * @param tagIds - Array of tag IDs to retrieve
+ * @returns Array of tag objects matching the IDs
+ * @example
+ * const selectedTags = getTagsByIds(tags, ['23', '24', '25']);
+ * // Returns full tag objects for display
+ */
+export function getTagsByIds<T extends { id: string }>(
+  tags: T[],
+  tagIds: string[],
+): T[] {
+  if (!Array.isArray(tagIds) || tagIds.length === 0) return [];
+  const idSet = new Set(tagIds);
+  return tags.filter((tag) => idSet.has(tag.id));
+}
+
+/**
+ * Get tag by ID (single lookup)
+ * @param tags - Flat tags array
+ * @param tagId - Tag ID to retrieve
+ * @returns Tag object or undefined
+ * @example
+ * const tag = getTagById(tags, '23');
+ */
+export function getTagById<T extends { id: string }>(
+  tags: T[],
+  tagId: string,
+): T | undefined {
+  return tags.find((tag) => tag.id === tagId);
+}
+
+/**
+ * Create tag lookup map for O(1) access (performance optimization)
+ * Use this when you need to do many tag lookups
+ * @param tags - Flat tags array
+ * @returns Map of id → tag object
+ * @example
+ * const tagMap = createTagMap(tags);
+ * const tag = tagMap.get('23'); // O(1) lookup
+ */
+export function createTagMap<T extends { id: string }>(
+  tags: T[],
+): Map<string, T> {
+  return new Map(tags.map((tag) => [tag.id, tag]));
+}
+
+/**
+ * Validate that tag IDs exist in the dataset
+ * @param tags - Flat tags array
+ * @param tagIds - Array of tag IDs to validate
+ * @returns Array of valid tag IDs that exist in the dataset
+ * @example
+ * const validIds = validateTagIds(tags, ['23', '999', '24']);
+ * // Returns ['23', '24'] (999 doesn't exist)
+ */
+export function validateTagIds<T extends { id: string }>(
+  tags: T[],
+  tagIds: string[],
+): string[] {
+  const idSet = new Set(tags.map((tag) => tag.id));
+  return tagIds.filter((id) => idSet.has(id));
+}
+
+/**
+ * Search skills by term (optimized for LazyCombobox)
+ * @param skills - Flat skills array
+ * @param searchTerm - Search query
+ * @returns Filtered skills matching search term
+ * @example
+ * const results = searchSkills(skills, 'react');
+ * // Returns all skills with 'react' in label or slug
+ */
+export function searchSkills<
+  T extends { id: string; label: string; slug: string },
+>(skills: T[], searchTerm: string): T[] {
+  if (!searchTerm) return skills;
+  const term = searchTerm.toLowerCase().trim();
+  return skills.filter(
+    (skill) =>
+      skill.label.toLowerCase().includes(term) ||
+      skill.slug.toLowerCase().includes(term),
+  );
+}
+
+/**
+ * Get skills by IDs (for resolving saved skill IDs to full skill objects)
+ * @param skills - Flat skills array
+ * @param skillIds - Array of skill IDs to retrieve
+ * @returns Array of skill objects matching the IDs
+ * @example
+ * const selectedSkills = getSkillsByIds(skills, ['11', '12', '13']);
+ * // Returns full skill objects for display
+ */
+export function getSkillsByIds<T extends { id: string }>(
+  skills: T[],
+  skillIds: string[],
+): T[] {
+  if (!Array.isArray(skillIds) || skillIds.length === 0) return [];
+  const idSet = new Set(skillIds);
+  return skills.filter((skill) => idSet.has(skill.id));
+}
+
+/**
+ * Get skill by ID (single lookup)
+ * @param skills - Flat skills array
+ * @param skillId - Skill ID to retrieve
+ * @returns Skill object or undefined
+ * @example
+ * const skill = getSkillById(skills, '11');
+ */
+export function getSkillById<T extends { id: string }>(
+  skills: T[],
+  skillId: string,
+): T | undefined {
+  return skills.find((skill) => skill.id === skillId);
+}
+
+/**
+ * Create skill lookup map for O(1) access (performance optimization)
+ * @param skills - Flat skills array
+ * @returns Map of id → skill object
+ * @example
+ * const skillMap = createSkillMap(skills);
+ * const skill = skillMap.get('11'); // O(1) lookup
+ */
+export function createSkillMap<T extends { id: string }>(
+  skills: T[],
+): Map<string, T> {
+  return new Map(skills.map((skill) => [skill.id, skill]));
+}
+
+/**
+ * Get skills by subcategory (from pro-taxonomy hierarchy)
+ * This finds the parent category of a subcategory, then filters skills by that category
+ * @param skills - Flat skills array with category field
+ * @param proTaxonomies - Pro taxonomies with categories/subcategories
+ * @param subcategoryId - Subcategory ID to filter by
+ * @returns Skills belonging to that subcategory's parent category
+ * @example
+ * const webDevSkills = getSkillsBySubcategory(skills, proTaxonomies, '3372');
+ * // Returns skills for the Web Development category
+ */
+export function getSkillsBySubcategory<
+  T extends { id: string; category: string },
+>(
+  skills: T[],
+  proTaxonomies: DatasetItem[],
+  subcategoryId: string,
+): T[] {
+  // Find which category this subcategory belongs to
+  for (const category of proTaxonomies) {
+    const subcategory = category.children?.find(
+      (sub: any) => sub.id === subcategoryId,
+    );
+    if (subcategory) {
+      return filterSkillsByCategory(skills, category.id);
+    }
+  }
+  return [];
+}
+
+/**
+ * Validate that skill IDs exist in the dataset
+ * @param skills - Flat skills array
+ * @param skillIds - Array of skill IDs to validate
+ * @returns Array of valid skill IDs that exist in the dataset
+ * @example
+ * const validIds = validateSkillIds(skills, ['11', '999', '12']);
+ * // Returns ['11', '12'] (999 doesn't exist)
+ */
+export function validateSkillIds<T extends { id: string }>(
+  skills: T[],
+  skillIds: string[],
+): string[] {
+  const idSet = new Set(skills.map((skill) => skill.id));
+  return skillIds.filter((id) => idSet.has(id));
+}
+
+/**
+ * Filter skills by multiple categories (OR logic)
+ * @param skills - Flat skills array with category field
+ * @param categoryIds - Array of category IDs to filter by
+ * @returns Skills belonging to any of the specified categories
+ * @example
+ * const contentSkills = filterSkillsByCategories(skills, ['7', '8']);
+ * // Returns skills from categories 7 OR 8
+ */
+export function filterSkillsByCategories<
+  T extends { id: string; category: string },
+>(skills: T[], categoryIds: string[]): T[] {
+  if (!Array.isArray(categoryIds) || categoryIds.length === 0) return [];
+  const categorySet = new Set(categoryIds);
+  return skills.filter((skill) => categorySet.has(skill.category));
+}
+
+// =============================================================================
 // TAXONOMY-SPECIFIC UTILITIES
 // =============================================================================
 
@@ -689,6 +915,82 @@ type CoverageWithNames = {
   countyAreasMap?: Array<{ county: string; areas: string[] }>; // Grouped county-area relationships
 };
 
+type Coverage = z.infer<typeof coverageSchema>;
+
+/**
+ * Generate normalized coverage string for search
+ * Extracts all location names from coverage object and normalizes them
+ *
+ * Uses getLocationName() which searches hierarchically through the location dataset
+ * to find counties, areas, and even zipcodes by their IDs.
+ *
+ * @param coverage - Profile coverage object containing area/county IDs
+ * @returns Space-separated normalized location names for search
+ *
+ * @example
+ * const coverage = {
+ *   online: true,
+ *   onsite: true,
+ *   areas: ['216', '224'], // Area IDs (Γαλάτσι, Γέρακας)
+ *   counties: ['2'] // County ID (Αττική)
+ * };
+ * generateCoverageNormalized(coverage);
+ * // Returns: "γαλατσι γερακας αττικη"
+ */
+export function generateCoverageNormalized(
+  coverage: Coverage | null | undefined,
+): string | null {
+  if (!coverage) return null;
+
+  // Load hierarchical location dataset once
+  const locations = getLocations();
+  const locationNames: string[] = [];
+
+  // Extract area names from area IDs
+  if (Array.isArray(coverage.areas)) {
+    for (const areaId of coverage.areas) {
+      const areaName = getLocationName(locations, areaId);
+      if (areaName) {
+        // Normalize: "Γαλάτσι" → "γαλατσι"
+        locationNames.push(normalizeTerm(areaName));
+      }
+    }
+  }
+
+  // Extract county names from county IDs
+  if (Array.isArray(coverage.counties)) {
+    for (const countyId of coverage.counties) {
+      const countyName = getLocationName(locations, countyId);
+      if (countyName) {
+        // Normalize: "Αττική" → "αττικη"
+        locationNames.push(normalizeTerm(countyName));
+      }
+    }
+  }
+
+  // Legacy single area/county support (if exists)
+  if (coverage.area) {
+    const areaName = getLocationName(locations, coverage.area);
+    if (areaName) {
+      locationNames.push(normalizeTerm(areaName));
+    }
+  }
+
+  if (coverage.county) {
+    const countyName = getLocationName(locations, coverage.county);
+    if (countyName) {
+      locationNames.push(normalizeTerm(countyName));
+    }
+  }
+
+  // Remove duplicate location names while preserving order
+  const uniqueLocationNames = [...new Set(locationNames)];
+
+  // Return space-separated normalized location names
+  // This allows database CONTAINS search to find any location
+  return uniqueLocationNames.length > 0 ? uniqueLocationNames.join(' ') : null;
+}
+
 /**
  * Get formatted coverage areas display text
  * @param coverage - Coverage object from profile (already with resolved names)
@@ -737,6 +1039,37 @@ export function getCoverageAddress(coverage: CoverageWithNames): string | null {
     return null;
   }
   return coverage.address;
+}
+
+/**
+ * Get the formatted address for onbase coverage with area and county
+ * @param coverage - Coverage object from profile (already transformed with names)
+ * @returns Formatted address string: "address, area (county)" or null
+ * @example
+ * // Returns: "Κάδμου 3, Αγία Παρασκευή (Αττική)"
+ * getCoverageAddressWithLocation({ address: "Κάδμου 3", area: "Αγία Παρασκευή", county: "Αττική" })
+ */
+export function getCoverageAddressWithLocation(
+  coverage: CoverageWithNames,
+): string | null {
+  if (!coverage.onbase || !coverage.address) {
+    return null;
+  }
+
+  // Build formatted address: "address, area (county)"
+  const parts: string[] = [coverage.address];
+
+  if (coverage.area) {
+    parts.push(coverage.area);
+  }
+
+  let formattedAddress = parts.join(', ');
+
+  if (coverage.county) {
+    formattedAddress += ` (${coverage.county})`;
+  }
+
+  return formattedAddress;
 }
 
 /**
@@ -819,6 +1152,46 @@ export function getCoverageGroupedByCounty(
 // =============================================================================
 // COVERAGE TRANSFORMATION UTILITIES
 // =============================================================================
+
+/**
+ * Helper function to get area name from a location ID (handles both area IDs and zipcode IDs)
+ * If the locationId is a zipcode ID, it returns the parent area name
+ * If the locationId is an area ID, it returns the area name
+ * @param locationOptions - Hierarchical location dataset
+ * @param locationId - Can be either an area ID or a zipcode ID
+ * @param countyId - County ID for context (optional, helps narrow search)
+ * @returns Area name or null
+ */
+function getAreaNameFromLocationId<T extends DatasetItem>(
+  locationOptions: T[],
+  locationId: string | null | undefined,
+  countyId: string | null | undefined,
+): string | null {
+  if (!locationId) return null;
+
+  // First, try to find it as an area (direct child of county)
+  for (const county of locationOptions) {
+    // If countyId is provided, only search in that county
+    if (countyId && county.id !== countyId) continue;
+
+    const area = county.children?.find((a: any) => a.id === locationId);
+    if (area) {
+      // Found as area - return area name
+      return area.name || area.label || null;
+    }
+
+    // Not found as area, search in zipcodes (grandchildren)
+    for (const area of county.children || []) {
+      const zipcode = (area as any).children?.find((z: any) => z.id === locationId);
+      if (zipcode) {
+        // Found as zipcode - return parent area name
+        return area.name || area.label || null;
+      }
+    }
+  }
+
+  return null;
+}
 
 /**
  * Transform raw coverage data by resolving all location IDs to names
@@ -925,9 +1298,12 @@ export function transformCoverageWithLocationNames<T extends DatasetItem>(
     county: rawCoverage.county
       ? getLocationName(locationOptions, rawCoverage.county)
       : null,
+    // Use helper that handles both area IDs and zipcode IDs
     area: rawCoverage.area
-      ? getLocationNameInContext(locationOptions, rawCoverage.area, rawCoverage.county)
-      : null,
+      ? getAreaNameFromLocationId(locationOptions, rawCoverage.area, rawCoverage.county)
+      : rawCoverage.zipcode
+        ? getAreaNameFromLocationId(locationOptions, rawCoverage.zipcode, rawCoverage.county)
+        : null,
     zipcode: rawCoverage.zipcode
       ? getLocationNameInContext(locationOptions, rawCoverage.zipcode, rawCoverage.county)
       : null,

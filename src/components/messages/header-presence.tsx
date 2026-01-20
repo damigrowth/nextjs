@@ -7,19 +7,23 @@
 
 import { usePresence } from '@/lib/hooks/chat/use-presence';
 import { ChatHeader } from './chat-header';
-import type { ChatHeaderUser } from '@/lib/types/messages';
+import type { ChatHeaderUser, ChatListItem } from '@/lib/types/messages';
 import { useState, useEffect } from 'react';
 
 interface HeaderPresenceProps {
   chatId: string;
   currentUserId: string;
   user: ChatHeaderUser;
+  chats?: ChatListItem[];
+  showMobileChatButton?: boolean;
 }
 
 export function HeaderPresence({
   chatId,
   currentUserId,
   user,
+  chats,
+  showMobileChatButton = false,
 }: HeaderPresenceProps) {
   // Track our own presence
   usePresence({
@@ -54,6 +58,8 @@ export function HeaderPresence({
       chatId={chatId}
       currentUserId={currentUserId}
       user={userWithPresence}
+      chats={chats}
+      showMobileChatButton={showMobileChatButton}
     />
   );
 }

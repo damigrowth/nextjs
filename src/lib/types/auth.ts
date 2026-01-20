@@ -28,7 +28,7 @@ export type AuthSession = typeof auth.$Infer.Session;
 /**
  * Type definitions
  */
-export type UserRole = 'user' | 'freelancer' | 'company' | 'admin';
+export type UserRole = 'user' | 'freelancer' | 'company' | 'admin' | 'support' | 'editor';
 export type AuthStep =
   | 'EMAIL_VERIFICATION'
   | 'OAUTH_SETUP'
@@ -37,7 +37,8 @@ export type AuthStep =
 export type AuthProvider = 'email' | 'google' | 'github'; // Add more providers as needed
 
 // Auth form UI types
-export type AuthType = '' | 'user' | 'pro'; // '' = no selection, 'user' = user, 'pro' = professional
+export type AuthType = '' | 'user' | 'pro'; // '' = no selection, 'user' = simple user, 'pro' = professional
+export type FormAuthType = Exclude<AuthType, ''>; // For form validation - excludes empty selection state
 export type ProRole = 'freelancer' | 'company' | null; // freelancer, company, null = not selected
 export type ConsentType = boolean | string[];
 

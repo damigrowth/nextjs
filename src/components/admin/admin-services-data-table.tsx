@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/tooltip';
 import { AdminDataTable, ColumnDef } from './admin-data-table';
 import type { AdminServiceWithRelations } from '@/lib/types/services';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 interface AdminServicesDataTableProps {
   data: AdminServiceWithRelations[];
@@ -108,7 +108,7 @@ export function AdminServicesDataTable({
   const columns: ColumnDef<AdminServiceWithRelations>[] = [
     {
       key: 'title',
-      header: 'Service',
+      header: 'Υπηρεσία',
       sortable: true,
       className: 'max-w-[480px]',
       render: (service) => (
@@ -138,7 +138,7 @@ export function AdminServicesDataTable({
     },
     {
       key: 'category',
-      header: 'Category',
+      header: 'Κατηγορία',
       sortable: true,
       className: 'max-w-[200px]',
       render: (service) =>
@@ -152,7 +152,7 @@ export function AdminServicesDataTable({
     },
     {
       key: 'price',
-      header: 'Price',
+      header: 'Τιμή',
       sortable: true,
       render: (service) => (
         <div className='font-medium'>{formatPrice(service.price)}</div>
@@ -215,7 +215,7 @@ export function AdminServicesDataTable({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>View Service Page</p>
+                <p>Προβολή Υπηρεσίας</p>
               </TooltipContent>
             </Tooltip>
           )}
@@ -229,7 +229,7 @@ export function AdminServicesDataTable({
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Edit Service</p>
+              <p>Επεξεργασία Υπηρεσίας</p>
             </TooltipContent>
           </Tooltip>
         </div>

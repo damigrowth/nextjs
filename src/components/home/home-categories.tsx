@@ -11,13 +11,13 @@ import {
 } from '@/components/ui/carousel';
 import { CarouselPagination } from '@/components/ui/carousel-pagination';
 import { SectionHeader } from '@/components/ui/section-header';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { getCategoryIcon } from '@/constants/datasets/category-icons';
 import type { DatasetItem } from '@/lib/types/datasets';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 type Props = {
   categories?: DatasetItem[];
+  fallbackCategories?: any[];
 };
 
 function getCategoryIconComponent(iconKey?: string) {
@@ -31,7 +31,11 @@ function CategoryCard({ category }: { category: DatasetItem }) {
   return (
     <div className='bg-transparent rounded-xl p-6 relative transition-all duration-300 ease-in-out group'>
       <div className='text-left'>
-        <NextLink href={`/categories/${slug}`} className='inline-block'>
+        <NextLink
+          href={`/categories/${slug}`}
+          className='inline-block'
+          aria-label={label}
+        >
           <div className='relative inline-block text-4xl text-primary z-10 mb-4 sm:mb-5 transition-all duration-300 ease-in-out before:content-[""] before:bg-orangy before:rounded-full before:absolute before:-bottom-2.5 before:-right-5 before:h-10 before:w-10 before:-z-10 before:transition-all before:duration-300 before:ease-in-out group-hover:before:bg-sixth'>
             {getCategoryIconComponent(icon)}
           </div>
@@ -39,14 +43,14 @@ function CategoryCard({ category }: { category: DatasetItem }) {
       </div>
 
       <div className='mt-2'>
-        <h4 className='text-sm mb-1.5 font-bold leading-6 text-left'>
+        <h2 className='text-sm mb-1.5 font-bold leading-6 text-left'>
           <NextLink
             href={`/categories/${slug}`}
             className='text-gray-900 hover:text-third transition-colors'
           >
             {label}
           </NextLink>
-        </h4>
+        </h2>
 
         <p className='mb-0 text-sm text-gray-600 text-left'>
           {(subcategories || []).map((sub, i, array) => (
@@ -66,27 +70,13 @@ function CategoryCard({ category }: { category: DatasetItem }) {
   );
 }
 
-export default function CategoriesHome({ categories = [] }: Props) {
-  // Use provided categories with subcategories or fallback to featured categories from static data
+export default function CategoriesHome({
+  categories = [],
+  fallbackCategories = [],
+}: Props) {
+  // Use provided categories with subcategories or server-prepared fallback
   const displayCategories =
-    categories.length > 0
-      ? categories
-      : serviceTaxonomies
-          .filter((cat) => cat.featured === true)
-          .slice(0, 8)
-          .map((cat) => ({
-            id: cat.id,
-            label: cat.label,
-            slug: cat.slug,
-            icon: cat.icon,
-            featured: cat.featured,
-            subcategories: (cat.children || []).slice(0, 3).map((sub) => ({
-              id: sub.id,
-              label: sub.label,
-              slug: sub.slug,
-              count: 0,
-            })),
-          }));
+    categories.length > 0 ? categories : fallbackCategories;
 
   return (
     <section className='py-8 sm:py-12 md:py-16 lg:pb-24'>
@@ -142,7 +132,7 @@ export default function CategoriesHome({ categories = [] }: Props) {
             }}
             className='w-full'
           >
-            <CarouselContent className='-ml-2 sm:-ml-4'>
+            <CarouselContent className='-ml-0 sm:-ml-2'>
               {displayCategories.map((category, index) => (
                 <CarouselItem
                   key={index}

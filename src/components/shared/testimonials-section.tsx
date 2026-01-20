@@ -3,6 +3,10 @@
 import React from 'react';
 import Image from 'next/image';
 import { Quote } from 'lucide-react';
+import {
+  buildCloudinaryUrl,
+  extractPublicId,
+} from '@/lib/utils/cloudinary';
 
 type TestimonialItem = {
   id: string;
@@ -43,11 +47,33 @@ function TestimonialNav({ testimonials }: { testimonials: TestimonialItem[] }) {
   const activeIndex = testimonials.findIndex(t => t.active) || 1;
   const [currentIndex, setCurrentIndex] = React.useState(activeIndex);
 
+  // Optimize testimonial images to exact display size (70×70px)
+  const optimizedTestimonials = testimonials.map((testimonial) => {
+    const publicId = extractPublicId(testimonial.author.image);
+    return {
+      ...testimonial,
+      author: {
+        ...testimonial.author,
+        image: publicId
+          ? buildCloudinaryUrl(publicId, {
+              width: 70,
+              height: 70,
+              crop: 'fill',
+              gravity: 'face',
+              quality: 'auto:good',
+              format: 'auto',
+              dpr: 'auto',
+            })
+          : testimonial.author.image,
+      },
+    };
+  });
+
   return (
     <div className='relative'>
       {/* Content Display */}
       <div className='mb-8'>
-        {testimonials.map((testimonial, index) => (
+        {optimizedTestimonials.map((testimonial, index) => (
           <div
             key={testimonial.id}
             className={`${index === currentIndex ? 'block' : 'hidden'}`}
@@ -59,7 +85,7 @@ function TestimonialNav({ testimonials }: { testimonials: TestimonialItem[] }) {
 
       {/* Navigation Pills */}
       <nav className='flex justify-center flex-wrap gap-4'>
-        {testimonials.map((testimonial, index) => (
+        {optimizedTestimonials.map((testimonial, index) => (
           <button
             key={testimonial.id}
             onClick={() => setCurrentIndex(index)}

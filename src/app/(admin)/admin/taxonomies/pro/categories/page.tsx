@@ -1,10 +1,10 @@
 import {
   TaxonomyListPage,
   type TaxonomyListPageConfig,
-  AdminProCategoriesFilters,
-  AdminProCategoriesTableSection,
-  AdminProCategoriesTableSkeleton,
-} from '@/components/admin';
+} from '@/components/admin/taxonomy-list-page';
+import { AdminProCategoriesFilters } from '@/components/admin/admin-pro-categories-filters';
+import { AdminProCategoriesTableSection } from '@/components/admin/admin-pro-categories-table-section';
+import { AdminProCategoriesTableSkeleton } from '@/components/admin/admin-pro-categories-table-skeleton';
 
 export const dynamic = 'force-dynamic';
 

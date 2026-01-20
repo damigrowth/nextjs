@@ -1,10 +1,10 @@
 import {
   TaxonomyListPage,
   type TaxonomyListPageConfig,
-  AdminTagsFilters,
-  AdminTagsTableSection,
-  AdminTagsTableSkeleton,
-} from '@/components/admin';
+} from '@/components/admin/taxonomy-list-page';
+import { AdminTagsFilters } from '@/components/admin/admin-tags-filters';
+import { AdminTagsTableSection } from '@/components/admin/admin-tags-table-section';
+import { AdminTagsTableSkeleton } from '@/components/admin/admin-tags-table-skeleton';
 
 export const dynamic = 'force-dynamic';
 

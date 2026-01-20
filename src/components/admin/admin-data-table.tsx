@@ -14,7 +14,7 @@ import {
 import { ArrowUpDown, ArrowUp, ArrowDown, Edit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 // Column definition type
 export interface ColumnDef<T = any> {

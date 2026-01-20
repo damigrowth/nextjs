@@ -6,17 +6,18 @@ import { requireAuth } from './server';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import { Prisma } from '@prisma/client';
+import { Prisma, UserRole, UserType, JourneyStep } from '@prisma/client';
 import { CloudinaryResource } from '@/lib/types/cloudinary';
 import { onboardingFormSchemaWithMedia } from '@/lib/validations';
 import { getFormString, getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import {
   processImageForDatabase,
   sanitizeCloudinaryResources,
 } from '@/lib/utils/cloudinary';
 import { brevoWorkflowService, sendNewProfileEmail } from '@/lib/email';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 
 /**
  * Complete onboarding action wrapper for useActionState
@@ -126,16 +127,19 @@ export async function completeOnboarding(
             ? user.role
             : 'freelancer', // Sync user.role to profile.type
         bio: data.bio,
+        bioNormalized: data.bio ? normalizeTerm(data.bio) : null,
         category: data.category,
         subcategory: data.subcategory,
         coverage: data.coverage,
         ...(processedImage && { image: processedImage }), // Only include if image exists
         portfolio: sanitizedPortfolio,
+        visibility: { email: false, phone: true, address: true }, // Default visibility settings - email hidden
         published: user.role !== 'user',
         isActive: true,
         // Sync user fields to profile
         username: user.username,
         displayName: user.displayName,
+        displayNameNormalized: user.displayName ? normalizeTerm(user.displayName) : null,
         email: user.email,
       },
       create: {
@@ -144,16 +148,19 @@ export async function completeOnboarding(
             ? user.role
             : 'freelancer', // Sync user.role to profile.type
         bio: data.bio,
+        bioNormalized: data.bio ? normalizeTerm(data.bio) : null,
         category: data.category,
         subcategory: data.subcategory,
         coverage: data.coverage,
         ...(processedImage && { image: processedImage }), // Only include if image exists
         portfolio: sanitizedPortfolio,
+        visibility: { email: false, phone: true, address: true }, // Default visibility settings - email hidden
         published: user.role !== 'user',
         isActive: true,
         // Sync user fields to profile
         username: user.username,
         displayName: user.displayName,
+        displayNameNormalized: user.displayName ? normalizeTerm(user.displayName) : null,
         email: user.email,
         user: {
           connect: { id: user.id },

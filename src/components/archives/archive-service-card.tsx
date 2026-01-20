@@ -3,13 +3,11 @@ import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
 import type { ArchiveServiceCardData } from '@/lib/types/components';
 import type { ServiceCardData } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import {
-  MediaCarousel,
-  NextLink,
-  ProfileBadges,
-  RatingDisplay,
-  UserAvatar,
-} from '../shared';
+import { NextLink } from '@/components';
+import MediaCarousel from '@/components/shared/media-carousel';
+import ProfileBadges from '@/components/shared/profile-badges';
+import RatingDisplay from '@/components/shared/rating-display';
+import UserAvatar from '@/components/shared/user-avatar';
 import { CoverageDisplay } from './coverage-display';
 
 interface ArchiveServiceCardProps {

@@ -10,7 +10,7 @@ import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
 import { getFormString } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 
 export async function login(
   prevState: ActionResponse | null,
@@ -91,7 +91,8 @@ export async function login(
   } else if (user.step === 'ONBOARDING') {
     redirectPath = '/onboarding';
   } else if (user.step === 'DASHBOARD') {
-    if (user.role === 'admin') {
+    // Redirect all admin roles (admin, support, editor) to /admin
+    if (user.role === 'admin' || user.role === 'support' || user.role === 'editor') {
       redirectPath = '/admin';
     } else {
       redirectPath = '/dashboard';

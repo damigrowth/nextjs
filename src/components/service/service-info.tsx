@@ -1,9 +1,12 @@
 import React from 'react';
-import { Clock, MapPin, Globe, Users, Briefcase } from 'lucide-react';
+import { Clock, MapPin, Globe, Users } from 'lucide-react';
 import { DatasetItem } from '@/lib/types/datasets';
-import { getCoverageGroupedByCounty } from '@/lib/utils/datasets';
+import {
+  getCoverageGroupedByCounty,
+  getCoverageAddressWithLocation,
+} from '@/lib/utils/datasets';
 import IconBox from '@/components/shared/icon-box';
-import { FlaticonCategory } from '@/components/icon';
+import { FlaticonCategory, FlaticonRefresh } from '@/components/icon';
 import CoverageDisplay from '@/components/shared/coverage-display';
 
 interface ServiceInfoProps {
@@ -70,7 +73,7 @@ export default function ServiceInfo({
       {online && subscription && subscriptionType && (
         <div className='sm:col-span-1 md:col-span-1'>
           <IconBox
-            icon={<Briefcase className='h-10 w-10' />}
+            icon={<FlaticonRefresh size={40} />}
             title='Πληρωμή'
             value={
               {
@@ -89,7 +92,7 @@ export default function ServiceInfo({
         <div className='sm:col-span-1 md:col-span-1'>
           <IconBox
             icon={<Clock className='h-10 w-10' />}
-            title='Χρόνος Παράδοσης'
+            title='Ημέρες παράδοσης'
             value={
               duration > 1 ? duration + ' ' + 'Μέρες' : duration + ' ' + 'Μέρα'
             }
@@ -102,23 +105,20 @@ export default function ServiceInfo({
           <IconBox
             icon={<MapPin className='h-10 w-10' />}
             title='Διεύθυνση'
-            value={coverage.address}
+            value={getCoverageAddressWithLocation(coverage)}
           />
         </div>
       )}
 
-      {presence &&
-        onsite &&
-        coverage.onsite &&
-        groupedCoverage.length > 0 && (
-          <div className='sm:col-span-2 md:col-span-2'>
-            <IconBox
-              icon={<Users className='h-10 w-10' />}
-              title='Περιοχές Εξυπηρέτησης'
-              value={<CoverageDisplay groupedCoverage={groupedCoverage} />}
-            />
-          </div>
-        )}
+      {presence && onsite && coverage.onsite && groupedCoverage.length > 0 && (
+        <div className='sm:col-span-2 md:col-span-2'>
+          <IconBox
+            icon={<Users className='h-10 w-10' />}
+            title='Περιοχές Εξυπηρέτησης'
+            value={<CoverageDisplay groupedCoverage={groupedCoverage} />}
+          />
+        </div>
+      )}
     </div>
   );
 }

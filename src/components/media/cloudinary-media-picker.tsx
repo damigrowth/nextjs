@@ -19,6 +19,11 @@ interface CloudinaryMediaPickerProps {
 declare global {
   interface Window {
     cloudinary?: {
+      createUploadWidget: (options: any, callback: (error: any, result: any) => void) => {
+        open: () => void;
+        close: () => void;
+        destroy: () => void;
+      };
       createMediaLibrary: (
         options: any,
         callbacks: { insertHandler: (data: any) => void },
@@ -57,7 +62,6 @@ export function CloudinaryMediaPicker({
 
   const openMediaLibrary = async () => {
     if (!window.cloudinary) {
-      console.error('Cloudinary Media Library not loaded');
       return;
     }
 
@@ -118,7 +122,6 @@ export function CloudinaryMediaPicker({
 
       widgetRef.current.show();
     } catch (error) {
-      console.error('Error opening Media Library:', error);
       alert('Failed to open Media Library. Please try again.');
     } finally {
       setIsLoading(false);

@@ -14,6 +14,8 @@ import {
 } from '@/lib/validations/service';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 import { generateServiceSlug } from '@/lib/utils/text';
+import { sendServiceCreatedEmail } from '@/lib/email/services';
+import { brevoWorkflowService } from '@/lib/email';
 
 // =============================================
 // SHARED UTILITIES
@@ -84,7 +86,7 @@ export async function updateServiceMedia(
     });
 
     if (!session?.user) {
-      return { success: false, error: 'Authentication required' };
+      return { success: false, error: 'Χρειάζεται σύνδεση.' };
     }
 
     // Get user profile
@@ -93,7 +95,7 @@ export async function updateServiceMedia(
     });
 
     if (!profile) {
-      return { success: false, error: 'Profile not found' };
+      return { success: false, error: 'Το προφίλ δεν βρέθηκε.' };
     }
 
     // Check if service exists and belongs to user
@@ -102,11 +104,11 @@ export async function updateServiceMedia(
     });
 
     if (!existingService) {
-      return { success: false, error: 'Service not found' };
+      return { success: false, error: 'Η υπηρεσία δεν βρέθηκε.' };
     }
 
     if (existingService.pid !== profile.id) {
-      return { success: false, error: 'Unauthorized access' };
+      return { success: false, error: 'Η πρόσβαση δεν επιτρέπεται.' };
     }
 
     // Parse and validate media data
@@ -123,7 +125,7 @@ export async function updateServiceMedia(
       return {
         success: false,
         error:
-          'Validation failed: ' +
+          'Αποτυχία: ' +
           validationResult.error.issues.map((e) => e.message).join(', '),
       };
     }
@@ -165,7 +167,7 @@ export async function updateServiceMedia(
     console.error('Update service media error:', error);
     return {
       success: false,
-      error: 'Failed to update service media',
+      error: 'Η ενημέρωση των πολυμέσων απέτυχε.',
     };
   }
 }
@@ -185,30 +187,73 @@ export async function updateServiceInfo(
     });
 
     if (!session?.user) {
-      return { success: false, error: 'Authentication required' };
+      return { success: false, error: 'Χρειάζεται σύνδεση.' };
     }
 
-    // Get user profile
+    // Get user profile with refresh tracking fields
     const profile = await prisma.profile.findUnique({
       where: { uid: session.user.id },
+      select: {
+        id: true,
+        uid: true,
+        username: true,
+        lastServiceRefreshDate: true,
+        dailyServiceRefreshCount: true,
+      },
     });
 
     if (!profile) {
-      return { success: false, error: 'Profile not found' };
+      return { success: false, error: 'Το προφίλ δεν βρέθηκε.' };
     }
 
     // Check if service exists and belongs to user
     const existingService = await prisma.service.findUnique({
       where: { id: serviceId },
+      select: {
+        id: true,
+        pid: true,
+        status: true,
+        refreshedAt: true,
+        slug: true,
+        category: true,
+      },
     });
 
     if (!existingService) {
-      return { success: false, error: 'Service not found' };
+      return { success: false, error: 'Η υπηρεσία δεν βρέθηκε.' };
     }
 
     if (existingService.pid !== profile.id) {
-      return { success: false, error: 'Unauthorized access' };
+      return { success: false, error: 'Η πρόσβαση δεν επιτρέπεται.' };
     }
+
+    // Track if service was draft before update (for transition logic)
+    const wasDraft = existingService.status === 'draft';
+
+    // Check if user can refresh service (car.gr logic)
+    // If user has refresh credits, updating will also boost service to top
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    let canRefreshService = false;
+    let currentDailyCount = profile.dailyServiceRefreshCount || 0;
+
+    // Reset daily counter if it's a new day
+    if (
+      !profile.lastServiceRefreshDate ||
+      profile.lastServiceRefreshDate < today
+    ) {
+      currentDailyCount = 0;
+    }
+
+    // Check refresh eligibility
+    const hasRefreshCredits = currentDailyCount < 10;
+    const service24hPassed =
+      !existingService.refreshedAt ||
+      (Date.now() - existingService.refreshedAt.getTime()) / (1000 * 60 * 60) >=
+        24;
+
+    canRefreshService = hasRefreshCredits && service24hPassed;
 
     // Parse FormData - only include fields that are present
     const rawData: Partial<UpdateServiceInfoInput> = {};
@@ -259,7 +304,7 @@ export async function updateServiceInfo(
       return {
         success: false,
         error:
-          'Validation failed: ' +
+          'Αποτυχία: ' +
           validationResult.error.issues.map((e) => e.message).join(', '),
       };
     }
@@ -268,7 +313,11 @@ export async function updateServiceInfo(
 
     // Build update data object with only provided fields
     const updateData: any = {
-      updatedAt: new Date(),
+      // Don't manually set updatedAt - Prisma handles it automatically
+      // Transition draft services to pending on first save
+      ...(wasDraft && { status: 'pending' }),
+      // If user has refresh credits, boost service to top
+      ...(canRefreshService && { refreshedAt: now, sortDate: now }),
     };
 
     // Add each field if present in validated data
@@ -278,7 +327,10 @@ export async function updateServiceInfo(
           updateData.title = value;
           updateData.titleNormalized = normalizeTerm(value as string);
           // Regenerate slug when title changes to keep URL in sync
-          updateData.slug = generateServiceSlug(value as string, serviceId.toString());
+          updateData.slug = generateServiceSlug(
+            value as string,
+            serviceId.toString(),
+          );
           break;
 
         case 'description':
@@ -305,18 +357,90 @@ export async function updateServiceInfo(
       }
     }
 
-    // Update service
-    const updatedService = await prisma.service.update({
-      where: { id: serviceId },
-      data: updateData,
-      include: {
-        profile: {
-          select: {
-            username: true,
+    // Update service (with transaction if refreshing)
+    const updatedService = canRefreshService
+      ? await prisma.$transaction(async (tx) => {
+          // Update service with refreshedAt
+          const updated = await tx.service.update({
+            where: { id: serviceId },
+            data: updateData,
+            include: {
+              profile: {
+                select: {
+                  username: true,
+                },
+              },
+            },
+          });
+
+          // Update profile refresh counter
+          await tx.profile.update({
+            where: { id: profile.id },
+            data: {
+              dailyServiceRefreshCount: currentDailyCount + 1,
+              lastServiceRefreshDate: now,
+            },
+          });
+
+          return updated;
+        })
+      : await prisma.service.update({
+          where: { id: serviceId },
+          data: updateData,
+          include: {
+            profile: {
+              select: {
+                username: true,
+              },
+            },
           },
+        });
+
+    // If service transitioned from draft to pending, send notification email
+    if (wasDraft && updatedService.status === 'pending') {
+      // Send email notification to admin
+      await sendServiceCreatedEmail(
+        {
+          id: updatedService.id,
+          title: updatedService.title,
+          description: updatedService.description,
+          slug: updatedService.slug,
         },
-      },
-    });
+        {
+          ...session.user,
+          email: session.user.email || '',
+        },
+        typeof profile.id === 'string' ? parseInt(profile.id) : profile.id,
+        updatedService.category,
+      );
+
+      // Check if this is the user's first service and move to pros list
+      const serviceCount = await prisma.service.count({
+        where: {
+          pid: profile.id,
+          status: { not: 'draft' },
+        },
+      });
+
+      if (serviceCount === 1 && session.user.email) {
+        brevoWorkflowService
+          .handleFirstServiceCreated(session.user.email, {
+            DISPLAY_NAME: session.user.displayName || undefined,
+            USERNAME: session.user.username || undefined,
+            USER_TYPE: session.user.type as 'user' | 'pro',
+            USER_ROLE: session.user.role as
+              | 'user'
+              | 'freelancer'
+              | 'company'
+              | 'admin',
+            IS_PRO: session.user.type === 'pro',
+            SERVICES_COUNT: 1,
+          })
+          .catch((error) => {
+            console.error('Failed to move user to pros list:', error);
+          });
+      }
+    }
 
     // Invalidate caches
     await invalidateServiceCaches({
@@ -329,15 +453,25 @@ export async function updateServiceInfo(
       profileUsername: updatedService.profile?.username || null,
     });
 
+    // Generate success message based on what happened
+    let message = '';
+    if (wasDraft) {
+      message = 'Η υπηρεσία υποβλήθηκε για έγκριση επιτυχώς!';
+    } else if (canRefreshService) {
+      message = 'Η υπηρεσία ενημερώθηκε επιτυχώς!';
+    } else {
+      message = 'Η υπηρεσία ενημερώθηκε επιτυχώς!';
+    }
+
     return {
       success: true,
-      data: { message: 'Η υπηρεσία ενημερώθηκε επιτυχώς!' },
+      data: { message },
     };
   } catch (error) {
     console.error('Update service info error:', error);
     return {
       success: false,
-      error: 'Failed to update service info',
+      error: 'Η ενημέρωση της υπηρεσίας απέτυχε',
     };
   }
 }

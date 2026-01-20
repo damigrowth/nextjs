@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import type { DatasetItem } from '@/lib/types/datasets';
 import type { ActionResult } from '@/lib/types/api';
-import { getAdminSession } from './helpers';
+import { getAdminSession, getAdminSessionWithPermission } from './helpers';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import {
   readTaxonomyFile,
   writeTaxonomyFile,
@@ -149,7 +150,7 @@ export async function createItem(
   }
 ): Promise<ActionResult<{ backupPath: string; id: string }>> {
   try {
-    const session = await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
 
     const result = await withLock(`${config.type}-create`, async () => {
       console.log(`[${config.type.toUpperCase()}_CREATE] Starting: ${data.slug}`);
@@ -162,7 +163,7 @@ export async function createItem(
       const uniqueSlug = generateUniqueSlug(data.slug!, currentItems);
 
       const newId = getNextId(currentItems);
-      const newItem = { id: newId, ...data, slug: uniqueSlug };
+      const newItem = { id: newId, ...data, slug: uniqueSlug } as DatasetItem;
 
       // Normalize property order before staging
       const normalizedItem = normalizeItemProperties(newItem);
@@ -201,7 +202,7 @@ export async function updateItem(
   data: DatasetItem
 ): Promise<ActionResult<{ backupPath: string }>> {
   try {
-    const session = await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
 
     const result = await withLock(`${config.type}-update`, async () => {
       console.log(`[${config.type.toUpperCase()}_UPDATE] Starting: ${data.id}`);
@@ -254,7 +255,7 @@ export async function deleteItem(
   id: string
 ): Promise<ActionResult<{ backupPath: string }>> {
   try {
-    const session = await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
 
     const result = await withLock(`${config.type}-delete`, async () => {
       console.log(`[${config.type.toUpperCase()}_DELETE] Starting: ${id}`);
@@ -436,7 +437,7 @@ export async function updateHierarchicalItem(
   }
 ): Promise<ActionResult<{ backupPath: string }>> {
   try {
-    const session = await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
 
     const result = await withLock(`${config.type}-update`, async () => {
       console.log(`[${config.type.toUpperCase()}_UPDATE] Starting update for ${data.level} ID: ${data.id}`);
@@ -499,7 +500,7 @@ export async function createHierarchicalItem(
   }
 ): Promise<ActionResult<{ backupPath: string; id: string }>> {
   try {
-    const session = await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
 
     const result = await withLock(`${config.type}-create`, async () => {
       console.log(`[${config.type.toUpperCase()}_CREATE] Starting creation for ${data.level}: ${data.item.slug}`);
@@ -520,7 +521,7 @@ export async function createHierarchicalItem(
         throw new Error(`A ${config.typeName} with ID "${newId}" already exists`);
       }
 
-      const newItem = { id: newId, ...data.item, slug: uniqueSlug };
+      const newItem = { id: newId, ...data.item, slug: uniqueSlug } as DatasetItem;
 
       // Stage the change in database with hierarchy info
       const { createStagedChange } = await import('./taxonomy-staging');

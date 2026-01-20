@@ -3,6 +3,7 @@ import { Shield } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { getOptimizedImageUrl, IMAGE_SIZES } from '@/lib/utils/cloudinary';
 import NextLink from './next-link';
 
 export interface UserAvatarProps {
@@ -120,13 +121,45 @@ export default function UserAvatar({
   const fallbackSizeClass = fallbackSizeClasses[size];
   const topIconSizeClass = topIconSizeClasses[size];
 
-  // Extract image URL from CloudinaryResource or use string directly
-  const imageUrl =
-    typeof image === 'object' && image?.secure_url
-      ? image.secure_url
-      : typeof image === 'string'
+  // Determine optimal avatar size preset based on display size
+  // This ensures we load the smallest optimized image for the actual display size
+  const getAvatarSizePreset = (
+    displayWidth?: number,
+    displaySize?: UserAvatarProps['size']
+  ): keyof typeof IMAGE_SIZES.avatar => {
+    // If custom width is provided, use it for precise optimization
+    if (displayWidth !== undefined) {
+      if (displayWidth <= 50) return 'sm';   // 50×50px
+      if (displayWidth <= 100) return 'md';  // 100×100px
+      if (displayWidth <= 150) return 'lg';  // 150×150px
+      if (displayWidth <= 200) return 'xl';  // 200×200px
+      return '2xl'; // 300×300px
+    }
+
+    // Otherwise, map size prop to appropriate preset
+    switch (displaySize) {
+      case 'sm': return 'sm';   // 32px → 50px
+      case 'md': return 'md';   // 48px → 100px
+      case 'lg': return 'lg';   // 64px → 150px
+      case 'xl': return 'xl';   // 80px → 200px
+      case '2xl': return '2xl'; // 120px → 300px
+      default: return 'lg';
+    }
+  };
+
+  const avatarSizePreset = getAvatarSizePreset(width, size);
+
+  // Get optimized image URL based on avatar size
+  // Uses Cloudinary transformations for significant bandwidth savings (90%+)
+  const imageUrl = image
+    ? getOptimizedImageUrl(image, 'avatar', avatarSizePreset) ||
+      // Fallback to original URL for non-Cloudinary images (e.g., OAuth avatars)
+      (typeof image === 'object' && image?.secure_url
+        ? image.secure_url
+        : typeof image === 'string'
         ? image
-        : undefined;
+        : undefined)
+    : undefined;
 
   const initials =
     fallback || getUserInitials(displayName, firstName, lastName);

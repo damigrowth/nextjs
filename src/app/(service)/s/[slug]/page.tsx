@@ -2,7 +2,6 @@ import type { JSX } from 'react';
 import { notFound } from 'next/navigation';
 import { getServicePageData } from '@/actions/services';
 import { getServiceMetadata } from '@/lib/seo/pages';
-import { TaxonomyTabs, DynamicBreadcrumb } from '@/components';
 import { Card, CardContent } from '@/components/ui/card';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import {
@@ -13,10 +12,13 @@ import {
   ServiceContact,
   ServiceOrderFixed,
   ServiceFAQ,
-  ProfileTerms,
   ServiceRelated,
   ReportServiceDialog,
-} from '@/components';
+} from '@/components/service';
+import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
+import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
+import { ProfileTerms } from '@/components/profile';
+import { ServiceSchema } from '@/lib/seo/schema';
 
 // ISR configuration with shorter interval + tag-based revalidation
 export const revalidate = 300; // Revalidate every 5 minutes (backup for tag-based)
@@ -107,8 +109,29 @@ export default async function ServicePage({
     relatedServices,
   } = result.data;
 
+  // Get first media image for schema
+  const firstMediaImage = service.media && Array.isArray(service.media) && service.media.length > 0
+    ? service.media[0].url
+    : undefined;
+
+  // Get metadata to reuse the formatted and truncated description
+  // This ensures schema description matches meta description exactly
+  const metadata = await getServiceMetadata(serviceId);
+  const schemaDescription = metadata.description || '';
+
   return (
     <div className='py-20 bg-silver'>
+      <ServiceSchema
+        slug={service.slug || ''}
+        title={service.title}
+        description={schemaDescription}
+        displayName={service.profile.displayName || ''}
+        price={service.price || 0}
+        // rating={service.rating}
+        // reviewCount={service.reviewCount}
+        faq={service.faq || []}
+        image={firstMediaImage}
+      />
       {/* Category Navigation Tabs */}
       <TaxonomyTabs
         items={featuredCategories}
@@ -127,7 +150,7 @@ export default async function ServicePage({
 
       {/* Service Content */}
       <section className='pt-4'>
-        <div className='container mx-auto px-4'>
+        <div className='container mx-auto px-4 lg:px-10'>
           <div className='relative grid grid-cols-1 lg:grid-cols-3 gap-28'>
             {/* Main Content */}
             <div className='lg:col-span-2 space-y-6'>

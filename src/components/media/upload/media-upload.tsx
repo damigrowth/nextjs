@@ -45,7 +45,17 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
       folder = 'uploads',
       maxFiles = 10,
       maxFileSize = 15000000, // 15MB
-      allowedFormats = ['jpg', 'jpeg', 'png', 'webp', 'mp4', 'webm', 'mp3', 'ogg', 'wav'],
+      allowedFormats = [
+        'jpg',
+        'jpeg',
+        'png',
+        'webp',
+        'mp4',
+        'webm',
+        'mp3',
+        'ogg',
+        'wav',
+      ],
       className = '',
       placeholder = 'Ανεβάστε αρχεία',
       error,
@@ -212,11 +222,8 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
         // Clear uploaded files from queue
         setQueuedFiles((prev) => prev.filter((qf) => !qf.isUploaded));
       } catch (error) {
-        console.error('Upload failed:', error);
         setUploadError(
-          error instanceof Error
-            ? error.message
-            : 'Upload failed. Please try again.',
+          error instanceof Error ? error.message : 'Αποτυχία μεταφόρτωσης.',
         );
       } finally {
         setIsUploading(false);
@@ -337,6 +344,9 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
 
     // Profile Image Mode (single file)
     if (!multiple) {
+      // Widget mode for direct upload with cropping
+      const useWidget = type === 'image'; // Enable widget for image-only uploads
+
       return (
         <ProfileImageUpload
           resource={profileData?.resource || null}
@@ -357,6 +367,15 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
           maxFileSize={maxFileSize}
           formats={formats}
           className={className}
+          useWidget={useWidget}
+          folder={folder}
+          uploadPreset={uploadPreset}
+          signed={signed}
+          signatureEndpoint={signatureEndpoint}
+          onDirectUpload={(resource) => {
+            // Handle direct upload from widget (bypasses queue)
+            onChange(resource);
+          }}
         />
       );
     }

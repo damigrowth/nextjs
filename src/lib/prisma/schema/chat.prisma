@@ -9,7 +9,7 @@ model Chat {
   lastMessageId String?      @unique
   lastActivity  DateTime     @default(now())
   members       ChatMember[]
-  creator       User         @relation(fields: [creatorUid], references: [id])
+  creator       User         @relation(fields: [creatorUid], references: [id], onDelete: Cascade)
   lastMessage   Message?     @relation("ChatLastMessage", fields: [lastMessageId], references: [id])
   messages      Message[]    @relation("ChatMessages")
 
@@ -55,9 +55,9 @@ model Message {
   /// [MessageReactions]
   reactions     Json?
   lastMessageOf Chat?     @relation("ChatLastMessage")
-  author        User      @relation("MessageAuthor", fields: [authorUid], references: [id])
+  author        User      @relation("MessageAuthor", fields: [authorUid], references: [id], onDelete: Cascade)
   chat          Chat      @relation("ChatMessages", fields: [chatId], references: [id], onDelete: Cascade)
-  deletedByUser User?     @relation("MessageDeletedBy", fields: [deletedBy], references: [id])
+  deletedByUser User?     @relation("MessageDeletedBy", fields: [deletedBy], references: [id], onDelete: SetNull)
   replyTo       Message?  @relation("MessageReplies", fields: [replyToId], references: [id])
   replies       Message[] @relation("MessageReplies")
 

@@ -1,9 +1,10 @@
 import { getDirectoryPageData } from '@/actions/profiles/get-directory';
-import { TaxonomyTabs } from '@/components/shared';
+import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
 import { ArchiveBanner } from '@/components/archives/archive-banner';
 import { SubdivisionsCarousel } from '@/components/archives/subdivisions-carousel';
 import { CategoriesGrid } from '@/components/archives/categories-grid';
 import { getDirectoryMetadata } from '@/lib/seo/pages';
+import { DirectorySchema } from '@/lib/seo/schema';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -38,6 +39,7 @@ export default async function DirectoryPage() {
 
     return (
       <div className='py-20 bg-silver'>
+        <DirectorySchema categories={categories} />
         {/* Pro Category Navigation Tabs */}
         <TaxonomyTabs
           items={proCategories}
@@ -51,7 +53,7 @@ export default async function DirectoryPage() {
         {/* Archive Banner */}
         <ArchiveBanner
           title='Επαγγελματικός Κατάλογος'
-          subtitle='Ανακάλυψε επαγγελματίες και επιχειρήσεις για κάθε ανάγκη από όλες τις κατηγορίες.'
+          subtitle='Ανακάλυψε όλες τις κατηγορίες με επαγγελματίες και επιχειρήσεις για κάθε ανάγκη.'
         />
 
         {/* Page Content */}
@@ -62,6 +64,7 @@ export default async function DirectoryPage() {
               <SubdivisionsCarousel
                 subdivisions={popularSubcategories}
                 gradientColor='silver'
+                title='Πιο δημοφιλείς επαγγελματικές κατηγορίες'
               />
 
               {/* Categories Grid */}

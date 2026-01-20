@@ -1,7 +1,8 @@
 import React from 'react';
-import { AudioGallery, MediaCarousel } from '@/components';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { detectMediaType } from '@/lib/utils/media';
+import AudioGallery from './audio-gallery';
+import MediaCarousel from './media-carousel';
 
 interface MediaGalleryProps {
   media: PrismaJson.CloudinaryResource[] | null;

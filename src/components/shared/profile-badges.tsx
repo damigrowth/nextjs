@@ -6,6 +6,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from '@/components/ui/tooltip';
+import { buildCloudinaryUrl, extractPublicId } from '@/lib/utils/cloudinary';
 
 interface ProfileBadgesProps {
   verified?: boolean;
@@ -55,13 +56,29 @@ export function VerifiedBadge({ verified }: { verified?: boolean }) {
 export function TopLevelBadge({ topLevel }: { topLevel?: boolean }) {
   if (!topLevel) return null;
 
+  const badgeUrl = React.useMemo(() => {
+    const url =
+      'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076624/Static/top-badge_rajlxi.webp';
+    const publicId = extractPublicId(url);
+    return publicId
+      ? buildCloudinaryUrl(publicId, {
+          width: 40,
+          height: 40,
+          crop: 'fill',
+          quality: 'auto:good',
+          format: 'auto',
+          dpr: 'auto',
+        })
+      : url;
+  }, []);
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Image
           width={20}
           height={20}
-          src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1750076624/Static/top-badge_rajlxi.webp'
+          src={badgeUrl}
           alt='top badge'
           className='cursor-pointer'
         />

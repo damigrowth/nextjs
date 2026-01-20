@@ -7,7 +7,7 @@ import { requireAuth, hasAnyRole } from '@/actions/auth/server';
 import { Prisma } from '@prisma/client';
 import { extractFormData, getFormString } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { sanitizeCloudinaryResources } from '@/lib/utils/cloudinary';
 import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
 import { updateProfilePortfolioSchema } from '@/lib/validations/profile';
@@ -25,8 +25,8 @@ export async function updateProfilePortfolioAdmin(
     const session = await requireAuth();
     const user = session.user;
 
-    // 2. Check if user is admin
-    const roleCheck = await hasAnyRole(['admin']);
+    // 2. Check if user has admin or support role
+    const roleCheck = await hasAnyRole(['admin', 'support']);
     if (!roleCheck.success || !roleCheck.data) {
       return {
         success: false,

@@ -3,13 +3,12 @@ import { Badge } from '@/components/ui/badge';
 import { CoverageDisplay } from './coverage-display';
 import type { ArchiveProfileCardData } from '@/lib/types/components';
 import { cn } from '@/lib/utils';
-import {
-  UserAvatar,
-  ProfileBadges,
-  RatingDisplay,
-  TaxonomiesDisplay,
-  NextLink,
-} from '../shared';
+import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
+import { NextLink } from '@/components';
+import UserAvatar from '@/components/shared/user-avatar';
+import ProfileBadges from '@/components/shared/profile-badges';
+import RatingDisplay from '@/components/shared/rating-display';
+import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
 
 interface ArchiveProfileCardProps {
   profile: ArchiveProfileCardData;
@@ -26,6 +25,11 @@ export function ArchiveProfileCard({
     return `€${rate}`;
   };
 
+  // Get optimized background image URL
+  const optimizedBgImage = profile.image
+    ? getOptimizedImageUrl(profile.image, 'card')
+    : null;
+
   return (
     <Card
       className={cn(
@@ -39,7 +43,9 @@ export function ArchiveProfileCard({
           href={`/profile/${profile.username}`}
           className='group w-full md:w-48 flex-shrink-0 relative overflow-hidden flex md:items-center md:justify-center pl-5 md:pl-0 bg-gray-50 bg-cover bg-center bg-no-repeat min-h-28'
           style={{
-            backgroundImage: `${profile.image ? `url(${profile.image})` : ''}`,
+            backgroundImage: optimizedBgImage
+              ? `url(${optimizedBgImage})`
+              : undefined,
           }}
         >
           {/* Grayscale and transparency overlay */}
@@ -53,7 +59,7 @@ export function ArchiveProfileCard({
               displayName={profile.displayName}
               image={profile.image}
               top={profile.top}
-              size='xl'
+              size='lg'
               className='h-32 w-32'
               showShadow={false}
             />
@@ -143,7 +149,7 @@ export function ArchiveProfileCard({
                           {profile.specialityData && (
                             <Badge
                               variant='muted'
-                              className='bg-third/10 text-primary/80 border-primary/20 hover:bg-blue-100 hover:bg-third/10'
+                              className='text-primary/80 border-primary/20'
                             >
                               {profile.specialityData.label}
                             </Badge>

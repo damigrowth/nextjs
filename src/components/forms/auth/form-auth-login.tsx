@@ -22,7 +22,7 @@ import { loginSchema, type LoginInput } from '@/lib/validations/auth';
 import { authClient, useSession } from '@/lib/auth/client';
 import { AuthUser } from '@/lib/types/auth';
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { Separator } from '../../ui/separator';
 import GoogleLoginButton from './button-login-goolge';
 
@@ -97,9 +97,11 @@ const LoginForm: React.FC = () => {
 
   const handleGoogleSignIn = async (): Promise<void> => {
     try {
+      // Type selection now happens AFTER OAuth on /oauth-type-selection page
+      // This works for both new users (type selection) and existing users (direct login)
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: '/dashboard',
+        callbackURL: '/oauth-callback',
       });
     } catch (error) {
       console.error('Google Sign-in Error:', error);
@@ -241,6 +243,7 @@ const LoginForm: React.FC = () => {
         </div>
       </div>
 
+      {/* Google Login Button */}
       <GoogleLoginButton onClick={handleGoogleSignIn} disabled={isPending}>
         Σύνδεση με Google
       </GoogleLoginButton>

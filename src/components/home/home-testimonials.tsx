@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/carousel';
 import { CarouselPagination } from '@/components/ui/carousel-pagination';
 import { testimonials } from '@/constants/datasets/data';
+import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 
 type TestimonialData = {
   id: string;
@@ -28,6 +29,9 @@ type Props = {
 };
 
 function TestimonialCard({ testimonial }: { testimonial: TestimonialData }) {
+  // Optimize testimonial avatar image (60x60px display)
+  const optimizedAvatar = getOptimizedImageUrl(testimonial.image, 'thumbnail') || testimonial.image;
+
   return (
     <div className='rounded-2xl bg-white px-10 py-11 pb-8 relative'>
       <div className='border-b border-border mb-5 pb-8'>
@@ -44,8 +48,9 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialData }) {
             height={60}
             width={60}
             className='h-15 w-15 object-cover rounded-full'
-            src={testimonial.image}
+            src={optimizedAvatar}
             alt='avatar'
+            loading='lazy'
           />
         </div>
         <div className='flex-grow ml-3'>

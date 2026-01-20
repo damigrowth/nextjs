@@ -1,13 +1,14 @@
 model Session {
-  id        String   @id @default(cuid())
-  userId    String
-  expiresAt DateTime
-  token     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ipAddress String?
-  userAgent String?
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String   @id @default(cuid())
+  userId         String
+  expiresAt      DateTime
+  token          String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  impersonatedBy String? // Admin plugin: ID of admin impersonating this session
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
@@ -54,4 +55,36 @@ model PendingRegistration {
   expiresAt   DateTime // Auto-expire after 24 hours
 
   @@map("pending_registrations")
+}
+
+// JWT Web Key Set (JWKS) for Better Auth JWT plugin
+model Jwks {
+  id         String   @id @default(cuid())
+  publicKey  String
+  privateKey String
+  createdAt  DateTime @default(now())
+
+  @@map("jwks")
+}
+
+// API Keys for Better Auth API Key plugin
+model ApiKey {
+  id               String    @id @default(cuid())
+  name             String?
+  key              String    @unique
+  userId           String
+  enabled          Boolean   @default(true)
+  expiresAt        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  start            String? // First characters of the key
+  prefix           String? // Key prefix
+  remaining        Int? // Remaining requests
+  refillInterval   Int? // Refill interval in seconds
+  rateLimitEnabled Boolean   @default(false)
+  permissions      Json? // Stored permissions
+  metadata         Json? // Additional metadata
+  user             User      @relation("UserApiKeys", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("api_keys")
 }

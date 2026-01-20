@@ -21,7 +21,9 @@ interface PresenceOnlineStepProps {
   };
 }
 
-export default function PresenceOnlineStep({ disabledOptions }: PresenceOnlineStepProps) {
+export default function PresenceOnlineStep({
+  disabledOptions,
+}: PresenceOnlineStepProps) {
   const form = useFormContext<CreateServiceInput>();
   const { setValue, formState } = form;
 
@@ -71,7 +73,9 @@ export default function PresenceOnlineStep({ disabledOptions }: PresenceOnlineSt
                     : 'border-gray-200 hover:border-gray-300'
                 }`
           }`}
-          onClick={() => !disabledOptions?.presence && handleSelection('presence')}
+          onClick={() =>
+            !disabledOptions?.presence && handleSelection('presence')
+          }
         >
           <div className='flex flex-col items-center text-center space-y-4'>
             <div
@@ -107,7 +111,8 @@ export default function PresenceOnlineStep({ disabledOptions }: PresenceOnlineSt
                       : 'text-gray-600'
                 }`}
               >
-                Παρέχω την υπηρεσία με φυσική παρουσία
+                Η υπηρεσία παρέχεται με φυσική παρουσία <br></br> (π.χ. στον
+                χώρο σας ή στον χώρο του πελάτη)
               </p>
             </div>
 
@@ -167,7 +172,7 @@ export default function PresenceOnlineStep({ disabledOptions }: PresenceOnlineSt
                       : 'text-gray-600'
                 }`}
               >
-                Παρέχω την υπηρεσία online ή απομακρυσμένα
+                Η υπηρεσία παρέχεται online ή απομακρυσμένα
               </p>
             </div>
 
@@ -183,20 +188,22 @@ export default function PresenceOnlineStep({ disabledOptions }: PresenceOnlineSt
 
       {/* Disabled Options Notices */}
       {(disabledOptions?.presence || disabledOptions?.online) && (
-        <div className="mt-4 space-y-2">
+        <div className='mt-4 space-y-2'>
           {disabledOptions?.presence && (
-            <Alert className="border-orange-200 bg-orange-50">
-              <AlertCircle className="h-4 w-4 text-orange-600" />
-              <AlertDescription className="text-orange-800">
-                Δεν μπορείτε να επιλέξετε "Φυσική παρουσία" γιατί δεν έχετε επιλέξει το Προσφέρω τις υπηρεσίες "Στον χώρο μου" ή "Στον χώρο του πελάτη" στη Διαχείριση Προφίλ.
+            <Alert className='border-gray-200 bg-gray-50'>
+              <AlertCircle className='h-4 w-4 text-gray-600' />
+              <AlertDescription className='text-gray-700'>
+                Για να επιλέξετε "Φυσική παρουσία" ενεργοποιήστε το από τη
+                Διαχείριση Προφίλ (Τρόποι Παροχής).
               </AlertDescription>
             </Alert>
           )}
           {disabledOptions?.online && (
-            <Alert className="border-orange-200 bg-orange-50">
-              <AlertCircle className="h-4 w-4 text-orange-600" />
-              <AlertDescription className="text-orange-800">
-                Δεν μπορείτε να επιλέξετε "Online" γιατί δεν έχετε συμπληρώσει το αντίστοιχο πεδίο στη Διαχείριση Προφίλ.
+            <Alert className='border-gray-200 bg-gray-50'>
+              <AlertCircle className='h-4 w-4 text-gray-600' />
+              <AlertDescription className='text-gray-700'>
+                Για να επιλέξετε "Online" ενεργοποιήστε το από τη Διαχείριση
+                Προφίλ (Τρόποι Παροχής).
               </AlertDescription>
             </Alert>
           )}

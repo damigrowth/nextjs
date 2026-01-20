@@ -1,11 +1,13 @@
-import { getCurrentUser } from '@/actions/auth/server';
+import { requirePermission } from '@/actions/auth/server';
 import { getVerification } from '@/actions/admin/verifications';
 import { redirect, notFound } from 'next/navigation';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { SiteHeader, AdminVerificationActions } from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
+import { AdminVerificationActions } from '@/components/admin/admin-verification-actions';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { NextLink } from '@/components';
 
@@ -39,18 +41,8 @@ function getStatusBadgeClassName(status: string) {
 export default async function AdminVerificationDetailPage({
   params,
 }: PageProps) {
-  // Verify admin authentication
-  const userResult = await getCurrentUser({ revalidate: true });
-
-  if (!userResult.success || !userResult.data.user) {
-    redirect('/login');
-  }
-
-  const { user: currentUser } = userResult.data;
-
-  if (currentUser.role !== 'admin') {
-    redirect('/dashboard');
-  }
+  // Verify permission to view verifications
+  await requirePermission(ADMIN_RESOURCES.VERIFICATIONS, '/admin/verifications');
 
   // Get verification ID from params
   const { id: verificationId } = await params;

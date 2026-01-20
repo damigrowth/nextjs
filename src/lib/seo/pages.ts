@@ -11,7 +11,7 @@ export async function getServiceMetadata(id: number) {
     type: 'service',
     params: { id },
     titleTemplate: '%title% από %displayName%',
-    descriptionTemplate: '%category% - %description%',
+    descriptionTemplate: '%subcategory% - %subdivision% - %description%',
     size: 100,
     // URL will be constructed from the service slug after fetching
   });
@@ -26,7 +26,7 @@ export async function getProfileMetadata(username: string) {
   const { meta } = await Meta({
     type: 'profile',
     params: { username },
-    titleTemplate: '%displayName% - %type% - %category%. %tagline%',
+    titleTemplate: '%displayName% - %type% - %subcategorySingular%. %tagline%',
     descriptionTemplate: '%bio%',
     size: 160,
     url: `/profile/${username}`,
@@ -231,7 +231,7 @@ export async function getOAuthSetupMetadata() {
 }
 
 /**
- * Home page metadata generation
+ * Home page metadata generation with performance optimizations
  */
 export async function getHomeMetadata() {
   const { meta } = await Meta({
@@ -243,7 +243,7 @@ export async function getHomeMetadata() {
     url: '/',
   });
 
-  return meta;
+  return { meta };
 }
 
 /**

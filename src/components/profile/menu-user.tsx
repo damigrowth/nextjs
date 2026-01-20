@@ -36,7 +36,7 @@ import {
 } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { MessagesMenu, SavedMenu } from '../dashboard';
-import { UserAvatar } from '../shared';
+import UserAvatar from '@/components/shared/user-avatar';
 import { useSession } from '@/lib/auth/client';
 import { capitalizeFirstLetter } from '@/lib/utils/validation';
 

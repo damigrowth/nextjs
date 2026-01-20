@@ -1,5 +1,6 @@
 'use server';
 
+import { Octokit } from '@octokit/rest';
 import {
   getGitHubClient,
   REPO_CONFIG,
@@ -16,7 +17,8 @@ import {
   getRecentCommits as fetchRecentCommits,
   getCommitsAhead,
 } from '@/actions/github/operations';
-import { getAdminSession } from './helpers';
+import { getAdminSession, getAdminSessionWithPermission } from './helpers';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import type {
   GitStatusResponse,
   CommitResponse,
@@ -31,7 +33,7 @@ import type {
  */
 export async function getGitStatus(): Promise<GitStatusResponse> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     const octokit = getGitHubClient();
@@ -138,6 +140,7 @@ export async function getGitStatus(): Promise<GitStatusResponse> {
     // Check how many commits ahead of comparison branch
     // For datasets branch: compare with stack-migration (now) or main (after migration)
     let aheadBy = 0;
+    let behindBy = 0;
     try {
       const comparison = await getCommitDiff(
         octokit,
@@ -145,6 +148,7 @@ export async function getGitStatus(): Promise<GitStatusResponse> {
         currentBranch,
       );
       aheadBy = comparison.ahead_by;
+      behindBy = comparison.behind_by;
     } catch (error) {
       console.warn(
         `[GIT_STATUS] Could not compare ${currentBranch} with ${comparisonBranch}:`,
@@ -162,6 +166,7 @@ export async function getGitStatus(): Promise<GitStatusResponse> {
         datasetDiffs,
         datasetModifiedCount: modifiedFiles.length,
         ahead_by: aheadBy,
+        behind_by: behindBy,
       },
     };
   } catch (error) {
@@ -175,17 +180,86 @@ export async function getGitStatus(): Promise<GitStatusResponse> {
 }
 
 /**
+ * Automatically sync datasets with main if behind
+ * Called before every commit to ensure branch is up-to-date
+ * @returns Object with sync status and number of commits synced
+ */
+async function autoSyncIfBehind(
+  octokit: Octokit,
+  currentBranch: string,
+  comparisonBranch: string,
+): Promise<{ synced: boolean; behind_by: number; error?: string }> {
+  try {
+    const comparison = await getCommitDiff(
+      octokit,
+      comparisonBranch,
+      currentBranch,
+    );
+
+    // If not behind, no sync needed
+    if (comparison.behind_by === 0) {
+      return { synced: false, behind_by: 0 };
+    }
+
+    console.log(
+      `[AUTO_SYNC] ${currentBranch} is ${comparison.behind_by} commits behind ${comparisonBranch}. Auto-syncing...`,
+    );
+
+    // Perform automatic sync
+    const { owner, repo } = REPO_CONFIG;
+    const { data: merge } = await octokit.rest.repos.merge({
+      owner,
+      repo,
+      base: currentBranch,
+      head: comparisonBranch,
+      commit_message: `🤖 Auto-sync: Merge ${comparisonBranch} into ${currentBranch}\n\nAutomatically merged ${comparison.behind_by} commit${comparison.behind_by > 1 ? 's' : ''} from ${comparisonBranch} before committing taxonomy changes.\n\nThis ensures ${currentBranch} stays up-to-date with production.`,
+    });
+
+    console.log(
+      `[AUTO_SYNC] Successfully synced ${comparison.behind_by} commits. Merge SHA: ${merge.sha}`,
+    );
+
+    return { synced: true, behind_by: comparison.behind_by };
+  } catch (error) {
+    console.error('[AUTO_SYNC] Auto-sync failed:', error);
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+    // Return error but don't throw - caller can decide how to handle
+    return { synced: false, behind_by: 0, error: errorMessage };
+  }
+}
+
+/**
  * Commit dataset changes with a descriptive message
  * Creates a commit via GitHub API with all modified dataset files
+ * Automatically syncs with main branch first if behind
  */
 export async function commitDatasetChanges(
   message: string,
 ): Promise<CommitResponse> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     const octokit = getGitHubClient();
+    const { defaultBranch, comparisonBranch } = REPO_CONFIG;
+
+    // AUTO-SYNC: Ensure branch is up-to-date before committing
+    const syncResult = await autoSyncIfBehind(
+      octokit,
+      defaultBranch,
+      comparisonBranch,
+    );
+
+    if (syncResult.error) {
+      console.warn(
+        `[COMMIT] Auto-sync failed but continuing: ${syncResult.error}`,
+      );
+    } else if (syncResult.synced) {
+      console.log(
+        `[COMMIT] Auto-synced ${syncResult.behind_by} commit${syncResult.behind_by > 1 ? 's' : ''} from ${comparisonBranch}`,
+      );
+    }
 
     // Get current status to see which dataset files are modified
     const statusResult = await getGitStatus();
@@ -324,7 +398,7 @@ export async function commitDatasetChanges(
  */
 export async function pushToRemote(branch?: string): Promise<PushResponse> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     const octokit = getGitHubClient();
@@ -370,7 +444,7 @@ export async function getRecentCommits(
   branch?: string,
 ): Promise<RecentCommitsResponse> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     const octokit = getGitHubClient();
@@ -433,7 +507,7 @@ export async function discardStagedChanges(): Promise<{
   error?: string;
 }> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'edit');
 
     const { clearStagedChanges } = await import('./taxonomy-staging');
     const count = await clearStagedChanges();
@@ -462,7 +536,7 @@ export async function revertCommits(
   commitHashes: string[],
 ): Promise<CommitResponse> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'full');
     validateRepoConfig();
 
     if (!commitHashes || commitHashes.length === 0) {
@@ -587,7 +661,7 @@ export async function revertCommits(
  */
 export async function undoLastCommit(count: number = 1): Promise<UndoCommitResponse> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     if (count < 1 || count > 10) {
@@ -677,7 +751,7 @@ export async function mergeDatasetsToMain(): Promise<
   import('@/lib/types/github').MergeBranchResponse
 > {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     const octokit = getGitHubClient();
@@ -774,7 +848,7 @@ export async function syncDatasetsWithMain(): Promise<
   import('@/lib/types/github').MergeBranchResponse
 > {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'edit');
     validateRepoConfig();
 
     const octokit = getGitHubClient();
@@ -873,7 +947,7 @@ export async function resetDatasetsToMain(): Promise<
   import('@/lib/types/github').MergeBranchResponse
 > {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
     validateRepoConfig();
 
     const octokit = getGitHubClient();

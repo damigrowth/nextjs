@@ -2,11 +2,11 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 
 import MediaDisplay from '@/components/ui/media-display';
-import RatingDisplay from './rating-display';
 import SaveButton from './save-button';
 import UserAvatar from './user-avatar';
 import { ServiceCardData } from '@/lib/types';
 import NextLink from './next-link';
+import RatingDisplay from './rating-display';
 
 interface ServiceCardProps {
   service: ServiceCardData;
@@ -98,7 +98,8 @@ export default function ServiceCard({
                   <UserAvatar
                     displayName={service.profile.displayName}
                     image={service.profile.image}
-                    size='sm'
+                    width={24}
+                    height={24}
                     className='h-6 w-6'
                     showBorder={false}
                     showShadow={false}

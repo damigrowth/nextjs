@@ -1,4 +1,4 @@
-import { TaxonomyEditPage } from '@/components/admin';
+import { TaxonomyEditPage } from '@/components/admin/taxonomy-edit-page';
 import { EditTagForm } from '@/components/admin/forms/edit-tag-form';
 import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
 

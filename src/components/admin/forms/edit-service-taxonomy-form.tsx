@@ -17,25 +17,12 @@ import {
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { updateServiceTaxonomyAction } from '@/actions/admin/services';
-import { TaxonomySelector } from '@/components/shared';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+import type { DatasetItem } from '@/lib/types/datasets';
 import { findById } from '@/lib/utils/datasets';
-import { useMemo } from 'react';
-import { createServiceSchema } from '@/lib/validations/service';
+import { editServiceTaxonomySchema } from '@/lib/validations/service';
 import { populateFormData } from '@/lib/utils/form';
-
-// Use dashboard service schema - pick only taxonomy fields
-// Extend to make tags explicitly optional to match the interface
-const editServiceTaxonomySchema = createServiceSchema
-  .pick({
-    category: true,
-    subcategory: true,
-    subdivision: true,
-  })
-  .extend({
-    tags: z.array(z.string()).optional(),
-  });
+import TaxonomySelector from '@/components/shared/taxonomy-selector';
 
 type EditServiceTaxonomyFormValues = z.infer<typeof editServiceTaxonomySchema>;
 
@@ -47,11 +34,20 @@ interface EditServiceTaxonomyFormProps {
     subdivision: string | null;
     tags?: string[];
   };
+  serviceTaxonomies: DatasetItem[];
+  availableTags: Array<{ value: string; label: string }>;
 }
 
-export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProps) {
+export function EditServiceTaxonomyForm({
+  service,
+  serviceTaxonomies,
+  availableTags,
+}: EditServiceTaxonomyFormProps) {
   const router = useRouter();
-  const [state, formAction, isPending] = useActionState(updateServiceTaxonomyAction, null);
+  const [state, formAction, isPending] = useActionState(
+    updateServiceTaxonomyAction,
+    null,
+  );
 
   const form = useForm<EditServiceTaxonomyFormValues>({
     resolver: zodResolver(editServiceTaxonomySchema),
@@ -72,40 +68,8 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
   // Find taxonomy data
   const selectedCategoryData = findById(serviceTaxonomies, watchedCategory);
   const subcategories = selectedCategoryData?.children || [];
-  const selectedSubcategoryData = findById(subcategories, watchedSubcategory);
+  const selectedSubcategoryData = findById(serviceTaxonomies, watchedSubcategory);
   const subdivisions = selectedSubcategoryData?.children || [];
-
-  const availableTags = useMemo(() => {
-    if (!watchedCategory || !selectedCategoryData) return [];
-
-    const tags: Array<{ value: string; label: string }> = [];
-
-    subcategories.forEach(
-      (subcategory: {
-        id: string;
-        label: string;
-        children?: Array<{ id: string; label: string }>;
-      }) => {
-        tags.push({
-          value: subcategory.id,
-          label: subcategory.label,
-        });
-
-        if (subcategory.children) {
-          subcategory.children.forEach(
-            (subdivision: { id: string; label: string }) => {
-              tags.push({
-                value: subdivision.id,
-                label: subdivision.label,
-              });
-            },
-          );
-        }
-      },
-    );
-
-    return tags;
-  }, [watchedCategory, selectedCategoryData, subcategories]);
 
   // Handle state changes from server action
   useEffect(() => {
@@ -130,7 +94,13 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
     };
 
     populateFormData(formData, payload, {
-      stringFields: ['serviceId', 'category', 'subcategory', 'subdivision', 'tags'],
+      stringFields: [
+        'serviceId',
+        'category',
+        'subcategory',
+        'subdivision',
+        'tags',
+      ],
     });
 
     formAction(formData);
@@ -149,10 +119,8 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
                     category: watchedCategory,
                     subcategory: watchedSubcategory || '',
                     subdivision: watchedSubdivision || '',
-                    categoryLabel: findById(serviceTaxonomies, watchedCategory)?.label,
-                    subcategoryLabel: watchedSubcategory
-                      ? findById(subcategories, watchedSubcategory)?.label
-                      : undefined,
+                    categoryLabel: selectedCategoryData?.label,
+                    subcategoryLabel: selectedSubcategoryData?.label,
                     subdivisionLabel: watchedSubdivision
                       ? findById(subdivisions, watchedSubdivision)?.label
                       : undefined,
@@ -173,11 +141,6 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
                   shouldDirty: true,
                   shouldValidate: true,
                 });
-                // Clear tags when taxonomy changes
-                form.setValue('tags', [], {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
               } else {
                 form.setValue('category', '', {
                   shouldDirty: true,
@@ -188,10 +151,6 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
                   shouldValidate: true,
                 });
                 form.setValue('subdivision', '', {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-                form.setValue('tags', [], {
                   shouldDirty: true,
                   shouldValidate: true,
                 });
@@ -220,8 +179,9 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
               <FormLabel>Tags</FormLabel>
               <FormControl>
                 <LazyCombobox
+                  trigger='search'
                   multiple
-                  options={availableTags.map(tag => ({
+                  options={availableTags.map((tag) => ({
                     id: tag.value,
                     label: tag.label,
                   }))}
@@ -256,7 +216,9 @@ export function EditServiceTaxonomyForm({ service }: EditServiceTaxonomyFormProp
           </Button>
           <Button
             type='submit'
-            disabled={isPending || !form.formState.isValid || !form.formState.isDirty}
+            disabled={
+              isPending || !form.formState.isValid || !form.formState.isDirty
+            }
           >
             {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
             Save Changes

@@ -1,10 +1,8 @@
 import { Suspense } from 'react';
-import {
-  AdminServicesFilters,
-  AdminServicesTableSkeleton,
-  AdminServicesTableSection,
-  SiteHeader,
-} from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
+import { AdminServicesFilters } from '@/components/admin/admin-services-filters';
+import { AdminServicesTableSkeleton } from '@/components/admin/admin-services-table-skeleton';
+import { AdminServicesTableSection } from '@/components/admin/admin-services-table-section';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Plus } from 'lucide-react';
 import { NextLink } from '@/components';

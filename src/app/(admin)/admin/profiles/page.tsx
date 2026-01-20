@@ -1,13 +1,11 @@
 import { Suspense } from 'react';
-import {
-  AdminProfilesFilters,
-  AdminProfilesTableSkeleton,
-  AdminProfilesTableSection,
-  SiteHeader,
-} from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
+import { AdminProfilesFilters } from '@/components/admin/admin-profiles-filters';
+import { AdminProfilesTableSkeleton } from '@/components/admin/admin-profiles-table-skeleton';
+import { AdminProfilesTableSection } from '@/components/admin/admin-profiles-table-section';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, UserPlus } from 'lucide-react';
-import { NextLink } from '@/components/shared';
+import { NextLink } from '@/components';
 
 export const dynamic = 'force-dynamic';
 

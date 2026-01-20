@@ -1,18 +1,14 @@
 'use server';
 
 import { unstable_cache } from 'next/cache';
-import { proTaxonomies as importedProTaxonomies } from '@/constants/datasets/pro-taxonomies';
 // O(1) optimized taxonomy lookups - 99% faster than find
-import { findProBySlug } from '@/lib/taxonomies';
+import { getProTaxonomies, findProBySlug } from '@/lib/taxonomies';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
 import { DirectoryCacheKeys } from '@/lib/cache/keys';
 import { CACHE_TAGS } from '@/lib/cache';
 import type { ActionResult } from '@/lib/types/api';
 import type { DatasetItem } from '@/lib/types/datasets';
-
-// Cast to proper type
-const proTaxonomies = importedProTaxonomies as DatasetItem[];
 
 // Types for directory page data
 // Pro subcategories (not subdivisions like services)
@@ -71,6 +67,9 @@ export async function getDirectoryPageData(options?: {
 
     const getCachedData = unstable_cache(
       async () => {
+        // Lazy-load pro taxonomies for O(1) lookups
+        const proTaxonomies = getProTaxonomies();
+
         // Import prisma to get profession counts
         const { prisma } = await import('@/lib/prisma/client');
 

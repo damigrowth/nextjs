@@ -7,8 +7,9 @@ import { requireAuth, hasAnyRole } from '@/actions/auth/server';
 import { coverageSchema } from '@/lib/validations/profile';
 import { getFormJSON, getFormString } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
+import { generateCoverageNormalized } from '@/lib/utils/datasets';
 
 /**
  * Admin server action for updating profile coverage
@@ -22,8 +23,8 @@ export async function updateCoverageAdmin(
     // 1. Require authentication
     const session = await requireAuth();
 
-    // 2. Check if user is admin
-    const roleCheck = await hasAnyRole(['admin']);
+    // 2. Check if user has admin or support role
+    const roleCheck = await hasAnyRole(['admin', 'support']);
     if (!roleCheck.success || !roleCheck.data) {
       return {
         success: false,
@@ -88,11 +89,14 @@ export async function updateCoverageAdmin(
       };
     }
 
-    // 6. Update profile with coverage
+    // 6. Update profile with coverage and auto-generate normalized coverage
+    const coverageNormalized = generateCoverageNormalized(data);
+
     await prisma.profile.update({
       where: { id: profileId },
       data: {
         coverage: data as any,
+        coverageNormalized,
         updatedAt: new Date(),
       },
     });

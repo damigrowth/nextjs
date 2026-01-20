@@ -1,13 +1,12 @@
 import { Suspense } from 'react';
-import {
-  SiteHeader,
-  AdminServiceTaxonomiesFilters,
-  AdminServiceTaxonomiesTableSection,
-  AdminServiceTaxonomiesTableSkeleton,
-  CreateServiceTaxonomyDialog,
-} from '@/components/admin';
+import { SiteHeader } from '@/components/admin/site-header';
+import { AdminServiceTaxonomiesFilters } from '@/components/admin/admin-service-taxonomies-filters';
+import { AdminServiceTaxonomiesTableSection } from '@/components/admin/admin-service-taxonomies-table-section';
+import { AdminServiceTaxonomiesTableSkeleton } from '@/components/admin/admin-service-taxonomies-table-skeleton';
+import { CreateServiceTaxonomyDialog } from '@/components/admin/create-service-taxonomy-dialog';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
+import { getServiceTaxonomies } from '@/lib/taxonomies';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +26,9 @@ export default async function ServiceTaxonomiesPage({
   searchParams,
 }: ServiceTaxonomiesPageProps) {
   const params = await searchParams;
+
+  // Prepare taxonomy data server-side to prevent client-side bundle bloat
+  const serviceTaxonomies = getServiceTaxonomies();
 
   return (
     <>
@@ -53,7 +55,10 @@ export default async function ServiceTaxonomiesPage({
               key={JSON.stringify(params)}
               fallback={<AdminServiceTaxonomiesTableSkeleton />}
             >
-              <AdminServiceTaxonomiesTableSection searchParams={params} />
+              <AdminServiceTaxonomiesTableSection
+                searchParams={params}
+                serviceTaxonomies={serviceTaxonomies}
+              />
             </Suspense>
           </div>
         </div>

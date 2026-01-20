@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 interface SectionHeaderProps {
   title: string;

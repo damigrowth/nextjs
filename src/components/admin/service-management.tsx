@@ -54,7 +54,6 @@ import {
 } from '@/actions/admin/services';
 
 import { AdminServicesDataTable } from './admin-services-data-table';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
 
 interface ServiceListResponse {
   services: AdminServiceWithRelations[];
@@ -101,7 +100,8 @@ export function ServiceManagement() {
   // Dialog states
   const [deleteServiceOpen, setDeleteServiceOpen] = useState(false);
   const [statusUpdateOpen, setStatusUpdateOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState<AdminServiceWithRelations | null>(null);
+  const [selectedService, setSelectedService] =
+    useState<AdminServiceWithRelations | null>(null);
   const [selectedStatus, setSelectedStatus] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
 
@@ -163,13 +163,7 @@ export function ServiceManagement() {
   useEffect(() => {
     loadServices();
     loadStats();
-  }, [
-    currentPage,
-    searchQuery,
-    statusFilter,
-    featuredFilter,
-    categoryFilter,
-  ]);
+  }, [currentPage, searchQuery, statusFilter, featuredFilter, categoryFilter]);
 
   // Action handlers
   const handleTogglePublished = async (serviceId: number) => {
@@ -204,7 +198,10 @@ export function ServiceManagement() {
     }
   };
 
-  const handleUpdateStatus = (service: AdminServiceWithRelations, status: string) => {
+  const handleUpdateStatus = (
+    service: AdminServiceWithRelations,
+    status: string,
+  ) => {
     setSelectedService(service);
     setSelectedStatus(status);
     setRejectionReason('');
@@ -283,8 +280,8 @@ export function ServiceManagement() {
     loadStats();
   };
 
-  // Get unique categories from pro taxonomies
-  const categories = Object.keys(proTaxonomies);
+  // TODO: Get unique categories from service taxonomies (currently unused - dead code)
+  const categories: string[] = [];
 
   return (
     <div className='space-y-6'>
@@ -342,9 +339,7 @@ export function ServiceManagement() {
           </CardHeader>
           <CardContent>
             <div className='text-2xl font-bold'>{stats.pending}</div>
-            <p className='text-xs text-muted-foreground'>
-              Awaiting review
-            </p>
+            <p className='text-xs text-muted-foreground'>Awaiting review</p>
           </CardContent>
         </Card>
 
@@ -373,7 +368,7 @@ export function ServiceManagement() {
             <div className='relative'>
               <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
               <Input
-                placeholder='Search services...'
+                placeholder='Αναζήτηση υπηρεσιών...'
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -447,9 +442,7 @@ export function ServiceManagement() {
       {/* Services Table */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            Services ({total})
-          </CardTitle>
+          <CardTitle>Services ({total})</CardTitle>
           <CardDescription>
             Manage service listings and approvals
           </CardDescription>
@@ -460,10 +453,7 @@ export function ServiceManagement() {
               <RefreshCw className='h-6 w-6 animate-spin text-muted-foreground' />
             </div>
           ) : (
-            <AdminServicesDataTable
-              data={services}
-              loading={loading}
-            />
+            <AdminServicesDataTable data={services} loading={loading} />
           )}
 
           {/* Pagination */}
@@ -559,7 +549,8 @@ export function ServiceManagement() {
             <DialogTitle>Delete Service</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete "{selectedService?.title}"? This
-              action cannot be undone and will also delete all associated reviews.
+              action cannot be undone and will also delete all associated
+              reviews.
             </DialogDescription>
           </DialogHeader>
           <Alert variant='destructive'>

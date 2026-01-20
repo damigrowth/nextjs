@@ -5,10 +5,11 @@ model User {
   name            String?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-  step            String        @default("EMAIL_VERIFICATION")
+  step            JourneyStep   @default(EMAIL_VERIFICATION)
   confirmed       Boolean       @default(false)
   blocked         Boolean       @default(false)
   username        String?       @unique // Keep in user for auth purposes
+  displayUsername String?       @unique // Better Auth username plugin requirement - original case version
   displayName     String? // Keep in user for auth purposes
   firstName       String? // Keep in user for menu/auth purposes
   lastName        String? // Keep in user for menu/auth purposes
@@ -16,8 +17,8 @@ model User {
   banExpires      DateTime?
   banReason       String?
   banned          Boolean       @default(false)
-  type            String        @default("user") // 'user', 'pro' - for registration flow UI starts as ''
-  role            String        @default("user")
+  type            UserType      @default(user)
+  role            UserRole      @default(user)
   provider        String        @default("email") // email or google
   lastUnreadEmailSentAt DateTime?   // Track when last unread messages email was sent (24h cooldown)
   accounts        Account[]
@@ -34,6 +35,7 @@ model User {
   savedServices   SavedService[]
   savedProfiles   SavedProfile[]
   emailBatches    EmailBatch[]
+  apiKeys         ApiKey[]       @relation("UserApiKeys")
 
   @@index([role])
   @@index([step])
@@ -46,11 +48,13 @@ model Profile {
   uid     String  @unique
   type    String?
   tagline String?
+  taglineNormalized String? // Normalized for accent-insensitive search
   bio     String?
+  bioNormalized String? // Normalized for accent-insensitive search
   website String?
 
   size        String?
-  skills      String[] // Array of skill IDs from taxonomy  
+  skills      String[] // Array of skill IDs from taxonomy
   speciality  String? // Speciality ID from taxonomy
   category    String? // Service category ID from taxonomy
   subcategory String? // Service subcategory ID from taxonomy
@@ -58,12 +62,14 @@ model Profile {
   // Fields moved from User table
   username    String? // Duplicated from User for profile purposes
   displayName String? // Duplicated from User for profile purposes
+  displayNameNormalized String? // Normalized for accent-insensitive search
   firstName   String? // Moved from User
   lastName    String? // Moved from User
   email       String? // Duplicated from User for profile purposes
   phone       String? // Moved from User
   /// [Coverage]
   coverage    Json? // Coverage options and location data
+  coverageNormalized String? // Normalized coverage location names for search
 
   // Media fields for onboarding form
   image     String? // Profile image URL
@@ -93,6 +99,8 @@ model Profile {
 
   // Rate limiting fields
   lastServiceDraft DateTime? // Last time user saved a service draft
+  lastServiceRefreshDate  DateTime? // Last date when any service was refreshed
+  dailyServiceRefreshCount Int @default(0) // Count of unique services refreshed today
 
   verified        Boolean              @default(false)
   featured        Boolean              @default(false)
@@ -115,8 +123,10 @@ model Profile {
   // OPTIMIZED INDEXES (Performance Optimization - ML15-25)
   // ============================================================================
 
-  // Keep existing essential index
+  // Keep existing essential indexes
   @@index([uid]) // User to profile lookup
+  @@index([displayNameNormalized]) // Search functionality
+  @@index([coverageNormalized]) // Coverage/location search functionality
 
   // NEW: Composite indexes for common query patterns (60-70% faster queries)
 
@@ -162,14 +172,24 @@ model ProfileVerification {
   @@map("verifications")
 }
 
+enum UserRole {
+  user
+  freelancer
+  company
+  admin
+  support
+  editor
+}
+
 enum UserType {
-  USER
-  FREELANCER
-  COMPANY
+  user
+  pro
 }
 
 enum JourneyStep {
   EMAIL_VERIFICATION
+  TYPE_SELECTION
+  OAUTH_SETUP
   ONBOARDING
   DASHBOARD
 }

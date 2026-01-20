@@ -52,7 +52,7 @@ export const data = {
     description:
       'Η Doulitsa σου προσφέρει την καλύτερη πλατφόρμα για να προβάλεις τις υπηρεσίες σου, να βρεις νέους πελάτες και να αυξήσεις τα κέρδη σου. Εγγραφή δωρεάν και εύκολη!',
     image:
-      'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750069606/Static/about-page-image-1_x5y8jm.webp',
+      'https://res.cloudinary.com/ddejhvzbf/image/upload/w_800,h_450,c_limit,q_auto:good,f_auto,dpr_auto/v1750069606/Static/about-page-image-1_x5y8jm.webp',
     features: [
       'Δωρεάν εγγραφή και δημιουργία προφίλ',
       'Άμεση πρόσβαση σε χιλιάδες πελάτες',
@@ -91,7 +91,7 @@ export const data = {
     subtitle:
       'Δες την διαδικασία για να προβληθείς στην Doulitsa. Είναι πολύ απλή!',
     image:
-      'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750070110/Static/about-page-image-3_bzuclt.webp',
+      'https://res.cloudinary.com/ddejhvzbf/image/upload/w_600,h_338,c_limit,q_auto:good,f_auto,dpr_auto/v1750070110/Static/about-page-image-3_bzuclt.webp',
     list: [
       {
         icon: 'flaticon-cv',
@@ -208,7 +208,7 @@ export const data = {
   ctaBanner: {
     title: 'Έτοιμοι <br class="d-none d-xl-block" /> για νέες συνεργασίες;',
     image:
-      'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750083636/Static/about-5_nmvx1j.webp',
+      'https://res.cloudinary.com/ddejhvzbf/image/upload/w_600,h_338,c_limit,q_auto:good,f_auto,dpr_auto/v1750083636/Static/about-5_nmvx1j.webp',
     features: [
       {
         title: 'Εμφανίσου στους κορυφαίους',

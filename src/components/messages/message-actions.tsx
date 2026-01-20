@@ -10,21 +10,17 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Reply, Edit, Copy, Forward, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Reply, Copy } from 'lucide-react';
 
 interface MessageActionsProps {
   messageId: string;
   isOwn: boolean;
   align?: 'start' | 'end';
   messageContent: string;
-  onEdit?: () => void;
-  onDelete?: () => void;
   onCopy?: () => void;
   onReply?: () => void;
-  onForward?: () => void;
 }
 
 export function MessageActions({
@@ -32,28 +28,16 @@ export function MessageActions({
   isOwn,
   align = 'end',
   messageContent,
-  onEdit,
-  onDelete,
   onCopy,
   onReply,
-  onForward,
 }: MessageActionsProps) {
   const handleMenuAction = (action: string) => {
     switch (action) {
       case 'reply':
         onReply?.();
         break;
-      case 'edit':
-        onEdit?.();
-        break;
       case 'copy':
         onCopy?.();
-        break;
-      case 'forward':
-        onForward?.();
-        break;
-      case 'delete':
-        onDelete?.();
         break;
       default:
         console.log('Unknown action:', action);
@@ -76,32 +60,10 @@ export function MessageActions({
           <Reply className='h-4 w-4' />
           Απάντηση
         </DropdownMenuItem>
-        {isOwn && (
-          <DropdownMenuItem onClick={() => handleMenuAction('edit')}>
-            <Edit className='h-4 w-4' />
-            Επεξεργασία
-          </DropdownMenuItem>
-        )}
         <DropdownMenuItem onClick={() => handleMenuAction('copy')}>
           <Copy className='h-4 w-4' />
           Αντιγραφή
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleMenuAction('forward')}>
-          <Forward className='h-4 w-4' />
-          Προώθηση
-        </DropdownMenuItem>
-        {isOwn && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => handleMenuAction('delete')}
-              className='text-destructive focus:text-destructive'
-            >
-              <Trash2 className='h-4 w-4' />
-              Διαγραφή
-            </DropdownMenuItem>
-          </>
-        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

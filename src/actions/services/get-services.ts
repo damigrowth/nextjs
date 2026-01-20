@@ -2,10 +2,15 @@
 
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 import { tags } from '@/constants/datasets/tags';
 // O(1) optimized taxonomy lookups - 99% faster than findById
-import { findServiceById, findLocationBySlugOrName } from '@/lib/taxonomies';
+import {
+  getServiceTaxonomies,
+  findServiceById,
+  resolveServiceHierarchy,
+  findLocationBySlugOrName,
+} from '@/lib/taxonomies';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 // Complex utilities - KEEP for hierarchy resolution, breadcrumbs, coverage transformation, and nested children lookups
 import {
   findById, // Generic utility for nested children lookups and tags (not yet optimized)
@@ -20,7 +25,6 @@ import {
   findSubdivisionBySlug,
 } from '@/lib/utils/datasets';
 import { locationOptions } from '@/constants/datasets/locations';
-import { normalizeTerm } from '@/lib/utils/text/normalize';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
 import { ServiceCacheKeys } from '@/lib/cache/keys';
@@ -53,12 +57,40 @@ export type ServiceFilters = Partial<
   sortBy?: ArchiveSortBy;
 };
 
+/**
+ * Build Prisma where clause for county coverage filtering
+ * Checks both coverage.county (single) and coverage.counties (array)
+ * Reusable function to avoid query duplication across multiple filter scenarios
+ */
+function buildCountyCoverageFilter(countyId: string) {
+  return {
+    OR: [
+      {
+        profile: {
+          coverage: {
+            path: ['county'],
+            equals: countyId,
+          },
+        },
+      },
+      {
+        profile: {
+          coverage: {
+            path: ['counties'],
+            array_contains: countyId,
+          },
+        },
+      },
+    ],
+  };
+}
+
 // Helper function to resolve category labels using the reusable utility
 function resolveCategoryLabels(
   service: Pick<Service, 'category' | 'subcategory' | 'subdivision'>,
 ) {
   return resolveTaxonomyHierarchy(
-    serviceTaxonomies,
+    getServiceTaxonomies(),
     service.category,
     service.subcategory,
     service.subdivision,
@@ -210,7 +242,7 @@ export async function getFeaturedServices(): Promise<
     // Prepare categories for tabs (server-side computation)
     const mainCategories = [
       { id: 'all', label: 'Όλες', slug: 'all' },
-      ...serviceTaxonomies.slice(0, 6).map((cat) => ({
+      ...getServiceTaxonomies().slice(0, 6).map((cat) => ({
         id: cat.id,
         label: cat.label,
         slug: cat.slug,
@@ -226,7 +258,7 @@ export async function getFeaturedServices(): Promise<
     mainCategories.slice(1).forEach((category) => {
       servicesByCategory[category.id] = transformedServices.filter(
         (service) => {
-          const serviceCat = serviceTaxonomies.find(
+          const serviceCat = getServiceTaxonomies().find(
             (cat) => cat.label === service.category,
           );
           return serviceCat?.id === category.id;
@@ -346,14 +378,6 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
   }>
 > {
   try {
-    // console.log('getServicesByFiltersInternal called with filters:', {
-    //   ...filters,
-    //   dbConnectionCheck: {
-    //     DATABASE_URL: process.env.DATABASE_URL ? 'Set' : 'Not set',
-    //     DIRECT_URL: process.env.DIRECT_URL ? 'Set' : 'Not set',
-    //   },
-    // });
-
     const page = filters.page || 1;
     const limit = filters.limit || 20;
     const offset = (page - 1) * limit;
@@ -374,78 +398,40 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
       whereClause.subdivision = filters.subdivision;
     }
 
-    // Add search filter for title, description, and tags using normalized fields
-    // This provides accent-insensitive search for Greek text
-    if (filters.search) {
+    // Add automatic location detection from search query
+    // Only applies if no explicit county filter is already set
+    if (filters.search && !filters.county) {
       const searchTerm = filters.search.trim();
       if (searchTerm.length >= 2) {
-        // Normalize search term to handle Greek accents (ά → α, etc.)
         const normalizedSearch = normalizeTerm(searchTerm);
 
-        // Find matching tags by searching in tag labels
-        const matchingTags = tags.filter((tag) => {
-          const normalizedLabel = normalizeTerm(tag.label);
-          return normalizedLabel
-            .toLowerCase()
-            .includes(normalizedSearch.toLowerCase());
-        });
-        const matchingTagIds = matchingTags.map((tag) => tag.id);
+        // Try to find a location match using normalized search term
+        // This handles both slugs and Greek names with/without accents
+        const locationMatch = findLocationBySlugOrName(normalizedSearch);
 
-        whereClause.OR = whereClause.OR || [];
-        const searchConditions: Array<
-          | { titleNormalized: { contains: string; mode: 'insensitive' } }
-          | { descriptionNormalized: { contains: string; mode: 'insensitive' } }
-          | { title: { contains: string; mode: 'insensitive' } }
-          | { description: { contains: string; mode: 'insensitive' } }
-          | { tags: { hasSome: string[] } }
-        > = [
-          // Search in normalized fields (for services with proper normalized data)
-          {
-            titleNormalized: {
-              contains: normalizedSearch,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            descriptionNormalized: {
-              contains: normalizedSearch,
-              mode: 'insensitive' as const,
-            },
-          },
-          // Fallback: Also search in original fields for services without normalized data
-          {
-            title: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            description: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-        ];
+        if (locationMatch) {
+          // Determine if matched location is a county or area
+          const isCounty = locationOptions.some(c => c.id === locationMatch.id);
 
-        // Add tag search condition if matching tags found
-        if (matchingTagIds.length > 0) {
-          searchConditions.push({
-            tags: {
-              hasSome: matchingTagIds,
-            },
-          });
-        }
+          let countyId: string | undefined;
+          if (isCounty) {
+            // Direct county match
+            countyId = locationMatch.id;
+          } else {
+            // Area match - find parent county
+            const parentCounty = locationOptions.find(county =>
+              county.children?.some(area => area.id === locationMatch.id)
+            );
+            if (parentCounty) {
+              countyId = parentCounty.id;
+            }
+          }
 
-        // If there's already an OR clause (from filters), combine them with AND
-        if (whereClause.OR.length > 0) {
-          const existingOR = whereClause.OR;
-          whereClause.AND = whereClause.AND || [];
-          whereClause.AND.push({
-            OR: searchConditions,
-          });
-          whereClause.OR = existingOR;
-        } else {
-          whereClause.OR = searchConditions;
+          // Apply county filter using reusable helper function
+          if (countyId) {
+            whereClause.AND = whereClause.AND || [];
+            whereClause.AND.push(buildCountyCoverageFilter(countyId));
+          }
         }
       }
     }
@@ -466,31 +452,10 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
               equals: true,
             },
           },
-          // County-based services (onbase OR onsite) - check both county and counties array
+          // County-based services (onbase OR onsite) with county coverage filter
           {
             AND: [
-              {
-                OR: [
-                  // Single county match
-                  {
-                    profile: {
-                      coverage: {
-                        path: ['county'],
-                        equals: countyId,
-                      },
-                    },
-                  },
-                  // Counties array match
-                  {
-                    profile: {
-                      coverage: {
-                        path: ['counties'],
-                        array_contains: countyId,
-                      },
-                    },
-                  },
-                ],
-              },
+              buildCountyCoverageFilter(countyId),
               {
                 OR: [
                   {
@@ -525,28 +490,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
 
       if (countyId) {
         whereClause.AND = [
-          {
-            OR: [
-              // Single county match
-              {
-                profile: {
-                  coverage: {
-                    path: ['county'],
-                    equals: countyId,
-                  },
-                },
-              },
-              // Counties array match
-              {
-                profile: {
-                  coverage: {
-                    path: ['counties'],
-                    array_contains: countyId,
-                  },
-                },
-              },
-            ],
-          },
+          buildCountyCoverageFilter(countyId),
           {
             OR: [
               {
@@ -567,14 +511,100 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
       }
     }
 
+    // Add search filter for title, description, coverage, and tags using normalized fields
+    // This provides accent-insensitive search for Greek text
+    // IMPORTANT: Process AFTER location filters so search can combine with existing OR clause
+    if (filters.search) {
+      const searchTerm = filters.search.trim();
+      if (searchTerm.length >= 2) {
+        // Normalize search term to handle Greek accents (ά → α, etc.)
+        const normalizedSearch = normalizeTerm(searchTerm);
+
+        // Find matching tags by searching in tag labels
+        const matchingTags = tags.filter((tag) => {
+          const normalizedLabel = normalizeTerm(tag.label);
+          return normalizedLabel
+            .toLowerCase()
+            .includes(normalizedSearch.toLowerCase());
+        });
+        const matchingTagIds = matchingTags.map((tag) => tag.id);
+
+        const searchConditions: Array<
+          | { titleNormalized: { contains: string; mode: 'insensitive' } }
+          | { descriptionNormalized: { contains: string; mode: 'insensitive' } }
+          | { title: { contains: string; mode: 'insensitive' } }
+          | { description: { contains: string; mode: 'insensitive' } }
+          | { profile: { coverageNormalized: { contains: string; mode: 'insensitive' } } }
+          | { tags: { hasSome: string[] } }
+        > = [
+          // Search in normalized fields (for services with proper normalized data)
+          {
+            titleNormalized: {
+              contains: normalizedSearch,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            descriptionNormalized: {
+              contains: normalizedSearch,
+              mode: 'insensitive' as const,
+            },
+          },
+          // Fallback: Also search in original fields for services without normalized data
+          {
+            title: {
+              contains: searchTerm,
+              mode: 'insensitive' as const,
+            },
+          },
+          {
+            description: {
+              contains: searchTerm,
+              mode: 'insensitive' as const,
+            },
+          },
+          // Search in coverage field for location names (like search suggestions)
+          {
+            profile: {
+              coverageNormalized: {
+                contains: normalizedSearch,
+                mode: 'insensitive' as const,
+              },
+            },
+          },
+        ];
+
+        // Add tag search condition if matching tags found
+        if (matchingTagIds.length > 0) {
+          searchConditions.push({
+            tags: {
+              hasSome: matchingTagIds,
+            },
+          });
+        }
+
+        // If there's already an OR clause (from filters), combine them with AND
+        if (whereClause.OR && whereClause.OR.length > 0) {
+          const existingOR = whereClause.OR;
+          whereClause.AND = whereClause.AND || [];
+          whereClause.AND.push({
+            OR: searchConditions,
+          });
+          whereClause.OR = existingOR;
+        } else {
+          whereClause.OR = searchConditions;
+        }
+      }
+    }
+
     // Build order by clause based on sortBy
     let orderBy: any[] = [];
     switch (filters.sortBy) {
       case 'recent':
-        orderBy = [{ updatedAt: 'desc' }];
+        orderBy = [{ sortDate: 'desc' }];
         break;
       case 'oldest':
-        orderBy = [{ updatedAt: 'asc' }];
+        orderBy = [{ sortDate: 'asc' }];
         break;
       case 'price_asc':
         orderBy = [{ price: 'asc' }];
@@ -590,7 +620,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
         break;
       case 'default':
       default:
-        // Default sort: featured first, then by rating and date, with media nulls last
+        // Default sort: featured first, then by rating and most recent activity
         orderBy = [
           { featured: 'desc' },
           { rating: 'desc' },
@@ -601,7 +631,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
               nulls: 'last',
             },
           },
-          { updatedAt: 'desc' },
+          { sortDate: 'desc' },
         ];
         break;
     }
@@ -629,6 +659,8 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
           locationOptions,
         );
 
+        const taxonomyLabels = resolveCategoryLabels(service);
+
         return {
           id: service.id,
           title: service.title,
@@ -638,7 +670,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
           reviewCount: service.reviewCount,
           media: service.media,
           type: service.type,
-          taxonomyLabels: resolveCategoryLabels(service),
+          taxonomyLabels,
           profile: {
             id: service.profile.id,
             displayName: service.profile.displayName,
@@ -681,10 +713,9 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
 }
 
 /**
- * Get services by filters with coverage filtering (cached)
- * Caches results for 5 minutes based on filter combination
+ * Get services by filters with coverage filtering
+ * Uses direct database queries with ISR caching at page level (matches profile pattern)
  */
-// OPTIMIZATION: Cached wrapper with hierarchical cache key and semantic TTL
 export async function getServicesByFilters(filters: ServiceFilters): Promise<
   ActionResult<{
     services: ArchiveServiceCardData[];
@@ -692,28 +723,7 @@ export async function getServicesByFilters(filters: ServiceFilters): Promise<
     hasMore: boolean;
   }>
 > {
-  const getCachedServices = unstable_cache(
-    () => getServicesByFiltersInternal(filters),
-    ServiceCacheKeys.archive({
-      category: filters.category,
-      subcategory: filters.subcategory,
-      subdivision: filters.subdivision,
-      status: filters.status,
-      featured: filters.search ? undefined : undefined, // Search queries don't use featured flag
-    }),
-    {
-      revalidate: getCacheTTL('SERVICE_ARCHIVE'), // 10 minutes - moderate frequency updates
-      tags: [
-        CACHE_TAGS.collections.services,
-        CACHE_TAGS.archive.servicesFiltered,
-        CACHE_TAGS.archive.all,
-        ...(filters.category ? [CACHE_TAGS.collections.servicesCategory(filters.category)] : []),
-        ...(filters.search ? [CACHE_TAGS.search.all] : []),
-      ],
-    },
-  );
-
-  return getCachedServices();
+  return getServicesByFiltersInternal(filters);
 }
 
 /**
@@ -810,30 +820,11 @@ export async function getServiceTaxonomyPaths(): Promise<
         }> = [];
 
         for (const group of sortedGroups) {
-          const categoryData = group.category
-            ? findById(serviceTaxonomies, group.category)
-            : null;
+          // O(1) hierarchical lookups - context-aware resolution (avoids ID collisions)
+          const { category: categoryData, subcategory: subcategoryData, subdivision: subdivisionData } =
+            resolveServiceHierarchy(group.category, group.subcategory, group.subdivision);
 
           if (!categoryData) continue; // Skip if category not found
-
-          let subcategoryData = null;
-          let subdivisionData = null;
-
-          // Find subcategory within the category's children
-          if (group.subcategory && categoryData.children) {
-            subcategoryData = findById(
-              categoryData.children,
-              group.subcategory,
-            );
-          }
-
-          // Find subdivision within the subcategory's children
-          if (group.subdivision && subcategoryData?.children) {
-            subdivisionData = findById(
-              subcategoryData.children,
-              group.subdivision,
-            );
-          }
 
           // Add the path with slugs
           paths.push({
@@ -937,7 +928,7 @@ export async function getServiceArchivePageData(params: {
     if (subcategorySlug) {
       // Use new utility to find by subcategory (no category required)
       const result = findTaxonomyBySubcategorySlug(
-        serviceTaxonomies,
+        getServiceTaxonomies(),
         subcategorySlug,
         subdivisionSlug,
       );
@@ -958,7 +949,7 @@ export async function getServiceArchivePageData(params: {
       };
     } else if (categorySlug) {
       // Find category by slug when only categorySlug is provided
-      const category = findBySlug(serviceTaxonomies, categorySlug);
+      const category = findBySlug(getServiceTaxonomies(), categorySlug);
       if (!category) {
         return {
           success: false,
@@ -1163,7 +1154,7 @@ export async function getServiceArchivePageData(params: {
     // Generate breadcrumbs using new route structure (no category)
     const breadcrumbData = {
       segments: getBreadcrumbsForNewRoutes(
-        serviceTaxonomies,
+        getServiceTaxonomies(),
         subcategorySlug,
         subdivisionSlug,
         {
@@ -1193,7 +1184,7 @@ export async function getServiceArchivePageData(params: {
 
       // Build a flat list of all subcategories that have services
       const allSubcategoriesWithServices: DatasetItem[] = [];
-      serviceTaxonomies.forEach((category) => {
+      getServiceTaxonomies().forEach((category) => {
         if (category.children) {
           category.children.forEach((subcat) => {
             if (availableSubcategories.has(subcat.slug)) {
@@ -1259,7 +1250,7 @@ export async function getServiceArchivePageData(params: {
     }
 
     // Filter categories to only show those with services
-    const categories = serviceTaxonomies
+    const categories = getServiceTaxonomies()
       .filter((cat) => availableCategories.has(cat.slug))
       .slice(0, 10);
 
@@ -1335,7 +1326,7 @@ export async function getServiceArchivePageData(params: {
         Object.entries(filteredSubdivisionCounts).forEach(
           ([subdivisionId, count]) => {
             // subdivisionId is the actual ID, not slug - need to find it in taxonomy
-            for (const category of serviceTaxonomies) {
+            for (const category of getServiceTaxonomies()) {
               if (!category.children) continue;
               for (const subcategory of category.children) {
                 if (!subcategory.children) continue;

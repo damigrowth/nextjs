@@ -1,8 +1,5 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -10,52 +7,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useAdminFilters } from '@/lib/hooks/admin/use-admin-filters';
+import { AdminSearchInput } from './admin-search-input';
 
 export function AdminServicesFilters() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const handleFilterChange = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (value && value !== 'all') {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
-
-    // Reset to page 1 when filters change
-    params.set('page', '1');
-
-    router.push(`/admin/services?${params.toString()}`);
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (e.target.value) {
-      params.set('search', e.target.value);
-    } else {
-      params.delete('search');
-    }
-
-    // Reset to page 1 when search changes
-    params.set('page', '1');
-
-    router.push(`/admin/services?${params.toString()}`);
-  };
+  const { searchValue, setSearchValue, handleFilterChange, searchParams } =
+    useAdminFilters('/admin/services');
 
   return (
     <div className='flex items-center gap-4'>
-      <div className='flex-1 relative'>
-        <Search className='absolute left-3 top-3 h-4 w-4 text-muted-foreground' />
-        <Input
-          placeholder='Search services...'
-          defaultValue={searchParams.get('search') || ''}
-          onChange={handleSearchChange}
-          className='pl-9'
-        />
-      </div>
+      <AdminSearchInput
+        placeholder='Αναζήτηση υπηρεσιών...'
+        value={searchValue}
+        onChange={(e) => setSearchValue(e.target.value)}
+      />
 
       {/* Status Filter */}
       <Select

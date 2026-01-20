@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { authClient } from '@/lib/auth/client';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 
 interface GoogleLoginButtonProps {
   children?: React.ReactNode;
@@ -17,7 +17,7 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
   disabled,
   className = '',
   onClick,
-  callbackURL = '/dashboard',
+  callbackURL = '/oauth-callback',
 }) => {
   const handleGoogleAuth = async () => {
     if (disabled) return;

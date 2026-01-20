@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Folder, FileText, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import {
   Command,
   CommandEmpty,
@@ -15,7 +15,8 @@ import {
   PopoverAnchor,
 } from '@/components/ui/popover';
 import type { SearchSuggestionsResult } from '@/lib/types/search';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
+import { FlaticonCategory } from '@/components/icon';
 
 export interface SearchDropdownProps {
   suggestions: SearchSuggestionsResult | null;
@@ -45,7 +46,7 @@ export function SearchDropdown({
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Command shouldFilter={false}>
-          <CommandList>
+          <CommandList id='search-suggestions-listbox' role='listbox'>
             {isLoading ? (
               <div className='flex items-center justify-center py-6'>
                 <Loader2 className='h-4 w-4 animate-spin text-muted-foreground' />
@@ -74,7 +75,7 @@ export function SearchDropdown({
                           href={taxonomy.url}
                           className='flex items-center gap-3 cursor-pointer'
                         >
-                          <Folder className='h-4 w-4 text-muted-foreground' />
+                          <FlaticonCategory size={16} className='text-muted-foreground' />
                           <div className='flex-1 min-w-0'>
                             <p className='text-sm font-medium truncate'>
                               {taxonomy.label}
@@ -106,7 +107,6 @@ export function SearchDropdown({
                           href={service.url}
                           className='flex items-center gap-3 cursor-pointer'
                         >
-                          <FileText className='h-4 w-4 text-muted-foreground' />
                           <div className='flex-1 min-w-0'>
                             <p className='text-sm font-medium truncate'>
                               {service.title}

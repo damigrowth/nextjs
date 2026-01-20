@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ArchiveLayout, ArchiveProfileCard } from '@/components/archives';
 import { getProfileArchivePageData } from '@/actions/profiles/get-profiles';
 import { getDirectoryCategoryMetadata } from '@/lib/seo/pages';
+import { ProfilesSchema } from '@/lib/seo/schema';
 
 // ISR Configuration
 export const revalidate = 3600; // 1 hour
@@ -83,8 +84,20 @@ export default async function DirectoryCategoryPage({
   const { profiles, total, taxonomyData, breadcrumbData, counties, filters, availableSubcategories } =
     result.data;
 
+  // Determine type based on filters or default to 'freelancer'
+  const profileType = (filters.type as 'company' | 'freelancer') || 'freelancer';
+
   return (
-    <ArchiveLayout
+    <>
+      <ProfilesSchema
+        type={profileType}
+        profiles={profiles}
+        taxonomies={{
+          category: taxonomyData.currentCategory,
+          subcategory: taxonomyData.currentSubcategory,
+        }}
+      />
+      <ArchiveLayout
       archiveType='directory'
       category={params_.category}
       initialFilters={filters}
@@ -115,5 +128,6 @@ export default async function DirectoryCategoryPage({
         )}
       </div>
     </ArchiveLayout>
+    </>
   );
 }

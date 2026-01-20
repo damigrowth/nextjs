@@ -3,6 +3,9 @@ import { getOnboardingMetadata } from '@/lib/seo/pages';
 import { getCurrentUser } from '@/actions/auth/server';
 import { OnboardingForm } from '@/components';
 import { OnboardingGuard } from '@/components/guards/onboarding-guard';
+import { getProTaxonomies } from '@/lib/taxonomies';
+import type { DatasetOption } from '@/lib/types/datasets';
+import { locationOptions } from '@/constants/datasets/locations';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +23,9 @@ export default async function page() {
   }
 
   const { user } = userResult.data;
+
+  // Prepare taxonomy and location data server-side to prevent client-side bundle bloat
+  const proTaxonomies = getProTaxonomies();
 
   return (
     <section className='mt-20 pt-20 pb-40 bg-gray-50'>
@@ -43,7 +49,11 @@ export default async function page() {
           <div className='flex justify-center'>
             <div className='xl:w-3/5 w-full max-w-3xl'>
               <div className='relative bg-white p-12 sm:p-8 rounded-xl shadow-lg border border-gray-300'>
-                <OnboardingForm user={user} />
+                <OnboardingForm
+                  user={user}
+                  proTaxonomies={proTaxonomies as DatasetOption[]}
+                  locationOptions={locationOptions}
+                />
               </div>
             </div>
           </div>

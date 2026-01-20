@@ -1,20 +1,23 @@
 /**
  * CONSOLIDATED MEDIA UTILITIES
- * 
+ *
  * Universal media utilities for handling all media types across the application:
  * - File validation and type detection
  * - Cloudinary resource handling
  * - Legacy Strapi media support
  * - Cross-browser compatibility
  * - Modern TypeScript implementation
- * 
+ *
  * Replaces:
  * - /lib/utils/validation/media.js
  * - /lib/utils/misc/media.js
  * - /lib/utils/misc/image.ts
  */
 
-import { CloudinaryResource, isCloudinaryResource } from '@/lib/types/cloudinary';
+import {
+  CloudinaryResource,
+  isCloudinaryResource,
+} from '@/lib/types/cloudinary';
 
 // =============================================
 // SUPPORTED FORMATS CONFIGURATION
@@ -23,43 +26,55 @@ import { CloudinaryResource, isCloudinaryResource } from '@/lib/types/cloudinary
 export const SUPPORTED_FORMATS = {
   // Profile picture formats - restricted for better performance
   profileImage: {
-    mimeTypes: [
-      'image/jpeg',
-      'image/jpg', 
-      'image/png'
-    ],
+    mimeTypes: ['image/jpeg', 'image/jpg', 'image/png'],
     extensions: ['jpg', 'jpeg', 'png'],
-    displayFormats: ['JPEG', 'PNG']
+    displayFormats: ['JPEG', 'PNG'],
   },
-  
+
   // Gallery image formats - comprehensive
   image: {
     mimeTypes: [
       'image/jpeg',
-      'image/jpg', 
+      'image/jpg',
       'image/png',
       'image/gif',
       'image/webp',
       'image/avif',
       'image/svg+xml',
       'image/tiff',
-      'image/x-icon'
+      'image/x-icon',
     ],
-    extensions: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'svg', 'tiff', 'tif', 'ico'],
-    displayFormats: ['JPEG', 'PNG', 'GIF', 'WebP', 'AVIF', 'SVG', 'TIFF', 'ICO']
+    extensions: [
+      'jpg',
+      'jpeg',
+      'png',
+      'gif',
+      'webp',
+      'avif',
+      'svg',
+      'tiff',
+      'tif',
+      'ico',
+    ],
+    displayFormats: [
+      'JPEG',
+      'PNG',
+      'GIF',
+      'WebP',
+      'AVIF',
+      'SVG',
+      'TIFF',
+      'ICO',
+    ],
   },
-  
+
   // Video formats - web-compatible only
   video: {
-    mimeTypes: [
-      'video/mp4',
-      'video/webm',
-      'video/ogg'
-    ],
+    mimeTypes: ['video/mp4', 'video/webm', 'video/ogg'],
     extensions: ['mp4', 'webm', 'ogg'],
-    displayFormats: ['MP4', 'WebM', 'OGG']
+    displayFormats: ['MP4', 'WebM', 'OGG'],
   },
-  
+
   // Audio formats - web-compatible only
   audio: {
     mimeTypes: [
@@ -68,11 +83,11 @@ export const SUPPORTED_FORMATS = {
       'audio/wav',
       'audio/wave',
       'audio/ogg',
-      'audio/webm'
+      'audio/webm',
     ],
     extensions: ['mp3', 'wav', 'ogg', 'webm'],
-    displayFormats: ['MP3', 'WAV', 'OGG', 'WebM']
-  }
+    displayFormats: ['MP3', 'WAV', 'OGG', 'WebM'],
+  },
 };
 
 export type MediaType = 'image' | 'video' | 'audio' | 'unknown';
@@ -85,55 +100,76 @@ export type MediaFormat = keyof typeof SUPPORTED_FORMATS;
 /**
  * Advanced media type detection with cross-browser compatibility
  */
-export const getMediaType = (input: string | File, isProfileImage = false): MediaType => {
+export const getMediaType = (
+  input: string | File,
+  isProfileImage = false,
+): MediaType => {
   if (!input) return 'unknown';
-  
+
   const fileType = input instanceof File ? input.type : input;
   const fileName = input instanceof File ? input.name : input;
-  
+
   // Normalize for cross-browser compatibility
   const normalizedType = fileType.toLowerCase();
-  
+
   // Check MIME types first
   if (normalizedType.includes('/')) {
     if (normalizedType.startsWith('image/')) {
-      const formatToCheck = isProfileImage ? SUPPORTED_FORMATS.profileImage : SUPPORTED_FORMATS.image;
-      if (formatToCheck.mimeTypes.some(mime => normalizedType === mime.toLowerCase())) {
+      const formatToCheck = isProfileImage
+        ? SUPPORTED_FORMATS.profileImage
+        : SUPPORTED_FORMATS.image;
+      if (
+        formatToCheck.mimeTypes.some(
+          (mime) => normalizedType === mime.toLowerCase(),
+        )
+      ) {
         return 'image';
       }
     }
-    
+
     if (normalizedType.startsWith('video/')) {
-      if (SUPPORTED_FORMATS.video.mimeTypes.some(mime => normalizedType === mime.toLowerCase())) {
+      if (
+        SUPPORTED_FORMATS.video.mimeTypes.some(
+          (mime) => normalizedType === mime.toLowerCase(),
+        )
+      ) {
         return 'video';
       }
     }
-    
+
     if (normalizedType.startsWith('audio/')) {
-      if (SUPPORTED_FORMATS.audio.mimeTypes.some(mime => normalizedType === mime.toLowerCase())) {
+      if (
+        SUPPORTED_FORMATS.audio.mimeTypes.some(
+          (mime) => normalizedType === mime.toLowerCase(),
+        )
+      ) {
         return 'audio';
       }
     }
   }
-  
+
   // Fallback: check by file extension
   const extension = fileName.toLowerCase().split('.').pop();
   if (extension) {
-    const formatToCheck = isProfileImage ? SUPPORTED_FORMATS.profileImage : SUPPORTED_FORMATS.image;
+    const formatToCheck = isProfileImage
+      ? SUPPORTED_FORMATS.profileImage
+      : SUPPORTED_FORMATS.image;
     if (formatToCheck.extensions.includes(extension)) return 'image';
     if (SUPPORTED_FORMATS.video.extensions.includes(extension)) return 'video';
     if (SUPPORTED_FORMATS.audio.extensions.includes(extension)) return 'audio';
   }
-  
+
   return 'unknown';
 };
 
 /**
  * Get media type from CloudinaryResource
  */
-export const getCloudinaryMediaType = (resource: CloudinaryResource): MediaType => {
+export const getCloudinaryMediaType = (
+  resource: CloudinaryResource,
+): MediaType => {
   if (!resource) return 'unknown';
-  
+
   // Use Cloudinary's resource_type if available
   if (resource.resource_type) {
     if (resource.resource_type === 'image') return 'image';
@@ -143,7 +179,7 @@ export const getCloudinaryMediaType = (resource: CloudinaryResource): MediaType 
       return getMediaTypeFromUrl(resource.secure_url);
     }
   }
-  
+
   // Fallback to URL-based detection
   return getMediaTypeFromUrl(resource.secure_url);
 };
@@ -153,26 +189,32 @@ export const getCloudinaryMediaType = (resource: CloudinaryResource): MediaType 
  */
 export const getMediaTypeFromUrl = (url: string): MediaType => {
   if (!url) return 'unknown';
-  
+
   try {
     const urlPath = new URL(url).pathname;
     const extension = urlPath.toLowerCase().split('.').pop();
-    
+
     if (extension) {
-      if (SUPPORTED_FORMATS.image.extensions.includes(extension)) return 'image';
-      if (SUPPORTED_FORMATS.video.extensions.includes(extension)) return 'video';
-      if (SUPPORTED_FORMATS.audio.extensions.includes(extension)) return 'audio';
+      if (SUPPORTED_FORMATS.image.extensions.includes(extension))
+        return 'image';
+      if (SUPPORTED_FORMATS.video.extensions.includes(extension))
+        return 'video';
+      if (SUPPORTED_FORMATS.audio.extensions.includes(extension))
+        return 'audio';
     }
   } catch {
     // If URL parsing fails, try simple extension detection
     const extension = url.toLowerCase().split('.').pop();
     if (extension) {
-      if (SUPPORTED_FORMATS.image.extensions.includes(extension)) return 'image';
-      if (SUPPORTED_FORMATS.video.extensions.includes(extension)) return 'video';
-      if (SUPPORTED_FORMATS.audio.extensions.includes(extension)) return 'audio';
+      if (SUPPORTED_FORMATS.image.extensions.includes(extension))
+        return 'image';
+      if (SUPPORTED_FORMATS.video.extensions.includes(extension))
+        return 'video';
+      if (SUPPORTED_FORMATS.audio.extensions.includes(extension))
+        return 'audio';
     }
   }
-  
+
   return 'unknown';
 };
 
@@ -192,64 +234,70 @@ export interface ValidationResult {
 export const validateFileType = (
   file: File | string,
   allowedTypes: MediaType[] = ['image', 'video', 'audio'],
-  isProfileImage = false
+  isProfileImage = false,
 ): ValidationResult => {
   const detectedType = getMediaType(file, isProfileImage);
-  
+
   if (detectedType === 'unknown') {
     return {
       isValid: false,
       type: 'unknown',
-      error: 'Unsupported file type. Please choose a different file.'
+      error:
+        'Μη έγκυρος τύπος αρχείου. Παρακαλώ επιλέξτε ένα έγκυρο είδος αρχείου.',
     };
   }
-  
+
   if (!allowedTypes.includes(detectedType)) {
-    const allowedFormats = allowedTypes.map(type => {
-      if (type === 'image' && isProfileImage) {
-        return SUPPORTED_FORMATS.profileImage.displayFormats.join(', ');
-      }
-      return SUPPORTED_FORMATS[type].displayFormats.join(', ');
-    }).join(', ');
-    
+    const allowedFormats = allowedTypes
+      .map((type) => {
+        if (type === 'image' && isProfileImage) {
+          return SUPPORTED_FORMATS.profileImage.displayFormats.join(', ');
+        }
+        return SUPPORTED_FORMATS[type].displayFormats.join(', ');
+      })
+      .join(', ');
+
     return {
       isValid: false,
       type: detectedType,
-      error: `Only ${allowedFormats} files are allowed.`
+      error: `Only ${allowedFormats} files are allowed.`,
     };
   }
-  
+
   return {
     isValid: true,
-    type: detectedType
+    type: detectedType,
   };
 };
 
 /**
  * Validate file size
  */
-export const validateFileSize = (file: File, maxSizeMB = 15): ValidationResult => {
+export const validateFileSize = (
+  file: File,
+  maxSizeMB = 15,
+): ValidationResult => {
   if (!file || !(file instanceof File)) {
     return {
       isValid: false,
       type: 'unknown',
-      error: 'Invalid file'
+      error: 'Invalid file',
     };
   }
-  
+
   const fileSizeMB = file.size / (1024 * 1024);
-  
+
   if (fileSizeMB > maxSizeMB) {
     return {
       isValid: false,
       type: getMediaType(file),
-      error: `File size must be less than ${maxSizeMB}MB`
+      error: `File size must be less than ${maxSizeMB}MB`,
     };
   }
-  
+
   return {
     isValid: true,
-    type: getMediaType(file)
+    type: getMediaType(file),
   };
 };
 
@@ -262,29 +310,29 @@ export const validateFile = (
     allowedTypes?: MediaType[];
     maxSizeMB?: number;
     isProfileImage?: boolean;
-  } = {}
+  } = {},
 ): ValidationResult => {
   const {
     allowedTypes = ['image', 'video', 'audio'],
     maxSizeMB = 15,
-    isProfileImage = false
+    isProfileImage = false,
   } = options;
-  
+
   // Check file type
   const typeValidation = validateFileType(file, allowedTypes, isProfileImage);
   if (!typeValidation.isValid) {
     return typeValidation;
   }
-  
+
   // Check file size
   const sizeValidation = validateFileSize(file, maxSizeMB);
   if (!sizeValidation.isValid) {
     return sizeValidation;
   }
-  
+
   return {
     isValid: true,
-    type: typeValidation.type
+    type: typeValidation.type,
   };
 };
 
@@ -297,18 +345,20 @@ export const validateFile = (
  */
 export const generateAcceptString = (
   types: MediaType[] = ['image', 'video', 'audio'],
-  isProfileImage = false
+  isProfileImage = false,
 ): string => {
   const acceptedMimeTypes: string[] = [];
-  
-  types.forEach(type => {
+
+  types.forEach((type) => {
     if (type === 'image' && isProfileImage) {
       acceptedMimeTypes.push(...SUPPORTED_FORMATS.profileImage.mimeTypes);
     } else if (SUPPORTED_FORMATS[type as MediaFormat]) {
-      acceptedMimeTypes.push(...SUPPORTED_FORMATS[type as MediaFormat].mimeTypes);
+      acceptedMimeTypes.push(
+        ...SUPPORTED_FORMATS[type as MediaFormat].mimeTypes,
+      );
     }
   });
-  
+
   return acceptedMimeTypes.join(',');
 };
 
@@ -327,10 +377,10 @@ export const getOptimizedCloudinaryUrl = (
     quality?: number;
     format?: 'webp' | 'avif' | 'jpg' | 'png';
     crop?: 'fill' | 'fit' | 'scale' | 'crop';
-  } = {}
+  } = {},
 ): string => {
   if (!resource?.secure_url) return '';
-  
+
   // For Cloudinary URLs, we can add transformations
   if (resource.secure_url.includes('cloudinary.com')) {
     const {
@@ -338,28 +388,30 @@ export const getOptimizedCloudinaryUrl = (
       height,
       quality = 'auto',
       format = 'auto',
-      crop = 'fill'
+      crop = 'fill',
     } = options;
-    
+
     const transformations: string[] = [];
-    
+
     if (width || height) {
       const dimensions = [
         width && `w_${width}`,
         height && `h_${height}`,
-        `c_${crop}`
-      ].filter(Boolean).join(',');
+        `c_${crop}`,
+      ]
+        .filter(Boolean)
+        .join(',');
       transformations.push(dimensions);
     }
-    
+
     if (quality) {
       transformations.push(`q_${quality}`);
     }
-    
+
     if (format) {
       transformations.push(`f_${format}`);
     }
-    
+
     if (transformations.length > 0) {
       // Insert transformations into Cloudinary URL
       const urlParts = resource.secure_url.split('/upload/');
@@ -368,26 +420,28 @@ export const getOptimizedCloudinaryUrl = (
       }
     }
   }
-  
+
   return resource.secure_url;
 };
 
 /**
  * Get display name from CloudinaryResource
  */
-export const getResourceDisplayName = (resource: CloudinaryResource): string => {
+export const getResourceDisplayName = (
+  resource: CloudinaryResource,
+): string => {
   if (!resource) return '';
-  
+
   // Try original filename first
   if (resource.original_filename) {
     return resource.original_filename;
   }
-  
+
   // Fallback to public_id
   if (resource.public_id) {
     return resource.public_id.split('/').pop() || resource.public_id;
   }
-  
+
   return 'Unnamed file';
 };
 
@@ -396,11 +450,11 @@ export const getResourceDisplayName = (resource: CloudinaryResource): string => 
  */
 export const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 Bytes';
-  
+
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 };
 
@@ -410,12 +464,12 @@ export const formatFileSize = (bytes: number): string => {
  */
 export const convertImageData = (imageData: any): CloudinaryResource | null => {
   if (!imageData) return null;
-  
+
   // If it's already a valid CloudinaryResource, return it
   if (isCloudinaryResource(imageData)) {
     return imageData;
   }
-  
+
   // If it's a string URL, try to convert it
   if (typeof imageData === 'string') {
     const publicId = imageData.split('/').pop()?.split('.')[0] || '';
@@ -427,9 +481,13 @@ export const convertImageData = (imageData: any): CloudinaryResource | null => {
       url: imageData,
     };
   }
-  
+
   // If it's an object with the right properties, convert it
-  if (typeof imageData === 'object' && imageData.public_id && imageData.secure_url) {
+  if (
+    typeof imageData === 'object' &&
+    imageData.public_id &&
+    imageData.secure_url
+  ) {
     return {
       public_id: imageData.public_id,
       secure_url: imageData.secure_url,
@@ -443,10 +501,10 @@ export const convertImageData = (imageData: any): CloudinaryResource | null => {
       folder: imageData.folder,
       original_filename: imageData.original_filename,
       // Spread any other properties
-      ...imageData
+      ...imageData,
     } as CloudinaryResource;
   }
-  
+
   return null;
 };
 
@@ -464,7 +522,7 @@ export const getUserProfileImageUrl = (
     quality?: number;
     format?: 'webp' | 'avif' | 'jpg' | 'png';
     crop?: 'fill' | 'fit' | 'scale' | 'crop';
-  } = {}
+  } = {},
 ): string | null => {
   if (!userImage) return null;
 
@@ -478,7 +536,11 @@ export const getUserProfileImageUrl = (
     // Legacy fallback: try parsing as JSON (for backward compatibility during migration)
     try {
       const cloudinaryData = JSON.parse(userImage);
-      if (cloudinaryData && typeof cloudinaryData === 'object' && cloudinaryData.secure_url) {
+      if (
+        cloudinaryData &&
+        typeof cloudinaryData === 'object' &&
+        cloudinaryData.secure_url
+      ) {
         return getOptimizedCloudinaryUrl(cloudinaryData, options);
       }
     } catch {
@@ -495,7 +557,6 @@ export const getUserProfileImageUrl = (
   return null;
 };
 
-
 // =============================================
 // LEGACY SUPPORT (STRAPI)
 // =============================================
@@ -506,18 +567,18 @@ export const getUserProfileImageUrl = (
  */
 export const getStrapiMediaType = (mediaItem: any): MediaType => {
   if (!mediaItem?.attributes) return 'unknown';
-  
+
   const { mime, url } = mediaItem.attributes;
-  
+
   if (mime) {
     const type = getMediaType(mime);
     if (type !== 'unknown') return type;
   }
-  
+
   if (url) {
     return getMediaTypeFromUrl(url);
   }
-  
+
   return 'unknown';
 };
 
@@ -525,16 +586,19 @@ export const getStrapiMediaType = (mediaItem: any): MediaType => {
  * Legacy Strapi image utility
  * @deprecated Use CloudinaryResource instead
  */
-export const getStrapiImageUrl = (imageData: any, size = 'thumbnail'): string | null => {
+export const getStrapiImageUrl = (
+  imageData: any,
+  size = 'thumbnail',
+): string | null => {
   if (!imageData?.data?.attributes) return null;
-  
+
   const attributes = imageData.data.attributes;
-  
+
   // Try to get specific format
   if (attributes.formats?.[size]) {
     return attributes.formats[size].url;
   }
-  
+
   // Fallback to original
   return attributes.url || null;
 };
@@ -559,7 +623,9 @@ export interface PendingCloudinaryResource extends CloudinaryResource {
   _pending: boolean;
 }
 
-export type CloudinaryResourceOrPending = CloudinaryResource | PendingCloudinaryResource;
+export type CloudinaryResourceOrPending =
+  | CloudinaryResource
+  | PendingCloudinaryResource;
 
 export interface FileValidationOptions {
   allowedTypes: MediaType[];
@@ -577,7 +643,9 @@ export const generateFileId = (file: File): string => {
 /**
  * Create a pending CloudinaryResource from a queued file
  */
-export const createPendingResource = (file: QueuedFile): PendingCloudinaryResource => {
+export const createPendingResource = (
+  file: QueuedFile,
+): PendingCloudinaryResource => {
   return {
     public_id: `pending_${file.id}`,
     secure_url: file.preview,
@@ -601,7 +669,9 @@ export const createPendingResource = (file: QueuedFile): PendingCloudinaryResour
 /**
  * Detect media type from CloudinaryResource or PendingResource
  */
-export const detectMediaType = (resource: CloudinaryResourceOrPending): MediaType => {
+export const detectMediaType = (
+  resource: CloudinaryResourceOrPending,
+): MediaType => {
   if (!resource) return 'image';
 
   // For pending resources, use the resource_type we set
@@ -639,9 +709,13 @@ export const detectMediaType = (resource: CloudinaryResourceOrPending): MediaTyp
 /**
  * Check if resource is a pending resource
  */
-export const isPendingResource = (resource: CloudinaryResourceOrPending): resource is PendingCloudinaryResource => {
-  return (resource as PendingCloudinaryResource)._pending === true || 
-         resource.public_id?.startsWith('pending_') === true;
+export const isPendingResource = (
+  resource: CloudinaryResourceOrPending,
+): resource is PendingCloudinaryResource => {
+  return (
+    (resource as PendingCloudinaryResource)._pending === true ||
+    resource.public_id?.startsWith('pending_') === true
+  );
 };
 
 /**
@@ -650,7 +724,7 @@ export const isPendingResource = (resource: CloudinaryResourceOrPending): resour
 export const isFileExists = (
   file: File,
   queuedFiles: QueuedFile[],
-  resources: CloudinaryResourceOrPending[]
+  resources: CloudinaryResourceOrPending[],
 ): boolean => {
   const fileId = generateFileId(file);
   const existsInQueue = queuedFiles.some((qf) => qf.id === fileId);
@@ -673,7 +747,7 @@ export const processSelectedFiles = (
     isProfileImage: boolean;
     maxFiles: number;
     multiple: boolean;
-  }
+  },
 ): { newFiles: QueuedFile[]; error: string | null } => {
   const newFiles: QueuedFile[] = [];
   let error: string | null = null;
@@ -713,8 +787,15 @@ export const processSelectedFiles = (
   });
 
   // Respect maxFiles limit
-  const filesToAdd = options.multiple 
-    ? newFiles.slice(0, Math.max(0, options.maxFiles - (existingQueuedFiles.length + existingResources.length)))
+  const filesToAdd = options.multiple
+    ? newFiles.slice(
+        0,
+        Math.max(
+          0,
+          options.maxFiles -
+            (existingQueuedFiles.length + existingResources.length),
+        ),
+      )
     : newFiles.slice(0, 1);
 
   return { newFiles: filesToAdd, error };
@@ -734,7 +815,9 @@ export const cleanupPreviewUrls = (files: QueuedFile[]): void => {
 /**
  * Filter out pending resources from array
  */
-export const filterPendingResources = (resources: CloudinaryResourceOrPending[]): CloudinaryResource[] => {
+export const filterPendingResources = (
+  resources: CloudinaryResourceOrPending[],
+): CloudinaryResource[] => {
   return resources.filter((r) => !isPendingResource(r)) as CloudinaryResource[];
 };
 
@@ -748,7 +831,7 @@ export const generateUploadFormData = async (
     folder: string;
     signed: boolean;
     signatureEndpoint?: string;
-  }
+  },
 ): Promise<FormData> => {
   const formData = new FormData();
   formData.append('file', file);
@@ -776,7 +859,7 @@ export const generateUploadFormData = async (
     const signatureData = await signatureResponse.json();
     formData.append('timestamp', timestamp.toString());
     formData.append('signature', signatureData.signature);
-    
+
     if (process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY) {
       formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY);
     }
@@ -796,7 +879,7 @@ export const uploadFileToCloudinary = async (
     signed: boolean;
     signatureEndpoint?: string;
     resourceType: 'auto' | 'image' | 'video';
-  }
+  },
 ): Promise<CloudinaryResource> => {
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   if (!cloudName) {
@@ -827,7 +910,7 @@ export const uploadFileToCloudinary = async (
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(
-      errorData.error?.message || `Upload failed for ${file.name}`,
+      errorData.error?.message || `Αποτυχία μεταφόρτωσης για το ${file.name}`,
     );
   }
 
@@ -850,24 +933,24 @@ export default {
   getMediaType,
   getCloudinaryMediaType,
   getMediaTypeFromUrl,
-  
+
   // Validation
   validateFileType,
   validateFileSize,
   validateFile,
-  
+
   // HTML utilities
   generateAcceptString,
-  
+
   // Cloudinary utilities
   getOptimizedCloudinaryUrl,
   getResourceDisplayName,
   convertImageData,
   getUserProfileImageUrl,
-  
+
   // Helper utilities
   formatFileSize,
-  
+
   // Upload helpers
   generateFileId,
   createPendingResource,
@@ -879,11 +962,11 @@ export default {
   filterPendingResources,
   generateUploadFormData,
   uploadFileToCloudinary,
-  
+
   // Legacy support
   getStrapiMediaType,
   getStrapiImageUrl,
-  
+
   // Constants
-  SUPPORTED_FORMATS
+  SUPPORTED_FORMATS,
 };

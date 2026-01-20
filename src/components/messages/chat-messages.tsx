@@ -5,16 +5,15 @@
 
 'use client';
 
-import { RefObject, useState, useEffect, useRef } from 'react';
+import { RefObject } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 import { MessageActions } from './message-actions';
-import { MessageDeleteDialog } from './message-delete-dialog';
 import { MessageReplyQuote } from './message-reply-quote';
 import { ReactionPicker } from './reaction-picker';
 import { ChatMessageItem } from '@/lib/types/messages';
-import { ReplyToMessage, EditingMessage } from './message-input';
+import { ReplyToMessage } from './message-input';
 import { formatMessageTime, formatChatDateDivider } from '@/lib/utils/messages';
 import { toast } from 'sonner';
 import { toggleReaction } from '@/actions/messages/reactions';
@@ -24,7 +23,6 @@ interface ChatMessagesProps {
   scrollRef?: RefObject<HTMLDivElement>;
   currentUserId: string;
   onReply?: (replyTo: ReplyToMessage) => void;
-  onEdit?: (editing: EditingMessage) => void;
   loadTriggerRef?: RefObject<HTMLDivElement>;
   isLoadingOlder?: boolean;
   hasMore?: boolean;
@@ -35,21 +33,10 @@ export function ChatMessages({
   scrollRef,
   currentUserId,
   onReply,
-  onEdit,
   loadTriggerRef,
   isLoadingOlder,
   hasMore,
 }: ChatMessagesProps) {
-  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(
-    null,
-  );
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
   const handleReply = (message: ChatMessageItem) => {
     if (onReply) {
       onReply({
@@ -61,15 +48,6 @@ export function ChatMessages({
           message.author?.lastName ||
           'Unknown User',
         isOwn: message.isOwn,
-      });
-    }
-  };
-
-  const handleEdit = (message: ChatMessageItem) => {
-    if (onEdit) {
-      onEdit({
-        id: message.id,
-        content: message.content,
       });
     }
   };
@@ -186,8 +164,12 @@ export function ChatMessages({
   };
 
   return (
-    <ScrollArea className='flex-1 pl-0 p-4 pr-0' ref={scrollRef}>
-      <div>
+    <ScrollArea
+      className='flex-1 pl-0 p-0 sm:p-2'
+      scrollBarClassName='hidden'
+      ref={scrollRef}
+    >
+      <div className='pb-4'>
         {/* Load trigger for infinite scroll */}
         {hasMore && (
           <div ref={loadTriggerRef} className='flex justify-center py-4'>
@@ -221,8 +203,6 @@ export function ChatMessages({
                   messageId={message.id}
                   isOwn={true}
                   align='end'
-                  onEdit={() => handleEdit(message)}
-                  onDelete={() => setDeletingMessageId(message.id)}
                   onCopy={() => handleCopyMessage(message.content)}
                   onReply={() => handleReply(message)}
                   messageContent={message.content}
@@ -332,15 +312,7 @@ export function ChatMessages({
             </div>
           </div>
         ))}
-        {/* Invisible element to scroll to */}
-        <div ref={messagesEndRef} />
       </div>
-      <MessageDeleteDialog
-        messageId={deletingMessageId || ''}
-        userId={currentUserId}
-        open={!!deletingMessageId}
-        onOpenChange={(open) => !open && setDeletingMessageId(null)}
-      />
     </ScrollArea>
   );
 }

@@ -1,6 +1,7 @@
-import { getCurrentUser } from '@/actions/auth/server';
+import { requirePermission, getSession } from '@/actions/auth/server';
 import { getUser } from '@/actions/admin';
 import { redirect, notFound } from 'next/navigation';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, ExternalLink, Shield, UserCog } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,9 +11,11 @@ import {
   EditUserStatusForm,
   EditUserBanForm,
   RevokeSessionsForm,
+  DeleteUserForm,
 } from '@/components/admin/forms';
-import { SiteHeader } from '@/components/admin';
-import { AccountForm, NextLink } from '@/components';
+import { SiteHeader } from '@/components/admin/site-header';
+import { NextLink } from '@/components';
+import { AccountForm } from '@/components/forms';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,18 +24,14 @@ interface PageProps {
 }
 
 export default async function AdminUserDetailPage({ params }: PageProps) {
-  // Verify admin authentication
-  const userResult = await getCurrentUser({ revalidate: true });
+  // Verify permission to view users
+  await requirePermission(ADMIN_RESOURCES.USERS, '/admin/users');
 
-  if (!userResult.success || !userResult.data.user) {
-    redirect('/login');
-  }
-
-  const { user: currentUser } = userResult.data;
-
-  if (currentUser.role !== 'admin') {
-    redirect('/dashboard');
-  }
+  // Get current user session
+  const sessionResult = await getSession({ revalidate: true });
+  const currentUserRole = sessionResult.success && sessionResult.data.session
+    ? sessionResult.data.session.user.role
+    : undefined;
 
   // Get user ID from params
   const { id: userId } = await params;
@@ -495,7 +494,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
                     </p>
                   </CardHeader>
                   <CardContent>
-                    <EditUserStatusForm user={user} />
+                    <EditUserStatusForm user={user} currentUserRole={currentUserRole || ''} />
                   </CardContent>
                 </Card>
 
@@ -524,6 +523,22 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
                   </CardHeader>
                   <CardContent>
                     <RevokeSessionsForm user={user} />
+                  </CardContent>
+                </Card>
+
+                {/* Delete User - DANGER ZONE */}
+                <Card className='border-destructive'>
+                  <CardHeader className='bg-destructive/10'>
+                    <CardTitle className='text-lg text-destructive'>
+                      Danger Zone: Delete User
+                    </CardTitle>
+                    <p className='text-sm text-muted-foreground'>
+                      Permanently delete this user and all associated data. This
+                      action cannot be undone.
+                    </p>
+                  </CardHeader>
+                  <CardContent className='pt-6'>
+                    <DeleteUserForm user={user} />
                   </CardContent>
                 </Card>
               </div>

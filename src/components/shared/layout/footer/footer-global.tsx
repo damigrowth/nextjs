@@ -21,14 +21,14 @@ export default function Footer() {
               <div className='grid grid-cols-1 md:grid-cols-3 gap-8 justify-between'>
                 <div>
                   <div className='link-style1 mb-3'>
-                    <h6 className='mb-3 text-white font-semibold'>
+                    <h3 className='mb-3 text-white font-semibold text-base'>
                       <NextLink
                         href={'/about'}
                         className='text-white hover:text-green-400 transition-colors'
                       >
                         Σχετικά
                       </NextLink>
-                    </h6>
+                    </h3>
                     <div className='link-list space-y-2'>
                       {firstColumnLinks.map((item, i) => (
                         <NextLink
@@ -44,14 +44,14 @@ export default function Footer() {
                 </div>
                 <div>
                   <div className='link-style1 mb-3'>
-                    <h6 className='mb-3 text-white font-semibold'>
+                    <h3 className='mb-3 text-white font-semibold text-base'>
                       <NextLink
                         href={'/categories'}
                         className='text-white hover:text-green-400 transition-colors'
                       >
                         Υπηρεσίες
                       </NextLink>
-                    </h6>
+                    </h3>
                     <ul className='ps-0 space-y-2 list-none'>
                       {secondColumnLinks.map((item, i) => (
                         <li key={i}>
@@ -68,14 +68,14 @@ export default function Footer() {
                 </div>
                 <div>
                   <div className='link-style1 mb-3'>
-                    <h6 className='mb-3 text-white font-semibold'>
+                    <h3 className='mb-3 text-white font-semibold text-base'>
                       <NextLink
                         href={'/dashboard'}
                         className='text-white hover:text-green-400 transition-colors'
                       >
                         Ο Λογαριασμός μου
                       </NextLink>
-                    </h6>
+                    </h3>
                     <ul className='ps-0 space-y-2 list-none'>
                       {accountLinks.map((item, i) => (
                         <li key={i}>
@@ -90,9 +90,9 @@ export default function Footer() {
                     </ul>
                   </div>
                   <div className='link-style1 mb-3 pt-3'>
-                    <h6 className='text-white mb-3 font-semibold'>
+                    <h3 className='text-white mb-3 font-semibold text-base'>
                       Επαγγελματικά Προφίλ
-                    </h6>
+                    </h3>
                     <ul className='ps-0 space-y-2 list-none'>
                       {proLinks.map((item, i) => (
                         <li key={i}>
@@ -112,11 +112,14 @@ export default function Footer() {
           </div>
           <div className='lg:col-span-4 lg:col-start-9'>
             <div className='footer-widget mb-4 lg:mb-5'>
-              <NextLink className='footer-logo inline-block' href='/'>
+              <NextLink
+                className='inline-block bg-white h-[50px] w-[140px] rounded-[10px] p-[5px]'
+                href='/'
+              >
                 <Image
                   height={45}
                   width={123}
-                  className='mb-10 object-contain'
+                  className='object-contain h-full w-full'
                   src='https://res.cloudinary.com/ddejhvzbf/image/upload/v1761929834/Static/doulitsa-logo_mpqr5n.svg'
                   alt='Doulitsa logo'
                 />
@@ -125,14 +128,14 @@ export default function Footer() {
                 <div>
                   <div className='contact-info'>
                     <p className='mb-2 text-white'>Ερωτήσεις?</p>
-                    <h5 className='info-mail text-lg font-medium'>
+                    <p className='info-mail text-lg font-medium'>
                       <a
                         className='text-white hover:text-green-400 transition-colors'
                         href='mailto:contact@doulitsa.gr'
                       >
                         contact@doulitsa.gr
                       </a>
-                    </h5>
+                    </p>
                   </div>
                 </div>
               </div>

@@ -24,8 +24,10 @@ export function OAuthSetupGuard({ user, children }: OAuthSetupGuardProps) {
 
   useEffect(() => {
     // Check only once on mount
-    // Check if this is a Google OAuth user who needs setup
-    const needsSetup = user.provider === 'google' && user.step === 'OAUTH_SETUP';
+    // Check if this is a Google OAuth user who needs setup (type selection or username)
+    const needsSetup =
+      user.provider === 'google' &&
+      (user.step === 'TYPE_SELECTION' || user.step === 'OAUTH_SETUP');
 
     if (!needsSetup) {
       setIsRedirecting(true);

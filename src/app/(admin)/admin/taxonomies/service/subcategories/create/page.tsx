@@ -1,8 +1,6 @@
-import {
-  TaxonomyCreatePage,
-  CreateServiceTaxonomyForm,
-} from '@/components/admin';
 import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
+import { CreateServiceTaxonomyForm } from '@/components/admin/forms';
+import { TaxonomyCreatePage } from '@/components/admin/taxonomy-create-page';
 
 export const dynamic = 'force-dynamic';
 

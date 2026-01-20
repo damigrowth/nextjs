@@ -48,7 +48,7 @@ import {
 } from '@/lib/validations/profile';
 import { updateProfileAdditionalInfo } from '@/actions/profiles/additional-info';
 import { updateProfileAdditionalInfoAdmin } from '@/actions/admin/profiles/additional-info';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { AuthUser, ProfileWithRelations } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';
 import { Profile } from '@prisma/client';
@@ -170,56 +170,13 @@ export default function AdditionalInfoForm({
     <Form {...form}>
       <form
         action={handleFormSubmit}
-        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
+        className={
+          hideCard
+            ? 'space-y-6'
+            : 'space-y-6 p-6 border rounded-lg shadow bg-sidebar'
+        }
       >
-        {/* Row 1: Commencement and Rate */}
-        <div className='grid grid-cols-1 md:grid-cols-5 gap-6'>
-          {/* Commencement Field */}
-          <FormField
-            control={form.control}
-            name='commencement'
-            render={({ field }) => (
-              <FormItem className='col-span-1'>
-                <FormLabel>Έναρξη Δραστηριότητας</FormLabel>
-                <FormControl>
-                  <YearPicker
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    placeholder='π.χ. 2020'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Rate Field */}
-          <FormField
-            control={form.control}
-            name='rate'
-            render={({ field }) => (
-              <FormItem className='col-span-1'>
-                <FormLabel>Ωριαία Αμοιβή</FormLabel>
-                <FormControl>
-                  <Currency
-                    currency='€'
-                    position='right'
-                    placeholder='π.χ. 25'
-                    min={0}
-                    max={1000}
-                    allowDecimals={false}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    // className='w-1/2' breaks the layout
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Row 2: Three columns of checkbox methods */}
+        {/* Row 1: Three columns of checkbox methods */}
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
           {/* Contact Methods */}
           <FormField
@@ -249,12 +206,12 @@ export default function AdditionalInfoForm({
                             });
                           }}
                         />
-                        <label
+                        <FormLabel
                           htmlFor={`contact-${method.id}`}
                           className='text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
                         >
                           {method.label}
-                        </label>
+                        </FormLabel>
                       </div>
                     ))}
                   </div>
@@ -351,8 +308,52 @@ export default function AdditionalInfoForm({
           />
         </div>
 
-        {/* Row 3: Budget and Industries */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        {/* Row 2: Commencement, Rate and Budget */}
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+          {/* Commencement Field */}
+          <FormField
+            control={form.control}
+            name='commencement'
+            render={({ field }) => (
+              <FormItem className='space-y-2 flex flex-col'>
+                <FormLabel>Έναρξη Δραστηριότητας</FormLabel>
+                <FormControl>
+                  <YearPicker
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder='π.χ. 2020'
+                    clearable
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Rate Field */}
+          <FormField
+            control={form.control}
+            name='rate'
+            render={({ field }) => (
+              <FormItem className='space-y-2 flex flex-col'>
+                <FormLabel>Ωριαία Αμοιβή</FormLabel>
+                <FormControl>
+                  <Currency
+                    currency='€'
+                    position='right'
+                    placeholder='π.χ. 25'
+                    min={0}
+                    max={1000}
+                    allowDecimals={false}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           {/* Budget Field */}
           <FormField
             control={form.control}
@@ -365,44 +366,15 @@ export default function AdditionalInfoForm({
                     options={budgetOptions}
                     value={field.value || ''}
                     onValueChange={(value) => {
-                      // Prevent empty value from clearing the field (shadcn Select quirk)
-                      if (value && value !== '') {
-                        field.onChange(value);
-                        setValue('budget', value, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        });
-                      }
+                      field.onChange(value);
+                      setValue('budget', value, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
                     }}
                     placeholder='Επιλέξτε προϋπολογισμό...'
                     fullWidth
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Industries Multi-Select */}
-          <FormField
-            control={form.control}
-            name='industries'
-            render={({ field }) => (
-              <FormItem className='space-y-2 flex flex-col'>
-                <FormLabel>Κλάδοι Δραστηριότητας</FormLabel>
-                <FormControl>
-                  <LazyCombobox
-                    multiple
-                    options={industriesDataset}
-                    values={field.value || []}
-                    onMultiSelect={(selectedOptions) => {
-                      const selectedIds = selectedOptions.map((opt) => opt.id);
-                      field.onChange(selectedIds);
-                    }}
-                    onSelect={() => {}} // Required but not used in multi mode
-                    placeholder='Επιλέξτε κλάδους...'
-                    searchPlaceholder='Αναζήτηση κλάδων...'
-                    maxItems={10}
+                    clearable
                   />
                 </FormControl>
                 <FormMessage />
@@ -410,6 +382,33 @@ export default function AdditionalInfoForm({
             )}
           />
         </div>
+
+        {/* Row 3: Industries (full width) */}
+        <FormField
+          control={form.control}
+          name='industries'
+          render={({ field }) => (
+            <FormItem className='space-y-2 flex flex-col'>
+              <FormLabel>Κλάδοι Δραστηριότητας</FormLabel>
+              <FormControl>
+                <LazyCombobox
+                  multiple
+                  options={industriesDataset}
+                  values={field.value || []}
+                  onMultiSelect={(selectedOptions) => {
+                    const selectedIds = selectedOptions.map((opt) => opt.id);
+                    field.onChange(selectedIds);
+                  }}
+                  onSelect={() => {}} // Required but not used in multi mode
+                  placeholder='Επιλέξτε κλάδους...'
+                  searchPlaceholder='Αναζήτηση κλάδων...'
+                  maxItems={10}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Row 4: Terms (full width) */}
         <FormField

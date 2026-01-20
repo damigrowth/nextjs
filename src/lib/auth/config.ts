@@ -1,12 +1,24 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { nextCookies } from 'better-auth/next-js';
-import { admin, apiKey } from 'better-auth/plugins';
-import { User } from '@prisma/client';
-import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from '@/lib/email';
+import { admin, apiKey, jwt, username } from 'better-auth/plugins';
+import { localization } from 'better-auth-localization';
+import { User, UserRole, UserType, JourneyStep } from '@prisma/client';
+import {
+  sendVerificationEmail,
+  sendWelcomeEmail,
+  sendPasswordResetEmail,
+} from '@/lib/email';
+import { brevoListManager } from '@/lib/email/providers/brevo/list-management';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma/client';
 import { cookies } from 'next/headers';
+import {
+  ac,
+  admin as adminRole,
+  support as supportRole,
+  editor as editorRole,
+} from './permissions';
 
 export const auth = betterAuth({
   // Production uses doulitsa.gr, development uses localhost, previews use VERCEL_URL
@@ -84,9 +96,14 @@ export const auth = betterAuth({
         // Fetch full user data if needed
         const userWithFields = await prisma.user.findUnique({
           where: { id: user.id },
-          select: { displayName: true, username: true }
+          select: { displayName: true, username: true },
         });
-        await sendPasswordResetEmail(user.email, userWithFields?.displayName, userWithFields?.username, url);
+        await sendPasswordResetEmail(
+          user.email,
+          userWithFields?.displayName,
+          userWithFields?.username,
+          url,
+        );
       } catch (error) {
         console.error('Failed to send password reset email:', error);
         // Don't throw error here to prevent reset from failing
@@ -106,9 +123,14 @@ export const auth = betterAuth({
         // Fetch full user data if needed
         const userWithFields = await prisma.user.findUnique({
           where: { id: user.id },
-          select: { displayName: true, username: true }
+          select: { displayName: true, username: true },
         });
-        await sendVerificationEmail(user.email, userWithFields?.displayName, userWithFields?.username, url);
+        await sendVerificationEmail(
+          user.email,
+          userWithFields?.displayName,
+          userWithFields?.username,
+          url,
+        );
       } catch (error) {
         console.error('Failed to send verification email:', error);
         // Don't throw error here to prevent registration from failing
@@ -176,10 +198,39 @@ export const auth = betterAuth({
     deleteUser: {
       enabled: true,
       beforeDelete: async (user) => {
+        // Clean up Brevo email lists (GDPR compliance)
+        try {
+          if (user.email) {
+            const result = await brevoListManager.deleteContact(user.email);
+            if (result.success) {
+              console.log(`Brevo contact deleted for ${user.email}`);
+            } else {
+              console.error(
+                `Failed to delete Brevo contact for ${user.email}:`,
+                result.message,
+              );
+            }
+          }
+        } catch (error) {
+          // Log error but don't block deletion - this is a non-critical cleanup operation
+          console.error('Brevo cleanup error during account deletion:', error);
+        }
+
         // Delete Better Auth verification tokens (no relation to User, must delete manually)
-        await prisma.verification.deleteMany({
-          where: { identifier: user.email },
-        });
+        try {
+          const deleted = await prisma.verification.deleteMany({
+            where: { identifier: user.email },
+          });
+          console.log(
+            `Deleted ${deleted.count} verification token(s) for ${user.email}`,
+          );
+        } catch (error) {
+          // Log error but don't block deletion - verification cleanup is non-critical
+          console.error(
+            'Verification token cleanup error during account deletion:',
+            error,
+          );
+        }
       },
     },
   },
@@ -224,9 +275,11 @@ export const auth = betterAuth({
                   requestRole = 'user';
                 }
               } else {
-                // Fallback for OAuth users without intent (shouldn't happen)
+                // No intent cookie = New user from /login OAuth flow without type selection
+                // Set temporary default type='user' - will be updated after type selection
+                // The TYPE_SELECTION step will control the flow, not the type field
                 requestType = 'user';
-                requestRole = 'user';
+                requestRole = 'user'; // Temporary, will be set after type selection
               }
             } catch (error) {
               // Fallback on error
@@ -259,8 +312,18 @@ export const auth = betterAuth({
 
           // console.log('Setting user - Provider:', requestProvider, 'Type:', requestType, 'Role:', requestRole);
 
-          // Store role in context to set after creation (admin plugin blocks role in create)
+          // Store role and intent status in context to set after creation (admin plugin blocks role in create)
           (context as any)._pendingRole = requestRole;
+          // For OAuth users, track if they came with intent cookie (from /register) or without (from /login)
+          if (requestProvider === 'google') {
+            try {
+              const cookieStore = await cookies();
+              const intentCookie = cookieStore.get('oauth_intent');
+              (context as any)._hasOAuthIntent = !!intentCookie?.value;
+            } catch {
+              (context as any)._hasOAuthIntent = false;
+            }
+          }
 
           return {
             data: {
@@ -282,12 +345,18 @@ export const auth = betterAuth({
           const pendingRole = (context as any)._pendingRole || 'user';
 
           if (provider === 'google') {
-            // OAuth Flow: Google Auth → OAuth Setup → Dashboard (user) or Onboarding (pro)
+            // Check if user has OAuth intent (came from /register with type selection)
+            // If no intent, they came from /login and need type selection
+            const hasOAuthIntent = (context as any)._hasOAuthIntent || false;
+
+            // OAuth Flow:
+            // - With intent (from /register): Google Auth → OAuth Setup → Dashboard/Onboarding
+            // - Without intent (from /login): Google Auth → Type Selection → OAuth Setup → Dashboard/Onboarding
             await prisma.user.update({
               where: { id: user.id },
               data: {
-                role: pendingRole, // Set role here (admin plugin allows after creation)
-                step: 'OAUTH_SETUP', // OAuth users go to setup page first
+                role: pendingRole as UserRole, // Set role here (admin plugin allows after creation)
+                step: (hasOAuthIntent ? 'OAUTH_SETUP' : 'TYPE_SELECTION') as JourneyStep,
                 confirmed: true, // OAuth users are pre-confirmed
                 emailVerified: true, // OAuth providers have verified emails
               },
@@ -297,8 +366,8 @@ export const auth = betterAuth({
             await prisma.user.update({
               where: { id: user.id },
               data: {
-                role: pendingRole, // Set role here (admin plugin allows after creation)
-                step: 'EMAIL_VERIFICATION',
+                role: pendingRole as UserRole, // Set role here (admin plugin allows after creation)
+                step: 'EMAIL_VERIFICATION' as JourneyStep,
                 confirmed: true, // Email/password users start as confirmed
               },
             });
@@ -324,7 +393,7 @@ export const auth = betterAuth({
             await prisma.user.update({
               where: { id: userWithFields.id },
               data: {
-                role: context.body.role,
+                role: context.body.role as UserRole,
               },
             });
           }
@@ -349,7 +418,7 @@ export const auth = betterAuth({
               await prisma.user.update({
                 where: { id: userWithFields.id },
                 data: {
-                  step: 'DASHBOARD',
+                  step: 'DASHBOARD' as JourneyStep,
                 },
               });
               // Welcome email is now sent via Brevo automation when contact is added to list
@@ -358,7 +427,7 @@ export const auth = betterAuth({
               await prisma.user.update({
                 where: { id: userWithFields.id },
                 data: {
-                  step: 'ONBOARDING',
+                  step: 'ONBOARDING' as JourneyStep,
                 },
               });
             }
@@ -368,9 +437,24 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    localization({
+      defaultLocale: 'el-GR',
+      fallbackLocale: 'default',
+    }),
+    username({
+      minUsernameLength: 3,
+      maxUsernameLength: 30,
+      usernameValidator: (username) => /^[a-zA-Z0-9_]+$/.test(username),
+    }),
     admin({
       defaultRole: 'user',
-      adminRoles: ['admin'],
+      ac, // Access control system
+      roles: {
+        // Define admin roles with specific permissions
+        admin: adminRole,
+        support: supportRole,
+        editor: editorRole,
+      },
       // Admin user IDs can be set via environment variables
       adminUserIds: process.env.ADMIN_USER_IDS?.split(',') || [],
     }),
@@ -395,6 +479,19 @@ export const auth = betterAuth({
         enabled: true,
         timeWindow: 1000 * 60 * 60, // 1 hour
         maxRequests: 1000, // 1000 requests per hour for admin operations
+      },
+    }),
+    jwt({
+      jwt: {
+        // Configure JWT for Supabase RLS integration
+        definePayload: ({ user }) => ({
+          sub: user.id, // Standard JWT subject claim (user ID)
+          email: user.email,
+          role: (user as User).role || 'user',
+          // Additional claims for RLS policies
+          type: (user as User).type || 'user',
+        }),
+        expirationTime: '15m', // 15 minutes (match Supabase default)
       },
     }),
     nextCookies(), // MUST be the last plugin in the array

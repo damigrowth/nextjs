@@ -12,7 +12,7 @@ export default function Socials() {
       >
         <Icon name='linkedin' size={18} className='inline-block' />
       </a>
-      <h5 className='text-white text-xl font-medium mt-2'>Βρες μας στο Linkedin </h5>
+      <p className='text-white text-xl font-medium mt-2'>Βρες μας στο Linkedin </p>
       <div className='social-style1 flex space-x-3 mt-3'>
         {/* <a className='text-white hover:text-green-400 transition-colors'>
           <Icon name="facebook" size={18} />

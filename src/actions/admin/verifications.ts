@@ -12,7 +12,8 @@ import {
   type AdminUpdateVerificationStatusInput,
   type AdminDeleteVerificationInput,
 } from '@/lib/validations/admin';
-import { getAdminSession } from './helpers';
+import { getAdminSession, getAdminSessionWithPermission } from './helpers';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 
 /**
  * List verifications with filters and pagination
@@ -21,7 +22,7 @@ export async function listVerifications(
   params: Partial<AdminListVerificationsInput> = {},
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.VERIFICATIONS, 'view');
 
     const validatedParams = adminListVerificationsSchema.parse(params);
 
@@ -103,7 +104,7 @@ export async function listVerifications(
  */
 export async function getVerification(verificationId: string) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.VERIFICATIONS, 'view');
 
     const verification = await prisma.profileVerification.findUnique({
       where: { id: verificationId },
@@ -153,7 +154,7 @@ export async function updateVerificationStatus(
   params: AdminUpdateVerificationStatusInput,
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.VERIFICATIONS, 'edit');
 
     const validatedParams =
       adminUpdateVerificationStatusSchema.parse(params);
@@ -222,7 +223,7 @@ export async function deleteVerification(
   params: AdminDeleteVerificationInput,
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.VERIFICATIONS, 'full');
 
     const validatedParams = adminDeleteVerificationSchema.parse(params);
     const { verificationId } = validatedParams;
@@ -274,7 +275,7 @@ export async function deleteVerification(
  */
 export async function getVerificationStats() {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.VERIFICATIONS, 'view');
 
     const [total, pending, approved, rejected] = await Promise.all([
       prisma.profileVerification.count(),

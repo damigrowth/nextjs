@@ -37,7 +37,7 @@ import {
   registrationFormSchema,
   type RegistrationFormInput,
 } from '@/lib/validations/auth';
-import type { AuthType, ProRole } from '@/lib/types/auth';
+import type { AuthType, FormAuthType, ProRole } from '@/lib/types/auth';
 import { register } from '@/actions/auth/register';
 import { storeOAuthIntent } from '@/actions/auth/store-oauth-intent';
 
@@ -50,7 +50,7 @@ import {
   cutSpaces,
   formatDisplayName,
 } from '@/lib/utils/validation/formats';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import GoogleLoginButton from './button-login-goolge';
 
 const consentOptions = [
@@ -89,7 +89,7 @@ export default function RegisterForm() {
       password: '',
       username: '',
       displayName: '',
-      authType: type,
+      authType: type as FormAuthType,
       role: role || undefined,
       consent: [],
     },
@@ -109,7 +109,7 @@ export default function RegisterForm() {
 
   // Sync with Zustand store - only update authType and role fields
   useEffect(() => {
-    setValue('authType', type);
+    setValue('authType', type as FormAuthType);
     setValue('role', role || undefined);
   }, [type, role, setValue]);
 
@@ -161,7 +161,8 @@ export default function RegisterForm() {
       // Validate that user has selected a type
       if (type !== 'user' && type !== 'pro') {
         setError('root', {
-          message: 'Παρακαλώ επιλέξτε τύπο λογαριασμού (Χρήστης ή Επαγγελματίας)',
+          message:
+            'Παρακαλώ επιλέξτε τύπο λογαριασμού (Χρήστης ή Επαγγελματίας)',
         });
         return;
       }

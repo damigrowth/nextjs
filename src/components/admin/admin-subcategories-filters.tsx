@@ -1,14 +1,14 @@
 'use client';
 
 import { SearchFilter, SelectFilter, FilterContainer } from './filters/filter-components';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
 
-export function AdminSubcategoriesFilters() {
-  const categoryOptions = serviceTaxonomies.map((category) => ({
-    value: category.id,
-    label: category.label,
-  }));
+interface AdminSubcategoriesFiltersProps {
+  categoryOptions?: Array<{ value: string; label: string }>;
+}
 
+export function AdminSubcategoriesFilters({
+  categoryOptions = [],
+}: AdminSubcategoriesFiltersProps) {
   return (
     <FilterContainer>
       <SearchFilter placeholder='Search by label or slug...' />

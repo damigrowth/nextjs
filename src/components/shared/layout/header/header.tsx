@@ -81,7 +81,7 @@ export default function Header({ navigationData }: HeaderProps) {
                 </SheetHeader>
 
                 {/* Mobile Navigation */}
-                <div className='mt-6 flex-1'>
+                <div className='mt-6'>
                   <NavMenu
                     navigationData={navigationData}
                     isMobile={true}
@@ -91,7 +91,7 @@ export default function Header({ navigationData }: HeaderProps) {
 
                 {/* Mobile Auth Buttons - Only show for non-authenticated users */}
                 {!session?.user && (
-                  <div className='mt-auto pt-6 border-t space-y-3'>
+                  <div className='mt-6 pt-6 border-t space-y-5'>
                     <Button
                       asChild
                       variant='outline'

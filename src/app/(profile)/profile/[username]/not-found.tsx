@@ -1,4 +1,7 @@
-import { NotFoundPage, createNotFoundMetadata } from '@/components/shared';
+import {
+  createNotFoundMetadata,
+  NotFoundPage,
+} from '@/components/shared/not-found-page';
 
 export const metadata = createNotFoundMetadata(
   '404 - Προφίλ δεν βρέθηκε',

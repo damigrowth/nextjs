@@ -27,11 +27,10 @@ import { Selectbox } from '@/components/ui/selectbox';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
 
 // Static constants and dataset utilities
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
-import { skills as skillsDataset } from '@/constants/datasets/skills';
 import { formatInput } from '@/lib/utils/validation/formats';
-import { filterByField, filterSkillsByCategory } from '@/lib/utils/datasets';
+import { filterByField, filterSkillsByCategory, getSkillsByIds } from '@/lib/utils/datasets';
 import { populateFormData } from '@/lib/utils/form';
+import type { DatasetOption, DatasetWithCategory } from '@/lib/types/datasets';
 
 // Import validation schema
 import {
@@ -42,7 +41,7 @@ import {
 // Import server actions
 import { updateProfileBasicInfo } from '@/actions/profiles/basic-info';
 import { updateProfileBasicInfoAdmin } from '@/actions/admin/profiles/basic-info';
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { useSession } from '@/lib/auth/client';
 import { AuthUser } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';
@@ -56,6 +55,8 @@ const initialState = {
 interface BasicInfoFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null;
+  proTaxonomies: DatasetOption[];
+  skillsDataset: DatasetWithCategory[];
   adminMode?: boolean;
   hideCard?: boolean;
 }
@@ -63,6 +64,8 @@ interface BasicInfoFormProps {
 export default function BasicInfoForm({
   initialUser,
   initialProfile,
+  proTaxonomies,
+  skillsDataset,
   adminMode = false,
   hideCard = false,
 }: BasicInfoFormProps) {
@@ -150,9 +153,9 @@ export default function BasicInfoForm({
   const filteredSubcategories = React.useMemo(() => {
     const category = proTaxonomies.find((cat) => cat.id === watchedCategory);
     const subcategories = category?.children || [];
-    return initialUser?.role
+    return (initialUser?.role
       ? filterByField(subcategories, 'type', initialUser.role)
-      : subcategories;
+      : subcategories) as DatasetOption[];
   }, [watchedCategory, initialUser?.role]);
 
   // Memoize filtered skills based on selected category
@@ -165,9 +168,9 @@ export default function BasicInfoForm({
   // Memoize available specialities based on selected skills
   const availableSpecialities = React.useMemo(() => {
     return watchedSkills
-      ? skillsDataset.filter((skill) => watchedSkills.includes(skill.id))
+      ? getSkillsByIds(skillsDataset, watchedSkills)
       : [];
-  }, [watchedSkills]);
+  }, [watchedSkills, skillsDataset]);
 
   // Helper functions for formatting inputs
   const handleTaglineChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -241,7 +244,11 @@ export default function BasicInfoForm({
     <Form {...form}>
       <form
         action={handleFormAction}
-        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
+        className={
+          hideCard
+            ? 'space-y-6'
+            : 'space-y-6 p-6 border rounded-lg shadow bg-sidebar'
+        }
       >
         {/* Tagline */}
         <FormField
@@ -251,18 +258,18 @@ export default function BasicInfoForm({
             <FormItem>
               <FormLabel>Tagline</FormLabel>
               <p className='text-sm text-gray-600'>
-                Μια σύντομη φράση που περιγράφει τι κάνετε (π.χ. "Δημιουργός
-                ιστοσελίδων")
+                Μια σύντομη φράση που περιγράφει τι κάνετε (π.χ.
+                "Προγραμματιστής ιστοσελίδων")
               </p>
               <FormControl>
                 <Input
                   type='text'
-                  placeholder='π.χ. Δημιουργός ιστοσελίδων και εφαρμογών'
+                  placeholder='π.χ. Προγραμματιστής ιστοσελίδων και εφαρμογών'
                   {...field}
                   onChange={handleTaglineChange}
                 />
               </FormControl>
-              <div className='text-sm text-gray-500'>
+              <div className='text-xs text-gray-500'>
                 {field.value?.length || 0}/100 χαρακτήρες
               </div>
               <FormMessage />
@@ -343,13 +350,13 @@ export default function BasicInfoForm({
               <FormControl>
                 <Textarea
                   placeholder='Τουλάχιστον 80 χαρακτήρες (2-3 προτάσεις)'
-                  className='min-h-[360px]'
+                  className='min-h-[200px]'
                   rows={8}
                   value={field.value}
                   onChange={handleBioChange}
                 />
               </FormControl>
-              <div className='text-sm text-gray-500'>
+              <div className='text-xs text-gray-500'>
                 {field.value.length}/5000 χαρακτήρες (ελάχιστο: 80)
               </div>
               <FormMessage />

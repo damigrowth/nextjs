@@ -3,7 +3,8 @@
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
-import { serviceTaxonomies } from '@/constants/datasets/service-taxonomies';
+// O(1) optimized taxonomy lookups
+import { getServiceTaxonomies } from '@/lib/taxonomies';
 // Complex utilities - KEEP for hierarchy resolution
 import { resolveTaxonomyHierarchy } from '@/lib/utils/datasets';
 import type { ActionResult } from '@/lib/types/api';
@@ -19,7 +20,7 @@ import type {
 function transformServiceForTable(service: any): UserServiceTableData {
   // Resolve taxonomy labels using the reusable utility
   const taxonomyLabels = resolveTaxonomyHierarchy(
-    serviceTaxonomies,
+    getServiceTaxonomies(),
     service.category,
     service.subcategory,
     service.subdivision,
@@ -37,6 +38,8 @@ function transformServiceForTable(service: any): UserServiceTableData {
     media: service.media,
     createdAt: service.createdAt,
     updatedAt: service.updatedAt,
+    refreshedAt: service.refreshedAt,
+    sortDate: service.sortDate,
   };
 }
 
@@ -105,24 +108,27 @@ export async function getUserServices(
     }
 
     // Build order by clause
-    const orderBy: Prisma.ServiceOrderByWithRelationInput = {};
+    let orderBy:
+      | Prisma.ServiceOrderByWithRelationInput
+      | Prisma.ServiceOrderByWithRelationInput[] = {};
 
     switch (sortBy) {
       case 'title':
-        orderBy.title = sortOrder;
+        orderBy = { title: sortOrder };
         break;
       case 'status':
-        orderBy.status = sortOrder;
+        orderBy = { status: sortOrder };
         break;
       case 'category':
-        orderBy.category = sortOrder;
+        orderBy = { category: sortOrder };
         break;
       case 'createdAt':
-        orderBy.createdAt = sortOrder;
+        orderBy = { createdAt: sortOrder };
         break;
       case 'updatedAt':
       default:
-        orderBy.updatedAt = sortOrder;
+        // Sort by most recent activity (refresh or creation)
+        orderBy = { sortDate: sortOrder };
         break;
     }
 
@@ -144,6 +150,8 @@ export async function getUserServices(
           media: true,
           createdAt: true,
           updatedAt: true,
+          refreshedAt: true,
+          sortDate: true,
         },
       }),
       prisma.service.count({ where }),

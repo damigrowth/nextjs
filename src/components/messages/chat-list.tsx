@@ -14,7 +14,7 @@ interface ChatListProps {
 export function ChatList({ chats }: ChatListProps) {
   return (
     <ScrollArea className='h-full'>
-      <div className='space-y-1 p-2 pr-4'>
+      <div className='space-y-1 px-4 py-2'>
         {chats.map((chat) => (
           <ChatListItem key={chat.id} chat={chat} />
         ))}

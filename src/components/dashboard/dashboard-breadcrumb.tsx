@@ -39,13 +39,27 @@ export function DashboardBreadcrumb() {
   const breadcrumbItems = segments
     .map((segment, index) => {
       const path = `/${segments.slice(0, index + 1).join('/')}`;
-      const label = routeLabels[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
+      const label =
+        routeLabels[segment] ||
+        segment.charAt(0).toUpperCase() + segment.slice(1);
       const isLast = index === segments.length - 1;
 
       return { path, label, isLast, segment };
     })
     // Filter out dynamic route segments (chat IDs, etc.) that aren't in routeLabels
     .filter((item, index, array) => {
+      // Hide "edit" and service ID for /dashboard/services/edit/* pages
+      const isServicesEditPath =
+        segments[0] === 'dashboard' &&
+        segments[1] === 'services' &&
+        segments[2] === 'edit';
+      if (isServicesEditPath) {
+        // Hide "edit" segment
+        if (item.segment === 'edit') return false;
+        // Hide the ID segment (after "edit")
+        if (index > 0 && array[index - 1]?.segment === 'edit') return false;
+      }
+
       // Keep if it's in routeLabels
       if (routeLabels[item.segment]) return true;
 
@@ -65,15 +79,13 @@ export function DashboardBreadcrumb() {
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbItem className="hidden md:block">
-          <BreadcrumbLink href="/">
-            Αρχική
-          </BreadcrumbLink>
+        <BreadcrumbItem className='hidden md:block'>
+          <BreadcrumbLink href='/'>Αρχική</BreadcrumbLink>
         </BreadcrumbItem>
         {breadcrumbItems.map((item, index) => (
           <Fragment key={item.path}>
-            <BreadcrumbSeparator className="hidden md:block" />
-            <BreadcrumbItem className={index === 0 ? "hidden md:block" : ""}>
+            <BreadcrumbSeparator className='hidden md:block' />
+            <BreadcrumbItem className={index === 0 ? 'hidden md:block' : ''}>
               {item.isLast ? (
                 <BreadcrumbPage>{item.label}</BreadcrumbPage>
               ) : (

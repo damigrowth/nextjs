@@ -5,6 +5,8 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { processImageForDatabase } from '@/lib/utils/cloudinary';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
+import { UserRole, UserType, JourneyStep } from '@prisma/client';
 // legacy exports
 // import {
 //   listUsersSchema,
@@ -39,12 +41,13 @@ import {
 // Import types from centralized validation schemas
 import type { CreateUserInput, UpdateUserInput } from '@/lib/validations';
 import type { ActionResult } from '@/lib/types/api';
-import { getAdminSession } from './helpers';
+import { getAdminSession, getAdminSessionWithPermission } from './helpers';
+import { ADMIN_RESOURCES, canAssignRole } from '@/lib/auth/roles';
 
 // Admin Actions using correct Better Auth API methods
 export async function getUser(userId: string) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -93,15 +96,15 @@ export async function getUser(userId: string) {
 
 export async function listUsers(
   params: Partial<z.infer<typeof adminListUsersSchema>> & {
-    type?: string;
+    type?: UserType | 'all';
     provider?: string;
-    step?: string;
+    step?: JourneyStep | 'all';
     status?: string;
-    role?: string;
+    role?: UserRole | 'all';
   } = {},
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -174,6 +177,7 @@ export async function listUsers(
         email: true,
         name: true,
         username: true,
+        displayUsername: true,
         displayName: true,
         firstName: true,
         lastName: true,
@@ -212,7 +216,7 @@ export async function listUsers(
 
 export async function createUser(data: z.infer<typeof adminCreateUserSchema>) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = adminCreateUserSchema.parse(data);
 
@@ -245,9 +249,17 @@ export async function createUser(data: z.infer<typeof adminCreateUserSchema>) {
 
 export async function setUserRole(data: z.infer<typeof adminSetRoleSchema>) {
   try {
-    await getAdminSession();
+    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = adminSetRoleSchema.parse(data);
+
+    // Check if current user has permission to assign this role
+    if (!canAssignRole(session.user.role, validatedData.role)) {
+      return {
+        success: false,
+        error: 'You do not have permission to assign this role',
+      };
+    }
 
     // Your Better Auth supports all your custom roles: 'user', 'freelancer', 'company', 'admin'
     const result = await auth.api.setRole({
@@ -273,7 +285,7 @@ export async function setUserRole(data: z.infer<typeof adminSetRoleSchema>) {
 
 export async function banUser(data: z.infer<typeof adminBanUserSchema>) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = adminBanUserSchema.parse(data);
 
@@ -297,7 +309,7 @@ export async function banUser(data: z.infer<typeof adminBanUserSchema>) {
 
 export async function unbanUser(data: z.infer<typeof adminUnbanUserSchema>) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = adminUnbanUserSchema.parse(data);
 
@@ -321,7 +333,7 @@ export async function unbanUser(data: z.infer<typeof adminUnbanUserSchema>) {
 
 export async function removeUser(data: z.infer<typeof adminRemoveUserSchema>) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'full');
 
     const validatedData = adminRemoveUserSchema.parse(data);
 
@@ -347,7 +359,7 @@ export async function impersonateUser(
   data: z.infer<typeof adminImpersonateUserSchema>,
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const validatedData = adminImpersonateUserSchema.parse(data);
 
@@ -372,7 +384,7 @@ export async function impersonateUser(
 
 export async function stopImpersonating() {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const result = await auth.api.stopImpersonating({
       headers: await headers(),
@@ -394,7 +406,7 @@ export async function stopImpersonating() {
 
 export async function listUserSessions(userId: string) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const result = await auth.api.listUserSessions({
       body: { userId },
@@ -424,7 +436,7 @@ export async function revokeUserSession(
   data: z.infer<typeof revokeSessionSchema>,
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = revokeSessionSchema.parse(data);
 
@@ -453,7 +465,7 @@ export async function revokeAllUserSessions(
   data: z.infer<typeof revokeUserSessionsSchema>,
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = revokeUserSessionsSchema.parse(data);
 
@@ -480,7 +492,7 @@ export async function revokeAllUserSessions(
 
 export async function updateUser(data: z.infer<typeof adminUpdateUserSchema>) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const validatedData = adminUpdateUserSchema.parse(data);
     const { userId, ...updateFields } = validatedData;
@@ -533,7 +545,7 @@ export async function setUserPassword(
   data: z.infer<typeof adminSetPasswordSchema>,
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const validatedData = adminSetPasswordSchema.parse(data);
 
@@ -572,9 +584,31 @@ export async function updateUserBasicInfo(data: {
   displayName?: string;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const { prisma } = await import('@/lib/prisma/client');
+
+    // Check if username is being changed and if it's already taken
+    if (data.username !== undefined) {
+      const usernameCheck = await auth.api.isUsernameAvailable({
+        body: { username: data.username },
+      });
+
+      // Allow if username is available OR if it's the same user keeping their username
+      const currentUser = await prisma.user.findUnique({
+        where: { id: data.userId },
+        select: { username: true },
+      });
+
+      const isKeepingSameUsername = currentUser?.username === data.username;
+
+      if (!usernameCheck?.available && !isKeepingSameUsername) {
+        return {
+          success: false,
+          error: 'Το συγκεκριμένο username χρησιμοποιείται ήδη. Επιλέξτε ένα διαφορετικό username.',
+        };
+      }
+    }
 
     // Build update object with only provided fields
     const updateData: any = {};
@@ -610,10 +644,10 @@ export async function updateUserStatus(data: {
   confirmed?: boolean;
   blocked?: boolean;
   emailVerified?: boolean;
-  step?: string;
+  step?: JourneyStep;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -653,7 +687,7 @@ export async function updateUserBanStatus(data: {
   banExpires?: Date | null;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -687,7 +721,7 @@ export async function updateUserImage(data: {
   image: string | null;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -717,7 +751,7 @@ export async function toggleUserBlock(data: {
   blocked: boolean;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -748,7 +782,7 @@ export async function toggleUserConfirmation(data: {
   confirmed: boolean;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -776,10 +810,10 @@ export async function toggleUserConfirmation(data: {
  */
 export async function updateUserJourneyStep(data: {
   userId: string;
-  step: string;
+  step: JourneyStep;
 }) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -807,7 +841,7 @@ export async function updateUserJourneyStep(data: {
  */
 export async function getUserStats() {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     const { prisma } = await import('@/lib/prisma/client');
 
@@ -924,25 +958,17 @@ export async function updateUserBasicInfoAction(
   formData: FormData,
 ): Promise<ActionResult> {
   try {
-    const userId = formData.get('userId');
-
-    if (!userId) {
-      return {
-        success: false,
-        error: 'User ID is required',
-      };
-    }
-
-    // Parse FormData
+    // Parse FormData including userId
     const rawData = {
+      userId: formData.get('userId') as string,
       name: formData.get('name') as string,
       email: formData.get('email') as string,
       username: formData.get('username') as string,
       displayName: formData.get('displayName') as string,
     };
 
-    // Validate using imported schema (omit userId as it's passed separately)
-    const validationResult = updateUserBasicInfoSchema.omit({ userId: true }).safeParse(rawData);
+    // Validate complete data with userId
+    const validationResult = updateUserBasicInfoSchema.safeParse(rawData);
 
     if (!validationResult.success) {
       console.error('User basic info validation errors:', validationResult.error);
@@ -952,10 +978,7 @@ export async function updateUserBasicInfoAction(
       };
     }
 
-    const result = await updateUserBasicInfo({
-      userId: userId as string,
-      ...validationResult.data,
-    });
+    const result = await updateUserBasicInfo(validationResult.data);
 
     return result;
   } catch (error) {
@@ -974,27 +997,19 @@ export async function updateUserStatusAction(
   formData: FormData,
 ): Promise<ActionResult> {
   try {
-    const userId = formData.get('userId');
-
-    if (!userId) {
-      return {
-        success: false,
-        error: 'User ID is required',
-      };
-    }
-
-    // Parse FormData
+    // Parse FormData including userId
     const rawData = {
-      role: formData.get('role') as string,
-      type: formData.get('type') as string,
-      step: formData.get('step') as string,
+      userId: formData.get('userId') as string,
+      role: formData.get('role') as UserRole,
+      type: formData.get('type') as UserType,
+      step: formData.get('step') as JourneyStep,
       emailVerified: formData.get('emailVerified') === 'true',
       confirmed: formData.get('confirmed') === 'true',
       blocked: formData.get('blocked') === 'true',
     };
 
-    // Validate using imported schema (omit userId as it's passed separately)
-    const validationResult = updateUserStatusSchema.omit({ userId: true }).safeParse(rawData);
+    // Validate complete data with userId
+    const validationResult = updateUserStatusSchema.safeParse(rawData);
 
     if (!validationResult.success) {
       console.error('User status validation errors:', validationResult.error);
@@ -1004,11 +1019,13 @@ export async function updateUserStatusAction(
       };
     }
 
+    const { userId, role, ...statusData } = validationResult.data;
+
     // Handle role separately if provided (Better Auth API requirement)
-    if (validationResult.data.role) {
+    if (role) {
       const roleResult = await setUserRole({
-        userId: userId as string,
-        role: validationResult.data.role as any,
+        userId,
+        role: role as any,
       });
 
       if (!roleResult.success) {
@@ -1017,9 +1034,8 @@ export async function updateUserStatusAction(
     }
 
     // Update other status fields (excluding role which was handled above)
-    const { role, ...statusData } = validationResult.data;
     const result = await updateUserStatus({
-      userId: userId as string,
+      userId,
       ...statusData,
     });
 
@@ -1130,7 +1146,7 @@ export async function updateAccountAdmin(
 ) {
   try {
     // Verify admin authentication
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
 
     // Parse FormData
     const userId = formData.get('userId')?.toString();
@@ -1202,6 +1218,7 @@ export async function updateAccountAdmin(
         where: { uid: userId },
         data: {
           displayName: displayName || undefined,
+          displayNameNormalized: displayName ? normalizeTerm(displayName) : undefined,
           ...(processedImage !== undefined && { image: processedImage }),
           updatedAt: new Date(),
         },
@@ -1232,6 +1249,321 @@ export async function updateAccountAdmin(
     return {
       success: false,
       message: error instanceof Error ? error.message : 'Failed to update account',
+    };
+  }
+}
+
+// =============================================
+// TEAM MANAGEMENT (ADMIN ROLE ASSIGNMENT)
+// =============================================
+
+/**
+ * Team member interface for admin display
+ */
+export interface TeamMember {
+  id: string;
+  email: string;
+  username: string | null;
+  displayName: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  image: string | null;
+  role: UserRole;
+  createdAt: Date;
+  updatedAt: Date;
+  emailVerified: boolean;
+  confirmed: boolean;
+  blocked: boolean;
+}
+
+/**
+ * Get all team members (users with admin, support, or editor roles)
+ *
+ * Only admins can view team members
+ */
+export async function getTeamMembers(): Promise<ActionResult<TeamMember[]>> {
+  try {
+    // Require permission to view team
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.TEAM, 'view');
+
+    const { ADMIN_ROLES } = await import('@/lib/auth/roles');
+    const { prisma } = await import('@/lib/prisma/client');
+
+    const teamMembers = await prisma.user.findMany({
+      where: {
+        role: {
+          in: [ADMIN_ROLES.ADMIN, ADMIN_ROLES.SUPPORT, ADMIN_ROLES.EDITOR],
+        },
+      },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        displayName: true,
+        firstName: true,
+        lastName: true,
+        image: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        emailVerified: true,
+        confirmed: true,
+        blocked: true,
+      },
+      orderBy: [
+        { role: 'asc' }, // admin first, then support, then editor
+        { createdAt: 'desc' }, // newest first within each role
+      ],
+    });
+
+    return {
+      success: true,
+      data: teamMembers,
+    };
+  } catch (error) {
+    console.error('Get team members error:', error);
+    return {
+      success: false,
+      error: 'Failed to get team members',
+    };
+  }
+}
+
+/**
+ * Assign an admin role to a user
+ *
+ * Only admins can assign roles
+ *
+ * @param userId - User ID to assign role to
+ * @param role - Admin role to assign (admin, support, or editor)
+ */
+export async function assignAdminRole(
+  userId: string,
+  role: UserRole,
+): Promise<ActionResult<void>> {
+  try {
+    // Require permission to assign roles
+    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.TEAM, 'edit');
+
+    const { revalidatePath } = await import('next/cache');
+    const { USER_ROLES } = await import('@/lib/auth/roles');
+    const { prisma } = await import('@/lib/prisma/client');
+
+    // Validate role - accept all user roles
+    if (!Object.values(USER_ROLES).includes(role as any)) {
+      return {
+        success: false,
+        error: 'Invalid role. Must be one of: user, freelancer, company, admin, support, or editor',
+      };
+    }
+
+    // Check if current user has permission to assign this role
+    if (!canAssignRole(session.user.role, role)) {
+      return {
+        success: false,
+        error: 'You do not have permission to assign this role',
+      };
+    }
+
+    // Check if user exists
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        error: 'User not found',
+      };
+    }
+
+    // Prevent admin from removing their own admin role
+    if (session.user.id === userId && role !== USER_ROLES.ADMIN) {
+      return {
+        success: false,
+        error: 'You cannot remove your own admin role',
+      };
+    }
+
+    // Update user role
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        role,
+        step: 'DASHBOARD', // Ensure admin users are marked as completed
+      },
+    });
+
+    // Revalidate team page
+    revalidatePath('/admin/team');
+
+    return {
+      success: true,
+      data: undefined,
+    };
+  } catch (error) {
+    console.error('Assign admin role error:', error);
+    return {
+      success: false,
+      error: 'Failed to assign admin role',
+    };
+  }
+}
+
+/**
+ * Remove admin role from a user (revert to their original role)
+ *
+ * Only admins can remove roles
+ *
+ * @param userId - User ID to remove admin role from
+ */
+export async function removeAdminRole(userId: string): Promise<ActionResult<void>> {
+  try {
+    // Require permission to remove roles
+    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.TEAM, 'edit');
+
+    const { revalidatePath } = await import('next/cache');
+    const { prisma } = await import('@/lib/prisma/client');
+
+    // Check if user exists
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        type: true,
+      },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        error: 'User not found',
+      };
+    }
+
+    // Prevent admin from removing their own admin role
+    if (session.user.id === userId) {
+      return {
+        success: false,
+        error: 'You cannot remove your own admin role',
+      };
+    }
+
+    // Determine what role to revert to based on user type
+    let newRole: UserRole = 'user';
+    if (user.type === 'pro') {
+      // For pro users, check if they have a profile to determine role
+      const profile = await prisma.profile.findUnique({
+        where: { uid: userId },
+        select: { type: true },
+      });
+
+      if (profile?.type === 'company') {
+        newRole = 'company';
+      } else if (profile?.type === 'freelancer') {
+        newRole = 'freelancer';
+      }
+    }
+
+    // Update user role back to original role
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        role: newRole,
+      },
+    });
+
+    // Revalidate team page
+    revalidatePath('/admin/team');
+
+    return {
+      success: true,
+      data: undefined,
+    };
+  } catch (error) {
+    console.error('Remove admin role error:', error);
+    return {
+      success: false,
+      error: 'Failed to remove admin role',
+    };
+  }
+}
+
+/**
+ * Search users by email or username for role assignment
+ *
+ * Only admins can search users for role assignment
+ *
+ * @param search - Search query (email or username)
+ * @param limit - Maximum number of results (default: 10)
+ */
+export async function searchUsersForRoleAssignment(
+  search: string,
+  limit: number = 10,
+): Promise<ActionResult<TeamMember[]>> {
+  try {
+    // Require permission to search users
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.TEAM, 'view');
+
+    const { prisma } = await import('@/lib/prisma/client');
+
+    if (!search || search.length < 2) {
+      return {
+        success: false,
+        error: 'Search query must be at least 2 characters',
+      };
+    }
+
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          { email: { contains: search, mode: 'insensitive' } },
+          { username: { contains: search, mode: 'insensitive' } },
+          { displayName: { contains: search, mode: 'insensitive' } },
+        ],
+        // Optionally exclude users who already have admin roles
+        // Commented out to allow changing existing admin roles
+        // role: {
+        //   notIn: [ADMIN_ROLES.ADMIN, ADMIN_ROLES.SUPPORT, ADMIN_ROLES.EDITOR],
+        // },
+      },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        displayName: true,
+        firstName: true,
+        lastName: true,
+        image: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        emailVerified: true,
+        confirmed: true,
+        blocked: true,
+      },
+      take: limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return {
+      success: true,
+      data: users,
+    };
+  } catch (error) {
+    console.error('Search users for role assignment error:', error);
+    return {
+      success: false,
+      error: 'Failed to search users',
     };
   }
 }

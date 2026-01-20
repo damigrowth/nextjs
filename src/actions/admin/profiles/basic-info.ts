@@ -9,8 +9,9 @@ import { headers } from 'next/headers';
 import { profileBasicInfoUpdateSchema } from '@/lib/validations/profile';
 import { getFormString, getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 
 /**
  * Admin-specific profile basic info update action
@@ -25,8 +26,8 @@ export async function updateProfileBasicInfoAdmin(
     const session = await requireAuth();
     const user = session.user;
 
-    // 2. Check if user is admin
-    const roleCheck = await hasAnyRole(['admin']);
+    // 2. Check if user has admin or support role
+    const roleCheck = await hasAnyRole(['admin', 'support']);
     if (!roleCheck.success || !roleCheck.data) {
       return {
         success: false,
@@ -119,7 +120,9 @@ export async function updateProfileBasicInfoAdmin(
       where: { id: profileId },
       data: {
         tagline: data.tagline,
+        taglineNormalized: data.tagline ? normalizeTerm(data.tagline) : null,
         bio: data.bio,
+        bioNormalized: data.bio ? normalizeTerm(data.bio) : null,
         category: data.category,
         subcategory: data.subcategory,
         speciality: data.speciality,

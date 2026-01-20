@@ -76,36 +76,41 @@ export default function SaveButton({
     });
   };
 
-  const button = variant === 'remove' ? (
-    <Button
-      variant="ghost"
-      size="sm"
-      className={`h-8 w-8 p-0 rounded-full bg-muted text-gray-500 hover:text-red-500 hover:bg-red-50 ${className}`}
-      onClick={handleToggle}
-      disabled={isPending}
-    >
-      <Trash2 className="h-4 w-4" />
-    </Button>
-  ) : (
-    <Button
-      variant="ghost"
-      size="sm"
-      className={`h-8 w-8 p-0 rounded-full ${
-        isSaved
-          ? 'text-red-500 hover:text-red-600 bg-red-50'
-          : 'text-gray-400 hover:text-red-500 bg-muted'
-      } ${className}`}
-      onClick={handleToggle}
-      disabled={isPending}
-    >
-      <Heart className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
-    </Button>
-  );
+  const button =
+    variant === 'remove' ? (
+      <Button
+        variant='ghost'
+        size='sm'
+        className={`h-8 w-8 p-0 rounded-full bg-muted text-gray-500 hover:text-red-500 hover:bg-red-50 ${className}`}
+        onClick={handleToggle}
+        disabled={isPending}
+        aria-label='Διαγραφή'
+      >
+        <Trash2 className='h-4 w-4' />
+      </Button>
+    ) : (
+      <Button
+        variant='ghost'
+        size='sm'
+        className={`h-8 w-8 p-0 rounded-full ${
+          isSaved
+            ? 'text-red-500 hover:text-red-600 bg-red-50'
+            : 'text-gray-400 hover:text-red-500 bg-muted'
+        } ${className}`}
+        onClick={handleToggle}
+        disabled={isPending}
+        aria-label={isSaved ? 'Διαγραφή' : 'Αποθήκευση'}
+      >
+        <Heart className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
+      </Button>
+    );
 
   // If variant is 'save', wrap with visibility logic based on saved state
   if (variant === 'save') {
     return (
-      <div className={`transition-opacity duration-200 ${isSaved ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+      <div
+        className={`transition-opacity duration-200 ${isSaved ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+      >
         {button}
       </div>
     );

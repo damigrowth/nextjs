@@ -39,7 +39,8 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { NextLink, UserAvatar } from '@/components/shared';
+import { NextLink } from '@/components';
+import UserAvatar from '@/components/shared/user-avatar';
 import { toast } from 'sonner';
 import {
   Search,
@@ -390,7 +391,7 @@ export function VerificationManagement() {
               <div className='relative'>
                 <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
                 <Input
-                  placeholder='Search AFM or business name...'
+                  placeholder='Αναζήτηση με ΑΦΜ ή επωνυμία...'
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);

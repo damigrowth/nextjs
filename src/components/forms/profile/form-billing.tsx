@@ -33,7 +33,7 @@ import { updateProfileBillingAdmin } from '@/actions/admin/profiles/billing';
 // Utility for form data population
 import { populateFormData, parseJSONValue } from '@/lib/utils/form';
 
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 import { AuthUser } from '@/lib/types/auth';
 import { useRouter } from 'next/navigation';
 import { Profile } from '@prisma/client';
@@ -167,7 +167,11 @@ export default function BillingForm({
     <Form {...form}>
       <form
         action={handleFormSubmit}
-        className={hideCard ? 'space-y-6' : 'space-y-6 p-6 border rounded-lg'}
+        className={
+          hideCard
+            ? 'space-y-6'
+            : 'space-y-6 p-6 border rounded-lg shadow bg-sidebar'
+        }
       >
         {/* Billing Type Selection */}
         <div className='space-y-4'>
@@ -247,7 +251,7 @@ export default function BillingForm({
                     <FormControl>
                       <Input
                         type='text'
-                        placeholder='Εισάγετε τον ΑΦΜ (9 ψηφία)'
+                        placeholder='Εισάγετε ΑΦΜ (9 ψηφία)'
                         {...field}
                         maxLength={9}
                       />
@@ -266,7 +270,7 @@ export default function BillingForm({
                     <FormControl>
                       <Input
                         type='text'
-                        placeholder='Εισάγετε τη ΔΟΥ'
+                        placeholder='Εισάγετε ΔΟΥ'
                         {...field}
                       />
                     </FormControl>
@@ -287,7 +291,7 @@ export default function BillingForm({
                     <FormControl>
                       <Input
                         type='text'
-                        placeholder='Εισάγετε την επωνυμία'
+                        placeholder='Εισάγετε επωνυμία'
                         {...field}
                       />
                     </FormControl>
@@ -305,7 +309,7 @@ export default function BillingForm({
                     <FormControl>
                       <Input
                         type='text'
-                        placeholder='Εισάγετε το επάγγελμα'
+                        placeholder='Εισάγετε επάγγελμα'
                         {...field}
                       />
                     </FormControl>
@@ -324,7 +328,7 @@ export default function BillingForm({
                   <FormLabel>Διεύθυνση Τιμολόγησης</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder='Εισάγετε την πλήρη διεύθυνση'
+                      placeholder='Εισάγετε την επαγγελματική διεύθυνση'
                       className='min-h-[80px]'
                       rows={3}
                       {...field}

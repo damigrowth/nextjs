@@ -20,7 +20,7 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { QuickCreateDialog } from './quick-create-dialog';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 type NavItem = {
   title: string;
@@ -37,7 +37,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
   return (
     <SidebarGroup>
       <SidebarGroupContent className='flex flex-col gap-2'>
-        <SidebarMenu>
+        {/* <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => setQuickCreateOpen(true)}
@@ -48,7 +48,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
               <span>Quick Create</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
+        </SidebarMenu> */}
         <QuickCreateDialog
           open={quickCreateOpen}
           onOpenChange={setQuickCreateOpen}

@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useSession } from '@/lib/auth/client';
 import ServiceAddons from './service-addons';
-import ServiceCalculatedPrice from './service-calculated-price';
+// import ServiceCalculatedPrice from './service-calculated-price';
 import ServiceBuy from './service-buy';
 
 interface ServiceOrderFixedProps {
@@ -30,7 +30,7 @@ export default function ServiceOrderFixed({
     <Card className='mb-6'>
       <CardContent className='p-6 flex flex-col'>
         {/* Price Display */}
-        <ServiceCalculatedPrice basePrice={price} compact={compact} />
+        {/* <ServiceCalculatedPrice basePrice={price} compact={compact} /> */}
 
         {/* Addons */}
         {addons.length > 0 && (

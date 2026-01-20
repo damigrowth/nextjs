@@ -7,18 +7,20 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import type { SubdivisionWithCount } from '@/actions/services/get-categories';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
 
 interface SubdivisionsCarouselProps {
   subdivisions: SubdivisionWithCount[];
   hideTitle?: boolean;
   gradientColor?: 'white' | 'silver';
+  title?: string;
 }
 
 export function SubdivisionsCarousel({
   subdivisions,
   hideTitle = false,
   gradientColor = 'white',
+  title = 'Πιο δημοφιλείς εργασίες',
 }: SubdivisionsCarouselProps) {
   if (subdivisions.length === 0) {
     return null;
@@ -33,9 +35,7 @@ export function SubdivisionsCarousel({
     <section>
       {!hideTitle && (
         <div className='mb-6'>
-          <h2 className='text-2xl font-bold text-gray-900 mb-2'>
-            Πιο δημοφιλείς εργασίες
-          </h2>
+          <h2 className='text-2xl font-bold text-gray-900 mb-2'>{title}</h2>
         </div>
       )}
 
@@ -47,7 +47,7 @@ export function SubdivisionsCarousel({
           }}
           className='w-full'
         >
-          <CarouselContent className='-ml-2 md:-ml-4'>
+          <CarouselContent className='-ml-0 sm:-ml-2'>
             {subdivisions.map((subdivision) => (
               <CarouselItem
                 key={subdivision.id}
@@ -56,7 +56,7 @@ export function SubdivisionsCarousel({
                 <NextLink href={subdivision.href}>
                   <Badge
                     variant='outline'
-                    className='text-sm px-4 py-2 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer whitespace-nowrap bg-white'
+                    className='no-underline inline-block font-sans font-normal text-sm leading-6 py-2 px-5 rounded-full border border-gray-300 bg-white text-gray-700 transition-colors duration-200 ease-in-out hover:border-[#198754] hover:bg-[#198754]/5 cursor-pointer whitespace-nowrap'
                   >
                     {subdivision.label}
                     {/* <span className='ml-2 text-xs opacity-70'>

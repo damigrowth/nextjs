@@ -8,7 +8,8 @@ import {
 } from '@/components/ui/card';
 import type { CategoryWithSubcategories } from '@/actions/services/get-categories';
 import { Separator } from '../ui/separator';
-import { NextLink } from '../shared';
+import { NextLink } from '@/components';
+import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 
 interface CategoriesGridProps {
   categories: CategoryWithSubcategories[];
@@ -36,8 +37,8 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
         <h2 className='text-2xl font-bold text-gray-900 mb-2'>Κατηγορίες</h2>
       </div>
 
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-        {categories.map((category) => (
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+        {categories.map((category, index) => (
           <Card
             key={category.id}
             className='h-full hover:shadow-lg transition-shadow overflow-hidden'
@@ -46,11 +47,16 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
             {category.image && (
               <div className='relative w-full h-48 bg-gray-100'>
                 <Image
-                  src={category.image.secure_url}
+                  src={
+                    getOptimizedImageUrl(category.image, 'card') ||
+                    category.image.secure_url
+                  }
                   alt={category.label}
                   fill
                   className='object-cover'
                   sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+                  priority={index < 4}
+                  fetchPriority={index < 4 ? 'high' : undefined}
                 />
               </div>
             )}
@@ -66,7 +72,7 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
                     </NextLink>
                   </CardTitle>
                   {category.description && (
-                    <CardDescription className='text-sm text-gray-600 line-clamp-2'>
+                    <CardDescription className='text-sm text-gray-600 line-clamp-3'>
                       {category.description}
                     </CardDescription>
                   )}

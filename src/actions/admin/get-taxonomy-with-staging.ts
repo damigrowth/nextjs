@@ -1,6 +1,7 @@
 'use server';
 
-import { getAdminSession } from './helpers';
+import { getAdminSession, getAdminSessionWithPermission } from './helpers';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import { getStagedChanges, applyStagedChangesToData } from './taxonomy-staging';
 import {
   readTaxonomyFile,
@@ -20,7 +21,7 @@ export async function getTaxonomyWithStaging(
   type: TaxonomyType,
 ): Promise<DatasetItem[]> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'view');
 
     // 1. Fetch current committed state from GitHub API
     const fileContent = await readTaxonomyFile(type);

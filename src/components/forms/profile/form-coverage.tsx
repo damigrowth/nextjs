@@ -21,12 +21,15 @@ import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { toast } from 'sonner';
 
 // Custom components
-import { FormButton } from '../../shared';
+import FormButton from '@/components/shared/button-form';
 
 // Static constants and dataset utilities
-import { locationOptions } from '@/constants/datasets/locations';
+import type { DatasetItem } from '@/lib/types/datasets';
 import { formatInput } from '@/lib/utils/validation/formats';
-import { resetCoverageDependencies, getAllZipcodes } from '@/lib/utils/datasets';
+import {
+  resetCoverageDependencies,
+  getAllZipcodes,
+} from '@/lib/utils/datasets';
 import { populateFormData, parseJSONValue } from '@/lib/utils/form';
 
 // Import validation schema
@@ -53,6 +56,7 @@ const initialState = {
 interface CoverageFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null;
+  locationOptions: DatasetItem[];
   adminMode?: boolean;
   hideCard?: boolean;
 }
@@ -60,13 +64,12 @@ interface CoverageFormProps {
 export default function CoverageForm({
   initialUser,
   initialProfile,
+  locationOptions,
   adminMode = false,
   hideCard = false,
 }: CoverageFormProps) {
   // Select the appropriate action based on admin mode
-  const actionToUse = adminMode
-    ? updateCoverageAdmin
-    : updateCoverage;
+  const actionToUse = adminMode ? updateCoverageAdmin : updateCoverage;
 
   const [state, action, isPending] = useActionState(actionToUse, initialState);
   const [, startTransition] = useTransition();
@@ -113,7 +116,7 @@ export default function CoverageForm({
       area: zipcode.area,
       county: zipcode.county,
     }));
-  }, []);
+  }, [locationOptions]);
 
   // Memoize available areas based on selected counties
   const availableAreas = React.useMemo(() => {
@@ -131,7 +134,7 @@ export default function CoverageForm({
         })) || []
       );
     });
-  }, [watchedCoverage?.counties]);
+  }, [watchedCoverage?.counties, locationOptions]);
 
   // Update form values when profile data is available
   useEffect(() => {
@@ -273,321 +276,329 @@ export default function CoverageForm({
         }}
       >
         <FormWrapper {...wrapperProps}>
-        {/* Delivery Methods Section */}
-        <FormField
-          control={form.control}
-          name='coverage'
-          render={({ field }) => (
-            <FormItem>
-              <div className='space-y-4'>
-                <h3 className='text-lg font-semibold text-gray-900 border-b pb-2'>
-                  Προσφέρω τις υπηρεσίες:
-                </h3>
-                <div className='space-y-3'>
-                  <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                    <div className='flex items-center space-x-2'>
-                      <Checkbox
-                        id='online'
-                        checked={field.value.online}
-                        onCheckedChange={() => handleCoverageSwitch('online')}
-                      />
-                      <FormLabel
-                        htmlFor='online'
-                        className='text-sm font-medium text-gray-700'
-                      >
-                        Online
-                      </FormLabel>
-                    </div>
-                    <div className='flex items-center space-x-2'>
-                      <Checkbox
-                        id='onbase'
-                        checked={field.value.onbase}
-                        onCheckedChange={() => handleCoverageSwitch('onbase')}
-                      />
-                      <FormLabel
-                        htmlFor='onbase'
-                        className='text-sm font-medium text-gray-700'
-                      >
-                        Στον χώρο μου
-                      </FormLabel>
-                    </div>
-                    <div className='flex items-center space-x-2'>
-                      <Checkbox
-                        id='onsite'
-                        checked={field.value.onsite}
-                        onCheckedChange={() => handleCoverageSwitch('onsite')}
-                      />
-                      <FormLabel
-                        htmlFor='onsite'
-                        className='text-sm font-medium text-gray-700'
-                      >
-                        Στον χώρο του πελάτη
-                      </FormLabel>
+          {/* Delivery Methods Section */}
+          <FormField
+            control={form.control}
+            name='coverage'
+            render={({ field }) => (
+              <FormItem>
+                <div className='space-y-4'>
+                  <h3 className='text-lg font-semibold text-gray-900 border-b pb-2'>
+                    Προσφέρω τις υπηρεσίες:
+                  </h3>
+                  <div className='space-y-3'>
+                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                      <div className='flex items-center space-x-2'>
+                        <Checkbox
+                          id='online'
+                          checked={field.value.online}
+                          onCheckedChange={() => handleCoverageSwitch('online')}
+                        />
+                        <FormLabel
+                          htmlFor='online'
+                          className='text-sm font-medium text-gray-700'
+                        >
+                          Online
+                        </FormLabel>
+                      </div>
+                      <div className='flex items-center space-x-2'>
+                        <Checkbox
+                          id='onbase'
+                          checked={field.value.onbase}
+                          onCheckedChange={() => handleCoverageSwitch('onbase')}
+                        />
+                        <FormLabel
+                          htmlFor='onbase'
+                          className='text-sm font-medium text-gray-700'
+                        >
+                          Στον χώρο μου
+                        </FormLabel>
+                      </div>
+                      <div className='flex items-center space-x-2'>
+                        <Checkbox
+                          id='onsite'
+                          checked={field.value.onsite}
+                          onCheckedChange={() => handleCoverageSwitch('onsite')}
+                        />
+                        <FormLabel
+                          htmlFor='onsite'
+                          className='text-sm font-medium text-gray-700'
+                        >
+                          Στον χώρο του πελάτη
+                        </FormLabel>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Conditional Onbase Section */}
-        {watchedCoverage?.onbase && (
-          <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md'>
-            <h5 className='font-medium text-gray-900'>
-              Στοιχεία για τον χώρο σας
-            </h5>
-            <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-              {/* Address - First field */}
-              <FormField
-                control={form.control}
-                name='coverage.address'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-sm font-medium text-gray-700'>
-                      Διεύθυνση
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type='text'
-                        placeholder='Εισάγετε τη διεύθυνσή σας'
-                        value={field.value || ''}
-                        onChange={handleAddressChange}
-                        className='bg-white'
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Zipcode Combobox - Second field */}
-              <div className='space-y-2'>
-                <FormLabel className='text-sm font-medium text-gray-700'>
-                  Τ.Κ.
-                </FormLabel>
-                <LazyCombobox
-                  options={allZipcodes}
-                  value={watchedCoverage?.zipcode || undefined}
-                  onSelect={(zipcode) => handleZipcodeChange(zipcode.id)}
-                  placeholder='Επιλέξτε Τ.Κ...'
-                  searchPlaceholder='Αναζήτηση Τ.Κ...'
-                  emptyMessage='Δεν βρέθηκαν Τ.Κ.'
-                  formatLabel={(option) => (
-                    <>
-                      {option.name}{' '}
-                      <span className='text-gray-500'>
-                        ({option.area.name} - {option.county.name})
-                      </span>
-                    </>
-                  )}
-                  getButtonLabel={(option) => option?.name || 'Επιλέξτε Τ.Κ...'}
-                  initialLimit={20}
-                  loadMoreIncrement={20}
-                  loadMoreThreshold={50}
-                  searchLimit={100}
-                  showProgress={true}
-                />
-              </div>
-
-              {/* Area Input - Auto-filled from zipcode */}
-              <FormField
-                control={form.control}
-                name='coverage.area'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-sm font-medium text-gray-700'>
-                      Περιοχή
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type='text'
-                        value={
-                          watchedCoverage?.area
-                            ? allZipcodes.find((z) => z.area.id === watchedCoverage.area)
-                                ?.area.name || ''
-                            : ''
-                        }
-                        readOnly
-                        className='bg-gray-100 cursor-not-allowed'
-                        placeholder='Επιλέξτε πρώτα Τ.Κ.'
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* County Input - Auto-filled from zipcode */}
-              <FormField
-                control={form.control}
-                name='coverage.county'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-sm font-medium text-gray-700'>
-                      Νομός
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type='text'
-                        value={
-                          watchedCoverage?.county
-                            ? allZipcodes.find((z) => z.county.id === watchedCoverage.county)
-                                ?.county.name || ''
-                            : ''
-                        }
-                        readOnly
-                        className='bg-gray-100 cursor-not-allowed'
-                        placeholder='Επιλέξτε πρώτα Τ.Κ.'
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Onsite Section */}
-        {watchedCoverage?.onsite && (
-          <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md'>
-            <h5 className='font-medium text-gray-900'>Περιοχές κάλυψης</h5>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              {/* Counties MultiSelect */}
-              <FormField
-                control={form.control}
-                name='coverage.counties'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-sm font-medium text-gray-700'>
-                      Νομοί
-                    </FormLabel>
-                    <FormControl>
-                      <LazyCombobox
-                        multiple
-                        className='bg-white'
-                        options={locationOptions.map((county) => ({
-                          id: county.id,
-                          label: county.name,
-                        }))}
-                        values={field.value || []}
-                        onMultiSelect={(selectedOptions) => {
-                          const selected = selectedOptions.map((opt) => opt.id);
-                          // When counties change, filter areas to keep only those from selected counties
-                          const currentCoverage = getValues('coverage');
-                          const currentAreas = currentCoverage?.areas || [];
-
-                          // Get all area IDs from selected counties
-                          const validAreaIds = selected.flatMap(
-                            (countyId: string) => {
-                              const county = locationOptions.find(
-                                (c) => c.id === countyId,
-                              );
-                              return (
-                                county?.children?.map(
-                                  (area: any) => area.id,
-                                ) || []
-                              );
-                            },
-                          );
-
-                          // Filter areas to keep only those from selected counties
-                          const filteredAreas = currentAreas.filter(
-                            (areaId: string) => validAreaIds.includes(areaId),
-                          );
-
-                          setValue('coverage.counties', selected, {
-                            shouldDirty: true,
-                            shouldValidate: true,
-                          });
-                          setValue('coverage.areas', filteredAreas, {
-                            shouldDirty: true,
-                            shouldValidate: true,
-                          });
-                        }}
-                        onSelect={() => {}}
-                        placeholder='Επιλέξτε νομούς...'
-                        searchPlaceholder='Αναζήτηση νομών...'
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Areas MultiSelect */}
-              <FormField
-                control={form.control}
-                name='coverage.areas'
-                render={({ field }) => {
-                  return (
+          {/* Conditional Onbase Section */}
+          {watchedCoverage?.onbase && (
+            <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md shadow border'>
+              <h5 className='font-medium text-gray-900'>
+                Στοιχεία για τον χώρο σας
+              </h5>
+              <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+                {/* Address - First field */}
+                <FormField
+                  control={form.control}
+                  name='coverage.address'
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel className='text-sm font-medium text-gray-700'>
-                        Περιοχές
+                        Διεύθυνση
                       </FormLabel>
                       <FormControl>
-                        <div className='space-y-2'>
-                          {watchedCoverage?.counties?.length > 0 ? (
-                            <LazyCombobox
-                              key={`areas-${watchedCoverage.counties.join('-')}`} // Force remount when counties change
-                              multiple
-                              className='bg-white'
-                              options={availableAreas}
-                              values={field.value || []}
-                              onMultiSelect={(selectedOptions) => {
-                                const selectedIds = selectedOptions.map((opt) => opt.id);
-                                setValue('coverage.areas', selectedIds, {
-                                  shouldDirty: true,
-                                  shouldValidate: true,
-                                });
-                              }}
-                              onSelect={() => {}}
-                              placeholder='Επιλέξτε περιοχές...'
-                              searchPlaceholder='Αναζήτηση περιοχών...'
-                              formatLabel={(option) => (
-                                <>
-                                  {option.label}{' '}
-                                  <span className='text-gray-500'>
-                                    ({option.county})
-                                  </span>
-                                </>
-                              )}
-                            />
-                          ) : (
-                            <div className='text-gray-500 bg-gray-50 p-3 rounded-md border'>
-                              Επιλέξτε πρώτα νομούς για να δείτε τις διαθέσιμες
-                              περιοχές
-                            </div>
-                          )}
-                        </div>
+                        <Input
+                          type='text'
+                          placeholder='Εισάγετε τη διεύθυνσή σας'
+                          value={field.value || ''}
+                          onChange={handleAddressChange}
+                          className='bg-white'
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  );
-                }}
-              />
-            </div>
-          </div>
-        )}
+                  )}
+                />
 
-        <div className='flex justify-end space-x-4'>
-          <FormButton
-            variant='outline'
-            type='button'
-            text='Ακύρωση'
-            onClick={() => form.reset()}
-            disabled={isPending || !isDirty}
-          />
-          <FormButton
-            type='submit'
-            text='Αποθήκευση'
-            loadingText='Αποθήκευση...'
-            loading={isPending}
-            disabled={isPending || !isValid || !isDirty}
-          />
-        </div>
+                {/* Zipcode Combobox - Second field */}
+                <div className='space-y-2'>
+                  <FormLabel className='text-sm font-medium text-gray-700'>
+                    Τ.Κ.
+                  </FormLabel>
+                  <LazyCombobox
+                    options={allZipcodes}
+                    value={watchedCoverage?.zipcode || undefined}
+                    onSelect={(zipcode) => handleZipcodeChange(zipcode.id)}
+                    placeholder='Επιλέξτε Τ.Κ...'
+                    searchPlaceholder='Αναζήτηση Τ.Κ...'
+                    emptyMessage='Δεν βρέθηκαν Τ.Κ.'
+                    formatLabel={(option) => (
+                      <>
+                        {option.name}{' '}
+                        <span className='text-gray-500'>
+                          ({option.area.name} - {option.county.name})
+                        </span>
+                      </>
+                    )}
+                    getButtonLabel={(option) =>
+                      option?.name || 'Επιλέξτε Τ.Κ...'
+                    }
+                    initialLimit={20}
+                    loadMoreIncrement={20}
+                    loadMoreThreshold={50}
+                    searchLimit={100}
+                    showProgress={true}
+                  />
+                </div>
+
+                {/* Area Input - Auto-filled from zipcode */}
+                <FormField
+                  control={form.control}
+                  name='coverage.area'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='text-sm font-medium text-gray-700'>
+                        Περιοχή
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type='text'
+                          value={
+                            watchedCoverage?.area
+                              ? allZipcodes.find(
+                                  (z) => z.area.id === watchedCoverage.area,
+                                )?.area.name || ''
+                              : ''
+                          }
+                          readOnly
+                          className='bg-gray-100 cursor-not-allowed'
+                          placeholder='Επιλέξτε πρώτα Τ.Κ.'
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* County Input - Auto-filled from zipcode */}
+                <FormField
+                  control={form.control}
+                  name='coverage.county'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='text-sm font-medium text-gray-700'>
+                        Νομός
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type='text'
+                          value={
+                            watchedCoverage?.county
+                              ? allZipcodes.find(
+                                  (z) => z.county.id === watchedCoverage.county,
+                                )?.county.name || ''
+                              : ''
+                          }
+                          readOnly
+                          className='bg-gray-100 cursor-not-allowed'
+                          placeholder='Επιλέξτε πρώτα Τ.Κ.'
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Onsite Section */}
+          {watchedCoverage?.onsite && (
+            <div className='space-y-4 mt-4 p-4 bg-gray-50 rounded-md shadow border'>
+              <h5 className='font-medium text-gray-900'>Περιοχές κάλυψης</h5>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                {/* Counties MultiSelect */}
+                <FormField
+                  control={form.control}
+                  name='coverage.counties'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='text-sm font-medium text-gray-700'>
+                        Νομοί
+                      </FormLabel>
+                      <FormControl>
+                        <LazyCombobox
+                          multiple
+                          className='bg-white'
+                          options={locationOptions.map((county) => ({
+                            id: county.id,
+                            label: county.name,
+                          }))}
+                          values={field.value || []}
+                          onMultiSelect={(selectedOptions) => {
+                            const selected = selectedOptions.map(
+                              (opt) => opt.id,
+                            );
+                            // When counties change, filter areas to keep only those from selected counties
+                            const currentCoverage = getValues('coverage');
+                            const currentAreas = currentCoverage?.areas || [];
+
+                            // Get all area IDs from selected counties
+                            const validAreaIds = selected.flatMap(
+                              (countyId: string) => {
+                                const county = locationOptions.find(
+                                  (c) => c.id === countyId,
+                                );
+                                return (
+                                  county?.children?.map(
+                                    (area: any) => area.id,
+                                  ) || []
+                                );
+                              },
+                            );
+
+                            // Filter areas to keep only those from selected counties
+                            const filteredAreas = currentAreas.filter(
+                              (areaId: string) => validAreaIds.includes(areaId),
+                            );
+
+                            setValue('coverage.counties', selected, {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                            setValue('coverage.areas', filteredAreas, {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                          }}
+                          onSelect={() => {}}
+                          placeholder='Επιλέξτε νομούς...'
+                          searchPlaceholder='Αναζήτηση νομών...'
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Areas MultiSelect */}
+                <FormField
+                  control={form.control}
+                  name='coverage.areas'
+                  render={({ field }) => {
+                    return (
+                      <FormItem>
+                        <FormLabel className='text-sm font-medium text-gray-700'>
+                          Περιοχές
+                        </FormLabel>
+                        <FormControl>
+                          <div className='space-y-2'>
+                            {watchedCoverage?.counties?.length > 0 ? (
+                              <LazyCombobox
+                                key={`areas-${watchedCoverage.counties.join('-')}`} // Force remount when counties change
+                                multiple
+                                className='bg-white'
+                                options={availableAreas}
+                                values={field.value || []}
+                                onMultiSelect={(selectedOptions) => {
+                                  const selectedIds = selectedOptions.map(
+                                    (opt) => opt.id,
+                                  );
+                                  setValue('coverage.areas', selectedIds, {
+                                    shouldDirty: true,
+                                    shouldValidate: true,
+                                  });
+                                }}
+                                onSelect={() => {}}
+                                placeholder='Επιλέξτε περιοχές...'
+                                searchPlaceholder='Αναζήτηση περιοχών...'
+                                formatLabel={(option) => (
+                                  <>
+                                    {option.label}{' '}
+                                    <span className='text-gray-500'>
+                                      ({option.county})
+                                    </span>
+                                  </>
+                                )}
+                              />
+                            ) : (
+                              <div className='text-gray-500 bg-gray-50 p-3 rounded-md border'>
+                                Επιλέξτε πρώτα νομούς για να δείτε τις
+                                διαθέσιμες περιοχές
+                              </div>
+                            )}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className='flex justify-end space-x-4'>
+            <FormButton
+              variant='outline'
+              type='button'
+              text='Ακύρωση'
+              onClick={() => form.reset()}
+              disabled={isPending || !isDirty}
+            />
+            <FormButton
+              type='submit'
+              text='Αποθήκευση'
+              loadingText='Αποθήκευση...'
+              loading={isPending}
+              disabled={isPending || !isValid || !isDirty}
+            />
+          </div>
         </FormWrapper>
       </form>
     </Form>

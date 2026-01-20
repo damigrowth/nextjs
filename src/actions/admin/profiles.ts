@@ -7,8 +7,9 @@ import { prisma } from '@/lib/prisma/client';
 import { z } from 'zod';
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
-import { proTaxonomies } from '@/constants/datasets/pro-taxonomies';
+import { getProTaxonomies } from '@/lib/taxonomies';
 import { resolveTaxonomyHierarchy } from '@/lib/utils/datasets';
+import { normalizeTerm } from '@/lib/utils/text/normalize';
 
 import {
   adminListProfilesSchema,
@@ -22,7 +23,8 @@ import {
   type AdminDeleteProfileInput,
   type AdminUpdateVerificationInput,
 } from '@/lib/validations/admin';
-import { getAdminSession } from './helpers';
+import { getAdminSession, getAdminSessionWithPermission } from './helpers';
+import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 
 /**
  * List profiles with filters and pagination
@@ -31,7 +33,7 @@ export async function listProfiles(
   params: Partial<AdminListProfilesInput> = {},
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'view');
 
     const validatedParams = adminListProfilesSchema.parse(params);
 
@@ -134,6 +136,9 @@ export async function listProfiles(
       prisma.profile.count({ where }),
     ]);
 
+    // Lazy-load pro taxonomies for O(1) lookups
+    const proTaxonomies = getProTaxonomies();
+
     // Transform profiles to include taxonomy labels
     const transformedProfiles = profiles.map((profile) => ({
       ...profile,
@@ -169,7 +174,7 @@ export async function listProfiles(
  */
 export async function getProfile(profileId: string) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'view');
 
     const profile = await prisma.profile.findUnique({
       where: { id: profileId },
@@ -237,16 +242,29 @@ export async function getProfile(profileId: string) {
  */
 export async function updateProfile(params: AdminUpdateProfileInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'edit');
 
     const validatedParams = adminUpdateProfileSchema.parse(params);
 
     const { profileId, ...updateData } = validatedParams;
 
-    // Remove undefined values
-    const cleanData = Object.fromEntries(
-      Object.entries(updateData).filter(([_, v]) => v !== undefined),
-    );
+    // Remove undefined values and add normalized fields for searchable text
+    const cleanData: Record<string, any> = {};
+    Object.entries(updateData).forEach(([key, value]) => {
+      if (value !== undefined) {
+        cleanData[key] = value;
+
+        // Add normalized version for searchable text fields
+        // Only normalize non-empty strings (empty string should set normalized to null)
+        if (key === 'displayName' && value) {
+          cleanData.displayNameNormalized = normalizeTerm(value as string);
+        } else if (key === 'tagline' && value) {
+          cleanData.taglineNormalized = normalizeTerm(value as string);
+        } else if (key === 'bio' && value) {
+          cleanData.bioNormalized = normalizeTerm(value as string);
+        }
+      }
+    });
 
     const profile = await prisma.profile.update({
       where: { id: profileId },
@@ -289,7 +307,7 @@ export async function updateProfile(params: AdminUpdateProfileInput) {
  */
 export async function togglePublished(params: AdminToggleProfileInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'edit');
 
     const validatedParams = adminToggleProfileSchema.parse(params);
 
@@ -341,7 +359,7 @@ export async function togglePublished(params: AdminToggleProfileInput) {
  */
 export async function toggleFeatured(params: AdminToggleProfileInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'edit');
 
     const validatedParams = adminToggleProfileSchema.parse(params);
 
@@ -420,7 +438,7 @@ export async function toggleFeatured(params: AdminToggleProfileInput) {
  */
 export async function toggleVerified(params: AdminToggleProfileInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'edit');
 
     const validatedParams = adminToggleProfileSchema.parse(params);
 
@@ -491,7 +509,7 @@ export async function updateVerificationStatus(
   params: AdminUpdateVerificationInput,
 ) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'edit');
 
     const validatedParams = adminUpdateVerificationSchema.parse(params);
 
@@ -566,7 +584,7 @@ export async function updateVerificationStatus(
  */
 export async function deleteProfile(params: AdminDeleteProfileInput) {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'full');
 
     const validatedParams = adminDeleteProfileSchema.parse(params);
 
@@ -616,11 +634,169 @@ export async function deleteProfile(params: AdminDeleteProfileInput) {
 }
 
 /**
+ * Search profiles for selection dropdown (unlimited search across all profiles)
+ */
+export async function searchProfilesForSelection(searchQuery: string) {
+  try {
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'view');
+
+    // Validate search query
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      return {
+        success: true,
+        data: [],
+      };
+    }
+
+    const trimmedQuery = searchQuery.trim();
+
+    // Search ALL profiles matching query (no pagination)
+    // Filter by role and search across displayName, email, username
+    const profiles = await prisma.profile.findMany({
+      where: {
+        AND: [
+          // Only freelancers and companies
+          {
+            user: {
+              role: {
+                in: ['freelancer', 'company'],
+              },
+            },
+          },
+          // Search across multiple fields
+          {
+            OR: [
+              { username: { contains: trimmedQuery, mode: 'insensitive' } },
+              { displayName: { contains: trimmedQuery, mode: 'insensitive' } },
+              { email: { contains: trimmedQuery, mode: 'insensitive' } },
+              { user: { email: { contains: trimmedQuery, mode: 'insensitive' } } },
+            ],
+          },
+        ],
+      },
+      select: {
+        id: true,
+        uid: true,
+        username: true,
+        displayName: true,
+        email: true,
+        image: true,
+        coverage: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+      // Limit to 50 results for performance (reasonable for dropdown)
+      take: 50,
+      orderBy: {
+        displayName: 'asc',
+      },
+    });
+
+    return {
+      success: true,
+      data: profiles,
+    };
+  } catch (error) {
+    console.error('Error searching profiles:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to search profiles',
+      data: [],
+    };
+  }
+}
+
+/**
+ * Search profiles for service creation (used by Editors who don't have profiles permission)
+ * Assumes caller has been authorized with SERVICES permission
+ * This function does NOT check permissions - it's meant for service creation workflows
+ */
+export async function searchProfilesForServiceCreation(searchQuery: string) {
+  try {
+    // NO permission check - assumes caller verified with SERVICES permission
+
+    // Validate search query
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      return {
+        success: true,
+        data: [],
+      };
+    }
+
+    const trimmedQuery = searchQuery.trim();
+
+    // Search ALL profiles matching query (no pagination)
+    // Filter by role and search across displayName, email, username
+    const profiles = await prisma.profile.findMany({
+      where: {
+        AND: [
+          // Only freelancers and companies
+          {
+            user: {
+              role: {
+                in: ['freelancer', 'company'],
+              },
+            },
+          },
+          // Search across multiple fields
+          {
+            OR: [
+              { username: { contains: trimmedQuery, mode: 'insensitive' } },
+              { displayName: { contains: trimmedQuery, mode: 'insensitive' } },
+              { email: { contains: trimmedQuery, mode: 'insensitive' } },
+              { user: { email: { contains: trimmedQuery, mode: 'insensitive' } } },
+            ],
+          },
+        ],
+      },
+      select: {
+        id: true,
+        uid: true,
+        username: true,
+        displayName: true,
+        email: true,
+        image: true,
+        coverage: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+      // Limit to 50 results for performance (reasonable for dropdown)
+      take: 50,
+      orderBy: {
+        displayName: 'asc',
+      },
+    });
+
+    return {
+      success: true,
+      data: profiles,
+    };
+  } catch (error) {
+    console.error('Error searching profiles for service creation:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to search profiles for service creation',
+      data: [],
+    };
+  }
+}
+
+/**
  * Get profile statistics
  */
 export async function getProfileStats() {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'view');
 
     const [total, published, featured, verified, unverified, top, professional, company] = await Promise.all([
       prisma.profile.count(),
@@ -664,7 +840,7 @@ export async function updateProfileSettingsAction(
   formData: FormData,
 ): Promise<any> {
   try {
-    await getAdminSession();
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'edit');
 
     const profileId = formData.get('profileId');
 

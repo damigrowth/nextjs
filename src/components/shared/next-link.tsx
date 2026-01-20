@@ -3,6 +3,7 @@
 import NextLinkOriginal, { type LinkProps as NextLinkProps } from 'next/link';
 import { forwardRef, useState, type AnchorHTMLAttributes, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { useNavigationSkeletonStore } from '@/lib/stores/use-navigation-skeleton-store';
 
 type PrefetchStrategy = boolean | 'hover';
 
@@ -20,7 +21,7 @@ type NextLinkCustomProps = Omit<NextLinkProps, 'prefetch'> &
   };
 
 /**
- * Enhanced Next.js Link component with intelligent prefetch strategies
+ * Enhanced Next.js Link component with intelligent prefetch strategies and instant skeleton loading
  *
  * @description
  * Next.js Link automatically prefetches pages on hover and viewport visibility,
@@ -41,9 +42,15 @@ type NextLinkCustomProps = Omit<NextLinkProps, 'prefetch'> &
  * - Best for: Service listings, search results, category pages
  * - Reduces unnecessary prefetches by 70-90%
  *
+ * **Instant Skeleton Loading:**
+ * - Automatically detects service and profile page navigation
+ * - Shows full skeleton overlay instantly on click (0ms)
+ * - Works from anywhere in the app
+ * - No prefetch performance penalty
+ *
  * @example
  * ```tsx
- * import { NextLink } from '@/components/shared';
+ * import { NextLink } from '@/components';
  *
  * // Default: no prefetching
  * <NextLink href="/profile/123">View Profile</NextLink>
@@ -60,10 +67,70 @@ type NextLinkCustomProps = Omit<NextLinkProps, 'prefetch'> &
  * ```
  */
 const NextLink = forwardRef<HTMLAnchorElement, NextLinkCustomProps>(
-  function NextLinkWithRef({ prefetch = false, ...rest }, ref) {
+  function NextLinkWithRef({ prefetch = false, onClick, ...rest }, ref) {
     const router = useRouter();
     const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
     const [prefetched, setPrefetched] = useState(false);
+    const { showSkeleton } = useNavigationSkeletonStore();
+
+    /**
+     * Detect if href is a service or profile page
+     * Returns skeleton type or null
+     * Explicitly excludes admin routes
+     */
+    const detectSkeletonType = (href: string): 'service' | 'profile' | null => {
+      // Normalize href - handle both absolute and relative paths
+      const normalizedHref = href.toString();
+
+      // Exclude any admin routes (both /admin and routes containing /admin/)
+      if (normalizedHref.includes('/admin')) {
+        return null;
+      }
+
+      // Service page: /s/[slug] (exact match, no additional segments)
+      if (/^\/s\/[^/]+$/.test(normalizedHref)) {
+        return 'service';
+      }
+
+      // Profile page: /profile/[username] (exact match, no additional segments)
+      if (/^\/profile\/[^/]+$/.test(normalizedHref)) {
+        return 'profile';
+      }
+
+      return null;
+    };
+
+    /**
+     * Handle click with skeleton detection and scroll to top
+     */
+    const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+      const href = rest.href as string;
+      const target = rest.target;
+
+      // Never show skeleton for links opening in new tab
+      if (target === '_blank') {
+        // Just call original onClick if provided
+        if (onClick) {
+          onClick(event);
+        }
+        return;
+      }
+
+      const skeletonType = detectSkeletonType(href);
+
+      // Show skeleton overlay if service or profile page (and not opening in new tab)
+      if (skeletonType) {
+        // Show skeleton first to hide the scroll action
+        showSkeleton(skeletonType);
+        // Then scroll to top hidden underneath the overlay
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+
+      // Call original onClick if provided
+      if (onClick) {
+        onClick(event);
+      }
+    };
 
     // Strategy 3: Hover-based prefetching with 1.5s delay
     if (prefetch === 'hover') {
@@ -91,6 +158,7 @@ const NextLink = forwardRef<HTMLAnchorElement, NextLinkCustomProps>(
           prefetch={false}
           {...rest}
           ref={ref}
+          onClick={handleClick}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         />
@@ -98,7 +166,14 @@ const NextLink = forwardRef<HTMLAnchorElement, NextLinkCustomProps>(
     }
 
     // Strategy 1 & 2: No prefetch (false) or Always prefetch (true)
-    return <NextLinkOriginal prefetch={prefetch as boolean} {...rest} ref={ref} />;
+    return (
+      <NextLinkOriginal
+        prefetch={prefetch as boolean}
+        {...rest}
+        ref={ref}
+        onClick={handleClick}
+      />
+    );
   }
 );
 

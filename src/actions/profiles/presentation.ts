@@ -11,7 +11,7 @@ import {
 } from '@/lib/validations/profile';
 import { extractFormData } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
 
 /**
@@ -47,7 +47,7 @@ export async function updateProfilePresentation(
         visibility: {
           type: 'json',
           required: false,
-          defaultValue: { email: true, phone: true, address: true },
+          defaultValue: { email: false, phone: true, address: true },
         },
         socials: { type: 'json', required: false, defaultValue: {} },
       },
@@ -105,7 +105,7 @@ export async function updateProfilePresentation(
         viber: data.viber || null,
         whatsapp: data.whatsapp || null,
         visibility: data.visibility || {
-          email: true,
+          email: false,
           phone: true,
           address: true,
         },

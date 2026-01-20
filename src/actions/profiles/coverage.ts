@@ -7,8 +7,9 @@ import { requireAuth, hasAnyRole } from '@/actions/auth/server';
 import { coverageSchema } from '@/lib/validations/profile';
 import { getFormJSON } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
-import { handleBetterAuthError } from '@/lib/utils/better-auth-localization';
+import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
+import { generateCoverageNormalized } from '@/lib/utils/datasets';
 
 /**
  * Server action for updating profile coverage
@@ -81,11 +82,14 @@ export async function updateCoverage(
       };
     }
 
-    // 6. Update profile with coverage
+    // 6. Update profile with coverage and auto-generate normalized coverage
+    const coverageNormalized = generateCoverageNormalized(data);
+
     await prisma.profile.update({
       where: { uid: user.id },
       data: {
         coverage: data as any,
+        coverageNormalized,
         updatedAt: new Date(),
       },
     });

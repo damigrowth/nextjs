@@ -3,7 +3,6 @@
 import { prisma } from '@/lib/prisma/client';
 import { transformMessageForChat } from '@/lib/utils/messages';
 import type { ChatMessageItem, MessageWithRelations } from '@/lib/types/messages';
-import { sendUnreadMessagesEmail } from '@/lib/email/services/message-emails';
 import { MESSAGE_WITH_AUTHOR_INCLUDE } from '@/lib/database/selects';
 
 /**
@@ -15,7 +14,7 @@ export async function getMessages(
   options?: { limit?: number; before?: string }
 ): Promise<ChatMessageItem[]> {
   try {
-    const limit = options?.limit || 100;
+    const limit = options?.limit || 20;
 
     // Verify user is a member of the chat
     const chatMember = await prisma.chatMember.findUnique({
@@ -65,7 +64,7 @@ export async function getMessages(
         },
       },
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc', // Get newest messages first
       },
       take: limit,
     });
@@ -75,7 +74,8 @@ export async function getMessages(
       transformMessageForChat(message as MessageWithRelations, currentUserId)
     );
 
-    return chatMessages;
+    // Reverse to display oldest→newest (bottom of chat shows most recent)
+    return chatMessages.reverse();
   } catch (error) {
     console.error('Error fetching messages:', error);
     throw new Error('Failed to fetch messages');
@@ -142,13 +142,8 @@ export async function sendMessage(
       return newMessage;
     });
 
-    // Check if we should trigger unread messages email notification (async, non-blocking)
-    checkAndSendUnreadEmailNotification(chatId, authorUid).catch((error) => {
-      console.error('[Email] Failed to check/send unread email notification:', error);
-      // Don't throw - email failure shouldn't break message send
-    });
-
     // Transform for UI
+    // Note: Email notifications are handled by cron job (/api/cron/process-email-batches)
     return transformMessageForChat(message as MessageWithRelations, authorUid);
   } catch (error) {
     console.error('Error sending message:', error);
@@ -193,42 +188,6 @@ export async function editMessage(
     });
   } catch (error) {
     console.error('Error editing message:', error);
-    throw error;
-  }
-}
-
-/**
- * Delete a message (soft delete)
- */
-export async function deleteMessage(
-  messageId: string,
-  userId: string
-): Promise<void> {
-  try {
-    // Get the message and verify ownership
-    const message = await prisma.message.findUnique({
-      where: { id: messageId },
-    });
-
-    if (!message) {
-      throw new Error('Message not found');
-    }
-
-    if (message.authorUid !== userId) {
-      throw new Error('You can only delete your own messages');
-    }
-
-    // Soft delete message
-    await prisma.message.update({
-      where: { id: messageId },
-      data: {
-        deleted: true,
-        deletedAt: new Date(),
-        deletedBy: userId,
-      },
-    });
-  } catch (error) {
-    console.error('Error deleting message:', error);
     throw error;
   }
 }
@@ -408,85 +367,3 @@ export async function getRecentUnreadMessages(
   }
 }
 
-/**
- * Manage email batch state when a message is sent
- * Creates or updates EmailBatch records for 15-minute collection windows
- *
- * Note: Email sending is handled by Vercel cron job (/api/cron/process-email-batches)
- * that runs every 15 minutes automatically
- *
- * This is called asynchronously after sending a message (non-blocking)
- */
-async function checkAndSendUnreadEmailNotification(
-  chatId: string,
-  senderUid: string
-): Promise<void> {
-  try {
-    // Get the other member(s) in the chat (recipients)
-    const chatMembers = await prisma.chatMember.findMany({
-      where: {
-        chatId: chatId,
-        uid: {
-          not: senderUid, // Exclude the sender
-        },
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-          },
-        },
-      },
-    });
-
-    // Check each recipient
-    for (const member of chatMembers) {
-      const recipient = member.user;
-
-      // Check for existing unprocessed email batch
-      const batch = await prisma.emailBatch.findFirst({
-        where: {
-          userId: recipient.id,
-          processed: false,
-        },
-        orderBy: {
-          firstMessageAt: 'desc',
-        },
-      });
-
-      if (!batch) {
-        // No active batch - create new one (start 15-minute collection window)
-        await prisma.emailBatch.create({
-          data: {
-            userId: recipient.id,
-            firstMessageAt: new Date(),
-            messageCount: 1,
-          },
-        });
-
-        console.log(
-          `[Email Batch] Started new 15-minute collection window for user ${recipient.id}`
-        );
-      } else {
-        // Batch exists - increment message count
-        const minutesSinceFirst =
-          (Date.now() - new Date(batch.firstMessageAt).getTime()) / (1000 * 60);
-
-        await prisma.emailBatch.update({
-          where: { id: batch.id },
-          data: {
-            messageCount: { increment: 1 },
-          },
-        });
-
-        console.log(
-          `[Email Batch] Added message to batch for user ${recipient.id} (${Math.floor(minutesSinceFirst)} min elapsed, cron will send at 15 min)`
-        );
-      }
-    }
-  } catch (error) {
-    console.error('[Email] Error in checkAndSendUnreadEmailNotification:', error);
-    // Don't throw - this is a background task
-  }
-}

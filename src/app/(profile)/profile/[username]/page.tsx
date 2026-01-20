@@ -2,6 +2,8 @@ import type { JSX } from 'react';
 import { notFound } from 'next/navigation';
 import { getProfilePageData } from '@/actions/profiles/get-profile';
 import { getProfileMetadata } from '@/lib/seo/pages';
+import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
+import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
 import {
   ProfileBio,
   ProfileFeatures,
@@ -13,10 +15,9 @@ import {
   ProfileServices,
   ProfileSkills,
   ProfileTerms,
-  TaxonomyTabs,
-  DynamicBreadcrumb,
   ReportProfileDialog,
-} from '@/components';
+} from '@/components/profile';
+import { ProfileSchema } from '@/lib/seo/schema';
 
 // ISR configuration with shorter interval + tag-based revalidation
 export const revalidate = 300; // Revalidate every 5 minutes (backup for tag-based)
@@ -86,7 +87,6 @@ export default async function ProfilePage({
     profile,
     category,
     subcategory,
-    speciality,
     featuredCategories,
     skillsData,
     specialityData,
@@ -106,8 +106,21 @@ export default async function ProfilePage({
 
   const image = profile.image;
 
+  // Get first county for location schema
+  const firstCounty = coverage.counties && coverage.counties.length > 0
+    ? coverage.counties[0]
+    : undefined;
+
   return (
     <div className='my-20'>
+      <ProfileSchema
+        username={profile.username || ''}
+        displayName={profile.displayName || ''}
+        location={firstCounty}
+        // rating={profile.rating}
+        // reviewCount={profile.reviewCount}
+        image={image}
+      />
       {/* Category Navigation Tabs */}
       <TaxonomyTabs
         items={featuredCategories}
@@ -125,7 +138,7 @@ export default async function ProfilePage({
       />
       {/* Profile Content */}
       <section className='pt-4 pb-20 bg-white'>
-        <div className='container mx-auto px-4'>
+        <div className='container mx-auto px-4 lg:px-10'>
           <div className='relative grid grid-cols-1 lg:grid-cols-3 gap-28'>
             {/* Main Content */}
             <div className='lg:col-span-2 space-y-12'>
@@ -206,7 +219,7 @@ export default async function ProfilePage({
                     profileDisplayName={profile.displayName || ''}
                   />
 
-                  {(skillsData.length > 0 || speciality) && (
+                  {(skillsData.length > 0 || specialityData) && (
                     <ProfileSkills
                       skills={skillsData}
                       speciality={specialityData?.label}
@@ -237,7 +250,7 @@ export default async function ProfilePage({
                 profileDisplayName={profile.displayName || ''}
               />
 
-              {(skillsData.length > 0 || speciality) && (
+              {(skillsData.length > 0 || specialityData) && (
                 <ProfileSkills
                   skills={skillsData}
                   speciality={specialityData?.label}

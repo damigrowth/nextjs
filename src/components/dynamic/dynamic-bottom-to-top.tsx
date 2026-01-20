@@ -3,7 +3,10 @@
 import dynamic from 'next/dynamic';
 
 const BottomToTop = dynamic(
-  () => import('../shared').then((mod) => ({ default: mod.BottomToTop })),
+  () =>
+    import('../shared/button-scroll-to-top').then((mod) => ({
+      default: mod.default,
+    })),
   {
     ssr: false,
     loading: () => null, // No loading state needed for scroll to top

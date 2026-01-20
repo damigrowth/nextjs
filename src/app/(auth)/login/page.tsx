@@ -1,6 +1,6 @@
 import { JSX } from 'react';
 import { Metadata } from 'next';
-import NextLink from '@/components/shared/next-link';
+// import NextLink from '@/components/shared/next-link';
 
 import { getLoginMetadata } from '@/lib/seo/pages';
 
