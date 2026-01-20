@@ -36,8 +36,7 @@ import {
   // revertCommits,
   undoLastCommit,
   mergeDatasetsToMain,
-  syncDatasetsWithMain,
-  resetDatasetsToMain,
+  // Removed after UI simplification: syncDatasetsWithMain, resetDatasetsToMain
 } from '@/actions/admin/git-operations';
 import { toast } from 'sonner';
 import { CommitForm } from './commit-form';
@@ -56,8 +55,7 @@ export function DeploymentManager() {
   // const [reverting, setReverting] = useState<string | null>(null);
   const [undoing, setUndoing] = useState<string | null>(null);
   const [deploying, setDeploying] = useState(false);
-  const [syncing, setSyncing] = useState(false);
-  const [resetting, setResetting] = useState(false);
+  // Removed: syncing, resetting - no longer needed after UI simplification
 
   // Helper function to generate Vercel preview URL
   const getVercelPreviewUrl = (branch: string) => {
@@ -292,93 +290,9 @@ export function DeploymentManager() {
     }
   };
 
-  const handleSyncWithProduction = async () => {
-    const behindCount = gitStatus?.behind_by || 0;
-
-    if (behindCount === 0) {
-      toast.info('Already up-to-date with production.');
-      return;
-    }
-
-    if (
-      !confirm(
-        `Sync with Production?\n\n` +
-          `This will merge ${behindCount} commit${behindCount > 1 ? 's' : ''} from main into ${gitStatus?.branch}.\n\n` +
-          `This operation:\n` +
-          `• Merges main → ${gitStatus?.branch}\n` +
-          `• Updates ${gitStatus?.branch} with production changes\n` +
-          `• Triggers preview deployment on Vercel\n\n` +
-          `Continue?`,
-      )
-    ) {
-      return;
-    }
-
-    setSyncing(true);
-
-    try {
-      const result = await syncDatasetsWithMain();
-
-      if (result.success && result.data) {
-        toast.success(result.data.message);
-        await loadGitStatus();
-        await loadRecentCommits();
-      } else {
-        toast.error(result.error || 'Failed to sync with production');
-      }
-    } catch (error) {
-      toast.error('An unexpected error occurred');
-      console.error(error);
-    } finally {
-      setSyncing(false);
-    }
-  };
-
-  const handleResetToProduction = async () => {
-    const aheadCount = gitStatus?.ahead_by || 0;
-
-    if (aheadCount === 0) {
-      toast.info('Already in sync with production.');
-      return;
-    }
-
-    if (
-      !confirm(
-        `⚠️ WARNING: Reset ${gitStatus?.branch} to Production?\n\n` +
-          `This will PERMANENTLY DELETE ${aheadCount} commit${aheadCount > 1 ? 's' : ''} from ${gitStatus?.branch}:\n\n` +
-          recentCommits
-            .slice(0, aheadCount)
-            .map((c) => `- ${c.shortHash}: ${c.message}`)
-            .join('\n') +
-          `\n\nAfter reset:\n` +
-          `• ${gitStatus?.branch} will be identical to main\n` +
-          `• All test commits will be lost\n` +
-          `• Cannot be undone\n\n` +
-          `Are you absolutely sure?`,
-      )
-    ) {
-      return;
-    }
-
-    setResetting(true);
-
-    try {
-      const result = await resetDatasetsToMain();
-
-      if (result.success && result.data) {
-        toast.success(result.data.message);
-        await loadGitStatus();
-        await loadRecentCommits();
-      } else {
-        toast.error(result.error || 'Failed to reset branch');
-      }
-    } catch (error) {
-      toast.error('An unexpected error occurred');
-      console.error(error);
-    } finally {
-      setResetting(false);
-    }
-  };
+  // Removed handleSyncWithProduction and handleResetToProduction
+  // After UI simplification, these operations are no longer exposed to users
+  // Auto-sync before commit and auto-sync after deploy handle synchronization automatically
 
   const hasChanges = gitStatus?.hasDatasetChanges || false;
   const isBehind = (gitStatus?.behind_by || 0) > 0;
@@ -394,11 +308,6 @@ export function DeploymentManager() {
               <CardTitle className='flex items-center gap-2 mb-2'>
                 <GitBranch className='h-5 w-5' />
                 Current Branch
-                {isBehind && (
-                  <Badge variant='orange' className='ml-2'>
-                    {gitStatus.behind_by} behind main
-                  </Badge>
-                )}
               </CardTitle>
               <CardDescription>You are working on this branch</CardDescription>
             </div>
@@ -414,26 +323,6 @@ export function DeploymentManager() {
           </div>
         </CardHeader>
       </Card>
-
-      {/* Auto-Sync Warning Banner */}
-      {isBehind && (
-        <Alert className='border-blue-500 bg-blue-50'>
-          <AlertCircle className='h-4 w-4 text-blue-600' />
-          <AlertDescription>
-            <div className='space-y-2'>
-              <p className='font-semibold text-blue-900'>
-                ℹ️ Branch is {gitStatus.behind_by} commit
-                {gitStatus.behind_by > 1 ? 's' : ''} behind main
-              </p>
-              <p className='text-sm text-blue-800'>
-                🤖 <strong>Auto-sync enabled:</strong> When you commit, the
-                system will automatically merge the latest changes from main to
-                keep your branch up-to-date and prevent build errors.
-              </p>
-            </div>
-          </AlertDescription>
-        </Alert>
-      )}
 
       {/* Dataset Changes Alert */}
       {hasChanges && (
@@ -744,7 +633,7 @@ export function DeploymentManager() {
               Branch Management
             </CardTitle>
             <CardDescription>
-              Deploy to production or sync with production changes
+              Publish your taxonomy changes to the live website
             </CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
@@ -754,10 +643,10 @@ export function DeploymentManager() {
                 <Alert>
                   <Rocket className='h-4 w-4' />
                   <AlertDescription>
-                    {gitStatus.branch} is{' '}
+                    ✅ You have{' '}
                     <span className='font-bold'>{gitStatus.ahead_by}</span>{' '}
-                    commit{gitStatus.ahead_by !== 1 ? 's' : ''} ahead of main.
-                    Ready to deploy to production.
+                    commit{gitStatus.ahead_by !== 1 ? 's' : ''} ready to deploy.
+                    Click below to publish your changes to production.
                   </AlertDescription>
                 </Alert>
                 <div className='flex justify-center'>
@@ -776,67 +665,15 @@ export function DeploymentManager() {
               </div>
             )}
 
-            {/* Sync with Production Section */}
-            {gitStatus.behind_by !== undefined && gitStatus.behind_by > 0 && (
-              <div className='space-y-3'>
-                <Alert variant='warning'>
-                  <AlertCircle className='h-4 w-4' />
-                  <AlertDescription>
-                    {gitStatus.branch} is{' '}
-                    <span className='font-bold'>{gitStatus.behind_by}</span>{' '}
-                    commit{gitStatus.behind_by !== 1 ? 's' : ''} behind main.
-                    Sync to get the latest production changes.
-                  </AlertDescription>
-                </Alert>
-                <div className='flex justify-center'>
-                  <Button
-                    onClick={handleSyncWithProduction}
-                    disabled={syncing}
-                    size='lg'
-                    variant='outline'
-                  >
-                    <RefreshCw
-                      className={`h-4 w-4 ${syncing ? 'animate-spin' : ''}`}
-                    />
-                    {syncing ? 'Syncing...' : 'Sync with Production'}
-                  </Button>
-                </div>
-              </div>
-            )}
-
             {/* All up-to-date */}
             {gitStatus.ahead_by === 0 && gitStatus.behind_by === 0 && (
               <Alert>
                 <CheckCircle className='h-4 w-4' />
                 <AlertDescription>
-                  {gitStatus.branch} is up-to-date with production (main
-                  branch).
+                  ✅ Everything is up-to-date. You can edit taxonomies and commit
+                  changes.
                 </AlertDescription>
               </Alert>
-            )}
-
-            {/* Reset to Production Section - Danger Zone */}
-            {gitStatus.ahead_by !== undefined && gitStatus.ahead_by > 0 && (
-              <div className='mt-4 pt-4 border-t'>
-                <Alert variant='destructive'>
-                  <AlertCircle className='h-4 w-4' />
-                  <AlertDescription className='text-sm'>
-                    Danger Zone: Reset will permanently delete all{' '}
-                    {gitStatus.ahead_by} commit
-                    {gitStatus.ahead_by !== 1 ? 's' : ''} ahead of main.
-                  </AlertDescription>
-                </Alert>
-                <div className='flex justify-center mt-3'>
-                  <Button
-                    onClick={handleResetToProduction}
-                    disabled={resetting}
-                    size='sm'
-                    variant='destructive'
-                  >
-                    {resetting ? 'Resetting...' : 'Reset to Production'}
-                  </Button>
-                </div>
-              </div>
             )}
           </CardContent>
         </Card>
