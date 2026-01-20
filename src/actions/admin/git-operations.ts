@@ -796,6 +796,33 @@ export async function mergeDatasetsToMain(): Promise<
       `[MERGE_TO_MAIN] Success! Merge commit: ${mergeResult.data.sha.substring(0, 7)}`,
     );
 
+    // AUTO-SYNC: Bring the merge commit back to datasets to prevent "behind" status
+    // This prevents the infinite loop where datasets alternates between "ahead" and "behind"
+    console.log(
+      `[MERGE_TO_MAIN] Auto-syncing ${defaultBranch} with ${comparisonBranch} after deploy...`,
+    );
+
+    try {
+      await octokit.repos.merge({
+        owner,
+        repo,
+        base: defaultBranch, // datasets (target)
+        head: comparisonBranch, // main (source)
+        commit_message: `🤖 Auto-sync after deploy\n\nAutomatically synced ${defaultBranch} with ${comparisonBranch} after production deployment to keep branches in sync.\n\nThis prevents the "behind main" status and ensures both branches are equal.`,
+      });
+
+      console.log(
+        `[MERGE_TO_MAIN] Auto-sync complete. Branches are now equal.`,
+      );
+    } catch (syncError) {
+      console.warn(
+        `[MERGE_TO_MAIN] Auto-sync failed (non-critical):`,
+        syncError,
+      );
+      // Don't fail the deployment if auto-sync fails
+      // User can manually sync later if needed
+    }
+
     return {
       success: true,
       data: {
