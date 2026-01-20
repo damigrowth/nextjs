@@ -1,4 +1,4 @@
-// Generated on 2026-01-19T14:43:18.189Z
+// Generated on 2026-01-20T15:29:56.473Z
 // All data is sorted alphabetically by label
 // Flat list of tags
 
@@ -6362,5 +6362,10 @@ export const tags = [
     id: '1283',
     slug: 'psuxagogia-ekdiloseon',
     label: 'Ψυχαγωγία Εκδηλώσεων',
+  },
+  {
+    id: '1309',
+    slug: 'nano-banana-pro',
+    label: 'Nano Banana Pro',
   },
 ];
