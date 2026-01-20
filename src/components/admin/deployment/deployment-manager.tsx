@@ -324,6 +324,26 @@ export function DeploymentManager() {
         </CardHeader>
       </Card>
 
+      {/* Smart Behind Warning - Only when behind AND no uncommitted changes */}
+      {gitStatus && gitStatus.behind_by > 0 && !hasChanges && (
+        <Alert className='border-blue-500 bg-blue-50'>
+          <AlertCircle className='h-4 w-4 text-blue-600' />
+          <AlertDescription>
+            <div className='space-y-1'>
+              <p className='font-semibold text-blue-900'>
+                ℹ️ Branch is {gitStatus.behind_by} commit
+                {gitStatus.behind_by > 1 ? 's' : ''} behind production
+              </p>
+              <p className='text-sm text-blue-800'>
+                This is normal after deployment. When you make your next
+                taxonomy change and commit, the system will automatically sync
+                these updates.
+              </p>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Dataset Changes Alert */}
       {hasChanges && (
         <Alert variant='warning'>
