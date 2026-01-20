@@ -1,4 +1,4 @@
-// Generated on 2025-12-04T17:51:08.823Z
+// Generated on 2026-01-19T14:43:18.998Z
 // All data is sorted alphabetically by label/name at all levels
 // Three-level taxonomy hierarchy: categories → subcategories → subdivisions
 // Complete three-level taxonomy hierarchy: categories → subcategories → subdivisions
@@ -5838,7 +5838,7 @@ export const serviceTaxonomies = [
           },
           {
             id: '325',
-            label: 'Διαχειριση Δικτύων',
+            label: 'Διαχείριση Δικτύων',
             slug: 'diaxeirisi-diktuon',
             description:
               'Βελτίωσε την απόδοση του δικτύου σου με επαγγελματική διαχείριση και εξασφάλισε απρόσκοπτη λειτουργία.',
@@ -5857,8 +5857,8 @@ export const serviceTaxonomies = [
           },
           {
             id: '326',
-            label: 'Διαχείριση Δικτύων',
-            slug: 'diaxeirisi-diktuon-2',
+            label: 'Υποστήριξη Δικτύων',
+            slug: 'upostirixi-diktuon',
             description:
               'Βελτίωσε την απόδοση του δικτύου σου με επαγγελματική διαχείριση και επίλυση προβλημάτων άμεσα.',
             image: {
