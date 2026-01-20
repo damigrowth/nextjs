@@ -99,6 +99,14 @@ export function DeploymentManager() {
     setCommitting(true);
 
     try {
+      // Show auto-sync notification if behind
+      if (gitStatus?.behind_by && gitStatus.behind_by > 0) {
+        toast.info(
+          `🤖 Auto-syncing ${gitStatus.behind_by} commit${gitStatus.behind_by > 1 ? 's' : ''} from main before committing...`,
+          { duration: 5000 },
+        );
+      }
+
       const result = await commitDatasetChanges(message);
 
       if (result.success) {
@@ -373,6 +381,8 @@ export function DeploymentManager() {
   };
 
   const hasChanges = gitStatus?.hasDatasetChanges || false;
+  const isBehind = (gitStatus?.behind_by || 0) > 0;
+  const isAhead = (gitStatus?.ahead_by || 0) > 0;
 
   return (
     <div className='space-y-6'>
@@ -384,6 +394,11 @@ export function DeploymentManager() {
               <CardTitle className='flex items-center gap-2 mb-2'>
                 <GitBranch className='h-5 w-5' />
                 Current Branch
+                {isBehind && (
+                  <Badge variant='orange' className='ml-2'>
+                    {gitStatus.behind_by} behind main
+                  </Badge>
+                )}
               </CardTitle>
               <CardDescription>You are working on this branch</CardDescription>
             </div>
@@ -399,6 +414,26 @@ export function DeploymentManager() {
           </div>
         </CardHeader>
       </Card>
+
+      {/* Auto-Sync Warning Banner */}
+      {isBehind && (
+        <Alert className='border-blue-500 bg-blue-50'>
+          <AlertCircle className='h-4 w-4 text-blue-600' />
+          <AlertDescription>
+            <div className='space-y-2'>
+              <p className='font-semibold text-blue-900'>
+                ℹ️ Branch is {gitStatus.behind_by} commit
+                {gitStatus.behind_by > 1 ? 's' : ''} behind main
+              </p>
+              <p className='text-sm text-blue-800'>
+                🤖 <strong>Auto-sync enabled:</strong> When you commit, the
+                system will automatically merge the latest changes from main to
+                keep your branch up-to-date and prevent build errors.
+              </p>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Dataset Changes Alert */}
       {hasChanges && (
