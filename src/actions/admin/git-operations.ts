@@ -1,5 +1,6 @@
 'use server';
 
+import { Octokit } from '@octokit/rest';
 import {
   getGitHubClient,
   REPO_CONFIG,
