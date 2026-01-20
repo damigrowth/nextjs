@@ -1,4 +1,4 @@
-// Generated on 2026-01-20T17:15:07.417Z
+// Generated on 2026-01-20T17:38:48.812Z
 // All data is sorted alphabetically by label
 // Flat list of tags
 
@@ -6365,7 +6365,7 @@ export const tags = [
   },
   {
     id: '1309',
-    label: 'Nano Pro',
-    slug: 'nano-pro',
+    label: 'Nano Banana Pro',
+    slug: 'nano-banana-pro',
   },
 ];
