@@ -1,4 +1,4 @@
-// Generated on 2025-10-13T11:46:20.898Z
+// Generated on 2026-01-19T14:43:18.189Z
 // All data is sorted alphabetically by label
 // Flat list of tags
 
@@ -3050,8 +3050,8 @@ export const tags = [
   },
   {
     id: '1305',
-    slug: 'dok',
-    label: 'Δοκ',
+    label: 'Testing',
+    slug: 'testing',
   },
   {
     id: '610',
