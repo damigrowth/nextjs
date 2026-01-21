@@ -1139,6 +1139,7 @@ export async function getServiceArchivePageData(params: {
               const searchTerm = filters.search.trim();
               if (searchTerm.length >= 2) {
                 const normalizedSearch = normalizeTerm(searchTerm);
+                const tags = getTags();
                 const matchingTags = tags.filter((tag) =>
                   normalizeTerm(tag.label)
                     .toLowerCase()
