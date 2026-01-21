@@ -38,6 +38,7 @@ export function StartChatDialog({
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showSelfMessageError, setShowSelfMessageError] = useState(false);
 
   // Load initial message when dialog opens
   useEffect(() => {
@@ -55,10 +56,20 @@ export function StartChatDialog({
   // Check if user is logged in
   const isLoggedIn = !!currentUserId;
 
-  // Don't show button if viewing own profile
-  if (currentUserId === recipientId) {
-    return null;
-  }
+  // Handle dialog open state changes
+  const handleOpenChange = (newOpen: boolean) => {
+    // If trying to open the dialog, validate first
+    if (newOpen && currentUserId && currentUserId === recipientId) {
+      setShowSelfMessageError(true);
+      return; // Don't open the dialog
+    }
+    // Clear error when closing
+    if (!newOpen) {
+      setShowSelfMessageError(false);
+    }
+    // Otherwise, allow the dialog state to change
+    setOpen(newOpen);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,104 +109,103 @@ export function StartChatDialog({
     }
   };
 
-  // Show loading state if session is still loading and no prop provided
-  // Ensure disabled is always boolean to prevent hydration mismatch
-  const isButtonLoading = Boolean(!propCurrentUserId && isPending);
-
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          className={className || 'w-full'}
-          size='lg'
-          type='button'
-          disabled={isButtonLoading}
-        >
-          {customTrigger || 'Επικοινωνία'}
-          {!customTrigger && <MessageCircle className='h-4 w-4' />}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className='sm:max-w-base'>
-        <DialogHeader>
-          <DialogTitle className='flex items-center gap-2'>
-            {isLoggedIn ? (
-              <MessageCircle className='h-5 w-5 text-primary' />
-            ) : null}
-            {isLoggedIn
-              ? `Νέο Μήνυμα προς ${recipientName}`
-              : 'Για να επικοινωνήσεις πρέπει να έχεις λογαριασμό'}
-          </DialogTitle>
-          <DialogDescription className='sr-only'>
-            {isLoggedIn
-              ? `Στείλτε μήνυμα στον χρήστη ${recipientName}`
-              : 'Συνδεθείτε ή εγγραφείτε για να στείλετε μήνυμα'}
-          </DialogDescription>
-        </DialogHeader>
-        {isLoggedIn ? (
-          <form onSubmit={handleSubmit} className='space-y-4'>
-            <div className='space-y-2'>
-              <Textarea
-                id='message'
-                placeholder='Πληκτρολόγησε εδώ το μήνυμα...'
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows={5}
-                disabled={isLoading}
-                className='resize-none'
-              />
+    <div className='space-y-2'>
+      {showSelfMessageError && (
+        <p className='text-center text-sm text-destructive'>
+          Δεν μπορείς να στείλεις μήνυμα στον εαυτό σου
+        </p>
+      )}
+
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogTrigger asChild>
+          <Button className={className || 'w-full'} size='lg' type='button'>
+            {customTrigger || 'Επικοινωνία'}
+            {!customTrigger && <MessageCircle className='h-4 w-4' />}
+          </Button>
+        </DialogTrigger>
+        <DialogContent className='sm:max-w-base'>
+          <DialogHeader>
+            <DialogTitle className='flex items-center gap-2'>
+              {isLoggedIn ? (
+                <MessageCircle className='h-5 w-5 text-primary' />
+              ) : null}
+              {isLoggedIn
+                ? `Νέο Μήνυμα προς ${recipientName}`
+                : 'Για να επικοινωνήσεις πρέπει να έχεις λογαριασμό'}
+            </DialogTitle>
+            <DialogDescription className='sr-only'>
+              {isLoggedIn
+                ? `Στείλτε μήνυμα στον χρήστη ${recipientName}`
+                : 'Συνδεθείτε ή εγγραφείτε για να στείλετε μήνυμα'}
+            </DialogDescription>
+          </DialogHeader>
+          {isLoggedIn ? (
+            <form onSubmit={handleSubmit} className='space-y-4'>
+              <div className='space-y-2'>
+                <Textarea
+                  id='message'
+                  placeholder='Πληκτρολόγησε εδώ το μήνυμα...'
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  rows={5}
+                  disabled={isLoading}
+                  className='resize-none'
+                />
+              </div>
+              <div className='flex gap-2 justify-end'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  onClick={() => setOpen(false)}
+                  disabled={isLoading}
+                >
+                  Ακύρωση
+                </Button>
+                <Button type='submit' disabled={isLoading || !message.trim()}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className='h-4 w-4 animate-spin' />
+                      Αποστολή...
+                    </>
+                  ) : (
+                    <>
+                      Αποστολή
+                      <Send className='h-4 w-4' />
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <div className='space-y-4'>
+              <div className='flex gap-2 justify-center'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  onClick={() => {
+                    setOpen(false);
+                    router.push('/login');
+                  }}
+                  className='rounded-full'
+                >
+                  Σύνδεση
+                </Button>
+                <Button
+                  type='button'
+                  onClick={() => {
+                    setOpen(false);
+                    router.push('/register');
+                  }}
+                  className='rounded-full'
+                >
+                  Εγγραφή
+                </Button>
+              </div>
             </div>
-            <div className='flex gap-2 justify-end'>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={() => setOpen(false)}
-                disabled={isLoading}
-              >
-                Ακύρωση
-              </Button>
-              <Button type='submit' disabled={isLoading || !message.trim()}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className='h-4 w-4 animate-spin' />
-                    Αποστολή...
-                  </>
-                ) : (
-                  <>
-                    Αποστολή
-                    <Send className='h-4 w-4' />
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-        ) : (
-          <div className='space-y-4'>
-            <div className='flex gap-2 justify-center'>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={() => {
-                  setOpen(false);
-                  router.push('/login');
-                }}
-                className='rounded-full'
-              >
-                Σύνδεση
-              </Button>
-              <Button
-                type='button'
-                onClick={() => {
-                  setOpen(false);
-                  router.push('/register');
-                }}
-                className='rounded-full'
-              >
-                Εγγραφή
-              </Button>
-            </div>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
