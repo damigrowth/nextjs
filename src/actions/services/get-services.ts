@@ -2,10 +2,10 @@
 
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma/client';
-import { tags } from '@/constants/datasets/tags';
 // O(1) optimized taxonomy lookups - 99% faster than findById
 import {
   getServiceTaxonomies,
+  getTags,
   findServiceById,
   resolveServiceHierarchy,
   findLocationBySlugOrName,
@@ -514,85 +514,190 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
     // Add search filter for title, description, coverage, and tags using normalized fields
     // This provides accent-insensitive search for Greek text
     // IMPORTANT: Process AFTER location filters so search can combine with existing OR clause
+    // MULTI-WORD SEARCH: Splits search into words and requires ALL words to match (somewhere)
     if (filters.search) {
       const searchTerm = filters.search.trim();
       if (searchTerm.length >= 2) {
-        // Normalize search term to handle Greek accents (ά → α, etc.)
+        // Normalize and split search term into words for multi-word search
+        // Example: "μαθήματα Γαλλικών Θεσσαλονίκη" → ["μαθηματα", "γαλλικων", "θεσσαλονικη"]
         const normalizedSearch = normalizeTerm(searchTerm);
+        const searchWords = normalizedSearch
+          .split(/\s+/)
+          .filter((word) => word.length >= 2); // Filter out single characters
 
-        // Find matching tags by searching in tag labels
-        const matchingTags = tags.filter((tag) => {
-          const normalizedLabel = normalizeTerm(tag.label);
-          return normalizedLabel
-            .toLowerCase()
-            .includes(normalizedSearch.toLowerCase());
-        });
-        const matchingTagIds = matchingTags.map((tag) => tag.id);
+        // If only one word or empty after filtering, fall back to single-term search
+        if (searchWords.length === 0) {
+          // Skip search
+        } else if (searchWords.length === 1) {
+          // Single word search (original logic)
+          const word = searchWords[0];
 
-        const searchConditions: Array<
-          | { titleNormalized: { contains: string; mode: 'insensitive' } }
-          | { descriptionNormalized: { contains: string; mode: 'insensitive' } }
-          | { title: { contains: string; mode: 'insensitive' } }
-          | { description: { contains: string; mode: 'insensitive' } }
-          | { profile: { coverageNormalized: { contains: string; mode: 'insensitive' } } }
-          | { tags: { hasSome: string[] } }
-        > = [
-          // Search in normalized fields (for services with proper normalized data)
-          {
-            titleNormalized: {
-              contains: normalizedSearch,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            descriptionNormalized: {
-              contains: normalizedSearch,
-              mode: 'insensitive' as const,
-            },
-          },
-          // Fallback: Also search in original fields for services without normalized data
-          {
-            title: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            description: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-          // Search in coverage field for location names (like search suggestions)
-          {
-            profile: {
-              coverageNormalized: {
-                contains: normalizedSearch,
+          // Find matching tags by searching in tag labels
+          const tags = getTags();
+          const matchingTags = tags.filter((tag) => {
+            const normalizedLabel = normalizeTerm(tag.label);
+            return normalizedLabel.toLowerCase().includes(word.toLowerCase());
+          });
+          const matchingTagIds = matchingTags.map((tag) => tag.id);
+
+          const searchConditions: Array<
+            | { titleNormalized: { contains: string; mode: 'insensitive' } }
+            | { descriptionNormalized: { contains: string; mode: 'insensitive' } }
+            | { title: { contains: string; mode: 'insensitive' } }
+            | { description: { contains: string; mode: 'insensitive' } }
+            | {
+                profile: {
+                  coverageNormalized: { contains: string; mode: 'insensitive' };
+                };
+              }
+            | { tags: { hasSome: string[] } }
+          > = [
+            // Search in normalized fields (for services with proper normalized data)
+            {
+              titleNormalized: {
+                contains: word,
                 mode: 'insensitive' as const,
               },
             },
-          },
-        ];
-
-        // Add tag search condition if matching tags found
-        if (matchingTagIds.length > 0) {
-          searchConditions.push({
-            tags: {
-              hasSome: matchingTagIds,
+            {
+              descriptionNormalized: {
+                contains: word,
+                mode: 'insensitive' as const,
+              },
             },
-          });
-        }
+            // Fallback: Also search in original fields for services without normalized data
+            {
+              title: {
+                contains: searchTerm,
+                mode: 'insensitive' as const,
+              },
+            },
+            {
+              description: {
+                contains: searchTerm,
+                mode: 'insensitive' as const,
+              },
+            },
+            // Search in coverage field for location names (like search suggestions)
+            {
+              profile: {
+                coverageNormalized: {
+                  contains: word,
+                  mode: 'insensitive' as const,
+                },
+              },
+            },
+          ];
 
-        // If there's already an OR clause (from filters), combine them with AND
-        if (whereClause.OR && whereClause.OR.length > 0) {
-          const existingOR = whereClause.OR;
-          whereClause.AND = whereClause.AND || [];
-          whereClause.AND.push({
-            OR: searchConditions,
-          });
-          whereClause.OR = existingOR;
+          // Add tag search condition if matching tags found
+          if (matchingTagIds.length > 0) {
+            searchConditions.push({
+              tags: {
+                hasSome: matchingTagIds,
+              },
+            });
+          }
+
+          // If there's already an OR clause (from filters), combine them with AND
+          if (whereClause.OR && whereClause.OR.length > 0) {
+            const existingOR = whereClause.OR;
+            whereClause.AND = whereClause.AND || [];
+            whereClause.AND.push({
+              OR: searchConditions,
+            });
+            whereClause.OR = existingOR;
+          } else {
+            whereClause.OR = searchConditions;
+          }
         } else {
-          whereClause.OR = searchConditions;
+          // Multi-word search: ALL words must match (each word in title OR description OR coverage)
+          // Example: "autocad thessaloniki" requires both "autocad" AND "thessaloniki" to be found
+          const tags = getTags();
+          const multiWordConditions = searchWords.map((word) => {
+            // Find matching tags for this word
+            const matchingTags = tags.filter((tag) => {
+              const normalizedLabel = normalizeTerm(tag.label);
+              return normalizedLabel
+                .toLowerCase()
+                .includes(word.toLowerCase());
+            });
+            const matchingTagIds = matchingTags.map((tag) => tag.id);
+
+            // Each word must match in at least one field
+            const wordConditions: Array<
+              | { titleNormalized: { contains: string; mode: 'insensitive' } }
+              | {
+                  descriptionNormalized: {
+                    contains: string;
+                    mode: 'insensitive';
+                  };
+                }
+              | { title: { contains: string; mode: 'insensitive' } }
+              | { description: { contains: string; mode: 'insensitive' } }
+              | {
+                  profile: {
+                    coverageNormalized: {
+                      contains: string;
+                      mode: 'insensitive';
+                    };
+                  };
+                }
+              | { tags: { hasSome: string[] } }
+            > = [
+              {
+                titleNormalized: {
+                  contains: word,
+                  mode: 'insensitive' as const,
+                },
+              },
+              {
+                descriptionNormalized: {
+                  contains: word,
+                  mode: 'insensitive' as const,
+                },
+              },
+              {
+                title: {
+                  contains: word,
+                  mode: 'insensitive' as const,
+                },
+              },
+              {
+                description: {
+                  contains: word,
+                  mode: 'insensitive' as const,
+                },
+              },
+              {
+                profile: {
+                  coverageNormalized: {
+                    contains: word,
+                    mode: 'insensitive' as const,
+                  },
+                },
+              },
+            ];
+
+            // Add tag search if matching tags found for this word
+            if (matchingTagIds.length > 0) {
+              wordConditions.push({
+                tags: {
+                  hasSome: matchingTagIds,
+                },
+              });
+            }
+
+            // Return OR condition for this word (word must match in at least one field)
+            return { OR: wordConditions };
+          });
+
+          // Combine all word conditions with AND (all words must match)
+          // If there's already an AND clause, extend it; otherwise create new one
+          if (whereClause.AND && whereClause.AND.length > 0) {
+            whereClause.AND.push(...multiWordConditions);
+          } else {
+            whereClause.AND = multiWordConditions;
+          }
         }
       }
     }
@@ -1034,6 +1139,7 @@ export async function getServiceArchivePageData(params: {
               const searchTerm = filters.search.trim();
               if (searchTerm.length >= 2) {
                 const normalizedSearch = normalizeTerm(searchTerm);
+                const tags = getTags();
                 const matchingTags = tags.filter((tag) =>
                   normalizeTerm(tag.label)
                     .toLowerCase()

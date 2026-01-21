@@ -17,8 +17,7 @@ import {
 } from '@/components/admin/forms';
 import { FormServiceDelete } from '@/components/forms/service/form-service-delete';
 import { SiteHeader } from '@/components/admin/site-header';
-import { getServiceTaxonomies } from '@/lib/taxonomies';
-import { tags } from '@/constants/datasets/tags';
+import { getServiceTaxonomies, getTags } from '@/lib/taxonomies';
 import { NextLink } from '@/components';
 import { formatServiceType } from '@/lib/utils/service';
 
@@ -54,6 +53,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
 
   // Prepare taxonomy data server-side to prevent client-side bundle bloat
   const serviceTaxonomies = getServiceTaxonomies();
+  const tags = getTags();
   const availableTags = tags.map((tag) => ({
     value: tag.id,
     label: tag.label,
