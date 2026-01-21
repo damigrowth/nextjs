@@ -2,8 +2,7 @@ import { SiteHeader } from '@/components/admin/site-header';
 import { requireFullPermission } from '@/actions/auth/server';
 import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import { AdminCreateServiceForm } from '@/components/admin/forms/admin-create-service-form';
-import { getServiceTaxonomies } from '@/lib/taxonomies';
-import { tags } from '@/constants/datasets/tags';
+import { getServiceTaxonomies, getTags } from '@/lib/taxonomies';
 import { getAllSubdivisions } from '@/lib/utils/datasets';
 
 export const dynamic = 'force-dynamic';
@@ -27,6 +26,7 @@ export default async function AdminCreateServicePage() {
     subcategory: subdivision.subcategory,
     category: subdivision.category,
   }));
+  const tags = getTags();
   const availableTags = tags.map((tag) => ({
     value: tag.id,
     label: tag.label,

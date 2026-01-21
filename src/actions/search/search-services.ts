@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma/client';
 // O(1) optimized taxonomy lookups - 99% faster than findById
 import {
   getServiceTaxonomies,
+  getTags,
   findServiceById,
   findMatchingLocationInCoverage,
 } from '@/lib/taxonomies';
@@ -144,33 +145,107 @@ async function performSearch(
     const taxonomyMatches = [...sortedSubdivisions, ...sortedSubcategories];
     const limitedTaxonomies = taxonomyMatches.slice(0, 5);
 
-    // Search services by title, description, and location using normalized fields for accent-insensitive search
-    const services = await prisma.service.findMany({
-      where: {
-        status: 'published',
-        OR: [
+    // Search services by title, description, location, and tags using normalized fields for accent-insensitive search
+    // MULTI-WORD SEARCH: Split into words and require ALL words to match
+    const searchWords = searchTerm.split(/\s+/).filter((word) => word.length >= 2);
+    const tags = getTags();
+
+    // Build where clause based on number of words
+    let serviceWhereClause: any = { status: 'published' };
+
+    if (searchWords.length === 0) {
+      // No valid search words, return empty
+      serviceWhereClause.id = -1; // No results
+    } else if (searchWords.length === 1) {
+      // Single word search
+      // Find matching tags
+      const matchingTags = tags.filter((tag) => {
+        const normalizedLabel = normalizeTerm(tag.label);
+        return normalizedLabel.toLowerCase().includes(searchTerm.toLowerCase());
+      });
+      const matchingTagIds = matchingTags.map((tag) => tag.id);
+
+      const searchConditions: any[] = [
+        {
+          titleNormalized: {
+            contains: searchTerm,
+            mode: 'insensitive',
+          },
+        },
+        {
+          descriptionNormalized: {
+            contains: searchTerm,
+            mode: 'insensitive',
+          },
+        },
+        {
+          profile: {
+            coverageNormalized: {
+              contains: searchTerm,
+              mode: 'insensitive',
+            },
+          },
+        },
+      ];
+
+      // Add tag search if matching tags found
+      if (matchingTagIds.length > 0) {
+        searchConditions.push({
+          tags: {
+            hasSome: matchingTagIds,
+          },
+        });
+      }
+
+      serviceWhereClause.OR = searchConditions;
+    } else {
+      // Multi-word search: ALL words must match
+      serviceWhereClause.AND = searchWords.map((word) => {
+        // Find matching tags for this word
+        const matchingTags = tags.filter((tag) => {
+          const normalizedLabel = normalizeTerm(tag.label);
+          return normalizedLabel.toLowerCase().includes(word.toLowerCase());
+        });
+        const matchingTagIds = matchingTags.map((tag) => tag.id);
+
+        const wordConditions: any[] = [
           {
             titleNormalized: {
-              contains: searchTerm,
+              contains: word,
               mode: 'insensitive',
             },
           },
           {
             descriptionNormalized: {
-              contains: searchTerm,
+              contains: word,
               mode: 'insensitive',
             },
           },
           {
             profile: {
               coverageNormalized: {
-                contains: searchTerm,
+                contains: word,
                 mode: 'insensitive',
               },
             },
           },
-        ],
-      },
+        ];
+
+        // Add tag search if matching tags found for this word
+        if (matchingTagIds.length > 0) {
+          wordConditions.push({
+            tags: {
+              hasSome: matchingTagIds,
+            },
+          });
+        }
+
+        return { OR: wordConditions };
+      });
+    }
+
+    const services = await prisma.service.findMany({
+      where: serviceWhereClause,
       select: {
         id: true,
         title: true,
@@ -178,6 +253,7 @@ async function performSearch(
         category: true,
         titleNormalized: true,
         descriptionNormalized: true,
+        tags: true, // Include tags for match type detection
         profile: {
           select: {
             coverage: true, // Include coverage for location extraction
@@ -213,11 +289,21 @@ async function performSearch(
           !titleMatch &&
           service.descriptionNormalized?.includes(searchTerm);
 
-        const matchType: 'coverage' | 'title' | 'description' = coverageMatch
+        // Check if match is only in tags (LOWEST priority)
+        const tagMatch =
+          !coverageMatch &&
+          !titleMatch &&
+          !descriptionMatch &&
+          service.tags &&
+          service.tags.length > 0;
+
+        const matchType: 'coverage' | 'title' | 'description' | 'tags' = coverageMatch
           ? 'coverage'
           : titleMatch
             ? 'title'
-            : 'description';
+            : descriptionMatch
+              ? 'description'
+              : 'tags';
 
         return {
           type: 'service' as const,
@@ -271,7 +357,18 @@ async function performSearch(
         if (aCoverageMatch && !bCoverageMatch) return -1;
         if (!aCoverageMatch && bCoverageMatch) return 1;
 
-        // Priority 4: Description matches fall here naturally
+        // Priority 4: Description matches (higher priority than tags)
+        const aDescriptionMatch = a.matchType === 'description';
+        const bDescriptionMatch = b.matchType === 'description';
+        if (aDescriptionMatch && !bDescriptionMatch) return -1;
+        if (!aDescriptionMatch && bDescriptionMatch) return 1;
+
+        // Priority 5: Tag matches (LOWEST priority)
+        const aTagMatch = a.matchType === 'tags';
+        const bTagMatch = b.matchType === 'tags';
+        if (aTagMatch && !bTagMatch) return 1; // Tag matches go last
+        if (!aTagMatch && bTagMatch) return -1; // Non-tag matches come first
+
         // If equal priority, maintain original order (by rating)
         return 0;
       });

@@ -31,6 +31,7 @@ import { normalizeTerm } from '@/lib/utils/text/normalize';
 let _serviceTaxonomies: DatasetItem[] | null = null;
 let _proTaxonomies: DatasetItem[] | null = null;
 let _locations: DatasetItem[] | null = null;
+let _tags: DatasetItem[] | null = null;
 let _taxonomyMaps: any | null = null;
 
 // ============================================================================
@@ -71,6 +72,18 @@ export function getLocations(): DatasetItem[] {
     _locations = require('@/constants/datasets/locations').locationOptions;
   }
   return _locations;
+}
+
+/**
+ * Get full tags with lazy loading
+ * @server-only Use only in server components and server actions
+ * @returns Complete tags array
+ */
+export function getTags(): DatasetItem[] {
+  if (!_tags) {
+    _tags = require('@/constants/datasets/tags').tags;
+  }
+  return _tags;
 }
 
 // ============================================================================

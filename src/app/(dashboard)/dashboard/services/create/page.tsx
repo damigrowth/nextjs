@@ -3,8 +3,7 @@ import { getCurrentUser } from '@/actions/auth/server';
 import { redirect } from 'next/navigation';
 import React from 'react';
 import { getDashboardMetadata } from '@/lib/seo/pages';
-import { getServiceTaxonomies } from '@/lib/taxonomies';
-import { tags } from '@/constants/datasets/tags';
+import { getServiceTaxonomies, getTags } from '@/lib/taxonomies';
 import { getAllSubdivisions } from '@/lib/utils/datasets';
 
 export const metadata = getDashboardMetadata('Δημιουργία Υπηρεσίας');
@@ -34,6 +33,7 @@ export default async function CreateServicePage() {
     subcategory: subdivision.subcategory,
     category: subdivision.category,
   }));
+  const tags = getTags();
   const availableTags = tags.map((tag) => ({
     value: tag.id,
     label: tag.label,

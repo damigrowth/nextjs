@@ -10,8 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { StatusLabels, StatusColors } from '@/lib/types/common';
 import { getDashboardMetadata } from '@/lib/seo/pages';
 import { NextLink } from '@/components';
-import { getServiceTaxonomies, batchFindTagsByIds } from '@/lib/taxonomies';
-import { tags } from '@/constants/datasets/tags';
+import { getServiceTaxonomies, getTags, batchFindTagsByIds } from '@/lib/taxonomies';
 import { getAllSubdivisions } from '@/lib/utils/datasets';
 
 export const metadata = getDashboardMetadata('Επεξεργασία Υπηρεσίας');
@@ -60,6 +59,7 @@ export default async function EditServicePage({
     subcategory: subdivision.subcategory,
     category: subdivision.category,
   }));
+  const tags = getTags();
   const availableTags = tags.map((tag) => ({
     value: tag.id,
     label: tag.label,
