@@ -477,6 +477,60 @@ export type RejectVerificationFormInput = z.infer<
 >;
 
 // =============================================
+// ADMIN REVIEW MANAGEMENT SCHEMAS
+// =============================================
+
+export const adminListReviewsSchema = z.object({
+  searchQuery: z.string().optional(), // Search comment or author name
+  status: z.enum(['all', 'pending', 'approved', 'rejected']).optional(),
+  rating: z.enum(['all', '1', '2', '3', '4', '5']).optional(),
+  type: z.enum(['all', 'SERVICE', 'PROFILE']).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(10),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+  sortBy: z
+    .enum(['createdAt', 'updatedAt', 'rating'])
+    .optional()
+    .default('createdAt'),
+  sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
+});
+
+export const adminUpdateReviewStatusSchema = z.object({
+  reviewId: z.string().min(1, 'Review ID is required'),
+  status: z.enum(['pending', 'approved', 'rejected']),
+  notes: z.string().max(1000).optional(),
+});
+
+export const adminDeleteReviewSchema = z.object({
+  reviewId: z.string().min(1, 'Review ID is required'),
+});
+
+// Form schemas for dialogs
+export const approveReviewFormSchema = z.object({
+  reviewId: z.string().min(1),
+  notes: z.string().max(1000).optional(),
+});
+
+export const rejectReviewFormSchema = z.object({
+  reviewId: z.string().min(1),
+  reason: z
+    .string()
+    .min(1, 'Rejection reason is required')
+    .max(1000, 'Reason is too long'),
+});
+
+// =============================================
+// REVIEW TYPE EXPORTS
+// =============================================
+
+export type AdminListReviewsInput = z.infer<typeof adminListReviewsSchema>;
+export type AdminUpdateReviewStatusInput = z.infer<
+  typeof adminUpdateReviewStatusSchema
+>;
+export type AdminDeleteReviewInput = z.infer<typeof adminDeleteReviewSchema>;
+export type ApproveReviewFormInput = z.infer<typeof approveReviewFormSchema>;
+export type RejectReviewFormInput = z.infer<typeof rejectReviewFormSchema>;
+
+// =============================================
 // ADMIN TAXONOMY MANAGEMENT SCHEMAS
 // =============================================
 
