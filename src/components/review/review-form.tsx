@@ -1,0 +1,257 @@
+'use client';
+
+import { useState, useActionState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { RatingStars } from './rating-stars';
+import { ReviewSuccess } from './review-success';
+import { createReview } from '@/actions/reviews/create-review';
+import { Loader2, Send, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { useSession } from '@/lib/auth/client';
+
+interface ReviewFormProps {
+  profileId: string;
+  serviceId?: number;
+  type: 'service' | 'profile';
+  profileServices?: Array<{ id: number; title: string }>;
+  onSuccess?: () => void;
+}
+
+export function ReviewForm({
+  profileId,
+  serviceId,
+  type,
+  profileServices,
+  onSuccess,
+}: ReviewFormProps) {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const [rating, setRating] = useState(0); // Changed: Start with 0 (no selection)
+  const [comment, setComment] = useState('');
+  const [selectedService, setSelectedService] = useState<number | null>(
+    serviceId || null,
+  );
+  const [showComment, setShowComment] = useState(false); // New: Show comment after button click
+
+  const [state, formAction, isPending] = useActionState(createReview, null);
+
+  // Get reviewId directly from state (legacy pattern)
+  const reviewId = state?.data?.id;
+
+  // Check if user is logged in
+  const isLoggedIn = !!session?.user?.id;
+
+  // Debug: Log props to identify why profileId might be undefined
+  useEffect(() => {
+    console.log('ReviewForm mounted with:', {
+      profileId,
+      serviceId,
+      type,
+      hasProfileServices: !!profileServices,
+    });
+  }, [profileId, serviceId, type, profileServices]);
+
+  const handleSubmit = async (formData: FormData) => {
+    // Validate required fields before submission
+    if (!profileId) {
+      console.error('ProfileId is missing! Cannot submit review.', {
+        profileId,
+        type,
+        serviceId,
+      });
+      return;
+    }
+
+    formData.append('rating', rating.toString());
+    formData.append('comment', comment);
+    formData.append('profileId', profileId);
+
+    // Add serviceId - either from prop (service page) or selected (profile page)
+    const finalServiceId = type === 'service' ? serviceId : selectedService;
+    if (finalServiceId) {
+      formData.append('serviceId', finalServiceId.toString());
+    }
+
+    // Submit form - state.data.id will be set automatically by useActionState
+    await formAction(formData);
+  };
+
+  const commentLength = comment.length;
+  const minLength = 25;
+  const maxLength = 350;
+  const isCommentValid =
+    commentLength >= minLength && commentLength <= maxLength;
+
+  // If review submitted successfully, show success component
+  if (reviewId) {
+    return <ReviewSuccess />;
+  }
+
+  // If not logged in, show auth prompt instead of form
+  if (!isLoggedIn) {
+    return (
+      <div className='space-y-4'>
+        <div className='space-y-2'>
+          <h6 className='text-lg font-semibold'>
+            Για να αξιολογήσεις πρέπει να έχεις λογαριασμό
+          </h6>
+        </div>
+        <div className='flex gap-2'>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={() => router.push('/login')}
+            className='rounded-full'
+          >
+            Σύνδεση
+          </Button>
+          <Button
+            type='button'
+            onClick={() => router.push('/register')}
+            className='rounded-full'
+          >
+            Εγγραφή
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Otherwise show form
+  return (
+    <form action={handleSubmit} className='space-y-6'>
+      {/* Form Title - Conditional based on type and profile services */}
+      <div className='space-y-2'>
+        <h6 className='text-lg font-semibold'>
+          {type === 'service' || (profileServices && profileServices.length > 0)
+            ? 'Σύσταση υπηρεσίας'
+            : 'Αξιολόγηση προφίλ'}
+        </h6>
+        <p className='text-sm text-muted-foreground'>
+          {type === 'service' || (profileServices && profileServices.length > 0)
+            ? 'Άφησε μια αξιολόγηση για τη συγκεκριμένη υπηρεσία'
+            : 'Άφησε μια αξιολόγηση για αυτό το προφίλ'}
+        </p>
+      </div>
+
+      {/* Service Selection - Only for freelancer/profile reviews */}
+      {type === 'profile' && profileServices && profileServices.length > 0 && (
+        <div className='space-y-2'>
+          <Select
+            value={selectedService?.toString() || ''}
+            onValueChange={(val) => setSelectedService(Number(val))}
+            disabled={isPending}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder='Επιλέξτε υπηρεσία' />
+            </SelectTrigger>
+            <SelectContent>
+              {profileServices.map((service) => (
+                <SelectItem key={service.id} value={service.id.toString()}>
+                  {service.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* Like/Unlike Buttons - Boss requirement */}
+      <div className='space-y-3'>
+        <Label className='text-base font-semibold'>Η γνώμη σου</Label>
+        <div className='flex gap-4'>
+          <Button
+            type='button'
+            variant={rating === 5 ? 'default' : 'outline'}
+            size='lg'
+            onClick={() => {
+              setRating(5);
+              setShowComment(true);
+            }}
+            disabled={isPending}
+            className='flex-1'
+          >
+            <ThumbsUp className='mr-2 h-5 w-5' />
+            Μου αρέσει
+          </Button>
+
+          <Button
+            type='button'
+            variant={rating === 1 ? 'destructive' : 'outline'}
+            size='lg'
+            onClick={() => {
+              setRating(1);
+              setShowComment(true);
+            }}
+            disabled={isPending}
+            className='flex-1'
+          >
+            <ThumbsDown className='mr-2 h-5 w-5' />
+            Δεν μου αρέσει
+          </Button>
+        </div>
+      </div>
+
+      {/* Comment Input - Conditional (shown after Like/Unlike click) */}
+      {showComment && (
+        <div className='space-y-2'>
+          <div className='flex items-center justify-between'>
+            <Label htmlFor='comment' className='text-base font-semibold'>
+              Σχόλιο (προαιρετικό)
+            </Label>
+            <span className='text-sm text-gray-500'>
+              {commentLength}/{maxLength}
+            </span>
+          </div>
+          <Textarea
+            id='comment'
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder='Αν θέλεις γράψε ένα σχόλιο στην σύσταση'
+            className='min-h-[120px] resize-none'
+            maxLength={maxLength}
+            disabled={isPending}
+          />
+        </div>
+      )}
+
+      {/* Error Display - ActionResponse uses message field */}
+      {state && !state.success && state.message && (
+        <Alert variant='destructive'>
+          <AlertDescription>{state.message}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Submit Button - Centered */}
+      <div className='pt-2'>
+        <Button
+          type='submit'
+          disabled={isPending || rating === 0} // Changed: Only require Like/Unlike selection
+          className='min-w-[200px]'
+        >
+          {isPending ? (
+            <>
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+              Αποστολή...
+            </>
+          ) : (
+            <>
+              <Send className='mr-2 h-4 w-4' />
+              Αποστολή Σύστασης
+            </>
+          )}
+        </Button>
+      </div>
+    </form>
+  );
+}
