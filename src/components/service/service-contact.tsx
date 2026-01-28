@@ -96,6 +96,7 @@ export default function ServiceContact({
               reviewCount={reviewCount}
               showReviewCount={true}
               size='sm'
+              variant='compact'
             />
           </div>
         </div>

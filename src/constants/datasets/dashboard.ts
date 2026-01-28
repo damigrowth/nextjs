@@ -160,6 +160,12 @@ export const hasAccessUserMenuNav = [
     path: '/dashboard/saved',
   },
   {
+    id: 4.5,
+    name: 'Αξιολογήσεις',
+    icon: 'flaticon-star',
+    path: '/dashboard/reviews',
+  },
+  {
     id: 5,
     name: 'Διαχείριση Υπηρεσιών',
     icon: 'flaticon-document',
@@ -252,6 +258,12 @@ export const noAccessUserMenuNav = [
     name: 'Αποθηκευμένα',
     icon: 'flaticon-like',
     path: '/dashboard/saved',
+  },
+  {
+    id: 3.5,
+    name: 'Αξιολογήσεις',
+    icon: 'flaticon-star',
+    path: '/dashboard/reviews',
   },
   {
     id: 0,

@@ -83,6 +83,7 @@ export default function ServiceCard({
           <RatingDisplay
             rating={service.rating}
             reviewCount={service.reviewCount}
+            variant='compact'
           />
         </CardContent>
       </NextLink>

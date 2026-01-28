@@ -55,6 +55,7 @@ export interface ActionResult<T = any> {
 export interface ActionResponse<T = any> {
   success: boolean;
   message: string;
+  data?: T; // Support for data payload (e.g., { id: string })
   errors?: {
     [K in keyof T]?: string[];
   };

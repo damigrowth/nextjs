@@ -102,6 +102,7 @@ export function ArchiveServiceCard({
                   rating={service.rating}
                   reviewCount={service.reviewCount}
                   size='sm'
+                  variant='compact'
                   className='text-sm'
                 />
               )}

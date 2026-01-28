@@ -115,19 +115,43 @@ export function isThisWeek(date: Date | string | number): boolean {
 
 /**
  * Get time ago in words
+ * Matches legacy Greek grammar rules from timeago.js (singular/plural forms)
  */
 export function getTimeAgo(date: Date | string | number): string {
   const dateObj = typeof date === 'string' ? parseISO(date) : new Date(date);
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
-  
+
+  // Just now
   if (diffInSeconds < 60) return 'Μόλις τώρα';
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} λεπτά πριν`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} ώρες πριν`;
-  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} μέρες πριν`;
-  if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)} μήνες πριν`;
-  
-  return `${Math.floor(diffInSeconds / 31536000)} χρόνια πριν`;
+
+  // Minutes: "1 λεπτό πριν" vs "X λεπτά πριν"
+  if (diffInSeconds < 3600) {
+    const minutes = Math.floor(diffInSeconds / 60);
+    return minutes === 1 ? '1 λεπτό πριν' : `${minutes} λεπτά πριν`;
+  }
+
+  // Hours: "1 ώρα πριν" vs "X ώρες πριν"
+  if (diffInSeconds < 86400) {
+    const hours = Math.floor(diffInSeconds / 3600);
+    return hours === 1 ? '1 ώρα πριν' : `${hours} ώρες πριν`;
+  }
+
+  // Days: "1 ημέρα πριν" vs "X ημέρες πριν"
+  if (diffInSeconds < 2592000) {
+    const days = Math.floor(diffInSeconds / 86400);
+    return days === 1 ? '1 ημέρα πριν' : `${days} ημέρες πριν`;
+  }
+
+  // Months: "1 μήνα πριν" vs "X μήνες πριν"
+  if (diffInSeconds < 31536000) {
+    const months = Math.floor(diffInSeconds / 2592000);
+    return months === 1 ? '1 μήνα πριν' : `${months} μήνες πριν`;
+  }
+
+  // Years: "1 χρόνο πριν" vs "X χρόνια πριν"
+  const years = Math.floor(diffInSeconds / 31536000);
+  return years === 1 ? '1 χρόνο πριν' : `${years} χρόνια πριν`;
 }
 
 /**

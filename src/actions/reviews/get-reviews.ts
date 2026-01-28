@@ -1,220 +1,326 @@
-// 'use server';
+'use server';
 
-// import { prisma } from '@/lib/prisma/client';
+import { unstable_cache } from 'next/cache';
+import { prisma } from '@/lib/prisma/client';
+import { ActionResponse } from '@/lib/types/api';
+import { CACHE_TAGS } from '@/lib/cache';
+import type { ReviewWithAuthor } from '@/lib/types/reviews';
 
-// type ActionResult<T = any> = {
-//   success: boolean;
-//   data?: T;
-//   error?: string;
-// };
+/**
+ * Internal function to fetch profile reviews
+ * Cached with profile review tags
+ */
+async function _getProfileReviews(
+  profileId: string,
+  page: number,
+  limit: number,
+) {
+  const skip = (page - 1) * limit;
 
-// export type ReviewWithAuthor = {
-//   id: string;
-//   rating: number;
-//   comment: string | null;
-//   published: boolean;
-//   createdAt: Date;
-//   updatedAt: Date;
-//   author: {
-//     id: string;
-//     name: string | null;
-//     displayName: string | null;
-//     username: string | null;
-//     image: {
-//       url: string;
-//       alt: string | null;
-//     } | null;
-//   };
-//   service?: {
-//     id: string;
-//     title: string;
-//   };
-// };
+  const [reviews, total] = await Promise.all([
+    prisma.review.findMany({
+      where: {
+        pid: profileId,
+        status: 'approved', // Only show approved reviews
+        published: true,
+        visibility: true, // Only show visible comments
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+            username: true,
+          },
+        },
+        service: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    }),
+    prisma.review.count({
+      where: {
+        pid: profileId,
+        status: 'approved', // Only count approved reviews
+        published: true,
+        visibility: true, // Only count visible comments
+      },
+    }),
+  ]);
 
-// // Get reviews for a profile
-// export async function getProfileReviews(
-//   profileId: string,
-// ): Promise<ActionResult<ReviewWithAuthor[]>> {
-//   try {
-//     const reviews = await prisma.review.findMany({
-//       where: {
-//         pid: profileId,
-//         published: true,
-//       },
-//       include: {
-//         author: {
-//           select: {
-//             id: true,
-//             name: true,
-//             displayName: true,
-//             username: true,
-//           },
-//         },
-//         service: {
-//           select: {
-//             id: true,
-//             title: true,
-//           },
-//         },
-//       },
-//       orderBy: { createdAt: 'desc' },
-//     });
+  // Get author profile images
+  const reviewsWithImages = await Promise.all(
+    reviews.map(async (review) => {
+      const authorProfile = await prisma.profile.findUnique({
+        where: { uid: review.author.id },
+        select: {
+          image: true,
+        },
+      });
 
-//     // Get author profile images
-//     const reviewsWithImages = await Promise.all(
-//       reviews.map(async (review) => {
-//         const authorProfile = await prisma.profile.findUnique({
-//           where: { uid: review.author.id },
-//           select: {
-//             image: {
-//               select: {
-//                 url: true,
-//                 alt: true,
-//               },
-//             },
-//           },
-//         });
+      return {
+        ...review,
+        author: {
+          ...review.author,
+          image: authorProfile?.image || null,
+        },
+      };
+    }),
+  );
 
-//         return {
-//           ...review,
-//           author: {
-//             ...review.author,
-//             image: authorProfile?.image || null,
-//           },
-//         };
-//       }),
-//     );
+  return { reviews: reviewsWithImages, total };
+}
 
-//     return {
-//       success: true,
-//       data: reviewsWithImages,
-//     };
-//   } catch (error) {
-//     console.error('Get profile reviews error:', error);
-//     return {
-//       success: false,
-//       error: 'Failed to fetch reviews',
-//     };
-//   }
-// }
+/**
+ * Get reviews for a profile with caching
+ */
+export async function getProfileReviews(
+  profileId: string,
+  page: number = 1,
+  limit: number = 10,
+): Promise<ActionResponse<{ reviews: ReviewWithAuthor[]; total: number }>> {
+  try {
+    const getCachedReviews = unstable_cache(
+      _getProfileReviews,
+      [`profile-reviews-${profileId}-${page}-${limit}`],
+      {
+        tags: [
+          CACHE_TAGS.review.byProfile(profileId),
+          CACHE_TAGS.profile.byId(profileId),
+        ],
+        revalidate: 300, // 5 minutes
+      },
+    );
 
-// // Get reviews for a service
-// export async function getServiceReviews(
-//   serviceId: string,
-// ): Promise<ActionResult<ReviewWithAuthor[]>> {
-//   try {
-//     const reviews = await prisma.review.findMany({
-//       where: {
-//         sid: serviceId,
-//         published: true,
-//       },
-//       include: {
-//         author: {
-//           select: {
-//             id: true,
-//             name: true,
-//             displayName: true,
-//             username: true,
-//           },
-//         },
-//       },
-//       orderBy: { createdAt: 'desc' },
-//     });
+    const data = await getCachedReviews(profileId, page, limit);
 
-//     // Get author profile images
-//     const reviewsWithImages = await Promise.all(
-//       reviews.map(async (review) => {
-//         const authorProfile = await prisma.profile.findUnique({
-//           where: { uid: review.author.id },
-//           select: {
-//             image: {
-//               select: {
-//                 url: true,
-//                 alt: true,
-//               },
-//             },
-//           },
-//         });
+    return {
+      success: true,
+      message: '',
+      data,
+    };
+  } catch (error) {
+    console.error('Get profile reviews error:', error);
+    return {
+      success: false,
+      message: 'Αποτυχία λήψης αξιολογήσεων',
+    };
+  }
+}
 
-//         return {
-//           ...review,
-//           author: {
-//             ...review.author,
-//             image: authorProfile?.image || null,
-//           },
-//         };
-//       }),
-//     );
+/**
+ * Internal function to fetch service reviews
+ * Cached with service review tags
+ */
+async function _getServiceReviews(
+  serviceId: number,
+  page: number,
+  limit: number,
+) {
+  const skip = (page - 1) * limit;
 
-//     return {
-//       success: true,
-//       data: reviewsWithImages,
-//     };
-//   } catch (error) {
-//     console.error('Get service reviews error:', error);
-//     return {
-//       success: false,
-//       error: 'Failed to fetch reviews',
-//     };
-//   }
-// }
+  const [reviews, total] = await Promise.all([
+    prisma.review.findMany({
+      where: {
+        sid: serviceId,
+        status: 'approved', // Only show approved reviews
+        published: true,
+        visibility: true, // Only show visible comments
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+            username: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    }),
+    prisma.review.count({
+      where: {
+        sid: serviceId,
+        status: 'approved', // Only count approved reviews
+        published: true,
+        visibility: true, // Only count visible comments
+      },
+    }),
+  ]);
 
-// // Get review statistics for a profile
-// export async function getProfileReviewStats(profileId: string): Promise<
-//   ActionResult<{
-//     totalReviews: number;
-//     averageRating: number;
-//     ratingDistribution: { rating: number; count: number }[];
-//   }>
-// > {
-//   try {
-//     const reviews = await prisma.review.findMany({
-//       where: {
-//         pid: profileId,
-//         published: true,
-//       },
-//       select: {
-//         rating: true,
-//       },
-//     });
+  // Get author profile images
+  const reviewsWithImages = await Promise.all(
+    reviews.map(async (review) => {
+      const authorProfile = await prisma.profile.findUnique({
+        where: { uid: review.author.id },
+        select: {
+          image: true,
+        },
+      });
 
-//     const totalReviews = reviews.length;
-//     const averageRating =
-//       totalReviews > 0
-//         ? Number(
-//             (
-//               reviews.reduce((sum, review) => sum + review.rating, 0) /
-//               totalReviews
-//             ).toFixed(2),
-//           )
-//         : 0;
+      return {
+        ...review,
+        author: {
+          ...review.author,
+          image: authorProfile?.image || null,
+        },
+        service: null, // Service reviews don't need service info
+      };
+    }),
+  );
 
-//     // Calculate rating distribution
-//     const ratingCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-//     reviews.forEach((review) => {
-//       ratingCounts[review.rating as keyof typeof ratingCounts]++;
-//     });
+  return { reviews: reviewsWithImages, total };
+}
 
-//     const ratingDistribution = Object.entries(ratingCounts).map(
-//       ([rating, count]) => ({
-//         rating: Number(rating),
-//         count,
-//       }),
-//     );
+/**
+ * Get reviews for a service with caching
+ */
+export async function getServiceReviews(
+  serviceId: number,
+  page: number = 1,
+  limit: number = 10,
+): Promise<ActionResponse<{ reviews: ReviewWithAuthor[]; total: number }>> {
+  try {
+    const getCachedReviews = unstable_cache(
+      _getServiceReviews,
+      [`service-reviews-${serviceId}-${page}-${limit}`],
+      {
+        tags: [
+          CACHE_TAGS.review.byService(serviceId),
+          CACHE_TAGS.service.byId(serviceId),
+        ],
+        revalidate: 300, // 5 minutes
+      },
+    );
 
-//     return {
-//       success: true,
-//       data: {
-//         totalReviews,
-//         averageRating,
-//         ratingDistribution,
-//       },
-//     };
-//   } catch (error) {
-//     console.error('Get profile review stats error:', error);
-//     return {
-//       success: false,
-//       error: 'Failed to fetch review statistics',
-//     };
-//   }
-// }
+    const data = await getCachedReviews(serviceId, page, limit);
+
+    return {
+      success: true,
+      message: '',
+      data,
+    };
+  } catch (error) {
+    console.error('Get service reviews error:', error);
+    return {
+      success: false,
+      message: 'Αποτυχία λήψης αξιολογήσεων',
+    };
+  }
+}
+
+/**
+ * Internal function to fetch profile's other service reviews
+ * Cached with profile review tags
+ */
+async function _getProfileOtherServiceReviews(
+  profileId: string,
+  excludeServiceId: number | undefined,
+  limit: number,
+) {
+  const where: any = {
+    pid: profileId,
+    status: 'approved',
+    published: true,
+    visibility: true, // Only show visible comments
+    sid: { not: null },
+  };
+
+  if (excludeServiceId !== undefined) {
+    where.sid.not = excludeServiceId;
+  }
+
+  const reviews = await prisma.review.findMany({
+    where,
+    include: {
+      author: {
+        select: {
+          id: true,
+          name: true,
+          displayName: true,
+          username: true,
+        },
+      },
+      service: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
+
+  // Get author profile images
+  const reviewsWithImages = await Promise.all(
+    reviews.map(async (review) => {
+      const authorProfile = await prisma.profile.findUnique({
+        where: { uid: review.author.id },
+        select: {
+          image: true,
+        },
+      });
+
+      return {
+        ...review,
+        author: {
+          ...review.author,
+          image: authorProfile?.image || null,
+        },
+      };
+    }),
+  );
+
+  return { reviews: reviewsWithImages, total: reviewsWithImages.length };
+}
+
+/**
+ * Get other service reviews from the same profile with caching
+ * Excludes the current service to show reviews for other services
+ */
+export async function getProfileOtherServiceReviews(
+  profileId: string,
+  excludeServiceId?: number,
+  limit: number = 5,
+): Promise<ActionResponse<{ reviews: ReviewWithAuthor[]; total: number }>> {
+  try {
+    const getCachedReviews = unstable_cache(
+      _getProfileOtherServiceReviews,
+      [`profile-other-reviews-${profileId}-${excludeServiceId}-${limit}`],
+      {
+        tags: [
+          CACHE_TAGS.review.byProfile(profileId),
+          CACHE_TAGS.profile.byId(profileId),
+        ],
+        revalidate: 300, // 5 minutes
+      },
+    );
+
+    const data = await getCachedReviews(profileId, excludeServiceId, limit);
+
+    return {
+      success: true,
+      message: '',
+      data,
+    };
+  } catch (error) {
+    console.error('Get profile other service reviews error:', error);
+    return {
+      success: false,
+      message: 'Αποτυχία λήψης αξιολογήσεων',
+    };
+  }
+}

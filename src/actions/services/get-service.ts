@@ -41,10 +41,17 @@ import type {
 } from '@/lib/types/components';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { SERVICE_DETAIL_SELECT } from '@/lib/database/selects';
+import {
+  getServiceReviews,
+  getServiceReviewStats,
+  getProfileOtherServiceReviews,
+} from '@/actions/reviews';
+import type { ReviewWithAuthor, ReviewStats } from '@/lib/types/reviews';
 
 // Define the selected profile fields for the service page
 export type ServiceProfileFields = Pick<
   Profile,
+  | 'id'
   | 'uid'
   | 'firstName'
   | 'lastName'
@@ -104,6 +111,16 @@ export interface ServicePageData {
   tagsData: (DatasetItem | null)[];
   // Related services from the same category
   relatedServices: ServiceCardData[];
+  // Reviews data
+  serviceReviews: {
+    reviews: ReviewWithAuthor[];
+    total: number;
+  };
+  profileOtherReviews: {
+    reviews: ReviewWithAuthor[];
+    total: number;
+  };
+  reviewStats: ReviewStats;
 }
 
 /**
@@ -268,8 +285,10 @@ async function _getServicePageData(
       saveType: 'service',
     };
 
-    // Fetch related services from the same category (6 random services)
-    const relatedServicesRaw = await prisma.service.findMany({
+    // Fetch related services and reviews in parallel
+    const [relatedServicesRaw, serviceReviewsResult, otherReviewsResult, reviewStatsResult] = await Promise.all([
+      // Related services from the same category
+      prisma.service.findMany({
       where: {
         status: 'published',
         category: service.category, // Same category
@@ -305,7 +324,14 @@ async function _getServicePageData(
         { updatedAt: 'desc' },
       ],
       take: 20, // Fetch 20 to account for empty array filtering
-    });
+    }),
+      // Service-specific reviews
+      getServiceReviews(service.id, 1, 10),
+      // Other reviews from the same profile
+      getProfileOtherServiceReviews(service.pid, service.id, 5),
+      // Review statistics
+      getServiceReviewStats(service.id),
+    ]);
 
     // Shuffle and take 5 for randomization
     // Filter out services with empty media arrays
@@ -358,6 +384,18 @@ async function _getServicePageData(
         settlementMethodsData,
         tagsData,
         relatedServices,
+        serviceReviews: serviceReviewsResult.success
+          ? serviceReviewsResult.data
+          : { reviews: [], total: 0 },
+        profileOtherReviews: otherReviewsResult.success
+          ? otherReviewsResult.data
+          : { reviews: [], total: 0 },
+        reviewStats: reviewStatsResult.success
+          ? reviewStatsResult.data
+          : {
+              totalReviews: 0,
+              averageRating: 0,
+            },
       },
     };
   } catch (error) {

@@ -63,6 +63,7 @@ export const ADMIN_RESOURCES = {
   TEAM: 'team',
   TAXONOMIES: 'taxonomies',
   CHATS: 'chats',
+  REVIEWS: 'reviews',
   ANALYTICS: 'analytics',
   GIT: 'git',
   SETTINGS: 'settings',
@@ -102,6 +103,7 @@ export const ROLE_PERMISSIONS: PermissionMatrix = {
     team: 'full', // Only admins can manage team
     taxonomies: 'full', // Only admins can manage taxonomies
     chats: 'full',
+    reviews: 'full',
     analytics: 'full', // Only admins can view analytics
     git: 'full',
     settings: 'full', // Only admins can manage settings
@@ -117,6 +119,7 @@ export const ROLE_PERMISSIONS: PermissionMatrix = {
     team: null, // Cannot access team management
     taxonomies: null, // Cannot access taxonomies
     chats: 'full', // Can monitor chats
+    reviews: 'full', // Can moderate reviews
     analytics: null, // Cannot access analytics
     git: null, // Cannot access git operations
     settings: null, // Cannot access settings
@@ -132,6 +135,7 @@ export const ROLE_PERMISSIONS: PermissionMatrix = {
     team: null, // Cannot access team management
     taxonomies: null, // Cannot access taxonomies
     chats: null, // Cannot access chats
+    reviews: null, // Cannot access reviews
     analytics: null, // Cannot access analytics
     git: null, // Cannot access git
     settings: null, // Cannot access settings

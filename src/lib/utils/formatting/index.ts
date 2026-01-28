@@ -4,6 +4,5 @@
  */
 
 export * from './date';
-export * from './rating';
 export * from './time';
 export * from './text';
