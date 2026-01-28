@@ -1,5 +1,7 @@
 import type { JSX } from 'react';
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
+import { auth } from '@/lib/auth';
 import { getServicePageData } from '@/actions/services';
 import { getServiceMetadata } from '@/lib/seo/pages';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,6 +21,7 @@ import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
 import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
 import { ProfileTerms } from '@/components/profile';
 import { ServiceSchema } from '@/lib/seo/schema';
+import { ReviewsContainer } from '@/components/review';
 
 // ISR configuration with shorter interval + tag-based revalidation
 export const revalidate = 300; // Revalidate every 5 minutes (backup for tag-based)
@@ -74,6 +77,10 @@ export default async function ServicePage({
 }: ServicePageProps): Promise<JSX.Element> {
   const { slug } = await params;
 
+  // Get current user for isOwner check
+  const session = await auth.api.getSession({ headers: await headers() });
+  const currentUserId = session?.user?.id;
+
   // Extract service ID from slug (last segment after last dash)
   // This allows old URLs to work even when the title/slug changes
   const parts = slug.split('-');
@@ -107,12 +114,16 @@ export default async function ServicePage({
     settlementMethodsData,
     tagsData,
     relatedServices,
+    serviceReviews,
+    profileOtherReviews,
+    reviewStats,
   } = result.data;
 
   // Get first media image for schema
-  const firstMediaImage = service.media && Array.isArray(service.media) && service.media.length > 0
-    ? service.media[0].url
-    : undefined;
+  const firstMediaImage =
+    service.media && Array.isArray(service.media) && service.media.length > 0
+      ? service.media[0].url
+      : undefined;
 
   // Get metadata to reuse the formatted and truncated description
   // This ensures schema description matches meta description exactly
@@ -216,6 +227,20 @@ export default async function ServicePage({
 
               {/* Profile Terms */}
               <ProfileTerms terms={service.profile.terms} />
+
+              {/* Service Reviews Section */}
+              <ReviewsContainer
+                reviews={serviceReviews.reviews}
+                stats={reviewStats}
+                profileId={service.profile.id}
+                profileDisplayName={service.profile.displayName || ''}
+                serviceId={service.id}
+                otherServicesReviews={profileOtherReviews.reviews}
+                showReviewsModel={true}
+                type='service'
+                isOwner={currentUserId === service.profile.uid}
+                isServicePage={true}
+              />
 
               {/* Report Service Button */}
               <ReportServiceDialog
