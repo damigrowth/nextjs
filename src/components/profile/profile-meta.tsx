@@ -129,7 +129,11 @@ export default function ProfileMeta({
               {/* Rating */}
               {reviewCount > 0 && (
                 <div className='mb-4'>
-                  <RatingDisplay rating={rating} reviewCount={reviewCount} />
+                  <RatingDisplay
+                    rating={rating}
+                    reviewCount={reviewCount}
+                    variant="full"
+                  />
                 </div>
               )}
 
