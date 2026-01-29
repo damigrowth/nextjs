@@ -1,5 +1,6 @@
 'use server';
 
+import { nanoid } from 'nanoid';
 import { revalidatePath } from 'next/cache';
 import type { DatasetItem } from '@/lib/types/datasets';
 import type { ActionResult } from '@/lib/types/api';
@@ -26,26 +27,41 @@ export interface TaxonomyConfig {
 }
 
 /**
- * Generate next ID by finding the maximum ID across all levels
+ * Collect all existing IDs from taxonomy tree (for collision detection)
  */
-function getNextId(items: DatasetItem[]): string {
-  let maxId = 0;
+function collectAllIds(items: DatasetItem[]): Set<string> {
+  const ids = new Set<string>();
 
-  function findMaxId(itemList: DatasetItem[]) {
+  function collect(itemList: DatasetItem[]) {
     for (const item of itemList) {
-      const numId = parseInt(item.id, 10);
-      if (!isNaN(numId) && numId > maxId) {
-        maxId = numId;
-      }
-      // Recursively check children
+      ids.add(item.id);
       if (item.children && item.children.length > 0) {
-        findMaxId(item.children);
+        collect(item.children);
       }
     }
   }
 
-  findMaxId(items);
-  return (maxId + 1).toString();
+  collect(items);
+  return ids;
+}
+
+/**
+ * Generate unique 6-character nanoid that doesn't collide with existing IDs
+ */
+function generateUniqueNanoid(existingIds: Set<string>): string {
+  let id: string;
+  let attempts = 0;
+  const maxAttempts = 100;
+
+  do {
+    id = nanoid(6);
+    attempts++;
+    if (attempts > maxAttempts) {
+      throw new Error('Failed to generate unique nanoid after 100 attempts');
+    }
+  } while (existingIds.has(id));
+
+  return id;
 }
 
 /**
@@ -162,7 +178,9 @@ export async function createItem(
       // Generate unique slug if conflicts exist
       const uniqueSlug = generateUniqueSlug(data.slug!, currentItems);
 
-      const newId = getNextId(currentItems);
+      // Generate unique nanoid
+      const existingIds = collectAllIds(currentItems);
+      const newId = generateUniqueNanoid(existingIds);
       const newItem = { id: newId, ...data, slug: uniqueSlug } as DatasetItem;
 
       // Normalize property order before staging
@@ -512,13 +530,16 @@ export async function createHierarchicalItem(
       // Generate unique slug if conflicts exist
       const uniqueSlug = generateUniqueSlug(data.item.slug!, currentItems);
 
-      // Use provided ID or generate next numeric ID
-      const newId = data.id || getNextId(currentItems);
+      // Use provided ID or generate unique nanoid
+      const existingIds = collectAllIds(currentItems);
+      const newId = data.id || generateUniqueNanoid(existingIds);
 
-      // Check for duplicate ID
-      const existingItem = findHierarchicalItemById(currentItems, newId);
-      if (existingItem) {
-        throw new Error(`A ${config.typeName} with ID "${newId}" already exists`);
+      // Check for duplicate ID (if provided)
+      if (data.id) {
+        const existingItem = findHierarchicalItemById(currentItems, newId);
+        if (existingItem) {
+          throw new Error(`A ${config.typeName} with ID "${newId}" already exists`);
+        }
       }
 
       const newItem = { id: newId, ...data.item, slug: uniqueSlug } as DatasetItem;
