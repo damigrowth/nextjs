@@ -18,6 +18,7 @@ import {
 import { FormServiceDelete } from '@/components/forms/service/form-service-delete';
 import { SiteHeader } from '@/components/admin/site-header';
 import { getServiceTaxonomies, getTags } from '@/lib/taxonomies';
+import { getAllSubdivisions } from '@/lib/utils/datasets';
 import { NextLink } from '@/components';
 import { formatServiceType } from '@/lib/utils/service';
 
@@ -53,6 +54,14 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
 
   // Prepare taxonomy data server-side to prevent client-side bundle bloat
   const serviceTaxonomies = getServiceTaxonomies();
+  const subdivisions = getAllSubdivisions(serviceTaxonomies);
+  const allSubdivisions = subdivisions.map((subdivision) => ({
+    id: subdivision.id,
+    label: `${subdivision.label}`,
+    subdivision: subdivision,
+    subcategory: subdivision.subcategory,
+    category: subdivision.category,
+  }));
   const tags = getTags();
   const availableTags = tags.map((tag) => ({
     value: tag.id,
@@ -374,7 +383,7 @@ export default async function AdminServiceDetailPage({ params }: PageProps) {
                   <CardContent>
                     <EditServiceTaxonomyForm
                       service={service}
-                      serviceTaxonomies={serviceTaxonomies}
+                      allSubdivisions={allSubdivisions}
                       availableTags={availableTags}
                     />
                   </CardContent>

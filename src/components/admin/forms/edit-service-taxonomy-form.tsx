@@ -15,14 +15,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ChevronRight } from 'lucide-react';
 import { updateServiceTaxonomyAction } from '@/actions/admin/services';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
+import { Badge } from '@/components/ui/badge';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { editServiceTaxonomySchema } from '@/lib/validations/service';
-import { resolveServiceHierarchy } from '@/lib/taxonomies';
 import { populateFormData } from '@/lib/utils/form';
-import TaxonomySelector from '@/components/shared/taxonomy-selector';
 
 type EditServiceTaxonomyFormValues = z.infer<typeof editServiceTaxonomySchema>;
 
@@ -34,13 +33,19 @@ interface EditServiceTaxonomyFormProps {
     subdivision: string | null;
     tags?: string[];
   };
-  serviceTaxonomies: DatasetItem[];
+  allSubdivisions: Array<{
+    id: string;
+    label: string;
+    subdivision: any;
+    subcategory: any;
+    category: any;
+  }>;
   availableTags: Array<{ value: string; label: string }>;
 }
 
 export function EditServiceTaxonomyForm({
   service,
-  serviceTaxonomies,
+  allSubdivisions,
   availableTags,
 }: EditServiceTaxonomyFormProps) {
   const router = useRouter();
@@ -59,23 +64,6 @@ export function EditServiceTaxonomyForm({
       tags: service.tags || [],
     },
   });
-
-  // Watch form values (plain strings after using createServiceSchema)
-  const watchedCategory = form.watch('category');
-  const watchedSubcategory = form.watch('subcategory');
-  const watchedSubdivision = form.watch('subdivision');
-
-  // Resolve taxonomy hierarchy using optimized O(1) lookups
-  const { category, subcategory, subdivision } = resolveServiceHierarchy(
-    watchedCategory,
-    watchedSubcategory,
-    watchedSubdivision
-  );
-
-  const selectedCategoryData = category;
-  const subcategories = category?.children || [];
-  const selectedSubcategoryData = subcategory;
-  const subdivisions = subcategory?.children || [];
 
   // Handle state changes from server action
   useEffect(() => {
@@ -115,65 +103,102 @@ export function EditServiceTaxonomyForm({
   return (
     <Form {...form}>
       <form action={handleFormSubmit} className='space-y-4'>
-        <div className='space-y-2'>
-          <label className='text-sm font-medium'>Service Category</label>
-          <TaxonomySelector
-            taxonomies={serviceTaxonomies}
-            value={
-              watchedCategory
-                ? {
-                    category: watchedCategory,
-                    subcategory: watchedSubcategory || '',
-                    subdivision: watchedSubdivision || '',
-                    categoryLabel: category?.label,
-                    subcategoryLabel: subcategory?.label,
-                    subdivisionLabel: subdivision?.label,
-                  }
-                : null
-            }
-            onValueChange={(value) => {
-              if (value) {
-                form.setValue('category', value.category, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-                form.setValue('subcategory', value.subcategory, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-                form.setValue('subdivision', value.subdivision, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-              } else {
-                form.setValue('category', '', {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-                form.setValue('subcategory', '', {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-                form.setValue('subdivision', '', {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-              }
-            }}
-            placeholder='Select service category...'
-            disabled={isPending}
-          />
-          {form.formState.errors.category && (
-            <p className='text-sm font-medium text-destructive'>
-              {form.formState.errors.category.message}
-            </p>
-          )}
-          {form.formState.errors.subcategory && (
-            <p className='text-sm font-medium text-destructive'>
-              {form.formState.errors.subcategory.message}
-            </p>
-          )}
-        </div>
+        <FormField
+          control={form.control}
+          name='subdivision'
+          render={({ field }) => {
+            // Watch subdivision inside render to get fresh updates
+            const currentSubdivision = form.watch('subdivision');
+
+            return (
+              <FormItem>
+                <FormLabel>Service Category</FormLabel>
+                <FormControl>
+                  <LazyCombobox
+                    key={`taxonomy-${currentSubdivision || 'empty'}`}
+                    trigger='search'
+                    clearable={true}
+                    options={allSubdivisions}
+                    value={currentSubdivision || undefined}
+                    onSelect={(option) => {
+                    // Auto-populate all three fields
+                    form.setValue('category', option.category.id, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                    form.setValue('subcategory', option.subcategory.id, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                    form.setValue('subdivision', option.subdivision.id, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                    form.clearErrors(['category', 'subcategory', 'subdivision']);
+                  }}
+                  onClear={() => {
+                    // Clear all three fields
+                    form.setValue('category', '', {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                    form.setValue('subcategory', '', {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                    form.setValue('subdivision', '', {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                  }}
+                  placeholder='Select service category...'
+                  searchPlaceholder='Search category...'
+                  emptyMessage='No categories found.'
+                  formatLabel={(option) => (
+                    <>
+                      {option.label}{' '}
+                      <span className='text-gray-500 text-sm'>
+                        ({option.category.label} / {option.subcategory.label})
+                      </span>
+                    </>
+                  )}
+                  renderButtonContent={(option) => {
+                    if (!option) {
+                      return (
+                        <span className='text-muted-foreground'>
+                          Select service category...
+                        </span>
+                      );
+                    }
+                    return (
+                      <div className='flex flex-wrap gap-1 items-center'>
+                        <Badge variant='default' className='hover:bg-primary/90'>
+                          {option.category.label}
+                        </Badge>
+                        <ChevronRight className='h-3 w-3 text-muted-foreground' />
+                        <Badge variant='default' className='hover:bg-primary/90'>
+                          {option.subcategory.label}
+                        </Badge>
+                        <ChevronRight className='h-3 w-3 text-muted-foreground' />
+                        <Badge variant='default' className='hover:bg-primary/90'>
+                          {option.label}
+                        </Badge>
+                      </div>
+                    );
+                  }}
+                  initialLimit={20}
+                  loadMoreIncrement={20}
+                  loadMoreThreshold={50}
+                  searchLimit={100}
+                  showProgress={true}
+                  disabled={isPending}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+            );
+          }}
+        />
 
         <FormField
           control={form.control}
