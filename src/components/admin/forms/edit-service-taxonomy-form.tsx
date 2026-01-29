@@ -19,8 +19,8 @@ import { Loader2 } from 'lucide-react';
 import { updateServiceTaxonomyAction } from '@/actions/admin/services';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import type { DatasetItem } from '@/lib/types/datasets';
-import { findById } from '@/lib/utils/datasets';
 import { editServiceTaxonomySchema } from '@/lib/validations/service';
+import { resolveServiceHierarchy } from '@/lib/taxonomies';
 import { populateFormData } from '@/lib/utils/form';
 import TaxonomySelector from '@/components/shared/taxonomy-selector';
 
@@ -65,11 +65,17 @@ export function EditServiceTaxonomyForm({
   const watchedSubcategory = form.watch('subcategory');
   const watchedSubdivision = form.watch('subdivision');
 
-  // Find taxonomy data
-  const selectedCategoryData = findById(serviceTaxonomies, watchedCategory);
-  const subcategories = selectedCategoryData?.children || [];
-  const selectedSubcategoryData = findById(serviceTaxonomies, watchedSubcategory);
-  const subdivisions = selectedSubcategoryData?.children || [];
+  // Resolve taxonomy hierarchy using optimized O(1) lookups
+  const { category, subcategory, subdivision } = resolveServiceHierarchy(
+    watchedCategory,
+    watchedSubcategory,
+    watchedSubdivision
+  );
+
+  const selectedCategoryData = category;
+  const subcategories = category?.children || [];
+  const selectedSubcategoryData = subcategory;
+  const subdivisions = subcategory?.children || [];
 
   // Handle state changes from server action
   useEffect(() => {
@@ -119,11 +125,9 @@ export function EditServiceTaxonomyForm({
                     category: watchedCategory,
                     subcategory: watchedSubcategory || '',
                     subdivision: watchedSubdivision || '',
-                    categoryLabel: selectedCategoryData?.label,
-                    subcategoryLabel: selectedSubcategoryData?.label,
-                    subdivisionLabel: watchedSubdivision
-                      ? findById(subdivisions, watchedSubdivision)?.label
-                      : undefined,
+                    categoryLabel: category?.label,
+                    subcategoryLabel: subcategory?.label,
+                    subdivisionLabel: subdivision?.label,
                   }
                 : null
             }
