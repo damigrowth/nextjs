@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -57,7 +57,14 @@ export function EditServicePricingForm({ service }: EditServicePricingFormProps)
     },
   });
 
-  const watchFixed = form.watch('fixed');
+  const { watch, setValue, clearErrors, trigger } = form;
+
+  // Use useWatch for reactive updates with useActionState
+  const fixedValue = useWatch({
+    control: form.control,
+    name: 'fixed',
+    defaultValue: service.fixed,
+  });
 
   useEffect(() => {
     if (state?.success) {
@@ -95,18 +102,18 @@ export function EditServicePricingForm({ service }: EditServicePricingFormProps)
             name='price'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Price {watchFixed ? '(Required)' : '(Hidden)'}</FormLabel>
+                <FormLabel>Price {fixedValue ? '(Required)' : '(Hidden)'}</FormLabel>
                 <FormControl>
                   <Currency
                     currency='€'
                     position='right'
-                    placeholder={watchFixed ? 'e.g., 50' : 'Price hidden'}
+                    placeholder={fixedValue ? 'e.g., 50' : 'Price hidden'}
                     min={1}
                     max={10000}
                     allowDecimals={false}
                     value={field.value || 0}
                     onValueChange={field.onChange}
-                    disabled={!watchFixed || isPending}
+                    disabled={!fixedValue}
                   />
                 </FormControl>
                 <FormMessage />
@@ -128,15 +135,15 @@ export function EditServicePricingForm({ service }: EditServicePricingFormProps)
                 <FormControl>
                   <Switch
                     checked={!field.value}
-                    onCheckedChange={(checked) => {
+                    onCheckedChange={async (checked) => {
                       field.onChange(!checked);
                       if (checked) {
-                        form.setValue('price', 0, { shouldValidate: false });
-                        form.clearErrors('price');
+                        setValue('price', 0, { shouldValidate: false });
+                        clearErrors('price');
                       } else {
-                        form.clearErrors('price');
+                        clearErrors('price');
                       }
-                      form.trigger('price');
+                      await trigger('price');
                     }}
                     disabled={isPending}
                   />

@@ -52,7 +52,6 @@ export default function ServiceDetailsStep() {
   const watchedCategory = watch('category');
   const watchedSubcategory = watch('subcategory');
   const watchedSubdivision = watch('subdivision');
-  const watchedFixed = watch('fixed');
   const watchedType = watch('type');
 
   // Get filtered data based on selections
@@ -317,22 +316,22 @@ export default function ServiceDetailsStep() {
               <FormItem>
                 <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
                   <FormLabel
-                    className={`sm:min-w-[50px] transition-colors ${!watchedFixed ? 'text-muted-foreground' : ''}`}
+                    className={`sm:min-w-[50px] transition-colors ${!watch('fixed') ? 'text-muted-foreground' : ''}`}
                   >
-                    Τιμή{watchedFixed ? '*' : ''}
+                    Τιμή{watch('fixed') ? '*' : ''}
                   </FormLabel>
                   <FormControl>
                     <div className='w-[150px]'>
                       <Currency
                         currency='€'
                         position='right'
-                        placeholder={watchedFixed ? 'π.χ. 50' : 'Τιμή κρυφή'}
+                        placeholder={watch('fixed') ? 'π.χ. 50' : 'Τιμή κρυφή'}
                         min={1}
                         max={10000}
                         allowDecimals={false}
                         value={field.value || 0}
                         onValueChange={field.onChange}
-                        disabled={!watchedFixed}
+                        disabled={!watch('fixed')}
                       />
                     </div>
                   </FormControl>
