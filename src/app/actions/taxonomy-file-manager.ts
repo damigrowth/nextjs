@@ -175,9 +175,9 @@ export async function backupTaxonomyFile(type: TaxonomyType): Promise<string> {
 export function parseTaxonomyFile(type: TaxonomyType, content: string): any[] {
   const config = getConfig(type);
 
-  // Extract the exported array using regex
+  // Extract the exported array using regex (handles TypeScript type annotations)
   const match = content.match(
-    new RegExp(`export const ${config.exportName}\\s*=\\s*(\\[[\\s\\S]*\\]);?\\s*$`, 'm')
+    new RegExp(`export const ${config.exportName}(?:\\s*:\\s*[^=]+)?\\s*=\\s*(\\[[\\s\\S]*\\]);?\\s*$`, 'm')
   );
 
   if (!match) {
