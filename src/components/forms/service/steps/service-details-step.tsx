@@ -345,13 +345,17 @@ export default function ServiceDetailsStep() {
             name='fixed'
             render={({ field }) => {
               const handleToggle = async (checked: boolean) => {
-                field.onChange(!checked);
-                if (checked) {
-                  // When switch becomes ON (fixed becomes false), price is not required, set to 0
+                // checked = true means "Hide price" switch is ON
+                // so fixed should be false (price hidden)
+                const newFixedValue = !checked;
+                field.onChange(newFixedValue);
+
+                if (!newFixedValue) {
+                  // When fixed becomes false (price hidden), set price to 0
                   setValue('price', 0, { shouldValidate: false });
                   clearErrors('price');
                 } else {
-                  // When switch becomes OFF (fixed becomes true), price is required
+                  // When fixed becomes true (price visible), clear errors for validation
                   clearErrors('price');
                 }
                 await trigger('price');
