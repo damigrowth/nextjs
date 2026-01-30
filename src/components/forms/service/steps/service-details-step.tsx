@@ -34,7 +34,7 @@ import {
 import { TaxonomyDataContext } from '../form-service-create';
 import { findById } from '@/lib/utils/datasets';
 import type { CreateServiceInput } from '@/lib/validations/service';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 
 export default function ServiceDetailsStep() {
   const form = useFormContext<CreateServiceInput>();
@@ -53,6 +53,13 @@ export default function ServiceDetailsStep() {
   const watchedSubcategory = watch('subcategory');
   const watchedSubdivision = watch('subdivision');
   const watchedType = watch('type');
+
+  // Use useWatch for reactive updates in multi-step context (survives component remounting)
+  const fixedValue = useWatch({
+    control: form.control,
+    name: 'fixed',
+    defaultValue: true,
+  });
 
   // Get filtered data based on selections
   const selectedCategoryData = findById(serviceTaxonomies, watchedCategory);
@@ -316,22 +323,22 @@ export default function ServiceDetailsStep() {
               <FormItem>
                 <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
                   <FormLabel
-                    className={`sm:min-w-[50px] transition-colors ${!watch('fixed') ? 'text-muted-foreground' : ''}`}
+                    className={`sm:min-w-[50px] transition-colors ${!fixedValue ? 'text-muted-foreground' : ''}`}
                   >
-                    Τιμή{watch('fixed') ? '*' : ''}
+                    Τιμή{fixedValue ? '*' : ''}
                   </FormLabel>
                   <FormControl>
                     <div className='w-[150px]'>
                       <Currency
                         currency='€'
                         position='right'
-                        placeholder={watch('fixed') ? 'π.χ. 50' : 'Τιμή κρυφή'}
+                        placeholder={fixedValue ? 'π.χ. 50' : 'Τιμή κρυφή'}
                         min={1}
                         max={10000}
                         allowDecimals={false}
                         value={field.value || 0}
                         onValueChange={field.onChange}
-                        disabled={!watch('fixed')}
+                        disabled={!fixedValue}
                       />
                     </div>
                   </FormControl>
