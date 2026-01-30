@@ -29,7 +29,7 @@ export async function getProfileMetadata(username: string) {
     titleTemplate: '%displayName% - %type% - %subcategorySingular%. %tagline%',
     descriptionTemplate: '%bio%',
     size: 160,
-    url: `/profile/${username}`,
+    url: `/profile/${encodeURIComponent(username)}`,
   });
 
   return meta;

@@ -10,7 +10,7 @@ model Review {
   updatedAt DateTime @updatedAt
   author    User     @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
   profile   Profile  @relation("ReviewReceiver", fields: [pid], references: [id], onDelete: Cascade)
-  service   Service? @relation(fields: [sid], references: [id])
+  service   Service? @relation(fields: [sid], references: [id], onDelete: Cascade)
 
   // ============================================================================
   // OPTIMIZED INDEXES (Performance Optimization - ML15-25)

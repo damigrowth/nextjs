@@ -1390,21 +1390,35 @@ export const adminEditServiceAddonsSchema = z.object({
     .optional(),
 });
 
-export const adminEditServicePricingSchema = z.object({
-  price: z
-    .number()
-    .int()
-    .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
-    .optional(),
-  fixed: z.boolean(),
-  duration: z
-    .number()
-    .int()
-    .min(0, 'Η διάρκεια δεν μπορεί να είναι αρνητική')
-    .max(365, 'Η διάρκεια δεν μπορεί να ξεπερνά τις 365 ημέρες')
-    .optional(),
-  subscriptionType: z.nativeEnum(SubscriptionType).optional(),
-});
+export const adminEditServicePricingSchema = z
+  .object({
+    price: z
+      .number()
+      .int()
+      .max(10000, 'Η τιμή δεν μπορεί να ξεπερνά τα 10.000€')
+      .optional(),
+    fixed: z.boolean(),
+    duration: z
+      .number()
+      .int()
+      .min(0, 'Η διάρκεια δεν μπορεί να είναι αρνητική')
+      .max(365, 'Η διάρκεια δεν μπορεί να ξεπερνά τις 365 ημέρες')
+      .optional(),
+    subscriptionType: z.nativeEnum(SubscriptionType).optional(),
+  })
+  .refine(
+    (data) => {
+      // Price is required when fixed is true (default state, showing price)
+      if (data.fixed && (!data.price || data.price === 0)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Πληκτρολογήστε τιμή',
+      path: ['price'],
+    },
+  );
 
 // =============================================
 // TYPE EXPORTS

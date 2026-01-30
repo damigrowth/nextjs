@@ -243,7 +243,7 @@ export async function sendNewProfileEmail(
       username: profile.username,
       profileId: profile.id.toString(),
       userEmail: user.email,
-      publicUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://doulitsa.gr'}/profile/${profile.username}`,
+      publicUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://doulitsa.gr'}/profile/${encodeURIComponent(profile.username)}`,
       adminUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://doulitsa.gr'}/admin/profiles/${profile.id}`,
       userType: user.type,
       createdAt: new Date(),

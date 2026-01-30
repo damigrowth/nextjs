@@ -74,6 +74,31 @@ const NextLink = forwardRef<HTMLAnchorElement, NextLinkCustomProps>(
     const { showSkeleton } = useNavigationSkeletonStore();
 
     /**
+     * Automatically encode URLs for dynamic routes to handle special characters
+     * Ensures URLs with @, ., spaces, etc. work correctly
+     */
+    const encodeUrlForDynamicRoutes = (href: string | object): string | object => {
+      // Handle object hrefs (rarely used but possible)
+      if (typeof href === 'object') {
+        return href;
+      }
+
+      const hrefString = href.toString();
+
+      // Encode profile URLs: /profile/username → /profile/encoded-username
+      const profileMatch = hrefString.match(/^\/profile\/([^/]+)$/);
+      if (profileMatch && profileMatch[1]) {
+        return `/profile/${encodeURIComponent(profileMatch[1])}`;
+      }
+
+      // Could add other dynamic routes here in the future:
+      // - Services: /s/[slug]
+      // - Categories: /dir/[category]/[subcategory]
+
+      return hrefString;
+    };
+
+    /**
      * Detect if href is a service or profile page
      * Returns skeleton type or null
      * Explicitly excludes admin routes
@@ -157,6 +182,7 @@ const NextLink = forwardRef<HTMLAnchorElement, NextLinkCustomProps>(
         <NextLinkOriginal
           prefetch={false}
           {...rest}
+          href={encodeUrlForDynamicRoutes(rest.href)}
           ref={ref}
           onClick={handleClick}
           onMouseEnter={handleMouseEnter}
@@ -170,6 +196,7 @@ const NextLink = forwardRef<HTMLAnchorElement, NextLinkCustomProps>(
       <NextLinkOriginal
         prefetch={prefetch as boolean}
         {...rest}
+        href={encodeUrlForDynamicRoutes(rest.href)}
         ref={ref}
         onClick={handleClick}
       />
