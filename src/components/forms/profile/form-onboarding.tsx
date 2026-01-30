@@ -57,12 +57,14 @@ import { completeOnboarding } from '@/actions/auth/complete-onboarding';
 import { MediaUpload } from '../../media';
 import FormButton from '@/components/shared/button-form';
 import { AuthUser } from '@/lib/types';
+import { Profile } from '@prisma/client';
 
 // Use existing Zod schema
 type OnboardingFormData = z.infer<typeof onboardingFormSchemaWithMedia>;
 
 interface OnboardingFormProps {
   user: AuthUser | null;
+  profile: Profile | null;
   proTaxonomies: DatasetItem[];
   locationOptions: DatasetItem[];
 }
@@ -79,6 +81,7 @@ const initialState = {
  */
 export default function OnboardingForm({
   user,
+  profile,
   proTaxonomies,
   locationOptions,
 }: OnboardingFormProps) {
@@ -113,22 +116,39 @@ export default function OnboardingForm({
   const form = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingFormSchemaWithMedia),
     defaultValues: {
-      image: undefined, // Will be set below when user data loads - use undefined instead of null
-      category: '',
-      subcategory: '',
-      bio: '',
-      coverage: {
-        online: false,
-        onbase: false,
-        onsite: false,
-        address: '',
-        area: null,
-        county: null,
-        zipcode: null,
-        counties: [],
-        areas: [],
-      },
-      portfolio: [],
+      // Pre-fill image from user or profile
+      image: user?.image || profile?.image || undefined,
+      // Pre-fill category and subcategory from profile
+      category: profile?.category || '',
+      subcategory: profile?.subcategory || '',
+      // Pre-fill bio from profile
+      bio: profile?.bio || '',
+      // Pre-fill coverage from profile if it exists
+      coverage: profile?.coverage
+        ? {
+            online: profile.coverage.online || false,
+            onbase: profile.coverage.onbase || false,
+            onsite: profile.coverage.onsite || false,
+            address: profile.coverage.address || '',
+            area: profile.coverage.area || null,
+            county: profile.coverage.county || null,
+            zipcode: profile.coverage.zipcode || null,
+            counties: profile.coverage.counties || [],
+            areas: profile.coverage.areas || [],
+          }
+        : {
+            online: false,
+            onbase: false,
+            onsite: false,
+            address: '',
+            area: null,
+            county: null,
+            zipcode: null,
+            counties: [],
+            areas: [],
+          },
+      // Pre-fill portfolio from profile
+      portfolio: profile?.portfolio || [],
     },
     mode: 'onChange', // Real-time validation
   });
@@ -170,13 +190,6 @@ export default function OnboardingForm({
   useEffect(() => {
     router.prefetch('/dashboard');
   }, [router]);
-
-  // Update form values when user data becomes available
-  useEffect(() => {
-    if (user && hasExistingImage && !form.getValues('image')) {
-      form.setValue('image', user.image, { shouldValidate: true });
-    }
-  }, [user, hasExistingImage, form]);
 
   // Handle successful onboarding completion and redirect
   useEffect(() => {
