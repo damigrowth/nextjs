@@ -1,13 +1,35 @@
 import { TaxonomyCreatePage } from '@/components/admin/taxonomy-create-page';
 import { CreateSkillForm } from '@/components/admin/forms/create-skill-form';
-import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
+import { getTaxonomyData } from '@/actions/admin/taxonomy-helpers';
+import { isSuccess } from '@/lib/types/server-actions';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CreateSkillPage() {
-  // Fetch taxonomy data with staged changes applied
-  const skills = await getTaxonomyWithStaging('skills');
-  const proTaxonomies = await getTaxonomyWithStaging('pro');
+  // Fetch taxonomy data from Git
+  const skillsResult = await getTaxonomyData('skills');
+  const proResult = await getTaxonomyData('pro');
+
+  if (!isSuccess(skillsResult)) {
+    return (
+      <div className="p-4">
+        <h1 className="text-lg font-semibold text-destructive">Error</h1>
+        <p className="text-sm text-muted-foreground">{skillsResult.error.message}</p>
+      </div>
+    );
+  }
+
+  if (!isSuccess(proResult)) {
+    return (
+      <div className="p-4">
+        <h1 className="text-lg font-semibold text-destructive">Error</h1>
+        <p className="text-sm text-muted-foreground">{proResult.error.message}</p>
+      </div>
+    );
+  }
+
+  const skills = skillsResult.data;
+  const proTaxonomies = proResult.data;
 
   return (
     <TaxonomyCreatePage

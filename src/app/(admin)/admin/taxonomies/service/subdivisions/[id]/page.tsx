@@ -4,7 +4,8 @@ import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SiteHeader } from '@/components/admin/site-header';
 import { EditTaxonomyItemForm } from '@/components/admin/forms';
-import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
+import { getTaxonomyData } from '@/actions/admin/taxonomy-helpers';
+import { isSuccess } from '@/lib/types/server-actions';
 import { getItemPath } from '@/lib/utils/datasets';
 import { DatasetItem } from '@/lib/types/datasets';
 
@@ -20,8 +21,20 @@ interface PageProps {
 
 export default async function EditSubdivisionPage({ params }: PageProps) {
   const { id } = await params;
-  // Get taxonomies including staged changes
-  const serviceTaxonomies = await getTaxonomyWithStaging('service');
+
+  // Get taxonomy data from Git
+  const result = await getTaxonomyData('service');
+
+  if (!isSuccess(result)) {
+    return (
+      <div className="p-4">
+        <h1 className="text-lg font-semibold text-destructive">Error</h1>
+        <p className="text-sm text-muted-foreground">{result.error.message}</p>
+      </div>
+    );
+  }
+
+  const serviceTaxonomies = result.data;
   const taxonomy = findServiceById(id);
   const path = getItemPath(serviceTaxonomies as DatasetItem[], id);
 

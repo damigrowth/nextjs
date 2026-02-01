@@ -4,7 +4,8 @@ import { SiteHeader } from '@/components/admin/site-header';
 import { EditProTaxonomyForm } from '@/components/admin/forms/edit-pro-taxonomy-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
+import { getTaxonomyData } from '@/actions/admin/taxonomy-helpers';
+import { isSuccess } from '@/lib/types/server-actions';
 import { getItemPath } from '@/lib/utils/datasets';
 import { NextLink } from '@/components';
 
@@ -19,8 +20,20 @@ interface PageProps {
 
 export default async function EditProSubcategoryPage({ params }: PageProps) {
   const { id } = await params;
-  // Get taxonomies including staged changes
-  const proTaxonomies = await getTaxonomyWithStaging('pro');
+
+  // Get taxonomy data from Git
+  const result = await getTaxonomyData('pro');
+
+  if (!isSuccess(result)) {
+    return (
+      <div className="p-4">
+        <h1 className="text-lg font-semibold text-destructive">Error</h1>
+        <p className="text-sm text-muted-foreground">{result.error.message}</p>
+      </div>
+    );
+  }
+
+  const proTaxonomies = result.data;
   const taxonomy = findProById(id);
   const path = getItemPath(proTaxonomies, id);
 
