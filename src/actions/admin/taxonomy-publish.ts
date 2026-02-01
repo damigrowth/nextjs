@@ -29,7 +29,25 @@ import {
 import type { DatasetItem } from '@/lib/types/datasets';
 import { sanitizeDrafts, mergeDraftOperations } from '@/lib/validations/taxonomy-drafts';
 import { isSuccess } from '@/lib/types/server-actions';
-import { collectAllIds } from './taxonomies-shared';
+
+/**
+ * Collect all existing IDs from taxonomy tree (for collision detection)
+ */
+function collectAllIds(items: DatasetItem[]): Set<string> {
+  const ids = new Set<string>();
+
+  function collect(itemList: DatasetItem[]) {
+    for (const item of itemList) {
+      ids.add(item.id);
+      if (item.children && item.children.length > 0) {
+        collect(item.children);
+      }
+    }
+  }
+
+  collect(items);
+  return ids;
+}
 
 /**
  * Apply drafts to taxonomy data

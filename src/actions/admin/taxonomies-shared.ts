@@ -29,7 +29,7 @@ export interface TaxonomyConfig {
 /**
  * Collect all existing IDs from taxonomy tree (for collision detection)
  */
-export function collectAllIds(items: DatasetItem[]): Set<string> {
+function collectAllIds(items: DatasetItem[]): Set<string> {
   const ids = new Set<string>();
 
   function collect(itemList: DatasetItem[]) {
