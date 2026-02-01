@@ -23,7 +23,7 @@ export default async function EditSubcategoryPage({ params }: PageProps) {
   const { id } = await params;
 
   // Get taxonomy data from Git
-  const result = await getTaxonomyData('service');
+  const result = await getTaxonomyData('service-subcategories');
 
   if (!isSuccess(result)) {
     return (

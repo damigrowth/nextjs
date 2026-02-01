@@ -21,7 +21,7 @@ export default async function EditProCategoryPage({ params }: PageProps) {
   const { id } = await params;
 
   // Get taxonomy data from Git
-  const result = await getTaxonomyData('pro');
+  const result = await getTaxonomyData('pro-categories');
 
   if (!isSuccess(result)) {
     return (

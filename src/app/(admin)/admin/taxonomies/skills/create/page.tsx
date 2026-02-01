@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export default async function CreateSkillPage() {
   // Fetch taxonomy data from Git
   const skillsResult = await getTaxonomyData('skills');
-  const proResult = await getTaxonomyData('pro');
+  const proResult = await getTaxonomyData('pro-categories');
 
   if (!isSuccess(skillsResult)) {
     return (

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function CreateSubcategoryPage() {
   // Fetch taxonomy data from Git
-  const result = await getTaxonomyData('service');
+  const result = await getTaxonomyData('service-subcategories');
 
   if (!isSuccess(result)) {
     return (

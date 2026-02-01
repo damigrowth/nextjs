@@ -23,7 +23,7 @@ export default async function EditSubdivisionPage({ params }: PageProps) {
   const { id } = await params;
 
   // Get taxonomy data from Git
-  const result = await getTaxonomyData('service');
+  const result = await getTaxonomyData('service-subdivisions');
 
   if (!isSuccess(result)) {
     return (

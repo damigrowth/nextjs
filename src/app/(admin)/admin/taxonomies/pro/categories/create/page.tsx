@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function CreateProCategoryPage() {
   // Fetch taxonomy data from Git
-  const result = await getTaxonomyData('pro');
+  const result = await getTaxonomyData('pro-categories');
 
   if (!isSuccess(result)) {
     return (
