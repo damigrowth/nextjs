@@ -86,7 +86,6 @@ export default function DashboardSidebar({
       title: 'Αξιολογήσεις',
       url: '/dashboard/reviews',
       icon: Star,
-      isActive: false,
     },
   ];
 

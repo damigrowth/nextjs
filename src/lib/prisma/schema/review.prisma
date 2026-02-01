@@ -1,16 +1,24 @@
+enum ReviewType {
+  SERVICE // Review on specific service
+  PROFILE // General profile review (no specific service)
+}
+
 model Review {
-  id        String   @id @default(cuid())
-  rating    Int
-  comment   String?
-  published Boolean  @default(true)
-  sid       Int?     // Changed from String? to Int? to match Service.id
-  pid       String
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  author    User     @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  profile   Profile  @relation("ReviewReceiver", fields: [pid], references: [id], onDelete: Cascade)
-  service   Service? @relation(fields: [sid], references: [id], onDelete: Cascade)
+  id         String     @id @default(cuid())
+  rating     Int
+  comment    String?
+  status     Status     @default(pending) // Moderation workflow: pending → approved/rejected
+  type       ReviewType @default(PROFILE) // SERVICE or PROFILE review
+  published  Boolean    @default(false) // Admin control - syncs with status for backward compatibility
+  visibility Boolean    @default(false) // Professional control - shows/hides comment publicly
+  sid        Int? // Service ID (optional - for service reviews)
+  pid        String // Profile ID (required - all reviews target a profile)
+  authorId   String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  author     User       @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  profile    Profile    @relation("ReviewReceiver", fields: [pid], references: [id], onDelete: Cascade)
+  service    Service?   @relation(fields: [sid], references: [id])
 
   // ============================================================================
   // OPTIMIZED INDEXES (Performance Optimization - ML15-25)
@@ -37,6 +45,12 @@ model Review {
 
   // User's reviews sorted by date (for user dashboard)
   @@index([authorId, createdAt]) // User's review history
+
+  // NEW: Moderation workflow indexes
+  @@index([status, createdAt]) // Admin moderation queue
+  @@index([pid, status, published, visibility]) // Profile reviews with status+visibility filter
+  @@index([sid, status, published, visibility]) // Service reviews with status+visibility filter
+  @@index([type, status]) // Filter by review type and status
 
   @@map("reviews")
 }

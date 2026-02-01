@@ -113,6 +113,7 @@ export function ArchiveProfileCard({
                   rating={profile.rating}
                   reviewCount={profile.reviewCount}
                   size='sm'
+                  variant='compact'
                   className='text-sm'
                 />
               )}

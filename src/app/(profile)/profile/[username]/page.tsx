@@ -1,5 +1,7 @@
 import type { JSX } from 'react';
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
+import { auth } from '@/lib/auth';
 import { getProfilePageData } from '@/actions/profiles/get-profile';
 import { getProfileMetadata } from '@/lib/seo/pages';
 import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
@@ -18,6 +20,7 @@ import {
   ReportProfileDialog,
 } from '@/components/profile';
 import { ProfileSchema } from '@/lib/seo/schema';
+import { ReviewsContainer } from '@/components/review';
 
 // ISR configuration with shorter interval + tag-based revalidation
 export const revalidate = 300; // Revalidate every 5 minutes (backup for tag-based)
@@ -75,6 +78,10 @@ export async function generateStaticParams() {
 export default async function ProfilePage({
   params,
 }: ProfilePageProps): Promise<JSX.Element> {
+  // Get current user for isOwner check
+  const session = await auth.api.getSession({ headers: await headers() });
+  const currentUserId = session?.user?.id;
+
   const username = decodeURIComponent((await params).username);
   const result = await getProfilePageData(username);
 
@@ -102,14 +109,17 @@ export default async function ProfilePage({
     calculatedExperience,
     breadcrumbSegments,
     breadcrumbButtons,
+    reviews,
+    reviewStats,
   } = result.data;
 
   const image = profile.image;
 
   // Get first county for location schema
-  const firstCounty = coverage.counties && coverage.counties.length > 0
-    ? coverage.counties[0]
-    : undefined;
+  const firstCounty =
+    coverage.counties && coverage.counties.length > 0
+      ? coverage.counties[0]
+      : undefined;
 
   return (
     <div className='my-20'>
@@ -193,8 +203,22 @@ export default async function ProfilePage({
 
               <ProfileTerms terms={profile.terms} />
 
-              {/* Report Profile Button */}
+              {/* Profile Reviews Section */}
+              <ReviewsContainer
+                reviews={reviews.reviews}
+                stats={reviewStats}
+                profileId={profile.id}
+                profileDisplayName={profile.displayName || ''}
+                showReviewsModel={false}
+                type='profile'
+                isOwner={currentUserId === profile.uid}
+                profileServices={result.data.services.map((s) => ({
+                  id: s.id,
+                  title: s.title,
+                }))}
+              />
 
+              {/* Report Profile Button */}
               <ReportProfileDialog
                 profileId={profile.id}
                 profileName={profile.displayName || profile.username || ''}

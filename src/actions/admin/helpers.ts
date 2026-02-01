@@ -194,6 +194,11 @@ export async function getFilteredNavItems(): Promise<{
         resource: ADMIN_RESOURCES.CHATS,
       },
       {
+        title: 'Reviews',
+        url: '/admin/reviews',
+        resource: ADMIN_RESOURCES.REVIEWS,
+      },
+      {
         title: 'Analytics',
         url: '/admin/analytics',
         resource: ADMIN_RESOURCES.ANALYTICS,
