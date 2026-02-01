@@ -104,8 +104,7 @@ export function EditTaxonomyItemForm({
           }),
           ...(data.image && { image: data.image }),
         } as DatasetItem,
-        level: data.level,
-        parentId: data.parentId || null,
+        previousData: taxonomy, // Include original data for diff tracking
       });
 
       // Save to localStorage

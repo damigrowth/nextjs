@@ -244,8 +244,7 @@ export function EditProTaxonomyForm({
           description: data.description,
           ...(data.level === 'subcategory' && { type: data.type }),
         } as DatasetItem,
-        level: data.level,
-        parentId: data.parentId || null,
+        previousData: taxonomy, // Include original data for diff tracking
       });
 
       // Save to localStorage
