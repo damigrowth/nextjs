@@ -261,6 +261,20 @@ function buildTagsMaps(items: DatasetItem[]) {
 async function buildTaxonomyMaps() {
   console.log('🔨 Building taxonomy maps...\n');
 
+  // LOG: Sample source IDs for verification
+  console.log('📋 Source Data Sample (First 5 Categories):');
+  serviceTaxonomies.slice(0, 5).forEach((cat, idx) => {
+    console.log(`   ${idx + 1}. Category ID: "${cat.id}" - ${cat.label}`);
+    if (cat.children && cat.children.length > 0) {
+      const firstSub = cat.children[0];
+      console.log(`      └─ First Subcategory ID: "${firstSub.id}" - ${firstSub.label}`);
+      if (firstSub.children && firstSub.children.length > 0) {
+        console.log(`         └─ First Subdivision ID: "${firstSub.children[0].id}" - ${firstSub.children[0].label}`);
+      }
+    }
+  });
+  console.log();
+
   // Build service maps
   const { maps: serviceMaps, subdivisionCount: serviceSubdivisions } =
     buildServiceMaps(serviceTaxonomies);
@@ -282,6 +296,15 @@ async function buildTaxonomyMaps() {
 
   // Build tags maps
   const tagsMaps = buildTagsMaps(tags);
+
+  // LOG: Sample generated map IDs for verification
+  console.log('🗺️  Generated Map Sample (First 5 IDs from byId):');
+  const sampleIds = Object.keys(serviceMaps.byId).slice(0, 5);
+  sampleIds.forEach((id, idx) => {
+    const item = serviceMaps.byId[id];
+    console.log(`   ${idx + 1}. Map ID: "${id}" - ${item.label} (level: ${item.children ? 'category/subcategory' : 'subdivision'})`);
+  });
+  console.log();
 
   // Create final structure
   const maps: TaxonomyMaps = {
@@ -330,6 +353,16 @@ async function buildTaxonomyMaps() {
     outputPath.replace('.json', '.json.gz'),
     compressed
   );
+
+  // LOG: Verify what was written to file
+  console.log('💾 Verification - Reading back written file:');
+  const writtenContent = JSON.parse(fs.readFileSync(outputPath, 'utf-8'));
+  const writtenSampleIds = Object.keys(writtenContent.service.byId).slice(0, 5);
+  writtenSampleIds.forEach((id, idx) => {
+    const item = writtenContent.service.byId[id];
+    console.log(`   ${idx + 1}. Written ID: "${id}" - ${item.label}`);
+  });
+  console.log();
 
   // Calculate sizes
   const originalSize = JSON.stringify(maps).length;

@@ -7,6 +7,9 @@ import { LabelField, SlugField, CategoryField } from './taxonomy-form-fields';
 import { useSlugHandlers } from './use-slug-handlers';
 import type { DatasetItem } from '@/lib/types/datasets';
 import type { UseFormReturn } from 'react-hook-form';
+import { createDraftData } from '@/lib/validations/taxonomy-drafts';
+import { saveDraft } from '@/lib/taxonomy-drafts';
+import type { ActionResult } from '@/lib/types/api';
 
 interface CreateSkillFormProps {
   existingItems: DatasetItem[];
@@ -58,6 +61,24 @@ function CreateSkillFormFields({
 }
 
 export function CreateSkillForm({ existingItems, categories }: CreateSkillFormProps) {
+  const handleSuccess = (result: ActionResult) => {
+    if (result.success && result.data) {
+      try {
+        // Create validated draft for create operation
+        const draft = createDraftData('skills', 'create', {
+          data: result.data.item,
+          level: null,
+          parentId: null,
+        });
+
+        // Save to localStorage
+        saveDraft(draft);
+      } catch (error) {
+        console.error('[CREATE_SKILL_FORM] Failed to save draft:', error);
+      }
+    }
+  };
+
   return (
     <TaxonomyFormWrapper<CreateSkillInput>
       schema={createSkillSchema}
@@ -67,9 +88,10 @@ export function CreateSkillForm({ existingItems, categories }: CreateSkillFormPr
         slug: '',
         category: '',
       }}
-      successMessage='Skill created successfully'
+      successMessage='Skill created (draft saved)'
       redirectPath='/admin/taxonomies/skills'
       stringFields={['label', 'slug', 'category']}
+      onSuccess={handleSuccess}
     >
       {(form, isPending) => (
         <CreateSkillFormFields

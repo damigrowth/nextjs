@@ -22,7 +22,7 @@ export default async function page() {
     redirect('/login');
   }
 
-  const { user } = userResult.data;
+  const { user, profile } = userResult.data;
 
   // Prepare taxonomy and location data server-side to prevent client-side bundle bloat
   const proTaxonomies = getProTaxonomies();
@@ -51,6 +51,7 @@ export default async function page() {
               <div className='relative bg-white p-12 sm:p-8 rounded-xl shadow-lg border border-gray-300'>
                 <OnboardingForm
                   user={user}
+                  profile={profile}
                   proTaxonomies={proTaxonomies as DatasetOption[]}
                   locationOptions={locationOptions}
                 />

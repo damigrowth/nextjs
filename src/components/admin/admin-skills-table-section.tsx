@@ -1,4 +1,5 @@
-import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
+import { getTaxonomyData } from '@/actions/admin/taxonomy-helpers';
+import { isSuccess } from '@/lib/types/server-actions';
 import { AdminSkillsDataTable } from './admin-skills-data-table';
 import {
   processTableData,
@@ -18,8 +19,9 @@ export async function AdminSkillsTableSection({
   searchParams,
   categoryLookup,
 }: AdminSkillsTableSectionProps) {
-  // Get skills including staged changes
-  const skills = await getTaxonomyWithStaging('skills');
+  // Get skills from Git
+  const result = await getTaxonomyData('skills');
+  const skills = isSuccess(result) ? result.data : [];
 
   const categoryFilter = (skill: any, params: BaseSearchParams) => {
     const { category } = params;

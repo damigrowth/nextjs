@@ -1,5 +1,6 @@
 import { AdminCategoriesDataTable } from './admin-categories-data-table';
-import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
+import { getTaxonomyData } from '@/actions/admin/taxonomy-helpers';
+import { isSuccess } from '@/lib/types/server-actions';
 import { DatasetItem } from '@/lib/types/datasets';
 import {
   processTableData,
@@ -20,8 +21,9 @@ interface CategoryItem extends DatasetItem {
 export async function AdminCategoriesTableSection({
   searchParams,
 }: AdminCategoriesTableSectionProps) {
-  // Get categories with subcategory counts (including staged changes)
-  const serviceTaxonomies = await getTaxonomyWithStaging('service');
+  // Get categories with subcategory counts from Git
+  const result = await getTaxonomyData('service-categories');
+  const serviceTaxonomies = isSuccess(result) ? result.data : [];
   const categories: CategoryItem[] = serviceTaxonomies.map((category) => ({
     ...category,
     subcategoryCount: category.children?.length || 0,

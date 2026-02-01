@@ -10,6 +10,9 @@ import { TaxonomyFormWrapper } from './taxonomy-form-wrapper';
 import { LabelField, SlugField, CategoryField } from './taxonomy-form-fields';
 import { useSlugHandlers } from './use-slug-handlers';
 import type { UseFormReturn } from 'react-hook-form';
+import { createDraftData } from '@/lib/validations/taxonomy-drafts';
+import { saveDraft } from '@/lib/taxonomy-drafts';
+import type { ActionResult } from '@/lib/types/api';
 
 interface EditSkillFormProps {
   skill: DatasetItem;
@@ -66,6 +69,24 @@ export function EditSkillForm({
   existingItems,
   categories,
 }: EditSkillFormProps) {
+  const handleSuccess = (result: ActionResult) => {
+    if (result.success && result.data) {
+      try {
+        // Create validated draft for update operation
+        const draft = createDraftData('skills', 'update', {
+          itemId: skill.id,
+          data: result.data.item,
+          previousData: skill,
+        });
+
+        // Save to localStorage
+        saveDraft(draft);
+      } catch (error) {
+        console.error('[EDIT_SKILL_FORM] Failed to save draft:', error);
+      }
+    }
+  };
+
   return (
     <TaxonomyFormWrapper<UpdateSkillInput>
       schema={updateSkillSchema}
@@ -76,9 +97,10 @@ export function EditSkillForm({
         slug: skill.slug,
         category: skill.category || '',
       }}
-      successMessage='Skill updated successfully'
+      successMessage='Skill updated (draft saved)'
       isEdit={true}
       stringFields={['id', 'label', 'slug', 'category']}
+      onSuccess={handleSuccess}
     >
       {(form, isPending) => (
         <EditSkillFormFields

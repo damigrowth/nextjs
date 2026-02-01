@@ -37,7 +37,7 @@ interface ProfilePageProps {
  * Creates dynamic title, description, and OpenGraph data based on profile
  */
 export async function generateMetadata({ params }: ProfilePageProps) {
-  const { username } = await params;
+  const username = decodeURIComponent((await params).username);
   return getProfileMetadata(username);
 }
 
@@ -58,7 +58,7 @@ export async function generateStaticParams() {
     });
 
     return profiles.map((profile) => ({
-      username: profile.username!,
+      username: encodeURIComponent(profile.username!),
     }));
   } catch (error) {
     console.error('Error generating static params for profiles:', error);
@@ -78,12 +78,11 @@ export async function generateStaticParams() {
 export default async function ProfilePage({
   params,
 }: ProfilePageProps): Promise<JSX.Element> {
-  const { username } = await params;
-
   // Get current user for isOwner check
   const session = await auth.api.getSession({ headers: await headers() });
   const currentUserId = session?.user?.id;
 
+  const username = decodeURIComponent((await params).username);
   const result = await getProfilePageData(username);
 
   // Type-safe data validation

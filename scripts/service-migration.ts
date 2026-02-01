@@ -13,13 +13,14 @@
  *
  * Strapi services → Better-Auth Service
  * ├── id → id (converted to CUID)
- * ├── title → title
- * ├── description → description
+ * ├── title → title + titleNormalized (accent-insensitive search)
+ * ├── description → description + descriptionNormalized (accent-insensitive search)
  * ├── price → price
  * ├── time → duration (days)
  * ├── fixed → fixed
- * ├── rating → rating
- * ├── reviews_total → reviewCount
+ * // REVIEWS DISABLED - NOT MIGRATING YET
+ * // ├── rating → rating
+ * // ├── reviews_total → reviewCount
  * ├── featured → featured
  * ├── created_at → createdAt
  * ├── updated_at → updatedAt
@@ -48,6 +49,7 @@
 
 import { PrismaClient as SourcePrismaClient } from '@prisma/client';
 import { PrismaClient as TargetPrismaClient, SubscriptionType, Status } from '@prisma/client';
+import { normalizeTerm } from '../src/lib/utils/text/normalize';
 
 // Types for source database (Strapi)
 interface StrapiService {
@@ -62,9 +64,10 @@ interface StrapiService {
   price: number | null;
   time: number | null;
   fixed: boolean | null;
-  rating: number | null;
+  // REVIEWS DISABLED - NOT MIGRATING YET
+  // rating: number | null;
   slug: string | null;
-  reviews_total: bigint | null;
+  // reviews_total: bigint | null;
   featured: boolean | null;
   subscription_type: string | null;
 }
@@ -427,6 +430,71 @@ async function fetchServiceMedia(serviceIds: number[]): Promise<Map<number, Stra
   }
 }
 
+// Helper function to detect service data changes
+function hasServiceChanges(existingService: any, newData: any): {hasChanges: boolean, changedFields: string[]} {
+  const changedFields: string[] = [];
+
+  // Helper to compare values (handles null/undefined and objects)
+  const isDifferent = (oldVal: any, newVal: any): boolean => {
+    const normalizedOld = oldVal === undefined ? null : oldVal;
+    const normalizedNew = newVal === undefined ? null : newVal;
+
+    // Handle number comparison with float precision tolerance
+    if (typeof normalizedOld === 'number' && typeof normalizedNew === 'number') {
+      // Use epsilon for float comparison (handles precision differences)
+      return Math.abs(normalizedOld - normalizedNew) > 0.0001;
+    }
+
+    if (typeof normalizedOld === 'object' && typeof normalizedNew === 'object') {
+      // Both null or both arrays/objects
+      if (normalizedOld === null && normalizedNew === null) return false;
+      if (normalizedOld === null || normalizedNew === null) return true;
+
+      // Sort object keys before stringify to ensure consistent comparison
+      const sortKeys = (obj: any): any => {
+        if (Array.isArray(obj)) {
+          return obj.map(sortKeys);
+        }
+        if (obj !== null && typeof obj === 'object') {
+          return Object.keys(obj)
+            .sort()
+            .reduce((sorted: any, key) => {
+              sorted[key] = sortKeys(obj[key]);
+              return sorted;
+            }, {});
+        }
+        return obj;
+      };
+
+      return JSON.stringify(sortKeys(normalizedOld)) !== JSON.stringify(sortKeys(normalizedNew));
+    }
+
+    return normalizedOld !== normalizedNew;
+  };
+
+  // Check all service fields (excluding id, pid, createdAt, updatedAt)
+  const fieldsToCheck = [
+    'slug', 'title', 'titleNormalized', 'description', 'descriptionNormalized',
+    'category', 'subcategory', 'subdivision', 'tags',
+    'fixed', 'price', 'type', 'subscriptionType', 'duration',
+    'addons', 'faq', 'media', 'featured',
+    // REVIEWS DISABLED - NOT CHECKING FOR CHANGES
+    // 'rating', 'reviewCount',
+    'status'
+  ];
+
+  for (const field of fieldsToCheck) {
+    if (isDifferent(existingService[field], newData[field])) {
+      changedFields.push(field);
+    }
+  }
+
+  return {
+    hasChanges: changedFields.length > 0,
+    changedFields
+  };
+}
+
 // Main migration function
 async function migrateServices(updateExisting: boolean = false): Promise<MigrationStats> {
   const stats: MigrationStats = {
@@ -652,57 +720,76 @@ async function migrateServices(updateExisting: boolean = false): Promise<Migrati
 
         stats.statusDistribution[mappedStatus] = (stats.statusDistribution[mappedStatus] || 0) + 1;
 
-        // Prepare service data
+        // Prepare service data (use raw Strapi values for comparison)
+        const title = service.title ?? 'Untitled Service';
+        const description = service.description ?? '';
+
         const serviceData = {
-          id: service.id, // Now using numeric ID directly (Int)
+          id: service.id,
           pid: profileId,
-          slug: service.slug || `service-${service.id}`, // Use existing slug or fallback to service-id
-          title: service.title || 'Untitled Service',
-          description: service.description || '',
-          
-          // Taxonomies
-          category: service.category_id || '',
-          subcategory: service.subcategory_id || '',
-          subdivision: service.subdivision_id || '',
-          tags: service.tags || [],
-          
+          slug: service.slug ?? `service-${service.id}`,
+          title: title,
+          titleNormalized: normalizeTerm(title),
+          description: description,
+          descriptionNormalized: normalizeTerm(description),
+
+          // Taxonomies (all required, use empty string instead of null)
+          category: service.category_id ?? '',
+          subcategory: service.subcategory_id ?? '',
+          subdivision: service.subdivision_id ?? '',
+          tags: service.tags ?? [],
+
           // Pricing
-          fixed: service.fixed || true,
-          price: service.price || 0,
+          fixed: service.fixed ?? true,
+          price: service.price ?? 0,
           type: serviceType,
           subscriptionType: mappedSubscriptionType,
-          duration: service.time || 0,
-          
+          duration: service.time ?? 0,
+
           // Features
           addons: addons,
           faq: faq,
-          
+
           // Media
           media: media,
-          
+
           // Misc
-          featured: service.featured || false,
-          
+          featured: service.featured ?? false,
+
+          // REVIEWS DISABLED - SET DEFAULT VALUES (NOT MIGRATING REVIEWS YET)
           // Reviews and Rating
-          rating: Number(service.rating || 0),
-          reviewCount: bigintToNumber(service.reviews_total),
-          
+          // rating: service.rating ? Number(service.rating) : 0,
+          // reviewCount: bigintToNumber(service.reviews_total) ?? 0,
+          rating: 0,
+          reviewCount: 0,
+
           status: mappedStatus,
-          createdAt: service.created_at || new Date(),
-          updatedAt: service.updated_at || new Date(),
+          createdAt: service.created_at ?? new Date(),
+          updatedAt: service.updated_at ?? new Date(),
         };
 
         // Create or update service
         if (existingService && updateExisting) {
-          // For updates, exclude the id field (can't update primary key)
-          const { id, ...updateData } = serviceData;
+          // Check for actual changes
+          // Exclude id, pid (foreign key), createdAt, updatedAt from updates
+          const { id, pid, createdAt, updatedAt, ...dataWithoutMeta } = serviceData;
+          const changeCheck = hasServiceChanges(existingService, dataWithoutMeta);
 
-          await targetDb.service.update({
-            where: { id: existingService.id },
-            data: updateData,
-          });
-          stats.servicesUpdated++;
-          console.log(`✅ ${progress} SERVICE UPDATED: ${service.title?.substring(0, 50)}...`);
+          if (changeCheck.hasChanges) {
+            // Only update if there are actual changes
+            // Note: updatedAt is auto-updated by Prisma @updatedAt decorator
+            await targetDb.service.update({
+              where: { id: existingService.id },
+              data: dataWithoutMeta,
+            });
+            stats.servicesUpdated++;
+            console.log(`✅ ${progress} SERVICE UPDATED with changes (${changeCheck.changedFields.join(', ')}): ${service.title?.substring(0, 50)}...`);
+          } else {
+            // No changes detected
+            stats.servicesSkipped++;
+            stats.warnings.push(`Service ${service.id}: No changes detected`);
+            console.log(`⚠️ ${progress} SERVICE SKIPPED - No changes: ${service.title?.substring(0, 50)}...`);
+          }
         } else {
           // For creation, use the exact data from Strapi
           await targetDb.service.create({
@@ -797,7 +884,9 @@ async function testServiceData(serviceId: string): Promise<boolean> {
     console.log(`  - Duration: ${service.duration} days`);
     console.log(`  - Subscription Type: ${service.subscriptionType || 'None'}`);
     console.log(`  - Status: ${service.status}`);
-    console.log(`  - Rating: ${service.rating}/5 (${service.reviewCount} reviews)`);
+    // REVIEWS DISABLED
+    // console.log(`  - Rating: ${service.rating}/5 (${service.reviewCount} reviews)`);
+    console.log(`  - Rating: 0/5 (0 reviews) - Reviews disabled`);
     console.log(`  - Featured: ${service.featured ? 'Yes' : 'No'}`);
     console.log(`  - Tags: ${service.tags?.join(', ') || 'None'}`);
     console.log(`  - Service Type:`, service.type);
@@ -823,7 +912,9 @@ async function analyzeServiceMigration(): Promise<void> {
 
     const serviceStats = await targetDb.service.aggregate({
       _count: { id: true },
-      _avg: { rating: true, price: true, reviewCount: true },
+      // REVIEWS DISABLED
+      // _avg: { rating: true, price: true, reviewCount: true },
+      _avg: { price: true },
     });
 
     const statusDistribution = await targetDb.service.groupBy({
@@ -837,9 +928,12 @@ async function analyzeServiceMigration(): Promise<void> {
 
     console.log('\n📈 RESULTS:');
     console.log(`Total services: ${serviceStats._count.id}`);
-    console.log(`Average rating: ${serviceStats._avg.rating?.toFixed(2) || 'N/A'}`);
+    // REVIEWS DISABLED
+    // console.log(`Average rating: ${serviceStats._avg.rating?.toFixed(2) || 'N/A'}`);
+    console.log(`Average rating: 0.00 - Reviews disabled`);
     console.log(`Average price: €${serviceStats._avg.price?.toFixed(0) || 'N/A'}`);
-    console.log(`Average reviews: ${serviceStats._avg.reviewCount?.toFixed(1) || 'N/A'}`);
+    // console.log(`Average reviews: ${serviceStats._avg.reviewCount?.toFixed(1) || 'N/A'}`);
+    console.log(`Average reviews: 0.0 - Reviews disabled`);
     console.log(`Featured services: ${featuredCount}`);
     
     console.log('\n📊 Status Distribution:');
@@ -890,11 +984,15 @@ async function main() {
     return;
   }
 
-  // Check for update flag
-  const shouldUpdateExisting = args.includes('--update-existing');
-  
+  // Default to update mode (always check for changes and update if needed)
+  // Use --create-only flag to skip updates
+  const createOnly = args.includes('--create-only');
+  const shouldUpdateExisting = !createOnly; // Update by default
+
   if (shouldUpdateExisting) {
-    console.log('🔄 Running migration with --update-existing flag: Will update existing services');
+    console.log('🔄 UPDATE MODE - Existing records will be updated if changes detected\n');
+  } else {
+    console.log('📝 CREATE ONLY MODE - Existing records will be skipped\n');
   }
 
   // Run the migration

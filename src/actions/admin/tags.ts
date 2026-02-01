@@ -1,7 +1,6 @@
 'use server';
 
 import type { DatasetItem } from '@/lib/types/datasets';
-import type { ActionResult } from '@/lib/types/api';
 import { createTagSchema, updateTagSchema, deleteTagSchema } from '@/lib/validations/admin';
 import {
   createItem,
@@ -9,6 +8,12 @@ import {
   deleteItem,
   type TaxonomyConfig,
 } from './taxonomies-shared';
+import type {
+  TaxonomyActionResult,
+  CreateItemResult,
+  UpdateItemResult,
+  DeleteItemResult,
+} from '@/lib/types/taxonomy-operations';
 
 const TAGS_CONFIG: TaxonomyConfig = {
   type: 'tags',
@@ -28,7 +33,7 @@ interface TagItem extends DatasetItem {
 export async function createTag(data: {
   label: string;
   slug: string;
-}): Promise<ActionResult<{ backupPath: string; id: string }>> {
+}): Promise<TaxonomyActionResult<CreateItemResult>> {
   return createItem(TAGS_CONFIG, data);
 }
 
@@ -39,14 +44,14 @@ export async function updateTag(data: {
   id: string;
   label: string;
   slug: string;
-}): Promise<ActionResult<{ backupPath: string }>> {
+}): Promise<TaxonomyActionResult<UpdateItemResult>> {
   return updateItem(TAGS_CONFIG, data);
 }
 
 /**
  * Core delete function
  */
-export async function deleteTag(data: { id: string }): Promise<ActionResult<{ backupPath: string }>> {
+export async function deleteTag(data: { id: string }): Promise<TaxonomyActionResult<DeleteItemResult>> {
   return deleteItem(TAGS_CONFIG, data.id);
 }
 

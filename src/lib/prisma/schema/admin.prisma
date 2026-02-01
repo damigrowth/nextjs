@@ -1,17 +1,14 @@
-// Admin-related models for taxonomy management and staging
-
-model TaxonomyStaging {
-  id           String   @id @default(cuid())
-  taxonomyType String   @map("taxonomy_type") // 'service' | 'pro' | 'tags' | 'skills'
-  operation    String                         // 'create' | 'update' | 'delete'
-  itemId       String?  @map("item_id")       // taxonomy item ID (for update/delete, null for create)
-  data         Json                           // the actual taxonomy item data as JSONB
-  level        String?                        // hierarchy level: 'category' | 'subcategory' | 'subdivision' (for hierarchical taxonomies)
-  parentId     String?  @map("parent_id")     // parent item ID (for hierarchical taxonomies)
-  createdBy    String   @map("created_by")    // admin user ID from Better Auth
-  createdAt    DateTime @default(now()) @map("created_at")
-
-  @@map("taxonomy_staging")
-  @@index([taxonomyType], map: "idx_taxonomy_staging_type")
-  @@index([createdBy], map: "idx_taxonomy_staging_created_by")
-}
+// Admin-related models
+//
+// TaxonomyStaging model REMOVED (ML15-290)
+//
+// Rationale: Taxonomies are treated as code (Infrastructure-as-Code), not database data.
+// The staging table created a database dependency that defeated the original static-file
+// performance strategy, causing:
+// - 28-second queries with 10K+ line JSONB records
+// - Massive egress quota consumption (98% usage)
+// - Database dependency during Supabase maintenance windows
+//
+// New workflow: Direct Git commits to `datasets` branch → PR review → merge to `main`
+// This follows industry best practices (Netlify CMS, Contentlayer, Keystatic) and leverages
+// GitHub's native PR workflow for review/approval instead of custom database staging.

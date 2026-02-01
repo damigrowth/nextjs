@@ -38,7 +38,7 @@ export function ProfileSchema({
     //   ratingValue: rating,
     //   reviewCount: reviewCount,
     // },
-    url: `${baseUrl}/profile/${username}`,
+    url: `${baseUrl}/profile/${encodeURIComponent(username)}`,
     image: image || undefined,
     sameAs: baseUrl,
   };

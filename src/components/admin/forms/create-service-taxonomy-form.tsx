@@ -1,12 +1,10 @@
 'use client';
 
-import { useEffect, useActionState } from 'react';
+import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { createServiceTaxonomySchema } from '@/lib/validations/admin';
-import { createServiceTaxonomyAction } from '@/actions/admin';
-import { populateFormData } from '@/lib/utils/form';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -34,6 +32,10 @@ import { LabelField, SlugField } from './taxonomy-form-fields';
 import { useSlugHandlers } from './use-slug-handlers';
 import { CloudinaryMediaPicker } from '@/components/media/cloudinary-media-picker';
 import type { CloudinaryResource } from '@/lib/types/cloudinary';
+import { createDraftData } from '@/lib/validations/taxonomy-drafts';
+import { saveDraft } from '@/lib/taxonomy-drafts';
+import type { TaxonomyType } from '@/lib/types/taxonomy-operations';
+import { nanoid } from 'nanoid';
 
 type CreateServiceTaxonomyFormValues = z.infer<
   typeof createServiceTaxonomySchema
@@ -49,10 +51,7 @@ export function CreateServiceTaxonomyForm({
   existingItems,
 }: CreateServiceTaxonomyFormProps) {
   const router = useRouter();
-  const [state, formAction, isPending] = useActionState(
-    createServiceTaxonomyAction,
-    null,
-  );
+  const [isPending, setIsPending] = useState(false);
 
   const form = useForm<CreateServiceTaxonomyFormValues>({
     resolver: zodResolver(createServiceTaxonomySchema),
@@ -68,9 +67,46 @@ export function CreateServiceTaxonomyForm({
     },
   });
 
-  useEffect(() => {
-    if (state?.success) {
-      toast.success(state.message || 'Taxonomy created successfully');
+  const onSubmit = async (data: CreateServiceTaxonomyFormValues) => {
+    setIsPending(true);
+
+    try {
+      // Generate unique ID for new item
+      const newId = nanoid();
+
+      // Determine taxonomy type based on level
+      const taxonomyType: TaxonomyType =
+        level === 'category'
+          ? 'service-categories'
+          : level === 'subcategory'
+            ? 'service-subcategories'
+            : 'service-subdivisions';
+
+      // Create new item data
+      const newItem: DatasetItem = {
+        id: newId,
+        label: data.label,
+        slug: data.slug,
+        description: data.description,
+        ...(level === 'category' && {
+          featured: data.featured,
+          icon: data.icon,
+        }),
+        ...(data.image && { image: data.image }),
+      };
+
+      // Create validated draft for create operation
+      const draft = createDraftData(taxonomyType, 'create', {
+        data: newItem,
+        level,
+        parentId: level !== 'category' ? data.parentId : null,
+      });
+
+      // Save to localStorage
+      saveDraft(draft);
+
+      toast.success('Draft saved');
+
       // Navigate back to the list page
       const listPath =
         level === 'category'
@@ -78,29 +114,14 @@ export function CreateServiceTaxonomyForm({
           : level === 'subcategory'
             ? '/admin/taxonomies/service/subcategories'
             : '/admin/taxonomies/service/subdivisions';
+
       router.push(listPath);
-    } else if (state?.error) {
-      toast.error(state.error);
+    } catch (error) {
+      console.error('[CREATE_SERVICE_TAXONOMY_FORM] Failed to save draft:', error);
+      toast.error('Failed to save draft');
+    } finally {
+      setIsPending(false);
     }
-  }, [state, router, level]);
-
-  const handleFormSubmit = (formData: FormData) => {
-    const allValues = form.getValues();
-
-    populateFormData(formData, allValues, {
-      stringFields: [
-        'label',
-        'slug',
-        'description',
-        'level',
-        'parentId',
-        'icon',
-      ],
-      booleanFields: ['featured'],
-      jsonFields: ['image'],
-    });
-
-    formAction(formData);
   };
 
   // Get parent options based on level
@@ -135,7 +156,7 @@ export function CreateServiceTaxonomyForm({
 
   return (
     <Form {...form}>
-      <form action={handleFormSubmit} className='space-y-4'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
         <div className='grid gap-4 md:grid-cols-2'>
           <FormField
             control={form.control}

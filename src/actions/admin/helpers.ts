@@ -95,6 +95,18 @@ export interface NavItem {
 }
 
 /**
+ * In-memory cache for navigation session results
+ * Prevents redundant getSession() calls during Supabase connection instability
+ * Cache key is based on user ID to ensure user-specific results
+ * TTL: 60 seconds (reasonable for admin navigation changes)
+ */
+const navSessionCache = new Map<
+  string,
+  { data: { navItems: NavItem[]; userRole: string | null }; timestamp: number }
+>();
+const NAV_SESSION_CACHE_TTL = 60000; // 60 seconds
+
+/**
  * Get filtered navigation items based on current user's role
  * Returns only nav items the user has permission to access
  */
@@ -102,6 +114,8 @@ export async function getFilteredNavItems(): Promise<{
   navItems: NavItem[];
   userRole: string | null;
 }> {
+  console.log('[GET_NAV_ITEMS] START:', new Date().toISOString());
+
   try {
     const { getSession } = await import('@/actions/auth/server');
     const {
@@ -110,15 +124,31 @@ export async function getFilteredNavItems(): Promise<{
       isAdminRole,
     } = await import('@/lib/auth/roles');
 
+    // Get session first (fast, no database call after ML15-290 fix)
+    const sessionStart = performance.now();
     const sessionResult = await getSession({ revalidate: true });
+    console.log('[GET_NAV_ITEMS] getSession took:', performance.now() - sessionStart, 'ms');
 
     if (!sessionResult.success || !sessionResult.data.session) {
+      console.log('[GET_NAV_ITEMS] END (no session):', new Date().toISOString());
       return { navItems: [], userRole: null };
     }
 
+    const userId = sessionResult.data.session.user.id;
     const userRole = sessionResult.data.session.user.role || null;
 
+    // Check cache first (keyed by user ID for user-specific results)
+    const cacheKey = `nav-items-${userId}`;
+    const cached = navSessionCache.get(cacheKey);
+
+    if (cached && Date.now() - cached.timestamp < NAV_SESSION_CACHE_TTL) {
+      console.log('[GET_NAV_ITEMS] Using cached result (age:', Date.now() - cached.timestamp, 'ms)');
+      console.log('[GET_NAV_ITEMS] END (cached):', new Date().toISOString());
+      return cached.data;
+    }
+
     if (!userRole || !isAdminRole(userRole)) {
+      console.log('[GET_NAV_ITEMS] END (not admin):', new Date().toISOString());
       return { navItems: [], userRole };
     }
 
@@ -186,9 +216,14 @@ export async function getFilteredNavItems(): Promise<{
 
     const navItems = filteredItems.map(({ resource, ...item }) => item);
 
-    return { navItems, userRole };
+    // Cache the result
+    const result = { navItems, userRole };
+    navSessionCache.set(cacheKey, { data: result, timestamp: Date.now() });
+
+    console.log('[GET_NAV_ITEMS] END (fresh data cached):', new Date().toISOString());
+    return result;
   } catch (error) {
-    console.error('Error getting filtered nav items:', error);
+    console.error('[GET_NAV_ITEMS] ERROR:', error);
     return { navItems: [], userRole: null };
   }
 }
