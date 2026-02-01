@@ -34,6 +34,9 @@ import { LabelField, SlugField } from './taxonomy-form-fields';
 import { useSlugHandlers } from './use-slug-handlers';
 import { CloudinaryMediaPicker } from '@/components/media/cloudinary-media-picker';
 import type { CloudinaryResource } from '@/lib/types/cloudinary';
+import { createDraftData } from '@/lib/validations/taxonomy-drafts';
+import { saveDraft } from '@/lib/taxonomy-drafts';
+import type { TaxonomyType } from '@/lib/types/taxonomy-operations';
 
 type CreateServiceTaxonomyFormValues = z.infer<
   typeof createServiceTaxonomySchema
@@ -69,8 +72,30 @@ export function CreateServiceTaxonomyForm({
   });
 
   useEffect(() => {
-    if (state?.success) {
-      toast.success(state.message || 'Taxonomy created successfully');
+    if (state?.success && state.data) {
+      // Save draft to localStorage
+      try {
+        // Determine taxonomy type based on level
+        const taxonomyType: TaxonomyType =
+          level === 'category'
+            ? 'service-categories'
+            : level === 'subcategory'
+              ? 'service-subcategories'
+              : 'service-subdivisions';
+
+        // Create validated draft
+        const draft = createDraftData(taxonomyType, 'create', {
+          data: state.data.item,
+          level,
+          parentId: level !== 'category' ? state.data.item.parentId : null,
+        });
+
+        saveDraft(draft);
+      } catch (error) {
+        console.error('[CREATE_SERVICE_TAXONOMY_FORM] Failed to save draft:', error);
+      }
+
+      toast.success(state.message || 'Taxonomy created (draft saved)');
       // Navigate back to the list page
       const listPath =
         level === 'category'

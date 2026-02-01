@@ -7,6 +7,9 @@ import { LabelField, SlugField } from './taxonomy-form-fields';
 import { useSlugHandlers } from './use-slug-handlers';
 import type { DatasetItem } from '@/lib/types/datasets';
 import type { UseFormReturn } from 'react-hook-form';
+import { createDraftData } from '@/lib/validations/taxonomy-drafts';
+import { saveDraft } from '@/lib/taxonomy-drafts';
+import type { ActionResult } from '@/lib/types/api';
 
 interface CreateTagFormProps {
   existingItems: DatasetItem[];
@@ -47,6 +50,24 @@ function CreateTagFormFields({
 }
 
 export function CreateTagForm({ existingItems }: CreateTagFormProps) {
+  const handleSuccess = (result: ActionResult) => {
+    if (result.success && result.data) {
+      try {
+        // Create validated draft for create operation
+        const draft = createDraftData('tags', 'create', {
+          data: result.data.item,
+          level: null,
+          parentId: null,
+        });
+
+        // Save to localStorage
+        saveDraft(draft);
+      } catch (error) {
+        console.error('[CREATE_TAG_FORM] Failed to save draft:', error);
+      }
+    }
+  };
+
   return (
     <TaxonomyFormWrapper<CreateTagInput>
       schema={createTagSchema}
@@ -55,9 +76,10 @@ export function CreateTagForm({ existingItems }: CreateTagFormProps) {
         label: '',
         slug: '',
       }}
-      successMessage='Tag created successfully'
+      successMessage='Tag created (draft saved)'
       redirectPath='/admin/taxonomies/tags'
       stringFields={['label', 'slug']}
+      onSuccess={handleSuccess}
     >
       {(form, isPending) => (
         <CreateTagFormFields

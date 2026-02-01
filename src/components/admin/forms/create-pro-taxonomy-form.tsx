@@ -23,6 +23,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useWatch, UseFormReturn } from 'react-hook-form';
+import { createDraftData } from '@/lib/validations/taxonomy-drafts';
+import { saveDraft } from '@/lib/taxonomy-drafts';
+import type { ActionResult } from '@/lib/types/api';
+import type { TaxonomyType } from '@/lib/types/taxonomy-operations';
 
 interface CreateProTaxonomyFormProps {
   level: 'category' | 'subcategory';
@@ -178,6 +182,28 @@ export function CreateProTaxonomyForm({
   // Get parent categories for subcategory creation
   const parentCategories = level === 'subcategory' ? existingItems : [];
 
+  const handleSuccess = (result: ActionResult) => {
+    if (result.success && result.data) {
+      try {
+        // Determine taxonomy type based on level
+        const taxonomyType: TaxonomyType =
+          level === 'category' ? 'pro-categories' : 'pro-subcategories';
+
+        // Create validated draft for create operation
+        const draft = createDraftData(taxonomyType, 'create', {
+          data: result.data.item,
+          level,
+          parentId: level === 'subcategory' ? result.data.item.parentId : null,
+        });
+
+        // Save to localStorage
+        saveDraft(draft);
+      } catch (error) {
+        console.error('[CREATE_PRO_TAXONOMY_FORM] Failed to save draft:', error);
+      }
+    }
+  };
+
   return (
     <TaxonomyFormWrapper<CreateProTaxonomyInput>
       schema={createProTaxonomySchema}
@@ -191,9 +217,10 @@ export function CreateProTaxonomyForm({
         parentId: '',
         type: 'freelancer',
       }}
-      successMessage='Professional taxonomy created successfully'
+      successMessage='Professional taxonomy created (draft saved)'
       isEdit={false}
       stringFields={['label', 'plural', 'slug', 'description', 'level', 'parentId', 'type']}
+      onSuccess={handleSuccess}
     >
       {(form, isPending) => (
         <CreateProTaxonomyFormFields

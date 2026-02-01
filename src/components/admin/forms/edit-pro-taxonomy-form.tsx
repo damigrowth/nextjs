@@ -26,6 +26,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useWatch, UseFormReturn } from 'react-hook-form';
+import { createDraftData } from '@/lib/validations/taxonomy-drafts';
+import { saveDraft } from '@/lib/taxonomy-drafts';
+import type { ActionResult } from '@/lib/types/api';
+import type { TaxonomyType } from '@/lib/types/taxonomy-operations';
 
 interface EditProTaxonomyFormProps {
   taxonomy: {
@@ -198,6 +202,28 @@ export function EditProTaxonomyForm({
   taxonomy,
   existingItems,
 }: EditProTaxonomyFormProps) {
+  const handleSuccess = (result: ActionResult) => {
+    if (result.success && result.data) {
+      try {
+        // Determine taxonomy type based on level
+        const taxonomyType: TaxonomyType =
+          taxonomy.level === 'category' ? 'pro-categories' : 'pro-subcategories';
+
+        // Create validated draft for update operation
+        const draft = createDraftData(taxonomyType, 'update', {
+          itemId: taxonomy.id,
+          data: result.data.item,
+          previousData: taxonomy,
+        });
+
+        // Save to localStorage
+        saveDraft(draft);
+      } catch (error) {
+        console.error('[EDIT_PRO_TAXONOMY_FORM] Failed to save draft:', error);
+      }
+    }
+  };
+
   return (
     <TaxonomyFormWrapper<UpdateProTaxonomyInput>
       schema={updateProTaxonomySchema}
@@ -212,7 +238,7 @@ export function EditProTaxonomyForm({
         parentId: taxonomy.parentId || '',
         type: taxonomy.type || 'freelancer',
       }}
-      successMessage='Professional taxonomy updated successfully'
+      successMessage='Professional taxonomy updated (draft saved)'
       isEdit={true}
       stringFields={[
         'id',
@@ -224,6 +250,7 @@ export function EditProTaxonomyForm({
         'parentId',
         'type',
       ]}
+      onSuccess={handleSuccess}
     >
       {(form, isPending) => (
         <EditProTaxonomyFormFields
