@@ -13,7 +13,7 @@
 
 import { getAdminSessionWithPermission } from './helpers';
 import { ADMIN_RESOURCES } from '@/lib/auth/roles';
-import { commitTaxonomyChange, ensurePullRequest, mergePullRequest, syncDatasetsWithMain } from './taxonomy-git';
+import { commitTaxonomyChange } from './taxonomy-git';
 import { getTaxonomyData } from './taxonomy-helpers';
 import type {
   TaxonomyDraft,
@@ -226,32 +226,7 @@ export async function publishAllChanges(
 
     console.log('[PUBLISH] Grouped into', grouped.size, 'taxonomy types');
 
-    // STEP 1: Sync datasets with main to prevent data loss
-    console.log('[PUBLISH] Syncing datasets with main...');
-    const syncResult = await syncDatasetsWithMain();
-
-    if (!syncResult.success) {
-      // Sync failed - stop immediately, preserve drafts for retry
-      console.error('[PUBLISH] Sync failed:', syncResult.error);
-
-      return {
-        success: false,
-        error: {
-          code: 'SYNC_FAILED' as PublishErrorCode,
-          message: syncResult.error || 'Failed to sync datasets with main branch',
-          recoverable: true,
-          failedAt: 'sync',
-        },
-      };
-    }
-
-    if (syncResult.alreadyUpToDate) {
-      console.log('[PUBLISH] datasets already up-to-date with main');
-    } else {
-      console.log('[PUBLISH] Synced datasets with main:', syncResult.mergeCommitSha);
-    }
-
-    // STEP 2: Process taxonomy drafts
+    // Process taxonomy drafts and commit directly to main
     const commitShas: string[] = [];
 
     // Process each taxonomy type
@@ -282,44 +257,10 @@ export async function publishAllChanges(
       console.log(`[PUBLISH] Committed ${type}:`, commitResult.commitSha);
     }
 
-    // Ensure PR exists (auto-creates if needed)
-    const prResult = await ensurePullRequest('datasets');
-
-    if (!prResult.success || !prResult.pr) {
-      throw new Error('Failed to create/update pull request');
-    }
-
-    console.log('[PUBLISH] PR ready:', prResult.pr.number);
-
-    // Auto-merge PR
-    const mergeResult = await mergePullRequest(prResult.pr.number, 'squash');
-
-    if (!mergeResult.success) {
-      // Partial success - changes committed but merge failed
-      console.warn('[PUBLISH] PR merge failed:', mergeResult.error);
-
-      return {
-        success: true,
-        data: {
-          commitsCreated: commitShas.length,
-          commitShas,
-          prNumber: prResult.pr.number,
-          prUrl: prResult.pr.url,
-          publishedDrafts: optimizedDrafts,
-        },
-        error: {
-          code: 'PR_MERGE_FAILED' as PublishErrorCode,
-          message: `Changes committed but auto-merge failed. Please merge PR #${prResult.pr.number} manually.`,
-          recoverable: true,
-          failedAt: 'pr-merge',
-        },
-      };
-    }
-
     console.log(
       '[PUBLISH] Successfully published',
       commitShas.length,
-      'commits'
+      'commits directly to main'
     );
 
     return {
@@ -327,8 +268,6 @@ export async function publishAllChanges(
       data: {
         commitsCreated: commitShas.length,
         commitShas,
-        prNumber: prResult.pr.number,
-        prUrl: prResult.pr.url,
         publishedDrafts: optimizedDrafts,
       },
     };
@@ -337,22 +276,16 @@ export async function publishAllChanges(
 
     // Categorize error
     let errorCode: PublishErrorCode = 'UNKNOWN' as PublishErrorCode;
-    let failedAt: 'sync' | 'commit' | 'pr-create' | 'pr-merge' | undefined;
+    let failedAt: 'commit' | undefined;
 
     if (error instanceof Error) {
       const message = error.message.toLowerCase();
 
       if (message.includes('permission') || message.includes('unauthorized')) {
         errorCode = 'PERMISSION_DENIED' as PublishErrorCode;
-      } else if (message.includes('sync') || message.includes('main')) {
-        errorCode = 'SYNC_FAILED' as PublishErrorCode;
-        failedAt = 'sync';
       } else if (message.includes('commit')) {
         errorCode = 'COMMIT_FAILED' as PublishErrorCode;
         failedAt = 'commit';
-      } else if (message.includes('pull request') || message.includes('pr')) {
-        errorCode = 'PR_CREATE_FAILED' as PublishErrorCode;
-        failedAt = 'pr-create';
       }
     }
 
