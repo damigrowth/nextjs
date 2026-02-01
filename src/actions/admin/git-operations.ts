@@ -27,13 +27,40 @@ import type {
   UndoCommitResponse,
 } from '@/lib/types/github';
 
+// =============================================
+// GIT STATUS CACHING FOR PERFORMANCE
+// =============================================
+
+/**
+ * In-memory cache for git status results
+ * Prevents expensive git status command (33-74s) on page refreshes
+ * TTL: 30 seconds (reasonable for git operations that don't change frequently)
+ */
+const gitStatusCache = new Map<
+  string,
+  { data: GitStatusResponse; timestamp: number }
+>();
+const GIT_STATUS_CACHE_TTL = 30000; // 30 seconds
+
 /**
  * Get current Git status and uncommitted staged changes for dataset files
  * Uses staging table from database instead of local filesystem
+ *
+ * @param session - Optional pre-authenticated session to skip redundant auth check (ML15-290 performance fix)
  */
-export async function getGitStatus(): Promise<GitStatusResponse> {
+export async function getGitStatus(session?: any): Promise<GitStatusResponse> {
+  console.log('[GIT_STATUS] START:', new Date().toISOString());
+
   try {
-    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
+    // Only do auth check if session not provided (prevents redundant 60-73s database calls)
+    if (!session) {
+      const authStart = performance.now();
+      await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
+      console.log('[GIT_STATUS] Auth check took:', performance.now() - authStart, 'ms');
+    } else {
+      console.log('[GIT_STATUS] Using provided session (auth check bypassed)');
+    }
+
     validateRepoConfig();
 
     const octokit = getGitHubClient();
@@ -42,148 +69,34 @@ export async function getGitStatus(): Promise<GitStatusResponse> {
     // Use defaultBranch as current working branch
     const currentBranch = defaultBranch;
 
+    // Check cache first (keyed by branch name)
+    const cacheKey = `git-status-${currentBranch}`;
+    const cached = gitStatusCache.get(cacheKey);
+
+    if (cached && Date.now() - cached.timestamp < GIT_STATUS_CACHE_TTL) {
+      console.log('[GIT_STATUS] Using cached result (age:', Date.now() - cached.timestamp, 'ms)');
+      console.log('[GIT_STATUS] END (cached):', new Date().toISOString());
+      return cached.data;
+    }
+
     // Verify branch exists on remote
+    const branchStart = performance.now();
     await getCurrentBranch(octokit, currentBranch);
+    console.log('[GIT_STATUS] getCurrentBranch took:', performance.now() - branchStart, 'ms');
 
-    // Get staged changes from database
-    const { getStagedChanges } = await import('./taxonomy-staging');
-    const stagedChanges = await getStagedChanges();
-
-    // ⚡ Performance optimization: Early return if no staged changes
-    // Avoids expensive file parsing, GitHub API calls, and diff generation
-    // This covers 95%+ of page loads (when users just view the page)
-    if (stagedChanges.length === 0) {
-      // Still check branch status for UI display
-      let aheadBy = 0;
-      let behindBy = 0;
-      try {
-        const comparison = await getCommitDiff(
-          octokit,
-          comparisonBranch,
-          currentBranch,
-        );
-        aheadBy = comparison.ahead_by;
-        behindBy = comparison.behind_by;
-      } catch (error) {
-        console.warn(
-          `[GIT_STATUS] Could not compare ${currentBranch} with ${comparisonBranch}:`,
-          error,
-        );
-      }
-
-      return {
-        success: true,
-        data: {
-          branch: currentBranch,
-          hasDatasetChanges: false,
-          modifiedFiles: [],
-          datasetDiffs: {},
-          datasetModifiedCount: 0,
-          ahead_by: aheadBy,
-          behind_by: behindBy,
-        },
-      };
-    }
-
-    // Only import heavy file operations when we have staged changes
-    const { readTaxonomyFile, applyStagedChangesToFileContent } = await import('@/app/actions/taxonomy-file-manager');
-
-    // Group staged changes by taxonomy type
-    const changesByType = new Map<string, typeof stagedChanges>();
-    for (const change of stagedChanges) {
-      const existing = changesByType.get(change.taxonomyType) || [];
-      existing.push(change);
-      changesByType.set(change.taxonomyType, existing);
-    }
-
-    // Generate modified file content with staged changes applied surgically
-    const localFiles = new Map<string, string>();
-
-    for (const [taxonomyType, changes] of changesByType) {
-      try {
-        // Read current state from GitHub
-        const currentContent = await readTaxonomyFile(taxonomyType as any);
-
-        // Apply staged changes surgically (preserves formatting)
-        const newContent = await applyStagedChangesToFileContent(currentContent, changes);
-
-        // Map to corresponding file path
-        const filePathMap: Record<string, string> = {
-          'service': 'src/constants/datasets/service-taxonomies.ts',
-          'pro': 'src/constants/datasets/pro-taxonomies.ts',
-          'tags': 'src/constants/datasets/tags.ts',
-          'skills': 'src/constants/datasets/skills.ts',
-        };
-
-        const filePath = filePathMap[taxonomyType];
-        if (filePath) {
-          localFiles.set(filePath, newContent);
-        }
-      } catch (error) {
-        console.warn(
-          `[GIT_STATUS] Could not process staged changes for ${taxonomyType}:`,
-          error,
-        );
-      }
-    }
-
-    // Detect changes by comparing with remote
-    const modifiedFiles = await detectFileChanges(
-      octokit,
-      localFiles,
-      currentBranch,
-    );
-
-    // Generate actual diffs using diff library
-    const datasetDiffs: Record<string, string> = {};
-    const { structuredPatch } = await import('diff');
-
-    for (const { file } of modifiedFiles) {
-      try {
-        const remoteFile = await getFileContent(octokit, file, currentBranch);
-        const remoteContent = remoteFile.content
-          ? Buffer.from(remoteFile.content, 'base64').toString('utf-8')
-          : '';
-        const localContent = localFiles.get(file) || '';
-
-        // Generate structured patch (similar to git diff)
-        const patch = structuredPatch(
-          file,
-          file,
-          remoteContent,
-          localContent,
-          'Remote',
-          'Local'
-        );
-
-        // Convert to unified diff format
-        let unifiedDiff = `--- ${patch.oldFileName}\n+++ ${patch.newFileName}\n`;
-
-        for (const hunk of patch.hunks) {
-          unifiedDiff += `@@ -${hunk.oldStart},${hunk.oldLines} +${hunk.newStart},${hunk.newLines} @@\n`;
-          unifiedDiff += hunk.lines.join('\n') + '\n';
-        }
-
-        datasetDiffs[file] = unifiedDiff;
-      } catch (error) {
-        console.warn(
-          `[GIT_STATUS] Could not generate diff for ${file}:`,
-          error,
-        );
-        datasetDiffs[file] = 'Unable to generate diff';
-      }
-    }
-
-    // Check how many commits ahead of comparison branch
-    // For datasets branch: compare with stack-migration (now) or main (after migration)
+    // Get diff between datasets branch and main branch (ML15-290: Direct Git workflow)
+    // This shows actual Git commits not yet merged to main, replacing database staging system
     let aheadBy = 0;
     let behindBy = 0;
+
     try {
+      const comparisonStart = performance.now();
       const comparison = await getCommitDiff(
         octokit,
         comparisonBranch,
         currentBranch,
       );
+      console.log('[GIT_STATUS] getCommitDiff took:', performance.now() - comparisonStart, 'ms');
       aheadBy = comparison.ahead_by;
       behindBy = comparison.behind_by;
     } catch (error) {
@@ -194,18 +107,23 @@ export async function getGitStatus(): Promise<GitStatusResponse> {
       // Branch comparison might fail if branch doesn't exist on remote yet
     }
 
-    return {
+    // Cache the result before returning
+    const result = {
       success: true,
       data: {
         branch: currentBranch,
-        hasDatasetChanges: modifiedFiles.length > 0,
-        modifiedFiles,
-        datasetDiffs,
-        datasetModifiedCount: modifiedFiles.length,
+        hasDatasetChanges: aheadBy > 0, // ML15-290: Changes indicated by commits ahead
+        modifiedFiles: [], // ML15-290: No longer tracking individual files (use Git diff instead)
+        datasetDiffs: {}, // ML15-290: Use GitHub PR diff UI for viewing changes
+        datasetModifiedCount: aheadBy, // ML15-290: Count of commits, not files
         ahead_by: aheadBy,
         behind_by: behindBy,
       },
     };
+    gitStatusCache.set(cacheKey, { data: result, timestamp: Date.now() });
+    console.log('[GIT_STATUS] Cached fresh result for branch:', currentBranch);
+    console.log('[GIT_STATUS] END (fresh data cached):', new Date().toISOString());
+    return result;
   } catch (error) {
     console.error('[GIT_STATUS] Error:', error);
     return {
@@ -315,107 +233,11 @@ export async function commitDatasetChanges(
 
     const branch = statusResult.data.branch;
 
-    // Get staged changes and apply them surgically to preserve formatting
-    const { getStagedChanges, clearStagedChanges } = await import('./taxonomy-staging');
-    const { readTaxonomyFile, applyStagedChangesToFileContent } = await import('@/app/actions/taxonomy-file-manager');
-
-    const stagedChanges = await getStagedChanges();
-
-    // Group by taxonomy type and generate final content
-    const changesByType = new Map<string, typeof stagedChanges>();
-    for (const change of stagedChanges) {
-      const existing = changesByType.get(change.taxonomyType) || [];
-      existing.push(change);
-      changesByType.set(change.taxonomyType, existing);
-    }
-
-    const filesToCommit: Array<{ path: string; content: string }> = [];
-
-    for (const [taxonomyType, changes] of changesByType) {
-      try {
-        // Read current state from GitHub
-        const currentContent = await readTaxonomyFile(taxonomyType as any);
-
-        // Apply staged changes surgically (preserves formatting)
-        const newContent = await applyStagedChangesToFileContent(currentContent, changes);
-
-        // Map to file path
-        const filePathMap: Record<string, string> = {
-          'service': 'src/constants/datasets/service-taxonomies.ts',
-          'pro': 'src/constants/datasets/pro-taxonomies.ts',
-          'tags': 'src/constants/datasets/tags.ts',
-          'skills': 'src/constants/datasets/skills.ts',
-        };
-
-        const filePath = filePathMap[taxonomyType];
-        if (filePath) {
-          filesToCommit.push({
-            path: filePath,
-            content: newContent,
-          });
-        }
-      } catch (error) {
-        console.error(`[GIT_COMMIT] Error processing ${taxonomyType}:`, error);
-        throw new Error(`Failed to process ${taxonomyType} staged changes`);
-      }
-    }
-
-    if (filesToCommit.length === 0) {
-      return {
-        success: false,
-        error: 'No files to commit after processing staged changes',
-      };
-    }
-
-    // Get latest commit SHA for parent
-    const parentSha = await getLatestCommitSha(octokit, branch);
-
-    // Create commit with all files
-    const commitSha = await createCommit(
-      octokit,
-      branch,
-      message,
-      filesToCommit,
-      parentSha,
-    );
-
-    // Clear staged changes after successful commit
-    await clearStagedChanges();
-
-    // Regenerate taxonomy hash maps for local development
-    // (Vercel regenerates automatically during build, so skip there)
-    if (!process.env.VERCEL && !process.env.CI) {
-      console.log('[GIT_COMMIT] Regenerating taxonomy maps (local dev)...');
-      try {
-        const { execSync } = require('child_process');
-        execSync('yarn build:taxonomies', {
-          cwd: process.cwd(),
-          stdio: 'inherit',
-          timeout: 30000, // 30 second timeout
-        });
-        console.log('[GIT_COMMIT] Hash maps regenerated successfully');
-      } catch (error) {
-        console.warn(
-          '[GIT_COMMIT] Hash map regeneration failed (non-critical):',
-          error
-        );
-        // Don't fail the commit - Vercel will regenerate on deploy
-      }
-    } else {
-      console.log('[GIT_COMMIT] Skipping local regeneration (Vercel build will handle it)');
-    }
-
-    const { owner, repo } = REPO_CONFIG;
-    const commitUrl = `https://github.com/${owner}/${repo}/commit/${commitSha}`;
-
+    // DEPRECATED: Old staging system removed in ML15-290
+    // Use new Git-native workflow: taxonomy-git.ts (commitTaxonomyChange, ensurePullRequest)
     return {
-      success: true,
-      data: {
-        commitSha,
-        message,
-        filesCommitted: filesToCommit.map((f) => f.path),
-        commitUrl,
-      },
+      success: false,
+      error: 'Legacy staging system deprecated. Use Git-native workflow (taxonomy-git.ts) instead.',
     };
   } catch (error) {
     console.error('[GIT_COMMIT] Error:', error);
@@ -479,9 +301,20 @@ export async function pushToRemote(branch?: string): Promise<PushResponse> {
 export async function getRecentCommits(
   limit: number = 10,
   branch?: string,
+  session?: any,
 ): Promise<RecentCommitsResponse> {
+  console.log('[GET_RECENT_COMMITS] START:', new Date().toISOString());
+
   try {
-    await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
+    // Only do auth check if session not provided (prevents redundant 60-73s database calls)
+    if (!session) {
+      const authStart = performance.now();
+      await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'view');
+      console.log('[GET_RECENT_COMMITS] Auth check took:', performance.now() - authStart, 'ms');
+    } else {
+      console.log('[GET_RECENT_COMMITS] Using provided session (auth check bypassed)');
+    }
+
     validateRepoConfig();
 
     const octokit = getGitHubClient();
@@ -494,15 +327,20 @@ export async function getRecentCommits(
     let commits;
     try {
       // Get commits ahead of comparison branch (commits that would be pushed/merged)
+      const fetchStart = performance.now();
       commits = await getCommitsAhead(octokit, comparisonBranch, currentBranch);
+      console.log('[GET_RECENT_COMMITS] getCommitsAhead took:', performance.now() - fetchStart, 'ms');
       commits = commits.slice(0, limit);
+      console.log('[GET_RECENT_COMMITS] Commits count:', commits.length);
     } catch (error) {
       console.warn(
         `[GIT_LOG] Could not compare ${currentBranch} with ${comparisonBranch}:`,
         error,
       );
       // Fallback: show recent commits on current branch
+      const fallbackStart = performance.now();
       commits = await fetchRecentCommits(octokit, currentBranch, limit);
+      console.log('[GET_RECENT_COMMITS] Fallback fetchRecentCommits took:', performance.now() - fallbackStart, 'ms');
     }
 
     // Format commits for UI and sort by date (latest first)
@@ -519,6 +357,7 @@ export async function getRecentCommits(
       .sort((a, b) => b.timestamp - a.timestamp) // Latest first
       .map(({ timestamp, ...commit }) => commit); // Remove timestamp from final output
 
+    console.log('[GET_RECENT_COMMITS] END:', new Date().toISOString());
     return {
       success: true,
       data: {
@@ -526,7 +365,7 @@ export async function getRecentCommits(
       },
     };
   } catch (error) {
-    console.error('[GIT_LOG] Error:', error);
+    console.error('[GET_RECENT_COMMITS] ERROR:', error);
     return {
       success: false,
       error:
@@ -546,12 +385,11 @@ export async function discardStagedChanges(): Promise<{
   try {
     await getAdminSessionWithPermission(ADMIN_RESOURCES.GIT, 'edit');
 
-    const { clearStagedChanges } = await import('./taxonomy-staging');
-    const count = await clearStagedChanges();
-
+    // DEPRECATED: Old staging system removed in ML15-290
+    // Use new Git-native workflow with localStorage drafts instead
     return {
-      success: true,
-      message: `Discarded ${count} staged change${count === 1 ? '' : 's'}`,
+      success: false,
+      error: 'Legacy staging system deprecated. Use localStorage draft system (taxonomy-drafts.ts) instead.',
     };
   } catch (error) {
     console.error('[DISCARD_STAGED] Error:', error);
