@@ -132,15 +132,15 @@ export interface PublishResult {
   data?: {
     commitsCreated: number;
     commitShas: string[];
-    prNumber: number;
-    prUrl: string;
+    prNumber?: number; // Optional - only when using PR workflow
+    prUrl?: string; // Optional - only when using PR workflow
     publishedDrafts: TaxonomyDraft[];
   };
   error?: {
     code: PublishErrorCode;
     message: string;
     recoverable: boolean;
-    failedAt?: 'sync' | 'commit' | 'pr-create' | 'pr-merge';
+    failedAt?: 'commit';
   };
 }
 
