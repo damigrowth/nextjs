@@ -5864,6 +5864,11 @@ export const serviceTaxonomies: DatasetItem[] = [
         "id": "xxuOf_ICVQQ1ZZTMwOWSI",
         "label": "Google Cloud",
         "slug": "google-cloud"
+      },
+      {
+        "id": "xxuOf_ICVQQ1ZZTMwOWSI",
+        "label": "Google Cloud",
+        "slug": "google-cloud"
       }
     ]
   },
