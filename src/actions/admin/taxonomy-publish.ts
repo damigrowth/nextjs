@@ -29,6 +29,7 @@ import {
 import type { DatasetItem } from '@/lib/types/datasets';
 import { sanitizeDrafts, mergeDraftOperations } from '@/lib/validations/taxonomy-drafts';
 import { isSuccess } from '@/lib/types/server-actions';
+import { collectAllIds } from './taxonomies-shared';
 
 /**
  * Apply drafts to taxonomy data
@@ -60,7 +61,24 @@ function applyCreateDraft(
   data: DatasetItem[],
   draft: Extract<TaxonomyDraft, { operation: 'create' }>
 ): DatasetItem[] {
+  // Duplicate ID detection guard
+  const existingIds = collectAllIds(data);
+
+  if (existingIds.has(draft.data.id)) {
+    throw new Error(
+      `Duplicate ID: "${draft.data.id}" already exists in ${draft.taxonomyType}`
+    );
+  }
+
   if (draft.level === 'subcategory' && draft.parentId) {
+    // Validate parent category exists
+    const parentExists = data.some((cat) => cat.id === draft.parentId);
+    if (!parentExists) {
+      throw new Error(
+        `Parent category "${draft.parentId}" not found in ${draft.taxonomyType}`
+      );
+    }
+
     // Add as child of parent category
     return data.map((cat) =>
       cat.id === draft.parentId
@@ -68,6 +86,16 @@ function applyCreateDraft(
         : cat
     );
   } else if (draft.level === 'subdivision' && draft.parentId) {
+    // Validate parent subcategory exists
+    const parentExists = data.some((cat) =>
+      cat.children?.some((sub) => sub.id === draft.parentId)
+    );
+    if (!parentExists) {
+      throw new Error(
+        `Parent subcategory "${draft.parentId}" not found in ${draft.taxonomyType}`
+      );
+    }
+
     // Add as child of parent subcategory
     return data.map((cat) => ({
       ...cat,
@@ -90,6 +118,17 @@ function applyUpdateDraft(
   data: DatasetItem[],
   draft: Extract<TaxonomyDraft, { operation: 'update' }>
 ): DatasetItem[] {
+  // If ID is changing, check for duplicates
+  if (draft.data.id && draft.data.id !== draft.itemId) {
+    const existingIds = collectAllIds(data);
+
+    if (existingIds.has(draft.data.id)) {
+      throw new Error(
+        `Duplicate ID: "${draft.data.id}" already exists in ${draft.taxonomyType}`
+      );
+    }
+  }
+
   return updateItemRecursively(data, draft.itemId, draft.data);
 }
 

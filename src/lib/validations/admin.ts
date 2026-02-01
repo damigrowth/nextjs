@@ -598,6 +598,7 @@ export const createProTaxonomySchema = z.object({
   level: z.enum(['category', 'subcategory']),
   parentId: z.string().optional(),
   type: z.enum(['freelancer', 'company']).optional(),
+  icon: z.string().optional(),
 });
 
 export const updateProTaxonomySchema = z.object({
@@ -616,6 +617,7 @@ export const updateProTaxonomySchema = z.object({
   level: z.enum(['category', 'subcategory']),
   parentId: z.string().optional(),
   type: z.enum(['freelancer', 'company']).optional(),
+  icon: z.string().optional(),
 });
 
 export type CreateProTaxonomyInput = z.infer<typeof createProTaxonomySchema>;

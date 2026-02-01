@@ -29,7 +29,7 @@ export interface TaxonomyConfig {
 /**
  * Collect all existing IDs from taxonomy tree (for collision detection)
  */
-function collectAllIds(items: DatasetItem[]): Set<string> {
+export function collectAllIds(items: DatasetItem[]): Set<string> {
   const ids = new Set<string>();
 
   function collect(itemList: DatasetItem[]) {
@@ -62,6 +62,24 @@ function generateUniqueNanoid(existingIds: Set<string>): string {
   } while (existingIds.has(id));
 
   return id;
+}
+
+/**
+ * Generate unique numeric ID that doesn't collide with existing IDs
+ * Used for skills and tags taxonomies
+ */
+function generateUniqueNumericId(existingIds: Set<string>): string {
+  // Find the highest existing numeric ID
+  let maxId = 0;
+  for (const id of existingIds) {
+    const numId = parseInt(id, 10);
+    if (!isNaN(numId) && numId > maxId) {
+      maxId = numId;
+    }
+  }
+
+  // Return next ID as string
+  return String(maxId + 1);
 }
 
 /**
@@ -187,9 +205,11 @@ export async function createItem(
       // Generate unique slug if conflicts exist
       const uniqueSlug = generateUniqueSlug(data.slug!, currentItems);
 
-      // Generate unique nanoid
+      // Generate unique ID based on taxonomy type
       const existingIds = collectAllIds(currentItems);
-      const newId = generateUniqueNanoid(existingIds);
+      const newId = (config.type === 'skills' || config.type === 'tags')
+        ? generateUniqueNumericId(existingIds)
+        : generateUniqueNanoid(existingIds);
       const newItem = { id: newId, ...data, slug: uniqueSlug } as DatasetItem;
 
       // Normalize property order

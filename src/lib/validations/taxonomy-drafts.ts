@@ -42,7 +42,13 @@ const taxonomyLevelSchema = z.enum([
  * DatasetItem schema (simplified - extend as needed)
  */
 const datasetItemSchema = z.object({
-  id: z.string().min(1),
+  id: z
+    .string()
+    .min(1, 'ID is required')
+    .regex(
+      /^[a-zA-Z0-9_-]{6}$|^\d+$/,
+      'ID must be 6-char nanoid (service/pro) or numeric (skills/tags)'
+    ),
   label: z.string().min(1),
   slug: z.string().min(1),
   children: z.array(z.any()).optional(),
@@ -192,6 +198,24 @@ export function createDraftData(
 
   switch (operation) {
     case 'create':
+      // Validate ID format for taxonomy type
+      const validation = validateIdForTaxonomyType(
+        (data.data as any).id,
+        taxonomyType
+      );
+      if (!validation.valid) {
+        throw new Error(
+          `Invalid ID format for ${taxonomyType}: "${(data.data as any).id}". Expected: ${validation.expected}`
+        );
+      }
+
+      // Prevent circular reference (item cannot be its own parent)
+      if (data.parentId && data.parentId === (data.data as any).id) {
+        throw new Error(
+          `Circular reference detected: Item cannot be its own parent (ID: "${data.parentId}")`
+        );
+      }
+
       return createDraftSchema.parse({
         ...baseData,
         operation: 'create',
@@ -306,4 +330,39 @@ export function mergeDraftOperations(
   }
 
   return Array.from(mergedMap.values());
+}
+
+/**
+ * Validate ID format for taxonomy type
+ *
+ * Enforces taxonomy-specific ID format rules:
+ * - Service/Pro taxonomies (all categories, subcategories, subdivisions): 6-char nanoid
+ * - Skills/Tags: numeric ID
+ *
+ * @param id - ID to validate
+ * @param taxonomyType - Taxonomy type
+ * @returns Validation result with expected format if invalid
+ */
+export function validateIdForTaxonomyType(
+  id: string,
+  taxonomyType: TaxonomyType
+): { valid: boolean; expected?: string } {
+  const nanoidTaxonomies = [
+    'service-categories',
+    'service-subcategories',
+    'service-subdivisions',
+    'pro-categories',
+    'pro-subcategories',
+  ];
+  const numericTaxonomies = ['skills', 'tags'];
+
+  if (nanoidTaxonomies.includes(taxonomyType)) {
+    const valid = /^[a-zA-Z0-9_-]{6}$/.test(id);
+    return { valid, expected: '6-char nanoid (e.g., "qWYlwq")' };
+  } else if (numericTaxonomies.includes(taxonomyType)) {
+    const valid = /^\d+$/.test(id);
+    return { valid, expected: 'numeric ID (e.g., "123")' };
+  }
+
+  return { valid: false };
 }
