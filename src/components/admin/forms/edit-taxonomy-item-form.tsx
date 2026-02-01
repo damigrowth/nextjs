@@ -1,12 +1,10 @@
 'use client';
 
-import { useEffect, useActionState } from 'react';
+import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { updateServiceTaxonomySchema } from '@/lib/validations/admin';
-import { updateServiceTaxonomyAction } from '@/actions/admin';
-import { populateFormData } from '@/lib/utils/form';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -34,6 +32,9 @@ import { LabelField, SlugField } from './taxonomy-form-fields';
 import { useSlugHandlers } from './use-slug-handlers';
 import { CloudinaryMediaPicker } from '@/components/media/cloudinary-media-picker';
 import type { CloudinaryResource } from '@/lib/types/cloudinary';
+import { createDraftData } from '@/lib/validations/taxonomy-drafts';
+import { saveDraft } from '@/lib/taxonomy-drafts';
+import type { TaxonomyType } from '@/lib/types/taxonomy-operations';
 
 type EditTaxonomyItemFormValues = z.infer<typeof updateServiceTaxonomySchema>;
 
@@ -56,10 +57,7 @@ export function EditTaxonomyItemForm({
   existingItems,
 }: EditTaxonomyItemFormProps) {
   const router = useRouter();
-  const [state, formAction, isPending] = useActionState(
-    updateServiceTaxonomyAction,
-    null,
-  );
+  const [isPending, setIsPending] = useState(false);
 
   const form = useForm<EditTaxonomyItemFormValues>({
     resolver: zodResolver(updateServiceTaxonomySchema),
@@ -80,44 +78,59 @@ export function EditTaxonomyItemForm({
   // Watch the label field for changes using useWatch
   const labelValue = useWatch({ control: form.control, name: 'label' });
 
-  useEffect(() => {
-    if (state?.success) {
-      toast.success(state.message || 'Taxonomy updated successfully');
-      // Reset form to clear dirty state - this will trigger a re-render
-      // with the updated values without needing router.refresh()
-      form.reset(form.getValues());
-      // No router.refresh() needed - ISR revalidation on the server
-      // will ensure fresh data on next navigation
-    } else if (state?.error) {
-      toast.error(state.error);
+  const onSubmit = async (data: EditTaxonomyItemFormValues) => {
+    setIsPending(true);
+
+    try {
+      // Determine taxonomy type based on level
+      const taxonomyType: TaxonomyType =
+        data.level === 'category'
+          ? 'service-categories'
+          : data.level === 'subcategory'
+            ? 'service-subcategories'
+            : 'service-subdivisions';
+
+      // Create validated draft for update operation
+      const draft = createDraftData(taxonomyType, 'update', {
+        itemId: data.id,
+        data: {
+          id: data.id,
+          label: data.label,
+          slug: data.slug,
+          description: data.description,
+          ...(data.level === 'category' && {
+            featured: data.featured,
+            icon: data.icon,
+          }),
+          ...(data.image && { image: data.image }),
+        } as DatasetItem,
+        level: data.level,
+        parentId: data.parentId || null,
+      });
+
+      // Save to localStorage
+      saveDraft(draft);
+
+      toast.success('Changes saved to drafts');
+
+      // Reset form dirty state
+      form.reset(data);
+
+      // Navigate back to list
+      router.push(`/admin/taxonomies/service/${data.level === 'category' ? 'categories' : data.level === 'subcategory' ? 'subcategories' : 'subdivisions'}`);
+    } catch (error) {
+      console.error('[EDIT_TAXONOMY_ITEM_FORM] Failed to save draft:', error);
+      toast.error('Failed to save changes');
+    } finally {
+      setIsPending(false);
     }
-  }, [state, form]);
-
-  const handleFormSubmit = (formData: FormData) => {
-    const allValues = form.getValues();
-
-    populateFormData(formData, allValues, {
-      stringFields: [
-        'id',
-        'label',
-        'slug',
-        'description',
-        'level',
-        'parentId',
-        'icon',
-      ],
-      booleanFields: ['featured'],
-      jsonFields: ['image'],
-    });
-
-    formAction(formData);
   };
 
   const { handleLabelChange, handleSlugRegenerate } = useSlugHandlers(form);
 
   return (
     <Form {...form}>
-      <form action={handleFormSubmit} className='space-y-4'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
         <div className='grid gap-4 md:grid-cols-2'>
           <FormField
             control={form.control}

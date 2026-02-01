@@ -1,11 +1,17 @@
 'use client';
 
+import { useState } from 'react';
+import { useForm, useWatch, UseFormReturn } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { nanoid } from 'nanoid';
 import { createProTaxonomySchema, type CreateProTaxonomyInput } from '@/lib/validations/admin';
-import { createProTaxonomyAction } from '@/actions/admin/pro-taxonomies';
 import type { DatasetItem } from '@/lib/types/datasets';
-import { TaxonomyFormWrapper, FieldGrid, LabelField, SlugField } from './';
+import { FieldGrid, LabelField, SlugField } from './';
 import { useSlugHandlers } from './use-slug-handlers';
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -15,6 +21,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -22,10 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useWatch, UseFormReturn } from 'react-hook-form';
 import { createDraftData } from '@/lib/validations/taxonomy-drafts';
 import { saveDraft } from '@/lib/taxonomy-drafts';
-import type { ActionResult } from '@/lib/types/api';
 import type { TaxonomyType } from '@/lib/types/taxonomy-operations';
 
 interface CreateProTaxonomyFormProps {
@@ -179,50 +185,77 @@ export function CreateProTaxonomyForm({
   level,
   existingItems,
 }: CreateProTaxonomyFormProps) {
+  const router = useRouter();
+  const [isPending, setIsPending] = useState(false);
+
   // Get parent categories for subcategory creation
   const parentCategories = level === 'subcategory' ? existingItems : [];
 
-  const handleSuccess = (result: ActionResult) => {
-    if (result.success && result.data) {
-      try {
-        // Determine taxonomy type based on level
-        const taxonomyType: TaxonomyType =
-          level === 'category' ? 'pro-categories' : 'pro-subcategories';
+  const form = useForm<CreateProTaxonomyInput>({
+    resolver: zodResolver(createProTaxonomySchema),
+    mode: 'onChange',
+    defaultValues: {
+      label: '',
+      plural: '',
+      slug: '',
+      description: '',
+      level,
+      parentId: '',
+      type: 'freelancer',
+    },
+  });
 
-        // Create validated draft for create operation
-        const draft = createDraftData(taxonomyType, 'create', {
-          data: result.data.item,
-          level,
-          parentId: level === 'subcategory' ? result.data.item.parentId : null,
-        });
+  const onSubmit = async (data: CreateProTaxonomyInput) => {
+    setIsPending(true);
 
-        // Save to localStorage
-        saveDraft(draft);
-      } catch (error) {
-        console.error('[CREATE_PRO_TAXONOMY_FORM] Failed to save draft:', error);
-      }
+    try {
+      // Generate unique nanoid for pro taxonomies (6-character collision-proof ID)
+      const newId = nanoid(6);
+
+      // Determine taxonomy type based on level
+      const taxonomyType: TaxonomyType =
+        level === 'category' ? 'pro-categories' : 'pro-subcategories';
+
+      // Create new item data
+      const newItem: DatasetItem = {
+        id: newId,
+        label: data.label,
+        slug: data.slug,
+        plural: data.plural,
+        description: data.description,
+        ...(level === 'subcategory' && { type: data.type }),
+      };
+
+      // Create validated draft for create operation
+      const draft = createDraftData(taxonomyType, 'create', {
+        data: newItem,
+        level,
+        parentId: level === 'subcategory' ? data.parentId : null,
+      });
+
+      // Save to localStorage
+      saveDraft(draft);
+
+      toast.success('Draft saved');
+
+      // Navigate back to the list page
+      const listPath =
+        level === 'category'
+          ? '/admin/taxonomies/pro/categories'
+          : '/admin/taxonomies/pro/subcategories';
+
+      router.push(listPath);
+    } catch (error) {
+      console.error('[CREATE_PRO_TAXONOMY_FORM] Failed to save draft:', error);
+      toast.error('Failed to save draft');
+    } finally {
+      setIsPending(false);
     }
   };
 
   return (
-    <TaxonomyFormWrapper<CreateProTaxonomyInput>
-      schema={createProTaxonomySchema}
-      action={createProTaxonomyAction}
-      defaultValues={{
-        label: '',
-        plural: '',
-        slug: '',
-        description: '',
-        level,
-        parentId: '',
-        type: 'freelancer',
-      }}
-      successMessage='Professional taxonomy created (draft saved)'
-      isEdit={false}
-      stringFields={['label', 'plural', 'slug', 'description', 'level', 'parentId', 'type']}
-      onSuccess={handleSuccess}
-    >
-      {(form, isPending) => (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
         <CreateProTaxonomyFormFields
           form={form}
           isPending={isPending}
@@ -230,7 +263,22 @@ export function CreateProTaxonomyForm({
           existingItems={existingItems}
           parentCategories={parentCategories}
         />
-      )}
-    </TaxonomyFormWrapper>
+
+        <div className='flex justify-end gap-4'>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={() => router.back()}
+            disabled={isPending}
+          >
+            Cancel
+          </Button>
+          <Button type='submit' disabled={isPending}>
+            {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+            Create {level.charAt(0).toUpperCase() + level.slice(1)}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }
