@@ -1,4 +1,5 @@
-import { getTaxonomyWithStaging } from '@/actions/admin/get-taxonomy-with-staging';
+import { getTaxonomyData } from '@/actions/admin/taxonomy-helpers';
+import { isSuccess } from '@/lib/types/server-actions';
 import { AdminTagsDataTable } from './admin-tags-data-table';
 import {
   processTableData,
@@ -13,8 +14,9 @@ interface AdminTagsTableSectionProps {
 }
 
 export async function AdminTagsTableSection({ searchParams }: AdminTagsTableSectionProps) {
-  // Get tags including staged changes
-  const tags = await getTaxonomyWithStaging('tags');
+  // Get tags from Git
+  const result = await getTaxonomyData('tags');
+  const tags = isSuccess(result) ? result.data : [];
 
   const { paginatedData, totalPages, currentPage, currentLimit } = processTableData({
     data: tags,

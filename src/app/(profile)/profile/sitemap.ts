@@ -33,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     return profiles.map((profile) => ({
-      url: `${baseUrl}/profile/${profile.username}`,
+      url: `${baseUrl}/profile/${encodeURIComponent(profile.username)}`,
       lastModified: profile.updatedAt,
     }));
   } catch (error) {

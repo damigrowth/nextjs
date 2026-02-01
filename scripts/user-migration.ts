@@ -78,8 +78,10 @@ interface MigrationStats {
   localUsers: number;
   googleUsers: number;
   migratedSuccessfully: number;
+  usersUpdated: number;
   errors: string[];
   skipped: string[];
+  warnings: string[];
 }
 
 // Helper function to get user role from Strapi
@@ -133,14 +135,16 @@ function isBcryptHash(password: string): boolean {
 }
 
 // Main migration function
-async function migrateUsers(): Promise<MigrationStats> {
+async function migrateUsers(updateExisting: boolean = false): Promise<MigrationStats> {
   const stats: MigrationStats = {
     totalUsers: 0,
     localUsers: 0,
     googleUsers: 0,
     migratedSuccessfully: 0,
+    usersUpdated: 0,
     errors: [],
-    skipped: []
+    skipped: [],
+    warnings: []
   };
 
   try {
@@ -185,8 +189,122 @@ async function migrateUsers(): Promise<MigrationStats> {
         });
 
         if (existingUser) {
-          stats.skipped.push(`User ${strapiUser.email}: Already exists`);
-          console.log(`⚠️ ${progress} Skipped - Already exists`);
+          if (!updateExisting) {
+            stats.skipped.push(`User ${strapiUser.email}: Already exists`);
+            console.log(`⚠️ ${progress} Skipped - Already exists`);
+            continue;
+          }
+
+          // UPDATE MODE: Update existing user with safe fields only
+          console.log(`🔄 ${progress} Checking for changes...`);
+
+          // Get the user's role from Strapi
+          const userRole = await getUserRole(strapiUser.id);
+
+          // Handle potential duplicate username
+          let username = strapiUser.username;
+          if (username && username !== existingUser.username) {
+            const existingUsername = await targetDb.user.findUnique({
+              where: { username }
+            });
+
+            if (existingUsername && existingUsername.id !== existingUser.id) {
+              const emailLocal = strapiUser.email.split('@')[0];
+              username = `${username}_${emailLocal}`;
+              stats.warnings.push(`User ${strapiUser.email}: Username conflict during update, using ${username}`);
+            }
+          }
+
+          // Prepare update data
+          // Use ?? to preserve empty strings - only fall through if null/undefined
+          const newName = strapiUser.display_name ??
+                          (strapiUser.first_name && strapiUser.last_name ?
+                           `${strapiUser.first_name} ${strapiUser.last_name}` : null);
+
+          const updatedData: any = {};
+          let hasChanges = false;
+
+          // Check each field for changes
+          // Use ?? to preserve empty strings from Strapi (only convert undefined/null)
+          const normalizedUsername = username ?? null;
+          const normalizedDisplayName = strapiUser.display_name ?? null;
+          const normalizedFirstName = strapiUser.first_name ?? null;
+          const normalizedLastName = strapiUser.last_name ?? null;
+          const normalizedName = newName ?? null;
+          const normalizedConfirmed = strapiUser.confirmed ?? false;
+          const normalizedBlocked = strapiUser.blocked ?? false;
+
+          const changedFields: string[] = [];
+
+          // Normalize existing values to null for consistent comparison
+          // Use ?? to preserve empty strings from database (only convert undefined/null)
+          const existingUsername = existingUser.username ?? null;
+          const existingDisplayName = existingUser.displayName ?? null;
+          const existingFirstName = existingUser.firstName ?? null;
+          const existingLastName = existingUser.lastName ?? null;
+          const existingName = existingUser.name ?? null;
+
+          if (normalizedUsername !== existingUsername) {
+            updatedData.username = normalizedUsername;
+            changedFields.push('username');
+            hasChanges = true;
+          }
+          if (normalizedDisplayName !== existingDisplayName) {
+            updatedData.displayName = normalizedDisplayName;
+            changedFields.push('displayName');
+            hasChanges = true;
+          }
+          if (normalizedFirstName !== existingFirstName) {
+            updatedData.firstName = normalizedFirstName;
+            changedFields.push('firstName');
+            hasChanges = true;
+          }
+          if (normalizedLastName !== existingLastName) {
+            updatedData.lastName = normalizedLastName;
+            changedFields.push('lastName');
+            hasChanges = true;
+          }
+          if (normalizedName !== existingName) {
+            updatedData.name = normalizedName;
+            changedFields.push('name');
+            hasChanges = true;
+          }
+          if (userRole !== existingUser.role) {
+            updatedData.role = userRole;
+            changedFields.push('role');
+            hasChanges = true;
+          }
+          const normalizedProvider = strapiUser.provider === 'google' ? 'google' : 'email';
+          if (normalizedProvider !== (existingUser.provider ?? 'email')) {
+            updatedData.provider = normalizedProvider;
+            changedFields.push('provider');
+            hasChanges = true;
+          }
+          if (normalizedConfirmed !== (existingUser.confirmed ?? false)) {
+            updatedData.confirmed = normalizedConfirmed;
+            changedFields.push('confirmed');
+            hasChanges = true;
+          }
+          if (normalizedBlocked !== (existingUser.blocked ?? false)) {
+            updatedData.blocked = normalizedBlocked;
+            changedFields.push('blocked');
+            hasChanges = true;
+          }
+
+          if (hasChanges) {
+            // Only update if there are actual changes
+            // Note: updatedAt is auto-updated by Prisma @updatedAt decorator
+            await targetDb.user.update({
+              where: { id: existingUser.id },
+              data: updatedData
+            });
+
+            stats.usersUpdated++;
+            console.log(`✅ ${progress} USER UPDATED with changes (${changedFields.join(', ')}): ${strapiUser.email}`);
+          } else {
+            stats.skipped.push(`User ${strapiUser.email}: No changes detected`);
+            console.log(`⚠️ ${progress} Skipped - No changes`);
+          }
           continue;
         }
 
@@ -202,23 +320,40 @@ async function migrateUsers(): Promise<MigrationStats> {
         // Get the user's role from Strapi
         const userRole = await getUserRole(strapiUser.id);
 
+        // Handle potential duplicate username
+        let username = strapiUser.username;
+        if (username) {
+          // Check if username already exists
+          const existingUsername = await targetDb.user.findUnique({
+            where: { username }
+          });
+
+          if (existingUsername) {
+            // Make username unique by appending email local part
+            const emailLocal = strapiUser.email.split('@')[0];
+            username = `${username}_${emailLocal}`;
+            stats.warnings.push(`User ${strapiUser.email}: Username conflict, using ${username}`);
+          }
+        }
+
         // Prepare user data (let Prisma generate the ID)
         const userData = {
           email: strapiUser.email,
           emailVerified: strapiUser.confirmed || false,
-          name: strapiUser.display_name || 
-                (strapiUser.first_name && strapiUser.last_name ? 
+          name: strapiUser.display_name ??
+                (strapiUser.first_name && strapiUser.last_name ?
                  `${strapiUser.first_name} ${strapiUser.last_name}` : null),
           createdAt: strapiUser.created_at || new Date(),
           updatedAt: strapiUser.updated_at || new Date(),
           step: determineUserStep(strapiUser),
           confirmed: strapiUser.confirmed || false,
           blocked: strapiUser.blocked || false,
-          username: strapiUser.username,
+          username: username,
           displayName: strapiUser.display_name,
           firstName: strapiUser.first_name,
           lastName: strapiUser.last_name,
-          role: userRole
+          role: userRole,
+          provider: strapiUser.provider === 'google' ? 'google' : 'email'
         };
 
         // Create user in transaction
@@ -277,14 +412,21 @@ async function migrateUsers(): Promise<MigrationStats> {
     console.log(`Local users (with passwords): ${stats.localUsers}`);
     console.log(`Google OAuth users: ${stats.googleUsers}`);
     console.log(`Successfully migrated: ${stats.migratedSuccessfully}`);
+    console.log(`Users updated: ${stats.usersUpdated}`);
     console.log(`Skipped: ${stats.skipped.length}`);
+    console.log(`Warnings: ${stats.warnings.length}`);
     console.log(`Errors: ${stats.errors.length}`);
-    
+
     if (stats.skipped.length > 0) {
       console.log('\n⚠️ SKIPPED USERS:');
       stats.skipped.forEach(msg => console.log(`  - ${msg}`));
     }
-    
+
+    if (stats.warnings.length > 0) {
+      console.log('\n⚠️ WARNINGS:');
+      stats.warnings.forEach(msg => console.log(`  - ${msg}`));
+    }
+
     if (stats.errors.length > 0) {
       console.log('\n❌ ERRORS:');
       stats.errors.forEach(msg => console.log(`  - ${msg}`));
@@ -369,20 +511,31 @@ async function rollbackMigration(): Promise<void> {
 // Main execution
 async function main() {
   const args = process.argv.slice(2);
-  
+
   if (args[0] === 'rollback') {
     await rollbackMigration();
     return;
   }
-  
+
   if (args[0] === 'test' && args[1]) {
     await testUserLogin(args[1], args[2]);
     return;
   }
-  
+
+  // Default to update mode (always check for changes and update if needed)
+  // Use --create-only flag to skip updates
+  const createOnly = args.includes('--create-only');
+  const updateExisting = !createOnly; // Update by default
+
+  if (updateExisting) {
+    console.log('🔄 UPDATE MODE - Existing records will be updated if changes detected\n');
+  } else {
+    console.log('📝 CREATE ONLY MODE - Existing records will be skipped\n');
+  }
+
   // Run the migration
-  const stats = await migrateUsers();
-  
+  const stats = await migrateUsers(updateExisting);
+
   // Exit with appropriate code
   process.exit(stats.errors.length > 0 ? 1 : 0);
 }

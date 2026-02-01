@@ -38,6 +38,10 @@ import { ProfileCacheKeys } from '@/lib/cache/keys';
 import { CACHE_TAGS } from '@/lib/cache';
 import { getYearsOfExperience } from '@/lib/utils/misc/experience';
 import { PROFILE_DETAIL_INCLUDE } from '@/lib/database/selects';
+import {
+  getProfileReviews,
+  getProfileReviewStats,
+} from '@/actions/reviews';
 
 /**
  * Internal function to fetch profile data (uncached)
@@ -171,6 +175,14 @@ export interface ProfilePageData {
     subjectTitle: string;
     id: string;
     saveType: string;
+  };
+  reviews: {
+    reviews: any[]; // ReviewWithAuthor[]
+    total: number;
+  };
+  reviewStats: {
+    totalReviews: number;
+    averageRating: number;
   };
 }
 
@@ -318,24 +330,28 @@ async function _getProfilePageData(
       });
     }
 
-    // Fetch services for this profile
-    const services = await prisma.service.findMany({
-      where: {
-        pid: profile.id,
-        status: 'published',
-      },
-      include: {
-        profile: {
-          select: {
-            id: true,
-            username: true,
-            displayName: true,
-            image: true,
+    // Fetch services and reviews in parallel for this profile
+    const [services, profileReviews, reviewStats] = await Promise.all([
+      prisma.service.findMany({
+        where: {
+          pid: profile.id,
+          status: 'published',
+        },
+        include: {
+          profile: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              image: true,
+            },
           },
         },
-      },
-      orderBy: { sortDate: 'desc' },
-    });
+        orderBy: { sortDate: 'desc' },
+      }),
+      getProfileReviews(profile.id, 1, 10),
+      getProfileReviewStats(profile.id),
+    ]);
 
     // Transform services for component use
     const transformedServices = services.map(transformProfileService);
@@ -380,6 +396,15 @@ async function _getProfilePageData(
         calculatedExperience,
         breadcrumbSegments,
         breadcrumbButtons,
+        reviews: profileReviews.success
+          ? profileReviews.data
+          : { reviews: [], total: 0 },
+        reviewStats: reviewStats.success
+          ? reviewStats.data
+          : {
+              totalReviews: 0,
+              averageRating: 0,
+            },
       },
     };
   } catch (error) {

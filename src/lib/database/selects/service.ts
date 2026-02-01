@@ -81,6 +81,7 @@ export const SERVICE_DETAIL_SELECT = {
   sortDate: true,
   profile: {
     select: {
+      id: true,
       uid: true,
       firstName: true,
       lastName: true,

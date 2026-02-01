@@ -1,14 +1,17 @@
 'use client';
 
+import { useState } from 'react';
+import { useForm, useWatch, UseFormReturn } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   updateProTaxonomySchema,
   type UpdateProTaxonomyInput,
 } from '@/lib/validations/admin';
-import { updateProTaxonomyAction } from '@/actions/admin/pro-taxonomies';
 import type { DatasetItem } from '@/lib/types/datasets';
-import { TaxonomyFormWrapper, FieldGrid, LabelField, SlugField } from './';
+import { FieldGrid, LabelField, SlugField } from './';
 import { useSlugHandlers } from './use-slug-handlers';
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -25,7 +28,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useWatch, UseFormReturn } from 'react-hook-form';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { createDraftData } from '@/lib/validations/taxonomy-drafts';
+import { saveDraft } from '@/lib/taxonomy-drafts';
+import type { TaxonomyType } from '@/lib/types/taxonomy-operations';
 
 interface EditProTaxonomyFormProps {
   taxonomy: {
@@ -198,41 +207,91 @@ export function EditProTaxonomyForm({
   taxonomy,
   existingItems,
 }: EditProTaxonomyFormProps) {
+  const router = useRouter();
+  const [isPending, setIsPending] = useState(false);
+
+  const form = useForm<UpdateProTaxonomyInput>({
+    resolver: zodResolver(updateProTaxonomySchema),
+    mode: 'onChange',
+    defaultValues: {
+      id: taxonomy.id,
+      label: taxonomy.label,
+      slug: taxonomy.slug,
+      plural: taxonomy.plural || '',
+      description: taxonomy.description,
+      level: taxonomy.level,
+      parentId: taxonomy.parentId || '',
+      type: taxonomy.type || 'freelancer',
+    },
+  });
+
+  const onSubmit = async (data: UpdateProTaxonomyInput) => {
+    setIsPending(true);
+
+    try {
+      // Determine taxonomy type based on level
+      const taxonomyType: TaxonomyType =
+        data.level === 'category' ? 'pro-categories' : 'pro-subcategories';
+
+      // Create validated draft for update operation
+      const draft = createDraftData(taxonomyType, 'update', {
+        itemId: data.id,
+        data: {
+          id: data.id,
+          label: data.label,
+          slug: data.slug,
+          plural: data.plural,
+          description: data.description,
+          ...(data.level === 'subcategory' && { type: data.type }),
+        } as DatasetItem,
+        previousData: taxonomy, // Include original data for diff tracking
+      });
+
+      // Save to localStorage
+      saveDraft(draft);
+
+      toast.success('Changes saved to drafts');
+
+      // Reset form dirty state
+      form.reset(data);
+
+      // Navigate back to list
+      router.push(
+        `/admin/taxonomies/pro/${data.level === 'category' ? 'categories' : 'subcategories'}`
+      );
+    } catch (error) {
+      console.error('[EDIT_PRO_TAXONOMY_FORM] Failed to save draft:', error);
+      toast.error('Failed to save changes');
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   return (
-    <TaxonomyFormWrapper<UpdateProTaxonomyInput>
-      schema={updateProTaxonomySchema}
-      action={updateProTaxonomyAction}
-      defaultValues={{
-        id: taxonomy.id,
-        label: taxonomy.label,
-        slug: taxonomy.slug,
-        plural: taxonomy.plural || '',
-        description: taxonomy.description,
-        level: taxonomy.level,
-        parentId: taxonomy.parentId || '',
-        type: taxonomy.type || 'freelancer',
-      }}
-      successMessage='Professional taxonomy updated successfully'
-      isEdit={true}
-      stringFields={[
-        'id',
-        'label',
-        'slug',
-        'plural',
-        'description',
-        'level',
-        'parentId',
-        'type',
-      ]}
-    >
-      {(form, isPending) => (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
         <EditProTaxonomyFormFields
           form={form}
           isPending={isPending}
           taxonomy={taxonomy}
           existingItems={existingItems}
         />
-      )}
-    </TaxonomyFormWrapper>
+
+        <div className='flex justify-end gap-4'>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={() => form.reset()}
+            disabled={isPending}
+          >
+            Reset
+          </Button>
+          <Button type='submit' disabled={isPending || !form.formState.isDirty}>
+            {isPending && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+            Save Changes
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

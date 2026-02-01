@@ -18,7 +18,7 @@ import { ROLE_PERMISSIONS } from './roles';
  */
 const statement = {
   // User Management
-  users: ['create', 'read', 'update', 'delete', 'ban', 'unban'],
+  user: ['create', 'read', 'update', 'delete', 'ban', 'unban'],
 
   // Service Management
   services: ['read', 'update', 'delete', 'approve', 'reject'],
@@ -71,7 +71,7 @@ export const ac = createAccessControl(statement);
  * Permissions: 'full' level on all resources
  */
 export const admin = ac.newRole({
-  users: ['create', 'read', 'update', 'delete', 'ban', 'unban'],
+  user: ['create', 'read', 'update', 'delete', 'ban', 'unban'],
   services: ['read', 'update', 'delete', 'approve', 'reject'],
   profiles: ['read', 'update', 'verify'],
   verifications: ['read', 'approve', 'reject'],
@@ -106,7 +106,7 @@ export const admin = ac.newRole({
  * - Settings
  */
 export const support = ac.newRole({
-  users: ['create', 'read', 'update', 'delete', 'ban', 'unban'],
+  user: ['create', 'read', 'update', 'delete', 'ban', 'unban'],
   services: ['read', 'update', 'delete', 'approve', 'reject'],
   profiles: ['read', 'update', 'verify'],
   verifications: ['read', 'approve', 'reject'],

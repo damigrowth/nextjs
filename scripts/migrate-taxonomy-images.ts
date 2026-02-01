@@ -12,9 +12,11 @@
  * 1. Extracts images from Strapi categories, subcategories, and subdivisions
  * 2. Converts them to CloudinaryResource format
  * 3. Generates updated service-taxonomies.ts with image data
+ * 4. Uses nanoid for collision-proof ID generation
  */
 
 import { PrismaClient as SourcePrismaClient } from '@prisma/client';
+import { nanoid } from 'nanoid';
 import fs from 'fs';
 import path from 'path';
 
@@ -78,6 +80,27 @@ interface TaxonomyImageData {
   categories: Map<string, CloudinaryResource>;
   subcategories: Map<string, CloudinaryResource>;
   subdivisions: Map<string, CloudinaryResource>;
+}
+
+// Track generated IDs to ensure uniqueness
+const generatedIds = new Set<string>();
+
+// Helper function to generate unique 6-character nanoid
+function generateUniqueNanoid(): string {
+  let id: string;
+  let attempts = 0;
+  const maxAttempts = 100;
+
+  do {
+    id = nanoid(6);
+    attempts++;
+    if (attempts > maxAttempts) {
+      throw new Error('Failed to generate unique nanoid after 100 attempts');
+    }
+  } while (generatedIds.has(id));
+
+  generatedIds.add(id);
+  return id;
 }
 
 // Helper function to convert Strapi file to Cloudinary format (same as service migration)
@@ -185,8 +208,9 @@ async function loadTaxonomyImages(): Promise<TaxonomyImageData> {
 
     categoryImages.forEach(item => {
       const cloudinaryResource = convertStrapiFileToCloudinary(item);
-      imageData.categories.set(String(item.id), cloudinaryResource);
-      console.log(`  ✅ Category: ${item.label} (${item.id}) → ${cloudinaryResource.secure_url}`);
+      const nanoidId = generateUniqueNanoid();
+      imageData.categories.set(nanoidId, cloudinaryResource);
+      console.log(`  ✅ Category: ${item.label} (Strapi ID: ${item.id} → Nanoid: ${nanoidId}) → ${cloudinaryResource.secure_url}`);
     });
 
     // Load subcategory images
@@ -221,8 +245,9 @@ async function loadTaxonomyImages(): Promise<TaxonomyImageData> {
 
     subcategoryImages.forEach(item => {
       const cloudinaryResource = convertStrapiFileToCloudinary(item);
-      imageData.subcategories.set(String(item.id), cloudinaryResource);
-      console.log(`  ✅ Subcategory: ${item.label} (${item.id}) → ${cloudinaryResource.secure_url}`);
+      const nanoidId = generateUniqueNanoid();
+      imageData.subcategories.set(nanoidId, cloudinaryResource);
+      console.log(`  ✅ Subcategory: ${item.label} (Strapi ID: ${item.id} → Nanoid: ${nanoidId}) → ${cloudinaryResource.secure_url}`);
     });
 
     // Load subdivision images
@@ -257,8 +282,9 @@ async function loadTaxonomyImages(): Promise<TaxonomyImageData> {
 
     subdivisionImages.forEach(item => {
       const cloudinaryResource = convertStrapiFileToCloudinary(item);
-      imageData.subdivisions.set(String(item.id), cloudinaryResource);
-      console.log(`  ✅ Subdivision: ${item.label} (${item.id}) → ${cloudinaryResource.secure_url}`);
+      const nanoidId = generateUniqueNanoid();
+      imageData.subdivisions.set(nanoidId, cloudinaryResource);
+      console.log(`  ✅ Subdivision: ${item.label} (Strapi ID: ${item.id} → Nanoid: ${nanoidId}) → ${cloudinaryResource.secure_url}`);
     });
 
     console.log(`\n📊 Image Summary:`);

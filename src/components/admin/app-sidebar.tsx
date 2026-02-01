@@ -11,6 +11,7 @@ import {
   UserCheckIcon,
   TagsIcon,
   MessageSquareIcon,
+  StarIcon,
   GitBranchIcon,
   ShieldIcon,
   type LucideIcon,
@@ -41,6 +42,7 @@ const iconMap: Record<string, LucideIcon> = {
   '/admin/team': ShieldIcon,
   '/admin/taxonomies': TagsIcon,
   '/admin/chats': MessageSquareIcon,
+  '/admin/reviews': StarIcon,
   '/admin/analytics': BarChartIcon,
   '/admin/git': GitBranchIcon,
 };

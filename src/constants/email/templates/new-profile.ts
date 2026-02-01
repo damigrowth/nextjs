@@ -44,7 +44,7 @@ export const NEW_PROFILE_HTML = (data: NewProfileData): string => `
                       <p style="margin: 15px 0 0 0; font-size: 16px; line-height: 24px; font-family: Arial, sans-serif;">
                         <strong>🔧 Ενέργειες:</strong>
                       </p>
-                      <a href="${data.publicUrl || `https://doulitsa.gr/profile/${data.username}`}" style="background: #1f4c40; color: #ffffff; text-decoration: none; padding: 16px 30px; border-radius: 4px; display: inline-block; margin: 10px 10px 10px 0; font-weight: 700;">
+                      <a href="${data.publicUrl || `https://doulitsa.gr/profile/${encodeURIComponent(data.username)}`}" style="background: #1f4c40; color: #ffffff; text-decoration: none; padding: 16px 30px; border-radius: 4px; display: inline-block; margin: 10px 10px 10px 0; font-weight: 700;">
                         Προβολή Προφίλ
                       </a>
                       <a href="${data.adminUrl || `https://doulitsa.gr/admin/profiles/${data.profileId}`}" style="background: #ffffff; color: #1f4c40; text-decoration: none; padding: 16px 30px; border-radius: 4px; display: inline-block; margin: 10px; font-weight: 700; border: 2px solid #1f4c40;">
@@ -95,7 +95,7 @@ Email: ${data.userEmail}
 🔧 ΕΝΕΡΓΕΙΕΣ:
 
 Προβολή Προφίλ:
-${data.publicUrl || `https://doulitsa.gr/profile/${data.username}`}
+${data.publicUrl || `https://doulitsa.gr/profile/${encodeURIComponent(data.username)}`}
 
 Επεξεργασία Προφίλ:
 ${data.adminUrl || `https://doulitsa.gr/admin/profiles/${data.profileId}`}

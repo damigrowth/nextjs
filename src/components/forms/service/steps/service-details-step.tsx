@@ -34,7 +34,7 @@ import {
 import { TaxonomyDataContext } from '../form-service-create';
 import { findById } from '@/lib/utils/datasets';
 import type { CreateServiceInput } from '@/lib/validations/service';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 
 export default function ServiceDetailsStep() {
   const form = useFormContext<CreateServiceInput>();
@@ -53,6 +53,13 @@ export default function ServiceDetailsStep() {
   const watchedSubcategory = watch('subcategory');
   const watchedSubdivision = watch('subdivision');
   const watchedType = watch('type');
+
+  // Use useWatch for reactive updates in multi-step context (survives component remounting)
+  const fixedValue = useWatch({
+    control: form.control,
+    name: 'fixed',
+    defaultValue: true,
+  });
 
   // Get filtered data based on selections
   const selectedCategoryData = findById(serviceTaxonomies, watchedCategory);
@@ -316,22 +323,22 @@ export default function ServiceDetailsStep() {
               <FormItem>
                 <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
                   <FormLabel
-                    className={`sm:min-w-[50px] transition-colors ${!watch('fixed') ? 'text-muted-foreground' : ''}`}
+                    className={`sm:min-w-[50px] transition-colors ${!fixedValue ? 'text-muted-foreground' : ''}`}
                   >
-                    Τιμή{watch('fixed') ? '*' : ''}
+                    Τιμή{fixedValue ? '*' : ''}
                   </FormLabel>
                   <FormControl>
                     <div className='w-[150px]'>
                       <Currency
                         currency='€'
                         position='right'
-                        placeholder={watch('fixed') ? 'π.χ. 50' : 'Τιμή κρυφή'}
+                        placeholder={fixedValue ? 'π.χ. 50' : 'Τιμή κρυφή'}
                         min={1}
                         max={10000}
                         allowDecimals={false}
                         value={field.value || 0}
                         onValueChange={field.onChange}
-                        disabled={!watch('fixed')}
+                        disabled={!fixedValue}
                       />
                     </div>
                   </FormControl>
@@ -343,50 +350,44 @@ export default function ServiceDetailsStep() {
           <FormField
             control={form.control}
             name='fixed'
-            render={({ field }) => {
-              const handleToggle = async (checked: boolean) => {
-                field.onChange(!checked);
-                if (checked) {
-                  // When switch becomes ON (fixed becomes false), price is not required, set to 0
-                  setValue('price', 0, { shouldValidate: false });
-                  clearErrors('price');
-                } else {
-                  // When switch becomes OFF (fixed becomes true), price is required
-                  clearErrors('price');
-                }
-                await trigger('price');
-              };
-
-              return (
-                <FormItem>
-                  <div className='flex items-center gap-2'>
-                    <label
-                      className={`flex items-center justify-between shadow gap-4 p-3 rounded-lg border transition-colors cursor-pointer hover:border-primary/50 w-[220px] ${!field.value ? 'bg-white shadow-sm' : 'bg-muted/30'}`}
-                    >
-                      <span className='text-sm font-medium cursor-pointer'>
-                        Απόκρυψη τιμής
-                      </span>
-                      <FormControl>
-                        <Switch
-                          checked={!field.value}
-                          onCheckedChange={handleToggle}
-                        />
-                      </FormControl>
-                    </label>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className='h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help flex-shrink-0' />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Ενεργοποίηση για να μην εμφανίζεται τιμή</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                </FormItem>
-              );
-            }}
+            render={({ field }) => (
+              <FormItem>
+                <div className='flex items-center gap-2'>
+                  <label
+                    className={`flex items-center justify-between shadow gap-4 p-3 rounded-lg border transition-colors cursor-pointer hover:border-primary/50 w-[220px] ${!field.value ? 'bg-white shadow-sm' : 'bg-muted/30'}`}
+                  >
+                    <span className='text-sm font-medium cursor-pointer'>
+                      Απόκρυψη τιμής
+                    </span>
+                    <FormControl>
+                      <Switch
+                        checked={!field.value}
+                        onCheckedChange={async (checked) => {
+                          field.onChange(!checked);
+                          if (checked) {
+                            setValue('price', 0, { shouldValidate: false });
+                            clearErrors('price');
+                          } else {
+                            clearErrors('price');
+                          }
+                          await trigger('price');
+                        }}
+                      />
+                    </FormControl>
+                  </label>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className='h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-help flex-shrink-0' />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Ενεργοποίηση για να μην εμφανίζεται τιμή</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              </FormItem>
+            )}
           />
         </div>
 

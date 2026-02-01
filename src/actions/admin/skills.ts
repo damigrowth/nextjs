@@ -2,7 +2,6 @@
 'use server';
 
 import type { DatasetItem } from '@/lib/types/datasets';
-import type { ActionResult } from '@/lib/types/api';
 import { createSkillSchema, updateSkillSchema, deleteSkillSchema } from '@/lib/validations/admin';
 import {
   createItem,
@@ -10,6 +9,12 @@ import {
   deleteItem,
   type TaxonomyConfig,
 } from './taxonomies-shared';
+import type {
+  TaxonomyActionResult,
+  CreateItemResult,
+  UpdateItemResult,
+  DeleteItemResult,
+} from '@/lib/types/taxonomy-operations';
 
 const SKILLS_CONFIG: TaxonomyConfig = {
   type: 'skills',
@@ -31,7 +36,7 @@ export async function createSkill(data: {
   label: string;
   slug: string;
   category?: string;
-}): Promise<ActionResult<{ backupPath: string; id: string }>> {
+}): Promise<TaxonomyActionResult<CreateItemResult>> {
   return createItem(SKILLS_CONFIG, data);
 }
 
@@ -43,14 +48,14 @@ export async function updateSkill(data: {
   label: string;
   slug: string;
   category?: string;
-}): Promise<ActionResult<{ backupPath: string }>> {
+}): Promise<TaxonomyActionResult<UpdateItemResult>> {
   return updateItem(SKILLS_CONFIG, data);
 }
 
 /**
  * Core delete function
  */
-export async function deleteSkill(data: { id: string }): Promise<ActionResult<{ backupPath: string }>> {
+export async function deleteSkill(data: { id: string }): Promise<TaxonomyActionResult<DeleteItemResult>> {
   return deleteItem(SKILLS_CONFIG, data.id);
 }
 

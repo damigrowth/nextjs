@@ -20,18 +20,23 @@ export async function getCurrentBranch(
   octokit: Octokit,
   branch?: string,
 ): Promise<string> {
+  console.log('[GET_CURRENT_BRANCH] START:', new Date().toISOString());
+
   const { owner, repo, defaultBranch } = REPO_CONFIG;
   const targetBranch = branch || defaultBranch;
 
   try {
+    const apiStart = performance.now();
     await octokit.rest.repos.getBranch({
       owner,
       repo,
       branch: targetBranch,
     });
+    console.log('[GET_CURRENT_BRANCH] GitHub API call took:', performance.now() - apiStart, 'ms');
+    console.log('[GET_CURRENT_BRANCH] END:', new Date().toISOString());
     return targetBranch;
   } catch (error) {
-    console.error('[GITHUB] Branch not found:', targetBranch);
+    console.error('[GET_CURRENT_BRANCH] Branch not found:', targetBranch);
     throw new Error(`Branch ${targetBranch} not found`);
   }
 }
@@ -156,18 +161,24 @@ export async function getCommitDiff(
   base: string,
   head: string,
 ): Promise<GitHubCompareResult> {
+  console.log('[GET_COMMIT_DIFF] START:', new Date().toISOString(), `(${base}...${head})`);
+
   const { owner, repo } = REPO_CONFIG;
 
   try {
+    const apiStart = performance.now();
     const { data } = await octokit.rest.repos.compareCommitsWithBasehead({
       owner,
       repo,
       basehead: `${base}...${head}`,
     });
+    console.log('[GET_COMMIT_DIFF] GitHub API call took:', performance.now() - apiStart, 'ms');
+    console.log('[GET_COMMIT_DIFF] Files changed:', data.files?.length || 0);
+    console.log('[GET_COMMIT_DIFF] END:', new Date().toISOString());
 
     return data as GitHubCompareResult;
   } catch (error) {
-    console.error('[GITHUB] Failed to get diff:', error);
+    console.error('[GET_COMMIT_DIFF] Failed to get diff:', error);
     throw new Error('Failed to compare commits');
   }
 }
@@ -271,11 +282,17 @@ export async function getCommitsAhead(
   baseBranch: string,
   headBranch: string,
 ): Promise<GitHubCommit[]> {
+  console.log('[GET_COMMITS_AHEAD] START:', new Date().toISOString(), `(${baseBranch}...${headBranch})`);
+
   try {
+    const diffStart = performance.now();
     const comparison = await getCommitDiff(octokit, baseBranch, headBranch);
+    console.log('[GET_COMMITS_AHEAD] getCommitDiff took:', performance.now() - diffStart, 'ms');
+    console.log('[GET_COMMITS_AHEAD] Commits found:', comparison.commits?.length || 0);
+    console.log('[GET_COMMITS_AHEAD] END:', new Date().toISOString());
     return comparison.commits as GitHubCommit[];
   } catch (error) {
-    console.error('[GITHUB] Failed to get commits ahead:', error);
+    console.error('[GET_COMMITS_AHEAD] Failed to get commits ahead:', error);
     return [];
   }
 }

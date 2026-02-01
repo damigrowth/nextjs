@@ -80,32 +80,38 @@ export async function getSession(
       };
     }
 
-    // Additional validation: check if user exists in database
-    if (session?.user?.id) {
-      try {
-        // console.log(
-        //   'getSession - validating user in database:',
-        //   session.user.id,
-        // );
-        const dbUser = await prisma.user.findUnique({
-          where: { id: session.user.id },
-        });
-
-        // console.log('getSession - database user found:', !!dbUser);
-
-        if (!dbUser) {
-          // User was deleted - sessions already cleaned up by Better Auth's deleteUser
-          // No need to call signOut (would fail with P2025 since sessions are already gone)
-          return {
-            success: false,
-            error: 'User account no longer exists',
-          };
-        }
-      } catch (dbError) {
-        console.error('Database check error:', dbError);
-        // Continue with existing session if DB check fails
-      }
-    }
+    // Database validation REMOVED for performance (ML15-290)
+    // This check was added in ML15-142 but causes severe performance issues (60-73s per call)
+    // due to unstable database connections during Supabase maintenance (Jan 26 - Feb 2, 2026)
+    // and approaching egress quota limits (98% usage).
+    //
+    // Better Auth already handles deleted users properly via:
+    // 1. deleteUser hook cleans up sessions automatically (src/lib/auth/config.ts:200-234)
+    // 2. Session validation returns null user if account deleted
+    // 3. The session.user check above (line 73) catches orphaned sessions
+    //
+    // The database round trip is unnecessary and blocks all admin operations.
+    // If we need deleted user detection in the future, implement it as:
+    // - Background job to clean up orphaned sessions
+    // - Lazy validation on critical operations only
+    // - Cached validation with longer TTL (5-10 minutes)
+    //
+    // ORIGINAL CODE (commented out for reference):
+    // if (session?.user?.id) {
+    //   try {
+    //     const dbUser = await prisma.user.findUnique({
+    //       where: { id: session.user.id },
+    //     });
+    //     if (!dbUser) {
+    //       return {
+    //         success: false,
+    //         error: 'User account no longer exists',
+    //       };
+    //     }
+    //   } catch (dbError) {
+    //     console.error('Database check error:', dbError);
+    //   }
+    // }
 
     return {
       success: true,
@@ -341,28 +347,28 @@ export async function hasAdminRole(): Promise<boolean> {
 }
 
 export async function requireOnboardingComplete(onboardingUrl = '/onboarding') {
-  // Get cached session first
-  let sessionResult = await getSession();
-  
-  if (!sessionResult.success || !sessionResult.data.session) {
+  // Get cached user + profile data together (uses unstable_cache)
+  let userResult = await getCurrentUser();
+
+  if (!userResult.success || !userResult.data.session) {
     redirect('/login');
   }
 
-  let session = sessionResult.data.session;
-  let user = session?.user;
+  let { user, profile, session } = userResult.data;
 
   // Time-based revalidation: revalidate for users created in the last 10 minutes
   // This ensures fresh registrations get updated data while keeping cache benefits for established users
-  const shouldRevalidateByTime = user?.createdAt && 
+  const shouldRevalidateByTime = user?.createdAt &&
     new Date().getTime() - new Date(user.createdAt).getTime() < 10 * 60 * 1000; // 10 minutes
 
   if (shouldRevalidateByTime) {
     console.log('Revalidating session for recently registered user');
-    const freshResult = await getSession({ revalidate: true });
-    
+    const freshResult = await getCurrentUser({ revalidate: true });
+
     if (freshResult.success && freshResult.data.session) {
+      user = freshResult.data.user;
+      profile = freshResult.data.profile;
       session = freshResult.data.session;
-      user = session.user;
     }
   }
 
@@ -389,6 +395,36 @@ export async function requireOnboardingComplete(onboardingUrl = '/onboarding') {
   if (user?.type === 'pro' && user?.step === 'ONBOARDING') {
     console.log('Pro user onboarding required - redirecting to:', onboardingUrl);
     redirect(onboardingUrl);
+  }
+
+  // Check if pro user has completed all required profile fields
+  // Uses already-fetched cached profile data - no extra DB query
+  if (user?.type === 'pro' && user?.step === 'DASHBOARD') {
+    const missingImage = !user.image;
+    const missingCategory = !profile?.category;
+    const missingSubcategory = !profile?.subcategory;
+
+    if (missingImage || missingCategory || missingSubcategory) {
+      console.log('Pro user missing required profile fields - setting step to ONBOARDING');
+
+      // Update step to ONBOARDING so OnboardingGuard will allow access
+      // This prevents infinite redirect loops
+      try {
+        await auth.api.updateUser({
+          headers: await headers(),
+          body: { step: 'ONBOARDING' }
+        });
+      } catch (authError) {
+        console.warn('Failed to update user step via Better Auth, falling back to Prisma:', authError);
+        // Fallback to direct Prisma update if Better Auth fails
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { step: 'ONBOARDING' }
+        });
+      }
+
+      redirect(onboardingUrl);
+    }
   }
 
   return session;

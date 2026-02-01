@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -43,12 +43,20 @@ import { CommitForm } from './commit-form';
 import { GitStatusResponse, RecentCommitsResponse } from '@/lib/types/github';
 import { NextLink } from '@/components';
 
-export function DeploymentManager() {
-  const [gitStatus, setGitStatus] = useState<GitStatusResponse['data']>(null);
+interface DeploymentManagerProps {
+  initialStatus: GitStatusResponse['data'];
+  initialCommits: RecentCommitsResponse['data']['commits'];
+}
+
+export function DeploymentManager({
+  initialStatus,
+  initialCommits,
+}: DeploymentManagerProps) {
+  const [gitStatus, setGitStatus] = useState<GitStatusResponse['data']>(initialStatus);
   const [recentCommits, setRecentCommits] = useState<
     RecentCommitsResponse['data']['commits']
-  >([]);
-  const [loading, setLoading] = useState(true);
+  >(initialCommits);
+  const [loading, setLoading] = useState(false);
   const [committing, setCommitting] = useState(false);
   const [pushing, setPushing] = useState(false);
   const [discarding, setDiscarding] = useState(false);
@@ -81,17 +89,6 @@ export function DeploymentManager() {
       setRecentCommits(result.data.commits || []);
     }
   };
-
-  useEffect(() => {
-    const initLoad = async () => {
-      setLoading(true);
-      await loadGitStatus();
-      await loadRecentCommits();
-      setLoading(false);
-    };
-
-    initLoad();
-  }, []);
 
   const handleCommit = async (message: string) => {
     setCommitting(true);

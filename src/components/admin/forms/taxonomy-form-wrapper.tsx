@@ -68,6 +68,12 @@ export interface TaxonomyFormWrapperProps<TFormData> {
   submitButtonText?: string;
 
   /**
+   * Optional callback after successful submission (before redirect/refresh)
+   * Use this to save drafts to localStorage
+   */
+  onSuccess?: (result: ActionResult) => void;
+
+  /**
    * Render function for form fields
    */
   children: (form: UseFormReturn<TFormData>, isPending: boolean) => ReactNode;
@@ -84,6 +90,7 @@ export function TaxonomyFormWrapper<TFormData extends Record<string, any>>({
   booleanFields,
   layout = 'default',
   submitButtonText,
+  onSuccess,
   children,
 }: TaxonomyFormWrapperProps<TFormData>) {
   const router = useRouter();
@@ -98,6 +105,11 @@ export function TaxonomyFormWrapper<TFormData extends Record<string, any>>({
   // Handle state changes from server action
   useEffect(() => {
     if (state?.success) {
+      // Call onSuccess callback if provided (e.g., to save draft)
+      if (onSuccess) {
+        onSuccess(state);
+      }
+
       toast.success(successMessage);
       if (redirectPath) {
         router.push(redirectPath);
@@ -111,7 +123,7 @@ export function TaxonomyFormWrapper<TFormData extends Record<string, any>>({
     } else if (state?.error) {
       toast.error(state.error);
     }
-  }, [state, router, successMessage, redirectPath, isEdit, form]);
+  }, [state, router, successMessage, redirectPath, isEdit, form, onSuccess]);
 
   const handleFormSubmit = (formData: FormData) => {
     const allValues = form.getValues();

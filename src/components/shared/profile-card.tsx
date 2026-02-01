@@ -64,6 +64,7 @@ export function ProfileCard({ profile, isSaved = false }: ProfileCardProps) {
         <RatingDisplay
           rating={rating}
           reviewCount={reviewCount}
+          variant='compact'
           className='text-2sm'
         />
 
