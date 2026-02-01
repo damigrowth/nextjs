@@ -29,10 +29,11 @@
  * ├── years_of_experience → Profile.experience
  * ├── commencement (int) → Profile.commencement (string)
  * ├── terms → Profile.terms
- * ├── rating (numeric) → Profile.rating (float)
- * ├── reviews_total → Profile.reviewCount
- * ├── rating_stars_1-5 → Profile.stars JSON {1: 5, 2: 10, 3: 15, 4: 20, 5: 50}
- * 
+ * // REVIEWS DISABLED - NOT MIGRATING YET
+ * // ├── rating (numeric) → Profile.rating (float)
+ * // ├── reviews_total → Profile.reviewCount
+ * // ├── rating_stars_1-5 → Profile.stars JSON {1: 5, 2: 10, 3: 15, 4: 20, 5: 50}
+ *
  * ├── freelancers_category_links → Profile.category (proTaxonomies category ID)
  * ├── freelancers_subcategory_links → Profile.subcategory (proTaxonomies subcategory ID)  
  * ├── freelancers_specialization_links → Profile.speciality (single skill ID)
@@ -79,14 +80,15 @@ interface StrapiFreelancer {
   description: string | null;
   rate: number | null;
   terms: string | null;
-  rating: number | null; // numeric type
+  // REVIEWS DISABLED - NOT MIGRATING YET
+  // rating: number | null; // numeric type
   top_level: boolean | null;
-  reviews_total: bigint | null;
-  rating_stars_1: bigint | null;
-  rating_stars_2: bigint | null;
-  rating_stars_3: bigint | null;
-  rating_stars_4: bigint | null;
-  rating_stars_5: bigint | null;
+  // reviews_total: bigint | null;
+  // rating_stars_1: bigint | null;
+  // rating_stars_2: bigint | null;
+  // rating_stars_3: bigint | null;
+  // rating_stars_4: bigint | null;
+  // rating_stars_5: bigint | null;
   verified: boolean | null;
   email: string | null;
   display_name: string | null;
@@ -117,7 +119,7 @@ interface StrapiFreelancerWithType extends StrapiFreelancer {
   specialization_id: string | null; // One skill ID
   size_id: string | null;
   budget_id: string | null;
-  // Array taxonomy fields  
+  // Array taxonomy fields
   skills: string[]; // Array of skill IDs
   contact_methods: string[]; // Array of contact type IDs
   payment_methods: string[]; // Array of payment method IDs
@@ -125,11 +127,13 @@ interface StrapiFreelancerWithType extends StrapiFreelancer {
   industries: string[]; // Array of industry IDs
   // Component data fields
   coverage_data: any | null; // location.coverage component
-  visibility_data: any | null; // global.visibility component  
+  visibility_data: any | null; // global.visibility component
   billing_data: any | null; // pricing.billing-details component
   socials_data: any | null; // socials.list component
   // Image data
   image_data: StrapiFile | null; // Profile image from files table
+  // Status field
+  status_name: string | null; // Status name from statuses table (e.g., "Active")
 }
 
 interface StrapiFile {
@@ -204,31 +208,6 @@ function bigintToString(value: bigint | null): string | null {
   return value.toString();
 }
 
-// Helper function to calculate weighted average rating from star breakdown
-function calculateRating(
-  stars1: bigint | null,
-  stars2: bigint | null,
-  stars3: bigint | null,
-  stars4: bigint | null,
-  stars5: bigint | null,
-): { rating: number; count: number } {
-  const s1 = Number(stars1 || 0);
-  const s2 = Number(stars2 || 0);
-  const s3 = Number(stars3 || 0);
-  const s4 = Number(stars4 || 0);
-  const s5 = Number(stars5 || 0);
-
-  const totalReviews = s1 + s2 + s3 + s4 + s5;
-
-  if (totalReviews === 0) {
-    return { rating: 0, count: 0 };
-  }
-
-  const weightedSum = s1 * 1 + s2 * 2 + s3 * 3 + s4 * 4 + s5 * 5;
-  const rating = weightedSum / totalReviews;
-
-  return { rating: Math.round(rating * 100) / 100, count: totalReviews };
-}
 
 // Helper function to convert commencement number to string
 function convertCommencement(commencement: number | null): string | null {
@@ -652,6 +631,98 @@ async function fetchFreelancerSocials(freelancerIds: number[]): Promise<Map<numb
   }
 }
 
+// Helper function to detect profile data changes
+function hasProfileChanges(existingProfile: any, newData: any): {hasChanges: boolean, changedFields: string[]} {
+  const changedFields: string[] = [];
+
+  // Helper to compare values (handles null/undefined)
+  const isDifferent = (oldVal: any, newVal: any): boolean => {
+    // Normalize null/undefined to null for comparison
+    const normalizedOld = oldVal === undefined ? null : oldVal;
+    const normalizedNew = newVal === undefined ? null : newVal;
+
+    // Handle number comparison with float precision tolerance
+    if (typeof normalizedOld === 'number' && typeof normalizedNew === 'number') {
+      // Use epsilon for float comparison (handles precision differences)
+      return Math.abs(normalizedOld - normalizedNew) > 0.0001;
+    }
+
+    // For objects/arrays, do deep comparison
+    if (typeof normalizedOld === 'object' && typeof normalizedNew === 'object') {
+      // Both null or both arrays/objects
+      if (normalizedOld === null && normalizedNew === null) return false;
+      if (normalizedOld === null || normalizedNew === null) return true;
+
+      // Sort object keys before stringify to ensure consistent comparison
+      const sortKeys = (obj: any): any => {
+        if (Array.isArray(obj)) {
+          return obj.map(sortKeys);
+        }
+        if (obj !== null && typeof obj === 'object') {
+          return Object.keys(obj)
+            .sort()
+            .reduce((sorted: any, key) => {
+              sorted[key] = sortKeys(obj[key]);
+              return sorted;
+            }, {});
+        }
+        return obj;
+      };
+
+      return JSON.stringify(sortKeys(normalizedOld)) !== JSON.stringify(sortKeys(normalizedNew));
+    }
+
+    return normalizedOld !== normalizedNew;
+  };
+
+  // Check each field
+  const fieldsToCheck = [
+    'type', 'username', 'displayName', 'firstName', 'lastName', 'email',
+    'tagline', 'bio', 'website', 'phone', 'viber', 'whatsapp',
+    'rate', 'experience', 'commencement', 'terms',
+    'category', 'subcategory', 'speciality', 'skills',
+    'size', 'budget',
+    'contactMethods', 'paymentMethods', 'settlementMethods', 'industries',
+    'coverage', 'visibility', 'billing', 'socials',
+    'image', 'portfolio',
+    // REVIEWS DISABLED - NOT CHECKING FOR CHANGES
+    // 'rating', 'reviewCount', 'stars',
+    'verified', 'featured', 'top', 'published', 'isActive'
+  ];
+
+  for (const field of fieldsToCheck) {
+    if (isDifferent(existingProfile[field], newData[field])) {
+      changedFields.push(field);
+    }
+  }
+
+  return {
+    hasChanges: changedFields.length > 0,
+    changedFields
+  };
+}
+
+// Helper function to detect user data changes
+function hasUserChanges(existingUser: any, newData: any): {hasChanges: boolean, changedFields: string[]} {
+  const changedFields: string[] = [];
+
+  const fieldsToCheck = ['role', 'type', 'username', 'displayName', 'firstName', 'lastName', 'image'];
+
+  for (const field of fieldsToCheck) {
+    const oldVal = existingUser[field] === undefined ? null : existingUser[field];
+    const newVal = newData[field] === undefined ? null : newData[field];
+
+    if (oldVal !== newVal) {
+      changedFields.push(field);
+    }
+  }
+
+  return {
+    hasChanges: changedFields.length > 0,
+    changedFields
+  };
+}
+
 // Main migration function
 async function migrateProfiles(updateExisting: boolean = false): Promise<MigrationStats> {
   const stats: MigrationStats = {
@@ -698,70 +769,75 @@ async function migrateProfiles(updateExisting: boolean = false): Promise<Migrati
     console.log('📥 Loading all freelancers with taxonomy relationships from Strapi...');
 
     const strapiFreelancers = await sourceDb.$queryRaw<StrapiFreelancerWithType[]>`
-      SELECT 
+      SELECT
         f.*,
         ft.type as freelancer_type,
-        
+        s.type as status_name,
+
         -- Single relationship fields (get IDs directly from link tables)
         cat_link.freelancer_category_id::text as category_id,
-        subcat_link.freelancer_subcategory_id::text as subcategory_id, 
+        subcat_link.freelancer_subcategory_id::text as subcategory_id,
         spec_link.skill_id::text as specialization_id,
         size_link.size_id::text as size_id,
         budget_link.budget_id::text as budget_id,
-        
+
         -- Multiple relationship fields (aggregate as arrays)
         COALESCE(
           array_agg(DISTINCT skills_link.skill_id::text) FILTER (WHERE skills_link.skill_id IS NOT NULL),
           ARRAY[]::text[]
         ) as skills,
-        
+
         COALESCE(
           array_agg(DISTINCT contact_link.contact_type_id::text) FILTER (WHERE contact_link.contact_type_id IS NOT NULL),
           ARRAY[]::text[]
         ) as contact_methods,
-        
+
         COALESCE(
           array_agg(DISTINCT payment_link.payment_method_id::text) FILTER (WHERE payment_link.payment_method_id IS NOT NULL),
           ARRAY[]::text[]
         ) as payment_methods,
-        
+
         COALESCE(
           array_agg(DISTINCT settlement_link.settlement_method_id::text) FILTER (WHERE settlement_link.settlement_method_id IS NOT NULL),
           ARRAY[]::text[]
         ) as settlement_methods,
-        
+
         COALESCE(
           array_agg(DISTINCT industry_link.industry_id::text) FILTER (WHERE industry_link.industry_id IS NOT NULL),
           ARRAY[]::text[]
         ) as industries,
-        
+
         -- Component data (will be fetched separately to avoid JSON GROUP BY issues)
         NULL as coverage_data,
         NULL as visibility_data,
         NULL as billing_data,
         NULL as socials_data
-        
+
       FROM freelancers f
-      
+
       -- Type relationship
       LEFT JOIN freelancers_type_links ftl ON f.id = ftl.freelancer_id
       LEFT JOIN freelancer_types ft ON ftl.freelancer_type_id = ft.id
-      
+
+      -- Status relationship
+      LEFT JOIN freelancers_status_links status_link ON f.id = status_link.freelancer_id
+      LEFT JOIN statuses s ON status_link.status_id = s.id
+
       -- Single taxonomy relationships
       LEFT JOIN freelancers_category_links cat_link ON f.id = cat_link.freelancer_id
       LEFT JOIN freelancers_subcategory_links subcat_link ON f.id = subcat_link.freelancer_id
       LEFT JOIN freelancers_specialization_links spec_link ON f.id = spec_link.freelancer_id
       LEFT JOIN freelancers_size_links size_link ON f.id = size_link.freelancer_id
       LEFT JOIN freelancers_min_budget_links budget_link ON f.id = budget_link.freelancer_id
-      
+
       -- Multiple relationship arrays
       LEFT JOIN skills_freelancers_links skills_link ON f.id = skills_link.freelancer_id
       LEFT JOIN freelancers_contact_types_links contact_link ON f.id = contact_link.freelancer_id
       LEFT JOIN freelancers_payment_methods_links payment_link ON f.id = payment_link.freelancer_id
       LEFT JOIN freelancers_settlement_methods_links settlement_link ON f.id = settlement_link.freelancer_id
       LEFT JOIN freelancers_industries_links industry_link ON f.id = industry_link.freelancer_id
-      
-      GROUP BY f.id, ft.type, cat_link.freelancer_category_id, subcat_link.freelancer_subcategory_id, 
+
+      GROUP BY f.id, ft.type, s.type, cat_link.freelancer_category_id, subcat_link.freelancer_subcategory_id,
                spec_link.skill_id, size_link.size_id, budget_link.budget_id
       ORDER BY f.created_at ASC
     `;
@@ -918,49 +994,68 @@ async function migrateProfiles(updateExisting: boolean = false): Promise<Migrati
 
         // Handle type="user" freelancers (no profile, just user update)
         if (!shouldCreateProfile) {
-          await targetDb.user.update({
-            where: { id: migratedUser.id },
-            data: { 
-              role: 'user', 
-              type: 'user',
-              // Sync shared fields if different
-              username: freelancer.username || undefined,
-              displayName: freelancer.display_name || undefined,
-              firstName: freelancer.first_name || undefined,
-              lastName: freelancer.last_name || undefined
-            }
+          // Fetch existing user to check for changes
+          const existingUser = await targetDb.user.findUnique({
+            where: { id: migratedUser.id }
           });
-          
-          stats.userOnlyUpdates++;
-          stats.usersUpdated++;
-          console.log(`✅ ${progress} Updated user only (type="${freelancerType}" → no profile)`);
+
+          if (!existingUser) {
+            console.error(`❌ ${progress} User not found: ${migratedUser.id}`);
+            continue;
+          }
+
+          // Prepare user update data
+          const userOnlyUpdates: any = {
+            role: 'user',
+            type: 'user',
+            username: freelancer.username ?? null,
+            displayName: freelancer.display_name ?? null,
+            firstName: freelancer.first_name ?? null,
+            lastName: freelancer.last_name ?? null
+          };
+
+          // Check for changes
+          const userCheck = hasUserChanges(existingUser, userOnlyUpdates);
+
+          if (userCheck.hasChanges && updateExisting) {
+            await targetDb.user.update({
+              where: { id: migratedUser.id },
+              data: userOnlyUpdates
+            });
+
+            stats.userOnlyUpdates++;
+            stats.usersUpdated++;
+            console.log(`✅ ${progress} Updated user only (type="${freelancerType}") with changes (${userCheck.changedFields.join(', ')}): ${originalUser.email}`);
+          } else {
+            stats.profilesSkipped++;
+            stats.warnings.push(`User ${originalUser.email}: No changes detected (type="${freelancerType}")`);
+            console.log(`⚠️ ${progress} User-only SKIPPED - No changes (type="${freelancerType}")`);
+          }
           continue;
         }
 
-        // Calculate rating from star breakdown
-        const ratingData = calculateRating(
-          freelancer.rating_stars_1,
-          freelancer.rating_stars_2,
-          freelancer.rating_stars_3,
-          freelancer.rating_stars_4,
-          freelancer.rating_stars_5,
-        );
-
-        // Use star breakdown rating if available, otherwise use direct rating
-        const finalRating =
-          ratingData.count > 0 ? ratingData.rating : freelancer.rating || 0;
-        const reviewCount =
-          ratingData.count > 0
-            ? ratingData.count
-            : Number(freelancer.reviews_total || 0);
+        // REVIEWS DISABLED - SET DEFAULT VALUES (NOT MIGRATING REVIEWS YET)
+        // Use Strapi's stored rating and review count directly
+        // Note: Strapi stores these as separate number fields, no need to recalculate
+        // const finalRating = Number(freelancer.rating || 0);
+        // const reviewCount = Number(freelancer.reviews_total || 0);
+        const finalRating = 0;
+        const reviewCount = 0;
 
         // Create stars breakdown JSON
+        // const starsBreakdown = {
+        //   1: Number(freelancer.rating_stars_1 || 0),
+        //   2: Number(freelancer.rating_stars_2 || 0),
+        //   3: Number(freelancer.rating_stars_3 || 0),
+        //   4: Number(freelancer.rating_stars_4 || 0),
+        //   5: Number(freelancer.rating_stars_5 || 0)
+        // };
         const starsBreakdown = {
-          1: Number(freelancer.rating_stars_1 || 0),
-          2: Number(freelancer.rating_stars_2 || 0),
-          3: Number(freelancer.rating_stars_3 || 0),
-          4: Number(freelancer.rating_stars_4 || 0),
-          5: Number(freelancer.rating_stars_5 || 0)
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
         };
 
         // Get component data for this freelancer
@@ -991,7 +1086,7 @@ async function migrateProfiles(updateExisting: boolean = false): Promise<Migrati
 
         // Get and convert image data for this freelancer
         const rawImageData = imageMap.get(freelancer.id);
-        const imageData = extractImageUrl(rawImageData);
+        const imageData = extractImageUrl(rawImageData || null);
         
         // Get portfolio data for this freelancer
         const portfolioData = portfolioMap.get(freelancer.id) || [];
@@ -1052,7 +1147,7 @@ async function migrateProfiles(updateExisting: boolean = false): Promise<Migrati
           featured: freelancer.featured || false,
           top: freelancer.top_level || false,
           published: freelancer.published_at !== null,
-          isActive: true,
+          isActive: freelancer.status_name === 'Active',
 
           // Timestamps
           createdAt: freelancer.created_at || new Date(),
@@ -1068,109 +1163,141 @@ async function migrateProfiles(updateExisting: boolean = false): Promise<Migrati
 
         // Sync shared fields between User and Profile
         // Always update these fields to keep User and Profile in sync
-        if (freelancer.username) {
-          userUpdates.username = freelancer.username;
-        }
-        if (freelancer.display_name) {
-          userUpdates.displayName = freelancer.display_name;
-        }
-        if (freelancer.first_name) {
-          userUpdates.firstName = freelancer.first_name;
-        }
-        if (freelancer.last_name) {
-          userUpdates.lastName = freelancer.last_name;
-        }
+        userUpdates.username = freelancer.username ?? null;
+        userUpdates.displayName = freelancer.display_name ?? null;
+        userUpdates.firstName = freelancer.first_name ?? null;
+        userUpdates.lastName = freelancer.last_name ?? null;
         // Sync image field - ensure User.image matches Profile.image
         if (imageData) {
           userUpdates.image = imageData;
         }
 
+        // Handle potential duplicate username before update
+        if (userUpdates.username) {
+          const existingUsername = await targetDb.user.findFirst({
+            where: {
+              username: userUpdates.username,
+              NOT: { id: migratedUser.id } // Exclude current user
+            }
+          });
+
+          if (existingUsername) {
+            // Make username unique by appending email local part
+            const emailLocal = originalUser.email.split('@')[0];
+            userUpdates.username = `${userUpdates.username}_${emailLocal}`;
+            stats.warnings.push(`User ${originalUser.email}: Username conflict, using ${userUpdates.username}`);
+          }
+        }
+
         // Create or update profile and update user in transaction
+        let profileHasChanges = false;
+        let userHasChanges = false;
+        let profileCheck = { hasChanges: false, changedFields: [] as string[] };
+        let userCheck = { hasChanges: false, changedFields: [] as string[] };
+
         await targetDb.$transaction(async (tx) => {
           if (migratedUser.hasProfile && updateExisting) {
-            // Update existing profile
-            await tx.profile.update({
-              where: { uid: migratedUser.id },
-              data: {
-                // Update all fields except uid and createdAt
-                type: profileData.type,
-                username: profileData.username,
-                displayName: profileData.displayName,
-                firstName: profileData.firstName,
-                lastName: profileData.lastName,
-                email: profileData.email,
-                tagline: profileData.tagline,
-                bio: profileData.bio,
-                website: profileData.website,
-                phone: profileData.phone,
-                viber: profileData.viber,
-                whatsapp: profileData.whatsapp,
-                rate: profileData.rate,
-                experience: profileData.experience,
-                commencement: profileData.commencement,
-                terms: profileData.terms,
-                category: profileData.category,
-                subcategory: profileData.subcategory,
-                speciality: profileData.speciality,
-                skills: profileData.skills,
-                size: profileData.size,
-                budget: profileData.budget,
-                contactMethods: profileData.contactMethods,
-                paymentMethods: profileData.paymentMethods,
-                settlementMethods: profileData.settlementMethods,
-                industries: profileData.industries,
-                coverage: profileData.coverage,
-                visibility: profileData.visibility,
-                billing: profileData.billing,
-                socials: profileData.socials,
-                image: profileData.image,
-                portfolio: profileData.portfolio,
-                rating: profileData.rating,
-                reviewCount: profileData.reviewCount,
-                stars: profileData.stars,
-                verified: profileData.verified,
-                featured: profileData.featured,
-                top: profileData.top,
-                published: profileData.published,
-                isActive: profileData.isActive,
-                updatedAt: new Date(),
-              },
+            // Fetch existing profile and user to check for changes
+            const existingProfile = await tx.profile.findUnique({
+              where: { uid: migratedUser.id }
             });
+
+            const existingUser = await tx.user.findUnique({
+              where: { id: migratedUser.id }
+            });
+
+            if (!existingProfile || !existingUser) {
+              throw new Error(`Profile or User not found for uid: ${migratedUser.id}`);
+            }
+
+            // Check for profile changes
+            profileCheck = hasProfileChanges(existingProfile, profileData);
+            profileHasChanges = profileCheck.hasChanges;
+
+            // Check for user changes
+            userCheck = hasUserChanges(existingUser, userUpdates);
+            userHasChanges = userCheck.hasChanges;
+
+            // Only update if there are changes
+            if (profileHasChanges) {
+              // Note: updatedAt is auto-updated by Prisma @updatedAt decorator
+              await tx.profile.update({
+                where: { uid: migratedUser.id },
+                data: {
+                  ...profileData,
+                  uid: undefined, // Remove uid from update
+                  createdAt: undefined, // Don't update createdAt
+                  updatedAt: undefined, // Let Prisma auto-update this
+                },
+              });
+            }
+
+            if (userHasChanges) {
+              await tx.user.update({
+                where: { id: migratedUser.id },
+                data: userUpdates,
+              });
+            }
           } else {
             // Create new profile
             await tx.profile.create({
               data: profileData,
             });
-          }
 
-          // Update user
-          await tx.user.update({
-            where: { id: migratedUser.id },
-            data: userUpdates,
-          });
+            // Update user (always update for new profiles)
+            await tx.user.update({
+              where: { id: migratedUser.id },
+              data: userUpdates,
+            });
+
+            profileHasChanges = true;
+            userHasChanges = true;
+          }
         });
 
         const isUpdate = migratedUser.hasProfile && updateExisting;
-        
+
         if (isUpdate) {
-          stats.profilesUpdated++;
-          console.log(
-            `✅ ${progress} ${freelancerType.toUpperCase()} profile UPDATED (Rating: ${finalRating}, Reviews: ${reviewCount})`,
-          );
+          // Only count as updated if there were actual changes
+          if (profileHasChanges || userHasChanges) {
+            if (profileHasChanges) {
+              stats.profilesUpdated++;
+            }
+            if (userHasChanges) {
+              stats.usersUpdated++;
+            }
+            const changedFieldsMsg = [];
+            if (profileHasChanges) {
+              changedFieldsMsg.push(`Profile[${profileCheck.changedFields.join(', ')}]`);
+            }
+            if (userHasChanges) {
+              changedFieldsMsg.push(`User[${userCheck.changedFields.join(', ')}]`);
+            }
+            console.log(
+              `✅ ${progress} ${freelancerType.toUpperCase()} profile UPDATED with changes ${changedFieldsMsg.join(' ')}: ${originalUser.email}`,
+            );
+          } else {
+            stats.profilesSkipped++;
+            stats.warnings.push(`User ${originalUser.email}: No changes detected`);
+            console.log(
+              `⚠️ ${progress} ${freelancerType.toUpperCase()} profile SKIPPED - No changes`,
+            );
+          }
         } else {
           stats.profilesCreated++;
+          stats.usersUpdated++;
           console.log(
-            `✅ ${progress} ${freelancerType.toUpperCase()} profile CREATED (Rating: ${finalRating}, Reviews: ${reviewCount})`,
+            `✅ ${progress} ${freelancerType.toUpperCase()} profile CREATED (Reviews: disabled)`,
           );
         }
-        
-        stats.usersUpdated++;
-        
-        // Track by type
-        if (freelancerType === 'freelancer') {
-          stats.freelancerProfiles++;
-        } else if (freelancerType === 'company') {
-          stats.companyProfiles++;
+
+        // Track by type (only if profile was created or updated)
+        if (!isUpdate || profileHasChanges) {
+          if (freelancerType === 'freelancer') {
+            stats.freelancerProfiles++;
+          } else if (freelancerType === 'company') {
+            stats.companyProfiles++;
+          }
         }
       } catch (error) {
         const errorMsg = `Freelancer ${freelancer.id}: ${error instanceof Error ? error.message : 'Unknown error'}`;
@@ -1300,9 +1427,11 @@ async function testProfileData(email: string): Promise<boolean> {
     console.log(`  - ID: ${user.profile.id}`);
     console.log(`  - Type: ${user.profile.type}`);
     console.log(`  - Tagline: ${user.profile.tagline || 'N/A'}`);
-    console.log(
-      `  - Rating: ${user.profile.rating}/5 (${user.profile.reviewCount} reviews)`,
-    );
+    // REVIEWS DISABLED
+    // console.log(
+    //   `  - Rating: ${user.profile.rating}/5 (${user.profile.reviewCount} reviews)`,
+    // );
+    console.log(`  - Rating: 0/5 (0 reviews) - Reviews disabled`);
     console.log(`  - Experience: ${user.profile.experience || 'N/A'} years`);
     console.log(`  - Rate: €${user.profile.rate || 'N/A'}`);
     console.log(`  - Phone: ${user.profile.phone || 'N/A'}`);
@@ -1332,13 +1461,15 @@ async function testProfileData(email: string): Promise<boolean> {
     console.log(`  - Settlement Methods (${(user.profile.settlementMethods as string[])?.length || 0}): ${(user.profile.settlementMethods as string[])?.join(', ') || 'N/A'}`);
     console.log(`  - Industries (${(user.profile.industries as string[])?.length || 0}): ${(user.profile.industries as string[])?.join(', ') || 'N/A'}`);
     
-    console.log('\n⭐ RATING BREAKDOWN:');
-    if (user.profile.stars) {
-      const stars = user.profile.stars as any;
-      console.log(`  - 1★: ${stars['1'] || 0} | 2★: ${stars['2'] || 0} | 3★: ${stars['3'] || 0} | 4★: ${stars['4'] || 0} | 5★: ${stars['5'] || 0}`);
-    } else {
-      console.log(`  - No star breakdown available`);
-    }
+    // REVIEWS DISABLED
+    // console.log('\n⭐ RATING BREAKDOWN:');
+    // if (user.profile.stars) {
+    //   const stars = user.profile.stars as any;
+    //   console.log(`  - 1★: ${stars['1'] || 0} | 2★: ${stars['2'] || 0} | 3★: ${stars['3'] || 0} | 4★: ${stars['4'] || 0} | 5★: ${stars['5'] || 0}`);
+    // } else {
+    //   console.log(`  - No star breakdown available`);
+    // }
+    console.log('\n⭐ RATING BREAKDOWN: Reviews disabled - all set to 0');
 
     return true;
   } catch (error) {
@@ -1373,12 +1504,12 @@ async function analyzeProfileMigration(): Promise<void> {
     });
 
     const profilesWithImages = await targetDb.profile.count({
-      where: { 
-        type: 'freelancer', 
-        image: { 
-          not: null,
-          not: '' // Also exclude empty strings
-        } 
+      where: {
+        type: 'freelancer',
+        AND: [
+          { image: { not: null } },
+          { image: { not: '' } }
+        ]
       },
     });
 
@@ -1462,11 +1593,15 @@ async function main() {
     return;
   }
 
-  // Check for update flag
-  const shouldUpdateExisting = args.includes('--update-existing');
-  
+  // Default to update mode (always check for changes and update if needed)
+  // Use --create-only flag to skip updates
+  const createOnly = args.includes('--create-only');
+  const shouldUpdateExisting = !createOnly; // Update by default
+
   if (shouldUpdateExisting) {
-    console.log('🔄 Running migration with --update-existing flag: Will update existing profiles');
+    console.log('🔄 UPDATE MODE - Existing records will be updated if changes detected\n');
+  } else {
+    console.log('📝 CREATE ONLY MODE - Existing records will be skipped\n');
   }
 
   // Run the migration
