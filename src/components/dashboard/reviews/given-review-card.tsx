@@ -1,9 +1,7 @@
 'use client';
 
-import { NextLink } from '@/components';
-import UserAvatar from '@/components/shared/user-avatar';
-import { getTimeAgo } from '@/lib/utils/date';
-import { ReviewStars } from '@/components/review';
+import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { formatDate } from '@/lib/utils/formatting/date';
 import type { DashboardReviewCardData } from '@/lib/types/reviews';
 
 interface GivenReviewCardProps {
@@ -15,72 +13,50 @@ export function GivenReviewCard({ review }: GivenReviewCardProps) {
 
   if (!displayPerson) return null;
 
-  return (
-    <div className='flex gap-4 pb-6 mb-6 border-b last:border-b-0 last:pb-0 last:mb-0'>
-      {/* Avatar */}
-      <NextLink
-        href={`/profile/${displayPerson.username}`}
-        className='flex-shrink-0'
-      >
-        <UserAvatar
-          displayName={displayPerson.displayName || ''}
-          image={displayPerson.image || null}
-          size='md'
-          className='h-14 w-14'
-        />
-      </NextLink>
+  const { formattedDate } = formatDate(review.createdAt, 'dd/MM/yyyy');
+  const isPositive = review.rating === 5;
 
-      {/* Content */}
-      <div className='flex-1 space-y-2 min-w-0'>
-        {/* Name and Service */}
-        <div className='flex items-start justify-between gap-2'>
-          <div className='flex-1 min-w-0'>
-            <NextLink
-              href={`/profile/${displayPerson.username}`}
-              className='hover:text-third transition-colors'
-            >
-              <h6 className='font-semibold text-base mb-1'>
-                {displayPerson.displayName}
-              </h6>
-            </NextLink>
-            {review.service && (
-              <NextLink
-                href={`/service/${review.service.slug}`}
-                className='text-sm text-muted-foreground hover:text-third transition-colors'
-              >
-                {review.service.title}
-              </NextLink>
+  return (
+    <div className='flex flex-col gap-3 pb-6 mb-6 border-b last:border-b-0 last:pb-0 last:mb-0'>
+      {/* 1. Comment with icon - FIRST */}
+      {review.comment && (
+        <div className='flex items-start gap-3'>
+          <div className='shrink-0 mt-0.5'>
+            {isPositive ? (
+              <ThumbsUp className='h-5 w-5 text-green-600' />
+            ) : (
+              <ThumbsDown className='h-5 w-5 text-red-600' />
             )}
           </div>
-        </div>
-
-        {/* Rating and Status */}
-        <div className='flex items-center gap-3 flex-wrap'>
-          <div className='flex items-center gap-1'>
-            <ReviewStars rating={review.rating} size='sm' />
-            <span className='text-sm text-muted-foreground ml-2'>
-              {getTimeAgo(new Date(review.createdAt))}
-            </span>
-          </div>
-
-          {/* Status Badges */}
-          {review.status === 'pending' && (
-            <span className='text-xs px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full'>
-              Σε αναμονή έγκρισης
-            </span>
-          )}
-          {review.status === 'rejected' && (
-            <span className='text-xs px-2 py-0.5 bg-red-100 text-red-800 rounded-full'>
-              Απορρίφθηκε
-            </span>
-          )}
-        </div>
-
-        {/* Comment */}
-        {review.comment && (
-          <p className='text-sm text-gray-700 leading-relaxed'>
+          <p className='text-base font-semibold text-gray-900 leading-relaxed flex-1'>
             {review.comment}
           </p>
+        </div>
+      )}
+
+      {/* 2. To: name - date */}
+      <div className='text-sm text-muted-foreground'>
+        Προς: <span className='font-medium'>{displayPerson.displayName}</span> - ({formattedDate})
+      </div>
+
+      {/* 3. Service */}
+      {review.service && (
+        <div className='text-sm text-muted-foreground'>
+          Υπηρεσία: <span className='font-medium'>{review.service.title}</span>
+        </div>
+      )}
+
+      {/* 4. Status badges */}
+      <div className='flex items-center gap-2'>
+        {review.status === 'pending' && (
+          <span className='text-xs px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full'>
+            Σε αναμονή έγκρισης
+          </span>
+        )}
+        {review.status === 'rejected' && (
+          <span className='text-xs px-2 py-0.5 bg-red-100 text-red-800 rounded-full'>
+            Απορρίφθηκε
+          </span>
         )}
       </div>
     </div>

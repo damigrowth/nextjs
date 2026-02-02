@@ -168,8 +168,8 @@ export function ReviewForm({
 
       {/* Like/Unlike Buttons - Boss requirement */}
       <div className='space-y-3'>
-        <Label className='text-base font-semibold'>Η γνώμη σου</Label>
-        <div className='flex gap-4'>
+        <Label className='text-base font-semibold'>Θα σύστηνες την υπηρεσία και σε άλλους;</Label>
+        <div className='flex flex-col sm:flex-row gap-4'>
           <Button
             type='button'
             variant={rating === 5 ? 'default' : 'outline'}
@@ -182,7 +182,7 @@ export function ReviewForm({
             className='flex-1'
           >
             <ThumbsUp className='mr-2 h-5 w-5' />
-            Μου αρέσει
+            Ναι
           </Button>
 
           <Button
@@ -197,7 +197,7 @@ export function ReviewForm({
             className='flex-1'
           >
             <ThumbsDown className='mr-2 h-5 w-5' />
-            Δεν μου αρέσει
+            Όχι
           </Button>
         </div>
       </div>

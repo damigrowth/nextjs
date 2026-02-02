@@ -1,14 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
-import { NextLink } from '@/components';
-import UserAvatar from '@/components/shared/user-avatar';
-import { getTimeAgo } from '@/lib/utils/date';
+import { Eye, EyeOff, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { formatDate } from '@/lib/utils/formatting/date';
 import { Button } from '@/components/ui/button';
 import { toggleReviewVisibility } from '@/actions/reviews';
 import { toast } from 'sonner';
-import { ReviewStars } from '@/components/review';
 import type { DashboardReviewCardData } from '@/lib/types/reviews';
 
 interface DashboardReviewCardProps {
@@ -52,80 +49,65 @@ export function DashboardReviewCard({
     }
   };
 
-  return (
-    <div className='flex gap-4 pb-6 mb-6 border-b last:border-b-0 last:pb-0 last:mb-0'>
-      {/* Avatar */}
-      <NextLink
-        href={`/profile/${displayPerson.username}`}
-        className='flex-shrink-0'
-      >
-        <UserAvatar
-          displayName={displayPerson.displayName || ''}
-          image={displayPerson.image || null}
-          size='md'
-          className='h-14 w-14'
-        />
-      </NextLink>
+  const { formattedDate } = formatDate(review.createdAt, 'dd/MM/yyyy');
+  const isPositive = review.rating === 5;
 
-      {/* Content */}
-      <div className='flex-1 space-y-2 min-w-0'>
-        {/* Name and Service */}
-        <div className='flex items-start justify-between gap-2'>
-          <div className='flex-1 min-w-0'>
-            <NextLink
-              href={`/profile/${displayPerson.username}`}
-              className='hover:text-third transition-colors'
-            >
-              <h6 className='font-semibold text-base mb-1'>
-                {displayPerson.displayName}
-              </h6>
-            </NextLink>
-            {review.service && (
-              <NextLink
-                href={`/s/${review.service.slug}`}
-                className='hover:text-third transition-colors'
-              >
-                <span className='text-sm text-muted-foreground line-clamp-1'>
-                  {review.service.title}
-                </span>
-              </NextLink>
+  return (
+    <div className='flex flex-col gap-3 pb-6 mb-6 border-b last:border-b-0 last:pb-0 last:mb-0'>
+      {/* Comment with icon - FIRST */}
+      {review.comment && (
+        <div className='flex items-start gap-3'>
+          <div className='shrink-0 mt-0.5'>
+            {isPositive ? (
+              <ThumbsUp className='h-5 w-5 text-green-600' />
+            ) : (
+              <ThumbsDown className='h-5 w-5 text-red-600' />
             )}
           </div>
-
-          {/* Visibility Toggle Button */}
-          {showVisibilityToggle && review.status === 'approved' && (
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={handleToggleVisibility}
-              disabled={isToggling}
-              className='flex-shrink-0'
-              title={isPublished ? 'Απόκρυψη αξιολόγησης' : 'Εμφάνιση αξιολόγησης'}
-            >
-              {isPublished ? (
-                <>
-                  <Eye className='h-4 w-4 mr-1' />
-                  Ορατή
-                </>
-              ) : (
-                <>
-                  <EyeOff className='h-4 w-4 mr-1' />
-                  Κρυφή
-                </>
-              )}
-            </Button>
-          )}
+          <p className='text-base font-semibold text-gray-900 leading-relaxed flex-1'>
+            {review.comment}
+          </p>
         </div>
+      )}
 
-        {/* Rating + Time + Status */}
-        <div className='flex items-center gap-4 text-sm flex-wrap'>
-          <div className='flex items-center gap-1.5'>
-            <ReviewStars rating={review.rating} size='sm' />
-            <span className='font-medium'>{review.rating}</span>
-          </div>
-          <span className='text-muted-foreground'>
-            {getTimeAgo(review.createdAt)}
-          </span>
+      {/* From: name - date */}
+      <div className='text-sm text-muted-foreground'>
+        Από: <span className='font-medium'>{displayPerson.displayName}</span> - ({formattedDate})
+      </div>
+
+      {/* Service */}
+      {review.service && (
+        <div className='text-sm text-muted-foreground'>
+          Υπηρεσία: <span className='font-medium'>{review.service.title}</span>
+        </div>
+      )}
+
+      {/* Visibility Toggle Button */}
+      <div className='flex items-center justify-between'>
+        {showVisibilityToggle && review.status === 'approved' && (
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={handleToggleVisibility}
+            disabled={isToggling}
+            title='Εμφάνιση σχολίου'
+          >
+            {isPublished ? (
+              <>
+                <Eye className='h-4 w-4 mr-1' />
+                Εμφάνιση σχολίου
+              </>
+            ) : (
+              <>
+                <EyeOff className='h-4 w-4 mr-1' />
+                Εμφάνιση σχολίου
+              </>
+            )}
+          </Button>
+        )}
+
+        {/* Status badges */}
+        <div className='flex items-center gap-2'>
           {review.status === 'pending' && (
             <span className='text-xs px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full'>
               Σε αναμονή έγκρισης
@@ -137,13 +119,6 @@ export function DashboardReviewCard({
             </span>
           )}
         </div>
-
-        {/* Comment */}
-        {review.comment && (
-          <p className='text-sm text-muted-foreground leading-relaxed'>
-            {review.comment}
-          </p>
-        )}
       </div>
     </div>
   );
