@@ -14,16 +14,23 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { getDrafts, getDraftSummary, clearDrafts } from '@/lib/taxonomy-drafts';
 import { publishAllChanges } from '@/actions/admin/taxonomy-publish';
-import type { DraftSummary, PublishErrorCode } from '@/lib/types/taxonomy-operations';
+import type { DraftSummary, PublishErrorCode, TaxonomyDraft } from '@/lib/types/taxonomy-operations';
 import { toast } from 'sonner';
 import { Rocket, Trash2 } from 'lucide-react';
+import { PendingChangesList } from './pending-changes-list';
+import { ConfirmPublishDialog } from './confirm-publish-dialog';
+import { ConfirmDiscardDialog } from './confirm-discard-dialog';
 
 export function DraftPublishCard() {
   const [summary, setSummary] = useState<DraftSummary | null>(null);
+  const [drafts, setDrafts] = useState<TaxonomyDraft[]>([]);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const [showDiscardDialog, setShowDiscardDialog] = useState(false);
 
   const refreshSummary = () => {
     setSummary(getDraftSummary());
+    setDrafts(getDrafts());
   };
 
   useEffect(() => {
@@ -43,26 +50,23 @@ export function DraftPublishCard() {
     };
   }, []);
 
-  const handlePublish = async () => {
+  const handlePublishClick = () => {
     if (!summary || summary.total === 0) {
       toast.error('No changes to publish');
       return;
     }
+    setShowPublishDialog(true);
+  };
 
-    const confirmed = confirm(
-      `Publish ${summary.total} change${summary.total > 1 ? 's' : ''} to Git?\n\nThis will commit directly to the main branch.`
-    );
-
-    if (!confirmed) return;
-
+  const handlePublishConfirm = async () => {
     setIsPublishing(true);
 
     try {
       // Get all drafts from localStorage
-      const drafts = getDrafts();
+      const currentDrafts = getDrafts();
 
       // Call server action
-      const result = await publishAllChanges(drafts);
+      const result = await publishAllChanges(currentDrafts);
 
       if (result.success) {
         // Clear localStorage
@@ -110,18 +114,15 @@ export function DraftPublishCard() {
     }
   };
 
-  const handleDiscard = () => {
+  const handleDiscardClick = () => {
     if (!summary || summary.total === 0) {
       toast.error('No changes to discard');
       return;
     }
+    setShowDiscardDialog(true);
+  };
 
-    const confirmed = confirm(
-      `Discard ${summary.total} unpublished change${summary.total > 1 ? 's' : ''}?\n\nThis action cannot be undone.`
-    );
-
-    if (!confirmed) return;
-
+  const handleDiscardConfirm = () => {
     clearDrafts();
     refreshSummary();
     toast.success('All drafts discarded');
@@ -159,9 +160,13 @@ export function DraftPublishCard() {
           </Alert>
         ) : (
           <>
-            <div className="flex gap-2">
+            {/* Pending changes list */}
+            <PendingChangesList drafts={drafts} />
+
+            {/* Action buttons */}
+            <div className="flex gap-2 pt-2">
               <Button
-                onClick={handlePublish}
+                onClick={handlePublishClick}
                 disabled={isPublishing}
                 size="lg"
                 className="gap-2 flex-1"
@@ -171,7 +176,7 @@ export function DraftPublishCard() {
               </Button>
 
               <Button
-                onClick={handleDiscard}
+                onClick={handleDiscardClick}
                 disabled={isPublishing}
                 variant="destructive"
                 size="lg"
@@ -184,6 +189,22 @@ export function DraftPublishCard() {
           </>
         )}
       </CardContent>
+
+      {/* Confirmation dialogs */}
+      <ConfirmPublishDialog
+        open={showPublishDialog}
+        onOpenChange={setShowPublishDialog}
+        onConfirm={handlePublishConfirm}
+        changeCount={totalDrafts}
+        isPublishing={isPublishing}
+      />
+
+      <ConfirmDiscardDialog
+        open={showDiscardDialog}
+        onOpenChange={setShowDiscardDialog}
+        onConfirm={handleDiscardConfirm}
+        changeCount={totalDrafts}
+      />
     </Card>
   );
 }
