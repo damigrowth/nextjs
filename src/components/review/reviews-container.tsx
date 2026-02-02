@@ -43,7 +43,7 @@ export function ReviewsContainer({
   const hasAnyReviews = hasPublishedReviews || hasOtherReviews;
 
   return (
-    <section>
+    <section id="reviews">
       <h4 className='font-semibold text-lg text-foreground mb-5'>
         Αξιολογήσεις
       </h4>

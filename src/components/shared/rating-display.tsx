@@ -26,6 +26,8 @@ export interface RatingDisplayProps {
   className?: string;
   /** Show empty state when no reviews */
   showEmpty?: boolean;
+  /** Link href for clickable rating (e.g., #reviews) */
+  href?: string;
 }
 
 const sizeClasses = {
@@ -61,8 +63,8 @@ const defaultReviewCountFormatter = (
   if (variant === 'compact') {
     return `(${count})`;
   }
-  // For full variant: "αστέρια από X χρήστες"
-  return `αστέρια από ${count} ${count === 1 ? 'χρήστη' : 'χρήστες'}`;
+  // For full variant: "X αξιολογήσεις"
+  return `${count} ${count === 1 ? 'αξιολόγηση' : 'αξιολογήσεις'}`;
 };
 
 export default function RatingDisplay({
@@ -75,6 +77,7 @@ export default function RatingDisplay({
   reviewCountFormatter,
   className = 'text-sm',
   showEmpty = false,
+  href,
 }: RatingDisplayProps) {
   const starSize = sizeClasses[size];
 
@@ -93,7 +96,7 @@ export default function RatingDisplay({
     return 0; // Empty
   };
 
-  return (
+  const content = (
     <div className={clsx('flex items-center gap-2', className)}>
       {/* 5 Stars with progressive fill (Skroutz-style) */}
       {variant === 'compact' ? (
@@ -177,4 +180,15 @@ export default function RatingDisplay({
       )}
     </div>
   );
+
+  // Wrap in link if href is provided
+  if (href) {
+    return (
+      <a href={href} className='hover:opacity-80 transition-opacity'>
+        {content}
+      </a>
+    );
+  }
+
+  return content;
 }

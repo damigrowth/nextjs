@@ -31,10 +31,7 @@ export function ReviewCard({ review, showService = false }: ReviewCardProps) {
       <div className='py-6'>
         {/* Author Info */}
         <div className='flex items-start gap-4'>
-          <Link
-            href={`/profile/${review.author.username}`}
-            className='shrink-0'
-          >
+          <div className='shrink-0'>
             <Avatar className='h-12 w-12'>
               <AvatarImage
                 src={review.author.image || ''}
@@ -42,17 +39,14 @@ export function ReviewCard({ review, showService = false }: ReviewCardProps) {
               />
               <AvatarFallback>{authorInitials}</AvatarFallback>
             </Avatar>
-          </Link>
+          </div>
 
           <div className='flex-1 min-w-0'>
             {/* Author Name */}
             <div className='mb-2'>
-              <Link
-                href={`/profile/${review.author.username}`}
-                className='font-semibold text-gray-900 hover:text-primary transition-colors'
-              >
+              <span className='font-semibold text-gray-900'>
                 {authorDisplayName}
-              </Link>
+              </span>
               {showService && review.service && (
                 <Link
                   href={`/s/${review.service.slug}`}

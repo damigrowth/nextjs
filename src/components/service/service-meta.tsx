@@ -69,6 +69,7 @@ export default function ServiceMeta({
             showRating={true}
             showReviewCount={true}
             className='ml-auto sm:ml-0'
+            href='#reviews'
           />
         </div>
       </div>
