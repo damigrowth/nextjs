@@ -1,4 +1,4 @@
-// Generated on 2026-02-02T13:55:46.506Z
+// Generated on 2026-02-02T14:24:30.576Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const proTaxonomies = [
@@ -1547,6 +1547,14 @@ export const proTaxonomies = [
         label: 'Google Cloud Engineer',
         slug: 'google-cloud-engineers',
         plural: 'Google Cloud Engineers',
+        description: '',
+        type: 'freelancer',
+      },
+      {
+        id: 'Qs6SS_',
+        label: 'Aws Engineer',
+        slug: 'aws-engineers',
+        plural: 'Aws Engineers ',
         description: '',
         type: 'freelancer',
       },

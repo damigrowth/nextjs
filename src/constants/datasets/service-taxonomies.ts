@@ -1,4 +1,4 @@
-// Generated on 2026-02-02T13:55:42.793Z
+// Generated on 2026-02-02T14:24:30.576Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -6550,6 +6550,11 @@ export const serviceTaxonomies = [
         id: 'ycxwJx',
         label: 'Google Cloud Api',
         slug: 'google-cloud-api',
+      },
+      {
+        id: 'BYT6s_',
+        label: 'Aws Services',
+        slug: 'aws-services',
       },
     ],
   },
