@@ -71,8 +71,8 @@ export function CreateServiceTaxonomyForm({
     setIsPending(true);
 
     try {
-      // Generate unique ID for new item
-      const newId = nanoid();
+      // Generate unique nanoid for service taxonomies (6-character collision-proof ID)
+      const newId = nanoid(6);
 
       // Determine taxonomy type based on level
       const taxonomyType: TaxonomyType =
