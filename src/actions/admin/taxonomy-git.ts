@@ -91,18 +91,19 @@ function getExportName(type: TaxonomyType): string {
 /**
  * Format taxonomy data as TypeScript file content
  */
-function formatTaxonomyFile(type: TaxonomyType, data: DatasetItem[]): string {
+async function formatTaxonomyFile(type: TaxonomyType, data: DatasetItem[]): Promise<string> {
   const exportName = getExportName(type);
 
-  // Import shared formatter for consistent formatting
-  const { formatTaxonomyFile: sharedFormatter } = require('@/app/actions/shared-file-formatter');
+  // Import shared formatter for consistent formatting with Prettier
+  const { formatTaxonomyFile: sharedFormatter } = await import('@/app/actions/shared-file-formatter');
 
-  const formattedData = JSON.stringify(data, null, 2);
+  // Header comments for context
+  const headerComments = [
+    'import type { DatasetItem } from \'@/lib/types/datasets\';',
+    '',
+  ];
 
-  return `import type { DatasetItem } from '@/lib/types/datasets';
-
-export const ${exportName}: DatasetItem[] = ${formattedData};
-`;
+  return sharedFormatter(data, exportName, headerComments);
 }
 
 /**
@@ -129,7 +130,7 @@ export async function commitTaxonomyChange(
 
     // Get file path and format content
     const filePath = getTaxonomyFilePath(type);
-    const fileContent = formatTaxonomyFile(type, data);
+    const fileContent = await formatTaxonomyFile(type, data);
 
     // Get current file SHA (required for update)
     let currentSha: string | undefined;
