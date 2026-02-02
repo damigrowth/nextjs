@@ -135,6 +135,7 @@ export interface PublishResult {
     prNumber?: number; // Optional - only when using PR workflow
     prUrl?: string; // Optional - only when using PR workflow
     publishedDrafts: TaxonomyDraft[];
+    changeCount?: number; // Number of taxonomy types changed in batch commit
   };
   error?: {
     code: PublishErrorCode;

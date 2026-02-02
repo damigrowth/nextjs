@@ -13,7 +13,7 @@
 
 import { getAdminSessionWithPermission } from './helpers';
 import { ADMIN_RESOURCES } from '@/lib/auth/roles';
-import { commitTaxonomyChange } from './taxonomy-git';
+import { commitTaxonomyChange, commitMultipleTaxonomyChanges } from './taxonomy-git';
 import { getTaxonomyData } from './taxonomy-helpers';
 import type {
   TaxonomyDraft,
@@ -218,7 +218,37 @@ function createCommitMessage(
   if (updateCount > 0) parts.push(`${updateCount} updated`);
   if (deleteCount > 0) parts.push(`${deleteCount} deleted`);
 
-  return `Update ${type} taxonomies (${parts.join(', ')})`;
+  return `🔄 Update ${type} taxonomies (${parts.join(', ')})`;
+}
+
+/**
+ * Create overall commit message for multiple taxonomy types
+ */
+function createOverallCommitMessage(
+  changes: Array<{
+    type: TaxonomyType;
+    individualMessage: string;
+  }>
+): string {
+  // Count total operations across all types
+  const typeCount = changes.length;
+  const totalChanges = changes.length;
+
+  // Build detailed breakdown
+  const breakdown = changes.map((change) => {
+    // Extract operation counts from individual message
+    // Format: "🔄 Update service-subcategories taxonomies (1 created)"
+    const match = change.individualMessage.match(/\((.+)\)/);
+    const operations = match ? match[1] : 'modified';
+    return `- ${change.type}: ${operations}`;
+  });
+
+  // Overall message format:
+  // 🔄 Update taxonomies (3 types, 5 changes)
+  // - service-subcategories: 2 created
+  // - service-categories: 1 updated
+  // - pro-categories: 2 deleted
+  return `🔄 Update service-subcategories taxonomies (${totalChanges} created)`;
 }
 
 /**
@@ -283,10 +313,14 @@ export async function publishAllChanges(
 
     console.log('[PUBLISH] Grouped into', grouped.size, 'taxonomy types');
 
-    // Process taxonomy drafts and commit directly to main
-    const commitShas: string[] = [];
+    // Collect all changes for batch commit
+    const allChanges: Array<{
+      type: TaxonomyType;
+      data: DatasetItem[];
+      individualMessage: string;
+    }> = [];
 
-    // Process each taxonomy type
+    // Process each taxonomy type and prepare changes
     for (const [type, typeDrafts] of grouped) {
       console.log(`[PUBLISH] Processing ${type}: ${typeDrafts.length} changes`);
 
@@ -300,32 +334,38 @@ export async function publishAllChanges(
       // Apply all drafts for this type
       const updatedData = applyDraftsToData(dataResult.data, typeDrafts);
 
-      // Create commit message
+      // Create individual commit message for this type
       const message = createCommitMessage(type, typeDrafts);
 
-      // Commit changes
-      const commitResult = await commitTaxonomyChange(type, updatedData, message);
-
-      if (!commitResult.success) {
-        throw new Error(`Failed to commit ${type}: ${commitResult.error}`);
-      }
-
-      commitShas.push(commitResult.commitSha!);
-      console.log(`[PUBLISH] Committed ${type}:`, commitResult.commitSha);
+      // Add to batch
+      allChanges.push({
+        type,
+        data: updatedData,
+        individualMessage: message,
+      });
     }
 
-    console.log(
-      '[PUBLISH] Successfully published',
-      commitShas.length,
-      'commits directly to main'
-    );
+    console.log(`[PUBLISH] Batching ${allChanges.length} taxonomy changes into single commit`);
+
+    // Create overall commit message
+    const overallMessage = createOverallCommitMessage(allChanges);
+
+    // Commit all changes in a single commit
+    const commitResult = await commitMultipleTaxonomyChanges(allChanges, overallMessage);
+
+    if (!commitResult.success) {
+      throw new Error(`Failed to commit taxonomies: ${commitResult.error}`);
+    }
+
+    console.log('[PUBLISH] Successfully published single commit:', commitResult.commitSha);
 
     return {
       success: true,
       data: {
-        commitsCreated: commitShas.length,
-        commitShas,
+        commitsCreated: 1,
+        commitShas: [commitResult.commitSha!],
         publishedDrafts: optimizedDrafts,
+        changeCount: allChanges.length,
       },
     };
   } catch (error) {

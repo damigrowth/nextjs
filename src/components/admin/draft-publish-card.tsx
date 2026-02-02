@@ -73,9 +73,10 @@ export function DraftPublishCard() {
         clearDrafts();
         refreshSummary();
 
-        // Success message
+        // Success message - show number of taxonomy types changed
+        const changeCount = result.data!.changeCount || result.data!.commitsCreated;
         toast.success(
-          `Successfully published ${result.data!.commitsCreated} commit${result.data!.commitsCreated > 1 ? 's' : ''} to main!`
+          `Successfully published ${changeCount} taxonomy change${changeCount > 1 ? 's' : ''} in 1 commit to main!`
         );
 
         // Refresh page to update Git status

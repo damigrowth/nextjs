@@ -107,6 +107,124 @@ async function formatTaxonomyFile(type: TaxonomyType, data: DatasetItem[]): Prom
 }
 
 /**
+ * Commit multiple taxonomy file changes in a single commit
+ * Prevents triggering multiple builds - all changes in one commit
+ *
+ * @param changes - Array of { type, data, individualMessage }
+ * @param overallMessage - Combined commit message for all changes
+ * @returns Commit SHA and PR info
+ */
+export async function commitMultipleTaxonomyChanges(
+  changes: Array<{
+    type: TaxonomyType;
+    data: DatasetItem[];
+    individualMessage: string;
+  }>,
+  overallMessage: string
+): Promise<CommitTaxonomyResult> {
+  try {
+    // Auth check
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.TAXONOMIES, 'edit');
+
+    // Validate GitHub config
+    validateRepoConfig();
+    const { owner, repo, defaultBranch } = REPO_CONFIG;
+    const octokit = getGitHubClient();
+
+    console.log(`[TAXONOMY_GIT] Batching ${changes.length} taxonomy changes into single commit`);
+
+    // Get current commit SHA from branch
+    const { data: refData } = await octokit.rest.git.getRef({
+      owner,
+      repo,
+      ref: `heads/${defaultBranch}`,
+    });
+
+    const currentCommitSha = refData.object.sha;
+
+    // Get current commit tree
+    const { data: currentCommit } = await octokit.rest.git.getCommit({
+      owner,
+      repo,
+      commit_sha: currentCommitSha,
+    });
+
+    // Create blobs for each taxonomy file
+    const treeItems = await Promise.all(
+      changes.map(async ({ type, data }) => {
+        const filePath = getTaxonomyFilePath(type);
+        const fileContent = await formatTaxonomyFile(type, data);
+
+        // Create blob
+        const { data: blob } = await octokit.rest.git.createBlob({
+          owner,
+          repo,
+          content: Buffer.from(fileContent).toString('base64'),
+          encoding: 'base64',
+        });
+
+        console.log(`[TAXONOMY_GIT] Created blob for ${type}: ${blob.sha.substring(0, 7)}`);
+
+        return {
+          path: filePath,
+          mode: '100644' as const,
+          type: 'blob' as const,
+          sha: blob.sha,
+        };
+      })
+    );
+
+    // Create new tree with all file changes
+    const { data: newTree } = await octokit.rest.git.createTree({
+      owner,
+      repo,
+      base_tree: currentCommit.tree.sha,
+      tree: treeItems,
+    });
+
+    console.log(`[TAXONOMY_GIT] Created tree: ${newTree.sha.substring(0, 7)}`);
+
+    // Create commit
+    const { data: newCommit } = await octokit.rest.git.createCommit({
+      owner,
+      repo,
+      message: overallMessage,
+      tree: newTree.sha,
+      parents: [currentCommitSha],
+    });
+
+    console.log(`[TAXONOMY_GIT] Created commit: ${newCommit.sha.substring(0, 7)}`);
+
+    // Update branch reference
+    await octokit.rest.git.updateRef({
+      owner,
+      repo,
+      ref: `heads/${defaultBranch}`,
+      sha: newCommit.sha,
+    });
+
+    console.log(`[TAXONOMY_GIT] Updated ${defaultBranch} to ${newCommit.sha.substring(0, 7)}`);
+
+    // Auto-create PR if it doesn't exist
+    const prResult = await ensurePullRequest(defaultBranch);
+
+    return {
+      success: true,
+      commitSha: newCommit.sha,
+      commitUrl: newCommit.html_url,
+      prNumber: prResult.pr?.number,
+      prUrl: prResult.pr?.url,
+    };
+  } catch (error) {
+    console.error('[TAXONOMY_GIT] Batch commit error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to commit taxonomies',
+    };
+  }
+}
+
+/**
  * Commit taxonomy change directly to datasets branch
  *
  * @param type - Taxonomy type (service, pro, tags, skills)
