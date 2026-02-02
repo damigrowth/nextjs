@@ -209,7 +209,7 @@ export default async function ProfilePage({
                 stats={reviewStats}
                 profileId={profile.id}
                 profileDisplayName={profile.displayName || ''}
-                showReviewsModel={false}
+                showReviewsModel={true}
                 type='profile'
                 isOwner={currentUserId === profile.uid}
                 profileServices={result.data.services.map((s) => ({
