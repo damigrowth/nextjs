@@ -1,6 +1,5 @@
-// Generated on 2026-01-20T17:38:48.812Z
-// All data is sorted alphabetically by label
-// Flat list of tags
+// Generated on 2026-02-02T13:55:51.151Z
+import type { DatasetItem } from '@/lib/types/datasets';
 
 export const tags = [
   {
@@ -6367,5 +6366,10 @@ export const tags = [
     id: '1309',
     label: 'Nano Banana Pro',
     slug: 'nano-banana-pro',
+  },
+  {
+    id: '1310',
+    label: 'Google Cloud',
+    slug: 'google-cloud',
   },
 ];
