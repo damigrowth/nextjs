@@ -1,6 +1,7 @@
+// Generated on 2026-02-02T13:55:38.480Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
-export const serviceTaxonomies: DatasetItem[] = [
+export const serviceTaxonomies = [
   {
     id: 'qWYlwq',
     label: 'Δημιουργία Περιεχομένου',
@@ -6537,6 +6538,11 @@ export const serviceTaxonomies: DatasetItem[] = [
         id: '7cwCpE',
         label: 'Google Cloud',
         slug: 'google-cloud',
+      },
+      {
+        id: 'ycxwJx',
+        label: 'Google Cloud Api',
+        slug: 'google-cloud-api',
       },
     ],
   },
