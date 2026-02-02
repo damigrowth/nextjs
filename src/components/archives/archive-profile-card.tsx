@@ -107,8 +107,9 @@ export function ArchiveProfileCard({
 
           {/* Profile and Price Section */}
           <div className='mt-3'>
-            <div className='flex flex-col md:flex-row md:items-center gap-2 md:gap-3'>
-              {profile.reviewCount > 0 && (
+            {/* Rating Display - directly after tagline */}
+            {profile.reviewCount > 0 && (
+              <div className='mb-2'>
                 <RatingDisplay
                   rating={profile.rating}
                   reviewCount={profile.reviewCount}
@@ -116,8 +117,11 @@ export function ArchiveProfileCard({
                   variant='compact'
                   className='text-sm'
                 />
-              )}
+              </div>
+            )}
 
+            {/* Coverage Display - now on its own line */}
+            <div>
               <CoverageDisplay
                 online={profile.coverage?.online}
                 onbase={profile.coverage?.onbase}
