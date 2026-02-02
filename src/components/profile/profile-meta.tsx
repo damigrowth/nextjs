@@ -133,6 +133,7 @@ export default function ProfileMeta({
                     rating={rating}
                     reviewCount={reviewCount}
                     variant="full"
+                    href='#reviews'
                   />
                 </div>
               )}

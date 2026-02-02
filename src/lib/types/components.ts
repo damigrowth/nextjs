@@ -361,6 +361,8 @@ export type ArchiveServiceCardData = Pick<
     | 'coverage'
     | 'verified'
     | 'top'
+    | 'rating'
+    | 'reviewCount'
   > & {
     groupedCoverage: Array<{ county: string; areas: string[] }>; // Pre-computed grouped coverage from server
   };

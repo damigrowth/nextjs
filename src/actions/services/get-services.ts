@@ -785,6 +785,8 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
             groupedCoverage: transformedCoverage.countyAreasMap || [],
             verified: service.profile.verified,
             top: service.profile.top,
+            rating: service.profile.rating,
+            reviewCount: service.profile.reviewCount,
           },
         };
       },

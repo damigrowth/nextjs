@@ -1,4 +1,3 @@
-import { getRatingLabel } from '@/lib/utils/rating';
 import { ReviewStars } from './review-stars';
 
 interface ReviewStatsProps {
@@ -45,7 +44,7 @@ export function ReviewStatsEnhanced({
         <div className='flex flex-col'>
           {/* Quality label */}
           <span className='text-xl font-semibold text-gray-800'>
-            {getRatingLabel(averageRating)}
+            Βαθμολογία
           </span>
 
           {/* Review count with stars */}

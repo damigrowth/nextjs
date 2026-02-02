@@ -41,6 +41,8 @@ export const SERVICE_ARCHIVE_SELECT = {
       coverage: true,
       verified: true,
       top: true,
+      rating: true,
+      reviewCount: true,
     },
   },
 } as const;

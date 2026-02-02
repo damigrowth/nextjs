@@ -41,6 +41,12 @@ export function ArchiveServiceCard({
   const profileGroupedCoverage =
     'groupedCoverage' in service.profile ? service.profile.groupedCoverage : [];
 
+  // Check if profile has rating data (might not exist in ServiceCardData)
+  const profileRating =
+    'rating' in service.profile ? service.profile.rating : 0;
+  const profileReviewCount =
+    'reviewCount' in service.profile ? service.profile.reviewCount : 0;
+
   // Convert price to number for reliable comparison
   const priceValue = Number(service?.price) || 0;
   const hasValidPrice = priceValue > 0;
@@ -96,20 +102,9 @@ export function ArchiveServiceCard({
 
           {/* Profile and Price Section */}
           <div className='mt-3'>
-            <div className='flex flex-col md:flex-row md:items-center gap-2 md:gap-3'>
-              {service.reviewCount > 0 && (
-                <RatingDisplay
-                  rating={service.rating}
-                  reviewCount={service.reviewCount}
-                  size='sm'
-                  variant='compact'
-                  className='text-sm'
-                />
-              )}
-
-              {/* <Separator orientation='vertical' className='h-4' /> */}
-
-              {profileCoverage && (
+            {/* Coverage Display - now alone */}
+            {profileCoverage && (
+              <div className='mb-3'>
                 <CoverageDisplay
                   online={service.type?.online}
                   onbase={service.type?.onbase}
@@ -120,10 +115,12 @@ export function ArchiveServiceCard({
                   variant='compact'
                   className='text-sm'
                 />
-              )}
-            </div>
-            <div className='flex items-center gap-3 border-t border-gray-200 mt-3 pt-3'>
-              {/* Profile Info */}
+              </div>
+            )}
+
+            {/* Bottom section with profile+rating (left) and price (right) */}
+            <div className='flex items-center gap-3 border-t border-gray-200 pt-3'>
+              {/* Profile Info + Rating */}
               {showProfile && (
                 <div className='flex items-center gap-2 flex-1'>
                   <UserAvatar
@@ -147,6 +144,17 @@ export function ArchiveServiceCard({
                     verified={profileVerified}
                     topLevel={profileTop}
                   />
+
+                  {/* Rating - now inside profile div */}
+                  {profileReviewCount > 0 && (
+                    <RatingDisplay
+                      rating={profileRating}
+                      reviewCount={profileReviewCount}
+                      size='sm'
+                      variant='compact'
+                      className='text-sm ml-2'
+                    />
+                  )}
                 </div>
               )}
 
