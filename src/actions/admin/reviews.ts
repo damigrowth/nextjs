@@ -14,6 +14,7 @@ import {
 import { getAdminSession, getAdminSessionWithPermission } from './helpers';
 import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import { updateProfileRating, updateServiceRating } from '../reviews/update-rating';
+import { sendReviewApprovedEmail } from '@/lib/email/services/review-emails';
 
 /**
  * List reviews with filters and pagination
@@ -235,6 +236,7 @@ export async function updateReviewStatus(
           select: {
             id: true,
             name: true,
+            displayName: true,
             email: true,
           },
         },
@@ -242,6 +244,18 @@ export async function updateReviewStatus(
           select: {
             id: true,
             displayName: true,
+            user: {
+              select: {
+                email: true,
+                displayName: true,
+                username: true,
+              },
+            },
+          },
+        },
+        service: {
+          select: {
+            title: true,
           },
         },
       },
@@ -262,8 +276,23 @@ export async function updateReviewStatus(
       }
     }
 
-    // TODO: Create audit log entry if you have an audit log system
-    // TODO: Send email notification to review author about status change
+    // Send email notification to profile owner on approval
+    if (statusChanged && status === 'approved') {
+      const reviewerName = review.author?.displayName || review.author?.name || 'Ανώνυμος';
+      sendReviewApprovedEmail(
+        {
+          rating: review.rating,
+          comment: review.comment,
+          reviewerName,
+          serviceName: review.service?.title,
+        },
+        {
+          email: review.profile.user.email,
+          displayName: review.profile.user.displayName,
+          username: review.profile.user.username,
+        }
+      );
+    }
 
     return {
       success: true,
