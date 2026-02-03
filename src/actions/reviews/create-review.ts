@@ -10,6 +10,7 @@ import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { CACHE_TAGS } from '@/lib/cache';
 import { getSession } from '@/actions/auth/server';
+import { sendNewReviewEmail } from '@/lib/email/services/admin-emails';
 
 /**
  * Server action for creating a review with transaction-based rating updates
@@ -79,7 +80,7 @@ export async function createReview(
     // 4. Business logic validation - Check if target profile exists
     const targetProfile = await prisma.profile.findUnique({
       where: { id: data.profileId },
-      include: { user: { select: { id: true } } },
+      select: { id: true, username: true, displayName: true, user: { select: { id: true, email: true } } },
     });
 
     if (!targetProfile) {
@@ -98,11 +99,11 @@ export async function createReview(
     }
 
     // 6. If serviceId provided, verify it belongs to the profile
-    let service: { pid: string; slug: string | null } | null = null;
+    let service: { pid: string; slug: string | null; title: string } | null = null;
     if (data.serviceId) {
       service = await prisma.service.findUnique({
         where: { id: data.serviceId },
-        select: { pid: true, slug: true },
+        select: { pid: true, slug: true, title: true },
       });
 
       if (!service || service.pid !== data.profileId) {
@@ -149,6 +150,27 @@ export async function createReview(
 
     // NOTE: Rating calculations moved to moderate-review action
     // Ratings only update when review is approved (status: 'approved', published: true)
+
+    // Send admin notification email about new pending review
+    const authorName = user.displayName || user.name || 'Ανώνυμος';
+    sendNewReviewEmail(
+      {
+        id: result.id,
+        rating: data.rating,
+        comment: data.comment,
+        type: data.serviceId ? 'SERVICE' : 'PROFILE',
+        serviceName: service?.title,
+      },
+      {
+        name: authorName,
+        email: user.email,
+      },
+      {
+        displayName: targetProfile.displayName || targetProfile.username,
+        username: targetProfile.username,
+        email: targetProfile.user.email,
+      }
+    );
 
     // 9. Revalidate cache tags for comprehensive cache invalidation
     // Revalidate profile reviews and data
