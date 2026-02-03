@@ -94,7 +94,7 @@ export default function ServiceInfo({
             icon={<Clock className='h-10 w-10' />}
             title='Ημέρες παράδοσης'
             value={
-              duration > 1 ? duration + ' ' + 'Μέρες' : duration + ' ' + 'Μέρα'
+              'Έως ' + duration
             }
           />
         </div>
