@@ -228,7 +228,7 @@ export async function sendProfileReportEmail(
  */
 export async function sendNewProfileEmail(
   profile: {
-    id: number;
+    id: string;
     name: string;
     username: string;
   },
@@ -242,7 +242,7 @@ export async function sendNewProfileEmail(
       profileName: profile.name,
       displayName: profile.name,
       username: profile.username,
-      profileId: profile.id.toString(),
+      profileId: profile.id,
       userEmail: user.email,
       publicUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://doulitsa.gr'}/profile/${encodeURIComponent(profile.username)}`,
       adminUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://doulitsa.gr'}/admin/profiles/${profile.id}`,
@@ -273,7 +273,7 @@ export async function sendNewProfileEmail(
         text: textMessage,
         attributes: {
           PROFILE_NAME: profile.name,
-          PROFILE_ID: profile.id.toString(),
+          PROFILE_ID: profile.id,
           USER_EMAIL: user.email,
           USER_TYPE: user.type,
         }

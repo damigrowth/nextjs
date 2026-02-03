@@ -196,7 +196,7 @@ export async function completeOnboarding(
     if (user.type === 'pro') {
       sendNewProfileEmail(
         {
-          id: Number(profile.id),
+          id: profile.id,
           name: user.displayName || user.username || 'Unknown',
           username: user.username || '',
         },
