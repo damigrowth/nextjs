@@ -23,6 +23,8 @@ export * from './profile-report';
 export * from './new-profile';
 export * from './support-feedback';
 export * from './unread-messages';
+export * from './review-approved';
+export * from './new-review';
 
 // Legacy EMAIL_TEMPLATES export for auth emails only
 // TODO: Migrate auth emails to use EMAIL_CONFIG

@@ -16,6 +16,7 @@ export const EMAIL_TAGS = {
   CONTACT_FORM_USER: 'contact-confirmation',
   SERVICE_PUBLISHED: 'service-published',
   NEW_REVIEW: 'new-review',
+  REVIEW_APPROVED: 'review-approved',
 
   // Authentication emails
   EMAIL_VERIFICATION: 'email-verification',

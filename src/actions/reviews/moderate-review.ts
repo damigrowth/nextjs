@@ -8,6 +8,7 @@ import { requireAuth } from '@/actions/auth/server';
 import { CACHE_TAGS } from '@/lib/cache';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { updateProfileRating, updateServiceRating } from './update-rating';
+import { sendReviewApprovedEmail } from '@/lib/email/services/review-emails';
 
 /**
  * Admin action to moderate (approve/reject) a pending review
@@ -51,16 +52,32 @@ export async function moderateReview(
     const review = await prisma.review.findUnique({
       where: { id: reviewId },
       include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+          },
+        },
         profile: {
           select: {
             id: true,
             username: true,
+            displayName: true,
+            user: {
+              select: {
+                email: true,
+                displayName: true,
+                username: true,
+              },
+            },
           },
         },
         service: {
           select: {
             id: true,
             slug: true,
+            title: true,
           },
         },
       },
@@ -99,6 +116,22 @@ export async function moderateReview(
       if (review.sid) {
         await updateServiceRating(review.sid);
       }
+
+      // Send email notification to profile owner
+      const reviewerName = review.author?.displayName || review.author?.name || 'Ανώνυμος';
+      sendReviewApprovedEmail(
+        {
+          rating: review.rating,
+          comment: review.comment,
+          reviewerName,
+          serviceName: review.service?.title,
+        },
+        {
+          email: review.profile.user.email,
+          displayName: review.profile.user.displayName,
+          username: review.profile.user.username,
+        }
+      );
     } else {
       // Reject review (no rating updates)
       await prisma.review.update({

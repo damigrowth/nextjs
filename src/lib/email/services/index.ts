@@ -21,7 +21,13 @@ export {
   sendServiceReportEmail,
   sendProfileReportEmail,
   sendNewProfileEmail,
+  sendNewReviewEmail,
 } from './admin-emails';
+
+// Review notification emails
+export {
+  sendReviewApprovedEmail,
+} from './review-emails';
 
 // Contact form emails
 export {

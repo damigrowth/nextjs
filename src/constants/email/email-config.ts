@@ -55,6 +55,16 @@ import {
   UNREAD_MESSAGES_TEXT,
   UnreadMessagesData,
 } from './templates/unread-messages';
+import {
+  REVIEW_APPROVED_HTML,
+  REVIEW_APPROVED_TEXT,
+  ReviewApprovedData,
+} from './templates/review-approved';
+import {
+  NEW_REVIEW_HTML,
+  NEW_REVIEW_TEXT,
+  NewReviewData,
+} from './templates/new-review';
 
 export interface EmailConfig<T = any> {
   to: string | ((data: T) => string);
@@ -186,6 +196,27 @@ export const EMAIL_CONFIG = {
     html: PASSWORD_RESET_HTML,
     text: PASSWORD_RESET_TEXT,
   } as EmailConfig<PasswordResetData>,
+
+  // Review Notifications (Admin)
+  NEW_REVIEW: {
+    to: () => 'domvournias@gmail.com', // TODO: revert to process.env.ADMIN_EMAIL || 'contact@doulitsa.gr'
+    from: 'Admin Doulitsa <noreply@doulitsa.gr>',
+    replyTo: null,
+    subject: (data: NewReviewData) =>
+      `Νέα Αξιολόγηση για ${data.receiverName}`,
+    html: NEW_REVIEW_HTML,
+    text: NEW_REVIEW_TEXT,
+  } as EmailConfig<NewReviewData>,
+
+  // Review Notifications (User)
+  REVIEW_APPROVED: {
+    to: (data: ReviewApprovedData) => data.profileOwnerEmail,
+    from: 'Doulitsa <noreply@doulitsa.gr>',
+    replyTo: null,
+    subject: () => 'Νέα Αξιολόγηση!',
+    html: REVIEW_APPROVED_HTML,
+    text: REVIEW_APPROVED_TEXT,
+  } as EmailConfig<ReviewApprovedData>,
 
   // Message Notifications
   UNREAD_MESSAGES: {
