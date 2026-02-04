@@ -22,6 +22,7 @@ import {
   Info,
   Presentation,
   Globe,
+  Crown,
 } from 'lucide-react';
 
 import { NavMain } from './dashboard-nav-main';
@@ -189,6 +190,20 @@ export default function DashboardSidebar({
               icon: Plus,
             }]} />
           </div>
+        )}
+
+        {/* Subscription (if professional) */}
+        {isProfessional && (
+          <NavMain
+            items={[
+              {
+                title: 'Συνδρομή',
+                url: '/dashboard/subscription',
+                icon: Crown,
+              },
+            ]}
+            label='Πακέτο'
+          />
         )}
 
         {/* Group 3: Account Management */}
