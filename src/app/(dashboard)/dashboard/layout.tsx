@@ -1,6 +1,7 @@
 import { requireOnboardingComplete } from '@/actions/auth/server';
 import { DashboardLayout } from '@/components/dashboard';
 import { Toaster } from '@/components/ui/sonner';
+import { SubscriptionSheet } from '@/components/subscription';
 
 // Dashboard requires auth and user-specific data, so it should be dynamic
 export const dynamic = 'force-dynamic';
@@ -20,6 +21,7 @@ export default async function layout({
   return (
     <>
       <DashboardLayout>{children}</DashboardLayout>
+      <SubscriptionSheet />
       <Toaster />
     </>
   );

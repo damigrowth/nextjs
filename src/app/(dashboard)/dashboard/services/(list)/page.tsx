@@ -166,6 +166,7 @@ export default async function ServicesPage({
               field: filters.sortBy || 'updatedAt',
               order: filters.sortOrder || 'desc',
             }}
+            canFeatureMore={services.canFeatureMore}
           />
 
           {/* Pagination */}

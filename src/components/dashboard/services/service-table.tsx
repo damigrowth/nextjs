@@ -17,6 +17,7 @@ import ServiceStatusBadge from './service-status-badge';
 import TaxonomiesDisplay from '../../shared/taxonomies-display';
 import ServiceTableHeaderSort from './service-table-header-sort';
 import ServiceRefreshButton from './service-refresh-button';
+import FeaturedStarButton from './featured-star-button';
 import type {
   UserServiceTableData,
   ServiceSortField,
@@ -30,12 +31,14 @@ interface ServiceTableProps {
     field: ServiceSortField;
     order: SortOrder;
   };
+  canFeatureMore: boolean;
   className?: string;
 }
 
 export default function ServiceTable({
   services,
   currentSort,
+  canFeatureMore,
   className,
 }: ServiceTableProps) {
   // Empty state
@@ -169,6 +172,12 @@ export default function ServiceTable({
               {/* Actions Column */}
               <TableCell className='text-right'>
                 <div className='flex items-center justify-end gap-1'>
+                  <FeaturedStarButton
+                    serviceId={service.id}
+                    featured={service.featured}
+                    canFeatureMore={canFeatureMore}
+                    isPublished={service.status === Status.published}
+                  />
                   {service.status === Status.published && service.slug && (
                     <Button
                       variant='ghost'
