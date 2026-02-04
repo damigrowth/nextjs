@@ -15,6 +15,7 @@ import {
   ServiceOrderFixed,
   ServiceFAQ,
   ServiceRelated,
+  ServiceAdditional,
   ReportServiceDialog,
 } from '@/components/service';
 import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
@@ -114,6 +115,7 @@ export default async function ServicePage({
     settlementMethodsData,
     tagsData,
     relatedServices,
+    additionalServices,
     serviceReviews,
     profileOtherReviews,
     reviewStats,
@@ -271,6 +273,9 @@ export default async function ServicePage({
           </div>
         </div>
       </section>
+
+      {/* Additional Services from same profile (promoted subscribers) */}
+      <ServiceAdditional services={additionalServices} />
 
       {/* Related Services Section */}
       <ServiceRelated

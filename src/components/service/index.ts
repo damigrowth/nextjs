@@ -9,4 +9,5 @@ export { default as ServiceMedia } from './service-media';
 export { default as ServiceMeta } from './service-meta';
 export { default as ServiceOrderFixed } from './service-order-fixed';
 export { default as ServiceRelated } from './service-related';
+export { default as ServiceAdditional } from './service-additional';
 export { ReportServiceDialog } from './report-service-dialog';

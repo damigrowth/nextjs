@@ -1,0 +1,42 @@
+enum SubscriptionStatus {
+  active
+  past_due
+  canceled
+  incomplete
+  trialing
+  unpaid
+}
+
+enum SubscriptionPlan {
+  free
+  promoted
+}
+
+enum BillingInterval {
+  month
+  year
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  pid                  String             @unique // One subscription per profile
+  stripeCustomerId     String             @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+  plan                 SubscriptionPlan   @default(free)
+  status               SubscriptionStatus @default(incomplete)
+  billingInterval      BillingInterval?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  canceledAt           DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  profile Profile @relation(fields: [pid], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId])
+  @@index([stripeSubscriptionId])
+  @@index([pid, status])
+  @@map("subscriptions")
+}
