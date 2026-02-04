@@ -1,4 +1,4 @@
-// Generated on 2026-02-02T14:24:30.576Z
+// Generated on 2026-02-04T13:54:48.558Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -1703,16 +1703,15 @@ export const serviceTaxonomies = [
         description:
           'Δώσε ζωή στην εκδήλωσή σου με μοναδική διακόσμηση που θα εντυπωσιάσει τους καλεσμένους σου.',
         image: {
-          public_id: '164_139a08e8fd',
+          public_id: 'subcategories/diakosmisi-ekdiloseon_zkdmhl',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168309/164_139a08e8fd.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769196799/subcategories/diakosmisi-ekdiloseon_zkdmhl.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 26941,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168309/164_139a08e8fd.webp',
-          original_filename: '164.webp',
+          bytes: 109438,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769196799/subcategories/diakosmisi-ekdiloseon_zkdmhl.webp',
         },
         children: [
           {
@@ -1743,16 +1742,15 @@ export const serviceTaxonomies = [
         description:
           'Βρες ιδανικές επιλογές διασκέδασης για κάθε εκδήλωση. Εξερεύνησε επιλογές που θα εντυπωσιάσουν.',
         image: {
-          public_id: '166_ea8f959543',
+          public_id: 'subcategories/diaskedasi_vdt0yt',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168309/166_ea8f959543.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/diaskedasi_vdt0yt.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 48036,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168309/166_ea8f959543.webp',
-          original_filename: '166.webp',
+          bytes: 186488,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/diaskedasi_vdt0yt.webp',
         },
         children: [
           {
@@ -1840,16 +1838,15 @@ export const serviceTaxonomies = [
         description:
           'Απόλαυσε γεύσεις και εξυπηρέτηση που θα εντυπωσιάσουν τους καλεσμένους σου σε κάθε εκδήλωση.',
         image: {
-          public_id: '172_3408a82697',
+          public_id: 'subcategories/estiasi_if3psy',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168358/172_3408a82697.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/estiasi_if3psy.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 54067,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168358/172_3408a82697.webp',
-          original_filename: '172.webp',
+          bytes: 169626,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/estiasi_if3psy.webp',
         },
         children: [
           {
@@ -1937,16 +1934,15 @@ export const serviceTaxonomies = [
         description:
           'Οργάνωσε την τέλεια εκδήλωση με επαγγελματική βοήθεια. Δημιούργησε αξέχαστες και μοναδικές αναμνήσεις.',
         image: {
-          public_id: '173_440f084d2c',
+          public_id: 'organosi_ekdiloseon_abac3ce43c',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168361/173_440f084d2c.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1725373348/organosi_ekdiloseon_abac3ce43c.png',
+          width: 532,
+          height: 300,
           resource_type: 'image',
-          format: 'webp',
-          bytes: 87040,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168361/173_440f084d2c.webp',
-          original_filename: '173.webp',
+          format: 'png',
+          bytes: 128045,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1725373348/organosi_ekdiloseon_abac3ce43c.png',
         },
         children: [
           {
