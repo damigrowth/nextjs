@@ -1,5 +1,3 @@
-'use server';
-
 import { prisma } from '@/lib/prisma/client';
 import { getProvider } from './factory';
 import type { CheckoutSessionParams, CustomerPortalParams } from './types';

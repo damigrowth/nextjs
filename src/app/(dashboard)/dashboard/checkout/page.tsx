@@ -1,10 +1,11 @@
 import { redirect } from 'next/navigation';
+import { getDashboardMetadata } from '@/lib/seo/pages';
 import { requireProUser, getCurrentUser } from '@/actions/auth/server';
 import { getSubscription } from '@/actions/subscription';
-import { getDashboardMetadata } from '@/lib/seo/pages';
 import CheckoutContent from './checkout-content';
 
 export const metadata = getDashboardMetadata('Ολοκλήρωση Συνδρομής');
+export const dynamic = 'force-dynamic';
 
 interface CheckoutPageProps {
   searchParams: Promise<{
@@ -35,12 +36,12 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
   const billingInterval = params.interval === 'month' ? 'month' : 'year';
 
   return (
-    <div className='space-y-6'>
+    <div className='max-w-5xl w-full mx-auto space-y-6'>
       <div>
         <h1 className='text-2xl font-bold tracking-tight'>
           Ολοκλήρωση Συνδρομής
         </h1>
-        <p className='text-muted-foreground'>
+        <p className='text-muted-foreground mt-1'>
           Ελέγξτε τα στοιχεία τιμολόγησης και ολοκληρώστε την εγγραφή σας
         </p>
       </div>

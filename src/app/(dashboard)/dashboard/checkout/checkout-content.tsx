@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Check, Loader2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
-import { PRICING, SUBSCRIPTION_PLANS } from '@/lib/stripe/config';
+import { SUBSCRIPTION_PLANS } from '@/lib/stripe/config';
 import { createCheckoutSession } from '@/actions/subscription';
 import { toast } from 'sonner';
 import { BillingForm } from '@/components';
@@ -28,7 +27,6 @@ export default function CheckoutContent({
   const [interval, setInterval] = useState<'month' | 'year'>(defaultInterval);
   const [isPending, startTransition] = useTransition();
 
-  const pricing = interval === 'year' ? PRICING.annual : PRICING.monthly;
   const plan = SUBSCRIPTION_PLANS.promoted;
 
   const handleCheckout = () => {
@@ -70,15 +68,15 @@ export default function CheckoutContent({
 
       {/* Right: Plan Summary */}
       <div className='space-y-4'>
-        <Card>
-          <CardHeader>
-            <CardTitle>Προωθημένο Πακέτο</CardTitle>
+        <Card className='border-2 border-primary shadow-lg'>
+          <CardHeader className='pb-3'>
+            <CardTitle className='text-lg'>Προωθημένο Πακέτο</CardTitle>
           </CardHeader>
           <CardContent className='space-y-4'>
             {/* Interval Toggle */}
             <div className='flex gap-2'>
               <Button
-                variant={interval === 'month' ? 'default' : 'outline'}
+                variant={interval === 'month' ? 'secondary' : 'outline'}
                 size='sm'
                 className='flex-1'
                 onClick={() => setInterval('month')}
@@ -86,16 +84,13 @@ export default function CheckoutContent({
                 Μηνιαία
               </Button>
               <Button
-                variant={interval === 'year' ? 'default' : 'outline'}
+                variant={interval === 'year' ? 'secondary' : 'outline'}
                 size='sm'
                 className='flex-1 relative'
                 onClick={() => setInterval('year')}
               >
                 Ετήσια
-                <Badge
-                  variant='secondary'
-                  className='absolute -top-2 -right-2 text-[10px] px-1'
-                >
+                <Badge className='absolute -top-2 -right-2 text-[10px] px-1'>
                   -25%
                 </Badge>
               </Button>
@@ -105,9 +100,9 @@ export default function CheckoutContent({
 
             {/* Price Display */}
             <div className='text-center space-y-1'>
-              <p className='text-3xl font-bold'>
+              <p className='text-2xl font-bold'>
                 {interval === 'year' ? '€15' : '€20'}
-                <span className='text-base font-normal text-muted-foreground'>
+                <span className='text-sm font-normal text-muted-foreground'>
                   /μήνα
                 </span>
               </p>
@@ -121,22 +116,19 @@ export default function CheckoutContent({
             <Separator />
 
             {/* Benefits Summary */}
-            <div className='space-y-2 text-sm'>
-              <p className='font-medium'>Περιλαμβάνει:</p>
-              <ul className='space-y-1 text-muted-foreground'>
-                <li>- Προφίλ στην κορυφή αποτελεσμάτων</li>
-                <li>- Έως {plan.maxServices} υπηρεσίες</li>
-                <li>- Αυτόματη ημερήσια ανανέωση</li>
-                <li>- Έως {plan.maxFeaturedServices} προβεβλημένες ⭐</li>
-                <li>- Ενότητα "Επιπλέον υπηρεσίες"</li>
-              </ul>
+            <div className='space-y-3'>
+              <FeatureRow label='Προφίλ στην κορυφή αποτελεσμάτων' />
+              <FeatureRow label={`Έως ${plan.maxServices} υπηρεσίες`} />
+              <FeatureRow label='Αυτόματη ημερήσια ανανέωση' />
+              <FeatureRow label={`Έως ${plan.maxFeaturedServices} προβεβλημένες ⭐`} />
+              <FeatureRow label='Ενότητα "Επιπλέον υπηρεσίες"' />
             </div>
 
             <Separator />
 
             {/* Checkout Button */}
             <Button
-              className='w-full'
+              className='w-full bg-black hover:bg-black/90 text-white'
               size='lg'
               onClick={handleCheckout}
               disabled={isPending}
@@ -147,16 +139,24 @@ export default function CheckoutContent({
                   Μετάβαση στην πληρωμή...
                 </>
               ) : (
-                `Πληρωμή ${interval === 'year' ? '€180/έτος' : '€20/μήνα'}`
+                <>
+                  <Lock className='size-4 mr-2 text-white' />
+                  Πληρωμή {interval === 'year' ? '€180/έτος' : '€20/μήνα'}
+                </>
               )}
             </Button>
-
-            <p className='text-xs text-center text-muted-foreground'>
-              Ασφαλής πληρωμή μέσω Stripe. Ακύρωση οποτεδήποτε.
-            </p>
           </CardContent>
         </Card>
       </div>
+    </div>
+  );
+}
+
+function FeatureRow({ label }: { label: string }) {
+  return (
+    <div className='flex items-center gap-2 text-sm'>
+      <Check className='size-4 text-green-600 shrink-0' />
+      <span>{label}</span>
     </div>
   );
 }

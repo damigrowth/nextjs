@@ -1,13 +1,11 @@
 'use client';
 
 import { Check, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SUBSCRIPTION_PLANS } from '@/lib/stripe/config';
 
 interface PlanComparisonProps {
-  onSelectPromoted: () => void;
   triggerReason?: string | null;
 }
 
@@ -15,7 +13,6 @@ const freePlan = SUBSCRIPTION_PLANS.free;
 const promotedPlan = SUBSCRIPTION_PLANS.promoted;
 
 export default function PlanComparison({
-  onSelectPromoted,
   triggerReason,
 }: PlanComparisonProps) {
   return (
@@ -57,17 +54,17 @@ export default function PlanComparison({
           <CardHeader className='pb-3'>
             <div className='flex items-center justify-between'>
               <CardTitle className='text-lg'>Προωθημένο</CardTitle>
-              <Badge>Δημοφιλές</Badge>
+              <Badge variant='secondary'>Δημοφιλές</Badge>
             </div>
             <p className='text-2xl font-bold'>
-              Από €15<span className='text-sm font-normal text-muted-foreground'>/μήνα</span>
+              Από €15
+              <span className='text-sm font-normal text-muted-foreground'>
+                /μήνα
+              </span>
             </p>
           </CardHeader>
           <CardContent className='space-y-3'>
-            <FeatureRow
-              label='Προφίλ στην κορυφή αποτελεσμάτων'
-              included
-            />
+            <FeatureRow label='Προφίλ στην κορυφή αποτελεσμάτων' included />
             <FeatureRow
               label={`Έως ${promotedPlan.maxServices} υπηρεσίες`}
               included
@@ -84,14 +81,7 @@ export default function PlanComparison({
               label='Προτεραιότητα στις σχετικές υπηρεσίες'
               included
             />
-            <FeatureRow
-              label='Ενότητα "Επιπλέον υπηρεσίες"'
-              included
-            />
-
-            <Button className='w-full mt-4' size='lg' onClick={onSelectPromoted}>
-              Επιλογή Προωθημένου
-            </Button>
+            <FeatureRow label='Ενότητα "Επιπλέον υπηρεσίες"' included />
           </CardContent>
         </Card>
       </div>
@@ -99,13 +89,7 @@ export default function PlanComparison({
   );
 }
 
-function FeatureRow({
-  label,
-  included,
-}: {
-  label: string;
-  included: boolean;
-}) {
+function FeatureRow({ label, included }: { label: string; included: boolean }) {
   return (
     <div className='flex items-center gap-2 text-sm'>
       {included ? (

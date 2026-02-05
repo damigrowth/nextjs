@@ -47,9 +47,22 @@ export function getSubscriptionPeriod(subscription: Stripe.Subscription): {
 } {
   // Access properties directly - they exist at runtime
   const sub = subscription as unknown as StripeSubscriptionWithPeriods;
+
+  // Validate timestamps exist and are numbers
+  const startTimestamp = sub.current_period_start;
+  const endTimestamp = sub.current_period_end;
+
+  // Fallback to current time if timestamps are missing
+  const now = new Date();
+  const oneMonthLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
   return {
-    start: new Date(sub.current_period_start * 1000),
-    end: new Date(sub.current_period_end * 1000),
+    start: typeof startTimestamp === 'number' && startTimestamp > 0
+      ? new Date(startTimestamp * 1000)
+      : now,
+    end: typeof endTimestamp === 'number' && endTimestamp > 0
+      ? new Date(endTimestamp * 1000)
+      : oneMonthLater,
     cancelAtPeriodEnd: sub.cancel_at_period_end ?? false,
   };
 }

@@ -5,6 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { cancelSubscription } from '@/actions/subscription';
 import { useSubscriptionSheetStore } from '@/lib/stores/use-subscription-sheet-store';
 import { toast } from 'sonner';
@@ -25,10 +36,6 @@ export default function SubscriptionManagement({
   const isCanceling = isActive && subscription?.cancelAtPeriodEnd;
 
   const handleCancel = () => {
-    if (!confirm('Είστε σίγουροι ότι θέλετε να ακυρώσετε τη συνδρομή σας;')) {
-      return;
-    }
-
     startTransition(async () => {
       const result = await cancelSubscription(true);
       if (result.success) {
@@ -42,9 +49,9 @@ export default function SubscriptionManagement({
   // Free plan state
   if (!subscription || subscription.plan === 'free' || subscription.status === 'canceled') {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className='flex items-center gap-2'>
+      <Card className='w-full max-w-lg shadow-lg'>
+        <CardHeader className='pb-3'>
+          <CardTitle className='text-lg flex items-center gap-2'>
             Βασικό Πακέτο
             <Badge variant='outline'>Δωρεάν</Badge>
           </CardTitle>
@@ -53,8 +60,8 @@ export default function SubscriptionManagement({
           <p className='text-muted-foreground'>
             Αναβαθμίστε στο Προωθημένο πακέτο για περισσότερες δυνατότητες.
           </p>
-          <Button onClick={() => openSheet()}>
-            <Crown className='size-4 mr-2' />
+          <Button className='w-full sm:w-auto' onClick={() => openSheet()}>
+            <Crown className='size-4' />
             Αναβάθμιση σε Προωθημένο
           </Button>
         </CardContent>
@@ -64,9 +71,9 @@ export default function SubscriptionManagement({
 
   // Active subscription
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className='flex items-center gap-2'>
+    <Card className='w-full max-w-lg shadow-lg'>
+      <CardHeader className='pb-3'>
+        <CardTitle className='text-lg flex items-center gap-2'>
           Προωθημένο Πακέτο
           <Badge>{isActive ? 'Ενεργό' : subscription.status}</Badge>
           {isCanceling && (
@@ -112,18 +119,36 @@ export default function SubscriptionManagement({
 
         <div className='flex gap-2'>
           {!isCanceling && (
-            <Button
-              variant='destructive'
-              size='sm'
-              onClick={handleCancel}
-              disabled={isPending}
-            >
-              {isPending ? (
-                <Loader2 className='size-4 animate-spin' />
-              ) : (
-                'Ακύρωση Συνδρομής'
-              )}
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant='destructive' size='sm' disabled={isPending}>
+                  {isPending ? (
+                    <Loader2 className='size-4 animate-spin' />
+                  ) : (
+                    'Ακύρωση Συνδρομής'
+                  )}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Ακύρωση Συνδρομής</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Είστε σίγουροι ότι θέλετε να ακυρώσετε τη συνδρομή σας; Θα
+                    διατηρήσετε πρόσβαση στις δυνατότητες έως το τέλος της
+                    τρέχουσας περιόδου χρέωσης.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Άκυρο</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleCancel}
+                    className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                  >
+                    Ακύρωση Συνδρομής
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
         </div>
       </CardContent>
