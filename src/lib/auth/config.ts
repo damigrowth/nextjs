@@ -2,8 +2,18 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { nextCookies } from 'better-auth/next-js';
 import { admin, apiKey, jwt, username } from 'better-auth/plugins';
+import { stripe as stripePlugin } from '@better-auth/stripe';
+import Stripe from 'stripe';
 import { localization } from 'better-auth-localization';
-import { User, UserRole, UserType, JourneyStep } from '@prisma/client';
+import {
+  User,
+  UserRole,
+  UserType,
+  JourneyStep,
+  SubscriptionStatus,
+  SubscriptionPlan,
+  BillingInterval,
+} from '@prisma/client';
 import {
   sendVerificationEmail,
   sendWelcomeEmail,
@@ -19,6 +29,224 @@ import {
   support as supportRole,
   editor as editorRole,
 } from './permissions';
+
+/**
+ * Lazy Stripe client initialization
+ * Only creates the client when Stripe is the selected provider and keys are configured
+ * Prevents module-load crashes when STRIPE_SECRET_KEY is not set
+ */
+function getStripeClient(): Stripe | null {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+
+  if (!secretKey) {
+    // Silently return null - Stripe is not configured
+    return null;
+  }
+
+  try {
+    return new Stripe(secretKey, {
+      apiVersion: '2026-01-28.clover',
+      typescript: true,
+    });
+  } catch (error) {
+    console.warn('Failed to initialize Stripe client:', error);
+    return null;
+  }
+}
+
+/**
+ * Map Stripe subscription status to our Prisma enum
+ */
+function mapStripeStatus(status: string): SubscriptionStatus {
+  const statusMap: Record<string, SubscriptionStatus> = {
+    active: 'active',
+    past_due: 'past_due',
+    canceled: 'canceled',
+    incomplete: 'incomplete',
+    trialing: 'trialing',
+    unpaid: 'unpaid',
+    incomplete_expired: 'incomplete',
+    paused: 'active', // Treat paused as active for now
+  };
+  return statusMap[status] || 'incomplete';
+}
+
+/**
+ * Map plan name to our Prisma enum
+ */
+function mapPlanName(planName: string): SubscriptionPlan {
+  if (planName === 'promoted') {
+    return 'promoted';
+  }
+  return 'free';
+}
+
+/**
+ * Sync Better Auth Stripe subscription to YOUR database (source of truth)
+ * This function is called by the Stripe plugin hooks when subscription state changes
+ */
+async function syncStripeSubscriptionToYourDB(
+  betterAuthSub: {
+    referenceId: string;
+    stripeCustomerId?: string;
+    stripeSubscriptionId?: string;
+    plan?: string;
+    status?: string;
+    periodStart?: Date;
+    periodEnd?: Date;
+    cancelAtPeriodEnd?: boolean;
+    priceId?: string;
+  },
+  status: string
+): Promise<void> {
+  try {
+    // Get profile ID from user ID (referenceId is the user ID)
+    const profile = await prisma.profile.findFirst({
+      where: { uid: betterAuthSub.referenceId },
+      select: { id: true },
+    });
+
+    if (!profile) {
+      console.warn(
+        `No profile found for user ${betterAuthSub.referenceId}, skipping subscription sync`
+      );
+      return;
+    }
+
+    const mappedStatus = mapStripeStatus(status);
+    const mappedPlan = mapPlanName(betterAuthSub.plan || 'free');
+
+    // Determine billing interval from price ID (annual vs monthly)
+    // Annual price IDs typically match STRIPE_PROMOTED_ANNUAL_PRICE_ID
+    const annualPriceId = process.env.STRIPE_PROMOTED_ANNUAL_PRICE_ID;
+    const billingInterval: BillingInterval | null =
+      betterAuthSub.priceId && annualPriceId && betterAuthSub.priceId === annualPriceId
+        ? 'year'
+        : 'month';
+
+    await prisma.subscription.upsert({
+      where: { pid: profile.id },
+      create: {
+        pid: profile.id,
+        provider: 'stripe',
+        providerCustomerId: betterAuthSub.stripeCustomerId || null,
+        providerSubscriptionId: betterAuthSub.stripeSubscriptionId || null,
+        // Legacy fields for backward compatibility
+        stripeCustomerId: betterAuthSub.stripeCustomerId || '',
+        stripeSubscriptionId: betterAuthSub.stripeSubscriptionId || null,
+        stripePriceId: betterAuthSub.priceId || null,
+        plan: mappedPlan,
+        status: mappedStatus,
+        billingInterval,
+        currentPeriodStart: betterAuthSub.periodStart || null,
+        currentPeriodEnd: betterAuthSub.periodEnd || null,
+        cancelAtPeriodEnd: betterAuthSub.cancelAtPeriodEnd || false,
+      },
+      update: {
+        providerCustomerId: betterAuthSub.stripeCustomerId || undefined,
+        providerSubscriptionId: betterAuthSub.stripeSubscriptionId || undefined,
+        // Legacy fields
+        stripeCustomerId: betterAuthSub.stripeCustomerId || undefined,
+        stripeSubscriptionId: betterAuthSub.stripeSubscriptionId || undefined,
+        stripePriceId: betterAuthSub.priceId || undefined,
+        plan: mappedPlan,
+        status: mappedStatus,
+        billingInterval,
+        currentPeriodStart: betterAuthSub.periodStart || undefined,
+        currentPeriodEnd: betterAuthSub.periodEnd || undefined,
+        cancelAtPeriodEnd: betterAuthSub.cancelAtPeriodEnd || false,
+      },
+    });
+
+    console.log(
+      `Synced Stripe subscription for profile ${profile.id}: ${mappedPlan} (${mappedStatus})`
+    );
+  } catch (error) {
+    console.error('Failed to sync Stripe subscription to database:', error);
+    // Don't throw - we don't want to break the webhook processing
+  }
+}
+
+/**
+ * Build Stripe plugin if configured
+ * Returns the plugin instance or null if Stripe is not configured
+ */
+function buildStripePlugin() {
+  const stripeClient = getStripeClient();
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!stripeClient || !webhookSecret) {
+    // Stripe not configured - return null
+    return null;
+  }
+
+  return stripePlugin({
+    stripeClient,
+    stripeWebhookSecret: webhookSecret,
+    createCustomerOnSignUp: false, // We create customers on first subscription
+
+    subscription: {
+      enabled: true,
+      plans: [
+        {
+          name: 'promoted',
+          priceId: process.env.STRIPE_PROMOTED_MONTHLY_PRICE_ID || '',
+          annualDiscountPriceId: process.env.STRIPE_PROMOTED_ANNUAL_PRICE_ID,
+        },
+      ],
+
+      // Sync to YOUR database when subscription changes
+      onSubscriptionComplete: async ({ subscription, plan }) => {
+        await syncStripeSubscriptionToYourDB(
+          {
+            referenceId: subscription.referenceId,
+            stripeCustomerId: subscription.stripeCustomerId,
+            stripeSubscriptionId: subscription.stripeSubscriptionId,
+            plan: plan?.name || 'promoted',
+            periodStart: subscription.periodStart,
+            periodEnd: subscription.periodEnd,
+            cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+            priceId: subscription.priceId,
+          },
+          'active'
+        );
+      },
+
+      onSubscriptionUpdate: async ({ subscription }) => {
+        await syncStripeSubscriptionToYourDB(
+          {
+            referenceId: subscription.referenceId,
+            stripeCustomerId: subscription.stripeCustomerId,
+            stripeSubscriptionId: subscription.stripeSubscriptionId,
+            plan: subscription.plan || 'promoted',
+            status: subscription.status,
+            periodStart: subscription.periodStart,
+            periodEnd: subscription.periodEnd,
+            cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+            priceId: subscription.priceId,
+          },
+          subscription.status || 'active'
+        );
+      },
+
+      onSubscriptionCancel: async ({ subscription }) => {
+        await syncStripeSubscriptionToYourDB(
+          {
+            referenceId: subscription.referenceId,
+            stripeCustomerId: subscription.stripeCustomerId,
+            stripeSubscriptionId: subscription.stripeSubscriptionId,
+            plan: subscription.plan || 'free',
+            periodStart: subscription.periodStart,
+            periodEnd: subscription.periodEnd,
+            cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+            priceId: subscription.priceId,
+          },
+          'canceled'
+        );
+      },
+    },
+  });
+}
 
 export const auth = betterAuth({
   // Production uses doulitsa.gr, development uses localhost, previews use VERCEL_URL
@@ -494,6 +722,8 @@ export const auth = betterAuth({
         expirationTime: '15m', // 15 minutes (match Supabase default)
       },
     }),
+    // Stripe plugin (conditionally added - returns null if not configured)
+    buildStripePlugin(),
     nextCookies(), // MUST be the last plugin in the array
-  ],
+  ].filter(Boolean) as any[], // Filter out null plugins (when Stripe is not configured)
 });

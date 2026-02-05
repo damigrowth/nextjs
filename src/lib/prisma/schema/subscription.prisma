@@ -18,25 +18,38 @@ enum BillingInterval {
 }
 
 model Subscription {
-  id                   String             @id @default(cuid())
-  pid                  String             @unique // One subscription per profile
-  stripeCustomerId     String             @unique
-  stripeSubscriptionId String?            @unique
-  stripePriceId        String?
-  plan                 SubscriptionPlan   @default(free)
-  status               SubscriptionStatus @default(incomplete)
-  billingInterval      BillingInterval?
-  currentPeriodStart   DateTime?
-  currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean            @default(false)
-  canceledAt           DateTime?
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  id                     String             @id @default(cuid())
+  pid                    String             @unique // One subscription per profile
+
+  // Provider info (multi-provider support)
+  provider               String             @default("stripe") // 'stripe' | 'paypal' | 'eurobank'
+
+  // Provider-specific IDs (polymorphic - use these for new code)
+  providerCustomerId     String?            @unique // Stripe customer ID, PayPal payer ID, etc.
+  providerSubscriptionId String?            @unique // Stripe sub ID, PayPal sub ID, etc.
+
+  // Legacy Stripe fields (keep for backward compatibility during migration)
+  stripeCustomerId       String             @unique
+  stripeSubscriptionId   String?            @unique
+  stripePriceId          String?
+
+  // Provider-agnostic subscription data
+  plan                   SubscriptionPlan   @default(free)
+  status                 SubscriptionStatus @default(incomplete)
+  billingInterval        BillingInterval?
+  currentPeriodStart     DateTime?
+  currentPeriodEnd       DateTime?
+  cancelAtPeriodEnd      Boolean            @default(false)
+  canceledAt             DateTime?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
 
   profile Profile @relation(fields: [pid], references: [id], onDelete: Cascade)
 
-  @@index([stripeCustomerId])
-  @@index([stripeSubscriptionId])
+  @@index([provider, providerCustomerId])
+  @@index([provider, providerSubscriptionId])
+  @@index([stripeCustomerId]) // Legacy index
+  @@index([stripeSubscriptionId]) // Legacy index
   @@index([pid, status])
   @@map("subscriptions")
 }

@@ -9,13 +9,11 @@ import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
 import type { ActionResult } from '@/lib/types/api';
 
 /**
- * Cancel the current user's subscription (provider-agnostic).
+ * Restore a subscription that was scheduled for cancellation (provider-agnostic).
  * Uses PaymentService facade which delegates to the configured payment provider.
- * By default, cancels at end of current billing period.
+ * Only works if the subscription has cancelAtPeriodEnd = true and hasn't expired yet.
  */
-export async function cancelSubscription(
-  cancelAtPeriodEnd: boolean = true,
-): Promise<ActionResult<{ canceledAt: Date | null }>> {
+export async function restoreSubscription(): Promise<ActionResult<{ restored: boolean }>> {
   try {
     const session = await requireAuth();
     const user = session.user;
@@ -34,9 +32,9 @@ export async function cancelSubscription(
       return { success: false, error: 'Το προφίλ δεν βρέθηκε' };
     }
 
-    // Use PaymentService to cancel subscription (provider-agnostic)
-    // PaymentService.cancelSubscription handles provider lookup and database update
-    await PaymentService.cancelSubscription(profile.id, cancelAtPeriodEnd);
+    // Use PaymentService to restore subscription (provider-agnostic)
+    // PaymentService.restoreSubscription handles provider lookup and database update
+    await PaymentService.restoreSubscription(profile.id);
 
     // Revalidate using existing centralized helper
     await revalidateProfile({
@@ -48,12 +46,9 @@ export async function cancelSubscription(
       includeServices: true,
     });
 
-    logCacheRevalidation('profile', profile.id, 'subscription cancellation');
+    logCacheRevalidation('profile', profile.id, 'subscription restoration');
 
-    return {
-      success: true,
-      data: { canceledAt: cancelAtPeriodEnd ? new Date() : null },
-    };
+    return { success: true, data: { restored: true } };
   } catch (error: any) {
     // Handle payment provider specific errors
     if (error instanceof ProviderNotConfiguredError) {
@@ -61,14 +56,14 @@ export async function cancelSubscription(
     }
     if (error instanceof ProviderOperationError) {
       console.error('Payment provider error:', error);
-      return { success: false, error: 'Αποτυχία ακύρωσης συνδρομής' };
+      return { success: false, error: 'Αποτυχία επαναφοράς συνδρομής' };
     }
     // Handle specific error messages from PaymentService
     if (error?.message === 'No subscription found') {
       return { success: false, error: 'Δεν βρέθηκε συνδρομή' };
     }
-    if (error?.message === 'No active subscription found') {
-      return { success: false, error: 'Δεν βρέθηκε ενεργή συνδρομή' };
+    if (error?.message === 'Subscription is not scheduled for cancellation') {
+      return { success: false, error: 'Η συνδρομή δεν είναι προγραμματισμένη για ακύρωση' };
     }
     return handleBetterAuthError(error);
   }

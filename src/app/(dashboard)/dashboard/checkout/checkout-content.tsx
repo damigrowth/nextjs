@@ -33,8 +33,9 @@ export default function CheckoutContent({
 
   const handleCheckout = () => {
     startTransition(async () => {
+      // Provider-agnostic checkout - only needs billing interval
+      // Plan defaults to 'promoted' in the action
       const result = await createCheckoutSession({
-        priceId: pricing.stripePriceId,
         billingInterval: interval,
       });
 

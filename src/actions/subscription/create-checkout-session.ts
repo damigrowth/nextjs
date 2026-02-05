@@ -1,20 +1,20 @@
 'use server';
 
 import { prisma } from '@/lib/prisma/client';
-import { stripe } from '@/lib/stripe/client';
-import { PRICING } from '@/lib/stripe/config';
+import { PaymentService } from '@/lib/payment';
 import { createCheckoutSessionSchema } from '@/lib/validations/subscription';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
+import { ProviderNotConfiguredError, ProviderOperationError } from '@/lib/payment';
 import type { ActionResult } from '@/lib/types/api';
 
 /**
- * Create a Stripe Checkout Session for subscription.
- * Creates a Stripe customer if one doesn't exist.
+ * Create a Checkout Session for subscription (provider-agnostic).
+ * Uses PaymentService facade which delegates to the configured payment provider.
  * Returns the checkout session URL to redirect to.
  */
 export async function createCheckoutSession(
-  input: { priceId: string; billingInterval: 'month' | 'year' },
+  input: { billingInterval: 'month' | 'year' },
 ): Promise<ActionResult<{ url: string }>> {
   try {
     const session = await requireAuth();
@@ -31,17 +31,11 @@ export async function createCheckoutSession(
       return { success: false, error: 'Μη έγκυρα δεδομένα' };
     }
 
-    const { priceId, billingInterval } = parsed.data;
-
-    // Verify priceId matches our configured prices
-    const validPriceIds = [PRICING.monthly.stripePriceId, PRICING.annual.stripePriceId];
-    if (!validPriceIds.includes(priceId)) {
-      return { success: false, error: 'Μη έγκυρο πακέτο τιμής' };
-    }
+    const { plan, billingInterval } = parsed.data;
 
     const profile = await prisma.profile.findUnique({
       where: { uid: user.id },
-      select: { id: true, email: true, displayName: true },
+      select: { id: true },
     });
 
     if (!profile) {
@@ -57,58 +51,27 @@ export async function createCheckoutSession(
       return { success: false, error: 'Έχετε ήδη ενεργή συνδρομή' };
     }
 
-    // Get or create Stripe customer
-    let stripeCustomerId = existingSub?.stripeCustomerId;
-
-    if (!stripeCustomerId) {
-      const customer = await stripe.customers.create({
-        email: profile.email || user.email,
-        name: profile.displayName || undefined,
-        metadata: {
-          profileId: profile.id,
-          userId: user.id,
-        },
-      });
-      stripeCustomerId = customer.id;
-
-      // Upsert subscription record with Stripe customer ID
-      await prisma.subscription.upsert({
-        where: { pid: profile.id },
-        create: {
-          pid: profile.id,
-          stripeCustomerId: customer.id,
-          plan: 'free',
-          status: 'incomplete',
-        },
-        update: {
-          stripeCustomerId: customer.id,
-        },
-      });
-    }
-
-    // Create Stripe Checkout Session
-    // Reuse BETTER_AUTH_URL as the app's base URL (same pattern as auth config)
+    // Use PaymentService to create checkout (provider-agnostic)
     const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
 
-    const checkoutSession = await stripe.checkout.sessions.create({
-      customer: stripeCustomerId,
-      mode: 'subscription',
-      payment_method_types: ['card'],
-      line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${baseUrl}/dashboard/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/dashboard/checkout`,
-      metadata: {
-        profileId: profile.id,
-        billingInterval,
-      },
+    const checkout = await PaymentService.createCheckout({
+      profileId: profile.id,
+      plan,
+      billingInterval,
+      successUrl: `${baseUrl}/dashboard/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: `${baseUrl}/dashboard/checkout`,
     });
 
-    if (!checkoutSession.url) {
+    return { success: true, data: { url: checkout.url } };
+  } catch (error: any) {
+    // Handle payment provider specific errors
+    if (error instanceof ProviderNotConfiguredError) {
+      return { success: false, error: 'Ο πάροχος πληρωμών δεν έχει ρυθμιστεί' };
+    }
+    if (error instanceof ProviderOperationError) {
+      console.error('Payment provider error:', error);
       return { success: false, error: 'Αποτυχία δημιουργίας συνεδρίας πληρωμής' };
     }
-
-    return { success: true, data: { url: checkoutSession.url } };
-  } catch (error: any) {
     return handleBetterAuthError(error);
   }
 }

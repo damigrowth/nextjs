@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe/client';
+import { getStripeForWebhook } from '@/lib/stripe/client';
 import { prisma } from '@/lib/prisma/client';
 import { revalidateProfile, logCacheRevalidation, CACHE_TAGS } from '@/lib/cache';
 import { revalidateTag } from 'next/cache';
 import type Stripe from 'stripe';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+
+// Get Stripe client for webhook processing
+const stripe = getStripeForWebhook();
 
 /**
  * Handle Stripe webhook events for subscription lifecycle.
@@ -70,9 +73,12 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const profileId = session.metadata?.profileId;
   if (!profileId || !session.subscription) return;
 
-  const stripeSubscription = await stripe.subscriptions.retrieve(
+  // Retrieve subscription from Stripe (cast to correct type for SDK v20+)
+  const stripeSubscription = (await stripe.subscriptions.retrieve(
     session.subscription as string,
-  );
+  )) as unknown as Stripe.Subscription;
+  // Type assertion for Stripe SDK v20+ compatibility
+  const sub = stripeSubscription as any;
 
   // Get profile data needed for cache revalidation
   const profile = await prisma.profile.findUnique({
@@ -84,16 +90,23 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     await tx.subscription.update({
       where: { pid: profileId },
       data: {
+        // Provider-agnostic fields (new)
+        provider: 'stripe',
+        providerCustomerId: session.customer as string,
+        providerSubscriptionId: stripeSubscription.id,
+        // Legacy Stripe fields (backward compatibility)
+        stripeCustomerId: session.customer as string,
         stripeSubscriptionId: stripeSubscription.id,
         stripePriceId: stripeSubscription.items.data[0]?.price.id,
+        // Subscription data
         plan: 'promoted',
         status: 'active',
         billingInterval:
           stripeSubscription.items.data[0]?.price.recurring?.interval === 'year'
             ? 'year'
             : 'month',
-        currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
-        currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
+        currentPeriodStart: new Date(sub.current_period_start * 1000),
+        currentPeriodEnd: new Date(sub.current_period_end * 1000),
       },
     });
 
@@ -125,6 +138,8 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   if (!dbSub) return;
 
   const isActive = subscription.status === 'active';
+  // Type assertion for Stripe SDK v20+ compatibility
+  const sub = subscription as any;
 
   const profile = await prisma.profile.findUnique({
     where: { id: dbSub.pid },
@@ -135,10 +150,16 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     await tx.subscription.update({
       where: { stripeSubscriptionId: subscription.id },
       data: {
+        // Ensure provider fields are set
+        provider: 'stripe',
+        providerSubscriptionId: subscription.id,
+        // Subscription status and data
         status: subscription.status as any,
-        currentPeriodStart: new Date(subscription.current_period_start * 1000),
-        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        currentPeriodStart: new Date(sub.current_period_start * 1000),
+        currentPeriodEnd: new Date(sub.current_period_end * 1000),
+        cancelAtPeriodEnd: sub.cancel_at_period_end,
+        canceledAt: sub.cancel_at_period_end ? new Date() : null,
+        // Legacy Stripe fields
         stripePriceId: subscription.items.data[0]?.price.id,
         billingInterval:
           subscription.items.data[0]?.price.recurring?.interval === 'year'
@@ -214,12 +235,14 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
-  if (!invoice.subscription) return;
+  // Type assertion for Stripe SDK v20+ compatibility
+  const inv = invoice as any;
+  if (!inv.subscription) return;
 
   const subscriptionId =
-    typeof invoice.subscription === 'string'
-      ? invoice.subscription
-      : invoice.subscription.id;
+    typeof inv.subscription === 'string'
+      ? inv.subscription
+      : inv.subscription.id;
 
   await prisma.subscription.updateMany({
     where: { stripeSubscriptionId: subscriptionId },
