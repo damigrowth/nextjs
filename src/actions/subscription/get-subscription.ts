@@ -37,7 +37,7 @@ export async function getSubscription(): Promise<
     const subscription = await PaymentService.getSubscription(profile.id);
 
     return { success: true, data: { subscription } };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleBetterAuthError(error);
   }
 }

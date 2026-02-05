@@ -49,7 +49,7 @@ export async function restoreSubscription(): Promise<ActionResult<{ restored: bo
     logCacheRevalidation('profile', profile.id, 'subscription restoration');
 
     return { success: true, data: { restored: true } };
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Handle payment provider specific errors
     if (error instanceof ProviderNotConfiguredError) {
       return { success: false, error: 'Ο πάροχος πληρωμών δεν έχει ρυθμιστεί' };
@@ -59,11 +59,13 @@ export async function restoreSubscription(): Promise<ActionResult<{ restored: bo
       return { success: false, error: 'Αποτυχία επαναφοράς συνδρομής' };
     }
     // Handle specific error messages from PaymentService
-    if (error?.message === 'No subscription found') {
-      return { success: false, error: 'Δεν βρέθηκε συνδρομή' };
-    }
-    if (error?.message === 'Subscription is not scheduled for cancellation') {
-      return { success: false, error: 'Η συνδρομή δεν είναι προγραμματισμένη για ακύρωση' };
+    if (error instanceof Error) {
+      if (error.message === 'No subscription found') {
+        return { success: false, error: 'Δεν βρέθηκε συνδρομή' };
+      }
+      if (error.message === 'Subscription is not scheduled for cancellation') {
+        return { success: false, error: 'Η συνδρομή δεν είναι προγραμματισμένη για ακύρωση' };
+      }
     }
     return handleBetterAuthError(error);
   }

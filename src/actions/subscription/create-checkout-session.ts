@@ -63,7 +63,7 @@ export async function createCheckoutSession(
     });
 
     return { success: true, data: { url: checkout.url } };
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Handle payment provider specific errors
     if (error instanceof ProviderNotConfiguredError) {
       return { success: false, error: 'Ο πάροχος πληρωμών δεν έχει ρυθμιστεί' };

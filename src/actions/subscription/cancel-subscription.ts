@@ -54,7 +54,7 @@ export async function cancelSubscription(
       success: true,
       data: { canceledAt: cancelAtPeriodEnd ? new Date() : null },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Handle payment provider specific errors
     if (error instanceof ProviderNotConfiguredError) {
       return { success: false, error: 'Ο πάροχος πληρωμών δεν έχει ρυθμιστεί' };
@@ -64,11 +64,13 @@ export async function cancelSubscription(
       return { success: false, error: 'Αποτυχία ακύρωσης συνδρομής' };
     }
     // Handle specific error messages from PaymentService
-    if (error?.message === 'No subscription found') {
-      return { success: false, error: 'Δεν βρέθηκε συνδρομή' };
-    }
-    if (error?.message === 'No active subscription found') {
-      return { success: false, error: 'Δεν βρέθηκε ενεργή συνδρομή' };
+    if (error instanceof Error) {
+      if (error.message === 'No subscription found') {
+        return { success: false, error: 'Δεν βρέθηκε συνδρομή' };
+      }
+      if (error.message === 'No active subscription found') {
+        return { success: false, error: 'Δεν βρέθηκε ενεργή συνδρομή' };
+      }
     }
     return handleBetterAuthError(error);
   }

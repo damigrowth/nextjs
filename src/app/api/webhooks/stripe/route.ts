@@ -4,8 +4,17 @@ import { prisma } from '@/lib/prisma/client';
 import { revalidateProfile, logCacheRevalidation, CACHE_TAGS } from '@/lib/cache';
 import { revalidateTag } from 'next/cache';
 import type Stripe from 'stripe';
+import {
+  getSubscriptionPeriod,
+  mapStripeStatus,
+  getInvoiceSubscriptionId,
+} from '@/lib/types/stripe';
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+// Validate webhook secret at startup
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+if (!webhookSecret) {
+  console.error('STRIPE_WEBHOOK_SECRET is not configured');
+}
 
 // Get Stripe client for webhook processing
 const stripe = getStripeForWebhook();
@@ -19,6 +28,12 @@ const stripe = getStripeForWebhook();
  * - invoice.payment_failed → Mark as past_due
  */
 export async function POST(request: NextRequest) {
+  // Runtime check for webhook secret
+  if (!webhookSecret) {
+    console.error('STRIPE_WEBHOOK_SECRET is not configured');
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
+  }
+
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
 
@@ -30,7 +45,7 @@ export async function POST(request: NextRequest) {
 
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Webhook signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
@@ -73,12 +88,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const profileId = session.metadata?.profileId;
   if (!profileId || !session.subscription) return;
 
-  // Retrieve subscription from Stripe (cast to correct type for SDK v20+)
-  const stripeSubscription = (await stripe.subscriptions.retrieve(
+  // Retrieve subscription from Stripe
+  const stripeSubscription = await stripe.subscriptions.retrieve(
     session.subscription as string,
-  )) as unknown as Stripe.Subscription;
-  // Type assertion for Stripe SDK v20+ compatibility
-  const sub = stripeSubscription as any;
+  );
+
+  // Get subscription period using type-safe utility
+  const period = getSubscriptionPeriod(stripeSubscription);
 
   // Get profile data needed for cache revalidation
   const profile = await prisma.profile.findUnique({
@@ -105,8 +121,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           stripeSubscription.items.data[0]?.price.recurring?.interval === 'year'
             ? 'year'
             : 'month',
-        currentPeriodStart: new Date(sub.current_period_start * 1000),
-        currentPeriodEnd: new Date(sub.current_period_end * 1000),
+        currentPeriodStart: period.start,
+        currentPeriodEnd: period.end,
       },
     });
 
@@ -138,8 +154,9 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   if (!dbSub) return;
 
   const isActive = subscription.status === 'active';
-  // Type assertion for Stripe SDK v20+ compatibility
-  const sub = subscription as any;
+  // Get subscription period using type-safe utility
+  const period = getSubscriptionPeriod(subscription);
+  const mappedStatus = mapStripeStatus(subscription.status);
 
   const profile = await prisma.profile.findUnique({
     where: { id: dbSub.pid },
@@ -154,11 +171,11 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
         provider: 'stripe',
         providerSubscriptionId: subscription.id,
         // Subscription status and data
-        status: subscription.status as any,
-        currentPeriodStart: new Date(sub.current_period_start * 1000),
-        currentPeriodEnd: new Date(sub.current_period_end * 1000),
-        cancelAtPeriodEnd: sub.cancel_at_period_end,
-        canceledAt: sub.cancel_at_period_end ? new Date() : null,
+        status: mappedStatus,
+        currentPeriodStart: period.start,
+        currentPeriodEnd: period.end,
+        cancelAtPeriodEnd: period.cancelAtPeriodEnd,
+        canceledAt: period.cancelAtPeriodEnd ? new Date() : null,
         // Legacy Stripe fields
         stripePriceId: subscription.items.data[0]?.price.id,
         billingInterval:
@@ -235,14 +252,9 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
-  // Type assertion for Stripe SDK v20+ compatibility
-  const inv = invoice as any;
-  if (!inv.subscription) return;
-
-  const subscriptionId =
-    typeof inv.subscription === 'string'
-      ? inv.subscription
-      : inv.subscription.id;
+  // Get subscription ID using type-safe utility
+  const subscriptionId = getInvoiceSubscriptionId(invoice);
+  if (!subscriptionId) return;
 
   await prisma.subscription.updateMany({
     where: { stripeSubscriptionId: subscriptionId },

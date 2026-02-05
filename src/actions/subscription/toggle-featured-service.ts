@@ -84,7 +84,7 @@ export async function toggleFeaturedService(
     logCacheRevalidation('service', service.id, 'featured toggle');
 
     return { success: true, data: { featured: !service.featured } };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleBetterAuthError(error);
   }
 }
