@@ -29,6 +29,9 @@ const routeLabels: Record<string, string> = {
   presentation: 'Παρουσίαση',
   verification: 'Πιστοποίηση',
   billing: 'Στοιχεία Τιμολόγησης',
+  subscription: 'Συνδρομή',
+  checkout: 'Ολοκλήρωση Πληρωμής',
+  success: 'Επιτυχής Εγγραφή',
 };
 
 export function DashboardBreadcrumb() {

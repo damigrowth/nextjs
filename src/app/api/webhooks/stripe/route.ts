@@ -123,6 +123,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             : 'month',
         currentPeriodStart: period.start,
         currentPeriodEnd: period.end,
+        // Reset cancellation fields for new subscription
+        cancelAtPeriodEnd: false,
+        canceledAt: null,
       },
     });
 
