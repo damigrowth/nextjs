@@ -22,6 +22,8 @@ import {
   Info,
   Presentation,
   Globe,
+  Crown,
+  ChevronRight,
 } from 'lucide-react';
 
 import { NavMain } from './dashboard-nav-main';
@@ -29,18 +31,31 @@ import { NavUser } from './dashboard-nav-user';
 import { NavServices } from './dashboard-nav-services';
 import { SupportFeedbackDialog } from './support-feedback-dialog';
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
+import { NextLink } from '@/components';
 import { Badge } from '@/components/ui/badge';
 import { useSession } from '@/lib/auth/client';
 import { capitalizeFirstLetter } from '@/lib/utils/validation';
 import { useUnreadCount } from '@/lib/hooks/use-unread-count';
+import { usePaymentsAccess } from '@/lib/hooks/use-payments-access';
 import FlaticonMenu from '@/components/icon/flaticon/flaticon-menu';
 import { usePathname } from 'next/navigation';
 
@@ -49,12 +64,15 @@ export default function DashboardSidebar({
 }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession();
   const { unreadCount } = useUnreadCount();
+  const { allowed: canAccessPayments, isLoading: isLoadingAccess } = usePaymentsAccess();
   const pathname = usePathname();
 
   // Use Better Auth session data
   const user = session?.user;
   const isProfessional =
-    user?.role === 'freelancer' || user?.role === 'company';
+    user?.role === 'freelancer' ||
+    user?.role === 'company' ||
+    user?.role === 'admin';
 
   // Don't show badge when on messages routes
   const isOnMessagesRoute = pathname.startsWith('/dashboard/messages');
@@ -72,7 +90,10 @@ export default function DashboardSidebar({
       url: '/dashboard/messages',
       icon: MessageSquare,
       badge: showBadge ? (
-        <Badge variant='destructive' className='h-4 min-w-4 flex items-center justify-center px-1 text-[10px] font-semibold rounded-full'>
+        <Badge
+          variant='destructive'
+          className='h-4 min-w-4 flex items-center justify-center px-1 text-[10px] font-semibold rounded-full'
+        >
           {unreadCount > 99 ? '99+' : unreadCount}
         </Badge>
       ) : undefined,
@@ -90,46 +111,6 @@ export default function DashboardSidebar({
   ];
 
   // Group 2: Services (professionals only) - now handled by NavServices component
-
-  // Group 3: Account Management
-  const accountGroup = [
-    {
-      title: 'Διαχείριση',
-      url: '/dashboard/profile/account',
-      icon: Settings,
-      items: user?.type === 'pro' ? [
-        {
-          title: 'Λογαριασμός',
-          url: '/dashboard/profile/account',
-        },
-        {
-          title: 'Βασικά στοιχεία',
-          url: '/dashboard/profile/basic',
-        },
-        {
-          title: 'Τρόποι Παροχής',
-          url: '/dashboard/profile/coverage',
-        },
-        {
-          title: 'Πρόσθετα Στοιχεία',
-          url: '/dashboard/profile/additional',
-        },
-        {
-          title: 'Παρουσίαση',
-          url: '/dashboard/profile/presentation',
-        },
-        {
-          title: 'Πιστοποίηση',
-          url: '/dashboard/profile/verification',
-        },
-        {
-          title: 'Στοιχεία Τιμολόγησης',
-          url: '/dashboard/profile/billing',
-        },
-      ] : undefined,
-    },
-  ];
-
 
   const userData = {
     name: isProfessional
@@ -176,23 +157,130 @@ export default function DashboardSidebar({
 
         {/* Group 2: Services (if professional) */}
         {isProfessional && (
-          <div className="space-y-2">
-            <div className="px-2 py-1.5">
-              <h4 className="text-xs font-medium text-sidebar-foreground/70 uppercase tracking-wider">
-                Υπηρεσίες
-              </h4>
-            </div>
+          <SidebarGroup>
+            <SidebarGroupLabel className='uppercase'>Υπηρεσίες</SidebarGroupLabel>
             <NavServices />
-            <NavMain items={[{
-              title: 'Δημιουργία Υπηρεσίας',
-              url: '/dashboard/services/create',
-              icon: Plus,
-            }]} />
-          </div>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip='Δημιουργία Υπηρεσίας'
+                  isActive={pathname === '/dashboard/services/create'}
+                >
+                  <NextLink href='/dashboard/services/create'>
+                    <Plus />
+                    <span>Δημιουργία Υπηρεσίας</span>
+                  </NextLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
+
+        {/* Subscription (if professional and has payment access) */}
+        {isProfessional && !isLoadingAccess && canAccessPayments && (
+          <SidebarGroup>
+            <SidebarGroupLabel className='uppercase'>Πακέτο</SidebarGroupLabel>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip='Συνδρομή'
+                  isActive={pathname.startsWith('/dashboard/subscription') || pathname.startsWith('/dashboard/checkout')}
+                >
+                  <NextLink href='/dashboard/subscription'>
+                    <Crown />
+                    <span>Συνδρομή</span>
+                  </NextLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
         )}
 
         {/* Group 3: Account Management */}
-        <NavMain items={accountGroup} label='Λογαριασμός' />
+        <SidebarGroup>
+          <SidebarGroupLabel className='uppercase'>Λογαριασμός</SidebarGroupLabel>
+          <SidebarMenu>
+            <Collapsible asChild defaultOpen={pathname.startsWith('/dashboard/profile')}>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip='Διαχείριση'
+                  isActive={pathname.startsWith('/dashboard/profile')}
+                >
+                  <NextLink href='/dashboard/profile/account'>
+                    <Settings />
+                    <span>Διαχείριση</span>
+                  </NextLink>
+                </SidebarMenuButton>
+                {user?.type === 'pro' && (
+                  <>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuAction className='data-[state=open]:rotate-90'>
+                        <ChevronRight />
+                        <span className='sr-only'>Toggle</span>
+                      </SidebarMenuAction>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild isActive={pathname === '/dashboard/profile/account'}>
+                            <NextLink href='/dashboard/profile/account'>
+                              <span>Λογαριασμός</span>
+                            </NextLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild isActive={pathname === '/dashboard/profile/basic'}>
+                            <NextLink href='/dashboard/profile/basic'>
+                              <span>Βασικά στοιχεία</span>
+                            </NextLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild isActive={pathname === '/dashboard/profile/coverage'}>
+                            <NextLink href='/dashboard/profile/coverage'>
+                              <span>Τρόποι Παροχής</span>
+                            </NextLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild isActive={pathname === '/dashboard/profile/additional'}>
+                            <NextLink href='/dashboard/profile/additional'>
+                              <span>Πρόσθετα Στοιχεία</span>
+                            </NextLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild isActive={pathname === '/dashboard/profile/presentation'}>
+                            <NextLink href='/dashboard/profile/presentation'>
+                              <span>Παρουσίαση</span>
+                            </NextLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild isActive={pathname === '/dashboard/profile/verification'}>
+                            <NextLink href='/dashboard/profile/verification'>
+                              <span>Πιστοποίηση</span>
+                            </NextLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild isActive={pathname === '/dashboard/profile/billing'}>
+                            <NextLink href='/dashboard/profile/billing'>
+                              <span>Στοιχεία Τιμολόγησης</span>
+                            </NextLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </>
+                )}
+              </SidebarMenuItem>
+            </Collapsible>
+          </SidebarMenu>
+        </SidebarGroup>
 
         {/* Secondary Navigation - Support/Feedback */}
         <div className='mt-auto px-2'>

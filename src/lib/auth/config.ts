@@ -356,7 +356,9 @@ export const auth = betterAuth({
               where: { id: user.id },
               data: {
                 role: pendingRole as UserRole, // Set role here (admin plugin allows after creation)
-                step: (hasOAuthIntent ? 'OAUTH_SETUP' : 'TYPE_SELECTION') as JourneyStep,
+                step: (hasOAuthIntent
+                  ? 'OAUTH_SETUP'
+                  : 'TYPE_SELECTION') as JourneyStep,
                 confirmed: true, // OAuth users are pre-confirmed
                 emailVerified: true, // OAuth providers have verified emails
               },

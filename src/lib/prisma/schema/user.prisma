@@ -118,6 +118,7 @@ model Profile {
   services        Service[]
   verification    ProfileVerification?
   savedBy         SavedProfile[]
+  subscription    Subscription?
 
   // ============================================================================
   // OPTIMIZED INDEXES (Performance Optimization - ML15-25)

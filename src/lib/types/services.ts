@@ -72,6 +72,7 @@ export interface UserServiceTableData {
   updatedAt: Date;
   refreshedAt: Date | null;
   sortDate: Date;
+  featured: boolean;
 }
 
 export interface UserServicesResponse {
@@ -80,6 +81,7 @@ export interface UserServicesResponse {
   page: number;
   limit: number;
   totalPages: number;
+  canFeatureMore: boolean;
 }
 
 // Service status types

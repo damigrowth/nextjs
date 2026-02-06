@@ -111,6 +111,8 @@ export interface ServicePageData {
   tagsData: (DatasetItem | null)[];
   // Related services from the same category
   relatedServices: ServiceCardData[];
+  // Additional services from same profile (promoted subscribers only)
+  additionalServices: ServiceCardData[];
   // Reviews data
   serviceReviews: {
     reviews: ReviewWithAuthor[];
@@ -319,6 +321,7 @@ async function _getServicePageData(
         },
       },
       orderBy: [
+        { featured: 'desc' }, // Promoted subscribers' services first
         { rating: 'desc' },
         { reviewCount: 'desc' },
         { updatedAt: 'desc' },
@@ -365,6 +368,57 @@ async function _getServicePageData(
       },
     );
 
+    // Check if profile is a promoted subscriber for "Additional Services" section
+    let additionalServices: ServiceCardData[] = [];
+
+    const profileSubscription = await prisma.subscription.findUnique({
+      where: { pid: service.pid },
+      select: { plan: true, status: true },
+    });
+
+    if (profileSubscription?.plan === 'promoted' && profileSubscription?.status === 'active') {
+      const otherServices = await prisma.service.findMany({
+        where: {
+          pid: service.pid,
+          status: 'published',
+          id: { not: service.id },
+        },
+        include: {
+          profile: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              image: true,
+            },
+          },
+        },
+        take: 5,
+        orderBy: [{ featured: 'desc' }, { rating: 'desc' }],
+      });
+
+      additionalServices = otherServices.map((s) => {
+        const cat = findServiceById(s.category);
+        return {
+          id: s.id,
+          title: s.title,
+          category: cat?.label,
+          slug: s.slug,
+          price: s.price,
+          rating: s.rating,
+          reviewCount: s.reviewCount,
+          media: s.media,
+          type: s.type,
+          profile: {
+            id: s.profile.id,
+            displayName: s.profile.displayName,
+            username: s.profile.username,
+            image: s.profile.image,
+          },
+        };
+      });
+    }
+
     return {
       success: true,
       data: {
@@ -384,6 +438,7 @@ async function _getServicePageData(
         settlementMethodsData,
         tagsData,
         relatedServices,
+        additionalServices,
         serviceReviews: serviceReviewsResult.success
           ? serviceReviewsResult.data
           : { reviews: [], total: 0 },
