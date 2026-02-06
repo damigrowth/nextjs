@@ -117,11 +117,20 @@ export async function listUsers(
       const searchOperator = params.searchOperator || 'contains';
 
       if (searchOperator === 'contains') {
-        where[searchField] = { contains: params.searchValue, mode: 'insensitive' };
+        where[searchField] = {
+          contains: params.searchValue,
+          mode: 'insensitive',
+        };
       } else if (searchOperator === 'starts_with') {
-        where[searchField] = { startsWith: params.searchValue, mode: 'insensitive' };
+        where[searchField] = {
+          startsWith: params.searchValue,
+          mode: 'insensitive',
+        };
       } else if (searchOperator === 'ends_with') {
-        where[searchField] = { endsWith: params.searchValue, mode: 'insensitive' };
+        where[searchField] = {
+          endsWith: params.searchValue,
+          mode: 'insensitive',
+        };
       }
     }
 
@@ -222,7 +231,6 @@ export async function createUser(data: z.infer<typeof adminCreateUserSchema>) {
 
     // Your Better Auth configuration supports custom roles through additionalFields and database hooks
     // Pass the role directly - your database hook will handle it correctly
-    // @ts-expect-error - createUser is added by admin plugin but not in types
     const result = await auth.api.createUser({
       body: {
         email: validatedData.email,
@@ -250,7 +258,10 @@ export async function createUser(data: z.infer<typeof adminCreateUserSchema>) {
 
 export async function setUserRole(data: z.infer<typeof adminSetRoleSchema>) {
   try {
-    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
+    const session = await getAdminSessionWithPermission(
+      ADMIN_RESOURCES.USERS,
+      'view',
+    );
 
     const validatedData = adminSetRoleSchema.parse(data);
 
@@ -263,7 +274,6 @@ export async function setUserRole(data: z.infer<typeof adminSetRoleSchema>) {
     }
 
     // Your Better Auth supports all your custom roles: 'user', 'freelancer', 'company', 'admin'
-    // @ts-expect-error - setRole is added by admin plugin but not in types
     const result = await auth.api.setRole({
       body: {
         userId: validatedData.userId,
@@ -291,7 +301,6 @@ export async function banUser(data: z.infer<typeof adminBanUserSchema>) {
 
     const validatedData = adminBanUserSchema.parse(data);
 
-    // @ts-expect-error - banUser is added by admin plugin but not in types
     const result = await auth.api.banUser({
       body: validatedData,
       headers: await headers(),
@@ -316,7 +325,6 @@ export async function unbanUser(data: z.infer<typeof adminUnbanUserSchema>) {
 
     const validatedData = adminUnbanUserSchema.parse(data);
 
-    // @ts-expect-error - unbanUser is added by admin plugin but not in types
     const result = await auth.api.unbanUser({
       body: validatedData,
       headers: await headers(),
@@ -341,7 +349,6 @@ export async function removeUser(data: z.infer<typeof adminRemoveUserSchema>) {
 
     const validatedData = adminRemoveUserSchema.parse(data);
 
-    // @ts-expect-error - removeUser is added by admin plugin but not in types
     const result = await auth.api.removeUser({
       body: validatedData,
       headers: await headers(),
@@ -368,7 +375,6 @@ export async function impersonateUser(
 
     const validatedData = adminImpersonateUserSchema.parse(data);
 
-    // @ts-expect-error - impersonateUser is added by admin plugin but not in types
     const result = await auth.api.impersonateUser({
       body: validatedData,
       headers: await headers(),
@@ -392,7 +398,6 @@ export async function stopImpersonating() {
   try {
     await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
-    // @ts-expect-error - stopImpersonating is added by admin plugin but not in types
     const result = await auth.api.stopImpersonating({
       headers: await headers(),
     });
@@ -415,7 +420,6 @@ export async function listUserSessions(userId: string) {
   try {
     await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
-    // @ts-expect-error - listUserSessions is added by admin plugin but not in types
     const result = await auth.api.listUserSessions({
       body: { userId },
       headers: await headers(),
@@ -448,7 +452,6 @@ export async function revokeUserSession(
 
     const validatedData = revokeSessionSchema.parse(data);
 
-    // @ts-expect-error - revokeUserSession is added by admin plugin but not in types
     const result = await auth.api.revokeUserSession({
       body: validatedData,
       headers: await headers(),
@@ -478,7 +481,6 @@ export async function revokeAllUserSessions(
 
     const validatedData = revokeUserSessionsSchema.parse(data);
 
-    // @ts-expect-error - revokeUserSessions is added by admin plugin but not in types
     const result = await auth.api.revokeUserSessions({
       body: validatedData,
       headers: await headers(),
@@ -514,7 +516,6 @@ export async function updateUser(data: z.infer<typeof adminUpdateUserSchema>) {
 
     // Handle role update if provided
     if (updateFields.role) {
-      // @ts-expect-error - setRole is added by admin plugin but not in types
       const roleResult = await auth.api.setRole({
         body: {
           userId,
@@ -560,7 +561,6 @@ export async function setUserPassword(
 
     const validatedData = adminSetPasswordSchema.parse(data);
 
-    // @ts-expect-error - setUserPassword is added by admin plugin but not in types
     const result = await auth.api.setUserPassword({
       body: validatedData,
       headers: await headers(),
@@ -602,7 +602,6 @@ export async function updateUserBasicInfo(data: {
 
     // Check if username is being changed and if it's already taken
     if (data.username !== undefined) {
-      // @ts-expect-error - isUsernameAvailable is added by admin plugin but not in types
       const usernameCheck = await auth.api.isUsernameAvailable({
         body: { username: data.username },
       });
@@ -618,7 +617,8 @@ export async function updateUserBasicInfo(data: {
       if (!usernameCheck?.available && !isKeepingSameUsername) {
         return {
           success: false,
-          error: 'Το συγκεκριμένο username χρησιμοποιείται ήδη. Επιλέξτε ένα διαφορετικό username.',
+          error:
+            'Το συγκεκριμένο username χρησιμοποιείται ήδη. Επιλέξτε ένα διαφορετικό username.',
         };
       }
     }
@@ -628,7 +628,8 @@ export async function updateUserBasicInfo(data: {
     if (data.name !== undefined) updateData.name = data.name;
     if (data.email !== undefined) updateData.email = data.email;
     if (data.username !== undefined) updateData.username = data.username;
-    if (data.displayName !== undefined) updateData.displayName = data.displayName;
+    if (data.displayName !== undefined)
+      updateData.displayName = data.displayName;
 
     const user = await prisma.user.update({
       where: { id: data.userId },
@@ -643,7 +644,10 @@ export async function updateUserBasicInfo(data: {
     console.error('Error updating user basic info:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update user basic info',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to update user basic info',
     };
   }
 }
@@ -668,7 +672,8 @@ export async function updateUserStatus(data: {
     const updateData: any = {};
     if (data.confirmed !== undefined) updateData.confirmed = data.confirmed;
     if (data.blocked !== undefined) updateData.blocked = data.blocked;
-    if (data.emailVerified !== undefined) updateData.emailVerified = data.emailVerified;
+    if (data.emailVerified !== undefined)
+      updateData.emailVerified = data.emailVerified;
     if (data.step !== undefined) updateData.step = data.step;
 
     const user = await prisma.user.update({
@@ -684,7 +689,8 @@ export async function updateUserStatus(data: {
     console.error('Error updating user status:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update user status',
+      error:
+        error instanceof Error ? error.message : 'Failed to update user status',
     };
   }
 }
@@ -721,7 +727,10 @@ export async function updateUserBanStatus(data: {
     console.error('Error updating user ban status:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update user ban status',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to update user ban status',
     };
   }
 }
@@ -751,7 +760,8 @@ export async function updateUserImage(data: {
     console.error('Error updating user image:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update user image',
+      error:
+        error instanceof Error ? error.message : 'Failed to update user image',
     };
   }
 }
@@ -776,13 +786,18 @@ export async function toggleUserBlock(data: {
     return {
       success: true,
       data: user,
-      message: data.blocked ? 'User blocked successfully' : 'User unblocked successfully',
+      message: data.blocked
+        ? 'User blocked successfully'
+        : 'User unblocked successfully',
     };
   } catch (error) {
     console.error('Error toggling user block status:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to toggle user block status',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to toggle user block status',
     };
   }
 }
@@ -807,13 +822,18 @@ export async function toggleUserConfirmation(data: {
     return {
       success: true,
       data: user,
-      message: data.confirmed ? 'User confirmed successfully' : 'User unconfirmed successfully',
+      message: data.confirmed
+        ? 'User confirmed successfully'
+        : 'User unconfirmed successfully',
     };
   } catch (error) {
     console.error('Error toggling user confirmation:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to toggle user confirmation',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to toggle user confirmation',
     };
   }
 }
@@ -844,7 +864,10 @@ export async function updateUserJourneyStep(data: {
     console.error('Error updating user journey step:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update user journey step',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to update user journey step',
     };
   }
 }
@@ -954,7 +977,8 @@ export async function getUserStats() {
     console.error('Error getting user stats:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to get user stats',
+      error:
+        error instanceof Error ? error.message : 'Failed to get user stats',
     };
   }
 }
@@ -984,10 +1008,15 @@ export async function updateUserBasicInfoAction(
     const validationResult = updateUserBasicInfoSchema.safeParse(rawData);
 
     if (!validationResult.success) {
-      console.error('User basic info validation errors:', validationResult.error);
+      console.error(
+        'User basic info validation errors:',
+        validationResult.error,
+      );
       return {
         success: false,
-        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+        error:
+          'Validation failed: ' +
+          validationResult.error.issues.map((e) => e.message).join(', '),
       };
     }
 
@@ -997,7 +1026,10 @@ export async function updateUserBasicInfoAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update user basic info',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to update user basic info',
     };
   }
 }
@@ -1028,7 +1060,9 @@ export async function updateUserStatusAction(
       console.error('User status validation errors:', validationResult.error);
       return {
         success: false,
-        error: 'Validation failed: ' + validationResult.error.issues.map((e) => e.message).join(', '),
+        error:
+          'Validation failed: ' +
+          validationResult.error.issues.map((e) => e.message).join(', '),
       };
     }
 
@@ -1056,7 +1090,8 @@ export async function updateUserStatusAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update user status',
+      error:
+        error instanceof Error ? error.message : 'Failed to update user status',
     };
   }
 }
@@ -1098,7 +1133,9 @@ export async function updateUserBanAction(
     const banDuration = formData.get('banDuration');
 
     if (banned && !isPermanent && banDuration) {
-      banExpires = new Date(Date.now() + Number(banDuration) * 24 * 60 * 60 * 1000);
+      banExpires = new Date(
+        Date.now() + Number(banDuration) * 24 * 60 * 60 * 1000,
+      );
     }
 
     const result = await updateUserBanStatus({
@@ -1112,7 +1149,10 @@ export async function updateUserBanAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update user ban status',
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to update user ban status',
     };
   }
 }
@@ -1145,7 +1185,8 @@ export async function updateUserImageAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update user image',
+      error:
+        error instanceof Error ? error.message : 'Failed to update user image',
     };
   }
 }
@@ -1153,10 +1194,7 @@ export async function updateUserImageAction(
 /**
  * Update user account (display name and image) - Admin version for useActionState
  */
-export async function updateAccountAdmin(
-  prevState: any,
-  formData: FormData,
-) {
+export async function updateAccountAdmin(prevState: any, formData: FormData) {
   try {
     // Verify admin authentication
     await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'view');
@@ -1188,15 +1226,17 @@ export async function updateAccountAdmin(
     }
 
     // Validate with schema
-    const validationResult = z.object({
-      userId: z.string().min(1),
-      displayName: z.string().min(1).max(100).optional(),
-      image: z.string().nullable().optional(),
-    }).safeParse({
-      userId,
-      displayName,
-      image: processedImage,
-    });
+    const validationResult = z
+      .object({
+        userId: z.string().min(1),
+        displayName: z.string().min(1).max(100).optional(),
+        image: z.string().nullable().optional(),
+      })
+      .safeParse({
+        userId,
+        displayName,
+        image: processedImage,
+      });
 
     if (!validationResult.success) {
       return {
@@ -1231,7 +1271,9 @@ export async function updateAccountAdmin(
         where: { uid: userId },
         data: {
           displayName: displayName || undefined,
-          displayNameNormalized: displayName ? normalizeTerm(displayName) : undefined,
+          displayNameNormalized: displayName
+            ? normalizeTerm(displayName)
+            : undefined,
           ...(processedImage !== undefined && { image: processedImage }),
           updatedAt: new Date(),
         },
@@ -1261,7 +1303,8 @@ export async function updateAccountAdmin(
     console.error('Admin account update error:', error);
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to update account',
+      message:
+        error instanceof Error ? error.message : 'Failed to update account',
     };
   }
 }
@@ -1356,7 +1399,10 @@ export async function assignAdminRole(
 ): Promise<ActionResult<void>> {
   try {
     // Require permission to assign roles
-    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.TEAM, 'edit');
+    const session = await getAdminSessionWithPermission(
+      ADMIN_RESOURCES.TEAM,
+      'edit',
+    );
 
     const { revalidatePath } = await import('next/cache');
     const { USER_ROLES } = await import('@/lib/auth/roles');
@@ -1366,7 +1412,8 @@ export async function assignAdminRole(
     if (!Object.values(USER_ROLES).includes(role as any)) {
       return {
         success: false,
-        error: 'Invalid role. Must be one of: user, freelancer, company, admin, support, or editor',
+        error:
+          'Invalid role. Must be one of: user, freelancer, company, admin, support, or editor',
       };
     }
 
@@ -1435,10 +1482,15 @@ export async function assignAdminRole(
  *
  * @param userId - User ID to remove admin role from
  */
-export async function removeAdminRole(userId: string): Promise<ActionResult<void>> {
+export async function removeAdminRole(
+  userId: string,
+): Promise<ActionResult<void>> {
   try {
     // Require permission to remove roles
-    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.TEAM, 'edit');
+    const session = await getAdminSessionWithPermission(
+      ADMIN_RESOURCES.TEAM,
+      'edit',
+    );
 
     const { revalidatePath } = await import('next/cache');
     const { prisma } = await import('@/lib/prisma/client');

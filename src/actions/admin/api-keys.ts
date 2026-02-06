@@ -35,7 +35,6 @@ export async function validateAdminApiKey(data: { apiKey: string }) {
     }
 
     // Then check database API keys
-    // @ts-expect-error - verifyApiKey is added by apiKey plugin but not in types
     const result = await auth.api.verifyApiKey({
       body: {
         key: apiKey,
@@ -79,10 +78,12 @@ export async function createAdminApiKey(data: {
   metadata?: { purpose?: string; owner?: string };
 }) {
   try {
-    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'edit');
+    const session = await getAdminSessionWithPermission(
+      ADMIN_RESOURCES.SETTINGS,
+      'edit',
+    );
     const validatedData = createAdminApiKeySchema.parse(data);
 
-    // @ts-expect-error - createApiKey is added by apiKey plugin but not in types
     const result = await auth.api.createApiKey({
       body: {
         name: validatedData.name,
@@ -126,7 +127,6 @@ export async function listAdminApiKeys() {
   try {
     await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'view');
 
-    // @ts-expect-error - listApiKeys is added by apiKey plugin but not in types
     const result = await auth.api.listApiKeys({
       headers: await headers(),
     });
@@ -160,7 +160,6 @@ export async function updateAdminApiKey(
   try {
     await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'edit');
 
-    // @ts-expect-error - updateApiKey is added by apiKey plugin but not in types
     const result = await auth.api.updateApiKey({
       body: {
         keyId,
@@ -191,7 +190,6 @@ export async function deleteAdminApiKey(keyId: string) {
   try {
     await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'view');
 
-    // @ts-expect-error - deleteApiKey is added by apiKey plugin but not in types
     const result = await auth.api.deleteApiKey({
       body: {
         keyId,
@@ -218,7 +216,10 @@ export async function deleteAdminApiKey(keyId: string) {
  */
 export async function checkAdminApiAccess() {
   try {
-    const session = await getAdminSessionWithPermission(ADMIN_RESOURCES.SETTINGS, 'view');
+    const session = await getAdminSessionWithPermission(
+      ADMIN_RESOURCES.SETTINGS,
+      'view',
+    );
 
     // Check if session was created with a valid admin API key
     // This would be stored in session metadata when API key is used

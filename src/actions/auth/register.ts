@@ -69,7 +69,6 @@ export async function register(
 
     // Check username availability using Better Auth's official API
     // This is the recommended approach from Better Auth username plugin
-    // @ts-expect-error - isUsernameAvailable is added by admin plugin but not in types
     const usernameCheck = await auth.api.isUsernameAvailable({
       body: { username: data.username },
     });
