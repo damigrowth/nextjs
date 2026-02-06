@@ -55,6 +55,7 @@ import { Badge } from '@/components/ui/badge';
 import { useSession } from '@/lib/auth/client';
 import { capitalizeFirstLetter } from '@/lib/utils/validation';
 import { useUnreadCount } from '@/lib/hooks/use-unread-count';
+import { usePaymentsAccess } from '@/lib/hooks/use-payments-access';
 import FlaticonMenu from '@/components/icon/flaticon/flaticon-menu';
 import { usePathname } from 'next/navigation';
 
@@ -63,6 +64,7 @@ export default function DashboardSidebar({
 }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession();
   const { unreadCount } = useUnreadCount();
+  const { allowed: canAccessPayments, isLoading: isLoadingAccess } = usePaymentsAccess();
   const pathname = usePathname();
 
   // Use Better Auth session data
@@ -173,8 +175,8 @@ export default function DashboardSidebar({
           </SidebarGroup>
         )}
 
-        {/* Subscription (if professional) */}
-        {isProfessional && (
+        {/* Subscription (if professional and has payment access) */}
+        {isProfessional && !isLoadingAccess && canAccessPayments && (
           <SidebarGroup>
             <SidebarGroupLabel className='uppercase'>Πακέτο</SidebarGroupLabel>
             <SidebarMenu>

@@ -2,6 +2,9 @@ import { redirect } from 'next/navigation';
 import { getDashboardMetadata } from '@/lib/seo/pages';
 import { requireProUser, getCurrentUser } from '@/actions/auth/server';
 import { getSubscription } from '@/actions/subscription';
+import { canAccessPayments, getTestModeBanner } from '@/lib/payment/test-mode';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 import CheckoutContent from './checkout-content';
 
 export const metadata = getDashboardMetadata('Ολοκλήρωση Συνδρομής');
@@ -32,11 +35,27 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
     redirect('/dashboard/subscription');
   }
 
+  // Check test mode access - redirect if not allowed
+  const accessCheck = await canAccessPayments();
+  if (!accessCheck.allowed) {
+    redirect('/dashboard');
+  }
+
   const { user, profile } = userResult.data;
   const billingInterval = params.interval === 'month' ? 'month' : 'year';
+  const testModeBanner = await getTestModeBanner();
 
   return (
     <div className='max-w-5xl w-full mx-auto space-y-6'>
+      {testModeBanner && (
+        <Alert className='bg-amber-50 border-amber-200 text-amber-800'>
+          <AlertTriangle className='h-4 w-4' />
+          <AlertDescription className='ml-2'>
+            {testModeBanner}
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div>
         <h1 className='text-2xl font-bold tracking-tight'>
           Ολοκλήρωση Συνδρομής

@@ -11,7 +11,10 @@ import {
   SheetFooter,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useSubscriptionSheetStore } from '@/lib/stores/use-subscription-sheet-store';
+import { usePaymentsAccess } from '@/lib/hooks/use-payments-access';
 import PlanComparison from './plan-comparison';
 import PricingSelection from './pricing-selection';
 
@@ -25,11 +28,17 @@ export default function SubscriptionSheet() {
     useSubscriptionSheetStore();
   const [selectedInterval, setSelectedInterval] = useState<'month' | 'year'>('year');
   const router = useRouter();
+  const { allowed, reason, testModeBanner, isLoading } = usePaymentsAccess();
 
   const handleContinue = () => {
     router.push(`/dashboard/checkout?interval=${selectedInterval}`);
     close();
   };
+
+  // Don't render sheet at all if access is denied
+  if (!isLoading && !allowed) {
+    return null;
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && close()}>
@@ -42,15 +51,32 @@ export default function SubscriptionSheet() {
         </SheetHeader>
 
         <div className='mt-6 flex-1'>
-          {panel === 'plans' && (
-            <PlanComparison triggerReason={triggerReason} />
-          )}
-          {panel === 'pricing' && (
-            <PricingSelection
-              onBack={showPlans}
-              selectedInterval={selectedInterval}
-              onIntervalChange={setSelectedInterval}
-            />
+          {isLoading ? (
+            <div className='flex items-center justify-center py-12'>
+              <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
+            </div>
+          ) : (
+            <>
+              {testModeBanner && (
+                <Alert className='bg-amber-50 border-amber-200 text-amber-800 mb-6'>
+                  <AlertTriangle className='h-4 w-4' />
+                  <AlertDescription className='ml-2'>
+                    {testModeBanner}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {panel === 'plans' && (
+                <PlanComparison triggerReason={triggerReason} />
+              )}
+              {panel === 'pricing' && (
+                <PricingSelection
+                  onBack={showPlans}
+                  selectedInterval={selectedInterval}
+                  onIntervalChange={setSelectedInterval}
+                />
+              )}
+            </>
           )}
         </div>
 
@@ -63,12 +89,12 @@ export default function SubscriptionSheet() {
             Όχι τώρα
           </Button>
           {panel === 'plans' && (
-            <Button className='w-full' size='lg' onClick={showPricing}>
+            <Button className='w-full' size='lg' onClick={showPricing} disabled={isLoading}>
               Επιλογή Προωθημένου
             </Button>
           )}
           {panel === 'pricing' && (
-            <Button className='w-full' size='lg' onClick={handleContinue}>
+            <Button className='w-full' size='lg' onClick={handleContinue} disabled={isLoading}>
               Ολοκλήρωση Συνδρομής
             </Button>
           )}

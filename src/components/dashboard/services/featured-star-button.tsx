@@ -8,6 +8,7 @@ import { toggleFeaturedService } from '@/actions/subscription/toggle-featured-se
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useSubscriptionGate } from '@/lib/hooks/use-subscription-gate';
+import { usePaymentsAccess } from '@/lib/hooks/use-payments-access';
 
 interface FeaturedStarButtonProps {
   serviceId: number;
@@ -20,6 +21,7 @@ interface FeaturedStarButtonProps {
  * Featured star toggle button for service list.
  * Allows promoted subscribers to feature/unfeature services.
  * Triggers upgrade sheet if user has no subscription or reached limit.
+ * Hidden in test mode for non-admins.
  */
 export default function FeaturedStarButton({
   serviceId,
@@ -31,9 +33,15 @@ export default function FeaturedStarButton({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const { openUpgradeSheet } = useSubscriptionGate();
+  const { allowed, isLoading } = usePaymentsAccess();
 
   // Don't show button for non-published services
   if (!isPublished) {
+    return null;
+  }
+
+  // Hide in test mode for non-admins
+  if (!isLoading && !allowed) {
     return null;
   }
 
