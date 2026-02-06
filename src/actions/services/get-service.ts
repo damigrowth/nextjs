@@ -321,6 +321,7 @@ async function _getServicePageData(
         },
       },
       orderBy: [
+        { featured: 'desc' }, // Promoted subscribers' services first
         { rating: 'desc' },
         { reviewCount: 'desc' },
         { updatedAt: 'desc' },

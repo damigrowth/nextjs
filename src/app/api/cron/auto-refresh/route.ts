@@ -12,7 +12,7 @@ import { revalidateTag } from 'next/cache';
  */
 export async function POST(request: NextRequest) {
   const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
+  const cronSecret = process.env.AUTO_REFRESH_CRON_SECRET;
 
   if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -56,6 +56,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Auto-refresh cron error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 },
+    );
   }
 }
