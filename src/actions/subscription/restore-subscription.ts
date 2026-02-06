@@ -18,7 +18,7 @@ export async function restoreSubscription(): Promise<ActionResult<{ restored: bo
     const session = await requireAuth();
     const user = session.user;
 
-    const roleCheck = await hasAnyRole(['freelancer', 'company']);
+    const roleCheck = await hasAnyRole(['freelancer', 'company', 'admin']);
     if (!roleCheck.success || !roleCheck.data) {
       return { success: false, error: 'Απαιτείται επαγγελματικό προφίλ' };
     }
