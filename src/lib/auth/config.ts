@@ -102,7 +102,7 @@ async function syncStripeSubscriptionToYourDB(
     cancelAtPeriodEnd?: boolean;
     priceId?: string;
   },
-  status: string
+  status: string,
 ): Promise<void> {
   try {
     // Get profile ID from user ID (referenceId is the user ID)
@@ -113,7 +113,7 @@ async function syncStripeSubscriptionToYourDB(
 
     if (!profile) {
       console.warn(
-        `No profile found for user ${betterAuthSub.referenceId}, skipping subscription sync`
+        `No profile found for user ${betterAuthSub.referenceId}, skipping subscription sync`,
       );
       return;
     }
@@ -126,7 +126,9 @@ async function syncStripeSubscriptionToYourDB(
     const stripeConfig = getStripeConfig();
     const annualPriceId = stripeConfig.promotedAnnualPriceId;
     const billingInterval: BillingInterval | null =
-      betterAuthSub.priceId && annualPriceId && betterAuthSub.priceId === annualPriceId
+      betterAuthSub.priceId &&
+      annualPriceId &&
+      betterAuthSub.priceId === annualPriceId
         ? 'year'
         : 'month';
 
@@ -165,7 +167,7 @@ async function syncStripeSubscriptionToYourDB(
     });
 
     console.log(
-      `Synced Stripe subscription for profile ${profile.id}: ${mappedPlan} (${mappedStatus})`
+      `Synced Stripe subscription for profile ${profile.id}: ${mappedPlan} (${mappedStatus})`,
     );
   } catch (error) {
     console.error('Failed to sync Stripe subscription to database:', error);
@@ -215,7 +217,7 @@ function buildStripePlugin() {
             cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
             priceId: subscription.priceId,
           },
-          'active'
+          'active',
         );
       },
 
@@ -232,7 +234,7 @@ function buildStripePlugin() {
             cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
             priceId: subscription.priceId,
           },
-          subscription.status || 'active'
+          subscription.status || 'active',
         );
       },
 
@@ -248,7 +250,7 @@ function buildStripePlugin() {
             cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
             priceId: subscription.priceId,
           },
-          'canceled'
+          'canceled',
         );
       },
     },
@@ -591,7 +593,9 @@ export const auth = betterAuth({
               where: { id: user.id },
               data: {
                 role: pendingRole as UserRole, // Set role here (admin plugin allows after creation)
-                step: (hasOAuthIntent ? 'OAUTH_SETUP' : 'TYPE_SELECTION') as JourneyStep,
+                step: (hasOAuthIntent
+                  ? 'OAUTH_SETUP'
+                  : 'TYPE_SELECTION') as JourneyStep,
                 confirmed: true, // OAuth users are pre-confirmed
                 emailVerified: true, // OAuth providers have verified emails
               },
@@ -729,8 +733,8 @@ export const auth = betterAuth({
         expirationTime: '15m', // 15 minutes (match Supabase default)
       },
     }),
-    // Stripe plugin (conditionally added - returns null if not configured)
-    buildStripePlugin(),
+    // Stripe plugin (conditionally added)
+    ...(buildStripePlugin() ? [buildStripePlugin()!] : []),
     nextCookies(), // MUST be the last plugin in the array
-  ].filter(Boolean) as any[], // Filter out null plugins (when Stripe is not configured)
+  ],
 });

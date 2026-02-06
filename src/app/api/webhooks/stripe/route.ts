@@ -11,14 +11,22 @@ import {
 } from '@/lib/types/stripe';
 import { getStripeWebhookSecret } from '@/lib/payment/stripe-config';
 
-// Get Stripe webhook secret (automatically selects test or live based on PAYMENTS_TEST_MODE)
-const webhookSecret = getStripeWebhookSecret();
-if (!webhookSecret) {
-  console.error('Stripe webhook secret is not configured');
+// Lazy initialization to avoid build-time errors
+let _stripe: ReturnType<typeof getStripeForWebhook> | null = null;
+function getStripe() {
+  if (!_stripe) {
+    _stripe = getStripeForWebhook();
+  }
+  return _stripe;
 }
 
-// Get Stripe client for webhook processing
-const stripe = getStripeForWebhook();
+function getWebhookSecret() {
+  const secret = getStripeWebhookSecret();
+  if (!secret) {
+    console.error('Stripe webhook secret is not configured');
+  }
+  return secret;
+}
 
 /**
  * Handle Stripe webhook events for subscription lifecycle.
@@ -29,6 +37,8 @@ const stripe = getStripeForWebhook();
  * - invoice.payment_failed → Mark as past_due
  */
 export async function POST(request: NextRequest) {
+  const webhookSecret = getWebhookSecret();
+
   // Runtime check for webhook secret
   if (!webhookSecret) {
     console.error('STRIPE_WEBHOOK_SECRET is not configured');
@@ -45,6 +55,7 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event;
 
   try {
+    const stripe = getStripe();
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err: unknown) {
     console.error('Webhook signature verification failed:', err);
@@ -90,6 +101,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   if (!profileId || !session.subscription) return;
 
   // Retrieve subscription from Stripe
+  const stripe = getStripe();
   const stripeSubscription = await stripe.subscriptions.retrieve(
     session.subscription as string,
   );
