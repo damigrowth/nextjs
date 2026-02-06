@@ -32,6 +32,7 @@ export async function completeOAuth(
     }
 
     // Check if username is already taken
+    // @ts-expect-error - isUsernameAvailable is added by admin plugin but not in types
     const usernameCheck = await auth.api.isUsernameAvailable({
       body: { username },
     });
