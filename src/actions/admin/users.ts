@@ -222,6 +222,7 @@ export async function createUser(data: z.infer<typeof adminCreateUserSchema>) {
 
     // Your Better Auth configuration supports custom roles through additionalFields and database hooks
     // Pass the role directly - your database hook will handle it correctly
+    // @ts-expect-error - createUser is added by admin plugin but not in types
     const result = await auth.api.createUser({
       body: {
         email: validatedData.email,
@@ -262,6 +263,7 @@ export async function setUserRole(data: z.infer<typeof adminSetRoleSchema>) {
     }
 
     // Your Better Auth supports all your custom roles: 'user', 'freelancer', 'company', 'admin'
+    // @ts-expect-error - setRole is added by admin plugin but not in types
     const result = await auth.api.setRole({
       body: {
         userId: validatedData.userId,
@@ -289,6 +291,7 @@ export async function banUser(data: z.infer<typeof adminBanUserSchema>) {
 
     const validatedData = adminBanUserSchema.parse(data);
 
+    // @ts-expect-error - banUser is added by admin plugin but not in types
     const result = await auth.api.banUser({
       body: validatedData,
       headers: await headers(),
@@ -313,6 +316,7 @@ export async function unbanUser(data: z.infer<typeof adminUnbanUserSchema>) {
 
     const validatedData = adminUnbanUserSchema.parse(data);
 
+    // @ts-expect-error - unbanUser is added by admin plugin but not in types
     const result = await auth.api.unbanUser({
       body: validatedData,
       headers: await headers(),
@@ -337,6 +341,7 @@ export async function removeUser(data: z.infer<typeof adminRemoveUserSchema>) {
 
     const validatedData = adminRemoveUserSchema.parse(data);
 
+    // @ts-expect-error - removeUser is added by admin plugin but not in types
     const result = await auth.api.removeUser({
       body: validatedData,
       headers: await headers(),
@@ -363,6 +368,7 @@ export async function impersonateUser(
 
     const validatedData = adminImpersonateUserSchema.parse(data);
 
+    // @ts-expect-error - impersonateUser is added by admin plugin but not in types
     const result = await auth.api.impersonateUser({
       body: validatedData,
       headers: await headers(),
@@ -386,6 +392,7 @@ export async function stopImpersonating() {
   try {
     await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
+    // @ts-expect-error - stopImpersonating is added by admin plugin but not in types
     const result = await auth.api.stopImpersonating({
       headers: await headers(),
     });
@@ -408,6 +415,7 @@ export async function listUserSessions(userId: string) {
   try {
     await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'edit');
 
+    // @ts-expect-error - listUserSessions is added by admin plugin but not in types
     const result = await auth.api.listUserSessions({
       body: { userId },
       headers: await headers(),
@@ -440,6 +448,7 @@ export async function revokeUserSession(
 
     const validatedData = revokeSessionSchema.parse(data);
 
+    // @ts-expect-error - revokeUserSession is added by admin plugin but not in types
     const result = await auth.api.revokeUserSession({
       body: validatedData,
       headers: await headers(),
@@ -469,6 +478,7 @@ export async function revokeAllUserSessions(
 
     const validatedData = revokeUserSessionsSchema.parse(data);
 
+    // @ts-expect-error - revokeUserSessions is added by admin plugin but not in types
     const result = await auth.api.revokeUserSessions({
       body: validatedData,
       headers: await headers(),
@@ -504,6 +514,7 @@ export async function updateUser(data: z.infer<typeof adminUpdateUserSchema>) {
 
     // Handle role update if provided
     if (updateFields.role) {
+      // @ts-expect-error - setRole is added by admin plugin but not in types
       const roleResult = await auth.api.setRole({
         body: {
           userId,
@@ -549,6 +560,7 @@ export async function setUserPassword(
 
     const validatedData = adminSetPasswordSchema.parse(data);
 
+    // @ts-expect-error - setUserPassword is added by admin plugin but not in types
     const result = await auth.api.setUserPassword({
       body: validatedData,
       headers: await headers(),
@@ -590,6 +602,7 @@ export async function updateUserBasicInfo(data: {
 
     // Check if username is being changed and if it's already taken
     if (data.username !== undefined) {
+      // @ts-expect-error - isUsernameAvailable is added by admin plugin but not in types
       const usernameCheck = await auth.api.isUsernameAvailable({
         body: { username: data.username },
       });
