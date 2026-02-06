@@ -70,7 +70,9 @@ export default function DashboardSidebar({
   // Use Better Auth session data
   const user = session?.user;
   const isProfessional =
-    user?.role === 'freelancer' || user?.role === 'company';
+    user?.role === 'freelancer' ||
+    user?.role === 'company' ||
+    user?.role === 'admin';
 
   // Don't show badge when on messages routes
   const isOnMessagesRoute = pathname.startsWith('/dashboard/messages');
