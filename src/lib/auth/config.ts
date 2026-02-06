@@ -29,14 +29,19 @@ import {
   support as supportRole,
   editor as editorRole,
 } from './permissions';
+import {
+  getStripeSecretKey,
+  getStripeWebhookSecret,
+  getStripeConfig,
+} from '@/lib/payment/stripe-config';
 
 /**
  * Lazy Stripe client initialization
  * Only creates the client when Stripe is the selected provider and keys are configured
- * Prevents module-load crashes when STRIPE_SECRET_KEY is not set
+ * Automatically uses test or live keys based on PAYMENTS_TEST_MODE
  */
 function getStripeClient(): Stripe | null {
-  const secretKey = process.env.STRIPE_SECRET_KEY;
+  const secretKey = getStripeSecretKey();
 
   if (!secretKey) {
     // Silently return null - Stripe is not configured
@@ -117,8 +122,9 @@ async function syncStripeSubscriptionToYourDB(
     const mappedPlan = mapPlanName(betterAuthSub.plan || 'free');
 
     // Determine billing interval from price ID (annual vs monthly)
-    // Annual price IDs typically match STRIPE_PROMOTED_ANNUAL_PRICE_ID
-    const annualPriceId = process.env.STRIPE_PROMOTED_ANNUAL_PRICE_ID;
+    // Annual price IDs match configured annual price (test or live mode)
+    const stripeConfig = getStripeConfig();
+    const annualPriceId = stripeConfig.promotedAnnualPriceId;
     const billingInterval: BillingInterval | null =
       betterAuthSub.priceId && annualPriceId && betterAuthSub.priceId === annualPriceId
         ? 'year'
@@ -170,19 +176,20 @@ async function syncStripeSubscriptionToYourDB(
 /**
  * Build Stripe plugin if configured
  * Returns the plugin instance or null if Stripe is not configured
+ * Automatically uses test or live credentials based on PAYMENTS_TEST_MODE
  */
 function buildStripePlugin() {
   const stripeClient = getStripeClient();
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const stripeConfig = getStripeConfig();
 
-  if (!stripeClient || !webhookSecret) {
+  if (!stripeClient || !stripeConfig.webhookSecret) {
     // Stripe not configured - return null
     return null;
   }
 
   return stripePlugin({
     stripeClient,
-    stripeWebhookSecret: webhookSecret,
+    stripeWebhookSecret: stripeConfig.webhookSecret,
     createCustomerOnSignUp: false, // We create customers on first subscription
 
     subscription: {
@@ -190,8 +197,8 @@ function buildStripePlugin() {
       plans: [
         {
           name: 'promoted',
-          priceId: process.env.STRIPE_PROMOTED_MONTHLY_PRICE_ID || '',
-          annualDiscountPriceId: process.env.STRIPE_PROMOTED_ANNUAL_PRICE_ID,
+          priceId: stripeConfig.promotedMonthlyPriceId || '',
+          annualDiscountPriceId: stripeConfig.promotedAnnualPriceId,
         },
       ],
 

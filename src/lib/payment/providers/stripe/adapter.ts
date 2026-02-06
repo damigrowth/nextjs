@@ -7,13 +7,15 @@ import type {
   CustomerPortalParams,
 } from '../../types';
 import { ProviderNotConfiguredError, ProviderOperationError } from '../../types';
+import { getStripeSecretKey, getStripePriceId } from '../../stripe-config';
 
 /**
  * Lazy Stripe client getter
  * Returns null if Stripe is not configured
+ * Automatically uses test or live keys based on PAYMENTS_TEST_MODE
  */
 function getStripeClient(): Stripe | null {
-  const secretKey = process.env.STRIPE_SECRET_KEY;
+  const secretKey = getStripeSecretKey();
 
   if (!secretKey) {
     return null;
@@ -32,25 +34,10 @@ function getStripeClient(): Stripe | null {
 
 /**
  * Get Stripe price ID for the given plan and billing interval
+ * Automatically uses test or live price IDs based on PAYMENTS_TEST_MODE
  */
 function getPriceId(plan: string, billingInterval: string): string {
-  if (plan === 'promoted') {
-    if (billingInterval === 'year') {
-      const annualPriceId = process.env.STRIPE_PROMOTED_ANNUAL_PRICE_ID;
-      if (!annualPriceId) {
-        throw new Error('STRIPE_PROMOTED_ANNUAL_PRICE_ID not configured');
-      }
-      return annualPriceId;
-    } else {
-      const monthlyPriceId = process.env.STRIPE_PROMOTED_MONTHLY_PRICE_ID;
-      if (!monthlyPriceId) {
-        throw new Error('STRIPE_PROMOTED_MONTHLY_PRICE_ID not configured');
-      }
-      return monthlyPriceId;
-    }
-  }
-
-  throw new Error(`Unknown plan: ${plan}`);
+  return getStripePriceId(plan, billingInterval);
 }
 
 /**

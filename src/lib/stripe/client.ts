@@ -4,19 +4,21 @@
  * Direct Stripe SDK usage should be avoided in favor of the payment abstraction layer.
  */
 import Stripe from 'stripe';
+import { getStripeSecretKey } from '@/lib/payment/stripe-config';
 
 let stripeClient: Stripe | null = null;
 
 /**
  * Get Stripe client instance (lazy initialization)
- * Returns null if STRIPE_SECRET_KEY is not configured
+ * Returns null if Stripe secret key is not configured
+ * Automatically uses test or live keys based on PAYMENTS_TEST_MODE
  */
 function getStripeClient(): Stripe | null {
   if (stripeClient) {
     return stripeClient;
   }
 
-  const secretKey = process.env.STRIPE_SECRET_KEY;
+  const secretKey = getStripeSecretKey();
   if (!secretKey) {
     return null;
   }

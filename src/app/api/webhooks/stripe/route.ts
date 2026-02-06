@@ -9,11 +9,12 @@ import {
   mapStripeStatus,
   getInvoiceSubscriptionId,
 } from '@/lib/types/stripe';
+import { getStripeWebhookSecret } from '@/lib/payment/stripe-config';
 
-// Validate webhook secret at startup
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+// Get Stripe webhook secret (automatically selects test or live based on PAYMENTS_TEST_MODE)
+const webhookSecret = getStripeWebhookSecret();
 if (!webhookSecret) {
-  console.error('STRIPE_WEBHOOK_SECRET is not configured');
+  console.error('Stripe webhook secret is not configured');
 }
 
 // Get Stripe client for webhook processing
