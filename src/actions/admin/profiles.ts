@@ -104,6 +104,16 @@ export async function listProfiles(
       }
     }
 
+    // Build orderBy - handle count-based sorting differently
+    let orderBy: any;
+    if (sortBy === 'services') {
+      // For sorting by services count, use Prisma's relation count syntax
+      orderBy = { services: { _count: sortDirection } };
+    } else {
+      // Standard field sorting
+      orderBy = { [sortBy]: sortDirection };
+    }
+
     // Execute query
     const [profiles, total] = await Promise.all([
       prisma.profile.findMany({
@@ -127,9 +137,7 @@ export async function listProfiles(
             },
           },
         },
-        orderBy: {
-          [sortBy]: sortDirection,
-        },
+        orderBy,
         take: limit,
         skip: offset,
       }),

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Pagination,
@@ -11,6 +11,8 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Selectbox } from '@/components/ui/selectbox';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface AdminTablePaginationProps {
   currentPage: number;
@@ -48,6 +50,23 @@ export default function AdminTablePagination({
     label: `${size} ανά σελίδα`,
   }));
 
+  // Direct page navigation
+  const [pageInput, setPageInput] = useState('');
+
+  const handlePageInputSubmit = () => {
+    const page = parseInt(pageInput, 10);
+    if (!isNaN(page) && page >= 1 && page <= totalPages) {
+      updatePage(page);
+      setPageInput('');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handlePageInputSubmit();
+    }
+  };
+
   return (
     <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
       {/* Page Size Selector */}
@@ -60,6 +79,35 @@ export default function AdminTablePagination({
           placeholder={`${currentLimit} ανά σελίδα`}
           className='w-[140px]'
         />
+      </div>
+
+      {/* Direct Page Navigation */}
+      <div className='flex items-center gap-2 w-full sm:w-1/3'>
+        <span className='text-sm text-gray-600'>
+          Σελίδα {currentPage} από {totalPages}
+        </span>
+        <Input
+          type='number'
+          min={1}
+          max={totalPages}
+          value={pageInput}
+          onChange={(e) => setPageInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder='#'
+          className='w-[70px] h-9 text-center'
+        />
+        <Button
+          variant='outline'
+          size='sm'
+          onClick={handlePageInputSubmit}
+          disabled={
+            !pageInput ||
+            parseInt(pageInput, 10) < 1 ||
+            parseInt(pageInput, 10) > totalPages
+          }
+        >
+          Μετάβαση
+        </Button>
       </div>
 
       {/* Pagination Controls */}
