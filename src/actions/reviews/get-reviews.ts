@@ -56,25 +56,21 @@ async function _getProfileReviews(
     }),
   ]);
 
-  // Get author profile images
-  const reviewsWithImages = await Promise.all(
-    reviews.map(async (review) => {
-      const authorProfile = await prisma.profile.findUnique({
-        where: { uid: review.author.id },
-        select: {
-          image: true,
-        },
-      });
+  // Batch fetch author profile images (egress optimization - single query instead of N)
+  const authorIds = [...new Set(reviews.map((r) => r.author.id))];
+  const authorProfiles = await prisma.profile.findMany({
+    where: { uid: { in: authorIds } },
+    select: { uid: true, image: true },
+  });
+  const authorImageMap = new Map(authorProfiles.map((p) => [p.uid, p.image]));
 
-      return {
-        ...review,
-        author: {
-          ...review.author,
-          image: authorProfile?.image || null,
-        },
-      };
-    }),
-  );
+  const reviewsWithImages = reviews.map((review) => ({
+    ...review,
+    author: {
+      ...review.author,
+      image: authorImageMap.get(review.author.id) || null,
+    },
+  }));
 
   return { reviews: reviewsWithImages, total };
 }
@@ -159,26 +155,22 @@ async function _getServiceReviews(
     }),
   ]);
 
-  // Get author profile images
-  const reviewsWithImages = await Promise.all(
-    reviews.map(async (review) => {
-      const authorProfile = await prisma.profile.findUnique({
-        where: { uid: review.author.id },
-        select: {
-          image: true,
-        },
-      });
+  // Batch fetch author profile images (egress optimization - single query instead of N)
+  const authorIds = [...new Set(reviews.map((r) => r.author.id))];
+  const authorProfiles = await prisma.profile.findMany({
+    where: { uid: { in: authorIds } },
+    select: { uid: true, image: true },
+  });
+  const authorImageMap = new Map(authorProfiles.map((p) => [p.uid, p.image]));
 
-      return {
-        ...review,
-        author: {
-          ...review.author,
-          image: authorProfile?.image || null,
-        },
-        service: null, // Service reviews don't need service info
-      };
-    }),
-  );
+  const reviewsWithImages = reviews.map((review) => ({
+    ...review,
+    author: {
+      ...review.author,
+      image: authorImageMap.get(review.author.id) || null,
+    },
+    service: null, // Service reviews don't need service info
+  }));
 
   return { reviews: reviewsWithImages, total };
 }
@@ -264,25 +256,21 @@ async function _getProfileOtherServiceReviews(
     take: limit,
   });
 
-  // Get author profile images
-  const reviewsWithImages = await Promise.all(
-    reviews.map(async (review) => {
-      const authorProfile = await prisma.profile.findUnique({
-        where: { uid: review.author.id },
-        select: {
-          image: true,
-        },
-      });
+  // Batch fetch author profile images (egress optimization - single query instead of N)
+  const authorIds = [...new Set(reviews.map((r) => r.author.id))];
+  const authorProfiles = await prisma.profile.findMany({
+    where: { uid: { in: authorIds } },
+    select: { uid: true, image: true },
+  });
+  const authorImageMap = new Map(authorProfiles.map((p) => [p.uid, p.image]));
 
-      return {
-        ...review,
-        author: {
-          ...review.author,
-          image: authorProfile?.image || null,
-        },
-      };
-    }),
-  );
+  const reviewsWithImages = reviews.map((review) => ({
+    ...review,
+    author: {
+      ...review.author,
+      image: authorImageMap.get(review.author.id) || null,
+    },
+  }));
 
   return { reviews: reviewsWithImages, total: reviewsWithImages.length };
 }

@@ -254,6 +254,45 @@ export async function getUnreadCount(
 }
 
 /**
+ * Get unread counts for multiple chats in a single query
+ * Optimized batch query to reduce N+1 database calls (egress optimization)
+ */
+export async function getUnreadCountsBatch(
+  chatIds: string[],
+  userId: string
+): Promise<Map<string, number>> {
+  if (chatIds.length === 0) {
+    return new Map();
+  }
+
+  try {
+    // Group by chatId and count unread messages in single query
+    const unreadCounts = await prisma.message.groupBy({
+      by: ['chatId'],
+      where: {
+        chatId: { in: chatIds },
+        authorUid: { not: userId },
+        deleted: false,
+        read: false,
+      },
+      _count: { _all: true },
+    });
+
+    // Convert to Map for O(1) lookup
+    const countMap = new Map<string, number>();
+    chatIds.forEach((id) => countMap.set(id, 0)); // Initialize all to 0
+    unreadCounts.forEach((item) => {
+      countMap.set(item.chatId, item._count._all);
+    });
+
+    return countMap;
+  } catch (error) {
+    console.error('Error getting batch unread counts:', error);
+    return new Map(chatIds.map((id) => [id, 0]));
+  }
+}
+
+/**
  * Get total unread message count across all chats for a user
  * Optimized with single aggregation query
  */

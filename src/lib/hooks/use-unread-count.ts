@@ -27,7 +27,7 @@ export function useUnreadCount() {
     },
     {
       // Revalidation strategy
-      refreshInterval: 30000, // 30 seconds
+      refreshInterval: 60000, // 60 seconds - reduced for egress optimization
       revalidateOnFocus: true, // Refresh when user returns to tab
       revalidateOnReconnect: true, // Refresh when connection restored
       dedupingInterval: 5000, // Prevent duplicate requests within 5s

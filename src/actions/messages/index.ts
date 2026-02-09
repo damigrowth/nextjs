@@ -20,6 +20,7 @@ export {
   editMessage,
   markAsRead,
   getUnreadCount,
+  getUnreadCountsBatch,
 } from './messages';
 
 // Presence operations
