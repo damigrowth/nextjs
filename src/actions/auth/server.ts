@@ -400,7 +400,7 @@ export async function requireOnboardingComplete(onboardingUrl = '/onboarding') {
   // Check if pro user has completed all required profile fields
   // Uses already-fetched cached profile data - no extra DB query
   if (user?.type === 'pro' && user?.step === 'DASHBOARD') {
-    const missingImage = !user.image;
+    const missingImage = !profile?.image;
     const missingCategory = !profile?.category;
     const missingSubcategory = !profile?.subcategory;
 
