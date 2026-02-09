@@ -1,5 +1,5 @@
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDebouncedSearch } from '../archives/use-debounced-value';
 
 /**
@@ -28,14 +28,32 @@ export function useAdminFilters(basePath: string) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // Track if this is the initial mount to avoid resetting page on URL navigation
+  const isInitialMount = useRef(true);
+  const previousSearchValue = useRef<string | null>(null);
+
   // Use debounced search with 500ms delay (longer for expensive DB queries)
   const { searchValue, debouncedSearchValue, setSearchValue } = useDebouncedSearch(
     searchParams.get('search') || '',
     500
   );
 
-  // Update URL when debounced value changes
+  // Update URL when debounced value changes (but not on initial mount)
   useEffect(() => {
+    // Skip the initial mount to preserve URL page parameter
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      previousSearchValue.current = debouncedSearchValue;
+      return;
+    }
+
+    // Only update if the search value actually changed
+    if (previousSearchValue.current === debouncedSearchValue) {
+      return;
+    }
+
+    previousSearchValue.current = debouncedSearchValue;
+
     const params = new URLSearchParams(searchParams.toString());
 
     if (debouncedSearchValue) {

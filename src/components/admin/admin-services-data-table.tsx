@@ -109,7 +109,7 @@ export function AdminServicesDataTable({
     {
       key: 'title',
       header: 'Υπηρεσία',
-      sortable: true,
+      // Note: title sorting not supported by backend - requires full-text search
       className: 'max-w-[480px]',
       render: (service) => (
         <div className='flex items-center gap-3'>
@@ -139,7 +139,7 @@ export function AdminServicesDataTable({
     {
       key: 'category',
       header: 'Κατηγορία',
-      sortable: true,
+      // Note: category sorting not supported - use filters instead
       className: 'max-w-[200px]',
       render: (service) =>
         service.taxonomyLabels ? (
@@ -161,7 +161,7 @@ export function AdminServicesDataTable({
     {
       key: 'status',
       header: 'Status',
-      sortable: true,
+      // Note: status sorting not supported - use filters instead
       render: (service) => (
         <ServiceStatusBadges
           status={service.status as Status}

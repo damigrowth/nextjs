@@ -53,6 +53,28 @@ import { getAdminSession, getAdminSessionWithPermission } from './helpers';
 import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 
 /**
+ * Warm the service page cache by making a request to it
+ * This ensures the page is regenerated before sending notification emails
+ * Prevents users from hitting 404 when clicking email links too fast
+ */
+async function warmServicePageCache(slug: string | null): Promise<void> {
+  if (!slug) return;
+
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://doulitsa.gr';
+
+  try {
+    await fetch(`${baseUrl}/s/${slug}`, {
+      cache: 'no-store',
+      // Short timeout - we don't want to block too long
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch (error) {
+    // Log but don't throw - cache warming is best-effort
+    console.warn('[Cache] Failed to warm service page cache:', error);
+  }
+}
+
+/**
  * Invalidate all caches related to a service update
  */
 async function invalidateServiceCaches(params: {
@@ -473,6 +495,9 @@ export async function updateService(params: AdminUpdateServiceInput) {
       });
 
       if (serviceWithUser?.profile.user) {
+        // Warm cache before sending email to prevent 404 on fast clicks
+        await warmServicePageCache(serviceWithUser.slug);
+
         try {
           await sendServicePublishedEmail(
             {
@@ -989,6 +1014,9 @@ export async function togglePublished(params: AdminToggleServiceInput) {
 
     // Send email notification if service was published
     if (newStatus === 'published') {
+      // Warm cache before sending email to prevent 404 on fast clicks
+      await warmServicePageCache(updatedService.slug);
+
       try {
         await sendServicePublishedEmail(
           {
@@ -1165,6 +1193,9 @@ export async function updateServiceStatus(
 
     // Send email notification if service was published
     if (status === 'published') {
+      // Warm cache before sending email to prevent 404 on fast clicks
+      await warmServicePageCache(updatedService.slug);
+
       try {
         await sendServicePublishedEmail(
           {
@@ -1666,6 +1697,9 @@ export async function createServiceForProfile(
 
     // 7. Send email notification to profile owner (not admin)
     if (profile.user.email) {
+      // Warm cache before sending email to prevent 404 on fast clicks
+      await warmServicePageCache(createdService.slug);
+
       try {
         await sendServicePublishedEmail(
           {

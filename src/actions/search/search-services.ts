@@ -23,7 +23,7 @@ import type {
 
 /**
  * Cached function to get all published services' taxonomy usage
- * Caches for 15 minutes to reduce database load
+ * Caches for 1 hour to reduce database load (egress optimization)
  */
 const getPublishedServiceTaxonomies = unstable_cache(
   async () => {
@@ -49,7 +49,7 @@ const getPublishedServiceTaxonomies = unstable_cache(
   },
   ['published-service-taxonomies'],
   {
-    revalidate: 900, // 15 minutes
+    revalidate: 3600, // 1 hour - extended for egress optimization
     tags: [CACHE_TAGS.collections.services, CACHE_TAGS.search.taxonomies],
   },
 );

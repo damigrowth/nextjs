@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma/client';
 import { transformChatForList } from '@/lib/utils/messages';
 import type { ChatListItem, ChatWithRelations } from '@/lib/types/messages';
 import { customAlphabet } from 'nanoid';
-import { getUnreadCount } from './messages';
+import { getUnreadCountsBatch } from './messages';
 import { CHAT_LIST_SELECT } from '@/lib/database/selects';
 
 // URL-safe alphabet without lookalike characters (no i, l, 1, o, 0)
@@ -38,13 +38,14 @@ export async function getChats(userId: string): Promise<ChatListItem[]> {
       transformChatForList(chat as ChatWithRelations, userId),
     );
 
-    // Add unread counts to each chat
-    const chatListItemsWithUnread = await Promise.all(
-      chatListItems.map(async (chat) => ({
-        ...chat,
-        unread: await getUnreadCount(chat.id, userId),
-      }))
-    );
+    // Batch fetch unread counts (egress optimization - single query instead of N)
+    const chatIds = chatListItems.map((chat) => chat.id);
+    const unreadCounts = await getUnreadCountsBatch(chatIds, userId);
+
+    const chatListItemsWithUnread = chatListItems.map((chat) => ({
+      ...chat,
+      unread: unreadCounts.get(chat.id) || 0,
+    }));
 
     return chatListItemsWithUnread;
   } catch (error) {
