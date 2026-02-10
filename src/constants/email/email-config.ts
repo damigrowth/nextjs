@@ -199,7 +199,7 @@ export const EMAIL_CONFIG = {
 
   // Review Notifications (Admin)
   NEW_REVIEW: {
-    to: () => 'domvournias@gmail.com', // TODO: revert to process.env.ADMIN_EMAIL || 'contact@doulitsa.gr'
+    to: () => process.env.ADMIN_EMAIL || 'contact@doulitsa.gr',
     from: 'Admin Doulitsa <noreply@doulitsa.gr>',
     replyTo: null,
     subject: (data: NewReviewData) =>
