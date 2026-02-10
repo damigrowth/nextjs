@@ -16,6 +16,7 @@ import {
 } from '@/lib/taxonomies';
 import { generateServiceSlug } from '@/lib/utils/text';
 import { sendServicePublishedEmail } from '@/lib/email/services';
+import { brevoWorkflowService } from '@/lib/email/providers/brevo/workflows';
 
 import {
   adminListServicesSchema,
@@ -487,6 +488,8 @@ export async function updateService(params: AdminUpdateServiceInput) {
                   email: true,
                   displayName: true,
                   username: true,
+                  type: true,
+                  role: true,
                 },
               },
             },
@@ -516,6 +519,33 @@ export async function updateService(params: AdminUpdateServiceInput) {
             emailError,
           );
           // Don't block the status update if email fails
+        }
+
+        // Update Brevo list: move from noservices to activepros if first non-draft service
+        // Only trigger when going from draft to non-draft (not pending to published)
+        if (existingService.status === 'draft') {
+          const serviceCount = await prisma.service.count({
+            where: {
+              pid: serviceWithUser.profile.id,
+              status: { not: 'draft' },
+            },
+          });
+
+          if (serviceCount === 1 && serviceWithUser.profile.user.email) {
+            brevoWorkflowService
+              .handleFirstServiceCreated(serviceWithUser.profile.user.email, {
+                DISPLAY_NAME: serviceWithUser.profile.user.displayName || undefined,
+                USERNAME: serviceWithUser.profile.user.username || undefined,
+                USER_TYPE: serviceWithUser.profile.user.type as 'user' | 'pro',
+                USER_ROLE: serviceWithUser.profile.user.role as 'user' | 'freelancer' | 'company' | 'admin',
+                IS_PRO: serviceWithUser.profile.user.type === 'pro',
+                SERVICES_COUNT: 1,
+              })
+              .catch((error) => {
+                console.error('[Brevo] Failed to move user to activepros list:', error);
+                // Don't block the status update if Brevo fails
+              });
+          }
         }
       }
     }
@@ -994,6 +1024,8 @@ export async function togglePublished(params: AdminToggleServiceInput) {
                 email: true,
                 displayName: true,
                 username: true,
+                type: true,
+                role: true,
               },
             },
           },
@@ -1035,6 +1067,33 @@ export async function togglePublished(params: AdminToggleServiceInput) {
           emailError,
         );
         // Don't block the status update if email fails
+      }
+
+      // Update Brevo list: move from noservices to activepros if first non-draft service
+      // Only trigger when going from draft to published (not pending to published)
+      if (service.status === 'draft') {
+        const serviceCount = await prisma.service.count({
+          where: {
+            pid: updatedService.profile.id,
+            status: { not: 'draft' },
+          },
+        });
+
+        if (serviceCount === 1 && updatedService.profile.user.email) {
+          brevoWorkflowService
+            .handleFirstServiceCreated(updatedService.profile.user.email, {
+              DISPLAY_NAME: updatedService.profile.user.displayName || undefined,
+              USERNAME: updatedService.profile.user.username || undefined,
+              USER_TYPE: updatedService.profile.user.type as 'user' | 'pro',
+              USER_ROLE: updatedService.profile.user.role as 'user' | 'freelancer' | 'company' | 'admin',
+              IS_PRO: updatedService.profile.user.type === 'pro',
+              SERVICES_COUNT: 1,
+            })
+            .catch((error) => {
+              console.error('[Brevo] Failed to move user to activepros list:', error);
+              // Don't block the status update if Brevo fails
+            });
+        }
       }
     }
 
@@ -1173,6 +1232,8 @@ export async function updateServiceStatus(
                 email: true,
                 displayName: true,
                 username: true,
+                type: true,
+                role: true,
               },
             },
           },
@@ -1214,6 +1275,58 @@ export async function updateServiceStatus(
           emailError,
         );
         // Don't block the status update if email fails
+      }
+
+      // Update Brevo list: move from noservices to activepros if first non-draft service
+      // Only trigger when going from draft to published (not pending to published)
+      if (service.status === 'draft') {
+        const serviceCount = await prisma.service.count({
+          where: {
+            pid: updatedService.profile.id,
+            status: { not: 'draft' },
+          },
+        });
+
+        if (serviceCount === 1 && updatedService.profile.user.email) {
+          brevoWorkflowService
+            .handleFirstServiceCreated(updatedService.profile.user.email, {
+              DISPLAY_NAME: updatedService.profile.user.displayName || undefined,
+              USERNAME: updatedService.profile.user.username || undefined,
+              USER_TYPE: updatedService.profile.user.type as 'user' | 'pro',
+              USER_ROLE: updatedService.profile.user.role as 'user' | 'freelancer' | 'company' | 'admin',
+              IS_PRO: updatedService.profile.user.type === 'pro',
+              SERVICES_COUNT: 1,
+            })
+            .catch((error) => {
+              console.error('[Brevo] Failed to move user to activepros list:', error);
+              // Don't block the status update if Brevo fails
+            });
+        }
+      }
+    }
+
+    // Also handle draft → pending (no email, but still needs Brevo update)
+    if (status === 'pending' && service.status === 'draft') {
+      const serviceCount = await prisma.service.count({
+        where: {
+          pid: updatedService.profile.id,
+          status: { not: 'draft' },
+        },
+      });
+
+      if (serviceCount === 1 && updatedService.profile.user.email) {
+        brevoWorkflowService
+          .handleFirstServiceCreated(updatedService.profile.user.email, {
+            DISPLAY_NAME: updatedService.profile.user.displayName || undefined,
+            USERNAME: updatedService.profile.user.username || undefined,
+            USER_TYPE: updatedService.profile.user.type as 'user' | 'pro',
+            USER_ROLE: updatedService.profile.user.role as 'user' | 'freelancer' | 'company' | 'admin',
+            IS_PRO: updatedService.profile.user.type === 'pro',
+            SERVICES_COUNT: 1,
+          })
+          .catch((error) => {
+            console.error('[Brevo] Failed to move user to activepros list:', error);
+          });
       }
     }
 
@@ -1558,6 +1671,7 @@ export async function createServiceForProfile(
             email: true,
             displayName: true,
             username: true,
+            type: true,
             role: true,
           },
         },
@@ -1719,6 +1833,29 @@ export async function createServiceForProfile(
           emailError,
         );
         // Don't block service creation if email fails
+      }
+
+      // Update Brevo list: move from noservices to activepros if first non-draft service
+      const serviceCount = await prisma.service.count({
+        where: {
+          pid: profile.id,
+          status: { not: 'draft' },
+        },
+      });
+
+      if (serviceCount === 1) {
+        brevoWorkflowService
+          .handleFirstServiceCreated(profile.user.email, {
+            DISPLAY_NAME: profile.user.displayName || undefined,
+            USERNAME: profile.user.username || undefined,
+            USER_TYPE: profile.user.type as 'user' | 'pro',
+            USER_ROLE: profile.user.role as 'user' | 'freelancer' | 'company' | 'admin',
+            IS_PRO: profile.user.type === 'pro',
+            SERVICES_COUNT: 1,
+          })
+          .catch((error) => {
+            console.error('[Brevo] Failed to move user to activepros list:', error);
+          });
       }
     }
 
