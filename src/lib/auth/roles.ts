@@ -64,12 +64,14 @@ export const ADMIN_RESOURCES = {
   TAXONOMIES: 'taxonomies',
   CHATS: 'chats',
   REVIEWS: 'reviews',
+  SUBSCRIPTIONS: 'subscriptions',
   ANALYTICS: 'analytics',
   GIT: 'git',
   SETTINGS: 'settings',
 } as const;
 
-export type AdminResource = (typeof ADMIN_RESOURCES)[keyof typeof ADMIN_RESOURCES];
+export type AdminResource =
+  (typeof ADMIN_RESOURCES)[keyof typeof ADMIN_RESOURCES];
 
 // ============================================================================
 // PERMISSION MAPPINGS
@@ -104,6 +106,7 @@ export const ROLE_PERMISSIONS: PermissionMatrix = {
     taxonomies: 'full', // Only admins can manage taxonomies
     chats: 'full',
     reviews: 'full',
+    subscriptions: 'full', // Can manage subscriptions
     analytics: 'full', // Only admins can view analytics
     git: 'full',
     settings: 'full', // Only admins can manage settings
@@ -120,6 +123,7 @@ export const ROLE_PERMISSIONS: PermissionMatrix = {
     taxonomies: null, // Cannot access taxonomies
     chats: 'full', // Can monitor chats
     reviews: 'full', // Can moderate reviews
+    subscriptions: null, // Can view subscriptions but not modify
     analytics: null, // Cannot access analytics
     git: null, // Cannot access git operations
     settings: null, // Cannot access settings
@@ -136,6 +140,7 @@ export const ROLE_PERMISSIONS: PermissionMatrix = {
     taxonomies: null, // Cannot access taxonomies
     chats: null, // Cannot access chats
     reviews: null, // Cannot access reviews
+    subscriptions: null, // Cannot access subscriptions
     analytics: null, // Cannot access analytics
     git: null, // Cannot access git
     settings: null, // Cannot access settings
@@ -149,7 +154,10 @@ export const ROLE_PERMISSIONS: PermissionMatrix = {
 /**
  * Check if a role has any access (view, edit, or full) to a resource
  */
-export function hasAccess(role: string | undefined, resource: AdminResource): boolean {
+export function hasAccess(
+  role: string | undefined,
+  resource: AdminResource,
+): boolean {
   if (!role || !isAdminRole(role)) return false;
   return ROLE_PERMISSIONS[role][resource] !== null;
 }
@@ -157,7 +165,10 @@ export function hasAccess(role: string | undefined, resource: AdminResource): bo
 /**
  * Check if a role has edit access (edit or full) to a resource
  */
-export function canEdit(role: string | undefined, resource: AdminResource): boolean {
+export function canEdit(
+  role: string | undefined,
+  resource: AdminResource,
+): boolean {
   if (!role || !isAdminRole(role)) return false;
   const permission = ROLE_PERMISSIONS[role][resource];
   return permission === 'edit' || permission === 'full';
@@ -166,7 +177,10 @@ export function canEdit(role: string | undefined, resource: AdminResource): bool
 /**
  * Check if a role has full access to a resource
  */
-export function hasFullAccess(role: string | undefined, resource: AdminResource): boolean {
+export function hasFullAccess(
+  role: string | undefined,
+  resource: AdminResource,
+): boolean {
   if (!role || !isAdminRole(role)) return false;
   return ROLE_PERMISSIONS[role][resource] === 'full';
 }
@@ -192,19 +206,22 @@ export function getPermissionLevel(
 export const ROLE_DISPLAY_INFO = {
   admin: {
     label: 'Admin',
-    description: 'Full system access - can manage all features including team, taxonomies, and analytics',
+    description:
+      'Full system access - can manage all features including team, taxonomies, and analytics',
     color: 'yellow',
     icon: 'shield',
   },
   support: {
     label: 'Support',
-    description: 'Limited admin access - can manage users, services, and verifications but not team, taxonomies, analytics, or settings',
+    description:
+      'Limited admin access - can manage users, services, and verifications but not team, taxonomies, analytics, or settings',
     color: 'blue',
     icon: 'headphones',
   },
   editor: {
     label: 'Editor',
-    description: 'Content management only - can edit services and profiles with read-only access to taxonomies',
+    description:
+      'Content management only - can edit services and profiles with read-only access to taxonomies',
     color: 'green',
     icon: 'pencil',
   },
@@ -222,7 +239,8 @@ export const ALL_ROLES_DISPLAY_INFO = {
   },
   freelancer: {
     label: 'Freelancer',
-    description: 'Professional service provider - can create and manage services',
+    description:
+      'Professional service provider - can create and manage services',
     color: 'purple',
     icon: 'briefcase',
   },
@@ -234,19 +252,22 @@ export const ALL_ROLES_DISPLAY_INFO = {
   },
   admin: {
     label: 'Admin',
-    description: 'Full system access - can manage all features including team, taxonomies, and analytics',
+    description:
+      'Full system access - can manage all features including team, taxonomies, and analytics',
     color: 'yellow',
     icon: 'shield',
   },
   support: {
     label: 'Support',
-    description: 'Limited admin access - can manage users, services, and verifications but not team, taxonomies, analytics, or settings',
+    description:
+      'Limited admin access - can manage users, services, and verifications but not team, taxonomies, analytics, or settings',
     color: 'blue',
     icon: 'headphones',
   },
   editor: {
     label: 'Editor',
-    description: 'Content management only - can edit services and profiles with read-only access to taxonomies',
+    description:
+      'Content management only - can edit services and profiles with read-only access to taxonomies',
     color: 'green',
     icon: 'pencil',
   },
@@ -271,7 +292,9 @@ export function getRoleDisplayInfo(role: string | undefined) {
  * - Support: Can assign only user-level roles (user, freelancer, company)
  * - Editor: Cannot assign any roles
  */
-export function getAllowedRolesToAssign(userRole: string | undefined): UserRole[] {
+export function getAllowedRolesToAssign(
+  userRole: string | undefined,
+): UserRole[] {
   if (!userRole) return [];
 
   if (userRole === USER_ROLES.ADMIN) {
@@ -281,7 +304,11 @@ export function getAllowedRolesToAssign(userRole: string | undefined): UserRole[
 
   if (userRole === USER_ROLES.SUPPORT) {
     // Support can only assign non-admin roles
-    return [USER_ROLES.USER, USER_ROLES.FREELANCER, USER_ROLES.COMPANY] as UserRole[];
+    return [
+      USER_ROLES.USER,
+      USER_ROLES.FREELANCER,
+      USER_ROLES.COMPANY,
+    ] as UserRole[];
   }
 
   // Editor and others cannot assign roles
@@ -297,16 +324,25 @@ export function getAllowedRolesDisplayInfo(userRole: string | undefined) {
 
   return Object.entries(ALL_ROLES_DISPLAY_INFO)
     .filter(([role]) => allowedRoles.includes(role as UserRole))
-    .reduce((acc, [role, info]) => {
-      acc[role] = info;
-      return acc;
-    }, {} as Record<string, typeof ALL_ROLES_DISPLAY_INFO[keyof typeof ALL_ROLES_DISPLAY_INFO]>);
+    .reduce(
+      (acc, [role, info]) => {
+        acc[role] = info;
+        return acc;
+      },
+      {} as Record<
+        string,
+        (typeof ALL_ROLES_DISPLAY_INFO)[keyof typeof ALL_ROLES_DISPLAY_INFO]
+      >,
+    );
 }
 
 /**
  * Check if a user can assign a specific role
  */
-export function canAssignRole(userRole: string | undefined, targetRole: string): boolean {
+export function canAssignRole(
+  userRole: string | undefined,
+  targetRole: string,
+): boolean {
   const allowedRoles = getAllowedRolesToAssign(userRole);
   return allowedRoles.includes(targetRole as UserRole);
 }

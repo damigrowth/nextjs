@@ -702,3 +702,52 @@ export const deleteSkillSchema = z.object({
 });
 
 export type DeleteSkillInput = z.infer<typeof deleteSkillSchema>;
+
+// =============================================
+// ADMIN SUBSCRIPTION MANAGEMENT SCHEMAS
+// =============================================
+
+export const adminListSubscriptionsSchema = z.object({
+  searchQuery: z.string().optional(), // Search profile displayName or user email
+  status: z.enum(['all', 'active', 'canceled']).optional(),
+  plan: z.enum(['all', 'free', 'promoted']).optional(),
+  billingInterval: z.enum(['all', 'month', 'year']).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(12),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+  sortBy: z
+    .enum(['createdAt', 'updatedAt', 'currentPeriodEnd', 'status', 'plan'])
+    .optional()
+    .default('createdAt'),
+  sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
+});
+
+export const adminUpdateSubscriptionStatusSchema = z.object({
+  subscriptionId: z.string().min(1, 'Subscription ID is required'),
+  status: z.enum([
+    'active',
+    'past_due',
+    'canceled',
+    'incomplete',
+    'trialing',
+    'unpaid',
+  ]),
+  notes: z.string().max(1000).optional(),
+});
+
+export const adminDeleteSubscriptionSchema = z.object({
+  subscriptionId: z.string().min(1, 'Subscription ID is required'),
+});
+
+// =============================================
+// SUBSCRIPTION TYPE EXPORTS
+// =============================================
+
+export type AdminListSubscriptionsInput = z.infer<
+  typeof adminListSubscriptionsSchema
+>;
+export type AdminUpdateSubscriptionStatusInput = z.infer<
+  typeof adminUpdateSubscriptionStatusSchema
+>;
+export type AdminDeleteSubscriptionInput = z.infer<
+  typeof adminDeleteSubscriptionSchema
+>;
