@@ -132,8 +132,8 @@ export default function ProfileMeta({
                   <RatingDisplay
                     rating={rating}
                     reviewCount={reviewCount}
-                    variant="full"
-                    href='#reviews'
+                    variant="compact"
+                    href='#review'
                   />
                 </div>
               )}

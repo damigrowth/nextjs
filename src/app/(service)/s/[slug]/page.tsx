@@ -23,6 +23,7 @@ import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
 import { ProfileTerms } from '@/components/profile';
 import { ServiceSchema } from '@/lib/seo/schema';
 import { ReviewsContainer } from '@/components/review';
+import { HashScroll } from '@/components/shared/hash-scroll';
 
 // ISR configuration with shorter interval + tag-based revalidation
 export const revalidate = 300; // Revalidate every 5 minutes (backup for tag-based)
@@ -134,6 +135,7 @@ export default async function ServicePage({
 
   return (
     <div className='py-20 bg-silver'>
+      <HashScroll />
       <ServiceSchema
         slug={service.slug || ''}
         title={service.title}

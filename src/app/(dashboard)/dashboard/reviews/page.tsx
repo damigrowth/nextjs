@@ -1,3 +1,5 @@
+import { headers } from 'next/headers';
+import { auth } from '@/lib/auth';
 import { DashboardReviewsContainer } from '@/components/dashboard/reviews';
 import { getDashboardMetadata } from '@/lib/seo/pages';
 
@@ -15,6 +17,10 @@ interface ReviewsPageProps {
 export default async function ReviewsPage({
   searchParams,
 }: ReviewsPageProps) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
   const { r_page, g_page, rec_page, g_rec_page } = await searchParams;
 
   // Parse pagination params with fallback to 1
@@ -23,12 +29,16 @@ export default async function ReviewsPage({
   const recommendationsPage = Number(rec_page) || 1;
   const givensRecommendationsPage = Number(g_rec_page) || 1;
 
+  // Check if user is a professional (can receive reviews)
+  const isPro = session?.user?.type === 'pro';
+
   return (
     <DashboardReviewsContainer
       receivedPage={receivedPage}
       givenPage={givenPage}
       recommendationsPage={recommendationsPage}
       givensRecommendationsPage={givensRecommendationsPage}
+      isPro={isPro}
     />
   );
 }

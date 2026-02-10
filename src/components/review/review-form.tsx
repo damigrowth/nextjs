@@ -147,6 +147,9 @@ export function ReviewForm({
       {/* Service Selection - Only for freelancer/profile reviews */}
       {type === 'profile' && profileServices && profileServices.length > 0 && (
         <div className='space-y-2'>
+          <Label className='text-base font-semibold'>
+            Επιλογή υπηρεσίας <span className='text-destructive'>*</span>
+          </Label>
           <Select
             value={selectedService?.toString() || ''}
             onValueChange={(val) => setSelectedService(Number(val))}
@@ -236,7 +239,7 @@ export function ReviewForm({
       <div className='pt-2'>
         <Button
           type='submit'
-          disabled={isPending || rating === 0} // Changed: Only require Like/Unlike selection
+          disabled={isPending || rating === 0 || (type === 'profile' && profileServices && profileServices.length > 0 && !selectedService)}
           className='min-w-[200px]'
         >
           {isPending ? (

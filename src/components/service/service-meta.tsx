@@ -66,10 +66,9 @@ export default function ServiceMeta({
             rating={rating}
             reviewCount={totalReviews}
             size='md'
-            showRating={true}
-            showReviewCount={true}
+            variant='compact'
             className='ml-auto sm:ml-0'
-            href='#reviews'
+            href='#review'
           />
         </div>
       </div>

@@ -21,6 +21,7 @@ import {
 } from '@/components/profile';
 import { ProfileSchema } from '@/lib/seo/schema';
 import { ReviewsContainer } from '@/components/review';
+import { HashScroll } from '@/components/shared/hash-scroll';
 
 // ISR configuration with shorter interval + tag-based revalidation
 export const revalidate = 300; // Revalidate every 5 minutes (backup for tag-based)
@@ -123,6 +124,7 @@ export default async function ProfilePage({
 
   return (
     <div className='my-20'>
+      <HashScroll />
       <ProfileSchema
         username={profile.username || ''}
         displayName={profile.displayName || ''}
