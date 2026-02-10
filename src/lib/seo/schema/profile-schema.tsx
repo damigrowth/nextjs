@@ -5,26 +5,26 @@ interface ProfileSchemaProps {
   username: string;
   displayName: string;
   location?: string;
-  // rating: number;
-  // reviewCount: number;
+  rating?: number;
+  reviewCount?: number;
   image?: string | null;
 }
 
 /**
  * LocalBusiness schema for profile detail pages
- * Includes location and business information
+ * Includes location, reviews, and business information
  */
 export function ProfileSchema({
   username,
   displayName,
   location,
-  // rating,
-  // reviewCount,
+  rating,
+  reviewCount,
   image,
 }: ProfileSchemaProps) {
   const baseUrl = process.env.BETTER_AUTH_URL || process.env.LIVE_URL || 'https://doulitsa.gr';
 
-  const data = {
+  const data: any = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: displayName,
@@ -33,15 +33,21 @@ export function ProfileSchema({
       addressLocality: location || 'Greece',
       addressCountry: 'GR',
     },
-    // aggregateRating: {
-    //   '@type': 'AggregateRating',
-    //   ratingValue: rating,
-    //   reviewCount: reviewCount,
-    // },
     url: `${baseUrl}/profile/${encodeURIComponent(username)}`,
     image: image || undefined,
     sameAs: baseUrl,
   };
+
+  // Add aggregate rating if reviews exist
+  if (rating && reviewCount && reviewCount > 0) {
+    data.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: rating,
+      reviewCount: reviewCount,
+      bestRating: 5,
+      worstRating: 1,
+    };
+  }
 
   return <JsonLd data={data} />;
 }

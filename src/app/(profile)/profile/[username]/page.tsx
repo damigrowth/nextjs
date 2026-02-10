@@ -127,8 +127,8 @@ export default async function ProfilePage({
         username={profile.username || ''}
         displayName={profile.displayName || ''}
         location={firstCounty}
-        // rating={profile.rating}
-        // reviewCount={profile.reviewCount}
+        rating={profile.rating}
+        reviewCount={profile.reviewCount}
         image={image}
       />
       {/* Category Navigation Tabs */}

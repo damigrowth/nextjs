@@ -140,8 +140,8 @@ export default async function ServicePage({
         description={schemaDescription}
         displayName={service.profile.displayName || ''}
         price={service.price || 0}
-        // rating={service.rating}
-        // reviewCount={service.reviewCount}
+        rating={service.rating}
+        reviewCount={service.reviewCount}
         faq={service.faq || []}
         image={firstMediaImage}
       />

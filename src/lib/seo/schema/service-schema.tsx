@@ -7,15 +7,15 @@ interface ServiceSchemaProps {
   description?: string;
   displayName: string;
   price: number;
-  // rating: number;
-  // reviewCount: number;
+  rating?: number;
+  reviewCount?: number;
   faq: Array<{ question: string; answer: string }>;
   image?: string;
 }
 
 /**
  * Product schema for service detail pages
- * Includes pricing and FAQ structured data
+ * Includes pricing, reviews, and FAQ structured data
  */
 export function ServiceSchema({
   slug,
@@ -23,8 +23,8 @@ export function ServiceSchema({
   description,
   displayName,
   price,
-  // rating,
-  // reviewCount,
+  rating,
+  reviewCount,
   faq,
   image,
 }: ServiceSchemaProps) {
@@ -51,16 +51,22 @@ export function ServiceSchema({
       url: `${baseUrl}/s/${slug}`,
       availability: 'https://schema.org/InStock',
     },
-    // aggregateRating: {
-    //   '@type': 'AggregateRating',
-    //   ratingValue: rating,
-    //   reviewCount: reviewCount,
-    // },
   };
 
   // Add description if provided
   if (description) {
     data.description = description;
+  }
+
+  // Add aggregate rating if reviews exist
+  if (rating && reviewCount && reviewCount > 0) {
+    data.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: rating,
+      reviewCount: reviewCount,
+      bestRating: 5,
+      worstRating: 1,
+    };
   }
 
   // Only include FAQ schema if FAQs exist
