@@ -1,4 +1,4 @@
-// Generated on 2026-02-04T13:54:48.558Z
+// Generated on 2026-02-10T12:28:48.143Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -30,16 +30,15 @@ export const serviceTaxonomies = [
         description:
           'Δημιούργησε μοναδικά βίντεο που ξεχωρίζουν. Εξασφάλισε επαγγελματική ποιότητα και δημιουργικότητα.',
         image: {
-          public_id: '91_d606918ea0',
+          public_id: 'subcategories/video_a98mwx',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168114/91_d606918ea0.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769196799/subcategories/video_a98mwx.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 64348,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168114/91_d606918ea0.webp',
-          original_filename: '91.webp',
+          bytes: 94488,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769196799/subcategories/video_a98mwx.webp',
         },
         children: [
           {
@@ -357,16 +356,15 @@ export const serviceTaxonomies = [
         description:
           'Εξασφάλισε άψογες εκτυπώσεις για κάθε σου ανάγκη. Βρες την ιδανική λύση για το περιεχόμενό σου.',
         image: {
-          public_id: '107_f695827285',
+          public_id: 'subcategories/ektuposeis_fbcy9e',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168169/107_f695827285.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/ektuposeis_fbcy9e.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 46029,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168169/107_f695827285.webp',
-          original_filename: '107.webp',
+          bytes: 105472,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/ektuposeis_fbcy9e.webp',
         },
         children: [
           {
@@ -435,16 +433,15 @@ export const serviceTaxonomies = [
         description:
           'Δημιούργησε μοναδικούς ήχους από επαγγελματίες για μια ξεχωριστή ακουστική εμπειρία.',
         image: {
-          public_id: '122_fc9a463130',
+          public_id: 'subcategories/ixos_r0wqh7',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168256/122_fc9a463130.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/ixos_r0wqh7.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 40325,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168256/122_fc9a463130.webp',
-          original_filename: '122.webp',
+          bytes: 63164,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/ixos_r0wqh7.webp',
         },
         children: [
           {
@@ -741,16 +738,15 @@ export const serviceTaxonomies = [
         description:
           'Μεταφράσεις που μεταφέρουν το μήνυμά σου με ακρίβεια και σαφήνεια σε κάθε γλώσσα.',
         image: {
-          public_id: '125_0cfe3004ca',
+          public_id: 'metafraseis_e28d02a6f9',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168263/125_0cfe3004ca.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1728400159/metafraseis_e28d02a6f9.png',
+          width: 532,
+          height: 300,
           resource_type: 'image',
-          format: 'webp',
-          bytes: 177766,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168263/125_0cfe3004ca.webp',
-          original_filename: '125.webp',
+          format: 'png',
+          bytes: 62979,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1728400159/metafraseis_e28d02a6f9.png',
         },
         children: [
           {
@@ -876,16 +872,15 @@ export const serviceTaxonomies = [
         description:
           'Δημιούργησε μοναδικό περιεχόμενο με επαγγελματική συγγραφή που ενισχύει το μήνυμά σου και ξεχωρίζει.',
         image: {
-          public_id: '127_070f1227a4',
+          public_id: 'subcategories/sugrafi_p8hegz',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168259/127_070f1227a4.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/sugrafi_p8hegz.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 38922,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168259/127_070f1227a4.webp',
-          original_filename: '127.webp',
+          bytes: 110846,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/sugrafi_p8hegz.webp',
         },
         children: [
           {
@@ -1068,16 +1063,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε μοναδικές ιδέες σχεδίασης & γραφικών και δώσε ζωή στο όραμά σου με επαγγελματική ακρίβεια.',
         image: {
-          public_id: '145_aea9e7394b',
+          public_id: 'sxediasmos_b63117da83',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168309/145_aea9e7394b.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1728401805/sxediasmos_b63117da83.png',
+          width: 532,
+          height: 300,
           resource_type: 'image',
-          format: 'webp',
-          bytes: 57385,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168309/145_aea9e7394b.webp',
-          original_filename: '145.webp',
+          format: 'png',
+          bytes: 35918,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1728401805/sxediasmos_b63117da83.png',
         },
         children: [
           {
@@ -1545,16 +1539,15 @@ export const serviceTaxonomies = [
         description:
           'Αποτύπωσε τις στιγμές σου με μία επαγγελματική φωτογράφιση που θα ξεχωρίσει.',
         image: {
-          public_id: '160_11d1bf7de2',
+          public_id: 'subcategories/fotografia_kc3tdc',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168311/160_11d1bf7de2.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/fotografia_kc3tdc.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 56750,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168311/160_11d1bf7de2.webp',
-          original_filename: '160.webp',
+          bytes: 44524,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/fotografia_kc3tdc.webp',
         },
         children: [
           {
@@ -2152,16 +2145,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε υπηρεσίες αισθητικής από επαγγελματίες που ξεχωρίζουν και ανανέωσε την εμφάνισή σου.',
         image: {
-          public_id: '179_ffc49581b1',
+          public_id: 'subcategories/aisthitiki_rlcylk',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168362/179_ffc49581b1.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769196799/subcategories/aisthitiki_rlcylk.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 59453,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168362/179_ffc49581b1.webp',
-          original_filename: '179.webp',
+          bytes: 66884,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769196799/subcategories/aisthitiki_rlcylk.webp',
         },
         children: [
           {
@@ -2439,16 +2431,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε την ηρεμία και την ισορροπία με υπηρεσίες αποκατάστασης που αναζωογονούν σώμα και πνεύμα.',
         image: {
-          public_id: '197_f4c7df22ab',
+          public_id: 'subcategories/apokatastasi_crrfeu',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168362/197_f4c7df22ab.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769196797/subcategories/apokatastasi_crrfeu.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 41390,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168362/197_f4c7df22ab.webp',
-          original_filename: '197.webp',
+          bytes: 65108,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769196797/subcategories/apokatastasi_crrfeu.webp',
         },
         children: [
           {
@@ -2690,16 +2681,15 @@ export const serviceTaxonomies = [
         description:
           'Βελτίωσε τη διατροφή σου με εξατομικευμένα πλάνα και συμβουλές για υγιεινή ζωή και ευεξία.',
         image: {
-          public_id: '206_8125831efe',
+          public_id: 'subcategories/diatrofi_f6t57f',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168437/206_8125831efe.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/diatrofi_f6t57f.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 102963,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168437/206_8125831efe.webp',
-          original_filename: '206.webp',
+          bytes: 98104,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769196798/subcategories/diatrofi_f6t57f.webp',
         },
         children: [
           {
@@ -2768,16 +2758,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε την απόλυτη ευεξία με υπηρεσίες που αναζωογονούν σώμα και πνεύμα. Δώσε προτεραιότητα σε εσένα.',
         image: {
-          public_id: '207_c40fd14a6e',
+          public_id: 'subcategories/euexia_sr1wpb',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168433/207_c40fd14a6e.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769196797/subcategories/euexia_sr1wpb.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 63857,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168433/207_c40fd14a6e.webp',
-          original_filename: '207.webp',
+          bytes: 82548,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769196797/subcategories/euexia_sr1wpb.webp',
         },
         children: [
           {
@@ -2922,16 +2911,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε ιατρικές υπηρεσίες που καλύπτουν τις ανάγκες σου με ένα κλικ.',
         image: {
-          public_id: '214_e00065c326',
+          public_id: 'subcategories/iatrikes-upiresies_egian0',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168428/214_e00065c326.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769196797/subcategories/iatrikes-upiresies_egian0.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 41462,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168428/214_e00065c326.webp',
-          original_filename: '214.webp',
+          bytes: 52738,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769196797/subcategories/iatrikes-upiresies_egian0.webp',
         },
         children: [
           {
@@ -3192,16 +3180,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε υπηρεσίες φροντίδας για αυτούς που αγαπάμε και χρειάζονται την προσοχή μας.',
         image: {
-          public_id: '226_ee657249ce',
+          public_id: 'frontidas_ipiresies_9d8f6e56a9',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168428/226_ee657249ce.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1725451391/frontidas_ipiresies_9d8f6e56a9.png',
+          width: 532,
+          height: 300,
           resource_type: 'image',
-          format: 'webp',
-          bytes: 47124,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168428/226_ee657249ce.webp',
-          original_filename: '226.webp',
+          format: 'png',
+          bytes: 64405,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1725451391/frontidas_ipiresies_9d8f6e56a9.png',
         },
         children: [
           {
@@ -3232,16 +3219,15 @@ export const serviceTaxonomies = [
         description:
           'Φρόντισε το κατοικίδιό σου με υπηρεσίες που καλύπτουν όλες τις ανάγκες τους.',
         image: {
-          public_id: '233_955873eb7a',
+          public_id: 'subcategories/frontida-katoikidion_jbpyco',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168433/233_955873eb7a.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1770720374/subcategories/frontida-katoikidion_jbpyco.webp',
+          width: 532,
+          height: 300,
           resource_type: 'image',
           format: 'webp',
-          bytes: 74537,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168433/233_955873eb7a.webp',
-          original_filename: '233.webp',
+          bytes: 16754,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1770720374/subcategories/frontida-katoikidion_jbpyco.webp',
         },
         children: [
           {
@@ -3409,16 +3395,15 @@ export const serviceTaxonomies = [
         description:
           'Βρες το ιδανικό μάθημα άθλησης και βελτίωσε τις ικανότητές σου με την καθοδήγηση ειδικών προπονητών.',
         image: {
-          public_id: '236_8ec7d3de1a',
+          public_id: 'subcategories/athlitismos_s8ctta',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168433/236_8ec7d3de1a.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769198654/subcategories/athlitismos_s8ctta.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 50135,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168433/236_8ec7d3de1a.webp',
-          original_filename: '236.webp',
+          bytes: 96874,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769198654/subcategories/athlitismos_s8ctta.webp',
         },
         children: [
           {
@@ -3582,16 +3567,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε νέες γνώσεις και δεξιότητες με μαθήματα που προσαρμόζονται στις ανάγκες σου.',
         image: {
-          public_id: '239_c9d30329f9',
+          public_id: 'subcategories/ekpaideusi_q2mpip',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168436/239_c9d30329f9.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/ekpaideusi_q2mpip.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 70154,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168436/239_c9d30329f9.webp',
-          original_filename: '239.webp',
+          bytes: 92676,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/ekpaideusi_q2mpip.webp',
         },
         children: [
           {
@@ -3622,16 +3606,15 @@ export const serviceTaxonomies = [
         description:
           'Βελτίωσε την ευεξία σου με μαθήματα που βελτιώνουν σώμα και πνεύμα.',
         image: {
-          public_id: '569_f35e015955',
+          public_id: 'subcategories/mathimata-euexias_attmgn',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168872/569_f35e015955.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/mathimata-euexias_attmgn.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 92744,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168872/569_f35e015955.webp',
-          original_filename: '569.webp',
+          bytes: 69782,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/mathimata-euexias_attmgn.webp',
         },
         children: [
           {
@@ -3719,16 +3702,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε τη χαρά της μουσικής με μαθήματα που προσαρμόζονται στις ανάγκες και το επίπεδό σου.',
         image: {
-          public_id: '243_5703557194',
+          public_id: 'mathimata_mousikis_7f59e18b93',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168492/243_5703557194.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1728399876/mathimata_mousikis_7f59e18b93.png',
+          width: 532,
+          height: 300,
           resource_type: 'image',
-          format: 'webp',
-          bytes: 59218,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168492/243_5703557194.webp',
-          original_filename: '243.webp',
+          format: 'png',
+          bytes: 83557,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1728399876/mathimata_mousikis_7f59e18b93.png',
         },
         children: [
           {
@@ -3875,16 +3857,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε τα μυστικά της τεχνολογίας με μαθήματα πληροφορικής που θα σε κάνουν ειδικό στον τομέα σου.',
         image: {
-          public_id: '248_bf8eb873f7',
+          public_id: 'subcategories/mathimata-pliroforikis_l6avp3',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/248_bf8eb873f7.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/mathimata-pliroforikis_l6avp3.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 85494,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/248_bf8eb873f7.webp',
-          original_filename: '248.webp',
+          bytes: 51198,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/mathimata-pliroforikis_l6avp3.webp',
         },
         children: [
           {
@@ -3915,16 +3896,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε τη δημιουργικότητά σου με μαθήματα τεχνών. Εξέλιξε τις δεξιότητές σου σε κάθε μορφή τέχνης.',
         image: {
-          public_id: '252_5254658313',
+          public_id: 'subcategories/mathimata-texnon_sgjw0i',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/252_5254658313.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/mathimata-texnon_sgjw0i.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 71332,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/252_5254658313.webp',
-          original_filename: '252.webp',
+          bytes: 52106,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/mathimata-texnon_sgjw0i.webp',
         },
         children: [
           {
@@ -4012,16 +3992,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε τη χαρά του χορού με μαθήματα που ταιριάζουν στο ρυθμό και το στυλ σου.',
         image: {
-          public_id: '562_1ffade5462',
+          public_id: 'subcategories/mathimata-xorou_x8md4k',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168872/562_1ffade5462.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/mathimata-xorou_x8md4k.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 96440,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168872/562_1ffade5462.webp',
-          original_filename: '562.webp',
+          bytes: 56990,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/mathimata-xorou_x8md4k.webp',
         },
         children: [
           {
@@ -4071,16 +4050,15 @@ export const serviceTaxonomies = [
         description:
           'Μάθε ξένες γλώσσες εύκολα και γρήγορα. Εξασφάλισε νέες δεξιότητες και διεύρυνε τους ορίζοντές σου.',
         image: {
-          public_id: '255_e6be15e59a',
+          public_id: 'subcategories/xenes-glosses_yiihut',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168521/255_e6be15e59a.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769198652/subcategories/xenes-glosses_yiihut.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 70963,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168521/255_e6be15e59a.webp',
-          original_filename: '255.webp',
+          bytes: 128464,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769198652/subcategories/xenes-glosses_yiihut.webp',
         },
         children: [
           {
@@ -4130,16 +4108,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε πανεπιστημιακά μαθήματα που ενισχύουν τις γνώσεις σου και σε οδηγούν στην επιτυχία.',
         image: {
-          public_id: '257_d063c7b310',
+          public_id: 'subcategories/panepistimiaka-mathimata_mxgecp',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168513/257_d063c7b310.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/panepistimiaka-mathimata_mxgecp.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 51333,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168513/257_d063c7b310.webp',
-          original_filename: '257.webp',
+          bytes: 95610,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/panepistimiaka-mathimata_mxgecp.webp',
         },
         children: [
           {
@@ -4208,16 +4185,15 @@ export const serviceTaxonomies = [
         description:
           'Βρες βοήθεια για τα σχολικά μαθήματα που χρειάζεσαι και βελτίωσε τις επιδόσεις σου άμεσα.',
         image: {
-          public_id: '259_d3b3ebbc93',
+          public_id: 'subcategories/sxolika-mathimata_od5ygd',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168521/259_d3b3ebbc93.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/sxolika-mathimata_od5ygd.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 79729,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168521/259_d3b3ebbc93.webp',
-          original_filename: '259.webp',
+          bytes: 80422,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769198653/subcategories/sxolika-mathimata_od5ygd.webp',
         },
         children: [
           {
@@ -4290,16 +4266,15 @@ export const serviceTaxonomies = [
         description:
           'Δημιούργησε μια μοναδική ταυτότητα για την επιχείρησή σου και ξεχώρισε στην αγορά με επαγγελματικό branding.',
         image: {
-          public_id: '262_6ec7b1da3f',
+          public_id: 'branding_ec43f68a97',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168511/262_6ec7b1da3f.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1728402020/branding_ec43f68a97.png',
+          width: 532,
+          height: 300,
           resource_type: 'image',
-          format: 'webp',
-          bytes: 50913,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168511/262_6ec7b1da3f.webp',
-          original_filename: '262.webp',
+          format: 'png',
+          bytes: 66083,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1728402020/branding_ec43f68a97.png',
         },
         children: [
           {
@@ -4349,16 +4324,15 @@ export const serviceTaxonomies = [
         description:
           'Αύξησε την online παρουσία σου με στρατηγικές digital marketing που προσελκύουν και αυξάνουν τους πελάτες.',
         image: {
-          public_id: '273_2e0594ef3d',
+          public_id: 'digital_marketing_ipiresies_c36961f97a',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/273_2e0594ef3d.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1728402147/digital_marketing_ipiresies_c36961f97a.png',
+          width: 532,
+          height: 300,
           resource_type: 'image',
-          format: 'webp',
-          bytes: 83261,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/273_2e0594ef3d.webp',
-          original_filename: '273.webp',
+          format: 'png',
+          bytes: 39890,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1728402147/digital_marketing_ipiresies_c36961f97a.png',
         },
         children: [
           {
@@ -5081,16 +5055,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε στρατηγικές μάρκετινγκ που ενισχύουν την επιχείρησή σου και προσελκύουν νέους πελάτες.',
         image: {
-          public_id: '298_a5354604d9',
+          public_id: 'marketing_449289d8e0',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168519/298_a5354604d9.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1749569059/marketing_449289d8e0.png',
+          width: 532,
+          height: 300,
           resource_type: 'image',
-          format: 'webp',
-          bytes: 65997,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168519/298_a5354604d9.webp',
-          original_filename: '298.webp',
+          format: 'png',
+          bytes: 44625,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1749569059/marketing_449289d8e0.png',
         },
         children: [
           {
@@ -5475,16 +5448,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε κρυμμένα μοτίβα στα δεδομένα σου και πάρε αποφάσεις με σιγουριά και ακρίβεια.',
         image: {
-          public_id: '313_57edef0610',
+          public_id: 'analusi_dedomenon_68af9eac1f',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168639/313_57edef0610.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1728403208/analusi_dedomenon_68af9eac1f.png',
+          width: 532,
+          height: 300,
           resource_type: 'image',
-          format: 'webp',
-          bytes: 66355,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168639/313_57edef0610.webp',
-          original_filename: '313.webp',
+          format: 'png',
+          bytes: 45256,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1728403208/analusi_dedomenon_68af9eac1f.png',
         },
         children: [
           {
@@ -5571,16 +5543,15 @@ export const serviceTaxonomies = [
         description:
           'Δημιούργησε την ιδανική εφαρμογή για τις ανάγκες σου με εξειδικευμένες λύσεις πληροφορικής.',
         image: {
-          public_id: '316_0bdd0f96d4',
+          public_id: 'subcategories/anaptuxi-efarmogon_fpbmhk',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168641/316_0bdd0f96d4.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/anaptuxi-efarmogon_fpbmhk.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 77097,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168641/316_0bdd0f96d4.webp',
-          original_filename: '316.webp',
+          bytes: 105452,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/anaptuxi-efarmogon_fpbmhk.webp',
         },
         children: [
           {
@@ -5687,16 +5658,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε λύσεις λογισμικού που καλύπτουν τις ανάγκες σου με εξειδικευμένες υπηρεσίες πληροφορικής.',
         image: {
-          public_id: '323_bc43f9c7f8',
+          public_id: 'anaptuxi_logismikou_c45bd90b09',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168628/323_bc43f9c7f8.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1728403168/anaptuxi_logismikou_c45bd90b09.png',
+          width: 532,
+          height: 300,
           resource_type: 'image',
-          format: 'webp',
-          bytes: 52634,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168628/323_bc43f9c7f8.webp',
-          original_filename: '323.webp',
+          format: 'png',
+          bytes: 55928,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1728403168/anaptuxi_logismikou_c45bd90b09.png',
         },
         children: [
           {
@@ -5822,16 +5792,15 @@ export const serviceTaxonomies = [
         description:
           'Σύνδεσε τις συσκευές σου με ασφάλεια και ταχύτητα. Βρες λύσεις για όλα τα θέματα δικτύου.',
         image: {
-          public_id: '329_daa1b8b2c1',
+          public_id: 'subcategories/diktua_wp2oif',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168641/329_daa1b8b2c1.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/diktua_wp2oif.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 72161,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168641/329_daa1b8b2c1.webp',
-          original_filename: '329.webp',
+          bytes: 112036,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/diktua_wp2oif.webp',
         },
         children: [
           {
@@ -5957,16 +5926,15 @@ export const serviceTaxonomies = [
         description:
           'Δημιούργησε την ιδανική ιστοσελίδα για την επιχείρησή σου με επαγγελματική κατασκευή και σχεδίαση.',
         image: {
-          public_id: '332_cb28af9e9e',
+          public_id: 'kataskeui_istoselidon_74ac0f2ee2',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168631/332_cb28af9e9e.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1728403143/kataskeui_istoselidon_74ac0f2ee2.png',
+          width: 532,
+          height: 300,
           resource_type: 'image',
-          format: 'webp',
-          bytes: 60682,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168631/332_cb28af9e9e.webp',
-          original_filename: '332.webp',
+          format: 'png',
+          bytes: 73230,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1728403143/kataskeui_istoselidon_74ac0f2ee2.png',
         },
         children: [
           {
@@ -6054,16 +6022,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε λύσεις προγραμματισμού για κάθε ανάγκη σου στην πληροφορική με άμεση και αξιόπιστη υποστήριξη.',
         image: {
-          public_id: '334_04512813ee',
+          public_id: 'subcategories/programmatismos_dndfqo',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168641/334_04512813ee.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1770723401/subcategories/programmatismos_dndfqo.webp',
+          width: 532,
+          height: 300,
           resource_type: 'image',
           format: 'webp',
-          bytes: 73472,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168641/334_04512813ee.webp',
-          original_filename: '334.webp',
+          bytes: 13602,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1770723401/subcategories/programmatismos_dndfqo.webp',
         },
         children: [
           {
@@ -6113,16 +6080,15 @@ export const serviceTaxonomies = [
         description:
           'Δημιούργησε την ιδανική ιστοσελίδα για την επιχείρησή σου με επαγγελματικό σχεδιασμό και λειτουργικότητα.',
         image: {
-          public_id: '337_a9833fe08e',
+          public_id: 'sxediasmos_istoselidon_c1b9ebb8fc',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168633/337_a9833fe08e.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1728403240/sxediasmos_istoselidon_c1b9ebb8fc.png',
+          width: 532,
+          height: 300,
           resource_type: 'image',
-          format: 'webp',
-          bytes: 60078,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168633/337_a9833fe08e.webp',
-          original_filename: '337.webp',
+          format: 'png',
+          bytes: 31791,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1728403240/sxediasmos_istoselidon_c1b9ebb8fc.png',
         },
         children: [
           {
@@ -6191,16 +6157,15 @@ export const serviceTaxonomies = [
         description:
           'Λύσε άμεσα τα τεχνικά προβλήματα με αξιόπιστη υποστήριξη IT.',
         image: {
-          public_id: '338_c012a7d8a6',
+          public_id: 'subcategories/upostirixi-it_ngbhpd',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168641/338_c012a7d8a6.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769200709/subcategories/upostirixi-it_ngbhpd.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 69908,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168641/338_c012a7d8a6.webp',
-          original_filename: '338.webp',
+          bytes: 73278,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769200709/subcategories/upostirixi-it_ngbhpd.webp',
         },
         children: [
           {
@@ -6440,16 +6405,15 @@ export const serviceTaxonomies = [
         description:
           'Φιλοξένησε την ιστοσελίδα σου με ασφάλεια και ταχύτητα. Εξασφάλισε αξιόπιστη online παρουσία.',
         image: {
-          public_id: '351_4ce85448fe',
+          public_id: 'subcategories/filoxenia-istoselidon_hlokoi',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168631/351_4ce85448fe.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1770723611/subcategories/filoxenia-istoselidon_hlokoi.webp',
+          width: 532,
+          height: 300,
           resource_type: 'image',
           format: 'webp',
-          bytes: 60774,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168631/351_4ce85448fe.webp',
-          original_filename: '351.webp',
+          bytes: 20514,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1770723611/subcategories/filoxenia-istoselidon_hlokoi.webp',
         },
         children: [
           {
@@ -6582,16 +6546,15 @@ export const serviceTaxonomies = [
         description:
           'Καθάρισε το χώρο σου από έντομα και μικρόβια με επαγγελματικές απεντομώσεις και απολυμάνσεις.',
         image: {
-          public_id: '357_450990435d',
+          public_id: 'subcategories/apedomoseis-apolumanseis_lhhlyt',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168617/357_450990435d.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769192236/subcategories/apedomoseis-apolumanseis_lhhlyt.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 35891,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168617/357_450990435d.webp',
-          original_filename: '357.webp',
+          bytes: 44848,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769192236/subcategories/apedomoseis-apolumanseis_lhhlyt.webp',
         },
         children: [
           {
@@ -6794,16 +6757,15 @@ export const serviceTaxonomies = [
         slug: 'asfaleia',
         description: 'Προστάτεψε το χώρο σου με αξιόπιστες λύσεις ασφάλειας.',
         image: {
-          public_id: '365_c260352c16',
+          public_id: 'subcategories/asfaleia_y44f2z',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168643/365_c260352c16.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1770725359/subcategories/asfaleia_y44f2z.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 177930,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168643/365_c260352c16.webp',
-          original_filename: '365.webp',
+          bytes: 62094,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1770725359/subcategories/asfaleia_y44f2z.webp',
         },
         children: [
           {
@@ -7102,16 +7064,15 @@ export const serviceTaxonomies = [
         description:
           'Εξασφάλισε άμεση και αξιόπιστη εγκατάσταση για κάθε τεχνική σου ανάγκη με επαγγελματική ακρίβεια.',
         image: {
-          public_id: '380_f6d3f95e47',
+          public_id: 'subcategories/egatastasi_bakflq',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168642/380_f6d3f95e47.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769192235/subcategories/egatastasi_bakflq.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 98099,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168642/380_f6d3f95e47.webp',
-          original_filename: '380.webp',
+          bytes: 85144,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769192235/subcategories/egatastasi_bakflq.webp',
         },
         children: [
           {
@@ -7826,16 +7787,15 @@ export const serviceTaxonomies = [
         description:
           'Βρες λύσεις για ενεργειακά θέματα στο σπίτι σου με εξειδικευμένες υπηρεσίες και άμεση εξυπηρέτηση.',
         image: {
-          public_id: '409_1499c2e54d',
+          public_id: 'subcategories/energeia_wjfhn4',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168772/409_1499c2e54d.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1770725725/subcategories/energeia_wjfhn4.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 65587,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168772/409_1499c2e54d.webp',
-          original_filename: '409.webp',
+          bytes: 45758,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1770725725/subcategories/energeia_wjfhn4.webp',
         },
         children: [
           {
@@ -7923,16 +7883,15 @@ export const serviceTaxonomies = [
         description:
           'Βρες άμεσα λύση για κάθε τεχνική βλάβη. Επισκευές για σωστή αποκατάσταση από επαγγελματίες που ξεχωρίζουν.',
         image: {
-          public_id: '412_4c48458104',
+          public_id: 'subcategories/episkeues_yqtbws',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168756/412_4c48458104.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769192234/subcategories/episkeues_yqtbws.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 41779,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168756/412_4c48458104.webp',
-          original_filename: '412.webp',
+          bytes: 46718,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769192234/subcategories/episkeues_yqtbws.webp',
         },
         children: [
           {
@@ -8193,16 +8152,15 @@ export const serviceTaxonomies = [
         description:
           'Βρες άμεσα λύσεις για κάθε ηλεκτρολογική ανάγκη με ασφάλεια και επαγγελματική υπευθυνότητα.',
         image: {
-          public_id: '424_aac576e4e5',
+          public_id: 'subcategories/ilektrologika_lxnc6p',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168767/424_aac576e4e5.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769192234/subcategories/ilektrologika_lxnc6p.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 44728,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168767/424_aac576e4e5.webp',
-          original_filename: '424.webp',
+          bytes: 24436,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769192234/subcategories/ilektrologika_lxnc6p.webp',
         },
         children: [
           {
@@ -8271,16 +8229,15 @@ export const serviceTaxonomies = [
         description:
           'Καθάρισε το χώρο σου άμεσα και με φροντίδα από επαγγελματίες που ξεχωρίζουν.',
         image: {
-          public_id: '434_2a45e6dfaa',
+          public_id: 'subcategories/katharismoi_ngupkr',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168776/434_2a45e6dfaa.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769192235/subcategories/katharismoi_ngupkr.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 81459,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168776/434_2a45e6dfaa.webp',
-          original_filename: '434.webp',
+          bytes: 99708,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769192235/subcategories/katharismoi_ngupkr.webp',
         },
         children: [
           {
@@ -9186,16 +9143,15 @@ export const serviceTaxonomies = [
         description:
           'Φρόντισε τον κήπο σου με επαγγελματική φροντίδα. Εξασφάλισε υγιή φυτά και όμορφο περιβάλλον.',
         image: {
-          public_id: '476_4949f3c99d',
+          public_id: 'subcategories/kipos_1_ofypck',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168767/476_4949f3c99d.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769192235/subcategories/kipos_1_ofypck.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 61000,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168767/476_4949f3c99d.webp',
-          original_filename: '476.webp',
+          bytes: 155620,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769192235/subcategories/kipos_1_ofypck.webp',
         },
         children: [
           {
@@ -9342,16 +9298,15 @@ export const serviceTaxonomies = [
         description:
           'Εργασίες επισκευών με άμεση και αξιόπιστη συντήρηση. Υπηρεσίες για να εξασφαλίσεις άριστη λειτουργία.',
         image: {
-          public_id: '490_109db0b6c6',
+          public_id: 'subcategories/suntirisi_la90hd',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168767/490_109db0b6c6.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769192233/subcategories/suntirisi_la90hd.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 46838,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168767/490_109db0b6c6.webp',
-          original_filename: '490.webp',
+          bytes: 58156,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769192233/subcategories/suntirisi_la90hd.webp',
         },
         children: [
           {
@@ -9707,16 +9662,15 @@ export const serviceTaxonomies = [
         description:
           'Βρες άμεσα λύσεις για υδραυλικά προβλήματα στο σπίτι σου με εξειδικευμένες υπηρεσίες επισκευής.',
         image: {
-          public_id: '496_89448becae',
+          public_id: 'subcategories/udraulika_vd7zoz',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168768/496_89448becae.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769192235/subcategories/udraulika_vd7zoz.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 48599,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168768/496_89448becae.webp',
-          original_filename: '496.webp',
+          bytes: 52604,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769192235/subcategories/udraulika_vd7zoz.webp',
         },
         children: [
           {
@@ -9766,16 +9720,15 @@ export const serviceTaxonomies = [
         description:
           'Βρες λύσεις για κάθε τεχνική πρόκληση με τις υπηρεσίες μηχανικών που χρειάζεσαι άμεσα και αξιόπιστα.',
         image: {
-          public_id: '498_cc950d8f11',
+          public_id: 'subcategories/upiresies-mixanikon_cvrbax',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168776/498_cc950d8f11.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1770725962/subcategories/upiresies-mixanikon_cvrbax.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 93686,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168776/498_cc950d8f11.webp',
-          original_filename: '498.webp',
+          bytes: 66796,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1770725962/subcategories/upiresies-mixanikon_cvrbax.webp',
         },
         children: [
           {
@@ -9964,16 +9917,15 @@ export const serviceTaxonomies = [
         description:
           'Βρες άμεσα υπηρεσίες διανομής για κάθε σου ανάγκη. Εξασφάλισε γρήγορη και αξιόπιστη παράδοση.',
         image: {
-          public_id: '509_2194724adf',
+          public_id: 'subcategories/dianomes_kskvfy',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168855/509_2194724adf.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769200709/subcategories/dianomes_kskvfy.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 52767,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168855/509_2194724adf.webp',
-          original_filename: '509.webp',
+          bytes: 77484,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769200709/subcategories/dianomes_kskvfy.webp',
         },
         children: [
           {
@@ -10061,16 +10013,15 @@ export const serviceTaxonomies = [
         description:
           'Οργάνωσε και βελτίωσε την ακίνητη περιουσία σου με επαγγελματική διαχείριση και υποστήριξη.',
         image: {
-          public_id: '514_162f69b6c2',
+          public_id: 'subcategories/diaxeirisi-akiniton_g8xsu9',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168872/514_162f69b6c2.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/diaxeirisi-akiniton_g8xsu9.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 88986,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168872/514_162f69b6c2.webp',
-          original_filename: '514.webp',
+          bytes: 97686,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/diaxeirisi-akiniton_g8xsu9.webp',
         },
         children: [
           {
@@ -10176,16 +10127,15 @@ export const serviceTaxonomies = [
         slug: 'exoplismos',
         description: 'Βρες τον εξοπλισμό που χρειάζεσαι για κάθε σου ανάγκη.',
         image: {
-          public_id: '521_5a946262d0',
+          public_id: 'subcategories/exoplismos_bzklal',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168869/521_5a946262d0.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/exoplismos_bzklal.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 66499,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168869/521_5a946262d0.webp',
-          original_filename: '521.webp',
+          bytes: 100312,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/exoplismos_bzklal.webp',
         },
         children: [
           {
@@ -10235,16 +10185,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε εξατομικευμένες λύσεις για κάθε ανάγκη με τις ιδιωτικές υπηρεσίες.',
         image: {
-          public_id: '561_3fd8a6ecd6',
+          public_id: 'subcategories/idiotikes-upiresies_cnhotv',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168865/561_3fd8a6ecd6.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/idiotikes-upiresies_cnhotv.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 40704,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168865/561_3fd8a6ecd6.webp',
-          original_filename: '561.webp',
+          bytes: 57092,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/idiotikes-upiresies_cnhotv.webp',
         },
         children: [
           {
@@ -10332,16 +10281,15 @@ export const serviceTaxonomies = [
         description:
           'Βρες αξιόπιστες λύσεις για τις μεταφορές σου με επαγγελματική υποστήριξη και ασφάλεια.',
         image: {
-          public_id: '527_4f5d6eb790',
+          public_id: 'subcategories/metafores_sc4dkv',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168856/527_4f5d6eb790.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/metafores_sc4dkv.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 37304,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168856/527_4f5d6eb790.webp',
-          original_filename: '527.webp',
+          bytes: 51918,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/metafores_sc4dkv.webp',
         },
         children: [
           {
@@ -10640,16 +10588,15 @@ export const serviceTaxonomies = [
         description:
           'Λάβε αξιόπιστη υποστήριξη για τις ανάγκες σου σε οικονομικα και λογιστικά θέματα.',
         image: {
-          public_id: '537_eb01c31e42',
+          public_id: 'subcategories/oikonomikes-upiresies_pg9ah8',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168865/537_eb01c31e42.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769200709/subcategories/oikonomikes-upiresies_pg9ah8.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 56863,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168865/537_eb01c31e42.webp',
-          original_filename: '537.webp',
+          bytes: 48536,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769200709/subcategories/oikonomikes-upiresies_pg9ah8.webp',
         },
         children: [
           {
@@ -10912,16 +10859,15 @@ export const serviceTaxonomies = [
         description:
           'Συμβουλευτική καθοδήγηση και λύσεις για κάθε πρόκληση. Εξασφάλισε την επιτυχία σου με επαγγελματική υποστήριξη.',
         image: {
-          public_id: '546_bcb988dd41',
+          public_id: 'subcategories/sumvouleutikes-upiresies_aolxfp',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168871/546_bcb988dd41.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/sumvouleutikes-upiresies_aolxfp.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 71629,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168871/546_bcb988dd41.webp',
-          original_filename: '546.webp',
+          bytes: 47812,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/sumvouleutikes-upiresies_aolxfp.webp',
         },
         children: [
           {
@@ -11009,16 +10955,15 @@ export const serviceTaxonomies = [
         description:
           'Λάβε άμεση βοήθεια για κάθε σου ανάγκη. Επίλυσε τις ανάγκες σου στην υποστήριξη των πελατών σου.',
         image: {
-          public_id: '548_a466a9ecad',
+          public_id: 'subcategories/upostirixi-pelaton_tjosxg',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168872/548_a466a9ecad.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/upostirixi-pelaton_tjosxg.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 100721,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168872/548_a466a9ecad.webp',
-          original_filename: '548.webp',
+          bytes: 96060,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769200710/subcategories/upostirixi-pelaton_tjosxg.webp',
         },
         children: [
           {
@@ -11124,16 +11069,15 @@ export const serviceTaxonomies = [
         slug: 'psifiaka-proionta',
         description: 'Ανακάλυψε λύσεις σε ψηφιακά προϊόντα.',
         image: {
-          public_id: '133_c318ff3a11_8c537542a1',
+          public_id: 'subcategories/psifiaka-proionta_qu6dzj',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1752070512/133_c318ff3a11_8c537542a1.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769200709/subcategories/psifiaka-proionta_qu6dzj.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 60017,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1752070512/133_c318ff3a11_8c537542a1.webp',
-          original_filename: '133_c318ff3a11.webp',
+          bytes: 28666,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769200709/subcategories/psifiaka-proionta_qu6dzj.webp',
         },
         children: [
           {
