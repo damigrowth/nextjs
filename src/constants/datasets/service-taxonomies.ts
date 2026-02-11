@@ -1,4 +1,4 @@
-// Generated on 2026-02-10T12:28:48.143Z
+// Generated on 2026-02-11T12:50:26.532Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -3798,16 +3798,15 @@ export const serviceTaxonomies = [
         description:
           'Μάθε να οδηγείς με ασφάλεια και αυτοπεποίθηση. Απόκτησε τις δεξιότητες που χρειάζεσαι για το δρόμο.',
         image: {
-          public_id: '246_2145b31128',
+          public_id: 'subcategories/mathimata-odigisis_xr2r2n',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168504/246_2145b31128.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1770813667/subcategories/mathimata-odigisis_xr2r2n.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 57805,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168504/246_2145b31128.webp',
-          original_filename: '246.webp',
+          bytes: 84774,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1770813667/subcategories/mathimata-odigisis_xr2r2n.webp',
         },
         children: [
           {
@@ -5250,16 +5249,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε λύσεις AI για τις ανάγκες σου στην πληροφορική. Βρες την ιδανική υπηρεσία τώρα!',
         image: {
-          public_id: '303_7f0125c97c',
+          public_id: 'subcategories/Efarmoges-AI_kfjzaf',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168577/303_7f0125c97c.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1770813910/subcategories/Efarmoges-AI_kfjzaf.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 60836,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168577/303_7f0125c97c.webp',
-          original_filename: '303.webp',
+          bytes: 128994,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1770813910/subcategories/Efarmoges-AI_kfjzaf.webp',
         },
         children: [
           {
@@ -5368,16 +5366,15 @@ export const serviceTaxonomies = [
         description:
           'Ανακάλυψε λύσεις για το ηλεκτρονικό σου κατάστημα με εξειδικευμένες υπηρεσίες eCommerce.',
         image: {
-          public_id: '307_6421921edc',
+          public_id: 'subcategories/ecommerce_asxkpt',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168576/307_6421921edc.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1770814143/subcategories/ecommerce_asxkpt.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 26081,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168576/307_6421921edc.webp',
-          original_filename: '307.webp',
+          bytes: 43502,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1770814143/subcategories/ecommerce_asxkpt.webp',
         },
         children: [
           {
@@ -7005,16 +7002,15 @@ export const serviceTaxonomies = [
         description:
           'Δώσε στυλ και χαρακτήρα στον χώρο σου με μοναδικές λύσεις διακόσμησης που ταιριάζουν στις ανάγκες σου.',
         image: {
-          public_id: '372_b2ab5e6f14',
+          public_id: 'subcategories/diakosmisi_jtqiok',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168636/372_b2ab5e6f14.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1769192235/subcategories/diakosmisi_jtqiok.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 64686,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168636/372_b2ab5e6f14.webp',
-          original_filename: '372.webp',
+          bytes: 58884,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1769192235/subcategories/diakosmisi_jtqiok.webp',
         },
         children: [
           {
