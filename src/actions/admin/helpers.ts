@@ -49,7 +49,7 @@ export async function getAdminSession() {
  */
 export async function getAdminSessionWithPermission(
   resource: string,
-  level: 'view' | 'edit' | 'full' = 'view'
+  level: 'view' | 'edit' | 'full' = 'view',
 ) {
   const headersList = await headers();
   const session = await auth.api.getSession({
@@ -61,11 +61,8 @@ export async function getAdminSessionWithPermission(
   }
 
   // Import permission checkers
-  const {
-    requirePermission,
-    requireEditPermission,
-    requireFullPermission
-  } = await import('@/actions/auth/server');
+  const { requirePermission, requireEditPermission, requireFullPermission } =
+    await import('@/actions/auth/server');
 
   // Check appropriate permission level
   if (level === 'full') {
@@ -114,23 +111,16 @@ export async function getFilteredNavItems(): Promise<{
   navItems: NavItem[];
   userRole: string | null;
 }> {
-  console.log('[GET_NAV_ITEMS] START:', new Date().toISOString());
-
   try {
     const { getSession } = await import('@/actions/auth/server');
-    const {
-      ADMIN_RESOURCES,
-      hasAccess,
-      isAdminRole,
-    } = await import('@/lib/auth/roles');
+    const { ADMIN_RESOURCES, hasAccess, isAdminRole } =
+      await import('@/lib/auth/roles');
 
     // Get session first (fast, no database call after ML15-290 fix)
     const sessionStart = performance.now();
     const sessionResult = await getSession({ revalidate: true });
-    console.log('[GET_NAV_ITEMS] getSession took:', performance.now() - sessionStart, 'ms');
 
     if (!sessionResult.success || !sessionResult.data.session) {
-      console.log('[GET_NAV_ITEMS] END (no session):', new Date().toISOString());
       return { navItems: [], userRole: null };
     }
 
@@ -142,13 +132,10 @@ export async function getFilteredNavItems(): Promise<{
     const cached = navSessionCache.get(cacheKey);
 
     if (cached && Date.now() - cached.timestamp < NAV_SESSION_CACHE_TTL) {
-      console.log('[GET_NAV_ITEMS] Using cached result (age:', Date.now() - cached.timestamp, 'ms)');
-      console.log('[GET_NAV_ITEMS] END (cached):', new Date().toISOString());
       return cached.data;
     }
 
     if (!userRole || !isAdminRole(userRole)) {
-      console.log('[GET_NAV_ITEMS] END (not admin):', new Date().toISOString());
       return { navItems: [], userRole };
     }
 
@@ -225,10 +212,8 @@ export async function getFilteredNavItems(): Promise<{
     const result = { navItems, userRole };
     navSessionCache.set(cacheKey, { data: result, timestamp: Date.now() });
 
-    console.log('[GET_NAV_ITEMS] END (fresh data cached):', new Date().toISOString());
     return result;
   } catch (error) {
-    console.error('[GET_NAV_ITEMS] ERROR:', error);
     return { navItems: [], userRole: null };
   }
 }

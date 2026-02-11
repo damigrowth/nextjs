@@ -2,46 +2,50 @@
 
 import { useState } from 'react';
 import {
+  AlertCircle,
+  ArrowUp,
+  CheckCircle,
+  Database,
+  // RotateCcw,
+  ExternalLink,
+  FileCode,
+  GitBranch,
+  GitCommit,
+  GitMerge,
+  RefreshCw,
+  Rocket,
+  Trash2,
+  Undo2,
+  Upload,
+} from 'lucide-react';
+import { toast } from 'sonner';
+
+import {
+  commitDatasetChanges,
+  discardStagedChanges,
+  getGitStatus,
+  getRecentCommits,
+  mergeDatasetsToMain,
+  pushToRemote,
+  // revertCommits,
+  undoLastCommit,
+  // Removed after UI simplification: syncDatasetsWithMain, resetDatasetsToMain
+} from '@/actions/admin/git-operations';
+import { revalidateTaxonomyCaches } from '@/actions/admin/revalidate-taxonomies';
+import { NextLink } from '@/components';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  GitCommit,
-  GitBranch,
-  Upload,
-  AlertCircle,
-  CheckCircle,
-  FileCode,
-  ArrowUp,
-  Trash2,
-  // RotateCcw,
-  ExternalLink,
-  Undo2,
-  GitMerge,
-  RefreshCw,
-  Rocket,
-} from 'lucide-react';
-import {
-  getGitStatus,
-  commitDatasetChanges,
-  pushToRemote,
-  getRecentCommits,
-  discardStagedChanges,
-  // revertCommits,
-  undoLastCommit,
-  mergeDatasetsToMain,
-  // Removed after UI simplification: syncDatasetsWithMain, resetDatasetsToMain
-} from '@/actions/admin/git-operations';
-import { toast } from 'sonner';
-import { CommitForm } from './commit-form';
 import { GitStatusResponse, RecentCommitsResponse } from '@/lib/types/github';
-import { NextLink } from '@/components';
+
+import { CommitForm } from './commit-form';
 
 interface DeploymentManagerProps {
   initialStatus: GitStatusResponse['data'];
@@ -52,24 +56,36 @@ export function DeploymentManager({
   initialStatus,
   initialCommits,
 }: DeploymentManagerProps) {
-  const [gitStatus, setGitStatus] = useState<GitStatusResponse['data']>(initialStatus);
-  const [recentCommits, setRecentCommits] = useState<
-    RecentCommitsResponse['data']['commits']
-  >(initialCommits);
+  const [gitStatus, setGitStatus] =
+    useState<GitStatusResponse['data']>(initialStatus);
+
+  const [recentCommits, setRecentCommits] =
+    useState<RecentCommitsResponse['data']['commits']>(initialCommits);
+
   const [loading, setLoading] = useState(false);
+
   const [committing, setCommitting] = useState(false);
+
   const [pushing, setPushing] = useState(false);
+
   const [discarding, setDiscarding] = useState(false);
+
   // const [reverting, setReverting] = useState<string | null>(null);
   const [undoing, setUndoing] = useState<string | null>(null);
+
   const [deploying, setDeploying] = useState(false);
+
+  const [refreshingCache, setRefreshingCache] = useState(false);
+  const [canRefreshCache, setCanRefreshCache] = useState(false);
   // Removed: syncing, resetting - no longer needed after UI simplification
 
   // Helper function to generate Vercel preview URL
   const getVercelPreviewUrl = (branch: string) => {
     // Vercel preview URL format: project-git-branch-username.vercel.app
     const projectName = 'doulitsa';
+
     const username = 'damigrowth';
+
     return `https://${projectName}-git-${branch}-${username}.vercel.app`;
   };
 
@@ -85,6 +101,7 @@ export function DeploymentManager({
 
   const loadRecentCommits = async () => {
     const result = await getRecentCommits(5, gitStatus?.branch);
+
     if (result.success && result.data) {
       setRecentCommits(result.data.commits || []);
     }
@@ -106,6 +123,7 @@ export function DeploymentManager({
 
       if (result.success) {
         const fileCount = result.data?.filesCommitted?.length || 0;
+
         toast.success(
           `Changes committed successfully! (${fileCount} file${fileCount !== 1 ? 's' : ''})`,
         );
@@ -229,6 +247,7 @@ export function DeploymentManager({
 
       if (result.success && result.data) {
         const undoneCount = result.data.undoneCommits.length;
+
         toast.success(
           `Successfully undone ${undoneCount} commit${undoneCount > 1 ? 's' : ''}. Branch now at ${result.data.newHeadSha.substring(0, 7)}`,
         );
@@ -250,6 +269,7 @@ export function DeploymentManager({
 
     if (aheadCount === 0) {
       toast.info('No changes to deploy. Already up-to-date with production.');
+
       return;
     }
 
@@ -276,6 +296,12 @@ export function DeploymentManager({
         toast.success(result.data.message);
         await loadGitStatus();
         await loadRecentCommits();
+        // Enable cache refresh button after successful deployment
+        setCanRefreshCache(true);
+        toast.info(
+          'Deployment started. Wait for Vercel to finish, then refresh the cache.',
+          { duration: 8000 },
+        );
       } else {
         toast.error(result.error || 'Failed to deploy to production');
       }
@@ -291,8 +317,31 @@ export function DeploymentManager({
   // After UI simplification, these operations are no longer exposed to users
   // Auto-sync before commit and auto-sync after deploy handle synchronization automatically
 
+  const handleRefreshCache = async () => {
+    setRefreshingCache(true);
+
+    try {
+      const result = await revalidateTaxonomyCaches();
+
+      if (result.success) {
+        toast.success(result.message);
+        // Reset so button becomes disabled again until next deployment
+        setCanRefreshCache(false);
+      } else {
+        toast.error(result.message || 'Failed to refresh cache');
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred');
+      console.error(error);
+    } finally {
+      setRefreshingCache(false);
+    }
+  };
+
   const hasChanges = gitStatus?.hasDatasetChanges || false;
+
   const isBehind = (gitStatus?.behind_by || 0) > 0;
+
   const isAhead = (gitStatus?.ahead_by || 0) > 0;
 
   return (
@@ -426,18 +475,21 @@ export function DeploymentManager({
                   if (!diff || typeof diff !== 'string') return null;
 
                   const filename = filePath.split('/').pop() || 'file';
+
                   const lines = diff.split('\n');
 
                   // Calculate diff statistics
                   const additions = lines.filter(
                     (line) => line.startsWith('+') && !line.startsWith('+++'),
                   ).length;
+
                   const deletions = lines.filter(
                     (line) => line.startsWith('-') && !line.startsWith('---'),
                   ).length;
 
                   // Limit preview to first 100 lines for performance
                   const previewLines = lines.slice(0, 100);
+
                   const hasMore = lines.length > 100;
 
                   return (
@@ -462,8 +514,10 @@ export function DeploymentManager({
                           {previewLines.map((line, index) => {
                             const isAddition =
                               line.startsWith('+') && !line.startsWith('+++');
+
                             const isDeletion =
                               line.startsWith('-') && !line.startsWith('---');
+
                             const isHeader =
                               line.startsWith('@@') ||
                               line.startsWith('diff') ||
@@ -687,11 +741,59 @@ export function DeploymentManager({
               <Alert>
                 <CheckCircle className='h-4 w-4' />
                 <AlertDescription>
-                  ✅ Everything is up-to-date. You can edit taxonomies and commit
-                  changes.
+                  ✅ Everything is up-to-date. You can edit taxonomies and
+                  commit changes.
                 </AlertDescription>
               </Alert>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Cache Management */}
+      {!loading && gitStatus && (
+        <Card>
+          <CardHeader>
+            <CardTitle className='flex items-center gap-2 mb-2'>
+              <Database className='h-5 w-5' />
+              Cache Management
+            </CardTitle>
+            <CardDescription>
+              Refresh server cache after deployment to show updated taxonomy
+              data
+            </CardDescription>
+          </CardHeader>
+          <CardContent className='space-y-4'>
+            {canRefreshCache ? (
+              <Alert className='border-green-500 bg-green-50'>
+                <CheckCircle className='h-4 w-4 text-green-600' />
+                <AlertDescription className='text-green-800'>
+                  Deployment initiated! Wait for Vercel to finish building, then
+                  click below to refresh the cache.
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <Alert>
+                <AlertCircle className='h-4 w-4' />
+                <AlertDescription>
+                  The cache refresh button will be enabled after you deploy
+                  taxonomy changes to production.
+                </AlertDescription>
+              </Alert>
+            )}
+            <div className='flex justify-center'>
+              <Button
+                onClick={handleRefreshCache}
+                disabled={refreshingCache || !canRefreshCache}
+                variant='outline'
+                size='lg'
+              >
+                <RefreshCw
+                  className={`h-4 w-4 ${refreshingCache ? 'animate-spin' : ''}`}
+                />
+                {refreshingCache ? 'Refreshing...' : 'Refresh Taxonomy Cache'}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
