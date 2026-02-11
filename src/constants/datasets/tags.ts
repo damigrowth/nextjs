@@ -1,4 +1,4 @@
-// Generated on 2026-02-02T13:55:51.151Z
+// Generated on 2026-02-11T23:35:44.240Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const tags = [
@@ -6371,5 +6371,10 @@ export const tags = [
     id: '1310',
     label: 'Google Cloud',
     slug: 'google-cloud',
+  },
+  {
+    id: '1311',
+    label: 'Flux',
+    slug: 'flux',
   },
 ];
