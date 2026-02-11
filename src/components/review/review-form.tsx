@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useActionState, useEffect } from 'react';
+import { useState, useActionState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -50,16 +50,6 @@ export function ReviewForm({
 
   // Check if user is logged in
   const isLoggedIn = !!session?.user?.id;
-
-  // Debug: Log props to identify why profileId might be undefined
-  useEffect(() => {
-    console.log('ReviewForm mounted with:', {
-      profileId,
-      serviceId,
-      type,
-      hasProfileServices: !!profileServices,
-    });
-  }, [profileId, serviceId, type, profileServices]);
 
   const handleSubmit = async (formData: FormData) => {
     // Validate required fields before submission

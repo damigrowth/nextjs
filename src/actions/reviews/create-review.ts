@@ -26,10 +26,12 @@ export async function createReview(
     const user = session.user;
 
     // 2. Extract form data using type-safe utility
+    // Note: rating is not marked required here because 0 is falsy and would fail the check
+    // Zod validation handles the rating requirement with proper Greek error message
     const { data: extractedData, errors: extractionErrors } = extractFormData(
       formData,
       {
-        rating: { type: 'int', required: true },
+        rating: { type: 'int', required: false },
         comment: { type: 'string', required: false }, // Changed: Comment is optional (Like/Unlike system)
         profileId: { type: 'string', required: true },
         serviceId: { type: 'int', required: false },
@@ -45,15 +47,6 @@ export async function createReview(
       };
     }
 
-    // Debug: Log extracted data before validation
-    console.log('Extracted form data:', {
-      rating: extractedData.rating,
-      comment: extractedData.comment,
-      commentLength: typeof extractedData.comment === 'string' ? extractedData.comment.length : 0,
-      profileId: extractedData.profileId,
-      serviceId: extractedData.serviceId,
-    });
-
     // Fix: Convert serviceId 0 to undefined for optional validation
     if (extractedData.serviceId === 0) {
       extractedData.serviceId = undefined;
@@ -68,11 +61,12 @@ export async function createReview(
     });
 
     if (!validationResult.success) {
-      console.error('Review validation failed:', validationResult.error);
-      return createValidationErrorResponse(
-        validationResult.error,
-        'Μη έγκυρα δεδομένα αξιολόγησης',
-      );
+      // Return the first Zod error message directly for user-friendly display
+      const firstError = validationResult.error.issues[0]?.message || 'Μη έγκυρα δεδομένα αξιολόγησης';
+      return {
+        success: false,
+        message: firstError,
+      };
     }
 
     const data = validationResult.data;
