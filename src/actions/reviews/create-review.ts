@@ -80,13 +80,27 @@ export async function createReview(
     // 4. Business logic validation - Check if target profile exists
     const targetProfile = await prisma.profile.findUnique({
       where: { id: data.profileId },
-      select: { id: true, username: true, displayName: true, user: { select: { id: true, email: true } } },
+      select: {
+        id: true,
+        username: true,
+        displayName: true,
+        user: { select: { id: true, email: true } },
+        _count: { select: { services: true } },
+      },
     });
 
     if (!targetProfile) {
       return {
         success: false,
         message: 'Το προφίλ δεν βρέθηκε',
+      };
+    }
+
+    // 4b. If profile has services, serviceId is required
+    if (targetProfile._count.services > 0 && !data.serviceId) {
+      return {
+        success: false,
+        message: 'Επιλέξτε την υπηρεσία που θα αξιολογηθεί',
       };
     }
 

@@ -239,7 +239,7 @@ export function ReviewForm({
       <div className='pt-2'>
         <Button
           type='submit'
-          disabled={isPending || rating === 0 || (type === 'profile' && profileServices && profileServices.length > 0 && !selectedService)}
+          disabled={isPending}
           className='min-w-[200px]'
         >
           {isPending ? (
