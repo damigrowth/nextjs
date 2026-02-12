@@ -3,20 +3,14 @@
 import { useState } from 'react';
 import {
   AlertCircle,
-  ArrowUp,
   CheckCircle,
-  Database,
   // RotateCcw,
-  ExternalLink,
   FileCode,
   GitBranch,
   GitCommit,
   GitMerge,
-  RefreshCw,
   Rocket,
   Trash2,
-  Undo2,
-  Upload,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -31,7 +25,6 @@ import {
   undoLastCommit,
   // Removed after UI simplification: syncDatasetsWithMain, resetDatasetsToMain
 } from '@/actions/admin/git-operations';
-import { revalidateTaxonomyCaches } from '@/actions/admin/revalidate-taxonomies';
 import { NextLink } from '@/components';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -74,10 +67,8 @@ export function DeploymentManager({
   const [undoing, setUndoing] = useState<string | null>(null);
 
   const [deploying, setDeploying] = useState(false);
-
-  const [refreshingCache, setRefreshingCache] = useState(false);
-  const [canRefreshCache, setCanRefreshCache] = useState(false);
-  // Removed: syncing, resetting - no longer needed after UI simplification
+  // Removed: syncing, resetting, refreshingCache - no longer needed after UI simplification
+  // Cache revalidation now happens automatically via Vercel deploy webhook
 
   // Helper function to generate Vercel preview URL
   const getVercelPreviewUrl = (branch: string) => {
@@ -296,12 +287,7 @@ export function DeploymentManager({
         toast.success(result.data.message);
         await loadGitStatus();
         await loadRecentCommits();
-        // Enable cache refresh button after successful deployment
-        setCanRefreshCache(true);
-        toast.info(
-          'Deployment started. Wait for Vercel to finish, then refresh the cache.',
-          { duration: 8000 },
-        );
+        // Cache revalidation happens automatically via Vercel deploy webhook
       } else {
         toast.error(result.error || 'Failed to deploy to production');
       }
@@ -313,30 +299,9 @@ export function DeploymentManager({
     }
   };
 
-  // Removed handleSyncWithProduction and handleResetToProduction
+  // Removed handleSyncWithProduction, handleResetToProduction, handleRefreshCache
   // After UI simplification, these operations are no longer exposed to users
-  // Auto-sync before commit and auto-sync after deploy handle synchronization automatically
-
-  const handleRefreshCache = async () => {
-    setRefreshingCache(true);
-
-    try {
-      const result = await revalidateTaxonomyCaches();
-
-      if (result.success) {
-        toast.success(result.message);
-        // Reset so button becomes disabled again until next deployment
-        setCanRefreshCache(false);
-      } else {
-        toast.error(result.message || 'Failed to refresh cache');
-      }
-    } catch (error) {
-      toast.error('An unexpected error occurred');
-      console.error(error);
-    } finally {
-      setRefreshingCache(false);
-    }
-  };
+  // Auto-sync before commit, auto-sync after deploy, and cache revalidation via webhook
 
   const hasChanges = gitStatus?.hasDatasetChanges || false;
 
@@ -750,53 +715,7 @@ export function DeploymentManager({
         </Card>
       )}
 
-      {/* Cache Management */}
-      {!loading && gitStatus && (
-        <Card>
-          <CardHeader>
-            <CardTitle className='flex items-center gap-2 mb-2'>
-              <Database className='h-5 w-5' />
-              Cache Management
-            </CardTitle>
-            <CardDescription>
-              Refresh server cache after deployment to show updated taxonomy
-              data
-            </CardDescription>
-          </CardHeader>
-          <CardContent className='space-y-4'>
-            {canRefreshCache ? (
-              <Alert className='border-green-500 bg-green-50'>
-                <CheckCircle className='h-4 w-4 text-green-600' />
-                <AlertDescription className='text-green-800'>
-                  Deployment initiated! Wait for Vercel to finish building, then
-                  click below to refresh the cache.
-                </AlertDescription>
-              </Alert>
-            ) : (
-              <Alert>
-                <AlertCircle className='h-4 w-4' />
-                <AlertDescription>
-                  The cache refresh button will be enabled after you deploy
-                  taxonomy changes to production.
-                </AlertDescription>
-              </Alert>
-            )}
-            <div className='flex justify-center'>
-              <Button
-                onClick={handleRefreshCache}
-                disabled={refreshingCache || !canRefreshCache}
-                variant='outline'
-                size='lg'
-              >
-                <RefreshCw
-                  className={`h-4 w-4 ${refreshingCache ? 'animate-spin' : ''}`}
-                />
-                {refreshingCache ? 'Refreshing...' : 'Refresh Taxonomy Cache'}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Cache Management removed - now handled automatically via Vercel deploy webhook */}
     </div>
   );
 }
