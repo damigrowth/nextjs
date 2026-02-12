@@ -8,6 +8,8 @@ import {
   getTags,
   findServiceById,
   findMatchingLocationInCoverage,
+  findMatchingServiceSubcategoryIds,
+  findMatchingSubdivisionIds,
 } from '@/lib/taxonomies';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 // Unified cache configuration
@@ -165,6 +167,10 @@ async function performSearch(
       });
       const matchingTagIds = matchingTags.map((tag) => tag.id);
 
+      // Find matching subcategories and subdivisions by searching in taxonomy labels
+      const matchingSubcategoryIds = findMatchingServiceSubcategoryIds(searchTerm);
+      const matchingSubdivisionIds = findMatchingSubdivisionIds(searchTerm);
+
       const searchConditions: any[] = [
         {
           titleNormalized: {
@@ -197,6 +203,24 @@ async function performSearch(
         });
       }
 
+      // Add subcategory search if matching subcategories found
+      if (matchingSubcategoryIds.length > 0) {
+        searchConditions.push({
+          subcategory: {
+            in: matchingSubcategoryIds,
+          },
+        });
+      }
+
+      // Add subdivision search if matching subdivisions found
+      if (matchingSubdivisionIds.length > 0) {
+        searchConditions.push({
+          subdivision: {
+            in: matchingSubdivisionIds,
+          },
+        });
+      }
+
       serviceWhereClause.OR = searchConditions;
     } else {
       // Multi-word search: ALL words must match
@@ -207,6 +231,10 @@ async function performSearch(
           return normalizedLabel.toLowerCase().includes(word.toLowerCase());
         });
         const matchingTagIds = matchingTags.map((tag) => tag.id);
+
+        // Find matching subcategories and subdivisions for this word
+        const matchingSubcategoryIdsMulti = findMatchingServiceSubcategoryIds(word);
+        const matchingSubdivisionIdsMulti = findMatchingSubdivisionIds(word);
 
         const wordConditions: any[] = [
           {
@@ -236,6 +264,24 @@ async function performSearch(
           wordConditions.push({
             tags: {
               hasSome: matchingTagIds,
+            },
+          });
+        }
+
+        // Add subcategory search if matching subcategories found for this word
+        if (matchingSubcategoryIdsMulti.length > 0) {
+          wordConditions.push({
+            subcategory: {
+              in: matchingSubcategoryIdsMulti,
+            },
+          });
+        }
+
+        // Add subdivision search if matching subdivisions found for this word
+        if (matchingSubdivisionIdsMulti.length > 0) {
+          wordConditions.push({
+            subdivision: {
+              in: matchingSubdivisionIdsMulti,
             },
           });
         }

@@ -694,6 +694,129 @@ export function batchFindTagsByIds(ids: string[]): (DatasetItem | null)[] {
 }
 
 // ============================================================================
+// SEARCH: Label-Based Taxonomy Matching
+// ============================================================================
+
+/**
+ * Find service subcategory IDs that match a search term by label
+ *
+ * Searches all service subcategory labels using normalized text matching.
+ * Used by service archive search to include services in matching subcategories.
+ *
+ * @param searchTerm - Search term (will be normalized internally)
+ * @returns Array of matching subcategory IDs
+ *
+ * @example
+ * const ids = findMatchingServiceSubcategoryIds('Ηλεκτρολογικές');
+ * // Returns: ['electrical', ...] - IDs of subcategories with matching labels
+ *
+ * // Use in Prisma query:
+ * if (ids.length > 0) {
+ *   whereConditions.push({ subcategory: { in: ids } });
+ * }
+ */
+export function findMatchingServiceSubcategoryIds(searchTerm: string): string[] {
+  if (!searchTerm) return [];
+
+  const normalizedSearch = normalizeTerm(searchTerm).toLowerCase();
+  const allTaxonomies = getServiceTaxonomies();
+  const matchingIds: string[] = [];
+
+  allTaxonomies.forEach((category) => {
+    category.children?.forEach((subcategory) => {
+      if (subcategory.label) {
+        const normalizedLabel = normalizeTerm(subcategory.label);
+        if (normalizedLabel.includes(normalizedSearch)) {
+          matchingIds.push(subcategory.id);
+        }
+      }
+    });
+  });
+
+  return matchingIds;
+}
+
+/**
+ * Find service subdivision IDs that match a search term by label
+ *
+ * Searches all subdivision labels using normalized text matching.
+ * Used by service archive search to include services in matching subdivisions.
+ *
+ * @param searchTerm - Search term (will be normalized internally)
+ * @returns Array of matching subdivision IDs
+ *
+ * @example
+ * const ids = findMatchingSubdivisionIds('φωτοβολταϊκά');
+ * // Returns: ['photovoltaika', ...] - IDs of subdivisions with matching labels
+ *
+ * // Use in Prisma query:
+ * if (ids.length > 0) {
+ *   whereConditions.push({ subdivision: { in: ids } });
+ * }
+ */
+export function findMatchingSubdivisionIds(searchTerm: string): string[] {
+  if (!searchTerm) return [];
+
+  const normalizedSearch = normalizeTerm(searchTerm).toLowerCase();
+  const allTaxonomies = getServiceTaxonomies();
+  const matchingIds: string[] = [];
+
+  allTaxonomies.forEach((category) => {
+    category.children?.forEach((subcategory) => {
+      subcategory.children?.forEach((subdivision) => {
+        if (subdivision.label) {
+          const normalizedLabel = normalizeTerm(subdivision.label);
+          if (normalizedLabel.includes(normalizedSearch)) {
+            matchingIds.push(subdivision.id);
+          }
+        }
+      });
+    });
+  });
+
+  return matchingIds;
+}
+
+/**
+ * Find pro subcategory IDs that match a search term by label
+ *
+ * Searches all pro subcategory labels using normalized text matching.
+ * Used by profile archive search to include profiles in matching subcategories.
+ *
+ * @param searchTerm - Search term (will be normalized internally)
+ * @returns Array of matching subcategory IDs
+ *
+ * @example
+ * const ids = findMatchingProSubcategoryIds('ηλεκτρολόγος');
+ * // Returns: ['electrician', ...] - IDs of subcategories with matching labels
+ *
+ * // Use in Prisma query:
+ * if (ids.length > 0) {
+ *   whereConditions.push({ subcategory: { in: ids } });
+ * }
+ */
+export function findMatchingProSubcategoryIds(searchTerm: string): string[] {
+  if (!searchTerm) return [];
+
+  const normalizedSearch = normalizeTerm(searchTerm).toLowerCase();
+  const allProTaxonomies = getProTaxonomies();
+  const matchingIds: string[] = [];
+
+  allProTaxonomies.forEach((category) => {
+    category.children?.forEach((subcategory) => {
+      if (subcategory.label) {
+        const normalizedLabel = normalizeTerm(subcategory.label);
+        if (normalizedLabel.includes(normalizedSearch)) {
+          matchingIds.push(subcategory.id);
+        }
+      }
+    });
+  });
+
+  return matchingIds;
+}
+
+// ============================================================================
 // UTILITIES
 // ============================================================================
 

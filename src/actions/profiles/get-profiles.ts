@@ -20,6 +20,7 @@ import {
   findProById,
   findLocationBySlugOrName,
   batchFindSkillsByIds,
+  findMatchingProSubcategoryIds,
 } from '@/lib/taxonomies';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
@@ -196,7 +197,10 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
         // Normalize search term to handle Greek accents (ά → α, etc.)
         const normalizedSearch = normalizeTerm(searchTerm);
 
-        const searchConditions = [
+        // Find matching subcategories by searching in subcategory labels
+        const matchingSubcategoryIds = findMatchingProSubcategoryIds(searchTerm);
+
+        const searchConditions: any[] = [
           // Search in normalized fields (for profiles with proper normalized data)
           {
             displayNameNormalized: {
@@ -236,6 +240,15 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
             },
           },
         ];
+
+        // Add subcategory search if matching subcategories found
+        if (matchingSubcategoryIds.length > 0) {
+          searchConditions.push({
+            subcategory: {
+              in: matchingSubcategoryIds,
+            },
+          });
+        }
 
         // If there's already an OR clause (from location filters), combine with AND
         if (whereClause.OR) {

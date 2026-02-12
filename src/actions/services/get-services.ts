@@ -9,6 +9,8 @@ import {
   findServiceById,
   resolveServiceHierarchy,
   findLocationBySlugOrName,
+  findMatchingServiceSubcategoryIds,
+  findMatchingSubdivisionIds,
 } from '@/lib/taxonomies';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 // Complex utilities - KEEP for hierarchy resolution, breadcrumbs, coverage transformation, and nested children lookups
@@ -540,6 +542,10 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
           });
           const matchingTagIds = matchingTags.map((tag) => tag.id);
 
+          // Find matching subcategories and subdivisions by searching in taxonomy labels
+          const matchingSubcategoryIds = findMatchingServiceSubcategoryIds(word);
+          const matchingSubdivisionIds = findMatchingSubdivisionIds(word);
+
           const searchConditions: Array<
             | { titleNormalized: { contains: string; mode: 'insensitive' } }
             | { descriptionNormalized: { contains: string; mode: 'insensitive' } }
@@ -551,6 +557,8 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
                 };
               }
             | { tags: { hasSome: string[] } }
+            | { subcategory: { in: string[] } }
+            | { subdivision: { in: string[] } }
           > = [
             // Search in normalized fields (for services with proper normalized data)
             {
@@ -598,6 +606,24 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
             });
           }
 
+          // Add subcategory search condition if matching subcategories found
+          if (matchingSubcategoryIds.length > 0) {
+            searchConditions.push({
+              subcategory: {
+                in: matchingSubcategoryIds,
+              },
+            });
+          }
+
+          // Add subdivision search condition if matching subdivisions found
+          if (matchingSubdivisionIds.length > 0) {
+            searchConditions.push({
+              subdivision: {
+                in: matchingSubdivisionIds,
+              },
+            });
+          }
+
           // If there's already an OR clause (from filters), combine them with AND
           if (whereClause.OR && whereClause.OR.length > 0) {
             const existingOR = whereClause.OR;
@@ -623,6 +649,10 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
             });
             const matchingTagIds = matchingTags.map((tag) => tag.id);
 
+            // Find matching subcategories and subdivisions for this word
+            const matchingSubcategoryIdsMulti = findMatchingServiceSubcategoryIds(word);
+            const matchingSubdivisionIdsMulti = findMatchingSubdivisionIds(word);
+
             // Each word must match in at least one field
             const wordConditions: Array<
               | { titleNormalized: { contains: string; mode: 'insensitive' } }
@@ -643,6 +673,8 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
                   };
                 }
               | { tags: { hasSome: string[] } }
+              | { subcategory: { in: string[] } }
+              | { subdivision: { in: string[] } }
             > = [
               {
                 titleNormalized: {
@@ -683,6 +715,24 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
               wordConditions.push({
                 tags: {
                   hasSome: matchingTagIds,
+                },
+              });
+            }
+
+            // Add subcategory search if matching subcategories found for this word
+            if (matchingSubcategoryIdsMulti.length > 0) {
+              wordConditions.push({
+                subcategory: {
+                  in: matchingSubcategoryIdsMulti,
+                },
+              });
+            }
+
+            // Add subdivision search if matching subdivisions found for this word
+            if (matchingSubdivisionIdsMulti.length > 0) {
+              wordConditions.push({
+                subdivision: {
+                  in: matchingSubdivisionIdsMulti,
                 },
               });
             }
