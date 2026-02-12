@@ -100,6 +100,7 @@ export async function updateProfileBasicInfoAdmin(
         uid: true,
         username: true,
         category: true,
+        subcategory: true,
         featured: true,
         services: {
           where: { status: 'published' },
@@ -137,6 +138,8 @@ export async function updateProfileBasicInfoAdmin(
       userId: existingProfile.uid,
       username: existingProfile.username,
       category: data.category, // Use updated category
+      subcategory: data.subcategory,
+      oldSubcategory: existingProfile.subcategory,
       includeHome: existingProfile.featured, // Always include home for admin (featured might change)
       includeServices: true,
     });

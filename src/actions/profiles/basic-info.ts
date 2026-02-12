@@ -95,6 +95,8 @@ export async function updateProfileBasicInfo(
         uid: true,
         username: true,
         featured: true,
+        category: true,
+        subcategory: true,
         services: {
           where: { status: 'published' },
           select: { slug: true },
@@ -132,6 +134,8 @@ export async function updateProfileBasicInfo(
       userId: user.id,
       username: existingProfile.username,
       category: data.category,
+      subcategory: data.subcategory,
+      oldSubcategory: existingProfile.subcategory,
       includeHome: existingProfile.featured,
       includeServices: true,
     });

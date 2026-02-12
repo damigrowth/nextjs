@@ -5,6 +5,7 @@
 
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { CACHE_TAGS, getServiceTags, getProfileTags } from './index';
+import { findProById } from '@/lib/taxonomies';
 
 /**
  * Invalidate all caches related to a service mutation
@@ -97,8 +98,10 @@ export async function revalidateService(params: {
  *   profileId: profile.id,
  *   userId: user.id,
  *   username: profile.username,
- *   category: profile.category,
- *   includeHome: profile.featured, // Only if featured
+ *   category: newCategory,
+ *   subcategory: newSubcategory,
+ *   oldSubcategory: existingProfile.subcategory, // Pass when subcategory changes
+ *   includeHome: profile.featured,
  *   includeServices: true,
  * });
  */
@@ -106,7 +109,9 @@ export async function revalidateProfile(params: {
   profileId: string;
   userId: string;
   username?: string | null;
-  category?: string | null;
+  category?: string | null; // Current/new category ID
+  subcategory?: string | null; // Current/new subcategory ID
+  oldSubcategory?: string | null; // Previous subcategory ID (for subcategory changes)
   includeHome?: boolean; // For featured profiles
   includeServices?: boolean; // When profile data affects services
 }) {
@@ -115,6 +120,8 @@ export async function revalidateProfile(params: {
     userId,
     username,
     category,
+    subcategory,
+    oldSubcategory,
     includeHome = false,
     includeServices = true
   } = params;
@@ -141,6 +148,19 @@ export async function revalidateProfile(params: {
 
   if (category) {
     revalidateTag(CACHE_TAGS.directory.category(category));
+    revalidateTag(CACHE_TAGS.collections.profilesCategory(category));
+  }
+
+  // Subcategory-specific cache invalidation
+  if (subcategory) {
+    revalidateTag(CACHE_TAGS.directory.subcategory(subcategory));
+    revalidateTag(CACHE_TAGS.collections.profilesSubcategory(subcategory));
+  }
+
+  // When subcategory changes, also invalidate the OLD subcategory's cache
+  if (oldSubcategory && oldSubcategory !== subcategory) {
+    revalidateTag(CACHE_TAGS.directory.subcategory(oldSubcategory));
+    revalidateTag(CACHE_TAGS.collections.profilesSubcategory(oldSubcategory));
   }
 
   // Home page (if featured profile changed)
@@ -149,12 +169,31 @@ export async function revalidateProfile(params: {
     revalidatePath('/');
   }
 
-  // Paths
+  // Paths - profile page
   if (username) {
     revalidatePath(`/profile/${username}`);
   }
+
+  // Paths - directory archive pages (resolve IDs to slugs internally)
+  const categoryData = category ? findProById(category) : null;
+  const subcategoryData = subcategory ? findProById(subcategory) : null;
+  const oldSubcategoryData = oldSubcategory ? findProById(oldSubcategory) : null;
+
+  if (categoryData?.slug) {
+    revalidatePath(`/dir/${categoryData.slug}`);
+
+    if (subcategoryData?.slug) {
+      revalidatePath(`/dir/${categoryData.slug}/${subcategoryData.slug}`);
+    }
+
+    // Revalidate old subcategory archive (to remove the profile from it)
+    if (oldSubcategoryData?.slug && oldSubcategoryData.slug !== subcategoryData?.slug) {
+      revalidatePath(`/dir/${categoryData.slug}/${oldSubcategoryData.slug}`);
+    }
+  }
+
   revalidatePath('/dir');
-  revalidatePath('/dashboard'); // Dashboard main page shows profile summary
+  revalidatePath('/dashboard');
 }
 
 /**
