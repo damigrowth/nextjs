@@ -13,6 +13,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { RatingStars } from './rating-stars';
 import { ReviewSuccess } from './review-success';
 import { createReview } from '@/actions/reviews/create-review';
@@ -42,6 +49,7 @@ export function ReviewForm({
     serviceId || null,
   );
   const [showComment, setShowComment] = useState(false); // New: Show comment after button click
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
 
   const [state, formAction, isPending] = useActionState(createReview, null);
 
@@ -52,6 +60,12 @@ export function ReviewForm({
   const isLoggedIn = !!session?.user?.id;
 
   const handleSubmit = async (formData: FormData) => {
+    // If not logged in, show login dialog instead of submitting
+    if (!isLoggedIn) {
+      setShowLoginDialog(true);
+      return;
+    }
+
     // Validate required fields before submission
     if (!profileId) {
       console.error('ProfileId is missing! Cannot submit review.', {
@@ -87,37 +101,7 @@ export function ReviewForm({
     return <ReviewSuccess />;
   }
 
-  // If not logged in, show auth prompt instead of form
-  if (!isLoggedIn) {
-    return (
-      <div className='space-y-4'>
-        <div className='space-y-2'>
-          <h6 className='text-lg font-semibold'>
-            Για να αξιολογήσεις πρέπει να έχεις λογαριασμό
-          </h6>
-        </div>
-        <div className='flex gap-2'>
-          <Button
-            type='button'
-            variant='outline'
-            onClick={() => router.push('/login')}
-            className='rounded-full'
-          >
-            Σύνδεση
-          </Button>
-          <Button
-            type='button'
-            onClick={() => router.push('/register')}
-            className='rounded-full'
-          >
-            Εγγραφή
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Otherwise show form
+  // Show form (for both logged in and guest users)
   return (
     <form action={handleSubmit} className='space-y-6'>
       {/* Form Title - Conditional based on type and profile services */}
@@ -245,6 +229,43 @@ export function ReviewForm({
           )}
         </Button>
       </div>
+
+      {/* Login Dialog - shown when guest tries to submit */}
+      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+        <DialogContent className='sm:max-w-md'>
+          <DialogHeader>
+            <DialogTitle>
+              Για να αξιολογήσεις πρέπει να έχεις λογαριασμό
+            </DialogTitle>
+            <DialogDescription className='sr-only'>
+              Συνδεθείτε ή εγγραφείτε για να υποβάλετε αξιολόγηση
+            </DialogDescription>
+          </DialogHeader>
+          <div className='flex gap-2 justify-center'>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => {
+                setShowLoginDialog(false);
+                router.push('/login');
+              }}
+              className='rounded-full'
+            >
+              Σύνδεση
+            </Button>
+            <Button
+              type='button'
+              onClick={() => {
+                setShowLoginDialog(false);
+                router.push('/register');
+              }}
+              className='rounded-full'
+            >
+              Εγγραφή
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </form>
   );
 }
