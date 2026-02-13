@@ -74,13 +74,152 @@ export class StripeAdapter implements PaymentProvider {
 
   /**
    * Create a Stripe Checkout session
+   * Prefills customer data from billing details if provided
    */
   async createCheckoutSession(params: CheckoutSessionParams): Promise<CheckoutSession> {
     try {
       const stripe = this.getClient();
       const priceId = getPriceId(params.plan, params.billingInterval);
+      const { prisma } = await import('@/lib/prisma/client');
 
-      const session = await stripe.checkout.sessions.create({
+      // Check for existing Stripe customer
+      const existingSub = await prisma.subscription.findUnique({
+        where: { pid: params.profileId },
+        select: {
+          stripeCustomerId: true,
+          providerCustomerId: true,
+        },
+      });
+
+      let customerId = existingSub?.providerCustomerId || existingSub?.stripeCustomerId;
+
+      // Build customer data from billing details
+      const billing = params.billing;
+
+      // Debug: Log billing data received
+      console.log('[Stripe Adapter] Billing data received:', {
+        hasBilling: !!billing,
+        billing,
+      });
+
+      const customerData: Stripe.CustomerCreateParams = {
+        metadata: {
+          profileId: params.profileId,
+          // Store business details in metadata for invoice purposes
+          ...(billing?.isBusinessPurchase
+            ? {
+                businessName: billing.name || '',
+                isBusinessPurchase: 'true',
+              }
+            : {}),
+        },
+      };
+
+      if (billing?.email) customerData.email = billing.email;
+      if (billing?.phone) customerData.phone = billing.phone;
+
+      // Set name fields based on purchase type
+      if (billing?.isBusinessPurchase && billing?.name) {
+        // For business purchases (Τιμολόγιο), set business_name field
+        // This populates the "Business name" field in Stripe dashboard
+        (customerData as Record<string, unknown>).business_name = billing.name;
+        // Also set general name for display purposes
+        customerData.name = billing.name;
+      } else if (billing?.name) {
+        // For individual purchases (Απόδειξη), set individual_name
+        (customerData as Record<string, unknown>).individual_name = billing.name;
+        customerData.name = billing.name;
+      }
+
+      // Add address if provided
+      if (billing?.address?.line1) {
+        customerData.address = {
+          line1: billing.address.line1,
+          line2: billing.address.line2 || undefined,
+          city: billing.address.city || undefined,
+          state: billing.address.state || undefined,
+          postal_code: billing.address.postalCode || undefined,
+          country: billing.address.country || 'GR',
+        };
+      }
+
+      // For business purchases (Τιμολόγιο), add Greek invoice details to custom fields
+      // This ensures Επωνυμία, ΔΟΥ, Επάγγελμα appear on invoices
+      if (billing?.isBusinessPurchase) {
+        const customFields: Array<{ name: string; value: string }> = [];
+
+        if (billing.name) {
+          customFields.push({ name: 'Επωνυμία', value: billing.name });
+        }
+        if (billing.taxOffice) {
+          customFields.push({ name: 'ΔΟΥ', value: billing.taxOffice });
+        }
+        if (billing.profession) {
+          customFields.push({ name: 'Επάγγελμα', value: billing.profession });
+        }
+
+        if (customFields.length > 0) {
+          customerData.invoice_settings = {
+            custom_fields: customFields,
+          };
+        }
+      }
+
+      // Debug: Log customer data being sent to Stripe
+      console.log('[Stripe Adapter] Customer data to send:', customerData);
+
+      // Create or update Stripe customer with billing details
+      if (customerId) {
+        // Update existing customer with new billing details
+        console.log('[Stripe Adapter] Updating existing customer:', customerId);
+        const updatedCustomer = await stripe.customers.update(customerId, customerData);
+        console.log('[Stripe Adapter] Customer update result:', {
+          id: updatedCustomer.id,
+          name: updatedCustomer.name,
+          email: updatedCustomer.email,
+          phone: updatedCustomer.phone,
+          address: updatedCustomer.address,
+          metadata: updatedCustomer.metadata,
+        });
+      } else if (billing?.email || billing?.name) {
+        // Create new customer only if we have some billing info
+        console.log('[Stripe Adapter] Creating new customer with data:', customerData);
+        const customer = await stripe.customers.create(customerData);
+        customerId = customer.id;
+        console.log('[Stripe Adapter] Created customer:', {
+          id: customer.id,
+          name: customer.name,
+          email: customer.email,
+          phone: customer.phone,
+          address: customer.address,
+          metadata: customer.metadata,
+        });
+      }
+
+      // Add Greek VAT (AFM) to customer if business purchase
+      if (customerId && billing?.isBusinessPurchase && billing?.taxId) {
+        try {
+          // Check if tax ID already exists
+          const existingTaxIds = await stripe.customers.listTaxIds(customerId);
+          const hasExistingVat = existingTaxIds.data.some(
+            (tid) => tid.value === `EL${billing.taxId}` || tid.value === billing.taxId,
+          );
+
+          if (!hasExistingVat) {
+            // Add Greek VAT number (AFM prefixed with EL for EU VAT format)
+            await stripe.customers.createTaxId(customerId, {
+              type: 'eu_vat',
+              value: `EL${billing.taxId}`, // Greek VAT format: EL + 9-digit AFM
+            });
+          }
+        } catch (taxError) {
+          // Log but don't fail checkout if tax ID addition fails
+          console.warn('Failed to add tax ID to customer:', taxError);
+        }
+      }
+
+      // Build checkout session options
+      const sessionOptions: Stripe.Checkout.SessionCreateParams = {
         mode: 'subscription',
         payment_method_types: ['card'],
         line_items: [
@@ -101,12 +240,41 @@ export class StripeAdapter implements PaymentProvider {
         client_reference_id: params.profileId,
         // Allow promotion codes
         allow_promotion_codes: true,
-        // Billing address collection
-        billing_address_collection: 'required',
+        // Billing address collection - use 'auto' to prefill from customer
+        billing_address_collection: customerId ? 'auto' : 'required',
         // Tax ID collection for Greek businesses
         tax_id_collection: {
           enabled: true,
         },
+      };
+
+      // Use existing customer or prefill email
+      if (customerId) {
+        sessionOptions.customer = customerId;
+        // Only allow name to be updated from checkout - don't include 'address'
+        // because we already set it on the customer and don't want checkout to overwrite it
+        sessionOptions.customer_update = {
+          name: 'auto',
+        };
+      } else if (billing?.email) {
+        sessionOptions.customer_email = billing.email;
+      }
+
+      // Log the final session options being sent to Stripe
+      console.log('[Stripe Adapter] Creating checkout session with options:', {
+        customer: sessionOptions.customer,
+        customer_email: sessionOptions.customer_email,
+        billing_address_collection: sessionOptions.billing_address_collection,
+        customer_update: sessionOptions.customer_update,
+        metadata: sessionOptions.metadata,
+      });
+
+      const session = await stripe.checkout.sessions.create(sessionOptions);
+
+      console.log('[Stripe Adapter] Checkout session created:', {
+        sessionId: session.id,
+        url: session.url,
+        customer: session.customer,
       });
 
       if (!session.url) {

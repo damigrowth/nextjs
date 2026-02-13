@@ -8,10 +8,17 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { SUBSCRIPTION_PLANS } from '@/lib/stripe/config';
 import { createCheckoutSession } from '@/actions/subscription';
+import { updateProfileBilling } from '@/actions/profiles/billing';
 import { toast } from 'sonner';
 import { BillingForm } from '@/components';
 import type { AuthUser } from '@/lib/types/auth';
 import type { Profile } from '@prisma/client';
+
+interface BillingFormState {
+  formData: Record<string, any>;
+  isValid: boolean;
+  isDirty: boolean;
+}
 
 interface CheckoutContentProps {
   user: AuthUser;
@@ -26,11 +33,47 @@ export default function CheckoutContent({
 }: CheckoutContentProps) {
   const [interval, setInterval] = useState<'month' | 'year'>(defaultInterval);
   const [isPending, startTransition] = useTransition();
+  const [billingState, setBillingState] = useState<BillingFormState | null>(
+    null,
+  );
 
   const plan = SUBSCRIPTION_PLANS.promoted;
 
   const handleCheckout = () => {
     startTransition(async () => {
+      // Debug: Log billing state
+      console.log('[Checkout] billingState:', {
+        hasState: !!billingState,
+        isValid: billingState?.isValid,
+        isDirty: billingState?.isDirty,
+        formData: billingState?.formData,
+      });
+
+      // Always save billing data before checkout to ensure it's captured
+      // Save if we have any form data, even if not fully valid
+      if (billingState?.formData) {
+        const formData = new FormData();
+        Object.entries(billingState.formData).forEach(([key, value]) => {
+          if (typeof value === 'boolean') {
+            formData.set(key, value ? 'true' : 'false');
+          } else {
+            formData.set(key, String(value ?? ''));
+          }
+        });
+
+        console.log('[Checkout] Saving billing with formData:', Object.fromEntries(formData));
+
+        const saveResult = await updateProfileBilling(null, formData);
+        console.log('[Checkout] Billing save result:', saveResult);
+
+        if (!saveResult.success) {
+          toast.error(saveResult.message || 'Αποτυχία αποθήκευσης στοιχείων');
+          return;
+        }
+      } else {
+        console.log('[Checkout] No billingState.formData, skipping billing save');
+      }
+
       // Provider-agnostic checkout - only needs billing interval
       // Plan defaults to 'promoted' in the action
       const result = await createCheckoutSession({
@@ -61,6 +104,8 @@ export default function CheckoutContent({
               initialUser={user}
               initialProfile={profile}
               hideCard
+              hideButtons
+              onFormChange={setBillingState}
             />
           </CardContent>
         </Card>
@@ -131,7 +176,7 @@ export default function CheckoutContent({
               className='w-full bg-black hover:bg-black/90 text-white'
               size='lg'
               onClick={handleCheckout}
-              disabled={isPending}
+              disabled={isPending || (billingState !== null && !billingState.isValid)}
             >
               {isPending ? (
                 <>

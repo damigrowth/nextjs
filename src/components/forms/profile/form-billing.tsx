@@ -45,11 +45,19 @@ const initialState = {
   message: '',
 };
 
+interface BillingFormState {
+  formData: Record<string, any>;
+  isValid: boolean;
+  isDirty: boolean;
+}
+
 interface BillingFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null;
   adminMode?: boolean;
   hideCard?: boolean;
+  hideButtons?: boolean;
+  onFormChange?: (state: BillingFormState) => void;
 }
 
 export default function BillingForm({
@@ -57,6 +65,8 @@ export default function BillingForm({
   initialProfile,
   adminMode = false,
   hideCard = false,
+  hideButtons = false,
+  onFormChange,
 }: BillingFormProps) {
   // Select the appropriate action based on admin mode
   const actionToUse = adminMode
@@ -137,9 +147,39 @@ export default function BillingForm({
   } = form;
 
   // Watch billing type to show/hide fields
-  const watchedReceipt = watch('receipt');
-  const watchedInvoice = watch('invoice');
-  const isInvoiceSelected = watchedInvoice === true;
+  const watchedReceipt = watch('receipt') === true;
+  const watchedInvoice = watch('invoice') === true;
+  const isInvoiceSelected = watchedInvoice;
+
+  // Watch all form fields for checkout integration
+  const watchedAfm = watch('afm');
+  const watchedName = watch('name');
+  const watchedAddress = watch('address');
+  const watchedDoy = watch('doy');
+  const watchedProfession = watch('profession');
+
+  // Report form state changes to parent (for checkout integration)
+  useEffect(() => {
+    if (onFormChange) {
+      onFormChange({
+        formData: getValues(),
+        isValid,
+        isDirty,
+      });
+    }
+  }, [
+    onFormChange,
+    watchedReceipt,
+    watchedInvoice,
+    watchedAfm,
+    watchedName,
+    watchedAddress,
+    watchedDoy,
+    watchedProfession,
+    isValid,
+    isDirty,
+    getValues,
+  ]);
 
   // Handle form submission
   const handleFormSubmit = (formData: FormData) => {
@@ -185,12 +225,13 @@ export default function BillingForm({
                 <FormItem className='flex flex-row items-start space-x-3 space-y-0'>
                   <FormControl>
                     <Checkbox
-                      checked={field.value}
+                      checked={field.value === true}
                       onCheckedChange={(checked) => {
+                        const isChecked = checked === true;
                         setHasUserInteracted(true);
-                        field.onChange(checked);
+                        field.onChange(isChecked);
                         // If receipt is checked, uncheck invoice
-                        if (checked) {
+                        if (isChecked) {
                           form.setValue('invoice', false, {
                             shouldDirty: true,
                             shouldValidate: true,
@@ -214,12 +255,13 @@ export default function BillingForm({
                 <FormItem className='flex flex-row items-start space-x-3 space-y-0'>
                   <FormControl>
                     <Checkbox
-                      checked={field.value}
+                      checked={field.value === true}
                       onCheckedChange={(checked) => {
+                        const isChecked = checked === true;
                         setHasUserInteracted(true);
-                        field.onChange(checked);
+                        field.onChange(isChecked);
                         // If invoice is checked, uncheck receipt
-                        if (checked) {
+                        if (isChecked) {
                           form.setValue('receipt', false, {
                             shouldDirty: true,
                             shouldValidate: true,
@@ -341,27 +383,29 @@ export default function BillingForm({
           </div>
         )}
 
-        <div className='flex justify-end space-x-4'>
-          <FormButton
-            variant='outline'
-            type='button'
-            text='Ακύρωση'
-            onClick={() => form.reset()}
-            disabled={isPending || !isDirty}
-          />
-          <FormButton
-            type='submit'
-            text='Αποθήκευση'
-            loadingText='Αποθήκευση...'
-            loading={isPending}
-            disabled={
-              isPending ||
-              !isValid ||
-              !isDirty ||
-              (!watchedReceipt && !watchedInvoice)
-            }
-          />
-        </div>
+        {!hideButtons && (
+          <div className='flex justify-end space-x-4'>
+            <FormButton
+              variant='outline'
+              type='button'
+              text='Ακύρωση'
+              onClick={() => form.reset()}
+              disabled={isPending || !isDirty}
+            />
+            <FormButton
+              type='submit'
+              text='Αποθήκευση'
+              loadingText='Αποθήκευση...'
+              loading={isPending}
+              disabled={
+                isPending ||
+                !isValid ||
+                !isDirty ||
+                (!watchedReceipt && !watchedInvoice)
+              }
+            />
+          </div>
+        )}
       </form>
     </Form>
   );

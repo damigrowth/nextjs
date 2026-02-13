@@ -62,6 +62,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
+  // Log all incoming webhook events
+  console.log('[Stripe Webhook] Event received:', {
+    type: event.type,
+    id: event.id,
+    created: new Date(event.created * 1000).toISOString(),
+  });
+
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -87,6 +94,12 @@ export async function POST(request: NextRequest) {
         await handlePaymentFailed(invoice);
         break;
       }
+
+      case 'invoice.paid': {
+        const invoice = event.data.object as Stripe.Invoice;
+        await handleInvoicePaid(invoice);
+        break;
+      }
     }
 
     return NextResponse.json({ received: true });
@@ -109,11 +122,23 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   // Get subscription period using type-safe utility
   const period = getSubscriptionPeriod(stripeSubscription);
 
-  // Get profile data needed for cache revalidation
+  // Get profile data needed for cache revalidation and billing snapshot
   const profile = await prisma.profile.findUnique({
     where: { id: profileId },
-    select: { uid: true, username: true, category: true },
+    select: { uid: true, username: true, category: true, billing: true },
   });
+
+  // Debug logging for billing snapshot
+  console.log('[Stripe Webhook] Profile billing snapshot:', {
+    profileId,
+    hasBilling: !!profile?.billing,
+    billing: profile?.billing,
+  });
+
+  // Get subscription price details for analytics
+  const priceItem = stripeSubscription.items.data[0]?.price;
+  const amount = priceItem?.unit_amount || null;
+  const currency = priceItem?.currency || 'eur';
 
   await prisma.$transaction(async (tx) => {
     await tx.subscription.update({
@@ -126,19 +151,22 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         // Legacy Stripe fields (backward compatibility)
         stripeCustomerId: session.customer as string,
         stripeSubscriptionId: stripeSubscription.id,
-        stripePriceId: stripeSubscription.items.data[0]?.price.id,
+        stripePriceId: priceItem?.id,
         // Subscription data
         plan: 'promoted',
         status: 'active',
         billingInterval:
-          stripeSubscription.items.data[0]?.price.recurring?.interval === 'year'
-            ? 'year'
-            : 'month',
+          priceItem?.recurring?.interval === 'year' ? 'year' : 'month',
         currentPeriodStart: period.start,
         currentPeriodEnd: period.end,
         // Reset cancellation fields for new subscription
         cancelAtPeriodEnd: false,
         canceledAt: null,
+        // Snapshot of billing details from profile at time of checkout
+        billing: profile?.billing ?? null,
+        // Analytics: set initial amount (cumulative tracking handled by invoice.paid)
+        amount,
+        currency,
       },
     });
 
@@ -275,5 +303,134 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   await prisma.subscription.updateMany({
     where: { stripeSubscriptionId: subscriptionId },
     data: { status: 'past_due' },
+  });
+}
+
+/**
+ * Handle successful invoice payment - tracks cumulative payment analytics.
+ * This fires on every successful payment (initial + renewals).
+ */
+async function handleInvoicePaid(invoice: Stripe.Invoice) {
+  const subscriptionId = getInvoiceSubscriptionId(invoice);
+  const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
+
+  console.log('[Stripe Webhook] invoice.paid received:', {
+    invoiceId: invoice.id,
+    subscriptionId,
+    customerId,
+    amountPaid: invoice.amount_paid,
+  });
+
+  let dbSub = null;
+
+  // Try to find subscription by stripeSubscriptionId first (if available)
+  if (subscriptionId) {
+    dbSub = await prisma.subscription.findUnique({
+      where: { stripeSubscriptionId: subscriptionId },
+      select: { id: true, totalPaidLifetime: true, paymentCount: true, firstPaymentAt: true },
+    });
+  }
+
+  // Fallback: If not found by subscription ID (or subscription ID not in invoice),
+  // try to find by customer ID
+  if (!dbSub && customerId) {
+    console.log('[Stripe Webhook] invoice.paid: Trying lookup by customerId:', customerId);
+
+    dbSub = await prisma.subscription.findUnique({
+      where: { stripeCustomerId: customerId },
+      select: { id: true, totalPaidLifetime: true, paymentCount: true, firstPaymentAt: true },
+    });
+
+    // If found by customer ID and we have a subscriptionId, also update the stripeSubscriptionId
+    if (dbSub && subscriptionId) {
+      await prisma.subscription.update({
+        where: { id: dbSub.id },
+        data: { stripeSubscriptionId: subscriptionId, providerSubscriptionId: subscriptionId },
+      });
+      console.log('[Stripe Webhook] invoice.paid: Updated subscription with stripeSubscriptionId');
+    }
+  }
+
+  if (!dbSub) {
+    console.log('[Stripe Webhook] invoice.paid: No subscription found for', { subscriptionId, customerId });
+    return;
+  }
+
+  // Amount paid in cents
+  const amountPaid = invoice.amount_paid || 0;
+  const currency = invoice.currency || 'eur';
+
+  // Extract payment method details from the charge
+  let paymentMethodType: string | null = null;
+  let paymentMethodLast4: string | null = null;
+  let paymentMethodBrand: string | null = null;
+
+  if (invoice.charge) {
+    try {
+      const stripe = getStripe();
+      const charge = await stripe.charges.retrieve(invoice.charge as string);
+
+      if (charge.payment_method_details) {
+        const pmDetails = charge.payment_method_details;
+        paymentMethodType = pmDetails.type || null;
+
+        if (pmDetails.card) {
+          paymentMethodLast4 = pmDetails.card.last4 || null;
+          paymentMethodBrand = pmDetails.card.brand || null;
+        } else if (pmDetails.sepa_debit) {
+          paymentMethodLast4 = pmDetails.sepa_debit.last4 || null;
+          paymentMethodBrand = 'sepa';
+        }
+      }
+    } catch (error) {
+      console.error('[Stripe Webhook] Failed to retrieve charge details:', error);
+    }
+  }
+
+  // Extract discount info if present
+  let discountCode: string | null = null;
+  let discountPercentOff: number | null = null;
+  let discountAmountOff: number | null = null;
+
+  if (invoice.discount?.coupon) {
+    discountCode = invoice.discount.coupon.id || null;
+    discountPercentOff = invoice.discount.coupon.percent_off || null;
+    discountAmountOff = invoice.discount.coupon.amount_off || null;
+  }
+
+  // Update analytics - increment cumulative totals
+  await prisma.subscription.update({
+    where: { id: dbSub.id },
+    data: {
+      // Current payment details
+      amount: amountPaid,
+      currency: currency,
+      paymentMethodType,
+      paymentMethodLast4,
+      paymentMethodBrand,
+
+      // Cumulative totals - increment on each payment
+      totalPaidLifetime: dbSub.totalPaidLifetime + amountPaid,
+      paymentCount: dbSub.paymentCount + 1,
+
+      // Payment timestamps
+      firstPaymentAt: dbSub.firstPaymentAt || new Date(),
+      lastPaymentAt: new Date(),
+
+      // Discount tracking
+      discountCode,
+      discountPercentOff,
+      discountAmountOff,
+    },
+  });
+
+  console.log('[Stripe Webhook] Payment analytics updated:', {
+    subscriptionId: dbSub.id,
+    amountPaid,
+    currency,
+    newTotalPaidLifetime: dbSub.totalPaidLifetime + amountPaid,
+    newPaymentCount: dbSub.paymentCount + 1,
+    paymentMethodType,
+    paymentMethodBrand,
   });
 }

@@ -35,7 +35,15 @@ export async function createCheckoutSession(
 
     const profile = await prisma.profile.findUnique({
       where: { uid: user.id },
-      select: { id: true },
+      select: { id: true, billing: true, phone: true },
+    });
+
+    // Debug: Log profile billing data
+    console.log('[CreateCheckoutSession] Profile billing data:', {
+      profileId: profile?.id,
+      hasBilling: !!profile?.billing,
+      billing: profile?.billing,
+      phone: profile?.phone,
     });
 
     if (!profile) {
@@ -51,6 +59,32 @@ export async function createCheckoutSession(
       return { success: false, error: 'Έχετε ήδη ενεργή συνδρομή' };
     }
 
+    // Parse billing data for Stripe prefill (all fields from billing form)
+    const billingData = profile.billing as {
+      invoice?: boolean;
+      receipt?: boolean;
+      name?: string;
+      address?: string;
+      afm?: string;
+      doy?: string;
+      profession?: string;
+    } | null;
+
+    // Check if user selected invoice (Τιμολόγιο) - means business purchase
+    const isBusinessPurchase = billingData?.invoice === true;
+
+    // Format phone number with country code for Stripe
+    const formatPhone = (phone: string | null | undefined): string | undefined => {
+      if (!phone) return undefined;
+      // Remove any non-digit characters
+      const digits = phone.replace(/\D/g, '');
+      // Add Greek country code if not present
+      if (digits.startsWith('30')) {
+        return `+${digits}`;
+      }
+      return `+30${digits}`;
+    };
+
     // Use PaymentService to create checkout (provider-agnostic)
     const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
 
@@ -60,6 +94,33 @@ export async function createCheckoutSession(
       billingInterval,
       successUrl: `${baseUrl}/dashboard/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: `${baseUrl}/dashboard/checkout`,
+      // Pass billing details for Stripe prefill
+      billing: {
+        email: user.email,
+        name: billingData?.name || user.name || undefined,
+        phone: formatPhone(profile.phone),
+        address: billingData?.address
+          ? { line1: billingData.address, country: 'GR' }
+          : undefined,
+        taxId: billingData?.afm || undefined,
+        // Greek invoice details (ΔΟΥ, Επάγγελμα)
+        taxOffice: billingData?.doy || undefined,
+        profession: billingData?.profession || undefined,
+        // If invoice selected, this is a business purchase
+        isBusinessPurchase,
+      },
+    });
+
+    // Debug: Log what's being passed to PaymentService
+    console.log('[CreateCheckoutSession] Billing passed to PaymentService:', {
+      email: user.email,
+      name: billingData?.name || user.name,
+      phone: formatPhone(profile.phone),
+      address: billingData?.address ? { line1: billingData.address, country: 'GR' } : undefined,
+      taxId: billingData?.afm,
+      taxOffice: billingData?.doy,
+      profession: billingData?.profession,
+      isBusinessPurchase,
     });
 
     return { success: true, data: { url: checkout.url } };

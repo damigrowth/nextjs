@@ -24,8 +24,8 @@ export async function updateProfileBilling(
     const session = await requireAuth();
     const user = session.user;
 
-    // 2. Check if user has permission to update profile (professionals only)
-    const roleCheck = await hasAnyRole(['freelancer', 'company']);
+    // 2. Check if user has permission to update profile (professionals and admins)
+    const roleCheck = await hasAnyRole(['freelancer', 'company', 'admin']);
     if (!roleCheck.success || !roleCheck.data) {
       return {
         success: false,

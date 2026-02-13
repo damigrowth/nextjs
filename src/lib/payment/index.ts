@@ -9,5 +9,6 @@ export type {
   CheckoutSessionParams,
   CheckoutSession,
   CustomerPortalParams,
+  CheckoutBillingDetails,
 } from './types';
 export { ProviderNotConfiguredError, ProviderOperationError } from './types';

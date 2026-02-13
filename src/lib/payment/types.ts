@@ -11,6 +11,30 @@ import type { SubscriptionPlan, BillingInterval } from '@prisma/client';
 export type PaymentProviderName = 'stripe' | 'paypal' | 'eurobank' | 'lemonsqueezy';
 
 /**
+ * Billing details for prefilling checkout (optional)
+ */
+export interface CheckoutBillingDetails {
+  email?: string;
+  name?: string; // Business name or full name
+  phone?: string;
+  address?: {
+    line1?: string;
+    line2?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string; // ISO 3166-1 alpha-2 (e.g., 'GR')
+  };
+  taxId?: string; // Greek AFM or other tax ID
+  /** Greek tax office (ΔΟΥ) */
+  taxOffice?: string;
+  /** Profession (Επάγγελμα) */
+  profession?: string;
+  /** If true, user selected invoice (Τιμολόγιο) - prefill business details */
+  isBusinessPurchase?: boolean;
+}
+
+/**
  * Checkout session parameters (provider-agnostic)
  * Uses Prisma-generated enums for type safety
  */
@@ -20,6 +44,8 @@ export interface CheckoutSessionParams {
   billingInterval: BillingInterval; // Using Prisma enum: 'month' | 'year'
   successUrl: string;
   cancelUrl: string;
+  /** Optional billing details to prefill checkout */
+  billing?: CheckoutBillingDetails;
 }
 
 /**

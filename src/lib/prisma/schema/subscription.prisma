@@ -37,12 +37,33 @@ model Subscription {
   plan                   SubscriptionPlan   @default(free)
   status                 SubscriptionStatus @default(incomplete)
   billingInterval        BillingInterval?
+
+  // Billing details snapshot (copied from profile.billing at checkout)
+  billing                Json?
   currentPeriodStart     DateTime?
   currentPeriodEnd       DateTime?
   cancelAtPeriodEnd      Boolean            @default(false)
   canceledAt             DateTime?
   createdAt              DateTime           @default(now())
   updatedAt              DateTime           @updatedAt
+
+  // Analytics fields - payment tracking
+  amount                 Int?               // Current subscription amount in cents (e.g., 1999 = €19.99)
+  currency               String?            @default("eur") // ISO currency code
+  paymentMethodType      String?            // 'card', 'sepa_debit', 'paypal', etc.
+  paymentMethodLast4     String?            // Last 4 digits of card/account
+  paymentMethodBrand     String?            // 'visa', 'mastercard', 'amex', etc.
+
+  // Lifetime analytics - cumulative tracking
+  totalPaidLifetime      Int                @default(0) // Total amount paid in cents (accumulates on each payment)
+  paymentCount           Int                @default(0) // Number of successful payments
+  firstPaymentAt         DateTime?          // When first payment was made
+  lastPaymentAt          DateTime?          // When most recent payment was made
+
+  // Optional: discount/coupon tracking
+  discountCode           String?            // If a coupon was applied
+  discountPercentOff     Int?               // Percentage off (0-100)
+  discountAmountOff      Int?               // Fixed amount off in cents
 
   profile Profile @relation(fields: [pid], references: [id], onDelete: Cascade)
 
