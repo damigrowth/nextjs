@@ -62,13 +62,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  // Log all incoming webhook events
-  console.log('[Stripe Webhook] Event received:', {
-    type: event.type,
-    id: event.id,
-    created: new Date(event.created * 1000).toISOString(),
-  });
-
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -126,13 +119,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const profile = await prisma.profile.findUnique({
     where: { id: profileId },
     select: { uid: true, username: true, category: true, billing: true },
-  });
-
-  // Debug logging for billing snapshot
-  console.log('[Stripe Webhook] Profile billing snapshot:', {
-    profileId,
-    hasBilling: !!profile?.billing,
-    billing: profile?.billing,
   });
 
   // Get subscription price details for analytics
@@ -314,13 +300,6 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   const subscriptionId = getInvoiceSubscriptionId(invoice);
   const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
 
-  console.log('[Stripe Webhook] invoice.paid received:', {
-    invoiceId: invoice.id,
-    subscriptionId,
-    customerId,
-    amountPaid: invoice.amount_paid,
-  });
-
   let dbSub = null;
 
   // Try to find subscription by stripeSubscriptionId first (if available)
@@ -334,8 +313,6 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   // Fallback: If not found by subscription ID (or subscription ID not in invoice),
   // try to find by customer ID
   if (!dbSub && customerId) {
-    console.log('[Stripe Webhook] invoice.paid: Trying lookup by customerId:', customerId);
-
     dbSub = await prisma.subscription.findUnique({
       where: { stripeCustomerId: customerId },
       select: { id: true, totalPaidLifetime: true, paymentCount: true, firstPaymentAt: true },
@@ -347,12 +324,10 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
         where: { id: dbSub.id },
         data: { stripeSubscriptionId: subscriptionId, providerSubscriptionId: subscriptionId },
       });
-      console.log('[Stripe Webhook] invoice.paid: Updated subscription with stripeSubscriptionId');
     }
   }
 
   if (!dbSub) {
-    console.log('[Stripe Webhook] invoice.paid: No subscription found for', { subscriptionId, customerId });
     return;
   }
 
@@ -422,15 +397,5 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
       discountPercentOff,
       discountAmountOff,
     },
-  });
-
-  console.log('[Stripe Webhook] Payment analytics updated:', {
-    subscriptionId: dbSub.id,
-    amountPaid,
-    currency,
-    newTotalPaidLifetime: dbSub.totalPaidLifetime + amountPaid,
-    newPaymentCount: dbSub.paymentCount + 1,
-    paymentMethodType,
-    paymentMethodBrand,
   });
 }

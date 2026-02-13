@@ -715,9 +715,18 @@ export const adminListSubscriptionsSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional().default(12),
   offset: z.coerce.number().int().min(0).optional().default(0),
   sortBy: z
-    .enum(['createdAt', 'updatedAt', 'currentPeriodEnd', 'status', 'plan'])
+    .enum([
+      'createdAt',
+      'updatedAt',
+      'currentPeriodEnd',
+      'status',
+      'plan',
+      'lastPaymentAt',
+      'amount',
+      'totalPaidLifetime',
+    ])
     .optional()
-    .default('createdAt'),
+    .default('lastPaymentAt'),
   sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
 });
 

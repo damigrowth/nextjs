@@ -23,7 +23,7 @@ export async function AdminSubscriptionsTableSection({
     offset:
       (parseInt(searchParams.page || '1') - 1) *
       parseInt(searchParams.limit || '12'),
-    sortBy: searchParams.sortBy || 'createdAt',
+    sortBy: searchParams.sortBy || 'lastPaymentAt',
     sortDirection: searchParams.sortOrder || 'desc',
   };
 

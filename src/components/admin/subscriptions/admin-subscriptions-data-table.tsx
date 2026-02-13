@@ -21,9 +21,10 @@ import {
 } from '@/components/ui/table';
 import { NextLink } from '@/components';
 import UserAvatar from '@/components/shared/user-avatar';
-import { ArrowUpDown, Copy, Check } from 'lucide-react';
+import { ArrowUpDown, Copy, Check, Eye } from 'lucide-react';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 // Copyable text component with hover state
 function CopyableText({
@@ -82,6 +83,12 @@ interface Subscription {
   canceledAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
+  // Analytics fields
+  amount: number | null;
+  currency: string | null;
+  totalPaidLifetime: number;
+  paymentCount: number;
+  lastPaymentAt: Date | null;
   profile: SubscriptionProfile;
 }
 
@@ -95,6 +102,7 @@ export function AdminSubscriptionsDataTable({
   loading = false,
 }: AdminSubscriptionsDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const router = useRouter();
 
   // Helper function for status badge
   const getStatusBadgeVariant = (status: string) => {
@@ -232,6 +240,46 @@ export function AdminSubscriptionsDataTable({
       },
     },
     {
+      accessorKey: 'amount',
+      header: 'Ποσό',
+      cell: ({ row }) => {
+        const amount = row.original.amount;
+        if (!amount) {
+          return <span className='text-muted-foreground text-sm'>—</span>;
+        }
+        const euros = amount / 100;
+        const formatted = Number.isInteger(euros) ? euros.toString() : euros.toFixed(2);
+        return <span className='font-medium'>{formatted}€</span>;
+      },
+    },
+    {
+      accessorKey: 'lastPaymentAt',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant='ghost'
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            className='h-auto p-0'
+          >
+            Τελ. Πληρωμή
+            <ArrowUpDown className='ml-2 h-4 w-4' />
+          </Button>
+        );
+      },
+      cell: ({ row }) => {
+        const date = row.original.lastPaymentAt;
+        if (!date) {
+          return <span className='text-muted-foreground text-sm'>—</span>;
+        }
+        return (
+          <div className='text-sm text-muted-foreground'>
+            <div>{formatDate(date)}</div>
+            <div className='text-xs'>{formatTime(date)}</div>
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: 'createdAt',
       header: ({ column }) => {
         return (
@@ -270,6 +318,23 @@ export function AdminSubscriptionsDataTable({
             <div>{formatDate(date)}</div>
             <div className='text-xs'>{formatTime(date)}</div>
           </div>
+        );
+      },
+    },
+    {
+      id: 'actions',
+      header: '',
+      cell: ({ row }) => {
+        return (
+          <Button
+            variant='ghost'
+            size='sm'
+            className='h-8 w-8 p-0'
+            onClick={() => router.push(`/admin/subscriptions/${row.original.id}`)}
+          >
+            <Eye className='h-4 w-4' />
+            <span className='sr-only'>Προβολή</span>
+          </Button>
         );
       },
     },
