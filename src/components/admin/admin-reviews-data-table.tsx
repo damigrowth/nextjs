@@ -278,7 +278,7 @@ export function AdminReviewsDataTable({
               <>
                 {service && (
                   <NextLink
-                    href={`/service/${service.slug}`}
+                    href={`/s/${service.slug}`}
                     className='hover:underline'
                   >
                     <p className='font-medium text-sm'>{service.title}</p>
@@ -306,7 +306,7 @@ export function AdminReviewsDataTable({
                 </NextLink>
                 {service && (
                   <NextLink
-                    href={`/service/${service.slug}`}
+                    href={`/s/${service.slug}`}
                     className='hover:underline'
                   >
                     <p className='text-xs text-muted-foreground truncate max-w-[150px]'>
