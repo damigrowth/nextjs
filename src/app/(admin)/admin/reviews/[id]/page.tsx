@@ -92,7 +92,7 @@ export default async function AdminReviewDetailPage({ params }: PageProps) {
             {review.type === 'SERVICE' && review.service && (
               <Button variant='outline' size='sm' asChild>
                 <NextLink
-                  href={`/service/${review.service.slug}`}
+                  href={`/s/${review.service.slug}`}
                   target='_blank'
                 >
                   <ExternalLink className='h-4 w-4' />
@@ -231,7 +231,7 @@ export default async function AdminReviewDetailPage({ params }: PageProps) {
                       <p className='text-sm font-medium mt-1'>
                         {review.service ? (
                           <NextLink
-                            href={`/service/${review.service.slug}`}
+                            href={`/s/${review.service.slug}`}
                             className='text-primary hover:underline'
                             target='_blank'
                           >
