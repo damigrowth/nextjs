@@ -676,7 +676,7 @@ export const createSkillSchema = z.object({
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
       'Slug must be lowercase with hyphens only',
     ),
-  category: z.string().optional(),
+  category: z.string().min(1, 'Category is required'),
 });
 
 export type CreateSkillInput = z.infer<typeof createSkillSchema>;
@@ -692,7 +692,7 @@ export const updateSkillSchema = z.object({
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
       'Slug must be lowercase with hyphens only',
     ),
-  category: z.string().optional(),
+  category: z.string().min(1, 'Category is required'),
 });
 
 export type UpdateSkillInput = z.infer<typeof updateSkillSchema>;
