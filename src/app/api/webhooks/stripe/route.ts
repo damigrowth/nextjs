@@ -126,6 +126,31 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const amount = priceItem?.unit_amount || null;
   const currency = priceItem?.currency || 'eur';
 
+  // Get payment method details from the latest invoice if available
+  let paymentMethodType: string | null = null;
+  let paymentMethodLast4: string | null = null;
+  let paymentMethodBrand: string | null = null;
+
+  if (stripeSubscription.default_payment_method) {
+    try {
+      const pmId =
+        typeof stripeSubscription.default_payment_method === 'string'
+          ? stripeSubscription.default_payment_method
+          : stripeSubscription.default_payment_method.id;
+      const paymentMethod = await stripe.paymentMethods.retrieve(pmId);
+      paymentMethodType = paymentMethod.type || null;
+      if (paymentMethod.card) {
+        paymentMethodLast4 = paymentMethod.card.last4 || null;
+        paymentMethodBrand = paymentMethod.card.brand || null;
+      } else if (paymentMethod.sepa_debit) {
+        paymentMethodLast4 = paymentMethod.sepa_debit.last4 || null;
+        paymentMethodBrand = 'sepa';
+      }
+    } catch (error) {
+      console.error('[Stripe Webhook] Failed to retrieve payment method:', error);
+    }
+  }
+
   await prisma.$transaction(async (tx) => {
     await tx.subscription.update({
       where: { pid: profileId },
@@ -150,9 +175,16 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         canceledAt: null,
         // Snapshot of billing details from profile at time of checkout
         billing: profile?.billing ?? null,
-        // Analytics: set initial amount (cumulative tracking handled by invoice.paid)
+        // Analytics: set initial payment data (handles race condition with invoice.paid)
         amount,
         currency,
+        firstPaymentAt: new Date(),
+        lastPaymentAt: new Date(),
+        paymentCount: 1,
+        totalPaidLifetime: amount || 0,
+        paymentMethodType,
+        paymentMethodLast4,
+        paymentMethodBrand,
       },
     });
 
