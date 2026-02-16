@@ -134,6 +134,117 @@ export function CloudinaryUploadWidget({
       showAdvancedOptions: false,
       showCompletedButton: true,
       showUploadMoreButton: false,
+      // Greek language support
+      language: 'el',
+      text: {
+        el: {
+          // Menu items
+          menu: {
+            files: 'Τα Αρχεία Μου',
+            camera: 'Κάμερα',
+          },
+          // Local file upload
+          local: {
+            browse: 'Επιλογή Αρχείου',
+            dd_title_single: 'Σύρε μια εικόνα εδώ',
+            dd_title_multi: 'Σύρε εικόνες εδώ',
+            drop_title_single: 'Άφησε το αρχείο για μεταφόρτωση',
+            drop_title_multi: 'Άφησε τα αρχεία για μεταφόρτωση',
+          },
+          // Camera
+          camera: {
+            capture: 'Λήψη',
+            cancel: 'Ακύρωση',
+            take_pic: 'Βγάλε μια φωτογραφία',
+            explanation:
+              'Βεβαιώσου ότι η κάμερα είναι συνδεδεμένη και ότι το πρόγραμμα περιήγησης επιτρέπει τη λήψη φωτογραφιών.',
+            camera_error: 'Αποτυχία σύνδεσης με την κάμερα',
+            retry: 'Δοκίμασε ξανά',
+          },
+          // Cropping
+          crop: {
+            title: 'Περικοπή',
+            crop_btn: 'Περικοπή',
+            skip_btn: 'Παράλειψη',
+            reset_btn: 'Επαναφορά',
+            close_btn: 'Ναι',
+            close_prompt:
+              'Η ακύρωση θα διαγράψει όλες τις μεταφορτώσεις. Είσαι σίγουρος;',
+            image_error: 'Σφάλμα φόρτωσης εικόνας',
+            corner_tooltip: 'Σύρε τη γωνία για αλλαγή μεγέθους',
+            handle_tooltip: 'Σύρε τη γωνία για αλλαγή μεγέθους',
+          },
+          // Queue / Upload progress
+          queue: {
+            title: 'Σειρά Μεταφόρτωσης',
+            title_uploading_with_counter: 'Μεταφόρτωση {{num}} αρχείων',
+            title_processing_with_counter: 'Επεξεργασία {{num}} αρχείων',
+            title_uploading: 'Μεταφόρτωση αρχείων',
+            title_processing: 'Επεξεργασία αρχείων',
+            mini_title: 'Μεταφορτώθηκε',
+            mini_title_uploading: 'Μεταφόρτωση',
+            mini_title_processing: 'Επεξεργασία',
+            done: 'Ολοκληρώθηκε',
+            mini_upload_count: '{{num}} μεταφορτώθηκαν',
+            statuses: {
+              uploading: 'Μεταφόρτωση...',
+              processing: 'Επεξεργασία...',
+              timeout:
+                'Ένα μεγάλο αρχείο μεταφορτώνεται. Μπορεί να πάρει λίγο χρόνο για να εμφανιστεί.',
+              error: 'Σφάλμα',
+              uploaded: 'Ολοκληρώθηκε',
+              aborted: 'Ακυρώθηκε',
+            },
+            abort_all: 'Ακύρωση όλων',
+            upload_more: 'Μεταφόρτωση περισσότερων',
+            abort: 'Ακύρωση',
+            retry_failed: 'Επανάληψη αποτυχημένων',
+            retry: 'Επανάληψη',
+          },
+          // Notifications
+          notifications: {
+            general_error: 'Παρουσιάστηκε σφάλμα',
+            general_prompt: 'Είσαι σίγουρος;',
+            limit_reached: 'Δεν μπορείς να επιλέξεις περισσότερα αρχεία.',
+            invalid_add_url: 'Η διεύθυνση URL δεν είναι έγκυρη.',
+            invalid_public_id: 'Μη έγκυρο Public ID.',
+            no_new_files: 'Τα αρχεία έχουν ήδη μεταφορτωθεί.',
+            image_purchased: 'Η εικόνα αγοράστηκε',
+            video_purchased: 'Το βίντεο αγοράστηκε',
+            purchase_failed: 'Η αγορά απέτυχε. Παρακαλώ δοκίμασε ξανά.',
+            service_logged_out: 'Η υπηρεσία αποσυνδέθηκε λόγω σφάλματος',
+            great: 'Τέλεια',
+            image_converted: 'Εικόνα μετατράπηκε σε {{dest_format}}.',
+          },
+          // Errors
+          errors: {
+            max_file_size:
+              'Το μέγεθος του αρχείου υπερβαίνει το επιτρεπόμενο όριο ({{size}})',
+            allowed_formats: 'Μη αποδεκτός τύπος αρχείου',
+            max_number_of_files: 'Υπέρβαση μέγιστου αριθμού αρχείων',
+            min_dimensions:
+              'Οι διαστάσεις της εικόνας είναι πολύ μικρές. Ελάχιστες διαστάσεις: {{minWidth}}x{{minHeight}}',
+            max_dimensions: 'Οι διαστάσεις της εικόνας είναι πολύ μεγάλες',
+          },
+          // Global actions
+          actions: {
+            upload: 'Μεταφόρτωση',
+            next: 'Επόμενο',
+            clear_all: 'Καθαρισμός όλων',
+            log_out: 'Αποσύνδεση',
+          },
+          // Or divider
+          or: 'Ή',
+          // Back button
+          back: 'Πίσω',
+          // Close button
+          close: 'Κλείσιμο',
+          // No assets
+          no_assets: 'Δεν υπάρχουν αρχεία',
+          // Search
+          search: 'Αναζήτηση',
+        },
+      },
       styles: {
         palette: {
           window: '#FFFFFF',
