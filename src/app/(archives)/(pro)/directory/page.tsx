@@ -43,9 +43,9 @@ export default async function DirectoryPage() {
         {/* Pro Category Navigation Tabs */}
         <TaxonomyTabs
           items={proCategories}
-          basePath='dir'
-          allItemsLabel='Επαγγελματικός Κατάλογος'
-          allItemsHref='/directory'
+          basePath='categories'
+          allItemsLabel='Όλες οι Κατηγορίες'
+          allItemsHref='/categories'
           activeItemSlug={undefined}
           usePluralLabels={true}
         />

@@ -136,9 +136,9 @@ export default async function ProfilePage({
       {/* Category Navigation Tabs */}
       <TaxonomyTabs
         items={featuredCategories}
-        basePath='dir'
-        allItemsLabel='Επαγγελματικός Κατάλογος'
-        allItemsHref='/directory'
+        basePath='categories'
+        allItemsLabel='Όλες οι Κατηγορίες'
+        allItemsHref='/categories'
         activeItemSlug={category?.slug}
         usePluralLabels={profile.user.role === 'freelancer'}
       />

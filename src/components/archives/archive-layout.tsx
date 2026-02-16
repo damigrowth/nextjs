@@ -135,8 +135,8 @@ export function ArchiveLayout({
     switch (archiveType) {
       case 'directory':
         return {
-          basePath: 'dir',
-          allItemsLabel: 'Επαγγελματικός Κατάλογος',
+          basePath: 'categories',
+          allItemsLabel: 'Όλες οι Κατηγορίες',
           usePluralLabels: true,
           sidebarType: 'profiles' as const,
         };
