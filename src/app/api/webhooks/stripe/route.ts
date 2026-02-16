@@ -335,17 +335,26 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   const amountPaid = invoice.amount_paid || 0;
   const currency = invoice.currency || 'eur';
 
-  // Extract payment method details from the charge
+  // Extract payment method details from the payment intent
+  // Note: payment_intent exists at runtime but may not be in older TS types
   let paymentMethodType: string | null = null;
   let paymentMethodLast4: string | null = null;
   let paymentMethodBrand: string | null = null;
 
-  if (invoice.charge) {
+  const invoicePaymentIntent = (invoice as unknown as { payment_intent?: string | { id: string } }).payment_intent;
+  if (invoicePaymentIntent) {
     try {
       const stripe = getStripe();
-      const charge = await stripe.charges.retrieve(invoice.charge as string);
+      const paymentIntentId =
+        typeof invoicePaymentIntent === 'string'
+          ? invoicePaymentIntent
+          : invoicePaymentIntent.id;
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId, {
+        expand: ['latest_charge'],
+      });
 
-      if (charge.payment_method_details) {
+      const charge = paymentIntent.latest_charge;
+      if (charge && typeof charge !== 'string' && charge.payment_method_details) {
         const pmDetails = charge.payment_method_details;
         paymentMethodType = pmDetails.type || null;
 
@@ -358,19 +367,23 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
         }
       }
     } catch (error) {
-      console.error('[Stripe Webhook] Failed to retrieve charge details:', error);
+      console.error('[Stripe Webhook] Failed to retrieve payment details:', error);
     }
   }
 
-  // Extract discount info if present
+  // Extract discount info if present (use first discount from array)
+  // Note: Stripe v20+ types changed - using runtime checks with type assertions
   let discountCode: string | null = null;
   let discountPercentOff: number | null = null;
   let discountAmountOff: number | null = null;
 
-  if (invoice.discount?.coupon) {
-    discountCode = invoice.discount.coupon.id || null;
-    discountPercentOff = invoice.discount.coupon.percent_off || null;
-    discountAmountOff = invoice.discount.coupon.amount_off || null;
+  const firstDiscount = invoice.discounts?.[0] as unknown as {
+    coupon?: { id?: string; percent_off?: number; amount_off?: number };
+  } | undefined;
+  if (firstDiscount?.coupon) {
+    discountCode = firstDiscount.coupon.id || null;
+    discountPercentOff = firstDiscount.coupon.percent_off || null;
+    discountAmountOff = firstDiscount.coupon.amount_off || null;
   }
 
   // Update analytics - increment cumulative totals
