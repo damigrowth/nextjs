@@ -841,6 +841,92 @@ export async function getProfileStats() {
 }
 
 /**
+ * Get Brevo list statistics
+ * Counts users based on Brevo list assignment logic:
+ * - USERS (simpleusers): type === 'user'
+ * - EMPTYPROFILE: type === 'pro' AND (no profile OR step !== 'DASHBOARD')
+ * - NOSERVICES: type === 'pro' AND has profile AND step === 'DASHBOARD' AND 0 published services
+ * - PROS (activepros): type === 'pro' AND has profile AND step === 'DASHBOARD' AND ≥1 published services
+ */
+export async function getBrevoListStats() {
+  try {
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.PROFILES, 'view');
+
+    const [
+      // USERS: simple users
+      simpleUsers,
+      // EMPTYPROFILE: pros without profile
+      prosWithoutProfile,
+      // EMPTYPROFILE: pros with profile but not at DASHBOARD
+      prosNotAtDashboard,
+      // For NOSERVICES and PROS: pros at DASHBOARD with profile
+      prosAtDashboardWithProfile,
+    ] = await Promise.all([
+      prisma.user.count({ where: { type: 'user' } }),
+      prisma.user.count({ where: { type: 'pro', profile: null } }),
+      prisma.user.count({
+        where: {
+          type: 'pro',
+          step: { not: 'DASHBOARD' },
+          profile: { isNot: null },
+        },
+      }),
+      prisma.user.findMany({
+        where: {
+          type: 'pro',
+          step: 'DASHBOARD',
+          profile: { isNot: null },
+        },
+        select: {
+          id: true,
+          profile: {
+            select: {
+              services: {
+                where: { status: 'published' },
+                select: { id: true },
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+    // Calculate NOSERVICES and PROS from prosAtDashboardWithProfile
+    let noServices = 0;
+    let activePros = 0;
+    for (const user of prosAtDashboardWithProfile) {
+      if (user.profile?.services.length === 0) {
+        noServices++;
+      } else {
+        activePros++;
+      }
+    }
+
+    const emptyProfile = prosWithoutProfile + prosNotAtDashboard;
+
+    return {
+      success: true,
+      data: {
+        users: simpleUsers, // USERS list (simpleusers)
+        emptyProfile, // EMPTYPROFILE list
+        noServices, // NOSERVICES list
+        activePros, // PROS list (activepros)
+        total: simpleUsers + emptyProfile + noServices + activePros,
+      },
+    };
+  } catch (error) {
+    console.error('Error getting Brevo list stats:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to get Brevo list stats',
+    };
+  }
+}
+
+/**
  * Update profile settings (boolean flags) - FormData version for useActionState
  */
 export async function updateProfileSettingsAction(

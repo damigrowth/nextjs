@@ -2,6 +2,7 @@ import { SiteHeader } from '@/components/admin/site-header';
 import { AdminUsersStats } from '@/components/admin/admin-users-stats';
 import { AdminProfilesStats } from '@/components/admin/admin-profiles-stats';
 import { AdminServicesStats } from '@/components/admin/admin-services-stats';
+import { AdminBrevoStats } from '@/components/admin/admin-brevo-stats';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { requirePermission } from '@/actions/auth/server';
 import { ADMIN_RESOURCES } from '@/lib/auth/roles';
@@ -38,8 +39,9 @@ export default async function AnalyticsPage() {
                 {/* Profiles Stats */}
                 <div>
                   <h3 className='mb-4 text-lg font-semibold'>Profiles</h3>
-                  <div className='grid gap-4 md:grid-cols-3'>
+                  <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
                     <AdminProfilesStats />
+                    <AdminBrevoStats />
                   </div>
                 </div>
 
@@ -60,8 +62,9 @@ export default async function AnalyticsPage() {
             </TabsContent>
 
             <TabsContent value='profiles' className='space-y-4'>
-              <div className='grid gap-4 md:grid-cols-3'>
+              <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
                 <AdminProfilesStats />
+                <AdminBrevoStats />
               </div>
             </TabsContent>
 
