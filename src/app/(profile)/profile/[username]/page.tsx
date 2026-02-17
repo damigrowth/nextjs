@@ -134,14 +134,7 @@ export default async function ProfilePage({
         image={image}
       />
       {/* Category Navigation Tabs */}
-      <TaxonomyTabs
-        items={featuredCategories}
-        basePath='categories'
-        allItemsLabel='Όλες οι Κατηγορίες'
-        allItemsHref='/categories'
-        activeItemSlug={category?.slug}
-        usePluralLabels={profile.user.role === 'freelancer'}
-      />
+      <TaxonomyTabs activeItemSlug={category?.slug} />
 
       {/* Breadcrumb Navigation */}
       <DynamicBreadcrumb

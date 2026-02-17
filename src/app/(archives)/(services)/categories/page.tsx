@@ -46,11 +46,6 @@ export default async function CategoriesPage() {
     const { taxonomyData } = archiveDataResult.data;
     const { subdivisions, categories } = categoriesDataResult.data;
 
-    // Filter categories to ensure required properties for TaxonomyTabs
-    const validCategories = taxonomyData.categories.filter(
-      (category): category is any => Boolean(category.slug && category.label),
-    );
-
     // Custom breadcrumb for categories page
     const categoriesBreadcrumb = {
       segments: [{ label: 'Αρχική', href: '/' }, { label: 'Κατηγορίες' }],
@@ -60,13 +55,7 @@ export default async function CategoriesPage() {
       <div className='py-20 bg-silver'>
         <CategoriesSchema categories={categories} />
         {/* Category Navigation Tabs */}
-        <TaxonomyTabs
-          items={validCategories}
-          basePath='categories'
-          allItemsLabel='Όλες οι Κατηγορίες'
-          activeItemSlug={undefined}
-          usePluralLabels={false}
-        />
+        <TaxonomyTabs />
 
         {/* Breadcrumb Navigation */}
         <DynamicBreadcrumb segments={categoriesBreadcrumb.segments} />

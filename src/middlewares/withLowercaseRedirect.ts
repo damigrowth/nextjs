@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 // Define static routes that should be lowercase
 const STATIC_ROUTES = [
   '/dir',
+  '/directory',
   '/services',
   '/ipiresies',
   '/categories',

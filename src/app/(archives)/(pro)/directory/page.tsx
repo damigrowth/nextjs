@@ -30,25 +30,11 @@ export default async function DirectoryPage() {
 
     const { popularSubcategories, categories } = directoryDataResult.data;
 
-    // Transform categories for TaxonomyTabs
-    const proCategories = categories.map((cat) => ({
-      id: cat.id,
-      label: cat.label,
-      slug: cat.slug,
-    }));
-
     return (
       <div className='py-20 bg-silver'>
         <DirectorySchema categories={categories} />
-        {/* Pro Category Navigation Tabs */}
-        <TaxonomyTabs
-          items={proCategories}
-          basePath='categories'
-          allItemsLabel='Όλες οι Κατηγορίες'
-          allItemsHref='/categories'
-          activeItemSlug={undefined}
-          usePluralLabels={true}
-        />
+        {/* Category Navigation Tabs */}
+        <TaxonomyTabs />
 
         {/* Archive Banner */}
         <ArchiveBanner

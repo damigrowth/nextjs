@@ -1,19 +1,28 @@
 import React from 'react';
 import NextLink from './next-link';
-import { TaxonomyTabsProps } from '@/lib/types';
+
+// Static service categories for navbar - links to /categories/{slug}
+const SERVICE_CATEGORIES = [
+  { id: '1', label: 'Δημιουργία Περιεχομένου', slug: 'dimiourgia-periexomenou' },
+  { id: '2', label: 'Εκδηλώσεις', slug: 'ekdiloseis' },
+  { id: '3', label: 'Ευεξία & Φροντίδα', slug: 'eveksia-frontida' },
+  { id: '4', label: 'Μαθήματα', slug: 'mathimata' },
+  { id: '5', label: 'Μάρκετινγκ', slug: 'marketing' },
+  { id: '6', label: 'Πληροφορική', slug: 'pliroforiki' },
+  { id: '7', label: 'Τεχνικά', slug: 'texnika' },
+  { id: '8', label: 'Υποστήριξη', slug: 'ypostiriksi' },
+];
+
+interface TaxonomyTabsProps {
+  activeItemSlug?: string;
+  className?: string;
+}
 
 /**
- * Universal tab navigation component for any collection
- * Completely generic and reusable across different data types
+ * Static navbar with service categories linking to /categories/{slug}
  */
-
 export default function TaxonomyTabs({
-  items,
-  basePath,
-  allItemsLabel,
-  allItemsHref,
   activeItemSlug,
-  usePluralLabels = false,
   className = '',
 }: TaxonomyTabsProps) {
   return (
@@ -23,37 +32,31 @@ export default function TaxonomyTabs({
           <div className='w-full relative overflow-x-clip'>
             <nav className='overflow-x-auto scrollbar-hide'>
               <ul className='mb-0 flex flex-nowrap ps-0'>
-                {/* All items link */}
+                {/* All categories link */}
                 <li className='flex-shrink-0'>
                   <NextLink
-                    href={allItemsHref || `/${basePath}`}
+                    href='/categories'
                     className={`inline-block px-4 py-2 text-body hover:text-primary transition-colors text-sm whitespace-nowrap ${
                       !activeItemSlug ? 'text-primary font-medium' : ''
                     }`}
                   >
-                    {allItemsLabel}
+                    Όλες οι Κατηγορίες
                   </NextLink>
                 </li>
 
-                {/* Individual item links */}
-                {items.map((item) => {
-                  const isActive = activeItemSlug === item.slug;
-                  const displayLabel =
-                    usePluralLabels && item.plural ? item.plural : item.label;
-
-                  return (
-                    <li key={item.id} className='flex-shrink-0'>
-                      <NextLink
-                        href={`/${basePath}/${item.slug}`}
-                        className={`inline-block px-4 py-2 text-body hover:text-primary transition-colors text-sm whitespace-nowrap ${
-                          isActive ? 'text-primary font-medium' : ''
-                        }`}
-                      >
-                        {displayLabel}
-                      </NextLink>
-                    </li>
-                  );
-                })}
+                {/* Category links */}
+                {SERVICE_CATEGORIES.map((category) => (
+                  <li key={category.id} className='flex-shrink-0'>
+                    <NextLink
+                      href={`/categories/${category.slug}`}
+                      className={`inline-block px-4 py-2 text-body hover:text-primary transition-colors text-sm whitespace-nowrap ${
+                        activeItemSlug === category.slug ? 'text-primary font-medium' : ''
+                      }`}
+                    >
+                      {category.label}
+                    </NextLink>
+                  </li>
+                ))}
               </ul>
             </nav>
             {/* Fade overlay on right edge */}

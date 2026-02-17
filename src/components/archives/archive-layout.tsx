@@ -173,12 +173,6 @@ export function ArchiveLayout({
 
   const archiveConfig = getArchiveConfig();
 
-  // Filter categories to ensure required properties for TaxonomyTabs
-  const validCategories = taxonomyData.categories.filter(
-    (category): category is DatasetItem & { slug: string; label: string } =>
-      Boolean(category.slug && category.label),
-  );
-
   // Generate banner title based on current taxonomy hierarchy
   const getBannerTitle = (): string => {
     const { currentSubdivision, currentSubcategory, currentCategory } =
@@ -267,13 +261,7 @@ export function ArchiveLayout({
   return (
     <div className={clsx(className, 'py-20 bg-silver')}>
       {/* Category Navigation Tabs */}
-      <TaxonomyTabs
-        items={validCategories}
-        basePath={archiveConfig.basePath}
-        allItemsLabel={archiveConfig.allItemsLabel}
-        activeItemSlug={taxonomyData.currentCategory?.slug}
-        usePluralLabels={archiveConfig.usePluralLabels}
-      />
+      <TaxonomyTabs activeItemSlug={taxonomyData.currentCategory?.slug} />
 
       {/* Breadcrumb Navigation */}
       {breadcrumbData && (

@@ -64,28 +64,12 @@ export default async function HomePage() {
       })),
     }));
 
-  // Get categories for TaxonomyTabs
-  const serviceCategories = homeData.services.mainCategories
-    .filter((cat) => cat.slug !== 'all')
-    .map((cat) => ({
-      id: cat.id,
-      label: cat.label,
-      slug: cat.slug,
-    }));
-
   return (
     <>
       <HomeSchema />
       {/* Service Categories Navigation Tabs */}
       <div>
-        <TaxonomyTabs
-          items={serviceCategories}
-          basePath='categories'
-          allItemsLabel='Όλες οι Κατηγορίες'
-          allItemsHref='/categories'
-          activeItemSlug={undefined}
-          usePluralLabels={false}
-        />
+        <TaxonomyTabs />
       </div>
 
       <HeroHome popularSubcategories={homeData.popularSubcategories} />

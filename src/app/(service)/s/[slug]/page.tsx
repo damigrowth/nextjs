@@ -148,13 +148,7 @@ export default async function ServicePage({
         image={firstMediaImage}
       />
       {/* Category Navigation Tabs */}
-      <TaxonomyTabs
-        items={featuredCategories}
-        basePath='categories'
-        allItemsLabel='Όλες οι Υπηρεσίες'
-        activeItemSlug={category?.slug}
-        usePluralLabels={false}
-      />
+      <TaxonomyTabs activeItemSlug={category?.slug} />
 
       {/* Breadcrumb Navigation */}
       <DynamicBreadcrumb
