@@ -204,6 +204,7 @@ export async function listUsers(
         createdAt: true,
         updatedAt: true,
         lastUnreadEmailSentAt: true,
+        lastUsernameChangeAt: true,
       },
     });
 
