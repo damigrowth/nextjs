@@ -7,6 +7,7 @@ export { default as VerificationForm } from './form-verification';
 export { default as BillingForm } from './form-billing';
 export { default as CoverageForm } from './form-coverage';
 export { default as ChangePasswordForm } from './form-change-password';
+export { default as ChangeUsernameForm } from './form-change-username';
 export { default as DeleteAccountForm } from './form-delete-account';
 export { default as OnboardingForm } from './form-onboarding';
 export { default as DocumentsInterface } from './documents-interface';

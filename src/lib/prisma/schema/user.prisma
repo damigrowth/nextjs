@@ -21,6 +21,7 @@ model User {
   role            UserRole      @default(user)
   provider        String        @default("email") // email or google
   lastUnreadEmailSentAt DateTime?   // Track when last unread messages email was sent (24h cooldown)
+  lastUsernameChangeAt  DateTime?   // Track last username change for rate limiting (7-day cooldown)
   accounts        Account[]
   chatMemberships ChatMember[]
   chatsCreated    Chat[]

@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { ChangePasswordForm } from '@/components';
-import { DeleteAccountForm } from '@/components';
+import {
+  ChangePasswordForm,
+  ChangeUsernameForm,
+  DeleteAccountForm,
+} from '@/components';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { Key, Trash2 } from 'lucide-react';
+import { Key, Trash2, AtSign } from 'lucide-react';
 import { AuthUser } from '@/lib/types/auth';
 
 interface AccountPageActionsProps {
@@ -14,6 +17,7 @@ interface AccountPageActionsProps {
 
 export default function AccountPageActions({ user }: AccountPageActionsProps) {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [changeUsernameOpen, setChangeUsernameOpen] = useState(false);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
   return (
@@ -31,6 +35,25 @@ export default function AccountPageActions({ user }: AccountPageActionsProps) {
             <ChangePasswordForm
               onSuccess={() => setChangePasswordOpen(false)}
               onCancel={() => setChangePasswordOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Change Username Button - Only for pro users */}
+      {user?.type === 'pro' && (
+        <Dialog open={changeUsernameOpen} onOpenChange={setChangeUsernameOpen}>
+          <DialogTrigger asChild>
+            <Button variant='outline' className='flex items-center gap-2'>
+              <AtSign className='h-4 w-4' />
+              Αλλαγή Username
+            </Button>
+          </DialogTrigger>
+          <DialogContent className='sm:max-w-md'>
+            <ChangeUsernameForm
+              user={user}
+              onSuccess={() => setChangeUsernameOpen(false)}
+              onCancel={() => setChangeUsernameOpen(false)}
             />
           </DialogContent>
         </Dialog>

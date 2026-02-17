@@ -194,6 +194,7 @@ export const auth = betterAuth({
       image: { type: 'string', required: false }, // Profile image JSON string synced from profile
       confirmed: { type: 'boolean', defaultValue: false },
       blocked: { type: 'boolean', defaultValue: false },
+      lastUsernameChangeAt: { type: 'date', required: false, input: false }, // Rate limiting for username changes
     },
     deleteUser: {
       enabled: true,

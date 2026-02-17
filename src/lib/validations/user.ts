@@ -81,6 +81,28 @@ export const setUserPasswordSchema = z.object({
 });
 
 // =============================================
+// USERNAME CHANGE SCHEMA
+// =============================================
+
+export const changeUsernameSchema = z
+  .object({
+    newUsername: z
+      .string()
+      .min(3, 'Το username πρέπει να έχει τουλάχιστον 3 χαρακτήρες')
+      .max(30, 'Το username δεν μπορεί να υπερβαίνει τους 30 χαρακτήρες')
+      .regex(
+        /^[a-zA-Z0-9_-]+$/,
+        'Επιτρέπονται μόνο λατινικοί χαρακτήρες, αριθμοί, παύλες και κάτω παύλες',
+      )
+      .transform((val) => val.toLowerCase()),
+    confirmUsername: z.string().min(1, 'Η επιβεβαίωση είναι υποχρεωτική'),
+  })
+  .refine((data) => data.newUsername === data.confirmUsername.toLowerCase(), {
+    message: 'Τα usernames δεν ταιριάζουν',
+    path: ['confirmUsername'],
+  });
+
+// =============================================
 // USER PREFERENCES SCHEMAS
 // =============================================
 
@@ -123,4 +145,5 @@ export type UnbanUserInput = z.infer<typeof unbanUserSchema>;
 export type SetUserRoleInput = z.infer<typeof setUserRoleSchema>;
 export type BlockUserInput = z.infer<typeof blockUserSchema>;
 export type SetUserPasswordInput = z.infer<typeof setUserPasswordSchema>;
+export type ChangeUsernameInput = z.infer<typeof changeUsernameSchema>;
 export type UserPreferencesInput = z.infer<typeof userPreferencesSchema>;
