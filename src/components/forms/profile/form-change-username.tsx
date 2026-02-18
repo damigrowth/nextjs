@@ -175,8 +175,8 @@ export default function ChangeUsernameForm({
             <Alert>
               <Info className='h-4 w-4' />
               <AlertDescription>
-                <strong>Προσοχή:</strong> Η αλλαγή του username θα αλλάξει και
-                το URL του προφίλ σας.
+                <strong>ΠΡΟΣΟΧΗ:</strong> Το url του προφίλ σας θα ενημερωθεί
+                με το νέο username και δεν θα ισχύει το παλιό.
               </AlertDescription>
             </Alert>
 

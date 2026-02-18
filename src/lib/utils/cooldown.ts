@@ -5,7 +5,7 @@
  * Used by username change and potentially other features with time-based restrictions.
  */
 
-export const USERNAME_COOLDOWN_DAYS = 7;
+export const USERNAME_COOLDOWN_DAYS = 30;
 
 /**
  * Check if an action is allowed based on the last change date and cooldown period.
