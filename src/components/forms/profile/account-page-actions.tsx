@@ -5,10 +5,11 @@ import {
   ChangePasswordForm,
   ChangeUsernameForm,
   DeleteAccountForm,
+  UpgradeToProForm,
 } from '@/components';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { Key, Trash2, AtSign } from 'lucide-react';
+import { Key, Trash2, AtSign, ArrowUpCircle } from 'lucide-react';
 import { AuthUser } from '@/lib/types/auth';
 
 interface AccountPageActionsProps {
@@ -18,6 +19,7 @@ interface AccountPageActionsProps {
 export default function AccountPageActions({ user }: AccountPageActionsProps) {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [changeUsernameOpen, setChangeUsernameOpen] = useState(false);
+  const [upgradeToProOpen, setUpgradeToProOpen] = useState(false);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
   return (
@@ -54,6 +56,25 @@ export default function AccountPageActions({ user }: AccountPageActionsProps) {
               user={user}
               onSuccess={() => setChangeUsernameOpen(false)}
               onCancel={() => setChangeUsernameOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Upgrade to Pro Button - Only for simple users */}
+      {user?.type === 'user' && (
+        <Dialog open={upgradeToProOpen} onOpenChange={setUpgradeToProOpen}>
+          <DialogTrigger asChild>
+            <Button variant='outline' className='flex items-center gap-2'>
+              <ArrowUpCircle className='h-4 w-4' />
+              Αλλαγή σε Επαγγελματικό λογαριασμό
+            </Button>
+          </DialogTrigger>
+          <DialogContent className='sm:max-w-md'>
+            <UpgradeToProForm
+              user={user}
+              onSuccess={() => setUpgradeToProOpen(false)}
+              onCancel={() => setUpgradeToProOpen(false)}
             />
           </DialogContent>
         </Dialog>

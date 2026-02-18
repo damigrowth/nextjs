@@ -103,6 +103,20 @@ export const changeUsernameSchema = z
   });
 
 // =============================================
+// UPGRADE TO PRO SCHEMA
+// =============================================
+
+export const upgradeToProSchema = z.object({
+  displayName: z
+    .string()
+    .min(2, 'Το όνομα εμφάνισης πρέπει να έχει τουλάχιστον 2 χαρακτήρες')
+    .max(50, 'Το όνομα εμφάνισης δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες'),
+  role: z.enum(['freelancer', 'company'], {
+    message: 'Επιλέξτε τύπο λογαριασμού',
+  }),
+});
+
+// =============================================
 // USER PREFERENCES SCHEMAS
 // =============================================
 
@@ -146,4 +160,5 @@ export type SetUserRoleInput = z.infer<typeof setUserRoleSchema>;
 export type BlockUserInput = z.infer<typeof blockUserSchema>;
 export type SetUserPasswordInput = z.infer<typeof setUserPasswordSchema>;
 export type ChangeUsernameInput = z.infer<typeof changeUsernameSchema>;
+export type UpgradeToProInput = z.infer<typeof upgradeToProSchema>;
 export type UserPreferencesInput = z.infer<typeof userPreferencesSchema>;
