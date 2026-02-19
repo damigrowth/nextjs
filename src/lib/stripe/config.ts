@@ -11,7 +11,7 @@
  * - Up to 5 featured services (star icon in dashboard)
  * - Automatic daily refresh for all published services
  * - Priority in "Similar Services" section on service pages
- * - "Additional Services" section on subscriber's service pages
+ * - "Additional Services" section on subscriber's service pages.
  */
 
 export const SUBSCRIPTION_PLANS = {
