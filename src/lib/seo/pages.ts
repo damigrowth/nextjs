@@ -126,6 +126,21 @@ export async function getTermsMetadata() {
 }
 
 /**
+ * Cancellation policy page metadata generation
+ */
+export async function getCancellationMetadata() {
+  const { meta } = await Meta({
+    titleTemplate: 'Πολιτική Ακύρωσης',
+    descriptionTemplate:
+      'Μάθετε για την πολιτική ακύρωσης συνδρομών της Doulitsa. Δικαίωμα ακύρωσης, επιστροφές χρημάτων και λήξη υπηρεσιών.',
+    size: 160,
+    url: '/politiki-akirosis',
+  });
+
+  return meta;
+}
+
+/**
  * Login page metadata generation
  */
 export async function getLoginMetadata() {
