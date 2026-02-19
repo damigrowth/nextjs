@@ -54,11 +54,11 @@ export default function PricingSelection({
             <div>
               <p className='font-semibold'>Ετήσια χρέωση</p>
               <p className='text-sm text-muted-foreground'>
-                €180/έτος (εξοικονόμηση €60)
+                180€/έτος (εξοικονόμηση 60€)
               </p>
             </div>
             <p className='text-xl font-bold'>
-              €15<span className='text-sm font-normal'>/μήνα</span>
+              15€<span className='text-sm font-normal'>/μήνα</span>
             </p>
           </CardContent>
         </Card>
@@ -81,11 +81,15 @@ export default function PricingSelection({
               </p>
             </div>
             <p className='text-xl font-bold'>
-              €20<span className='text-sm font-normal'>/μήνα</span>
+              20€<span className='text-sm font-normal'>/μήνα</span>
             </p>
           </CardContent>
         </Card>
       </div>
+
+      <p className='text-xs text-muted-foreground'>
+        *Οι παραπάνω τιμές δεν συμπεριλαμβάνουν Φ.Π.Α.
+      </p>
     </div>
   );
 }

@@ -146,14 +146,14 @@ export default function CheckoutContent({
             {/* Price Display */}
             <div className='text-center space-y-1'>
               <p className='text-2xl font-bold'>
-                {interval === 'year' ? '€15' : '€20'}
+                {interval === 'year' ? '15€' : '20€'}
                 <span className='text-sm font-normal text-muted-foreground'>
                   /μήνα
                 </span>
               </p>
               {interval === 'year' && (
                 <p className='text-sm text-muted-foreground'>
-                  €180/έτος (3 μήνες δώρο)
+                  180€/έτος (3 μήνες δώρο)
                 </p>
               )}
             </div>
@@ -171,6 +171,10 @@ export default function CheckoutContent({
 
             <Separator />
 
+            <p className='text-sm text-muted-foreground text-center'>
+              Φ.Π.Α. {interval === 'year' ? '43,20€' : '4,80€'}
+            </p>
+
             {/* Checkout Button */}
             <Button
               className='w-full bg-black hover:bg-black/90 text-white'
@@ -186,7 +190,7 @@ export default function CheckoutContent({
               ) : (
                 <>
                   <Lock className='size-4 mr-2 text-white' />
-                  Πληρωμή {interval === 'year' ? '€180/έτος' : '€20/μήνα'}
+                  Πληρωμή {interval === 'year' ? '223,20€/έτος' : '24,80€/μήνα'}
                 </>
               )}
             </Button>

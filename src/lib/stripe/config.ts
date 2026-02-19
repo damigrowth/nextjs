@@ -40,7 +40,7 @@ export const SUBSCRIPTION_PLANS = {
 export const PRICING = {
   monthly: {
     amount: 2000, // €20.00 in cents
-    label: '€20/μήνα',
+    label: '20€/μήνα',
     interval: 'month' as const,
     // Provider-specific price IDs
     stripePriceId: process.env.STRIPE_PROMOTED_MONTHLY_PRICE_ID || '',
@@ -48,8 +48,8 @@ export const PRICING = {
   },
   annual: {
     amount: 18000, // €180.00 in cents (€15/month × 12)
-    label: '€15/μήνα',
-    sublabel: '€180/έτος (3 μήνες δώρο)',
+    label: '15€/μήνα',
+    sublabel: '180€/έτος (3 μήνες δώρο)',
     interval: 'year' as const,
     // Provider-specific price IDs
     stripePriceId: process.env.STRIPE_PROMOTED_ANNUAL_PRICE_ID || '',

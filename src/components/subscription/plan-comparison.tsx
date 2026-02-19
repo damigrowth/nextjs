@@ -57,7 +57,7 @@ export default function PlanComparison({
               <Badge variant='secondary'>Δημοφιλές</Badge>
             </div>
             <p className='text-2xl font-bold'>
-              Από €15
+              Από 15€
               <span className='text-sm font-normal text-muted-foreground'>
                 /μήνα
               </span>

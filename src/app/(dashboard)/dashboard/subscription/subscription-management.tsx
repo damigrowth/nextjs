@@ -86,7 +86,7 @@ export default function SubscriptionManagement({
           <div>
             <p className='text-muted-foreground'>Χρέωση</p>
             <p className='font-medium'>
-              {subscription.billingInterval === 'year' ? '€180/έτος' : '€20/μήνα'}
+              {subscription.billingInterval === 'year' ? '180€/έτος' : '20€/μήνα'}
             </p>
           </div>
           <div>
