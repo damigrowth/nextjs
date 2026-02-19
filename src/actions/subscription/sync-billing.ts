@@ -35,12 +35,6 @@ export async function syncSubscriptionBilling(): Promise<ActionResult<{ synced: 
 
     // Only sync if subscription exists and billing is null but profile has billing
     if (subscription.billing === null && profile.billing !== null) {
-      console.log('[SyncBilling] Attempting to sync billing:', {
-        profileId: profile.id,
-        subscriptionId: subscription.id,
-        inputBilling: profile.billing,
-      });
-
       await prisma.subscription.update({
         where: { pid: profile.id },
         data: { billing: profile.billing },
@@ -56,16 +50,6 @@ export async function syncSubscriptionBilling(): Promise<ActionResult<{ synced: 
       const savedJson = JSON.stringify(verifyUpdate?.billing);
       const success = inputJson === savedJson;
 
-      console.log('[SyncBilling] Verified update result:', {
-        profileId: profile.id,
-        subscriptionId: verifyUpdate?.id,
-        inputBilling: profile.billing,
-        savedBilling: verifyUpdate?.billing,
-        inputJson,
-        savedJson,
-        success,
-      });
-
       if (!success) {
         console.error('[SyncBilling] UPDATE FAILED - billing was not saved correctly!');
         return { success: false, error: 'Failed to persist billing data' };
@@ -73,15 +57,6 @@ export async function syncSubscriptionBilling(): Promise<ActionResult<{ synced: 
 
       return { success: true, data: { synced: true } };
     }
-
-    // Log why sync was skipped
-    console.log('[SyncBilling] Sync skipped:', {
-      profileId: profile.id,
-      subscriptionBillingIsNull: subscription.billing === null,
-      profileBillingIsNotNull: profile.billing !== null,
-      subscriptionBilling: subscription.billing,
-      profileBilling: profile.billing,
-    });
 
     return { success: true, data: { synced: false } };
   } catch (error) {

@@ -3,6 +3,7 @@ export const firstColumnLinks = [
   { attributes: { title: 'Για Επαγγελματίες', slug: 'for-pros' } },
   { attributes: { title: 'Συχνές Ερωτήσεις', slug: 'faq' } },
   { attributes: { title: 'Πολιτική Απορρήτου', slug: 'privacy' } },
+  { attributes: { title: 'Πολιτική Ακύρωσης', slug: 'politiki-akirosis' } },
   { attributes: { title: 'Όροι Χρήσης', slug: 'terms' } },
   { attributes: { title: 'Επικοινωνία', slug: 'contact' } },
 ];

@@ -38,14 +38,6 @@ export async function createCheckoutSession(
       select: { id: true, billing: true, phone: true },
     });
 
-    // Debug: Log profile billing data
-    console.log('[CreateCheckoutSession] Profile billing data:', {
-      profileId: profile?.id,
-      hasBilling: !!profile?.billing,
-      billing: profile?.billing,
-      phone: profile?.phone,
-    });
-
     if (!profile) {
       return { success: false, error: 'Το προφίλ δεν βρέθηκε' };
     }
@@ -111,17 +103,6 @@ export async function createCheckoutSession(
       },
     });
 
-    // Debug: Log what's being passed to PaymentService
-    console.log('[CreateCheckoutSession] Billing passed to PaymentService:', {
-      email: user.email,
-      name: billingData?.name || user.name,
-      phone: formatPhone(profile.phone),
-      address: billingData?.address ? { line1: billingData.address, country: 'GR' } : undefined,
-      taxId: billingData?.afm,
-      taxOffice: billingData?.doy,
-      profession: billingData?.profession,
-      isBusinessPurchase,
-    });
 
     return { success: true, data: { url: checkout.url } };
   } catch (error: unknown) {

@@ -96,12 +96,6 @@ export class StripeAdapter implements PaymentProvider {
       // Build customer data from billing details
       const billing = params.billing;
 
-      // Debug: Log billing data received
-      console.log('[Stripe Adapter] Billing data received:', {
-        hasBilling: !!billing,
-        billing,
-      });
-
       const customerData: Stripe.CustomerCreateParams = {
         metadata: {
           profileId: params.profileId,
@@ -165,35 +159,12 @@ export class StripeAdapter implements PaymentProvider {
         }
       }
 
-      // Debug: Log customer data being sent to Stripe
-      console.log('[Stripe Adapter] Customer data to send:', customerData);
-
       // Create or update Stripe customer with billing details
       if (customerId) {
-        // Update existing customer with new billing details
-        console.log('[Stripe Adapter] Updating existing customer:', customerId);
-        const updatedCustomer = await stripe.customers.update(customerId, customerData);
-        console.log('[Stripe Adapter] Customer update result:', {
-          id: updatedCustomer.id,
-          name: updatedCustomer.name,
-          email: updatedCustomer.email,
-          phone: updatedCustomer.phone,
-          address: updatedCustomer.address,
-          metadata: updatedCustomer.metadata,
-        });
+        await stripe.customers.update(customerId, customerData);
       } else if (billing?.email || billing?.name) {
-        // Create new customer only if we have some billing info
-        console.log('[Stripe Adapter] Creating new customer with data:', customerData);
         const customer = await stripe.customers.create(customerData);
         customerId = customer.id;
-        console.log('[Stripe Adapter] Created customer:', {
-          id: customer.id,
-          name: customer.name,
-          email: customer.email,
-          phone: customer.phone,
-          address: customer.address,
-          metadata: customer.metadata,
-        });
       }
 
       // Add Greek VAT (AFM) to customer if business purchase
@@ -260,22 +231,7 @@ export class StripeAdapter implements PaymentProvider {
         sessionOptions.customer_email = billing.email;
       }
 
-      // Log the final session options being sent to Stripe
-      console.log('[Stripe Adapter] Creating checkout session with options:', {
-        customer: sessionOptions.customer,
-        customer_email: sessionOptions.customer_email,
-        billing_address_collection: sessionOptions.billing_address_collection,
-        customer_update: sessionOptions.customer_update,
-        metadata: sessionOptions.metadata,
-      });
-
       const session = await stripe.checkout.sessions.create(sessionOptions);
-
-      console.log('[Stripe Adapter] Checkout session created:', {
-        sessionId: session.id,
-        url: session.url,
-        customer: session.customer,
-      });
 
       if (!session.url) {
         throw new Error('Stripe returned session without URL');
