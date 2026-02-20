@@ -5,12 +5,21 @@ import {
   adminListSubscriptionsSchema,
   adminUpdateSubscriptionStatusSchema,
   adminDeleteSubscriptionSchema,
+  adminCreateManualSubscriptionSchema,
   type AdminListSubscriptionsInput,
   type AdminUpdateSubscriptionStatusInput,
   type AdminDeleteSubscriptionInput,
+  type AdminCreateManualSubscriptionInput,
 } from '@/lib/validations/admin';
 import { getAdminSessionWithPermission } from './helpers';
 import { ADMIN_RESOURCES } from '@/lib/auth/roles';
+import {
+  Prisma,
+  UserType,
+  SubscriptionStatus,
+  SubscriptionPlan,
+  SubscriptionProvider,
+} from '@prisma/client';
 
 /**
  * List subscriptions with filters and pagination
@@ -35,7 +44,7 @@ export async function listSubscriptions(
     } = validatedParams;
 
     // Build where clause
-    const where: any = {};
+    const where: Prisma.SubscriptionWhereInput = {};
 
     // Search filter (profile displayName or user email)
     if (searchQuery) {
@@ -178,7 +187,7 @@ export async function updateSubscriptionStatus(
         status,
         updatedAt: new Date(),
         // If canceling, set canceledAt
-        ...(status === 'canceled' && { canceledAt: new Date() }),
+        ...(status === SubscriptionStatus.canceled && { canceledAt: new Date() }),
       },
       include: {
         profile: {
@@ -192,7 +201,7 @@ export async function updateSubscriptionStatus(
     });
 
     // If subscription is canceled, also update the profile's featured status
-    if (status === 'canceled' && subscription.plan === 'promoted') {
+    if (status === SubscriptionStatus.canceled && subscription.plan === SubscriptionPlan.promoted) {
       await prisma.profile.update({
         where: { id: subscription.pid },
         data: {
@@ -202,7 +211,7 @@ export async function updateSubscriptionStatus(
     }
 
     // If subscription is reactivated, restore featured status for promoted plans
-    if (status === 'active' && subscription.plan === 'promoted') {
+    if (status === SubscriptionStatus.active && subscription.plan === SubscriptionPlan.promoted) {
       await prisma.profile.update({
         where: { id: subscription.pid },
         data: {
@@ -256,7 +265,7 @@ export async function deleteSubscription(params: AdminDeleteSubscriptionInput) {
     });
 
     // Also remove featured status if it was a promoted subscription
-    if (subscription.plan === 'promoted') {
+    if (subscription.plan === SubscriptionPlan.promoted) {
       await prisma.profile.update({
         where: { id: subscription.pid },
         data: {
@@ -290,9 +299,9 @@ export async function getSubscriptionStats() {
 
     const [total, active, canceled, pastDue] = await Promise.all([
       prisma.subscription.count(),
-      prisma.subscription.count({ where: { status: 'active' } }),
-      prisma.subscription.count({ where: { status: 'canceled' } }),
-      prisma.subscription.count({ where: { status: 'past_due' } }),
+      prisma.subscription.count({ where: { status: SubscriptionStatus.active } }),
+      prisma.subscription.count({ where: { status: SubscriptionStatus.canceled } }),
+      prisma.subscription.count({ where: { status: SubscriptionStatus.past_due } }),
     ]);
 
     return {
@@ -355,7 +364,10 @@ export async function updateSubscriptionStatusAction(
     }
 
     const result = await updateSubscriptionStatus(validationResult.data);
-    return result;
+    if ('error' in result) {
+      return { success: false, error: result.error };
+    }
+    return { success: true };
   } catch (error) {
     return {
       success: false,
@@ -363,6 +375,99 @@ export async function updateSubscriptionStatusAction(
         error instanceof Error
           ? error.message
           : 'Failed to update subscription status',
+    };
+  }
+}
+
+/**
+ * Create a manual subscription for a profile (admin only)
+ * Used for bank deposits, trials, or offline arrangements
+ */
+export async function createManualSubscription(
+  params: AdminCreateManualSubscriptionInput,
+): Promise<
+  | { success: true; data: { id: string } }
+  | { success: false; error: string }
+> {
+  try {
+    await getAdminSessionWithPermission(ADMIN_RESOURCES.SUBSCRIPTIONS, 'edit');
+
+    const { profileId, endDate } =
+      adminCreateManualSubscriptionSchema.parse(params);
+
+    const parsedEndDate = new Date(endDate);
+
+    // Verify profile exists and is a pro
+    const profile = await prisma.profile.findUnique({
+      where: { id: profileId },
+      select: {
+        id: true,
+        user: { select: { type: true } },
+      },
+    });
+
+    if (!profile) {
+      return { success: false, error: 'Το προφίλ δεν βρέθηκε' };
+    }
+
+    if (profile.user.type !== UserType.pro) {
+      return {
+        success: false,
+        error: 'Μόνο επαγγελματικά προφίλ μπορούν να έχουν συνδρομή',
+      };
+    }
+
+    // Check for existing active subscription
+    const existing = await prisma.subscription.findUnique({
+      where: { pid: profileId },
+      select: { status: true },
+    });
+
+    if (existing?.status === SubscriptionStatus.active) {
+      return {
+        success: false,
+        error: 'Το προφίλ έχει ήδη ενεργή συνδρομή',
+      };
+    }
+
+    // Create or update subscription
+    const subscription = await prisma.subscription.upsert({
+      where: { pid: profileId },
+      create: {
+        pid: profileId,
+        provider: SubscriptionProvider.manual,
+        plan: SubscriptionPlan.promoted,
+        status: SubscriptionStatus.active,
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: parsedEndDate,
+      },
+      update: {
+        provider: SubscriptionProvider.manual,
+        plan: SubscriptionPlan.promoted,
+        status: SubscriptionStatus.active,
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: parsedEndDate,
+        cancelAtPeriodEnd: false,
+        canceledAt: null,
+      },
+      select: { id: true },
+    });
+
+    // Set profile as featured (same pattern as updateSubscriptionStatus)
+    await prisma.profile.update({
+      where: { id: profileId },
+      data: { featured: true },
+    });
+
+    return { success: true, data: { id: subscription.id } };
+  } catch (error) {
+    console.error('Error creating manual subscription:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Αποτυχία δημιουργίας συνδρομής',
     };
   }
 }

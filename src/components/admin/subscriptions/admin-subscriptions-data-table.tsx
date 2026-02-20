@@ -25,6 +25,12 @@ import { ArrowUpDown, Copy, Check, Eye } from 'lucide-react';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import {
+  SubscriptionStatus,
+  SubscriptionPlan,
+  BillingInterval,
+  SubscriptionProvider,
+} from '@prisma/client';
 
 // Copyable text component with hover state
 function CopyableText({
@@ -73,10 +79,10 @@ interface SubscriptionProfile {
 interface Subscription {
   id: string;
   pid: string;
-  status: string;
-  plan: string;
-  billingInterval: string | null;
-  provider: string;
+  status: SubscriptionStatus;
+  plan: SubscriptionPlan;
+  billingInterval: BillingInterval | null;
+  provider: SubscriptionProvider;
   currentPeriodStart: Date | null;
   currentPeriodEnd: Date | null;
   cancelAtPeriodEnd: boolean;
@@ -105,11 +111,11 @@ export function AdminSubscriptionsDataTable({
   const router = useRouter();
 
   // Helper function for status badge
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeVariant = (status: SubscriptionStatus) => {
     switch (status) {
-      case 'active':
+      case SubscriptionStatus.active:
         return 'default' as const;
-      case 'canceled':
+      case SubscriptionStatus.canceled:
         return 'destructive' as const;
       default:
         return 'outline' as const;
@@ -117,11 +123,11 @@ export function AdminSubscriptionsDataTable({
   };
 
   // Helper function for status badge className
-  const getStatusBadgeClassName = (status: string) => {
+  const getStatusBadgeClassName = (status: SubscriptionStatus) => {
     switch (status) {
-      case 'past_due':
+      case SubscriptionStatus.past_due:
         return 'border-yellow-500 text-yellow-600 bg-yellow-50';
-      case 'trialing':
+      case SubscriptionStatus.trialing:
         return 'border-blue-500 text-blue-600 bg-blue-50';
       default:
         return '';
@@ -129,25 +135,31 @@ export function AdminSubscriptionsDataTable({
   };
 
   // Helper function for status label
-  const getStatusLabel = (status: string) => {
+  const getStatusLabel = (status: SubscriptionStatus) => {
     switch (status) {
-      case 'active':
+      case SubscriptionStatus.active:
         return 'Ενεργή';
-      case 'canceled':
+      case SubscriptionStatus.canceled:
         return 'Έληξε';
-      case 'incomplete':
+      case SubscriptionStatus.past_due:
+        return 'Εκπρόθεσμη';
+      case SubscriptionStatus.incomplete:
         return 'Ημιτελής';
+      case SubscriptionStatus.trialing:
+        return 'Δοκιμαστική';
+      case SubscriptionStatus.unpaid:
+        return 'Απλήρωτη';
       default:
         return status;
     }
   };
 
   // Helper function for billing interval label
-  const getBillingLabel = (interval: string | null) => {
+  const getBillingLabel = (interval: BillingInterval | null) => {
     switch (interval) {
-      case 'month':
+      case BillingInterval.month:
         return 'Μηνιαία';
-      case 'year':
+      case BillingInterval.year:
         return 'Ετήσια';
       default:
         return '—';

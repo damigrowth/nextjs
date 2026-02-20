@@ -20,7 +20,12 @@ import { cancelSubscription } from '@/actions/subscription';
 import { useSubscriptionSheetStore } from '@/lib/stores/use-subscription-sheet-store';
 import { toast } from 'sonner';
 import { Loader2, Crown, AlertTriangle } from 'lucide-react';
-import type { Subscription } from '@prisma/client';
+import {
+  SubscriptionStatus,
+  SubscriptionPlan,
+  BillingInterval,
+  type Subscription,
+} from '@prisma/client';
 
 interface SubscriptionManagementProps {
   subscription: Subscription | null;
@@ -32,7 +37,7 @@ export default function SubscriptionManagement({
   const [isPending, startTransition] = useTransition();
   const { open: openSheet } = useSubscriptionSheetStore();
 
-  const isActive = subscription?.status === 'active';
+  const isActive = subscription?.status === SubscriptionStatus.active;
   const isCanceling = isActive && subscription?.cancelAtPeriodEnd;
 
   const handleCancel = () => {
@@ -47,7 +52,7 @@ export default function SubscriptionManagement({
   };
 
   // Free plan state
-  if (!subscription || subscription.plan === 'free' || subscription.status === 'canceled') {
+  if (!subscription || subscription.plan === SubscriptionPlan.free || subscription.status === SubscriptionStatus.canceled) {
     return (
       <Card className='w-full max-w-lg shadow-lg'>
         <CardHeader className='pb-3'>
@@ -86,7 +91,7 @@ export default function SubscriptionManagement({
           <div>
             <p className='text-muted-foreground'>Χρέωση</p>
             <p className='font-medium'>
-              {subscription.billingInterval === 'year' ? '180€/έτος' : '20€/μήνα'}
+              {subscription.billingInterval === BillingInterval.year ? '180€/έτος' : '20€/μήνα'}
             </p>
           </div>
           <div>

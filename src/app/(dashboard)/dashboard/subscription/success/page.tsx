@@ -1,5 +1,6 @@
 import { requireProUser } from '@/actions/auth/server';
 import { getSubscription, syncSubscriptionBilling } from '@/actions/subscription';
+import { SubscriptionStatus } from '@prisma/client';
 import { getDashboardMetadata } from '@/lib/seo/pages';
 import SuccessContent from './success-content';
 
@@ -13,7 +14,7 @@ export default async function SubscriptionSuccessPage() {
   await syncSubscriptionBilling();
 
   const subResult = await getSubscription();
-  const isActive = subResult.success && subResult.data?.subscription?.status === 'active';
+  const isActive = subResult.success && subResult.data?.subscription?.status === SubscriptionStatus.active;
 
   return <SuccessContent initialIsActive={isActive} />;
 }

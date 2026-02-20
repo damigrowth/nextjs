@@ -1,6 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma/client';
+import { SubscriptionStatus, BillingInterval } from '@prisma/client';
 import { PaymentService } from '@/lib/payment';
 import { createCheckoutSessionSchema } from '@/lib/validations/subscription';
 import { requireAuth, hasAnyRole } from '@/actions/auth/server';
@@ -14,7 +15,7 @@ import type { ActionResult } from '@/lib/types/api';
  * Returns the checkout session URL to redirect to.
  */
 export async function createCheckoutSession(
-  input: { billingInterval: 'month' | 'year' },
+  input: { billingInterval: BillingInterval },
 ): Promise<ActionResult<{ url: string }>> {
   try {
     const session = await requireAuth();
@@ -47,7 +48,7 @@ export async function createCheckoutSession(
       where: { pid: profile.id },
     });
 
-    if (existingSub?.status === 'active') {
+    if (existingSub?.status === SubscriptionStatus.active) {
       return { success: false, error: 'Έχετε ήδη ενεργή συνδρομή' };
     }
 

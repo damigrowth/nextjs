@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma/client';
+import { SubscriptionPlan, SubscriptionStatus } from '@prisma/client';
 import { CACHE_TAGS } from '@/lib/cache';
 import { revalidateTag } from 'next/cache';
 
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     // Find all active promoted subscriptions
     const activeSubscriptions = await prisma.subscription.findMany({
-      where: { plan: 'promoted', status: 'active' },
+      where: { plan: SubscriptionPlan.promoted, status: SubscriptionStatus.active },
       select: { pid: true },
     });
 

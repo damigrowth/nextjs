@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth';
 import { unstable_cache } from 'next/cache';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
-import { Prisma } from '@prisma/client';
+import { Prisma, SubscriptionPlan, SubscriptionStatus } from '@prisma/client';
 // O(1) optimized taxonomy lookups - 99% faster than findById
 import {
   getServiceTaxonomies,
@@ -376,7 +376,7 @@ async function _getServicePageData(
       select: { plan: true, status: true },
     });
 
-    if (profileSubscription?.plan === 'promoted' && profileSubscription?.status === 'active') {
+    if (profileSubscription?.plan === SubscriptionPlan.promoted && profileSubscription?.status === SubscriptionStatus.active) {
       const otherServices = await prisma.service.findMany({
         where: {
           pid: service.pid,

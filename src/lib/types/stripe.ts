@@ -6,6 +6,7 @@
  */
 
 import type Stripe from 'stripe';
+import { SubscriptionStatus } from '@prisma/client';
 
 /**
  * Extended Subscription type with properties that exist at runtime
@@ -72,18 +73,18 @@ export function getSubscriptionPeriod(subscription: Stripe.Subscription): {
  */
 export function mapStripeStatus(
   status: Stripe.Subscription.Status
-): 'active' | 'past_due' | 'canceled' | 'incomplete' | 'trialing' | 'unpaid' {
-  const statusMap: Record<string, 'active' | 'past_due' | 'canceled' | 'incomplete' | 'trialing' | 'unpaid'> = {
-    active: 'active',
-    past_due: 'past_due',
-    canceled: 'canceled',
-    incomplete: 'incomplete',
-    incomplete_expired: 'incomplete',
-    trialing: 'trialing',
-    unpaid: 'unpaid',
-    paused: 'active', // Treat paused as active for our purposes
+): SubscriptionStatus {
+  const statusMap: Record<string, SubscriptionStatus> = {
+    active: SubscriptionStatus.active,
+    past_due: SubscriptionStatus.past_due,
+    canceled: SubscriptionStatus.canceled,
+    incomplete: SubscriptionStatus.incomplete,
+    incomplete_expired: SubscriptionStatus.incomplete,
+    trialing: SubscriptionStatus.trialing,
+    unpaid: SubscriptionStatus.unpaid,
+    paused: SubscriptionStatus.active, // Treat paused as active for our purposes
   };
-  return statusMap[status] || 'incomplete';
+  return statusMap[status] || SubscriptionStatus.incomplete;
 }
 
 /**

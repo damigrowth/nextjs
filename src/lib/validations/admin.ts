@@ -27,6 +27,11 @@ import {
   type UpdateServiceMediaInput,
 } from './service';
 import { cloudinaryResourceSchema } from '../prisma/json-types';
+import {
+  SubscriptionStatus,
+  SubscriptionPlan,
+  BillingInterval,
+} from '@prisma/client';
 
 // =============================================
 // ADMIN USER MANAGEMENT SCHEMAS
@@ -709,9 +714,13 @@ export type DeleteSkillInput = z.infer<typeof deleteSkillSchema>;
 
 export const adminListSubscriptionsSchema = z.object({
   searchQuery: z.string().optional(), // Search profile displayName or user email
-  status: z.enum(['all', 'active', 'canceled']).optional(),
-  plan: z.enum(['all', 'free', 'promoted']).optional(),
-  billingInterval: z.enum(['all', 'month', 'year']).optional(),
+  status: z
+    .union([z.literal('all'), z.nativeEnum(SubscriptionStatus)])
+    .optional(),
+  plan: z.union([z.literal('all'), z.nativeEnum(SubscriptionPlan)]).optional(),
+  billingInterval: z
+    .union([z.literal('all'), z.nativeEnum(BillingInterval)])
+    .optional(),
   limit: z.coerce.number().int().min(1).max(100).optional().default(12),
   offset: z.coerce.number().int().min(0).optional().default(0),
   sortBy: z
@@ -732,19 +741,20 @@ export const adminListSubscriptionsSchema = z.object({
 
 export const adminUpdateSubscriptionStatusSchema = z.object({
   subscriptionId: z.string().min(1, 'Subscription ID is required'),
-  status: z.enum([
-    'active',
-    'past_due',
-    'canceled',
-    'incomplete',
-    'trialing',
-    'unpaid',
-  ]),
+  status: z.nativeEnum(SubscriptionStatus),
   notes: z.string().max(1000).optional(),
 });
 
 export const adminDeleteSubscriptionSchema = z.object({
   subscriptionId: z.string().min(1, 'Subscription ID is required'),
+});
+
+export const adminCreateManualSubscriptionSchema = z.object({
+  profileId: z.string().cuid('Invalid profile ID'),
+  endDate: z
+    .string()
+    .min(1, 'End date is required')
+    .refine((val) => !isNaN(Date.parse(val)), 'Invalid date format'),
 });
 
 // =============================================
@@ -759,4 +769,7 @@ export type AdminUpdateSubscriptionStatusInput = z.infer<
 >;
 export type AdminDeleteSubscriptionInput = z.infer<
   typeof adminDeleteSubscriptionSchema
+>;
+export type AdminCreateManualSubscriptionInput = z.infer<
+  typeof adminCreateManualSubscriptionSchema
 >;

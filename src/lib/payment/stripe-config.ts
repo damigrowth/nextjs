@@ -20,6 +20,7 @@
  *   - STRIPE_LIVE_PROMOTED_ANNUAL_PRICE_ID
  */
 
+import { SubscriptionPlan, BillingInterval } from '@prisma/client';
 import { isPaymentsTestMode } from './test-mode';
 
 /**
@@ -91,8 +92,8 @@ export function getStripeWebhookSecret(): string | undefined {
 export function getStripePriceId(plan: string, billingInterval: string): string {
   const config = getStripeConfig();
 
-  if (plan === 'promoted') {
-    if (billingInterval === 'year') {
+  if (plan === SubscriptionPlan.promoted) {
+    if (billingInterval === BillingInterval.year) {
       if (!config.promotedAnnualPriceId) {
         const mode = config.isTestMode ? 'TEST' : 'LIVE';
         throw new Error(`STRIPE_${mode}_PROMOTED_ANNUAL_PRICE_ID not configured`);

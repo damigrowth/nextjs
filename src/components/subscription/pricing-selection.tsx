@@ -4,11 +4,12 @@ import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { BillingInterval } from '@prisma/client';
 
 interface PricingSelectionProps {
   onBack: () => void;
-  selectedInterval: 'month' | 'year';
-  onIntervalChange: (interval: 'month' | 'year') => void;
+  selectedInterval: BillingInterval;
+  onIntervalChange: (interval: BillingInterval) => void;
 }
 
 export default function PricingSelection({
@@ -38,11 +39,11 @@ export default function PricingSelection({
         <Card
           className={cn(
             'cursor-pointer transition-all border-2 relative',
-            selectedInterval === 'year'
+            selectedInterval === BillingInterval.year
               ? 'border-primary bg-primary/5'
               : 'border-muted hover:border-muted-foreground/30',
           )}
-          onClick={() => onIntervalChange('year')}
+          onClick={() => onIntervalChange(BillingInterval.year)}
         >
           <Badge
             variant='secondary'
@@ -67,11 +68,11 @@ export default function PricingSelection({
         <Card
           className={cn(
             'cursor-pointer transition-all border-2',
-            selectedInterval === 'month'
+            selectedInterval === BillingInterval.month
               ? 'border-primary bg-primary/5'
               : 'border-muted hover:border-muted-foreground/30',
           )}
-          onClick={() => onIntervalChange('month')}
+          onClick={() => onIntervalChange(BillingInterval.month)}
         >
           <CardContent className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4'>
             <div>

@@ -15,6 +15,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useSubscriptionSheetStore } from '@/lib/stores/use-subscription-sheet-store';
 import { usePaymentsAccess } from '@/lib/hooks/use-payments-access';
+import { BillingInterval } from '@prisma/client';
 import PlanComparison from './plan-comparison';
 import PricingSelection from './pricing-selection';
 
@@ -26,7 +27,7 @@ import PricingSelection from './pricing-selection';
 export default function SubscriptionSheet() {
   const { isOpen, panel, triggerReason, close, showPricing, showPlans } =
     useSubscriptionSheetStore();
-  const [selectedInterval, setSelectedInterval] = useState<'month' | 'year'>('year');
+  const [selectedInterval, setSelectedInterval] = useState<BillingInterval>(BillingInterval.year);
   const router = useRouter();
   const { allowed, reason, testModeBanner, isLoading } = usePaymentsAccess();
 

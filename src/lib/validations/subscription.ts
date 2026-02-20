@@ -1,25 +1,24 @@
 import { z } from 'zod';
+import {
+  SubscriptionPlan,
+  BillingInterval,
+  SubscriptionStatus,
+} from '@prisma/client';
 
 /**
  * Subscription Validation Schemas
  * Provider-agnostic schemas for subscription operations
+ * Derived from Prisma enums for compile-time safety
  */
 
-// Subscription plan enum (matches Prisma SubscriptionPlan)
-export const subscriptionPlanSchema = z.enum(['free', 'promoted']);
+// Subscription plan enum (derived from Prisma SubscriptionPlan)
+export const subscriptionPlanSchema = z.nativeEnum(SubscriptionPlan);
 
-// Billing interval enum (matches Prisma BillingInterval)
-export const billingIntervalSchema = z.enum(['month', 'year']);
+// Billing interval enum (derived from Prisma BillingInterval)
+export const billingIntervalSchema = z.nativeEnum(BillingInterval);
 
-// Subscription status enum (matches Prisma SubscriptionStatus)
-export const subscriptionStatusSchema = z.enum([
-  'active',
-  'past_due',
-  'canceled',
-  'incomplete',
-  'trialing',
-  'unpaid',
-]);
+// Subscription status enum (derived from Prisma SubscriptionStatus)
+export const subscriptionStatusSchema = z.nativeEnum(SubscriptionStatus);
 
 /**
  * Create checkout session input
@@ -27,7 +26,7 @@ export const subscriptionStatusSchema = z.enum([
  */
 export const createCheckoutSessionSchema = z.object({
   // Plan to subscribe to (default: promoted for upgrades)
-  plan: subscriptionPlanSchema.default('promoted'),
+  plan: subscriptionPlanSchema.default(SubscriptionPlan.promoted),
   // Billing interval (monthly or yearly)
   billingInterval: billingIntervalSchema,
 });
@@ -53,10 +52,7 @@ export const customerPortalSchema = z.object({
   returnUrl: z.string().url().optional(),
 });
 
-// Type exports
-export type SubscriptionPlan = z.infer<typeof subscriptionPlanSchema>;
-export type BillingInterval = z.infer<typeof billingIntervalSchema>;
-export type SubscriptionStatus = z.infer<typeof subscriptionStatusSchema>;
+// Type exports (SubscriptionPlan, BillingInterval, SubscriptionStatus are imported from @prisma/client)
 export type CreateCheckoutSessionInput = z.infer<typeof createCheckoutSessionSchema>;
 export type CancelSubscriptionInput = z.infer<typeof cancelSubscriptionSchema>;
 export type RestoreSubscriptionInput = z.infer<typeof restoreSubscriptionSchema>;

@@ -10,6 +10,12 @@ import { SiteHeader } from '@/components/admin/site-header';
 import { NextLink } from '@/components';
 import { formatDate, formatTime } from '@/lib/utils/date';
 import { CopyableId } from '@/components/admin/subscriptions/copyable-id';
+import {
+  SubscriptionStatus,
+  SubscriptionPlan,
+  BillingInterval,
+  Prisma,
+} from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,55 +23,68 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+// Type for the subscription detail query result
+type SubscriptionDetail = Prisma.SubscriptionGetPayload<{
+  include: {
+    profile: {
+      include: {
+        user: {
+          select: { id: true; email: true; name: true; role: true };
+        };
+      };
+    };
+  };
+}>;
+
 // Helper functions
-function getStatusBadgeVariant(status: string) {
+function getStatusBadgeVariant(status: SubscriptionStatus) {
   switch (status) {
-    case 'active':
+    case SubscriptionStatus.active:
       return 'default' as const;
-    case 'canceled':
+    case SubscriptionStatus.canceled:
       return 'destructive' as const;
-    case 'past_due':
+    case SubscriptionStatus.past_due:
       return 'outline' as const;
     default:
       return 'secondary' as const;
   }
 }
 
-function getStatusLabel(status: string) {
+function getStatusLabel(status: SubscriptionStatus) {
   switch (status) {
-    case 'active':
+    case SubscriptionStatus.active:
       return 'Ενεργή';
-    case 'canceled':
+    case SubscriptionStatus.canceled:
       return 'Ακυρωμένη';
-    case 'past_due':
+    case SubscriptionStatus.past_due:
       return 'Ληξιπρόθεσμη';
-    case 'incomplete':
+    case SubscriptionStatus.incomplete:
       return 'Ημιτελής';
-    case 'trialing':
+    case SubscriptionStatus.trialing:
       return 'Δοκιμαστική';
-    case 'unpaid':
+    case SubscriptionStatus.unpaid:
       return 'Απλήρωτη';
     default:
       return status;
   }
 }
 
-function getPlanLabel(plan: string) {
+function getPlanLabel(plan: SubscriptionPlan) {
   switch (plan) {
-    case 'promoted':
+    case SubscriptionPlan.promoted:
       return 'Promoted';
-    case 'free':
+    case SubscriptionPlan.free:
       return 'Free';
     default:
       return plan;
   }
 }
 
-function getBillingLabel(interval: string | null) {
+function getBillingLabel(interval: BillingInterval | null) {
   switch (interval) {
-    case 'month':
+    case BillingInterval.month:
       return 'Μηνιαία';
-    case 'year':
+    case BillingInterval.year:
       return 'Ετήσια';
     default:
       return '—';
@@ -92,9 +111,17 @@ export default async function AdminSubscriptionDetailPage({
     notFound();
   }
 
-  const subscription = result.data as any;
+  const subscription = result.data as SubscriptionDetail;
   const profile = subscription.profile;
-  const billing = subscription.billing as Record<string, any> | null;
+  const billing = subscription.billing as {
+    receipt?: boolean;
+    invoice?: boolean;
+    name?: string;
+    afm?: string;
+    doy?: string;
+    address?: string;
+    profession?: string;
+  } | null;
 
   return (
     <>
@@ -131,8 +158,8 @@ export default async function AdminSubscriptionDetailPage({
         }
       />
       <div className='flex flex-col gap-4 pb-6 pt-4 md:gap-6'>
-        <div className='px-4 lg:px-6'>
-          <div className='space-y-6 pb-16'>
+        <div className='mx-auto w-full max-w-5xl px-4 lg:px-6'>
+          <div className='space-y-6'>
             {/* Subscription Overview - 4 Cards */}
             <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
               {/* Card 1: Subscription Information */}
@@ -244,7 +271,7 @@ export default async function AdminSubscriptionDetailPage({
                         Plan
                       </span>
                       <Badge
-                        variant={subscription.plan === 'promoted' ? 'default' : 'outline'}
+                        variant={subscription.plan === SubscriptionPlan.promoted ? 'default' : 'outline'}
                         className='text-xs h-5'
                       >
                         {getPlanLabel(subscription.plan)}

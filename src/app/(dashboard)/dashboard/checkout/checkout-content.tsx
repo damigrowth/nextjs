@@ -19,9 +19,11 @@ import { toast } from 'sonner';
 import { BillingForm } from '@/components';
 import type { AuthUser } from '@/lib/types/auth';
 import type { Profile } from '@prisma/client';
+import { BillingInterval } from '@prisma/client';
+import type { BillingInput } from '@/lib/validations/profile';
 
 interface BillingFormState {
-  formData: Record<string, any>;
+  formData: Partial<BillingInput>;
   isValid: boolean;
   isDirty: boolean;
 }
@@ -29,7 +31,7 @@ interface BillingFormState {
 interface CheckoutContentProps {
   user: AuthUser;
   profile: Profile;
-  defaultInterval: 'month' | 'year';
+  defaultInterval: BillingInterval;
 }
 
 export default function CheckoutContent({
@@ -37,7 +39,7 @@ export default function CheckoutContent({
   profile,
   defaultInterval,
 }: CheckoutContentProps) {
-  const [interval, setInterval] = useState<'month' | 'year'>(defaultInterval);
+  const [interval, setInterval] = useState<BillingInterval>(defaultInterval);
   const [isPending, startTransition] = useTransition();
   const [billingState, setBillingState] = useState<BillingFormState | null>(
     null,
@@ -134,18 +136,18 @@ export default function CheckoutContent({
             {/* Interval Toggle */}
             <div className='flex gap-2'>
               <Button
-                variant={interval === 'month' ? 'secondary' : 'outline'}
+                variant={interval === BillingInterval.month ? 'secondary' : 'outline'}
                 size='sm'
                 className='flex-1'
-                onClick={() => setInterval('month')}
+                onClick={() => setInterval(BillingInterval.month)}
               >
                 Μηνιαία
               </Button>
               <Button
-                variant={interval === 'year' ? 'secondary' : 'outline'}
+                variant={interval === BillingInterval.year ? 'secondary' : 'outline'}
                 size='sm'
                 className='flex-1 relative'
-                onClick={() => setInterval('year')}
+                onClick={() => setInterval(BillingInterval.year)}
               >
                 Ετήσια
                 <Badge className='absolute -top-2 -right-2 text-[10px] px-1'>
@@ -159,12 +161,12 @@ export default function CheckoutContent({
             {/* Price Display */}
             <div className='text-center space-y-1'>
               <p className='text-2xl font-bold'>
-                {interval === 'year' ? '15€' : '20€'}
+                {interval === BillingInterval.year ? '15€' : '20€'}
                 <span className='text-sm font-normal text-muted-foreground'>
                   /μήνα
                 </span>
               </p>
-              {interval === 'year' && (
+              {interval === BillingInterval.year && (
                 <p className='text-sm text-muted-foreground'>
                   180€/έτος (3 μήνες δώρο)
                 </p>
@@ -1199,15 +1201,15 @@ export default function CheckoutContent({
             <div className='space-y-1 text-sm text-muted-foreground'>
               <div className='flex justify-between'>
                 <span>Καθαρό ποσό</span>
-                <span>{interval === 'year' ? '180,00€' : '20,00€'}</span>
+                <span>{interval === BillingInterval.year ? '180,00€' : '20,00€'}</span>
               </div>
               <div className='flex justify-between'>
                 <span>ΦΠΑ</span>
-                <span>{interval === 'year' ? '43,20€' : '4,80€'}</span>
+                <span>{interval === BillingInterval.year ? '43,20€' : '4,80€'}</span>
               </div>
               <div className='flex justify-between font-medium text-foreground'>
                 <span>Συνολικό ποσό</span>
-                <span>{interval === 'year' ? '223,20€' : '24,80€'}</span>
+                <span>{interval === BillingInterval.year ? '223,20€' : '24,80€'}</span>
               </div>
             </div>
 
@@ -1226,7 +1228,7 @@ export default function CheckoutContent({
               ) : (
                 <>
                   <Lock className='size-4 mr-2 text-white' />
-                  Πληρωμή {interval === 'year' ? '223,20€/έτος' : '24,80€/μήνα'}
+                  Πληρωμή {interval === BillingInterval.year ? '223,20€/έτος' : '24,80€/μήνα'}
                 </>
               )}
             </Button>

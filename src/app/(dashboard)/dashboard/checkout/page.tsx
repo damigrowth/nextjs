@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getDashboardMetadata } from '@/lib/seo/pages';
+import { SubscriptionStatus, BillingInterval } from '@prisma/client';
 import { requireProUser, getCurrentUser } from '@/actions/auth/server';
 import { getSubscription } from '@/actions/subscription';
 import { canAccessPayments, getTestModeBanner } from '@/lib/payment/test-mode';
@@ -31,7 +32,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
   }
 
   // If already subscribed, redirect to subscription management
-  if (subResult.success && subResult.data?.subscription?.status === 'active') {
+  if (subResult.success && subResult.data?.subscription?.status === SubscriptionStatus.active) {
     redirect('/dashboard/subscription');
   }
 
@@ -42,7 +43,8 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
   }
 
   const { user, profile } = userResult.data;
-  const billingInterval = params.interval === 'month' ? 'month' : 'year';
+  const billingInterval =
+    params.interval === 'month' ? BillingInterval.month : BillingInterval.year;
   const testModeBanner = await getTestModeBanner();
 
   return (

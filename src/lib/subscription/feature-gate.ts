@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma/client';
+import { SubscriptionStatus, SubscriptionPlan } from '@prisma/client';
 import { SUBSCRIPTION_PLANS, type PlanKey } from '@/lib/stripe/config';
 
 /**
@@ -11,11 +12,11 @@ export async function getActivePlan(profileId: string): Promise<PlanKey> {
     select: { plan: true, status: true },
   });
 
-  if (subscription?.status === 'active' && subscription.plan === 'promoted') {
-    return 'promoted';
+  if (subscription?.status === SubscriptionStatus.active && subscription.plan === SubscriptionPlan.promoted) {
+    return SubscriptionPlan.promoted;
   }
 
-  return 'free';
+  return SubscriptionPlan.free;
 }
 
 /**

@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripeForWebhook } from '@/lib/stripe/client';
 import { prisma } from '@/lib/prisma/client';
-import { revalidateProfile, logCacheRevalidation, CACHE_TAGS } from '@/lib/cache';
-import { revalidateTag } from 'next/cache';
+import {
+  SubscriptionProvider,
+  SubscriptionStatus,
+  SubscriptionPlan,
+  BillingInterval,
+} from '@prisma/client';
+import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
 import type Stripe from 'stripe';
 import {
   getSubscriptionPeriod,
@@ -42,7 +47,10 @@ export async function POST(request: NextRequest) {
   // Runtime check for webhook secret
   if (!webhookSecret) {
     console.error('STRIPE_WEBHOOK_SECRET is not configured');
-    return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Webhook not configured' },
+      { status: 500 },
+    );
   }
 
   const body = await request.text();
@@ -98,7 +106,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error('Webhook handler error:', error);
-    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Webhook handler failed' },
+      { status: 500 },
+    );
   }
 }
 
@@ -147,7 +158,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         paymentMethodBrand = 'sepa';
       }
     } catch (error) {
-      console.error('[Stripe Webhook] Failed to retrieve payment method:', error);
+      console.error(
+        '[Stripe Webhook] Failed to retrieve payment method:',
+        error,
+      );
     }
   }
 
@@ -156,7 +170,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       where: { pid: profileId },
       data: {
         // Provider-agnostic fields (new)
-        provider: 'stripe',
+        provider: SubscriptionProvider.stripe,
         providerCustomerId: session.customer as string,
         providerSubscriptionId: stripeSubscription.id,
         // Legacy Stripe fields (backward compatibility)
@@ -164,10 +178,12 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         stripeSubscriptionId: stripeSubscription.id,
         stripePriceId: priceItem?.id,
         // Subscription data
-        plan: 'promoted',
-        status: 'active',
+        plan: SubscriptionPlan.promoted,
+        status: SubscriptionStatus.active,
         billingInterval:
-          priceItem?.recurring?.interval === 'year' ? 'year' : 'month',
+          priceItem?.recurring?.interval === 'year'
+            ? BillingInterval.year
+            : BillingInterval.month,
         currentPeriodStart: period.start,
         currentPeriodEnd: period.end,
         // Reset cancellation fields for new subscription
@@ -230,7 +246,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
       where: { stripeSubscriptionId: subscription.id },
       data: {
         // Ensure provider fields are set
-        provider: 'stripe',
+        provider: SubscriptionProvider.stripe,
         providerSubscriptionId: subscription.id,
         // Subscription status and data
         status: mappedStatus,
@@ -242,8 +258,8 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
         stripePriceId: subscription.items.data[0]?.price.id,
         billingInterval:
           subscription.items.data[0]?.price.recurring?.interval === 'year'
-            ? 'year'
-            : 'month',
+            ? BillingInterval.year
+            : BillingInterval.month,
       },
     });
 
@@ -282,8 +298,8 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     await tx.subscription.update({
       where: { stripeSubscriptionId: subscription.id },
       data: {
-        status: 'canceled',
-        plan: 'free',
+        status: SubscriptionStatus.canceled,
+        plan: SubscriptionPlan.free,
         canceledAt: new Date(),
       },
     });
@@ -320,7 +336,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
 
   await prisma.subscription.updateMany({
     where: { stripeSubscriptionId: subscriptionId },
-    data: { status: 'past_due' },
+    data: { status: SubscriptionStatus.past_due },
   });
 }
 
@@ -330,7 +346,10 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
  */
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
   const subscriptionId = getInvoiceSubscriptionId(invoice);
-  const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
+  const customerId =
+    typeof invoice.customer === 'string'
+      ? invoice.customer
+      : invoice.customer?.id;
 
   let dbSub = null;
 
@@ -338,7 +357,12 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   if (subscriptionId) {
     dbSub = await prisma.subscription.findUnique({
       where: { stripeSubscriptionId: subscriptionId },
-      select: { id: true, totalPaidLifetime: true, paymentCount: true, firstPaymentAt: true },
+      select: {
+        id: true,
+        totalPaidLifetime: true,
+        paymentCount: true,
+        firstPaymentAt: true,
+      },
     });
   }
 
@@ -347,14 +371,22 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   if (!dbSub && customerId) {
     dbSub = await prisma.subscription.findUnique({
       where: { stripeCustomerId: customerId },
-      select: { id: true, totalPaidLifetime: true, paymentCount: true, firstPaymentAt: true },
+      select: {
+        id: true,
+        totalPaidLifetime: true,
+        paymentCount: true,
+        firstPaymentAt: true,
+      },
     });
 
     // If found by customer ID and we have a subscriptionId, also update the stripeSubscriptionId
     if (dbSub && subscriptionId) {
       await prisma.subscription.update({
         where: { id: dbSub.id },
-        data: { stripeSubscriptionId: subscriptionId, providerSubscriptionId: subscriptionId },
+        data: {
+          stripeSubscriptionId: subscriptionId,
+          providerSubscriptionId: subscriptionId,
+        },
       });
     }
   }
@@ -373,7 +405,9 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   let paymentMethodLast4: string | null = null;
   let paymentMethodBrand: string | null = null;
 
-  const invoicePaymentIntent = (invoice as unknown as { payment_intent?: string | { id: string } }).payment_intent;
+  const invoicePaymentIntent = (
+    invoice as unknown as { payment_intent?: string | { id: string } }
+  ).payment_intent;
   if (invoicePaymentIntent) {
     try {
       const stripe = getStripe();
@@ -381,12 +415,19 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
         typeof invoicePaymentIntent === 'string'
           ? invoicePaymentIntent
           : invoicePaymentIntent.id;
-      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId, {
-        expand: ['latest_charge'],
-      });
+      const paymentIntent = await stripe.paymentIntents.retrieve(
+        paymentIntentId,
+        {
+          expand: ['latest_charge'],
+        },
+      );
 
       const charge = paymentIntent.latest_charge;
-      if (charge && typeof charge !== 'string' && charge.payment_method_details) {
+      if (
+        charge &&
+        typeof charge !== 'string' &&
+        charge.payment_method_details
+      ) {
         const pmDetails = charge.payment_method_details;
         paymentMethodType = pmDetails.type || null;
 
@@ -399,7 +440,10 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
         }
       }
     } catch (error) {
-      console.error('[Stripe Webhook] Failed to retrieve payment details:', error);
+      console.error(
+        '[Stripe Webhook] Failed to retrieve payment details:',
+        error,
+      );
     }
   }
 
@@ -409,9 +453,11 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   let discountPercentOff: number | null = null;
   let discountAmountOff: number | null = null;
 
-  const firstDiscount = invoice.discounts?.[0] as unknown as {
-    coupon?: { id?: string; percent_off?: number; amount_off?: number };
-  } | undefined;
+  const firstDiscount = invoice.discounts?.[0] as unknown as
+    | {
+        coupon?: { id?: string; percent_off?: number; amount_off?: number };
+      }
+    | undefined;
   if (firstDiscount?.coupon) {
     discountCode = firstDiscount.coupon.id || null;
     discountPercentOff = firstDiscount.coupon.percent_off || null;

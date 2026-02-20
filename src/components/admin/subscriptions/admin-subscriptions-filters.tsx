@@ -15,12 +15,14 @@ export function AdminSubscriptionsFilters() {
     useAdminFilters('/admin/subscriptions');
 
   return (
-    <div className='flex flex-wrap items-center gap-4'>
+    <div className='flex items-center gap-4'>
       <AdminSearchInput
         placeholder='Αναζήτηση με όνομα ή email...'
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
       />
+
+      {/* Status Filter */}
       <Select
         value={searchParams.get('status') || 'all'}
         onValueChange={(value) => handleFilterChange('status', value)}
@@ -32,8 +34,14 @@ export function AdminSubscriptionsFilters() {
           <SelectItem value='all'>Όλες οι καταστάσεις</SelectItem>
           <SelectItem value='active'>Ενεργή</SelectItem>
           <SelectItem value='canceled'>Έληξε</SelectItem>
+          <SelectItem value='past_due'>Εκπρόθεσμη</SelectItem>
+          <SelectItem value='incomplete'>Ημιτελής</SelectItem>
+          <SelectItem value='trialing'>Δοκιμαστική</SelectItem>
+          <SelectItem value='unpaid'>Απλήρωτη</SelectItem>
         </SelectContent>
       </Select>
+
+      {/* Billing Interval Filter */}
       <Select
         value={searchParams.get('billingInterval') || 'all'}
         onValueChange={(value) => handleFilterChange('billingInterval', value)}

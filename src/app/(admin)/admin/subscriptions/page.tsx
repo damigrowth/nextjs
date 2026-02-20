@@ -1,13 +1,12 @@
 import { Suspense } from 'react';
 import { SiteHeader } from '@/components/admin/site-header';
-import {
-  AdminSubscriptionsStats,
-  AdminSubscriptionsFilters,
-  AdminSubscriptionsTableSkeleton,
-  AdminSubscriptionsTableSection,
-} from '@/components/admin/subscriptions';
+import { AdminSubscriptionsStats } from '@/components/admin/subscriptions/admin-subscriptions-stats';
+import { AdminSubscriptionsFilters } from '@/components/admin/subscriptions/admin-subscriptions-filters';
+import { AdminSubscriptionsTableSkeleton } from '@/components/admin/subscriptions/admin-subscriptions-table-skeleton';
+import { AdminSubscriptionsTableSection } from '@/components/admin/subscriptions/admin-subscriptions-table-section';
 import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Plus } from 'lucide-react';
+import { NextLink } from '@/components';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +37,12 @@ export default async function AdminSubscriptionsPage({
             <Button variant='outline' size='md'>
               <RefreshCw className='h-4 w-4' />
               Ανανέωση
+            </Button>
+            <Button variant='default' size='md' asChild>
+              <NextLink href='/admin/subscriptions/create'>
+                <Plus className='h-4 w-4' />
+                Νέα Συνδρομή
+              </NextLink>
             </Button>
           </>
         }

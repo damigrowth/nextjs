@@ -1,4 +1,9 @@
 import { prisma } from '@/lib/prisma/client';
+import {
+  SubscriptionPlan,
+  SubscriptionStatus,
+  type SubscriptionProvider,
+} from '@prisma/client';
 import { getProvider } from './factory';
 import type { CheckoutSessionParams, CustomerPortalParams } from './types';
 import { ProviderNotConfiguredError } from './types';
@@ -26,9 +31,9 @@ export class PaymentService {
     });
 
     // Determine provider: existing subscription provider > env default > 'stripe'
-    const providerName =
+    const providerName: SubscriptionProvider =
       subscription?.provider ||
-      process.env.DEFAULT_PAYMENT_PROVIDER ||
+      (process.env.DEFAULT_PAYMENT_PROVIDER as SubscriptionProvider) ||
       'stripe';
 
     // Get provider implementation
@@ -48,8 +53,8 @@ export class PaymentService {
         provider: providerName,
         providerCustomerId: '', // Will be set by webhook
         stripeCustomerId: '', // Legacy field - will be set by webhook for Stripe
-        plan: 'free',
-        status: 'incomplete',
+        plan: SubscriptionPlan.free,
+        status: SubscriptionStatus.incomplete,
       },
       update: {
         // Track that checkout was initiated
