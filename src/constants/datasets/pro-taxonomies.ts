@@ -1,4 +1,4 @@
-// Generated on 2026-02-02T14:24:30.576Z
+// Generated on 2026-02-20T15:19:03.586Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const proTaxonomies = [
@@ -1131,6 +1131,14 @@ export const proTaxonomies = [
         plural: 'Χειροπράκτες',
         description:
           'Ανακάλυψε χειροπράκτες που ειδικεύονται στη βελτίωση της ευεξίας σου μέσω φυσικών τεχνικών και φροντίδας.',
+        type: 'freelancer',
+      },
+      {
+        id: '-_2ykP',
+        label: 'Οδοντίατρος',
+        slug: 'odontiatroi',
+        plural: 'Οδοντίατροι',
+        description: 'Βρες τον καλύτερο οδοντίατρο για λευκά και υγιή δόντια.',
         type: 'freelancer',
       },
     ],
