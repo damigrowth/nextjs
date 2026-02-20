@@ -43,10 +43,29 @@ export default function CheckoutContent({
     null,
   );
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [checkoutErrors, setCheckoutErrors] = useState<string[]>([]);
 
   const plan = SUBSCRIPTION_PLANS.promoted;
 
   const handleCheckout = () => {
+    const errors: string[] = [];
+
+    if (!billingState?.formData?.receipt && !billingState?.formData?.invoice) {
+      errors.push('Παρακαλώ επιλέξτε Απόδειξη ή Τιμολόγιο');
+    }
+    if (!termsAccepted) {
+      errors.push('Παρακαλώ αποδεχτείτε τους Όρους Χρήσης');
+    }
+    if (billingState?.formData?.invoice && !billingState.isValid) {
+      errors.push('Παρακαλώ συμπληρώστε τα στοιχεία τιμολόγησης');
+    }
+
+    if (errors.length > 0) {
+      setCheckoutErrors(errors);
+      return;
+    }
+    setCheckoutErrors([]);
+
     startTransition(async () => {
       // Always save billing data before checkout to ensure it's captured
       // Save if we have any form data, even if not fully valid
@@ -83,10 +102,10 @@ export default function CheckoutContent({
   };
 
   return (
-    <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-      {/* Left: Billing Info — reuses existing BillingForm with hideCard prop */}
-      <div className='lg:col-span-2'>
-        <Card>
+    <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+        {/* Left: Billing Info — reuses existing BillingForm with hideCard prop */}
+        <div>
+          <Card>
           <CardHeader>
             <CardTitle>Στοιχεία Τιμολόγησης</CardTitle>
             <p className='text-sm text-muted-foreground'>
@@ -106,7 +125,7 @@ export default function CheckoutContent({
       </div>
 
       {/* Right: Plan Summary */}
-      <div className='space-y-4'>
+      <div>
         <Card className='border-2 border-primary shadow-lg'>
           <CardHeader className='pb-3'>
             <CardTitle className='text-lg'>Προωθημένο Πακέτο</CardTitle>
@@ -1180,7 +1199,7 @@ export default function CheckoutContent({
             <div className='space-y-1 text-sm text-muted-foreground'>
               <div className='flex justify-between'>
                 <span>Καθαρό ποσό</span>
-                <span>{interval === 'year' ? '180€' : '20€'}</span>
+                <span>{interval === 'year' ? '180,00€' : '20,00€'}</span>
               </div>
               <div className='flex justify-between'>
                 <span>ΦΠΑ</span>
@@ -1197,12 +1216,8 @@ export default function CheckoutContent({
               className='w-full bg-black hover:bg-black/90 text-white'
               size='lg'
               onClick={handleCheckout}
-              disabled={
-                isPending ||
-                !termsAccepted ||
-                (billingState !== null && !billingState.isValid)
-              }
-            >
+              disabled={isPending}
+>
               {isPending ? (
                 <>
                   <Loader2 className='size-4 mr-2 animate-spin' />
@@ -1215,6 +1230,15 @@ export default function CheckoutContent({
                 </>
               )}
             </Button>
+
+            {/* Validation Errors */}
+            {checkoutErrors.length > 0 && (
+              <div className='text-sm space-y-1'>
+                {checkoutErrors.map((err) => (
+                  <p key={err} className='!text-red-600'>{err}</p>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
