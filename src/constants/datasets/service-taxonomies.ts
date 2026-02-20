@@ -1,4 +1,4 @@
-// Generated on 2026-02-20T09:41:08.728Z
+// Generated on 2026-02-20T15:37:59.751Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -3052,6 +3052,42 @@ export const serviceTaxonomies = [
               bytes: 29460,
               url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168427/220_b365310d32.webp',
               original_filename: '220.webp',
+            },
+          },
+          {
+            id: '-eYaXE',
+            label: 'Εξέταση',
+            slug: 'exetasi',
+            description:
+              'Ιατρικές εξετάσεις από επαγγελματίες ιατρούς κάθε ειδικότητας.',
+            image: {
+              public_id: '214_e00065c326',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168428/214_e00065c326.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 40492,
+              url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1750168428/214_e00065c326.webp',
+            },
+          },
+          {
+            id: 'fPgSvn',
+            label: 'Επίσκεψη',
+            slug: 'episkepsi',
+            description:
+              'Κλείσε μία επίσκεψη για να σε εξετάσουν εξειδικευμένοι ιατροί.',
+            image: {
+              public_id: '214_e00065c326',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168428/214_e00065c326.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 40492,
+              url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1750168428/214_e00065c326.webp',
             },
           },
         ],
