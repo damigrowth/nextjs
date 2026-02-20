@@ -1,4 +1,4 @@
-// Generated on 2026-02-11T12:50:26.532Z
+// Generated on 2026-02-20T09:41:08.728Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -2082,16 +2082,15 @@ export const serviceTaxonomies = [
         description:
           'Αποτύπωσε τις σημαντικές στιγμές της εκδήλωσής σου με επαγγελματική φωτογράφιση που θα σε εντυπωσιάσει.',
         image: {
-          public_id: '178_de0b447e86',
+          public_id: 'subcategories/fotografisi-ekdiloseon_gj17x8',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168364/178_de0b447e86.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1771404957/subcategories/fotografisi-ekdiloseon_gj17x8.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 87204,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168364/178_de0b447e86.webp',
-          original_filename: '178.webp',
+          bytes: 40090,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1771404957/subcategories/fotografisi-ekdiloseon_gj17x8.webp',
         },
         children: [
           {
