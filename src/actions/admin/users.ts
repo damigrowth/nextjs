@@ -195,6 +195,7 @@ export async function listUsers(
         confirmed: true,
         blocked: true,
         banned: true,
+        testUser: true,
         banExpires: true,
         banReason: true,
         type: true,
@@ -1331,6 +1332,7 @@ export interface TeamMember {
   emailVerified: boolean;
   confirmed: boolean;
   blocked: boolean;
+  testUser: boolean;
 }
 
 /**
@@ -1366,6 +1368,7 @@ export async function getTeamMembers(): Promise<ActionResult<TeamMember[]>> {
         emailVerified: true,
         confirmed: true,
         blocked: true,
+        testUser: true,
       },
       orderBy: [
         { role: 'asc' }, // admin first, then support, then editor
@@ -1614,6 +1617,7 @@ export async function searchUsersForRoleAssignment(
         emailVerified: true,
         confirmed: true,
         blocked: true,
+        testUser: true,
       },
       take: limit,
       orderBy: {
