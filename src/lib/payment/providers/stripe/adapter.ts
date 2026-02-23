@@ -226,6 +226,7 @@ export class StripeAdapter implements PaymentProvider {
         // because we already set it on the customer and don't want checkout to overwrite it
         sessionOptions.customer_update = {
           name: 'auto',
+          address: 'auto',
         };
       } else if (billing?.email) {
         sessionOptions.customer_email = billing.email;

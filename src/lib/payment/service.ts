@@ -51,8 +51,6 @@ export class PaymentService {
       create: {
         pid: params.profileId,
         provider: providerName,
-        providerCustomerId: '', // Will be set by webhook
-        stripeCustomerId: '', // Legacy field - will be set by webhook for Stripe
         plan: SubscriptionPlan.free,
         status: SubscriptionStatus.incomplete,
       },
