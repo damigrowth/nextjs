@@ -9,6 +9,7 @@ import { getFormString, getFormArray } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { brevoWorkflowService } from '@/lib/email';
+import { generateUsernameFromEmail, formatDisplayName } from '@/lib/utils/validation/formats';
 
 /**
  * Register action wrapper for useActionState
@@ -45,12 +46,22 @@ export async function register(
     }
 
     // Get displayName - only for professionals, undefined for regular users
-    const usernameValue = getFormString(formData, 'username');
-    const displayNameValue =
+    const emailValue = getFormString(formData, 'email');
+    let usernameValue = getFormString(formData, 'username');
+
+    // For simple users, auto-generate username from email
+    if (authType === 'user' && !usernameValue) {
+      usernameValue = generateUsernameFromEmail(emailValue);
+    }
+
+    const displayNameRaw =
       getFormString(formData, 'displayName') || usernameValue;
+    const displayNameValue = displayNameRaw
+      ? formatDisplayName(displayNameRaw)
+      : usernameValue;
 
     const validatedFields = registerSchema.safeParse({
-      email: getFormString(formData, 'email'),
+      email: emailValue,
       username: usernameValue,
       password: getFormString(formData, 'password'),
       displayName: displayNameValue,
@@ -68,16 +79,32 @@ export async function register(
     const data = validatedFields.data;
 
     // Check username availability using Better Auth's official API
-    // This is the recommended approach from Better Auth username plugin
+    // For simple users, if auto-generated username is taken, append random digits
+    let finalUsername = data.username;
     const usernameCheck = await auth.api.isUsernameAvailable({
-      body: { username: data.username },
+      body: { username: finalUsername },
     });
 
     if (!usernameCheck?.available) {
-      return {
-        success: false,
-        message: 'Το συγκεκριμένο username χρησιμοποιείται ήδη. Επιλέξτε ένα διαφορετικό username.',
-      };
+      if (authType === 'user') {
+        // Auto-generate a unique username by appending random digits
+        for (let i = 0; i < 5; i++) {
+          const suffix = Math.floor(Math.random() * 10000);
+          const candidate = `${finalUsername}${suffix}`;
+          const check = await auth.api.isUsernameAvailable({
+            body: { username: candidate },
+          });
+          if (check?.available) {
+            finalUsername = candidate;
+            break;
+          }
+        }
+      } else {
+        return {
+          success: false,
+          message: 'Το συγκεκριμένο username χρησιμοποιείται ήδη. Επιλέξτε ένα διαφορετικό username.',
+        };
+      }
     }
 
     // Determine callback URL based on user type
@@ -90,7 +117,7 @@ export async function register(
       body: {
         email: data.email,
         password: data.password,
-        username: data.username,
+        username: finalUsername,
         name: data.displayName,
         displayName: data.displayName,
         type: userType, // 'user' or 'pro'
@@ -115,7 +142,7 @@ export async function register(
         userType as 'user' | 'pro',
         {
           DISPLAY_NAME: data.displayName,
-          USERNAME: data.username,
+          USERNAME: finalUsername,
           USER_TYPE: userType as 'user' | 'pro', // Type assertion for literal type
           USER_ROLE: userRole as 'user' | 'freelancer' | 'company' | 'admin', // Type assertion for literal type
           REGISTRATION_DATE: new Date().toISOString(),

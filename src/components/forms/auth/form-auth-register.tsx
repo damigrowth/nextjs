@@ -49,6 +49,7 @@ import {
   formatUsername,
   cutSpaces,
   formatDisplayName,
+  generateUsernameFromEmail,
 } from '@/lib/utils/validation/formats';
 import FormButton from '@/components/shared/button-form';
 import GoogleLoginButton from './button-login-goolge';
@@ -127,6 +128,14 @@ export default function RegisterForm() {
 
   // Handle form submission
   const handleFormSubmit = async (formData: FormData) => {
+    // For simple users, auto-generate username from email before validation
+    if (type === 'user') {
+      const email = watch('email');
+      const autoUsername = generateUsernameFromEmail(email);
+      setValue('username', autoUsername);
+      formData.set('username', autoUsername);
+    }
+
     // Trigger validation for all fields
     const isValid = await form.trigger();
 
@@ -293,29 +302,31 @@ export default function RegisterForm() {
           )}
         />
 
-        {/* Username */}
-        <FormField
-          control={form.control}
-          name='username'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input
-                  type='text'
-                  placeholder='username'
-                  className='w-full'
-                  {...field}
-                  onChange={(e) => {
-                    const formatted = formatUsername(e.target.value);
-                    field.onChange(formatted);
-                  }}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Username - only shown for pro users; simple users get auto-generated username from email */}
+        {type === 'pro' && (
+          <FormField
+            control={form.control}
+            name='username'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input
+                    type='text'
+                    placeholder='username'
+                    className='w-full'
+                    {...field}
+                    onChange={(e) => {
+                      const formatted = formatUsername(e.target.value);
+                      field.onChange(formatted);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {/* Password */}
         <FormField

@@ -210,7 +210,7 @@ export default function AccountForm({
           )}
         />
 
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+        <div className={`grid grid-cols-1 ${initialUser?.type === 'pro' ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4`}>
           {/* Email - Read Only */}
           <FormItem>
             <FormLabel>Email</FormLabel>
@@ -225,19 +225,21 @@ export default function AccountForm({
             </FormControl>
           </FormItem>
 
-          {/* Username - Read Only */}
-          <FormItem>
-            <FormLabel>Username</FormLabel>
-            <FormControl>
-              <Input
-                type='text'
-                value={initialUser?.username || ''}
-                disabled
-                readOnly
-                className='bg-muted'
-              />
-            </FormControl>
-          </FormItem>
+          {/* Username - Read Only - Only shown for pro users */}
+          {initialUser?.type === 'pro' && (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input
+                  type='text'
+                  value={initialUser?.username || ''}
+                  disabled
+                  readOnly
+                  className='bg-muted'
+                />
+              </FormControl>
+            </FormItem>
+          )}
 
           {/* Display Name */}
           <FormField

@@ -7,6 +7,7 @@ import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { ActionResponse } from '@/lib/types/api';
 import { brevoWorkflowService } from '@/lib/email';
 import { UserRole, UserType, JourneyStep } from '@prisma/client';
+import { generateUsernameFromEmail } from '@/lib/utils/validation/formats';
 
 export async function completeOAuth(
   prevState: ActionResponse | null,
@@ -14,7 +15,7 @@ export async function completeOAuth(
 ): Promise<ActionResponse> {
   try {
     // Extract form data
-    const username = getFormString(formData, 'username');
+    let username = getFormString(formData, 'username');
     const displayName = getFormString(formData, 'displayName');
     const role = getFormString(formData, 'role');
     const type = getFormString(formData, 'type');
@@ -31,16 +32,36 @@ export async function completeOAuth(
       };
     }
 
+    // For simple users, auto-generate username from email if not provided
+    if (type === 'user' && !username) {
+      username = generateUsernameFromEmail(session.user.email);
+    }
+
     // Check if username is already taken
     const usernameCheck = await auth.api.isUsernameAvailable({
       body: { username },
     });
 
     if (!usernameCheck?.available) {
-      return {
-        success: false,
-        message: 'Το συγκεκριμένο username χρησιμοποιείται ήδη. Επιλέξτε ένα διαφορετικό username.',
-      };
+      if (type === 'user') {
+        // Auto-generate a unique username by appending random digits
+        for (let i = 0; i < 5; i++) {
+          const suffix = Math.floor(Math.random() * 10000);
+          const candidate = `${username}${suffix}`;
+          const check = await auth.api.isUsernameAvailable({
+            body: { username: candidate },
+          });
+          if (check?.available) {
+            username = candidate;
+            break;
+          }
+        }
+      } else {
+        return {
+          success: false,
+          message: 'Το συγκεκριμένο username χρησιμοποιείται ήδη. Επιλέξτε ένα διαφορετικό username.',
+        };
+      }
     }
 
     // Determine the next step based on user type

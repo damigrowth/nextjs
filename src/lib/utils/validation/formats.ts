@@ -46,6 +46,13 @@ export const formatUsername = (str: string): string => {
   return str.replace(/[^a-zA-Z0-9_-]/g, '');
 };
 
+// Generate a username from the local part of an email (before @)
+// e.g. "john.doe@gmail.com" → "johndoe", "jane_smith-work@co.uk" → "jane_smith-work"
+export const generateUsernameFromEmail = (email: string): string => {
+  const localPart = email.split('@')[0] || email;
+  return localPart.replace(/[^a-zA-Z0-9_-]/g, '');
+};
+
 export const formatDisplayName = (str: string): string => {
   // Only capitalize first letter, no other formatting
   return capitalizeFirstLetter(str);

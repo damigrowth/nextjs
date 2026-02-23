@@ -81,12 +81,13 @@ export const registrationFormSchema = z
       .max(100, 'Ο κωδικός είναι πολύ μεγάλος'),
     username: z
       .string()
-      .min(3, 'Το username είναι υποχρεωτικό')
       .max(30, 'Το username δεν μπορεί να υπερβαίνει τους 30 χαρακτήρες')
       .regex(
-        /^[a-zA-Z0-9_-]+$/,
+        /^[a-zA-Z0-9_-]*$/,
         'Το username μπορεί να περιέχει μόνο γράμματα, αριθμούς, παύλες και κάτω παύλες',
-      ),
+      )
+      .optional()
+      .or(z.literal('')),
     displayName: z.string().optional(),
     authType: z.union([z.literal(''), z.literal('user'), z.literal('pro')]),
     role: z.union([z.literal('freelancer'), z.literal('company')]).optional(),
@@ -100,7 +101,6 @@ export const registrationFormSchema = z
       if (data.authType === 'pro' && !data.role) {
         return false;
       }
-      // If authType is empty, it means no selection yet (form won't submit anyway due to form validation)
       return true;
     },
     {
@@ -122,6 +122,19 @@ export const registrationFormSchema = z
     {
       message: 'Το όνομα προβολής είναι υποχρεωτικό',
       path: ['displayName'],
+    },
+  )
+  .refine(
+    (data) => {
+      // If authType is 'pro' (professional), username is required
+      if (data.authType === 'pro' && (!data.username || data.username.length < 3)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Το username είναι υποχρεωτικό',
+      path: ['username'],
     },
   );
 

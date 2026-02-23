@@ -200,9 +200,7 @@ export default function UserMenu({ isMobile }: UserMenuProps) {
                 <p className='text-sm font-medium leading-none'>
                   {isProfessional
                     ? user?.displayName
-                    : user?.username
-                      ? capitalizeFirstLetter(user.username)
-                      : user?.name || user?.email}
+                    : user?.displayName || user?.name || user?.email}
                 </p>
                 <p className='text-xs leading-none text-muted-foreground'>
                   {isProfessional ? `@${user.username}` : user?.email}

@@ -41,6 +41,7 @@ import { updateUserType } from '@/actions/auth/update-user-type';
 import {
   formatUsername,
   formatDisplayName,
+  generateUsernameFromEmail,
 } from '@/lib/utils/validation/formats';
 import { Label } from '@radix-ui/react-label';
 import { useAuthStore } from '@/lib/stores/authStore';
@@ -174,6 +175,22 @@ export default function OAuthSetupForm({
   //     });
   //   }
   // }, [userType, userRole, professionalForm]);
+
+  // Auto-submit for simple users - generate username from email and submit automatically
+  const [autoSubmitted, setAutoSubmitted] = useState(false);
+  useEffect(() => {
+    if (!showTypeSelection && userType === 'user' && !autoSubmitted && !isPending) {
+      setAutoSubmitted(true);
+      const autoUsername = generateUsernameFromEmail(userEmail);
+      const formData = new FormData();
+      formData.append('username', autoUsername);
+      formData.append('role', 'user');
+      formData.append('type', 'user');
+      startTransition(() => {
+        action(formData);
+      });
+    }
+  }, [showTypeSelection, userType, autoSubmitted, isPending, userEmail, action, startTransition]);
 
   // Handle success state and redirect
   useEffect(() => {
@@ -380,62 +397,26 @@ export default function OAuthSetupForm({
         </div>
       )}
 
-      {/* Simple User Form - for type 'user' (not in type selection step) */}
+      {/* Simple User - auto-submitting with generated username, show loading state */}
       {!showTypeSelection && userType === 'user' && (
-        <Form {...simpleForm}>
-          <form
-            onSubmit={simpleForm.handleSubmit(handleSimpleUserSubmit)}
-            className='space-y-4'
-            suppressHydrationWarning
-          >
-            <div className='text-center mb-6'>
-              <h3 className='text-lg font-semibold text-gray-900 mb-2'>
-                Ολοκλήρωση Εγγραφής ως Χρήστης
-              </h3>
-              <p className='text-gray-600'>
-                Επιλέξτε ένα username για τον λογαριασμό σας
-              </p>
-            </div>
-
-            <FormField
-              control={simpleForm.control}
-              name='username'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='username'
-                      {...field}
-                      onChange={(e) => {
-                        const formatted = formatUsername(e.target.value);
-                        field.onChange(formatted);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Error Display */}
-            {!state.success && state.message && (
-              <Alert variant='destructive'>
-                <AlertCircle className='h-4 w-4' />
-                <AlertDescription>{state.message}</AlertDescription>
-              </Alert>
-            )}
-
-            <FormButton
-              type='submit'
-              text='Ολοκλήρωση Εγγραφής'
-              loadingText='Ολοκλήρωση...'
-              loading={isPending}
-              disabled={isPending}
-              fullWidth
-            />
-          </form>
-        </Form>
+        <div className='space-y-4'>
+          <div className='text-center mb-6'>
+            <h3 className='text-lg font-semibold text-gray-900 mb-2'>
+              Ολοκλήρωση Εγγραφής
+            </h3>
+          </div>
+          <div className='flex items-center gap-2 justify-center text-gray-600'>
+            <Loader2 className='w-5 h-5 animate-spin' />
+            <span>Ολοκλήρωση εγγραφής...</span>
+          </div>
+          {/* Error Display */}
+          {!state.success && state.message && (
+            <Alert variant='destructive'>
+              <AlertCircle className='h-4 w-4' />
+              <AlertDescription>{state.message}</AlertDescription>
+            </Alert>
+          )}
+        </div>
       )}
 
       {/* Professional User Form - for type 'pro' (not in type selection step) */}

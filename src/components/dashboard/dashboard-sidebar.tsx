@@ -115,7 +115,7 @@ export default function DashboardSidebar({
   const userData = {
     name: isProfessional
       ? user?.displayName
-      : capitalizeFirstLetter(user?.username || 'User'),
+      : capitalizeFirstLetter(user?.displayName || user?.name || user?.email || 'User'),
     email: user?.email || '',
     avatar: user?.image || '',
   };
