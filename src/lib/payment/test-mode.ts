@@ -1,6 +1,7 @@
 /**
  * Payment test mode utilities.
- * When PAYMENTS_TEST_MODE=true, only admin users can access subscription features.
+ * When PAYMENTS_TEST_MODE=true, only admin users or users with testUser=true
+ * can access subscription features.
  * Integrates with existing RBAC system in @/lib/auth/roles and @/actions/auth/server.
  */
 
@@ -18,10 +19,8 @@ export function isPaymentsTestMode(): boolean {
  * Check if current user can access payments in test mode.
  * Returns true if:
  * - Test mode is disabled (production), OR
- * - Test mode is enabled AND user has 'admin' role (full system access)
- *
- * Note: Only 'admin' role (not support/editor) can access payments in test mode
- * since payment testing requires full system access.
+ * - Test mode is enabled AND user has 'admin' role, OR
+ * - Test mode is enabled AND user has testUser=true
  */
 export async function canAccessPayments(): Promise<{
   allowed: boolean;
@@ -46,8 +45,8 @@ export async function canAccessPayments(): Promise<{
 
   const user = sessionResult.data.session.user;
 
-  // Only 'admin' role can access payments in test mode
-  if (user.role !== 'admin') {
+  // Only 'admin' role or testUser can access payments in test mode
+  if (user.role !== 'admin' && !user.testUser) {
     return {
       allowed: false,
       reason:
@@ -59,8 +58,8 @@ export async function canAccessPayments(): Promise<{
 }
 
 /**
- * Get test mode banner message for admin users.
- * Returns null if not in test mode or user is not 'admin' role.
+ * Get test mode banner message for admin or test users.
+ * Returns null if not in test mode or user is neither admin nor testUser.
  */
 export async function getTestModeBanner(): Promise<string | null> {
   if (!isPaymentsTestMode()) {
@@ -76,8 +75,8 @@ export async function getTestModeBanner(): Promise<string | null> {
 
   const user = sessionResult.data.session.user;
 
-  // Only 'admin' role sees the test mode banner
-  if (user.role !== 'admin') {
+  // Only admin or testUser sees the test mode banner
+  if (user.role !== 'admin' && !user.testUser) {
     return null;
   }
 

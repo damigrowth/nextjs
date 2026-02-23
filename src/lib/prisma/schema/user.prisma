@@ -17,6 +17,7 @@ model User {
   banExpires      DateTime?
   banReason       String?
   banned          Boolean       @default(false)
+  testUser        Boolean       @default(false)
   type            UserType      @default(user)
   role            UserRole      @default(user)
   provider        String        @default("email") // email or google
