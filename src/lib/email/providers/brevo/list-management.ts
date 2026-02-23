@@ -264,6 +264,73 @@ export class BrevoListManagementService {
   }
 
   /**
+   * Sync user to the correct Brevo list based on their current state.
+   * Evaluates user state against list rules and ensures they're in exactly one list.
+   *
+   * Rules:
+   * - Blocked/banned users → removed from all lists
+   * - type='user' → USERS list
+   * - type='pro' + (step != DASHBOARD or incomplete profile) → EMPTYPROFILE list
+   * - type='pro' + step=DASHBOARD + 0 published services → NOSERVICES list
+   * - type='pro' + step=DASHBOARD + ≥1 published service → PROS list
+   */
+  async syncUserToCorrectList(
+    email: string,
+    user: { type: string; step: string; blocked: boolean; banned?: boolean },
+    publishedServiceCount: number,
+    hasCompleteProfile: boolean,
+    attributes?: DoulitsaContactAttributes
+  ): Promise<void> {
+    try {
+      const allLists = [
+        BrevoListId.USERS,
+        BrevoListId.EMPTYPROFILE,
+        BrevoListId.NOSERVICES,
+        BrevoListId.PROS,
+      ];
+
+      // Blocked/banned users: remove from all lists
+      if (user.blocked || user.banned) {
+        for (const listId of allLists) {
+          await this.removeContactFromList(email, listId);
+        }
+        return;
+      }
+
+      // Determine the correct list
+      let correctList: BrevoListId;
+
+      if (user.type === 'user') {
+        correctList = BrevoListId.USERS;
+      } else if (user.type === 'pro') {
+        if (user.step !== 'DASHBOARD' || !hasCompleteProfile) {
+          correctList = BrevoListId.EMPTYPROFILE;
+        } else if (publishedServiceCount === 0) {
+          correctList = BrevoListId.NOSERVICES;
+        } else {
+          correctList = BrevoListId.PROS;
+        }
+      } else {
+        // Unknown type — default to USERS
+        correctList = BrevoListId.USERS;
+      }
+
+      // Remove from all other lists
+      for (const listId of allLists) {
+        if (listId !== correctList) {
+          await this.removeContactFromList(email, listId);
+        }
+      }
+
+      // Add to the correct list
+      await this.addContactToList(email, correctList, attributes);
+    } catch (error) {
+      console.error(`Failed to sync user ${email} to correct Brevo list:`, error);
+      // Don't throw — Brevo sync should never block the main operation
+    }
+  }
+
+  /**
    * Delete contact completely from Brevo
    * This removes the contact from ALL lists and deletes all contact data
    * Used for GDPR compliance when users delete their account

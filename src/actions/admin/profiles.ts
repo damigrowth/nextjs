@@ -10,6 +10,7 @@ import { CACHE_TAGS, getProfileTags } from '@/lib/cache';
 import { getProTaxonomies } from '@/lib/taxonomies';
 import { resolveTaxonomyHierarchy } from '@/lib/utils/datasets';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
+import { brevoWorkflowService } from '@/lib/email/providers/brevo/workflows';
 
 import {
   adminListProfilesSchema,
@@ -616,10 +617,18 @@ export async function deleteProfile(params: AdminDeleteProfileInput) {
       };
     }
 
+    // Save user ID before deletion for Brevo sync
+    const userId = profile.uid;
+
     // Delete profile (cascades will handle related records)
     await prisma.profile.delete({
       where: { id: validatedParams.profileId },
     });
+
+    // Sync Brevo list (pro user loses profile → EMPTYPROFILE)
+    if (userId) {
+      await brevoWorkflowService.handleUserStateChange(userId);
+    }
 
     return {
       success: true,

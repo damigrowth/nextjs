@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { processImageForDatabase } from '@/lib/utils/cloudinary';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 import { UserRole, UserType, JourneyStep } from '@prisma/client';
+import { brevoWorkflowService } from '@/lib/email/providers/brevo/workflows';
 // legacy exports
 // import {
 //   listUsersSchema,
@@ -308,6 +309,9 @@ export async function banUser(data: z.infer<typeof adminBanUserSchema>) {
       headers: await headers(),
     });
 
+    // Sync Brevo list (remove banned user from all lists)
+    await brevoWorkflowService.handleUserStateChange(validatedData.userId);
+
     return {
       success: true,
       data: result,
@@ -331,6 +335,9 @@ export async function unbanUser(data: z.infer<typeof adminUnbanUserSchema>) {
       body: validatedData,
       headers: await headers(),
     });
+
+    // Sync Brevo list (re-add unbanned user to correct list)
+    await brevoWorkflowService.handleUserStateChange(validatedData.userId);
 
     return {
       success: true,
@@ -660,6 +667,7 @@ export async function updateUserBasicInfo(data: {
  */
 export async function updateUserStatus(data: {
   userId: string;
+  type?: UserType;
   confirmed?: boolean;
   blocked?: boolean;
   emailVerified?: boolean;
@@ -672,16 +680,40 @@ export async function updateUserStatus(data: {
 
     // Build update object with only provided fields
     const updateData: any = {};
+    if (data.type !== undefined) updateData.type = data.type;
     if (data.confirmed !== undefined) updateData.confirmed = data.confirmed;
     if (data.blocked !== undefined) updateData.blocked = data.blocked;
     if (data.emailVerified !== undefined)
       updateData.emailVerified = data.emailVerified;
     if (data.step !== undefined) updateData.step = data.step;
 
+    // Validate: prevent setting step=DASHBOARD for pro users without a complete profile
+    if (data.step === 'DASHBOARD') {
+      const currentUser = await prisma.user.findUnique({
+        where: { id: data.userId },
+        select: { type: true, profile: { select: { image: true, category: true, subcategory: true } } },
+      });
+
+      const effectiveType = data.type || currentUser?.type;
+      if (effectiveType === 'pro') {
+        const profile = currentUser?.profile;
+        if (!profile?.image || !profile?.category || !profile?.subcategory) {
+          // Auto-correct: set step to ONBOARDING instead of DASHBOARD
+          updateData.step = 'ONBOARDING';
+          console.warn(
+            `Admin tried to set step=DASHBOARD for pro user ${data.userId} without complete profile. Auto-corrected to ONBOARDING.`
+          );
+        }
+      }
+    }
+
     const user = await prisma.user.update({
       where: { id: data.userId },
       data: updateData,
     });
+
+    // Sync Brevo list after status/type/step changes
+    await brevoWorkflowService.handleUserStateChange(data.userId);
 
     return {
       success: true,
@@ -785,6 +817,9 @@ export async function toggleUserBlock(data: {
       data: { blocked: data.blocked },
     });
 
+    // Sync Brevo list (remove blocked user or re-add unblocked user)
+    await brevoWorkflowService.handleUserStateChange(data.userId);
+
     return {
       success: true,
       data: user,
@@ -852,15 +887,38 @@ export async function updateUserJourneyStep(data: {
 
     const { prisma } = await import('@/lib/prisma/client');
 
+    let stepToSet = data.step;
+
+    // Validate: prevent setting step=DASHBOARD for pro users without a complete profile
+    if (data.step === 'DASHBOARD') {
+      const currentUser = await prisma.user.findUnique({
+        where: { id: data.userId },
+        select: { type: true, profile: { select: { image: true, category: true, subcategory: true } } },
+      });
+
+      if (currentUser?.type === 'pro') {
+        const profile = currentUser.profile;
+        if (!profile?.image || !profile?.category || !profile?.subcategory) {
+          stepToSet = 'ONBOARDING' as JourneyStep;
+          console.warn(
+            `Admin tried to set step=DASHBOARD for pro user ${data.userId} without complete profile. Auto-corrected to ONBOARDING.`
+          );
+        }
+      }
+    }
+
     const user = await prisma.user.update({
       where: { id: data.userId },
-      data: { step: data.step },
+      data: { step: stepToSet },
     });
+
+    // Sync Brevo list after step change
+    await brevoWorkflowService.handleUserStateChange(data.userId);
 
     return {
       success: true,
       data: user,
-      message: `User step updated to ${data.step}`,
+      message: `User step updated to ${stepToSet}`,
     };
   } catch (error) {
     console.error('Error updating user journey step:', error);

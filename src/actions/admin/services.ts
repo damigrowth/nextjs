@@ -1330,6 +1330,12 @@ export async function updateServiceStatus(
       }
     }
 
+    // Handle status changes that may reduce published service count
+    // (e.g. published → rejected/inactive/draft: may move PROS → NOSERVICES)
+    if (['rejected', 'inactive', 'draft'].includes(status) && service.status === 'published') {
+      await brevoWorkflowService.handleUserStateChange(updatedService.profile.uid);
+    }
+
     return {
       success: true,
       message: `Service status updated to ${status}`,
@@ -1395,9 +1401,13 @@ export async function deleteService(params: AdminDeleteServiceInput) {
     });
 
     // Delete service (cascade will handle reviews)
+    const userId = service.profile.uid;
     await prisma.service.delete({
       where: { id: serviceId },
     });
+
+    // Sync Brevo list (may move PROS → NOSERVICES if last published service)
+    await brevoWorkflowService.handleUserStateChange(userId);
 
     return {
       success: true,

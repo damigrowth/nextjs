@@ -434,6 +434,17 @@ export const auth = betterAuth({
                   step: 'ONBOARDING' as JourneyStep,
                 },
               });
+            } else {
+              // Fallback for unknown type - treat as simple user
+              console.warn(
+                `Email verification: unknown user type "${userWithFields.type}" for user ${userWithFields.id}. Defaulting to DASHBOARD.`
+              );
+              await prisma.user.update({
+                where: { id: userWithFields.id },
+                data: {
+                  step: 'DASHBOARD' as JourneyStep,
+                },
+              });
             }
           }
         },

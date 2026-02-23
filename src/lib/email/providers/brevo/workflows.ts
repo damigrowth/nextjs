@@ -14,6 +14,7 @@ import {
   BrevoWorkflowResponse
 } from './types';
 import { User, Profile, Service, Review } from '@prisma/client';
+import { prisma } from '@/lib/prisma/client';
 import { EMAIL_TAGS } from '@/lib/email/constants';
 
 export class BrevoWorkflowService {
@@ -357,6 +358,78 @@ export class BrevoWorkflowService {
       await brevoListManager.onFirstServiceCreated(email, attributes);
     } catch (error) {
       console.error('Failed to handle first service creation list management:', error);
+    }
+  }
+
+  /**
+   * Handle any user state change by re-evaluating correct Brevo list placement.
+   * Fetches current user state from DB and calls syncUserToCorrectList().
+   * This is the universal sync method — call it after any action that changes
+   * user type, step, blocked status, services, or profile.
+   */
+  async handleUserStateChange(userId: string): Promise<void> {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          email: true,
+          type: true,
+          step: true,
+          blocked: true,
+          banned: true,
+          displayName: true,
+          username: true,
+          role: true,
+          profile: {
+            select: {
+              image: true,
+              category: true,
+              subcategory: true,
+              _count: {
+                select: {
+                  services: {
+                    where: { status: 'published' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!user) {
+        console.warn(`handleUserStateChange: user ${userId} not found`);
+        return;
+      }
+
+      const hasCompleteProfile = !!(
+        user.profile?.image &&
+        user.profile?.category &&
+        user.profile?.subcategory
+      );
+
+      const publishedServiceCount = user.profile?._count?.services ?? 0;
+
+      await brevoListManager.syncUserToCorrectList(
+        user.email,
+        {
+          type: user.type,
+          step: user.step,
+          blocked: user.blocked,
+          banned: user.banned ?? false,
+        },
+        publishedServiceCount,
+        hasCompleteProfile,
+        {
+          DISPLAY_NAME: user.displayName || user.username || undefined,
+          USERNAME: user.username || undefined,
+          USER_TYPE: user.type as 'user' | 'pro',
+          USER_ROLE: user.role as 'user' | 'freelancer' | 'company' | 'admin',
+        }
+      );
+    } catch (error) {
+      console.error(`Failed to handle user state change for ${userId}:`, error);
+      // Don't throw — Brevo sync should never block the main operation
     }
   }
 }

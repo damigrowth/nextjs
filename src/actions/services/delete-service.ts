@@ -9,6 +9,7 @@ import {
   type DeleteServiceInput,
 } from '@/lib/validations/service';
 import { revalidateService, logCacheRevalidation } from '@/lib/cache';
+import { brevoWorkflowService } from '@/lib/email/providers/brevo/workflows';
 import { z } from 'zod';
 
 /**
@@ -99,6 +100,9 @@ export async function deleteService(
     // 10. Log cache revalidation for monitoring
     logCacheRevalidation('service', service.id, 'deleted');
 
+    // 11. Sync Brevo list (may move PROS → NOSERVICES if last service)
+    await brevoWorkflowService.handleUserStateChange(user.id);
+
     return {
       success: true,
       message: 'Service deleted successfully',
@@ -188,6 +192,9 @@ export async function archiveService(
 
     // 7. Log cache revalidation
     logCacheRevalidation('service', service.id, 'archived');
+
+    // 8. Sync Brevo list (may move PROS → NOSERVICES if last published service)
+    await brevoWorkflowService.handleUserStateChange(user.id);
 
     return {
       success: true,

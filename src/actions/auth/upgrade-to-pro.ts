@@ -10,6 +10,7 @@ import { getFormString } from '@/lib/utils/form';
 import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { UserType, UserRole, JourneyStep } from '@prisma/client';
 import { getSession } from './server';
+import { brevoWorkflowService } from '@/lib/email/providers/brevo/workflows';
 
 /**
  * Upgrade a simple user account to a professional account.
@@ -66,6 +67,9 @@ export async function upgradeToProAccount(
         step: 'ONBOARDING' as JourneyStep,
       },
     });
+
+    // Sync Brevo list: USERS → EMPTYPROFILE
+    await brevoWorkflowService.handleUserStateChange(user.id);
 
     // Clear Better Auth cookie cache to ensure session updates
     await auth.api.getSession({
