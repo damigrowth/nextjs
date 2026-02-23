@@ -101,9 +101,6 @@ export const getSessionFresh = () =>
 //   }
 // };
 
-// Email integration functions (can be used in auth flows)
-export {
-  sendVerificationEmail,
-  sendWelcomeEmail,
-  sendPasswordResetEmail,
-} from '@/lib/email';
+// NOTE: Email integration functions (sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail)
+// are server-only and must be imported directly from '@/lib/email' in server actions/config.
+// Do NOT re-export them here - it pulls Prisma into the client bundle.
