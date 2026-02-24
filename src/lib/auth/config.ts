@@ -112,6 +112,8 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignUp: true,
+    expiresIn: 3600, // 1 hour
+    // expiresIn: 10, // 10 seconds for testing
     sendVerificationEmail: async ({ user, url, token }, request) => {
       try {
         if (!user.email) {
@@ -125,11 +127,17 @@ export const auth = betterAuth({
           where: { id: user.id },
           select: { displayName: true, username: true },
         });
+        // Replace Better Auth's default verify URL with our custom route
+        // that handles expired token redirects gracefully
+        const customUrl = url.replace(
+          '/api/auth/verify-email',
+          '/api/verify-email',
+        );
         await sendVerificationEmail(
           user.email,
           userWithFields?.displayName,
           userWithFields?.username,
-          url,
+          customUrl,
         );
       } catch (error) {
         console.error('Failed to send verification email:', error);
@@ -380,9 +388,6 @@ export const auth = betterAuth({
       },
       update: {
         after: async (user, context) => {
-          // console.log('UPDATING USER', user);
-          // console.log('UPDATING USER CONTEXT', context.body);
-
           // Cast to any to access additional fields that Better Auth might not have in its types
           const userWithFields = user as any;
 
@@ -408,13 +413,6 @@ export const auth = betterAuth({
             userWithFields.step === 'EMAIL_VERIFICATION' &&
             userWithFields.provider === 'email'
           ) {
-            // console.log('Email verification completed for email user:', {
-            //   id: userWithFields.id,
-            //   email: userWithFields.email,
-            //   type: userWithFields.type,
-            //   role: userWithFields.role,
-            // });
-
             // Email verification completed - transition to next step based on user type
             // Flow: Email Confirmation → Dashboard (user) or Onboarding (pro)
             if (userWithFields.type === 'user') {
@@ -437,7 +435,7 @@ export const auth = betterAuth({
             } else {
               // Fallback for unknown type - treat as simple user
               console.warn(
-                `Email verification: unknown user type "${userWithFields.type}" for user ${userWithFields.id}. Defaulting to DASHBOARD.`
+                `Email verification: unknown user type "${userWithFields.type}" for user ${userWithFields.id}. Defaulting to DASHBOARD.`,
               );
               await prisma.user.update({
                 where: { id: userWithFields.id },

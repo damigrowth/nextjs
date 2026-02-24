@@ -1,14 +1,13 @@
+import { Suspense } from 'react';
 import { getRegisterSuccessMetadata } from '@/lib/seo/pages';
+import FormResendVerification from '@/components/forms/auth/form-resend-verification';
 
-export const dynamic = 'force-static';
-export const revalidate = false;
-
-// Static SEO
+// SEO
 export async function generateMetadata() {
   return getRegisterSuccessMetadata();
 }
 
-export default function page() {
+export default function RegisterSuccessPage() {
   return (
     <section className='mt-20 pt-20 pb-40 bg-gray-50'>
       <div className='container mx-auto px-4'>
@@ -22,11 +21,11 @@ export default function page() {
                 Έλεγξε το email σου για να επιβεβαιώσεις την εγγραφή του
                 λογαριασμού.
               </p>
-              <p className='text-sm mb-8 text-muted-foreground'>
-                * Εάν δεν βλέπεις το email στα εισερχόμενα, έλεγξε και στα spam.
-                😊
+              <p className='text-sm mb-4 text-muted-foreground'>
+                * Εάν δεν βλέπεις το email στα εισερχόμενα, έλεγξε και στα
+                spam.
               </p>
-              <div className='flex justify-center items-center'>
+              <div className='flex justify-center items-center mb-6'>
                 <svg
                   width='150'
                   height='150'
@@ -74,6 +73,10 @@ export default function page() {
                   />
                 </svg>
               </div>
+              {/* Resend verification form */}
+              <Suspense fallback={null}>
+                <FormResendVerification />
+              </Suspense>
             </div>
           </div>
         </div>

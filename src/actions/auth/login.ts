@@ -79,6 +79,28 @@ export async function login(
       };
     }
   } catch (error: any) {
+    // Check if this is an email not verified error from Better Auth
+    const errorCode = error?.body?.code || error?.code;
+    const errorMessage = error?.body?.message || error?.message || '';
+
+    if (
+      errorCode === 'EMAIL_NOT_VERIFIED' ||
+      errorMessage.toLowerCase().includes('email not verified') ||
+      errorMessage.includes('επαληθευτεί') ||
+      errorMessage.includes('επιβεβαιωθεί')
+    ) {
+      // Extract email from the validated form data to redirect to resend page
+      const email = getFormString(formData, 'identifier');
+      return {
+        success: true,
+        message: 'Το email δεν έχει επιβεβαιωθεί',
+        data: {
+          user: {} as AuthUser,
+          redirectPath: `/register/success?email=${encodeURIComponent(email)}`,
+        },
+      };
+    }
+
     // Use comprehensive Better Auth error handling
     return handleBetterAuthError(error);
   }
@@ -87,7 +109,7 @@ export async function login(
   let redirectPath = '/dashboard'; // default
 
   if (!user.emailVerified) {
-    redirectPath = '/register/success';
+    redirectPath = `/register/success?email=${encodeURIComponent(user.email)}`;
   } else if (user.step === 'ONBOARDING') {
     redirectPath = '/onboarding';
   } else if (user.step === 'DASHBOARD') {
@@ -98,7 +120,7 @@ export async function login(
       redirectPath = '/dashboard';
     }
   } else {
-    redirectPath = '/register/success';
+    redirectPath = `/register/success?email=${encodeURIComponent(user.email)}`;
   }
 
   return {

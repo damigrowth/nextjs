@@ -18,6 +18,8 @@ export async function register(
   prevState: ActionResponse | null,
   formData: FormData,
 ): Promise<ActionResponse> {
+  let emailValue = '';
+
   try {
     // Parse consent array with proper handling
     const consentArray = getFormArray(formData, 'consent', []);
@@ -46,7 +48,7 @@ export async function register(
     }
 
     // Get displayName - only for professionals, undefined for regular users
-    const emailValue = getFormString(formData, 'email');
+    emailValue = getFormString(formData, 'email');
     let usernameValue = getFormString(formData, 'username');
 
     // For simple users, auto-generate username from email
@@ -159,5 +161,5 @@ export async function register(
   }
 
   // Server-side redirect like login action does (outside try/catch)
-  redirect('/register/success');
+  redirect(`/register/success?email=${encodeURIComponent(emailValue)}`);
 }
