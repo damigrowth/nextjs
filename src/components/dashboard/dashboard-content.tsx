@@ -17,7 +17,9 @@ import {
 } from 'lucide-react';
 
 import { getCurrentUser, isProfessional } from '@/actions/auth/server';
+import { getUserServiceStats } from '@/actions/services/get-user-services';
 import { NextLink } from '@/components';
+import NoServiceDialog from './no-service-dialog';
 
 interface DashboardData {
   services: any;
@@ -40,6 +42,13 @@ export default async function DashboardContent() {
   const userId = user?.id;
   const displayName =
     user?.displayName || user?.name || profile?.firstName || 'User';
+
+  // Check if professional user has any services
+  let hasServices = true;
+  if (userHasAccess) {
+    const statsResult = await getUserServiceStats();
+    hasServices = statsResult.success ? statsResult.data.total > 0 : true;
+  }
 
   // Temporary mock data while migrating from Strapi
   const data: DashboardData = {
@@ -189,6 +198,9 @@ export default async function DashboardContent() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Prompt to create first service */}
+      {!hasServices && <NoServiceDialog sessionId={userResult.success ? userResult.data.session?.id : undefined} />}
     </div>
   );
 }
