@@ -31,6 +31,8 @@ import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { sanitizeCloudinaryResources } from '@/lib/utils/cloudinary';
 import { generateServiceSlug } from '@/lib/utils/text';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
+import { stripHtmlTags } from '@/lib/utils/text/html';
+import { sanitizeRichText } from '@/lib/utils/text/sanitize';
 
 /**
  * Server action for creating a new service using the multi-step form data
@@ -221,8 +223,8 @@ async function createServiceInternal(
             pid: profile.id,
             title: title,
             titleNormalized: normalizeTerm(title),
-            description: description,
-            descriptionNormalized: normalizeTerm(description),
+            description: sanitizeRichText(description),
+            descriptionNormalized: normalizeTerm(stripHtmlTags(description)),
             category: data.category || '',
             subcategory: data.subcategory || '',
             subdivision: data.subdivision || '',
@@ -299,8 +301,8 @@ async function createServiceInternal(
             pid: profile.id,
             title: title,
             titleNormalized: normalizeTerm(title),
-            description: description,
-            descriptionNormalized: normalizeTerm(description),
+            description: sanitizeRichText(description),
+            descriptionNormalized: normalizeTerm(stripHtmlTags(description)),
             category: data.category || '',
             subcategory: data.subcategory || '',
             subdivision: data.subdivision || '',

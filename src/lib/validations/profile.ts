@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { stripHtmlTags } from '@/lib/utils/text/html';
 import {
   phoneSchema,
   urlSchema,
@@ -454,8 +455,14 @@ export const profileBasicInfoUpdateSchema = z.object({
     ),
   bio: z
     .string()
-    .min(80, 'Η περιγραφή πρέπει να έχει τουλάχιστον 80 χαρακτήρες')
-    .max(5000, 'Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες'),
+    .refine(
+      (val) => stripHtmlTags(val).length >= 80,
+      'Η περιγραφή πρέπει να έχει τουλάχιστον 80 χαρακτήρες',
+    )
+    .refine(
+      (val) => stripHtmlTags(val).length <= 5000,
+      'Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες',
+    ),
   category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
   subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
   skills: z
@@ -549,8 +556,14 @@ export const onboardingFormSchema = z.object({
   subcategory: categorySchema, // Required - now a string slug
   bio: z
     .string() // Required - renamed from description
-    .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες.')
-    .max(5000, 'Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες.'),
+    .refine(
+      (val) => stripHtmlTags(val).length >= 80,
+      'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες.',
+    )
+    .refine(
+      (val) => stripHtmlTags(val).length <= 5000,
+      'Η περιγραφή δεν μπορεί να υπερβαίνει τους 5000 χαρακτήρες.',
+    ),
   coverage: coverageSchema, // Required
   portfolio: z
     .array(cloudinaryResourceSchema)

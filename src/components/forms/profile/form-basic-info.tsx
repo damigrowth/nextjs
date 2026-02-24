@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 // Shadcn UI components
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import {
   Form,
   FormControl,
@@ -28,6 +28,7 @@ import { LazyCombobox } from '@/components/ui/lazy-combobox';
 
 // Static constants and dataset utilities
 import { formatInput } from '@/lib/utils/validation/formats';
+import { stripHtmlTags } from '@/lib/utils/text/html';
 import { filterByField, filterSkillsByCategory, getSkillsByIds } from '@/lib/utils/datasets';
 import { populateFormData } from '@/lib/utils/form';
 import type { DatasetOption, DatasetWithCategory } from '@/lib/types/datasets';
@@ -184,14 +185,10 @@ export default function BasicInfoForm({
     });
   };
 
-  const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const formattedValue = formatInput({
-      value: e.target.value,
-      maxLength: 5000,
-    });
-    setValue('bio', formattedValue, {
+  const handleBioChange = (html: string) => {
+    setValue('bio', html, {
       shouldDirty: true,
-      shouldValidate: true, // Trigger real-time validation
+      shouldValidate: true,
     });
   };
 
@@ -348,16 +345,15 @@ export default function BasicInfoForm({
                 Μια περιγραφή για εσάς και τις υπηρεσίες που προσφέρετε.
               </p>
               <FormControl>
-                <Textarea
-                  placeholder='Τουλάχιστον 80 χαρακτήρες (2-3 προτάσεις)'
-                  className='min-h-[200px]'
-                  rows={8}
+                <RichTextEditor
                   value={field.value}
                   onChange={handleBioChange}
+                  placeholder='Τουλάχιστον 80 χαρακτήρες (2-3 προτάσεις)'
+                  minHeight='200px'
                 />
               </FormControl>
               <div className='text-xs text-gray-500'>
-                {field.value.length}/5000 χαρακτήρες (ελάχιστο: 80)
+                {stripHtmlTags(field.value).length}/5000 χαρακτήρες (ελάχιστο: 80)
               </div>
               <FormMessage />
             </FormItem>

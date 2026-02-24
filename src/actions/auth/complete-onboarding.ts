@@ -18,6 +18,8 @@ import {
 } from '@/lib/utils/cloudinary';
 import { brevoWorkflowService, sendNewProfileEmail } from '@/lib/email';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
+import { stripHtmlTags } from '@/lib/utils/text/html';
+import { sanitizeRichText } from '@/lib/utils/text/sanitize';
 
 /**
  * Complete onboarding action wrapper for useActionState
@@ -126,8 +128,8 @@ export async function completeOnboarding(
           user.role === 'freelancer' || user.role === 'company'
             ? user.role
             : 'freelancer', // Sync user.role to profile.type
-        bio: data.bio,
-        bioNormalized: data.bio ? normalizeTerm(data.bio) : null,
+        bio: data.bio ? sanitizeRichText(data.bio) : data.bio,
+        bioNormalized: data.bio ? normalizeTerm(stripHtmlTags(data.bio)) : null,
         category: data.category,
         subcategory: data.subcategory,
         coverage: data.coverage,
@@ -147,8 +149,8 @@ export async function completeOnboarding(
           user.role === 'freelancer' || user.role === 'company'
             ? user.role
             : 'freelancer', // Sync user.role to profile.type
-        bio: data.bio,
-        bioNormalized: data.bio ? normalizeTerm(data.bio) : null,
+        bio: data.bio ? sanitizeRichText(data.bio) : data.bio,
+        bioNormalized: data.bio ? normalizeTerm(stripHtmlTags(data.bio)) : null,
         category: data.category,
         subcategory: data.subcategory,
         coverage: data.coverage,

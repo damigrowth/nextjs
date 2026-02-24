@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 // import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
@@ -33,6 +33,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Static constants and dataset utilities
 import { populateFormData } from '@/lib/utils/form';
+import { stripHtmlTags } from '@/lib/utils/text/html';
 import { findById } from '@/lib/utils/datasets';
 import type { DatasetItem } from '@/lib/types/datasets';
 
@@ -320,20 +321,15 @@ export default function FormServiceEdit({
                   </Tooltip>
                 </div>
                 <FormControl>
-                  <Textarea
+                  <RichTextEditor
+                    value={field.value || ''}
+                    onChange={(html) => field.onChange(html)}
                     placeholder='Περιγράψτε την υπηρεσία σας αναλυτικά...'
-                    className='min-h-[120px]'
-                    rows={5}
-                    maxLength={5000}
-                    {...field}
-                    onChange={(e) => {
-                      const value = e.target.value.slice(0, 5000);
-                      field.onChange(value);
-                    }}
+                    minHeight='120px'
                   />
                 </FormControl>
                 <div className='text-xs text-gray-500'>
-                  {field.value?.length || 0}/5000 χαρακτήρες
+                  {stripHtmlTags(field.value || '').length}/5000 χαρακτήρες
                 </div>
                 <FormMessage />
               </FormItem>

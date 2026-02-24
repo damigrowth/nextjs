@@ -16,6 +16,8 @@ import { createValidationErrorResponse } from '@/lib/utils/zod';
 import { handleBetterAuthError } from '@/lib/utils/better-auth-error';
 import { CACHE_TAGS, getProfileTags, revalidateProfile, logCacheRevalidation } from '@/lib/cache';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
+import { stripHtmlTags } from '@/lib/utils/text/html';
+import { sanitizeRichText } from '@/lib/utils/text/sanitize';
 
 /**
  * Server action wrapper for useActionState
@@ -118,8 +120,8 @@ export async function updateProfileBasicInfo(
       data: {
         tagline: data.tagline,
         taglineNormalized: data.tagline ? normalizeTerm(data.tagline) : null,
-        bio: data.bio,
-        bioNormalized: data.bio ? normalizeTerm(data.bio) : null,
+        bio: data.bio ? sanitizeRichText(data.bio) : data.bio,
+        bioNormalized: data.bio ? normalizeTerm(stripHtmlTags(data.bio)) : null,
         category: data.category,
         subcategory: data.subcategory,
         speciality: data.speciality,

@@ -16,7 +16,7 @@ import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import {
   Form,
   FormControl,
@@ -40,6 +40,7 @@ import { OnboardingFormSkeleton } from './onboarding-form-skeleton';
 // Static constants and dataset utilities
 import type { DatasetItem } from '@/lib/types/datasets';
 import { formatInput } from '@/lib/utils/validation/formats';
+import { stripHtmlTags } from '@/lib/utils/text/html';
 import { populateFormData } from '@/lib/utils/form';
 import {
   getAllZipcodes,
@@ -288,12 +289,8 @@ export default function OnboardingForm({
   const watchedCoverage = watch('coverage');
 
   // Helper functions for formatting inputs
-  const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const formattedValue = formatInput({
-      value: e.target.value,
-      maxLength: 5000,
-    });
-    setValue('bio', formattedValue, {
+  const handleBioChange = (html: string) => {
+    setValue('bio', html, {
       shouldDirty: true,
       shouldValidate: true,
     });
@@ -556,16 +553,15 @@ export default function OnboardingForm({
                 Μια περιγραφή για εσάς και τις υπηρεσίες που προσφέρετε.
               </p>
               <FormControl>
-                <Textarea
-                  placeholder='Τουλάχιστον 80 χαρακτήρες (2-3 προτάσεις)'
-                  className='min-h-[120px] w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                  rows={5}
+                <RichTextEditor
                   value={field.value}
                   onChange={handleBioChange}
+                  placeholder='Τουλάχιστον 80 χαρακτήρες (2-3 προτάσεις)'
+                  minHeight='120px'
                 />
               </FormControl>
               <div className='text-xs text-gray-500'>
-                {field.value.length}/80 χαρακτήρες
+                {stripHtmlTags(field.value).length}/80 χαρακτήρες
               </div>
               <FormMessage />
             </FormItem>

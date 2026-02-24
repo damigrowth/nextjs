@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { stripHtmlTags } from '@/lib/utils/text/html';
 import { paginationSchema } from './shared';
 import {
   serviceAddonSchema,
@@ -127,8 +128,14 @@ export const serviceEditSchema = z.object({
     .optional(),
   description: z
     .string()
-    .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
-    .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες')
+    .refine(
+      (val) => stripHtmlTags(val).length >= 80,
+      'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες',
+    )
+    .refine(
+      (val) => stripHtmlTags(val).length <= 5000,
+      'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες',
+    )
     .optional(),
   price: z
     .number()
@@ -441,8 +448,14 @@ export const serviceDetailsSchema = z
       .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
     description: z
       .string()
-      .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
-      .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες'),
+      .refine(
+        (val) => stripHtmlTags(val).length >= 80,
+        'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες',
+      )
+      .refine(
+        (val) => stripHtmlTags(val).length <= 5000,
+        'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες',
+      ),
     category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
     subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
     subdivision: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
@@ -771,8 +784,14 @@ export const adminServiceValidationSchema = z
       .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
     description: z
       .string()
-      .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
-      .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες'),
+      .refine(
+        (val) => stripHtmlTags(val).length >= 80,
+        'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες',
+      )
+      .refine(
+        (val) => stripHtmlTags(val).length <= 5000,
+        'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες',
+      ),
     category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
     subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
     subdivision: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
@@ -1027,8 +1046,14 @@ export const createServiceSchema = z
       .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
     description: z
       .string()
-      .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
-      .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες'),
+      .refine(
+        (val) => stripHtmlTags(val).length >= 80,
+        'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες',
+      )
+      .refine(
+        (val) => stripHtmlTags(val).length <= 5000,
+        'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες',
+      ),
     category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
     subcategory: z.string().min(1, 'Η υποκατηγορία είναι υποχρεωτική'),
     subdivision: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
@@ -1273,7 +1298,10 @@ export const createServiceDraftSchema = z.object({
     .optional(),
   description: z
     .string()
-    .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες')
+    .refine(
+      (val) => stripHtmlTags(val).length <= 5000,
+      'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες',
+    )
     .optional(),
   category: z.string().optional(),
   subcategory: z.string().optional(),
@@ -1476,8 +1504,14 @@ export const updateServiceInfoSchema = z
       .optional(),
     description: z
       .string()
-      .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
-      .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες')
+      .refine(
+        (val) => stripHtmlTags(val).length >= 80,
+        'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες',
+      )
+      .refine(
+        (val) => stripHtmlTags(val).length <= 5000,
+        'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες',
+      )
       .optional(),
     category: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική').optional(),
     subcategory: z
@@ -1621,8 +1655,14 @@ export const editServiceBasicSchema = z
       .max(100, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 100 χαρακτήρες'),
     description: z
       .string()
-      .min(80, 'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες')
-      .max(5000, 'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες'),
+      .refine(
+        (val) => stripHtmlTags(val).length >= 80,
+        'Η περιγραφή πρέπει να είναι τουλάχιστον 80 χαρακτήρες',
+      )
+      .refine(
+        (val) => stripHtmlTags(val).length <= 5000,
+        'Η περιγραφή δεν μπορεί να ξεπερνά τους 5000 χαρακτήρες',
+      ),
   })
   .partial();
 

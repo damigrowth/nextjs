@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { formatText } from '@/lib/utils/formatting';
+import { renderRichContent } from '@/lib/utils/formatting';
 import ProfileFeatures from '@/components/profile/profile-features';
 import React from 'react';
 
@@ -23,7 +23,6 @@ export default function ServiceAbout({
   paymentMethods = [],
   settlementMethods = [],
 }: Props) {
-  const formattedDescription = description && formatText(description);
   const hasProfileFeatures =
     budget ||
     size ||
@@ -39,7 +38,7 @@ export default function ServiceAbout({
       <CardContent className='space-y-6'>
         {/* Service Description */}
         {description && (
-          <div className='space-y-1 mb-14'>{formattedDescription}</div>
+          <div className='mb-14'>{renderRichContent(description)}</div>
         )}
 
         {/* Service Tags */}

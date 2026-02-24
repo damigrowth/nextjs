@@ -216,3 +216,59 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Rich text content (rendered from Tiptap HTML) */
+.rich-text h2 {
+  @apply text-lg font-semibold mt-4 mb-2;
+}
+.rich-text h3 {
+  @apply text-base font-semibold mt-3 mb-1;
+}
+.rich-text p {
+  @apply mb-2;
+}
+.rich-text ul {
+  @apply list-disc pl-5 my-2;
+}
+.rich-text ol {
+  @apply list-decimal pl-5 my-2;
+}
+.rich-text li {
+  @apply my-0.5;
+}
+.rich-text strong {
+  @apply font-bold;
+}
+.rich-text em {
+  @apply italic;
+}
+
+/* Tiptap editor styles */
+.rich-text-editor {
+  @apply flex flex-col cursor-text;
+}
+.rich-text-editor .tiptap {
+  @apply outline-none flex-1;
+}
+.rich-text-editor .tiptap p {
+  @apply mb-2;
+}
+.rich-text-editor .tiptap h2 {
+  @apply text-lg font-semibold mt-3 mb-1;
+}
+.rich-text-editor .tiptap h3 {
+  @apply text-base font-semibold mt-2 mb-1;
+}
+.rich-text-editor .tiptap ul {
+  @apply list-disc pl-5 my-2;
+}
+.rich-text-editor .tiptap ol {
+  @apply list-decimal pl-5 my-2;
+}
+.rich-text-editor .tiptap li {
+  @apply my-0.5;
+}
+.rich-text-editor .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply text-muted-foreground pointer-events-none float-left h-0;
+}

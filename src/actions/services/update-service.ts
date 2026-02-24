@@ -13,6 +13,8 @@ import {
   type UpdateServiceInfoInput,
 } from '@/lib/validations/service';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
+import { stripHtmlTags } from '@/lib/utils/text/html';
+import { sanitizeRichText } from '@/lib/utils/text/sanitize';
 import { generateServiceSlug } from '@/lib/utils/text';
 import { sendServiceCreatedEmail } from '@/lib/email/services';
 import { brevoWorkflowService } from '@/lib/email';
@@ -334,8 +336,8 @@ export async function updateServiceInfo(
           break;
 
         case 'description':
-          updateData.description = value;
-          updateData.descriptionNormalized = normalizeTerm(value as string);
+          updateData.description = sanitizeRichText(value as string);
+          updateData.descriptionNormalized = normalizeTerm(stripHtmlTags(value as string));
           break;
 
         case 'category':

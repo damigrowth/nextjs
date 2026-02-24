@@ -6,3 +6,4 @@
 export * from './date';
 export * from './time';
 export * from './text';
+export * from './rich-text';
