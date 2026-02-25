@@ -60,6 +60,8 @@ const initialSocials = {
   github: '',
   behance: '',
   dribbble: '',
+  pinterest: '',
+  vimeo: '',
 };
 
 // Available social media platforms
@@ -72,6 +74,8 @@ const socialPlatformOptions: Option[] = [
   { value: 'github', label: 'GitHub' },
   { value: 'behance', label: 'Behance' },
   { value: 'dribbble', label: 'Dribbble' },
+  { value: 'pinterest', label: 'Pinterest' },
+  { value: 'vimeo', label: 'Vimeo' },
 ];
 
 interface PresentationInfoFormProps {
@@ -590,6 +594,52 @@ export default function PresentationInfoForm({
                         <FormControl>
                           <Input
                             placeholder='https://dribbble.com/your-profile'
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {selectedPlatforms.includes('pinterest') && (
+                  <FormField
+                    control={form.control}
+                    name='socials.pinterest'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='flex items-center gap-2'>
+                          <Icon name='pinterest' size={16} />
+                          Pinterest
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='https://pinterest.com/your-profile'
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {selectedPlatforms.includes('vimeo') && (
+                  <FormField
+                    control={form.control}
+                    name='socials.vimeo'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='flex items-center gap-2'>
+                          <Icon name='vimeo' size={16} />
+                          Vimeo
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='https://vimeo.com/your-channel'
                             {...field}
                             value={field.value || ''}
                           />

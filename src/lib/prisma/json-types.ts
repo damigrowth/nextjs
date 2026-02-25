@@ -59,6 +59,8 @@ export const socialMediaSchema = z.object({
   instagram: z.string().optional().nullable(),
   behance: z.string().optional().nullable(),
   dribbble: z.string().optional().nullable(),
+  pinterest: z.string().optional().nullable(),
+  vimeo: z.string().optional().nullable(),
 });
 
 export const billingInfoSchema = z.object({

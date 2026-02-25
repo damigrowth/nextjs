@@ -277,6 +277,18 @@ export const socialMediaSchema = z.object({
     .optional()
     .nullable()
     .or(z.literal('')),
+  pinterest: z
+    .string()
+    .url('Εισάγετε έγκυρο URL')
+    .optional()
+    .nullable()
+    .or(z.literal('')),
+  vimeo: z
+    .string()
+    .url('Εισάγετε έγκυρο URL')
+    .optional()
+    .nullable()
+    .or(z.literal('')),
 });
 
 // =============================================

@@ -42,6 +42,10 @@ const getSocialColor = (platform: string) => {
       return 'hover:text-[#1769FF]';
     case 'dribbble':
       return 'hover:text-[#EA4C89]';
+    case 'pinterest':
+      return 'hover:text-[#BD081C]';
+    case 'vimeo':
+      return 'hover:text-[#1AB7EA]';
     default:
       return 'hover:text-primary';
   }
