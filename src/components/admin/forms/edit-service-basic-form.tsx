@@ -6,7 +6,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { stripHtmlTags } from '@/lib/utils/text/html';
 import {
   Form,
   FormControl,
@@ -102,15 +103,16 @@ export function EditServiceBasicForm({ service }: EditServiceBasicFormProps) {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea
+                <RichTextEditor
+                  value={field.value || ''}
+                  onChange={(html) => field.onChange(html)}
                   placeholder='Enter service description'
-                  className='min-h-[120px]'
-                  {...field}
+                  minHeight='120px'
                   disabled={isPending}
                 />
               </FormControl>
               <div className='text-sm text-muted-foreground'>
-                {field.value?.length || 0}/5000 characters
+                {stripHtmlTags(field.value || '').length}/5000 characters
               </div>
               <FormMessage />
             </FormItem>

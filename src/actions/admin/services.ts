@@ -8,6 +8,8 @@ import { z } from 'zod';
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { CACHE_TAGS, getServiceTags } from '@/lib/cache';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
+import { stripHtmlTags } from '@/lib/utils/text/html';
+import { sanitizeRichText } from '@/lib/utils/text/sanitize';
 // O(1) optimized taxonomy lookups - 99% faster than nested find
 import {
   resolveServiceHierarchy,
@@ -438,8 +440,9 @@ export async function updateService(params: AdminUpdateServiceInput) {
       );
     }
     if (updateData.description) {
+      updateData.description = sanitizeRichText(updateData.description);
       normalizedUpdates.descriptionNormalized = normalizeTerm(
-        updateData.description,
+        stripHtmlTags(updateData.description),
       );
     }
 
@@ -1751,8 +1754,8 @@ export async function createServiceForProfile(
           pid: profile.id,
           title: title,
           titleNormalized: normalizeTerm(title),
-          description: description,
-          descriptionNormalized: normalizeTerm(description),
+          description: sanitizeRichText(description),
+          descriptionNormalized: normalizeTerm(stripHtmlTags(description)),
           category: data.category || '',
           subcategory: data.subcategory || '',
           subdivision: data.subdivision || '',
