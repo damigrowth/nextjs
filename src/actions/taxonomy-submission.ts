@@ -37,7 +37,7 @@ export async function submitTaxonomySubmission(
     if (!parsed.success) {
       return {
         success: false,
-        message: parsed.error.errors[0]?.message || 'Μη έγκυρα δεδομένα',
+        message: parsed.error.issues[0]?.message || 'Μη έγκυρα δεδομένα',
       };
     }
 
