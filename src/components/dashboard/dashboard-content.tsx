@@ -13,21 +13,18 @@ import {
   MessageSquare,
   Settings,
   Plus,
+  Star,
   Users,
 } from 'lucide-react';
 
 import { getCurrentUser, isProfessional } from '@/actions/auth/server';
 import { getUserServiceStats } from '@/actions/services/get-user-services';
+import { getUserTotalReviewCount } from '@/actions/reviews/get-user-reviews';
+import { getChats } from '@/actions/messages/chats';
 import { NextLink } from '@/components';
+import { timeAgo } from '@/lib/utils/formatting/time';
+import { ShareReviewLinkAsync } from './reviews/share-review-link-async';
 import NoServiceDialog from './no-service-dialog';
-
-interface DashboardData {
-  services: any;
-  reviews: any;
-  popularServices: any;
-  totalServices: number;
-  totalReviews: number;
-}
 
 export default async function DashboardContent() {
   const userResult = await getCurrentUser();
@@ -42,22 +39,6 @@ export default async function DashboardContent() {
   const userId = user?.id;
   const displayName =
     user?.displayName || user?.name || profile?.firstName || 'User';
-
-  // Check if professional user has any services
-  let hasServices = true;
-  if (userHasAccess) {
-    const statsResult = await getUserServiceStats();
-    hasServices = statsResult.success ? statsResult.data.total > 0 : true;
-  }
-
-  // Temporary mock data while migrating from Strapi
-  const data: DashboardData = {
-    services: null,
-    reviews: null,
-    popularServices: null,
-    totalServices: 0, // TODO: Implement services count from new data structure
-    totalReviews: 0, // TODO: Implement reviews count from new data structure
-  };
 
   if (!userHasAccess) {
     return (
@@ -102,6 +83,18 @@ export default async function DashboardContent() {
     );
   }
 
+  // Fetch all dashboard data in parallel
+  const [statsResult, reviewCountResult, recentChats] = await Promise.all([
+    getUserServiceStats(),
+    getUserTotalReviewCount(),
+    userId ? getChats(userId).catch(() => []) : Promise.resolve([]),
+  ]);
+
+  const totalServices = statsResult.success ? statsResult.data.published : 0;
+  const totalReviews = reviewCountResult.success ? reviewCountResult.data.total : 0;
+  const hasServices = statsResult.success ? statsResult.data.total > 0 : true;
+  const latestChats = recentChats.slice(0, 3);
+
   return (
     <div className='space-y-6'>
       {/* Header */}
@@ -115,14 +108,14 @@ export default async function DashboardContent() {
       </div>
 
       {/* Stats Cards */}
-      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
         <Card>
           <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
             <CardTitle className='text-sm font-medium'>Υπηρεσίες</CardTitle>
             <BarChart3 className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
-            <div className='text-2xl font-bold'>{data.totalServices}</div>
+            <div className='text-2xl font-bold'>{totalServices}</div>
             <Badge variant='secondary' className='mt-2'>
               Ενεργές υπηρεσίες
             </Badge>
@@ -132,15 +125,17 @@ export default async function DashboardContent() {
         <Card>
           <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
             <CardTitle className='text-sm font-medium'>Αξιολογήσεις</CardTitle>
-            <MessageSquare className='h-4 w-4 text-muted-foreground' />
+            <Star className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
-            <div className='text-2xl font-bold'>{data.totalReviews}</div>
+            <div className='text-2xl font-bold'>{totalReviews}</div>
             <Badge variant='secondary' className='mt-2'>
               Συνολικές αξιολογήσεις
             </Badge>
           </CardContent>
         </Card>
+
+        <ShareReviewLinkAsync />
       </div>
 
       {/* Quick Actions and Recent Activity */}
@@ -190,11 +185,53 @@ export default async function DashboardContent() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='text-sm text-muted-foreground text-center py-8'>
-              Δεν υπάρχουν μηνύματα μέχρι τώρα. Βελτιώστε την εμφάνιση του
-              επαγγελματικού προφίλ και των υπηρεσιών σας για να σας ξεχωρίσουν
-              περισσότεροι χρήστες!
-            </div>
+            {latestChats.length > 0 ? (
+              <div className='space-y-3'>
+                {latestChats.map((chat) => (
+                  <NextLink
+                    key={chat.id}
+                    href={`/dashboard/messages/${chat.cid || chat.id}`}
+                    className='flex items-center gap-3 rounded-md border p-3 transition-colors hover:bg-muted/50'
+                  >
+                    <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-medium text-primary'>
+                      {chat.name?.charAt(0)?.toUpperCase() || '?'}
+                    </div>
+                    <div className='min-w-0 flex-1'>
+                      <div className='flex items-center justify-between gap-2'>
+                        <span className='truncate text-sm font-medium'>
+                          {chat.name}
+                        </span>
+                        <span className='shrink-0 text-xs text-muted-foreground'>
+                          {timeAgo(chat.lastActivity)}
+                        </span>
+                      </div>
+                      {chat.lastMessage && (
+                        <p className='truncate text-xs text-muted-foreground'>
+                          {chat.lastMessage}
+                        </p>
+                      )}
+                    </div>
+                    {chat.unread > 0 && (
+                      <Badge variant='default' className='shrink-0 text-xs'>
+                        {chat.unread}
+                      </Badge>
+                    )}
+                  </NextLink>
+                ))}
+                <Button variant='ghost' className='w-full' asChild>
+                  <NextLink href='/dashboard/messages'>
+                    Όλα τα μηνύματα
+                    <ArrowRight className='ml-2 h-4 w-4' />
+                  </NextLink>
+                </Button>
+              </div>
+            ) : (
+              <div className='text-sm text-muted-foreground text-center py-8'>
+                Δεν υπάρχουν μηνύματα μέχρι τώρα. Βελτιώστε την εμφάνιση του
+                επαγγελματικού προφίλ και των υπηρεσιών σας για να σας ξεχωρίσουν
+                περισσότεροι χρήστες!
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

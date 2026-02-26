@@ -6,6 +6,43 @@ import { headers } from 'next/headers';
 import type { ActionResult } from '@/lib/types/api';
 import type { ReviewWithAuthor } from '@/lib/types/reviews';
 
+// Get total count of approved reviews received by the authenticated user's profile
+export async function getUserTotalReviewCount(): Promise<
+  ActionResult<{ total: number }>
+> {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session?.user) {
+      return { success: false, error: 'Απαιτείται σύνδεση' };
+    }
+
+    const userProfile = await prisma.profile.findUnique({
+      where: { uid: session.user.id },
+      select: { id: true },
+    });
+
+    if (!userProfile) {
+      return { success: false, error: 'Το προφίλ δεν βρέθηκε' };
+    }
+
+    const total = await prisma.review.count({
+      where: {
+        pid: userProfile.id,
+        status: 'approved',
+        published: true,
+      },
+    });
+
+    return { success: true, data: { total } };
+  } catch (error) {
+    console.error('Get user total review count error:', error);
+    return { success: false, error: 'Αποτυχία λήψης αριθμού αξιολογήσεων' };
+  }
+}
+
 // Get reviews given by the authenticated user
 export async function getUserReviewsGiven(
   page: number = 1,
