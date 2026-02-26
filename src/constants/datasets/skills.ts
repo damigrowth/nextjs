@@ -1,4 +1,4 @@
-// Generated on 2026-02-16T13:32:56.165Z
+// Generated on 2026-02-26T22:25:55.194Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const skills = [
@@ -3595,5 +3595,11 @@ export const skills = [
     label: 'Google Cloud',
     slug: 'google-cloud',
     category: 'xWJj-V',
+  },
+  {
+    id: '614',
+    label: 'Στρατηγική Marketing',
+    slug: '-marketing',
+    category: 'Z0YeWT',
   },
 ];
