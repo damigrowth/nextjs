@@ -90,8 +90,17 @@ export async function createReview(
       };
     }
 
-    // 4b. If profile has services, serviceId is required
-    if (targetProfile._count.services > 0 && !data.serviceId) {
+    // 4b. Profile must have services to be reviewed
+    if (targetProfile._count.services === 0) {
+      return {
+        success: false,
+        message:
+          'Πρέπει να επιλεγεί μια υπηρεσία προς αξιολόγηση. Το προφίλ του επαγγελματία δεν έχει προσθέσει κάποια υπηρεσία.',
+      };
+    }
+
+    // 4c. serviceId is required
+    if (!data.serviceId) {
       return {
         success: false,
         message: 'Επιλέξτε την υπηρεσία που θα αξιολογηθεί',
