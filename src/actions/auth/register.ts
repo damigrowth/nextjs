@@ -110,7 +110,7 @@ export async function register(
     }
 
     // Determine callback URL based on user type
-    const callbackURL = userType === 'user' ? '/dashboard' : '/dashboard'; // Both go to dashboard, pro users will be redirected to onboarding by requireOnboardingComplete()
+    const callbackURL = userType === 'pro' ? '/onboarding' : '/dashboard';
 
     // Use Better Auth to create user
     // NOTE: The admin plugin blocks direct 'role' assignment for security.
