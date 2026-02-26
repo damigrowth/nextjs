@@ -177,7 +177,7 @@ export default async function DashboardContent() {
         </Card>
 
         {/* Recent Messages */}
-        <Card>
+        <Card className='overflow-hidden'>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
               <MessageSquare className='h-5 w-5' />

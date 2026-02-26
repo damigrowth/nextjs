@@ -98,9 +98,9 @@ export default async function ServicesPage({
   ];
 
   return (
-    <div className='space-y-6 p-2 pr-0'>
+    <div className='space-y-6'>
       {/* Header */}
-      <div className='flex justify-between items-center'>
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
         <div>
           <h1 className='text-2xl font-bold text-gray-900'>
             Διαχείριση Υπηρεσιών
@@ -129,7 +129,7 @@ export default async function ServicesPage({
           {/* Table Header with Stats */}
           <div className='space-y-4 mb-6'>
             {/* Title and Stats Row */}
-            <div className='flex items-center justify-between'>
+            <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-2'>
               <h2 className='text-lg font-semibold text-gray-900'>
                 Υπηρεσίες
                 <span className='text-sm font-normal text-gray-600 ml-2'>
@@ -138,7 +138,7 @@ export default async function ServicesPage({
               </h2>
 
               {/* Status Indicators */}
-              <div className='flex items-center gap-4'>
+              <div className='flex flex-wrap items-center gap-x-4 gap-y-2'>
                 {statusStats.map((stat) => (
                   <div key={stat.status} className='flex items-center gap-2'>
                     <div

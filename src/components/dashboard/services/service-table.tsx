@@ -44,7 +44,7 @@ export default function ServiceTable({
   // Empty state
   if (services.length === 0) {
     return (
-      <div className={cn('rounded-md border', className)}>
+      <div className={cn('rounded-md border overflow-x-auto', className)}>
         <Table>
           <TableHeader>
             <TableRow>
@@ -93,8 +93,8 @@ export default function ServiceTable({
   }
 
   return (
-    <div className={cn('rounded-md border', className)}>
-      <Table>
+    <div className={cn('rounded-md border overflow-x-auto', className)}>
+      <Table className='min-w-[700px]'>
         <TableHeader>
           <TableRow>
             <ServiceTableHeaderSort
