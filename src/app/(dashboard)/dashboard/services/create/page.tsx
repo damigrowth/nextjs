@@ -5,6 +5,7 @@ import React from 'react';
 import { getDashboardMetadata } from '@/lib/seo/pages';
 import { getServiceTaxonomies, getTags } from '@/lib/taxonomies';
 import { getAllSubdivisions } from '@/lib/utils/datasets';
+import { getUserTaxonomySubmissions } from '@/actions/taxonomy-submission';
 
 export const metadata = getDashboardMetadata('Δημιουργία Υπηρεσίας');
 
@@ -39,6 +40,10 @@ export default async function CreateServicePage() {
     label: tag.label,
   }));
 
+  // Fetch user's pending tags
+  const pendingResult = await getUserTaxonomySubmissions('tag');
+  const pendingTags = pendingResult.success ? pendingResult.data ?? [] : [];
+
   return (
     <FormCreateService
       initialUser={user}
@@ -46,6 +51,7 @@ export default async function CreateServicePage() {
       serviceTaxonomies={serviceTaxonomies}
       allSubdivisions={allSubdivisions}
       availableTags={availableTags}
+      pendingTags={pendingTags}
     />
   );
 }

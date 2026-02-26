@@ -5,6 +5,7 @@ import { getDashboardMetadata } from '@/lib/seo/pages';
 import { getProTaxonomies } from '@/lib/taxonomies';
 import { skills as skillsDataset } from '@/constants/datasets/skills';
 import type { DatasetOption, DatasetWithCategory } from '@/lib/types/datasets';
+import { getUserTaxonomySubmissions } from '@/actions/taxonomy-submission';
 
 export const metadata = getDashboardMetadata('Βασικά στοιχεία');
 
@@ -33,6 +34,10 @@ export default async function BasicPage() {
   // Prepare taxonomy data server-side to prevent client-side bundle bloat
   const proTaxonomies = getProTaxonomies();
 
+  // Fetch user's pending skills
+  const pendingResult = await getUserTaxonomySubmissions('skill');
+  const pendingSkills = pendingResult.success ? pendingResult.data ?? [] : [];
+
   return (
     <div className='space-y-6'>
       <div>
@@ -46,6 +51,7 @@ export default async function BasicPage() {
         initialProfile={profile}
         proTaxonomies={proTaxonomies as DatasetOption[]}
         skillsDataset={skillsDataset as DatasetWithCategory[]}
+        pendingSkills={pendingSkills}
       />
     </div>
   );

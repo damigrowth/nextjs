@@ -99,6 +99,10 @@ const taxonomySubitems = [
     title: 'Tags',
     url: '/admin/taxonomies/tags',
   },
+  {
+    title: 'Submissions',
+    url: '/admin/taxonomies/submissions',
+  },
 ];
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {

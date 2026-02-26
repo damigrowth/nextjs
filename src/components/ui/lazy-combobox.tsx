@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Check, ChevronsUpDown, Loader2, ChevronRight, X } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2, ChevronRight, X, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -75,6 +75,12 @@ export interface LazyComboboxProps {
   // Progress indicator
   showProgress?: boolean;
   progressFormatter?: (current: number, total: number) => string;
+
+  // Create new item support (pending taxonomy)
+  allowCreate?: boolean;
+  onCreateItem?: (label: string) => Promise<LazyComboboxOption | null>;
+  pendingIds?: Set<string>;
+  pendingBadgeText?: (count: number) => string;
 }
 
 export function LazyCombobox({
@@ -103,6 +109,13 @@ export function LazyCombobox({
   disabled = false,
   showProgress = true,
   progressFormatter = (current, total) => `${current} από ${total}`,
+  allowCreate = false,
+  onCreateItem,
+  pendingIds,
+  pendingBadgeText = (n) =>
+    n === 1
+      ? 'επιλεγμένο στοιχείο υπό έγκριση'
+      : 'επιλεγμένα στοιχεία υπό έγκριση',
 }: LazyComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -110,6 +123,23 @@ export function LazyCombobox({
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = React.useState('');
+  const [isCreating, setIsCreating] = React.useState(false);
+  const [createdOptions, setCreatedOptions] = React.useState<LazyComboboxOption[]>([]);
+
+  // Merge externally-created options with the prop-provided ones
+  const effectiveOptions = React.useMemo(() => {
+    const existingIds = new Set(options.map((o) => o.id));
+    const newOnes = createdOptions.filter((o) => !existingIds.has(o.id));
+    return [...options, ...newOnes];
+  }, [options, createdOptions]);
+
+  // Merge parent pendingIds with locally created option IDs for pending styling
+  const effectivePendingIds = React.useMemo(() => {
+    if (createdOptions.length === 0) return pendingIds;
+    const merged = new Set(pendingIds);
+    for (const opt of createdOptions) merged.add(opt.id);
+    return merged;
+  }, [pendingIds, createdOptions]);
 
   // Reset display limit when popover closes
   React.useEffect(() => {
@@ -138,10 +168,10 @@ export function LazyCombobox({
 
     // Filter based on search
     const filtered = isSearching
-      ? options.filter((option) =>
+      ? effectiveOptions.filter((option) =>
           option.label.toLowerCase().includes(activeSearchQuery.toLowerCase()),
         )
-      : options;
+      : effectiveOptions;
 
     // Apply limit
     let limited = isSearching
@@ -151,7 +181,7 @@ export function LazyCombobox({
     // ENSURE SELECTED OPTION IS ALWAYS VISIBLE (when not searching)
     if (!isSearching && (value || (multiple && values.length > 0))) {
       const selectedIds = multiple ? values : value ? [value] : [];
-      const selected = options.filter((opt) => selectedIds.includes(opt.id));
+      const selected = effectiveOptions.filter((opt) => selectedIds.includes(opt.id));
 
       // Add selected options that aren't in limited view
       selected.forEach((sel) => {
@@ -178,7 +208,7 @@ export function LazyCombobox({
       isSearching,
     };
   }, [
-    options,
+    effectiveOptions,
     searchQuery,
     inputValue,
     displayLimit,
@@ -187,6 +217,62 @@ export function LazyCombobox({
     value,
     values,
     multiple,
+  ]);
+
+  // Show "create new" option when allowCreate is enabled, query >= 2 chars, and no exact match
+  const showCreateOption = React.useMemo(() => {
+    if (!allowCreate || !onCreateItem) return false;
+    const activeQuery = trigger === 'search' ? inputValue : searchQuery;
+    if (activeQuery.trim().length < 2) return false;
+    const queryLower = activeQuery.trim().toLowerCase();
+    const hasExactMatch = effectiveOptions.some(
+      (opt) => opt.label.toLowerCase() === queryLower,
+    );
+    return !hasExactMatch;
+  }, [allowCreate, onCreateItem, trigger, inputValue, searchQuery, effectiveOptions]);
+
+  // Handle creating a new item
+  const handleCreateItem = React.useCallback(async () => {
+    if (!onCreateItem || isCreating) return;
+    const activeQuery = (trigger === 'search' ? inputValue : searchQuery).trim();
+    if (activeQuery.length < 2) return;
+
+    setIsCreating(true);
+    try {
+      const newOption = await onCreateItem(activeQuery);
+      if (newOption) {
+        setCreatedOptions((prev) => [...prev, newOption]);
+      }
+      if (newOption && multiple && onMultiSelect) {
+        // Add to current selections
+        if (!maxItems || values.length < maxItems) {
+          const newOptions = [
+            ...effectiveOptions.filter((opt) => values.includes(opt.id)),
+            newOption,
+          ];
+          onMultiSelect(newOptions);
+        }
+      } else if (newOption && !multiple) {
+        onSelect(newOption);
+      }
+      setInputValue('');
+      setSearchQuery('');
+      setOpen(false);
+    } finally {
+      setIsCreating(false);
+    }
+  }, [
+    onCreateItem,
+    isCreating,
+    trigger,
+    inputValue,
+    searchQuery,
+    multiple,
+    onMultiSelect,
+    onSelect,
+    values,
+    effectiveOptions,
+    maxItems,
   ]);
 
   // Scroll handler for lazy loading
@@ -199,16 +285,16 @@ export function LazyCombobox({
         target.scrollHeight - target.scrollTop - target.clientHeight <
         loadMoreThreshold;
 
-      if (scrolledToBottom && displayLimit < options.length) {
+      if (scrolledToBottom && displayLimit < effectiveOptions.length) {
         setDisplayLimit((prev) =>
-          Math.min(prev + loadMoreIncrement, options.length),
+          Math.min(prev + loadMoreIncrement, effectiveOptions.length),
         );
       }
     },
     [
       isSearching,
       displayLimit,
-      options.length,
+      effectiveOptions.length,
       loadMoreThreshold,
       loadMoreIncrement,
     ],
@@ -216,14 +302,21 @@ export function LazyCombobox({
 
   // Get selected option(s)
   const selectedOption = React.useMemo(
-    () => options.find((option) => option.id === value),
-    [options, value],
+    () => effectiveOptions.find((option) => option.id === value),
+    [effectiveOptions, value],
   );
 
   const selectedOptions = React.useMemo(
-    () => options.filter((option) => values.includes(option.id)),
-    [options, values],
+    () => effectiveOptions.filter((option) => values.includes(option.id)),
+    [effectiveOptions, values],
   );
+
+  // Count of selected items that are pending approval
+  const pendingCount = React.useMemo(() => {
+    if (!effectivePendingIds || effectivePendingIds.size === 0) return 0;
+    if (multiple) return values.filter((id) => effectivePendingIds.has(id)).length;
+    return value && effectivePendingIds.has(value) ? 1 : 0;
+  }, [effectivePendingIds, multiple, values, value]);
 
   // Multi-select handlers
   const handleMultiSelect = React.useCallback(
@@ -244,20 +337,20 @@ export function LazyCombobox({
         newValues = [...values, option.id];
       }
 
-      const newOptions = options.filter((opt) => newValues.includes(opt.id));
+      const newOptions = effectiveOptions.filter((opt) => newValues.includes(opt.id));
       onMultiSelect(newOptions);
     },
-    [values, options, onMultiSelect, maxItems],
+    [values, effectiveOptions, onMultiSelect, maxItems],
   );
 
   const handleRemoveBadge = React.useCallback(
     (optionId: string) => {
       if (!onMultiSelect) return;
       const newValues = values.filter((id) => id !== optionId);
-      const newOptions = options.filter((opt) => newValues.includes(opt.id));
+      const newOptions = effectiveOptions.filter((opt) => newValues.includes(opt.id));
       onMultiSelect(newOptions);
     },
-    [values, options, onMultiSelect],
+    [values, effectiveOptions, onMultiSelect],
   );
 
   // Button label
@@ -286,6 +379,7 @@ export function LazyCombobox({
   );
 
   return (
+    <>
     <Popover open={open} onOpenChange={setOpen}>
       {trigger === 'click' ? (
         <PopoverTrigger asChild>
@@ -311,20 +405,27 @@ export function LazyCombobox({
               </div>
             ) : multiple && selectedOptions.length > 0 ? (
               <div className='flex flex-wrap gap-1 flex-1'>
-                {selectedOptions.map((option) => (
-                  <Badge
-                    key={option.id}
-                    variant='default'
-                    className='mr-1'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveBadge(option.id);
-                    }}
-                  >
-                    {option.label}
-                    <X className='ml-1 h-3 w-3' />
-                  </Badge>
-                ))}
+                {selectedOptions.map((option) => {
+                  const isPending = effectivePendingIds?.has(option.id);
+                  return (
+                    <Badge
+                      key={option.id}
+                      variant={isPending ? 'outline' : 'default'}
+                      className={cn(
+                        'mr-1',
+                        isPending &&
+                          'border-orange-400 text-orange-600 bg-orange-50',
+                      )}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveBadge(option.id);
+                      }}
+                    >
+                      {option.label}
+                      <X className='ml-1 h-3 w-3' />
+                    </Badge>
+                  );
+                })}
               </div>
             ) : (
               buttonLabel
@@ -345,20 +446,27 @@ export function LazyCombobox({
               {renderButtonContent && selectedOption
                 ? renderButtonContent(selectedOption)
                 : multiple && selectedOptions.length > 0
-                  ? selectedOptions.map((option) => (
-                      <Badge
-                        key={option.id}
-                        variant='default'
-                        className='mr-1'
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRemoveBadge(option.id);
-                        }}
-                      >
-                        {option.label}
-                        <X className='ml-1 h-3 w-3' />
-                      </Badge>
-                    ))
+                  ? selectedOptions.map((option) => {
+                      const isPending = effectivePendingIds?.has(option.id);
+                      return (
+                        <Badge
+                          key={option.id}
+                          variant={isPending ? 'outline' : 'default'}
+                          className={cn(
+                            'mr-1',
+                            isPending &&
+                              'border-orange-400 text-orange-600 bg-orange-50',
+                          )}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveBadge(option.id);
+                          }}
+                        >
+                          {option.label}
+                          <X className='ml-1 h-3 w-3' />
+                        </Badge>
+                      );
+                    })
                   : null}
               <input
                 ref={inputRef}
@@ -439,6 +547,7 @@ export function LazyCombobox({
                 const isSelected = multiple
                   ? values.includes(option.id)
                   : value === option.id;
+                const isPending = effectivePendingIds?.has(option.id);
 
                 return (
                   <CommandItem
@@ -461,25 +570,50 @@ export function LazyCombobox({
                         isSelected ? 'opacity-100' : 'opacity-0',
                       )}
                     />
-                    {renderLabel(option)}
+                    {isPending ? (
+                      <span className='text-orange-600'>
+                        {renderLabel(option)}
+                      </span>
+                    ) : (
+                      renderLabel(option)
+                    )}
                   </CommandItem>
                 );
               })}
+
+              {/* Create new item option */}
+              {showCreateOption && (
+                <CommandItem
+                  value='__create_new__'
+                  onSelect={handleCreateItem}
+                  disabled={isCreating}
+                  className='text-orange-600'
+                >
+                  {isCreating ? (
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                  ) : (
+                    <Plus className='mr-2 h-4 w-4' />
+                  )}
+                  Προσθήκη &quot;
+                  {(trigger === 'search' ? inputValue : searchQuery).trim()}
+                  &quot;
+                </CommandItem>
+              )}
             </CommandGroup>
 
             {/* Progress Indicator */}
             {showProgress && !isSearching && displayedOptions.length > 0 && (
               <div className='flex items-center justify-center gap-2 p-2 text-xs text-muted-foreground border-t'>
-                {displayLimit < options.length ? (
+                {displayLimit < effectiveOptions.length ? (
                   <>
                     <Loader2 className='h-3 w-3 animate-spin' />
                     <span>
-                      {progressFormatter(displayLimit, options.length)}
+                      {progressFormatter(displayLimit, effectiveOptions.length)}
                     </span>
                   </>
                 ) : (
                   <span>
-                    {progressFormatter(options.length, options.length)}
+                    {progressFormatter(effectiveOptions.length, effectiveOptions.length)}
                   </span>
                 )}
               </div>
@@ -520,5 +654,12 @@ export function LazyCombobox({
         </Command>
       </PopoverContent>
     </Popover>
+    {pendingCount > 0 && (
+      <div className='flex items-center gap-1.5 mt-1 text-xs text-orange-600'>
+        <span className='h-2 w-2 rounded-full bg-orange-500 inline-block' />
+        {pendingCount} {pendingBadgeText(pendingCount)}
+      </div>
+    )}
+    </>
   );
 }

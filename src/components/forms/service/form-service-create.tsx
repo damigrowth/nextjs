@@ -117,6 +117,11 @@ const STEP_SCHEMAS = {
   5: serviceMediaUploadSchema,
 } as const;
 
+interface PendingTagItem {
+  pendingId: string;
+  label: string;
+}
+
 interface CreateServiceFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null; // Profile type with coverage data
@@ -129,6 +134,7 @@ interface CreateServiceFormProps {
     category: any;
   }>;
   availableTags: Array<{ value: string; label: string }>;
+  pendingTags?: PendingTagItem[];
 }
 
 // Create context to pass taxonomy data to step components
@@ -142,6 +148,7 @@ export const TaxonomyDataContext = React.createContext<{
     category: any;
   }>;
   availableTags: Array<{ value: string; label: string }>;
+  pendingTagIds: Set<string>;
 } | null>(null);
 
 export default function CreateServiceForm({
@@ -150,6 +157,7 @@ export default function CreateServiceForm({
   serviceTaxonomies,
   allSubdivisions,
   availableTags,
+  pendingTags = [],
 }: CreateServiceFormProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -616,9 +624,28 @@ export default function CreateServiceForm({
     }
   };
 
+  // Merge pending tags into available tags and compute pending IDs set
+  const pendingTagIds = React.useMemo(
+    () => new Set(pendingTags.map((p) => p.pendingId)),
+    [pendingTags],
+  );
+
+  const availableTagsWithPending = React.useMemo(() => {
+    const pendingAsOptions = pendingTags.map((p) => ({
+      value: p.pendingId,
+      label: p.label,
+    }));
+    return [...availableTags, ...pendingAsOptions];
+  }, [availableTags, pendingTags]);
+
   return (
     <TaxonomyDataContext.Provider
-      value={{ serviceTaxonomies, allSubdivisions, availableTags }}
+      value={{
+        serviceTaxonomies,
+        allSubdivisions,
+        availableTags: availableTagsWithPending,
+        pendingTagIds,
+      }}
     >
       <Form {...form}>
         <div className='max-w-5xl w-full mx-auto space-y-6 p-2 pr-0'>

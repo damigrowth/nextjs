@@ -536,6 +536,27 @@ export type ApproveReviewFormInput = z.infer<typeof approveReviewFormSchema>;
 export type RejectReviewFormInput = z.infer<typeof rejectReviewFormSchema>;
 
 // =============================================
+// ADMIN TAXONOMY SUBMISSION SCHEMAS
+// =============================================
+
+export const adminListTaxonomySubmissionsSchema = z.object({
+  searchQuery: z.string().optional(),
+  status: z.enum(['all', 'pending', 'approved', 'rejected']).optional(),
+  type: z.enum(['all', 'skill', 'tag']).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(10),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+  sortBy: z
+    .enum(['createdAt', 'status', 'label', 'type'])
+    .optional()
+    .default('createdAt'),
+  sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
+});
+
+export type AdminListTaxonomySubmissionsInput = z.infer<
+  typeof adminListTaxonomySubmissionsSchema
+>;
+
+// =============================================
 // ADMIN TAXONOMY MANAGEMENT SCHEMAS
 // =============================================
 

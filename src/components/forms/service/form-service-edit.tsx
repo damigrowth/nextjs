@@ -43,7 +43,9 @@ import {
   type CreateServiceInput,
 } from '@/lib/validations/service';
 import { updateServiceAction } from '@/actions/services/update-service';
+import { submitTaxonomySubmission } from '@/actions/taxonomy-submission';
 import { AuthUser } from '@/lib/types/auth';
+import type { LazyComboboxOption } from '@/components/ui/lazy-combobox';
 import { SubscriptionType } from '@prisma/client';
 import { isValidSubscriptionType } from '@/lib/types/common';
 import {
@@ -71,6 +73,11 @@ type ServiceWithProfile = Prisma.ServiceGetPayload<{
   };
 }>;
 
+interface PendingTagItem {
+  pendingId: string;
+  label: string;
+}
+
 interface FormServiceEditProps {
   service: ServiceWithProfile;
   initialUser: AuthUser | null;
@@ -84,6 +91,7 @@ interface FormServiceEditProps {
     category: any;
   }>;
   availableTags: Array<{ value: string; label: string }>;
+  pendingTags?: PendingTagItem[];
 }
 
 export default function FormServiceEdit({
@@ -93,6 +101,7 @@ export default function FormServiceEdit({
   serviceTaxonomies,
   allSubdivisions,
   availableTags,
+  pendingTags = [],
 }: FormServiceEditProps) {
   const [state, action, isPending] = useActionState(
     async (prevState: any, formData: FormData) => {
@@ -141,7 +150,10 @@ export default function FormServiceEdit({
     trigger,
   } = form;
 
-  // Update form values when service data is available (like profile form pattern)
+  // Guard form.reset() with snapshot ref to prevent unnecessary resets
+  // when service prop reference changes but data is identical (e.g. after server action revalidation)
+  const serviceSnapshotRef = React.useRef<string>('');
+
   useEffect(() => {
     if (service) {
       const resetData = {
@@ -173,7 +185,11 @@ export default function FormServiceEdit({
         faq: service.faq || [],
         media: service.media || [],
       };
-      form.reset(resetData);
+      const snapshot = JSON.stringify(resetData);
+      if (snapshot !== serviceSnapshotRef.current) {
+        serviceSnapshotRef.current = snapshot;
+        form.reset(resetData);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [service]);
@@ -208,8 +224,33 @@ export default function FormServiceEdit({
   const selectedSubcategoryData = findById(serviceTaxonomies, watchedSubcategory);
   const subdivisions = selectedSubcategoryData?.children || [];
 
-  // availableTags now passed as prop from server-side
-  // No need for useMemo since it's already prepared
+  // Merge pending tags into available tags and compute pending IDs set
+  const pendingTagIds = React.useMemo(
+    () => new Set(pendingTags.map((p) => p.pendingId)),
+    [pendingTags],
+  );
+
+  const availableTagsWithPending = React.useMemo(() => {
+    const pendingAsOptions = pendingTags.map((p) => ({
+      value: p.pendingId,
+      label: p.label,
+    }));
+    return [...availableTags, ...pendingAsOptions];
+  }, [availableTags, pendingTags]);
+
+  // Handle creating a new tag via taxonomy submission
+  const handleCreateTag = React.useCallback(
+    async (label: string): Promise<LazyComboboxOption | null> => {
+      const result = await submitTaxonomySubmission({ label, type: 'tag' });
+      if (result.success && result.data) {
+        toast.success(`Το tag "${label}" υποβλήθηκε για έγκριση`);
+        return { id: result.data.pendingId, label };
+      }
+      toast.error(result.message || 'Σφάλμα κατά την υποβολή');
+      return null;
+    },
+    [],
+  );
 
   // Selection handlers - store only ID values
   const handleCategorySelect = (selected: any) => {
@@ -579,7 +620,7 @@ export default function FormServiceEdit({
                     <LazyCombobox
                       trigger='search'
                       multiple
-                      options={availableTags.map((tag) => ({
+                      options={availableTagsWithPending.map((tag) => ({
                         id: tag.value,
                         label: tag.label,
                       }))}
@@ -597,6 +638,14 @@ export default function FormServiceEdit({
                       placeholder='Επιλέξτε tags..'
                       searchPlaceholder='Αναζήτηση tags...'
                       maxItems={10}
+                      allowCreate
+                      onCreateItem={handleCreateTag}
+                      pendingIds={pendingTagIds}
+                      pendingBadgeText={(n) =>
+                        n === 1
+                          ? 'επιλεγμένο tag υπό έγκριση'
+                          : 'επιλεγμένα tags υπό έγκριση'
+                      }
                     />
                   </FormControl>
                   <FormMessage />

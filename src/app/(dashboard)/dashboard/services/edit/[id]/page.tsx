@@ -12,6 +12,7 @@ import { getDashboardMetadata } from '@/lib/seo/pages';
 import { NextLink } from '@/components';
 import { getServiceTaxonomies, getTags, batchFindTagsByIds } from '@/lib/taxonomies';
 import { getAllSubdivisions } from '@/lib/utils/datasets';
+import { getUserTaxonomySubmissions } from '@/actions/taxonomy-submission';
 
 export const metadata = getDashboardMetadata('Επεξεργασία Υπηρεσίας');
 
@@ -65,6 +66,10 @@ export default async function EditServicePage({
     label: tag.label,
   }));
 
+  // Fetch user's pending tags
+  const pendingResult = await getUserTaxonomySubmissions('tag');
+  const pendingTags = pendingResult.success ? pendingResult.data ?? [] : [];
+
   return (
     <div className='max-w-5xl w-full mx-auto space-y-6 p-2 pr-0'>
       {/* Header */}
@@ -101,6 +106,7 @@ export default async function EditServicePage({
           serviceTaxonomies={serviceTaxonomies}
           allSubdivisions={allSubdivisions}
           availableTags={availableTags}
+          pendingTags={pendingTags}
         />
 
         {/* Service Media Form */}

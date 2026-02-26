@@ -36,6 +36,9 @@ import { TaxonomyDataContext } from '../form-service-create';
 import { findById } from '@/lib/utils/datasets';
 import type { CreateServiceInput } from '@/lib/validations/service';
 import { useFormContext, useWatch } from 'react-hook-form';
+import { submitTaxonomySubmission } from '@/actions/taxonomy-submission';
+import { toast } from 'sonner';
+import type { LazyComboboxOption } from '@/components/ui/lazy-combobox';
 
 export default function ServiceDetailsStep() {
   const form = useFormContext<CreateServiceInput>();
@@ -47,7 +50,22 @@ export default function ServiceDetailsStep() {
     throw new Error('ServiceDetailsStep must be used within TaxonomyDataContext');
   }
 
-  const { serviceTaxonomies, allSubdivisions, availableTags } = taxonomyData;
+  const { serviceTaxonomies, allSubdivisions, availableTags, pendingTagIds } =
+    taxonomyData;
+
+  // Handle creating a new pending tag
+  const handleCreateTag = React.useCallback(
+    async (label: string): Promise<LazyComboboxOption | null> => {
+      const result = await submitTaxonomySubmission({ label, type: 'tag' });
+      if (result.success && result.data) {
+        toast.success(`Το tag "${label}" υποβλήθηκε για έγκριση`);
+        return { id: result.data.pendingId, label };
+      }
+      toast.error(result.message || 'Σφάλμα κατά την υποβολή');
+      return null;
+    },
+    [],
+  );
 
   // Use watch for reactive form field watching
   const watchedCategory = watch('category');
@@ -303,6 +321,14 @@ export default function ServiceDetailsStep() {
                   searchPlaceholder='Αναζήτηση tags...'
                   maxItems={10}
                   className='bg-subtle'
+                  allowCreate
+                  onCreateItem={handleCreateTag}
+                  pendingIds={pendingTagIds}
+                  pendingBadgeText={(n) =>
+                    n === 1
+                      ? 'επιλεγμένο tag υπό έγκριση'
+                      : 'επιλεγμένα tags υπό έγκριση'
+                  }
                 />
               </FormControl>
               <FormMessage />

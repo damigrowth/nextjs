@@ -11,7 +11,7 @@ import {
 export function AdminVerificationsTableSkeleton() {
   return (
     <div className='rounded-md border'>
-      <Table>
+      <Table className='[&_th:first-child]:pl-4 [&_td:first-child]:pl-4 [&_th:last-child]:pr-4 [&_td:last-child]:pr-4'>
         <TableHeader>
           <TableRow>
             <TableHead>ID</TableHead>

@@ -1,0 +1,30 @@
+enum TaxonomySubmissionType {
+  skill
+  tag
+}
+
+enum TaxonomySubmissionStatus {
+  pending
+  approved
+  rejected
+}
+
+model TaxonomySubmission {
+  id           String                   @id @default(cuid())
+  label        String
+  type         TaxonomySubmissionType
+  status       TaxonomySubmissionStatus @default(pending)
+  category     String? // For skills only (pro-taxonomy category ID)
+  submittedBy  String // User ID
+  reviewedBy   String? // Admin user ID
+  reviewedAt   DateTime?
+  assignedId   String? // Real numeric ID after approval
+  rejectReason String?
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+
+  @@index([status])
+  @@index([type, status])
+  @@index([submittedBy])
+  @@map("taxonomy_submissions")
+}

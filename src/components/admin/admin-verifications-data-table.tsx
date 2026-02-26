@@ -12,7 +12,6 @@ import {
 } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -130,31 +129,6 @@ export function AdminVerificationsDataTable({
 
   // Column definitions
   const columns: ColumnDef<Verification>[] = [
-    {
-      id: 'select',
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected()
-              ? true
-              : table.getIsSomePageRowsSelected()
-                ? 'indeterminate'
-                : false
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label='Select all'
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label='Select row'
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
     {
       accessorKey: 'status',
       header: ({ column }) => {
@@ -315,7 +289,7 @@ export function AdminVerificationsDataTable({
 
   return (
     <div className='rounded-md border'>
-      <Table>
+      <Table className='[&_th:first-child]:pl-4 [&_td:first-child]:pl-4 [&_th:last-child]:pr-4 [&_td:last-child]:pr-4'>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
@@ -339,14 +313,11 @@ export function AdminVerificationsDataTable({
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
-                data-state={row.getIsSelected() && 'selected'}
                 className='cursor-pointer hover:bg-muted/50'
                 onClick={(e) => {
-                  // Don't navigate if clicking on actions dropdown or checkbox
                   const target = e.target as HTMLElement;
                   if (
                     target.closest('button') ||
-                    target.closest('[role="checkbox"]') ||
                     target.closest('a')
                   ) {
                     return;

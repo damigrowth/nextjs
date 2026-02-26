@@ -42,6 +42,8 @@ import {
 // Import server actions
 import { updateProfileBasicInfo } from '@/actions/profiles/basic-info';
 import { updateProfileBasicInfoAdmin } from '@/actions/admin/profiles/basic-info';
+import { submitTaxonomySubmission } from '@/actions/taxonomy-submission';
+import type { LazyComboboxOption } from '@/components/ui/lazy-combobox';
 import FormButton from '@/components/shared/button-form';
 import { useSession } from '@/lib/auth/client';
 import { AuthUser } from '@/lib/types/auth';
@@ -53,11 +55,18 @@ const initialState = {
   message: '',
 };
 
+interface PendingSkillItem {
+  pendingId: string;
+  label: string;
+  category?: string | null;
+}
+
 interface BasicInfoFormProps {
   initialUser: AuthUser | null;
   initialProfile: Profile | null;
   proTaxonomies: DatasetOption[];
   skillsDataset: DatasetWithCategory[];
+  pendingSkills?: PendingSkillItem[];
   adminMode?: boolean;
   hideCard?: boolean;
 }
@@ -67,6 +76,7 @@ export default function BasicInfoForm({
   initialProfile,
   proTaxonomies,
   skillsDataset,
+  pendingSkills = [],
   adminMode = false,
   hideCard = false,
 }: BasicInfoFormProps) {
@@ -108,7 +118,11 @@ export default function BasicInfoForm({
     watch,
   } = form;
 
-  // Update form values when profile data changes (e.g., after save)
+  // Update form values when profile data actually changes (e.g., after save)
+  // Uses a snapshot ref to avoid resetting on same-data re-renders
+  // (e.g., after a server action like submitTaxonomySubmission triggers route re-render)
+  const profileSnapshotRef = React.useRef<string>('');
+
   useEffect(() => {
     if (profile) {
       const resetData = {
@@ -119,9 +133,13 @@ export default function BasicInfoForm({
         skills: profile.skills || [],
         speciality: profile.speciality || '',
       };
-      form.reset(resetData, { keepDefaultValues: false });
+      const snapshot = JSON.stringify(resetData);
+      if (snapshot !== profileSnapshotRef.current) {
+        profileSnapshotRef.current = snapshot;
+        form.reset(resetData, { keepDefaultValues: false });
+      }
     }
-  }, [profile, form]); // Reset when profile data changes
+  }, [profile, form]);
 
   // Handle successful form submission - refresh session and page to get updated data
   useEffect(() => {
@@ -172,6 +190,38 @@ export default function BasicInfoForm({
       ? getSkillsByIds(skillsDataset, watchedSkills)
       : [];
   }, [watchedSkills, skillsDataset]);
+
+  // Pending skills: merge into filtered skills as options + track IDs
+  const pendingSkillIds = React.useMemo(
+    () => new Set(pendingSkills.map((p) => p.pendingId)),
+    [pendingSkills],
+  );
+
+  const filteredSkillsWithPending = React.useMemo(() => {
+    const pendingForCategory = pendingSkills
+      .filter((p) => p.category === watchedCategory)
+      .map((p) => ({ id: p.pendingId, label: p.label }));
+    return [...filteredSkills, ...pendingForCategory];
+  }, [filteredSkills, pendingSkills, watchedCategory]);
+
+  // Handle creating a new pending skill
+  const handleCreateSkill = React.useCallback(
+    async (label: string): Promise<LazyComboboxOption | null> => {
+      if (!watchedCategory) return null;
+      const result = await submitTaxonomySubmission({
+        label,
+        type: 'skill',
+        category: watchedCategory,
+      });
+      if (result.success && result.data) {
+        toast.success(`Η δεξιότητα "${label}" υποβλήθηκε για έγκριση`);
+        return { id: result.data.pendingId, label };
+      }
+      toast.error(result.message || 'Σφάλμα κατά την υποβολή');
+      return null;
+    },
+    [watchedCategory],
+  );
 
   // Helper functions for formatting inputs
   const handleTaglineChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -381,7 +431,7 @@ export default function BasicInfoForm({
                       <LazyCombobox
                         key={`skills-${watchedCategory}`} // Force remount when category changes
                         multiple
-                        options={filteredSkills}
+                        options={filteredSkillsWithPending}
                         values={field.value || []}
                         onMultiSelect={(selectedOptions) => {
                           const selectedIds = selectedOptions.map(
@@ -406,6 +456,14 @@ export default function BasicInfoForm({
                         placeholder='Επιλέξτε δεξιότητες...'
                         searchPlaceholder='Αναζήτηση δεξιοτήτων...'
                         maxItems={10}
+                        allowCreate={!adminMode}
+                        onCreateItem={handleCreateSkill}
+                        pendingIds={pendingSkillIds}
+                        pendingBadgeText={(n) =>
+                          n === 1
+                            ? 'επιλεγμένη δεξιότητα υπό έγκριση'
+                            : 'επιλεγμένες δεξιότητες υπό έγκριση'
+                        }
                       />
                     ) : (
                       <div className='p-4 text-center text-gray-500 bg-gray-50 rounded-md'>
