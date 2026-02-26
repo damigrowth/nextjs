@@ -589,7 +589,7 @@ export function AdminCreateServiceForm({
 
   return (
     <TaxonomyDataContext.Provider
-      value={{ serviceTaxonomies, allSubdivisions, availableTags }}
+      value={{ serviceTaxonomies, allSubdivisions, availableTags, pendingTagIds: new Set<string>() }}
     >
       <div className='mx-auto w-full max-w-5xl space-y-6'>
         <Form {...form}>
