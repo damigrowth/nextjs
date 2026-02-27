@@ -370,6 +370,7 @@ export async function removeUser(data: z.infer<typeof adminRemoveUserSchema>) {
     await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'full');
 
     const validatedData = adminRemoveUserSchema.parse(data);
+    const { prisma } = await import('@/lib/prisma/client');
 
     // Fetch user before deletion to get email for cleanup
     // auth.api.removeUser() bypasses deleteUser.beforeDelete hook,
