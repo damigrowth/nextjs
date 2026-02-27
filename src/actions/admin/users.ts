@@ -8,6 +8,7 @@ import { processImageForDatabase } from '@/lib/utils/cloudinary';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 import { UserRole, UserType, JourneyStep } from '@prisma/client';
 import { brevoWorkflowService } from '@/lib/email/providers/brevo/workflows';
+import { brevoListManager } from '@/lib/email/providers/brevo/list-management';
 // legacy exports
 // import {
 //   listUsersSchema,
@@ -246,6 +247,13 @@ export async function createUser(data: z.infer<typeof adminCreateUserSchema>) {
       headers: await headers(),
     });
 
+    // Sync Brevo list for admin-created user
+    if (result?.id) {
+      brevoWorkflowService.handleUserStateChange(result.id).catch((error) => {
+        console.error('Brevo sync error after admin createUser:', error);
+      });
+    }
+
     return {
       success: true,
       data: result,
@@ -283,6 +291,11 @@ export async function setUserRole(data: z.infer<typeof adminSetRoleSchema>) {
         role: validatedData.role as any, // Type assertion for your custom roles
       },
       headers: await headers(),
+    });
+
+    // Sync Brevo list after role change
+    brevoWorkflowService.handleUserStateChange(validatedData.userId).catch((error) => {
+      console.error('Brevo sync error after setUserRole:', error);
     });
 
     return {
@@ -357,6 +370,31 @@ export async function removeUser(data: z.infer<typeof adminRemoveUserSchema>) {
     await getAdminSessionWithPermission(ADMIN_RESOURCES.USERS, 'full');
 
     const validatedData = adminRemoveUserSchema.parse(data);
+
+    // Fetch user before deletion to get email for cleanup
+    // auth.api.removeUser() bypasses deleteUser.beforeDelete hook,
+    // so we must run Brevo + verification cleanup manually
+    const user = await prisma.user.findUnique({
+      where: { id: validatedData.userId },
+      select: { email: true },
+    });
+
+    if (user?.email) {
+      try {
+        await brevoListManager.deleteContact(user.email);
+        console.log(`Brevo contact deleted for ${user.email}`);
+      } catch (error) {
+        console.error('Brevo cleanup error during admin deletion:', error);
+      }
+
+      try {
+        await prisma.verification.deleteMany({
+          where: { identifier: user.email },
+        });
+      } catch (error) {
+        console.error('Verification cleanup error during admin deletion:', error);
+      }
+    }
 
     const result = await auth.api.removeUser({
       body: validatedData,
@@ -534,6 +572,11 @@ export async function updateUser(data: z.infer<typeof adminUpdateUserSchema>) {
       });
       results.push({ field: 'role', result: roleResult });
       hasUpdates = true;
+
+      // Sync Brevo list after role change
+      brevoWorkflowService.handleUserStateChange(userId).catch((error) => {
+        console.error('Brevo sync error after admin updateUser role:', error);
+      });
     }
 
     // For other fields like name, email, confirmed, blocked, step, emailVerified
@@ -751,6 +794,11 @@ export async function updateUserBanStatus(data: {
         banReason: data.banReason,
         banExpires: data.banExpires,
       },
+    });
+
+    // Sync Brevo list (banned → remove from all lists, unbanned → re-add to correct list)
+    brevoWorkflowService.handleUserStateChange(data.userId).catch((error) => {
+      console.error('Brevo sync error after updateUserBanStatus:', error);
     });
 
     return {
@@ -1521,6 +1569,11 @@ export async function assignAdminRole(
       },
     });
 
+    // Sync Brevo list after role/step change
+    brevoWorkflowService.handleUserStateChange(userId).catch((error) => {
+      console.error('Brevo sync error after assignAdminRole:', error);
+    });
+
     // Revalidate team page
     revalidatePath('/admin/team');
 
@@ -1605,6 +1658,11 @@ export async function removeAdminRole(
       data: {
         role: newRole,
       },
+    });
+
+    // Sync Brevo list after role revert (re-add to correct list)
+    brevoWorkflowService.handleUserStateChange(userId).catch((error) => {
+      console.error('Brevo sync error after removeAdminRole:', error);
     });
 
     // Revalidate team page

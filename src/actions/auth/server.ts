@@ -10,6 +10,7 @@ import { redirect } from 'next/navigation';
 import { getProfileByUserId } from '@/actions/profiles/get-profile';
 import { Session } from 'better-auth';
 import { prisma } from '@/lib/prisma/client';
+import { brevoWorkflowService } from '@/lib/email/providers/brevo/workflows';
 
 /**
  * Check if user is authenticated and return user/session data
@@ -422,6 +423,9 @@ export async function requireOnboardingComplete(onboardingUrl = '/onboarding') {
           data: { step: 'ONBOARDING' }
         });
       }
+
+      // Sync Brevo list after step change (DASHBOARD → ONBOARDING)
+      brevoWorkflowService.handleUserStateChange(user.id).catch(console.error);
 
       redirect(onboardingUrl);
     }

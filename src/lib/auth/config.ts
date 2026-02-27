@@ -10,6 +10,7 @@ import {
   sendPasswordResetEmail,
 } from '@/lib/email';
 import { brevoListManager } from '@/lib/email/providers/brevo/list-management';
+import { brevoWorkflowService } from '@/lib/email/providers/brevo/workflows';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma/client';
 import { cookies } from 'next/headers';
@@ -432,17 +433,18 @@ export const auth = betterAuth({
                   step: 'ONBOARDING' as JourneyStep,
                 },
               });
-            } else {
-              // Fallback for unknown type - treat as simple user
-              console.warn(
-                `Email verification: unknown user type "${userWithFields.type}" for user ${userWithFields.id}. Defaulting to DASHBOARD.`,
+            }
+
+            // Sync Brevo list after step transition
+            try {
+              await brevoWorkflowService.handleUserStateChange(
+                userWithFields.id,
               );
-              await prisma.user.update({
-                where: { id: userWithFields.id },
-                data: {
-                  step: 'DASHBOARD' as JourneyStep,
-                },
-              });
+            } catch (error) {
+              console.error(
+                `[AUTH] Brevo sync failed after email verification for user ${userWithFields.id}:`,
+                error,
+              );
             }
           }
         },
