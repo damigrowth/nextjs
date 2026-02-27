@@ -248,8 +248,8 @@ export async function createUser(data: z.infer<typeof adminCreateUserSchema>) {
     });
 
     // Sync Brevo list for admin-created user
-    if (result?.id) {
-      brevoWorkflowService.handleUserStateChange(result.id).catch((error) => {
+    if (result?.user?.id) {
+      brevoWorkflowService.handleUserStateChange(result.user.id).catch((error) => {
         console.error('Brevo sync error after admin createUser:', error);
       });
     }
