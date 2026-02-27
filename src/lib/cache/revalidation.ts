@@ -134,11 +134,12 @@ export async function revalidateProfile(params: {
   revalidateTag(CACHE_TAGS.user.byId(userId));
   revalidateTag(CACHE_TAGS.user.profile(userId));
 
-  // Services (profile changes affect service listings)
+  // Services (profile changes affect service listings and detail pages)
   if (includeServices) {
     revalidateTag(CACHE_TAGS.user.services(userId));
     revalidateTag(CACHE_TAGS.profile.services(profileId));
     revalidateTag(CACHE_TAGS.service.byProfile(profileId));
+    revalidateTag(CACHE_TAGS.collections.services);
   }
 
   // Archive/listing pages
