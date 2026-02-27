@@ -1,4 +1,4 @@
-// Generated on 2026-02-26T22:25:55.194Z
+// Generated on 2026-02-27T18:26:51.352Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const skills = [
@@ -3601,5 +3601,11 @@ export const skills = [
     label: 'Στρατηγική Marketing',
     slug: '-marketing',
     category: 'Z0YeWT',
+  },
+  {
+    id: '615',
+    label: 'Μετακομίσεις',
+    slug: 'metakomiseis',
+    category: 'XHoZuL',
   },
 ];
