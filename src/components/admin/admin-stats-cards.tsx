@@ -1,4 +1,9 @@
-import { BriefcaseIcon, CheckCircleIcon, UsersIcon } from 'lucide-react';
+import {
+  BriefcaseIcon,
+  CheckCircleIcon,
+  FileTextIcon,
+  UsersIcon,
+} from 'lucide-react';
 
 import {
   Card,
@@ -27,19 +32,28 @@ interface UserStats {
   };
 }
 
+interface SubmissionStats {
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+}
+
 interface AdminStatsCardsProps {
   serviceStats: ServiceStats | null;
   profileStats: ProfileStats | null;
   userStats: UserStats | null;
+  submissionStats?: SubmissionStats | null;
 }
 
 export function AdminStatsCards({
   serviceStats,
   profileStats,
   userStats,
+  submissionStats,
 }: AdminStatsCardsProps) {
   return (
-    <div className='grid gap-4 px-4 md:grid-cols-3 lg:px-6'>
+    <div className='grid gap-4 px-4 md:grid-cols-2 lg:grid-cols-4 lg:px-6'>
       {/* Services Card */}
       {serviceStats && (
         <Card>
@@ -118,6 +132,41 @@ export function AdminStatsCards({
                 <span>Pro</span>
                 <span className='font-medium text-foreground'>
                   {userStats.byType.pro}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Submissions Card */}
+      {submissionStats && (
+        <Card>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>
+              Total Submissions
+            </CardTitle>
+            <FileTextIcon className='h-4 w-4 text-muted-foreground' />
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold'>{submissionStats.total}</div>
+            <div className='mt-4 space-y-1 text-xs text-muted-foreground'>
+              <div className='flex items-center justify-between'>
+                <span>Pending</span>
+                <span className='font-medium text-foreground'>
+                  {submissionStats.pending}
+                </span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span>Approved</span>
+                <span className='font-medium text-foreground'>
+                  {submissionStats.approved}
+                </span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span>Rejected</span>
+                <span className='font-medium text-foreground'>
+                  {submissionStats.rejected}
                 </span>
               </div>
             </div>

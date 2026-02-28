@@ -5,10 +5,9 @@ import { revalidatePath } from 'next/cache';
 import { getAdminSessionWithPermission } from './helpers';
 import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import { getTaxonomyData } from './taxonomy-helpers';
-import { commitTaxonomyChange } from './taxonomy-git';
 import { generateUniqueSlug } from '@/lib/utils/text/slug';
 import { createSubmissionId } from '@/lib/utils/taxonomy-submission';
-import { findProById } from '@/lib/taxonomies';
+import { findProById, injectTaxonomyItem } from '@/lib/taxonomies';
 import {
   adminListTaxonomySubmissionsSchema,
   type AdminListTaxonomySubmissionsInput,
@@ -229,9 +228,19 @@ async function removeSubmissionIdFromRecords(
 // APPROVE
 // ============================================================================
 
+interface ApproveTaxonomyResult {
+  success: boolean;
+  error?: string;
+  assignedId?: string;
+  draft?: {
+    taxonomyType: TaxonomyType;
+    item: DatasetItem;
+  };
+}
+
 export async function approveTaxonomySubmission(
   id: string,
-): Promise<{ success: boolean; error?: string; assignedId?: string }> {
+): Promise<ApproveTaxonomyResult> {
   try {
     const session = await getAdminSessionWithPermission(
       ADMIN_RESOURCES.TAXONOMIES,
@@ -246,11 +255,11 @@ export async function approveTaxonomySubmission(
       return { success: false, error: 'Record is not pending' };
     }
 
-    // Determine taxonomy type for Git
+    // Determine taxonomy type
     const taxonomyType: TaxonomyType =
       record.type === 'skill' ? 'skills' : 'tags';
 
-    // Read current dataset from Git
+    // Read current dataset from Git to generate unique ID/slug
     const dataResult = await getTaxonomyData(taxonomyType);
     if (!isSuccess(dataResult)) {
       return {
@@ -284,21 +293,6 @@ export async function approveTaxonomySubmission(
       newItem.category = record.category;
     }
 
-    // Add to dataset and commit to Git
-    const updatedItems = [...currentItems, newItem];
-    const commitResult = await commitTaxonomyChange(
-      taxonomyType,
-      updatedItems,
-      `Add ${record.type}: ${record.label}`,
-    );
-
-    if (!commitResult.success) {
-      return {
-        success: false,
-        error: `Git commit failed: ${commitResult.error}`,
-      };
-    }
-
     // Update DB record
     await prisma.taxonomySubmission.update({
       where: { id },
@@ -313,10 +307,20 @@ export async function approveTaxonomySubmission(
     // Replace submission ID with real ID in all profiles/services
     await replaceSubmissionIdInRecords(id, newId, record.type as 'skill' | 'tag');
 
+    // Inject into runtime taxonomy cache so the item is immediately available
+    // without requiring a rebuild of maps.generated.json
+    injectTaxonomyItem(taxonomyType, newItem);
+
     revalidatePath('/admin/taxonomies');
     revalidatePath('/dashboard');
 
-    return { success: true, assignedId: newId };
+    // Return draft data so the client can save it to localStorage
+    // Admin then publishes from /admin/git like any other taxonomy change
+    return {
+      success: true,
+      assignedId: newId,
+      draft: { taxonomyType, item: newItem },
+    };
   } catch (error) {
     console.error('Error approving taxonomy submission:', error);
     return {

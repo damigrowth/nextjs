@@ -852,6 +852,27 @@ export function clearTaxonomyCache() {
   _taxonomyMaps = null;
 }
 
+/**
+ * Inject a newly approved taxonomy item into the runtime cache.
+ *
+ * After admin approval, the new item is committed to Git but maps.generated.json
+ * hasn't been rebuilt yet. This injects the item into the in-memory cache so
+ * lookups return it immediately without requiring a rebuild.
+ *
+ * @param type - 'skills' or 'tags'
+ * @param item - The new DatasetItem to inject
+ */
+export function injectTaxonomyItem(
+  type: 'skills' | 'tags',
+  item: DatasetItem,
+): void {
+  const maps = getTaxonomyMaps();
+  if (maps[type]) {
+    maps[type].byId[item.id] = item;
+    maps[type].bySlug[item.slug] = item;
+  }
+}
+
 // ============================================================================
 // EXPORTS
 // ============================================================================

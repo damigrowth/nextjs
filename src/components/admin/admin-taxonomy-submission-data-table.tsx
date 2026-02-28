@@ -28,6 +28,8 @@ import {
   approveTaxonomySubmission,
   rejectTaxonomySubmission,
 } from '@/actions/admin/taxonomy-submission';
+import { saveDraft } from '@/lib/taxonomy-drafts';
+import { createDraftData } from '@/lib/validations/taxonomy-drafts';
 import { toast } from 'sonner';
 
 interface SubmissionItem {
@@ -89,7 +91,22 @@ export function AdminTaxonomySubmissionDataTable({
     startTransition(async () => {
       const result = await approveTaxonomySubmission(id);
       if (result.success) {
-        toast.success(`Approved (ID: ${result.assignedId})`);
+        // Save draft to localStorage so admin can publish from /admin/git
+        if (result.draft) {
+          try {
+            const draft = createDraftData(result.draft.taxonomyType, 'create', {
+              data: result.draft.item,
+              level: null,
+              parentId: null,
+            });
+            saveDraft(draft);
+          } catch (draftError) {
+            console.error('Error saving draft:', draftError);
+          }
+        }
+        toast.success(
+          `Approved (ID: ${result.assignedId}). Go to Git to publish.`,
+        );
         router.refresh();
       } else {
         toast.error(result.error || 'Error approving');

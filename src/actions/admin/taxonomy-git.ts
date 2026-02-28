@@ -281,15 +281,21 @@ export async function commitTaxonomyChange(
 
     console.log(`[TAXONOMY_GIT] Committed ${type} taxonomy:`, commit.commit.sha);
 
-    // Auto-create PR if it doesn't exist
-    const prResult = await ensurePullRequest(defaultBranch);
+    // Try to create/find a PR, but don't block on failure
+    // The commit already landed on the target branch, so a PR is optional
+    let prResult: PullRequestResult | null = null;
+    try {
+      prResult = await ensurePullRequest(defaultBranch);
+    } catch (prError) {
+      console.warn('[TAXONOMY_GIT] PR creation skipped (non-blocking):', prError);
+    }
 
     return {
       success: true,
       commitSha: commit.commit.sha,
       commitUrl: commit.commit.html_url,
-      prNumber: prResult.pr?.number,
-      prUrl: prResult.pr?.url,
+      prNumber: prResult?.pr?.number,
+      prUrl: prResult?.pr?.url,
     };
   } catch (error) {
     console.error('[TAXONOMY_GIT] Commit error:', error);

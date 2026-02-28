@@ -4,6 +4,7 @@ import { SiteHeader } from '@/components/admin/site-header';
 import { getServiceStats } from '@/actions/admin/services';
 import { getProfileStats } from '@/actions/admin/profiles';
 import { getUserStats } from '@/actions/admin/users';
+import { getTaxonomySubmissionStats } from '@/actions/admin/taxonomy-submission';
 import { hasPermission } from '@/actions/auth/server';
 import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 
@@ -12,24 +13,30 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
   // Check permissions first to avoid redirect errors
-  const [canViewServices, canViewProfiles, canViewUsers] = await Promise.all([
-    hasPermission(ADMIN_RESOURCES.SERVICES),
-    hasPermission(ADMIN_RESOURCES.PROFILES),
-    hasPermission(ADMIN_RESOURCES.USERS),
-  ]);
+  const [canViewServices, canViewProfiles, canViewUsers, canViewTaxonomies] =
+    await Promise.all([
+      hasPermission(ADMIN_RESOURCES.SERVICES),
+      hasPermission(ADMIN_RESOURCES.PROFILES),
+      hasPermission(ADMIN_RESOURCES.USERS),
+      hasPermission(ADMIN_RESOURCES.TAXONOMIES),
+    ]);
 
   // Only fetch stats for resources user can access
-  const [servicesResult, profilesResult, usersResult] = await Promise.all([
-    canViewServices
-      ? getServiceStats()
-      : Promise.resolve({ success: false, data: null }),
-    canViewProfiles
-      ? getProfileStats()
-      : Promise.resolve({ success: false, data: null }),
-    canViewUsers
-      ? getUserStats()
-      : Promise.resolve({ success: false, data: null }),
-  ]);
+  const [servicesResult, profilesResult, usersResult, submissionsResult] =
+    await Promise.all([
+      canViewServices
+        ? getServiceStats()
+        : Promise.resolve({ success: false, data: null }),
+      canViewProfiles
+        ? getProfileStats()
+        : Promise.resolve({ success: false, data: null }),
+      canViewUsers
+        ? getUserStats()
+        : Promise.resolve({ success: false, data: null }),
+      canViewTaxonomies
+        ? getTaxonomySubmissionStats()
+        : Promise.resolve({ success: false, data: null }),
+    ]);
 
   // Extract data from results
   const serviceStats =
@@ -61,6 +68,16 @@ export default async function AdminDashboard() {
         }
       : null;
 
+  const submissionStats =
+    submissionsResult.success && submissionsResult.data
+      ? {
+          total: submissionsResult.data.total,
+          pending: submissionsResult.data.pending,
+          approved: submissionsResult.data.approved,
+          rejected: submissionsResult.data.rejected,
+        }
+      : null;
+
   return (
     <>
       <SiteHeader title='Dashboard' />
@@ -69,6 +86,7 @@ export default async function AdminDashboard() {
           serviceStats={serviceStats}
           profileStats={profileStats}
           userStats={userStats}
+          submissionStats={submissionStats}
         />
         <AdminNavCards />
       </div>
