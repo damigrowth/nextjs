@@ -3,8 +3,6 @@
 import React, { useActionState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
-import { useSession } from '@/lib/auth/client';
 
 // Shadcn UI components
 import { Button } from '@/components/ui/button';
@@ -17,6 +15,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import {
   DialogHeader,
@@ -64,13 +63,11 @@ export default function UpgradeToProForm({
     initialState,
   );
   const [isTransitionPending, startTransition] = useTransition();
-  const router = useRouter();
-  const { refetch: refreshSession } = useSession();
 
   const form = useForm<UpgradeToProInput>({
     resolver: zodResolver(upgradeToProSchema),
     defaultValues: {
-      displayName: user?.displayName ?? '',
+      username: user?.username ?? '',
     },
     mode: 'onChange',
   });
@@ -102,14 +99,8 @@ export default function UpgradeToProForm({
 
       toast.success(state.message, { id: 'upgrade-to-pro-success' });
 
-      // Close dialog
-      onSuccess?.();
-
-      // Refresh session so client-side reflects new type/role
-      refreshSession();
-
-      // Redirect to onboarding
-      router.push('/onboarding');
+      // Hard redirect to onboarding — ensures full page load with fresh session
+      window.location.href = '/onboarding';
     } else if (!state.success && state.message) {
       toast.error(state.message, { id: 'upgrade-to-pro-error' });
     }
@@ -117,7 +108,7 @@ export default function UpgradeToProForm({
     if (!state.success) {
       toastShownRef.current = false;
     }
-  }, [state, onSuccess, refreshSession, router]);
+  }, [state]);
 
   return (
     <>
@@ -141,21 +132,25 @@ export default function UpgradeToProForm({
             </AlertDescription>
           </Alert>
 
-          {/* Display Name */}
+          {/* Username */}
           <FormField
             control={form.control}
-            name='displayName'
+            name='username'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Όνομα Εμφάνισης</FormLabel>
+                <FormLabel>Username</FormLabel>
                 <FormControl>
                   <Input
                     type='text'
-                    placeholder='π.χ. Γιάννης Παπαδόπουλος'
+                    placeholder='π.χ. giannis-papadopoulos'
                     autoComplete='off'
                     {...field}
                   />
                 </FormControl>
+                <FormDescription>
+                  3-30 χαρακτήρες. Επιτρέπονται μόνο λατινικοί χαρακτήρες,
+                  αριθμοί, παύλες (-) και κάτω παύλες (_).
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

@@ -14,7 +14,7 @@ import { brevoWorkflowService } from '@/lib/email/providers/brevo/workflows';
 
 /**
  * Upgrade a simple user account to a professional account.
- * Sets type='pro', role='freelancer'|'company', displayName, step='ONBOARDING'.
+ * Sets type='pro', role='freelancer'|'company', username, step='ONBOARDING'.
  * The existing onboarding guard will then enforce onboarding completion.
  */
 export async function upgradeToProAccount(
@@ -24,7 +24,7 @@ export async function upgradeToProAccount(
   try {
     // Extract and validate form data
     const validatedFields = upgradeToProSchema.safeParse({
-      displayName: getFormString(formData, 'displayName'),
+      username: getFormString(formData, 'username'),
       role: getFormString(formData, 'role'),
     });
 
@@ -35,7 +35,7 @@ export async function upgradeToProAccount(
       );
     }
 
-    const { displayName, role } = validatedFields.data;
+    const { username, role } = validatedFields.data;
 
     // Get current session
     const sessionResult = await getSession();
@@ -57,13 +57,33 @@ export async function upgradeToProAccount(
       };
     }
 
-    // Update user: type, role, displayName, step
+    // Check if username is already taken by another user
+    const currentUsername = user.username?.toLowerCase();
+    if (username !== currentUsername) {
+      const existingUser = await prisma.user.findUnique({
+        where: { username },
+        select: { id: true },
+      });
+
+      if (existingUser && existingUser.id !== user.id) {
+        return {
+          success: false,
+          message: 'Αυτό το username χρησιμοποιείται ήδη',
+        };
+      }
+    }
+
+    // Get original case from form (before Zod lowercase transform)
+    const originalCaseUsername = getFormString(formData, 'username');
+
+    // Update user: type, role, username, step
     await prisma.user.update({
       where: { id: user.id },
       data: {
         type: 'pro' as UserType,
         role: role as UserRole,
-        displayName,
+        username,
+        displayUsername: originalCaseUsername,
         step: 'ONBOARDING' as JourneyStep,
       },
     });

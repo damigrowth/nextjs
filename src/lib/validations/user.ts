@@ -107,10 +107,15 @@ export const changeUsernameSchema = z
 // =============================================
 
 export const upgradeToProSchema = z.object({
-  displayName: z
+  username: z
     .string()
-    .min(2, 'Το όνομα εμφάνισης πρέπει να έχει τουλάχιστον 2 χαρακτήρες')
-    .max(50, 'Το όνομα εμφάνισης δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες'),
+    .min(3, 'Το username πρέπει να έχει τουλάχιστον 3 χαρακτήρες')
+    .max(30, 'Το username δεν μπορεί να υπερβαίνει τους 30 χαρακτήρες')
+    .regex(
+      /^[a-zA-Z0-9_-]+$/,
+      'Επιτρέπονται μόνο λατινικοί χαρακτήρες, αριθμοί, παύλες και κάτω παύλες',
+    )
+    .transform((val) => val.toLowerCase()),
   role: z.enum(['freelancer', 'company'], {
     message: 'Επιλέξτε τύπο λογαριασμού',
   }),
