@@ -1,4 +1,4 @@
-// Generated on 2026-02-27T18:26:51.352Z
+// Generated on 2026-02-28T16:34:17.506Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const skills = [
@@ -3607,5 +3607,11 @@ export const skills = [
     label: 'Μετακομίσεις',
     slug: 'metakomiseis',
     category: 'XHoZuL',
+  },
+  {
+    id: '616',
+    label: 'Soundcloud',
+    slug: 'soundcloud',
+    category: 'q20QDs',
   },
 ];
