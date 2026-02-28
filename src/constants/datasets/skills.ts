@@ -1,6 +1,5 @@
-// Generated on 2026-01-19T14:43:17.420Z
-// All data is sorted alphabetically by label
-// Skills with optional category relationship
+// Generated on 2026-02-28T14:18:13.148Z
+import type { DatasetItem } from '@/lib/types/datasets';
 
 export const skills = [
   {
@@ -3585,5 +3584,11 @@ export const skills = [
     slug: 'psuxagogia-koinou',
     label: 'Ψυχαγωγία Κοινού',
     category: '8',
+  },
+  {
+    id: '613',
+    label: 'Prospecting',
+    slug: 'prospecting',
+    category: 'q20QDs',
   },
 ];
