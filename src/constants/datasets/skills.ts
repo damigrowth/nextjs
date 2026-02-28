@@ -1,4 +1,4 @@
-// Generated on 2026-02-28T14:18:13.148Z
+// Generated on 2026-02-28T15:28:55.607Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const skills = [
@@ -3589,6 +3589,12 @@ export const skills = [
     id: '613',
     label: 'Prospecting',
     slug: 'prospecting',
+    category: 'q20QDs',
+  },
+  {
+    id: '614',
+    label: 'Saas',
+    slug: 'saas',
     category: 'q20QDs',
   },
 ];
