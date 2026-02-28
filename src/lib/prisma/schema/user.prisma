@@ -82,7 +82,7 @@ model Profile {
   /// [VisibilitySettings]
   visibility Json? // Visibility settings {email, phone, address}
   /// [SocialMedia]
-  socials    Json? // Social media links {facebook, instagram, linkedin, x, youtube, github, behance, dribbble, pinterest, vimeo}
+  socials    Json? // Social media links {facebook, instagram, linkedin, x, youtube, github, behance, dribbble, pinterest, vimeo, tiktok}
   viber      String? // Viber contact
   whatsapp   String? // WhatsApp contact
 

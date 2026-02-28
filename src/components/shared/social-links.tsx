@@ -46,6 +46,8 @@ const getSocialColor = (platform: string) => {
       return 'hover:text-[#BD081C]';
     case 'vimeo':
       return 'hover:text-[#1AB7EA]';
+    case 'tiktok':
+      return 'hover:text-[#000000]';
     default:
       return 'hover:text-primary';
   }

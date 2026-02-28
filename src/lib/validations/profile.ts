@@ -289,6 +289,12 @@ export const socialMediaSchema = z.object({
     .optional()
     .nullable()
     .or(z.literal('')),
+  tiktok: z
+    .string()
+    .url('Εισάγετε έγκυρο URL')
+    .optional()
+    .nullable()
+    .or(z.literal('')),
 });
 
 // =============================================

@@ -61,6 +61,7 @@ export const socialMediaSchema = z.object({
   dribbble: z.string().optional().nullable(),
   pinterest: z.string().optional().nullable(),
   vimeo: z.string().optional().nullable(),
+  tiktok: z.string().optional().nullable(),
 });
 
 export const billingInfoSchema = z.object({

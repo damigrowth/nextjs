@@ -62,6 +62,7 @@ const initialSocials = {
   dribbble: '',
   pinterest: '',
   vimeo: '',
+  tiktok: '',
 };
 
 // Available social media platforms
@@ -76,6 +77,7 @@ const socialPlatformOptions: Option[] = [
   { value: 'dribbble', label: 'Dribbble' },
   { value: 'pinterest', label: 'Pinterest' },
   { value: 'vimeo', label: 'Vimeo' },
+  { value: 'tiktok', label: 'TikTok' },
 ];
 
 interface PresentationInfoFormProps {
@@ -640,6 +642,29 @@ export default function PresentationInfoForm({
                         <FormControl>
                           <Input
                             placeholder='https://vimeo.com/your-channel'
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {selectedPlatforms.includes('tiktok') && (
+                  <FormField
+                    control={form.control}
+                    name='socials.tiktok'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className='flex items-center gap-2'>
+                          <Icon name='tiktok' size={16} />
+                          TikTok
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='https://tiktok.com/@your-profile'
                             {...field}
                             value={field.value || ''}
                           />
