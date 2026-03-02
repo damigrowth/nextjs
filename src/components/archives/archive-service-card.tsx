@@ -1,26 +1,24 @@
 import { Card } from '@/components/ui/card';
-import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
+import { Badge } from '@/components/ui/badge';
 import type { ArchiveServiceCardData } from '@/lib/types/components';
 import type { ServiceCardData } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 import { NextLink } from '@/components';
-import MediaCarousel from '@/components/shared/media-carousel';
 import ProfileBadges from '@/components/shared/profile-badges';
 import RatingDisplay from '@/components/shared/rating-display';
 import UserAvatar from '@/components/shared/user-avatar';
 import { CoverageDisplay } from './coverage-display';
-import { getServiceDisplayMedia } from '@/lib/utils/media';
+import { MediaTypeIndicators } from '@/components/shared/media-type-indicators';
 
 interface ArchiveServiceCardProps {
   service: ArchiveServiceCardData | ServiceCardData;
   className?: string;
-  showProfile?: boolean;
 }
 
 export function ArchiveServiceCard({
   service,
   className,
-  showProfile = true,
 }: ArchiveServiceCardProps) {
   // Check if service has taxonomyLabels (ArchiveServiceCardData) or just category (ServiceCardData)
   const hasDetailedTaxonomies = 'taxonomyLabels' in service;
@@ -40,7 +38,9 @@ export function ArchiveServiceCard({
     'verified' in service.profile ? service.profile.verified : false;
   const profileTop = 'top' in service.profile ? service.profile.top : false;
   const profileGroupedCoverage =
-    'groupedCoverage' in service.profile ? service.profile.groupedCoverage : [];
+    'groupedCoverage' in service.profile
+      ? service.profile.groupedCoverage
+      : [];
 
   // Check if profile has rating data (might not exist in ServiceCardData)
   const profileRating =
@@ -48,14 +48,14 @@ export function ArchiveServiceCard({
   const profileReviewCount =
     'reviewCount' in service.profile ? service.profile.reviewCount : 0;
 
-  // Merge service media with profile portfolio (portfolio as fallback)
-  const profilePortfolio =
-    'portfolio' in service.profile ? service.profile.portfolio : undefined;
-  const displayMedia = getServiceDisplayMedia(service.media, profilePortfolio);
-
   // Convert price to number for reliable comparison
   const priceValue = Number(service?.price) || 0;
   const hasValidPrice = priceValue > 0;
+
+  // Get optimized background image URL for profile section
+  const optimizedBgImage = service.profile.image
+    ? getOptimizedImageUrl(service.profile.image, 'card')
+    : null;
 
   return (
     <Card
@@ -64,33 +64,39 @@ export function ArchiveServiceCard({
         className,
       )}
     >
-      <div
-        className={cn(
-          'flex flex-col md:flex-row h-full',
-          displayMedia.length > 0 && 'md:h-52',
-        )}
-      >
-        {/* Media Section - Shows first on mobile, second on desktop */}
-        {displayMedia.length > 0 && (
-          <NextLink
-            href={`/s/${service.slug}`}
-            className='w-full md:w-96 flex-shrink-0 relative overflow-hidden md:order-2'
-          >
-            <MediaCarousel
-              media={displayMedia}
-              className='w-full h-full'
-              compactMode={true}
-              showThumbnails={false}
-              showControls={true}
-              aspectRatio='video'
-              noAudioFiles={true}
-            />
-          </NextLink>
-        )}
+      <div className='flex flex-col md:flex-row h-full md:h-52'>
+        {/* Profile Image Section - Left side */}
+        <NextLink
+          href={`/profile/${service.profile.username}`}
+          className='group w-full md:w-48 flex-shrink-0 relative overflow-hidden flex md:items-center md:justify-center pl-5 md:pl-0 bg-gray-50 bg-cover bg-center bg-no-repeat min-h-28'
+          style={{
+            backgroundImage: optimizedBgImage
+              ? `url(${optimizedBgImage})`
+              : undefined,
+          }}
+        >
+          {/* Grayscale and transparency overlay */}
+          {service.profile.image && (
+            <div className='absolute inset-0 bg-white bg-opacity-70 saturate-[.3] backdrop-blur-sm group-hover:saturate-[.6]'></div>
+          )}
 
-        {/* Content Section - Shows second on mobile, first on desktop */}
-        <div className='flex-1 px-6 pt-4 pb-3 flex flex-col justify-between min-w-0 md:order-1'>
+          {/* Avatar */}
+          <div className='relative z-10 flex items-center justify-center py-4'>
+            <UserAvatar
+              displayName={service.profile.displayName}
+              image={service.profile.image}
+              top={profileTop}
+              size='lg'
+              className='h-32 w-32'
+              showShadow={false}
+            />
+          </div>
+        </NextLink>
+
+        {/* Content Section */}
+        <div className='flex-1 px-6 py-4 pb-6 flex flex-col justify-between min-w-0'>
           <div className='space-y-2'>
+            {/* Title */}
             <NextLink href={`/s/${service.slug}`} className='block'>
               <h3 className='text-lg font-semibold text-gray-900 line-clamp-2 hover:text-third transition-colors mb-0'>
                 {service.title}
@@ -98,22 +104,20 @@ export function ArchiveServiceCard({
             </NextLink>
 
             {/* Category Display */}
-            <TaxonomiesDisplay
-              taxonomyLabels={{
-                category: categoryLabel,
-                subcategory: subcategoryLabel,
-                subdivision: '', // Hide subdivision level for archives
-              }}
-              compact
-              className='text-sm'
-            />
+            {(categoryLabel || subcategoryLabel) && (
+              <Badge variant='muted' className='font-normal'>
+                {categoryLabel && subcategoryLabel
+                  ? `${categoryLabel} - ${subcategoryLabel}`
+                  : categoryLabel || subcategoryLabel}
+              </Badge>
+            )}
           </div>
 
-          {/* Profile and Price Section */}
+          {/* Bottom Section */}
           <div className='mt-3'>
-            {/* Coverage Display - now alone */}
+            {/* Coverage + Media Icons */}
             {profileCoverage && (
-              <div className='mb-3'>
+              <div className='mb-3 flex items-center gap-4'>
                 <CoverageDisplay
                   online={service.type?.online}
                   onbase={service.type?.onbase}
@@ -124,52 +128,42 @@ export function ArchiveServiceCard({
                   variant='compact'
                   className='text-sm'
                 />
+                <MediaTypeIndicators media={service.media} />
               </div>
             )}
 
-            {/* Bottom section with profile+rating (left) and price (right) */}
+            {/* Bottom bar with profile+rating (left) and price (right) */}
             <div className='flex items-center gap-3 border-t border-gray-200 pt-3'>
               {/* Profile Info + Rating */}
-              {showProfile && (
-                <div className='flex items-center gap-2 flex-1'>
-                  <UserAvatar
-                    displayName={service.profile.displayName}
-                    image={service.profile.image}
-                    size='sm'
-                    className='h-8 w-8'
-                    showBorder={false}
-                    showShadow={false}
-                    href={`/profile/${service.profile.username}`}
-                  />
-                  <NextLink
-                    href={`/profile/${service.profile.username}`}
-                    className='group'
-                  >
-                    <span className='text-sm text-body group-hover:text-third transition-colors'>
-                      {service.profile.displayName}
-                    </span>
-                  </NextLink>
-                  <ProfileBadges
-                    verified={profileVerified}
-                    topLevel={profileTop}
-                  />
+              <div className='flex items-center gap-2 flex-1'>
+                <NextLink
+                  href={`/profile/${service.profile.username}`}
+                  className='group'
+                >
+                  <span className='text-sm text-body group-hover:text-third transition-colors'>
+                    {service.profile.displayName}
+                  </span>
+                </NextLink>
+                <ProfileBadges
+                  verified={profileVerified}
+                  topLevel={profileTop}
+                />
 
-                  {/* Rating - now inside profile div */}
-                  {profileReviewCount > 0 && (
-                    <RatingDisplay
-                      rating={profileRating}
-                      reviewCount={profileReviewCount}
-                      size='sm'
-                      variant='compact'
-                      className='text-sm ml-2'
-                    />
-                  )}
-                </div>
-              )}
+                {/* Rating */}
+                {profileReviewCount > 0 && (
+                  <RatingDisplay
+                    rating={profileRating}
+                    reviewCount={profileReviewCount}
+                    size='sm'
+                    variant='compact'
+                    className='text-sm ml-2'
+                  />
+                )}
+              </div>
 
               {/* Price */}
               {hasValidPrice && (
-                <div>
+                <div className='flex-shrink-0'>
                   <span className='font-normal text-body'>από </span>
                   <span className='font-semibold text-dark text-lg'>
                     {priceValue}€

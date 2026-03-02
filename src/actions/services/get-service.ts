@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth';
 import { unstable_cache } from 'next/cache';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma/client';
-import { Prisma, SubscriptionPlan, SubscriptionStatus } from '@prisma/client';
+import { SubscriptionPlan, SubscriptionStatus } from '@prisma/client';
 // O(1) optimized taxonomy lookups - 99% faster than findById
 import {
   getServiceTaxonomies,
@@ -18,6 +18,7 @@ import {
 // Complex utilities - KEEP for coverage transformation, defaults, and non-taxonomy datasets
 import {
   findById, // Generic utility for options, industries (not yet optimized)
+  resolveTaxonomyHierarchy,
   transformCoverageWithLocationNames,
   getDefaultCoverage,
 } from '@/lib/utils/datasets';
@@ -298,18 +299,6 @@ async function _getServicePageData(
         id: {
           not: service.id, // Exclude current service
         },
-        NOT: [
-          {
-            media: {
-              equals: Prisma.JsonNull,
-            },
-          },
-          {
-            media: {
-              equals: Prisma.DbNull,
-            },
-          },
-        ],
       },
       include: {
         profile: {
@@ -328,7 +317,7 @@ async function _getServicePageData(
         { reviewCount: 'desc' },
         { updatedAt: 'desc' },
       ],
-      take: 20, // Fetch 20 to account for empty array filtering
+      take: 5,
     }),
       // Service-specific reviews
       getServiceReviews(service.id, 1, 10),
@@ -338,22 +327,25 @@ async function _getServicePageData(
       getServiceReviewStats(service.id),
     ]);
 
-    // Shuffle and take 5 for randomization
-    // Filter out services with empty media arrays
-    const shuffled = relatedServicesRaw.sort(() => Math.random() - 0.5);
-    const relatedServicesSubset = shuffled
-      .filter((s) => s.media && Array.isArray(s.media) && s.media.length > 0)
-      .slice(0, 5);
+    // Shuffle for randomization
+    const relatedServicesSubset = relatedServicesRaw.sort(() => Math.random() - 0.5);
 
     // Transform to ServiceCardData format
     const relatedServices: ServiceCardData[] = relatedServicesSubset.map(
       (relatedService) => {
         const categoryTaxonomy = findServiceById(relatedService.category);
+        const taxonomyLabels = resolveTaxonomyHierarchy(
+          getServiceTaxonomies(),
+          relatedService.category,
+          relatedService.subcategory,
+          relatedService.subdivision,
+        );
 
         return {
           id: relatedService.id,
           title: relatedService.title,
           category: categoryTaxonomy?.label,
+          taxonomyLabels,
           slug: relatedService.slug,
           price: relatedService.price,
           rating: relatedService.rating,
@@ -403,10 +395,17 @@ async function _getServicePageData(
 
       additionalServices = otherServices.map((s) => {
         const cat = findServiceById(s.category);
+        const taxonomyLabels = resolveTaxonomyHierarchy(
+          getServiceTaxonomies(),
+          s.category,
+          s.subcategory,
+          s.subdivision,
+        );
         return {
           id: s.id,
           title: s.title,
           category: cat?.label,
+          taxonomyLabels,
           slug: s.slug,
           price: s.price,
           rating: s.rating,

@@ -11,7 +11,7 @@ import {
   findServiceBySlug,
   findSkillById,
 } from '@/lib/taxonomies';
-import { findById } from '@/lib/utils/datasets';
+import { findById, resolveTaxonomyHierarchy } from '@/lib/utils/datasets';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
 import { HomeCacheKeys } from '@/lib/cache/keys';
@@ -34,11 +34,18 @@ function transformServiceForComponent(
 ): ServiceCardData {
   // OPTIMIZATION: O(1) hash map lookup instead of O(n) findById
   const categoryTaxonomy = findServiceById(service.category);
+  const taxonomyLabels = resolveTaxonomyHierarchy(
+    getServiceTaxonomies(),
+    service.category,
+    service.subcategory,
+    service.subdivision,
+  );
 
   return {
     id: service.id,
     title: service.title,
     category: categoryTaxonomy?.label,
+    taxonomyLabels,
     slug: service.slug,
     type: service.type,
     price: service.price,

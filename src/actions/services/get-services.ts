@@ -106,11 +106,13 @@ function transformServiceForComponent(
 ): ServiceCardData {
   // OPTIMIZATION: O(1) hash map lookup instead of O(n) findById
   const categoryTaxonomy = findServiceById(service.category);
+  const taxonomyLabels = resolveCategoryLabels(service);
 
   return {
     id: service.id,
     title: service.title,
     category: categoryTaxonomy?.label,
+    taxonomyLabels,
     slug: service.slug, // Using ID as slug for now
     price: service.price,
     rating: service.rating,
@@ -166,12 +168,6 @@ export async function getFeaturedServices(): Promise<
       where: {
         status: 'published',
         featured: true,
-        // Only get services with media
-        NOT: {
-          media: {
-            equals: Prisma.JsonNull,
-          },
-        },
         // Only get services with reviews (reviewCount > 0)
         reviewCount: {
           gt: 0,
@@ -186,18 +182,12 @@ export async function getFeaturedServices(): Promise<
       take: 8,
     });
 
-    // If not enough featured services with media/reviews, get any published services with media/reviews
+    // If not enough featured services with reviews, get any published services with reviews
     if (services.length < 8) {
       const additionalServices = await prisma.service.findMany({
         where: {
           status: 'published',
           featured: false,
-          // Only get services with media
-          NOT: {
-            media: {
-              equals: Prisma.JsonNull,
-            },
-          },
           // Only get services with reviews
           reviewCount: {
             gt: 0,
@@ -215,19 +205,13 @@ export async function getFeaturedServices(): Promise<
       services = [...services, ...additionalServices];
     }
 
-    // Final fallback: If still not enough, get any services with media (even without reviews)
+    // Final fallback: If still not enough, get any published services
     if (services.length < 8) {
       const finalFallback = await prisma.service.findMany({
         where: {
           status: 'published',
           id: {
             notIn: services.map((s) => s.id), // Exclude already fetched services
-          },
-          // Only require media for final fallback
-          NOT: {
-            media: {
-              equals: Prisma.JsonNull,
-            },
           },
         },
         include: includeProfile,

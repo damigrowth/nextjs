@@ -127,6 +127,8 @@ export const HOME_SERVICE_SELECT = {
   slug: true,
   title: true,
   category: true,
+  subcategory: true,
+  subdivision: true,
   type: true,
   price: true,
   rating: true,

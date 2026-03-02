@@ -1,18 +1,19 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
-import MediaDisplay from '@/components/ui/media-display';
 import SaveButton from './save-button';
 import UserAvatar from './user-avatar';
 import { ServiceCardData } from '@/lib/types';
 import NextLink from './next-link';
 import RatingDisplay from './rating-display';
-import { getServiceDisplayMedia } from '@/lib/utils/media';
+import { MediaTypeIndicators } from './media-type-indicators';
+import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 
 interface ServiceCardProps {
   service: ServiceCardData;
-  showProfile?: boolean; // New prop to control profile section visibility
-  hideDisplayName?: boolean; // New prop to hide only the display name, keep avatar
+  showProfile?: boolean;
+  hideDisplayName?: boolean;
   isSaved?: boolean;
 }
 
@@ -22,24 +23,28 @@ export default function ServiceCard({
   hideDisplayName = false,
   isSaved = false,
 }: ServiceCardProps) {
-  // Service type declarations
-  // const serviceType = service.type;
-  // const isOnline = serviceType?.online;
-  // const isOnbase = serviceType?.onbase;
-  // const isOnsite = serviceType?.onsite;
-
-  // Merge service media with profile portfolio (portfolio as fallback)
-  const displayMedia = getServiceDisplayMedia(
-    service.media,
-    service.profile.portfolio,
-  );
-
   // Convert price to number for reliable comparison
   const priceValue = Number(service?.price) || 0;
   const hasValidPrice = priceValue > 0;
 
+  // Build category badge label: "subcategory - subdivision" or just "subcategory/category"
+  const primaryLabel =
+    service.taxonomyLabels?.subcategory ||
+    service.taxonomyLabels?.category ||
+    service.category;
+  const subdivisionLabel = service.taxonomyLabels?.subdivision;
+  const badgeLabel =
+    primaryLabel && subdivisionLabel
+      ? `${primaryLabel} - ${subdivisionLabel}`
+      : primaryLabel;
+
+  // Get optimized background image URL for profile section
+  const optimizedBgImage = service.profile.image
+    ? getOptimizedImageUrl(service.profile.image, 'card')
+    : null;
+
   return (
-    <Card className='group overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 rounded-lg bg-white relative'>
+    <Card className='group overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 rounded-lg bg-white relative h-full flex flex-col'>
       {/* Save Button - Positioned absolutely over card */}
       <div className='absolute top-4 right-4 z-20'>
         <SaveButton
@@ -49,88 +54,84 @@ export default function ServiceCard({
         />
       </div>
 
-      {/* Main card content - Link to service */}
-      <NextLink href={`/s/${service.slug}`} className='block'>
-        {/* Media Section */}
-        <div className='relative aspect-video bg-gray-100'>
-          <MediaDisplay
-            media={displayMedia}
-            className='w-full h-full rounded-t-lg'
-            aspectRatio='video'
-            showControls={true}
-            showAudio={false}
+      {/* Profile Image Section - Replaces media */}
+      <NextLink
+        href={`/profile/${service.profile.username}`}
+        className='group/profile relative h-28 bg-gray-50 bg-cover bg-center bg-no-repeat overflow-hidden flex items-end pl-5'
+        style={{
+          backgroundImage: optimizedBgImage
+            ? `url(${optimizedBgImage})`
+            : undefined,
+        }}
+      >
+        {/* Grayscale and transparency overlay */}
+        {service.profile.image && (
+          <div className='absolute inset-0 bg-white bg-opacity-70 saturate-[.3] backdrop-blur-sm group-hover/profile:saturate-[.6] transition-all duration-200'></div>
+        )}
+
+        {/* Avatar */}
+        <div className='relative z-10 flex items-center justify-center py-4'>
+          <UserAvatar
+            displayName={service.profile.displayName}
+            image={service.profile.image}
+            size='lg'
+            className='h-20 w-20'
+            showShadow={false}
           />
         </div>
+      </NextLink>
 
-        {/* Content Section */}
+      {/* Content Section */}
+      <NextLink href={`/s/${service.slug}`} className='block flex-1'>
         <CardContent className='p-4 flex flex-col h-full'>
           {/* Category */}
-          <p className='text-sm text-gray-600 mb-3 font-normal'>
-            {service.category}
-          </p>
+          {badgeLabel && (
+            <div className='mb-3'>
+              <Badge variant='muted' className='font-normal'>
+                {badgeLabel}
+              </Badge>
+            </div>
+          )}
 
-          {/* Title - Fixed height for consistency */}
-          <div className='h-12 mb-3'>
-            <h3 className='font-semibold text-dark leading-tight text-base hover:text-third transition-colors'>
-              <span
-                className='line-clamp-2'
-                style={{
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                }}
-              >
-                {service.title}
-              </span>
-            </h3>
+          {/* Title */}
+          <h3 className='font-semibold text-dark leading-tight text-base hover:text-third transition-colors mb-6'>
+            <span className='line-clamp-2'>{service.title}</span>
+          </h3>
+
+          {/* Rating + Media Icons - pushed to bottom */}
+          <div className='mt-auto flex items-center gap-2'>
+            <RatingDisplay
+              rating={service.rating}
+              reviewCount={service.reviewCount}
+              variant='compact'
+            />
+            <MediaTypeIndicators media={service.media} />
           </div>
-
-          {/* Rating */}
-          <RatingDisplay
-            rating={service.rating}
-            reviewCount={service.reviewCount}
-            variant='compact'
-          />
         </CardContent>
       </NextLink>
 
       {/* Footer section - Outside main link */}
-      {(showProfile || hasValidPrice) && (
+      {showProfile && (
         <CardContent className='p-4 pt-0'>
           <div className='border-t border-gray-200 pt-3'>
-            <div className='flex justify-between gap-3'>
-              {/* Profile Info - Separate link */}
-              {showProfile && (
-                <div className='flex items-center gap-2 w-fit z-10'>
-                  <UserAvatar
-                    displayName={service.profile.displayName}
-                    image={service.profile.image}
-                    width={24}
-                    height={24}
-                    className='h-6 w-6'
-                    showBorder={false}
-                    showShadow={false}
+            <div className='flex items-center justify-between gap-3'>
+              {/* Profile Info */}
+              <div className='flex items-center gap-2 flex-1 min-w-0'>
+                {!hideDisplayName && (
+                  <NextLink
                     href={`/profile/${service.profile.username}`}
-                  />
-                  {!hideDisplayName && (
-                    <NextLink
-                      href={`/profile/${service.profile.username}`}
-                      className='group/profile'
-                    >
-                      <span className='text-sm text-body group-hover/profile:text-third transition-colors'>
-                        {service.profile.displayName}
-                      </span>
-                    </NextLink>
-                  )}
-                </div>
-              )}
+                    className='group/profile'
+                  >
+                    <span className='text-sm text-body group-hover/profile:text-third transition-colors truncate'>
+                      {service.profile.displayName}
+                    </span>
+                  </NextLink>
+                )}
+              </div>
 
-              {/* Price - Only show if price > 0 */}
+              {/* Price */}
               {hasValidPrice && (
-                <div
-                  className={`text-base ${!showProfile ? 'w-full text-right' : ''}`}
-                >
+                <div className='text-sm'>
                   <span className='font-normal text-body'>από </span>
                   <span className='font-semibold text-dark'>{priceValue}€</span>
                 </div>
