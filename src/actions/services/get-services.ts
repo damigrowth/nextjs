@@ -9,6 +9,7 @@ import {
   findServiceById,
   resolveServiceHierarchy,
   findLocationBySlugOrName,
+  resolveToCountyId,
   findMatchingServiceSubcategoryIds,
   findMatchingSubdivisionIds,
 } from '@/lib/taxonomies';
@@ -441,9 +442,8 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
     // Handle combined online and county filters
     if (filters.online !== undefined && filters.county) {
       // Both online and county filters: show online services OR county-based services
-      // OPTIMIZATION: O(1) hash map lookup (slug) with O(n) name fallback for backward compatibility
-      const countyOption = findLocationBySlugOrName(filters.county);
-      const countyId = countyOption?.id;
+      // Resolves area slugs to parent county ID (handles slug collisions like "thessaloniki")
+      const countyId = resolveToCountyId(filters.county);
 
       if (countyId) {
         whereClause.OR = [
@@ -485,10 +485,8 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
         equals: filters.online,
       };
     } else if (filters.county) {
-      // Only county filter - using slug lookup with name fallback
-      // OPTIMIZATION: O(1) hash map lookup (slug) with O(n) name fallback for backward compatibility
-      const countyOption = findLocationBySlugOrName(filters.county);
-      const countyId = countyOption?.id;
+      // Only county filter — resolves area slugs to parent county ID
+      const countyId = resolveToCountyId(filters.county);
 
       if (countyId) {
         whereClause.AND = [
@@ -1226,9 +1224,8 @@ export async function getServiceArchivePageData(params: {
 
             // Location filters
             if (filters.county) {
-              // OPTIMIZATION: O(1) hash map lookup (slug) with O(n) name fallback
-              const countyOption = findLocationBySlugOrName(filters.county);
-              const countyId = countyOption?.id;
+              // Resolves area slugs to parent county ID (handles slug collisions)
+              const countyId = resolveToCountyId(filters.county);
 
               if (countyId && filters.online !== undefined) {
                 where.OR = where.OR || [];

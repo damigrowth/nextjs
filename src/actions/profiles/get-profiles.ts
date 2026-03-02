@@ -18,7 +18,7 @@ import type { DatasetItem } from '@/lib/types/datasets';
 import {
   getProTaxonomies,
   findProById,
-  findLocationBySlugOrName,
+  resolveToCountyId,
   batchFindSkillsByIds,
   findMatchingProSubcategoryIds,
 } from '@/lib/taxonomies';
@@ -115,9 +115,8 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
 
     // Handle combined online and county filters
     if (filters.online !== undefined && filters.county) {
-      // Resolve county slug to ID using O(1) hash map lookup (slug) with O(n) name fallback
-      const countyOption = findLocationBySlugOrName(filters.county);
-      const countyId = countyOption?.id;
+      // Resolves area slugs to parent county ID (handles slug collisions like "thessaloniki")
+      const countyId = resolveToCountyId(filters.county);
 
       if (countyId) {
         // Both online and county filters: show online profiles OR county-based profiles
@@ -163,9 +162,8 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
         equals: filters.online,
       };
     } else if (filters.county) {
-      // Only county filter - resolve county slug to ID using O(1) hash map lookup (slug) with O(n) name fallback
-      const countyOption = findLocationBySlugOrName(filters.county);
-      const countyId = countyOption?.id;
+      // Only county filter — resolves area slugs to parent county ID
+      const countyId = resolveToCountyId(filters.county);
 
       if (countyId) {
         // Check both single county and counties array
@@ -702,8 +700,7 @@ export async function getProfileArchivePageData(params: {
 
         // Location filters
         if (filters.online !== undefined && filters.county) {
-          const countyOption = findLocationBySlugOrName(filters.county);
-          const countyId = countyOption?.id;
+          const countyId = resolveToCountyId(filters.county);
 
           if (countyId) {
             countWhere.OR = [
@@ -721,8 +718,7 @@ export async function getProfileArchivePageData(params: {
         } else if (filters.online !== undefined) {
           countWhere.coverage = { path: ['online'], equals: filters.online };
         } else if (filters.county) {
-          const countyOption = findLocationBySlugOrName(filters.county);
-          const countyId = countyOption?.id;
+          const countyId = resolveToCountyId(filters.county);
 
           if (countyId) {
             countWhere.OR = [

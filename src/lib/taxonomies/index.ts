@@ -349,6 +349,33 @@ export function findLocationBySlugOrName(slugOrName: string | null | undefined):
 }
 
 /**
+ * Resolve a location slug/name to a county ID.
+ * If the slug resolves to an area (e.g. "thessaloniki" exists as both county and area),
+ * finds the parent county and returns its ID.
+ *
+ * @param slugOrName - Location slug or name
+ * @returns County ID or undefined if not found
+ */
+export function resolveToCountyId(slugOrName: string | null | undefined): string | undefined {
+  if (!slugOrName) return undefined;
+
+  const locationMatch = findLocationBySlugOrName(slugOrName);
+  if (!locationMatch) return undefined;
+
+  const locations = getLocations();
+
+  // Check if it's a top-level county
+  const isCounty = locations.some((c) => c.id === locationMatch.id);
+  if (isCounty) return locationMatch.id;
+
+  // Area match — find parent county
+  const parentCounty = locations.find((county) =>
+    county.children?.some((area: DatasetItem) => area.id === locationMatch.id),
+  );
+  return parentCounty?.id;
+}
+
+/**
  * Find matching location name from profile coverage arrays - O(1) optimized
  *
  * Searches profile coverage object (counties and areas arrays) for a location
