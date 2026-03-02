@@ -24,6 +24,7 @@ import { ProfileTerms } from '@/components/profile';
 import { ServiceSchema } from '@/lib/seo/schema';
 import { ReviewsContainer } from '@/components/review';
 import { HashScroll } from '@/components/shared/hash-scroll';
+import { getServiceDisplayMedia } from '@/lib/utils/media';
 
 // ISR configuration with shorter interval + tag-based revalidation
 export const revalidate = 300; // Revalidate every 5 minutes (backup for tag-based)
@@ -122,11 +123,15 @@ export default async function ServicePage({
     reviewStats,
   } = result.data;
 
+  // Merge service media with profile portfolio (service media first, portfolio as fallback)
+  const displayMedia = getServiceDisplayMedia(
+    service.media,
+    service.profile.portfolio,
+  );
+
   // Get first media image for schema
   const firstMediaImage =
-    service.media && Array.isArray(service.media) && service.media.length > 0
-      ? service.media[0].url
-      : undefined;
+    displayMedia.length > 0 ? displayMedia[0].url : undefined;
 
   // Get metadata to reuse the formatted and truncated description
   // This ensures schema description matches meta description exactly
@@ -208,7 +213,7 @@ export default async function ServicePage({
               />
 
               {/* Service Media Gallery */}
-              <ServiceMedia media={service.media} />
+              <ServiceMedia media={displayMedia} />
 
               {/* Service Order/Price Widget */}
               <ServiceOrderFixed

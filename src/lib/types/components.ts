@@ -275,7 +275,9 @@ export type ServiceCardData = Pick<
   profile: Pick<
     import('@prisma/client').Profile,
     'id' | 'username' | 'displayName' | 'image'
-  >;
+  > & {
+    portfolio?: PrismaJson.Portfolio | null;
+  };
 };
 
 // Profile Card Component Types
@@ -364,6 +366,7 @@ export type ArchiveServiceCardData = Pick<
     | 'rating'
     | 'reviewCount'
   > & {
+    portfolio?: PrismaJson.Portfolio | null;
     groupedCoverage: Array<{ county: string; areas: string[] }>; // Pre-computed grouped coverage from server
   };
 };

@@ -7,6 +7,7 @@ import UserAvatar from './user-avatar';
 import { ServiceCardData } from '@/lib/types';
 import NextLink from './next-link';
 import RatingDisplay from './rating-display';
+import { getServiceDisplayMedia } from '@/lib/utils/media';
 
 interface ServiceCardProps {
   service: ServiceCardData;
@@ -26,6 +27,12 @@ export default function ServiceCard({
   // const isOnline = serviceType?.online;
   // const isOnbase = serviceType?.onbase;
   // const isOnsite = serviceType?.onsite;
+
+  // Merge service media with profile portfolio (portfolio as fallback)
+  const displayMedia = getServiceDisplayMedia(
+    service.media,
+    service.profile.portfolio,
+  );
 
   // Convert price to number for reliable comparison
   const priceValue = Number(service?.price) || 0;
@@ -47,7 +54,7 @@ export default function ServiceCard({
         {/* Media Section */}
         <div className='relative aspect-video bg-gray-100'>
           <MediaDisplay
-            media={service.media}
+            media={displayMedia}
             className='w-full h-full rounded-t-lg'
             aspectRatio='video'
             showControls={true}

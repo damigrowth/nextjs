@@ -20,6 +20,7 @@ export type ServiceWithProfile = Prisma.ServiceGetPayload<{
         reviewCount: true;
         verified: true;
         image: true;
+        portfolio: true;
       };
     };
   };

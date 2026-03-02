@@ -78,6 +78,7 @@ export type ServiceProfileFields = Pick<
   | 'commencement'
   | 'experience'
   | 'terms'
+  | 'portfolio'
 >;
 
 export type ServiceWithFullProfile = Service & {
@@ -317,6 +318,7 @@ async function _getServicePageData(
             username: true,
             displayName: true,
             image: true,
+            portfolio: true,
           },
         },
       },
@@ -363,6 +365,7 @@ async function _getServicePageData(
             displayName: relatedService.profile.displayName,
             username: relatedService.profile.username,
             image: relatedService.profile.image,
+            portfolio: relatedService.profile.portfolio,
           },
         };
       },
@@ -390,6 +393,7 @@ async function _getServicePageData(
               username: true,
               displayName: true,
               image: true,
+              portfolio: true,
             },
           },
         },
@@ -414,6 +418,7 @@ async function _getServicePageData(
             displayName: s.profile.displayName,
             username: s.profile.username,
             image: s.profile.image,
+            portfolio: s.profile.portfolio,
           },
         };
       });

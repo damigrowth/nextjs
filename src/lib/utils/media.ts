@@ -925,6 +925,36 @@ export const uploadFileToCloudinary = async (
 };
 
 // =============================================
+// SERVICE DISPLAY MEDIA (PORTFOLIO FALLBACK)
+// =============================================
+
+/**
+ * Merge service media with profile portfolio for display.
+ * Priority: service-specific media first, then portfolio items (deduplicated by public_id).
+ */
+export const getServiceDisplayMedia = (
+  serviceMedia: CloudinaryResource[] | null | undefined,
+  profilePortfolio: CloudinaryResource[] | null | undefined,
+): CloudinaryResource[] => {
+  const service =
+    serviceMedia && Array.isArray(serviceMedia) ? serviceMedia : [];
+  const portfolio =
+    profilePortfolio && Array.isArray(profilePortfolio) ? profilePortfolio : [];
+
+  if (service.length === 0 && portfolio.length === 0) return [];
+  if (service.length === 0) return portfolio;
+  if (portfolio.length === 0) return service;
+
+  // Deduplicate: skip portfolio items already present in service media
+  const serviceIds = new Set(service.map((item) => item.public_id));
+  const uniquePortfolio = portfolio.filter(
+    (item) => !serviceIds.has(item.public_id),
+  );
+
+  return [...service, ...uniquePortfolio];
+};
+
+// =============================================
 // EXPORTS
 // =============================================
 
@@ -966,6 +996,9 @@ export default {
   // Legacy support
   getStrapiMediaType,
   getStrapiImageUrl,
+
+  // Service display
+  getServiceDisplayMedia,
 
   // Constants
   SUPPORTED_FORMATS,

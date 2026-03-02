@@ -9,6 +9,7 @@ import ProfileBadges from '@/components/shared/profile-badges';
 import RatingDisplay from '@/components/shared/rating-display';
 import UserAvatar from '@/components/shared/user-avatar';
 import { CoverageDisplay } from './coverage-display';
+import { getServiceDisplayMedia } from '@/lib/utils/media';
 
 interface ArchiveServiceCardProps {
   service: ArchiveServiceCardData | ServiceCardData;
@@ -47,6 +48,11 @@ export function ArchiveServiceCard({
   const profileReviewCount =
     'reviewCount' in service.profile ? service.profile.reviewCount : 0;
 
+  // Merge service media with profile portfolio (portfolio as fallback)
+  const profilePortfolio =
+    'portfolio' in service.profile ? service.profile.portfolio : undefined;
+  const displayMedia = getServiceDisplayMedia(service.media, profilePortfolio);
+
   // Convert price to number for reliable comparison
   const priceValue = Number(service?.price) || 0;
   const hasValidPrice = priceValue > 0;
@@ -63,13 +69,13 @@ export function ArchiveServiceCard({
         <NextLink
           href={`/s/${service.slug}`}
           className={
-            !service.media || service.media.length === 0
+            displayMedia.length === 0
               ? 'md:hidden aspect-video'
               : 'w-full md:w-96 flex-shrink-0 relative overflow-hidden md:order-2'
           }
         >
           <MediaCarousel
-            media={service.media}
+            media={displayMedia}
             className='w-full h-full'
             compactMode={true}
             showThumbnails={false}

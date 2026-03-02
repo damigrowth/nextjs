@@ -38,6 +38,7 @@ export const SERVICE_ARCHIVE_SELECT = {
       username: true,
       displayName: true,
       image: true,
+      portfolio: true,
       coverage: true,
       verified: true,
       top: true,
@@ -110,6 +111,7 @@ export const SERVICE_DETAIL_SELECT = {
       commencement: true,
       experience: true,
       terms: true,
+      portfolio: true,
     },
   },
 } as const;
@@ -139,6 +141,7 @@ export const HOME_SERVICE_SELECT = {
       username: true,
       displayName: true,
       image: true,
+      portfolio: true,
     },
   },
 } as const;

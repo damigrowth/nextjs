@@ -122,6 +122,7 @@ function transformServiceForComponent(
       displayName: service.profile.displayName,
       username: service.profile.username,
       image: service.profile.image,
+      portfolio: service.profile.portfolio,
     },
   };
 }
@@ -155,6 +156,7 @@ export async function getFeaturedServices(): Promise<
           reviewCount: true,
           verified: true,
           image: true,
+          portfolio: true,
         },
       },
     } as const;
@@ -316,6 +318,7 @@ export async function getServicesWithPagination(options?: {
           reviewCount: true,
           verified: true,
           image: true,
+          portfolio: true,
         },
       },
     } as const;
@@ -829,6 +832,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
             displayName: service.profile.displayName,
             username: service.profile.username,
             image: service.profile.image,
+            portfolio: service.profile.portfolio,
             coverage: transformedCoverage,
             groupedCoverage: transformedCoverage.countyAreasMap || [],
             verified: service.profile.verified,
