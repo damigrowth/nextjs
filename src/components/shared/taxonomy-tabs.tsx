@@ -3,14 +3,14 @@ import NextLink from './next-link';
 
 // Static service categories for navbar - links to /categories/{slug}
 const SERVICE_CATEGORIES = [
-  { id: '1', label: 'Δημιουργία Περιεχομένου', slug: 'dimiourgia-periexomenou' },
-  { id: '2', label: 'Εκδηλώσεις', slug: 'ekdiloseis' },
-  { id: '3', label: 'Ευεξία & Φροντίδα', slug: 'eveksia-frontida' },
-  { id: '4', label: 'Μαθήματα', slug: 'mathimata' },
-  { id: '5', label: 'Μάρκετινγκ', slug: 'marketing' },
-  { id: '6', label: 'Πληροφορική', slug: 'pliroforiki' },
-  { id: '7', label: 'Τεχνικά', slug: 'texnika' },
-  { id: '8', label: 'Υποστήριξη', slug: 'ypostiriksi' },
+  { id: '1', label: 'Δημιουργία Περιεχομένου', slug: 'dimiourgia-periexomenou', emoji: '🎥' },
+  { id: '2', label: 'Εκδηλώσεις', slug: 'ekdiloseis', emoji: '🎶' },
+  { id: '3', label: 'Ευεξία & Φροντίδα', slug: 'eveksia-frontida', emoji: '💖' },
+  { id: '4', label: 'Μαθήματα', slug: 'mathimata', emoji: '🎓' },
+  { id: '5', label: 'Μάρκετινγκ', slug: 'marketing', emoji: '🎯' },
+  { id: '6', label: 'Πληροφορική', slug: 'pliroforiki', emoji: '💻' },
+  { id: '7', label: 'Τεχνικά', slug: 'texnika', emoji: '🪛' },
+  { id: '8', label: 'Υποστήριξη', slug: 'ypostiriksi', emoji: '🤝' },
 ];
 
 interface TaxonomyTabsProps {
@@ -53,6 +53,7 @@ export default function TaxonomyTabs({
                         activeItemSlug === category.slug ? 'text-primary font-medium' : ''
                       }`}
                     >
+                      {category.emoji && <span className='mr-1'>{category.emoji}</span>}
                       {category.label}
                     </NextLink>
                   </li>

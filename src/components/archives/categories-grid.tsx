@@ -10,6 +10,7 @@ import type { CategoryWithSubcategories } from '@/actions/services/get-categorie
 import { Separator } from '../ui/separator';
 import { NextLink } from '@/components';
 import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
+import { getCategoryEmoji } from '@/constants/datasets/category-icons';
 
 interface CategoriesGridProps {
   categories: CategoryWithSubcategories[];
@@ -68,6 +69,11 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
                       href={category.href}
                       className='hover:text-primary transition-colors'
                     >
+                      {getCategoryEmoji(category.icon) && (
+                        <span className='mr-1.5'>
+                          {getCategoryEmoji(category.icon)}
+                        </span>
+                      )}
                       {category.label}
                     </NextLink>
                   </CardTitle>

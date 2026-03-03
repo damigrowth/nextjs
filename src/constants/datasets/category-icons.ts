@@ -61,3 +61,27 @@ export function getCategoryIcon(iconKey?: string): IconComponent | undefined {
   if (!iconKey) return undefined;
   return categoryIconMap[iconKey as CategoryIconKey];
 }
+
+/**
+ * Map category icon identifiers to emoji characters
+ */
+export const categoryEmojiMap: Record<CategoryIconKey, string> = {
+  'flaticon-content': '🎥', // Δημιουργία Περιεχομένου
+  'flaticon-place': '🎶', // Εκδηλώσεις
+  'flaticon-like': '💖', // Ευεξία & Φροντίδα
+  'flaticon-star': '🎓', // Μαθήματα
+  'flaticon-digital-marketing': '🎯', // Μάρκετινγκ
+  'flaticon-developer': '💻', // Πληροφορική
+  'flaticon-ruler': '🪛', // Τεχνικά
+  'flaticon-customer-service': '🤝', // Υποστήριξη
+};
+
+/**
+ * Get emoji by category icon key
+ * @param iconKey - The icon identifier from category data
+ * @returns Emoji string or undefined if not found
+ */
+export function getCategoryEmoji(iconKey?: string): string | undefined {
+  if (!iconKey) return undefined;
+  return categoryEmojiMap[iconKey as CategoryIconKey];
+}

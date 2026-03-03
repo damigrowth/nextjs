@@ -17,8 +17,8 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
-import { categoryIconMap } from '@/constants/datasets/category-icons';
-import { Grid3x3, ChevronRight, ChevronDown, ArrowRight } from 'lucide-react';
+import { categoryEmojiMap } from '@/constants/datasets/category-icons';
+import { ChevronRight, ChevronDown, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { NavigationMenuCategory } from '@/lib/types/components';
 import NextLink from '../../next-link';
@@ -71,16 +71,23 @@ export default function NavMenu({
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className='space-y-2 mt-2'>
-            {navigationData.map((category) => (
-              <NextLink
-                key={category.id}
-                href={`/categories/${category.slug}`}
-                onClick={handleLinkClick}
-                className='block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors'
-              >
-                {category.label}
-              </NextLink>
-            ))}
+            {navigationData.map((category) => {
+              const emoji =
+                categoryEmojiMap[
+                  category.icon as keyof typeof categoryEmojiMap
+                ];
+              return (
+                <NextLink
+                  key={category.id}
+                  href={`/categories/${category.slug}`}
+                  onClick={handleLinkClick}
+                  className='block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors'
+                >
+                  {emoji && <span className='mr-1.5'>{emoji}</span>}
+                  {category.label}
+                </NextLink>
+              );
+            })}
           </CollapsibleContent>
         </Collapsible>
 
@@ -129,8 +136,10 @@ export default function NavMenu({
               <div className='w-64 border-r p-2'>
                 <div className='space-y-1'>
                   {navigationData.map((category) => {
-                    const IconComponent =
-                      categoryIconMap[category.icon] || Grid3x3;
+                    const emoji =
+                      categoryEmojiMap[
+                        category.icon as keyof typeof categoryEmojiMap
+                      ];
                     return (
                       <div
                         key={category.id}
@@ -144,7 +153,9 @@ export default function NavMenu({
                           className='flex items-center justify-between rounded-md p-3 text-sm transition-colors hover:bg-accent'
                         >
                           <div className='flex items-center gap-3'>
-                            <IconComponent className='h-4 w-4 text-muted-foreground' />
+                            <span className='text-base leading-none'>
+                              {emoji}
+                            </span>
                             <span className='font-medium'>
                               {category.label}
                             </span>
