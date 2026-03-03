@@ -17,6 +17,7 @@ import {
   buildServiceSearchConditions,
   mergeSearchFilter,
 } from '@/lib/utils/search';
+import { shuffleFeatured } from '@/lib/utils/misc';
 // Complex utilities - KEEP for hierarchy resolution, breadcrumbs, coverage transformation, and nested children lookups
 import {
   findById, // Generic utility for nested children lookups and tags (not yet optimized)
@@ -537,17 +538,17 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
         break;
       case 'default':
       default:
-        // Default sort: featured first, then by rating and most recent activity
+        // Default sort: featured first (shuffled randomly), then by most recent activity
         orderBy = [
           { featured: 'desc' },
-          { rating: 'desc' },
-          { reviewCount: 'desc' },
-          {
-            media: {
-              sort: 'desc',
-              nulls: 'last',
-            },
-          },
+          // { rating: 'desc' },
+          // { reviewCount: 'desc' },
+          // {
+          //   media: {
+          //     sort: 'desc',
+          //     nulls: 'last',
+          //   },
+          // },
           { sortDate: 'desc' },
         ];
         break;
@@ -567,8 +568,11 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
       }),
     ]);
 
+    // Shuffle featured services for random rotation (changes each ISR revalidation)
+    const shuffledServices = shuffleFeatured(services);
+
     // Transform services to archive card data
-    const transformedServices: ArchiveServiceCardData[] = services.map(
+    const transformedServices: ArchiveServiceCardData[] = shuffledServices.map(
       (service) => {
         // Transform coverage once and extract groupedCoverage
         const transformedCoverage = transformCoverageWithLocationNames(

@@ -33,6 +33,7 @@ import {
   buildProfileSearchConditions,
   mergeSearchFilter,
 } from '@/lib/utils/search';
+import { shuffleFeatured } from '@/lib/utils/misc';
 import type { FilterState } from '@/lib/hooks/archives/use-archive-filters';
 import { Prisma, Profile, User } from '@prisma/client';
 import { getDirectoryPageData, type ProSubcategoryWithCount } from './get-directory';
@@ -225,18 +226,18 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
         break;
       case 'default':
       default:
-        // Default sort: featured first, then by rating and engagement, with image nulls last
+        // Default sort: featured first (shuffled randomly), then by most recent activity
         orderBy = [
           { featured: 'desc' },
-          { rating: 'desc' },
-          { reviewCount: 'desc' },
-          {
-            image: {
-              sort: 'desc',
-              nulls: 'last',
-            },
-          },
-          { verified: 'desc' },
+          // { rating: 'desc' },
+          // { reviewCount: 'desc' },
+          // {
+          //   image: {
+          //     sort: 'desc',
+          //     nulls: 'last',
+          //   },
+          // },
+          // { verified: 'desc' },
           { updatedAt: 'desc' },
         ];
         break;
@@ -256,11 +257,14 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
       }),
     ]);
 
+    // Shuffle featured profiles for random rotation (changes each ISR revalidation)
+    const shuffledProfiles = shuffleFeatured(profiles);
+
     // OPTIMIZATION: Batch lookup all skills upfront (O(1) instead of O(n) per profile)
-    const allSkillIds = profiles.flatMap(p =>
+    const allSkillIds = shuffledProfiles.flatMap(p =>
       p.skills ? (p.skills as string[]) : []
     );
-    const allSpecialityIds = profiles
+    const allSpecialityIds = shuffledProfiles
       .filter(p => p.speciality)
       .map(p => p.speciality!);
     const uniqueSkillIds = [...new Set([...allSkillIds, ...allSpecialityIds])];
@@ -272,7 +276,7 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
     );
 
     // Transform profiles to archive card data
-    const transformedProfiles: ArchiveProfileCardData[] = profiles.map(
+    const transformedProfiles: ArchiveProfileCardData[] = shuffledProfiles.map(
       (profile) => {
         // Resolve taxonomy labels
         const taxonomyLabels = resolveCategoryLabels(profile);
