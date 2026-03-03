@@ -183,6 +183,33 @@ export default async function ProfilePage({
                   (method) => method.label,
                 )}
               />
+              {/* Mobile Sidebar - shown after icon features on mobile */}
+              <div className='lg:hidden'>
+                <div className='space-y-6'>
+                  <ProfileInfo
+                    rate={profile.rate}
+                    coverage={coverage}
+                    commencement={profile.commencement}
+                    experience={calculatedExperience}
+                    website={profile.website}
+                    phone={profile.phone}
+                    viber={profile.viber}
+                    whatsapp={profile.whatsapp}
+                    email={profile.email || profile.user.email}
+                    visibility={visibility}
+                    profileUserId={profile.uid}
+                    profileDisplayName={profile.displayName || ''}
+                  />
+
+                  {(skillsData.length > 0 || specialityData) && (
+                    <ProfileSkills
+                      skills={skillsData}
+                      speciality={specialityData?.label}
+                    />
+                  )}
+                </div>
+              </div>
+
               <ProfileIndustries
                 industries={industriesData.map((industry) => industry.label)}
               />
@@ -219,33 +246,6 @@ export default async function ProfilePage({
                 profileName={profile.displayName || profile.username || ''}
                 profileUsername={profile.username || ''}
               />
-
-              {/* Mobile Sidebar - Skills shown on mobile */}
-              <div className='lg:hidden mb-8'>
-                <div className='space-y-6'>
-                  <ProfileInfo
-                    rate={profile.rate}
-                    coverage={coverage}
-                    commencement={profile.commencement}
-                    experience={calculatedExperience}
-                    website={profile.website}
-                    phone={profile.phone}
-                    viber={profile.viber}
-                    whatsapp={profile.whatsapp}
-                    email={profile.email || profile.user.email}
-                    visibility={visibility}
-                    profileUserId={profile.uid}
-                    profileDisplayName={profile.displayName || ''}
-                  />
-
-                  {(skillsData.length > 0 || specialityData) && (
-                    <ProfileSkills
-                      skills={skillsData}
-                      speciality={specialityData?.label}
-                    />
-                  )}
-                </div>
-              </div>
 
               {/* TODO: Add other profile sections here */}
               {/* - Featured Services */}

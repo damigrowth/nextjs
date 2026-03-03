@@ -225,6 +225,14 @@ export default async function ServicePage({
                 serviceTitle={service.title}
               />
 
+              {/* Mobile Sidebar - Contact card shown on mobile */}
+              <div className='lg:hidden'>
+                <ServiceContact
+                  profile={service.profile}
+                  subcategory={profileSubcategory?.label}
+                />
+              </div>
+
               {/* Service FAQ */}
               <ServiceFAQ faqs={service.faq || []} />
 
@@ -254,7 +262,7 @@ export default async function ServicePage({
             </div>
 
             {/* Sidebar */}
-            <div className='space-y-6 sticky top-2 self-start'>
+            <div className='hidden lg:block space-y-6 sticky top-2 self-start'>
               {/* Order/Price Widget */}
               <ServiceOrderFixed
                 price={service.price || 0}
