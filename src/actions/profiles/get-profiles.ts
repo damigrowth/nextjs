@@ -20,7 +20,6 @@ import {
   findProById,
   resolveToCountyId,
   batchFindSkillsByIds,
-  findMatchingProSubcategoryIds,
 } from '@/lib/taxonomies';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
@@ -29,7 +28,11 @@ import { isValidArchiveSortBy } from '@/lib/types/common';
 import type { ActionResult } from '@/lib/types/api';
 import type { ArchiveProfileCardData } from '@/lib/types/components';
 import type { ArchiveSortBy } from '@/lib/types/common';
-import { normalizeTerm } from '@/lib/utils/text/normalize';
+import {
+  buildSearchFilter,
+  buildProfileSearchConditions,
+  mergeSearchFilter,
+} from '@/lib/utils/search';
 import type { FilterState } from '@/lib/hooks/archives/use-archive-filters';
 import { Prisma, Profile, User } from '@prisma/client';
 import { getDirectoryPageData, type ProSubcategoryWithCount } from './get-directory';
@@ -186,86 +189,16 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
       }
     }
 
-    // Add search filter for displayName, tagline, and bio using normalized fields
-    // This provides accent-insensitive search for Greek text
+    // Add search filter for displayName, tagline, bio, username, and subcategory
+    // Supports accent-insensitive Greek text search and multi-word AND logic
     // IMPORTANT: Process AFTER location filters so search can combine with existing OR clause
     if (filters.search) {
-      const searchTerm = filters.search.trim();
-      if (searchTerm.length >= 2) {
-        // Normalize search term to handle Greek accents (ά → α, etc.)
-        const normalizedSearch = normalizeTerm(searchTerm);
-
-        // Find matching subcategories by searching in subcategory labels
-        const matchingSubcategoryIds = findMatchingProSubcategoryIds(searchTerm);
-
-        const searchConditions: any[] = [
-          // Search in normalized fields (for profiles with proper normalized data)
-          {
-            displayNameNormalized: {
-              contains: normalizedSearch,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            taglineNormalized: {
-              contains: normalizedSearch,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            bioNormalized: {
-              contains: normalizedSearch,
-              mode: 'insensitive' as const,
-            },
-          },
-          // Fallback: Also search in original fields for profiles without normalized data
-          {
-            displayName: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            tagline: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-          {
-            bio: {
-              contains: searchTerm,
-              mode: 'insensitive' as const,
-            },
-          },
-          // Search in username (duplicated on Profile)
-          {
-            username: {
-              contains: normalizedSearch,
-              mode: 'insensitive' as const,
-            },
-          },
-        ];
-
-        // Add subcategory search if matching subcategories found
-        if (matchingSubcategoryIds.length > 0) {
-          searchConditions.push({
-            subcategory: {
-              in: matchingSubcategoryIds,
-            },
-          });
-        }
-
-        // If there's already an OR clause (from location filters), combine with AND
-        if (whereClause.OR) {
-          const existingOR = whereClause.OR;
-          whereClause.AND = whereClause.AND || [];
-          whereClause.AND.push({
-            OR: searchConditions,
-          });
-          whereClause.OR = existingOR;
-        } else {
-          whereClause.OR = searchConditions;
-        }
+      const searchFilter = buildSearchFilter(
+        filters.search,
+        buildProfileSearchConditions,
+      );
+      if (searchFilter) {
+        mergeSearchFilter(whereClause, searchFilter);
       }
     }
 

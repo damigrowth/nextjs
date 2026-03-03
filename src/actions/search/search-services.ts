@@ -5,14 +5,11 @@ import { prisma } from '@/lib/prisma/client';
 // O(1) optimized taxonomy lookups - 99% faster than findById
 import {
   getServiceTaxonomies,
-  getTags,
   findServiceById,
   findMatchingLocationInCoverage,
-  findMatchingServiceSubcategoryIds,
-  findMatchingSubdivisionIds,
-  findMatchingProSubcategoryIds,
 } from '@/lib/taxonomies';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
+import { buildServiceSearchConditions } from '@/lib/utils/search';
 // Unified cache configuration
 import { getCacheTTL } from '@/lib/cache/config';
 import { SearchCacheKeys } from '@/lib/cache/keys';
@@ -148,10 +145,9 @@ async function performSearch(
     const taxonomyMatches = [...sortedSubdivisions, ...sortedSubcategories];
     const limitedTaxonomies = taxonomyMatches.slice(0, 5);
 
-    // Search services by title, description, location, and tags using normalized fields for accent-insensitive search
-    // MULTI-WORD SEARCH: Split into words and require ALL words to match
+    // Search services by title, description, location, tags, and profile fields
+    // Uses shared search condition builder (no fallback fields for autocomplete)
     const searchWords = searchTerm.split(/\s+/).filter((word) => word.length >= 2);
-    const tags = getTags();
 
     // Build where clause based on number of words
     let serviceWhereClause: any = { status: 'published' };
@@ -160,197 +156,13 @@ async function performSearch(
       // No valid search words, return empty
       serviceWhereClause.id = -1; // No results
     } else if (searchWords.length === 1) {
-      // Single word search
-      // Find matching tags
-      const matchingTags = tags.filter((tag) => {
-        const normalizedLabel = normalizeTerm(tag.label);
-        return normalizedLabel.toLowerCase().includes(searchTerm.toLowerCase());
-      });
-      const matchingTagIds = matchingTags.map((tag) => tag.id);
-
-      // Find matching subcategories and subdivisions by searching in taxonomy labels
-      const matchingSubcategoryIds = findMatchingServiceSubcategoryIds(searchTerm);
-      const matchingSubdivisionIds = findMatchingSubdivisionIds(searchTerm);
-      // Find matching pro subcategories (singular + plural) for profile subcategory search
-      const matchingProSubcategoryIds = findMatchingProSubcategoryIds(searchTerm);
-
-      const searchConditions: any[] = [
-        {
-          titleNormalized: {
-            contains: searchTerm,
-            mode: 'insensitive',
-          },
-        },
-        {
-          descriptionNormalized: {
-            contains: searchTerm,
-            mode: 'insensitive',
-          },
-        },
-        {
-          profile: {
-            coverageNormalized: {
-              contains: searchTerm,
-              mode: 'insensitive',
-            },
-          },
-        },
-        // Search in profile displayName
-        {
-          profile: {
-            displayNameNormalized: {
-              contains: searchTerm,
-              mode: 'insensitive',
-            },
-          },
-        },
-        // Search in username (duplicated on Profile)
-        {
-          profile: {
-            username: {
-              contains: searchTerm,
-              mode: 'insensitive',
-            },
-          },
-        },
-      ];
-
-      // Add tag search if matching tags found
-      if (matchingTagIds.length > 0) {
-        searchConditions.push({
-          tags: {
-            hasSome: matchingTagIds,
-          },
-        });
-      }
-
-      // Add subcategory search if matching subcategories found
-      if (matchingSubcategoryIds.length > 0) {
-        searchConditions.push({
-          subcategory: {
-            in: matchingSubcategoryIds,
-          },
-        });
-      }
-
-      // Add subdivision search if matching subdivisions found
-      if (matchingSubdivisionIds.length > 0) {
-        searchConditions.push({
-          subdivision: {
-            in: matchingSubdivisionIds,
-          },
-        });
-      }
-
-      // Add profile subcategory search (singular + plural via pro taxonomies)
-      if (matchingProSubcategoryIds.length > 0) {
-        searchConditions.push({
-          profile: {
-            subcategory: {
-              in: matchingProSubcategoryIds,
-            },
-          },
-        });
-      }
-
-      serviceWhereClause.OR = searchConditions;
+      // Single word: match any field
+      serviceWhereClause.OR = buildServiceSearchConditions(searchWords[0]);
     } else {
-      // Multi-word search: ALL words must match
-      serviceWhereClause.AND = searchWords.map((word) => {
-        // Find matching tags for this word
-        const matchingTags = tags.filter((tag) => {
-          const normalizedLabel = normalizeTerm(tag.label);
-          return normalizedLabel.toLowerCase().includes(word.toLowerCase());
-        });
-        const matchingTagIds = matchingTags.map((tag) => tag.id);
-
-        // Find matching subcategories and subdivisions for this word
-        const matchingSubcategoryIdsMulti = findMatchingServiceSubcategoryIds(word);
-        const matchingSubdivisionIdsMulti = findMatchingSubdivisionIds(word);
-        // Find matching pro subcategories (singular + plural) for this word
-        const matchingProSubcategoryIdsMulti = findMatchingProSubcategoryIds(word);
-
-        const wordConditions: any[] = [
-          {
-            titleNormalized: {
-              contains: word,
-              mode: 'insensitive',
-            },
-          },
-          {
-            descriptionNormalized: {
-              contains: word,
-              mode: 'insensitive',
-            },
-          },
-          {
-            profile: {
-              coverageNormalized: {
-                contains: word,
-                mode: 'insensitive',
-              },
-            },
-          },
-          // Search in profile displayName
-          {
-            profile: {
-              displayNameNormalized: {
-                contains: word,
-                mode: 'insensitive',
-              },
-            },
-          },
-          // Search in username (duplicated on Profile)
-          {
-            profile: {
-              username: {
-                contains: word,
-                mode: 'insensitive',
-              },
-            },
-          },
-        ];
-
-        // Add tag search if matching tags found for this word
-        if (matchingTagIds.length > 0) {
-          wordConditions.push({
-            tags: {
-              hasSome: matchingTagIds,
-            },
-          });
-        }
-
-        // Add subcategory search if matching subcategories found for this word
-        if (matchingSubcategoryIdsMulti.length > 0) {
-          wordConditions.push({
-            subcategory: {
-              in: matchingSubcategoryIdsMulti,
-            },
-          });
-        }
-
-        // Add subdivision search if matching subdivisions found for this word
-        if (matchingSubdivisionIdsMulti.length > 0) {
-          wordConditions.push({
-            subdivision: {
-              in: matchingSubdivisionIdsMulti,
-            },
-          });
-        }
-
-        // Add profile subcategory search (singular + plural via pro taxonomies)
-        if (matchingProSubcategoryIdsMulti.length > 0) {
-          wordConditions.push({
-            profile: {
-              subcategory: {
-                in: matchingProSubcategoryIdsMulti,
-              },
-            },
-          });
-        }
-
-        return { OR: wordConditions };
-      });
+      // Multi-word: each word must match somewhere (AND of ORs)
+      serviceWhereClause.AND = searchWords.map((word) => ({
+        OR: buildServiceSearchConditions(word),
+      }));
     }
 
     const services = await prisma.service.findMany({
