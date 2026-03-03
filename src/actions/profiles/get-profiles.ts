@@ -237,6 +237,13 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
               mode: 'insensitive' as const,
             },
           },
+          // Search in username (duplicated on Profile)
+          {
+            username: {
+              contains: normalizedSearch,
+              mode: 'insensitive' as const,
+            },
+          },
         ];
 
         // Add subcategory search if matching subcategories found

@@ -12,6 +12,7 @@ import {
   resolveToCountyId,
   findMatchingServiceSubcategoryIds,
   findMatchingSubdivisionIds,
+  findMatchingProSubcategoryIds,
 } from '@/lib/taxonomies';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 // Complex utilities - KEEP for hierarchy resolution, breadcrumbs, coverage transformation, and nested children lookups
@@ -530,6 +531,8 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
           // Find matching subcategories and subdivisions by searching in taxonomy labels
           const matchingSubcategoryIds = findMatchingServiceSubcategoryIds(word);
           const matchingSubdivisionIds = findMatchingSubdivisionIds(word);
+          // Find matching pro subcategories (singular + plural) for profile subcategory search
+          const matchingProSubcategoryIds = findMatchingProSubcategoryIds(word);
 
           const searchConditions: Array<
             | { titleNormalized: { contains: string; mode: 'insensitive' } }
@@ -541,9 +544,29 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
                   coverageNormalized: { contains: string; mode: 'insensitive' };
                 };
               }
+            | {
+                profile: {
+                  displayNameNormalized: { contains: string; mode: 'insensitive' };
+                };
+              }
+            | {
+                profile: {
+                  displayName: { contains: string; mode: 'insensitive' };
+                };
+              }
+            | {
+                profile: {
+                  username: { contains: string; mode: 'insensitive' };
+                };
+              }
             | { tags: { hasSome: string[] } }
             | { subcategory: { in: string[] } }
             | { subdivision: { in: string[] } }
+            | {
+                profile: {
+                  subcategory: { in: string[] };
+                };
+              }
           > = [
             // Search in normalized fields (for services with proper normalized data)
             {
@@ -580,6 +603,32 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
                 },
               },
             },
+            // Search in profile displayName
+            {
+              profile: {
+                displayNameNormalized: {
+                  contains: word,
+                  mode: 'insensitive' as const,
+                },
+              },
+            },
+            {
+              profile: {
+                displayName: {
+                  contains: searchTerm,
+                  mode: 'insensitive' as const,
+                },
+              },
+            },
+            // Search in username (duplicated on Profile)
+            {
+              profile: {
+                username: {
+                  contains: word,
+                  mode: 'insensitive' as const,
+                },
+              },
+            },
           ];
 
           // Add tag search condition if matching tags found
@@ -605,6 +654,17 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
             searchConditions.push({
               subdivision: {
                 in: matchingSubdivisionIds,
+              },
+            });
+          }
+
+          // Add profile subcategory search (singular + plural via pro taxonomies)
+          if (matchingProSubcategoryIds.length > 0) {
+            searchConditions.push({
+              profile: {
+                subcategory: {
+                  in: matchingProSubcategoryIds,
+                },
               },
             });
           }
@@ -637,6 +697,8 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
             // Find matching subcategories and subdivisions for this word
             const matchingSubcategoryIdsMulti = findMatchingServiceSubcategoryIds(word);
             const matchingSubdivisionIdsMulti = findMatchingSubdivisionIds(word);
+            // Find matching pro subcategories (singular + plural) for this word
+            const matchingProSubcategoryIdsMulti = findMatchingProSubcategoryIds(word);
 
             // Each word must match in at least one field
             const wordConditions: Array<
@@ -657,9 +719,38 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
                     };
                   };
                 }
+              | {
+                  profile: {
+                    displayNameNormalized: {
+                      contains: string;
+                      mode: 'insensitive';
+                    };
+                  };
+                }
+              | {
+                  profile: {
+                    displayName: {
+                      contains: string;
+                      mode: 'insensitive';
+                    };
+                  };
+                }
+              | {
+                  profile: {
+                    username: {
+                      contains: string;
+                      mode: 'insensitive';
+                    };
+                  };
+                }
               | { tags: { hasSome: string[] } }
               | { subcategory: { in: string[] } }
               | { subdivision: { in: string[] } }
+              | {
+                  profile: {
+                    subcategory: { in: string[] };
+                  };
+                }
             > = [
               {
                 titleNormalized: {
@@ -693,6 +784,32 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
                   },
                 },
               },
+              // Search in profile displayName
+              {
+                profile: {
+                  displayNameNormalized: {
+                    contains: word,
+                    mode: 'insensitive' as const,
+                  },
+                },
+              },
+              {
+                profile: {
+                  displayName: {
+                    contains: word,
+                    mode: 'insensitive' as const,
+                  },
+                },
+              },
+              // Search in username (duplicated on Profile)
+              {
+                profile: {
+                  username: {
+                    contains: word,
+                    mode: 'insensitive' as const,
+                  },
+                },
+              },
             ];
 
             // Add tag search if matching tags found for this word
@@ -718,6 +835,17 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
               wordConditions.push({
                 subdivision: {
                   in: matchingSubdivisionIdsMulti,
+                },
+              });
+            }
+
+            // Add profile subcategory search (singular + plural via pro taxonomies)
+            if (matchingProSubcategoryIdsMulti.length > 0) {
+              wordConditions.push({
+                profile: {
+                  subcategory: {
+                    in: matchingProSubcategoryIdsMulti,
+                  },
                 },
               });
             }

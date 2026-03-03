@@ -10,6 +10,7 @@ import {
   findMatchingLocationInCoverage,
   findMatchingServiceSubcategoryIds,
   findMatchingSubdivisionIds,
+  findMatchingProSubcategoryIds,
 } from '@/lib/taxonomies';
 import { normalizeTerm } from '@/lib/utils/text/normalize';
 // Unified cache configuration
@@ -170,6 +171,8 @@ async function performSearch(
       // Find matching subcategories and subdivisions by searching in taxonomy labels
       const matchingSubcategoryIds = findMatchingServiceSubcategoryIds(searchTerm);
       const matchingSubdivisionIds = findMatchingSubdivisionIds(searchTerm);
+      // Find matching pro subcategories (singular + plural) for profile subcategory search
+      const matchingProSubcategoryIds = findMatchingProSubcategoryIds(searchTerm);
 
       const searchConditions: any[] = [
         {
@@ -187,6 +190,24 @@ async function performSearch(
         {
           profile: {
             coverageNormalized: {
+              contains: searchTerm,
+              mode: 'insensitive',
+            },
+          },
+        },
+        // Search in profile displayName
+        {
+          profile: {
+            displayNameNormalized: {
+              contains: searchTerm,
+              mode: 'insensitive',
+            },
+          },
+        },
+        // Search in username (duplicated on Profile)
+        {
+          profile: {
+            username: {
               contains: searchTerm,
               mode: 'insensitive',
             },
@@ -221,6 +242,17 @@ async function performSearch(
         });
       }
 
+      // Add profile subcategory search (singular + plural via pro taxonomies)
+      if (matchingProSubcategoryIds.length > 0) {
+        searchConditions.push({
+          profile: {
+            subcategory: {
+              in: matchingProSubcategoryIds,
+            },
+          },
+        });
+      }
+
       serviceWhereClause.OR = searchConditions;
     } else {
       // Multi-word search: ALL words must match
@@ -235,6 +267,8 @@ async function performSearch(
         // Find matching subcategories and subdivisions for this word
         const matchingSubcategoryIdsMulti = findMatchingServiceSubcategoryIds(word);
         const matchingSubdivisionIdsMulti = findMatchingSubdivisionIds(word);
+        // Find matching pro subcategories (singular + plural) for this word
+        const matchingProSubcategoryIdsMulti = findMatchingProSubcategoryIds(word);
 
         const wordConditions: any[] = [
           {
@@ -252,6 +286,24 @@ async function performSearch(
           {
             profile: {
               coverageNormalized: {
+                contains: word,
+                mode: 'insensitive',
+              },
+            },
+          },
+          // Search in profile displayName
+          {
+            profile: {
+              displayNameNormalized: {
+                contains: word,
+                mode: 'insensitive',
+              },
+            },
+          },
+          // Search in username (duplicated on Profile)
+          {
+            profile: {
+              username: {
                 contains: word,
                 mode: 'insensitive',
               },
@@ -282,6 +334,17 @@ async function performSearch(
           wordConditions.push({
             subdivision: {
               in: matchingSubdivisionIdsMulti,
+            },
+          });
+        }
+
+        // Add profile subcategory search (singular + plural via pro taxonomies)
+        if (matchingProSubcategoryIdsMulti.length > 0) {
+          wordConditions.push({
+            profile: {
+              subcategory: {
+                in: matchingProSubcategoryIdsMulti,
+              },
             },
           });
         }

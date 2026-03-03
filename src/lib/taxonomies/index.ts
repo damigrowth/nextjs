@@ -831,9 +831,18 @@ export function findMatchingProSubcategoryIds(searchTerm: string): string[] {
 
   allProTaxonomies.forEach((category) => {
     category.children?.forEach((subcategory) => {
+      // Check label (singular form)
       if (subcategory.label) {
         const normalizedLabel = normalizeTerm(subcategory.label);
         if (normalizedLabel.includes(normalizedSearch)) {
+          matchingIds.push(subcategory.id);
+          return; // already matched, skip plural check
+        }
+      }
+      // Check plural form (e.g., "Γραφίστες" vs "Γραφίστας")
+      if (subcategory.plural) {
+        const normalizedPlural = normalizeTerm(subcategory.plural);
+        if (normalizedPlural.includes(normalizedSearch)) {
           matchingIds.push(subcategory.id);
         }
       }
