@@ -41,10 +41,9 @@ function StaticHeroContent() {
       </div>
 
       {/* Main Heading - Critical for LCP */}
-      <h1 className='text-[clamp(1.4rem,4.5vw,2.2rem)] font-bold leading-[1.2] text-black mb-[25px] block font-sans opacity-100 visible'>
+      <h1 className='text-lg sm:text-2xl font-bold leading-[1.2] text-black mb-4 block font-sans opacity-100 visible'>
         Οι καλύτερες υπηρεσίες στην οθόνη σου.
       </h1>
-
     </div>
   );
 }
@@ -105,13 +104,18 @@ export default function HeroHome({ popularSubcategories = [] }: HeroHomeProps) {
             <div className='w-full max-w-3xl lg:max-w-4xl mx-auto mt-2 bg-third rounded-3xl px-6 sm:px-10 py-8 sm:py-10'>
               {/* Subtitle */}
               <p className='text-base text-white font-medium mb-6 leading-relaxed font-sans'>
-                Άμεση αναζήτηση υπηρεσιών από <span className='font-bold'>Επαγγελματίες</span> και <span className='font-bold'>Επιχειρήσεις</span>.
+                Άμεση αναζήτηση υπηρεσιών από{' '}
+                <span className='font-bold'>Επαγγελματίες</span> και{' '}
+                <span className='font-bold'>Επιχειρήσεις</span>.
               </p>
 
               {/* Search Bar */}
               <Suspense
                 fallback={
-                  <div className='h-14 flex items-center justify-center' aria-label='Φόρτωση αναζήτησης'>
+                  <div
+                    className='h-14 flex items-center justify-center'
+                    aria-label='Φόρτωση αναζήτησης'
+                  >
                     <div
                       className='inline-block w-4 h-4 mr-2 border-2 border-white border-r-transparent rounded-full animate-spin'
                       role='status'
