@@ -1,4 +1,4 @@
-// Generated on 2026-03-05T11:57:15.132Z
+// Generated on 2026-03-05T15:53:27.247Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -5682,6 +5682,25 @@ export const serviceTaxonomies = [
               original_filename: '318.webp',
             },
           },
+          {
+            id: 'b1JdId',
+            label: 'UX/UI Design',
+            slug: 'uxui-design',
+            description:
+              'Βελτίωσε την εμπειρία χρήστη με ελκυστικά και λειτουργικά σχέδια για τις ψηφιακές σου εφαρμογές.',
+            image: {
+              public_id: '319_71a5abc2f4',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168641/319_71a5abc2f4.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 117217,
+              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168641/319_71a5abc2f4.webp',
+              original_filename: '319.webp',
+            },
+          },
         ],
       },
       {
@@ -6165,25 +6184,6 @@ export const serviceTaxonomies = [
               bytes: 60078,
               url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168633/337_a9833fe08e.webp',
               original_filename: '337.webp',
-            },
-          },
-          {
-            id: 'b1JdId',
-            label: 'UX/UI Design',
-            slug: 'uxui-design',
-            description:
-              'Βελτίωσε την εμπειρία χρήστη με ελκυστικά και λειτουργικά σχέδια για τις ψηφιακές σου εφαρμογές.',
-            image: {
-              public_id: '319_71a5abc2f4',
-              secure_url:
-                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168641/319_71a5abc2f4.webp',
-              width: 1792,
-              height: 1024,
-              resource_type: 'image',
-              format: 'webp',
-              bytes: 117217,
-              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168641/319_71a5abc2f4.webp',
-              original_filename: '319.webp',
             },
           },
         ],
