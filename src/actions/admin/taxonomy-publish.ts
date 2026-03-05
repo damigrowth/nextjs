@@ -147,7 +147,100 @@ function applyUpdateDraft(
     }
   }
 
+  // If newParentId is set, this is a move operation
+  if (draft.newParentId) {
+    return moveAndUpdateItem(
+      data,
+      draft.itemId,
+      draft.data,
+      draft.newParentId,
+      draft.level
+    );
+  }
+
+  // Standard in-place update (no parent change)
   return updateItemRecursively(data, draft.itemId, draft.data);
+}
+
+/**
+ * Move item to a new parent and apply property updates
+ *
+ * 1. Find existing item (preserve its children)
+ * 2. Remove from current location
+ * 3. Merge update data
+ * 4. Insert under new parent
+ */
+function moveAndUpdateItem(
+  data: DatasetItem[],
+  itemId: string,
+  newData: DatasetItem,
+  newParentId: string,
+  level?: string | null
+): DatasetItem[] {
+  // Find existing item to preserve children
+  const existingItem = findItemInTree(data, itemId);
+  if (!existingItem) {
+    throw new Error(`Item "${itemId}" not found for move operation`);
+  }
+
+  // Remove from current location
+  let result = deleteItemRecursively(data, itemId);
+
+  // Merge update data, preserving children
+  const updatedItem: DatasetItem = {
+    ...existingItem,
+    ...newData,
+    children: existingItem.children,
+  };
+
+  // Insert into new parent
+  if (level === 'subcategory') {
+    const parentExists = result.some((cat) => cat.id === newParentId);
+    if (!parentExists) {
+      throw new Error(`Target parent category "${newParentId}" not found`);
+    }
+    result = result.map((cat) =>
+      cat.id === newParentId
+        ? { ...cat, children: [...(cat.children || []), updatedItem] }
+        : cat
+    );
+  } else if (level === 'subdivision') {
+    const parentExists = result.some((cat) =>
+      cat.children?.some((sub) => sub.id === newParentId)
+    );
+    if (!parentExists) {
+      throw new Error(
+        `Target parent subcategory "${newParentId}" not found`
+      );
+    }
+    result = result.map((cat) => ({
+      ...cat,
+      children: cat.children?.map((sub) =>
+        sub.id === newParentId
+          ? { ...sub, children: [...(sub.children || []), updatedItem] }
+          : sub
+      ),
+    }));
+  }
+
+  return result;
+}
+
+/**
+ * Find item by ID in nested tree
+ */
+function findItemInTree(
+  items: DatasetItem[],
+  itemId: string
+): DatasetItem | null {
+  for (const item of items) {
+    if (item.id === itemId) return item;
+    if (item.children) {
+      const found = findItemInTree(item.children, itemId);
+      if (found) return found;
+    }
+  }
+  return null;
 }
 
 /**
@@ -243,12 +336,11 @@ function createOverallCommitMessage(
     return `- ${change.type}: ${operations}`;
   });
 
-  // Overall message format:
-  // 🔄 Update taxonomies (3 types, 5 changes)
-  // - service-subcategories: 2 created
-  // - service-categories: 1 updated
-  // - pro-categories: 2 deleted
-  return `🔄 Update service-subcategories taxonomies (${totalChanges} created)`;
+  if (changes.length === 1) {
+    return changes[0].individualMessage;
+  }
+
+  return `🔄 Update taxonomies (${typeCount} types)\n${breakdown.join('\n')}`;
 }
 
 /**

@@ -227,7 +227,42 @@ export function applyDraftsToData(
         break;
 
       case 'update':
-        data = updateItemRecursively(data, draft.itemId!, draft.data);
+        if (draft.newParentId) {
+          // Move operation: remove from old parent, update, insert into new parent
+          const existingItem = findItemInTree(data, draft.itemId!);
+          if (existingItem) {
+            data = deleteItemRecursively(data, draft.itemId!);
+            const updatedItem = {
+              ...existingItem,
+              ...draft.data,
+              children: existingItem.children,
+            };
+            if (draft.level === 'subcategory') {
+              data = data.map((cat) =>
+                cat.id === draft.newParentId
+                  ? {
+                      ...cat,
+                      children: [...(cat.children || []), updatedItem],
+                    }
+                  : cat
+              );
+            } else if (draft.level === 'subdivision') {
+              data = data.map((cat) => ({
+                ...cat,
+                children: cat.children?.map((sub) =>
+                  sub.id === draft.newParentId
+                    ? {
+                        ...sub,
+                        children: [...(sub.children || []), updatedItem],
+                      }
+                    : sub
+                ),
+              }));
+            }
+          }
+        } else {
+          data = updateItemRecursively(data, draft.itemId!, draft.data);
+        }
         break;
 
       case 'delete':
@@ -237,6 +272,23 @@ export function applyDraftsToData(
   }
 
   return data;
+}
+
+/**
+ * Find item by ID in nested tree
+ */
+function findItemInTree(
+  items: DatasetItem[],
+  itemId: string
+): DatasetItem | null {
+  for (const item of items) {
+    if (item.id === itemId) return item;
+    if (item.children) {
+      const found = findItemInTree(item.children, itemId);
+      if (found) return found;
+    }
+  }
+  return null;
 }
 
 /**

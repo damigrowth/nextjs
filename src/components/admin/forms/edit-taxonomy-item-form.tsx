@@ -78,6 +78,34 @@ export function EditTaxonomyItemForm({
   // Watch the label field for changes using useWatch
   const labelValue = useWatch({ control: form.control, name: 'label' });
 
+  // Get parent options based on level (for moving between parents)
+  const getParentOptions = () => {
+    if (taxonomy.level === 'subcategory') {
+      return existingItems.map((cat) => ({
+        id: cat.id,
+        label: cat.label || cat.name || cat.id,
+      }));
+    } else if (taxonomy.level === 'subdivision') {
+      const seen = new Set<string>();
+      const subcategories: Array<{ id: string; label: string }> = [];
+      existingItems.forEach((cat) => {
+        cat.children?.forEach((sub) => {
+          if (!seen.has(sub.id)) {
+            seen.add(sub.id);
+            subcategories.push({
+              id: sub.id,
+              label: `${cat.label || cat.name} > ${sub.label || sub.name}`,
+            });
+          }
+        });
+      });
+      return subcategories;
+    }
+    return [];
+  };
+
+  const parentOptions = getParentOptions();
+
   const onSubmit = async (data: EditTaxonomyItemFormValues) => {
     setIsPending(true);
 
@@ -89,6 +117,10 @@ export function EditTaxonomyItemForm({
           : data.level === 'subcategory'
             ? 'service-subcategories'
             : 'service-subdivisions';
+
+      // Detect if parent has changed
+      const parentChanged =
+        data.parentId && data.parentId !== taxonomy.parentId;
 
       // Create validated draft for update operation
       const draft = createDraftData(taxonomyType, 'update', {
@@ -105,6 +137,10 @@ export function EditTaxonomyItemForm({
           ...(data.image && { image: data.image }),
         } as DatasetItem,
         previousData: taxonomy, // Include original data for diff tracking
+        ...(parentChanged && {
+          newParentId: data.parentId,
+          level: data.level,
+        }),
       });
 
       // Save to localStorage
@@ -160,6 +196,51 @@ export function EditTaxonomyItemForm({
               </FormItem>
             )}
           />
+
+          {(taxonomy.level === 'subcategory' ||
+            taxonomy.level === 'subdivision') && (
+            <FormField
+              control={form.control}
+              name='parentId'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Parent{' '}
+                    {taxonomy.level === 'subcategory'
+                      ? 'Category'
+                      : 'Subcategory'}
+                  </FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={`Select parent ${taxonomy.level === 'subcategory' ? 'category' : 'subcategory'}`}
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {parentOptions.map((option) => (
+                        <SelectItem key={option.id} value={option.id}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Change the parent to move this {taxonomy.level} to a
+                    different{' '}
+                    {taxonomy.level === 'subcategory'
+                      ? 'category'
+                      : 'subcategory'}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <LabelField
             form={form}

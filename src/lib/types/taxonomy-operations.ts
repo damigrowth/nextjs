@@ -56,6 +56,8 @@ export interface UpdateDraft extends BaseDraft {
   itemId: string;
   data: DatasetItem;
   previousData?: DatasetItem; // For rollback capability
+  newParentId?: string | null; // Target parent ID when moving between parents
+  level?: TaxonomyLevel; // Item level (subcategory/subdivision) for move operations
 }
 
 /**

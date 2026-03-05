@@ -82,6 +82,8 @@ const updateDraftSchema = baseDraftSchema.extend({
   itemId: z.string().min(1),
   data: datasetItemSchema,
   previousData: datasetItemSchema.optional(),
+  newParentId: z.string().nullable().optional(),
+  level: taxonomyLevelSchema.optional(),
 });
 
 /**
@@ -173,6 +175,8 @@ export function createDraftData(
     itemId: string;
     data: unknown;
     previousData?: unknown;
+    newParentId?: string | null;
+    level?: string | null;
   }
 ): UpdateDraft;
 
@@ -231,6 +235,8 @@ export function createDraftData(
         itemId: data.itemId,
         data: data.data,
         previousData: data.previousData,
+        ...(data.newParentId !== undefined && { newParentId: data.newParentId }),
+        ...(data.level !== undefined && { level: data.level }),
       }) as TaxonomyDraft;
 
     case 'delete':
@@ -310,11 +316,13 @@ export function mergeDraftOperations(
       continue;
     }
 
-    // Update + update = keep latest
+    // Update + update = keep latest, preserve move info
     if (existing.operation === 'update' && draft.operation === 'update') {
       mergedMap.set(key, {
         ...draft,
         previousData: existing.previousData,
+        newParentId: draft.newParentId ?? existing.newParentId,
+        level: draft.level ?? existing.level,
       });
       continue;
     }
