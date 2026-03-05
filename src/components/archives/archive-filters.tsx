@@ -75,14 +75,15 @@ export function ArchiveFilters({
         className,
       )}
     >
-      <div className='flex flex-col lg:flex-row lg:flex-nowrap items-center justify-between w-full h-full gap-4'>
-        {/* Mobile: Filter button and sort in same row */}
-        <div className='flex flex-col xs:flex-row lg:hidden items-center justify-between w-full space-x-2 space-y-3 xs:space-y-0'>
+      {/* Mobile layout: 3 rows */}
+      <div className='flex flex-col gap-3 lg:hidden w-full'>
+        {/* Row 1: All Filters + Sort */}
+        <div className='flex flex-row items-center gap-2 w-full'>
           {filterTrigger || (
             <SheetTrigger asChild>
               <Button
                 variant='outline'
-                className='flex items-center gap-2 relative w-full xs:w-fit'
+                className='flex items-center gap-2 relative flex-1'
               >
                 <Filter className='w-4 h-4' />
                 <span>Όλα τα φίλτρα</span>
@@ -98,14 +99,40 @@ export function ArchiveFilters({
             value={filters.sortBy}
             onValueChange={handleSortChange}
             fullWidth={false}
-            className='w-full xs:w-fit'
+            className='flex-1'
           />
         </div>
 
+        {/* Row 2: Search */}
+        <SearchInput
+          value={filters.search}
+          onValueChange={handleSearchChange}
+          placeholder='Αναζήτηση...'
+          className='w-full'
+        />
+
+        {/* Row 3: Online + Counties */}
+        <div className='flex flex-row items-center gap-3 w-full'>
+          <OnlineToggle
+            id='online-filter-mobile'
+            checked={filters.online || false}
+            onCheckedChange={handleOnlineToggle}
+          />
+          <CountiesDropdown
+            value={filters.county}
+            onValueChange={handleCountyChange}
+            counties={counties}
+            className='flex-1'
+          />
+        </div>
+      </div>
+
+      {/* Desktop layout */}
+      <div className='hidden lg:flex lg:flex-row lg:flex-nowrap items-center justify-between w-full h-full gap-4'>
         {/* Left side: All Filters, Search, Online Toggle, Counties */}
-        <div className='flex flex-wrap lg:flex-nowrap items-center gap-3 lg:gap-6 w-full lg:w-auto'>
-          {/* All Filters Button/Trigger - Desktop only */}
-          <div className='hidden lg:block'>
+        <div className='flex flex-nowrap items-center gap-6 w-auto'>
+          {/* All Filters Button/Trigger */}
+          <div>
             {filterTrigger || (
               <SheetTrigger asChild>
                 <Button
@@ -128,15 +155,14 @@ export function ArchiveFilters({
             value={filters.search}
             onValueChange={handleSearchChange}
             placeholder='Αναζήτηση...'
-            className='w-full sm:min-w-56'
+            className='min-w-56'
           />
           {/* Online Toggle */}
           <OnlineToggle
-            id='online-filter'
+            id='online-filter-desktop'
             checked={filters.online || false}
             onCheckedChange={handleOnlineToggle}
           />
-
           {/* Counties Dropdown */}
           <CountiesDropdown
             value={filters.county}
@@ -146,7 +172,7 @@ export function ArchiveFilters({
         </div>
 
         {/* Right side: Sort Dropdown */}
-        <div className='hidden lg:block lg:ml-auto'>
+        <div className='ml-auto'>
           <SortDropdown
             value={filters.sortBy}
             onValueChange={handleSortChange}
