@@ -23,17 +23,17 @@ function StaticHeroContent() {
 
         {/* Cycling Badges Container - All in same position */}
         <div className='relative inline-block h-[26px] min-w-[220px] [contain:layout]'>
-          <Badge className='absolute top-0 left-0 bg-transparent hover:bg-transparent rounded-full px-3 py-1 text-3sm font-medium text-body animate-fade-cycle opacity-0 flex items-center gap-1.5 pointer-events-none whitespace-nowrap'>
+          <Badge className='absolute top-0 left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 bg-transparent hover:bg-transparent rounded-full px-3 py-1 text-3sm font-medium text-body animate-fade-cycle opacity-0 flex items-center gap-1.5 pointer-events-none whitespace-nowrap'>
             <Rocket className='h-3 w-3 fill-[#198754] text-[#198754]' />
             250+ νέες υπηρεσίες
           </Badge>
 
-          <Badge className='absolute top-0 left-0 bg-transparent hover:bg-transparent rounded-full px-3 py-1 text-3sm font-medium text-body animate-fade-cycle opacity-0 [animation-delay:3s] flex items-center gap-1.5 pointer-events-none whitespace-nowrap'>
+          <Badge className='absolute top-0 left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 bg-transparent hover:bg-transparent rounded-full px-3 py-1 text-3sm font-medium text-body animate-fade-cycle opacity-0 [animation-delay:3s] flex items-center gap-1.5 pointer-events-none whitespace-nowrap'>
             <Star className='h-3 w-3 fill-[#198754] text-[#198754]' />
             Άριστοι επαγγελματίες 5*
           </Badge>
 
-          <Badge className='absolute top-0 left-0 bg-transparent hover:bg-transparent rounded-full px-3 py-1 text-3sm font-medium text-body animate-fade-cycle opacity-0 [animation-delay:6s] flex items-center gap-1.5 pointer-events-none whitespace-nowrap'>
+          <Badge className='absolute top-0 left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 bg-transparent hover:bg-transparent rounded-full px-3 py-1 text-3sm font-medium text-body animate-fade-cycle opacity-0 [animation-delay:6s] flex items-center gap-1.5 pointer-events-none whitespace-nowrap'>
             <Sparkles className='h-3 w-3 fill-[#198754] text-[#198754]' />
             200+ πιστοποιημένοι επαγγελματίες
           </Badge>
