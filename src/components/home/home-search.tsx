@@ -119,7 +119,7 @@ const HomeSearch = React.forwardRef<HTMLFormElement, HomeSearchProps>(
         >
           <div
             className={cn(
-              'relative z-10 bg-white rounded-full border border-gray-400 p-2.5 max-w-[550px]',
+              'relative z-10 bg-white rounded-full border border-gray-400 p-2.5 max-w-[550px] mx-auto',
               className,
             )}
           >

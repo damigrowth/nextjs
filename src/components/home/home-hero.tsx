@@ -11,9 +11,9 @@ import { NextLink } from '@/components';
 // Static content that renders immediately for better LCP
 function StaticHeroContent() {
   return (
-    <div className='text-left max-w-3xl lg:max-w-4xl [contain:layout_style]'>
+    <div className='text-center max-w-3xl lg:max-w-4xl mx-auto [contain:layout_style]'>
       {/* Badges Row */}
-      <div className='flex flex-wrap gap-2 mb-6 items-center'>
+      <div className='flex flex-wrap gap-2 mb-6 items-center justify-center'>
         {/* Service Directory Badge */}
         <NextLink href='/categories' className='inline-block'>
           <Badge className='bg-[#198754] text-primary-foreground rounded-full px-3 py-1 text-3sm font-medium cursor-pointer mb-2 sm:mb-0'>
@@ -45,10 +45,6 @@ function StaticHeroContent() {
         Οι καλύτερες υπηρεσίες στην οθόνη σου.
       </h1>
 
-      {/* Subtitle */}
-      <p className='text-base text-[#6c757d] font-normal mb-8 leading-relaxed font-sans'>
-        Άμεση αναζήτηση υπηρεσιών από Επαγγελματίες και Επιχειρήσεις.
-      </p>
     </div>
   );
 }
@@ -71,12 +67,12 @@ function PopularSearches({ subcategories }: { subcategories: DatasetItem[] }) {
   }
 
   return (
-    <div className='text-left max-w-3xl lg:max-w-4xl'>
+    <div className='text-center max-w-3xl lg:max-w-4xl mx-auto'>
       <p className='font-sans mb-4 text-gray-600 text-sm'>
         Δημοφιλείς Αναζητήσεις
       </p>
 
-      <div className='flex flex-wrap gap-2'>
+      <div className='flex flex-wrap gap-2 justify-center'>
         {displaySubcategories.map((sub) => (
           <NextLink href={`/ipiresies/${sub.slug}`} key={sub.id}>
             <Badge
@@ -100,18 +96,24 @@ export default function HeroHome({ popularSubcategories = [] }: HeroHomeProps) {
   return (
     <section className='overflow-visible bg-silver bg-gradient-to-t from-white to-silver contain-layout'>
       <div className='container mx-auto pt-8 md:pt-10 pb-6 sm:pb-7 md:pb-8 px-4 sm:px-6'>
-        <div className='flex flex-col'>
-          <div className='max-w-6xl mx-auto'>
+        <div className='flex flex-col items-center'>
+          <div className='max-w-6xl mx-auto text-center'>
             {/* Hero Content - Critical for LCP */}
             <StaticHeroContent />
 
-            {/* Search Bar */}
-            <div className='w-full max-w-3xl lg:max-w-4xl mt-2'>
+            {/* Green container with subtitle + search */}
+            <div className='w-full max-w-3xl lg:max-w-4xl mx-auto mt-2 bg-third rounded-3xl px-6 sm:px-10 py-8 sm:py-10'>
+              {/* Subtitle */}
+              <p className='text-base text-white font-medium mb-6 leading-relaxed font-sans'>
+                Άμεση αναζήτηση υπηρεσιών από <span className='font-bold'>Επαγγελματίες</span> και <span className='font-bold'>Επιχειρήσεις</span>.
+              </p>
+
+              {/* Search Bar */}
               <Suspense
                 fallback={
-                  <div className='h-14 flex items-center' aria-label='Φόρτωση αναζήτησης'>
+                  <div className='h-14 flex items-center justify-center' aria-label='Φόρτωση αναζήτησης'>
                     <div
-                      className='inline-block w-4 h-4 mr-2 border-2 border-current border-r-transparent rounded-full animate-spin'
+                      className='inline-block w-4 h-4 mr-2 border-2 border-white border-r-transparent rounded-full animate-spin'
                       role='status'
                       aria-hidden='true'
                     />
