@@ -167,8 +167,9 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
     );
 
     // Manual upload function (optimized with useCallback)
-    const uploadFiles = useCallback(async () => {
-      if (queuedFiles.length === 0) return;
+    // Returns true if all uploads succeeded, false if any failed
+    const uploadFiles = useCallback(async (): Promise<boolean> => {
+      if (queuedFiles.length === 0) return true;
 
       setIsUploading(true);
       setUploadError(null);
@@ -221,10 +222,12 @@ const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
 
         // Clear uploaded files from queue
         setQueuedFiles((prev) => prev.filter((qf) => !qf.isUploaded));
+        return true;
       } catch (error) {
         setUploadError(
           error instanceof Error ? error.message : 'Αποτυχία μεταφόρτωσης.',
         );
+        return false;
       } finally {
         setIsUploading(false);
       }

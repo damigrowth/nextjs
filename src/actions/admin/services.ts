@@ -952,11 +952,19 @@ export async function updateServiceMedia(
 
     const validData = validationResult.data;
 
+    // Filter out pending/invalid resources that should never be saved
+    const cleanMedia = validData.media?.filter(
+      (r) =>
+        !r._pending &&
+        !r.public_id?.startsWith('pending_') &&
+        !r.secure_url?.startsWith('blob:'),
+    ) ?? null;
+
     // Update service media
     const updatedService = await prisma.service.update({
       where: { id: serviceId },
       data: {
-        media: validData.media as any,
+        media: cleanMedia as any,
         updatedAt: new Date(),
       },
     });

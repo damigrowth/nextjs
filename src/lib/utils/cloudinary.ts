@@ -471,11 +471,13 @@ export function sanitizeCloudinaryResource(
 export function sanitizeCloudinaryResources(
   resources: CloudinaryResource[]
 ): CloudinaryResource[] {
-  return filterPendingResources(resources).map(resource => {
-    // Remove _pending flag if it exists
-    const { _pending, ...sanitized } = resource as any;
-    return sanitized as CloudinaryResource;
-  });
+  return filterPendingResources(resources)
+    .filter(r => !r.secure_url?.startsWith('blob:'))
+    .map(resource => {
+      // Remove _pending flag if it exists
+      const { _pending, ...sanitized } = resource as any;
+      return sanitized as CloudinaryResource;
+    });
 }
 
 /**

@@ -95,7 +95,7 @@ export interface MediaUploadProps {
 }
 
 export interface MediaUploadRef {
-  uploadFiles: () => Promise<void>;
+  uploadFiles: () => Promise<boolean>;
   hasFiles: () => boolean;
   clearQueue: () => void;
 }

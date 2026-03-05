@@ -57,10 +57,20 @@ export function EditServiceMediaForm({ service }: EditServiceMediaFormProps) {
   const router = useRouter();
   const mediaRef = useRef<any>(null);
 
+  // Filter out invalid/pending resources from DB data (handles corrupted data)
+  const cleanMedia = (media: any[] | null | undefined) =>
+    media?.filter(
+      (r: any) =>
+        r &&
+        !r._pending &&
+        !r.public_id?.startsWith('pending_') &&
+        !r.secure_url?.startsWith('blob:'),
+    ) || [];
+
   const form = useForm<ServiceMediaInput>({
     resolver: zodResolver(updateServiceMediaSchema),
     defaultValues: {
-      media: service?.media || [],
+      media: cleanMedia(service?.media),
     },
     mode: 'onChange',
   });
@@ -74,7 +84,7 @@ export function EditServiceMediaForm({ service }: EditServiceMediaFormProps) {
   useEffect(() => {
     if (service) {
       form.reset({
-        media: service.media || null,
+        media: cleanMedia(service.media),
       });
     }
   }, [service, form]);
@@ -104,7 +114,11 @@ export function EditServiceMediaForm({ service }: EditServiceMediaFormProps) {
       const hasPendingFiles = mediaRef.current?.hasFiles();
 
       if (hasPendingFiles) {
-        await mediaRef.current.uploadFiles();
+        const uploadSuccess = await mediaRef.current.uploadFiles();
+        if (!uploadSuccess) {
+          setIsUploading(false);
+          return; // Don't submit form if upload fails
+        }
       }
 
       // Get all form values and populate FormData
