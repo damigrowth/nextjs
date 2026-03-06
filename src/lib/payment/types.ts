@@ -8,7 +8,7 @@ import type { SubscriptionPlan, BillingInterval } from '@prisma/client';
 /**
  * Supported payment providers
  */
-export type PaymentProviderName = 'stripe' | 'paypal' | 'eurobank' | 'lemonsqueezy';
+export type PaymentProviderName = 'stripe' | 'paypal' | 'eurobank' | 'worldline' | 'lemonsqueezy';
 
 /**
  * Billing details for prefilling checkout (optional)
