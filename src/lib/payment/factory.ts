@@ -37,6 +37,17 @@ export function getProvider(name: string): PaymentProvider | null {
       }
       break;
 
+    case 'worldline':
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { WorldlineAdapter } = require('./providers/worldline/adapter');
+        provider = new WorldlineAdapter();
+      } catch (error) {
+        console.warn('Failed to load Worldline provider:', error);
+        return null;
+      }
+      break;
+
     case 'paypal':
       // Future: PayPal implementation
       console.warn('PayPal provider not yet implemented');

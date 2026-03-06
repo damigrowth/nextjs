@@ -21,6 +21,7 @@ enum SubscriptionProvider {
   stripe
   paypal
   eurobank
+  worldline
   manual
 }
 
@@ -39,6 +40,11 @@ model Subscription {
   stripeCustomerId       String?            @unique
   stripeSubscriptionId   String?            @unique
   stripePriceId          String?
+
+  // Worldline/Cardlink fields
+  worldlineToken         String?            // Cardlink token for recurring charges
+  worldlineTokenExp      String?            // Token expiration (YYYYMMDD)
+  worldlineMasterOrderId String?            // Original orderId for recurring reference
 
   // Provider-agnostic subscription data
   plan                   SubscriptionPlan   @default(free)

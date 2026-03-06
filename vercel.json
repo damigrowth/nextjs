@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/auto-refresh",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/worldline-renewals",
+      "schedule": "0 6 * * *"
     }
   ]
 }

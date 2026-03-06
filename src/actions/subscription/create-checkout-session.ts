@@ -85,9 +85,9 @@ export async function createCheckoutSession(
       profileId: profile.id,
       plan,
       billingInterval,
-      successUrl: `${baseUrl}/dashboard/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+      successUrl: `${baseUrl}/dashboard/subscription/success`,
       cancelUrl: `${baseUrl}/dashboard/checkout`,
-      // Pass billing details for Stripe prefill
+      // Pass billing details for provider prefill
       billing: {
         email: user.email,
         name: billingData?.name || user.name || undefined,
