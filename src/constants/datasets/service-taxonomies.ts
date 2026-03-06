@@ -1,4 +1,4 @@
-// Generated on 2026-02-20T15:37:59.751Z
+// Generated on 2026-03-06T13:21:19.258Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -3099,16 +3099,15 @@ export const serviceTaxonomies = [
         description:
           'Αναζωογόνησε το σώμα και το πνεύμα σου με υπηρεσίες περιποίησης που προσφέρουν ομορφιά και ευεξία.',
         image: {
-          public_id: '225_8009b11e4c',
+          public_id: 'subcategories/peripoiisi_xxzzos',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168436/225_8009b11e4c.webp',
-          width: 1792,
-          height: 1024,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1772803238/subcategories/peripoiisi_xxzzos.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
           format: 'webp',
-          bytes: 68229,
-          url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168436/225_8009b11e4c.webp',
-          original_filename: '225.webp',
+          bytes: 51906,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1772803238/subcategories/peripoiisi_xxzzos.webp',
         },
         children: [
           {
