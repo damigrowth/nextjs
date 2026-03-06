@@ -64,13 +64,14 @@ export class WorldlineAdapter implements PaymentProvider {
 
       const recurringFrequency = params.billingInterval === 'year' ? '365' : '30';
 
-      // Build form fields — only include fields with values.
-      // This matches the official Cardlink WooCommerce plugin behavior.
-      // The field ORDER matters for digest calculation (JS objects maintain insertion order).
+      // Build the 44 documented form fields in table order.
+      // Digest is calculated from these 44 fields only.
+      // extTokenOptions/extToken are added separately (not part of digest).
       const formFields: Record<string, string> = {
         version: '2',
         mid: config.mid,
         lang: 'el',
+        deviceCategory: '0',
         orderid: orderId,
         orderDesc: `Doulitsa ${params.plan} - ${params.billingInterval === 'year' ? 'Ετήσια' : 'Μηνιαία'}`,
         orderAmount: amount,
@@ -89,17 +90,13 @@ export class WorldlineAdapter implements PaymentProvider {
         var1: params.profileId,
         var2: params.plan,
         var3: params.billingInterval,
-        extTokenOptions: '100',
       };
 
-      // Remove fields with empty values (matching official plugin — they never add empty fields)
-      for (const key of Object.keys(formFields)) {
-        if (formFields[key] === '') {
-          delete formFields[key];
-        }
-      }
-
+      // Calculate digest from the 44-field table order (extTokenOptions NOT included)
       const digest = calculateRequestDigest(formFields, config.sharedSecret);
+
+      // Add tokenization fields AFTER digest calculation (not part of digest)
+      formFields.extTokenOptions = '100';
 
       const sessionId = `wl_${orderId}`;
 

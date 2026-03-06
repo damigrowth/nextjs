@@ -2,16 +2,28 @@ import { createHash } from 'crypto';
 import type { WorldlineResponseParams } from './types';
 
 /**
- * Calculate digest for Cardlink redirect request.
- *
- * Matches the official Cardlink WooCommerce plugin approach:
- * 1. Concatenate ALL form field values (in insertion order)
- * 2. Append shared secret
- * 3. SHA256 → base64
- *
- * The digest field is NOT included in the concatenation.
+ * Fixed 44-field order for digest calculation (params #1-#44 from Cardlink docs).
+ * extTokenOptions, extToken, and digest are NOT part of this — they're extra form fields.
  * See docs/cardlink/cardlink-redirect-integration.md
- * See https://github.com/cardlink-sa/cardlink-payment-gateway-woocommerce
+ */
+const DIGEST_PARAM_ORDER = [
+  'version', 'mid', 'lang', 'deviceCategory', 'orderid', 'orderDesc',
+  'orderAmount', 'currency', 'payerEmail', 'payerPhone', 'billCountry',
+  'billState', 'billZip', 'billCity', 'billAddress', 'weight', 'dimensions',
+  'shipCountry', 'shipState', 'shipZip', 'shipCity', 'shipAddress',
+  'addFraudScore', 'maxPayRetries', 'reject3dsU', 'payMethod', 'trType',
+  'extInstallmentoffset', 'extInstallmentperiod', 'extRecurringfrequency',
+  'extRecurringenddate', 'blockScore', 'cssUrl', 'confirmUrl', 'cancelUrl',
+  'var1', 'var2', 'var3', 'var4', 'var5', 'var6', 'var7', 'var8', 'var9',
+] as const;
+
+/**
+ * Calculate digest for Cardlink redirect request.
+ * Algorithm: base64(sha256(utf8bytes(concat_44_fields_in_order + sharedSecret)))
+ *
+ * Uses the FIXED 44-field order from Cardlink documentation.
+ * Fields not present in formFields are treated as empty string.
+ * extTokenOptions and extToken are NOT included in the digest.
  *
  * IMPORTANT: Never calculate this client-side — exposes the shared secret.
  */
@@ -19,24 +31,16 @@ export function calculateRequestDigest(
   formFields: Record<string, string>,
   sharedSecret: string,
 ): string {
-  // Concatenate all form field values in order (matching PHP implode behavior)
-  const concatenated = Object.values(formFields).join('') + sharedSecret;
-
-  // Temporary debug logging - remove after testing
-  console.log('[Worldline Digest] Field count:', Object.keys(formFields).length);
-  console.log('[Worldline Digest] Fields:', Object.keys(formFields).join(', '));
-  console.log('[Worldline Digest] Concatenated:', concatenated);
+  const values = DIGEST_PARAM_ORDER.map((key) => formFields[key] || '');
+  const concatenated = values.join('') + sharedSecret;
 
   const hash = createHash('sha256').update(concatenated, 'utf8').digest('base64');
-  console.log('[Worldline Digest] Digest:', hash);
   return hash;
 }
 
 /**
  * Validate digest from Cardlink response.
- *
- * Matches the official Cardlink WooCommerce plugin approach:
- * Iterate ALL POST fields in order, exclude 'digest', concatenate values + secret.
+ * Iterates ALL POST fields in order, excludes 'digest', concatenates values + secret.
  */
 export function validateResponseDigest(
   params: WorldlineResponseParams,
