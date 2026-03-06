@@ -8,7 +8,6 @@ import { ProviderNotConfiguredError, ProviderOperationError } from '../../types'
 import { getWorldlineConfig } from '../../worldline-config';
 import { calculateRequestDigest } from './digest';
 import { cancelRecurring } from './xml';
-import type { WorldlineRedirectParams } from './types';
 
 /**
  * Worldline/Cardlink Adapter
@@ -21,6 +20,11 @@ import type { WorldlineRedirectParams } from './types';
  * 2. User is redirected to Cardlink payment page
  * 3. Cardlink POSTs result to our confirmUrl/cancelUrl (handled by webhook route)
  * 4. Recurring charges handled by cron job via XML API
+ *
+ * Digest approach matches official Cardlink WooCommerce plugin:
+ * - Only include fields with values (no empty padding)
+ * - Digest = base64(sha256(implode(field_values) + secret))
+ * - See https://github.com/cardlink-sa/cardlink-payment-gateway-woocommerce
  */
 export class WorldlineAdapter implements PaymentProvider {
   name: PaymentProviderName = 'worldline';
@@ -60,12 +64,13 @@ export class WorldlineAdapter implements PaymentProvider {
 
       const recurringFrequency = params.billingInterval === 'year' ? '365' : '30';
 
-      // Build all 45 parameters
-      const redirectParams: WorldlineRedirectParams = {
+      // Build form fields — only include fields with values.
+      // This matches the official Cardlink WooCommerce plugin behavior.
+      // The field ORDER matters for digest calculation (JS objects maintain insertion order).
+      const formFields: Record<string, string> = {
         version: '2',
         mid: config.mid,
         lang: 'el',
-        deviceCategory: '0',
         orderid: orderId,
         orderDesc: `Doulitsa ${params.plan} - ${params.billingInterval === 'year' ? 'Ετήσια' : 'Μηνιαία'}`,
         orderAmount: amount,
@@ -73,50 +78,34 @@ export class WorldlineAdapter implements PaymentProvider {
         payerEmail: params.billing?.email || '',
         payerPhone: params.billing?.phone || '',
         billCountry: params.billing?.address?.country || 'GR',
-        billState: '',
         billZip: params.billing?.address?.postalCode || '',
         billCity: params.billing?.address?.city || '',
         billAddress: params.billing?.address?.line1 || '',
-        weight: '',
-        dimensions: '',
-        shipCountry: '',
-        shipState: '',
-        shipZip: '',
-        shipCity: '',
-        shipAddress: '',
-        addFraudScore: '',
-        maxPayRetries: '',
-        reject3dsU: '',
-        payMethod: '',
         trType: '1',
-        extInstallmentoffset: '',
-        extInstallmentperiod: '',
         extRecurringfrequency: recurringFrequency,
         extRecurringenddate: recurringEndDate,
-        blockScore: '',
-        cssUrl: '',
         confirmUrl: `${baseUrl}/api/webhooks/worldline`,
         cancelUrl: `${baseUrl}/api/webhooks/worldline`,
         var1: params.profileId,
         var2: params.plan,
         var3: params.billingInterval,
-        var4: '',
-        var5: '',
-        var6: '',
-        var7: '',
-        var8: '',
-        var9: '',
         extTokenOptions: '100',
-        extToken: '',
       };
 
-      const digest = calculateRequestDigest(redirectParams, config.sharedSecret);
+      // Remove fields with empty values (matching official plugin — they never add empty fields)
+      for (const key of Object.keys(formFields)) {
+        if (formFields[key] === '') {
+          delete formFields[key];
+        }
+      }
+
+      const digest = calculateRequestDigest(formFields, config.sharedSecret);
 
       const sessionId = `wl_${orderId}`;
 
       // Encode params as URL-safe base64 for the redirect page
       const encodedParams = Buffer.from(
-        JSON.stringify({ ...redirectParams, digest }),
+        JSON.stringify({ ...formFields, digest }),
       ).toString('base64url');
 
       return {
