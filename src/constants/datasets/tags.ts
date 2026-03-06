@@ -1,4 +1,4 @@
-// Generated on 2026-03-06T13:21:19.257Z
+// Generated on 2026-03-06T17:48:08.055Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const tags = [
@@ -6386,5 +6386,10 @@ export const tags = [
     id: '1313',
     label: 'Lash lashes',
     slug: 'lash-lashes',
+  },
+  {
+    id: '1314',
+    label: 'Ανάλυση SEO',
+    slug: '-seo',
   },
 ];
