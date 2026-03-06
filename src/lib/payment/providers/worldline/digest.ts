@@ -2,20 +2,33 @@ import { createHash } from 'crypto';
 import type { WorldlineResponseParams } from './types';
 
 /**
+ * Fixed 46-field order for digest calculation.
+ * Verified empirically against Cardlink sandbox (eurocommerce-test).
+ * Key: extTokenOptions and extToken go BETWEEN cancelUrl and var1.
+ */
+const DIGEST_FIELD_ORDER = [
+  'version', 'mid', 'lang', 'deviceCategory', 'orderid', 'orderDesc',
+  'orderAmount', 'currency', 'payerEmail', 'payerPhone', 'billCountry',
+  'billState', 'billZip', 'billCity', 'billAddress', 'weight', 'dimensions',
+  'shipCountry', 'shipState', 'shipZip', 'shipCity', 'shipAddress',
+  'addFraudScore', 'maxPayRetries', 'reject3dsU', 'payMethod', 'trType',
+  'extInstallmentoffset', 'extInstallmentperiod', 'extRecurringfrequency',
+  'extRecurringenddate', 'blockScore', 'cssUrl', 'confirmUrl', 'cancelUrl',
+  'extTokenOptions', 'extToken',
+  'var1', 'var2', 'var3', 'var4', 'var5', 'var6', 'var7', 'var8', 'var9',
+] as const;
+
+/**
  * Calculate digest for Cardlink redirect request.
- * Matches the official WooCommerce plugin approach:
- * - Concatenate ALL form field values in insertion order
- * - Append shared secret
- * - SHA256 + base64
+ * Algorithm: base64(sha256(utf8bytes(concat_fields_in_order + sharedSecret)))
  *
- * The digest field itself is NOT included (it's the result).
- * See: cardlink-sa/cardlink-payment-gateway-woocommerce (implode approach)
+ * Uses fixed 46-field order. Missing fields default to empty string.
  */
 export function calculateRequestDigest(
   formFields: Record<string, string>,
   sharedSecret: string,
 ): string {
-  const concatenated = Object.values(formFields).join('') + sharedSecret;
+  const concatenated = DIGEST_FIELD_ORDER.map((k) => formFields[k] || '').join('') + sharedSecret;
   const hash = createHash('sha256').update(concatenated, 'utf8').digest('base64');
   return hash;
 }
