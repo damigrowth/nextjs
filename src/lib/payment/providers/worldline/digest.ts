@@ -2,9 +2,11 @@ import { createHash } from 'crypto';
 import type { WorldlineRedirectParams, WorldlineResponseParams } from './types';
 
 /**
- * Parameter order for digest calculation.
+ * Parameter order for digest calculation (params 1-44).
  * Cardlink requires concatenation in this EXACT order.
- * Empty string for omitted fields.
+ * The digest field (#45) is the RESULT, not included in concatenation.
+ * extTokenOptions and extToken are additional form fields NOT part of the digest.
+ * See docs/cardlink/cardlink-redirect-integration.md for reference.
  */
 const REDIRECT_PARAM_ORDER: (keyof WorldlineRedirectParams)[] = [
   'version',
@@ -51,8 +53,6 @@ const REDIRECT_PARAM_ORDER: (keyof WorldlineRedirectParams)[] = [
   'var7',
   'var8',
   'var9',
-  'extTokenOptions',
-  'extToken',
 ];
 
 /**
