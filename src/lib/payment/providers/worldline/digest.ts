@@ -2,38 +2,20 @@ import { createHash } from 'crypto';
 import type { WorldlineResponseParams } from './types';
 
 /**
- * Fixed 44-field order for digest calculation (params #1-#44 from Cardlink docs).
- * extTokenOptions, extToken, and digest are NOT part of this — they're extra form fields.
- * See docs/cardlink/cardlink-redirect-integration.md
- */
-const DIGEST_PARAM_ORDER = [
-  'version', 'mid', 'lang', 'deviceCategory', 'orderid', 'orderDesc',
-  'orderAmount', 'currency', 'payerEmail', 'payerPhone', 'billCountry',
-  'billState', 'billZip', 'billCity', 'billAddress', 'weight', 'dimensions',
-  'shipCountry', 'shipState', 'shipZip', 'shipCity', 'shipAddress',
-  'addFraudScore', 'maxPayRetries', 'reject3dsU', 'payMethod', 'trType',
-  'extInstallmentoffset', 'extInstallmentperiod', 'extRecurringfrequency',
-  'extRecurringenddate', 'blockScore', 'cssUrl', 'confirmUrl', 'cancelUrl',
-  'var1', 'var2', 'var3', 'var4', 'var5', 'var6', 'var7', 'var8', 'var9',
-] as const;
-
-/**
  * Calculate digest for Cardlink redirect request.
- * Algorithm: base64(sha256(utf8bytes(concat_44_fields_in_order + sharedSecret)))
+ * Matches the official WooCommerce plugin approach:
+ * - Concatenate ALL form field values in insertion order
+ * - Append shared secret
+ * - SHA256 + base64
  *
- * Uses the FIXED 44-field order from Cardlink documentation.
- * Fields not present in formFields are treated as empty string.
- * extTokenOptions and extToken are NOT included in the digest.
- *
- * IMPORTANT: Never calculate this client-side — exposes the shared secret.
+ * The digest field itself is NOT included (it's the result).
+ * See: cardlink-sa/cardlink-payment-gateway-woocommerce (implode approach)
  */
 export function calculateRequestDigest(
   formFields: Record<string, string>,
   sharedSecret: string,
 ): string {
-  const values = DIGEST_PARAM_ORDER.map((key) => formFields[key] || '');
-  const concatenated = values.join('') + sharedSecret;
-
+  const concatenated = Object.values(formFields).join('') + sharedSecret;
   const hash = createHash('sha256').update(concatenated, 'utf8').digest('base64');
   return hash;
 }

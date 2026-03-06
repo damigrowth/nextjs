@@ -71,13 +71,13 @@ export async function GET(request: NextRequest) {
     <p>Ανακατεύθυνση στη σελίδα πληρωμής...</p>
     <noscript>
       <p>Η JavaScript πρέπει να είναι ενεργοποιημένη. Πατήστε το κουμπί παρακάτω.</p>
-      <form method="POST" action="${escapeHtml(actionUrl)}">
+      <form method="POST" action="${escapeHtml(actionUrl)}" accept-charset="UTF-8">
         ${fields}
         <button type="submit">Συνέχεια στην πληρωμή</button>
       </form>
     </noscript>
   </div>
-  <form id="paymentForm" method="POST" action="${escapeHtml(actionUrl)}" style="display:none;">
+  <form id="paymentForm" method="POST" action="${escapeHtml(actionUrl)}" accept-charset="UTF-8" style="display:none;">
     ${fields}
   </form>
   <script>document.getElementById('paymentForm').submit();</script>

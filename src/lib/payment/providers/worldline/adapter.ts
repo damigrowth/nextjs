@@ -64,9 +64,9 @@ export class WorldlineAdapter implements PaymentProvider {
 
       const recurringFrequency = params.billingInterval === 'year' ? '365' : '30';
 
-      // Build the 44 documented form fields in table order.
-      // Digest is calculated from these 44 fields only.
-      // extTokenOptions/extToken are added separately (not part of digest).
+      // Build form fields matching WooCommerce plugin approach.
+      // Digest = base64(sha256(concat(all_values_in_order) + secret))
+      // extTokenOptions is included in the digest calculation.
       const formFields: Record<string, string> = {
         version: '2',
         mid: config.mid,
@@ -92,11 +92,11 @@ export class WorldlineAdapter implements PaymentProvider {
         var3: params.billingInterval,
       };
 
-      // Calculate digest from the 44-field table order (extTokenOptions NOT included)
-      const digest = calculateRequestDigest(formFields, config.sharedSecret);
-
-      // Add tokenization fields AFTER digest calculation (not part of digest)
+      // Add tokenization field BEFORE digest (included in digest per WooCommerce plugin)
       formFields.extTokenOptions = '100';
+
+      // Calculate digest from all form field values in insertion order + secret
+      const digest = calculateRequestDigest(formFields, config.sharedSecret);
 
       const sessionId = `wl_${orderId}`;
 
