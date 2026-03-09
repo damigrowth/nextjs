@@ -26,10 +26,6 @@ const baseUrl = () => process.env.BETTER_AUTH_URL || 'http://localhost:3000';
  * is redirected here with the result POSTed as form data.
  */
 export async function POST(request: NextRequest) {
-  // DEBUG: Log Content-Type
-  const contentType = request.headers.get('content-type') || '';
-  console.log('[Worldline Webhook] Content-Type:', contentType);
-
   let formData: FormData;
   try {
     formData = await request.formData();
@@ -37,16 +33,6 @@ export async function POST(request: NextRequest) {
     console.error('[Worldline Webhook] formData() failed:', error);
     return NextResponse.redirect(`${baseUrl()}/payment/callback?error=payment`);
   }
-
-  // DEBUG: Log ALL fields Cardlink sends
-  const allFields: Record<string, string> = {};
-  const allKeys: string[] = [];
-  formData.forEach((value, key) => {
-    allFields[key] = String(value);
-    allKeys.push(key);
-  });
-  console.log('[Worldline Webhook] Field order:', JSON.stringify(allKeys));
-  console.log('[Worldline Webhook] All fields:', JSON.stringify(allFields));
 
   // Parse response parameters
   const params: WorldlineResponseParams = {
@@ -67,10 +53,22 @@ export async function POST(request: NextRequest) {
     digest: (formData.get('digest') as string) || '',
   };
 
-  // Read var1-var3 which we set in the request
-  const profileId = (formData.get('var1') as string) || '';
-  const plan = (formData.get('var2') as string) || 'promoted';
-  const billingInterval = (formData.get('var3') as string) || 'month';
+  // Cardlink does NOT return var1-var9 in the response.
+  // Recover profileId/plan/interval from the pending subscription stored during checkout.
+  let profileId = (formData.get('var1') as string) || '';
+  let plan = (formData.get('var2') as string) || 'promoted';
+  let billingInterval = (formData.get('var3') as string) || 'month';
+
+  if (!profileId && params.orderid) {
+    const pending = await prisma.subscription.findFirst({
+      where: { providerSubscriptionId: params.orderid },
+      select: { pid: true, billingInterval: true },
+    });
+    if (pending) {
+      profileId = pending.pid;
+      billingInterval = pending.billingInterval || 'month';
+    }
+  }
 
   // Validate digest
   const sharedSecret = getWorldlineSharedSecret();
@@ -86,10 +84,13 @@ export async function POST(request: NextRequest) {
 
   const status = params.status as WorldlineStatus;
 
-  // Idempotency: check if this orderid was already processed
+  // Idempotency: check if this orderid was already processed (status already active)
   if (status === 'CAPTURED' || status === 'AUTHORIZED') {
     const existing = await prisma.subscription.findFirst({
-      where: { providerSubscriptionId: params.orderid },
+      where: {
+        providerSubscriptionId: params.orderid,
+        status: SubscriptionStatus.active,
+      },
     });
     if (existing) {
       console.log('[Worldline Webhook] Already processed order:', params.orderid);

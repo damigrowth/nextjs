@@ -45,7 +45,13 @@ export class PaymentService {
     // Delegate to provider
     const session = await provider.createCheckoutSession(params);
 
-    // Update YOUR database (source of truth)
+    // Store checkout metadata in DB so the webhook can recover profileId/plan/interval.
+    // Cardlink does NOT return var1-var9 in the response, so we need this lookup.
+    // Extract orderId from sessionId (format: "wl_{orderId}" for Worldline)
+    const pendingOrderId = session.sessionId.startsWith('wl_')
+      ? session.sessionId.slice(3)
+      : session.sessionId;
+
     await prisma.subscription.upsert({
       where: { pid: params.profileId },
       create: {
@@ -53,9 +59,12 @@ export class PaymentService {
         provider: providerName,
         plan: SubscriptionPlan.free,
         status: SubscriptionStatus.incomplete,
+        providerSubscriptionId: pendingOrderId,
+        billingInterval: params.billingInterval,
       },
       update: {
-        // Track that checkout was initiated
+        providerSubscriptionId: pendingOrderId,
+        billingInterval: params.billingInterval,
         updatedAt: new Date(),
       },
     });

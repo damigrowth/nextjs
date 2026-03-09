@@ -54,11 +54,5 @@ export function validateResponseDigestFromFormData(
   const concatenated = values.join('') + sharedSecret;
   const calculated = createHash('sha256').update(concatenated, 'utf8').digest('base64');
 
-  // DEBUG: Log digest comparison
-  console.log('[Worldline Digest] Expected:', digest);
-  console.log('[Worldline Digest] Calculated:', calculated);
-  console.log('[Worldline Digest] Values concatenated (no secret):', values.join(''));
-  console.log('[Worldline Digest] Match:', calculated === digest);
-
   return calculated === digest;
 }
