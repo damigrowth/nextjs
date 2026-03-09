@@ -158,7 +158,7 @@ export default async function AdminSubscriptionDetailPage({
         }
       />
       <div className='flex flex-col gap-4 pb-6 pt-4 md:gap-6'>
-        <div className='mx-auto w-full max-w-5xl px-4 lg:px-6'>
+        <div className='w-full px-4 lg:px-6'>
           <div className='space-y-6'>
             {/* Subscription Overview - 4 Cards */}
             <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
@@ -414,52 +414,6 @@ export default async function AdminSubscriptionDetailPage({
                   <div className='divide-y'>
                     {billing ? (
                       <>
-                        {billing.name && (
-                          <div className='flex items-center justify-between px-6 py-2'>
-                            <span className='text-xs text-muted-foreground'>
-                              Όνομα
-                            </span>
-                            <span className='text-xs font-medium'>
-                              {billing.name}
-                            </span>
-                          </div>
-                        )}
-                        {billing.afm && (
-                          <div className='flex items-center justify-between px-6 py-2'>
-                            <span className='text-xs text-muted-foreground'>
-                              ΑΦΜ
-                            </span>
-                            <span className='text-xs font-mono'>
-                              {billing.afm}
-                            </span>
-                          </div>
-                        )}
-                        {billing.doy && (
-                          <div className='flex items-center justify-between px-6 py-2'>
-                            <span className='text-xs text-muted-foreground'>
-                              ΔΟΥ
-                            </span>
-                            <span className='text-xs'>{billing.doy}</span>
-                          </div>
-                        )}
-                        {billing.address && (
-                          <div className='flex items-center justify-between px-6 py-2'>
-                            <span className='text-xs text-muted-foreground'>
-                              Διεύθυνση
-                            </span>
-                            <span className='text-xs truncate max-w-[120px]' title={billing.address}>
-                              {billing.address}
-                            </span>
-                          </div>
-                        )}
-                        {billing.profession && (
-                          <div className='flex items-center justify-between px-6 py-2'>
-                            <span className='text-xs text-muted-foreground'>
-                              Επάγγελμα
-                            </span>
-                            <span className='text-xs'>{billing.profession}</span>
-                          </div>
-                        )}
                         <div className='flex items-center justify-between px-6 py-2'>
                           <span className='text-xs text-muted-foreground'>
                             Τύπος
@@ -468,6 +422,56 @@ export default async function AdminSubscriptionDetailPage({
                             {billing.invoice ? 'Τιμολόγιο' : 'Απόδειξη'}
                           </Badge>
                         </div>
+                        {billing.invoice && (
+                          <>
+                            {billing.name && (
+                              <div className='flex items-center justify-between px-6 py-2'>
+                                <span className='text-xs text-muted-foreground'>
+                                  Όνομα
+                                </span>
+                                <span className='text-xs font-medium'>
+                                  {billing.name}
+                                </span>
+                              </div>
+                            )}
+                            {billing.afm && (
+                              <div className='flex items-center justify-between px-6 py-2'>
+                                <span className='text-xs text-muted-foreground'>
+                                  ΑΦΜ
+                                </span>
+                                <span className='text-xs font-mono'>
+                                  {billing.afm}
+                                </span>
+                              </div>
+                            )}
+                            {billing.doy && (
+                              <div className='flex items-center justify-between px-6 py-2'>
+                                <span className='text-xs text-muted-foreground'>
+                                  ΔΟΥ
+                                </span>
+                                <span className='text-xs'>{billing.doy}</span>
+                              </div>
+                            )}
+                            {billing.address && (
+                              <div className='flex items-center justify-between px-6 py-2'>
+                                <span className='text-xs text-muted-foreground'>
+                                  Διεύθυνση
+                                </span>
+                                <span className='text-xs truncate max-w-[120px]' title={billing.address}>
+                                  {billing.address}
+                                </span>
+                              </div>
+                            )}
+                            {billing.profession && (
+                              <div className='flex items-center justify-between px-6 py-2'>
+                                <span className='text-xs text-muted-foreground'>
+                                  Επάγγελμα
+                                </span>
+                                <span className='text-xs'>{billing.profession}</span>
+                              </div>
+                            )}
+                          </>
+                        )}
                       </>
                     ) : (
                       <div className='px-6 py-4 text-center'>
