@@ -8,7 +8,6 @@ import { ProviderNotConfiguredError, ProviderOperationError } from '../../types'
 import { getWorldlineConfig } from '../../worldline-config';
 import { getPlanAmount } from '../../pricing';
 import { calculateRequestDigest } from './digest';
-import { cancelRecurring } from './xml';
 
 /**
  * Worldline/Cardlink Adapter
@@ -110,17 +109,11 @@ export class WorldlineAdapter implements PaymentProvider {
     }
   }
 
-  async cancelSubscription(subscriptionId: string): Promise<void> {
-    try {
-      const result = await cancelRecurring({ orderId: subscriptionId });
-
-      if (result.status !== 'CANCELED' && result.status !== 'CAPTURED') {
-        throw new Error(`Cancel failed with status: ${result.status} - ${result.message}`);
-      }
-    } catch (error) {
-      if (error instanceof ProviderNotConfiguredError) throw error;
-      throw new ProviderOperationError('worldline', 'cancelSubscription', error);
-    }
+  async cancelSubscription(_subscriptionId: string): Promise<void> {
+    // Worldline subscriptions are merchant-managed: our cron job charges customers
+    // using stored tokens. Cancellation is a DB-only operation handled by
+    // PaymentService (sets cancelAtPeriodEnd/canceledAt), which causes the
+    // cron job to skip future charges. No Cardlink API call needed.
   }
 
   async restoreSubscription(_subscriptionId: string): Promise<void> {
