@@ -12,7 +12,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { SUBSCRIPTION_PLANS } from '@/lib/stripe/config';
+import { SUBSCRIPTION_PLANS } from '@/lib/payment/pricing';
 import { createCheckoutSession } from '@/actions/subscription';
 import { updateProfileBilling } from '@/actions/profiles/billing';
 import { toast } from 'sonner';

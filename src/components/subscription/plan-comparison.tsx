@@ -3,7 +3,7 @@
 import { Check, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { SUBSCRIPTION_PLANS } from '@/lib/stripe/config';
+import { SUBSCRIPTION_PLANS } from '@/lib/payment/pricing';
 
 interface PlanComparisonProps {
   triggerReason?: string | null;

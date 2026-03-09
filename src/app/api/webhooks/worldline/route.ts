@@ -66,6 +66,17 @@ export async function POST(request: NextRequest) {
 
   const status = params.status as WorldlineStatus;
 
+  // Idempotency: check if this orderid was already processed
+  if (status === 'CAPTURED' || status === 'AUTHORIZED') {
+    const existing = await prisma.subscription.findFirst({
+      where: { providerSubscriptionId: params.orderid },
+    });
+    if (existing) {
+      console.log('[Worldline Webhook] Already processed order:', params.orderid);
+      return NextResponse.redirect(`${baseUrl()}/dashboard/subscription/success`);
+    }
+  }
+
   // Handle based on status
   if (status === 'CAPTURED' || status === 'AUTHORIZED') {
     await handlePaymentSuccess(params, profileId, plan, billingInterval);
