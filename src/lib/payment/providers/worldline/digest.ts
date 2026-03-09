@@ -1,5 +1,4 @@
 import { createHash } from 'crypto';
-import type { WorldlineResponseParams } from './types';
 
 /**
  * Fixed 46-field order for digest calculation.
@@ -35,22 +34,24 @@ export function calculateRequestDigest(
 
 /**
  * Validate digest from Cardlink response.
- * Iterates ALL POST fields in order, excludes 'digest', concatenates values + secret.
+ * Uses raw FormData to capture ALL fields Cardlink sends (including var1-var9, etc.)
+ * in the exact order they appear in the POST body.
  */
-export function validateResponseDigest(
-  params: WorldlineResponseParams,
+export function validateResponseDigestFromFormData(
+  formData: FormData,
   sharedSecret: string,
 ): boolean {
-  const excludeKeys = new Set(['digest']);
+  const digest = (formData.get('digest') as string) || '';
   const values: string[] = [];
 
-  for (const [key, value] of Object.entries(params)) {
-    if (!excludeKeys.has(key)) {
-      values.push(value || '');
+  // FormData.forEach preserves insertion order from the POST body
+  formData.forEach((value, key) => {
+    if (key !== 'digest') {
+      values.push(String(value));
     }
-  }
+  });
 
   const concatenated = values.join('') + sharedSecret;
   const calculated = createHash('sha256').update(concatenated, 'utf8').digest('base64');
-  return calculated === params.digest;
+  return calculated === digest;
 }
