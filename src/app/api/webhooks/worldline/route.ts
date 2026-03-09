@@ -29,15 +29,47 @@ const baseUrl = () => process.env.BETTER_AUTH_URL || 'http://localhost:3000';
  *    - Identified by Sequence field >= 2
  *    - Returns JSON (no browser redirect)
  *
- * 3. Background confirmation (server-to-server, user-agent: "Modirum VPOS"):
+ * 3. Background confirmation (server-to-server, user-agent: "Modirum VPOS" or "Modirum HTTPClient"):
  *    - Duplicate of initial payment for reliability
+ *    - May use non-form Content-Type (parsed as URL-encoded text)
  */
 export async function POST(request: NextRequest) {
+  const userAgent = request.headers.get('user-agent') || '';
+  const isServerToServer = userAgent.includes('Modirum');
+  const contentType = request.headers.get('content-type') || '';
+
   let formData: FormData;
-  try {
-    formData = await request.formData();
-  } catch (error) {
-    console.error('[Worldline Webhook] formData() failed:', error);
+
+  // Modirum HTTPClient may send with non-form Content-Type (e.g. text/plain).
+  // Detect and parse body as URL-encoded text in that case.
+  const isFormContentType =
+    contentType.includes('application/x-www-form-urlencoded') ||
+    contentType.includes('multipart/form-data');
+
+  if (isFormContentType) {
+    try {
+      formData = await request.formData();
+    } catch (error) {
+      if (isServerToServer) {
+        console.warn('[Worldline Webhook] Background confirmation parse failed, acknowledging');
+        return NextResponse.json({ status: 'ok', message: 'parse failed, acknowledged' });
+      }
+      console.error('[Worldline Webhook] formData() failed:', error);
+      return NextResponse.redirect(`${baseUrl()}/payment/callback?error=payment`);
+    }
+  } else if (isServerToServer) {
+    // Non-standard Content-Type from Modirum — try parsing body as URL-encoded text
+    try {
+      const bodyText = await request.text();
+      const urlParams = new URLSearchParams(bodyText);
+      formData = new FormData();
+      urlParams.forEach((value, key) => formData.append(key, value));
+    } catch {
+      console.warn('[Worldline Webhook] Background confirmation unknown format, acknowledging');
+      return NextResponse.json({ status: 'ok', message: 'unknown format, acknowledged' });
+    }
+  } else {
+    console.error('[Worldline Webhook] Unexpected Content-Type:', contentType);
     return NextResponse.redirect(`${baseUrl()}/payment/callback?error=payment`);
   }
 
@@ -70,7 +102,21 @@ export async function POST(request: NextRequest) {
   }
 
   if (!validateResponseDigestFromFormData(formData, sharedSecret)) {
+    // For background confirmations, if order already processed, acknowledge silently
+    if (isServerToServer && params.orderid) {
+      const alreadyProcessed = await prisma.subscription.findFirst({
+        where: { providerSubscriptionId: params.orderid, status: SubscriptionStatus.active },
+        select: { id: true },
+      });
+      if (alreadyProcessed) {
+        console.warn('[Worldline Webhook] Digest mismatch on background confirmation, order already processed:', params.orderid);
+        return NextResponse.json({ status: 'ok', message: 'already processed' });
+      }
+    }
     console.error('[Worldline Webhook] Digest validation failed for order:', params.orderid);
+    if (isServerToServer) {
+      return NextResponse.json({ status: 'error', message: 'digest validation failed' }, { status: 400 });
+    }
     return NextResponse.redirect(`${baseUrl()}/payment/callback?error=security`);
   }
 
@@ -102,8 +148,7 @@ export async function POST(request: NextRequest) {
   const status = params.status as WorldlineStatus;
 
   // Detect background confirmation (server-to-server, no browser)
-  const userAgent = request.headers.get('user-agent') || '';
-  const isBackgroundConfirmation = userAgent.includes('Modirum VPOS');
+  const isBackgroundConfirmation = isServerToServer;
 
   // Idempotency: check if this orderid was already processed (status already active)
   if (status === 'CAPTURED' || status === 'AUTHORIZED') {
