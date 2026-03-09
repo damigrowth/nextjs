@@ -8,7 +8,7 @@ import {
 } from '@prisma/client';
 import { revalidateProfile, logCacheRevalidation } from '@/lib/cache';
 import { getWorldlineSharedSecret } from '@/lib/payment/worldline-config';
-import { validateResponseDigest } from '@/lib/payment/providers/worldline/digest';
+import { validateResponseDigestFromFormData } from '@/lib/payment/providers/worldline/digest';
 import type { WorldlineResponseParams, WorldlineStatus } from '@/lib/payment/providers/worldline/types';
 
 const baseUrl = () => process.env.BETTER_AUTH_URL || 'http://localhost:3000';
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.redirect(`${baseUrl()}/payment/callback?error=config`);
   }
 
-  if (!validateResponseDigest(params, sharedSecret)) {
+  if (!validateResponseDigestFromFormData(formData, sharedSecret)) {
     console.error('[Worldline Webhook] Digest validation failed for order:', params.orderid);
     return NextResponse.redirect(`${baseUrl()}/payment/callback?error=security`);
   }
