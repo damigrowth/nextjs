@@ -26,7 +26,27 @@ const baseUrl = () => process.env.BETTER_AUTH_URL || 'http://localhost:3000';
  * is redirected here with the result POSTed as form data.
  */
 export async function POST(request: NextRequest) {
-  const formData = await request.formData();
+  // DEBUG: Log Content-Type
+  const contentType = request.headers.get('content-type') || '';
+  console.log('[Worldline Webhook] Content-Type:', contentType);
+
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+  } catch (error) {
+    console.error('[Worldline Webhook] formData() failed:', error);
+    return NextResponse.redirect(`${baseUrl()}/payment/callback?error=payment`);
+  }
+
+  // DEBUG: Log ALL fields Cardlink sends
+  const allFields: Record<string, string> = {};
+  const allKeys: string[] = [];
+  formData.forEach((value, key) => {
+    allFields[key] = String(value);
+    allKeys.push(key);
+  });
+  console.log('[Worldline Webhook] Field order:', JSON.stringify(allKeys));
+  console.log('[Worldline Webhook] All fields:', JSON.stringify(allFields));
 
   // Parse response parameters
   const params: WorldlineResponseParams = {
