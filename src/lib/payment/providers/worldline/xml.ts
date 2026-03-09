@@ -133,8 +133,16 @@ export async function executeRecurringCharge(params: XmlSaleParams): Promise<Xml
   };
 }
 
+const VPOS_NS = 'http://www.modirum.com/schemas/vposxmlapi41';
+const XMLDSIG_NS = 'http://www.w3.org/2000/09/xmldsig#';
+
 /**
- * Cancel a recurring subscription via Direct XML API.
+ * Cancel a scheduled recurring subscription via Direct XML API.
+ *
+ * Uses manual XML string building (not fast-xml-parser) for precise control over:
+ * - XML namespace placement (required on VPOS element and canonicalized Message)
+ * - Element ordering (TransactionInfo before Operation, per Cardlink docs)
+ * - Attribute ordering in canonicalized form (xmlns, xmlns:ns2, messageId, timeStamp, version)
  */
 export async function cancelRecurring(params: XmlCancelRecurringParams): Promise<XmlResponse> {
   const config = getWorldlineConfig();
@@ -143,40 +151,34 @@ export async function cancelRecurring(params: XmlCancelRecurringParams): Promise
     throw new Error('Worldline not configured: missing MID or shared secret');
   }
 
-  const messageId = `m${Date.now()}`;
-  const timestamp = new Date().toISOString();
+  const messageId = `M${Date.now()}`;
+  const timestamp = formatTimestampWithOffset(new Date());
 
-  const messageContent = {
-    VPOS: {
-      Message: {
-        '@_version': '2.1',
-        '@_messageId': messageId,
-        '@_timeStamp': timestamp,
-        RecurringOperationRequest: {
-          Authentication: {
-            Mid: config.mid,
-          },
-          Operation: 'Cancel',
-          TransactionInfo: {
-            OrderId: params.orderId,
-          },
-        },
-      },
-    },
-  };
+  // Canonicalized Message XML — namespaces ON the Message tag, attributes in canonical order
+  const canonicalMessageXml =
+    `<Message xmlns="${VPOS_NS}" xmlns:ns2="${XMLDSIG_NS}" messageId="${messageId}" timeStamp="${timestamp}" version="2.1">` +
+    `<RecurringOperationRequest>` +
+    `<Authentication><Mid>${config.mid}</Mid></Authentication>` +
+    `<TransactionInfo><OrderId>${params.orderId}</OrderId></TransactionInfo>` +
+    `<Operation>Cancel</Operation>` +
+    `</RecurringOperationRequest>` +
+    `</Message>`;
 
-  const xmlBody = xmlBuilder.build(messageContent);
-  const messageXml = xmlBody.match(/<Message.*?<\/Message>/s)?.[0] || '';
-  const digest = calculateXmlDigest(messageXml, config.sharedSecret);
+  const digest = calculateXmlDigest(canonicalMessageXml, config.sharedSecret);
 
-  const finalContent = {
-    VPOS: {
-      ...messageContent.VPOS,
-      Digest: digest,
-    },
-  };
-
-  const finalXml = xmlBuilder.build(finalContent);
+  // Final XML — namespaces on VPOS element (not on Message)
+  const finalXml =
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+    `<VPOS xmlns="${VPOS_NS}" xmlns:ns2="${XMLDSIG_NS}">` +
+    `<Message version="2.1" messageId="${messageId}" timeStamp="${timestamp}">` +
+    `<RecurringOperationRequest>` +
+    `<Authentication><Mid>${config.mid}</Mid></Authentication>` +
+    `<TransactionInfo><OrderId>${params.orderId}</OrderId></TransactionInfo>` +
+    `<Operation>Cancel</Operation>` +
+    `</RecurringOperationRequest>` +
+    `</Message>` +
+    `<Digest>${digest}</Digest>` +
+    `</VPOS>`;
 
   const response = await fetch(config.xmlUrl, {
     method: 'POST',
@@ -195,6 +197,23 @@ export async function cancelRecurring(params: XmlCancelRecurringParams): Promise
 
   return {
     status: opResponse?.Status || 'ERROR',
-    message: opResponse?.Message || opResponse?.ErrorMessage,
+    message: opResponse?.Message || opResponse?.ErrorMessage || opResponse?.Description,
+    txId: opResponse?.TxId,
   };
+}
+
+/**
+ * Format a Date as ISO 8601 with timezone offset (e.g. 2024-11-05T18:09:34.343+02:00).
+ * Cardlink requires this format, not UTC 'Z' suffix.
+ */
+function formatTimestampWithOffset(date: Date): string {
+  const pad = (n: number, len = 2) => String(n).padStart(len, '0');
+  const offset = -date.getTimezoneOffset();
+  const sign = offset >= 0 ? '+' : '-';
+  const absOffset = Math.abs(offset);
+  return (
+    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
+    `T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}.${pad(date.getMilliseconds(), 3)}` +
+    `${sign}${pad(Math.floor(absOffset / 60))}:${pad(absOffset % 60)}`
+  );
 }

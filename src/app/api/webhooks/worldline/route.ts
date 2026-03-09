@@ -16,14 +16,21 @@ const baseUrl = () => process.env.BETTER_AUTH_URL || 'http://localhost:3000';
 /**
  * Worldline/Cardlink payment callback handler.
  *
- * Cardlink POSTs the payment result to this URL when:
- * - Payment succeeds (status: CAPTURED/AUTHORIZED)
- * - User cancels (status: CANCELED)
- * - Payment refused (status: REFUSED)
- * - Error occurred (status: ERROR)
+ * Handles three types of POSTs from Cardlink:
  *
- * This is both a webhook AND a user redirect — the user's browser
- * is redirected here with the result POSTed as form data.
+ * 1. Initial payment result (browser redirect):
+ *    - Payment succeeds (status: CAPTURED/AUTHORIZED)
+ *    - User cancels (status: CANCELED)
+ *    - Payment refused (status: REFUSED)
+ *    - Error occurred (status: ERROR)
+ *
+ * 2. Scheduled recurring child notification (server-to-server):
+ *    - Auto-charge by Cardlink every billing period
+ *    - Identified by Sequence field >= 2
+ *    - Returns JSON (no browser redirect)
+ *
+ * 3. Background confirmation (server-to-server, user-agent: "Modirum VPOS"):
+ *    - Duplicate of initial payment for reliability
  */
 export async function POST(request: NextRequest) {
   let formData: FormData;
@@ -50,8 +57,30 @@ export async function POST(request: NextRequest) {
     extToken: (formData.get('extToken') as string) || undefined,
     extTokenPanEnd: (formData.get('extTokenPanEnd') as string) || undefined,
     extTokenExp: (formData.get('extTokenExp') as string) || undefined,
+    Sequence: (formData.get('Sequence') as string) || undefined,
+    SeqTxId: (formData.get('SeqTxId') as string) || undefined,
     digest: (formData.get('digest') as string) || '',
   };
+
+  // Validate digest
+  const sharedSecret = getWorldlineSharedSecret();
+  if (!sharedSecret) {
+    console.error('[Worldline Webhook] Shared secret not configured');
+    return NextResponse.redirect(`${baseUrl()}/payment/callback?error=config`);
+  }
+
+  if (!validateResponseDigestFromFormData(formData, sharedSecret)) {
+    console.error('[Worldline Webhook] Digest validation failed for order:', params.orderid);
+    return NextResponse.redirect(`${baseUrl()}/payment/callback?error=security`);
+  }
+
+  // Recurring child notification (Sequence >= 2 = auto-charge by Cardlink)
+  const sequence = params.Sequence ? parseInt(params.Sequence) : 0;
+  if (sequence >= 2) {
+    return handleRecurringChild(params, sequence);
+  }
+
+  // --- Initial (parent) payment handling below ---
 
   // Cardlink does NOT return var1-var9 in the response.
   // Recover profileId/plan/interval from the pending subscription stored during checkout.
@@ -70,19 +99,11 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Validate digest
-  const sharedSecret = getWorldlineSharedSecret();
-  if (!sharedSecret) {
-    console.error('[Worldline Webhook] Shared secret not configured');
-    return NextResponse.redirect(`${baseUrl()}/payment/callback?error=config`);
-  }
-
-  if (!validateResponseDigestFromFormData(formData, sharedSecret)) {
-    console.error('[Worldline Webhook] Digest validation failed for order:', params.orderid);
-    return NextResponse.redirect(`${baseUrl()}/payment/callback?error=security`);
-  }
-
   const status = params.status as WorldlineStatus;
+
+  // Detect background confirmation (server-to-server, no browser)
+  const userAgent = request.headers.get('user-agent') || '';
+  const isBackgroundConfirmation = userAgent.includes('Modirum VPOS');
 
   // Idempotency: check if this orderid was already processed (status already active)
   if (status === 'CAPTURED' || status === 'AUTHORIZED') {
@@ -93,7 +114,9 @@ export async function POST(request: NextRequest) {
       },
     });
     if (existing) {
-      console.log('[Worldline Webhook] Already processed order:', params.orderid);
+      if (isBackgroundConfirmation) {
+        return NextResponse.json({ status: 'ok', message: 'already processed' });
+      }
       return NextResponse.redirect(`${baseUrl()}/payment/callback?status=success`);
     }
   }
@@ -101,16 +124,25 @@ export async function POST(request: NextRequest) {
   // Handle based on status
   if (status === 'CAPTURED' || status === 'AUTHORIZED') {
     await handlePaymentSuccess(params, profileId, plan, billingInterval);
+    if (isBackgroundConfirmation) {
+      return NextResponse.json({ status: 'ok' });
+    }
     return NextResponse.redirect(`${baseUrl()}/payment/callback?status=success`);
   }
 
   if (status === 'CANCELED') {
     console.log('[Worldline Webhook] Payment canceled by user:', params.orderid);
+    if (isBackgroundConfirmation) {
+      return NextResponse.json({ status: 'canceled' });
+    }
     return NextResponse.redirect(`${baseUrl()}/payment/callback?canceled=true`);
   }
 
   // REFUSED or ERROR
   console.error(`[Worldline Webhook] Payment ${status}:`, params.message, 'Order:', params.orderid);
+  if (isBackgroundConfirmation) {
+    return NextResponse.json({ status: 'error', message: params.message });
+  }
   return NextResponse.redirect(`${baseUrl()}/payment/callback?error=payment`);
 }
 
@@ -211,4 +243,115 @@ async function handlePaymentSuccess(
     });
     logCacheRevalidation('profile', profileId, 'worldline subscription activated');
   }
+}
+
+/**
+ * Handle scheduled recurring child notification from Cardlink.
+ * These are server-to-server POSTs (no browser) sent automatically each billing period.
+ */
+async function handleRecurringChild(
+  params: WorldlineResponseParams,
+  sequence: number,
+): Promise<NextResponse> {
+  const status = params.status as WorldlineStatus;
+
+  // Cardlink appends "/N" to orderid for children (e.g. "DOL...abc/2").
+  // The master orderId is the part before the slash.
+  const masterOrderId = params.orderid.includes('/')
+    ? params.orderid.split('/')[0]
+    : params.orderid;
+
+  const subscription = await prisma.subscription.findFirst({
+    where: {
+      provider: SubscriptionProvider.worldline,
+      worldlineMasterOrderId: masterOrderId,
+    },
+    include: {
+      profile: { select: { id: true, uid: true, username: true, category: true } },
+    },
+  });
+
+  if (!subscription) {
+    console.error(`[Worldline Recurring] No subscription for order: ${masterOrderId}`);
+    return NextResponse.json({ status: 'error', message: 'Subscription not found' }, { status: 404 });
+  }
+
+  if (status === 'CAPTURED' || status === 'AUTHORIZED') {
+    const now = new Date();
+    const billingInterval = subscription.billingInterval || BillingInterval.month;
+    const newPeriodStart = subscription.currentPeriodEnd || now;
+    const newPeriodEnd = new Date(newPeriodStart);
+
+    if (billingInterval === BillingInterval.year) {
+      newPeriodEnd.setFullYear(newPeriodEnd.getFullYear() + 1);
+    } else {
+      newPeriodEnd.setMonth(newPeriodEnd.getMonth() + 1);
+    }
+
+    const amountCents = Math.round(parseFloat(params.orderAmount) * 100);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.subscription.update({
+        where: { id: subscription.id },
+        data: {
+          status: SubscriptionStatus.active,
+          currentPeriodStart: newPeriodStart,
+          currentPeriodEnd: newPeriodEnd,
+          lastPaymentAt: now,
+          paymentCount: { increment: 1 },
+          totalPaidLifetime: { increment: amountCents },
+          amount: amountCents,
+          cancelAtPeriodEnd: false,
+          canceledAt: null,
+        },
+      });
+
+      await tx.profile.update({
+        where: { id: subscription.pid },
+        data: { featured: true },
+      });
+    });
+
+    if (subscription.profile) {
+      await revalidateProfile({
+        profileId: subscription.pid,
+        userId: subscription.profile.uid,
+        username: subscription.profile.username,
+        category: subscription.profile.category,
+        includeHome: true,
+        includeServices: true,
+      });
+      logCacheRevalidation('profile', subscription.pid, `worldline recurring child #${sequence}`);
+    }
+
+    console.log(`[Worldline Recurring] Child #${sequence} succeeded for ${subscription.pid}`);
+    return NextResponse.json({ status: 'ok', sequence });
+  }
+
+  // Failed recurring child (REFUSED/ERROR)
+  console.error(`[Worldline Recurring] Child #${sequence} failed: ${status} - ${params.message}`);
+
+  await prisma.subscription.update({
+    where: { id: subscription.id },
+    data: { status: SubscriptionStatus.past_due },
+  });
+
+  await prisma.profile.update({
+    where: { id: subscription.pid },
+    data: { featured: false },
+  });
+
+  if (subscription.profile) {
+    await revalidateProfile({
+      profileId: subscription.pid,
+      userId: subscription.profile.uid,
+      username: subscription.profile.username,
+      category: subscription.profile.category,
+      includeHome: true,
+      includeServices: true,
+    });
+    logCacheRevalidation('profile', subscription.pid, `worldline recurring child #${sequence} failed`);
+  }
+
+  return NextResponse.json({ status: 'failed', sequence });
 }

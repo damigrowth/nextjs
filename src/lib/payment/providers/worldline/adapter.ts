@@ -8,18 +8,20 @@ import { ProviderNotConfiguredError, ProviderOperationError } from '../../types'
 import { getWorldlineConfig } from '../../worldline-config';
 import { getPlanAmount } from '../../pricing';
 import { calculateRequestDigest } from './digest';
+import { cancelRecurring } from './xml';
 
 /**
  * Worldline/Cardlink Adapter
  *
  * Implements PaymentProvider using Cardlink's redirect integration for checkout
- * and Direct XML API for recurring operations.
+ * and Direct XML API for cancel/recurring operations.
  *
  * Flow:
  * 1. createCheckoutSession builds form params + digest, returns auto-submit page URL
  * 2. User is redirected to Cardlink payment page
  * 3. Cardlink POSTs result to our confirmUrl/cancelUrl (handled by webhook route)
- * 4. Recurring charges handled by daily cron job via XML API
+ * 4. Cardlink auto-charges recurring via Scheduled Recurring (sends webhook notifications)
+ * 5. Cancel via RecurringOperationRequest XML API
  *
  * Digest: Fixed 46-field order, verified empirically against Cardlink sandbox.
  * Key finding: extTokenOptions/extToken go between cancelUrl and var1.
@@ -109,11 +111,16 @@ export class WorldlineAdapter implements PaymentProvider {
     }
   }
 
-  async cancelSubscription(_subscriptionId: string): Promise<void> {
-    // Worldline subscriptions are merchant-managed: our cron job charges customers
-    // using stored tokens. Cancellation is a DB-only operation handled by
-    // PaymentService (sets cancelAtPeriodEnd/canceledAt), which causes the
-    // cron job to skip future charges. No Cardlink API call needed.
+  async cancelSubscription(subscriptionId: string): Promise<void> {
+    try {
+      const result = await cancelRecurring({ orderId: subscriptionId });
+      if (result.status !== 'CANCELED') {
+        throw new Error(`Worldline cancel failed: ${result.status} - ${result.message || 'unknown error'}`);
+      }
+    } catch (error) {
+      if (error instanceof ProviderNotConfiguredError) throw error;
+      throw new ProviderOperationError('worldline', 'cancelSubscription', error);
+    }
   }
 
   async restoreSubscription(_subscriptionId: string): Promise<void> {

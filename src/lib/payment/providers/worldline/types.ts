@@ -1,6 +1,6 @@
 /**
  * Worldline/Cardlink redirect request parameters.
- * All 45 fields in the exact order required for digest calculation.
+ * All 46 fields in the exact order required for digest calculation.
  * Empty string for omitted fields.
  */
 export interface WorldlineRedirectParams {
@@ -39,6 +39,8 @@ export interface WorldlineRedirectParams {
   cssUrl: string;
   confirmUrl: string;
   cancelUrl: string;
+  extTokenOptions: string;
+  extToken: string;
   var1: string;
   var2: string;
   var3: string;
@@ -48,12 +50,11 @@ export interface WorldlineRedirectParams {
   var7: string;
   var8: string;
   var9: string;
-  extTokenOptions: string;
-  extToken: string;
 }
 
 /**
  * Worldline redirect response parameters (POST to confirmUrl/cancelUrl).
+ * Also used for scheduled recurring child notifications (which include Sequence/SeqTxId).
  */
 export interface WorldlineResponseParams {
   mid: string;
@@ -70,8 +71,10 @@ export interface WorldlineResponseParams {
   extToken?: string;
   extTokenPanEnd?: string;
   extTokenExp?: string;
+  Sequence?: string;
+  SeqTxId?: string;
   digest: string;
 }
 
 /** Cardlink payment status values */
-export type WorldlineStatus = 'AUTHORIZED' | 'CAPTURED' | 'CANCELED' | 'REFUSED' | 'ERROR';
+export type WorldlineStatus = 'AUTHORIZED' | 'CAPTURED' | 'CANCELED' | 'REFUSED' | 'REFUSEDRISK' | 'ERROR';
