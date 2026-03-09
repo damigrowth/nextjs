@@ -10,7 +10,7 @@ const providers = new Map<PaymentProviderName, PaymentProvider>();
  * Get payment provider by name
  * Returns cached instance if available, otherwise creates new instance
  *
- * @param name - Provider name ('stripe' | 'paypal' | 'eurobank')
+ * @param name - Provider name ('stripe' | 'worldline' | 'paypal' | 'eurobank')
  * @returns Provider instance or null if not configured
  */
 export function getProvider(name: string): PaymentProvider | null {

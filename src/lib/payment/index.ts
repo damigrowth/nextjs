@@ -12,3 +12,5 @@ export type {
   CheckoutBillingDetails,
 } from './types';
 export { ProviderNotConfiguredError, ProviderOperationError } from './types';
+export { SUBSCRIPTION_PLANS, PLAN_PRICING, getPlanAmount } from './pricing';
+export type { PlanKey } from './pricing';

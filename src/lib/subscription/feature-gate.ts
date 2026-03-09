@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma/client';
 import { SubscriptionStatus, SubscriptionPlan } from '@prisma/client';
-import { SUBSCRIPTION_PLANS, type PlanKey } from '@/lib/stripe/config';
+import { SUBSCRIPTION_PLANS, type PlanKey } from '@/lib/payment/pricing';
 
 /**
  * Get the active plan for a profile.

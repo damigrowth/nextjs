@@ -6,6 +6,7 @@ import type {
 } from '../../types';
 import { ProviderNotConfiguredError, ProviderOperationError } from '../../types';
 import { getWorldlineConfig } from '../../worldline-config';
+import { getPlanAmount } from '../../pricing';
 import { calculateRequestDigest } from './digest';
 import { cancelRecurring } from './xml';
 
@@ -19,12 +20,11 @@ import { cancelRecurring } from './xml';
  * 1. createCheckoutSession builds form params + digest, returns auto-submit page URL
  * 2. User is redirected to Cardlink payment page
  * 3. Cardlink POSTs result to our confirmUrl/cancelUrl (handled by webhook route)
- * 4. Recurring charges handled by cron job via XML API
+ * 4. Recurring charges handled by daily cron job via XML API
  *
- * Digest approach matches official Cardlink WooCommerce plugin:
- * - Only include fields with values (no empty padding)
- * - Digest = base64(sha256(implode(field_values) + secret))
- * - See https://github.com/cardlink-sa/cardlink-payment-gateway-woocommerce
+ * Digest: Fixed 46-field order, verified empirically against Cardlink sandbox.
+ * Key finding: extTokenOptions/extToken go between cancelUrl and var1.
+ * See digest.ts for the exact field order.
  */
 export class WorldlineAdapter implements PaymentProvider {
   name: PaymentProviderName = 'worldline';
@@ -54,8 +54,7 @@ export class WorldlineAdapter implements PaymentProvider {
       const safeProfileId = params.profileId.replace(/[^a-zA-Z0-9]/g, '');
       const orderId = `DOL${safeProfileId}${timestamp}`.slice(0, 50);
 
-      // Calculate amount based on plan and interval
-      const amount = this.getAmount(params.plan, params.billingInterval);
+      const amount = getPlanAmount(params.plan, params.billingInterval);
 
       // Calculate recurring end date (1 year from now, renewed on each charge)
       const endDate = new Date();
@@ -132,17 +131,4 @@ export class WorldlineAdapter implements PaymentProvider {
     );
   }
 
-  /**
-   * Get subscription amount based on plan and billing interval.
-   * TODO: Move pricing to a shared config or DB when adding more plans.
-   */
-  private getAmount(plan: string, billingInterval: string): string {
-    if (plan === 'promoted') {
-      if (billingInterval === 'year') {
-        return '119.88';
-      }
-      return '9.99';
-    }
-    throw new Error(`Unknown plan: ${plan}`);
-  }
 }
