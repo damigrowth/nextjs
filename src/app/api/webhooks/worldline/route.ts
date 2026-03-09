@@ -56,12 +56,12 @@ export async function POST(request: NextRequest) {
   const sharedSecret = getWorldlineSharedSecret();
   if (!sharedSecret) {
     console.error('[Worldline Webhook] Shared secret not configured');
-    return NextResponse.redirect(`${baseUrl()}/dashboard/checkout?error=config`);
+    return NextResponse.redirect(`${baseUrl()}/payment/callback?error=config`);
   }
 
   if (!validateResponseDigest(params, sharedSecret)) {
     console.error('[Worldline Webhook] Digest validation failed for order:', params.orderid);
-    return NextResponse.redirect(`${baseUrl()}/dashboard/checkout?error=security`);
+    return NextResponse.redirect(`${baseUrl()}/payment/callback?error=security`);
   }
 
   const status = params.status as WorldlineStatus;
@@ -73,24 +73,24 @@ export async function POST(request: NextRequest) {
     });
     if (existing) {
       console.log('[Worldline Webhook] Already processed order:', params.orderid);
-      return NextResponse.redirect(`${baseUrl()}/dashboard/subscription/success`);
+      return NextResponse.redirect(`${baseUrl()}/payment/callback?status=success`);
     }
   }
 
   // Handle based on status
   if (status === 'CAPTURED' || status === 'AUTHORIZED') {
     await handlePaymentSuccess(params, profileId, plan, billingInterval);
-    return NextResponse.redirect(`${baseUrl()}/dashboard/subscription/success`);
+    return NextResponse.redirect(`${baseUrl()}/payment/callback?status=success`);
   }
 
   if (status === 'CANCELED') {
     console.log('[Worldline Webhook] Payment canceled by user:', params.orderid);
-    return NextResponse.redirect(`${baseUrl()}/dashboard/checkout?canceled=true`);
+    return NextResponse.redirect(`${baseUrl()}/payment/callback?canceled=true`);
   }
 
   // REFUSED or ERROR
   console.error(`[Worldline Webhook] Payment ${status}:`, params.message, 'Order:', params.orderid);
-  return NextResponse.redirect(`${baseUrl()}/dashboard/checkout?error=payment`);
+  return NextResponse.redirect(`${baseUrl()}/payment/callback?error=payment`);
 }
 
 async function handlePaymentSuccess(
