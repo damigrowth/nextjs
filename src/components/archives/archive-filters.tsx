@@ -77,7 +77,7 @@ export function ArchiveFilters({
     >
       {/* Mobile layout: 3 rows */}
       <div className='flex flex-col gap-3 lg:hidden w-full'>
-        {/* Row 1: All Filters + Sort */}
+        {/* Row 1: All Filters + Sort icon */}
         <div className='flex flex-row items-center gap-2 w-full'>
           {filterTrigger || (
             <SheetTrigger asChild>
@@ -99,7 +99,7 @@ export function ArchiveFilters({
             value={filters.sortBy}
             onValueChange={handleSortChange}
             fullWidth={false}
-            className='flex-1'
+            iconOnly
           />
         </div>
 
@@ -111,18 +111,18 @@ export function ArchiveFilters({
           className='w-full'
         />
 
-        {/* Row 3: Online + Counties */}
-        <div className='flex flex-row items-center gap-3 w-full'>
-          <OnlineToggle
-            id='online-filter-mobile'
-            checked={filters.online || false}
-            onCheckedChange={handleOnlineToggle}
-          />
+        {/* Row 3: Counties + Online */}
+        <div className='flex flex-row items-center gap-2 w-full'>
           <CountiesDropdown
             value={filters.county}
             onValueChange={handleCountyChange}
             counties={counties}
-            className='flex-1'
+            className='flex-1 min-w-0 [&_svg]:hidden'
+          />
+          <OnlineToggle
+            id='online-filter-mobile'
+            checked={filters.online || false}
+            onCheckedChange={handleOnlineToggle}
           />
         </div>
       </div>
@@ -157,17 +157,17 @@ export function ArchiveFilters({
             placeholder='Αναζήτηση...'
             className='min-w-56'
           />
-          {/* Online Toggle */}
-          <OnlineToggle
-            id='online-filter-desktop'
-            checked={filters.online || false}
-            onCheckedChange={handleOnlineToggle}
-          />
           {/* Counties Dropdown */}
           <CountiesDropdown
             value={filters.county}
             onValueChange={handleCountyChange}
             counties={counties}
+          />
+          {/* Online Toggle */}
+          <OnlineToggle
+            id='online-filter-desktop'
+            checked={filters.online || false}
+            onCheckedChange={handleOnlineToggle}
           />
         </div>
 

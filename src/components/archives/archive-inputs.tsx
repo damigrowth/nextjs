@@ -1,12 +1,18 @@
 'use client';
 
-import { Search, X } from 'lucide-react';
+import { ArrowUpDown, Search, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Combobox } from '@/components/ui/combobox';
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { Selectbox } from '@/components/ui/selectbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from '@/components/ui/select';
 import type { DatasetItem } from '@/lib/types/datasets';
 import { archiveSortOptions } from '@/constants/datasets/options';
 import { cn } from '@/lib/utils';
@@ -70,7 +76,12 @@ export function OnlineToggle({
   className,
 }: OnlineToggleProps) {
   return (
-    <div className={`flex items-center gap-2 ${className || ''}`}>
+    <div
+      className={cn(
+        'inline-flex items-center gap-2 rounded-md border border-input bg-background px-4 py-1.5 flex-shrink-0 whitespace-nowrap',
+        className,
+      )}
+    >
       <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
       <Label htmlFor={id} className='text-sm font-medium cursor-pointer'>
         {label}
@@ -133,6 +144,7 @@ interface SortDropdownProps {
   placeholder?: string;
   className?: string;
   fullWidth?: boolean;
+  iconOnly?: boolean;
 }
 
 export function SortDropdown({
@@ -141,7 +153,25 @@ export function SortDropdown({
   placeholder = 'Ταξινόμηση',
   className,
   fullWidth = true,
+  iconOnly = false,
 }: SortDropdownProps) {
+  if (iconOnly) {
+    return (
+      <Select value={value || 'default'} onValueChange={onValueChange}>
+        <SelectTrigger className={cn('w-10 px-0 justify-center [&>svg:last-child]:hidden', className)}>
+          <ArrowUpDown className='h-4 w-4' />
+        </SelectTrigger>
+        <SelectContent>
+          {archiveSortOptions.map((option) => (
+            <SelectItem key={option.id} value={option.id}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    );
+  }
+
   return (
     <Selectbox
       options={archiveSortOptions}
