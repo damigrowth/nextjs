@@ -36,26 +36,29 @@ export function ServiceMediaCard({
         className,
       )}
     >
-      <div className='flex flex-col md:flex-row h-full md:h-52'>
+      <div
+        className={cn(
+          'flex flex-col md:flex-row h-full',
+          displayMedia.length > 0 && 'md:h-52',
+        )}
+      >
         {/* Media Section - Shows first on mobile, second on desktop */}
-        <NextLink
-          href={`/s/${service.slug}`}
-          className={
-            displayMedia.length === 0
-              ? 'md:hidden aspect-video'
-              : 'w-full md:w-96 flex-shrink-0 relative overflow-hidden md:order-2'
-          }
-        >
-          <MediaCarousel
-            media={displayMedia}
-            className='w-full h-full'
-            compactMode={true}
-            showThumbnails={false}
-            showControls={true}
-            aspectRatio='video'
-            noAudioFiles={true}
-          />
-        </NextLink>
+        {displayMedia.length > 0 && (
+          <NextLink
+            href={`/s/${service.slug}`}
+            className='w-full md:w-96 flex-shrink-0 relative overflow-hidden md:order-2'
+          >
+            <MediaCarousel
+              media={displayMedia}
+              className='w-full h-full'
+              compactMode={true}
+              showThumbnails={false}
+              showControls={true}
+              aspectRatio='video'
+              noAudioFiles={true}
+            />
+          </NextLink>
+        )}
 
         {/* Content Section - Shows second on mobile, first on desktop */}
         <div className='flex-1 px-6 pt-4 pb-3 flex flex-col justify-between min-w-0 md:order-1'>
