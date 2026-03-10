@@ -499,7 +499,7 @@ export const proTaxonomies = [
     plural: 'Εκπαίδευση & Διδασκαλία',
     description:
       'Βρείτε δασκάλους, προπονητές και καθηγητές που προσφέρουν μαθήματα για εκμάθηση.',
-    icon: 'flaticon-like',
+    icon: 'flaticon-star',
     children: [
       {
         id: 'q2dxCf',
@@ -753,7 +753,7 @@ export const proTaxonomies = [
     plural: 'Ευεξία & Φροντίδα',
     description:
       'Επαγγελματίες και επιχειρήσεις που προσφέρουν που προσφέρουν υπηρεσίες ευεξίας και φροντίδας.',
-    icon: 'flaticon-star',
+    icon: 'flaticon-like',
     children: [
       {
         id: 'KZ7Sne',
