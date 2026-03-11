@@ -19,14 +19,36 @@ interface AuthorBoxProps {
 export default function AuthorBox({ authors }: AuthorBoxProps) {
   if (!authors || authors.length === 0) return null;
 
+  // Filter out "Doulitsa Team" author — only show team name, no full box
+  const isDoulitsaTeamOnly =
+    authors.length === 1 && authors[0].profile.username === 'doulitsa';
+
+  if (isDoulitsaTeamOnly) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Από την ομάδα{' '}
+        <Link
+          href="/articles"
+          className="font-medium text-primary hover:underline"
+        >
+          Doulitsa
+        </Link>
+      </p>
+    );
+  }
+
+  // For mixed authors, skip the Doulitsa Team profile
+  const visibleAuthors = authors.filter(
+    (a) => a.profile.username !== 'doulitsa',
+  );
+
+  if (visibleAuthors.length === 0) return null;
+
   return (
     <div className="space-y-4">
-      {authors.map((author) => {
+      {visibleAuthors.map((author) => {
         const profile = author.profile;
-        const href =
-          profile.username === 'doulitsa'
-            ? '/articles'
-            : `/profile/${profile.username}`;
+        const href = `/profile/${profile.username}`;
 
         return (
           <div

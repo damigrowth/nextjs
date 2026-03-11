@@ -7,6 +7,7 @@ export { default as ProfileIndustries } from './profile-industries';
 export { default as ProfilePortfolio } from './profile-portfolio';
 export { default as ProfileServices } from './profile-services';
 export { default as ProfileTerms } from './profile-terms';
+export { default as ProfileArticles } from './profile-articles';
 export { default as ProfileInfo } from './profile-info';
 export { default as ProfileSkills } from './profile-skills';
 export { default as ProfileBreadcrumb } from './profile-breadcrumb';

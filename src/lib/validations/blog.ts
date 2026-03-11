@@ -72,11 +72,39 @@ export const blogArticleQuerySchema = paginationSchema.extend({
 });
 
 // =============================================
+// SUBSCRIBER ARTICLE SCHEMAS
+// =============================================
+
+export const submitArticleSchema = z.object({
+  title: z
+    .string()
+    .min(5, 'Ο τίτλος πρέπει να είναι τουλάχιστον 5 χαρακτήρες')
+    .max(200, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 200 χαρακτήρες'),
+  excerpt: z
+    .string()
+    .max(500, 'Η περίληψη δεν μπορεί να ξεπερνά τους 500 χαρακτήρες')
+    .optional()
+    .or(z.literal('')),
+  content: z
+    .string()
+    .min(50, 'Το περιεχόμενο πρέπει να είναι τουλάχιστον 50 χαρακτήρες'),
+  coverImage: z.string().url('Μη έγκυρο URL εικόνας').optional().or(z.literal('')),
+  categoryId: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
+  tags: z.array(z.string()).max(10).optional(),
+});
+
+export const updateSubmittedArticleSchema = submitArticleSchema.partial().extend({
+  id: z.string().min(1),
+});
+
+// =============================================
 // TYPES
 // =============================================
 
 export type CreateArticleInput = z.infer<typeof createArticleSchema>;
 export type UpdateArticleInput = z.infer<typeof updateArticleSchema>;
+export type SubmitArticleInput = z.infer<typeof submitArticleSchema>;
+export type UpdateSubmittedArticleInput = z.infer<typeof updateSubmittedArticleSchema>;
 export type CreateBlogCategoryInput = z.infer<typeof createBlogCategorySchema>;
 export type UpdateBlogCategoryInput = z.infer<typeof updateBlogCategorySchema>;
 export type BlogArticleQuery = z.infer<typeof blogArticleQuerySchema>;
