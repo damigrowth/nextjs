@@ -1,6 +1,9 @@
 'use server';
 
 import { Meta } from './meta';
+import { MetaData } from './metadata';
+import { prisma } from '@/lib/prisma/client';
+import { stripHtmlTags } from '@/lib/utils/text/html';
 
 /**
  * Service page metadata generation
@@ -502,5 +505,81 @@ export async function getCompanySubcategoryMetadata(
     size: 200,
     url: `/dir/${categorySlug}/${subcategorySlug}?type=companies`,
   });
+  return meta;
+}
+
+// ============================================================================
+// BLOG METADATA
+// ============================================================================
+
+/**
+ * Blog archive page metadata
+ */
+export async function getBlogArchiveMetadata() {
+  const { meta } = await Meta({
+    titleTemplate: 'Άρθρα | Doulitsa',
+    descriptionTemplate:
+      'Διάβασε χρήσιμα άρθρα και συμβουλές από επαγγελματίες σε όλη την Ελλάδα.',
+    size: 160,
+    url: '/articles',
+  });
+
+  return meta;
+}
+
+/**
+ * Blog category page metadata
+ */
+export async function getBlogCategoryMetadata(categorySlug: string) {
+  const category = await prisma.blogCategory.findUnique({
+    where: { slug: categorySlug },
+    select: { label: true, description: true },
+  });
+
+  const label = category?.label || categorySlug;
+  const description =
+    category?.description ||
+    `Άρθρα στην κατηγορία ${label} από επαγγελματίες στη Doulitsa.`;
+
+  const { meta } = await Meta({
+    titleTemplate: `${label} - Άρθρα | Doulitsa`,
+    descriptionTemplate: description,
+    size: 160,
+    url: `/articles/${categorySlug}`,
+  });
+
+  return meta;
+}
+
+/**
+ * Blog article detail page metadata
+ */
+export async function getArticleMetadata(slug: string) {
+  const article = await prisma.blogArticle.findUnique({
+    where: { slug },
+    select: {
+      title: true,
+      excerpt: true,
+      content: true,
+      coverImage: true,
+      category: { select: { slug: true } },
+    },
+  });
+
+  if (!article) {
+    return null;
+  }
+
+  const description =
+    article.excerpt || stripHtmlTags(article.content).slice(0, 160);
+
+  const { meta } = await MetaData({
+    title: `${article.title} | Doulitsa`,
+    description,
+    size: 160,
+    image: article.coverImage || undefined,
+    url: `/articles/${article.category.slug}/${slug}`,
+  });
+
   return meta;
 }
