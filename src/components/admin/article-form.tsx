@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/select';
 import { Loader2, Trash2 } from 'lucide-react';
 
-type CreateInput = z.infer<typeof createArticleSchema>;
+type CreateInput = z.input<typeof createArticleSchema>;
 
 interface ArticleFormProps {
   article?: any;
@@ -79,7 +79,11 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
         if (isEditing) {
           result = await updateArticle({ id: article.id, ...data });
         } else {
-          result = await createArticle(data);
+          result = await createArticle({
+            ...data,
+            status: data.status ?? 'draft',
+            featured: data.featured ?? false,
+          });
         }
 
         if (result.success) {
