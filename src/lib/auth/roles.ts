@@ -68,6 +68,7 @@ export const ADMIN_RESOURCES = {
   ANALYTICS: 'analytics',
   GIT: 'git',
   SETTINGS: 'settings',
+  BLOG: 'blog',
 } as const;
 
 export type AdminResource =
@@ -110,6 +111,7 @@ export const ROLE_PERMISSIONS: PermissionMatrix = {
     analytics: 'full', // Only admins can view analytics
     git: 'full',
     settings: 'full', // Only admins can manage settings
+    blog: 'full', // Full blog management
   },
 
   // Support: Limited admin access (no git, team, taxonomies, analytics, settings)
@@ -127,6 +129,7 @@ export const ROLE_PERMISSIONS: PermissionMatrix = {
     analytics: null, // Cannot access analytics
     git: null, // Cannot access git operations
     settings: null, // Cannot access settings
+    blog: 'full', // Can manage blog articles
   },
 
   // Editor: Services management only
@@ -144,6 +147,7 @@ export const ROLE_PERMISSIONS: PermissionMatrix = {
     analytics: null, // Cannot access analytics
     git: null, // Cannot access git
     settings: null, // Cannot access settings
+    blog: null, // Cannot access blog
   },
 };
 

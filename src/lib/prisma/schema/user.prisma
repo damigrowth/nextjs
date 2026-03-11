@@ -36,6 +36,7 @@ model User {
   blockedByUsers  BlockedUser[] @relation("BlockedBy")
   savedServices   SavedService[]
   savedProfiles   SavedProfile[]
+  savedArticles   SavedArticle[]
   emailBatches    EmailBatch[]
   apiKeys         ApiKey[]       @relation("UserApiKeys")
 
@@ -104,6 +105,9 @@ model Profile {
   lastServiceRefreshDate  DateTime? // Last date when any service was refreshed
   dailyServiceRefreshCount Int @default(0) // Count of unique services refreshed today
 
+  // Blog author fields
+  authorBio String? // Displayed in the author box below blog articles
+
   verified        Boolean              @default(false)
   featured        Boolean              @default(false)
   rating          Float                @default(0)
@@ -121,6 +125,7 @@ model Profile {
   verification    ProfileVerification?
   savedBy         SavedProfile[]
   subscription    Subscription?
+  blogArticles    BlogArticleAuthor[] // Articles where this profile is an author
 
   // ============================================================================
   // OPTIMIZED INDEXES (Performance Optimization - ML15-25)

@@ -77,6 +77,19 @@ export const CACHE_TAGS = {
     all: 'admin:all' as const,
   },
 
+  // Blog/article-related tags
+  article: {
+    byId: (id: string) => `article:id:${id}` as const,
+    bySlug: (slug: string) => `article:slug:${slug}` as const,
+    byCategory: (categoryId: string) => `article:category:${categoryId}` as const,
+    byAuthor: (profileId: string) => `article:author:${profileId}` as const,
+  },
+
+  blog: {
+    articles: 'blog:articles' as const,
+    categories: 'blog:categories' as const,
+  },
+
   // Home page tag
   home: 'page:home' as const,
 

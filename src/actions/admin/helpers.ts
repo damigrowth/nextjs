@@ -191,6 +191,11 @@ export async function getFilteredNavItems(): Promise<{
         resource: ADMIN_RESOURCES.SUBSCRIPTIONS,
       },
       {
+        title: 'Blog',
+        url: '/admin/articles',
+        resource: ADMIN_RESOURCES.BLOG,
+      },
+      {
         title: 'Analytics',
         url: '/admin/analytics',
         resource: ADMIN_RESOURCES.ANALYTICS,

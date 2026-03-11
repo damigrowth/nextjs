@@ -238,6 +238,48 @@ export async function revalidateReview(params: {
 }
 
 /**
+ * Invalidate all caches related to a blog article mutation
+ * Use this for: create, update, delete, publish/unpublish
+ *
+ * @example
+ * await revalidateArticle({
+ *   articleId: article.id,
+ *   slug: article.slug,
+ *   categoryId: article.categoryId,
+ *   authorProfileIds: ['profileId1', 'profileId2'],
+ * });
+ */
+export async function revalidateArticle(params: {
+  articleId: string;
+  slug?: string | null;
+  categoryId?: string | null;
+  authorProfileIds?: string[];
+}) {
+  const { articleId, slug, categoryId, authorProfileIds = [] } = params;
+
+  // Article-specific tags
+  revalidateTag(CACHE_TAGS.article.byId(articleId));
+  if (slug) {
+    revalidateTag(CACHE_TAGS.article.bySlug(slug));
+  }
+  if (categoryId) {
+    revalidateTag(CACHE_TAGS.article.byCategory(categoryId));
+  }
+
+  // Author tags
+  for (const profileId of authorProfileIds) {
+    revalidateTag(CACHE_TAGS.article.byAuthor(profileId));
+  }
+
+  // Collection tags
+  revalidateTag(CACHE_TAGS.blog.articles);
+  revalidateTag(CACHE_TAGS.blog.categories);
+
+  // Paths
+  revalidatePath('/articles');
+}
+
+/**
  * Log cache revalidation for monitoring (development/production)
  */
 export function logCacheRevalidation(
