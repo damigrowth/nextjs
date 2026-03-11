@@ -46,13 +46,13 @@ export const SUBSCRIPTION_PLANS = {
 export type PlanKey = keyof typeof SUBSCRIPTION_PLANS;
 
 /**
- * Plan pricing amounts (net, excluding VAT).
- * Used by Worldline checkout and recurring billing cron.
+ * Plan pricing amounts (gross, including 24% VAT).
+ * Used by Worldline checkout and recurring billing.
  */
 export const PLAN_PRICING = {
   promoted: {
-    month: '20.00',
-    year: '180.00',
+    month: '24.80',
+    year: '223.20',
   },
 } as const;
 
