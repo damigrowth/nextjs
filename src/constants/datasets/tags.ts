@@ -1,4 +1,4 @@
-// Generated on 2026-03-06T17:48:08.055Z
+// Generated on 2026-03-11T09:35:19.248Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const tags = [
@@ -6391,5 +6391,10 @@ export const tags = [
     id: '1314',
     label: 'Ανάλυση SEO',
     slug: '-seo',
+  },
+  {
+    id: '1315',
+    label: 'Υποστήριξη εργασιών',
+    slug: '-',
   },
 ];
