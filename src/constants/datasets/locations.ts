@@ -7418,18 +7418,6 @@ export const locationOptions = [
         'slug': 'panorama'
       },
       {
-        'id': '683',
-        'name': 'Πανοραμό',
-        'children': [
-          {
-            'id': '1145',
-            'name': '55236'
-          }
-        ],
-        'child_count': 1,
-        'slug': 'panoramo'
-      },
-      {
         'id': '729',
         'name': 'Πολίχνη',
         'children': [
@@ -7618,7 +7606,7 @@ export const locationOptions = [
         'slug': 'oraiokastro'
       }
     ],
-    'child_count': 44,
+    'child_count': 43,
     'slug': 'thessaloniki'
   },
   {
