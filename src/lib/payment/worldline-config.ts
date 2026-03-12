@@ -22,8 +22,8 @@ const ENDPOINTS = {
     xml: 'https://eurocommerce-test.cardlink.gr/vpos/xmlpayvpos',
   },
   production: {
-    redirect: 'https://eurocommerce.cardlink.gr/vpos/shophandlermpi',
-    xml: 'https://eurocommerce.cardlink.gr/vpos/xmlpayvpos',
+    redirect: 'https://vpos.eurocommerce.gr/vpos/shophandlermpi',
+    xml: 'https://vpos.eurocommerce.gr/vpos/xmlpayvpos',
   },
 } as const;
 
