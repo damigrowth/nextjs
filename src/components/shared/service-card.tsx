@@ -1,8 +1,8 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 
 import SaveButton from './save-button';
+import TaxonomiesDisplay from './taxonomies-display';
 import UserAvatar from './user-avatar';
 import { ServiceCardData } from '@/lib/types';
 import NextLink from './next-link';
@@ -27,16 +27,16 @@ export default function ServiceCard({
   const priceValue = Number(service?.price) || 0;
   const hasValidPrice = priceValue > 0;
 
-  // Build category badge label: "subcategory - subdivision" or just "subcategory/category"
-  const primaryLabel =
-    service.taxonomyLabels?.subcategory ||
-    service.taxonomyLabels?.category ||
-    service.category;
-  const subdivisionLabel = service.taxonomyLabels?.subdivision;
-  const badgeLabel =
-    primaryLabel && subdivisionLabel
-      ? `${primaryLabel} - ${subdivisionLabel}`
-      : primaryLabel;
+  // Build taxonomy labels for badge display
+  const badgeTaxonomyLabels = {
+    category: '',
+    subcategory:
+      service.taxonomyLabels?.subcategory ||
+      service.taxonomyLabels?.category ||
+      service.category ||
+      '',
+    subdivision: service.taxonomyLabels?.subdivision || '',
+  };
 
   // Get optimized background image URL for profile section
   const optimizedBgImage = service.profile.image
@@ -85,13 +85,12 @@ export default function ServiceCard({
       <NextLink href={`/s/${service.slug}`} className='block flex-1'>
         <CardContent className='p-4 flex flex-col h-full'>
           {/* Category */}
-          {badgeLabel && (
-            <div className='mb-3'>
-              <Badge variant='muted' className='font-normal'>
-                {badgeLabel}
-              </Badge>
-            </div>
-          )}
+          <div className='mb-3'>
+            <TaxonomiesDisplay
+              taxonomyLabels={badgeTaxonomyLabels}
+              variant='badge'
+            />
+          </div>
 
           {/* Title */}
           <h3 className='font-semibold text-dark leading-tight text-base hover:text-third transition-colors mb-6'>
