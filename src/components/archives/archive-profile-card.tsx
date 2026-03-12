@@ -9,6 +9,7 @@ import UserAvatar from '@/components/shared/user-avatar';
 import ProfileBadges from '@/components/shared/profile-badges';
 import RatingDisplay from '@/components/shared/rating-display';
 import TaxonomiesDisplay from '@/components/shared/taxonomies-display';
+import SaveButton from '@/components/shared/save-button';
 
 interface ArchiveProfileCardProps {
   profile: ArchiveProfileCardData;
@@ -33,10 +34,15 @@ export function ArchiveProfileCard({
   return (
     <Card
       className={cn(
-        'hover:shadow-md transition-shadow duration-200 overflow-hidden',
+        'group relative hover:shadow-md transition-shadow duration-200 overflow-hidden',
         className,
       )}
     >
+      {/* Save Button - appears on hover */}
+      <div className='absolute top-3 right-3 z-20'>
+        <SaveButton itemType='profile' itemId={profile.id} />
+      </div>
+
       <div className='flex flex-col md:flex-row h-full md:h-52'>
         {/* Avatar Section */}
         <NextLink
