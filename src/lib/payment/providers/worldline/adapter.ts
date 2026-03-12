@@ -57,10 +57,8 @@ export class WorldlineAdapter implements PaymentProvider {
 
       const amount = getPlanAmount(params.plan, params.billingInterval);
 
-      // Calculate recurring end date (1 year from now, renewed on each charge)
-      const endDate = new Date();
-      endDate.setFullYear(endDate.getFullYear() + 1);
-      const recurringEndDate = endDate.toISOString().slice(0, 10).replace(/-/g, '');
+      // Recurring end date set far in the future — subscription renews indefinitely until canceled
+      const recurringEndDate = '20991231';
 
       const recurringFrequency = params.billingInterval === 'year' ? '365' : '30';
 
