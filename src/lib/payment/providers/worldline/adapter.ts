@@ -57,8 +57,10 @@ export class WorldlineAdapter implements PaymentProvider {
 
       const amount = getPlanAmount(params.plan, params.billingInterval);
 
-      // Recurring end date set far in the future — subscription renews indefinitely until canceled
-      const recurringEndDate = '20991231';
+      // Recurring end date: max allowed by Cardlink is 1825 days (~5 years)
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + 1825);
+      const recurringEndDate = endDate.toISOString().slice(0, 10).replace(/-/g, '');
 
       const recurringFrequency = params.billingInterval === 'year' ? '365' : '30';
 
