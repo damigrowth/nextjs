@@ -11,7 +11,7 @@ import type { ToggleSaveResult } from '@/lib/types/saved';
  * Uses optimistic locking to prevent race conditions
  */
 export async function toggleSave(
-  itemType: 'service' | 'profile' | 'article',
+  itemType: 'service' | 'profile',
   itemId: string | number
 ): Promise<ActionResult<ToggleSaveResult>> {
   try {
@@ -55,23 +55,6 @@ export async function toggleSave(
             serviceId,
           },
         });
-        return { success: true, data: { isSaved: true } };
-      }
-    } else if (itemType === 'article') {
-      // Article type
-      const articleId = typeof itemId === 'number' ? itemId.toString() : itemId;
-
-      const existing = await prisma.savedArticle.findUnique({
-        where: {
-          userId_articleId: { userId, articleId },
-        },
-      });
-
-      if (existing) {
-        await prisma.savedArticle.delete({ where: { id: existing.id } });
-        return { success: true, data: { isSaved: false } };
-      } else {
-        await prisma.savedArticle.create({ data: { userId, articleId } });
         return { success: true, data: { isSaved: true } };
       }
     } else {

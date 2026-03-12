@@ -21,9 +21,8 @@ export async function createArticle(
 
     const validated = createArticleSchema.parse(input);
 
-    // Generate slug from title + cuid suffix
-    const baseSlug = createSlug(validated.title);
-    const slug = `${baseSlug}-${Date.now().toString(36)}`;
+    // Use provided slug or generate from title + timestamp suffix
+    const slug = validated.slug || `${createSlug(validated.title)}-${Date.now().toString(36)}`;
 
     const article = await prisma.blogArticle.create({
       data: {
@@ -33,25 +32,28 @@ export async function createArticle(
         excerpt: validated.excerpt || null,
         content: validated.content,
         coverImage: validated.coverImage || null,
-        categoryId: validated.categoryId,
-        tags: validated.tags || [],
+        categorySlug: validated.categorySlug || null,
         status: validated.status,
         featured: validated.featured,
         publishedAt: validated.status === 'published' ? new Date() : null,
-        authors: {
-          create: validated.authorProfileIds.map((profileId, index) => ({
-            profileId,
-            order: index,
-          })),
-        },
+        ...(validated.authorProfileIds?.length
+          ? {
+              authors: {
+                create: validated.authorProfileIds.map((profileId, index) => ({
+                  profileId,
+                  order: index,
+                })),
+              },
+            }
+          : {}),
       },
     });
 
     await revalidateArticle({
       articleId: article.id,
       slug: article.slug,
-      categoryId: article.categoryId,
-      authorProfileIds: validated.authorProfileIds,
+      categorySlug: article.categorySlug || '',
+      authorProfileIds: validated.authorProfileIds || [],
     });
 
     return {
@@ -86,11 +88,11 @@ export async function updateArticle(
       data.title = updateData.title;
       data.titleNormalized = normalizeTerm(updateData.title);
     }
+    if (updateData.slug !== undefined && updateData.slug) data.slug = updateData.slug;
     if (updateData.excerpt !== undefined) data.excerpt = updateData.excerpt || null;
     if (updateData.content !== undefined) data.content = updateData.content;
     if (updateData.coverImage !== undefined) data.coverImage = updateData.coverImage || null;
-    if (updateData.categoryId !== undefined) data.categoryId = updateData.categoryId;
-    if (updateData.tags !== undefined) data.tags = updateData.tags;
+    if (updateData.categorySlug !== undefined) data.categorySlug = updateData.categorySlug || null;
     if (updateData.featured !== undefined) data.featured = updateData.featured;
 
     if (updateData.status !== undefined) {
@@ -132,7 +134,7 @@ export async function updateArticle(
     await revalidateArticle({
       articleId: article.id,
       slug: article.slug,
-      categoryId: article.categoryId,
+      categorySlug: article.categorySlug,
       authorProfileIds: authorProfileIds || [],
     });
 
@@ -163,7 +165,7 @@ export async function deleteArticle(
       select: {
         id: true,
         slug: true,
-        categoryId: true,
+        categorySlug: true,
         authors: { select: { profileId: true } },
       },
     });
@@ -177,7 +179,7 @@ export async function deleteArticle(
     await revalidateArticle({
       articleId: article.id,
       slug: article.slug,
-      categoryId: article.categoryId,
+      categorySlug: article.categorySlug,
       authorProfileIds: article.authors.map((a) => a.profileId),
     });
 
@@ -195,7 +197,7 @@ export async function listArticlesAdmin(params?: {
   page?: number;
   limit?: number;
   status?: string;
-  categoryId?: string;
+  categorySlug?: string;
   search?: string;
 }): Promise<
   ActionResult<{
@@ -216,8 +218,8 @@ export async function listArticlesAdmin(params?: {
     if (params?.status) {
       where.status = params.status;
     }
-    if (params?.categoryId) {
-      where.categoryId = params.categoryId;
+    if (params?.categorySlug) {
+      where.categorySlug = params.categorySlug;
     }
     if (params?.search) {
       where.OR = [
@@ -230,7 +232,6 @@ export async function listArticlesAdmin(params?: {
       prisma.blogArticle.findMany({
         where,
         include: {
-          category: { select: { label: true, slug: true } },
           authors: {
             select: {
               profile: {
@@ -243,7 +244,6 @@ export async function listArticlesAdmin(params?: {
             },
             orderBy: { order: 'asc' },
           },
-          _count: { select: { savedBy: true } },
         },
         orderBy: { createdAt: 'desc' },
         skip,
@@ -278,7 +278,6 @@ export async function getArticleAdmin(
     const article = await prisma.blogArticle.findUnique({
       where: { id },
       include: {
-        category: true,
         authors: {
           select: {
             profileId: true,

@@ -1,5 +1,5 @@
 // BLOG MODELS
-// Article management with multi-author support and category taxonomy
+// Article management with multi-author support
 
 model BlogArticle {
   id              String   @id @default(cuid())
@@ -8,30 +8,25 @@ model BlogArticle {
   titleNormalized String? // Normalized for accent-insensitive search (Greek)
   excerpt         String?  @db.Text
   content         String   @db.Text // Rich HTML from TipTap editor
-  coverImage      String? // Cloudinary URL (featured image)
+  /// [CloudinaryResource]
+  coverImage      Json? // Cloudinary resource object (featured image)
 
   // Taxonomy
-  categoryId String
-  tags       String[] // Future use
+  categorySlug String? // Matches slug from static blog-categories constants
 
   // Publishing
   status      Status   @default(draft) // Reuses enum from service.prisma
   featured    Boolean  @default(false)
   publishedAt DateTime?
 
-  // Metrics
-  viewCount Int @default(0)
-
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
-  category BlogCategory       @relation(fields: [categoryId], references: [id])
-  authors  BlogArticleAuthor[]
-  savedBy  SavedArticle[]
+  authors BlogArticleAuthor[]
 
-  @@index([categoryId])
+  @@index([categorySlug])
   @@index([status, publishedAt])
   @@index([status, featured, publishedAt])
   @@index([titleNormalized])
@@ -52,31 +47,4 @@ model BlogArticleAuthor {
   @@index([articleId])
   @@index([profileId])
   @@map("blog_article_authors")
-}
-
-model BlogCategory {
-  id          String  @id @default(cuid())
-  slug        String  @unique
-  label       String // Display name
-  description String?
-  order       Int     @default(0) // Sort order in tabs
-
-  articles BlogArticle[]
-
-  @@map("blog_categories")
-}
-
-model SavedArticle {
-  id        String   @id @default(cuid())
-  userId    String
-  articleId String
-  createdAt DateTime @default(now())
-
-  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  article BlogArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, articleId])
-  @@index([userId])
-  @@index([articleId])
-  @@map("saved_articles")
 }

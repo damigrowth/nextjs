@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import UserAvatar from '@/components/shared/user-avatar';
 import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
+import { getBlogCategoryBySlug } from '@/constants/datasets/blog-categories';
 
 interface ArticleCardProps {
   article: {
@@ -12,11 +13,8 @@ interface ArticleCardProps {
     title: string;
     excerpt: string | null;
     coverImage: any;
+    categorySlug: string | null;
     publishedAt: Date | string | null;
-    category: {
-      slug: string;
-      label: string;
-    } | null;
     authors: Array<{
       order: number;
       profile: {
@@ -30,8 +28,10 @@ interface ArticleCardProps {
 }
 
 export default function ArticleCard({ article }: ArticleCardProps) {
-  const categorySlug = article.category?.slug || 'uncategorized';
-  const href = `/articles/${categorySlug}/${article.slug}`;
+  const category = article.categorySlug
+    ? getBlogCategoryBySlug(article.categorySlug)
+    : null;
+  const href = `/articles/${article.categorySlug || 'uncategorized'}/${article.slug}`;
 
   const firstAuthor = article.authors[0]?.profile;
 
@@ -77,9 +77,9 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         <CardContent className="p-6 flex flex-col flex-1">
           {/* Category + Date */}
           <div className="flex items-center gap-3 mb-3">
-            {article.category && (
+            {category && (
               <Badge variant="secondary" className="font-medium text-xs">
-                {article.category.label}
+                {category.label}
               </Badge>
             )}
             {publishedDate && (

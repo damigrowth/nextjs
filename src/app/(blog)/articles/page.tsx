@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { getArticles, getBlogCategories } from '@/actions/blog/get-articles';
+import { getArticles } from '@/actions/blog/get-articles';
+import { getAllBlogCategories } from '@/constants/datasets/blog-categories';
 import {
   ArticleCard,
   BlogCategoryTabs,
@@ -26,16 +27,14 @@ export default async function ArticlesPage({
   const { page: pageParam } = await searchParams;
   const currentPage = Math.max(1, parseInt(pageParam || '1'));
 
-  const [articlesResult, categoriesResult] = await Promise.all([
-    getArticles({ page: currentPage, limit: 12 }),
-    getBlogCategories(),
-  ]);
+  const categories = getAllBlogCategories();
+
+  const articlesResult = await getArticles({ page: currentPage, limit: 12 });
 
   const articles = articlesResult.success ? articlesResult.data!.articles : [];
   const totalPages = articlesResult.success
     ? articlesResult.data!.totalPages
     : 0;
-  const categories = categoriesResult.success ? categoriesResult.data! : [];
 
   return (
     <div className="py-20 bg-white">

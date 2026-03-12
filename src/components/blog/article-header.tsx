@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 import { stripHtmlTags } from '@/lib/utils/text/html';
+import { getBlogCategoryBySlug } from '@/constants/datasets/blog-categories';
 
 interface ArticleHeaderProps {
   article: {
@@ -9,11 +10,8 @@ interface ArticleHeaderProps {
     excerpt: string | null;
     content: string | null;
     coverImage: any;
+    categorySlug: string | null;
     publishedAt: Date | string | null;
-    category: {
-      slug: string;
-      label: string;
-    } | null;
   };
 }
 
@@ -25,6 +23,9 @@ function estimateReadTime(content: string | null): number {
 }
 
 export default function ArticleHeader({ article }: ArticleHeaderProps) {
+  const category = article.categorySlug
+    ? getBlogCategoryBySlug(article.categorySlug)
+    : null;
   const readTime = estimateReadTime(article.content);
 
   const publishedDate = article.publishedAt
@@ -48,9 +49,9 @@ export default function ArticleHeader({ article }: ArticleHeaderProps) {
     <header className="mb-8">
       {/* Meta line */}
       <div className="flex items-center gap-3 mb-4">
-        {article.category && (
+        {category && (
           <Badge variant="secondary" className="font-medium">
-            {article.category.label}
+            {category.label}
           </Badge>
         )}
         {publishedDate && (

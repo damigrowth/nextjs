@@ -13,17 +13,10 @@ const ARTICLE_CARD_SELECT = {
   title: true,
   excerpt: true,
   coverImage: true,
+  categorySlug: true,
   featured: true,
   publishedAt: true,
   createdAt: true,
-  viewCount: true,
-  category: {
-    select: {
-      id: true,
-      slug: true,
-      label: true,
-    },
-  },
   authors: {
     select: {
       order: true,
@@ -63,7 +56,7 @@ export async function getArticles(
     };
 
     if (params?.categorySlug) {
-      where.category = { slug: params.categorySlug };
+      where.categorySlug = params.categorySlug;
     }
 
     if (params?.authorProfileId) {
@@ -104,48 +97,5 @@ export async function getArticles(
   } catch (error) {
     console.error('Error fetching articles:', error);
     return { success: false, error: 'Failed to fetch articles' };
-  }
-}
-
-/**
- * Get all blog categories (ordered)
- */
-export async function getBlogCategories(): Promise<ActionResult<any[]>> {
-  try {
-    const categories = await prisma.blogCategory.findMany({
-      orderBy: { order: 'asc' },
-      include: {
-        _count: {
-          select: { articles: { where: { status: 'published' } } },
-        },
-      },
-    });
-
-    return { success: true, data: categories };
-  } catch (error) {
-    console.error('Error fetching blog categories:', error);
-    return { success: false, error: 'Failed to fetch categories' };
-  }
-}
-
-/**
- * Get a single blog category by slug
- */
-export async function getBlogCategoryBySlug(
-  slug: string,
-): Promise<ActionResult<any>> {
-  try {
-    const category = await prisma.blogCategory.findUnique({
-      where: { slug },
-    });
-
-    if (!category) {
-      return { success: false, error: 'Category not found' };
-    }
-
-    return { success: true, data: category };
-  } catch (error) {
-    console.error('Error fetching blog category:', error);
-    return { success: false, error: 'Failed to fetch category' };
   }
 }

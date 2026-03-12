@@ -11,7 +11,7 @@ interface ArticleSchemaProps {
   categorySlug: string;
   title: string;
   excerpt?: string | null;
-  coverImage?: string | null;
+  coverImage?: any;
   publishedAt?: Date | string | null;
   updatedAt?: Date | string | null;
   authors: ArticleAuthor[];
@@ -51,7 +51,12 @@ export function ArticleSchema({
   }
 
   if (coverImage) {
-    data.image = coverImage;
+    data.image =
+      typeof coverImage === 'object' && coverImage.secure_url
+        ? coverImage.secure_url
+        : typeof coverImage === 'string'
+          ? coverImage
+          : undefined;
   }
 
   if (publishedAt) {

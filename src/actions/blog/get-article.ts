@@ -13,7 +13,6 @@ export async function getArticle(
     const article = await prisma.blogArticle.findUnique({
       where: { slug },
       include: {
-        category: true,
         authors: {
           select: {
             order: true,
@@ -36,49 +35,9 @@ export async function getArticle(
       return { success: false, error: 'Article not found' };
     }
 
-    // Get related articles (same category, exclude current)
-    const relatedArticles = await prisma.blogArticle.findMany({
-      where: {
-        status: 'published',
-        categoryId: article.categoryId,
-        id: { not: article.id },
-      },
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        excerpt: true,
-        coverImage: true,
-        publishedAt: true,
-        category: {
-          select: { slug: true, label: true },
-        },
-        authors: {
-          select: {
-            order: true,
-            profile: {
-              select: {
-                id: true,
-                username: true,
-                displayName: true,
-                image: true,
-              },
-            },
-          },
-          orderBy: { order: 'asc' },
-          take: 1,
-        },
-      },
-      orderBy: { publishedAt: 'desc' },
-      take: 3,
-    });
-
     return {
       success: true,
-      data: {
-        article,
-        relatedArticles,
-      },
+      data: article,
     };
   } catch (error) {
     console.error('Error fetching article:', error);

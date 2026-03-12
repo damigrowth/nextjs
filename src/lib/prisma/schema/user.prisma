@@ -36,7 +36,7 @@ model User {
   blockedByUsers  BlockedUser[] @relation("BlockedBy")
   savedServices   SavedService[]
   savedProfiles   SavedProfile[]
-  savedArticles   SavedArticle[]
+
   emailBatches    EmailBatch[]
   apiKeys         ApiKey[]       @relation("UserApiKeys")
 

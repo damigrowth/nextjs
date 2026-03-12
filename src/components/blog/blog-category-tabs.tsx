@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 interface BlogCategory {
-  id: number;
   slug: string;
   label: string;
 }
@@ -35,7 +34,7 @@ export default function BlogCategoryTabs({
         {/* Category tabs */}
         {categories.map((category) => (
           <Link
-            key={category.id}
+            key={category.slug}
             href={`/articles/${category.slug}`}
             className={cn(
               'px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap',

@@ -7,7 +7,6 @@ import { getProfileMetadata } from '@/lib/seo/pages';
 import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
 import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
 import {
-  ProfileArticles,
   ProfileBio,
   ProfileFeatures,
   ProfileIndustries,
@@ -115,30 +114,6 @@ export default async function ProfilePage({
     reviewStats,
   } = result.data;
 
-  // Fetch published articles by this profile
-  const { prisma } = await import('@/lib/prisma/client');
-  const profileArticles = await prisma.blogArticle.findMany({
-    where: {
-      status: 'published',
-      authors: {
-        some: { profileId: profile.id },
-      },
-    },
-    select: {
-      id: true,
-      slug: true,
-      title: true,
-      excerpt: true,
-      coverImage: true,
-      publishedAt: true,
-      category: {
-        select: { slug: true, label: true },
-      },
-    },
-    orderBy: { publishedAt: 'desc' },
-    take: 6,
-  });
-
   const image = profile.image;
 
   // Get first county for location schema
@@ -244,14 +219,6 @@ export default async function ProfilePage({
               {result.data.services && result.data.services.length > 0 && (
                 <ProfileServices
                   services={result.data.services}
-                  profileUsername={profile.username}
-                />
-              )}
-
-              {/* Profile Articles */}
-              {profileArticles.length > 0 && (
-                <ProfileArticles
-                  articles={profileArticles}
                   profileUsername={profile.username}
                 />
               )}

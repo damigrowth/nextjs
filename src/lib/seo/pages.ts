@@ -531,10 +531,8 @@ export async function getBlogArchiveMetadata() {
  * Blog category page metadata
  */
 export async function getBlogCategoryMetadata(categorySlug: string) {
-  const category = await prisma.blogCategory.findUnique({
-    where: { slug: categorySlug },
-    select: { label: true, description: true },
-  });
+  const { getBlogCategoryBySlug } = await import('@/constants/datasets/blog-categories');
+  const category = getBlogCategoryBySlug(categorySlug);
 
   const label = category?.label || categorySlug;
   const description =
@@ -562,7 +560,7 @@ export async function getArticleMetadata(slug: string) {
       excerpt: true,
       content: true,
       coverImage: true,
-      category: { select: { slug: true } },
+      categorySlug: true,
     },
   });
 
@@ -573,12 +571,18 @@ export async function getArticleMetadata(slug: string) {
   const description =
     article.excerpt || stripHtmlTags(article.content).slice(0, 160);
 
+  // Extract URL from CloudinaryResource JSON or string
+  const coverUrl =
+    article.coverImage && typeof article.coverImage === 'object'
+      ? (article.coverImage as any).secure_url
+      : article.coverImage;
+
   const { meta } = await MetaData({
     title: `${article.title} | Doulitsa`,
     description,
     size: 160,
-    image: article.coverImage || undefined,
-    url: `/articles/${article.category.slug}/${slug}`,
+    image: coverUrl || undefined,
+    url: `/articles/${article.categorySlug || 'uncategorized'}/${slug}`,
   });
 
   return meta;

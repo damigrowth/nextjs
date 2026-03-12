@@ -17,9 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: {
         slug: true,
         updatedAt: true,
-        category: {
-          select: { slug: true },
-        },
+        categorySlug: true,
       },
       orderBy: {
         updatedAt: 'desc',
@@ -27,7 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     return articles.map((article) => ({
-      url: `${baseUrl}/articles/${article.category.slug}/${article.slug}`,
+      url: `${baseUrl}/articles/${article.categorySlug || 'uncategorized'}/${article.slug}`,
       lastModified: article.updatedAt,
     }));
   } catch (error) {

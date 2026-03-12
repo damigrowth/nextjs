@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { getArticles } from '@/actions/blog/get-articles';
 import {
-  getArticles,
-  getBlogCategories,
+  getAllBlogCategories,
   getBlogCategoryBySlug,
-} from '@/actions/blog/get-articles';
+} from '@/constants/datasets/blog-categories';
 import {
   ArticleCard,
   BlogCategoryTabs,
@@ -24,22 +24,22 @@ interface CategoryPageProps {
 }
 
 export async function generateStaticParams() {
-  return [];
+  return getAllBlogCategories().map((cat) => ({ category: cat.slug }));
 }
 
 export async function generateMetadata({
   params,
 }: CategoryPageProps): Promise<Metadata> {
   const { category: categorySlug } = await params;
-  const result = await getBlogCategoryBySlug(categorySlug);
+  const category = getBlogCategoryBySlug(categorySlug);
 
-  if (!result.success || !result.data) {
+  if (!category) {
     return { title: 'Κατηγορία | Doulitsa' };
   }
 
   return {
-    title: `${result.data.label} - Άρθρα | Doulitsa`,
-    description: `Άρθρα στην κατηγορία ${result.data.label}`,
+    title: `${category.label} - Άρθρα | Doulitsa`,
+    description: category.description || `Άρθρα στην κατηγορία ${category.label}`,
   };
 }
 
@@ -51,17 +51,12 @@ export default async function CategoryPage({
   const { page: pageParam } = await searchParams;
   const currentPage = Math.max(1, parseInt(pageParam || '1'));
 
-  const [categoryResult, categoriesResult] = await Promise.all([
-    getBlogCategoryBySlug(categorySlug),
-    getBlogCategories(),
-  ]);
-
-  if (!categoryResult.success || !categoryResult.data) {
+  const category = getBlogCategoryBySlug(categorySlug);
+  if (!category) {
     notFound();
   }
 
-  const category = categoryResult.data;
-  const categories = categoriesResult.success ? categoriesResult.data! : [];
+  const categories = getAllBlogCategories();
 
   const articlesResult = await getArticles({
     page: currentPage,

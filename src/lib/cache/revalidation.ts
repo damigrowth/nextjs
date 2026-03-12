@@ -245,25 +245,25 @@ export async function revalidateReview(params: {
  * await revalidateArticle({
  *   articleId: article.id,
  *   slug: article.slug,
- *   categoryId: article.categoryId,
+ *   categorySlug: article.categorySlug,
  *   authorProfileIds: ['profileId1', 'profileId2'],
  * });
  */
 export async function revalidateArticle(params: {
   articleId: string;
   slug?: string | null;
-  categoryId?: string | null;
+  categorySlug?: string | null;
   authorProfileIds?: string[];
 }) {
-  const { articleId, slug, categoryId, authorProfileIds = [] } = params;
+  const { articleId, slug, categorySlug, authorProfileIds = [] } = params;
 
   // Article-specific tags
   revalidateTag(CACHE_TAGS.article.byId(articleId));
   if (slug) {
     revalidateTag(CACHE_TAGS.article.bySlug(slug));
   }
-  if (categoryId) {
-    revalidateTag(CACHE_TAGS.article.byCategory(categoryId));
+  if (categorySlug) {
+    revalidateTag(CACHE_TAGS.article.byCategory(categorySlug));
   }
 
   // Author tags
@@ -273,7 +273,6 @@ export async function revalidateArticle(params: {
 
   // Collection tags
   revalidateTag(CACHE_TAGS.blog.articles);
-  revalidateTag(CACHE_TAGS.blog.categories);
 
   // Paths
   revalidatePath('/articles');

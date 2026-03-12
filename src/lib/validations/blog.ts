@@ -5,59 +5,84 @@
 
 import { z } from 'zod';
 import { paginationSchema } from './shared';
+import { cloudinaryResourceSchema } from '@/lib/prisma/json-types';
 
 // =============================================
 // ARTICLE SCHEMAS
 // =============================================
 
-export const createArticleSchema = z.object({
-  title: z
+// Base fields shared between draft and publish modes
+const articleBaseFields = {
+  title: z.string().max(200, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 200 χαρακτήρες'),
+  slug: z
     .string()
-    .min(5, 'Ο τίτλος πρέπει να είναι τουλάχιστον 5 χαρακτήρες')
-    .max(200, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 200 χαρακτήρες'),
+    .max(300)
+    .optional()
+    .or(z.literal('')),
   excerpt: z
     .string()
     .max(500, 'Η περίληψη δεν μπορεί να ξεπερνά τους 500 χαρακτήρες')
     .optional()
     .or(z.literal('')),
-  content: z
-    .string()
-    .min(50, 'Το περιεχόμενο πρέπει να είναι τουλάχιστον 50 χαρακτήρες'),
-  coverImage: z.string().url('Μη έγκυρο URL εικόνας').optional().or(z.literal('')),
-  categoryId: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
-  authorProfileIds: z
-    .array(z.string())
-    .min(1, 'Απαιτείται τουλάχιστον ένας συγγραφέας'),
-  tags: z.array(z.string()).max(10).optional(),
+  content: z.string(),
+  coverImage: cloudinaryResourceSchema.nullable().optional(),
+  categorySlug: z.string().optional().or(z.literal('')),
+  authorProfileIds: z.array(z.string()).optional(),
   status: z.enum(['draft', 'pending', 'published']).default('draft'),
   featured: z.boolean().default(false),
-});
+};
 
-export const updateArticleSchema = createArticleSchema.partial().extend({
-  id: z.string().min(1),
-});
+// Base object schema (no refinements — allows .partial() for update schema)
+const articleBaseSchema = z.object(articleBaseFields);
 
-// =============================================
-// CATEGORY SCHEMAS
-// =============================================
+// Refinement for non-draft validation
+function articlePublishRefinement(data: z.infer<typeof articleBaseSchema>, ctx: z.RefinementCtx) {
+  // Skip strict validation for drafts
+  if (data.status === 'draft') return;
 
-export const createBlogCategorySchema = z.object({
-  label: z
-    .string()
-    .min(2, 'Η ετικέτα πρέπει να είναι τουλάχιστον 2 χαρακτήρες')
-    .max(100),
-  slug: z
-    .string()
-    .min(2)
-    .max(100)
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Μη έγκυρο slug'),
-  description: z.string().max(500).optional().or(z.literal('')),
-  order: z.coerce.number().int().min(0).default(0),
-});
+  if (!data.title || data.title.length < 5) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Ο τίτλος πρέπει να είναι τουλάχιστον 5 χαρακτήρες',
+      path: ['title'],
+    });
+  }
+  if (!data.content || data.content.length < 50) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Το περιεχόμενο πρέπει να είναι τουλάχιστον 50 χαρακτήρες',
+      path: ['content'],
+    });
+  }
+  if (!data.categorySlug) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Η κατηγορία είναι υποχρεωτική',
+      path: ['categorySlug'],
+    });
+  }
+  if (!data.authorProfileIds || data.authorProfileIds.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Απαιτείται τουλάχιστον ένας συγγραφέας',
+      path: ['authorProfileIds'],
+    });
+  }
+}
 
-export const updateBlogCategorySchema = createBlogCategorySchema.partial().extend({
-  id: z.string().min(1),
-});
+// Create schema with publish-time refinement
+export const createArticleSchema = articleBaseSchema.superRefine(articlePublishRefinement);
+
+// Update schema: partial base + id, then apply same refinement
+export const updateArticleSchema = articleBaseSchema
+  .partial()
+  .extend({ id: z.string().min(1) })
+  .superRefine((data, ctx) => {
+    // Only run publish refinement if status is being set to non-draft
+    if (data.status && data.status !== 'draft') {
+      articlePublishRefinement(data as z.infer<typeof articleBaseSchema>, ctx);
+    }
+  });
 
 // =============================================
 // QUERY SCHEMAS
@@ -72,39 +97,9 @@ export const blogArticleQuerySchema = paginationSchema.extend({
 });
 
 // =============================================
-// SUBSCRIBER ARTICLE SCHEMAS
-// =============================================
-
-export const submitArticleSchema = z.object({
-  title: z
-    .string()
-    .min(5, 'Ο τίτλος πρέπει να είναι τουλάχιστον 5 χαρακτήρες')
-    .max(200, 'Ο τίτλος δεν μπορεί να ξεπερνά τους 200 χαρακτήρες'),
-  excerpt: z
-    .string()
-    .max(500, 'Η περίληψη δεν μπορεί να ξεπερνά τους 500 χαρακτήρες')
-    .optional()
-    .or(z.literal('')),
-  content: z
-    .string()
-    .min(50, 'Το περιεχόμενο πρέπει να είναι τουλάχιστον 50 χαρακτήρες'),
-  coverImage: z.string().url('Μη έγκυρο URL εικόνας').optional().or(z.literal('')),
-  categoryId: z.string().min(1, 'Η κατηγορία είναι υποχρεωτική'),
-  tags: z.array(z.string()).max(10).optional(),
-});
-
-export const updateSubmittedArticleSchema = submitArticleSchema.partial().extend({
-  id: z.string().min(1),
-});
-
-// =============================================
 // TYPES
 // =============================================
 
-export type CreateArticleInput = z.infer<typeof createArticleSchema>;
-export type UpdateArticleInput = z.infer<typeof updateArticleSchema>;
-export type SubmitArticleInput = z.infer<typeof submitArticleSchema>;
-export type UpdateSubmittedArticleInput = z.infer<typeof updateSubmittedArticleSchema>;
-export type CreateBlogCategoryInput = z.infer<typeof createBlogCategorySchema>;
-export type UpdateBlogCategoryInput = z.infer<typeof updateBlogCategorySchema>;
+export type CreateArticleInput = z.input<typeof articleBaseSchema>;
+export type UpdateArticleInput = z.input<typeof articleBaseSchema> & { id: string };
 export type BlogArticleQuery = z.infer<typeof blogArticleQuerySchema>;

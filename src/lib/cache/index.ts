@@ -87,7 +87,6 @@ export const CACHE_TAGS = {
 
   blog: {
     articles: 'blog:articles' as const,
-    categories: 'blog:categories' as const,
   },
 
   // Home page tag
