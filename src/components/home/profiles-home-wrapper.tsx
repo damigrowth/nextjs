@@ -4,32 +4,24 @@ import { useEffect, useState } from 'react';
 import { useSession } from '@/lib/auth/client';
 import { getUserSavedState } from '@/actions/saved';
 import ProfilesHome from './home-profiles';
-import { ProfileCardData } from '@/lib/types';
+import type { ArchiveProfileCardData } from '@/lib/types/components';
 
 interface ProfilesHomeWrapperProps {
-  profiles: ProfileCardData[];
+  profiles: ArchiveProfileCardData[];
 }
 
 export function ProfilesHomeWrapper({ profiles }: ProfilesHomeWrapperProps) {
   const { data: session } = useSession();
   const [savedProfileIds, setSavedProfileIds] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchSavedState() {
       try {
-        if (!session?.user?.id) {
-          setIsLoading(false);
-          return;
-        }
-
+        if (!session?.user?.id) return;
         const savedState = await getUserSavedState(session.user.id);
-        const idsArray = Array.from(savedState.profileIds);
-        setSavedProfileIds(idsArray);
+        setSavedProfileIds(Array.from(savedState.profileIds));
       } catch (error) {
         console.error('Failed to fetch saved state:', error);
-      } finally {
-        setIsLoading(false);
       }
     }
 
