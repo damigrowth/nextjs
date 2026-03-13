@@ -1,4 +1,4 @@
-// Generated on 2026-03-11T09:35:19.248Z
+// Generated on 2026-03-13T17:22:50.148Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const tags = [
@@ -6396,5 +6396,10 @@ export const tags = [
     id: '1315',
     label: 'Υποστήριξη εργασιών',
     slug: 'upostirixi-ergasion',
+  },
+  {
+    id: '1316',
+    label: 'UGC',
+    slug: 'ugc',
   },
 ];
