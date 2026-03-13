@@ -6380,7 +6380,7 @@ export const tags = [
   {
     id: '1312',
     label: 'Ραντεβού',
-    slug: '',
+    slug: 'rantevou',
   },
   {
     id: '1313',
@@ -6390,11 +6390,11 @@ export const tags = [
   {
     id: '1314',
     label: 'Ανάλυση SEO',
-    slug: '-seo',
+    slug: 'analusi-seo',
   },
   {
     id: '1315',
     label: 'Υποστήριξη εργασιών',
-    slug: '-',
+    slug: 'upostirixi-ergasion',
   },
 ];

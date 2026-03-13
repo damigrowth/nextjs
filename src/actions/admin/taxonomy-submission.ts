@@ -5,7 +5,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { getAdminSessionWithPermission } from './helpers';
 import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import { getTaxonomyData } from './taxonomy-helpers';
-import { generateUniqueSlug } from '@/lib/utils/text/slug';
+import { createSlug, generateUniqueSlug } from '@/lib/utils/text/slug';
 import { createSubmissionId } from '@/lib/utils/taxonomy-submission';
 import { findProById, injectTaxonomyItem } from '@/lib/taxonomies';
 import {
@@ -275,10 +275,7 @@ export async function approveTaxonomySubmission(
     // Generate real numeric ID and slug
     const newId = generateUniqueNumericId(existingIds);
     const slug = generateUniqueSlug(
-      record.label
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, ''),
+      createSlug(record.label),
       currentItems,
     );
 
