@@ -272,6 +272,20 @@ export async function approveTaxonomySubmission(
     const currentItems = dataResult.data;
     const existingIds = collectAllIds(currentItems);
 
+    // Also include IDs already assigned to previously approved submissions
+    // (not yet published to Git) to prevent ID collisions during batch approvals
+    const approvedSubmissions = await prisma.taxonomySubmission.findMany({
+      where: {
+        status: 'approved',
+        assignedId: { not: null },
+        type: record.type,
+      },
+      select: { assignedId: true },
+    });
+    for (const sub of approvedSubmissions) {
+      if (sub.assignedId) existingIds.add(sub.assignedId);
+    }
+
     // Generate real numeric ID and slug
     const newId = generateUniqueNumericId(existingIds);
     const slug = generateUniqueSlug(
