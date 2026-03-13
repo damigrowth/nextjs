@@ -3,7 +3,7 @@
  * Types for saved services and profiles functionality
  */
 
-import { ServiceCardData, ProfileCardData } from './components';
+import { ServiceCardData, ArchiveProfileCardData } from './components';
 
 // Saved state for checking if items are saved (used in card components)
 export interface SavedState {
@@ -20,7 +20,7 @@ export interface SavedStateSerializable {
 // Response from get-saved-items action (used in /dashboard/saved page)
 export interface SavedItemsResponse {
   services: ServiceCardData[];
-  profiles: ProfileCardData[];
+  profiles: ArchiveProfileCardData[];
 }
 
 // Parameters for toggle-save action

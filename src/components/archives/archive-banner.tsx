@@ -61,7 +61,7 @@ export function ArchiveBanner({
           alt='vector'
           width={198}
           height={226}
-          className='absolute -left-20 -top-20 md:-left-10 md:-top-10 lg:left-0 lg:top-0 z-10'
+          className='absolute -left-20 -top-20 md:-left-10 md:-top-10 lg:left-0 lg:top-0 z-10 opacity-50'
           src={leftTopUrl}
           priority
         />
@@ -71,7 +71,7 @@ export function ArchiveBanner({
           alt='vector'
           width={255}
           height={181}
-          className='absolute -right-20 -bottom-20 md:-right-10 md:-bottom-10 lg:right-0 lg:bottom-0 z-10'
+          className='absolute -right-20 -bottom-20 md:-right-10 md:-bottom-10 lg:right-0 lg:bottom-0 z-10 opacity-50'
           src={rightBottomUrl}
           priority
         />
@@ -79,7 +79,7 @@ export function ArchiveBanner({
           alt={image?.original_filename || 'Service category'}
           width={320}
           height={180}
-          className='absolute rounded-3xl h-45 right-12pc w-80 hidden lg:block z-0 object-cover'
+          className='absolute rounded-3xl h-45 right-12pc w-80 hidden lg:block z-0 object-cover opacity-50'
           style={{ right: '12%' }}
           src={
             getOptimizedImageUrl(image?.secure_url, 'card') ||

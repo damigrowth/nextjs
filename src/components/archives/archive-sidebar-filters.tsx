@@ -372,15 +372,11 @@ export function ArchiveSidebarFilters({
         <Separator />
 
         {/* Online Toggle */}
-        <div className='space-y-3'>
-          <Label className='text-sm font-medium'>Online</Label>
-          <OnlineToggle
-            id='online-sidebar'
-            checked={filters.online || false}
-            onCheckedChange={(checked) => handleFilterChange('online', checked)}
-            label=''
-          />
-        </div>
+        <OnlineToggle
+          id='online-sidebar'
+          checked={filters.online || false}
+          onCheckedChange={(checked) => handleFilterChange('online', checked)}
+        />
 
         {/* County Selection */}
         <div className='space-y-3'>
