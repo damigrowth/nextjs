@@ -77,13 +77,28 @@ export function OnlineToggle({
 }: OnlineToggleProps) {
   return (
     <div
+      role='button'
+      tabIndex={0}
+      onClick={() => onCheckedChange(!checked)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onCheckedChange(!checked);
+        }
+      }}
       className={cn(
-        'inline-flex items-center gap-2 rounded-md border border-input bg-background px-4 py-1.5 flex-shrink-0 whitespace-nowrap',
+        'inline-flex items-center gap-2 rounded-md border-2 border-input bg-background shadow px-4 h-9 flex-shrink-0 whitespace-nowrap cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors',
         className,
       )}
     >
-      <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
-      <Label htmlFor={id} className='text-sm font-medium cursor-pointer'>
+      <Switch
+        id={id}
+        checked={checked}
+        onCheckedChange={onCheckedChange}
+        tabIndex={-1}
+        className='pointer-events-none'
+      />
+      <Label htmlFor={id} className='text-sm font-medium cursor-pointer pointer-events-none'>
         {label}
       </Label>
     </div>
