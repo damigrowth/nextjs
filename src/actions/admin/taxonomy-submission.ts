@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma/client';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { getAdminSessionWithPermission } from './helpers';
 import { ADMIN_RESOURCES } from '@/lib/auth/roles';
 import { getTaxonomyData } from './taxonomy-helpers';
@@ -15,6 +15,7 @@ import {
 import type { DatasetItem } from '@/lib/types/datasets';
 import type { TaxonomyType } from '@/lib/types/taxonomy-operations';
 import { isSuccess } from '@/lib/types/server-actions';
+import { CACHE_TAGS } from '@/lib/cache';
 
 // ============================================================================
 // LIST & STATS
@@ -311,8 +312,22 @@ export async function approveTaxonomySubmission(
     // without requiring a rebuild of maps.generated.json
     injectTaxonomyItem(taxonomyType, newItem);
 
+    // Revalidate caches so service/profile pages pick up the new tag/skill
     revalidatePath('/admin/taxonomies');
     revalidatePath('/dashboard');
+    if (record.type === 'tag') {
+      // Revalidate all service page caches so tags resolve correctly
+      revalidateTag(CACHE_TAGS.collections.services);
+      revalidateTag(CACHE_TAGS.archive.servicesFiltered);
+      revalidateTag(CACHE_TAGS.archive.all);
+    } else {
+      // Revalidate all profile page caches so skills resolve correctly
+      revalidateTag(CACHE_TAGS.collections.profiles);
+      revalidateTag(CACHE_TAGS.directory.all);
+      revalidateTag(CACHE_TAGS.archive.all);
+    }
+    revalidateTag(CACHE_TAGS.home);
+    revalidateTag(CACHE_TAGS.search.all);
 
     // Return draft data so the client can save it to localStorage
     // Admin then publishes from /admin/git like any other taxonomy change
@@ -369,8 +384,17 @@ export async function rejectTaxonomySubmission(
     // Remove submission ID from all profiles/services
     await removeSubmissionIdFromRecords(id, record.type as 'skill' | 'tag');
 
+    // Revalidate caches so removed pending tags/skills disappear from pages
     revalidatePath('/admin/taxonomies');
     revalidatePath('/dashboard');
+    if (record.type === 'tag') {
+      revalidateTag(CACHE_TAGS.collections.services);
+      revalidateTag(CACHE_TAGS.archive.servicesFiltered);
+    } else {
+      revalidateTag(CACHE_TAGS.collections.profiles);
+      revalidateTag(CACHE_TAGS.directory.all);
+    }
+    revalidateTag(CACHE_TAGS.archive.all);
 
     return { success: true };
   } catch (error) {
