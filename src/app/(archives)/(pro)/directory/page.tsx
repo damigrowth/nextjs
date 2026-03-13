@@ -1,5 +1,6 @@
 import { getDirectoryPageData } from '@/actions/profiles/get-directory';
 import TaxonomyTabs from '@/components/shared/taxonomy-tabs';
+import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
 import { ArchiveBanner } from '@/components/archives/archive-banner';
 import { SubdivisionsCarousel } from '@/components/archives/subdivisions-carousel';
 import { CategoriesGrid } from '@/components/archives/categories-grid';
@@ -35,6 +36,14 @@ export default async function DirectoryPage() {
         <DirectorySchema categories={categories} />
         {/* Category Navigation Tabs */}
         <TaxonomyTabs />
+
+        {/* Breadcrumb Navigation */}
+        <DynamicBreadcrumb
+          segments={[
+            { label: 'Αρχική', href: '/' },
+            { label: 'Επαγγελματικός Κατάλογος' },
+          ]}
+        />
 
         {/* Archive Banner */}
         <ArchiveBanner
