@@ -3599,7 +3599,7 @@ export const skills = [
   {
     id: '614',
     label: 'Στρατηγική Marketing',
-    slug: '-marketing',
+    slug: 'stratigiki-marketing',
     category: 'Z0YeWT',
   },
   {
@@ -3613,5 +3613,11 @@ export const skills = [
     label: 'Soundcloud',
     slug: 'soundcloud',
     category: 'q20QDs',
+  },
+  {
+    id: '1317',
+    label: 'Saas',
+    slug: 'saas',
+    category: 'xWJj-V',
   },
 ];

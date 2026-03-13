@@ -6394,12 +6394,57 @@ export const tags = [
   },
   {
     id: '1315',
-    label: 'Υποστήριξη εργασιών',
-    slug: 'upostirixi-ergasion',
+    label: 'Κάτοψη',
+    slug: 'katopsi',
   },
   {
     id: '1316',
     label: 'UGC',
     slug: 'ugc',
+  },
+  {
+    id: '1318',
+    label: 'dwg',
+    slug: 'dwg',
+  },
+  {
+    id: '1319',
+    label: '2D Design',
+    slug: '2d-design',
+  },
+  {
+    id: '1320',
+    label: 'Floor Plan',
+    slug: 'floor-plan',
+  },
+  {
+    id: '1321',
+    label: 'consulting',
+    slug: 'consulting',
+  },
+  {
+    id: '1322',
+    label: 'marketing consulting',
+    slug: 'marketing-consulting',
+  },
+  {
+    id: '1323',
+    label: 'Poster',
+    slug: 'poster',
+  },
+  {
+    id: '1324',
+    label: 'Εκπόνηση Εργασιών',
+    slug: 'ekponisi-ergasion',
+  },
+  {
+    id: '1325',
+    label: 'Υποστήριξη εργασιών',
+    slug: 'upostirixi-ergasion',
+  },
+  {
+    id: '1326',
+    label: 'Εργασίες',
+    slug: 'ergasies',
   },
 ];
