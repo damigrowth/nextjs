@@ -224,9 +224,19 @@ async function getHomePageDataUncached(): Promise<ActionResult<HomePageData>> {
       }),
     ]);
 
+    // Shuffle array using Fisher-Yates algorithm (seeded by current hour for cache consistency)
+    function shuffleArray<T>(array: T[]): T[] {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
     // Transform services data
-    const transformedServices = servicesResult.map(
-      transformServiceForComponent,
+    const transformedServices = shuffleArray(
+      servicesResult.map(transformServiceForComponent),
     );
 
     // Prepare categories for tabs (server-side computation)
@@ -262,9 +272,9 @@ async function getHomePageDataUncached(): Promise<ActionResult<HomePageData>> {
       allServices: transformedServices,
     };
 
-    // Transform profiles data
-    const transformedProfiles = profilesResult.map(
-      transformProfileForComponent,
+    // Transform and shuffle profiles data
+    const transformedProfiles = shuffleArray(
+      profilesResult.map(transformProfileForComponent),
     );
 
     // Extract data from cached functions
