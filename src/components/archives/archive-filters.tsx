@@ -117,7 +117,7 @@ export function ArchiveFilters({
             value={filters.county}
             onValueChange={handleCountyChange}
             counties={counties}
-            className='flex-1 min-w-0 [&_svg]:hidden'
+            className='flex-1 min-w-0'
           />
           <OnlineToggle
             id='online-filter-mobile'
