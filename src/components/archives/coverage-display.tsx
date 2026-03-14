@@ -132,7 +132,7 @@ export function CoverageDisplay({
               className='w-80 p-3'
             >
               <div className='text-xs text-gray-700'>
-                <SharedCoverageDisplay groupedCoverage={groupedCoverage} />
+                <SharedCoverageDisplay groupedCoverage={groupedCoverage} collapse={false} />
               </div>
             </PopoverContent>
           </Popover>
