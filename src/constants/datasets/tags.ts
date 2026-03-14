@@ -1,4 +1,4 @@
-// Generated on 2026-03-13T17:22:50.148Z
+// Generated on 2026-03-14T11:09:04.688Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const tags = [
@@ -6446,5 +6446,25 @@ export const tags = [
     id: '1326',
     label: 'Εργασίες',
     slug: 'ergasies',
+  },
+  {
+    id: '1327',
+    label: 'Καθαρισμοί οικοπέδων',
+    slug: 'katharismoi-oikopedon',
+  },
+  {
+    id: '1328',
+    label: 'product review',
+    slug: 'product-review',
+  },
+  {
+    id: '1329',
+    label: 'vlog',
+    slug: 'vlog',
+  },
+  {
+    id: '1330',
+    label: 'content creator',
+    slug: 'content-creator',
   },
 ];
