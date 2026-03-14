@@ -1,4 +1,4 @@
-// Generated on 2026-03-06T13:21:19.258Z
+// Generated on 2026-03-14T20:08:19.381Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -2213,25 +2213,6 @@ export const serviceTaxonomies = [
             },
           },
           {
-            id: 'ui0geF',
-            label: 'Θεραπείες',
-            slug: 'therapeies',
-            description:
-              'Ανακάλυψε θεραπείες που αναζωογονούν το σώμα και το πνεύμα σου, προσφέροντας ευεξία και φροντίδα.',
-            image: {
-              public_id: '182_e077508f61',
-              secure_url:
-                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168358/182_e077508f61.webp',
-              width: 1792,
-              height: 1024,
-              resource_type: 'image',
-              format: 'webp',
-              bytes: 28232,
-              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168358/182_e077508f61.webp',
-              original_filename: '182.webp',
-            },
-          },
-          {
             id: 'VYbWqa',
             label: 'Θεραπείες Δέρματος',
             slug: 'therapeies-dermatos',
@@ -3088,6 +3069,25 @@ export const serviceTaxonomies = [
               format: 'webp',
               bytes: 40492,
               url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1750168428/214_e00065c326.webp',
+            },
+          },
+          {
+            id: 'ui0geF',
+            label: 'Θεραπείες',
+            slug: 'therapeies',
+            description:
+              'Ανακάλυψε θεραπείες που αναζωογονούν το σώμα και το πνεύμα σου, προσφέροντας ευεξία και φροντίδα.',
+            image: {
+              public_id: '182_e077508f61',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168358/182_e077508f61.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 28232,
+              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168358/182_e077508f61.webp',
+              original_filename: '182.webp',
             },
           },
         ],
