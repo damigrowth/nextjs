@@ -1,10 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSession } from '@/lib/auth/client';
 import { getUserSavedState } from '@/actions/saved';
 import ProfilesHome from './home-profiles';
 import type { ArchiveProfileCardData } from '@/lib/types/components';
+
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
 
 interface ProfilesHomeWrapperProps {
   profiles: ArchiveProfileCardData[];
@@ -13,6 +22,9 @@ interface ProfilesHomeWrapperProps {
 export function ProfilesHomeWrapper({ profiles }: ProfilesHomeWrapperProps) {
   const { data: session } = useSession();
   const [savedProfileIds, setSavedProfileIds] = useState<string[]>([]);
+
+  // Shuffle profiles client-side so each visit gets a fresh order
+  const shuffledProfiles = useMemo(() => shuffleArray(profiles), [profiles]);
 
   useEffect(() => {
     async function fetchSavedState() {
@@ -29,6 +41,6 @@ export function ProfilesHomeWrapper({ profiles }: ProfilesHomeWrapperProps) {
   }, [session]);
 
   return (
-    <ProfilesHome profiles={profiles} savedProfileIds={savedProfileIds} />
+    <ProfilesHome profiles={shuffledProfiles} savedProfileIds={savedProfileIds} />
   );
 }

@@ -153,15 +153,15 @@ export function ArchiveProfileCard({
             </div>
 
             {/* Bottom section - only show if there are skills/speciality or rate */}
-            {(profile.skillsData.length > 0 ||
+            {((profile.skillsData?.length ?? 0) > 0 ||
               profile.specialityData ||
               (profile.rate != null && profile.rate > 0)) && (
               <div className='flex items-center gap-3 border-t border-gray-200 mt-3 pt-3'>
                 {/* Skills and Speciality */}
                 <div className='flex-1'>
-                  {(profile.skillsData.length > 0 || profile.specialityData) &&
+                  {((profile.skillsData?.length ?? 0) > 0 || profile.specialityData) &&
                     (() => {
-                      const filteredSkills = profile.skillsData.filter(
+                      const filteredSkills = (profile.skillsData ?? []).filter(
                         (skill) =>
                           skill.label !== profile.specialityData?.label,
                       );
