@@ -125,6 +125,7 @@ function transformServiceForComponent(
     type: service.type, // Service type JSON object
     profile: {
       id: service.profile.id,
+      uid: service.profile.uid,
       displayName: service.profile.displayName,
       username: service.profile.username,
       image: service.profile.image,
@@ -594,6 +595,7 @@ async function getServicesByFiltersInternal(filters: ServiceFilters): Promise<
           taxonomyLabels,
           profile: {
             id: service.profile.id,
+            uid: service.profile.uid,
             displayName: service.profile.displayName,
             username: service.profile.username,
             image: service.profile.image,

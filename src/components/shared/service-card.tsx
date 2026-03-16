@@ -14,14 +14,12 @@ interface ServiceCardProps {
   service: ServiceCardData;
   showProfile?: boolean;
   hideDisplayName?: boolean;
-  isSaved?: boolean;
 }
 
 export default function ServiceCard({
   service,
   showProfile = true,
   hideDisplayName = false,
-  isSaved = false,
 }: ServiceCardProps) {
   // Convert price to number for reliable comparison
   const priceValue = Number(service?.price) || 0;
@@ -50,7 +48,7 @@ export default function ServiceCard({
         <SaveButton
           itemType='service'
           itemId={service.id}
-          initialSaved={isSaved}
+          ownerId={service.profile.uid}
         />
       </div>
 

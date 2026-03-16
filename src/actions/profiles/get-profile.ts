@@ -175,6 +175,7 @@ export interface ProfilePageData {
     subjectTitle: string;
     id: string;
     saveType: string;
+    ownerId: string;
   };
   reviews: {
     reviews: any[]; // ReviewWithAuthor[]
@@ -370,6 +371,7 @@ async function _getProfilePageData(
       subjectTitle: profile.displayName || '',
       id: profile.id,
       saveType: 'profile',
+      ownerId: profile.uid,
     };
 
     return {

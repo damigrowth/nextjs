@@ -1,16 +1,18 @@
 'use client';
 
-import { useState, useTransition, useEffect } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Heart, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toggleSave } from '@/actions/saved';
 import { useSession } from '@/lib/auth/client';
+import { useSavedState } from '@/lib/providers/saved-state-provider';
 
 interface SaveButtonProps {
   itemType: 'service' | 'profile';
   itemId: string | number;
-  initialSaved?: boolean;
+  /** User ID of the item owner — hides button if it matches the logged-in user */
+  ownerId?: string;
   variant?: 'save' | 'remove';
   className?: string;
   onToggle?: (isSaved: boolean) => void;
@@ -19,7 +21,7 @@ interface SaveButtonProps {
 export default function SaveButton({
   itemType,
   itemId,
-  initialSaved = false,
+  ownerId,
   variant = 'save',
   className = '',
   onToggle,
@@ -27,48 +29,51 @@ export default function SaveButton({
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = useSession();
-  const [isSaved, setIsSaved] = useState(initialSaved);
+  const { isSaved: checkSaved, updateSavedState } = useSavedState();
+
+  const isOwnItem =
+    !!ownerId && !!session?.user?.id && session.user.id === ownerId;
+
+  const contextSaved = isOwnItem ? false : checkSaved(itemType, itemId);
+  const [localSaved, setLocalSaved] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  const isSaved = localSaved ?? contextSaved;
   const isInDashboard = pathname?.startsWith('/dashboard');
 
-  // Sync internal state with prop changes (e.g., when saved state loads from server)
-  useEffect(() => {
-    setIsSaved(initialSaved);
-  }, [initialSaved]);
+  // Own items: don't render.
+  // Safe from hydration mismatch because variant='save' buttons start
+  // at opacity-0 (invisible), and this only triggers on re-render
+  // after session loads — not during initial hydration.
+  if (isOwnItem) return null;
 
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    // Check if user is authenticated
     if (!session?.user) {
       router.push('/login');
       return;
     }
 
-    // Optimistic update
     const previousState = isSaved;
     const newState = !isSaved;
-    setIsSaved(newState);
-
-    // Call optional callback immediately for parent optimistic update
+    setLocalSaved(newState);
+    updateSavedState(itemType, itemId, newState);
     onToggle?.(newState);
 
-    // Background server action
     startTransition(async () => {
       const result = await toggleSave(itemType, itemId);
 
       if (!result.success) {
-        // Revert on error
-        setIsSaved(previousState);
+        setLocalSaved(previousState);
+        updateSavedState(itemType, itemId, previousState);
         onToggle?.(previousState);
       } else if (result.data) {
-        // Update with actual server state
-        setIsSaved(result.data.isSaved);
+        setLocalSaved(result.data.isSaved);
+        updateSavedState(itemType, itemId, result.data.isSaved);
         onToggle?.(result.data.isSaved);
 
-        // Refresh the page if in dashboard/saved to update the list
         if (isInDashboard && pathname?.includes('/saved')) {
           router.refresh();
         }
@@ -105,7 +110,6 @@ export default function SaveButton({
       </Button>
     );
 
-  // If variant is 'save', wrap with visibility logic based on saved state
   if (variant === 'save') {
     return (
       <div
@@ -116,6 +120,5 @@ export default function SaveButton({
     );
   }
 
-  // For 'remove' variant, return button directly
   return button;
 }

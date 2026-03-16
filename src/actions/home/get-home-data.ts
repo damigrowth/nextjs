@@ -60,6 +60,7 @@ function transformServiceForComponent(
     media: service.media,
     profile: {
       id: service.profile.id,
+      uid: service.profile.uid,
       displayName: service.profile.displayName,
       username: service.profile.username,
       image: service.profile.image,
@@ -98,6 +99,7 @@ function transformProfileForComponent(profile: any): ArchiveProfileCardData {
 
   return {
     id: profile.id,
+    uid: profile.uid,
     username: profile.username,
     displayName: profile.displayName,
     tagline: profile.tagline,

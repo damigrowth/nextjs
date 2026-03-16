@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useTransition } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Share2,
@@ -26,71 +26,66 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { BreadcrumbButtonsProps } from '@/lib/types';
 import { useSession } from '@/lib/auth/client';
-import { getUserSavedState, toggleSave } from '@/actions/saved';
+import { toggleSave } from '@/actions/saved';
+import { useSavedState } from '@/lib/providers/saved-state-provider';
 
 export default function BreadcrumbButtons({
   subjectTitle,
   id,
   saveType,
+  ownerId,
 }: BreadcrumbButtonsProps) {
   const router = useRouter();
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
   const { data: session } = useSession();
-  const [isSaved, setIsSaved] = useState(false);
+  const { isSaved: checkSaved, updateSavedState } = useSavedState();
   const [isPending, startTransition] = useTransition();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
-  // Fetch saved state on mount if user is authenticated
+  const itemType = saveType as 'service' | 'profile' | undefined;
+
+  // Ownership: only resolve after session loads (session is null during SSR)
+  const isOwnItem =
+    !!ownerId && !!session?.user?.id && session.user.id === ownerId;
+
+  const isSaved = itemType && !isOwnItem ? checkSaved(itemType, id) : false;
+
+  // Track whether we can show the save button.
+  // Starts false (matches SSR), becomes true after mount + session check.
+  // This prevents hydration mismatch AND flash-then-hide.
+  const [showSave, setShowSave] = useState(false);
+
   useEffect(() => {
-    if (session?.user?.id && saveType) {
-      const fetchSavedState = async () => {
-        try {
-          const savedState = await getUserSavedState(session.user.id);
-
-          if (saveType === 'service') {
-            const serviceId = typeof id === 'string' ? parseInt(id) : id;
-            setIsSaved(savedState.serviceIds.has(serviceId));
-          } else if (saveType === 'profile') {
-            const profileId = String(id);
-            setIsSaved(savedState.profileIds.has(profileId));
-          }
-        } catch (error) {
-          console.error('Failed to fetch saved state:', error);
-        }
-      };
-
-      fetchSavedState();
+    // Only show after we have a definitive answer about ownership.
+    // session === null means anonymous (resolved), session === undefined means still loading.
+    // useSession returns { data: Session | null }, so once data is not undefined, session has resolved.
+    if (session !== undefined) {
+      setShowSave(!!saveType && !isOwnItem);
     }
-  }, [session?.user?.id, saveType, id]);
+  }, [saveType, isOwnItem, session]);
 
   const handleSaveToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!saveType) return;
+    if (!itemType) return;
 
-    // Check if user is authenticated
     if (!session?.user) {
       setShowAuthDialog(true);
       return;
     }
 
-    // Optimistic update
     const previousState = isSaved;
     const newState = !isSaved;
-    setIsSaved(newState);
+    updateSavedState(itemType, id, newState);
 
-    // Background server action
     startTransition(async () => {
-      const itemType = saveType === 'service' ? 'service' : 'profile';
       const result = await toggleSave(itemType, id);
 
       if (!result.success) {
-        // Revert on error
-        setIsSaved(previousState);
+        updateSavedState(itemType, id, previousState);
       } else if (result.data) {
-        // Update with actual server state
-        setIsSaved(result.data.isSaved);
+        updateSavedState(itemType, id, result.data.isSaved);
       }
     });
   };
@@ -217,8 +212,8 @@ export default function BreadcrumbButtons({
           </PopoverContent>
         </Popover>
 
-        {/* Save Button */}
-        {saveType && (
+        {/* Save Button — client-only render via showSave state to avoid hydration mismatch */}
+        {showSave && (
           <>
             <Separator orientation='vertical' className='h-6' />
             <Button

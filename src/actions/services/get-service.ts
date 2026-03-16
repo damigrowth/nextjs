@@ -102,6 +102,7 @@ export interface ServicePageData {
     subjectTitle: string;
     id: number;
     saveType: string;
+    ownerId: string;
   };
   // Transformed profile data for ServiceAbout component
   budgetData?: DatasetItem | null;
@@ -287,6 +288,7 @@ async function _getServicePageData(
       subjectTitle: service.title,
       id: service.id,
       saveType: 'service',
+      ownerId: service.profile.uid,
     };
 
     // Fetch related services and reviews in parallel

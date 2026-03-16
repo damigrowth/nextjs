@@ -14,14 +14,12 @@ import SaveButton from '@/components/shared/save-button';
 interface ArchiveProfileCardProps {
   profile: ArchiveProfileCardData;
   variant?: 'horizontal' | 'vertical';
-  isSaved?: boolean;
   className?: string;
 }
 
 export function ArchiveProfileCard({
   profile,
   variant = 'horizontal',
-  isSaved,
   className,
 }: ArchiveProfileCardProps) {
   // Format rate display
@@ -44,7 +42,7 @@ export function ArchiveProfileCard({
     >
       {/* Save Button - appears on hover */}
       <div className='absolute top-3 right-3 z-20'>
-        <SaveButton itemType='profile' itemId={profile.id} initialSaved={isSaved} />
+        <SaveButton itemType='profile' itemId={profile.id} ownerId={profile.uid} />
       </div>
 
       <div className={cn(

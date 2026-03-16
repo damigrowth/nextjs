@@ -35,6 +35,7 @@ export const SERVICE_ARCHIVE_SELECT = {
   profile: {
     select: {
       id: true,
+      uid: true,
       username: true,
       displayName: true,
       image: true,
@@ -140,6 +141,7 @@ export const HOME_SERVICE_SELECT = {
   profile: {
     select: {
       id: true,
+      uid: true,
       username: true,
       displayName: true,
       image: true,

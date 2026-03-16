@@ -304,6 +304,7 @@ export async function getProfilesByFilters(filters: ProfileFilters): Promise<
 
         return {
           id: profile.id,
+          uid: profile.uid,
           username: profile.username,
           displayName: profile.displayName,
           rating: profile.rating,

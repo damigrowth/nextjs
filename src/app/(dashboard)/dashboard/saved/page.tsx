@@ -122,7 +122,6 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
                   <ServiceCard
                     key={service.id}
                     service={service}
-                    isSaved={true}
                     showProfile={true}
                   />
                 ))}

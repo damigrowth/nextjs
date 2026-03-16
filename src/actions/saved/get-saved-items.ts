@@ -106,6 +106,7 @@ export async function getSavedItems(params?: {
         media: service.media,
         profile: {
           id: service.profile.id,
+          uid: service.profile.uid,
           displayName: service.profile.displayName,
           username: service.profile.username,
           image: service.profile.image,
@@ -144,6 +145,7 @@ export async function getSavedItems(params?: {
 
       return {
         id: profile.id,
+        uid: profile.uid,
         username: profile.username,
         displayName: profile.displayName,
         tagline: profile.tagline,

@@ -15,6 +15,7 @@
  */
 export const PROFILE_ARCHIVE_SELECT = {
   id: true,
+  uid: true,
   username: true,
   displayName: true,
   image: true,
@@ -45,6 +46,7 @@ export const PROFILE_ARCHIVE_SELECT = {
  */
 export const HOME_PROFILE_SELECT = {
   id: true,
+  uid: true,
   username: true,
   displayName: true,
   tagline: true,

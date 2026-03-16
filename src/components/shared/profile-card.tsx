@@ -9,7 +9,7 @@ import NextLink from './next-link';
 import ProfileBadges from './profile-badges';
 import RatingDisplay from './rating-display';
 
-export function ProfileCard({ profile, isSaved = false }: ProfileCardProps) {
+export function ProfileCard({ profile }: ProfileCardProps) {
   const {
     id,
     displayName,
@@ -28,7 +28,7 @@ export function ProfileCard({ profile, isSaved = false }: ProfileCardProps) {
     <div className='group relative bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:border-gray-300'>
       {/* Save Button - Show on hover or if saved */}
       <div className='absolute top-4 right-4 z-10'>
-        <SaveButton itemType='profile' itemId={id} initialSaved={isSaved} />
+        <SaveButton itemType='profile' itemId={id} />
       </div>
 
       {/* Avatar Section */}

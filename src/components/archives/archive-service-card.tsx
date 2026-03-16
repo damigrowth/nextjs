@@ -67,7 +67,7 @@ export function ArchiveServiceCard({
     >
       {/* Save Button - appears on hover */}
       <div className='absolute top-3 right-3 z-20'>
-        <SaveButton itemType='service' itemId={service.id} />
+        <SaveButton itemType='service' itemId={service.id} ownerId={service.profile.uid} />
       </div>
 
       <div className='flex flex-col md:flex-row h-full md:h-52'>

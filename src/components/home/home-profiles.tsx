@@ -14,12 +14,10 @@ import type { ArchiveProfileCardData } from '@/lib/types/components';
 
 interface ProfilesHomeProps {
   profiles: ArchiveProfileCardData[];
-  savedProfileIds?: string[];
 }
 
 export default function ProfilesHome({
   profiles,
-  savedProfileIds = [],
 }: ProfilesHomeProps) {
   return (
     <section className='py-8 sm:py-12 md:py-16 bg-dark overflow-hidden'>
@@ -67,7 +65,6 @@ export default function ProfilesHome({
                   <ArchiveProfileCard
                     profile={profile}
                     variant='vertical'
-                    isSaved={savedProfileIds.includes(profile.id)}
                   />
                 </CarouselItem>
               ))}

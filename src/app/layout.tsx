@@ -13,6 +13,7 @@ import {
 import { FooterWrapper } from '@/components/shared/layout';
 import { Body, Notifications } from '@/components/shared/layout/wrapper';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { SavedStateProvider } from '@/lib/providers/saved-state-provider';
 import NavigationSkeletonOverlay from '@/components/shared/navigation-skeleton-overlay';
 
 export const metadata: Metadata = {
@@ -38,6 +39,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       </head>
       <Body>
         {/* CookieFirst loads via Google Tag Manager - no React wrapper needed */}
+        <SavedStateProvider>
         <TooltipProvider delayDuration={0}>
             {/* Global navigation skeleton overlay */}
             <NavigationSkeletonOverlay />
@@ -103,6 +105,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             strategy='beforeInteractive'
           /> */}
           </TooltipProvider>
+        </SavedStateProvider>
       </Body>
     </html>
   );
