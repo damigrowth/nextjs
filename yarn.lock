@@ -1795,7 +1795,7 @@
   resolved "https://registry.yarnpkg.com/@tanstack/table-core/-/table-core-8.21.3.tgz#2977727d8fc8dfa079112d9f4d4c019110f1732c"
   integrity sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==
 
-"@tiptap/core@3.20.3", "@tiptap/core@^3.20.3":
+"@tiptap/core@^3.20.3":
   version "3.20.3"
   resolved "https://registry.yarnpkg.com/@tiptap/core/-/core-3.20.3.tgz#7b6cbdc3bf705713a602c61b2bce39a71a305bc6"
   integrity sha512-e8x74+d2ZbDbVdNqOb0IapcxDuFFOb56RRpYWpTcz9n0BtadTjt3km3J00Al/mmcvHpn9yV8CqARSAiDl+VkuQ==
@@ -1924,7 +1924,7 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extensions/-/extensions-3.20.3.tgz#d32b438d7de7fb120721ba884ebf7c39f11e4463"
   integrity sha512-SqKzXnTrKK/MPyBdzEiC/UazXMCilIQXCl6fuaGkXFOfbYIs9ly9bD2ucgghhBq+khIRY6joNQndqbGi0U0OCA==
 
-"@tiptap/pm@3.20.3", "@tiptap/pm@^3.20.3":
+"@tiptap/pm@^3.20.0", "@tiptap/pm@^3.20.3":
   version "3.20.3"
   resolved "https://registry.yarnpkg.com/@tiptap/pm/-/pm-3.20.3.tgz#20c4ce5d56c995b2217e79af5e2b61fc7e5b42b2"
   integrity sha512-wdt0z2KBAJcw1FxwqpT0G+hmm0pUCiRTbpzfwnzPUeDoy9RQFDJFGfK/j2d32A259w/TxA2T6MKt7eYoUoT4CA==
@@ -1948,7 +1948,7 @@
     prosemirror-transform "^1.10.2"
     prosemirror-view "^1.38.1"
 
-"@tiptap/react@3.20.3":
+"@tiptap/react@^3.20.0":
   version "3.20.3"
   resolved "https://registry.yarnpkg.com/@tiptap/react/-/react-3.20.3.tgz#6fa48beff7c49521022663d9067290ff0fa63b36"
   integrity sha512-UCHfK1g1DPR+H3diW713Q8g1srhDPwqA7r0B94x48CxMQ9DBLcF0Z7mcbWm7UIEhYyChEJAb2ILqVxMEl9fEqQ==
@@ -1960,7 +1960,7 @@
     "@tiptap/extension-bubble-menu" "^3.20.3"
     "@tiptap/extension-floating-menu" "^3.20.3"
 
-"@tiptap/starter-kit@3.20.3":
+"@tiptap/starter-kit@^3.20.0":
   version "3.20.3"
   resolved "https://registry.yarnpkg.com/@tiptap/starter-kit/-/starter-kit-3.20.3.tgz#faa81e38c26fe9eda1ee16a387a69e17d6357352"
   integrity sha512-Px5odXXgCKYjeYMXijOl3/PIFX8kl+PQXD7JMI/Z8e5el5UVZjcCFOa0OBEpgHt4mkvaF3x9m7rlARG3OBDBbg==
