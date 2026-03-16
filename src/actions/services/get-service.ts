@@ -306,6 +306,7 @@ async function _getServicePageData(
         profile: {
           select: {
             id: true,
+            uid: true,
             username: true,
             displayName: true,
             image: true,
@@ -356,6 +357,7 @@ async function _getServicePageData(
           type: relatedService.type,
           profile: {
             id: relatedService.profile.id,
+            uid: relatedService.profile.uid,
             displayName: relatedService.profile.displayName,
             username: relatedService.profile.username,
             image: relatedService.profile.image,
@@ -384,6 +386,7 @@ async function _getServicePageData(
           profile: {
             select: {
               id: true,
+              uid: true,
               username: true,
               displayName: true,
               image: true,
@@ -416,6 +419,7 @@ async function _getServicePageData(
           type: s.type,
           profile: {
             id: s.profile.id,
+            uid: s.profile.uid,
             displayName: s.profile.displayName,
             username: s.profile.username,
             image: s.profile.image,
