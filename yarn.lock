@@ -1795,7 +1795,7 @@
   resolved "https://registry.yarnpkg.com/@tanstack/table-core/-/table-core-8.21.3.tgz#2977727d8fc8dfa079112d9f4d4c019110f1732c"
   integrity sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==
 
-"@tiptap/core@^3.20.3":
+"@tiptap/core@^3.20.0", "@tiptap/core@^3.20.3":
   version "3.20.3"
   resolved "https://registry.yarnpkg.com/@tiptap/core/-/core-3.20.3.tgz#7b6cbdc3bf705713a602c61b2bce39a71a305bc6"
   integrity sha512-e8x74+d2ZbDbVdNqOb0IapcxDuFFOb56RRpYWpTcz9n0BtadTjt3km3J00Al/mmcvHpn9yV8CqARSAiDl+VkuQ==
