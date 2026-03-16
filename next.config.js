@@ -4,9 +4,6 @@ const nextConfig = {
   // TODO: Re-enable after implementing useRef pattern for channel persistence
   reactStrictMode: false,
 
-  // Transpile tiptap ESM packages for webpack compatibility on Vercel
-  transpilePackages: ['@tiptap/react', '@tiptap/starter-kit', '@tiptap/core', '@tiptap/pm'],
-
   // Performance optimizations
   poweredByHeader: false, // Remove X-Powered-By header for security
   generateEtags: true, // Enable ETags for better caching
