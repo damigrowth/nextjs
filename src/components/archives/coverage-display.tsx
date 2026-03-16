@@ -71,7 +71,7 @@ export function CoverageDisplay({
 
       return (
         <>
-          Εξυπηρετεί:{' '}
+          Εξυπηρετεί: περιοχές{' '}
           {visibleCounties.map((item, index) => (
             <React.Fragment key={item.county}>
               {index > 0 && ', '}
