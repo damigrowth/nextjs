@@ -12,6 +12,7 @@ export type ServiceWithProfile = Prisma.ServiceGetPayload<{
     profile: {
       select: {
         id: true;
+        uid: true;
         username: true;
         displayName: true;
         firstName: true;
