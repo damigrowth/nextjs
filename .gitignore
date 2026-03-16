@@ -34,6 +34,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 todos.js
+yarn.lock
 src/lib/models/entries.js
 
 # Strapi directory
