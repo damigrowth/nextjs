@@ -140,6 +140,7 @@ function transformProfileService(service: any): ServiceCardData {
     media: service.media,
     profile: {
       id: service.pid,
+      uid: service.profile.uid,
       displayName: service.profile.displayName,
       username: service.profile.username,
       image: service.profile.image,
@@ -342,6 +343,7 @@ async function _getProfilePageData(
           profile: {
             select: {
               id: true,
+              uid: true,
               username: true,
               displayName: true,
               image: true,
