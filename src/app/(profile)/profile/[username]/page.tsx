@@ -139,7 +139,7 @@ export default async function ProfilePage({
       {/* Breadcrumb Navigation */}
       <DynamicBreadcrumb
         segments={breadcrumbSegments}
-        buttons={breadcrumbButtons}
+        buttons={{ ...breadcrumbButtons, isOwner: currentUserId === profile.uid }}
       />
       {/* Profile Content */}
       <section className='pt-4 pb-20 bg-white'>

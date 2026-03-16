@@ -245,7 +245,7 @@ export interface BreadcrumbButtonsProps {
   subjectTitle: string;
   id: string | number;
   saveType?: string;
-  ownerId?: string;
+  isOwner?: boolean;
 }
 
 export type ProfileBreadcrumbProfileData = {

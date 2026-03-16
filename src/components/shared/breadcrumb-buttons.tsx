@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useTransition } from 'react';
+import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Share2,
@@ -33,7 +33,7 @@ export default function BreadcrumbButtons({
   subjectTitle,
   id,
   saveType,
-  ownerId,
+  isOwner = false,
 }: BreadcrumbButtonsProps) {
   const router = useRouter();
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
@@ -43,26 +43,7 @@ export default function BreadcrumbButtons({
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   const itemType = saveType as 'service' | 'profile' | undefined;
-
-  // Ownership: only resolve after session loads (session is null during SSR)
-  const isOwnItem =
-    !!ownerId && !!session?.user?.id && session.user.id === ownerId;
-
-  const isSaved = itemType && !isOwnItem ? checkSaved(itemType, id) : false;
-
-  // Track whether we can show the save button.
-  // Starts false (matches SSR), becomes true after mount + session check.
-  // This prevents hydration mismatch AND flash-then-hide.
-  const [showSave, setShowSave] = useState(false);
-
-  useEffect(() => {
-    // Only show after we have a definitive answer about ownership.
-    // session === null means anonymous (resolved), session === undefined means still loading.
-    // useSession returns { data: Session | null }, so once data is not undefined, session has resolved.
-    if (session !== undefined) {
-      setShowSave(!!saveType && !isOwnItem);
-    }
-  }, [saveType, isOwnItem, session]);
+  const isSaved = itemType && !isOwner ? checkSaved(itemType, id) : false;
 
   const handleSaveToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -212,8 +193,8 @@ export default function BreadcrumbButtons({
           </PopoverContent>
         </Popover>
 
-        {/* Save Button — client-only render via showSave state to avoid hydration mismatch */}
-        {showSave && (
+        {/* Save Button — hidden for owners (server-computed, no hydration issue) */}
+        {saveType && !isOwner && (
           <>
             <Separator orientation='vertical' className='h-6' />
             <Button

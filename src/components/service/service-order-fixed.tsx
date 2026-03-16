@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { useSession } from '@/lib/auth/client';
 import ServiceAddons from './service-addons';
 // import ServiceCalculatedPrice from './service-calculated-price';
 import ServiceBuy from './service-buy';
@@ -11,6 +10,7 @@ interface ServiceOrderFixedProps {
   price: number;
   addons: PrismaJson.ServiceAddon[];
   compact?: boolean;
+  isOwner: boolean;
   profileUserId: string;
   profileDisplayName: string;
   serviceTitle: string;
@@ -20,12 +20,14 @@ export default function ServiceOrderFixed({
   price,
   addons,
   compact = false,
+  isOwner,
   profileUserId,
   profileDisplayName,
   serviceTitle,
 }: ServiceOrderFixedProps) {
-  const { data: session } = useSession();
-  const isOwner = session?.user?.id === profileUserId;
+  // Owner with no addons = nothing to show
+  if (isOwner && addons.length === 0) return null;
+
   return (
     <Card className='mb-6'>
       <CardContent className='p-6 flex flex-col'>

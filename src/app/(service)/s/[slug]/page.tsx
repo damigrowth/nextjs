@@ -158,7 +158,7 @@ export default async function ServicePage({
       {/* Breadcrumb Navigation */}
       <DynamicBreadcrumb
         segments={breadcrumbSegments}
-        buttons={breadcrumbButtons}
+        buttons={{ ...breadcrumbButtons, isOwner: currentUserId === service.profile.uid }}
         className='bg-silver'
       />
 
@@ -220,6 +220,7 @@ export default async function ServicePage({
                 price={service.price || 0}
                 addons={service.addons || []}
                 compact={false}
+                isOwner={currentUserId === service.profile.uid}
                 profileUserId={service.profile.uid}
                 profileDisplayName={service.profile.displayName || ''}
                 serviceTitle={service.title}
@@ -268,6 +269,7 @@ export default async function ServicePage({
                 price={service.price || 0}
                 addons={service.addons || []}
                 compact={true}
+                isOwner={currentUserId === service.profile.uid}
                 profileUserId={service.profile.uid}
                 profileDisplayName={service.profile.displayName || ''}
                 serviceTitle={service.title}
