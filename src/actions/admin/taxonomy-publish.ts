@@ -29,6 +29,8 @@ import {
 import type { DatasetItem } from '@/lib/types/datasets';
 import { sanitizeDrafts, mergeDraftOperations } from '@/lib/validations/taxonomy-drafts';
 import { isSuccess } from '@/lib/types/server-actions';
+import { prisma } from '@/lib/prisma/client';
+import { revalidateTag } from 'next/cache';
 
 /**
  * Collect all existing IDs from taxonomy tree (for collision detection)
@@ -177,6 +179,13 @@ function moveAndUpdateItem(
   newParentId: string,
   level?: string | null
 ): DatasetItem[] {
+  // SAFETY: level must be set for move operations
+  if (!level || (level !== 'subcategory' && level !== 'subdivision')) {
+    throw new Error(
+      `Move operation requires a valid level ("subcategory" or "subdivision"), got: "${level}"`
+    );
+  }
+
   // Find existing item to preserve children
   const existingItem = findItemInTree(data, itemId);
   if (!existingItem) {
@@ -344,6 +353,54 @@ function createOverallCommitMessage(
 }
 
 /**
+ * After a subdivision move, update all services in the database
+ * that reference the moved item so their subcategory points to the new parent.
+ *
+ * For subcategory moves, update the category field on affected services.
+ */
+async function syncServicesAfterMove(
+  drafts: TaxonomyDraft[]
+): Promise<void> {
+  for (const draft of drafts) {
+    if (!isUpdateDraft(draft) || !draft.newParentId || !draft.level) continue;
+
+    if (draft.level === 'subdivision') {
+      // Subdivision moved to a new subcategory
+      // Update all services that reference this subdivision
+      const result = await prisma.service.updateMany({
+        where: { subdivision: draft.itemId },
+        data: { subcategory: draft.newParentId },
+      });
+
+      if (result.count > 0) {
+        console.log(
+          `[PUBLISH] Updated ${result.count} services: subdivision "${draft.itemId}" → new subcategory "${draft.newParentId}"`
+        );
+        revalidateTag('services:all');
+        revalidateTag('archive:all');
+        revalidateTag('taxonomy-paths');
+      }
+    } else if (draft.level === 'subcategory') {
+      // Subcategory moved to a new category
+      // Update all services that reference this subcategory
+      const result = await prisma.service.updateMany({
+        where: { subcategory: draft.itemId },
+        data: { category: draft.newParentId },
+      });
+
+      if (result.count > 0) {
+        console.log(
+          `[PUBLISH] Updated ${result.count} services: subcategory "${draft.itemId}" → new category "${draft.newParentId}"`
+        );
+        revalidateTag('services:all');
+        revalidateTag('archive:all');
+        revalidateTag('taxonomy-paths');
+      }
+    }
+  }
+}
+
+/**
  * Publish all pending changes from localStorage
  *
  * Process:
@@ -353,6 +410,7 @@ function createOverallCommitMessage(
  * 4. For each type: apply drafts and commit
  * 5. Create/update PR
  * 6. Auto-merge PR
+ * 7. Sync database services for any move operations
  *
  * @param draftsRaw - All drafts from localStorage (sent by client)
  */
@@ -450,6 +508,9 @@ export async function publishAllChanges(
     }
 
     console.log('[PUBLISH] Successfully published single commit:', commitResult.commitSha);
+
+    // Sync database services for any move operations
+    await syncServicesAfterMove(optimizedDrafts);
 
     return {
       success: true,

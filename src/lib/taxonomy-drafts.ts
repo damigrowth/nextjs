@@ -228,6 +228,17 @@ export function applyDraftsToData(
 
       case 'update':
         if (draft.newParentId) {
+          // Validate level is set for move operations
+          if (
+            !draft.level ||
+            (draft.level !== 'subcategory' && draft.level !== 'subdivision')
+          ) {
+            console.error(
+              `[TAXONOMY_DRAFTS] Move operation missing valid level: "${draft.level}", falling back to in-place update`
+            );
+            data = updateItemRecursively(data, draft.itemId!, draft.data);
+            break;
+          }
           // Move operation: remove from old parent, update, insert into new parent
           const existingItem = findItemInTree(data, draft.itemId!);
           if (existingItem) {
