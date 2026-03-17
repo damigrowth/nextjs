@@ -61,8 +61,8 @@ export default function FeaturedStarButton({
         setIsFeatured(result.data.featured);
         toast.success(
           result.data.featured
-            ? 'Η υπηρεσία προβλήθηκε επιτυχώς'
-            : 'Η προβολή της υπηρεσίας διακόπηκε',
+            ? 'Η υπηρεσία έγινε προωθημένη'
+            : 'Η προώθηση ακυρώθηκε',
         );
         router.refresh();
       } else {
@@ -86,7 +86,7 @@ export default function FeaturedStarButton({
       )}
       onClick={handleToggle}
       disabled={isPending}
-      title={isFeatured ? 'Διακοπή προβολής' : 'Προβολή υπηρεσίας'}
+      title={isFeatured ? 'Ακύρωση προώθησης' : 'Προώθηση υπηρεσίας'}
     >
       <Star
         className={cn('w-4 h-4', isFeatured && 'fill-current')}
