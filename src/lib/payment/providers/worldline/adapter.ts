@@ -71,7 +71,7 @@ export class WorldlineAdapter implements PaymentProvider {
         lang: 'el',
         deviceCategory: '0',
         orderid: orderId,
-        orderDesc: `Doulitsa ${params.plan} - ${params.billingInterval === 'year' ? 'Ετήσια' : 'Μηνιαία'} Συνδρομή - Δυνατότητα ακύρωσης οποιαδήποτε στιγμή`,
+        orderDesc: `Doulitsa ${params.plan} - ${params.billingInterval === 'year' ? 'Ετήσια' : 'Μηνιαία'} Συνδρομή Προώθησης - Δυνατότητα ακύρωσης οποιαδήποτε στιγμή`,
         orderAmount: amount,
         currency: 'EUR',
         payerEmail: params.billing?.email || '',
