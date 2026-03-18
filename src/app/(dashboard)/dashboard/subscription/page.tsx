@@ -1,10 +1,12 @@
 import { redirect } from 'next/navigation';
-import { requireProUser } from '@/actions/auth/server';
+import { requireProUser, getCurrentUser } from '@/actions/auth/server';
 import { getSubscription } from '@/actions/subscription';
 import { getDashboardMetadata } from '@/lib/seo/pages';
 import { canAccessPayments, getTestModeBanner } from '@/lib/payment/test-mode';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
+import { BillingForm } from '@/components';
+import { SubscriptionStatus } from '@prisma/client';
 import SubscriptionManagement from './subscription-management';
 
 export const metadata = getDashboardMetadata('Συνδρομή');
@@ -23,6 +25,12 @@ export default async function SubscriptionPage() {
   }
 
   const testModeBanner = await getTestModeBanner();
+
+  const userResult = await getCurrentUser();
+  const user = userResult.success ? userResult.data?.user : null;
+  const profile = userResult.success ? userResult.data?.profile : null;
+
+  const isActive = subscription?.status === SubscriptionStatus.active;
 
   return (
     <div className='max-w-5xl w-full mx-auto space-y-6'>
@@ -43,6 +51,18 @@ export default async function SubscriptionPage() {
       </div>
 
       <SubscriptionManagement subscription={subscription || null} />
+
+      {isActive && user && (
+        <div className='space-y-4'>
+          <div>
+            <h2 className='text-xl font-semibold'>Στοιχεία Τιμολόγησης</h2>
+            <p className='text-muted-foreground'>
+              Διαχειριστείτε τα στοιχεία τιμολόγησης και πληρωμών
+            </p>
+          </div>
+          <BillingForm initialUser={user} initialProfile={profile} />
+        </div>
+      )}
     </div>
   );
 }
