@@ -30,7 +30,7 @@ import type { DatasetItem } from '@/lib/types/datasets';
 import { sanitizeDrafts, mergeDraftOperations } from '@/lib/validations/taxonomy-drafts';
 import { isSuccess } from '@/lib/types/server-actions';
 import { prisma } from '@/lib/prisma/client';
-import { revalidateTag } from 'next/cache';
+import { revalidateAllCaches } from './revalidate-caches';
 
 /**
  * Collect all existing IDs from taxonomy tree (for collision detection)
@@ -376,9 +376,7 @@ async function syncServicesAfterMove(
         console.log(
           `[PUBLISH] Updated ${result.count} services: subdivision "${draft.itemId}" → new subcategory "${draft.newParentId}"`
         );
-        revalidateTag('services:all');
-        revalidateTag('archive:all');
-        revalidateTag('taxonomy-paths');
+        await revalidateAllCaches();
       }
     } else if (draft.level === 'subcategory') {
       // Subcategory moved to a new category
@@ -392,9 +390,7 @@ async function syncServicesAfterMove(
         console.log(
           `[PUBLISH] Updated ${result.count} services: subcategory "${draft.itemId}" → new category "${draft.newParentId}"`
         );
-        revalidateTag('services:all');
-        revalidateTag('archive:all');
-        revalidateTag('taxonomy-paths');
+        await revalidateAllCaches();
       }
     }
   }
