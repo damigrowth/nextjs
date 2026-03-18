@@ -60,13 +60,24 @@ export async function revalidateTaxonomyCaches(): Promise<{
     revalidateTag(CACHE_TAGS.home);
     revalidated.push(`tag:${CACHE_TAGS.home}`);
 
-    // 4. Revalidate key public paths
-    const paths = ['/categories', '/ipiresies', '/'];
-
-    for (const path of paths) {
+    // 4. Revalidate key public paths (use dynamic segment pattern to cover all instances)
+    const staticPaths = ['/'];
+    for (const path of staticPaths) {
       revalidatePath(path);
       revalidated.push(`path:${path}`);
     }
+
+    revalidatePath('/categories', 'page');
+    revalidated.push('path:/categories');
+    revalidatePath('/categories/[category]', 'page');
+    revalidated.push('path:/categories/[category]');
+
+    revalidatePath('/ipiresies', 'page');
+    revalidated.push('path:/ipiresies');
+    revalidatePath('/ipiresies/[subcategory]', 'page');
+    revalidated.push('path:/ipiresies/[subcategory]');
+    revalidatePath('/ipiresies/[subcategory]/[subdivision]', 'page');
+    revalidated.push('path:/ipiresies/[subcategory]/[subdivision]');
 
     // Log for monitoring
     logCacheRevalidation('service', 'taxonomies', 'admin taxonomy refresh');
