@@ -102,17 +102,27 @@ export async function revalidateAllCaches(): Promise<{
     revalidatePath('/');
     revalidated.push('path:/');
 
-    // 'layout' type cascades to all nested pages (e.g. /categories/[category])
-    revalidatePath('/categories', 'layout');
-    revalidated.push('path:/categories (layout)');
+    // Invalidate dynamic route patterns (covers all instances of [param])
+    revalidatePath('/categories/[category]', 'page');
+    revalidated.push('path:/categories/[category]');
 
-    // Invalidate all sub-routes under /ipiresies (e.g. /ipiresies/aisthitiki)
-    revalidatePath('/ipiresies', 'layout');
-    revalidated.push('path:/ipiresies (layout)');
+    revalidatePath('/ipiresies', 'page');
+    revalidated.push('path:/ipiresies');
 
-    // Invalidate all sub-routes under /dir (e.g. /dir/[category]/[subcategory])
-    revalidatePath('/dir', 'layout');
-    revalidated.push('path:/dir (layout)');
+    revalidatePath('/ipiresies/[subcategory]', 'page');
+    revalidated.push('path:/ipiresies/[subcategory]');
+
+    revalidatePath('/ipiresies/[subcategory]/[subdivision]', 'page');
+    revalidated.push('path:/ipiresies/[subcategory]/[subdivision]');
+
+    revalidatePath('/dir', 'page');
+    revalidated.push('path:/dir');
+
+    revalidatePath('/dir/[category]', 'page');
+    revalidated.push('path:/dir/[category]');
+
+    revalidatePath('/dir/[category]/[subcategory]', 'page');
+    revalidated.push('path:/dir/[category]/[subcategory]');
 
     revalidatePath('/directory');
     revalidated.push('path:/directory');
