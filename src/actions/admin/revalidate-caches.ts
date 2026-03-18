@@ -99,18 +99,23 @@ export async function revalidateAllCaches(): Promise<{
     // ============================================
     // 8. KEY PUBLIC PATHS
     // ============================================
-    const paths = [
-      '/',
-      '/categories',
-      '/ipiresies',
-      '/companies',
-      '/pros',
-    ];
+    revalidatePath('/');
+    revalidated.push('path:/');
 
-    for (const path of paths) {
-      revalidatePath(path);
-      revalidated.push(`path:${path}`);
-    }
+    // 'layout' type cascades to all nested pages (e.g. /categories/[category])
+    revalidatePath('/categories', 'layout');
+    revalidated.push('path:/categories (layout)');
+
+    // Invalidate all sub-routes under /ipiresies (e.g. /ipiresies/aisthitiki)
+    revalidatePath('/ipiresies', 'layout');
+    revalidated.push('path:/ipiresies (layout)');
+
+    // Invalidate all sub-routes under /dir (e.g. /dir/[category]/[subcategory])
+    revalidatePath('/dir', 'layout');
+    revalidated.push('path:/dir (layout)');
+
+    revalidatePath('/directory');
+    revalidated.push('path:/directory');
 
     console.log(
       '[REVALIDATE_ALL] Successfully revalidated all caches:',
