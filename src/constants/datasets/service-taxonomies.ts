@@ -1,4 +1,4 @@
-// Generated on 2026-03-19T16:41:51.999Z
+// Generated on 2026-03-19T17:11:33.240Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -255,7 +255,7 @@ export const serviceTaxonomies = [
             label: 'UGC Video',
             slug: 'ugc-video',
             description:
-              'Ανακάλυψε πώς να ενισχύσεις την παρουσία σου στα social media με στρατηγικές που αποδίδουν.',
+              'Δημιουργία μοναδικού περιεχομένου βίντεο UGC από πραγματικούς χρήστες που θα δοκιμάσουν τα προϊόντα σου.',
             image: {
               public_id: '267_a22f361b2f',
               secure_url:
