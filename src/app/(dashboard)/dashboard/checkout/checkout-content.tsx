@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Check, ChevronDown, Loader2, Lock } from 'lucide-react';
+import { Check, ChevronDown, Loader2, Lock, Tag, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -13,7 +14,8 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { SUBSCRIPTION_PLANS } from '@/lib/payment/pricing';
-import { createCheckoutSession } from '@/actions/subscription';
+import type { DiscountedPricing } from '@/lib/payment/coupons';
+import { createCheckoutSession, validateCoupon } from '@/actions/subscription';
 import { updateProfileBilling } from '@/actions/profiles/billing';
 import { toast } from 'sonner';
 import { BillingForm } from '@/components';
@@ -46,8 +48,47 @@ export default function CheckoutContent({
   );
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [checkoutErrors, setCheckoutErrors] = useState<string[]>([]);
+  const [couponInput, setCouponInput] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponState, setCouponState] = useState<{
+    status: 'idle' | 'valid' | 'error';
+    code?: string;
+    percentOff?: number;
+    pricing?: DiscountedPricing;
+    message?: string;
+  }>({ status: 'idle' });
 
   const plan = SUBSCRIPTION_PLANS.promoted;
+
+  const hasCoupon = couponState.status === 'valid' && interval === BillingInterval.year;
+
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) return;
+    setCouponLoading(true);
+    const result = await validateCoupon({
+      code: couponInput.trim(),
+      billingInterval: interval,
+    });
+    setCouponLoading(false);
+
+    if (result.success) {
+      setCouponState({
+        status: 'valid',
+        code: result.data.code,
+        percentOff: result.data.percentOff,
+        pricing: result.data.pricing,
+      });
+      // Auto-switch to annual (coupon only applies to annual)
+      setInterval(BillingInterval.year);
+    } else {
+      setCouponState({ status: 'error', message: result.error });
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponState({ status: 'idle' });
+    setCouponInput('');
+  };
 
   const handleCheckout = () => {
     const errors: string[] = [];
@@ -89,10 +130,11 @@ export default function CheckoutContent({
         }
       }
 
-      // Provider-agnostic checkout - only needs billing interval
+      // Provider-agnostic checkout
       // Plan defaults to 'promoted' in the action
       const result = await createCheckoutSession({
         billingInterval: interval,
+        couponCode: couponState.status === 'valid' ? couponState.code : undefined,
       });
 
       if (result.success && result.data?.url) {
@@ -1199,18 +1241,91 @@ export default function CheckoutContent({
             <Separator />
 
             <div className='space-y-1 text-sm text-muted-foreground'>
+              {hasCoupon && couponState.pricing && (
+                <div className='flex justify-between text-green-600 font-medium'>
+                  <span>Επιπλέον ΕΚΠΤΩΣΗ {couponState.percentOff}%</span>
+                  <span>-{couponState.pricing.discountAmount.toFixed(2).replace('.', ',')}€</span>
+                </div>
+              )}
               <div className='flex justify-between'>
                 <span>Καθαρό ποσό</span>
-                <span>{interval === BillingInterval.year ? '180,00€' : '20,00€'}</span>
+                <span>
+                  {hasCoupon && couponState.pricing
+                    ? `${couponState.pricing.netAmount.toFixed(2).replace('.', ',')}€`
+                    : interval === BillingInterval.year ? '180,00€' : '20,00€'}
+                </span>
               </div>
               <div className='flex justify-between'>
                 <span>ΦΠΑ</span>
-                <span>{interval === BillingInterval.year ? '43,20€' : '4,80€'}</span>
+                <span>
+                  {hasCoupon && couponState.pricing
+                    ? `${couponState.pricing.vatAmount.toFixed(2).replace('.', ',')}€`
+                    : interval === BillingInterval.year ? '43,20€' : '4,80€'}
+                </span>
               </div>
               <div className='flex justify-between font-medium text-foreground'>
                 <span>Συνολικό ποσό</span>
-                <span>{interval === BillingInterval.year ? '223,20€' : '24,80€'}</span>
+                <span>
+                  {hasCoupon && couponState.pricing
+                    ? `${couponState.pricing.grossAmount.toFixed(2).replace('.', ',')}€`
+                    : interval === BillingInterval.year ? '223,20€' : '24,80€'}
+                </span>
               </div>
+            </div>
+
+            {/* Coupon Input */}
+            <div className='space-y-2'>
+              {couponState.status === 'valid' ? (
+                <div className='flex items-center justify-between rounded-md border border-green-200 bg-green-50 px-3 py-2'>
+                  <div className='flex items-center gap-2 text-sm text-green-700'>
+                    <Tag className='size-4' />
+                    <span className='font-medium'>{couponState.code}</span>
+                    <span>(-{couponState.percentOff}%)</span>
+                  </div>
+                  <button
+                    type='button'
+                    onClick={handleRemoveCoupon}
+                    className='text-green-600 hover:text-green-800'
+                  >
+                    <X className='size-4' />
+                  </button>
+                </div>
+              ) : (
+                <div className='flex gap-2'>
+                  <Input
+                    placeholder='Κωδικός κουπονιού'
+                    value={couponInput}
+                    onChange={(e) => {
+                      setCouponInput(e.target.value);
+                      if (couponState.status === 'error') {
+                        setCouponState({ status: 'idle' });
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleApplyCoupon();
+                      }
+                    }}
+                    className='flex-1'
+                  />
+                  <Button
+                    variant='outline'
+                    size='default'
+                    onClick={handleApplyCoupon}
+                    disabled={couponLoading || !couponInput.trim()}
+                  >
+                    {couponLoading ? (
+                      <Loader2 className='size-4 animate-spin' />
+                    ) : (
+                      'Εφαρμογή'
+                    )}
+                  </Button>
+                </div>
+              )}
+              {couponState.status === 'error' && couponState.message && (
+                <p className='text-xs text-red-600'>{couponState.message}</p>
+              )}
             </div>
 
             {/* Checkout Button */}
@@ -1228,7 +1343,9 @@ export default function CheckoutContent({
               ) : (
                 <>
                   <Lock className='size-4 mr-2 text-white' />
-                  Πληρωμή {interval === BillingInterval.year ? '223,20€/έτος' : '24,80€/μήνα'}
+                  Πληρωμή {hasCoupon && couponState.pricing
+                    ? `${couponState.pricing.grossAmount.toFixed(2).replace('.', ',')}€/έτος`
+                    : interval === BillingInterval.year ? '223,20€/έτος' : '24,80€/μήνα'}
                 </>
               )}
             </Button>

@@ -7,6 +7,7 @@ import type {
 import { ProviderNotConfiguredError, ProviderOperationError } from '../../types';
 import { getWorldlineConfig } from '../../worldline-config';
 import { getPlanAmount } from '../../pricing';
+import { findCoupon, calculateDiscountedPricing } from '../../coupons';
 import { calculateRequestDigest } from './digest';
 import { cancelRecurring } from './xml';
 
@@ -55,7 +56,17 @@ export class WorldlineAdapter implements PaymentProvider {
       const safeProfileId = params.profileId.replace(/[^a-zA-Z0-9]/g, '');
       const orderId = `DOL${safeProfileId}${timestamp}`.slice(0, 50);
 
-      const amount = getPlanAmount(params.plan, params.billingInterval);
+      // Apply coupon discount if provided
+      let amount = getPlanAmount(params.plan, params.billingInterval);
+      if (params.couponCode) {
+        const coupon = findCoupon(params.couponCode);
+        if (coupon) {
+          const discounted = calculateDiscountedPricing(coupon, params.plan, params.billingInterval);
+          if (discounted) {
+            amount = discounted.grossAmount.toFixed(2);
+          }
+        }
+      }
 
       // Recurring end date: max allowed by Cardlink is 1825 days (~5 years)
       const endDate = new Date();
@@ -89,6 +100,7 @@ export class WorldlineAdapter implements PaymentProvider {
         var1: params.profileId,
         var2: params.plan,
         var3: params.billingInterval,
+        var4: params.couponCode || '',
       };
 
       // Digest calculated from fixed 46-field order (handles field positioning)
