@@ -1,4 +1,4 @@
-// Generated on 2026-03-14T20:08:19.381Z
+// Generated on 2026-03-19T16:41:51.999Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -248,6 +248,25 @@ export const serviceTaxonomies = [
               bytes: 59546,
               url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168114/97_eefe62f42a.webp',
               original_filename: '97.webp',
+            },
+          },
+          {
+            id: 'Q8VeiC',
+            label: 'UGC Video',
+            slug: 'ugc-video',
+            description:
+              'Ανακάλυψε πώς να ενισχύσεις την παρουσία σου στα social media με στρατηγικές που αποδίδουν.',
+            image: {
+              public_id: '267_a22f361b2f',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/267_a22f361b2f.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 112077,
+              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/267_a22f361b2f.webp',
+              original_filename: '267.webp',
             },
           },
         ],
@@ -4480,25 +4499,6 @@ export const serviceTaxonomies = [
               bytes: 72622,
               url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/266_fa1bd31031.webp',
               original_filename: '266.webp',
-            },
-          },
-          {
-            id: 'Q8VeiC',
-            label: 'Social Media',
-            slug: 'social-media',
-            description:
-              'Ανακάλυψε πώς να ενισχύσεις την παρουσία σου στα social media με στρατηγικές που αποδίδουν.',
-            image: {
-              public_id: '267_a22f361b2f',
-              secure_url:
-                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/267_a22f361b2f.webp',
-              width: 1792,
-              height: 1024,
-              resource_type: 'image',
-              format: 'webp',
-              bytes: 112077,
-              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/267_a22f361b2f.webp',
-              original_filename: '267.webp',
             },
           },
           {
