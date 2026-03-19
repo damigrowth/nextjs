@@ -1,23 +1,23 @@
 'use client';
 
-import React, { useEffect, useActionState, useTransition } from 'react';
+import React, { useEffect, useActionState, useTransition, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
 // Shadcn UI components
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 // Icons
@@ -29,6 +29,7 @@ import { billingSchema, type BillingInput } from '@/lib/validations/profile';
 // Import server actions
 import { updateProfileBilling } from '@/actions/profiles/billing';
 import { updateProfileBillingAdmin } from '@/actions/admin/profiles/billing';
+import { lookupAfm } from '@/actions/profiles/lookup-afm';
 
 // Utility for form data population
 import { populateFormData, parseJSONValue } from '@/lib/utils/form';
@@ -61,7 +62,6 @@ interface BillingFormProps {
 }
 
 export default function BillingForm({
-  initialUser,
   initialProfile,
   adminMode = false,
   hideCard = false,
@@ -76,9 +76,12 @@ export default function BillingForm({
   const [state, action, isPending] = useActionState(actionToUse, initialState);
   const [, startTransition] = useTransition();
 
-  // Track if user has made any actual changes
-  const [hasUserInteracted, setHasUserInteracted] = React.useState(false);
   const router = useRouter();
+
+  // AFM lookup state
+  const [afmLookupLoading, setAfmLookupLoading] = React.useState(false);
+  const [afmLookupSuccess, setAfmLookupSuccess] = React.useState(false);
+  const lastLookedUpAfm = useRef<string>('');
 
   // Extract data from props
   const profile = initialProfile;
@@ -120,10 +123,46 @@ export default function BillingForm({
       };
 
       form.reset(billingData);
-      // User has existing billing data, so they can submit
-      setHasUserInteracted(true);
+      // If existing invoice data has afm + other fields, show as already populated
+      if (billingData.invoice && billingData.afm && billingData.name) {
+        lastLookedUpAfm.current = billingData.afm;
+        setAfmLookupSuccess(true);
+      }
     }
   }, [profile, form]);
+
+  // Trigger AADE lookup when AFM reaches 9 digits
+  async function handleAfmLookup(afm: string) {
+    if (afm.length !== 9 || afm === lastLookedUpAfm.current) return;
+    lastLookedUpAfm.current = afm;
+    setAfmLookupLoading(true);
+    setAfmLookupSuccess(false);
+
+    try {
+      const result = await lookupAfm(afm);
+
+      if (result.success) {
+        const { onomasia, doy_descr, firm_act_descr, postal_address, postal_address_no, postal_zip_code, postal_area_description } = result.data;
+        const addressParts = [postal_address, postal_address_no, postal_zip_code, postal_area_description].filter(Boolean);
+        form.setValue('name', onomasia, { shouldDirty: true, shouldValidate: true });
+        form.setValue('doy', doy_descr, { shouldDirty: true, shouldValidate: true });
+        form.setValue('profession', firm_act_descr, { shouldDirty: true, shouldValidate: true });
+        form.setValue('address', addressParts.join(', '), { shouldDirty: true, shouldValidate: true });
+        setAfmLookupSuccess(true);
+      } else {
+        toast.error(result.error || 'ΑΦΜ δεν βρέθηκε');
+        form.setValue('name', '', { shouldDirty: true });
+        form.setValue('doy', '', { shouldDirty: true });
+        form.setValue('profession', '', { shouldDirty: true });
+        form.setValue('address', '', { shouldDirty: true });
+      }
+    } catch (error) {
+      console.error('AFM lookup error:', error);
+      toast.error('Αδύνατη η επικοινωνία με AADE');
+    } finally {
+      setAfmLookupLoading(false);
+    }
+  }
 
   // Handle successful form submission
   useEffect(() => {
@@ -140,8 +179,7 @@ export default function BillingForm({
   }, [state, router]);
 
   const {
-    handleSubmit,
-    formState: { errors, isValid, isDirty },
+    formState: { isValid, isDirty },
     watch,
     getValues,
   } = form;
@@ -153,6 +191,7 @@ export default function BillingForm({
 
   // Watch all form fields for checkout integration
   const watchedAfm = watch('afm');
+
   const watchedName = watch('name');
   const watchedAddress = watch('address');
   const watchedDoy = watch('doy');
@@ -228,7 +267,6 @@ export default function BillingForm({
                       checked={field.value === true}
                       onCheckedChange={(checked) => {
                         const isChecked = checked === true;
-                        setHasUserInteracted(true);
                         field.onChange(isChecked);
                         // If receipt is checked, uncheck invoice
                         if (isChecked) {
@@ -258,7 +296,6 @@ export default function BillingForm({
                       checked={field.value === true}
                       onCheckedChange={(checked) => {
                         const isChecked = checked === true;
-                        setHasUserInteracted(true);
                         field.onChange(isChecked);
                         // If invoice is checked, uncheck receipt
                         if (isChecked) {
@@ -282,104 +319,115 @@ export default function BillingForm({
         {/* Invoice Fields - Only shown when invoice is selected */}
         {isInvoiceSelected && (
           <div className='space-y-4'>
-            {/* AFM and DOY Row */}
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <FormField
-                control={form.control}
-                name='afm'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ΑΦΜ</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='text'
-                        placeholder='Εισάγετε ΑΦΜ (9 ψηφία)'
-                        {...field}
-                        maxLength={9}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='doy'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ΔΟΥ</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='text'
-                        placeholder='Εισάγετε ΔΟΥ'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Name and Profession Row */}
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <FormField
-                control={form.control}
-                name='name'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Επωνυμία</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='text'
-                        placeholder='Εισάγετε επωνυμία'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='profession'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Επάγγελμα</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='text'
-                        placeholder='Εισάγετε επάγγελμα'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Address Row */}
+            {/* AFM field with AADE lookup */}
             <FormField
               control={form.control}
-              name='address'
+              name='afm'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Διεύθυνση Τιμολόγησης</FormLabel>
+                  <FormLabel>ΑΦΜ</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder='Εισάγετε την επαγγελματική διεύθυνση'
-                      className='min-h-[80px]'
-                      rows={3}
+                    <Input
+                      type='text'
+                      placeholder='Εισάγετε ΑΦΜ (9 ψηφία)'
                       {...field}
+                      maxLength={9}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, '');
+                        field.onChange(val);
+                        if (val.length === 9) {
+                          handleAfmLookup(val);
+                        } else {
+                          setAfmLookupSuccess(false);
+                          lastLookedUpAfm.current = '';
+                        }
+                      }}
                     />
                   </FormControl>
+                  {afmLookupLoading && (
+                    <FormDescription className='flex items-center gap-1.5'>
+                      <Loader2 className='h-3 w-3 animate-spin' />
+                      Αναζήτηση στοιχείων...
+                    </FormDescription>
+                  )}
+                  {afmLookupSuccess && !afmLookupLoading && (
+                    <div className='text-[0.8rem] text-muted-foreground'>
+                      <Badge variant='outline' className='text-green-600 border-green-300 bg-green-50'>
+                        Τα στοιχεία συμπληρώθηκαν αυτόματα
+                      </Badge>
+                    </div>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            {/* Auto-populated fields — shown after successful lookup */}
+            {afmLookupSuccess && (
+              <div className='space-y-4'>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <FormField
+                    control={form.control}
+                    name='name'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Επωνυμία</FormLabel>
+                        <FormControl>
+                          <Input type='text' {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='doy'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ΔΟΥ</FormLabel>
+                        <FormControl>
+                          <Input type='text' {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name='profession'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Επάγγελμα</FormLabel>
+                      <FormControl>
+                        <Input type='text' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='address'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Διεύθυνση Τιμολόγησης</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          className='min-h-[80px]'
+                          rows={3}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
           </div>
         )}
 

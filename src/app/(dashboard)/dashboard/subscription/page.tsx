@@ -60,7 +60,7 @@ export default async function SubscriptionPage() {
               Διαχειριστείτε τα στοιχεία τιμολόγησης και πληρωμών
             </p>
           </div>
-          <BillingForm initialUser={user} initialProfile={profile} />
+          <BillingForm initialUser={user} initialProfile={profile} hideCard />
         </div>
       )}
     </div>
