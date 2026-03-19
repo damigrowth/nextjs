@@ -1,4 +1,4 @@
-// Generated on 2026-03-14T11:09:04.688Z
+// Generated on 2026-03-19T17:42:14.237Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const tags = [
@@ -6466,5 +6466,30 @@ export const tags = [
     id: '1330',
     label: 'content creator',
     slug: 'content-creator',
+  },
+  {
+    id: '1331',
+    label: 'Άρση Βαρών',
+    slug: 'arsi-varon',
+  },
+  {
+    id: '1332',
+    label: 'Προπόνηση Δύναμης',
+    slug: 'proponisi-dunamis',
+  },
+  {
+    id: '1333',
+    label: 'Στίβος',
+    slug: 'stivos',
+  },
+  {
+    id: '1334',
+    label: 'Functional Training',
+    slug: 'functional-training',
+  },
+  {
+    id: '1335',
+    label: 'Cross Training',
+    slug: 'cross-training',
   },
 ];

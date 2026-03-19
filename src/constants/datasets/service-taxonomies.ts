@@ -1,4 +1,4 @@
-// Generated on 2026-03-19T17:11:33.240Z
+// Generated on 2026-03-19T17:33:58.434Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -4376,15 +4376,15 @@ export const serviceTaxonomies = [
         description:
           'Αύξησε την online παρουσία σου με στρατηγικές digital marketing που προσελκύουν και αυξάνουν τους πελάτες.',
         image: {
-          public_id: 'digital_marketing_ipiresies_c36961f97a',
+          public_id: 'subcategories/digital-marketing_lffcpk',
           secure_url:
-            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1728402147/digital_marketing_ipiresies_c36961f97a.png',
-          width: 532,
-          height: 300,
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1773940088/subcategories/digital-marketing_lffcpk.webp',
+          width: 1200,
+          height: 675,
           resource_type: 'image',
-          format: 'png',
-          bytes: 39890,
-          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1728402147/digital_marketing_ipiresies_c36961f97a.png',
+          format: 'webp',
+          bytes: 35254,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1773940088/subcategories/digital-marketing_lffcpk.webp',
         },
         children: [
           {
@@ -5252,6 +5252,24 @@ export const serviceTaxonomies = [
             },
           },
         ],
+      },
+      {
+        id: 'q5F8Ns',
+        label: 'Social Media',
+        slug: 'social-media',
+        description:
+          'Ανακάλυψε πώς θα ενισχύσεις την παρουσία σου στα social media με στρατηγικές που αποδίδουν.',
+        image: {
+          public_id: 'subcategories/social-media_w1nght',
+          secure_url:
+            'https://res.cloudinary.com/ddejhvzbf/image/upload/v1773939989/subcategories/social-media_w1nght.webp',
+          width: 1200,
+          height: 675,
+          resource_type: 'image',
+          format: 'webp',
+          bytes: 24938,
+          url: 'http://res.cloudinary.com/ddejhvzbf/image/upload/v1773939989/subcategories/social-media_w1nght.webp',
+        },
       },
     ],
   },
