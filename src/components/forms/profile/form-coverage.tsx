@@ -29,6 +29,9 @@ import { formatInput } from '@/lib/utils/validation/formats';
 import {
   resetCoverageDependencies,
   getAllZipcodes,
+  getCountiesForCoverageForms,
+  isNationwideSelected,
+  NATIONWIDE_ID,
 } from '@/lib/utils/datasets';
 import { populateFormData, parseJSONValue } from '@/lib/utils/form';
 
@@ -135,6 +138,14 @@ export default function CoverageForm({
       );
     });
   }, [watchedCoverage?.counties, locationOptions]);
+
+  // Memoize ordered county options for coverage form
+  const countyOptions = React.useMemo(() => {
+    return getCountiesForCoverageForms(locationOptions).map((county) => ({
+      id: county.id,
+      label: county.name || '',
+    }));
+  }, [locationOptions]);
 
   // Update form values when profile data is available
   useEffect(() => {
@@ -475,16 +486,46 @@ export default function CoverageForm({
                         <LazyCombobox
                           multiple
                           className='bg-white'
-                          options={locationOptions.map((county) => ({
-                            id: county.id,
-                            label: county.name,
-                          }))}
+                          options={isNationwideSelected(field.value || [])
+                            ? countyOptions.filter((c) => c.id === NATIONWIDE_ID)
+                            : countyOptions}
                           values={field.value || []}
                           onMultiSelect={(selectedOptions) => {
                             const selected = selectedOptions.map(
                               (opt) => opt.id,
                             );
-                            // When counties change, filter areas to keep only those from selected counties
+
+                            // Nationwide selection logic
+                            const wasNationwide = isNationwideSelected(field.value || []);
+                            const isNowNationwide = isNationwideSelected(selected);
+
+                            if (isNowNationwide && !wasNationwide) {
+                              // User just selected Πανελλαδικά — set only nationwide, clear areas
+                              setValue('coverage.counties', [NATIONWIDE_ID], {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              });
+                              setValue('coverage.areas', [], {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              });
+                              return;
+                            }
+
+                            if (wasNationwide && !isNowNationwide) {
+                              // User deselected Πανελλαδικά — clear everything
+                              setValue('coverage.counties', [], {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              });
+                              setValue('coverage.areas', [], {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              });
+                              return;
+                            }
+
+                            // Normal county selection — filter areas to keep only those from selected counties
                             const currentCoverage = getValues('coverage');
                             const currentAreas = currentCoverage?.areas || [];
 
@@ -538,7 +579,11 @@ export default function CoverageForm({
                         </FormLabel>
                         <FormControl>
                           <div className='space-y-2'>
-                            {watchedCoverage?.counties?.length > 0 ? (
+                            {isNationwideSelected(watchedCoverage?.counties || []) ? (
+                              <div className='flex items-center text-sm text-muted-foreground h-auto min-h-9 py-2 px-4 rounded-md border'>
+                                Έχετε επιλέξει πανελλαδική κάλυψη
+                              </div>
+                            ) : watchedCoverage?.counties?.length > 0 ? (
                               <LazyCombobox
                                 key={`areas-${watchedCoverage.counties.join('-')}`} // Force remount when counties change
                                 multiple
@@ -567,7 +612,7 @@ export default function CoverageForm({
                                 )}
                               />
                             ) : (
-                              <div className='text-gray-500 bg-gray-50 p-3 rounded-md border'>
+                              <div className='flex items-center text-sm text-muted-foreground h-auto min-h-9 py-2 px-4 rounded-md border'>
                                 Επιλέξτε πρώτα νομούς για να δείτε τις
                                 διαθέσιμες περιοχές
                               </div>

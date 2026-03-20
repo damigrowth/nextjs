@@ -12098,7 +12098,7 @@ export const locationOptions = [
   },
   {
     'id': '54',
-    'name': 'Σε όλη την Ελλάδα',
+    'name': 'Πανελλαδικά',
     'children': [],
     'child_count': 0,
     'slug': 'se-oli-tin-ellada'

@@ -392,9 +392,8 @@ export function LazyCombobox({
               'font-normal', // Always apply font-normal
               !value && !multiple && 'text-muted-foreground',
               values.length === 0 && multiple && 'text-muted-foreground',
-              (renderButtonContent ||
-                (multiple && selectedOptions.length > 0)) &&
-                'h-auto py-2',
+              (renderButtonContent || multiple) &&
+                'h-auto min-h-9 py-2',
               className,
             )}
             disabled={disabled}

@@ -47,6 +47,9 @@ import {
   getAllZipcodes,
   resetCoverageDependencies,
   filterTaxonomyByType,
+  getCountiesForCoverageForms,
+  isNationwideSelected,
+  NATIONWIDE_ID,
 } from '@/lib/utils/datasets';
 
 // Zod schemas
@@ -185,6 +188,14 @@ export default function OnboardingForm({
       name: zipcode.name,
       area: zipcode.area,
       county: zipcode.county,
+    }));
+  }, [locationOptions]);
+
+  // Memoize ordered county options for coverage form
+  const countyOptions = useMemo(() => {
+    return getCountiesForCoverageForms(locationOptions).map((county) => ({
+      id: county.id,
+      label: county.name || '',
     }));
   }, [locationOptions]);
 
@@ -769,14 +780,44 @@ export default function OnboardingForm({
                       <LazyCombobox
                         multiple
                         className='bg-white'
-                        options={locationOptions.map((county) => ({
-                          id: county.id,
-                          label: county.name,
-                        }))}
+                        options={isNationwideSelected(field.value || [])
+                          ? countyOptions.filter((c) => c.id === NATIONWIDE_ID)
+                          : countyOptions}
                         values={field.value || []}
                         onMultiSelect={(selectedOptions) => {
                           const selected = selectedOptions.map((opt) => opt.id);
-                          // When counties change, filter areas to keep only those from selected counties
+
+                          // Nationwide selection logic
+                          const wasNationwide = isNationwideSelected(field.value || []);
+                          const isNowNationwide = isNationwideSelected(selected);
+
+                          if (isNowNationwide && !wasNationwide) {
+                            // User just selected Πανελλαδικά — set only nationwide, clear areas
+                            setValue('coverage.counties', [NATIONWIDE_ID], {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                            setValue('coverage.areas', [], {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                            return;
+                          }
+
+                          if (wasNationwide && !isNowNationwide) {
+                            // User deselected Πανελλαδικά — clear everything
+                            setValue('coverage.counties', [], {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                            setValue('coverage.areas', [], {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                            return;
+                          }
+
+                          // Normal county selection — filter areas to keep only those from selected counties
                           const currentCoverage = getValues('coverage');
                           const currentAreas = currentCoverage?.areas || [];
 
@@ -832,7 +873,11 @@ export default function OnboardingForm({
                       </FormLabel>
                       <FormControl>
                         <div className='space-y-2'>
-                          {currentCoverage?.counties?.length > 0 ? (
+                          {isNationwideSelected(currentCoverage?.counties || []) ? (
+                            <div className='flex items-center text-sm text-muted-foreground h-auto min-h-9 py-2 px-4 rounded-md border'>
+                              Έχετε επιλέξει πανελλαδική κάλυψη
+                            </div>
+                          ) : currentCoverage?.counties?.length > 0 ? (
                             <LazyCombobox
                               key={`areas-${currentCoverage.counties.join('-')}`}
                               multiple
@@ -874,13 +919,9 @@ export default function OnboardingForm({
                               )}
                             />
                           ) : (
-                            <Button
-                              variant='outline'
-                              className='w-full justify-between cursor-not-allowed'
-                              disabled
-                            >
+                            <div className='flex items-center text-sm text-muted-foreground h-auto min-h-9 py-2 px-4 rounded-md border'>
                               Επιλέξτε πρώτα νομούς
-                            </Button>
+                            </div>
                           )}
                         </div>
                       </FormControl>
