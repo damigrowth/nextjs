@@ -1,4 +1,4 @@
-// Generated on 2026-03-20T15:20:51.822Z
+// Generated on 2026-03-20T17:26:44.305Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -4616,25 +4616,6 @@ export const serviceTaxonomies = [
             },
           },
           {
-            id: '6CgzmM',
-            label: 'Διαφημίσεις Social Media',
-            slug: 'diafimiseis-social-media',
-            description:
-              'Αύξησε την απήχηση της επιχείρησής σου με στοχευμένες διαφημίσεις στα social media.',
-            image: {
-              public_id: '276_82d5310e5e',
-              secure_url:
-                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/276_82d5310e5e.webp',
-              width: 1792,
-              height: 1024,
-              resource_type: 'image',
-              format: 'webp',
-              bytes: 111913,
-              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/276_82d5310e5e.webp',
-              original_filename: '276.webp',
-            },
-          },
-          {
             id: 'NEpFgX',
             label: 'Διαφημίσεις TIkTok',
             slug: 'diafimiseis-tiktok',
@@ -4651,25 +4632,6 @@ export const serviceTaxonomies = [
               bytes: 53361,
               url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168514/274_9b4524fce6.webp',
               original_filename: '274.webp',
-            },
-          },
-          {
-            id: 'UInpMs',
-            label: 'Διαχείριση Social Media',
-            slug: 'diaxeirisi-social-media',
-            description:
-              'Ανάπτυξε την παρουσία σου στα social media με στρατηγική διαχείριση και αύξησε την αλληλεπίδραση.',
-            image: {
-              public_id: '275_c2608a26f6',
-              secure_url:
-                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/275_c2608a26f6.webp',
-              width: 1792,
-              height: 1024,
-              resource_type: 'image',
-              format: 'webp',
-              bytes: 103803,
-              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/275_c2608a26f6.webp',
-              original_filename: '275.webp',
             },
           },
           {
@@ -5269,6 +5231,44 @@ export const serviceTaxonomies = [
               bytes: 85074,
               url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/261_92e7f98568.webp',
               original_filename: '261.webp',
+            },
+          },
+          {
+            id: '6CgzmM',
+            label: 'Διαφημίσεις Social Media',
+            slug: 'diafimiseis-social-media',
+            description:
+              'Αύξησε την απήχηση της επιχείρησής σου με στοχευμένες διαφημίσεις στα social media.',
+            image: {
+              public_id: '276_82d5310e5e',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/276_82d5310e5e.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 111913,
+              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/276_82d5310e5e.webp',
+              original_filename: '276.webp',
+            },
+          },
+          {
+            id: 'UInpMs',
+            label: 'Διαχείριση Social Media',
+            slug: 'diaxeirisi-social-media',
+            description:
+              'Ανάπτυξε την παρουσία σου στα social media με στρατηγική διαχείριση και αύξησε την αλληλεπίδραση.',
+            image: {
+              public_id: '275_c2608a26f6',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/275_c2608a26f6.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 103803,
+              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/275_c2608a26f6.webp',
+              original_filename: '275.webp',
             },
           },
         ],
