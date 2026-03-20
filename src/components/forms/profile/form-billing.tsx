@@ -101,9 +101,14 @@ export default function BillingForm({
     reValidateMode: 'onChange',
   });
 
-  // Update form values when initial data is available
+  // Track if form has been initialized to prevent re-renders from resetting user changes
+  const initializedRef = useRef(false);
+
+  // Update form values when initial data is available (once only)
   useEffect(() => {
+    if (initializedRef.current) return;
     if (profile?.billing) {
+      initializedRef.current = true;
       const billingData = parseJSONValue(profile.billing, {
         receipt: false,
         invoice: false,

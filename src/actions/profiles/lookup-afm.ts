@@ -29,8 +29,8 @@ export async function lookupAfm(afm: string): Promise<ActionResult<AfmLookupData
       return { success: false, error: 'Μη έγκυρο ΑΦΜ' };
     }
 
-    const username = process.env.AADE_USERNAME;
-    const password = process.env.AADE_PASSWORD;
+    const username = process.env.AADE_USERNAME?.trim();
+    const password = process.env.AADE_PASSWORD?.trim();
 
     if (!username || !password) {
       return { success: false, error: 'Σφάλμα διαμόρφωσης AADE' };
