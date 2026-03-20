@@ -258,7 +258,7 @@ export async function getHomeMetadata() {
     url: '/',
   });
 
-  return { meta };
+  return meta;
 }
 
 /**
