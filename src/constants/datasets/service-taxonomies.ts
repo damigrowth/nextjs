@@ -1,4 +1,4 @@
-// Generated on 2026-03-05T15:53:27.247Z
+// Generated on 2026-03-20T12:50:17.015Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -4344,6 +4344,25 @@ export const serviceTaxonomies = [
               original_filename: '262.webp',
             },
           },
+          {
+            id: 'gAn97n',
+            label: 'Influencer Marketing',
+            slug: 'influencer-marketing',
+            description:
+              'Ανακάλυψε πώς να προωθήσεις το brand σου μέσω επιδραστικών προσωπικοτήτων στα social media.',
+            image: {
+              public_id: '265_994bfdc477',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168511/265_994bfdc477.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 41697,
+              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168511/265_994bfdc477.webp',
+              original_filename: '265.webp',
+            },
+          },
         ],
       },
       {
@@ -4401,25 +4420,6 @@ export const serviceTaxonomies = [
               bytes: 53545,
               url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168513/277_f1a8078bb6.webp',
               original_filename: '277.webp',
-            },
-          },
-          {
-            id: 'gAn97n',
-            label: 'Influencer Marketing',
-            slug: 'influencer-marketing',
-            description:
-              'Ανακάλυψε πώς να προωθήσεις το brand σου μέσω επιδραστικών προσωπικοτήτων στα social media.',
-            image: {
-              public_id: '265_994bfdc477',
-              secure_url:
-                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168511/265_994bfdc477.webp',
-              width: 1792,
-              height: 1024,
-              resource_type: 'image',
-              format: 'webp',
-              bytes: 41697,
-              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168511/265_994bfdc477.webp',
-              original_filename: '265.webp',
             },
           },
           {
