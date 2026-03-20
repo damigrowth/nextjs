@@ -1,4 +1,4 @@
-// Generated on 2026-03-20T13:15:45.046Z
+// Generated on 2026-03-20T15:20:51.822Z
 import type { DatasetItem } from '@/lib/types/datasets';
 
 export const serviceTaxonomies = [
@@ -4502,25 +4502,6 @@ export const serviceTaxonomies = [
             },
           },
           {
-            id: '0syncL',
-            label: 'Δημιουργία Αναρτήσεων Social Media',
-            slug: 'dimiourgia-anartiseon-social-media',
-            description:
-              'Δημιούργησε εντυπωσιακές αναρτήσεις για τα social media σου και ενίσχυσε την ψηφιακή σου παρουσία.',
-            image: {
-              public_id: '261_92e7f98568',
-              secure_url:
-                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/261_92e7f98568.webp',
-              width: 1792,
-              height: 1024,
-              resource_type: 'image',
-              format: 'webp',
-              bytes: 85074,
-              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/261_92e7f98568.webp',
-              original_filename: '261.webp',
-            },
-          },
-          {
             id: '_7VzHZ',
             label: 'Δημιουργία Ψηφιακής Καμπάνιας',
             slug: 'dimiourgia-psifiakis-kabanias',
@@ -5269,6 +5250,25 @@ export const serviceTaxonomies = [
               bytes: 41697,
               url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168511/265_994bfdc477.webp',
               original_filename: '265.webp',
+            },
+          },
+          {
+            id: '0syncL',
+            label: 'Δημιουργία Αναρτήσεων Social Media',
+            slug: 'dimiourgia-anartiseon-social-media',
+            description:
+              'Δημιούργησε εντυπωσιακές αναρτήσεις για τα social media σου και ενίσχυσε την ψηφιακή σου παρουσία.',
+            image: {
+              public_id: '261_92e7f98568',
+              secure_url:
+                'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/261_92e7f98568.webp',
+              width: 1792,
+              height: 1024,
+              resource_type: 'image',
+              format: 'webp',
+              bytes: 85074,
+              url: 'https://res.cloudinary.com/ddejhvzbf/image/upload/v1750168522/261_92e7f98568.webp',
+              original_filename: '261.webp',
             },
           },
         ],
