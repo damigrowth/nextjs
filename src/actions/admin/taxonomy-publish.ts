@@ -33,6 +33,20 @@ import { prisma } from '@/lib/prisma/client';
 import { revalidateAllCaches } from './revalidate-caches';
 
 /**
+ * Map granular TaxonomyType to the underlying file type.
+ * Multiple TaxonomyType values share the same file:
+ *   service-categories, service-subcategories, service-subdivisions → 'service'
+ *   pro-categories, pro-subcategories → 'pro'
+ *   tags → 'tags'
+ *   skills → 'skills'
+ */
+function getFileType(type: TaxonomyType): string {
+  if (type.startsWith('service-')) return 'service';
+  if (type.startsWith('pro-')) return 'pro';
+  return type; // 'tags' | 'skills' are 1:1
+}
+
+/**
  * Collect all existing IDs from taxonomy tree (for collision detection)
  */
 function collectAllIds(items: DatasetItem[]): Set<string> {
@@ -448,16 +462,18 @@ export async function publishAllChanges(
       'operations'
     );
 
-    // Group drafts by taxonomy type
-    const grouped = new Map<TaxonomyType, TaxonomyDraft[]>();
+    // Group drafts by underlying FILE TYPE (not TaxonomyType)
+    // This prevents multiple types that share a file from clobbering each other
+    const groupedByFile = new Map<string, TaxonomyDraft[]>();
 
     for (const draft of optimizedDrafts) {
-      const existing = grouped.get(draft.taxonomyType) || [];
+      const fileType = getFileType(draft.taxonomyType);
+      const existing = groupedByFile.get(fileType) || [];
       existing.push(draft);
-      grouped.set(draft.taxonomyType, existing);
+      groupedByFile.set(fileType, existing);
     }
 
-    console.log('[PUBLISH] Grouped into', grouped.size, 'taxonomy types');
+    console.log('[PUBLISH] Grouped into', groupedByFile.size, 'file types');
 
     // Collect all changes for batch commit
     const allChanges: Array<{
@@ -466,28 +482,45 @@ export async function publishAllChanges(
       individualMessage: string;
     }> = [];
 
-    // Process each taxonomy type and prepare changes
-    for (const [type, typeDrafts] of grouped) {
-      console.log(`[PUBLISH] Processing ${type}: ${typeDrafts.length} changes`);
+    // Process each FILE TYPE: read once, apply ALL drafts, write once
+    for (const [fileType, fileDrafts] of groupedByFile) {
+      // Use any TaxonomyType from this group to read the file
+      // (they all map to the same file)
+      const representativeType = fileDrafts[0].taxonomyType;
 
-      // Read current data from Git
-      const dataResult = await getTaxonomyData(type);
-
-      if (!isSuccess(dataResult)) {
-        throw new Error(`Failed to read ${type}: ${dataResult.error.message}`);
+      // Collect per-TaxonomyType draft lists for commit message
+      const byType = new Map<TaxonomyType, TaxonomyDraft[]>();
+      for (const draft of fileDrafts) {
+        const list = byType.get(draft.taxonomyType) || [];
+        list.push(draft);
+        byType.set(draft.taxonomyType, list);
       }
 
-      // Apply all drafts for this type
-      const updatedData = applyDraftsToData(dataResult.data, typeDrafts);
+      const typeNames = [...byType.keys()].join(', ');
+      console.log(`[PUBLISH] Processing file "${fileType}" (${typeNames}): ${fileDrafts.length} total changes`);
 
-      // Create individual commit message for this type
-      const message = createCommitMessage(type, typeDrafts);
+      // Read current data from Git ONCE for this file
+      const dataResult = await getTaxonomyData(representativeType);
 
-      // Add to batch
+      if (!isSuccess(dataResult)) {
+        throw new Error(`Failed to read ${representativeType}: ${dataResult.error.message}`);
+      }
+
+      // Apply ALL drafts for this file sequentially
+      const updatedData = applyDraftsToData(dataResult.data, fileDrafts);
+
+      // Build commit message listing all affected TaxonomyTypes
+      const messageParts: string[] = [];
+      for (const [type, typeDrafts] of byType) {
+        messageParts.push(createCommitMessage(type, typeDrafts));
+      }
+      const combinedMessage = messageParts.join('\n');
+
+      // Add ONE entry per file (using representative type for file path resolution)
       allChanges.push({
-        type,
+        type: representativeType,
         data: updatedData,
-        individualMessage: message,
+        individualMessage: combinedMessage,
       });
     }
 
