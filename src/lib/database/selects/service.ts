@@ -146,6 +146,7 @@ export const HOME_SERVICE_SELECT = {
       displayName: true,
       image: true,
       portfolio: true,
+      coverage: true,
     },
   },
 } as const;

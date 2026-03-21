@@ -278,6 +278,8 @@ export type ServiceCardData = Pick<
     'id' | 'uid' | 'username' | 'displayName' | 'image'
   > & {
     portfolio?: PrismaJson.Portfolio | null;
+    coverage?: PrismaJson.Coverage | null;
+    groupedCoverage?: Array<{ county: string; areas: string[] }>;
   };
 };
 

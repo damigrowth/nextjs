@@ -21,6 +21,7 @@ export const SAVED_SERVICE_INCLUDE = {
           username: true,
           displayName: true,
           image: true,
+          coverage: true,
         },
       },
     },

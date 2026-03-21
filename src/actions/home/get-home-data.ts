@@ -47,6 +47,12 @@ function transformServiceForComponent(
     service.subdivision,
   );
 
+  // Transform coverage for location display
+  const rawCoverage = service.profile.coverage;
+  const transformedCoverage = rawCoverage
+    ? transformCoverageWithLocationNames(rawCoverage as any, locationOptions)
+    : null;
+
   return {
     id: service.id,
     title: service.title,
@@ -64,6 +70,8 @@ function transformServiceForComponent(
       displayName: service.profile.displayName,
       username: service.profile.username,
       image: service.profile.image,
+      coverage: transformedCoverage,
+      groupedCoverage: transformedCoverage?.countyAreasMap || [],
     },
   };
 }

@@ -94,6 +94,11 @@ export async function getSavedItems(params?: {
       // OPTIMIZATION: O(1) hash map lookup instead of O(n) findById
       const categoryTaxonomy = findServiceById(service.category);
 
+      const rawCoverage = service.profile.coverage;
+      const transformedCoverage = rawCoverage
+        ? transformCoverageWithLocationNames(rawCoverage as any, locationOptions)
+        : null;
+
       return {
         id: service.id,
         title: service.title,
@@ -110,6 +115,8 @@ export async function getSavedItems(params?: {
           displayName: service.profile.displayName,
           username: service.profile.username,
           image: service.profile.image,
+          coverage: transformedCoverage,
+          groupedCoverage: transformedCoverage?.countyAreasMap || [],
         },
       };
     });

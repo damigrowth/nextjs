@@ -8,6 +8,7 @@ import { ServiceCardData } from '@/lib/types';
 import NextLink from './next-link';
 import RatingDisplay from './rating-display';
 import { MediaTypeIndicators } from './media-type-indicators';
+import { CoverageDisplay } from '@/components/archives/coverage-display';
 import { getOptimizedImageUrl } from '@/lib/utils/cloudinary';
 
 interface ServiceCardProps {
@@ -82,18 +83,18 @@ export default function ServiceCard({
       {/* Content Section */}
       <NextLink href={`/s/${service.slug}`} className='block flex-1'>
         <CardContent className='p-4 flex flex-col h-full'>
+          {/* Title */}
+          <h3 className='font-semibold text-dark leading-tight text-base hover:text-third transition-colors mb-2'>
+            <span className='line-clamp-2'>{service.title}</span>
+          </h3>
+
           {/* Category */}
-          <div className='mb-3'>
+          <div className='mb-2'>
             <TaxonomiesDisplay
               taxonomyLabels={badgeTaxonomyLabels}
               variant='badge'
             />
           </div>
-
-          {/* Title */}
-          <h3 className='font-semibold text-dark leading-tight text-base hover:text-third transition-colors mb-6'>
-            <span className='line-clamp-2'>{service.title}</span>
-          </h3>
 
           {/* Rating + Media Icons - pushed to bottom */}
           <div className='mt-auto flex items-center gap-2'>
@@ -107,6 +108,20 @@ export default function ServiceCard({
         </CardContent>
       </NextLink>
 
+      {/* Coverage Display - Outside link to allow popover interaction */}
+      <div className='px-4 pb-3'>
+        <CoverageDisplay
+          online={service.profile.coverage?.online}
+          onbase={service.profile.coverage?.onbase}
+          onsite={service.profile.coverage?.onsite}
+          area={service.profile.coverage?.area}
+          county={service.profile.coverage?.county}
+          groupedCoverage={service.profile.groupedCoverage || []}
+          variant='compact'
+          className='text-sm'
+        />
+      </div>
+
       {/* Footer section - Outside main link */}
       {showProfile && (
         <CardContent className='p-4 pt-0'>
@@ -117,9 +132,9 @@ export default function ServiceCard({
                 {!hideDisplayName && (
                   <NextLink
                     href={`/profile/${service.profile.username}`}
-                    className='group/profile'
+                    className='group/profile min-w-0 block truncate'
                   >
-                    <span className='text-sm text-body group-hover/profile:text-third transition-colors truncate'>
+                    <span className='text-sm text-body group-hover/profile:text-third transition-colors'>
                       {service.profile.displayName}
                     </span>
                   </NextLink>

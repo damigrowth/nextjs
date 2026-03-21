@@ -311,6 +311,7 @@ async function _getServicePageData(
             displayName: true,
             image: true,
             portfolio: true,
+            coverage: true,
           },
         },
       },
@@ -344,6 +345,11 @@ async function _getServicePageData(
           relatedService.subdivision,
         );
 
+        const rawCoverage = relatedService.profile.coverage;
+        const transformedCoverage = rawCoverage
+          ? transformCoverageWithLocationNames(rawCoverage as any, getLocations())
+          : null;
+
         return {
           id: relatedService.id,
           title: relatedService.title,
@@ -362,6 +368,8 @@ async function _getServicePageData(
             username: relatedService.profile.username,
             image: relatedService.profile.image,
             portfolio: relatedService.profile.portfolio,
+            coverage: transformedCoverage,
+            groupedCoverage: transformedCoverage?.countyAreasMap || [],
           },
         };
       },
@@ -391,6 +399,7 @@ async function _getServicePageData(
               displayName: true,
               image: true,
               portfolio: true,
+              coverage: true,
             },
           },
         },
@@ -406,6 +415,11 @@ async function _getServicePageData(
           s.subcategory,
           s.subdivision,
         );
+        const rawCov = s.profile.coverage;
+        const transformedCov = rawCov
+          ? transformCoverageWithLocationNames(rawCov as any, getLocations())
+          : null;
+
         return {
           id: s.id,
           title: s.title,
@@ -424,6 +438,8 @@ async function _getServicePageData(
             username: s.profile.username,
             image: s.profile.image,
             portfolio: s.profile.portfolio,
+            coverage: transformedCov,
+            groupedCoverage: transformedCov?.countyAreasMap || [],
           },
         };
       });
