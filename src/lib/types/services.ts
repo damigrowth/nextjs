@@ -22,6 +22,7 @@ export type ServiceWithProfile = Prisma.ServiceGetPayload<{
         verified: true;
         image: true;
         portfolio: true;
+        coverage: true;
       };
     };
   };
