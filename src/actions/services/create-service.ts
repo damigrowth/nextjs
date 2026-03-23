@@ -19,6 +19,7 @@ interface ServiceActionResponse extends ActionResponse {
 }
 import { requireAuth } from '@/actions/auth/server';
 import { getProfileByUserId } from '@/actions/profiles/get-profile';
+import { canCreateService } from '@/lib/subscription/feature-gate';
 import { Prisma } from '@prisma/client';
 import {
   createServiceSchema,
@@ -97,7 +98,16 @@ async function createServiceInternal(
 
     const profile = profileResult.data;
 
-    // 4. Rate limiting check for draft saves
+    // 4. Check service limit based on subscription plan
+    const canCreate = await canCreateService(profile.id);
+    if (!canCreate) {
+      return {
+        success: false,
+        message: 'Έχετε φτάσει το μέγιστο όριο υπηρεσιών για το πλάνο σας.',
+      };
+    }
+
+    // 5. Rate limiting check for draft saves
     if (status === 'draft') {
       const now = new Date();
       const cooldownPeriod = 30 * 1000; // 30 seconds in milliseconds

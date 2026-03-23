@@ -85,6 +85,7 @@ export interface UserServicesResponse {
   limit: number;
   totalPages: number;
   canFeatureMore: boolean;
+  canCreateMore: boolean;
 }
 
 // Service status types

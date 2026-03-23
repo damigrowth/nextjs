@@ -19,6 +19,8 @@ import {
 
 import { getCurrentUser, isProfessional } from '@/actions/auth/server';
 import { getUserServiceStats } from '@/actions/services/get-user-services';
+import { canCreateService } from '@/lib/subscription/feature-gate';
+import CreateServiceButton from './services/create-service-button';
 import { getUserTotalReviewCount } from '@/actions/reviews/get-user-reviews';
 import { getChats } from '@/actions/messages/chats';
 import { NextLink } from '@/components';
@@ -84,10 +86,11 @@ export default async function DashboardContent() {
   }
 
   // Fetch all dashboard data in parallel
-  const [statsResult, reviewCountResult, recentChats] = await Promise.all([
+  const [statsResult, reviewCountResult, recentChats, canCreateMore] = await Promise.all([
     getUserServiceStats(),
     getUserTotalReviewCount(),
     userId ? getChats(userId).catch(() => []) : Promise.resolve([]),
+    profile?.id ? canCreateService(profile.id) : Promise.resolve(true),
   ]);
 
   const totalServices = statsResult.success ? statsResult.data.published : 0;
@@ -159,13 +162,14 @@ export default async function DashboardContent() {
                 <ArrowRight className='ml-auto h-4 w-4' />
               </NextLink>
             </Button>
-            <Button variant='outline' className='w-full justify-start' asChild>
-              <NextLink href='/dashboard/services/create'>
-                <Plus className='mr-2 h-4 w-4' />
-                Προσθήκη Υπηρεσίας
-                <ArrowRight className='ml-auto h-4 w-4' />
-              </NextLink>
-            </Button>
+            <CreateServiceButton
+              canCreateMore={canCreateMore}
+              className='w-full justify-start'
+            >
+              <Plus className='mr-2 h-4 w-4' />
+              Προσθήκη Υπηρεσίας
+              <ArrowRight className='ml-auto h-4 w-4' />
+            </CreateServiceButton>
             <Button variant='outline' className='w-full justify-start' asChild>
               <NextLink href='/dashboard/services'>
                 <BarChart3 className='mr-2 h-4 w-4' />

@@ -36,8 +36,9 @@ export default function SubscriptionSheet() {
     close();
   };
 
-  // Don't render sheet at all if access is denied
-  if (!isLoading && !allowed) {
+  // Don't render sheet if access is denied, UNLESS it was triggered by a
+  // feature limit (triggerReason) — limit dialogs should always show
+  if (!isLoading && !allowed && !triggerReason) {
     return null;
   }
 

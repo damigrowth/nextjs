@@ -18,6 +18,7 @@ import { sanitizeRichText } from '@/lib/utils/text/sanitize';
 import { generateServiceSlug } from '@/lib/utils/text';
 import { sendServiceCreatedEmail } from '@/lib/email/services';
 import { brevoWorkflowService } from '@/lib/email';
+import { canCreateService } from '@/lib/subscription/feature-gate';
 
 // =============================================
 // SHARED UTILITIES
@@ -239,6 +240,17 @@ export async function updateServiceInfo(
 
     // Track if service was draft before update (for transition logic)
     const wasDraft = existingService.status === 'draft';
+
+    // Check service limit before draft→pending transition
+    if (wasDraft) {
+      const canCreate = await canCreateService(profile.id);
+      if (!canCreate) {
+        return {
+          success: false,
+          error: 'Έχετε φτάσει το μέγιστο όριο υπηρεσιών για το πλάνο σας.',
+        };
+      }
+    }
 
     // Check if user can refresh service (car.gr logic)
     // If user has refresh credits, updating will also boost service to top
