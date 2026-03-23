@@ -41,16 +41,16 @@ export const keepOnlyNumbers = (str: string): string => {
   return str.toString().replace(/[^\d]/g, '');
 };
 
-// Changed function to allow English letters, numbers, hyphens, and underscores
+// Allow English letters, numbers, hyphens, and underscores; auto-lowercase
 export const formatUsername = (str: string): string => {
-  return str.replace(/[^a-zA-Z0-9_-]/g, '');
+  return str.replace(/[^a-zA-Z0-9_-]/g, '').toLowerCase();
 };
 
 // Generate a username from the local part of an email (before @)
-// e.g. "john.doe@gmail.com" → "johndoe", "jane_smith-work@co.uk" → "jane_smith-work"
+// e.g. "john.doe@gmail.com" → "johndoe", "Jane_Smith-work@co.uk" → "jane_smith-work"
 export const generateUsernameFromEmail = (email: string): string => {
   const localPart = email.split('@')[0] || email;
-  return localPart.replace(/[^a-zA-Z0-9_-]/g, '');
+  return localPart.replace(/[^a-zA-Z0-9_-]/g, '').toLowerCase();
 };
 
 export const formatDisplayName = (str: string): string => {

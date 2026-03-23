@@ -18,7 +18,7 @@ export const phoneSchema = z
 export const urlSchema = z.string().url('Invalid URL format');
 export const passwordSchema = z
   .string()
-  .min(8, 'Password must be at least 8 characters');
+  .min(6, 'Password must be at least 6 characters');
 
 // Pagination schema
 export const paginationSchema = z.object({
