@@ -9,7 +9,6 @@ import DynamicBreadcrumb from '@/components/shared/dynamic-breadcrumb';
 import {
   ProfileBio,
   ProfileFeatures,
-  ProfileIndustries,
   ProfileInfo,
   ProfileMeta,
   ProfileMetrics,
@@ -103,7 +102,6 @@ export default async function ProfilePage({
     settlementMethodsData,
     budgetData,
     sizeData,
-    industriesData,
     coverage,
     visibility,
     socials,
@@ -210,9 +208,6 @@ export default async function ProfilePage({
                 </div>
               </div>
 
-              <ProfileIndustries
-                industries={industriesData.map((industry) => industry.label)}
-              />
               <ProfilePortfolio portfolio={profile.portfolio} />
 
               {/* Profile Services */}

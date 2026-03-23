@@ -45,7 +45,6 @@ export async function updateProfileAdditionalInfo(
       paymentMethods: { type: 'json', required: false, defaultValue: [] },
       settlementMethods: { type: 'json', required: false, defaultValue: [] },
       budget: { type: 'string', required: false, defaultValue: '' },
-      industries: { type: 'json', required: false, defaultValue: [] },
       terms: { type: 'string', required: false, defaultValue: '' },
     });
 
@@ -108,7 +107,6 @@ export async function updateProfileAdditionalInfo(
         paymentMethods: data.paymentMethods || [],
         settlementMethods: data.settlementMethods || [],
         budget: data.budget || null,
-        industries: data.industries || [],
         terms: data.terms || null,
         updatedAt: new Date(),
       },

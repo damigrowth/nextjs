@@ -17,7 +17,7 @@ import {
 } from '@/lib/taxonomies';
 // Complex utilities - KEEP for coverage transformation, defaults, and non-taxonomy datasets
 import {
-  findById, // Generic utility for options, industries (not yet optimized)
+  findById, // Generic utility for options (not yet optimized)
   resolveTaxonomyHierarchy,
   transformCoverageWithLocationNames,
   getDefaultCoverage,

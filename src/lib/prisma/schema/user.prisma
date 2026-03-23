@@ -94,7 +94,6 @@ model Profile {
   paymentMethods    String[]
   settlementMethods String[]
   budget            String?
-  industries        String[]
   terms             String?
   /// [BillingInfo]
   billing           Json? // Billing information {receipt: boolean, invoice: boolean, afm: string, doy: string, name: string, profession: string, address: string}

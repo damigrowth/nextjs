@@ -215,12 +215,10 @@ export interface ProfileFeaturesProps {
   settlementMethods?: string[];
   size?: string;
   budget?: string;
-  industries?: string[];
   // Resolved data from taxonomies
   contactMethodsData?: DatasetItem[];
   paymentMethodsData?: DatasetItem[];
   settlementMethodsData?: DatasetItem[];
-  industriesData?: DatasetItem[];
 }
 
 export interface TaxonomyTab {

@@ -14,7 +14,6 @@ import {
   budgetOptions,
   sizeOptions,
 } from '@/constants/datasets/options';
-import { industriesOptions } from '@/constants/datasets/industries';
 import { locationOptions } from '@/constants/datasets/locations';
 // O(1) optimized taxonomy lookups - 99% faster than findById
 import {
@@ -27,7 +26,7 @@ import {
 } from '@/lib/taxonomies';
 // Complex utilities - KEEP for coverage transformation, defaults, and non-taxonomy datasets
 import {
-  findById, // Generic utility for options, industries, tags (not yet optimized)
+  findById, // Generic utility for options, tags (not yet optimized)
   transformCoverageWithLocationNames,
   getDefaultCoverage,
   resolveTaxonomyHierarchy,
@@ -163,7 +162,6 @@ export interface ProfilePageData {
   settlementMethodsData: (DatasetItem | null)[];
   budgetData?: DatasetItem | null;
   sizeData?: DatasetItem | null;
-  industriesData: (DatasetItem | null)[];
   coverage: ReturnType<typeof transformCoverageWithLocationNames>;
   visibility: PrismaJson.VisibilitySettings;
   socials: PrismaJson.SocialMedia;
@@ -286,10 +284,6 @@ async function _getProfilePageData(
 
     const sizeData = profile.size ? findById(sizeOptions, profile.size) : null;
 
-    const industriesData = profile.industries
-      .map((industryId) => findById(industriesOptions, industryId))
-      .filter((industry) => industry !== null);
-
     // Transform coverage data by resolving all location IDs to names
     const rawCoverage = profile.coverage || getDefaultCoverage();
     const coverage = transformCoverageWithLocationNames(
@@ -390,7 +384,6 @@ async function _getProfilePageData(
         settlementMethodsData,
         budgetData: budgetData || undefined,
         sizeData: sizeData || undefined,
-        industriesData,
         coverage,
         services: transformedServices,
         servicesCount: services.length,

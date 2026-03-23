@@ -7,7 +7,6 @@ export { default as ProfileMetaSkeleton } from './profile-meta-skeleton';
 export { default as ProfileMetricsSkeleton } from './profile-metrics-skeleton';
 export { default as ProfileBioSkeleton } from './profile-bio-skeleton';
 export { default as ProfileFeaturesSkeleton } from './profile-features-skeleton';
-export { default as ProfileIndustriesSkeleton } from './profile-industries-skeleton';
 export { default as ProfilePortfolioSkeleton } from './profile-portfolio-skeleton';
 export { default as ProfileServicesSkeleton } from './profile-services-skeleton';
 export { default as ProfileTermsSkeleton } from './profile-terms-skeleton';

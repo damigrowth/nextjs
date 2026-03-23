@@ -38,8 +38,6 @@ import {
   settlementMethodsOptions,
   budgetOptions,
 } from '@/constants/datasets/options';
-import { industriesOptions as industriesDataset } from '@/constants/datasets/industries';
-
 // Validation schema and server actions
 import {
   profileAdditionalInfoUpdateSchema,
@@ -92,7 +90,6 @@ export default function AdditionalInfoForm({
       paymentMethods: [],
       settlementMethods: [],
       budget: '',
-      industries: [],
       terms: '',
     },
     mode: 'onChange', // Real-time validation
@@ -116,7 +113,6 @@ export default function AdditionalInfoForm({
         paymentMethods: profile.paymentMethods || [],
         settlementMethods: profile.settlementMethods || [],
         budget: profile.budget || '',
-        industries: profile.industries || [],
         terms: profile.terms || '',
       };
       form.reset(resetData);
@@ -149,7 +145,6 @@ export default function AdditionalInfoForm({
         'contactMethods',
         'paymentMethods',
         'settlementMethods',
-        'industries',
       ], // Arrays that need JSON.stringify
       skipEmpty: true, // Skip null/undefined/empty values
     });
@@ -337,34 +332,7 @@ export default function AdditionalInfoForm({
           />
         </div>
 
-        {/* Row 3: Industries (full width) */}
-        <FormField
-          control={form.control}
-          name='industries'
-          render={({ field }) => (
-            <FormItem className='space-y-2 flex flex-col'>
-              <FormLabel>Κλάδοι Δραστηριότητας</FormLabel>
-              <FormControl>
-                <LazyCombobox
-                  multiple
-                  options={industriesDataset}
-                  values={field.value || []}
-                  onMultiSelect={(selectedOptions) => {
-                    const selectedIds = selectedOptions.map((opt) => opt.id);
-                    field.onChange(selectedIds);
-                  }}
-                  onSelect={() => {}} // Required but not used in multi mode
-                  placeholder='Επιλέξτε κλάδους...'
-                  searchPlaceholder='Αναζήτηση κλάδων...'
-                  maxItems={10}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Row 4: Terms (full width) */}
+        {/* Row 3: Terms (full width) */}
         <FormField
           control={form.control}
           name='terms'
