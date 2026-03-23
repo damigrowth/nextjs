@@ -44,19 +44,22 @@ export function SavedStateProvider({ children }: { children: ReactNode }) {
   const fetchGuard = useRef(false);
   const pathnameRef = useRef(pathname);
 
-  // Reset on route change
+  // Reset on route change — clear stale data but keep fetchRequested
+  // so the fetch effect re-triggers via the pathname dependency
   useEffect(() => {
     if (pathname !== pathnameRef.current) {
       pathnameRef.current = pathname;
       fetchGuard.current = false;
       setHasFetched(false);
-      setFetchRequested(false);
       setSavedServiceIds(new Set());
       setSavedProfileIds(new Set());
     }
   }, [pathname]);
 
   // Fetch when requested + user is logged in
+  // pathname in deps ensures re-fetch after client-side navigation
+  // (without it, React batching causes fetchRequested to stay true
+  // across route changes, so the effect never re-runs)
   useEffect(() => {
     if (!fetchRequested || fetchGuard.current || !session?.user?.id) return;
     fetchGuard.current = true;
@@ -76,7 +79,7 @@ export function SavedStateProvider({ children }: { children: ReactNode }) {
         console.error('Failed to fetch saved state:', error);
         fetchGuard.current = false;
       });
-  }, [fetchRequested, session?.user?.id]);
+  }, [fetchRequested, session?.user?.id, pathname]);
 
   const requestFetch = useCallback(() => {
     setFetchRequested(true);
