@@ -1,12 +1,13 @@
 'use client';
 
 import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, type ButtonProps } from '@/components/ui/button';
 import { NextLink } from '@/components';
 import { useSubscriptionSheetStore } from '@/lib/stores/use-subscription-sheet-store';
 
 interface CreateServiceButtonProps {
   canCreateMore: boolean;
+  variant?: ButtonProps['variant'];
   className?: string;
   children?: React.ReactNode;
 }
@@ -19,6 +20,7 @@ interface CreateServiceButtonProps {
  */
 export default function CreateServiceButton({
   canCreateMore,
+  variant,
   className = '',
   children,
 }: CreateServiceButtonProps) {
@@ -27,6 +29,7 @@ export default function CreateServiceButton({
   if (!canCreateMore) {
     return (
       <Button
+        variant={variant}
         className={className}
         onClick={() =>
           open(
@@ -45,7 +48,7 @@ export default function CreateServiceButton({
   }
 
   return (
-    <Button asChild className={className}>
+    <Button asChild variant={variant} className={className}>
       <NextLink href='/dashboard/services/create'>
         {children || (
           <>

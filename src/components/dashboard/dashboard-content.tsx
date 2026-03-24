@@ -164,6 +164,7 @@ export default async function DashboardContent() {
             </Button>
             <CreateServiceButton
               canCreateMore={canCreateMore}
+              variant='outline'
               className='w-full justify-start'
             >
               <Plus className='mr-2 h-4 w-4' />
