@@ -1,47 +1,45 @@
 import React from 'react';
+import { MapPin } from 'lucide-react';
 import type { ProfileMetricsProps } from '@/lib/types/components';
 import IconBox from '@/components/shared/icon-box';
 import { FlaticonCategory } from '@/components/icon';
 import { Badge } from '../ui/badge';
 import ProfileSubdivisionsWrapper from './profile-subdivisions-wrapper';
+import CoverageDisplay from '../shared/coverage-display';
+import {
+  getCoverageGroupedByCounty,
+  hasOnsiteCoverage,
+} from '@/lib/utils/datasets';
 
 /**
  * Modern ProfileMetrics Component
- * Displays key metrics about the profile (category, service subdivisions)
+ * Displays key metrics about the profile (services subdivisions, service areas)
  */
 
 export default function ProfileMetrics({
-  category,
-  subcategory,
   serviceSubdivisions,
+  coverage,
 }: ProfileMetricsProps) {
+  const groupedCoverage = coverage ? getCoverageGroupedByCounty(coverage) : [];
+  const hasServiceAreas =
+    coverage && hasOnsiteCoverage(coverage) && groupedCoverage.length > 0;
+
   const hasAnyMetric =
-    category ||
-    subcategory ||
-    (serviceSubdivisions && serviceSubdivisions.length > 0);
+    (serviceSubdivisions && serviceSubdivisions.length > 0) || hasServiceAreas;
 
   if (!hasAnyMetric) {
     return null;
   }
 
   return (
-    <section className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6'>
-      {/* Subcategory with category below */}
-      {(category || subcategory) && (
-        <div>
-          <IconBox
-            icon={<FlaticonCategory size={40} className='h-10 w-10' />}
-            title={subcategory?.label}
-            value={category?.label}
-          />
-        </div>
-      )}
-
-      {/* Service Subdivisions with category-specific icon */}
+    <section className='space-y-6'>
+      {/* Service Subdivisions */}
       {serviceSubdivisions && serviceSubdivisions.length > 0 && (
         <ProfileSubdivisionsWrapper>
           <IconBox
-            showIcon={false}
+            icon={<FlaticonCategory size={16} className='h-4 w-4' />}
+            iconSize='sm'
+            iconVariant='muted'
             title='Υπηρεσίες'
             titleClassName='mb-3'
             value={
@@ -61,6 +59,18 @@ export default function ProfileMetrics({
             }
           />
         </ProfileSubdivisionsWrapper>
+      )}
+
+      {/* Service Areas (Περιοχές Εξυπηρέτησης) */}
+      {hasServiceAreas && (
+        <IconBox
+          icon={<MapPin className='h-4 w-4' />}
+          iconSize='sm'
+          iconVariant='muted'
+          title='Περιοχές Εξυπηρέτησης'
+          titleClassName='mb-1'
+          value={<CoverageDisplay groupedCoverage={groupedCoverage} />}
+        />
       )}
     </section>
   );

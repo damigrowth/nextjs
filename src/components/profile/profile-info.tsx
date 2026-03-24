@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  MapPin,
   Headphones,
   Calendar,
   Globe2,
@@ -43,11 +42,8 @@ export default function ProfileInfo({
   if (coverage?.onbase) covers.push('Στην έδρα');
   if (coverage?.onsite) covers.push('Στον χώρο σας');
 
-  // Get location name from coverage data
   // Get years of experience (prefer stored value, fallback to calculated)
   const yearsOfExperience = getYearsOfExperience(commencement, experience);
-
-  const locationName = coverage?.county || coverage?.area;
 
   return (
     <Card className='rounded-lg bg-muted border border-border shadow-sm'>
@@ -64,21 +60,6 @@ export default function ProfileInfo({
 
       <CardContent className='space-y-0'>
         <div className=''>
-          {/* Location */}
-          {locationName && (
-            <div className='flex items-center justify-between py-6 border-b border-border'>
-              <div className='flex items-center gap-2'>
-                <MapPin className='h-4 w-4 text-primary' />
-                <span className='text-sm font-medium text-foreground'>
-                  Περιοχή
-                </span>
-              </div>
-              <span className='text-sm text-muted-foreground'>
-                {locationName}
-              </span>
-            </div>
-          )}
-
           {/* Service Coverage */}
           {covers.length > 0 && (
             <div className='flex items-center justify-between py-5 border-b border-border'>

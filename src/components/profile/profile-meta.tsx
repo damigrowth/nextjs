@@ -1,20 +1,17 @@
 import React from 'react';
 
-import { Home, MapPin } from 'lucide-react';
+import { Home } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import type { ProfileMetaProps } from '@/lib/types/components';
 
 import {
   getCoverageAddressWithLocation,
-  getCoverageGroupedByCounty,
   hasOnbaseCoverage,
-  hasOnsiteCoverage,
 } from '@/lib/utils/datasets';
 import RatingDisplay from '@/components/shared/rating-display';
 import UserAvatar from '@/components/shared/user-avatar';
 import { VerifiedBadge } from '../shared/profile-badges';
 import SocialLinks from '../shared/social-links';
-import CoverageDisplay from '../shared/coverage-display';
 
 
 
@@ -36,13 +33,11 @@ export default function ProfileMeta({
   coverage,
   visibility,
   socials,
+  subcategory,
 }: ProfileMetaProps) {
-  // Get grouped coverage data for display
-  const groupedCoverage = coverage ? getCoverageGroupedByCounty(coverage) : [];
-
   return (
     <section>
-      <Card className='relative overflow-hidden bg-muted border border-border rounded-xl shadow-lg mb-8'>
+      <Card className='relative overflow-hidden bg-white border border-border rounded-xl shadow-lg mb-8'>
         {/* Main content */}
         <div className='relative z-10 p-8'>
           <div className='flex flex-col sm:flex-row items-start sm:items-center gap-6'>
@@ -76,6 +71,13 @@ export default function ProfileMeta({
                 </h2>
               )}
 
+              {/* Subcategory */}
+              {subcategory?.label && (
+                <p className='text-sm font-medium text-muted-foreground mb-2'>
+                  {subcategory.label}
+                </p>
+              )}
+
               {/* Rating */}
               {reviewCount > 0 && (
                 <div className='mb-4'>
@@ -100,17 +102,6 @@ export default function ProfileMeta({
                     </div>
                   )}
 
-                {/* Service Areas - onsite coverage */}
-                {coverage &&
-                  hasOnsiteCoverage(coverage) &&
-                  groupedCoverage.length > 0 && (
-                    <div className='flex items-center gap-2 text-muted-foreground'>
-                      <MapPin className='h-4 w-4 flex-shrink-0 text-primary' />
-                      <span>
-                        <CoverageDisplay groupedCoverage={groupedCoverage} />
-                      </span>
-                    </div>
-                  )}
               </div>
 
               {/* Social links */}

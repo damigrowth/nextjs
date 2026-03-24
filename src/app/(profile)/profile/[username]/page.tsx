@@ -159,13 +159,13 @@ export default async function ProfilePage({
                 coverage={coverage}
                 visibility={visibility}
                 socials={socials}
+                subcategory={subcategory}
               />
 
               {/* Profile Metrics */}
               <ProfileMetrics
-                category={category}
-                subcategory={subcategory}
                 serviceSubdivisions={result.data.serviceSubdivisionsData}
+                coverage={coverage}
               />
               <ProfileBio bio={profile.bio} />
               <ProfileFeatures

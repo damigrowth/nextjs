@@ -180,6 +180,7 @@ export interface ProfileMetaProps {
   coverage?: PrismaJson.Coverage;
   visibility?: PrismaJson.VisibilitySettings;
   socials?: PrismaJson.SocialMedia;
+  subcategory?: DatasetItem;
 }
 
 export interface MetricCardProps {
@@ -194,6 +195,7 @@ export interface ProfileMetricsProps {
   category?: DatasetItem;
   subcategory?: DatasetItem;
   serviceSubdivisions?: DatasetItem[];
+  coverage?: PrismaJson.Coverage;
 }
 
 export interface ProfileRatingProps {
