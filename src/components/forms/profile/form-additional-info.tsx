@@ -22,7 +22,7 @@ import { toast } from 'sonner';
 // Custom components
 import { LazyCombobox } from '@/components/ui/lazy-combobox';
 import { Currency } from '@/components/ui/currency';
-import YearPicker from '@/components/ui/year-picker';
+import YearSelect from '@/components/ui/year-select';
 
 // Icons (lucide-react only)
 import { Loader2 } from 'lucide-react';
@@ -267,7 +267,7 @@ export default function AdditionalInfoForm({
               <FormItem className='space-y-2 flex flex-col'>
                 <FormLabel>Έναρξη Δραστηριότητας</FormLabel>
                 <FormControl>
-                  <YearPicker
+                  <YearSelect
                     value={field.value}
                     onValueChange={field.onChange}
                     placeholder='π.χ. 2020'
