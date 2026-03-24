@@ -349,7 +349,7 @@ export const presentationSchema = z.object({
       address: z.boolean(),
     })
     .default({
-      email: true,
+      email: false,
       phone: true,
       address: true,
     }),
