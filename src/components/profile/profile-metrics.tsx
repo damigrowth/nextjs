@@ -32,7 +32,7 @@ export default function ProfileMetrics({
   }
 
   return (
-    <section className='space-y-6'>
+    <section className='grid grid-cols-1 md:grid-cols-2 gap-6'>
       {/* Service Subdivisions */}
       {serviceSubdivisions && serviceSubdivisions.length > 0 && (
         <ProfileSubdivisionsWrapper>
@@ -68,7 +68,7 @@ export default function ProfileMetrics({
           iconSize='sm'
           iconVariant='muted'
           title='Περιοχές Εξυπηρέτησης'
-          titleClassName='mb-1'
+          titleClassName='mb-3'
           value={<CoverageDisplay groupedCoverage={groupedCoverage} />}
         />
       )}
