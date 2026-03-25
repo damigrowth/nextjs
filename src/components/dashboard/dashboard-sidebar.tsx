@@ -266,13 +266,6 @@ export default function DashboardSidebar({
                             </NextLink>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton asChild isActive={pathname === '/dashboard/profile/billing'}>
-                            <NextLink href='/dashboard/profile/billing'>
-                              <span>Στοιχεία Τιμολόγησης</span>
-                            </NextLink>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
                       </SidebarMenuSub>
                     </CollapsibleContent>
                   </>

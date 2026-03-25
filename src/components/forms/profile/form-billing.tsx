@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 // Shadcn UI components
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
   FormControl,
@@ -370,35 +369,33 @@ export default function BillingForm({
             {/* Auto-populated fields — shown after successful lookup */}
             {afmLookupSuccess && (
               <div className='space-y-4'>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  <FormField
-                    control={form.control}
-                    name='name'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Επωνυμία</FormLabel>
-                        <FormControl>
-                          <Input type='text' {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <FormField
+                  control={form.control}
+                  name='name'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Επωνυμία</FormLabel>
+                      <FormControl>
+                        <Input type='text' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <FormField
-                    control={form.control}
-                    name='doy'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>ΔΟΥ</FormLabel>
-                        <FormControl>
-                          <Input type='text' {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name='doy'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>ΔΟΥ</FormLabel>
+                      <FormControl>
+                        <Input type='text' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
@@ -421,11 +418,7 @@ export default function BillingForm({
                     <FormItem>
                       <FormLabel>Διεύθυνση Τιμολόγησης</FormLabel>
                       <FormControl>
-                        <Textarea
-                          className='min-h-[80px]'
-                          rows={3}
-                          {...field}
-                        />
+                        <Input type='text' {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
